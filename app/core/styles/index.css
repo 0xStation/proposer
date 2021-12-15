@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
+
+@font-face {
+  font-family: "VT323";
+  font-style: normal;
+  font-weight: 400;
+}

@@ -2,7 +2,7 @@
 
 This is a [Blitz.js](https://github.com/blitz-js/blitz) app.
 
-# **test-blitz**
+# **station-web**
 
 ## Getting Started
 
@@ -64,7 +64,7 @@ You can read more about it on the [CLI Overview](https://blitzjs.com/docs/cli-ov
 Here is the starting structure of your app.
 
 ```
-test-blitz
+station-web
 ├── app/
 │   ├── api/
 │   ├── auth/

@@ -1,0 +1,31 @@
+// tailwind.config.js
+module.exports = {
+  content: ["{pages,app}/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    colors: {
+      "tunnel-black": "#000000",
+      "neon-blue": "#5F6FFF",
+      "neon-carrot": "#FF9956",
+      "magic-mint": "#63EBAF",
+      "eletric-violet": "#AD72FF",
+      concrete: "#646464",
+      "torch-red": "#FF5650",
+      "marble-white": "#F2EFEF",
+    },
+    fontFamily: {
+      vt323: ["VT323", "Monospace"],
+      sans: ["Graphik", "sans-serif"],
+      serif: ["Merriweather", "serif"],
+    },
+    extend: {
+      spacing: {
+        128: "32rem",
+        144: "36rem",
+      },
+      borderRadius: {
+        "4xl": "2rem",
+      },
+    },
+  },
+  plugins: [],
+}
