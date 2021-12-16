@@ -1,19 +1,19 @@
 // need wallet address to mint nft
 // nft number will call the respective smart contract
 export const users = {
-  rie: {
-    fname: "rie",
-    handle: "123243534234234",
-    role: "visitor",
+  "0x65A3870F48B5237f27f674Ec42eA1E017E111D63": {
+    fname: "michael",
+    handle: "frog",
+    role: "contributor",
     address: "",
-    pronouns: "she/her",
-    skills: ["frontend"],
+    pronouns: "he/him",
+    skills: ["frontend, backend, nft"],
     terminals: ["station"],
     initiatives: ["web"],
-    nftId: 10,
+    nftId: 1,
   },
-  mindapi: {
-    fname: "mindapi",
+  "0xd32FA3e71737a19eE4CA44334b9f3c52665a6CDB": {
+    fname: "mind",
     handle: "mindapi",
     role: "staff",
     address: "",
@@ -23,8 +23,8 @@ export const users = {
     initiatives: ["brand", "web"],
     nftId: 2,
   },
-  fakepixels: {
-    fname: "fakepixels",
+  "0x78918036a8e4B9179bEE3CAB57110A3397986E44": {
+    fname: "tina",
     handle: "fakepixels",
     role: "staff",
     address: "",
@@ -32,7 +32,62 @@ export const users = {
     skills: ["entrepreneurship", "investing", "design"],
     terminals: ["station", "juicebox", "seedclub"],
     initiatives: ["newstand", "terminal partnership"],
-    nftId: 1,
+    nftId: 3,
+  },
+  "0x17B7163E708A06De4DdA746266277470dd42C53f": {
+    fname: "brendan",
+    handle: "brendo",
+    role: "commuter",
+    address: "",
+    pronouns: "he/him",
+    skills: ["design"],
+    terminals: ["station"],
+    initiatives: ["protocol"],
+    nftId: 4,
+  },
+  "0x6Cf61c97674C65c68D1E816eCCf36061aCD9a65c": {
+    fname: "darian",
+    handle: "WGMIApe",
+    role: "contributor",
+    address: "",
+    pronouns: "he/him",
+    skills: ["subgraph"],
+    terminals: ["station"],
+    initiatives: ["protocol"],
+    nftId: 5,
+  },
+  "0xB0F0bA31aA582726E36Dc0c79708E9e072455eD2": {
+    fname: "calvin",
+    handle: "cchengasaurus",
+    role: "staff",
+    address: "",
+    pronouns: "he/him",
+    skills: ["tokenomics"],
+    terminals: ["station"],
+    initiatives: ["protocol"],
+    nftId: 6,
+  },
+  "0xaE55f61f85935BBB68b8809d5c02142e4CbA9a13": {
+    fname: "kristen",
+    handle: "rie",
+    role: "visitor",
+    address: "",
+    pronouns: "she/her",
+    skills: ["frontend"],
+    terminals: ["station"],
+    initiatives: ["web"],
+    nftId: 7,
+  },
+  "0x016562aA41A8697720ce0943F003141f5dEAe006": {
+    fname: "conner",
+    handle: "symmtry",
+    role: "staff",
+    address: "",
+    pronouns: "he/him",
+    skills: ["architect", "mathematician"],
+    terminals: ["station"],
+    initiatives: ["protocol"],
+    nftId: 0,
   },
 }
 
@@ -40,9 +95,9 @@ export const terminals = {
   station: {
     terminalName: "Station",
     handle: "station",
-    staff: ["mindapi", "fakepixels"],
-    commuter: ["rie"],
-    visitor: [],
+    staff: ["mindapi", "fakepixels", "cswenberg"],
+    commuter: ["brendo"],
+    visitor: ["rie"],
     initiatives: ["protocol", "brand", "web", "terminal partnership"],
   },
   poolsuite: {
@@ -51,7 +106,7 @@ export const terminals = {
     staff: [],
     commuter: [],
     visitor: ["mindapi"],
-    initiatives: ["protocol", "brand", "web", "terminal partnership"],
+    initiatives: [],
   },
   juicebox: {
     terminalName: "Juicebox",
@@ -59,7 +114,7 @@ export const terminals = {
     staff: [],
     commuter: ["fakepixels"],
     visitor: [],
-    initiatives: ["protocol", "brand", "web", "terminal partnership"],
+    initiatives: [],
   },
   seedclub: {
     terminalName: "Seedclub",
@@ -67,6 +122,6 @@ export const terminals = {
     staff: ["fakepixels"],
     commuter: [],
     visitor: ["fakepixels"],
-    initiatives: ["protocol", "brand", "web", "terminal partnership"],
+    initiatives: [],
   },
 }
