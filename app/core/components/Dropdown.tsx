@@ -4,6 +4,7 @@ import { Fragment } from "react"
 interface DropdownProps {
   button: string | JSX.Element
   items: Link[]
+  className: string
 }
 interface Link {
   name: string
@@ -13,10 +14,13 @@ interface Link {
 /**
  * Run of the mill dropdown.
  */
-const Dropdown = ({ button, items }: DropdownProps) => {
+const Dropdown = ({ button, items, className }: DropdownProps) => {
   return (
-    <Menu as="div" className="relative">
-      <Menu.Button className="block">{button}</Menu.Button>
+    <Menu as="div" className={`relative ${className}`}>
+      {/* trust me I hate this too but I have to do it for next.js to work.
+       it does some annoying image optimization stuff that end up resizing the container.
+       see here: https://github.com/vercel/next.js/issues/18915 */}
+      <Menu.Button className="block h-[28px]">{button}</Menu.Button>
       <Transition
         as={Fragment}
         enter="transition ease-out duration-100"
