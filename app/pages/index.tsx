@@ -62,7 +62,7 @@ const Home: BlitzPage = () => {
   }
 
   const ConnectView = connectedUser ? (
-    <div style={{ top: "40%", left: "30%" }} className="absolute text-center">
+    <div className="max-w-screen-xl mx-auto mt-20 text-center">
       <p className="text-2xl pr-6">{`You're connected 🎉: ${account}`}</p>
       <p className="text-2xl pr-6">{`Welcome ${connectedUser?.handle} !`}</p>
       <form onSubmit={handleSubmit}>
