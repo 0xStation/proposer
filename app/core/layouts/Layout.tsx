@@ -1,4 +1,5 @@
 import { Head, BlitzLayout } from "blitz"
+import Ticker from "../components/Ticker"
 
 const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
   return (
@@ -7,6 +8,7 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
         <title>{title || "station-web"}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <Ticker />
       {children}
     </>
   )
