@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Image } from "blitz"
 import Dropdown from "../components/Dropdown"
 import logo from "../../../public/station_logo.svg"
-import SoundIcon from "../icons/soundIcon"
+import SoundIcon from "../icons/SoundIcon"
 
 interface NavigationProps {
   user?: {
