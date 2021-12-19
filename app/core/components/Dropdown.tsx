@@ -36,7 +36,9 @@ const Dropdown = ({ button, items, side, className }: DropdownProps) => {
             leaveTo="transform opacity-0 scale-95"
           >
             <Menu.Items
-              className={`uppercase text-marble-white text-lg absolute ${side}-[-5px] mt-[9px] origin-top-right bg-tunnel-black border border-[#646464] focus:outline-none whitespace-nowrap z-10`}
+              className={`${
+                side === "left" ? `left-[-5px]` : `right-[-5px]`
+              } uppercase text-marble-white text-lg absolute mt-[9px] origin-top-right bg-tunnel-black border border-[#646464] focus:outline-none whitespace-nowrap z-10`}
             >
               {items.map((item) => (
                 <Menu.Item key={item.name}>

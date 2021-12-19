@@ -21,6 +21,10 @@ const Home: BlitzPage = () => {
     transactionName: "Send Ethereum",
   })
 
+  const onError = (error: Error) => {
+    console.log(error.message)
+  }
+
   useEffect(() => {
     console.log("endorse state post transaction call ", endorseState)
   }, [endorseState])
@@ -62,61 +66,85 @@ const Home: BlitzPage = () => {
   }
 
   const ConnectView = connectedUser ? (
-    <div style={{ top: "40%", left: "30%" }} className="absolute text-center">
-      <p className="text-2xl pr-6">{`You're connected 🎉: ${account}`}</p>
-      <p className="text-2xl pr-6">{`Welcome ${connectedUser?.handle} !`}</p>
-      <form onSubmit={handleSubmit}>
-        <label className="text-2xl pr-6">Who would you like to endorse?</label>
-        <select
-          className="inline border-2 border-gray-200 rounded mr-1"
-          onChange={(e) => setWalletToEndorse(e.target.value)}
-        >
-          <option key="" value="">
-            --Please choose a user to endorse--
-          </option>
-          {usersToEndorse.map((walletAddress) => (
-            <option key={users[walletAddress].handle} value={walletAddress}>
-              {users[walletAddress].handle}
+    <div className="flex items-center justify-center h-full">
+      <div className="max-w-screen-lg p-4 border border-marble-white text-center bg-tunnel-black text-marble-white">
+        <p className="text-2xl pr-6">{`You're connected 🎉: ${account}`}</p>
+        <p className="text-2xl pr-6">{`Welcome ${connectedUser?.handle} !`}</p>
+        <form onSubmit={handleSubmit}>
+          <label className="text-2xl pr-6">Who would you like to endorse?</label>
+          <select
+            className="inline border-2 border-gray-200 rounded mr-1"
+            onChange={(e) => setWalletToEndorse(e.target.value)}
+          >
+            <option key="" value="">
+              --Please choose a user to endorse--
             </option>
-          ))}
-        </select>
-        <label className="text-2xl pr-6">How much would you like to endorse?</label>
-        <input
-          type="number"
-          id="endorsement"
-          name="endorsement"
-          min="0"
-          max="100"
-          step=".001"
-          className="border-2"
-          onChange={(e) => {
-            setEndorsementAmount(parseFloat(e.target.value))
-            setAllowanceIncreased(false)
-          }}
-          required
-        />
-        <button type="button" className="border-solid border-2" onClick={handleIncreaseAllowance}>
-          Allow
-        </button>
-        <button type="submit" className="border-solid border-2">
-          Submit
-        </button>
-      </form>
+            {usersToEndorse.map((walletAddress) => (
+              <option key={users[walletAddress].handle} value={walletAddress}>
+                {users[walletAddress].handle}
+              </option>
+            ))}
+          </select>
+          <label className="text-2xl pr-6">How much would you like to endorse?</label>
+          <input
+            type="number"
+            id="endorsement"
+            name="endorsement"
+            min="0"
+            max="100"
+            step=".001"
+            className="border-2"
+            onChange={(e) => {
+              setEndorsementAmount(parseFloat(e.target.value))
+              setAllowanceIncreased(false)
+            }}
+            required
+          />
+          <button type="button" className="border-solid border-2" onClick={handleIncreaseAllowance}>
+            Allow
+          </button>
+          <button type="submit" className="border-solid border-2">
+            Submit
+          </button>
+        </form>
+      </div>
     </div>
   ) : (
-    <button
-      style={{ top: "40%", left: "40%" }}
-      className="px-48 py-12 text-center bg-magic-mint no-underline border-2 absolute"
-      onClick={() => activateBrowserWallet()}
-    >
-      Connect Wallet
-    </button>
+    <div className="flex items-center h-full ml-40">
+      <div className="bg-tunnel-black border border-marble-white p-4 w-128">
+        <h3 className="text-marble-white text-3xl">Welcome to Station</h3>
+        <p className="text-marble-white text-sm mt-4">
+          This is where contributors come together and discover and participate in some of the most
+          exciting communities in Web3.
+        </p>
+        <p className="text-marble-white text-sm mt-4">Join the ride.</p>
+        <button
+          className="mt-4 w-full py-2 text-center text-sm bg-magic-mint rounded"
+          onClick={() => activateBrowserWallet(onError)}
+        >
+          Enter Station
+        </button>
+      </div>
+    </div>
   )
 
-  return <main className="w-screen h-screen">{ConnectView}</main>
+  return (
+    <Layout title="Home" user={connectedUser}>
+      <main
+        className="w-full h-[calc(100vh-6rem)] bg-cover bg-no-repeat"
+        style={{ backgroundImage: "url('/station-cover.png')" }}
+      >
+        {ConnectView}
+      </main>
+    </Layout>
+  )
 }
 
 Home.suppressFirstRenderFlicker = true
-Home.getLayout = (page) => <Layout title="Home">{page}</Layout>
+// I wasn't able to figure out how to pass props (like connected user) when using this .getLayout method.
+// I think it helps to reduce redudant component loads, which is nice, and maybe worth figuring out in the future.
+// https://adamwathan.me/2019/10/17/persistent-layout-patterns-in-nextjs/
+
+// Home.getLayout = (page) => <Layout title="Home">{page}</Layout>
 
 export default Home

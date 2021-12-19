@@ -2,11 +2,11 @@ import { useState } from "react"
 import { Image } from "blitz"
 import Dropdown from "../components/Dropdown"
 import logo from "../../../public/station-logo.svg"
-import SoundIcon from "../icons/SoundIcon"
+import Sound from "../icons/SoundIcon"
 
 interface NavigationProps {
   user?: {
-    address: string
+    handle: string
   }
 }
 /**
@@ -34,7 +34,7 @@ const Navigation = ({ user }: NavigationProps) => {
           Map
         </span>
         <span className="p-4 border-l border-l-concrete block">
-          <SoundIcon
+          <Sound
             isOn={isSoundOn}
             clickHandler={() => {
               setIsSoundOn(!isSoundOn)
@@ -48,7 +48,7 @@ const Navigation = ({ user }: NavigationProps) => {
             button={
               <div className="flex items-center">
                 <span className="w-7 h-7 rounded-full bg-concrete border border-marble-white mr-2"></span>
-                <span>{user.address}</span>
+                <span>{user.handle}</span>
               </div>
             }
             items={[
