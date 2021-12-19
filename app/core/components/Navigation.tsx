@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Image } from "blitz"
 import Dropdown from "../components/Dropdown"
 import logo from "../../../public/station_logo.svg"
-import SoundIcon from "../icons/SoundIcon"
+import Sound from "../icons/Sound"
 
 interface NavigationProps {
   user?: {
@@ -34,7 +34,7 @@ const Navigation = ({ user }: NavigationProps) => {
           Map
         </span>
         <span className="p-4 border-l border-l-concrete block">
-          <SoundIcon
+          <Sound
             isOn={isSoundOn}
             clickHandler={() => {
               setIsSoundOn(!isSoundOn)

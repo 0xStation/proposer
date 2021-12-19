@@ -1,4 +1,4 @@
-const SoundIcon = ({ isOn, clickHandler }: { isOn: boolean; clickHandler: () => void }) => {
+const Sound = ({ isOn, clickHandler }: { isOn: boolean; clickHandler: () => void }) => {
   return (
     <svg
       width="31"
@@ -29,4 +29,4 @@ const SoundIcon = ({ isOn, clickHandler }: { isOn: boolean; clickHandler: () => 
   )
 }
 
-export default SoundIcon
+export default Sound
