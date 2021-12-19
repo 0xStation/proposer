@@ -2,7 +2,7 @@ import { Head, BlitzLayout } from "blitz"
 import Ticker from "../components/Ticker"
 import Navigation from "../components/Navigation"
 
-const Layout: BlitzLayout<{ title?: string; user: { handle: string } }> = ({
+const Layout: BlitzLayout<{ title?: string; user?: { handle: string } }> = ({
   title,
   user,
   children,
