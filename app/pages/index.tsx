@@ -73,7 +73,7 @@ const Home: BlitzPage = () => {
         <form onSubmit={handleSubmit}>
           <label className="text-2xl pr-6">Who would you like to endorse?</label>
           <select
-            className="inline border-2 border-gray-200 rounded mr-1"
+            className="inline text-tunnel-black border-2 border-gray-200 rounded mr-1"
             onChange={(e) => setWalletToEndorse(e.target.value)}
           >
             <option key="" value="">
@@ -93,7 +93,7 @@ const Home: BlitzPage = () => {
             min="0"
             max="100"
             step=".001"
-            className="border-2"
+            className="border-2 text-tunnel-black"
             onChange={(e) => {
               setEndorsementAmount(parseFloat(e.target.value))
               setAllowanceIncreased(false)

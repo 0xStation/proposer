@@ -3,8 +3,8 @@
 export const users = {
   "0x65A3870F48B5237f27f674Ec42eA1E017E111D63": {
     fname: "michael",
-    handle: "frog",
-    role: "contributor",
+    handle: "0xmcg",
+    role: "commuter",
     address: "",
     pronouns: "he/him",
     skills: ["frontend, backend, nft"],
@@ -48,7 +48,7 @@ export const users = {
   "0x6Cf61c97674C65c68D1E816eCCf36061aCD9a65c": {
     fname: "darian",
     handle: "WGMIApe",
-    role: "contributor",
+    role: "commuter",
     address: "",
     pronouns: "he/him",
     skills: ["subgraph"],
@@ -59,7 +59,7 @@ export const users = {
   "0xB0F0bA31aA582726E36Dc0c79708E9e072455eD2": {
     fname: "calvin",
     handle: "cchengasaurus",
-    role: "staff",
+    role: "commuter",
     address: "",
     pronouns: "he/him",
     skills: ["tokenomics"],
@@ -70,7 +70,7 @@ export const users = {
   "0xaE55f61f85935BBB68b8809d5c02142e4CbA9a13": {
     fname: "kristen",
     handle: "rie",
-    role: "visitor",
+    role: "commuter",
     address: "",
     pronouns: "she/her",
     skills: ["frontend"],
@@ -81,13 +81,35 @@ export const users = {
   "0x016562aA41A8697720ce0943F003141f5dEAe006": {
     fname: "conner",
     handle: "symmtry",
-    role: "staff",
+    role: "commuter",
     address: "",
     pronouns: "he/him",
     skills: ["architect", "mathematician"],
     terminals: ["station"],
     initiatives: ["protocol"],
     nftId: 0,
+  },
+  "0x5716e900249D6c35afA41343a2394C32C1B4E6cB": {
+    fname: "kash",
+    handle: "honeykashmoney",
+    role: "commuter",
+    address: "",
+    pronouns: "he/him",
+    skills: ["chakra", "blitz", "tailwind"],
+    terminals: ["station"],
+    initiatives: ["protocol"],
+    nftId: 8,
+  },
+  "0x8FAA5498Ca6fc9A61BA967E07fBc9420aab99E55": {
+    fname: "akshay",
+    handle: "wagmiking",
+    role: "commuter",
+    address: "",
+    pronouns: "he/him",
+    skills: ["subgraphs"],
+    terminals: ["station"],
+    initiatives: ["protocol"],
+    nftId: 9,
   },
 }
 
