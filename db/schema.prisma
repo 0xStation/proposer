@@ -10,14 +10,62 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// --------------------------------------
+enum Role {
+  VISITOR
+  COMMUTOR
+  STAFF
+}
 
-// NO MODELS YET...
-// don't really need their defaults mucking up our migration history.
+// A user profile
+model Contributor {
+  id          Int           @id @default(autoincrement())
+  name        String
+  handle      String
+  address     String
+  pronouns    String
+  role        Role          @default(VISITOR)
+  skills      Skill[]
+  terminals   Terminal[]
+  initiatives Initiative[]
+  application Application[]
+}
 
-// NOTE: It's highly recommended to use an enum for the token type
-//       but enums only work in Postgres.
-//       See: https://blitzjs.com/docs/database-overview#switch-to-postgresql
-// enum TokenType {
-//   RESET_PASSWORD
-// }
+// Each DAO is represented by a termial.
+model Terminal {
+  id           Int           @id @default(autoincrement())
+  name         String
+  description  String
+  initiatives  Initiative[]
+  contributors Contributor[]
+}
+
+// An initiaitve within a terminal
+model Initiative {
+  id           Int           @id @default(autoincrement())
+  name         String
+  description  String
+  terminal     Terminal      @relation(fields: [terminalId], references: [id])
+  terminalId   Int
+  contributors Contributor[]
+  applications Application[]
+}
+
+// An application into a certain initiative
+model Application {
+  id            Int         @id @default(autoincrement())
+  url           String
+  contributor   Contributor @relation(fields: [contributorId], references: [id])
+  contributorId Int
+  initiative    Initiative  @relation(fields: [initiativeId], references: [id])
+  initiativeId  Int
+}
+
+// A user can have many skills
+// I wanted this in its own table (as opposed to a field of contributor)
+// so its easier to do things like show new user existing skills
+// or even "grouping" skills in the future by type (design, eng etc)
+model Skill {
+  id           Int           @id @default(autoincrement())
+  name         String
+  contributors Contributor[]
+}
