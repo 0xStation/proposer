@@ -16,48 +16,51 @@ enum Role {
   STAFF
 }
 
-// A user profile
-model Contributor {
-  id          Int           @id @default(autoincrement())
+// The account of user of Station
+// user's wallet address is primary key
+model Account {
+  address     String                  @id
   name        String
   handle      String
-  address     String
   pronouns    String
-  role        Role          @default(VISITOR)
+  role        Role                    @default(VISITOR)
   skills      Skill[]
-  terminals   Terminal[]
-  initiatives Initiative[]
-  application Application[]
+  application InitiativeApplication[]
 }
 
 // Each DAO is represented by a termial.
+// roleNameOverrides overrides default role names
 model Terminal {
-  id           Int           @id @default(autoincrement())
-  name         String
-  description  String
-  initiatives  Initiative[]
-  contributors Contributor[]
+  id                Int          @id @default(autoincrement())
+  subgraphId        String
+  name              String
+  handle            String
+  description       String
+  ticketContract    String
+  roleNameOverrides Json?
+  initiatives       Initiative[]
 }
 
 // An initiaitve within a terminal
 model Initiative {
-  id           Int           @id @default(autoincrement())
+  id           Int                     @id @default(autoincrement())
   name         String
+  shortName    String
   description  String
-  terminal     Terminal      @relation(fields: [terminalId], references: [id])
+  terminal     Terminal                @relation(fields: [terminalId], references: [id])
   terminalId   Int
-  contributors Contributor[]
-  applications Application[]
+  applications InitiativeApplication[]
 }
 
 // An application into a certain initiative
-model Application {
-  id            Int         @id @default(autoincrement())
-  url           String
-  contributor   Contributor @relation(fields: [contributorId], references: [id])
-  contributorId Int
-  initiative    Initiative  @relation(fields: [initiativeId], references: [id])
-  initiativeId  Int
+model InitiativeApplication {
+  id               Int        @id @default(autoincrement())
+  url              String
+  approved         Boolean
+  applicant        Account    @relation(fields: [applicantAddress], references: [address])
+  applicantAddress String
+  initiative       Initiative @relation(fields: [initiativeId], references: [id])
+  initiativeId     Int
 }
 
 // A user can have many skills
@@ -65,7 +68,7 @@ model Application {
 // so its easier to do things like show new user existing skills
 // or even "grouping" skills in the future by type (design, eng etc)
 model Skill {
-  id           Int           @id @default(autoincrement())
-  name         String
-  contributors Contributor[]
+  id       Int       @id @default(autoincrement())
+  name     String
+  accounts Account[]
 }
