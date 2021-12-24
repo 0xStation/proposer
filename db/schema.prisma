@@ -12,7 +12,7 @@ generator client {
 
 enum Role {
   VISITOR
-  COMMUTOR
+  COMMUTER
   STAFF
 }
 
@@ -28,7 +28,7 @@ model Account {
   application InitiativeApplication[]
 }
 
-// Each DAO is represented by a termial.
+// Each DAO is represented by a terminal.
 // roleNameOverrides overrides default role names
 model Terminal {
   id                Int          @id @default(autoincrement())
@@ -41,7 +41,7 @@ model Terminal {
   initiatives       Initiative[]
 }
 
-// An initiaitve within a terminal
+// An initiative within a terminal
 model Initiative {
   id           Int                     @id @default(autoincrement())
   name         String
