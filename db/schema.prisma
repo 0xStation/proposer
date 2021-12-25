@@ -10,22 +10,19 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum Role {
-  VISITOR
-  COMMUTER
-  STAFF
-}
-
 // The account of user of Station
 // user's wallet address is primary key
 model Account {
-  address     String                  @id
-  name        String
-  handle      String
-  pronouns    String
-  role        Role                    @default(VISITOR)
-  skills      Skill[]
-  application InitiativeApplication[]
+  id           Int                      @id @default(autoincrement())
+  address      String
+  name         String
+  handle       String
+  pronouns     String
+  bio          String
+  skills       Skill[]
+  application  InitiativeApplication[]
+  endorsements ApplicationEndorsement[]
+  tickets      Ticket[]
 }
 
 // Each DAO is represented by a terminal.
@@ -39,6 +36,17 @@ model Terminal {
   ticketContract    String
   roleNameOverrides Json?
   initiatives       Initiative[]
+  tickets           Ticket[]
+}
+
+model Ticket {
+  account    Account  @relation(fields: [accountId], references: [id])
+  accountId  Int
+  terminal   Terminal @relation(fields: [terminalId], references: [id])
+  terminalId Int
+  signiture  String
+
+  @@id([accountId, terminalId])
 }
 
 // An initiative within a terminal
@@ -54,13 +62,24 @@ model Initiative {
 
 // An application into a certain initiative
 model InitiativeApplication {
-  id               Int        @id @default(autoincrement())
-  url              String
-  approved         Boolean
-  applicant        Account    @relation(fields: [applicantAddress], references: [address])
-  applicantAddress String
-  initiative       Initiative @relation(fields: [initiativeId], references: [id])
-  initiativeId     Int
+  id           Int                      @id @default(autoincrement())
+  url          String
+  approved     Boolean
+  applicant    Account                  @relation(fields: [applicantId], references: [id])
+  applicantId  Int
+  initiative   Initiative               @relation(fields: [initiativeId], references: [id])
+  initiativeId Int
+  endorsements ApplicationEndorsement[]
+}
+
+model ApplicationEndorsement {
+  id                      Int                   @id @default(autoincrement())
+  signature               String
+  value                   Int
+  InitiativeApplication   InitiativeApplication @relation(fields: [initiativeApplicationId], references: [id])
+  initiativeApplicationId Int
+  endorser                Account               @relation(fields: [accountId], references: [id])
+  accountId               Int
 }
 
 // A user can have many skills
