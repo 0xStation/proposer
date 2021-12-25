@@ -4,7 +4,11 @@ import TerminalNavigation from "app/terminal/components/Navigation"
 import InitiativeCard from "app/terminal/components/InitiativeCard"
 
 const TerminalWaitingPage: BlitzPage = () => {
-  return <TerminalNavigation />
+  return (
+    <TerminalNavigation>
+      <span className="text-marble-white">COMING SOON</span>
+    </TerminalNavigation>
+  )
 }
 
 TerminalWaitingPage.suppressFirstRenderFlicker = true
