@@ -13,7 +13,6 @@ const TerminalInitiativePage: BlitzPage = () => {
     { suspense: false }
   )
 
-  console.log(initiatives)
   return (
     <TerminalNavigation>
       {!initiatives ? (
