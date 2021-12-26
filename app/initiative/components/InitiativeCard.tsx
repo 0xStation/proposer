@@ -1,5 +1,5 @@
 import { useState } from "react"
-import ApplicationModal from "../components/ApplicationModal"
+import ApplicationModal from "./ApplicationModal"
 
 const InitiativeCard = ({ title, description, contributors }) => {
   let [isOpen, setIsOpen] = useState(false)

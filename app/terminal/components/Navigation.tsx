@@ -1,11 +1,20 @@
 import { useParam } from "blitz"
-import { Link, Routes, useRouter } from "blitz"
+import { Link, Routes, useRouter, useQuery } from "blitz"
+import getTerminalById from "app/terminal/queries/getTerminalById"
 
 const Navigation = ({ children }: { children?: any }) => {
-  // can use this to eventually fetch the terminal data
-  // and replace the placeholders below
-  const terminalName = useParam("terminalName", "string") || ""
+  // need a better way of catching undefined here than defaulting to 1
+  // it will never happen, but TS doesn't know that
+  const terminalId = useParam("terminalId", "number") || 1
+
+  // I was getting a weird error that suspense was not supported by react-dom so I had to disable it.
+  const [terminal] = useQuery(getTerminalById, { id: terminalId }, { suspense: false })
   const router = useRouter()
+
+  // obviously need better error page if the terminal is not found, but this will do.
+  if (!terminal) {
+    return <div className="max-w-screen-xl mx-auto text-marble-white">Terminal not found.</div>
+  }
 
   return (
     <div
@@ -18,46 +27,42 @@ const Navigation = ({ children }: { children?: any }) => {
             <div className="flex items-center mt-12">
               <span className="border border-marble-white rounded-full h-12 w-12 mr-4 bg-concrete"></span>
               <div className="flex flex-col">
-                <h1 className="text-2xl text-marble-white">{terminalName}</h1>
-                <span className="text-sm text-concrete">@station</span>
+                <h1 className="text-2xl text-marble-white">{terminal.name}</h1>
+                <span className="text-sm text-concrete">@{terminal.handle}</span>
               </div>
             </div>
-            <h3 className="text-marble-white text-sm mt-6">
-              Building the infrastructure to empower the next billion contributors in web3.
-            </h3>
+            <h3 className="text-marble-white text-sm mt-6">{terminal.description}</h3>
             <ul className="mt-9 text-lg">
               <li
                 className={`${
-                  router.pathname === Routes.TerminalInitiativePage({ terminalName }).pathname
+                  router.pathname === Routes.TerminalInitiativePage({ terminalId }).pathname
                     ? "text-marble-white"
                     : "text-concrete"
                 } cursor-pointer hover:text-marble-white`}
               >
-                <Link href={Routes.TerminalInitiativePage({ terminalName })}>
+                <Link href={Routes.TerminalInitiativePage({ terminalId })}>
                   &#8594; Initiative Board
                 </Link>
               </li>
               <li
                 className={`${
-                  router.pathname === Routes.TerminalContributorsPage({ terminalName }).pathname
+                  router.pathname === Routes.TerminalContributorsPage({ terminalId }).pathname
                     ? "text-marble-white"
                     : "text-concrete"
                 } cursor-pointer hover:text-marble-white`}
               >
-                <Link href={Routes.TerminalContributorsPage({ terminalName })}>
+                <Link href={Routes.TerminalContributorsPage({ terminalId })}>
                   &#8594; Contributor Directory
                 </Link>
               </li>
               <li
                 className={`${
-                  router.pathname === Routes.TerminalWaitingPage({ terminalName }).pathname
+                  router.pathname === Routes.TerminalWaitingPage({ terminalId }).pathname
                     ? "text-marble-white"
                     : "text-concrete"
                 } cursor-pointer hover:text-marble-white`}
               >
-                <Link href={Routes.TerminalWaitingPage({ terminalName })}>
-                  &#8594; Waiting Room
-                </Link>
+                <Link href={Routes.TerminalWaitingPage({ terminalId })}>&#8594; Waiting Room</Link>
               </li>
             </ul>
           </div>

@@ -129,7 +129,7 @@ const Home: BlitzPage = () => {
   )
 
   return (
-    <Layout title="Home" user={connectedUser}>
+    <Layout title="Home">
       <main
         className="w-full h-[calc(100vh-6rem)] bg-cover bg-no-repeat"
         style={{ backgroundImage: "url('/station-cover.png')" }}
