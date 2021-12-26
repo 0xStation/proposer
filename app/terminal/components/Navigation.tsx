@@ -1,11 +1,17 @@
 import { useParam } from "blitz"
-import { Link, Routes, useRouter } from "blitz"
+import { Link, Routes, useRouter, useQuery } from "blitz"
+import getTerminalByName from "app/terminal/queries/getTerminalByName"
 
 const Navigation = ({ children }: { children?: any }) => {
-  // can use this to eventually fetch the terminal data
-  // and replace the placeholders below
   const terminalName = useParam("terminalName", "string") || ""
+  // I was getting a weird error that suspense was not supported by react-dom so I had to disable it.
+  const [terminal] = useQuery(getTerminalByName, { name: terminalName }, { suspense: false })
   const router = useRouter()
+
+  // obviously need better error page if the terminal is not found, but this will do.
+  if (!terminal) {
+    return <div className="max-w-screen-xl mx-auto text-marble-white">Terminal not found.</div>
+  }
 
   return (
     <div
@@ -18,13 +24,11 @@ const Navigation = ({ children }: { children?: any }) => {
             <div className="flex items-center mt-12">
               <span className="border border-marble-white rounded-full h-12 w-12 mr-4 bg-concrete"></span>
               <div className="flex flex-col">
-                <h1 className="text-2xl text-marble-white">{terminalName}</h1>
-                <span className="text-sm text-concrete">@station</span>
+                <h1 className="text-2xl text-marble-white">{terminal.name}</h1>
+                <span className="text-sm text-concrete">@{terminal.handle}</span>
               </div>
             </div>
-            <h3 className="text-marble-white text-sm mt-6">
-              Building the infrastructure to empower the next billion contributors in web3.
-            </h3>
+            <h3 className="text-marble-white text-sm mt-6">{terminal.description}</h3>
             <ul className="mt-9 text-lg">
               <li
                 className={`${
