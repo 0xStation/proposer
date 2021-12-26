@@ -1,7 +1,7 @@
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
-import InitiativeCard from "app/terminal/components/InitiativeCard"
+import InitiativeCard from "app/initiative/components/InitiativeCard"
 
 const TerminalContributorsPage: BlitzPage = () => {
   return (
