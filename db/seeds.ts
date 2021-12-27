@@ -78,46 +78,48 @@ const contributors = [
  */
 const seed = async () => {
   // creating the station terminal
-  // let terminal = await db.terminal.create({
-  //   data: {
-  //     name: "Station",
-  //     handle: "station",
-  //     description: "Building the infrastructure to empower the next billion contributors in web3.",
-  //     subgraphId: "",
-  //     ticketContract: "",
-  //   },
-  // })
+  let terminal = await db.terminal.create({
+    data: {
+      name: "Station",
+      handle: "station",
+      description: "Building the infrastructure to empower the next billion contributors in web3.",
+      subgraphId: "",
+      ticketContract: "0xd9243de6be84EA0f592D20e3E6bd67949D96bfe9",
+    },
+  })
+
   // creating all of the station contributors
-  // for (let i = 0; i < contributors.length; i++) {
-  //   let contributorData = contributors[i]
-  //   if (contributorData) {
-  //     await db.account.create({
-  //       data: contributorData,
-  //     })
-  //   }
-  // }
+  for (let i = 0; i < contributors.length; i++) {
+    let contributorData = contributors[i]
+    if (contributorData) {
+      await db.account.create({
+        data: contributorData,
+      })
+    }
+  }
+
   // creating the intial initiatives
-  // await db.initiative.create({
-  //   data: {
-  //     name: "web v1",
-  //     description: "working on the product of station.",
-  //     shortName: "web",
-  //     terminal: {
-  //       connect: { id: terminal.id },
-  //     },
-  //   },
-  // })
-  // await db.initiative.create({
-  //   data: {
-  //     name: "Newsstand",
-  //     description:
-  //       "Station Network’s publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity. ",
-  //     shortName: "news",
-  //     terminal: {
-  //       connect: { id: terminal.id },
-  //     },
-  //   },
-  // })
+  await db.initiative.create({
+    data: {
+      name: "Web v1",
+      description: "working on the product of station.",
+      shortName: "WEB",
+      terminal: {
+        connect: { id: terminal.id },
+      },
+    },
+  })
+  await db.initiative.create({
+    data: {
+      name: "Newstand",
+      description:
+        "Station Network’s publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity. ",
+      shortName: "NEWSTAND",
+      terminal: {
+        connect: { id: terminal.id },
+      },
+    },
+  })
 }
 
 export default seed
