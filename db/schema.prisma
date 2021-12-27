@@ -13,21 +13,20 @@ generator client {
 // The account of user of Station
 // user's wallet address is primary key
 model Account {
-  id           Int                      @id @default(autoincrement())
-  address      String
-  application  InitiativeApplication[]
-  endorsements ApplicationEndorsement[]
-  data         Json?
+  id                  Int                      @id @default(autoincrement())
+  address             String                   @unique
+  applications        InitiativeApplication[]
+  pledgedEndorsements ApplicationEndorsement[]
+  data                Json?
 }
 
 // Each DAO is represented by a terminal.
 // roleNameOverrides overrides default role names
 model Terminal {
-  id             Int          @id @default(autoincrement())
-  initiatives    Initiative[]
-  subgraphId     String
-  ticketContract String
-  data           Json?
+  id            Int          @id @default(autoincrement())
+  ticketAddress String       @unique
+  initiatives   Initiative[]
+  data          Json?
 }
 
 // An initiative within a terminal
@@ -51,11 +50,11 @@ model InitiativeApplication {
 }
 
 model ApplicationEndorsement {
-  id                      Int                   @id @default(autoincrement())
-  signature               String
-  value                   Int
-  InitiativeApplication   InitiativeApplication @relation(fields: [initiativeApplicationId], references: [id])
-  initiativeApplicationId Int
-  endorser                Account               @relation(fields: [accountId], references: [id])
-  accountId               Int
+  id            Int                   @id @default(autoincrement())
+  signature     String
+  value         Int
+  application   InitiativeApplication @relation(fields: [applicationId], references: [id])
+  applicationId Int
+  endorser      Account               @relation(fields: [accountId], references: [id])
+  accountId     Int
 }

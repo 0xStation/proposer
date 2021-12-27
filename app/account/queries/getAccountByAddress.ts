@@ -28,15 +28,6 @@ export default async function getAccountByAddress(input: z.infer<typeof GetAccou
 
   return {
     ...account,
-    name: account.data!["name"],
-    handle: account.data!["handle"],
-    pfpURL: account.data!["pfpURL"],
-    webURL: account.data!["webURL"],
-    githubURL: account.data!["githubURL"],
-    twitterURL: account.data!["twitterURL"],
-    skills: account.data!["skills"],
-    pronouns: account.data!["pronouns"],
-    discord: account.data!["discord"],
-    verified: account.data!["verified"],
+    ...(account.data as Object),
   } as Account & AccountMetadata
 }

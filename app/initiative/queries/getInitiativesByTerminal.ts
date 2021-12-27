@@ -29,14 +29,7 @@ export default async function getInitiativesByTerminal(
   return initiatives.map((i) => {
     return {
       ...i,
-      name: i.data!["name"],
-      shortName: i.data!["shortName"],
-      description: i.data!["description"],
-      bannerURL: i.data!["bannerURL"],
-      pfpURL: i.data!["pfpURL"],
-      contributeText: i.data!["contributeText"],
-      rewardText: i.data!["rewardText"],
-      openings: i.data!["openings"],
+      ...(i.data as Object),
     } as Initiative & InitiativeMetadata
   })
 }

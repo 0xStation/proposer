@@ -22,8 +22,6 @@ export default async function getTerminalById(input: z.infer<typeof GetTerminalB
 
   return {
     ...terminal,
-    name: terminal.data!["name"],
-    handle: terminal.data!["handle"],
-    description: terminal.data!["description"],
+    ...(terminal.data as Object),
   } as Terminal & TerminalMetadata
 }
