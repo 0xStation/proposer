@@ -1,45 +1,43 @@
+import { useMutation } from "blitz"
 import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
+import createApplication from "../mutations/createApplication"
 
-const ApplicationModal = ({ isOpen, setIsOpen }) => {
+const ApplicationModal = ({
+  isOpen,
+  setIsOpen,
+  initiativeId,
+}: {
+  isOpen: boolean
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  initiativeId: number
+}) => {
+  const [createApplicationMutation] = useMutation(createApplication)
+
   return (
     <Modal
       title="Contribute"
-      subtitle="Submit your interest in contributing to the initiative. "
+      subtitle="Submit your interest in contributing to the initiative."
       open={isOpen}
       toggle={setIsOpen}
     >
       <div className="mt-8">
         <Form
-          onSubmit={() => {
-            alert("sumbitting")
+          onSubmit={async (values: { url: string }) => {
+            try {
+              const application = await createApplicationMutation({
+                ...values,
+                initiative: initiativeId,
+                applicant: 1,
+              })
+              console.log(application)
+            } catch (error) {
+              alert("Error applying")
+            }
           }}
           render={({ handleSubmit }) => (
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-y-4 gap-x-2">
-                <div className="flex flex-col">
-                  <label htmlFor="firstName" className="text-marble-white">
-                    First Name
-                  </label>
-                  <Field
-                    name="firstName"
-                    component="input"
-                    placeholder="First Name"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <label htmlFor="pronouns" className="text-marble-white">
-                    Pronouns
-                  </label>
-                  <Field
-                    component="input"
-                    name="pronouns"
-                    placeholder="pronouns"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
-                  />
-                </div>
-
                 <div className="flex flex-col col-span-2">
                   <label htmlFor="url" className="text-marble-white">
                     URL
@@ -52,6 +50,8 @@ const ApplicationModal = ({ isOpen, setIsOpen }) => {
                   />
                 </div>
               </div>
+
+              {/* possibly a field for additional skills? */}
 
               <button
                 type="submit"

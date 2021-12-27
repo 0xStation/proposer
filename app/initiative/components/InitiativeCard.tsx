@@ -1,11 +1,11 @@
 import { useState } from "react"
-import ApplicationModal from "./ApplicationModal"
+import ApplicationModal from "../../application/components/ApplicationModal"
 
-const InitiativeCard = ({ title, description, contributors }) => {
+const InitiativeCard = ({ title, description, id, contributors }) => {
   let [isOpen, setIsOpen] = useState(false)
   return (
     <>
-      <ApplicationModal isOpen={isOpen} setIsOpen={setIsOpen} />
+      <ApplicationModal isOpen={isOpen} setIsOpen={setIsOpen} initiativeId={id} />
       <div
         className="border border-concrete p-4 flex flex-col cursor-pointer"
         onClick={() => {

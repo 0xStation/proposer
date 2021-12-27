@@ -23,6 +23,7 @@ const TerminalInitiativePage: BlitzPage = () => {
             return (
               <InitiativeCard
                 key={initiative.id}
+                id={initiative.id}
                 title={initiative?.data?.name || "Title"}
                 description={initiative?.data?.description || "Description"}
                 contributors={[]}
