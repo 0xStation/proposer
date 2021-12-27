@@ -1,22 +1,10 @@
 import db, { Account } from "db"
 import * as z from "zod"
+import { AccountMetadata } from "../types"
 
 const GetAccountByAddress = z.object({
   address: z.string(),
 })
-
-type AccountMetadata = {
-  name: string
-  handle: string
-  pfpURL: string
-  webURL: string
-  githubURL: string
-  twitterURL: string
-  skills: string[]
-  pronouns: string
-  discord: string
-  verified: boolean
-}
 
 export default async function getAccountByAddress(input: z.infer<typeof GetAccountByAddress>) {
   const data = GetAccountByAddress.parse(input)

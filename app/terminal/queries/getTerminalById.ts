@@ -1,15 +1,10 @@
 import db, { Terminal } from "db"
 import * as z from "zod"
+import { TerminalMetadata } from "../types"
 
 const GetTerminalById = z.object({
   id: z.number(),
 })
-
-type TerminalMetadata = {
-  name: string
-  handle: string
-  description: string
-}
 
 export default async function getTerminalById(input: z.infer<typeof GetTerminalById>) {
   const data = GetTerminalById.parse(input)

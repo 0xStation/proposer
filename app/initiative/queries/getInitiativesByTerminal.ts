@@ -1,20 +1,10 @@
 import db, { Initiative } from "db"
 import * as z from "zod"
+import { InitiativeMetadata } from "../types"
 
 const GetInitiativesByTerminal = z.object({
   terminalId: z.number(),
 })
-
-type InitiativeMetadata = {
-  name: string
-  description: string
-  shortName: string
-  bannerURL: string
-  pfpURL: string
-  contributeText: string
-  rewardText: string
-  openings: number
-}
 
 export default async function getInitiativesByTerminal(
   input: z.infer<typeof GetInitiativesByTerminal>
