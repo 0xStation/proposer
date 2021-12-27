@@ -80,11 +80,14 @@ const seed = async () => {
   // creating the station terminal
   let terminal = await db.terminal.create({
     data: {
-      name: "Station",
-      handle: "station",
-      description: "Building the infrastructure to empower the next billion contributors in web3.",
       subgraphId: "",
       ticketContract: "0xd9243de6be84EA0f592D20e3E6bd67949D96bfe9",
+      data: {
+        name: "Station",
+        handle: "station",
+        description:
+          "Building the infrastructure to empower the next billion contributors in web3.",
+      },
     },
   })
 
@@ -93,7 +96,12 @@ const seed = async () => {
     let contributorData = contributors[i]
     if (contributorData) {
       await db.account.create({
-        data: contributorData,
+        data: {
+          address: contributorData.address,
+          data: {
+            contributorData,
+          },
+        },
       })
     }
   }
@@ -101,22 +109,26 @@ const seed = async () => {
   // creating the intial initiatives
   await db.initiative.create({
     data: {
-      name: "Web v1",
-      description: "working on the product of station.",
-      shortName: "WEB",
       terminal: {
         connect: { id: terminal.id },
+      },
+      data: {
+        name: "Web v1",
+        description: "working on the product of station.",
+        shortName: "WEB",
       },
     },
   })
   await db.initiative.create({
     data: {
-      name: "Newstand",
-      description:
-        "Station Network’s publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity. ",
-      shortName: "NEWSTAND",
       terminal: {
         connect: { id: terminal.id },
+      },
+      data: {
+        name: "Newstand",
+        description:
+          "Station Network’s publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity. ",
+        shortName: "NEWSTAND",
       },
     },
   })
