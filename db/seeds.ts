@@ -1,75 +1,90 @@
 import db from "./index"
+import { TerminalMetadata } from "app/terminal/types"
+import { InitiativeMetadata } from "app/initiative/types"
+import { AccountMetadata } from "app/account/types"
+import { Initiative } from ".prisma/client"
 
-const contributors = [
+const contributors: (AccountMetadata & { address: string })[] = [
   {
     address: "0x65A3870F48B5237f27f674Ec42eA1E017E111D63",
     name: "michael",
     handle: "0xmcg",
     pronouns: "he/him",
-    bio: "working for station",
+    skills: [],
+    discord: "frog#",
+    verified: true,
   },
   {
     address: "0xd32FA3e71737a19eE4CA44334b9f3c52665a6CDB",
     name: "mind",
     handle: "mindapi",
     pronouns: "she/her",
-    bio: "working for station",
+    skills: [],
+    discord: "mindapi#",
+    verified: true,
   },
   {
     name: "tina",
     handle: "fakepixels",
     address: "0x78918036a8e4B9179bEE3CAB57110A3397986E44",
     pronouns: "she/her",
-    bio: "working for station",
+    skills: [],
+    discord: "fakepixels#",
+    verified: true,
   },
   {
     name: "brendan",
     handle: "brendo",
     address: "0x17B7163E708A06De4DdA746266277470dd42C53f",
     pronouns: "he/him",
-    bio: "working for station",
+    skills: [],
+    discord: "#",
+    verified: true,
   },
   {
     name: "darian",
     handle: "WGMIApe",
     address: "0x6Cf61c97674C65c68D1E816eCCf36061aCD9a65c",
     pronouns: "he/him",
-    bio: "working for station",
+    skills: [],
+    discord: "WGMIape#",
+    verified: true,
   },
   {
     name: "calvin",
     handle: "cchengasaurus",
     address: "0xB0F0bA31aA582726E36Dc0c79708E9e072455eD2",
     pronouns: "he/him",
-    bio: "working for station",
+    skills: [],
+    discord: "cc2#",
+    verified: true,
   },
   {
     name: "kristen",
     handle: "rie",
     address: "0xaE55f61f85935BBB68b8809d5c02142e4CbA9a13",
     pronouns: "she/her",
-    bio: "working for station",
+    skills: [],
+    discord: "rie#",
+    verified: true,
   },
   {
     name: "conner",
     handle: "symmtry",
     address: "0x016562aA41A8697720ce0943F003141f5dEAe006",
     pronouns: "he/him",
-    bio: "working for station",
-  },
-  {
-    name: "kash",
-    handle: "honeykashmoney",
-    address: "0x5716e900249D6c35afA41343a2394C32C1B4E6cB",
-    pronouns: "he/him",
-    bio: "working for station",
+    skills: [],
+    discord: "symmtry#",
+    verified: true,
   },
   {
     name: "akshay",
     handle: "wagmiking",
     address: "0x8FAA5498Ca6fc9A61BA967E07fBc9420aab99E55",
     pronouns: "he/him",
-    bio: "working for station",
+    skills: [],
+    discord: "wagmiking#",
+    verified: true,
   },
 ]
 
@@ -77,20 +92,20 @@ const contributors = [
  * This seed function is executed when you run `blitz db seed`.
  */
 const seed = async () => {
-  // creating the station terminal
-  let terminal = await db.terminal.create({
+  // Station terminal
+  const stationMetadata: TerminalMetadata = {
+    name: "Station",
+    handle: "station",
+    description: "Building the infrastructure to empower the next billion contributors in web3.",
+  }
+  let station = await db.terminal.create({
     data: {
       ticketAddress: "0xd9243de6be84EA0f592D20e3E6bd67949D96bfe9",
-      data: {
-        name: "Station",
-        handle: "station",
-        description:
-          "Building the infrastructure to empower the next billion contributors in web3.",
-      },
+      data: stationMetadata,
     },
   })
 
-  // creating all of the station contributors
+  // Station contributors
   for (let i = 0; i < contributors.length; i++) {
     let contributorData = contributors[i]
     if (contributorData) {
@@ -105,31 +120,52 @@ const seed = async () => {
     }
   }
 
-  // creating the intial initiatives
-  await db.initiative.create({
-    data: {
-      terminal: {
-        connect: { id: terminal.id },
+  // Station initiatives
+  const protocolMetadata: InitiativeMetadata = {
+    name: "Protocol v1",
+    description:
+      "Station's protocol is the smart contract engine that powers all of our app's on-chain capabilities.",
+    shortName: "PROTOCOl",
+    openings: 0,
+  }
+  const webMetadata: InitiativeMetadata = {
+    name: "Web v1",
+    description: "Station's web application is the home of our user experience.",
+    shortName: "WEB",
+    openings: 0,
+  }
+  const newstandMetadata: InitiativeMetadata = {
+    name: "Newstand",
+    description:
+      "Station Network’s publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity.",
+    shortName: "NEWSTAND",
+    openings: 2,
+  }
+  const partnershipMetadata: InitiativeMetadata = {
+    name: "Terminal Partnership",
+    description: "Forming GTM plans to onboard our Beta Terminal partners.",
+    shortName: "PARTNERSHIP",
+    openings: 1,
+  }
+  await db.initiative.createMany({
+    data: [
+      {
+        terminalId: station.id,
+        data: protocolMetadata,
       },
-      data: {
-        name: "Web v1",
-        description: "working on the product of station.",
-        shortName: "WEB",
+      {
+        terminalId: station.id,
+        data: webMetadata,
       },
-    },
-  })
-  await db.initiative.create({
-    data: {
-      terminal: {
-        connect: { id: terminal.id },
+      {
+        terminalId: station.id,
+        data: newstandMetadata,
       },
-      data: {
-        name: "Newstand",
-        description:
-          "Station Network’s publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity. ",
-        shortName: "NEWSTAND",
+      {
+        terminalId: station.id,
+        data: partnershipMetadata,
       },
-    },
+    ],
   })
 }
 
