@@ -2,7 +2,7 @@ import db from "./index"
 import { TerminalMetadata } from "app/terminal/types"
 import { InitiativeMetadata } from "app/initiative/types"
 import { AccountMetadata } from "app/account/types"
-import { Initiative } from ".prisma/client"
+import { Symbol } from "app/types"
 
 const contributors: (AccountMetadata & { address: string })[] = [
   {
@@ -126,26 +126,30 @@ const seed = async () => {
     description:
       "Station's protocol is the smart contract engine that powers all of our app's on-chain capabilities.",
     shortName: "PROTOCOl",
-    openings: 0,
+    isAcceptingApplications: false,
+    links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/protocol-v1" }],
   }
   const webMetadata: InitiativeMetadata = {
     name: "Web v1",
     description: "Station's web application is the home of our user experience.",
     shortName: "WEB",
-    openings: 0,
+    isAcceptingApplications: false,
+    links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/station-web" }],
   }
   const newstandMetadata: InitiativeMetadata = {
     name: "Newstand",
     description:
       "Station Network’s publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity.",
     shortName: "NEWSTAND",
-    openings: 2,
+    isAcceptingApplications: true,
+    links: [{ symbol: Symbol.MIRROR, url: "https://station.mirror.xyz/" }],
   }
   const partnershipMetadata: InitiativeMetadata = {
     name: "Terminal Partnership",
     description: "Forming GTM plans to onboard our Beta Terminal partners.",
     shortName: "PARTNERSHIP",
-    openings: 1,
+    isAcceptingApplications: true,
+    links: [],
   }
   await db.initiative.createMany({
     data: [

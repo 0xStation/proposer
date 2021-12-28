@@ -1,10 +1,12 @@
+import { ExternalLink } from "app/types"
+
 export type InitiativeMetadata = {
   name: string
   description: string
   shortName: string
   bannerURL?: string
-  pfpURL?: string
   contributeText?: string
   rewardText?: string
-  openings: number
+  isAcceptingApplications: boolean
+  links: ExternalLink[]
 }
