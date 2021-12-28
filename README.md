@@ -1,32 +1,69 @@
-[![Blitz.js](https://raw.githubusercontent.com/blitz-js/art/master/github-cover-photo.png)](https://blitzjs.com)
-
 This is a [Blitz.js](https://github.com/blitz-js/blitz) app.
 
-# **station-web**
+# Station Web
+
+![station](https://user-images.githubusercontent.com/38736612/147550818-b619f893-2202-4bba-ae51-a4ad58712ff3.png)
 
 ## Getting Started
 
-Run your app in the development mode.
+### Environment Variables
+
+**Make environment file copies**
+
+```
+cp .env.template .env.local
+cp .env.template .env.test.local
+```
+
+**Set database username**
+
+Replace `YOUR_USERNAME` in the `DATABASE_URL` variable with your machines root user.
+
+### Install Dependencies
+
+```
+brew install postgres
+npm install -g blitz
+npm install
+```
+
+### Setup Database
+
+**Start postgres**
+
+```
+pg_ctl -D /opt/homebrew/var/postgres start  # macOS M1
+OR
+pg_ctl -D /opt/homebrew/var/postgres start  # macOS Intel
+```
+
+**Create database**
+
+```
+createdb station
+```
+
+**Migrate schema**
+
+```
+blitz prisma migrate dev
+```
+
+**Seed database**
+
+```
+blitz db seed
+```
+
+### Run Application
+
+**Run in development mode**
 
 ```
 blitz dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## Environment Variables
-
-Ensure the `.env.local` file has required environment variables:
-
-```
-DATABASE_URL=postgresql://<YOUR_DB_USERNAME>@localhost:5432/test-blitz
-```
-
-Ensure the `.env.test.local` file has required environment variables:
-
-```
-DATABASE_URL=postgresql://<YOUR_DB_USERNAME>@localhost:5432/test-blitz_test
-```
 
 ## Tests
 
