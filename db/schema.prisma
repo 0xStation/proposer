@@ -13,81 +13,48 @@ generator client {
 // The account of user of Station
 // user's wallet address is primary key
 model Account {
-  id           Int                      @id @default(autoincrement())
-  address      String
-  name         String
-  handle       String
-  pronouns     String
-  bio          String
-  skills       Skill[]
-  application  InitiativeApplication[]
-  endorsements ApplicationEndorsement[]
-  tickets      Ticket[]
+  id                  Int                      @id @default(autoincrement())
+  address             String                   @unique
+  applications        InitiativeApplication[]
+  pledgedEndorsements ApplicationEndorsement[]
+  data                Json?
 }
 
 // Each DAO is represented by a terminal.
 // roleNameOverrides overrides default role names
 model Terminal {
-  id                Int          @id @default(autoincrement())
-  subgraphId        String
-  name              String
-  handle            String
-  description       String
-  ticketContract    String
-  roleNameOverrides Json?
-  initiatives       Initiative[]
-  tickets           Ticket[]
-}
-
-model Ticket {
-  account    Account  @relation(fields: [accountId], references: [id])
-  accountId  Int
-  terminal   Terminal @relation(fields: [terminalId], references: [id])
-  terminalId Int
-  signiture  String
-
-  @@id([accountId, terminalId])
+  id            Int          @id @default(autoincrement())
+  ticketAddress String       @unique
+  initiatives   Initiative[]
+  data          Json?
 }
 
 // An initiative within a terminal
 model Initiative {
   id           Int                     @id @default(autoincrement())
-  name         String
-  shortName    String
-  description  String
   terminal     Terminal                @relation(fields: [terminalId], references: [id])
   terminalId   Int
   applications InitiativeApplication[]
+  data         Json?
 }
 
 // An application into a certain initiative
 model InitiativeApplication {
   id           Int                      @id @default(autoincrement())
-  url          String
-  approved     Boolean
   applicant    Account                  @relation(fields: [applicantId], references: [id])
   applicantId  Int
   initiative   Initiative               @relation(fields: [initiativeId], references: [id])
   initiativeId Int
   endorsements ApplicationEndorsement[]
+  data         Json?
 }
 
 model ApplicationEndorsement {
-  id                      Int                   @id @default(autoincrement())
-  signature               String
-  value                   Int
-  InitiativeApplication   InitiativeApplication @relation(fields: [initiativeApplicationId], references: [id])
-  initiativeApplicationId Int
-  endorser                Account               @relation(fields: [accountId], references: [id])
-  accountId               Int
-}
-
-// A user can have many skills
-// I wanted this in its own table (as opposed to a field of contributor)
-// so its easier to do things like show new user existing skills
-// or even "grouping" skills in the future by type (design, eng etc)
-model Skill {
-  id       Int       @id @default(autoincrement())
-  name     String
-  accounts Account[]
+  id            Int                   @id @default(autoincrement())
+  signature     String
+  value         Int
+  application   InitiativeApplication @relation(fields: [applicationId], references: [id])
+  applicationId Int
+  endorser      Account               @relation(fields: [accountId], references: [id])
+  accountId     Int
 }
