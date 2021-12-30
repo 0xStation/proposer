@@ -1,9 +1,10 @@
 import { useMemo } from "react"
 import { useEthers, useSendTransaction } from "@usedapp/core"
 import { users } from "../../../../../core/utils/data"
-import { Image, BlitzPage } from "blitz"
+import { Image, useQuery, BlitzPage, useParam } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import Contributors from "../../../../../core/components/Contributors"
+import getInitiativeById from "app/terminal/initiative/queries/getInitiativeById"
 // import banner from ".../public/newstand-banner.png"
 
 const Project: BlitzPage = () => {
@@ -11,6 +12,10 @@ const Project: BlitzPage = () => {
     title: string
     details: string
   }
+
+  const initiativeId = useParam("initiativeId", "number") || 1
+
+  const initiative = useQuery(getInitiativeById, { id: initiativeId }, { suspense: false })
 
   const { activateBrowserWallet, account } = useEthers()
   const connectedUser = useMemo(() => (account ? users[account] : null), [account])
