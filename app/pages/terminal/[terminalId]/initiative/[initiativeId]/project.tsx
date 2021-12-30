@@ -39,7 +39,7 @@ const Project: BlitzPage = () => {
           <span className="text-marble-white text-sm">Back Icon</span>
         </div>
         <div className="flex justify-center items-center">
-          <div className="bg-tunnel-black content-center items-center h-full w-[766] mt-5">
+          <div className="bg-tunnel-black content-center items-center h-full w-[766px] mt-5">
             <div className="flex flex-col">
               <div className="flex flex-col text-marble-white items-center space-y-1">
                 <div className="flex flex-col items-center space-y-3">
@@ -51,7 +51,7 @@ const Project: BlitzPage = () => {
                 </div>
               </div>
 
-              <div className="h-[227] border border-marble-white bg-marble-white my-4">
+              <div className="h-[227px] border border-marble-white bg-marble-white my-4">
                 {/* <Image
                 className="h-227 border border-marble-white"
                 src={banner}
@@ -145,7 +145,7 @@ const Project: BlitzPage = () => {
 
               <div className="flex justify-center items-center ">
                 <button
-                  className="mt-4 w-full py-2 text-center text-sm bg-magic-mint rounded item-center"
+                  className="mt-4 w-full py-2 text-center text-sm bg-magic-mint rounded item-center w-[280px]"
                   onClick={() => activateBrowserWallet(onError)}
                 >
                   Submit interest
