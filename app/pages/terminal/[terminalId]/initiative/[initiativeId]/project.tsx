@@ -1,9 +1,9 @@
 import { useMemo } from "react"
 import { useEthers, useSendTransaction } from "@usedapp/core"
-import { users } from "../core/utils/data"
+import { users } from "../../../../../core/utils/data"
 import { Image, BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import Contributors from "../core/components/Contributors"
+import Contributors from "../../../../../core/components/Contributors"
 // import banner from ".../public/newstand-banner.png"
 
 const Project: BlitzPage = () => {
@@ -34,7 +34,7 @@ const Project: BlitzPage = () => {
           <span className="text-marble-white text-sm">Back Icon</span>
         </div>
         <div className="flex justify-center items-center">
-          <div className="bg-tunnel-black content-center items-center h-full w-766 mt-5">
+          <div className="bg-tunnel-black content-center items-center h-full w-[766] mt-5">
             <div className="flex flex-col">
               <div className="flex flex-col text-marble-white items-center space-y-1">
                 <div className="flex flex-col items-center space-y-3">
@@ -46,7 +46,7 @@ const Project: BlitzPage = () => {
                 </div>
               </div>
 
-              <div className="h-227 border border-marble-white bg-marble-white my-4">
+              <div className="h-[227] border border-marble-white bg-marble-white my-4">
                 {/* <Image
                 className="h-227 border border-marble-white"
                 src={banner}
