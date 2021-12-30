@@ -18,14 +18,6 @@ module.exports = {
       serif: ["Merriweather", "serif"],
     },
     extend: {
-      width: {
-        766: "766px",
-        280: "280px",
-      },
-      height: {
-        227: "227px",
-      },
-
       spacing: {
         128: "32rem",
         144: "36rem",
