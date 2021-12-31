@@ -23,7 +23,6 @@ const Navigation = () => {
 
   const getUserAccount = async (account) => {
     let user = await invoke(getAccountByAddress, { address: account })
-    console.log(user)
     if (user) {
       setUser(user)
     }
