@@ -6,7 +6,7 @@ import Layout from "app/core/layouts/Layout"
 // import Modal from "app/core/components/Modal"
 import ConnectWalletModal from "app/initiative/components/ConnectWalletModal"
 import ContributorCard from "../../../../../core/components/ContributorCard"
-import getInitiativeById from "app/terminal/queries/getInitiativeById"
+import getInitiativeById from "app/initiative/queries/getInitiativeById"
 // import banner from ".../public/newstand-banner.png"
 
 const Project: BlitzPage = () => {
@@ -17,9 +17,9 @@ const Project: BlitzPage = () => {
 
   let [isOpen, setIsOpen] = useState(false)
 
-  const initiativeId = useParam("initiativeId", "number") || 1
+  const initiativeId = useParam("initiativeId", "number") || 0
 
-  const [initiative] = useQuery(getInitiativeById, { id: initiativeId }, { suspense: false })
+  const [initiative] = useQuery(getInitiativeById, { id: 1 }, { suspense: false })
 
   // const { activateBrowserWallet, account } = useEthers()
   // // const connectedUser = useMemo(() => (account ? users[account] : null), [account])
@@ -27,10 +27,12 @@ const Project: BlitzPage = () => {
   //   console.log(error.message)
   // }
 
-  const title: string = "Newstand"
+  const title: string = initiative?.name || "Newstand"
   const description: string =
+    initiative?.description ||
     "Station Network’s publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity."
   const instructions =
+    initiative?.contributeText ||
     "Reach out with your pitch. A Newstand Editor will partner with you to brainstorm and develop a pitch that looks to amplifies and refines your unique perspective or point of view. After a first draft, your Editor will provide edits and help you bring your piece to second draft."
 
   // function showModal(){
@@ -56,7 +58,7 @@ const Project: BlitzPage = () => {
                     <span className="text-sm mx-35">{description}</span>
                   </div>
                   <div className="text-marble-white text-sm">
-                    <span>Links</span>
+                    <span>{initiative?.links}</span>
                   </div>
                 </div>
 
@@ -66,7 +68,7 @@ const Project: BlitzPage = () => {
                 src={banner}
                 alt="Project details banner image."
               /> */}
-                  <img src=".../public/newstand-banner.png" alt="Project banner image." />
+                  <img src={initiative?.bannerURL} alt="Project banner image." />
                 </div>
 
                 <div className=" text-marble-white flex flex-row my-4 gap-12">
