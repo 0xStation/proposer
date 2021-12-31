@@ -10,3 +10,9 @@ export type InitiativeMetadata = {
   isAcceptingApplications: boolean
   links: ExternalLink[]
 }
+
+export type Initiative = {
+  id: number
+  terminalId: number
+  data: InitiativeMetadata
+}
