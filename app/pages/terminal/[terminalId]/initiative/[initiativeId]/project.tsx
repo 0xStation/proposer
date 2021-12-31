@@ -5,15 +5,15 @@ import { Image, useQuery, BlitzPage, useParam } from "blitz"
 import Layout from "app/core/layouts/Layout"
 // import Modal from "app/core/components/Modal"
 import ConnectWalletModal from "app/initiative/components/ConnectWalletModal"
-import Contributors from "../../../../../core/components/Contributors"
+import ContributorCard from "../../../../../core/components/ContributorCard"
 import getInitiativeById from "app/terminal/initiative/queries/getInitiativeById"
 // import banner from ".../public/newstand-banner.png"
 
 const Project: BlitzPage = () => {
-  interface Instructions {
-    title: string
-    details: string
-  }
+  // interface Instructions {
+  //   title: string
+  //   details: string
+  // }
 
   let [isOpen, setIsOpen] = useState(false)
 
@@ -21,20 +21,18 @@ const Project: BlitzPage = () => {
 
   const [initiative] = useQuery(getInitiativeById, { id: initiativeId }, { suspense: false })
 
-  const { activateBrowserWallet, account } = useEthers()
-  const connectedUser = useMemo(() => (account ? users[account] : null), [account])
-  const onError = (error: Error) => {
-    console.log(error.message)
-  }
+  // const { activateBrowserWallet, account } = useEthers()
+  // // const connectedUser = useMemo(() => (account ? users[account] : null), [account])
+  // const onError = (error: Error) => {
+  //   console.log(error.message)
+  // }
 
-  const title: string = "Newstand"
+  const title: string = initiative?.name || "Newstand"
   const description: string =
+    initiative?.description ||
     "Station Network’s publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity."
-  const instructions: Instructions = {
-    title: "Calling for contributors",
-    details:
-      "Reach out with your pitch. A Newstand Editor will partner with you to brainstorm and develop a pitch that looks to amplifies and refines your unique perspective or point of view. After a first draft, your Editor will provide edits and help you bring your piece to second draft.",
-  }
+  const instructions =
+    "Reach out with your pitch. A Newstand Editor will partner with you to brainstorm and develop a pitch that looks to amplifies and refines your unique perspective or point of view. After a first draft, your Editor will provide edits and help you bring your piece to second draft."
 
   // function showModal(){
   //   return(
@@ -78,9 +76,9 @@ const Project: BlitzPage = () => {
                       <span className="text-lg">Calling for contributors</span>
                     </div>
                     <div className="space-y-3 ">
-                      <span className="text-sm flow-root">{instructions.details}</span>
-                      <span className="text-sm flow-root">{instructions.details}</span>
-                      <span className="text-sm flow-root">{instructions.details}</span>
+                      <span className="text-sm flow-root">{instructions}</span>
+                      <span className="text-sm flow-root">{instructions}</span>
+                      <span className="text-sm flow-root">{instructions}</span>
                     </div>
                   </div>
 
@@ -99,9 +97,9 @@ const Project: BlitzPage = () => {
                 <div className="space-y-4">
                   <span className="text-marble-white text-lg">Contributors</span>
                   <div className="flex flex-row space-x-4">
-                    <Contributors></Contributors>
-                    <Contributors></Contributors>
-                    <Contributors></Contributors>
+                    <ContributorCard></ContributorCard>
+                    <ContributorCard></ContributorCard>
+                    <ContributorCard></ContributorCard>
                   </div>
                 </div>
 
