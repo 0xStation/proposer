@@ -10,3 +10,9 @@ export type AccountMetadata = {
   discord: string
   verified: boolean
 }
+
+export type Account = {
+  id: number
+  address: string
+  data: { contributorData: AccountMetadata }
+}
