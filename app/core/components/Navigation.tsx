@@ -1,17 +1,19 @@
 import { useState, useEffect } from "react"
-import { Image, useQuery, invoke } from "blitz"
+import { Image, invoke } from "blitz"
 import { useEthers } from "@usedapp/core"
-import Dropdown from "../components/Dropdown"
 import logo from "../../../public/station-logo.svg"
-import Sound from "../icons/SoundIcon"
+import subwayAudioClip from "../../../public/subway.mp3"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import Dropdown from "../components/Dropdown"
+import Sound from "../icons/SoundIcon"
+import { useAudio } from "../hooks/useAudio"
 
 /**
  * Navigation Component
  */
 const Navigation = () => {
   const [user, setUser] = useState<Account>()
-  const [isSoundOn, setIsSoundOn] = useState<boolean>(true)
+  const [isSoundOn, setIsSoundOn] = useAudio(subwayAudioClip)
   const { activateBrowserWallet, account, active } = useEthers()
 
   useEffect(() => {
@@ -46,12 +48,7 @@ const Navigation = () => {
           Map
         </span>
         <span className="p-4 border-l border-l-concrete block">
-          <Sound
-            isOn={isSoundOn}
-            clickHandler={() => {
-              setIsSoundOn(!isSoundOn)
-            }}
-          />
+          <Sound isOn={isSoundOn} clickHandler={setIsSoundOn} />
         </span>
         {user ? (
           <Dropdown

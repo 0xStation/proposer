@@ -3,3 +3,5 @@ interface Account {
   handle: string
   address: string
 }
+
+declare module "*.mp3"
