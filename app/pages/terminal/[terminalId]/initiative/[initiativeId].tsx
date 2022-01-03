@@ -4,6 +4,7 @@ import { users } from "../../../../core/utils/data"
 import { Image, useQuery, BlitzPage, useParam } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import ConnectWalletModal from "app/initiative/components/ConnectWalletModal"
+import ApplicationModal from "app/initiative/components/ApplicationModal"
 import ContributorCard from "../../../../core/components/ContributorCard"
 import Links from "../../../../core/components/Links"
 import getInitiativeById from "app/initiative/queries/getInitiativeById"
@@ -12,7 +13,11 @@ import ProgressBar from "/public/progress-bar.svg"
 import Back from "/public/back-icon.svg"
 
 const Project: BlitzPage = () => {
-  let [isOpen, setIsOpen] = useState(false)
+  let [isOpen, setIsWalletOpen] = useState(false)
+  let [isAppOpen, setIsAppOpen] = useState(false)
+
+  const { activateBrowserWallet, account, active } = useEthers()
+  const connectedUser = useMemo(() => (account ? users[account] : null), [account])
 
   const initiativeId = useParam("initiativeId", "number") || 3
 
@@ -21,9 +26,14 @@ const Project: BlitzPage = () => {
   const title = initiative?.shortName
   const description = initiative?.description
 
+  const modalChoice = () => {
+    connectedUser ? setIsAppOpen(true) : setIsWalletOpen(true)
+  }
+
   return (
     <>
-      <ConnectWalletModal isOpen={isOpen} setIsOpen={setIsOpen} />
+      <ConnectWalletModal isOpen={isOpen} setIsOpen={setIsWalletOpen} />
+      <ApplicationModal isOpen={isOpen} setIsOpen={setIsAppOpen} />
       <Layout>
         <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col">
           <div className="mx-4 mt-4">
@@ -145,7 +155,7 @@ const Project: BlitzPage = () => {
                   <button
                     className="mt-4 w-full py-2 text-center text-sm bg-magic-mint rounded item-center w-[280px]"
                     onClick={() => {
-                      setIsOpen(true)
+                      modalChoice()
                     }}
                   >
                     Submit interest
