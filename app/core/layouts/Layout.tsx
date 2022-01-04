@@ -6,7 +6,7 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
   return (
     <>
       <Head>
-        <title>{title || "station-web"}</title>
+        <title>{title || "Station"}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Navigation />
