@@ -17,7 +17,7 @@ const Project: BlitzPage = () => {
   let [isWalletOpen, setIsWalletOpen] = useState(false)
   let [isOpen, setIsOpen] = useState(false)
 
-  const { activateBrowserWallet, account, active } = useEthers()
+  const { account } = useEthers()
   const connectedUser = useMemo(() => (account ? users[account] : null), [account])
 
   const initiativeId = useParam("initiativeId", "number") || 3

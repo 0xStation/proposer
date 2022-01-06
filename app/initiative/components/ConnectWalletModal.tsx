@@ -4,7 +4,7 @@ import { useEthers } from "@usedapp/core"
 import Modal from "../../core/components/Modal"
 
 const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
-  const { activateBrowserWallet, account } = useEthers()
+  const { activateBrowserWallet } = useEthers()
   const onError = (error: Error) => {
     console.log(error.message)
   }
