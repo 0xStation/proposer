@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react"
-import { useEthers, useSendTransaction } from "@usedapp/core"
+import { useEthers } from "@usedapp/core"
 import { users } from "../core/utils/data"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
@@ -11,15 +11,11 @@ const Home: BlitzPage = () => {
   const connectedUser = useMemo(() => (account ? users[account] : null), [account])
   const [walletToEndorse, setWalletToEndorse] = useState<string>("")
   const [endorsementAmount, setEndorsementAmount] = useState<number>(0)
-  const [endorsementCallState, setEndorsementCallState] = useState<any>(null)
-  const [allowanceIncreased, setAllowanceIncreased] = useState<any>(false)
+  const [allowanceIncreased, setAllowanceIncreased] = useState(false)
   const suppressRender = useSuppressFirstRenderFlicker()
   const { state: endorseState, send: endorse } = useEndorseContractMethod("endorse")
   const { state: allowanceState, send: increaseAllowance } =
     useIncreaseAllowanceMethod("increaseAllowance")
-  const { sendTransaction, state: transactionState } = useSendTransaction({
-    transactionName: "Send Ethereum",
-  })
 
   const onError = (error: Error) => {
     console.log(error.message)
