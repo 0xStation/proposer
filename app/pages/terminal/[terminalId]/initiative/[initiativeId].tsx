@@ -93,7 +93,12 @@ const Project: BlitzPage = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <span className="text-marble-white text-lg">Contributors</span>
+                  <div className="flex flex-row">
+                    <span className="flex-1 text-marble-white text-lg">Contributors</span>
+                    <span className="flex-1 text-right text-magic-mint text-sm cursor-pointer">
+                      See all
+                    </span>
+                  </div>
                   <div className="flex flex-row space-x-4">
                     <ContributorCard></ContributorCard>
                     <ContributorCard></ContributorCard>
