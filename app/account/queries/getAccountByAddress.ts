@@ -1,6 +1,6 @@
-import db, { Account } from "db"
+import db from "db"
 import * as z from "zod"
-import { AccountMetadata } from "../types"
+import { Account } from "../types"
 
 const GetAccountByAddress = z.object({
   address: z.string(),
@@ -14,8 +14,5 @@ export default async function getAccountByAddress(input: z.infer<typeof GetAccou
     return null
   }
 
-  return {
-    ...account,
-    ...(account.data as Object),
-  } as Account & AccountMetadata
+  return account as Account
 }

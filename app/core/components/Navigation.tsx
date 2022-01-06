@@ -3,15 +3,14 @@ import { Image, useQuery, invoke } from "blitz"
 import { useEthers } from "@usedapp/core"
 import Dropdown from "../components/Dropdown"
 import logo from "../../../public/station-logo.svg"
-import Sound from "../icons/SoundIcon"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import { Account } from "../../account/types"
 
 /**
  * Navigation Component
  */
 const Navigation = () => {
   const [user, setUser] = useState<Account>()
-  const [isSoundOn, setIsSoundOn] = useState<boolean>(true)
   const { activateBrowserWallet, account, active } = useEthers()
 
   useEffect(() => {
@@ -45,14 +44,6 @@ const Navigation = () => {
         <span className="p-4 border-l border-l-concrete uppercase text-marble-white text-lg cursor-pointer">
           Map
         </span>
-        <span className="p-4 border-l border-l-concrete block">
-          <Sound
-            isOn={isSoundOn}
-            clickHandler={() => {
-              setIsSoundOn(!isSoundOn)
-            }}
-          />
-        </span>
         {user ? (
           <Dropdown
             side="right"
@@ -60,7 +51,7 @@ const Navigation = () => {
             button={
               <div className="flex items-center">
                 <span className="w-7 h-7 rounded-full bg-concrete border border-marble-white mr-2"></span>
-                <span>{user.handle}</span>
+                <span>{user?.data?.contributorData.handle || "Handle"}</span>
               </div>
             }
             items={[
