@@ -3,7 +3,7 @@ import { useEthers } from "@usedapp/core"
 // import { users } from "../../core/utils/data"
 import Modal from "../../core/components/Modal"
 
-const ConnectWalletModal = ({ isOpen, setIsOpen }) => {
+const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   const { activateBrowserWallet, account } = useEthers()
   const onError = (error: Error) => {
     console.log(error.message)
@@ -13,8 +13,8 @@ const ConnectWalletModal = ({ isOpen, setIsOpen }) => {
     <Modal
       title="Enter Station"
       subtitle="Connect your wallet to enter Station and submit your interest."
-      open={isOpen}
-      toggle={setIsOpen}
+      open={isWalletOpen}
+      toggle={setIsWalletOpen}
     >
       <div className="mt-8">
         <div className="flex flex-row space-x-3 mx-5 text-marble-white">
