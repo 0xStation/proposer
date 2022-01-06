@@ -134,7 +134,7 @@ const seed = async () => {
     description: "Station's web application is the home of our user experience.",
     shortName: "WEB",
     isAcceptingApplications: false,
-    links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/station-web" }],
+    links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/web" }],
   }
   const newstandMetadata: InitiativeMetadata = {
     name: "Newstand",
