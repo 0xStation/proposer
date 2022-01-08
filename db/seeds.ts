@@ -142,7 +142,14 @@ const seed = async () => {
       "Station Network’s publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity.",
     shortName: "NEWSTAND",
     isAcceptingApplications: true,
+    contributeText: [
+      "Working on the Internet is hardly something new. While crypto unlocks new primitives for work to be done on the Internet, the exuberant optimism obfuscates the day-to-day conditions, operating details, and human stories behind each contributor.",
+      "We're inviting writers, artists, technologists, and researchers across all disciplines to push forward radical imaginations around the future of work unlocked by crypto while critically examine the current state of existence through a human lens.",
+      "We are a decentralized media publication where every contributor will have ownership over the work they create while sharing the upside from the piece fairly.",
+    ],
     links: [{ symbol: Symbol.MIRROR, url: "https://station.mirror.xyz/" }],
+    rewardText: "800 USDC, Station Visitor Ticket NFT",
+    bannerURL: "/public/newstand-banner.png",
   }
   const partnershipMetadata: InitiativeMetadata = {
     name: "Terminal Partnership",
