@@ -1,5 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
+import { Image } from "blitz"
 
 const Modal = ({
   title,
@@ -7,12 +8,14 @@ const Modal = ({
   toggle,
   subtitle,
   children,
+  banner,
 }: {
   title: string
   open: boolean
   toggle: React.Dispatch<React.SetStateAction<boolean>>
   subtitle?: string
   children?: any
+  banner?: any
 }) => {
   return (
     <Transition appear show={open} as={Fragment}>
@@ -44,6 +47,7 @@ const Modal = ({
             leaveTo="opacity-0 scale-95"
           >
             <div className="inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-tunnel-black border border-marble-white">
+              {/* <Image src={banner} alt="Modal banner" width={620} height={200} /> */}
               <Dialog.Title
                 as="h3"
                 className="text-3xl font-medium leading-8 text-marble-white text-center"

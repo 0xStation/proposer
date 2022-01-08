@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react"
 import { useEthers, useSendTransaction } from "@usedapp/core"
 import { users } from "../../../../core/utils/data"
-import { Image, useQuery, BlitzPage, useParam } from "blitz"
+import { Image, useQuery, BlitzPage, useParam, Link, Routes } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import ConnectWalletModal from "app/initiative/components/ConnectWalletModal"
 import ApplicationModal from "app/initiative/components/ApplicationModal"
@@ -19,6 +19,8 @@ const Project: BlitzPage = () => {
 
   const { account } = useEthers()
   const connectedUser = useMemo(() => (account ? users[account] : null), [account])
+
+  const terminalId = useParam("terminalId", "number") || 1
 
   const initiativeId = useParam("initiativeId", "number") || 3
 
@@ -38,10 +40,15 @@ const Project: BlitzPage = () => {
         <Layout>
           <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col">
             <div className="mx-4 mt-4">
-              {/* <link href="">
-                <Image src={Back} alt="Back Icon" width={22} height={24} />
-              </link> */}
-              <Image className="cursor-pointer" src={Back} alt="Back Icon" width={25} height={22} />
+              <Link href={Routes.TerminalInitiativePage({ terminalId })}>
+                <Image
+                  className="cursor-pointer"
+                  src={Back}
+                  alt="Back Icon"
+                  width={25}
+                  height={22}
+                />
+              </Link>
             </div>
             <div className="flex justify-center items-center">
               <div className="bg-tunnel-black content-center items-center h-full w-[766px] mt-5">

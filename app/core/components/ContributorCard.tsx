@@ -12,7 +12,7 @@ const person = {
   twitterHandle: "@fakepixels",
   pronouns: "she/her",
   role: "COMMUTER",
-  socials: ["wwww.twitter.com"],
+  socials: ["www.twitter.com"],
 }
 
 let role
@@ -27,7 +27,7 @@ if (person.role === "STAFF") {
 
 const ContributorCard = (contributor) => {
   return (
-    <div className="flex flex-col flex-1 content-center text-marble-white border border-marble-white h-[130px]">
+    <div className="flex flex-col flex-1 content-center text-marble-white border border-concrete h-[130px] cursor-pointer">
       <div className="flex flex-row flex-1 content-center mx-3 my-3 space-x-1">
         <div className="flex-2/5 content-center align-middle">
           <div className="h-[40px] w-[40px] place-self-center border border-marble-white rounded-full place-items-center"></div>
@@ -53,12 +53,13 @@ const ContributorCard = (contributor) => {
 
         <div className="flex flex-1 align-right place-content-end content-right text-sm">
           <Image className="content-right text-sm" src={role} alt="Role icon." height={17} />
+          {/* <span className="p-1 rounded-lg bg-purple-300 text-purple-500">{person.role}</span> */}
         </div>
       </div>
       <div className="flex flex-row flex-1 mx-3 ">
         <div className="flex-1 items-center justify-center text-sm">Socials</div>
         <div className="flex-1 text-right justify-end content-end text-sm">
-          <a href={person.socials[0]}>
+          <a target="_blank" rel="noreferrer" href={person.socials[0]}>
             <Image
               className="content-right text-sm"
               src={TwitterIcon}
