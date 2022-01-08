@@ -41,8 +41,8 @@ model Initiative {
 // An application into a certain initiative
 model InitiativeApplication {
   id           Int                      @id @default(autoincrement())
-  applicant    Account                  @relation(fields: [applicantId], references: [id])
-  applicantId  Int
+  applicant    Account?                 @relation(fields: [applicantId], references: [id])
+  applicantId  Int?
   initiative   Initiative               @relation(fields: [initiativeId], references: [id])
   initiativeId Int
   endorsements ApplicationEndorsement[]

@@ -5,6 +5,7 @@ import Dropdown from "../components/Dropdown"
 import logo from "../../../public/station-logo.svg"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { Account } from "../../account/types"
+import useStore from "../hooks/useStore"
 
 /**
  * Navigation Component
@@ -12,6 +13,7 @@ import { Account } from "../../account/types"
 const Navigation = () => {
   const [user, setUser] = useState<Account>()
   const { activateBrowserWallet, account, active } = useEthers()
+  const setActiveUser = useStore((state) => state.setActiveUser)
 
   useEffect(() => {
     if (account) {
@@ -22,6 +24,7 @@ const Navigation = () => {
   const getUserAccount = async (account) => {
     let user = await invoke(getAccountByAddress, { address: account })
     if (user) {
+      setActiveUser(user)
       setUser(user)
     }
   }

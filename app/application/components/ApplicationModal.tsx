@@ -2,6 +2,8 @@ import { useMutation } from "blitz"
 import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
+import useStore from "../../core/hooks/useStore"
+import { Account } from "../../account/types"
 
 const ApplicationModal = ({
   isOpen,
@@ -13,6 +15,7 @@ const ApplicationModal = ({
   initiativeId: number
 }) => {
   const [createApplicationMutation] = useMutation(createApplication)
+  const activeUser: Account | null = useStore((state) => state.activeUser)
 
   return (
     <Modal
@@ -25,14 +28,14 @@ const ApplicationModal = ({
         <Form
           onSubmit={async (values: { url: string }) => {
             try {
-              const application = await createApplicationMutation({
+              await createApplicationMutation({
                 ...values,
-                initiative: initiativeId,
-                applicant: 1,
+                initiativeId: initiativeId,
+                applicantId: activeUser?.id || undefined,
               })
-              console.log(application)
+              alert("Applied successfully!")
             } catch (error) {
-              alert("Error applying")
+              alert("Error applying.")
             }
           }}
           render={({ handleSubmit }) => (
