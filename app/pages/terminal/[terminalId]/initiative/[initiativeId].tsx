@@ -7,13 +7,14 @@ import ConnectWalletModal from "app/initiative/components/ConnectWalletModal"
 import ApplicationModal from "app/initiative/components/ApplicationModal"
 import ContributorCard from "../../../../core/components/ContributorCard"
 import ImageLink from "../../../../core/components/ImageLink"
-import getInitiativeById from "app/initiative/queries/getInitiativeById"
+import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
 import Newstand from "/public/newstand-banner.png"
 import ProgressBar from "/public/progress-bar.svg"
 import Back from "/public/back-icon.svg"
 import Page404 from "../../../404"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
 import { Account } from "app/account/types"
+import getTerminalById from "app/terminal/queries/getTerminalById"
 
 const Project: BlitzPage = () => {
   let [isWalletOpen, setIsWalletOpen] = useState(false)
@@ -23,10 +24,15 @@ const Project: BlitzPage = () => {
   const connectedUser = useMemo(() => (account ? users[account] : null), [account])
 
   const terminalId = useParam("terminalId", "number") || 1
+  const initiativeLocalId = useParam("initiativeId", "number") || 0
 
-  const initiativeId = useParam("initiativeId", "number") || 3
+  const [terminal] = useQuery(getTerminalById, { id: terminalId }, { suspense: false })
 
-  const [initiative] = useQuery(getInitiativeById, { id: initiativeId }, { suspense: false })
+  const [initiative] = useQuery(
+    getInitiativeByLocalId,
+    { terminalTicket: terminal?.ticketAddress || "", localId: initiativeLocalId },
+    { suspense: false }
+  )
 
   let [contributors] = useQuery(
     getAccountsByAddresses,

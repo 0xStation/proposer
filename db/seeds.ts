@@ -6,9 +6,9 @@ import { seedInitiatives } from "./seed/initiatives"
  * This seed function is executed when you run `blitz db seed`.
  */
 const seed = async () => {
-  const terminals = await seedTerminals()
-  seedInitiatives(terminals)
-  seedContributors()
+  await seedTerminals()
+  await seedInitiatives()
+  await seedContributors()
 }
 
 export default seed
