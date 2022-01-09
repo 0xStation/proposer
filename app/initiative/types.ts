@@ -15,5 +15,6 @@ export type InitiativeMetadata = {
 export type Initiative = {
   id: number
   terminalId: number
+  localId: number
   data: InitiativeMetadata
 }

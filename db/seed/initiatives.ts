@@ -2,8 +2,10 @@ import db from "../index"
 import { InitiativeMetadata } from "app/initiative/types"
 import { Symbol } from "app/types"
 import { contributors } from "./contributors"
+import { InitiativeWhereUniqueInput } from "prisma"
 
-const protocolMetadata: InitiativeMetadata = {
+const protocolMetadata: InitiativeMetadata & { localId: number } = {
+  localId: 1,
   name: "Protocol v1",
   description:
     "Station's protocol is the smart contract engine that powers all of our app's on-chain capabilities.",
@@ -17,7 +19,8 @@ const protocolMetadata: InitiativeMetadata = {
     contributors.nick.address,
   ],
 }
-const webMetadata: InitiativeMetadata = {
+const webMetadata: InitiativeMetadata & { localId: number } = {
+  localId: 2,
   name: "Web v1",
   description: "Station's web application is the home of our user experience.",
   shortName: "WEB",
@@ -31,7 +34,8 @@ const webMetadata: InitiativeMetadata = {
     contributors.conner.address,
   ],
 }
-const newstandMetadata: InitiativeMetadata = {
+const newstandMetadata: InitiativeMetadata & { localId: number } = {
+  localId: 3,
   name: "Newstand",
   description:
     "Station Network’s publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity.",
@@ -47,7 +51,8 @@ const newstandMetadata: InitiativeMetadata = {
   bannerURL: "/public/newstand-banner.png",
   members: [contributors.tina.address, contributors.mind.address, contributors.alli.address],
 }
-const partnershipMetadata: InitiativeMetadata = {
+const partnershipMetadata: InitiativeMetadata & { localId: number } = {
+  localId: 4,
   name: "Terminal Partnership",
   description: "Forming GTM plans to onboard our Beta Terminal partners.",
   shortName: "PARTNERSHIP",
@@ -61,25 +66,17 @@ const partnershipMetadata: InitiativeMetadata = {
   ],
 }
 
+const stationInitiaitves = [protocolMetadata, webMetadata, newstandMetadata, partnershipMetadata]
+
 export async function seedInitiatives(terminals) {
-  await db.initiative.createMany({
-    data: [
-      {
-        terminalId: terminals.station.id,
-        data: protocolMetadata,
+  for (const name in stationInitiaitves) {
+    const initiative = stationInitiaitves[name]
+    await db.initiative.upsert({
+      where: {
+        terminalInitiative: { terminalId: terminals.station.id, localId: initiative!.localId },
       },
-      {
-        terminalId: terminals.station.id,
-        data: webMetadata,
-      },
-      {
-        terminalId: terminals.station.id,
-        data: newstandMetadata,
-      },
-      {
-        terminalId: terminals.station.id,
-        data: partnershipMetadata,
-      },
-    ],
-  })
+      create: { terminalId: terminals.station.id, localId: initiative!.localId, data: initiative },
+      update: { data: initiative },
+    })
+  }
 }

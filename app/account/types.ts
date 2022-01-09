@@ -16,5 +16,5 @@ export type AccountMetadata = {
 export type Account = {
   id: number
   address: string
-  data: { contributorData: AccountMetadata }
+  data: AccountMetadata
 }

@@ -34,8 +34,11 @@ model Initiative {
   id           Int                     @id @default(autoincrement())
   terminal     Terminal                @relation(fields: [terminalId], references: [id])
   terminalId   Int
+  localId      Int
   applications InitiativeApplication[]
   data         Json?
+
+  @@unique([terminalId, localId], name: "terminalInitiative")
 }
 
 // An application into a certain initiative

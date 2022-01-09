@@ -51,7 +51,7 @@ const Navigation = () => {
             button={
               <div className="flex items-center">
                 <span className="w-7 h-7 rounded-full bg-concrete border border-marble-white mr-2"></span>
-                <span>{user?.data?.contributorData.handle || "Handle"}</span>
+                <span>{user?.data?.handle || "Handle"}</span>
               </div>
             }
             items={[

@@ -28,15 +28,15 @@ const ContributorCard = (contributor: Account) => {
         </div>
         <div className="flex flex-col flex-3/5 content-center">
           <div className="flex flex-row flex-1 space-x-1">
-            <div className="flex-3/5 text-m">{contributor.data.contributorData.handle}</div>
+            <div className="flex-3/5 text-m">{contributor.data.handle}</div>
             <div className="flex-2/5 m-auto">
               <Image src={Verified} alt="Verified icon." width={10} height={10} />
             </div>
           </div>
           <div className="flex flex-row flex-1 text-xs text-concrete space-x-1">
-            <div className="flex-1">{contributor.data.contributorData.wallet}</div>
+            <div className="flex-1">{contributor.data.wallet}</div>
             <div className="flex-1">-</div>
-            <div className="flex-1">{contributor.data.contributorData.pronouns}</div>
+            <div className="flex-1">{contributor.data.pronouns}</div>
           </div>
         </div>
       </div>
@@ -48,17 +48,17 @@ const ContributorCard = (contributor: Account) => {
         <div className="flex flex-1 align-right place-content-end content-right text-sm">
           <Image
             className="content-right text-sm"
-            src={roleSVG(contributor.data.contributorData.role)}
+            src={roleSVG(contributor.data.role)}
             alt="Role icon."
             height={17}
           />
-          {/* <span className="p-1 rounded-lg bg-purple-300 text-purple-500">{contributor.data.contributorData.role}</span> */}
+          {/* <span className="p-1 rounded-lg bg-purple-300 text-purple-500">{contributor.data.role}</span> */}
         </div>
       </div>
       <div className="flex flex-row flex-1 mx-3 ">
         <div className="flex-1 items-center justify-center text-sm">Socials</div>
         <div className="flex-1 text-right justify-end content-end text-sm">
-          <a target="_blank" rel="noreferrer" href={"www.twitter.com"}>
+          <a target="_blank" rel="noreferrer" href={contributor.data.twitterURL}>
             <Image
               className="content-right text-sm"
               src={TwitterIcon}

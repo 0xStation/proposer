@@ -11,6 +11,7 @@ const mind: AccountMetadata & { address: string } = {
   verified: true,
   wallet: "mindapi.eth",
   role: "STAFF",
+  twitterURL: "https://twitter.com/mindapi_",
 }
 const tina: AccountMetadata & { address: string } = {
   name: "Tina",
@@ -22,6 +23,7 @@ const tina: AccountMetadata & { address: string } = {
   verified: true,
   wallet: "fkpixels.eth",
   role: "STAFF",
+  twitterURL: "https://twitter.com/fkpxls",
 }
 const conner: AccountMetadata & { address: string } = {
   name: "Conner",
@@ -33,6 +35,7 @@ const conner: AccountMetadata & { address: string } = {
   verified: true,
   wallet: "symmtry.eth",
   role: "STAFF",
+  twitterURL: "https://twitter.com/symmtry69",
 }
 const kristen: AccountMetadata & { address: string } = {
   name: "Kristen",
@@ -44,6 +47,7 @@ const kristen: AccountMetadata & { address: string } = {
   verified: true,
   wallet: "0x420...6d9",
   role: "STAFF",
+  twitterURL: "https://twitter.com/0xRie_",
 }
 const calvin: AccountMetadata & { address: string } = {
   name: "Calvin",
@@ -55,6 +59,7 @@ const calvin: AccountMetadata & { address: string } = {
   verified: true,
   wallet: "0x420...6d9",
   role: "COMMUTER",
+  twitterURL: "https://twitter.com/cchengasaurus",
 }
 const brendan: AccountMetadata & { address: string } = {
   name: "Brendan",
@@ -66,6 +71,7 @@ const brendan: AccountMetadata & { address: string } = {
   verified: true,
   wallet: "brendo.eth",
   role: "COMMUTER",
+  twitterURL: "https://twitter.com/brendanelliot",
 }
 const michael: AccountMetadata & { address: string } = {
   name: "Michael",
@@ -77,6 +83,7 @@ const michael: AccountMetadata & { address: string } = {
   verified: true,
   wallet: "0x420...6d9",
   role: "COMMUTER",
+  twitterURL: "https://twitter.com/0xmcg",
 }
 const abe: AccountMetadata & { address: string } = {
   name: "Abe",
@@ -88,6 +95,7 @@ const abe: AccountMetadata & { address: string } = {
   verified: true,
   wallet: "0x420...6d9",
   role: "COMMUTER",
+  twitterURL: "https://twitter.com/abenazer_mekete",
 }
 const nick: AccountMetadata & { address: string } = {
   name: "Nick",
@@ -99,6 +107,7 @@ const nick: AccountMetadata & { address: string } = {
   verified: true,
   wallet: "0x420...6d9",
   role: "COMMUTER",
+  twitterURL: "https://twitter.com/zy22yz",
 }
 const alli: AccountMetadata & { address: string } = {
   name: "Alli",
@@ -110,6 +119,7 @@ const alli: AccountMetadata & { address: string } = {
   verified: true,
   wallet: "0x420...6d9",
   role: "COMMUTER",
+  twitterURL: "https://twitter.com/sonofalli",
 }
 const kassen: AccountMetadata & { address: string } = {
   name: "Kassen",
@@ -121,6 +131,7 @@ const kassen: AccountMetadata & { address: string } = {
   verified: true,
   wallet: "0x420...6d9",
   role: "COMMUTER",
+  twitterURL: "https://twitter.com/kassenq",
 }
 const alex: AccountMetadata & { address: string } = {
   name: "Alex",
@@ -132,6 +143,7 @@ const alex: AccountMetadata & { address: string } = {
   verified: true,
   wallet: "0x420...6d9",
   role: "COMMUTER",
+  twitterURL: "https://twitter.com/alexhughsam",
 }
 const akshay: AccountMetadata & { address: string } = {
   name: "Akshay",
@@ -143,6 +155,7 @@ const akshay: AccountMetadata & { address: string } = {
   verified: true,
   wallet: "0x420...6d9",
   role: "COMMUTER",
+  twitterURL: "https://twitter.com/wagmiking",
 }
 
 export const contributors = {
@@ -180,13 +193,10 @@ const contributorList: (AccountMetadata & { address: string })[] = [
 export async function seedContributors() {
   for (const name in contributorList) {
     const contributorData = contributorList[name]
-    let account = await db.account.create({
-      data: {
-        address: contributorData!.address,
-        data: {
-          contributorData,
-        },
-      },
+    await db.account.upsert({
+      where: { address: contributorData!.address },
+      create: { address: contributorData!.address, data: contributorData },
+      update: { data: contributorData },
     })
   }
 }

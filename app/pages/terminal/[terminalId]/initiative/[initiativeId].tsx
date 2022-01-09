@@ -33,7 +33,11 @@ const Project: BlitzPage = () => {
     { addresses: initiative?.members || [] },
     { suspense: false }
   )
-  contributors = contributors ? contributors : []
+  if (!contributors) {
+    contributors = []
+  } else if (contributors.length > 3) {
+    contributors = contributors.slice(0, 3)
+  }
 
   const modalChoice = () => {
     connectedUser ? setIsOpen(true) : setIsWalletOpen(true)
@@ -122,8 +126,6 @@ const Project: BlitzPage = () => {
                       {contributors.map((contributor) => {
                         return ContributorCard(contributor as Account)
                       })}
-                      {/* <ContributorCard></ContributorCard>
-                    <ContributorCard></ContributorCard> */}
                     </div>
                   </div>
 

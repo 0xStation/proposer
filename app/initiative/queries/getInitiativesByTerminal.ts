@@ -12,5 +12,9 @@ export default async function getInitiativesByTerminal(
   const data = GetInitiativesByTerminal.parse(input)
   const initiatives = await db.initiative.findMany({ where: { terminal: { id: data.terminalId } } })
 
+  if (!initiatives) {
+    return []
+  }
+
   return initiatives as Initiative[]
 }
