@@ -4,7 +4,7 @@ import { users } from "../../../../core/utils/data"
 import { Image, useQuery, BlitzPage, useParam, Link, Routes } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import ConnectWalletModal from "app/initiative/components/ConnectWalletModal"
-import ApplicationModal from "app/initiative/components/ApplicationModal"
+import ApplicationModal from "app/application/components/ApplicationModal"
 import ContributorCard from "../../../../core/components/ContributorCard"
 import ImageLink from "../../../../core/components/ImageLink"
 import getInitiativeById from "app/initiative/queries/getInitiativeById"
@@ -36,7 +36,7 @@ const Project: BlitzPage = () => {
     return (
       <>
         <ConnectWalletModal isWalletOpen={isWalletOpen} setIsWalletOpen={setIsWalletOpen} />
-        <ApplicationModal isOpen={isOpen} setIsOpen={setIsOpen} />
+        <ApplicationModal isOpen={isOpen} setIsOpen={setIsOpen} initiativeId={initiativeId} />
         <Layout>
           <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col">
             <div className="mx-4 mt-4">
