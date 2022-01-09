@@ -3,6 +3,9 @@ import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
 import InitiativeCard from "app/initiative/components/InitiativeCard"
 import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTerminal"
+import getAllAccounts from "app/account/queries/getAllAccounts"
+import { Account } from "app/account/types"
+import { Initiative } from "app/initiative/types"
 
 const TerminalInitiativePage: BlitzPage = () => {
   const terminalId = useParam("terminalId", "number") || 1
@@ -12,6 +15,11 @@ const TerminalInitiativePage: BlitzPage = () => {
     { terminalId: terminalId },
     { suspense: false }
   )
+
+  let [contributors] = useQuery(getAllAccounts, {}, { suspense: false })
+  if (!contributors) {
+    contributors = []
+  }
 
   return (
     <TerminalNavigation>
@@ -25,7 +33,7 @@ const TerminalInitiativePage: BlitzPage = () => {
                 key={initiative.id}
                 title={initiative?.data?.name || "Title"}
                 description={initiative?.data?.description || "Description"}
-                contributors={[]}
+                contributors={contributors}
               />
             )
           })}

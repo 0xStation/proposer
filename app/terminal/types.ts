@@ -3,3 +3,9 @@ export type TerminalMetadata = {
   handle: string
   description: string
 }
+
+export type Terminal = {
+  id: number
+  ticketAddress: string
+  data: TerminalMetadata
+}

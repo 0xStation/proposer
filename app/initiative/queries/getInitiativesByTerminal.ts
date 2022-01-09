@@ -10,7 +10,11 @@ export default async function getInitiativesByTerminal(
   input: z.infer<typeof GetInitiativesByTerminal>
 ) {
   const data = GetInitiativesByTerminal.parse(input)
-  const initiatives = await db.initiative.findMany({ where: { terminal: { id: data.terminalId } } })
+  const initiatives = await db.initiative.findMany({ where: { terminalId: data.terminalId } })
+
+  if (!initiatives) {
+    return []
+  }
 
   return initiatives as Initiative[]
 }

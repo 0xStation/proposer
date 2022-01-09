@@ -31,11 +31,15 @@ model Terminal {
 
 // An initiative within a terminal
 model Initiative {
-  id           Int                     @id @default(autoincrement())
-  terminal     Terminal                @relation(fields: [terminalId], references: [id])
-  terminalId   Int
-  applications InitiativeApplication[]
-  data         Json?
+  id             Int                     @id @default(autoincrement())
+  terminal       Terminal                @relation(fields: [terminalId], references: [id])
+  terminalId     Int
+  terminalTicket String
+  localId        Int                     @default(autoincrement())
+  applications   InitiativeApplication[]
+  data           Json?
+
+  @@unique([terminalTicket, localId], name: "terminalInitiative")
 }
 
 // An application into a certain initiative

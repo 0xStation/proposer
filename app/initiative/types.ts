@@ -9,10 +9,13 @@ export type InitiativeMetadata = {
   rewardText?: string
   isAcceptingApplications: boolean
   links: ExternalLink[]
+  members?: string[]
 }
 
 export type Initiative = {
   id: number
   terminalId: number
+  terminalTicket: string
+  localId: number
   data: InitiativeMetadata
 }

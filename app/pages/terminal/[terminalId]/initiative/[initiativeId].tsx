@@ -7,11 +7,14 @@ import ConnectWalletModal from "app/initiative/components/ConnectWalletModal"
 import ApplicationModal from "app/initiative/components/ApplicationModal"
 import ContributorCard from "../../../../core/components/ContributorCard"
 import ImageLink from "../../../../core/components/ImageLink"
-import getInitiativeById from "app/initiative/queries/getInitiativeById"
+import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
 import Newstand from "/public/newstand-banner.png"
 import ProgressBar from "/public/progress-bar.svg"
 import Back from "/public/back-icon.svg"
 import Page404 from "../../../404"
+import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
+import { Account } from "app/account/types"
+import getTerminalById from "app/terminal/queries/getTerminalById"
 
 const Project: BlitzPage = () => {
   let [isWalletOpen, setIsWalletOpen] = useState(false)
@@ -21,10 +24,26 @@ const Project: BlitzPage = () => {
   const connectedUser = useMemo(() => (account ? users[account] : null), [account])
 
   const terminalId = useParam("terminalId", "number") || 1
+  const initiativeLocalId = useParam("initiativeId", "number") || 0
 
-  const initiativeId = useParam("initiativeId", "number") || 3
+  const [terminal] = useQuery(getTerminalById, { id: terminalId }, { suspense: false })
 
-  const [initiative] = useQuery(getInitiativeById, { id: initiativeId }, { suspense: false })
+  const [initiative] = useQuery(
+    getInitiativeByLocalId,
+    { terminalTicket: terminal?.ticketAddress || "", localId: initiativeLocalId },
+    { suspense: false }
+  )
+
+  let [contributors] = useQuery(
+    getAccountsByAddresses,
+    { addresses: initiative?.data.members || [] },
+    { suspense: false }
+  )
+  if (!contributors) {
+    contributors = []
+  } else if (contributors.length > 3) {
+    contributors = contributors.slice(0, 3)
+  }
 
   const modalChoice = () => {
     connectedUser ? setIsOpen(true) : setIsWalletOpen(true)
@@ -55,13 +74,13 @@ const Project: BlitzPage = () => {
                 <div className="flex flex-col">
                   <div className="flex flex-col text-marble-white items-center space-y-1">
                     <div className="flex flex-col items-center content-center space-y-3">
-                      <span className="uppercase text-3xl">{initiative.shortName}</span>
+                      <span className="uppercase text-3xl">{initiative.data.shortName}</span>
                       <span className="text-sm mx-[60px] text-center">
-                        {initiative.description}
+                        {initiative.data.description}
                       </span>
                     </div>
                     <div className="cursor-pointer">
-                      {initiative.links?.map((item, index) => (
+                      {initiative.data.links?.map((item, index) => (
                         <ImageLink link={item} key={index} />
                       ))}
                     </div>
@@ -82,7 +101,7 @@ const Project: BlitzPage = () => {
                         <span className="text-lg">Calling for contributors</span>
                       </div>
                       <div className="space-y-3">
-                        {initiative.contributeText?.map((item, index) => {
+                        {initiative.data.contributeText?.map((item, index) => {
                           return (
                             <span className="text-sm flow-root" key={index}>
                               {item}
@@ -97,7 +116,7 @@ const Project: BlitzPage = () => {
                         <span className="text-lg">Rewards</span>
                       </div>
                       <div className="space-y-5">
-                        <span className="text-sm">{initiative.rewardText}</span>
+                        <span className="text-sm">{initiative.data.rewardText}</span>
                       </div>
                     </div>
                   </div>
@@ -110,9 +129,9 @@ const Project: BlitzPage = () => {
                       </span>
                     </div>
                     <div className="flex flex-row space-x-4">
-                      <ContributorCard></ContributorCard>
-                      <ContributorCard></ContributorCard>
-                      <ContributorCard></ContributorCard>
+                      {contributors.map((contributor) => {
+                        return ContributorCard(contributor as Account)
+                      })}
                     </div>
                   </div>
 

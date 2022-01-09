@@ -27,11 +27,11 @@ const Navigation = ({ children }: { children?: any }) => {
             <div className="flex items-center mt-12">
               <span className="border border-marble-white rounded-full h-12 w-12 mr-4 bg-concrete"></span>
               <div className="flex flex-col">
-                <h1 className="text-2xl text-marble-white">{terminal.name}</h1>
-                <span className="text-sm text-concrete">@{terminal.handle}</span>
+                <h1 className="text-2xl text-marble-white">{terminal.data.name}</h1>
+                <span className="text-sm text-concrete">@{terminal.data.handle}</span>
               </div>
             </div>
-            <h3 className="text-marble-white text-sm mt-6">{terminal.description}</h3>
+            <h3 className="text-marble-white text-sm mt-6">{terminal.data.description}</h3>
             <ul className="mt-9 text-lg">
               <li
                 className={`${

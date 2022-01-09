@@ -1,6 +1,7 @@
 export type AccountMetadata = {
   name: string
   handle: string
+  wallet?: string
   pfpURL?: string
   webURL?: string
   githubURL?: string
@@ -9,10 +10,11 @@ export type AccountMetadata = {
   pronouns: string
   discord: string
   verified: boolean
+  role?: string
 }
 
 export type Account = {
   id: number
   address: string
-  data: { contributorData: AccountMetadata }
+  data: AccountMetadata
 }
