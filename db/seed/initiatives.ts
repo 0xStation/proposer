@@ -2,7 +2,6 @@ import db from "../index"
 import { InitiativeMetadata } from "app/initiative/types"
 import { Symbol } from "app/types"
 import { contributors } from "./contributors"
-import { terminals } from "./terminals"
 
 const protocolMetadata: InitiativeMetadata & { localId: number } = {
   localId: 1,
@@ -68,7 +67,7 @@ const partnershipMetadata: InitiativeMetadata & { localId: number } = {
 
 const stationInitiaitves = [protocolMetadata, webMetadata, newstandMetadata, partnershipMetadata]
 
-export async function seedInitiatives() {
+export async function seedInitiatives(terminals) {
   for (const name in stationInitiaitves) {
     const initiative = stationInitiaitves[name]
     await db.initiative.upsert({
@@ -80,9 +79,9 @@ export async function seedInitiatives() {
       },
       create: {
         terminalTicket: terminals.station.ticketAddress,
+        terminalId: terminals.station.id,
         localId: initiative!.localId,
         data: initiative,
-        terminal: {},
       },
       update: { data: initiative },
     })

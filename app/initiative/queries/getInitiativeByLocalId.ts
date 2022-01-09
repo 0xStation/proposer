@@ -1,6 +1,6 @@
-import db, { Initiative } from "db"
+import db from "db"
 import * as z from "zod"
-import { InitiativeMetadata } from "app/initiative/types"
+import { Initiative } from "../types"
 
 const GetInitiativeByLocalId = z.object({
   terminalTicket: z.string(),
@@ -19,8 +19,5 @@ export default async function getInitiativeByLocalId(
     return null
   }
 
-  return {
-    ...initiative,
-    ...(initiative.data as Object),
-  } as Initiative & InitiativeMetadata
+  return initiative as Initiative
 }

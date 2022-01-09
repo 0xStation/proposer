@@ -36,7 +36,7 @@ const Project: BlitzPage = () => {
 
   let [contributors] = useQuery(
     getAccountsByAddresses,
-    { addresses: initiative?.members || [] },
+    { addresses: initiative?.data.members || [] },
     { suspense: false }
   )
   if (!contributors) {
@@ -74,13 +74,13 @@ const Project: BlitzPage = () => {
                 <div className="flex flex-col">
                   <div className="flex flex-col text-marble-white items-center space-y-1">
                     <div className="flex flex-col items-center content-center space-y-3">
-                      <span className="uppercase text-3xl">{initiative.shortName}</span>
+                      <span className="uppercase text-3xl">{initiative.data.shortName}</span>
                       <span className="text-sm mx-[60px] text-center">
-                        {initiative.description}
+                        {initiative.data.description}
                       </span>
                     </div>
                     <div className="cursor-pointer">
-                      {initiative.links?.map((item, index) => (
+                      {initiative.data.links?.map((item, index) => (
                         <ImageLink link={item} key={index} />
                       ))}
                     </div>
@@ -101,7 +101,7 @@ const Project: BlitzPage = () => {
                         <span className="text-lg">Calling for contributors</span>
                       </div>
                       <div className="space-y-3">
-                        {initiative.contributeText?.map((item, index) => {
+                        {initiative.data.contributeText?.map((item, index) => {
                           return (
                             <span className="text-sm flow-root" key={index}>
                               {item}
@@ -116,7 +116,7 @@ const Project: BlitzPage = () => {
                         <span className="text-lg">Rewards</span>
                       </div>
                       <div className="space-y-5">
-                        <span className="text-sm">{initiative.rewardText}</span>
+                        <span className="text-sm">{initiative.data.rewardText}</span>
                       </div>
                     </div>
                   </div>
