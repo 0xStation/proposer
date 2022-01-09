@@ -24,7 +24,13 @@ const ContributorCard = (contributor: Account) => {
     <div className="flex flex-col flex-1 content-center text-marble-white border border-concrete h-[130px] cursor-pointer">
       <div className="flex flex-row flex-1 content-center mx-3 my-3 space-x-1">
         <div className="flex-2/5 content-center align-middle">
-          <div className="h-[40px] w-[40px] place-self-center border border-marble-white rounded-full place-items-center"></div>
+          {contributor.data.pfpURL ? (
+            <div className="flex-2/5 m-auto">
+              <Image src={contributor.data.pfpURL} alt="PFP" width={40} height={40} />
+            </div>
+          ) : (
+            <div className="h-[40px] w-[40px] place-self-center border border-marble-white rounded-full place-items-center"></div>
+          )}
         </div>
         <div className="flex flex-col flex-3/5 content-center">
           <div className="flex flex-row flex-1 space-x-1">

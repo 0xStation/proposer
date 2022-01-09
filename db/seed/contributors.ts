@@ -12,6 +12,7 @@ const mind: AccountMetadata & { address: string } = {
   wallet: "mindapi.eth",
   role: "STAFF",
   twitterURL: "https://twitter.com/mindapi_",
+  pfpURL: "https://pbs.twimg.com/profile_images/1466504048006377472/KrC6aPam_400x400.jpg",
 }
 const tina: AccountMetadata & { address: string } = {
   name: "Tina",
@@ -24,6 +25,7 @@ const tina: AccountMetadata & { address: string } = {
   wallet: "fkpixels.eth",
   role: "STAFF",
   twitterURL: "https://twitter.com/fkpxls",
+  pfpURL: "https://pbs.twimg.com/profile_images/1470115904289574913/7t4TlLQd_400x400.jpg",
 }
 const conner: AccountMetadata & { address: string } = {
   name: "Conner",
@@ -36,6 +38,7 @@ const conner: AccountMetadata & { address: string } = {
   wallet: "symmtry.eth",
   role: "STAFF",
   twitterURL: "https://twitter.com/symmtry69",
+  pfpURL: "https://pbs.twimg.com/profile_images/1466148504934309888/mighngBe_400x400.jpg",
 }
 const kristen: AccountMetadata & { address: string } = {
   name: "Kristen",
@@ -48,6 +51,7 @@ const kristen: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "STAFF",
   twitterURL: "https://twitter.com/0xRie_",
+  pfpURL: "https://pbs.twimg.com/profile_images/1472492830362800130/IGUo8Pd__400x400.jpg",
 }
 const calvin: AccountMetadata & { address: string } = {
   name: "Calvin",
@@ -60,6 +64,7 @@ const calvin: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/cchengasaurus",
+  pfpURL: "https://pbs.twimg.com/profile_images/1383273360986054659/A3pwCK_O_400x400.png",
 }
 const brendan: AccountMetadata & { address: string } = {
   name: "Brendan",
@@ -71,7 +76,8 @@ const brendan: AccountMetadata & { address: string } = {
   verified: true,
   wallet: "brendo.eth",
   role: "COMMUTER",
-  twitterURL: "https://twitter.com/brendanelliot",
+  twitterURL: "https://twitter.com/brendanelliot_",
+  pfpURL: "https://pbs.twimg.com/profile_images/1474473416354902023/sJMCansO_400x400.jpg",
 }
 const michael: AccountMetadata & { address: string } = {
   name: "Michael",
@@ -84,6 +90,7 @@ const michael: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/0xmcg",
+  pfpURL: "https://pbs.twimg.com/profile_images/1445182641972695054/hQlv1yTJ_400x400.png",
 }
 const abe: AccountMetadata & { address: string } = {
   name: "Abe",
@@ -96,6 +103,7 @@ const abe: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/abenazer_mekete",
+  pfpURL: "https://pbs.twimg.com/profile_images/1477072835310936065/KGkgOsJV_400x400.jpg",
 }
 const nick: AccountMetadata & { address: string } = {
   name: "Nick",
@@ -108,6 +116,7 @@ const nick: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/zy22yz",
+  pfpURL: "https://pbs.twimg.com/profile_images/1479676346229874691/EDnifhen_400x400.png",
 }
 const alli: AccountMetadata & { address: string } = {
   name: "Alli",
@@ -120,6 +129,7 @@ const alli: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/sonofalli",
+  pfpURL: "https://pbs.twimg.com/profile_images/1467974510540251142/8Tld5x0g_400x400.jpg",
 }
 const kassen: AccountMetadata & { address: string } = {
   name: "Kassen",
@@ -132,6 +142,7 @@ const kassen: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/kassenq",
+  pfpURL: "https://pbs.twimg.com/profile_images/1447546582019289089/6FTxfXBw_400x400.jpg",
 }
 const alex: AccountMetadata & { address: string } = {
   name: "Alex",
@@ -144,6 +155,7 @@ const alex: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/alexhughsam",
+  pfpURL: "https://pbs.twimg.com/profile_images/1444053434383147017/NHJoWE9j_400x400.jpg",
 }
 const akshay: AccountMetadata & { address: string } = {
   name: "Akshay",
@@ -156,6 +168,7 @@ const akshay: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/wagmiking",
+  pfpURL: "https://pbs.twimg.com/profile_images/1468635081874948099/hG0lDyef_400x400.jpg",
 }
 
 export const contributors = {
@@ -174,25 +187,9 @@ export const contributors = {
   akshay,
 }
 
-const contributorList: (AccountMetadata & { address: string })[] = [
-  tina,
-  mind,
-  conner,
-  kristen,
-  calvin,
-  brendan,
-  michael,
-  abe,
-  nick,
-  alli,
-  kassen,
-  alex,
-  akshay,
-]
-
 export async function seedContributors() {
-  for (const name in contributorList) {
-    const contributorData = contributorList[name]
+  for (const name in contributors) {
+    const contributorData = contributors[name] as AccountMetadata & { address: string }
     await db.account.upsert({
       where: { address: contributorData!.address },
       create: { address: contributorData!.address, data: contributorData },
