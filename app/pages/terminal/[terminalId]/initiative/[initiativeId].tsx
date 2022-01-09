@@ -12,6 +12,8 @@ import Newstand from "/public/newstand-banner.png"
 import ProgressBar from "/public/progress-bar.svg"
 import Back from "/public/back-icon.svg"
 import Page404 from "../../../404"
+import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
+import { Account } from "app/account/types"
 
 const Project: BlitzPage = () => {
   let [isWalletOpen, setIsWalletOpen] = useState(false)
@@ -25,6 +27,13 @@ const Project: BlitzPage = () => {
   const initiativeId = useParam("initiativeId", "number") || 3
 
   const [initiative] = useQuery(getInitiativeById, { id: initiativeId }, { suspense: false })
+
+  let [contributors] = useQuery(
+    getAccountsByAddresses,
+    { addresses: initiative?.members || [] },
+    { suspense: false }
+  )
+  contributors = contributors ? contributors : []
 
   const modalChoice = () => {
     connectedUser ? setIsOpen(true) : setIsWalletOpen(true)
@@ -110,9 +119,11 @@ const Project: BlitzPage = () => {
                       </span>
                     </div>
                     <div className="flex flex-row space-x-4">
-                      <ContributorCard></ContributorCard>
-                      <ContributorCard></ContributorCard>
-                      <ContributorCard></ContributorCard>
+                      {contributors.map((contributor) => {
+                        return ContributorCard(contributor as Account)
+                      })}
+                      {/* <ContributorCard></ContributorCard>
+                    <ContributorCard></ContributorCard> */}
                     </div>
                   </div>
 

@@ -25,7 +25,7 @@ const TerminalInitiativePage: BlitzPage = () => {
                 key={initiative.id}
                 title={initiative?.data?.name || "Title"}
                 description={initiative?.data?.description || "Description"}
-                contributors={[]}
+                contributors={[initiative?.data?.members] || []}
               />
             )
           })}
