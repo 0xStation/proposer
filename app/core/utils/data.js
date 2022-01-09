@@ -66,4 +66,9 @@ export const users = {
     handle: "cryptoabe",
     nftId: 12,
   },
+  "0x2f40e3Fb0e892240E3cd5682D10ce1860275174C": {
+    fname: "nick",
+    handle: "zy2",
+    nftId: 13,
+  },
 }
