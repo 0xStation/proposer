@@ -35,7 +35,7 @@ model Initiative {
   terminal       Terminal                @relation(fields: [terminalId], references: [id])
   terminalId     Int
   terminalTicket String
-  localId        Int
+  localId        Int                     @default(autoincrement())
   applications   InitiativeApplication[]
   data           Json?
 
