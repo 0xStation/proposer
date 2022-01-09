@@ -1,15 +1,25 @@
 import { useState } from "react"
+import AccountModal from "../../application/components/AccountModal"
 import ApplicationModal from "../../application/components/ApplicationModal"
+import useStore from "../../core/hooks/useStore"
+import { Account } from "../../account/types"
 
 const InitiativeCard = ({ title, description, id, contributors }) => {
-  let [isOpen, setIsOpen] = useState(false)
+  let [applicationModalOpen, setApplicationModalOpen] = useState(false)
+  let [accountModalOpen, setAccountModalOpen] = useState(false)
+  const activeUser: Account | null = useStore((state) => state.activeUser)
   return (
     <>
-      <ApplicationModal isOpen={isOpen} setIsOpen={setIsOpen} initiativeId={id} />
+      <AccountModal isOpen={accountModalOpen} setIsOpen={setAccountModalOpen} initiativeId={id} />
+      <ApplicationModal
+        isOpen={applicationModalOpen}
+        setIsOpen={setApplicationModalOpen}
+        initiativeId={id}
+      />
       <div
         className="border border-concrete p-4 flex flex-col cursor-pointer"
         onClick={() => {
-          setIsOpen(true)
+          activeUser ? setApplicationModalOpen(true) : setAccountModalOpen(true)
         }}
       >
         <h3 className="text-marble-white text-2xl">{title}</h3>
