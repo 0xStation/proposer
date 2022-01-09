@@ -26,11 +26,6 @@ export const users = {
     handle: "brendo",
     nftId: 4,
   },
-  "0x6Cf61c97674C65c68D1E816eCCf36061aCD9a65c": {
-    fname: "darian",
-    handle: "WGMIApe",
-    nftId: 5,
-  },
   "0xB0F0bA31aA582726E36Dc0c79708E9e072455eD2": {
     fname: "calvin",
     handle: "cchengasaurus",
@@ -40,11 +35,6 @@ export const users = {
     fname: "kristen",
     handle: "rie",
     nftId: 7,
-  },
-  "0x5716e900249D6c35afA41343a2394C32C1B4E6cB": {
-    fname: "kash",
-    handle: "honeykashmoney",
-    nftId: 8,
   },
   "0x8FAA5498Ca6fc9A61BA967E07fBc9420aab99E55": {
     fname: "akshay",
@@ -65,5 +55,10 @@ export const users = {
     fname: "abenazer",
     handle: "cryptoabe",
     nftId: 12,
+  },
+  "0x2f40e3Fb0e892240E3cd5682D10ce1860275174C": {
+    fname: "nick",
+    handle: "zy2",
+    nftId: 13,
   },
 }
