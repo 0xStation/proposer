@@ -1,21 +1,24 @@
 import { useMutation } from "blitz"
 import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
-import createApplication from "../mutations/createApplication"
-import useStore from "../../core/hooks/useStore"
-import { Account } from "../../account/types"
+import createAccount from "../mutations/createAccount"
+import useStore from "app/core/hooks/useStore"
 
 const AccountModal = ({
   isOpen,
   setIsOpen,
-  initiativeId,
+  address,
 }: {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-  initiativeId: number
+  address: string
 }) => {
-  const [createApplicationMutation] = useMutation(createApplication)
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const setActiveUser = useStore((state) => state.setActiveUser)
+  const [createAccountMutation] = useMutation(createAccount, {
+    onSuccess: (data) => {
+      setActiveUser(data)
+    },
+  })
 
   return (
     <Modal
@@ -26,14 +29,15 @@ const AccountModal = ({
     >
       <div className="mt-8">
         <Form
-          onSubmit={async (values: { url: string }) => {
+          onSubmit={async (values: {
+            name: string
+            discordId: string
+            address: string
+            pronouns: string
+            timezone: string
+          }) => {
             try {
-              await createApplicationMutation({
-                ...values,
-                initiativeId: initiativeId,
-                applicantId: activeUser?.id || undefined,
-              })
-              alert("Applied successfully!")
+              await createAccountMutation({ ...values, address })
             } catch (error) {
               alert("Error applying.")
             }
@@ -53,12 +57,12 @@ const AccountModal = ({
                   />
                 </div>
                 <div className="flex flex-col">
-                  <label htmlFor="name" className="text-marble-white">
+                  <label htmlFor="discordId" className="text-marble-white">
                     Discord ID
                   </label>
                   <Field
                     component="input"
-                    name="name"
+                    name="discordId"
                     placeholder="Discord ID"
                     className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
                   />

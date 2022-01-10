@@ -1,4 +1,4 @@
-import { useMutation } from "blitz"
+import { useMutation, useRouter, useParam } from "blitz"
 import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
@@ -14,8 +14,20 @@ const ApplicationModal = ({
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   initiativeId: number
 }) => {
-  const [createApplicationMutation] = useMutation(createApplication)
+  const router = useRouter()
+  const terminalId = useParam("terminalId", "number") || 1
+  const [createApplicationMutation] = useMutation(createApplication, {
+    onSuccess: () => {
+      router.push(`/terminal/${terminalId}/waiting`)
+    },
+  })
   const activeUser: Account | null = useStore((state) => state.activeUser)
+
+  if (!activeUser) {
+    return (
+      <Modal title="Oops!" subtitle="You must be logged in." open={isOpen} toggle={setIsOpen} />
+    )
+  }
 
   return (
     <Modal
@@ -26,14 +38,13 @@ const ApplicationModal = ({
     >
       <div className="mt-8">
         <Form
-          onSubmit={async (values: { url: string }) => {
+          onSubmit={async (values: { url: string; why: string }) => {
             try {
               await createApplicationMutation({
                 ...values,
                 initiativeId: initiativeId,
-                applicantId: activeUser?.id || undefined,
+                applicantId: activeUser.id,
               })
-              alert("Applied successfully!")
             } catch (error) {
               alert("Error applying.")
             }
@@ -48,14 +59,22 @@ const ApplicationModal = ({
                   <Field
                     component="input"
                     name="url"
-                    placeholder="something.com"
+                    placeholder="Share your best work"
+                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
+                  />
+                </div>
+                <div className="flex flex-col col-span-2">
+                  <label htmlFor="why" className="text-marble-white">
+                    Why this initiative?
+                  </label>
+                  <Field
+                    component="input"
+                    name="why"
+                    placeholder="..."
                     className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
                   />
                 </div>
               </div>
-
-              {/* possibly a field for additional skills? */}
-
               <button
                 type="submit"
                 className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-12 mx-auto block p-2"

@@ -13,7 +13,7 @@ import Page404 from "../../../404"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
 import { Account } from "app/account/types"
 import getTerminalById from "app/terminal/queries/getTerminalById"
-import AccountModal from "app/application/components/AccountModal"
+import AccountModal from "app/account/components/AccountModal"
 import ApplicationModal from "app/application/components/ApplicationModal"
 import useStore from "app/core/hooks/useStore"
 
@@ -84,7 +84,7 @@ const Project: BlitzPage = () => {
         <AccountModal
           isOpen={accountModalOpen}
           setIsOpen={setAccountModalOpen}
-          initiativeId={initiativeLocalId}
+          address={account || ""}
         />
         <ConnectWalletModal isWalletOpen={walletModalOpen} setIsWalletOpen={setWalletModalOpen} />
         <Layout>
