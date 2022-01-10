@@ -45,7 +45,7 @@ const Project: BlitzPage = () => {
     contributors = contributors.slice(0, 3)
   }
 
-  const modalChoice = () => {
+  const showWalletOrApplicationModal = () => {
     connectedUser ? setIsOpen(true) : setIsWalletOpen(true)
   }
 
@@ -188,7 +188,7 @@ const Project: BlitzPage = () => {
                     <button
                       className="mt-4 w-full py-2 text-center text-sm bg-magic-mint rounded item-center w-[280px]"
                       onClick={() => {
-                        modalChoice()
+                        showWalletOrApplicationModal()
                       }}
                     >
                       Submit interest

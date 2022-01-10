@@ -2,6 +2,8 @@
 import { useEthers } from "@usedapp/core"
 // import { users } from "../../core/utils/data"
 import { Image } from "blitz"
+// import { users } from "../../core/utils/data"
+// import { useMemo } from "react"
 import Modal from "../../core/components/Modal"
 import Metamask from "/public/metamask-logo.svg"
 import Coinbase from "/public/coinbase-logo.svg"
@@ -10,6 +12,7 @@ import Banner from "/public/walletconnect-banner.svg"
 
 const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   const { activateBrowserWallet } = useEthers()
+  // const connectedUser = useMemo(() => (account ? users[account] : null), [account])
   const onError = (error: Error) => {
     console.log(error.message)
   }
