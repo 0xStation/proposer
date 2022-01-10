@@ -1,4 +1,4 @@
-import { useContractFunction } from "@usedapp/core"
+import { useContractFunction, useTokenBalance } from "@usedapp/core"
 import { utils } from "ethers"
 import { Contract } from "@ethersproject/contracts"
 import { TERMINAL } from "../utils/constants"
@@ -17,4 +17,9 @@ export const useIncreaseAllowanceMethod = (methodName: string) => {
   const contract = new Contract(TERMINAL.TOKEN_ADDRESS, endorsementTokenInterface)
   const { state, send } = useContractFunction(contract, methodName)
   return { state, send }
+}
+
+export const useEndorsementTokenBalance = (address) => {
+  const balanceOf: any = useTokenBalance(TERMINAL.TOKEN_ADDRESS, address)
+  return balanceOf && utils.formatUnits(balanceOf, 3)
 }

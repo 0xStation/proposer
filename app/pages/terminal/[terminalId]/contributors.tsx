@@ -1,12 +1,44 @@
-import { BlitzPage } from "blitz"
+import { useState } from "react"
+import { BlitzPage, useQuery, useParam } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
-import InitiativeCard from "app/initiative/components/InitiativeCard"
+import getAllAccounts from "app/account/queries/getAllAccounts"
+import ContributorCard from "app/core/components/ContributorCard"
+import { Account } from "app/account/types"
+import EndorseContributorModal from "app/contributors/components/EndorseContributorModal"
 
 const TerminalContributorsPage: BlitzPage = () => {
+  const terminalId = useParam("terminalId", "number") || 1
+
+  // TODO: get accounts by terminal id
+  let [contributors] = useQuery(getAllAccounts, {}, { suspense: false })
+  if (!contributors) {
+    contributors = []
+  }
+
+  let [endorseModalIsOpen, setEndorseModalIsOpen] = useState(false)
+  let [selectedUserToEndorse, setSelectedUserToEndorse] = useState<Account | null>(null)
+  const openEndorseModal = () => setEndorseModalIsOpen(!endorseModalIsOpen)
+
   return (
     <TerminalNavigation>
-      <span className="text-marble-white">COMING SOON</span>
+      {contributors.length ? (
+        <>
+          <EndorseContributorModal
+            isOpen={endorseModalIsOpen}
+            setIsOpen={setEndorseModalIsOpen}
+            selectedUserToEndorse={selectedUserToEndorse}
+          />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {contributors.length &&
+              contributors.map((contributor) =>
+                ContributorCard(contributor as Account, openEndorseModal, setSelectedUserToEndorse)
+              )}
+          </div>
+        </>
+      ) : (
+        <span className="text-marble-white">COMING SOON</span>
+      )}
     </TerminalNavigation>
   )
 }
