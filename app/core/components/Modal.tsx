@@ -1,7 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
 import { Image } from "blitz"
-import { useState } from "react"
 
 const checkBanner = (picture) => {
   if (picture) {
@@ -24,8 +23,6 @@ const Modal = ({
   children?: any
   banner?: any
 }) => {
-  let [isOpen, setIsOpen] = useState(true)
-
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" onClose={() => toggle(!open)}>
