@@ -26,7 +26,13 @@ const ContributorCard = (contributor: Account) => {
         <div className="flex-2/5 content-center align-middle">
           {contributor.data.pfpURL ? (
             <div className="flex-2/5 m-auto">
-              <Image src={contributor.data.pfpURL} alt="PFP" width={40} height={40} />
+              <Image
+                className="border rounded-full"
+                src={contributor.data.pfpURL}
+                alt="PFP"
+                width={40}
+                height={40}
+              />
             </div>
           ) : (
             <div className="h-[40px] w-[40px] place-self-center border border-marble-white rounded-full place-items-center"></div>
