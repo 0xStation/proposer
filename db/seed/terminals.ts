@@ -19,6 +19,7 @@ export async function seedTerminals() {
       data: stationMetadata,
     },
   })
+  console.log(`  Station id: ${station.id}`)
   return {
     station,
   }

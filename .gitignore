@@ -28,6 +28,7 @@ blitz-log.log
 .envrc
 .env.staging
 .env.production
+.env.development
 
 # Logs
 logs
