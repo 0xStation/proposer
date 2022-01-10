@@ -1,6 +1,5 @@
-// import { useMemo } from "react"
+import { useEffect, useState } from "react"
 import { useEthers } from "@usedapp/core"
-// import { users } from "../../core/utils/data"
 import { Image } from "blitz"
 import Modal from "../../core/components/Modal"
 import Metamask from "/public/metamask-logo.svg"
@@ -9,10 +8,17 @@ import WalletConnect from "/public/wallet-logo.svg"
 import Banner from "/public/walletconnect-banner.svg"
 
 const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
-  const { activateBrowserWallet } = useEthers()
+  const [userTriggered, setUserTrigged] = useState(false)
+  const { activateBrowserWallet, account } = useEthers()
   const onError = (error: Error) => {
     console.log(error.message)
   }
+
+  // useEffect(() => {
+  //   if (account && userTriggered) {
+  //     cleanup()
+  //   }
+  // }, [account])
 
   return (
     <Modal
@@ -26,7 +32,10 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         <div className="flex flex-row space-x-3 mx-5 text-marble-white">
           <button
             className="flex-1 border border-marble-white  rounded-md content-center"
-            onClick={() => activateBrowserWallet(onError)}
+            onClick={() => {
+              setUserTrigged(true)
+              activateBrowserWallet(onError)
+            }}
           >
             <div className="flex flex-row flex-1 justify-center space-x-2 my-1">
               <div className="flex-3/5">
@@ -39,7 +48,10 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           </button>
           <button
             className="flex-1  border border-marble-white rounded-md content-center"
-            onClick={() => activateBrowserWallet(onError)}
+            onClick={() => {
+              setUserTrigged(true)
+              activateBrowserWallet(onError)
+            }}
           >
             <div className="flex flex-row flex-1 justify-center align-middle space-x-2 my-1 mx-auto">
               <div className="flex-3/5">
@@ -52,7 +64,10 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           </button>
           <button
             className="flex-1 border border-marble-white rounded-md content-center"
-            onClick={() => activateBrowserWallet(onError)}
+            onClick={() => {
+              setUserTrigged(true)
+              activateBrowserWallet(onError)
+            }}
           >
             <div className="flex flex-row flex-1  justify-center align-middle space-x-2 my-1">
               <div className="flex-3/5">

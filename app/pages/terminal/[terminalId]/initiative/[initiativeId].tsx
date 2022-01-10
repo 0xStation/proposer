@@ -1,10 +1,8 @@
-import { useMemo, useState } from "react"
-import { useEthers, useSendTransaction } from "@usedapp/core"
-import { users } from "../../../../core/utils/data"
+import { useState, useEffect } from "react"
+import { useEthers } from "@usedapp/core"
 import { Image, useQuery, BlitzPage, useParam, Link, Routes } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import ConnectWalletModal from "app/initiative/components/ConnectWalletModal"
-import ApplicationModal from "app/initiative/components/ApplicationModal"
 import ContributorCard from "../../../../core/components/ContributorCard"
 import ImageLink from "../../../../core/components/ImageLink"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
@@ -15,13 +13,41 @@ import Page404 from "../../../404"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
 import { Account } from "app/account/types"
 import getTerminalById from "app/terminal/queries/getTerminalById"
+import AccountModal from "app/application/components/AccountModal"
+import ApplicationModal from "app/application/components/ApplicationModal"
+import useStore from "app/core/hooks/useStore"
 
 const Project: BlitzPage = () => {
-  let [isWalletOpen, setIsWalletOpen] = useState(false)
-  let [isOpen, setIsOpen] = useState(false)
-
   const { account } = useEthers()
-  const connectedUser = useMemo(() => (account ? users[account] : null), [account])
+  const activeUser: Account | null = useStore((state) => state.activeUser)
+  let [walletModalOpen, setWalletModalOpen] = useState(false)
+  let [accountModalOpen, setAccountModalOpen] = useState(false)
+  let [applicationModalOpen, setApplicationModalOpen] = useState(false)
+  const [userTriggered, setUserTrigged] = useState(false)
+
+  const setActiveModal = () => {
+    account
+      ? activeUser
+        ? setApplicationModalOpen(true)
+        : setAccountModalOpen(true)
+      : setWalletModalOpen(true)
+  }
+
+  useEffect(() => {
+    // need to check if the effect was actually triggered by the user (pressing the button)
+    // if we don't then the page load account changing from null -> account while it loads
+    // will trigger this to run, which we don't want.
+    if (userTriggered) {
+      setAccountModalOpen(false)
+      setApplicationModalOpen(false)
+      setWalletModalOpen(false)
+      // the modal was locking the screen unless I put a timeout between modal transitions.
+      // I think it has something to do with the previous modal cleaning up after it closes
+      // and the "fixed" state that locks the modal to prevent the user from scrolling while
+      // the modal is active does not properly clean itself up.
+      setTimeout(() => setActiveModal(), 500)
+    }
+  }, [account, activeUser])
 
   const terminalId = useParam("terminalId", "number") || 1
   const initiativeLocalId = useParam("initiativeId", "number") || 0
@@ -45,17 +71,22 @@ const Project: BlitzPage = () => {
     contributors = contributors.slice(0, 3)
   }
 
-  const modalChoice = () => {
-    connectedUser ? setIsOpen(true) : setIsWalletOpen(true)
-  }
-
   if (!initiative) {
     return <Page404 />
   } else {
     return (
       <>
-        <ConnectWalletModal isWalletOpen={isWalletOpen} setIsWalletOpen={setIsWalletOpen} />
-        <ApplicationModal isOpen={isOpen} setIsOpen={setIsOpen} />
+        <ApplicationModal
+          isOpen={applicationModalOpen}
+          setIsOpen={setApplicationModalOpen}
+          initiativeId={initiativeLocalId}
+        />
+        <AccountModal
+          isOpen={accountModalOpen}
+          setIsOpen={setAccountModalOpen}
+          initiativeId={initiativeLocalId}
+        />
+        <ConnectWalletModal isWalletOpen={walletModalOpen} setIsWalletOpen={setWalletModalOpen} />
         <Layout>
           <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col">
             <div className="mx-4 mt-4">
@@ -186,9 +217,10 @@ const Project: BlitzPage = () => {
 
                   <div className="flex justify-center items-center">
                     <button
-                      className="mt-4 w-full py-2 text-center text-sm bg-magic-mint rounded item-center w-[280px]"
+                      className="mt-4 py-2 text-center text-sm bg-magic-mint rounded item-center w-[280px]"
                       onClick={() => {
-                        modalChoice()
+                        setUserTrigged(true)
+                        setActiveModal()
                       }}
                     >
                       Submit interest

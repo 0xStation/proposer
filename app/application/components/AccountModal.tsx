@@ -59,7 +59,7 @@ const AccountModal = ({
                   <Field
                     component="input"
                     name="name"
-                    placeholder="Name"
+                    placeholder="Discord ID"
                     className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
                   />
                 </div>
@@ -70,7 +70,7 @@ const AccountModal = ({
                   <Field
                     component="input"
                     name="pronouns"
-                    placeholder="Select one"
+                    placeholder="Enter your pronouns"
                     className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
                   />
                 </div>
