@@ -4,8 +4,6 @@ import TerminalNavigation from "app/terminal/components/Navigation"
 import InitiativeCard from "app/initiative/components/InitiativeCard"
 import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTerminal"
 import getAllAccounts from "app/account/queries/getAllAccounts"
-import { Account } from "app/account/types"
-import { Initiative } from "app/initiative/types"
 
 const TerminalInitiativePage: BlitzPage = () => {
   const terminalId = useParam("terminalId", "number") || 1
@@ -30,6 +28,7 @@ const TerminalInitiativePage: BlitzPage = () => {
           {initiatives.map((initiative) => {
             return (
               <InitiativeCard
+                id={initiative.id}
                 key={initiative.id}
                 title={initiative?.data?.name || "Title"}
                 description={initiative?.data?.description || "Description"}

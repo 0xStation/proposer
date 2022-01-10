@@ -1,30 +1,33 @@
 import { useState } from "react"
-import ApplicationModal from "./ApplicationModal"
-import { Image } from "blitz"
+import AccountModal from "../../application/components/AccountModal"
+import ApplicationModal from "../../application/components/ApplicationModal"
+import useStore from "../../core/hooks/useStore"
+import { Account } from "../../account/types"
 
-const InitiativeCard = ({ title, description, contributors }) => {
-  let [isOpen, setIsOpen] = useState(false)
+const InitiativeCard = ({ title, description, id, contributors }) => {
+  let [applicationModalOpen, setApplicationModalOpen] = useState(false)
+  let [accountModalOpen, setAccountModalOpen] = useState(false)
+  const activeUser: Account | null = useStore((state) => state.activeUser)
   return (
     <>
-      <ApplicationModal isOpen={isOpen} setIsOpen={setIsOpen} />
+      <AccountModal isOpen={accountModalOpen} setIsOpen={setAccountModalOpen} initiativeId={id} />
+      <ApplicationModal
+        isOpen={applicationModalOpen}
+        setIsOpen={setApplicationModalOpen}
+        initiativeId={id}
+      />
       <div
         className="border border-concrete p-4 flex flex-col cursor-pointer"
         onClick={() => {
-          setIsOpen(true)
+          activeUser ? setApplicationModalOpen(true) : setAccountModalOpen(true)
         }}
       >
         <h3 className="text-marble-white text-2xl">{title}</h3>
         <p className="text-marble-white text-xs mt-2 grow">{description}</p>
         <div className="mt-8 flex flex-row">
-          {contributors.map((contributor) => {
-            return contributor.data?.pfpURL ? (
-              <div className="flex-2/5 m-auto ml-[-0.5px]">
-                <Image src={contributor.data.pfpURL} alt="PFP" width={16} height={16} />
-              </div>
-            ) : (
-              <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block ml-[-0.5px]"></span>
-            )
-          })}
+          <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block"></span>
+          <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block ml-[-5px]"></span>
+          <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block ml-[-5px]"></span>
         </div>
       </div>
     </>
