@@ -1,6 +1,4 @@
-// import { useMemo } from "react"
 import { useEthers } from "@usedapp/core"
-// import { users } from "../../core/utils/data"
 import { Image } from "blitz"
 import Modal from "../../core/components/Modal"
 import Metamask from "/public/metamask-logo.svg"
