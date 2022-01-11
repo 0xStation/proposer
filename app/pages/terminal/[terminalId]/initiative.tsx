@@ -1,11 +1,9 @@
-import { BlitzPage, useQuery, useParam } from "blitz"
+import { BlitzPage, useQuery, useParam, Routes, Link } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
 import InitiativeCard from "app/initiative/components/InitiativeCard"
 import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTerminal"
 import getAllAccounts from "app/account/queries/getAllAccounts"
-import { Account } from "app/account/types"
-import { Initiative } from "app/initiative/types"
 
 const TerminalInitiativePage: BlitzPage = () => {
   const terminalId = useParam("terminalId", "number") || 1
@@ -29,12 +27,18 @@ const TerminalInitiativePage: BlitzPage = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {initiatives.map((initiative) => {
             return (
-              <InitiativeCard
+              <Link
                 key={initiative.id}
-                title={initiative?.data?.name || "Title"}
-                description={initiative?.data?.description || "Description"}
-                contributors={contributors}
-              />
+                href={Routes.Project({ terminalId, initiativeId: initiative.id })}
+              >
+                <a>
+                  <InitiativeCard
+                    title={initiative?.data?.name || "Title"}
+                    description={initiative?.data?.description || "Description"}
+                    contributors={contributors}
+                  />
+                </a>
+              </Link>
             )
           })}
         </div>

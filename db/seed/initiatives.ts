@@ -1,11 +1,11 @@
 import db from "../index"
-import { InitiativeMetadata } from "app/initiative/types"
+import { Initiative, InitiativeMetadata } from "app/initiative/types"
 import { Symbol } from "app/types"
 import { contributors } from "./contributors"
 
 const protocolMetadata: InitiativeMetadata & { localId: number } = {
   localId: 1,
-  name: "Protocol v1",
+  name: "Protocol",
   description:
     "Station's protocol is the smart contract engine that powers all of our app's on-chain capabilities.",
   shortName: "PROTOCOl",
@@ -20,7 +20,7 @@ const protocolMetadata: InitiativeMetadata & { localId: number } = {
 }
 const webMetadata: InitiativeMetadata & { localId: number } = {
   localId: 2,
-  name: "Web v1",
+  name: "Web",
   description: "Station's web application is the home of our user experience.",
   shortName: "WEB",
   isAcceptingApplications: false,
@@ -52,7 +52,7 @@ const newstandMetadata: InitiativeMetadata & { localId: number } = {
 }
 const partnershipMetadata: InitiativeMetadata & { localId: number } = {
   localId: 4,
-  name: "Terminal Partnership",
+  name: "Partnerships",
   description: "Forming GTM plans to onboard our Beta Terminal partners.",
   shortName: "PARTNERSHIP",
   isAcceptingApplications: true,
@@ -70,7 +70,7 @@ const stationInitiaitves = [protocolMetadata, webMetadata, newstandMetadata, par
 export async function seedInitiatives(terminals) {
   for (const name in stationInitiaitves) {
     const initiative = stationInitiaitves[name]
-    await db.initiative.upsert({
+    const ret = await db.initiative.upsert({
       where: {
         terminalInitiative: {
           terminalTicket: terminals.station.ticketAddress,
@@ -85,5 +85,6 @@ export async function seedInitiatives(terminals) {
       },
       update: { data: initiative },
     })
+    console.log(`  ${(ret as Initiative).data?.name} localId: ${ret.localId}`)
   }
 }
