@@ -79,7 +79,7 @@ const Project: BlitzPage = () => {
         <ApplicationModal
           isOpen={applicationModalOpen}
           setIsOpen={setApplicationModalOpen}
-          initiativeId={initiativeLocalId}
+          initiativeId={initiative.id}
         />
         <AccountModal
           isOpen={accountModalOpen}
