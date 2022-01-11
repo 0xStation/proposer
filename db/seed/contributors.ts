@@ -103,7 +103,7 @@ const abe: AccountMetadata & { address: string } = {
   name: "Abe",
   handle: "cryptoabe",
   address: "0x237c9dbB180C4Fbc7A8DBfd2b70A9aab2518A33f",
-  ticketId: 14, // TODO: remove this when subgraph is ready
+  ticketId: 12, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
   skills: [],
   discord: "cryptoabe#",
