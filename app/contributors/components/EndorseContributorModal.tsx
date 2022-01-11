@@ -1,9 +1,12 @@
-import { useQuery, useParam, invoke } from "blitz"
+import { useQuery, useParam, invoke, Image } from "blitz"
+import { useState } from "react"
 import { useEthers } from "@usedapp/core"
 import { Field, Form } from "react-final-form"
+import Verified from "public/check-mark.svg"
 import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTerminal"
 import Modal from "../../core/components/Modal"
 import {
+  NUMBER_OF_DECIMALS,
   useEndorsementGraphMethod,
   useEndorsementTokenBalance,
   useEndorsementTokenMethod,
@@ -17,20 +20,25 @@ const MAX_ALLOWANCE = 100000000000000
 const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: contributor }) => {
   const { account, active } = useEthers()
   const contributorData = contributor?.data || {}
+
   const terminalId = useParam("terminalId", "number") || 1
   const [initiatives] = useQuery(getInitiativesByTerminal, { terminalId }, { suspense: false })
+
   const { send: endorse } = useEndorsementGraphMethod("endorse")
+  const { send: approveAllowance } = useEndorsementTokenMethod("approve")
   const tokenBalance = useEndorsementTokenBalance(account)
   const allowance = useAllowance(account)
-  const { send: approveAllowance } = useEndorsementTokenMethod("approve")
+
+  const [error, setError] = useState("")
 
   const handleApproveAllowance = async (e) => {
     e.preventDefault()
-    const approvedAllowance = approveAllowance(TERMINAL.GRAPH_ADDRESS, MAX_ALLOWANCE)
-
-    if (!approvedAllowance) {
-      alert("Sorry, something went wrong")
+    setError("")
+    if (!account) {
+      console.warn("account is not properly connected")
+      return
     }
+    await approveAllowance(TERMINAL.GRAPH_ADDRESS, MAX_ALLOWANCE)
   }
 
   return (
@@ -39,23 +47,29 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
         <Form
           onSubmit={async (values) => {
             const { endorsementAmount, initiative } = values
+            setError("")
             if (!Object.keys(values).length || !initiative) {
-              alert("Please fill out required inputs")
+              setError("Please fill out required inputs")
               return
             }
             if (!account || !active || !tokenBalance) {
-              alert("Please disconnect, refresh the page, and re-connect your account")
+              setError("Please disconnect, refresh the page, and re-connect your account")
               return
             }
             const currentAccount = await invoke(getAccountByAddress, { address: account })
 
             if (!currentAccount) {
-              alert("Sorry something went wrong, please try again later")
+              setError("Sorry something went wrong, please try again later")
               return
             }
 
-            if (parseInt(endorsementAmount) > parseInt(tokenBalance)) {
-              alert("You don't have enough points to endorse!")
+            if (endorsementAmount > tokenBalance) {
+              setError("You don't have enough points to endorse!")
+              return
+            }
+
+            if (endorsementAmount <= 0) {
+              setError("Please enter a valid amount")
               return
             }
 
@@ -63,25 +77,36 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
               initiative,
               currentAccount.data?.ticketId,
               contributorData.ticketId,
-              endorsementAmount * 1000
+              endorsementAmount * Math.pow(10, NUMBER_OF_DECIMALS)
             )
           }}
           render={({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>
+              <div className="flex items-center justify-center text-torch-red text-sm">{error}</div>
               <div className="flex flex-row flex-1">
                 <div className="flex-1 items-center justify-center text-marble-white text-sm">
                   Contributor
                 </div>
                 <div className="flex flex-1 align-right place-content-end content-right text-marble-white text-sm">
-                  {contributorData.handle || "N/A"}
+                  {contributorData.pfpURL ? (
+                    <img
+                      src={contributor.data.pfpURL}
+                      alt="PFP"
+                      className="h-[20px] w-[20px] border border-marble-white rounded-full mr-1"
+                    />
+                  ) : (
+                    <div className="h-[20px] w-[20px] place-self-center border border-marble-white rounded-full place-items-center mr-1"></div>
+                  )}
+                  <div className="mr-1">{contributorData.handle || "N/A"}</div>
+                  <Image src={Verified} alt="Verified icon." width={10} height={10} />
                 </div>
               </div>
               <div className="flex flex-row flex-1">
                 <div className="flex-1 items-center justify-center text-marble-white text-sm">
-                  Endorsement Budget
+                  Your Endorsement Budget
                 </div>
                 <div className="flex flex-1 align-right place-content-end content-right text-marble-white text-sm">
-                  {tokenBalance ? (
+                  {tokenBalance !== undefined ? (
                     tokenBalance
                   ) : (
                     <span className="text-torch-red">
@@ -116,13 +141,12 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
                 <Field
                   component="input"
                   type="number"
-                  max="1000"
                   name="endorsementAmount"
                   placeholder="Please enter an amount"
                   className="mt-1 border border-concrete bg-concrete text-marble-white p-2"
                 />
               </div>
-              {parseInt(allowance) > 100 ? (
+              {allowance > 100 ? (
                 <button
                   type="submit"
                   className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-12 mx-auto block p-1"

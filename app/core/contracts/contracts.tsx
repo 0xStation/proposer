@@ -5,7 +5,8 @@ import { TERMINAL } from "../utils/constants"
 import endorsementTokenAbi from "../abi/EndorsementToken.json"
 import endorsementGraphAbi from "../abi/EndorsementGraph.json"
 
-const NUMBER_OF_DECIMALS = 3
+// TODO: Remove this const and call endorsementToken contract's public view function "decimals"
+export const NUMBER_OF_DECIMALS = 6
 
 // call write functions from the endorsment graph
 export const useEndorsementGraphMethod = (methodName: string) => {
@@ -26,7 +27,7 @@ export const useEndorsementTokenMethod = (methodName: string) => {
 // read user's point (reputation) balance
 export const useEndorsementTokenBalance = (address) => {
   const balanceOf: any = useTokenBalance(TERMINAL.TOKEN_ADDRESS, address)
-  return balanceOf && utils.formatUnits(balanceOf, NUMBER_OF_DECIMALS)
+  return balanceOf && parseFloat(utils.formatUnits(balanceOf, NUMBER_OF_DECIMALS))
 }
 
 // read allowed amount of user's allowance that station can move on their behalf
@@ -39,5 +40,6 @@ export const useAllowance = (address) => {
       method: "allowance", // Method to be called
       args: [address, TERMINAL.GRAPH_ADDRESS], // Method arguments - address to be checked for balance
     }) ?? []
-  return allowance && utils.formatUnits(allowance, NUMBER_OF_DECIMALS)
+
+  return allowance && parseFloat(utils.formatUnits(allowance, NUMBER_OF_DECIMALS))
 }
