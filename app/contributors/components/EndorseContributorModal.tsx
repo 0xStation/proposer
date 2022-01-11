@@ -12,25 +12,27 @@ import {
 import { TERMINAL } from "app/core/utils/constants"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
-const THICC_NUMBER = 10000000000
+const MAX_ALLOWANCE = 100000000000000
 
 const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: contributor }) => {
   const { account, active } = useEthers()
   const contributorData = contributor?.data || {}
   const terminalId = useParam("terminalId", "number") || 1
   const [initiatives] = useQuery(getInitiativesByTerminal, { terminalId }, { suspense: false })
-  const { state, send: endorse } = useEndorsementGraphMethod("endorse")
+  const { send: endorse } = useEndorsementGraphMethod("endorse")
   const tokenBalance = useEndorsementTokenBalance(account)
   const allowance = useAllowance(account)
-  const { state: allowanceState, send: approveAllowance } = useEndorsementTokenMethod("approve")
+  const { send: approveAllowance } = useEndorsementTokenMethod("approve")
+
   const handleApproveAllowance = async (e) => {
     e.preventDefault()
-    const approvedAllowance = approveAllowance(TERMINAL.GRAPH_ADDRESS, THICC_NUMBER)
+    const approvedAllowance = approveAllowance(TERMINAL.GRAPH_ADDRESS, MAX_ALLOWANCE)
 
     if (!approvedAllowance) {
       alert("Sorry, something went wrong")
     }
   }
+
   return (
     <Modal title="Endorse" open={isOpen} toggle={setIsOpen}>
       <div className="mt-8">
@@ -56,11 +58,7 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
               alert("You don't have enough points to endorse!")
               return
             }
-            console.log("allowance", allowance)
-            console.log("endorsementAmount", endorsementAmount)
-            console.log("initiative", initiative)
-            console.log("currentAccount", currentAccount)
-            console.log("contributorData", contributorData)
+
             await endorse(
               initiative,
               currentAccount.data?.ticketId,
