@@ -3,7 +3,7 @@ import { useEthers } from "@usedapp/core"
 import { users } from "../core/utils/data"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import { useEndorseContractMethod, useIncreaseAllowanceMethod } from "../core/contracts/contracts"
+import { useEndorsementGraphMethod, useEndorsementTokenMethod } from "../core/contracts/contracts"
 import { useSuppressFirstRenderFlicker } from "../core/hooks/useSuppressFirstRenderFlicker"
 
 const Home: BlitzPage = () => {
@@ -13,9 +13,9 @@ const Home: BlitzPage = () => {
   const [endorsementAmount, setEndorsementAmount] = useState<number>(0)
   const [allowanceIncreased, setAllowanceIncreased] = useState(false)
   const suppressRender = useSuppressFirstRenderFlicker()
-  const { state: endorseState, send: endorse } = useEndorseContractMethod("endorse")
+  const { state: endorseState, send: endorse } = useEndorsementGraphMethod("endorse")
   const { state: allowanceState, send: increaseAllowance } =
-    useIncreaseAllowanceMethod("increaseAllowance")
+    useEndorsementTokenMethod("increaseAllowance")
 
   const onError = (error: Error) => {
     console.log(error.message)

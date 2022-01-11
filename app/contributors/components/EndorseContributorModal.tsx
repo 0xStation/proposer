@@ -3,16 +3,34 @@ import { useEthers } from "@usedapp/core"
 import { Field, Form } from "react-final-form"
 import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTerminal"
 import Modal from "../../core/components/Modal"
-import { useEndorseContractMethod, useEndorsementTokenBalance } from "app/core/contracts/contracts"
+import {
+  useEndorsementGraphMethod,
+  useEndorsementTokenBalance,
+  useEndorsementTokenMethod,
+  useAllowance,
+} from "app/core/contracts/contracts"
+import { TERMINAL } from "app/core/utils/constants"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
+
+const THICC_NUMBER = 10000000000
 
 const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: contributor }) => {
   const { account, active } = useEthers()
   const contributorData = contributor?.data || {}
   const terminalId = useParam("terminalId", "number") || 1
   const [initiatives] = useQuery(getInitiativesByTerminal, { terminalId }, { suspense: false })
-  const { state, send: endorse } = useEndorseContractMethod("endorse")
+  const { state, send: endorse } = useEndorsementGraphMethod("endorse")
   const tokenBalance = useEndorsementTokenBalance(account)
+  const allowance = useAllowance(account)
+  const { state: allowanceState, send: approveAllowance } = useEndorsementTokenMethod("approve")
+  const handleApproveAllowance = async (e) => {
+    e.preventDefault()
+    const approvedAllowance = approveAllowance(TERMINAL.GRAPH_ADDRESS, THICC_NUMBER)
+
+    if (!approvedAllowance) {
+      alert("Sorry, something went wrong")
+    }
+  }
 
   return (
     <Modal title="Endorse" open={isOpen} toggle={setIsOpen}>
@@ -103,12 +121,21 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
                   className="mt-1 border border-concrete bg-concrete text-marble-white p-2"
                 />
               </div>
-              <button
-                type="submit"
-                className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-12 mx-auto block p-1"
-              >
-                Endorse
-              </button>
+              {allowance > 0 ? (
+                <button
+                  type="submit"
+                  className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-12 mx-auto block p-1"
+                >
+                  Endorse
+                </button>
+              ) : (
+                <button
+                  className="bg-magic-mint text-tunnel-black w-3/5 rounded mt-12 mx-auto block p-1"
+                  onClick={handleApproveAllowance}
+                >
+                  Allow Station to move tokens on your behalf
+                </button>
+              )}
             </form>
           )}
         />
