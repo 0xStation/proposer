@@ -25,7 +25,7 @@ const ContributorCard = (
   setSelectedUserToEndorse?: Dispatch<SetStateAction<Account | null>>
 ) => {
   return (
-    <div className="flex flex-col flex-1 content-center text-marble-white border border-concrete h-[180px] cursor-pointer">
+    <div className="flex flex-col flex-1 content-center text-marble-white border border-concrete h-[200px] cursor-pointer">
       <div className="flex flex-row flex-1 content-center mx-3 my-3 space-x-1">
         <div className="flex-2/5 content-center align-middle">
           {contributor.data.pfpURL ? (
