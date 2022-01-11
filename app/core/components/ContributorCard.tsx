@@ -34,7 +34,7 @@ const ContributorCard = (
                 src={contributor.data.pfpURL}
                 alt="PFP"
                 className="h-[40px] w-[40px] border border-marble-white rounded-full"
-              />{" "}
+              />
             </div>
           ) : (
             <div className="h-[40px] w-[40px] place-self-center border border-marble-white rounded-full place-items-center"></div>

@@ -28,8 +28,8 @@ const TerminalInitiativePage: BlitzPage = () => {
           {initiatives.map((initiative) => {
             return (
               <Link
-                key={initiative.id}
-                href={Routes.Project({ terminalId, initiativeId: initiative.id })}
+                key={initiative.localId}
+                href={Routes.Project({ terminalId, initiativeId: initiative.localId })}
               >
                 <a>
                   <InitiativeCard
