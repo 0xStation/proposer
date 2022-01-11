@@ -87,7 +87,7 @@ const ContributorCard = (
         <div className="flex flex-row align-center justify-center">
           <button
             type="submit"
-            className="border-solid border border-magic-mint text-magic-mint w-full mt-0 mb-2 mx-2 rounded"
+            className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
             onClick={() => {
               setSelectedUserToEndorse(contributor)
               openEndorseModal()

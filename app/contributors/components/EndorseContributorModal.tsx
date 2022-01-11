@@ -31,8 +31,6 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
       alert("Sorry, something went wrong")
     }
   }
-  console.log("this is allowance ", typeof allowance)
-  console.log("tokenBalance", typeof tokenBalance)
   return (
     <Modal title="Endorse" open={isOpen} toggle={setIsOpen}>
       <div className="mt-8">
@@ -58,10 +56,14 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
               alert("You don't have enough points to endorse!")
               return
             }
-
+            console.log("allowance", allowance)
+            console.log("endorsementAmount", endorsementAmount)
+            console.log("initiative", initiative)
+            console.log("currentAccount", currentAccount)
+            console.log("contributorData", contributorData)
             await endorse(
               initiative,
-              currentAccount.data.ticketId,
+              currentAccount.data?.ticketId,
               contributorData.ticketId,
               endorsementAmount * 1000
             )
@@ -122,7 +124,7 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
                   className="mt-1 border border-concrete bg-concrete text-marble-white p-2"
                 />
               </div>
-              {parseInt(allowance) > 0 ? (
+              {parseInt(allowance) > 100 ? (
                 <button
                   type="submit"
                   className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-12 mx-auto block p-1"
