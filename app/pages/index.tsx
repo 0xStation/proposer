@@ -1,7 +1,8 @@
 import { useMemo, useState, useEffect } from "react"
 import { useEthers } from "@usedapp/core"
 import { users } from "../core/utils/data"
-import { BlitzPage } from "blitz"
+import { BlitzPage, useMutation } from "blitz"
+import generateTicketVisual from "app/ticket/mutations/generateTicketVisual"
 import Layout from "app/core/layouts/Layout"
 import { useEndorseContractMethod, useIncreaseAllowanceMethod } from "../core/contracts/contracts"
 import { useSuppressFirstRenderFlicker } from "../core/hooks/useSuppressFirstRenderFlicker"
@@ -20,6 +21,8 @@ const Home: BlitzPage = () => {
   const onError = (error: Error) => {
     console.log(error.message)
   }
+
+  const [generateTicketVisualMutation] = useMutation(generateTicketVisual)
 
   useEffect(() => {
     console.log("endorse state post transaction call ", endorseState)
@@ -103,6 +106,20 @@ const Home: BlitzPage = () => {
             Submit
           </button>
         </form>
+
+        <button
+          className="mt-4 border p-2"
+          onClick={() => {
+            generateTicketVisualMutation({
+              accountAddress: account || "",
+              accountName: "michael",
+              terminalName: "station",
+              roleName: "CORE",
+            })
+          }}
+        >
+          create NFT
+        </button>
       </div>
     </div>
   ) : (
