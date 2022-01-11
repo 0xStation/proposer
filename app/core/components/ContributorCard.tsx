@@ -39,6 +39,14 @@ const ContributorCard = (
           ) : (
             <div className="h-[40px] w-[40px] place-self-center border border-marble-white rounded-full place-items-center"></div>
           )}
+          <div className="flex flex-col flex-3/5 content-center">
+            <div className="flex flex-row flex-1 space-x-1">
+              <div className="flex-3/5 text-m">{contributor.data.handle}</div>
+              <div className="flex-2/5 m-auto">
+                <Image src={Verified} alt="Verified icon." width={10} height={10} />
+              </div>
+            </div>
+          </div>
           <div className="flex flex-row flex-1 text-xs text-concrete space-x-1">
             <div className="flex-1">{contributor.data.wallet}</div>
             <div className="flex-1">-</div>
