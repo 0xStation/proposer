@@ -35,7 +35,7 @@ export default async function generateTicketVisual(input: z.infer<typeof Generat
   })
     .then((response) => response.json())
     .then((json) => {
-      return json.encoded
+      return json.svg
     })
 
   const path = `tickets/${uuidv4()}.svg`
@@ -44,7 +44,7 @@ export default async function generateTicketVisual(input: z.infer<typeof Generat
 
   const updatedAccount = await db.account.update({
     where: { address: params.accountAddress },
-    data: { data: { ...(existingAccount.data as {}), image: uploadedImagePath } },
+    data: { data: { ...(existingAccount.data as {}), ticketImage: uploadedImagePath } },
   })
 
   // ^^^ note on the above

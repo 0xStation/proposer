@@ -85,21 +85,6 @@ const Home: BlitzPage = () => {
             Submit
           </button>
         </form>
-
-        <button
-          className="mt-4 border p-2"
-          onClick={() => {
-            generateTicketVisualMutation({
-              accountAddress: account || "",
-              accountName: "michael",
-              terminalName: "station",
-              roleName: "CORE",
-            })
-          }}
-        >
-          create NFT
-        </button>
-        <img src="https://station.nyc3.digitaloceanspaces.com/tickets/33dc95dd-c097-4658-86b3-10bc8aac23d3.svg" />
       </div>
     </div>
   ) : (
