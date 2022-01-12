@@ -13,10 +13,12 @@ import Page404 from "../../../404"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
 import { Account } from "app/account/types"
 import getTerminalById from "app/terminal/queries/getTerminalById"
-import chunk from "lodash"
 import AccountModal from "app/account/components/AccountModal"
 import ApplicationModal from "app/application/components/ApplicationModal"
 import useStore from "app/core/hooks/useStore"
+import "slick-carousel/slick/slick.css"
+import "slick-carousel/slick/slick-theme.css"
+import Slider from "react-slick"
 
 const Project: BlitzPage = () => {
   const { account } = useEthers()
@@ -71,9 +73,13 @@ const Project: BlitzPage = () => {
     contributors = []
   }
 
-  // const showWalletOrApplicationModal = () => {
-  //   connectedUser ? setIsOpen(true) : setIsWalletOpen(true)
-  // }
+  var settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+  }
 
   if (!initiative) {
     return <Page404 />
@@ -160,7 +166,7 @@ const Project: BlitzPage = () => {
                     <div className="flex flex-row">
                       <span className="flex-1 text-marble-white text-lg">Contributors</span>
                     </div>
-                    <div className="flex flex-row space-x-4 overflow-x-auto">
+                    <div className="flex flex-row overflow-x-auto space-x-4">
                       {contributors.map((contributor) => {
                         return ContributorCard(contributor as Account)
                       })}
@@ -220,7 +226,6 @@ const Project: BlitzPage = () => {
                     <button
                       className="mt-4 py-2 text-center text-sm bg-magic-mint rounded item-center w-[280px]"
                       onClick={() => {
-                        // showWalletOrApplicationModal()
                         setUserTrigged(true)
                         setActiveModal()
                       }}
