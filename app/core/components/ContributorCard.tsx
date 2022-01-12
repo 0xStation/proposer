@@ -74,7 +74,7 @@ const ContributorCard = (
           {/* <span className="p-1 rounded-lg bg-purple-300 text-purple-500">{contributor.data.role}</span> */}
         </div>
       </div>
-      <div className="flex flex-row flex-1 mx-3 ">
+      <div className="flex flex-row flex-auto mx-3 ">
         <div className="flex-1 items-center justify-center text-sm">Socials</div>
         <div className="flex-1 text-right justify-end content-end text-sm">
           <a target="_blank" rel="noreferrer" href={contributor.data.twitterURL}>
@@ -87,7 +87,7 @@ const ContributorCard = (
           </a>
         </div>
       </div>
-      {openEndorseModal && setSelectedUserToEndorse && activeUser?.address !== contributor.address && (
+      {isContributorDirectory && activeUser?.address !== contributor.address && (
         <div className="flex flex-row align-center justify-center my-2">
           <button
             type="submit"

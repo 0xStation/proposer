@@ -32,7 +32,9 @@ const TerminalContributorsPage: BlitzPage = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {contributors.length &&
               contributors
-                .filter((contributor) => contributor.data.ticketId)
+                .filter(
+                  (contributor) => contributor.data.ticketId || contributor.data.ticketId === 0
+                )
                 .map((contributor) =>
                   ContributorCard(
                     contributor as Account,
