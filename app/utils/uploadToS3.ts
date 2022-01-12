@@ -16,6 +16,7 @@ type UploadOptions = {
 const OPTION_DEFAULTS = {
   Bucket: "station",
   ACL: "public-read",
+  ContentType: "image/svg+xml",
 }
 
 function uploadToS3(content, path, options: UploadOptions = {}): Promise<UploadResponse> {

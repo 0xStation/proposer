@@ -2,10 +2,14 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import { genSVG } from "app/ticket/svg"
 
 type Data = {
-  encoded: string | undefined
+  svg: string
 }
 
-export default function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+type Error = {
+  error: string
+}
+
+export default function handler(req: NextApiRequest, res: NextApiResponse<Data | Error>) {
   let props = {
     gradientColor: req.body.gradientColor,
     name: req.body.name,
@@ -14,8 +18,11 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<Data>)
   }
 
   let nft = genSVG(props)
-  // let encoded = nft ? Buffer.from(nft).toString("base64") : ""
-  // res.status(200).json({ encoded })
 
-  res.status(200).json({ encoded: nft })
+  if (!nft) {
+    res.status(500).json({ error: "something went wrong generating the nft." })
+    return
+  }
+
+  res.status(200).json({ svg: nft })
 }
