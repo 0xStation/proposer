@@ -111,7 +111,7 @@ const abe: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/abenazer_mekete",
-  pfpURL: "https://pbs.twimg.com/profile_images/1477072835310936065/KGkgOsJV_400x400.jpg",
+  pfpURL: "https://pbs.twimg.com/profile_images/1480266187934257155/aRArmGkH_400x400.jpg",
 }
 const nick: AccountMetadata & { address: string } = {
   name: "Nick",
