@@ -15,6 +15,7 @@ import Page404 from "../../../404"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
 import { Account } from "app/account/types"
 import getTerminalById from "app/terminal/queries/getTerminalById"
+import chunk from "lodash"
 
 const Project: BlitzPage = () => {
   let [isWalletOpen, setIsWalletOpen] = useState(false)
@@ -39,10 +40,9 @@ const Project: BlitzPage = () => {
     { addresses: initiative?.data.members || [] },
     { suspense: false }
   )
+
   if (!contributors) {
     contributors = []
-  } else if (contributors.length > 3) {
-    contributors = contributors.slice(0, 3)
   }
 
   const showWalletOrApplicationModal = () => {
@@ -124,11 +124,8 @@ const Project: BlitzPage = () => {
                   <div className="space-y-4">
                     <div className="flex flex-row">
                       <span className="flex-1 text-marble-white text-lg">Contributors</span>
-                      <span className="flex-1 text-right text-magic-mint text-sm cursor-pointer">
-                        See all
-                      </span>
                     </div>
-                    <div className="flex flex-row space-x-4">
+                    <div className="flex flex-row space-x-4 overflow-x-auto">
                       {contributors.map((contributor) => {
                         return ContributorCard(contributor as Account)
                       })}
