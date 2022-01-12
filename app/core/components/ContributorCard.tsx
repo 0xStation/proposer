@@ -20,7 +20,7 @@ function roleSVG(role) {
 
 const ContributorCard = (contributor: Account) => {
   return (
-    <div className="flex flex-col flex-1 content-center text-marble-white border border-concrete h-[130px] cursor-pointer">
+    <div className="flex flex-col flex-none content-center text-marble-white border border-concrete h-[130px] cursor-pointer w-[240px]">
       <div className="flex flex-row flex-1 content-center mx-3 my-3 space-x-1">
         <div className="flex-2/5 content-center align-middle">
           {contributor.data.pfpURL ? (

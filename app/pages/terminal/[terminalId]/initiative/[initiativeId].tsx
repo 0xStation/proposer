@@ -16,6 +16,9 @@ import getTerminalById from "app/terminal/queries/getTerminalById"
 import AccountModal from "app/account/components/AccountModal"
 import ApplicationModal from "app/application/components/ApplicationModal"
 import useStore from "app/core/hooks/useStore"
+import "slick-carousel/slick/slick.css"
+import "slick-carousel/slick/slick-theme.css"
+import Slider from "react-slick"
 
 const Project: BlitzPage = () => {
   const { account } = useEthers()
@@ -65,10 +68,17 @@ const Project: BlitzPage = () => {
     { addresses: initiative?.data.members || [] },
     { suspense: false }
   )
+
   if (!contributors) {
     contributors = []
-  } else if (contributors.length > 3) {
-    contributors = contributors.slice(0, 3)
+  }
+
+  var settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
   }
 
   if (!initiative) {
@@ -155,11 +165,8 @@ const Project: BlitzPage = () => {
                   <div className="space-y-4">
                     <div className="flex flex-row">
                       <span className="flex-1 text-marble-white text-lg">Contributors</span>
-                      <span className="flex-1 text-right text-magic-mint text-sm cursor-pointer">
-                        See all
-                      </span>
                     </div>
-                    <div className="flex flex-row space-x-4">
+                    <div className="flex flex-row overflow-x-auto space-x-4">
                       {contributors.map((contributor) => {
                         return ContributorCard(contributor as Account)
                       })}

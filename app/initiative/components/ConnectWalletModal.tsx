@@ -26,11 +26,11 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
             className="flex-1 border border-marble-white  rounded-md content-center"
             onClick={() => activateBrowserWallet(onError)}
           >
-            <div className="flex flex-row flex-1 justify-center space-x-2 my-1">
+            <div className="flex flex-row flex-1 justify-center items-center space-x-2 my-1">
               <div className="flex-3/5">
                 <span>Metamask</span>
               </div>
-              <div className="flex-2/5">
+              <div className="flex flex-2/5 justify-center items-center">
                 <Image src={Metamask} alt="Metamask logo." width={21} height={21} />
               </div>
             </div>
@@ -39,12 +39,12 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
             className="flex-1  border border-marble-white rounded-md content-center"
             onClick={() => activateBrowserWallet(onError)}
           >
-            <div className="flex flex-row flex-1 justify-center align-middle space-x-2 my-1 mx-auto">
+            <div className="flex flex-row flex-1 justify-center align-middle items-center space-x-2 my-1 mx-auto">
               <div className="flex-3/5">
                 <span>Wallet Connect</span>
               </div>
-              <div className="flex-2/5">
-                <Image src={WalletConnect} alt="Metamask logo." width={19} height={12} />
+              <div className="flex flex-2/5 justify-center items-center">
+                <Image src={WalletConnect} alt="Wallet Connect logo." width={19} height={12} />
               </div>
             </div>
           </button>
@@ -52,12 +52,12 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
             className="flex-1 border border-marble-white rounded-md content-center"
             onClick={() => activateBrowserWallet(onError)}
           >
-            <div className="flex flex-row flex-1  justify-center align-middle space-x-2 my-1">
+            <div className="flex flex-row flex-1 justify-center items-center align-middle space-x-2 my-1">
               <div className="flex-3/5">
                 <span>Coinbase</span>
               </div>
-              <div className="flex-2/5">
-                <Image src={Coinbase} alt="Metamask logo." width={16} height={16} />
+              <div className="flex flex-2/5 justify-center items-center">
+                <Image src={Coinbase} alt="Coinbase logo." width={16} height={16} />
               </div>
             </div>
           </button>
