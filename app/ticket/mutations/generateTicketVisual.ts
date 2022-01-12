@@ -20,7 +20,7 @@ export default async function generateTicketVisual(input: z.infer<typeof Generat
     throw Error("cannot create a ticket for an account that does not exist.")
   }
 
-  let ticketSVG = await fetch("http://localhost:3000/api/nft/ticket", {
+  let ticketSVG = await fetch("http://localhost:3000/api/nft/create/ticket", {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",

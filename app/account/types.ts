@@ -11,6 +11,7 @@ export type AccountMetadata = {
   discord: string
   verified: boolean
   role?: string
+  ticketImage?: string
 }
 
 export type Account = {
