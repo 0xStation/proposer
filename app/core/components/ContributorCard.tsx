@@ -22,7 +22,8 @@ function roleSVG(role) {
 const ContributorCard = (
   contributor: Account,
   openEndorseModal?: () => void,
-  setSelectedUserToEndorse?: Dispatch<SetStateAction<Account | null>>
+  setSelectedUserToEndorse?: Dispatch<SetStateAction<Account | null>>,
+  activeUser?: Account | null
 ) => {
   return (
     <div className="flex flex-col flex-1 content-center text-marble-white border border-concrete h-[200px] cursor-pointer">
@@ -83,7 +84,7 @@ const ContributorCard = (
           </a>
         </div>
       </div>
-      {openEndorseModal && setSelectedUserToEndorse && (
+      {openEndorseModal && setSelectedUserToEndorse && activeUser?.address !== contributor.address && (
         <div className="flex flex-row align-center justify-center">
           <button
             type="submit"

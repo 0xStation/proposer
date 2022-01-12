@@ -6,10 +6,9 @@ import getAllAccounts from "app/account/queries/getAllAccounts"
 import ContributorCard from "app/core/components/ContributorCard"
 import { Account } from "app/account/types"
 import EndorseContributorModal from "app/contributors/components/EndorseContributorModal"
+import useStore from "app/core/hooks/useStore"
 
 const TerminalContributorsPage: BlitzPage = () => {
-  const terminalId = useParam("terminalId", "number") || 1
-
   // TODO: get accounts by terminal id
   let [contributors] = useQuery(getAllAccounts, {}, { suspense: false })
   if (!contributors) {
@@ -19,6 +18,7 @@ const TerminalContributorsPage: BlitzPage = () => {
   let [endorseModalIsOpen, setEndorseModalIsOpen] = useState(false)
   let [selectedUserToEndorse, setSelectedUserToEndorse] = useState<Account | null>(null)
   const openEndorseModal = () => setEndorseModalIsOpen(!endorseModalIsOpen)
+  const activeUser: Account | null = useStore((state) => state.activeUser)
 
   return (
     <TerminalNavigation>
@@ -31,9 +31,16 @@ const TerminalContributorsPage: BlitzPage = () => {
           />
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {contributors.length &&
-              contributors.map((contributor) =>
-                ContributorCard(contributor as Account, openEndorseModal, setSelectedUserToEndorse)
-              )}
+              contributors
+                .filter((contributor) => contributor.data.ticketId)
+                .map((contributor) =>
+                  ContributorCard(
+                    contributor as Account,
+                    openEndorseModal,
+                    setSelectedUserToEndorse,
+                    activeUser
+                  )
+                )}
           </div>
         </>
       ) : (
