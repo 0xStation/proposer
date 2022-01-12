@@ -2,8 +2,7 @@ import { Router } from "blitz"
 import { useMemo, useState, useEffect } from "react"
 import { useEthers } from "@usedapp/core"
 import { users } from "../core/utils/data"
-import { BlitzPage, useMutation } from "blitz"
-import generateTicketVisual from "app/ticket/mutations/generateTicketVisual"
+import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
 
 const Home: BlitzPage = () => {
@@ -13,8 +12,6 @@ const Home: BlitzPage = () => {
   const onError = (error: Error) => {
     console.log(error.message)
   }
-
-  const [generateTicketVisualMutation] = useMutation(generateTicketVisual)
 
   useEffect(() => {
     if (connectedUser) {
