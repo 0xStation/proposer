@@ -1,8 +1,7 @@
 import { useMemo, useState, useEffect } from "react"
 import { useEthers } from "@usedapp/core"
 import { users } from "../core/utils/data"
-import { BlitzPage, useMutation } from "blitz"
-import generateTicketVisual from "app/ticket/mutations/generateTicketVisual"
+import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import { useEndorseContractMethod, useIncreaseAllowanceMethod } from "../core/contracts/contracts"
 import { useSuppressFirstRenderFlicker } from "../core/hooks/useSuppressFirstRenderFlicker"
@@ -21,8 +20,6 @@ const Home: BlitzPage = () => {
   const onError = (error: Error) => {
     console.log(error.message)
   }
-
-  const [generateTicketVisualMutation] = useMutation(generateTicketVisual)
 
   useEffect(() => {
     console.log("endorse state post transaction call ", endorseState)
