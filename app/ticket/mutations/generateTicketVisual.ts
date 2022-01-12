@@ -1,6 +1,8 @@
 import db from "db"
 import * as z from "zod"
+import { v4 as uuidv4 } from "uuid"
 import { Account } from "app/account/types"
+import uploadToS3 from "app/utils/uploadToS3"
 
 const GenerateTicketVisual = z.object({
   accountAddress: z.string(),
@@ -18,7 +20,7 @@ export default async function generateTicketVisual(input: z.infer<typeof Generat
     throw Error("cannot create a ticket for an account that does not exist.")
   }
 
-  let base64EncodedNFT = await fetch("http://localhost:3000/api/nft/ticket", {
+  let ticketSVG = await fetch("http://localhost:3000/api/nft/ticket", {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
@@ -36,9 +38,13 @@ export default async function generateTicketVisual(input: z.infer<typeof Generat
       return json.encoded
     })
 
+  const path = `tickets/${uuidv4()}.svg`
+  const uploadedImageResponse = await uploadToS3(ticketSVG, path)
+  const uploadedImagePath = uploadedImageResponse.Location
+
   const updatedAccount = await db.account.update({
     where: { address: params.accountAddress },
-    data: { data: { ...(existingAccount.data as {}), image: base64EncodedNFT } },
+    data: { data: { ...(existingAccount.data as {}), image: uploadedImagePath } },
   })
 
   // ^^^ note on the above

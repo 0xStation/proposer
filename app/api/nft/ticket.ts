@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import { genSVG } from "../../ticket/svg"
 
 type Data = {
-  encoded: string
+  encoded: string | undefined
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
@@ -14,6 +14,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<Data>)
   }
 
   let nft = genSVG(props)
-  let encoded = nft ? Buffer.from(nft).toString("base64") : ""
-  res.status(200).json({ encoded })
+  // let encoded = nft ? Buffer.from(nft).toString("base64") : ""
+  // res.status(200).json({ encoded })
+
+  res.status(200).json({ encoded: nft })
 }
