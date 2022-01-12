@@ -125,7 +125,7 @@ const nick: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/zy22yz",
-  pfpURL: "https://pbs.twimg.com/profile_images/1479676346229874691/EDnifhen_400x400.png",
+  pfpURL: "https://pbs.twimg.com/profile_images/1480623159048957952/YMEGfCbN_400x400.jpg",
 }
 const alli: AccountMetadata & { address: string } = {
   name: "Alli",
