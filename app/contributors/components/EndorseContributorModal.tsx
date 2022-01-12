@@ -132,6 +132,9 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
                       {initiative?.data?.name}
                     </option>
                   ))}
+                  <option key={0} value={0}>
+                    Other
+                  </option>
                 </Field>
               </div>
               <div className="flex flex-col">

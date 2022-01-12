@@ -33,7 +33,8 @@ const TerminalContributorsPage: BlitzPage = () => {
             {contributors.length &&
               contributors
                 .filter(
-                  (contributor) => contributor.data.ticketId || contributor.data.ticketId === 0
+                  (contributor) =>
+                    typeof contributor.data.ticketId === "number" && contributor.data.ticketId >= 0
                 )
                 .map((contributor) =>
                   ContributorCard(
