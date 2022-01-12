@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import { genSVG } from "../../ticket/svg"
+import { genSVG } from "app/ticket/svg"
 
 type Data = {
   encoded: string | undefined
