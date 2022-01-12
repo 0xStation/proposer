@@ -28,7 +28,7 @@
     "@ethersproject/contracts": "5.5.0",
     "@headlessui/react": "1.4.2",
     "@prisma/client": "3.6.0",
-    "@usedapp/core": "0.7.1",
+    "@usedapp/core": "0.8.0",
     "autoprefixer": "10.4.0",
     "blitz": "0.44.4",
     "ethers": "5.5.2",

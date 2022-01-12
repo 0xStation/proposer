@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from "react"
 import Verified from "/public/check-mark.svg"
 import { Image } from "blitz"
 import Staff from "/public/role-staff.svg"
@@ -18,9 +19,19 @@ function roleSVG(role) {
   return svg
 }
 
-const ContributorCard = (contributor: Account) => {
+const ContributorCard = (
+  contributor: Account,
+  openEndorseModal?: () => void,
+  setSelectedUserToEndorse?: Dispatch<SetStateAction<Account | null>>,
+  activeUser?: Account | null
+) => {
+  const isContributorDirectory = openEndorseModal && setSelectedUserToEndorse
   return (
-    <div className="flex flex-col flex-none content-center text-marble-white border border-concrete h-[130px] cursor-pointer w-[240px]">
+    <div
+      className={`flex flex-col flex-none content-center text-marble-white border border-concrete cursor-pointer ${
+        !isContributorDirectory && "w-[240px] h-[130px]"
+      }`}
+    >
       <div className="flex flex-row flex-1 content-center mx-3 my-3 space-x-1">
         <div className="flex-2/5 content-center align-middle">
           {contributor.data.pfpURL ? (
@@ -49,11 +60,10 @@ const ContributorCard = (contributor: Account) => {
           </div>
         </div>
       </div>
-      <div className="flex flex-row flex-1 mx-3">
-        <div className="flex-1 items-center justify-center text-sm">
+      <div className="flex flex-row flex-initial mx-3">
+        <div className="flex-intial items-center justify-center text-sm">
           <div className="place-self-center mt-2">Role</div>
         </div>
-
         <div className="flex flex-1 align-right place-content-end content-right text-sm">
           <Image
             className="content-right text-sm"
@@ -64,7 +74,7 @@ const ContributorCard = (contributor: Account) => {
           {/* <span className="p-1 rounded-lg bg-purple-300 text-purple-500">{contributor.data.role}</span> */}
         </div>
       </div>
-      <div className="flex flex-row flex-1 mx-3 ">
+      <div className="flex flex-row flex-auto mx-3 ">
         <div className="flex-1 items-center justify-center text-sm">Socials</div>
         <div className="flex-1 text-right justify-end content-end text-sm">
           <a target="_blank" rel="noreferrer" href={contributor.data.twitterURL}>
@@ -77,6 +87,20 @@ const ContributorCard = (contributor: Account) => {
           </a>
         </div>
       </div>
+      {isContributorDirectory && activeUser?.address !== contributor.address && (
+        <div className="flex flex-row align-center justify-center my-2">
+          <button
+            type="submit"
+            className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
+            onClick={() => {
+              setSelectedUserToEndorse(contributor)
+              openEndorseModal()
+            }}
+          >
+            Endorse
+          </button>
+        </div>
+      )}
     </div>
   )
 }
