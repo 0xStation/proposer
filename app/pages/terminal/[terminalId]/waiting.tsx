@@ -60,8 +60,10 @@ const TerminalWaitingPage: BlitzPage = () => {
                   return (
                     <div
                       key={index}
-                      className="border border-marble-white rounded-xl hover:bg-marble-white hover:text-concrete h-[100px] w-[100px]"
-                    ></div>
+                      className="border border-marble-white rounded-xl hover:bg-marble-white hover:text-concrete h-[100px] w-[100px] text-marble-white"
+                    >
+                      {application.applicantId}
+                    </div>
                   )
                 })}
               </div>
