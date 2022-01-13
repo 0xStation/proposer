@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { Initiative } from "../types"
+import { Application } from "app/application/types"
 
 const GetApplicationsByInitiative = z.object({
   initiativeId: z.number(),
@@ -17,5 +17,5 @@ export default async function getApplicationsByInitiative(
     return []
   }
 
-  return applications as []
+  return applications as Application[]
 }

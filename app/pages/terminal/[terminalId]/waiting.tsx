@@ -3,7 +3,8 @@ import { useState, useEffect } from "react"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
 import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTerminal"
-import getApplicationsByInitiative from "app/initiative/queries/getApplicationsByInitiative"
+import getApplicationsByInitiative from "app/application/queries/getApplicationsByInitiative"
+import { Application } from "app/application/types"
 
 import InitiativeCard from "app/initiative/components/InitiativeCard"
 import getAllAccounts from "app/account/queries/getAllAccounts"
@@ -11,6 +12,7 @@ import getAllAccounts from "app/account/queries/getAllAccounts"
 const TerminalWaitingPage: BlitzPage = () => {
   const terminalId = useParam("terminalId", "number") || 1
   const [selectedInitiative, setSelectedInitiative] = useState(0)
+  const [applications, setApplications] = useState<Application[]>([])
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
@@ -18,17 +20,15 @@ const TerminalWaitingPage: BlitzPage = () => {
     { suspense: false }
   )
 
-  // let [applications]
+  const [newApplications] = useQuery(
+    getApplicationsByInitiative,
+    { initiativeId: selectedInitiative },
+    { suspense: false }
+  )
 
-  // function getApplications(initiative) => {
-  //   const [applications] = useQuery(
-  //     getInitiativesByTerminal,
-  //   { terminalId: terminalId },
-  //   { suspense: false }
-  //   )
-  // }
-
-  useEffect(() => {}, [selectedInitiative])
+  useEffect(() => {
+    setApplications(newApplications || [])
+  }, [selectedInitiative])
 
   return (
     <TerminalNavigation>
@@ -52,7 +52,20 @@ const TerminalWaitingPage: BlitzPage = () => {
             })}
           </div>
           <div className="flex-4/5 text-marble-white grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div></div>
+            {!applications ? (
+              <div>There are no applications for this initiative.</div>
+            ) : (
+              <div>
+                {applications.map((application, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className="border border-marble-white rounded-xl hover:bg-marble-white hover:text-concrete h-[100px] w-[100px]"
+                    ></div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}
