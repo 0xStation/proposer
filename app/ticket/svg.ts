@@ -1,3 +1,5 @@
+import getRandomElement from "app/utils/getRandomElement"
+
 // most of the SVG generators accept position props
 // defines the x-y position in the grid for that icon.
 interface PositionProps {
@@ -6,11 +8,12 @@ interface PositionProps {
 }
 
 interface SVGProps {
-  gradientColor: string
   name: string
   terminal: string
   role: string
 }
+
+const GRADIENTS = ["orange-purple", "blue-green", "green-red"]
 
 /**
  * Top level function, generates the SVG.
@@ -19,8 +22,6 @@ interface SVGProps {
  * @returns full string representation of the SVG.
  */
 export const genSVG = (props: SVGProps) => {
-  // next was calling this function with empty props for some reason
-  // so rather than debug fully I'm just stuffing an empty return so it terminates
   if (props === undefined) {
     return
   }
@@ -34,16 +35,8 @@ export const genSVG = (props: SVGProps) => {
   }
 
   if (props.role === "CORE") {
-    // not a huge fan of this but can refactor when I have a better idea of
-    // how the contract is atually going to be calling this function...
-    let ARRANGEMENT =
-      props.gradientColor === "green-red"
-        ? CORE_ARRANGEMENT_ONE
-        : props.gradientColor === "orange-purple"
-        ? CORE_ARRANGEMENT_TWO
-        : CORE_ARRANGEMENT_THREE
-
-    return stitchSVG(props, ARRANGEMENT)
+    const ARRANGEMENTS = [CORE_ARRANGEMENT_ONE, CORE_ARRANGEMENT_TWO, CORE_ARRANGEMENT_THREE]
+    return stitchSVG(props, getRandomElement(ARRANGEMENTS))
   }
 }
 
@@ -60,7 +53,7 @@ const stitchSVG = (
 ) => {
   return `
   ${genSVGDefs()}
-  ${genBase({ role: props.role, gradientColor: props.gradientColor })}
+  ${genBase({ role: props.role })}
   ${genLogo()}
   ${genIconWithText({ x: 0, y: 100, iconLetter: "N", text: props.name })}
   ${genIconWithText({ x: 0, y: 127.5, iconLetter: "T", text: props.terminal })}
@@ -153,7 +146,6 @@ const genSVGDefs = () => {
 
 interface BaseProps {
   role: string
-  gradientColor: string
 }
 
 /**
@@ -163,6 +155,11 @@ interface BaseProps {
  * @returns string SVG.
  */
 const genBase = (props: BaseProps) => {
+  let gradientColor
+  if (props.role === "CORE") {
+    gradientColor = getRandomElement(GRADIENTS)
+  }
+
   return `
   <g clip-path="url(#corners)">
     <rect fill="white" stroke="rgba(255,255,255,0.2)" x="0px" y="0px" rx="24" ry="24" width="240px" height="400px" />
@@ -172,7 +169,7 @@ const genBase = (props: BaseProps) => {
     }
     ${
       props.role === "CORE" &&
-      `<rect fill="url(#${props.gradientColor})"
+      `<rect fill="url(#${gradientColor})"
         x="0px" y="0px" width="240px" height="400px"
         rx="24" ry="24" fill-opacity="0.5" style="mix-blend-mode: color"
        />`
