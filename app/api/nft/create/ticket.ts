@@ -11,7 +11,6 @@ type Error = {
 
 export default function handler(req: NextApiRequest, res: NextApiResponse<Data | Error>) {
   let props = {
-    gradientColor: req.body.gradientColor,
     name: req.body.name,
     role: req.body.role,
     terminal: req.body.terminal,
