@@ -5,7 +5,7 @@ import { Account } from "app/account/types"
 type TicketMetaData = {
   name: string
   description: string
-  image_url: string
+  image: string
 }
 
 type Error = {
@@ -16,7 +16,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<TicketMetaData | Error>
 ) {
-  const address = req.query.address
+  const address = req.query.owner
+  const ticket_address = req.query.ticket
 
   if (typeof address !== "string") {
     res
@@ -25,25 +26,46 @@ export default async function handler(
     return
   }
 
-  const account = (await db.account.findUnique({
+  const account = await db.account.findUnique({
     where: {
       address,
     },
-  })) as Account
+    include: {
+      tickets: true,
+    },
+  })
 
-  if (!account) {
-    res.status(500).json({ error: "No account found for this address." })
+  console.log(account)
+  const terminalIds = account?.tickets.map((ticket) => ticket.terminalId)
+
+  if (!terminalIds) {
+    res.status(500).json({ error: "This account is not in any terminals" })
     return
   }
 
-  if (!account.data.ticketImage) {
-    res.status(500).json({ error: "No image generated for this account." })
+  const terminals = await db.terminal.findMany({
+    where: {
+      id: { in: terminalIds },
+    },
+  })
+
+  const activeTerminal = terminals.find((terminal) => terminal.ticketAddress === ticket_address)
+
+  if (!activeTerminal) {
+    res.status(500).json({ error: "No terminal with the provided ticket address" })
+    return
+  }
+
+  const activeTicket = account?.tickets.find((ticket) => ticket.terminalId === activeTerminal.id)
+
+  if (!activeTicket) {
+    res.status(500).json({ error: "No active ticket found" })
     return
   }
 
   res.status(200).json({
     name: "Terminal Ticket",
-    description: "This is the ticket. Let's replace this junk copy with something else :)",
-    image_url: account.data.ticketImage,
+    description: "This is the ticket. Wow!",
+    image: activeTicket.ticketUrl,
   })
 }

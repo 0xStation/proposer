@@ -18,15 +18,28 @@ model Account {
   applications        InitiativeApplication[]
   pledgedEndorsements ApplicationEndorsement[]
   data                Json?
+  tickets             AccountTerminal[]
 }
 
 // Each DAO is represented by a terminal.
 // roleNameOverrides overrides default role names
 model Terminal {
-  id            Int          @id @default(autoincrement())
-  ticketAddress String       @unique
+  id            Int               @id @default(autoincrement())
+  ticketAddress String            @unique
   initiatives   Initiative[]
   data          Json?
+  accounts      AccountTerminal[]
+}
+
+model AccountTerminal {
+  account    Account  @relation(fields: [accountId], references: [id])
+  accountId  Int
+  terminal   Terminal @relation(fields: [terminalId], references: [id])
+  terminalId Int
+  ticketUrl  String
+  active     Boolean
+
+  @@id([accountId, terminalId])
 }
 
 // An initiative within a terminal
