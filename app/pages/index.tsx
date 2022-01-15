@@ -20,71 +20,7 @@ const Home: BlitzPage = () => {
     }
   }, [connectedUser])
 
-    await increaseAllowance("0xa3395B5FEfca8bb39032A9604C0337fF7e847323", endorsementAmount * 1000)
-    setAllowanceIncreased(!allowanceIncreased)
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!walletToEndorse) {
-      alert("Please choose a user to endorse first")
-      return
-    }
-    if (!endorsementAmount) {
-      alert("Please choose an endorsement amount first")
-      return
-    }
-
-    const nftIdTo = users[walletToEndorse].nftId
-    const nftIdFrom = users[account].nftId
-    await endorse(0, nftIdFrom, nftIdTo, endorsementAmount * 1000)
-  }
-
-  const ConnectView = connectedUser ? (
-    <div className="flex items-center justify-center h-full">
-      <div className="max-w-screen-lg p-4 border border-marble-white text-center bg-tunnel-black text-marble-white">
-        <p className="text-2xl pr-6">{`You're connected 🎉: ${account}`}</p>
-        <p className="text-2xl pr-6">{`Welcome ${connectedUser?.handle} !`}</p>
-        <form onSubmit={handleSubmit}>
-          <label className="text-2xl pr-6">Who would you like to endorse?</label>
-          <select
-            className="inline text-tunnel-black border-2 border-gray-200 rounded mr-1"
-            onChange={(e) => setWalletToEndorse(e.target.value)}
-          >
-            <option key="" value="">
-              --Please choose a user to endorse--
-            </option>
-            {usersToEndorse.map((walletAddress) => (
-              <option key={users[walletAddress].handle} value={walletAddress}>
-                {users[walletAddress].handle}
-              </option>
-            ))}
-          </select>
-          <label className="text-2xl pr-6">How much would you like to endorse?</label>
-          <input
-            type="number"
-            id="endorsement"
-            name="endorsement"
-            min="0"
-            max="100"
-            step=".001"
-            className="border-2 text-tunnel-black"
-            onChange={(e) => {
-              setEndorsementAmount(parseFloat(e.target.value))
-              setAllowanceIncreased(false)
-            }}
-            required
-          />
-          <button type="button" className="border-solid border-2" onClick={handleIncreaseAllowance}>
-            Allow
-          </button>
-          <button type="submit" className="border-solid border-2">
-            Submit
-          </button>
-        </form>
-      </div>
-    </div>
-  ) : (
+  const ConnectView = (
     <div className="flex items-center h-full ml-40">
       <div className="bg-tunnel-black border border-marble-white p-4 w-128">
         <h3 className="text-marble-white text-3xl">Welcome to Station</h3>
