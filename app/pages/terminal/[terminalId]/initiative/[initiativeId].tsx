@@ -16,9 +16,9 @@ import getTerminalById from "app/terminal/queries/getTerminalById"
 import AccountModal from "app/account/components/AccountModal"
 import ApplicationModal from "app/application/components/ApplicationModal"
 import useStore from "app/core/hooks/useStore"
-import "slick-carousel/slick/slick.css"
-import "slick-carousel/slick/slick-theme.css"
-import Slider from "react-slick"
+// import "slick-carousel/slick/slick.css"
+// import "slick-carousel/slick/slick-theme.css"
+// import Slider from "react-slick"
 
 const Project: BlitzPage = () => {
   const { account } = useEthers()
@@ -52,6 +52,7 @@ const Project: BlitzPage = () => {
     }
   }, [account, activeUser])
 
+  const accepted = true
   const terminalId = useParam("terminalId", "number") || 1
   const initiativeLocalId = useParam("initiativeId", "number") || 0
 
@@ -73,13 +74,13 @@ const Project: BlitzPage = () => {
     contributors = []
   }
 
-  var settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-  }
+  // var settings = {
+  //   dots: true,
+  //   infinite: true,
+  //   speed: 500,
+  //   slidesToShow: 3,
+  //   slidesToScroll: 1,
+  // }
 
   if (!initiative) {
     return <Page404 />
@@ -168,7 +169,7 @@ const Project: BlitzPage = () => {
                     </div>
                     <div className="flex flex-row overflow-x-auto space-x-4">
                       {contributors.map((contributor) => {
-                        return ContributorCard(contributor as Account)
+                        return ContributorCard(contributor as Account, accepted)
                       })}
                     </div>
                   </div>
