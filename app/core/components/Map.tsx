@@ -9,7 +9,7 @@ const Map = () => {
   const [page, setPage] = useState(0)
   const [terminals] = useQuery(
     getTerminals,
-    { pagination: { page: page, per_page: 4 } },
+    { isContributor: false, pagination: { page: page, per_page: 4 } },
     { suspense: false }
   )
 
@@ -31,78 +31,85 @@ const Map = () => {
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Popover.Panel className="absolute z-10 w-[450px] px-4 mt-[9px] right-0 sm:px-0 lg:max-w-3xl">
-                <div className="relative right-[-17px] bg-tunnel-black border border-marble-white p-4">
+              <Popover.Panel className="absolute z-10 w-[450px] h-[140px] px-4 mt-[9px] right-0 sm:px-0 lg:max-w-3xl">
+                <div className="relative right-[-17px] bg-tunnel-black border border-marble-white p-4 h-full">
                   {!terminals ? (
-                    <span className="text-marble-white">loading</span>
+                    "loading"
                   ) : (
-                    <div className="grid gap-4 grid-cols-4">
-                      {terminals.map((terminal, idx) => {
-                        return (
-                          <div key={idx} className="flex flex-col items-center cursor-pointer">
-                            <img
-                              className="border border-marble-white h-12 w-12 rounded-full bg-concrete"
-                              src={terminal.data.pfpURL}
-                            />
+                    <>
+                      <div className="grid gap-4 grid-cols-4">
+                        {terminals.results.map((terminal, idx) => {
+                          return (
+                            <div key={idx} className="flex flex-col items-center cursor-pointer">
+                              <img
+                                className="border border-marble-white h-12 w-12 rounded-full bg-concrete"
+                                src={terminal.data.pfpURL}
+                              />
 
-                            <span className="text-marble-white text-xs mt-1 text-center whitespace-nowrap text-ellipsis overflow-hidden w-full">
-                              {terminal.data.name}
-                            </span>
-                          </div>
-                        )
-                      })}
-                    </div>
+                              <span className="text-marble-white text-xs mt-1 text-center whitespace-nowrap text-ellipsis overflow-hidden w-full">
+                                {terminal.data.name}
+                              </span>
+                            </div>
+                          )
+                        })}
+                      </div>
+
+                      <div className="flex flex-row mx-auto mt-8 justify-center">
+                        {[...Array(terminals.pages)].map((_, idx) => {
+                          return (
+                            <span
+                              key={idx}
+                              className={`h-1 w-1  rounded-full mr-1 ${
+                                page === idx ? "bg-marble-white" : "bg-concrete"
+                              }`}
+                            ></span>
+                          )
+                        })}
+                      </div>
+                      {terminals.hasPrev && (
+                        <div
+                          onClick={() => setPage(page - 1)}
+                          className="cursor-pointer absolute bottom-[10px] left-[10px] rotate-180"
+                        >
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 12 12"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
+                              fill="#F2EFEF"
+                            />
+                          </svg>
+                        </div>
+                      )}
+                      {terminals.hasNext && (
+                        <div
+                          onClick={() => setPage(page + 1)}
+                          className="cursor-pointer absolute bottom-[10px] right-[10px]"
+                        >
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 12 12"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
+                              fill="#F2EFEF"
+                            />
+                          </svg>
+                        </div>
+                      )}
+                    </>
                   )}
-                  <div className="flex flex-row mx-auto mt-8 justify-center">
-                    <span
-                      className={`h-1 w-1  rounded-full mr-1 ${
-                        page === 0 ? "bg-marble-white" : "bg-concrete"
-                      }`}
-                    ></span>
-                    <span
-                      className={`h-1 w-1  rounded-full ${
-                        page === 1 ? "bg-marble-white" : "bg-concrete"
-                      }`}
-                    ></span>
-                  </div>
-                  <div
-                    onClick={() => setPage(0)}
-                    className="cursor-pointer absolute bottom-[10px] left-[10px] rotate-180"
-                  >
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 12 12"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
-                        fill="#F2EFEF"
-                      />
-                    </svg>
-                  </div>
-                  <div
-                    onClick={() => setPage(1)}
-                    className="cursor-pointer absolute bottom-[10px] right-[10px]"
-                  >
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 12 12"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
-                        fill="#F2EFEF"
-                      />
-                    </svg>
-                  </div>
                 </div>
               </Popover.Panel>
             </Transition>
