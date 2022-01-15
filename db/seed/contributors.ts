@@ -205,8 +205,41 @@ export async function seedContributors() {
     const contributorData = contributors[name] as AccountMetadata & { address: string }
     await db.account.upsert({
       where: { address: contributorData!.address },
-      create: { address: contributorData!.address, data: contributorData },
-      update: { data: contributorData },
+      create: {
+        address: contributorData!.address,
+        data: contributorData,
+        tickets: {
+          create: [
+            {
+              ticketUrl:
+                "https://station.nyc3.digitaloceanspaces.com/tickets/ca77b341-502b-465e-b8ef-17a298ebd2e6.svg",
+              active: true,
+              terminal: {
+                connect: {
+                  id: 1,
+                },
+              },
+            },
+          ],
+        },
+      },
+      update: {
+        data: contributorData,
+        tickets: {
+          create: [
+            {
+              ticketUrl:
+                "https://station.nyc3.digitaloceanspaces.com/tickets/ca77b341-502b-465e-b8ef-17a298ebd2e6.svg",
+              active: true,
+              terminal: {
+                connect: {
+                  id: 1,
+                },
+              },
+            },
+          ],
+        },
+      },
     })
   }
 }
