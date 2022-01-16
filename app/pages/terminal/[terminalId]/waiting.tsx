@@ -175,7 +175,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             {!applications ? (
               <div>There are no applications for this initiative.</div>
             ) : (
-              <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 justify-start max-w-[720px]">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {dummyData.map((data) => {
                   return ContributorCard(data as Account, accepted, endorseAbility)
                 })}

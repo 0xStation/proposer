@@ -6,6 +6,7 @@ import Commuter from "/public/role-commuter.svg"
 import Visitor from "/public/role-visitor.svg"
 import { Account } from "app/account/types"
 import { contributors } from "db/seed/contributors"
+import EndorseContributorModal from "app/contributors/components/EndorseContributorModal"
 
 function roleSVG(role) {
   let svg
@@ -28,9 +29,17 @@ const ContributorCard = (
   activeUser?: Account | null
 ) => {
   const isContributorDirectory = openEndorseModal && setSelectedUserToEndorse
+  const isWaitingRoom = !accepted
   return (
     <div
-      className={`flex flex-col flex-auto content-center text-marble-white border border-concrete cursor-pointer w-[240px] min-h-[180px] max-h-[250px] mx-0`}
+      // className={`flex flex-col flex-none content-center text-marble-white border border-concrete cursor-pointer ${
+      //   !isContributorDirectory && "w-[240px] h-[130px]"
+      // }`}
+      className={`flex flex-col flex-auto content-center ${
+        endorse && accepted && "w-[240px]"
+      } text-marble-white border border-concrete cursor-pointer ${
+        !isWaitingRoom && !isContributorDirectory && "w-[240px] min-h-[180px] max-h-[250px]"
+      }`}
       // onClick={() => {
       //   if (!accepted) {
       //     contributor.data.applications
