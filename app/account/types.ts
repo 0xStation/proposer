@@ -2,6 +2,7 @@ export type AccountMetadata = {
   name: string
   handle: string
   wallet?: string
+  ticketId?: number // TODO: remove this when subgraph is ready
   pfpURL?: string
   webURL?: string
   githubURL?: string
@@ -11,6 +12,7 @@ export type AccountMetadata = {
   discord: string
   verified: boolean
   role?: string
+  applications?: number[]
 }
 
 export type Account = {

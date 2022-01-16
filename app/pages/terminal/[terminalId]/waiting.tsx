@@ -19,7 +19,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const accepted = false
   let endorseAbility = false
   if (connectedUser) {
-    if (connectedUser.data?.role != "N/A") {
+    if (connectedUser.data?.role !== "N/A") {
       endorseAbility = true
     }
   }
@@ -156,7 +156,7 @@ const TerminalWaitingPage: BlitzPage = () => {
         <div>There are no active initiatives and initiatives applications in this terminal.</div>
       ) : (
         <div className="flex flex-col space-y-10">
-          <div className="flex-1/5 flex flex-row space-x-3 text-marble-white text-sm">
+          <div className="flex-auto flex flex-row space-x-3 text-marble-white text-sm">
             {initiatives.map((initiative) => {
               return (
                 <button
@@ -171,11 +171,11 @@ const TerminalWaitingPage: BlitzPage = () => {
               )
             })}
           </div>
-          <div className="flex-4/5 text-marble-white">
+          <div className="flex-auto text-marble-white">
             {!applications ? (
               <div>There are no applications for this initiative.</div>
             ) : (
-              <div className="grid grid-cols-3 grid-rows-3">
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 justify-start max-w-[720px]">
                 {dummyData.map((data) => {
                   return ContributorCard(data as Account, accepted, endorseAbility)
                 })}

@@ -25,7 +25,13 @@ const Navigation = ({ children }: { children?: any }) => {
         <div className="grid gap-0 grid-cols-1 md:grid-cols-3 xl:grid-cols-4 max-w-screen-xl h-full mx-auto">
           <div className="col-span-1 pl-4 text-2xl border-concrete border-b pb-12 md:border-b-0 md:border-r md:pr-6 h-full">
             <div className="flex items-center mt-12">
-              <span className="border border-marble-white rounded-full h-12 w-12 mr-4 bg-concrete"></span>
+              <div className="flex-2/5 mr-4">
+                <img
+                  src={terminal.data.pfpURL}
+                  alt="PFP"
+                  className="h-[52px] w-[52px] border border-marble-white rounded-full"
+                />
+              </div>
               <div className="flex flex-col">
                 <h1 className="text-2xl text-marble-white">{terminal.data.name}</h1>
                 <span className="text-sm text-concrete">@{terminal.data.handle}</span>

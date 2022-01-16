@@ -53,6 +53,7 @@ const Project: BlitzPage = () => {
   }, [account, activeUser])
 
   const accepted = true
+  const endorse = false
   const terminalId = useParam("terminalId", "number") || 1
   const initiativeLocalId = useParam("initiativeId", "number") || 0
 
@@ -169,7 +170,7 @@ const Project: BlitzPage = () => {
                     </div>
                     <div className="flex flex-row overflow-x-auto space-x-4">
                       {contributors.map((contributor) => {
-                        return ContributorCard(contributor as Account, accepted)
+                        return ContributorCard(contributor as Account, accepted, endorse)
                       })}
                     </div>
                   </div>
