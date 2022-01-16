@@ -105,20 +105,22 @@ const ContributorCard = (
               <span>number</span>
             </div>
           </div>
-          {isContributorDirectory && activeUser?.address !== contributor.address && (
-            <div className="flex flex-row align-center justify-center my-2">
-              <button
-                type="submit"
-                className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
-                onClick={() => {
-                  setSelectedUserToEndorse(contributor)
-                  openEndorseModal()
-                }}
-              >
-                Endorse
-              </button>
-            </div>
-          )}
+          {setSelectedUserToEndorse &&
+            openEndorseModal &&
+            activeUser?.address !== contributor.address && (
+              <div className="flex flex-row align-center justify-center my-2">
+                <button
+                  type="submit"
+                  className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
+                  onClick={() => {
+                    setSelectedUserToEndorse(contributor)
+                    openEndorseModal()
+                  }}
+                >
+                  Endorse
+                </button>
+              </div>
+            )}
 
           <div className="flex flex-row flex-1 mx-3 ">
             <div className="flex-1 items-center justify-center text-xs text-concrete mt-2">
@@ -165,20 +167,22 @@ const ContributorCard = (
             <div></div>
           )}
 
-          {isContributorDirectory && activeUser?.address !== contributor.address && (
-            <div className="flex flex-row align-center justify-center my-2">
-              <button
-                type="submit"
-                className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
-                onClick={() => {
-                  setSelectedUserToEndorse(contributor)
-                  openEndorseModal()
-                }}
-              >
-                Endorse
-              </button>
-            </div>
-          )}
+          {setSelectedUserToEndorse &&
+            openEndorseModal &&
+            activeUser?.address !== contributor.address && (
+              <div className="flex flex-row align-center justify-center my-2">
+                <button
+                  type="submit"
+                  className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
+                  onClick={() => {
+                    setSelectedUserToEndorse(contributor)
+                    openEndorseModal()
+                  }}
+                >
+                  Endorse
+                </button>
+              </div>
+            )}
 
           <div className="flex flex-row flex-1 mx-3">
             <div className="flex-1 items-center justify-center text-xs text-concrete my-2">

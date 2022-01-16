@@ -7,7 +7,10 @@ import ContributorCard from "../../../../core/components/ContributorCard"
 import ImageLink from "../../../../core/components/ImageLink"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
 import Newstand from "/public/newstand-banner.png"
-import ProgressBar from "/public/progress-bar.svg"
+import StepOne from "/public/step-1.svg"
+import StepTwo from "/public/step-2.svg"
+import StepThree from "/public/step-3.svg"
+
 import Back from "/public/back-icon.svg"
 import Page404 from "../../../404"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
@@ -182,9 +185,9 @@ const Project: BlitzPage = () => {
                       <span className="text-lg">Whats next?</span>
                     </div>
                     <div className="flex flex-row space-x-4">
-                      <div className="flex-1 space-y-3">
+                      <div className="flex-1 space-y-4">
                         <div>
-                          <Image src={ProgressBar} alt="Progress bar." width={244.67} height={24} />
+                          <Image src={StepOne} alt="Step one." width={24} height={24} />
                         </div>
                         <div className="flex-1 space-y-2">
                           <span className="font-bold">Submit interest</span>
@@ -197,7 +200,7 @@ const Project: BlitzPage = () => {
                       </div>
                       <div className="flex-1 space-y-4">
                         <div>
-                          <Image src={ProgressBar} alt="Progress bar." width={244.67} height={24} />
+                          <Image src={StepTwo} alt="Step two." width={24} height={24} />
                         </div>
                         <div className="flex-1 space-y-2">
                           <span className="font-bold">Gather endorsements</span>
@@ -211,7 +214,7 @@ const Project: BlitzPage = () => {
                       </div>
                       <div className="flex-1 space-y-4">
                         <div>
-                          <Image src={ProgressBar} alt="Progress bar." width={244.67} height={24} />
+                          <Image src={StepThree} alt="Step three." width={24} height={24} />
                         </div>
                         <div className="flex-1 space-y-2">
                           <span className="font-bold">Start contributing</span>
