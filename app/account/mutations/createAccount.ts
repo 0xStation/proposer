@@ -3,7 +3,7 @@ import * as z from "zod"
 import { Account } from "../types"
 
 const CreateAccount = z.object({
-  name: z.string(),
+  handle: z.string(),
   discordId: z.string(),
   pronouns: z.string(),
   timezone: z.string(),

@@ -9,7 +9,8 @@ export type AccountMetadata = {
   twitterURL?: string
   skills: string[]
   pronouns: string
-  discord: string
+  discordId: string
+  timezone: string
   verified: boolean
   role?: string
 }

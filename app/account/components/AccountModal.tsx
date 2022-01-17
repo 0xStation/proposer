@@ -3,6 +3,7 @@ import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
 import createAccount from "../mutations/createAccount"
 import useStore from "app/core/hooks/useStore"
+import { AccountMetadata } from "../types"
 
 const AccountModal = ({
   isOpen,
@@ -29,13 +30,7 @@ const AccountModal = ({
     >
       <div className="mt-8">
         <Form
-          onSubmit={async (values: {
-            name: string
-            discordId: string
-            address: string
-            pronouns: string
-            timezone: string
-          }) => {
+          onSubmit={async (values: AccountMetadata) => {
             try {
               await createAccountMutation({ ...values, address })
             } catch (error) {
@@ -46,13 +41,13 @@ const AccountModal = ({
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-y-4 gap-x-2">
                 <div className="flex flex-col">
-                  <label htmlFor="name" className="text-marble-white">
-                    Name
+                  <label htmlFor="handle" className="text-marble-white">
+                    Handle
                   </label>
                   <Field
                     component="input"
-                    name="name"
-                    placeholder="Name"
+                    name="handle"
+                    placeholder="your station profile handle"
                     className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
                   />
                 </div>
