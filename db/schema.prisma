@@ -13,14 +13,12 @@ generator client {
 // The account of user of Station
 // user's wallet address is primary key
 model Account {
-  id                     Int                      @id @default(autoincrement())
-  address                String                   @unique
-  applications           InitiativeApplication[]
-  pledgedEndorsements    ApplicationEndorsement[]
-  skills                 SkillsOnAccounts[]
-  data                   Json?
-  accountSkillsAccountId Int
-  accountSkillsSkillId   Int
+  id                  Int                      @id @default(autoincrement())
+  address             String                   @unique
+  applications        InitiativeApplication[]
+  pledgedEndorsements ApplicationEndorsement[]
+  skills              SkillsOnAccounts[]
+  data                Json?
 }
 
 // Each DAO is represented by a terminal.
