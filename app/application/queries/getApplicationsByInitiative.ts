@@ -12,6 +12,7 @@ export default async function getApplicationsByInitiative(
   const data = GetApplicationsByInitiative.parse(input)
   const applications = await db.initiativeApplication.findMany({
     where: { initiativeId: data.initiativeId },
+    include: { applicant: true },
   })
   if (!applications) {
     return []

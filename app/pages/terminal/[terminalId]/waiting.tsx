@@ -153,7 +153,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   return (
     <TerminalNavigation>
       {!initiatives ? (
-        <div>There are no active initiatives and initiatives applications in this terminal.</div>
+        <div>There are no active applications in this terminal.</div>
       ) : (
         <div className="flex flex-col space-y-10">
           <div className="flex-auto flex flex-row space-x-3 text-marble-white text-sm">
@@ -164,7 +164,11 @@ const TerminalWaitingPage: BlitzPage = () => {
                   onClick={() => {
                     setSelectedInitiative(initiative.localId)
                   }}
-                  className="border border-marble-white rounded-xl hover:bg-marble-white hover:text-concrete h-[29px]"
+                  className={`${
+                    initiative.localId == selectedInitiative && "bg-marble-white text-concrete"
+                  } border border-marble-white rounded-xl h-[29px] ${
+                    initiative.localId != selectedInitiative && " border border-marble-white"
+                  } active:bg-marble-white active:text-concrete`}
                 >
                   <span className="m-4">{initiative.data?.name}</span>
                 </button>
@@ -173,7 +177,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           </div>
           <div className="flex-auto text-marble-white">
             {!applications ? (
-              <div>There are no applications for this initiative.</div>
+              <div>There are no active applications for this initiative.</div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {dummyData.map((data) => {
@@ -183,7 +187,7 @@ const TerminalWaitingPage: BlitzPage = () => {
               // This is the actual component we will be using once the schema is updated
               // <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               //   {applications.map((application) => {
-              //     return ContributorCard(application.applicant as Account)
+              //     return ContributorCard(application.applicant as Account, accepted, endorseAbility)
               //   })}
               // </div>
             )}

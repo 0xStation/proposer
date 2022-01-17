@@ -20,6 +20,24 @@ function roleSVG(role) {
   return svg
 }
 
+// type ContributorCardProps = {
+//   contributor: Account
+//   accepted: Boolean
+//   endorse: Boolean
+//   openEndorseModal?: () => void
+//   setSelectedUserToEndorse?: Dispatch<SetStateAction<Account | null>>
+//   activeUser?: Account | null
+// }
+
+// const ContributorCard: React.FC<ContributorCardProps> = ({
+//   contributor,
+//   accepted,
+//   endorse,
+//   openEndorseModal,
+//   setSelectedUserToEndorse,
+//   activeUser,
+// }) => {
+
 const ContributorCard = (
   contributor: Account,
   accepted: Boolean,
