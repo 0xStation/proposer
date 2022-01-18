@@ -4,6 +4,7 @@ import { useEthers } from "@usedapp/core"
 import { users } from "../core/utils/data"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
+import MultiSelect from "app/core/components/MultiSelect"
 
 const Home: BlitzPage = () => {
   const { activateBrowserWallet, account } = useEthers()
