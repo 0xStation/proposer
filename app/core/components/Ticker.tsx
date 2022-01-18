@@ -6,8 +6,8 @@
  */
 const Ticker = () => {
   return (
-    <div className="relative h-12 bg-tunnel-black flex overflow-x-hidden border-b border-concrete">
-      <div className="animate-marquee whitespace-nowrap text-neon-blue font-vt323 text-5xl">
+    <div className="relative h-12 bg-tunnel-black flex overflow-hidden border-b border-concrete">
+      <div className="animate-marquee whitespace-nowrap text-neon-blue font-vt323 text-5xl ">
         <p>WELCOME TO STATION. WELCOME TO STATION. WELCOME TO STATION. WELCOME TO STATION.</p>
       </div>
     </div>
