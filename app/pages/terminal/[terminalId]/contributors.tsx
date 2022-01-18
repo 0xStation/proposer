@@ -37,16 +37,17 @@ const TerminalContributorsPage: BlitzPage = () => {
                   (contributor) =>
                     typeof contributor.data.ticketId === "number" && contributor.data.ticketId >= 0
                 )
-                .map((contributor) =>
-                  ContributorCard(
-                    contributor as Account,
-                    accepted,
-                    endorse,
-                    openEndorseModal,
-                    setSelectedUserToEndorse,
-                    activeUser
-                  )
-                )}
+                .map((contributor, index) => (
+                  <ContributorCard
+                    key={index}
+                    contributor={contributor as Account}
+                    endorse={endorse}
+                    accepted={accepted}
+                    openEndorseModal={openEndorseModal}
+                    setSelectedUserToEndorse={setSelectedUserToEndorse}
+                    activeUser={activeUser}
+                  />
+                ))}
           </div>
         </>
       ) : (

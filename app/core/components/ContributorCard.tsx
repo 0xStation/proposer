@@ -7,6 +7,7 @@ import Visitor from "/public/role-visitor.svg"
 import { Account } from "app/account/types"
 import { contributors } from "db/seed/contributors"
 import EndorseContributorModal from "app/contributors/components/EndorseContributorModal"
+import { connectContractToSigner } from "@usedapp/core"
 
 function roleSVG(role) {
   let svg
@@ -20,49 +21,37 @@ function roleSVG(role) {
   return svg
 }
 
-// type ContributorCardProps = {
-//   contributor: Account
-//   accepted: Boolean
-//   endorse: Boolean
-//   openEndorseModal?: () => void
-//   setSelectedUserToEndorse?: Dispatch<SetStateAction<Account | null>>
-//   activeUser?: Account | null
-// }
-
-// const ContributorCard: React.FC<ContributorCardProps> = ({
-//   contributor,
-//   accepted,
-//   endorse,
-//   openEndorseModal,
-//   setSelectedUserToEndorse,
-//   activeUser,
-// }) => {
-
-const ContributorCard = (
-  contributor: Account,
-  accepted: Boolean,
-  endorse: Boolean,
-  openEndorseModal?: () => void,
-  setSelectedUserToEndorse?: Dispatch<SetStateAction<Account | null>>,
+type ContributorCardProps = {
+  contributor: Account
+  accepted: Boolean
+  endorse: Boolean
+  openEndorseModal?: () => void
+  setSelectedUserToEndorse?: Dispatch<SetStateAction<Account | null>>
   activeUser?: Account | null
-) => {
+}
+
+const ContributorCard: React.FC<ContributorCardProps> = ({
+  contributor,
+  accepted,
+  endorse,
+  openEndorseModal,
+  setSelectedUserToEndorse,
+  activeUser,
+}) => {
   const isContributorDirectory = openEndorseModal && setSelectedUserToEndorse
   const isWaitingRoom = !accepted
   return (
     <div
-      // className={`flex flex-col flex-none content-center text-marble-white border border-concrete cursor-pointer ${
-      //   !isContributorDirectory && "w-[240px] h-[130px]"
-      // }`}
       className={`flex flex-col flex-auto content-center ${
         endorse && accepted && "w-[240px]"
       } text-marble-white border border-concrete cursor-pointer ${
         !isWaitingRoom && !isContributorDirectory && "w-[240px] min-h-[180px] max-h-[250px]"
       }`}
-      // onClick={() => {
-      //   if (!accepted) {
-      //     contributor.data.applications
-      //   }
-      // }}
+      onClick={() => {
+        if (!accepted) {
+          console.log(accepted)
+        }
+      }}
     >
       <div className="flex flex-row flex-1 content-center mx-3 my-3 space-x-1">
         <div className="flex-2/5 content-center align-middle mr-1">
@@ -92,7 +81,7 @@ const ContributorCard = (
           </div>
         </div>
       </div>
-      {accepted ? (
+      {accepted === true ? (
         <div>
           <div className="flex flex-row flex-1 mx-3">
             <div className="flex-1 items-center justify-center text-sm">

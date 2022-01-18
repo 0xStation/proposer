@@ -174,8 +174,15 @@ const Project: BlitzPage = () => {
                       <span className="flex-1 text-marble-white text-lg">Contributors</span>
                     </div>
                     <div className="flex flex-row overflow-x-scroll space-x-4">
-                      {contributors.map((contributor) => {
-                        return ContributorCard(contributor as Account, accepted, endorse)
+                      {contributors.map((contributor, index) => {
+                        return (
+                          <ContributorCard
+                            key={index}
+                            contributor={contributor as Account}
+                            endorse={endorse}
+                            accepted={accepted}
+                          />
+                        )
                       })}
                     </div>
                   </div>
