@@ -4,12 +4,20 @@ import { Popover, Transition } from "@headlessui/react"
 import ChevronIcon from "../icons/ChevronIcon"
 import { Fragment } from "react"
 import getTerminals from "app/terminal/queries/getTerminals"
+import useStore from "app/core/hooks/useStore"
+import { Account } from "app/account/types"
 
 const Map = () => {
+  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const [contributorBoolean, setContributorBoolean] = useState(false)
   const [page, setPage] = useState(0)
   const [terminals] = useQuery(
     getTerminals,
-    { isContributor: false, pagination: { page: page, per_page: 4 } },
+    {
+      isContributor: contributorBoolean,
+      address: activeUser?.address,
+      pagination: { page: page, per_page: 4 },
+    },
     { suspense: false }
   )
 
@@ -31,18 +39,47 @@ const Map = () => {
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Popover.Panel className="absolute z-10 w-[450px] h-[140px] px-4 mt-[9px] right-0 sm:px-0 lg:max-w-3xl">
+              <Popover.Panel className="absolute z-10 w-[450px] h-[200px] px-4 mt-[9px] right-0 sm:px-0 lg:max-w-3xl">
                 <div className="relative right-[-17px] bg-tunnel-black border border-marble-white p-4 h-full">
                   {!terminals ? (
                     "loading"
                   ) : (
                     <>
-                      <div className="grid gap-4 grid-cols-4">
+                      <div className="">
+                        <button
+                          onClick={() => {
+                            setContributorBoolean(false)
+                          }}
+                          className={`${
+                            !contributorBoolean
+                              ? "text-tunnel-black bg-marble-white"
+                              : "text-marble-white"
+                          } py-1 px-3 border border-marble-white rounded-full text-sm mr-2 hover:bg-marble-white hover:text-tunnel-black`}
+                        >
+                          ALL
+                        </button>
+                        <button
+                          onClick={() => {
+                            setContributorBoolean(true)
+                          }}
+                          className={`${
+                            contributorBoolean
+                              ? "text-tunnel-black bg-marble-white"
+                              : "text-marble-white"
+                          } py-1 px-3 border border-marble-white rounded-full text-sm mr-2 hover:bg-marble-white hover:text-tunnel-black`}
+                        >
+                          CONTRIBUTING
+                        </button>
+                      </div>
+                      <div className="mt-4 grid gap-4 grid-cols-4">
                         {terminals.results.map((terminal, idx) => {
                           return (
-                            <div key={idx} className="flex flex-col items-center cursor-pointer">
+                            <div
+                              key={idx}
+                              className="flex flex-col items-center cursor-pointer w-16"
+                            >
                               <img
-                                className="border border-marble-white h-12 w-12 rounded-full bg-concrete"
+                                className="border border-marble-white h-16 w-16 rounded-full bg-concrete"
                                 src={terminal.data.pfpURL}
                               />
 

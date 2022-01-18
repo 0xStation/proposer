@@ -3,17 +3,20 @@ import * as z from "zod"
 import { request, gql } from "graphql-request"
 import { Terminal } from "../types"
 
-const CONTRIBUTOR_QUERY = gql`
+const createQuery = (address: string) => {
+  return gql`
   {
-    tickets(where: { owner: "0x65A3870F48B5237f27f674Ec42eA1E017E111D63" }) {
+    tickets(where: { owner: "${address}" }) {
       terminal {
         tokenAddress
       }
     }
   }
 `
+}
 
 const GetTerminals = z.object({
+  address: z.string().optional(),
   isContributor: z.boolean().optional(),
   pagination: z.object({
     page: z.number().default(0),
@@ -23,15 +26,30 @@ const GetTerminals = z.object({
 
 export default async function getTerminals(input: z.infer<typeof GetTerminals>) {
   const params = GetTerminals.parse(input)
+
   let args: any = {}
   args.take = params.pagination.per_page + 1
   args.skip = params.pagination.page * params.pagination.per_page
 
   if (params.isContributor) {
+    // if address is not provided by contributor toggle is active, should return empty
+    if (!params.address) {
+      return {
+        hasNext: false,
+        hasPrev: false,
+        results: [],
+        pages: 0,
+        total: 0,
+      }
+    }
+
     let data = await request(
       "https://api.thegraph.com/subgraphs/name/akshaymahajans/stationtest",
-      CONTRIBUTOR_QUERY
+      createQuery(params.address)
     )
+
+    console.log(data.tickets)
+
     const contributorOfTerminalsWithAddresses = data.tickets.map(
       (ticket) => ticket.terminal.tokenAddress
     )
