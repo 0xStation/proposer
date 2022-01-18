@@ -12,6 +12,7 @@ export type AccountMetadata = {
   discord: string
   verified: boolean
   role?: string
+  applications?: number[]
 }
 
 export type Account = {

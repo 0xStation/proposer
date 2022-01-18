@@ -4,8 +4,10 @@ import { Image } from "blitz"
 import Staff from "/public/role-staff.svg"
 import Commuter from "/public/role-commuter.svg"
 import Visitor from "/public/role-visitor.svg"
-import TwitterIcon from "/public/twitter-icon.svg"
 import { Account } from "app/account/types"
+import { contributors } from "db/seed/contributors"
+import EndorseContributorModal from "app/contributors/components/EndorseContributorModal"
+import { connectContractToSigner } from "@usedapp/core"
 
 function roleSVG(role) {
   let svg
@@ -19,21 +21,40 @@ function roleSVG(role) {
   return svg
 }
 
-const ContributorCard = (
-  contributor: Account,
-  openEndorseModal?: () => void,
-  setSelectedUserToEndorse?: Dispatch<SetStateAction<Account | null>>,
+type ContributorCardProps = {
+  contributor: Account
+  accepted: Boolean
+  endorse: Boolean
+  openEndorseModal?: () => void
+  setSelectedUserToEndorse?: Dispatch<SetStateAction<Account | null>>
   activeUser?: Account | null
-) => {
+}
+
+const ContributorCard: React.FC<ContributorCardProps> = ({
+  contributor,
+  accepted,
+  endorse,
+  openEndorseModal,
+  setSelectedUserToEndorse,
+  activeUser,
+}) => {
   const isContributorDirectory = openEndorseModal && setSelectedUserToEndorse
+  const isWaitingRoom = !accepted
   return (
     <div
-      className={`flex flex-col flex-none content-center text-marble-white border border-concrete cursor-pointer ${
-        !isContributorDirectory && "w-[240px] h-[130px]"
+      className={`flex flex-col flex-auto content-center ${
+        endorse && accepted && "w-[240px]"
+      } text-marble-white border border-concrete cursor-pointer ${
+        !isWaitingRoom && !isContributorDirectory && "w-[240px] min-h-[180px] max-h-[250px]"
       }`}
+      onClick={() => {
+        if (!accepted) {
+          console.log(accepted)
+        }
+      }}
     >
       <div className="flex flex-row flex-1 content-center mx-3 my-3 space-x-1">
-        <div className="flex-2/5 content-center align-middle">
+        <div className="flex-2/5 content-center align-middle mr-1">
           {contributor.data.pfpURL ? (
             <div className="flex-2/5 m-auto">
               <img
@@ -60,45 +81,121 @@ const ContributorCard = (
           </div>
         </div>
       </div>
-      <div className="flex flex-row flex-initial mx-3">
-        <div className="flex-intial items-center justify-center text-sm">
-          <div className="place-self-center mt-2">Role</div>
+      {accepted === true ? (
+        <div>
+          <div className="flex flex-row flex-1 mx-3">
+            <div className="flex-1 items-center justify-center text-sm">
+              <div className="place-self-center mt-2">Role</div>
+            </div>
+
+            <div className="flex flex-1 align-right place-content-end content-right text-sm">
+              <Image
+                className="content-right text-sm"
+                src={roleSVG(contributor.data.role)}
+                alt="Role icon."
+                height={17}
+              />
+            </div>
+          </div>
+          <div className="flex flex-row flex-1 mx-3">
+            <div className="flex-1 items-center justify-center text-sm">
+              <div className="place-self-center mt-2">Endorsers</div>
+            </div>
+
+            <div className="flex flex-1 align-right place-content-end content-right text-sm">
+              <span>people</span>
+            </div>
+          </div>
+          <div className="flex flex-row flex-1 mx-3 ">
+            <div className="flex-1 items-center justify-center text-sm mt-2">Points</div>
+            <div className="flex-1 text-right justify-end content-end text-sm">
+              <span>number</span>
+            </div>
+          </div>
+          {setSelectedUserToEndorse &&
+            openEndorseModal &&
+            activeUser?.address !== contributor.address && (
+              <div className="flex flex-row align-center justify-center my-2">
+                <button
+                  type="submit"
+                  className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
+                  onClick={() => {
+                    setSelectedUserToEndorse(contributor)
+                    openEndorseModal()
+                  }}
+                >
+                  Endorse
+                </button>
+              </div>
+            )}
+
+          <div className="flex flex-row flex-1 mx-3 ">
+            <div className="flex-1 items-center justify-center text-xs text-concrete mt-2">
+              Metadata
+            </div>
+          </div>
         </div>
-        <div className="flex flex-1 align-right place-content-end content-right text-sm">
-          <Image
-            className="content-right text-sm"
-            src={roleSVG(contributor.data.role)}
-            alt="Role icon."
-            height={17}
-          />
-          {/* <span className="p-1 rounded-lg bg-purple-300 text-purple-500">{contributor.data.role}</span> */}
-        </div>
-      </div>
-      <div className="flex flex-row flex-auto mx-3 ">
-        <div className="flex-1 items-center justify-center text-sm">Socials</div>
-        <div className="flex-1 text-right justify-end content-end text-sm">
-          <a target="_blank" rel="noreferrer" href={contributor.data.twitterURL}>
-            <Image
-              className="content-right text-sm"
-              src={TwitterIcon}
-              alt="Role icon."
-              height={15}
-            />
-          </a>
-        </div>
-      </div>
-      {isContributorDirectory && activeUser?.address !== contributor.address && (
-        <div className="flex flex-row align-center justify-center my-2">
-          <button
-            type="submit"
-            className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
-            onClick={() => {
-              setSelectedUserToEndorse(contributor)
-              openEndorseModal()
-            }}
-          >
-            Endorse
-          </button>
+      ) : (
+        <div>
+          <div className="flex flex-row flex-1 mx-3">
+            <div className="flex-1 items-center justify-center text-sm">
+              <div className="place-self-center mt-2">Endorsers</div>
+            </div>
+
+            <div className="flex flex-1 align-right place-content-end content-right text-sm">
+              <span>people</span>
+            </div>
+          </div>
+          <div className="flex flex-row flex-1 mx-3 ">
+            <div className="flex-1 items-center justify-center text-sm mt-2">Points</div>
+            <div className="flex-1 text-right justify-end content-end text-sm">
+              <span>number</span>
+            </div>
+          </div>
+          <div className="flex flex-row flex-1 mx-3">
+            <div className="flex-1 items-center justify-center text-sm">
+              <div className="place-self-center mt-2">Role</div>
+            </div>
+            <div className="flex flex-1 align-right place-content-end content-right text-sm">
+              <span>N/A</span>
+            </div>
+          </div>
+          {endorse ? (
+            <div className="flex flex-row flex-1 align-center justify-center mt-2">
+              <button
+                type="submit"
+                className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
+                onClick={() => {}}
+              >
+                Endorse
+              </button>
+            </div>
+          ) : (
+            <div></div>
+          )}
+
+          {setSelectedUserToEndorse &&
+            openEndorseModal &&
+            activeUser?.address !== contributor.address && (
+              <div className="flex flex-row align-center justify-center my-2">
+                <button
+                  type="submit"
+                  className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
+                  onClick={() => {
+                    setSelectedUserToEndorse(contributor)
+                    openEndorseModal()
+                  }}
+                >
+                  Endorse
+                </button>
+              </div>
+            )}
+
+          <div className="flex flex-row flex-1 mx-3">
+            <div className="flex-1 items-center justify-center text-xs text-concrete my-2">
+              Metadata
+            </div>
+          </div>
         </div>
       )}
     </div>
