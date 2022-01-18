@@ -2,6 +2,7 @@ import { Router } from "blitz"
 import { useEffect } from "react"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
+import MultiSelect from "app/core/components/MultiSelect"
 
 const Home: BlitzPage = () => {
   const redirectToTerminal = () => {
