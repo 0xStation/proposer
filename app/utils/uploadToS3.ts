@@ -19,6 +19,9 @@ const OPTION_DEFAULTS = {
   ContentType: "image/svg+xml",
 }
 
+// General function for uploading assets to Digital Ocean
+// We use the "aws-sdk" library which works with digital ocean, but all of the functions
+// are centered around AWS (S3 etc), so just keep that in mind. We are really on DO.
 function uploadToS3(content, path, options: UploadOptions = {}): Promise<UploadResponse> {
   const s3 = new aws.S3({
     endpoint: process.env.SPACES_ENDPOINT,
