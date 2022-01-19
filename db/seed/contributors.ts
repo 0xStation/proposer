@@ -55,7 +55,7 @@ const kristen: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "STAFF",
   twitterURL: "https://twitter.com/0xRie_",
-  pfpURL: "https://pbs.twimg.com/profile_images/1472492830362800130/IGUo8Pd__400x400.jpg",
+  pfpURL: "https://pbs.twimg.com/profile_images/1480639057914855424/LiE4wCe2_400x400.jpg",
 }
 const calvin: AccountMetadata & { address: string } = {
   name: "Calvin",
@@ -97,7 +97,7 @@ const michael: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/0xmcg",
-  pfpURL: "https://pbs.twimg.com/profile_images/1445182641972695054/hQlv1yTJ_400x400.png",
+  pfpURL: "https://pbs.twimg.com/profile_images/1480358868349714433/v7YwGkCb_400x400.jpg",
 }
 const abe: AccountMetadata & { address: string } = {
   name: "Abe",
@@ -181,7 +181,7 @@ const akshay: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/wagmiking",
-  pfpURL: "https://pbs.twimg.com/profile_images/1468635081874948099/hG0lDyef_400x400.jpg",
+  pfpURL: "https://pbs.twimg.com/profile_images/1481863734679126016/dfL8P2St_400x400.jpg",
 }
 
 export const contributors = {
