@@ -3,12 +3,12 @@ import { Initiative, InitiativeMetadata } from "app/initiative/types"
 import { Symbol } from "app/types"
 import { contributors } from "./contributors"
 
-const contributorDirectoryMetadata: InitiativeMetadata & { localId: number } = {
+const contributorReviewMetadata: InitiativeMetadata & { localId: number } = {
   localId: 1,
-  name: "Contributor Directory",
+  name: "Contributor Review",
   description:
-    "Station's contributor directory is the cornerstone of Station's reputation system, enabling contributors to recognize one another's work.",
-  shortName: "CONTRIBUTOR DIRECTORY",
+    "Station's contributor review is the cornerstone of Station's reputation system, enabling contributors to recognize one another's work.",
+  shortName: "CONTRIBUTOR REVIEW",
   isAcceptingApplications: false,
   links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/protocol-v1" }],
   members: [
@@ -68,7 +68,7 @@ const partnershipMetadata: InitiativeMetadata & { localId: number } = {
 }
 
 const stationInitiaitves = [
-  contributorDirectoryMetadata,
+  contributorReviewMetadata,
   waitingRoomMetadata,
   newstandMetadata,
   partnershipMetadata,
