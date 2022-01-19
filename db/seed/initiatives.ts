@@ -3,7 +3,7 @@ import { Initiative, InitiativeMetadata } from "app/initiative/types"
 import { Symbol } from "app/types"
 import { contributors } from "./contributors"
 
-const contributorMetadata: InitiativeMetadata & { localId: number } = {
+const contributorDirectoryMetadata: InitiativeMetadata & { localId: number } = {
   localId: 1,
   name: "Contributor Directory",
   description:
@@ -68,7 +68,7 @@ const partnershipMetadata: InitiativeMetadata & { localId: number } = {
 }
 
 const stationInitiaitves = [
-  contributorMetadata,
+  contributorDirectoryMetadata,
   waitingRoomMetadata,
   newstandMetadata,
   partnershipMetadata,
