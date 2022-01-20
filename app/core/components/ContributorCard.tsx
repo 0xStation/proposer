@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, useState, useEffect } from "react"
 import Verified from "/public/check-mark.svg"
 import { Image } from "blitz"
 import Staff from "/public/role-staff.svg"
@@ -26,7 +26,9 @@ type ContributorCardProps = {
   accepted: Boolean
   endorse: Boolean
   openEndorseModal?: () => void
+  openApplicantModal?: () => void
   setSelectedUserToEndorse?: Dispatch<SetStateAction<Account | null>>
+  setselectedApplicantToView?: Dispatch<SetStateAction<Account | null>>
   activeUser?: Account | null
 }
 
@@ -35,9 +37,19 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
   accepted,
   endorse,
   openEndorseModal,
+  openApplicantModal,
   setSelectedUserToEndorse,
+  setselectedApplicantToView,
   activeUser,
 }) => {
+  // const [userTriggered, setUserTrigged] = useState(false)
+  // const setActiveModal = () => {}
+  // useEffect(() => {
+  //   if (userTriggered) {
+  //     setTimeout(() => setActiveModal(), 500)
+  //   }
+  // }, [])
+
   const isContributorDirectory = openEndorseModal && setSelectedUserToEndorse
   const isWaitingRoom = !accepted
   return (
@@ -49,7 +61,10 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
       }`}
       onClick={() => {
         if (!accepted) {
-          console.log(accepted)
+          if (setselectedApplicantToView && openApplicantModal) {
+            openApplicantModal()
+            setselectedApplicantToView(contributor)
+          }
         }
       }}
     >
