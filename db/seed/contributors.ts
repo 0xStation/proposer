@@ -200,7 +200,7 @@ export const contributors = {
   akshay,
 }
 
-export async function seedContributors() {
+export async function seedContributors(terminals) {
   for (const name in contributors) {
     const contributorData = contributors[name] as AccountMetadata & { address: string }
     await db.account.upsert({
@@ -216,7 +216,7 @@ export async function seedContributors() {
               active: true,
               terminal: {
                 connect: {
-                  id: 1,
+                  id: terminals.station.id,
                 },
               },
             },
@@ -233,7 +233,7 @@ export async function seedContributors() {
               active: true,
               terminal: {
                 connect: {
-                  id: 1,
+                  id: terminals.station.id,
                 },
               },
             },

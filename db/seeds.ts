@@ -11,7 +11,7 @@ const seed = async () => {
   console.log("Seeding initiatives...")
   await seedInitiatives(terminals)
   console.log("Seeding contributors...")
-  await seedContributors()
+  await seedContributors(terminals)
 }
 
 export default seed
