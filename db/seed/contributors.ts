@@ -181,7 +181,7 @@ const akshay: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/wagmiking",
-  pfpURL: "https://pbs.twimg.com/profile_images/1481863734679126016/dfL8P2St_400x400.jpg",
+  pfpURL: "https://pbs.twimg.com/profile_images/1484237821099405312/zYGmw04f_400x400.jpg",
 }
 
 export const contributors = {
@@ -225,20 +225,6 @@ export async function seedContributors(terminals) {
       },
       update: {
         data: contributorData,
-        tickets: {
-          create: [
-            {
-              ticketUrl:
-                "https://station.nyc3.digitaloceanspaces.com/tickets/ca77b341-502b-465e-b8ef-17a298ebd2e6.svg",
-              active: true,
-              terminal: {
-                connect: {
-                  id: terminals.station.id,
-                },
-              },
-            },
-          ],
-        },
       },
     })
   }
