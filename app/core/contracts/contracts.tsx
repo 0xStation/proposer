@@ -1,45 +1,62 @@
-import { useContractFunction, useTokenBalance, useContractCall } from "@usedapp/core"
 import { utils } from "ethers"
-import { Contract } from "@ethersproject/contracts"
 import { TERMINAL } from "../utils/constants"
 import endorsementTokenAbi from "../abi/EndorsementToken.json"
 import endorsementGraphAbi from "../abi/EndorsementGraph.json"
+import { useContractRead, useContractWrite, useToken } from "wagmi"
 
-// TODO: Remove this const and call endorsementToken contract's public view function "decimals"
-export const NUMBER_OF_DECIMALS = 6
+const endorseContractInterface = new utils.Interface(endorsementGraphAbi)
+const endorsementTokenInterface = new utils.Interface(endorsementTokenAbi)
 
 // call write functions from the endorsment graph
-export const useEndorsementGraphMethod = (methodName: string) => {
-  const endorseContractInterface = new utils.Interface(endorsementGraphAbi)
-  const contract = new Contract(TERMINAL.GRAPH_ADDRESS, endorseContractInterface)
-  const { state, send } = useContractFunction(contract, methodName)
-  return { state, send }
+export const useEndorsementGraphRead = (methodName: string) => {
+  const [{ data, error, loading }, read] = useContractRead(
+    {
+      addressOrName: TERMINAL.GRAPH_ADDRESS,
+      contractInterface: endorseContractInterface,
+    },
+    methodName
+  )
+  return { data, error, loading, read }
 }
 
-// call write functions from the endorsment token
-export const useEndorsementTokenMethod = (methodName: string) => {
-  const endorsementTokenInterface = new utils.Interface(endorsementTokenAbi)
-  const contract = new Contract(TERMINAL.TOKEN_ADDRESS, endorsementTokenInterface)
-  const { state, send } = useContractFunction(contract, methodName)
-  return { state, send }
+export const useEndorsementGraphWrite = (methodName: string) => {
+  const [{ data, error, loading }, write] = useContractWrite(
+    {
+      addressOrName: TERMINAL.GRAPH_ADDRESS,
+      contractInterface: endorseContractInterface,
+    },
+    methodName
+  )
+  return { data, error, loading, write }
 }
 
-// read user's point (reputation) balance
-export const useEndorsementTokenBalance = (address) => {
-  const balanceOf: any = useTokenBalance(TERMINAL.TOKEN_ADDRESS, address)
-  return balanceOf && parseFloat(utils.formatUnits(balanceOf, NUMBER_OF_DECIMALS))
+export const useEndorsementTokenRead = (methodName: string) => {
+  const [{ data, error, loading }, read] = useContractRead(
+    {
+      addressOrName: TERMINAL.TOKEN_ADDRESS,
+      contractInterface: endorsementTokenInterface,
+    },
+    methodName
+  )
+  return { data, error, loading, read }
 }
 
-// read allowed amount of user's allowance that station can move on their behalf
-export const useAllowance = (address) => {
-  const endorsementTokenInterface = new utils.Interface(endorsementTokenAbi)
-  const [allowance]: any =
-    useContractCall({
-      abi: endorsementTokenInterface,
-      address: TERMINAL.TOKEN_ADDRESS,
-      method: "allowance", // Method to be called
-      args: [address, TERMINAL.GRAPH_ADDRESS], // Method arguments - address to be checked for balance
-    }) ?? []
+export const useEndorsementTokenWrite = (methodName: string) => {
+  const [{ data, error, loading }, write] = useContractWrite(
+    {
+      addressOrName: TERMINAL.TOKEN_ADDRESS,
+      contractInterface: endorsementTokenInterface,
+    },
+    methodName
+  )
+  return { data, error, loading, write }
+}
 
-  return allowance && parseFloat(utils.formatUnits(allowance, NUMBER_OF_DECIMALS))
+export const useDecimals = () => {
+  const {
+    data: decimals,
+    error: decimalsError,
+    loading: decimalsLoading,
+  } = useEndorsementTokenRead("decimals")
+  return { decimals: decimals as unknown as number, decimalsError, decimalsLoading }
 }

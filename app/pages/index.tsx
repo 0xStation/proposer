@@ -1,13 +1,16 @@
 import { Router } from "blitz"
-import { useMemo, useState, useEffect } from "react"
-import { useEthers } from "@usedapp/core"
+import { useMemo, useEffect } from "react"
+import { useAccount } from "wagmi"
 import { users } from "../core/utils/data"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
 
 const Home: BlitzPage = () => {
-  const { activateBrowserWallet, account } = useEthers()
-  const connectedUser = useMemo(() => (account ? users[account] : null), [account])
+  const [{ data: accountData }] = useAccount()
+  const connectedUser: Account = useMemo(
+    () => (accountData?.address ? users[accountData?.address] : null),
+    [accountData?.address]
+  )
 
   const onError = (error: Error) => {
     console.log(error.message)
@@ -31,7 +34,7 @@ const Home: BlitzPage = () => {
         <p className="text-marble-white text-sm mt-4">Join the ride.</p>
         <button
           className="mt-4 w-full py-2 text-center text-sm bg-magic-mint rounded"
-          onClick={() => activateBrowserWallet(onError)}
+          onClick={() => console.log("TODO~")}
         >
           Enter Station
         </button>

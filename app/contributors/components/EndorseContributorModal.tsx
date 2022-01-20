@@ -1,44 +1,84 @@
 import { useQuery, useParam, invoke, Image } from "blitz"
-import { useState } from "react"
-import { useEthers } from "@usedapp/core"
+import { useState, useEffect } from "react"
+import { useAccount, useBalance } from "wagmi"
+import { BigNumberish, utils } from "ethers"
 import { Field, Form } from "react-final-form"
 import Verified from "public/check-mark.svg"
 import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTerminal"
 import Modal from "../../core/components/Modal"
 import {
-  NUMBER_OF_DECIMALS,
-  useEndorsementGraphMethod,
-  useEndorsementTokenBalance,
-  useEndorsementTokenMethod,
-  useAllowance,
+  useEndorsementGraphWrite,
+  useEndorsementTokenRead,
+  useEndorsementTokenWrite,
+  useDecimals,
 } from "app/core/contracts/contracts"
-import { TERMINAL } from "app/core/utils/constants"
+import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
 const MAX_ALLOWANCE = 100000000000000
 
 const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: contributor }) => {
-  const { account, active } = useEthers()
+  const [{ data: accountData }, disconnect] = useAccount({
+    fetchEns: true,
+  })
+
+  const [allowance, setAllowance] = useState<number>(0)
+  const address = accountData?.address
   const contributorData = contributor?.data || {}
 
   const terminalId = useParam("terminalId", "number") || 1
   const [initiatives] = useQuery(getInitiativesByTerminal, { terminalId }, { suspense: false })
 
-  const { send: endorse } = useEndorsementGraphMethod("endorse")
-  const { send: approveAllowance } = useEndorsementTokenMethod("approve")
-  const tokenBalance = useEndorsementTokenBalance(account)
-  const allowance = useAllowance(account)
+  const { decimals = DEFAULT_NUMBER_OF_DECIMALS, decimalsError, decimalsLoading } = useDecimals()
+  const [{ data: balanceData, error: balanceError }] = useBalance({
+    addressOrName: address,
+    token: TERMINAL.TOKEN_ADDRESS,
+    watch: true,
+    formatUnits: decimals,
+  })
+  const tokenBalance = parseFloat(balanceData?.formatted || "")
+
+  const {
+    data: allowanceData,
+    error: allowanceError,
+    loading: allowanceLoading,
+    read: getAllowance,
+  } = useEndorsementTokenRead("allowance")
+
+  const {
+    data: approveData,
+    error: approveError,
+    loading: approveLoading,
+    write: approveAllowance,
+  } = useEndorsementTokenWrite("approve")
+
+  const {
+    data,
+    error: endorsementGraphWriteError,
+    loading,
+    write: endorse,
+  } = useEndorsementGraphWrite("endorse")
+
+  useEffect(() => {
+    const getEndorsementTokenAllowance = async () => {
+      const { data: tokenAllowance, error } = await getAllowance({
+        args: [address, TERMINAL.GRAPH_ADDRESS],
+      })
+      setAllowance(parseFloat(utils.formatUnits((tokenAllowance as BigNumberish) || 0, decimals)))
+    }
+    getEndorsementTokenAllowance()
+  }, [decimals])
 
   const [error, setError] = useState("")
 
   const handleApproveAllowance = async (e) => {
     e.preventDefault()
     setError("")
-    if (!account) {
+    if (!accountData?.address) {
       console.warn("account is not properly connected")
       return
     }
-    await approveAllowance(TERMINAL.GRAPH_ADDRESS, MAX_ALLOWANCE)
+    await approveAllowance({ args: [TERMINAL.GRAPH_ADDRESS, MAX_ALLOWANCE] })
   }
 
   return (
@@ -52,11 +92,13 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
               setError("Please fill out required inputs")
               return
             }
-            if (!account || !active || !tokenBalance) {
+            if (!address) {
               setError("Please disconnect, refresh the page, and re-connect your account")
               return
             }
-            const currentAccount = await invoke(getAccountByAddress, { address: account })
+            const currentAccount = await invoke(getAccountByAddress, {
+              address,
+            })
 
             if (!currentAccount) {
               setError("Sorry something went wrong, please try again later")
@@ -73,12 +115,14 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
               return
             }
 
-            await endorse(
-              initiative,
-              currentAccount.data?.ticketId,
-              contributorData.ticketId,
-              endorsementAmount * Math.pow(10, NUMBER_OF_DECIMALS)
-            )
+            await endorse({
+              args: [
+                initiative,
+                currentAccount.data?.ticketId,
+                contributorData.ticketId,
+                endorsementAmount * Math.pow(10, decimals),
+              ],
+            })
           }}
           render={({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>

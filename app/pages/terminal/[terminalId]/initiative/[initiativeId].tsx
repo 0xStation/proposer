@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useEthers } from "@usedapp/core"
+import { useAccount } from "wagmi"
 import { Image, useQuery, BlitzPage, useParam, Link, Routes } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import ConnectWalletModal from "app/initiative/components/ConnectWalletModal"
@@ -21,10 +21,9 @@ import ApplicationModal from "app/application/components/ApplicationModal"
 import useStore from "app/core/hooks/useStore"
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
-import Slider from "react-slick"
 
 const Project: BlitzPage = () => {
-  const { account } = useEthers()
+  const [{ data: accountData }] = useAccount()
   const activeUser: Account | null = useStore((state) => state.activeUser)
   let [walletModalOpen, setWalletModalOpen] = useState(false)
   let [accountModalOpen, setAccountModalOpen] = useState(false)
@@ -32,7 +31,7 @@ const Project: BlitzPage = () => {
   const [userTriggered, setUserTrigged] = useState(false)
 
   const setActiveModal = () => {
-    account
+    accountData
       ? activeUser
         ? setApplicationModalOpen(true)
         : setAccountModalOpen(true)
@@ -53,7 +52,7 @@ const Project: BlitzPage = () => {
       // the modal is active does not properly clean itself up.
       setTimeout(() => setActiveModal(), 500)
     }
-  }, [account, activeUser])
+  }, [accountData, activeUser])
 
   const accepted = true
   const endorse = false
@@ -101,7 +100,7 @@ const Project: BlitzPage = () => {
         <AccountModal
           isOpen={accountModalOpen}
           setIsOpen={setAccountModalOpen}
-          address={account || ""}
+          address={accountData?.address || ""}
         />
         <ConnectWalletModal isWalletOpen={walletModalOpen} setIsWalletOpen={setWalletModalOpen} />
         <Layout>

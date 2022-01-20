@@ -5,9 +5,6 @@ import Staff from "/public/role-staff.svg"
 import Commuter from "/public/role-commuter.svg"
 import Visitor from "/public/role-visitor.svg"
 import { Account } from "app/account/types"
-import { contributors } from "db/seed/contributors"
-import EndorseContributorModal from "app/contributors/components/EndorseContributorModal"
-import { connectContractToSigner } from "@usedapp/core"
 
 function roleSVG(role) {
   let svg
