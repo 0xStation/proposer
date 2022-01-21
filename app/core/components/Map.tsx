@@ -1,28 +1,35 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useQuery } from "blitz"
 import { Popover, Transition } from "@headlessui/react"
 import ChevronIcon from "../icons/ChevronIcon"
 import { Fragment } from "react"
 import getTerminals from "app/terminal/queries/getTerminals"
+import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
 import useStore from "app/core/hooks/useStore"
 import { Account } from "app/account/types"
+import usePagination from "app/core/hooks/usePagination"
+import { Terminal } from "app/terminal/types"
 
 const Map = () => {
   const activeUser: Account | null = useStore((state) => state.activeUser)
   const [contributorBoolean, setContributorBoolean] = useState(false)
   const [page, setPage] = useState(0)
-  const [terminals] = useQuery(
-    getTerminals,
-    {
-      isContributor: contributorBoolean,
-      address: activeUser?.address,
-      pagination: { page: page, per_page: 4 },
-    },
+  const [terminals] = useQuery(getTerminals, { suspense: false })
+
+  const [contributorTerminals] = useQuery(
+    getTerminalsByAccount,
+    { address: activeUser?.address },
     { suspense: false }
   )
 
+  const { results, totalResults, totalPages, hasNext, hasPrev } = usePagination(
+    contributorBoolean ? contributorTerminals || [] : terminals,
+    page,
+    4
+  )
+
   return (
-    <div className="w-full max-w-sm px-4">
+    <div className="px-4">
       <Popover className="relative">
         {({ open }) => (
           <>
@@ -39,9 +46,9 @@ const Map = () => {
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Popover.Panel className="absolute z-10 w-[450px] h-[200px] px-4 mt-[9px] right-0 sm:px-0 lg:max-w-3xl">
+              <Popover.Panel className="absolute z-10 w-[450px] px-4 mt-[9px] right-0 sm:px-0 lg:max-w-3xl">
                 <div className="relative right-[-17px] bg-tunnel-black border border-marble-white p-4 h-full">
-                  {!terminals ? (
+                  {!results ? (
                     "loading"
                   ) : (
                     <>
@@ -56,7 +63,7 @@ const Map = () => {
                               : "text-marble-white"
                           } py-1 px-3 border border-marble-white rounded-full text-sm mr-2 hover:bg-marble-white hover:text-tunnel-black`}
                         >
-                          ALL
+                          ALL ({terminals?.length || 0})
                         </button>
                         <button
                           onClick={() => {
@@ -68,11 +75,11 @@ const Map = () => {
                               : "text-marble-white"
                           } py-1 px-3 border border-marble-white rounded-full text-sm mr-2 hover:bg-marble-white hover:text-tunnel-black`}
                         >
-                          CONTRIBUTING
+                          CONTRIBUTING ({contributorTerminals?.length || 0})
                         </button>
                       </div>
                       <div className="mt-4 grid gap-4 grid-cols-4">
-                        {terminals.results.map((terminal, idx) => {
+                        {results.map((terminal, idx) => {
                           return (
                             <div
                               key={idx}
@@ -92,7 +99,7 @@ const Map = () => {
                       </div>
 
                       <div className="flex flex-row mx-auto mt-8 justify-center">
-                        {[...Array(terminals.pages)].map((_, idx) => {
+                        {[...Array(totalPages)].map((_, idx) => {
                           return (
                             <span
                               key={idx}
@@ -103,7 +110,7 @@ const Map = () => {
                           )
                         })}
                       </div>
-                      {terminals.hasPrev && (
+                      {hasPrev && (
                         <div
                           onClick={() => setPage(page - 1)}
                           className="cursor-pointer absolute bottom-[10px] left-[10px] rotate-180"
@@ -124,7 +131,7 @@ const Map = () => {
                           </svg>
                         </div>
                       )}
-                      {terminals.hasNext && (
+                      {hasNext && (
                         <div
                           onClick={() => setPage(page + 1)}
                           className="cursor-pointer absolute bottom-[10px] right-[10px]"

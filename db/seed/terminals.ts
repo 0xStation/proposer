@@ -9,7 +9,7 @@ const stationMetadata: TerminalMetadata & { ticketAddress: string } = {
   pfpURL: "https://pbs.twimg.com/profile_images/1465787628553310211/DOMgJi5d_400x400.jpg",
 }
 
-const CCSMetadata: TerminalMetadata & { ticketAddress: string } = {
+const ccsMetadata: TerminalMetadata & { ticketAddress: string } = {
   name: "Crypto Culture & Society",
   handle: "CCS",
   description: "Liberal arts in web3.",
@@ -17,7 +17,7 @@ const CCSMetadata: TerminalMetadata & { ticketAddress: string } = {
   pfpURL: "https://pbs.twimg.com/profile_images/1458991184756494352/w5_kw214_400x400.jpg",
 }
 
-const FWBMetadata: TerminalMetadata & { ticketAddress: string } = {
+const fwbMetadata: TerminalMetadata & { ticketAddress: string } = {
   name: "Friends with Benefits",
   handle: "FWB",
   description: "The original social DAO.",
@@ -25,7 +25,7 @@ const FWBMetadata: TerminalMetadata & { ticketAddress: string } = {
   pfpURL: "https://pbs.twimg.com/profile_images/1426752232133828609/GO240Kbh_400x400.jpg",
 }
 
-const KrauseHouseMetadata: TerminalMetadata & { ticketAddress: string } = {
+const krauseHouseMetadata: TerminalMetadata & { ticketAddress: string } = {
   name: "Krause House",
   handle: "krause_house",
   description: "WAGBABT",
@@ -33,7 +33,7 @@ const KrauseHouseMetadata: TerminalMetadata & { ticketAddress: string } = {
   pfpURL: "https://pbs.twimg.com/profile_images/1451668831026491394/-HEQTtGz_400x400.png",
 }
 
-const EdenDaoMetadata: TerminalMetadata & { ticketAddress: string } = {
+const edendaoMetadata: TerminalMetadata & { ticketAddress: string } = {
   name: "Eden Dao",
   handle: "TheEdenDao",
   description: "Decentralized reserve currency for the globe.",
@@ -43,10 +43,10 @@ const EdenDaoMetadata: TerminalMetadata & { ticketAddress: string } = {
 
 const terminalMap = {
   stationMetadata,
-  CCSMetadata,
-  FWBMetadata,
-  KrauseHouseMetadata,
-  EdenDaoMetadata,
+  ccsMetadata,
+  fwbMetadata,
+  krauseHouseMetadata,
+  edendaoMetadata,
 }
 
 export async function seedTerminals() {
