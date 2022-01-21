@@ -1,18 +1,13 @@
-import { useEffect } from "react"
 import { Image } from "blitz"
 import Modal from "./Modal"
 import Metamask from "/public/metamask-logo.svg"
 import Coinbase from "/public/coinbase-logo.svg"
 import WalletConnect from "/public/wallet-logo.svg"
 import Banner from "/public/walletconnect-banner.svg"
-import { useAccount, useConnect } from "wagmi"
+import { useConnect } from "wagmi"
 
 const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  })
-
-  const [{ data: connectData, error: connectError, loading }, connect] = useConnect()
+  const [{ data: connectData }, connect] = useConnect()
   const [metamaskWallet, walletConnect, coinbaseWallet] = connectData?.connectors
 
   // https://github.com/NoahZinsmeister/web3-react/issues/300
