@@ -3,6 +3,7 @@ import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
 import createAccount from "../mutations/createAccount"
 import useStore from "app/core/hooks/useStore"
+import getSkills from "app/skills/queries/getSkills"
 import { AccountMetadata } from "../types"
 
 const AccountModal = ({
@@ -20,6 +21,12 @@ const AccountModal = ({
       setActiveUser(data)
     },
   })
+
+  // we dont need to worry about skills for now
+  // const [skills] = useQuery(getSkills, {}, { suspense: false })
+  // const options = skills?.map((skill) => {
+  //   return { value: skill.name, label: skill.name }
+  // })
 
   return (
     <Modal
@@ -41,17 +48,28 @@ const AccountModal = ({
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-y-4 gap-x-2">
                 <div className="flex flex-col">
+                  <label htmlFor="name" className="text-marble-white">
+                    Name
+                  </label>
+                  <Field
+                    component="input"
+                    name="name"
+                    placeholder="name"
+                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
+                  />
+                </div>
+                <div className="flex flex-col">
                   <label htmlFor="handle" className="text-marble-white">
                     Handle
                   </label>
                   <Field
                     component="input"
                     name="handle"
-                    placeholder="your station profile handle"
+                    placeholder="@handle"
                     className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
                   />
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col col-span-2">
                   <label htmlFor="discordId" className="text-marble-white">
                     Discord ID
                   </label>
