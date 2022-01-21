@@ -5,14 +5,14 @@ import logo from "../../../public/station-logo.svg"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { Account } from "../../account/types"
 import useStore from "../hooks/useStore"
-import ConnectWalletModal from "app/initiative/components/ConnectWalletModal"
+import ConnectWalletModal from "app/core/components/ConnectWalletModal"
 import { useAccount } from "wagmi"
 
 /**
  * Navigation Component
  */
 const Navigation = () => {
-  const [user, setUser] = useState<Account>()
+  const [user, setUser] = useState<Account | null>()
   let [walletModalOpen, setWalletModalOpen] = useState(false)
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
@@ -23,6 +23,9 @@ const Navigation = () => {
     if (accountData?.address) {
       const { address } = accountData
       getUserAccount(address)
+    } else {
+      setActiveUser(null)
+      setUser(null)
     }
   }, [accountData?.address])
 
@@ -31,6 +34,7 @@ const Navigation = () => {
     if (user) {
       setActiveUser(user)
       setUser(user)
+      setWalletModalOpen(false)
     }
   }
 
@@ -68,7 +72,6 @@ const Navigation = () => {
                 { name: "profile", href: "/newstand" },
                 {
                   name: "disconnect",
-                  // TODO: look into disconnect function, for some reason it's not doing anything
                   onClick: disconnect,
                 },
               ]}

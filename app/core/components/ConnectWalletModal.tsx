@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { Image } from "blitz"
-import Modal from "../../core/components/Modal"
+import Modal from "./Modal"
 import Metamask from "/public/metamask-logo.svg"
 import Coinbase from "/public/coinbase-logo.svg"
 import WalletConnect from "/public/wallet-logo.svg"
@@ -13,6 +13,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   })
 
   const [{ data: connectData, error: connectError, loading }, connect] = useConnect()
+  const [metamaskWallet, walletConnect, coinbaseWallet] = connectData?.connectors
 
   // https://github.com/NoahZinsmeister/web3-react/issues/300
   // If a user is connecting their wallet for the first time and has both coinbase and metamask extensions,
@@ -28,7 +29,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
 
     // @ts-ignore
     if (!ethereum?.providers) {
-      console.log("ethereum is undefined")
+      // user doesn't have multiple providers
       return false
     }
     const providerLookupMap = {
@@ -63,7 +64,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
             onClick={async () => {
               activateInjectedProvider("metamask")
               // @ts-ignore
-              await connect(connectData?.connectors[0])
+              await connect(metamaskWallet)
             }}
           >
             <div className="flex flex-row flex-1 justify-center items-center space-x-2 my-1">
@@ -79,7 +80,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
             className="flex-1  border border-marble-white rounded-md content-center"
             onClick={async () => {
               // @ts-ignore
-              await connect(connectData?.connectors[1])
+              await connect(walletConnect)
             }}
           >
             <div className="flex flex-row flex-1 justify-center align-middle items-center space-x-2 my-1 mx-auto">
@@ -96,7 +97,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
             onClick={async () => {
               activateInjectedProvider("coinbase")
               // @ts-ignore
-              await connect(connectData?.connectors[2])
+              await connect(coinbaseWallet)
             }}
           >
             <div className="flex flex-row flex-1 justify-center items-center align-middle space-x-2 my-1">

@@ -8,7 +8,7 @@ const endorseContractInterface = new utils.Interface(endorsementGraphAbi)
 const endorsementTokenInterface = new utils.Interface(endorsementTokenAbi)
 
 // call write functions from the endorsment graph
-export const useEndorsementGraphRead = (methodName: string) => {
+export const useEndorsementGraphRead = ({ methodName }) => {
   const [{ data, error, loading }, read] = useContractRead(
     {
       addressOrName: TERMINAL.GRAPH_ADDRESS,
@@ -19,7 +19,7 @@ export const useEndorsementGraphRead = (methodName: string) => {
   return { data, error, loading, read }
 }
 
-export const useEndorsementGraphWrite = (methodName: string) => {
+export const useEndorsementGraphWrite = ({ methodName }) => {
   const [{ data, error, loading }, write] = useContractWrite(
     {
       addressOrName: TERMINAL.GRAPH_ADDRESS,
@@ -30,7 +30,7 @@ export const useEndorsementGraphWrite = (methodName: string) => {
   return { data, error, loading, write }
 }
 
-export const useEndorsementTokenRead = (methodName: string) => {
+export const useEndorsementTokenRead = ({ methodName }) => {
   const [{ data, error, loading }, read] = useContractRead(
     {
       addressOrName: TERMINAL.TOKEN_ADDRESS,
@@ -41,7 +41,7 @@ export const useEndorsementTokenRead = (methodName: string) => {
   return { data, error, loading, read }
 }
 
-export const useEndorsementTokenWrite = (methodName: string) => {
+export const useEndorsementTokenWrite = ({ methodName }) => {
   const [{ data, error, loading }, write] = useContractWrite(
     {
       addressOrName: TERMINAL.TOKEN_ADDRESS,
@@ -57,6 +57,6 @@ export const useDecimals = () => {
     data: decimals,
     error: decimalsError,
     loading: decimalsLoading,
-  } = useEndorsementTokenRead("decimals")
+  } = useEndorsementTokenRead({ methodName: "decimals" })
   return { decimals: decimals as unknown as number, decimalsError, decimalsLoading }
 }

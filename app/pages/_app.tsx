@@ -1,7 +1,7 @@
 import { AppProps } from "blitz"
 import "app/core/styles/index.css"
 import { providers } from "ethers"
-import { Provider, chain, defaultChains, developmentChains } from "wagmi"
+import { Provider, chain, defaultChains } from "wagmi"
 import { InjectedConnector } from "wagmi/connectors/injected"
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect"
 import { WalletLinkConnector } from "wagmi/connectors/walletLink"
@@ -17,6 +17,7 @@ const connectors = ({ chainId }) => {
   return [
     // MetaMask
     new InjectedConnector({ chains }),
+    // Wallet Connect
     new WalletConnectConnector({
       options: {
         qrcode: true,
@@ -26,7 +27,6 @@ const connectors = ({ chainId }) => {
     new WalletLinkConnector({
       options: {
         appName: "Station",
-        // jsonRpcUrl: "https://eth-rinkeby.alchemyapi.io/v2/ZJIj3ytrFaWioVp550EyzD4MR9q5VClg",
       },
     }),
   ]
@@ -34,12 +34,8 @@ const connectors = ({ chainId }) => {
 export default function App({ Component, pageProps }: AppProps) {
   const getLayout = Component.getLayout || ((page) => page)
 
-  // const suppressRender = useSuppressFirstRenderFlicker()
-
-  // if (suppressRender) return null
-
   return (
-    <Provider autoConnect connectors={connectors} provider={provider}>
+    <Provider connectors={connectors} provider={provider}>
       {getLayout(<Component {...pageProps} />)}
     </Provider>
   )

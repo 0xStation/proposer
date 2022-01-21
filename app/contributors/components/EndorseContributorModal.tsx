@@ -1,5 +1,5 @@
 import { useQuery, useParam, invoke, Image } from "blitz"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useAccount, useBalance } from "wagmi"
 import { BigNumberish, utils } from "ethers"
 import { Field, Form } from "react-final-form"
@@ -18,18 +18,19 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 const MAX_ALLOWANCE = 100000000000000
 
 const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: contributor }) => {
-  const [{ data: accountData }, disconnect] = useAccount({
+  const [{ data: accountData }] = useAccount({
     fetchEns: true,
   })
 
-  const [allowance, setAllowance] = useState<number>(0)
-  const address = accountData?.address
+  const [allowance, setAllowance] = useState<number>()
+  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
+
   const contributorData = contributor?.data || {}
 
   const terminalId = useParam("terminalId", "number") || 1
   const [initiatives] = useQuery(getInitiativesByTerminal, { terminalId }, { suspense: false })
 
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS, decimalsError, decimalsLoading } = useDecimals()
+  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
   const [{ data: balanceData, error: balanceError }] = useBalance({
     addressOrName: address,
     token: TERMINAL.TOKEN_ADDRESS,
@@ -38,26 +39,13 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
   })
   const tokenBalance = parseFloat(balanceData?.formatted || "")
 
-  const {
-    data: allowanceData,
-    error: allowanceError,
-    loading: allowanceLoading,
-    read: getAllowance,
-  } = useEndorsementTokenRead("allowance")
+  const { read: getAllowance } = useEndorsementTokenRead({
+    methodName: "allowance",
+  })
 
-  const {
-    data: approveData,
-    error: approveError,
-    loading: approveLoading,
-    write: approveAllowance,
-  } = useEndorsementTokenWrite("approve")
+  const { write: approveAllowance } = useEndorsementTokenWrite({ methodName: "approve" })
 
-  const {
-    data,
-    error: endorsementGraphWriteError,
-    loading,
-    write: endorse,
-  } = useEndorsementGraphWrite("endorse")
+  const { loading, write: endorse } = useEndorsementGraphWrite({ methodName: "endorse" })
 
   useEffect(() => {
     const getEndorsementTokenAllowance = async () => {
@@ -67,19 +55,23 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
       setAllowance(parseFloat(utils.formatUnits((tokenAllowance as BigNumberish) || 0, decimals)))
     }
     getEndorsementTokenAllowance()
-  }, [decimals])
+  }, [decimals, address])
 
   const [error, setError] = useState("")
 
   const handleApproveAllowance = async (e) => {
     e.preventDefault()
     setError("")
-    if (!accountData?.address) {
-      console.warn("account is not properly connected")
+    if (!address) {
+      alert("account is not properly connected")
       return
     }
     await approveAllowance({ args: [TERMINAL.GRAPH_ADDRESS, MAX_ALLOWANCE] })
   }
+
+  const Spinner = () => (
+    <div className="animate-spin border w-5 h-5 border-solid rounded-full inline-block border-t-5 border-t-neon-carrot"></div>
+  )
 
   return (
     <Modal title="Endorse" open={isOpen} toggle={setIsOpen}>
@@ -150,12 +142,12 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
                   Your Endorsement Budget
                 </div>
                 <div className="flex flex-1 align-right place-content-end content-right text-marble-white text-sm">
-                  {tokenBalance !== undefined ? (
-                    tokenBalance
-                  ) : (
+                  {tokenBalance === undefined || isNaN(tokenBalance) ? (
                     <span className="text-torch-red">
                       Please disconnect and reconnect your wallet
                     </span>
+                  ) : (
+                    tokenBalance
                   )}
                 </div>
               </div>
@@ -193,19 +185,21 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
                   className="mt-1 border border-concrete bg-concrete text-marble-white p-2"
                 />
               </div>
-              {allowance > 100 ? (
+              {allowance && allowance > 100 ? (
                 <button
                   type="submit"
                   className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-12 mx-auto block p-1"
                 >
-                  Endorse
+                  {loading ? <Spinner /> : "Endorse"}
                 </button>
               ) : (
                 <button
                   className="bg-magic-mint text-tunnel-black w-3/5 rounded mt-12 mx-auto block p-1"
                   onClick={handleApproveAllowance}
                 >
-                  Allow Station to move tokens on your behalf
+                  {address
+                    ? "Allow Station to move tokens on your behalf"
+                    : "Please connect your wallet"}
                 </button>
               )}
             </form>
