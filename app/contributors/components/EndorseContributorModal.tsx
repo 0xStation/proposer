@@ -31,7 +31,7 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
   const [initiatives] = useQuery(getInitiativesByTerminal, { terminalId }, { suspense: false })
 
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
-  const [{ data: balanceData, error: balanceError }] = useBalance({
+  const [{ data: balanceData }] = useBalance({
     addressOrName: address,
     token: TERMINAL.TOKEN_ADDRESS,
     watch: true,

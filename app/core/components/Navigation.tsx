@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Image, invoke } from "blitz"
 import Dropdown from "../components/Dropdown"
 import logo from "../../../public/station-logo.svg"
@@ -17,17 +17,17 @@ const Navigation = () => {
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
   })
+  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const setActiveUser = useStore((state) => state.setActiveUser)
 
   useEffect(() => {
-    if (accountData?.address) {
-      const { address } = accountData
+    if (address) {
       getUserAccount(address)
     } else {
       setActiveUser(null)
       setUser(null)
     }
-  }, [accountData?.address])
+  }, [address])
 
   const getUserAccount = async (address) => {
     let user = await invoke(getAccountByAddress, { address })
