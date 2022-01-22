@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react"
 import { Image, invoke } from "blitz"
 import Dropdown from "../components/Dropdown"
+import Map from "../components/Map"
 import logo from "../../../public/station-logo.svg"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { Account } from "../../account/types"
@@ -53,11 +54,8 @@ const Navigation = () => {
             { name: "twitter", href: "https://twitter.com/0xstation" },
           ]}
         />
-
         <div className="flex items-center">
-          <span className="p-4 border-l border-l-concrete uppercase text-marble-white text-lg cursor-pointer">
-            Map
-          </span>
+          <Map />
           {user ? (
             <Dropdown
               side="right"
