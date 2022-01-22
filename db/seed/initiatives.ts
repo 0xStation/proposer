@@ -80,13 +80,13 @@ export async function seedInitiatives(terminals) {
     const ret = await db.initiative.upsert({
       where: {
         terminalInitiative: {
-          terminalTicket: terminals.station.ticketAddress,
+          terminalTicket: terminals.Station.ticketAddress,
           localId: initiative!.localId,
         },
       },
       create: {
-        terminalTicket: terminals.station.ticketAddress,
-        terminalId: terminals.station.id,
+        terminalTicket: terminals.Station.ticketAddress,
+        terminalId: terminals.Station.id,
         localId: initiative!.localId,
         data: initiative,
       },
