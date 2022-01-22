@@ -216,7 +216,7 @@ export async function seedContributors(terminals) {
               active: true,
               terminal: {
                 connect: {
-                  id: terminals.station.id,
+                  id: terminals.Station.id,
                 },
               },
             },
