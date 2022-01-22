@@ -11,6 +11,7 @@ type UploadResponse = {
 type UploadOptions = {
   Bucket?: string
   ACL?: string
+  ContentType?: string
 }
 
 const OPTION_DEFAULTS = {

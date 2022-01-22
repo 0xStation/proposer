@@ -9,6 +9,7 @@ module.exports = {
       "magic-mint": "#63EBAF",
       "eletric-violet": "#AD72FF",
       concrete: "#646464",
+      "wet-concrete": "#2E2E2E",
       "torch-red": "#FF5650",
       "marble-white": "#F2EFEF",
     },

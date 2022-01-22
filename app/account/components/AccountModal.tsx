@@ -1,9 +1,11 @@
+import { useState } from "react"
 import { useMutation } from "blitz"
 import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
 import createAccount from "../mutations/createAccount"
 import useStore from "app/core/hooks/useStore"
 import getSkills from "app/skills/queries/getSkills"
+import { useDropzone } from "react-dropzone"
 import { AccountMetadata } from "../types"
 
 const AccountModal = ({
@@ -15,6 +17,8 @@ const AccountModal = ({
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   address: string
 }) => {
+  const [uploadingState, setUploadingState] = useState("")
+  const [imageURL, setImageURL] = useState("")
   const setActiveUser = useStore((state) => state.setActiveUser)
   const [createAccountMutation] = useMutation(createAccount, {
     onSuccess: (data) => {
@@ -28,6 +32,22 @@ const AccountModal = ({
   //   return { value: skill.name, label: skill.name }
   // })
 
+  const uploadFile = async (acceptedFiles) => {
+    console.log("Uploading....")
+    setUploadingState("UPLOADING")
+    const formData = new FormData()
+    formData.append("file", acceptedFiles[0])
+    let res = await fetch("http://localhost:3000/api/uploadImage", {
+      method: "POST",
+      body: formData,
+    })
+    const data = await res.json()
+    setImageURL(data.url)
+    setUploadingState("UPLOADED")
+  }
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: uploadFile })
+
   return (
     <Modal
       title="Complete your profile"
@@ -38,11 +58,12 @@ const AccountModal = ({
       <div className="mt-8">
         <Form
           onSubmit={async (values: AccountMetadata) => {
-            try {
-              await createAccountMutation({ ...values, address })
-            } catch (error) {
-              alert("Error applying.")
-            }
+            console.log(values)
+            // try {
+            //   await createAccountMutation({ ...values, address })
+            // } catch (error) {
+            //   alert("Error applying.")
+            // }
           }}
           render={({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>
@@ -55,7 +76,7 @@ const AccountModal = ({
                     component="input"
                     name="name"
                     placeholder="name"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
+                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>
                 <div className="flex flex-col">
@@ -66,9 +87,36 @@ const AccountModal = ({
                     component="input"
                     name="handle"
                     placeholder="@handle"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
+                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>
+                <div className="flex flex-col col-span-2">
+                  <label htmlFor="pfp" className="text-marble-white">
+                    PFP
+                  </label>
+                  {uploadingState === "UPLOADED" ? (
+                    <div>
+                      <img
+                        alt="Profile picture uploaded by the user."
+                        src={imageURL}
+                        className="w-16 h-16 rounded-full border border-concrete"
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      {...getRootProps()}
+                      className="text-sm text-concrete bg-wet-concrete border border-dotted border-concrete p-4 text-center"
+                    >
+                      <input {...getInputProps()} />
+                      {isDragActive ? (
+                        <p>Drop the files here ...</p>
+                      ) : (
+                        <p>Drag n drop some files here, or click to select files</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex flex-col col-span-2">
                   <label htmlFor="discordId" className="text-marble-white">
                     Discord ID
@@ -77,7 +125,7 @@ const AccountModal = ({
                     component="input"
                     name="discordId"
                     placeholder="Discord ID"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
+                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>
                 <div className="flex flex-col">
@@ -88,7 +136,7 @@ const AccountModal = ({
                     component="input"
                     name="pronouns"
                     placeholder="Enter your pronouns"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
+                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>
                 <div className="flex flex-col">
@@ -99,7 +147,7 @@ const AccountModal = ({
                     component="select"
                     name="timezone"
                     placeholder="Select one"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
+                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   >
                     <option />
                     <option value="-12:00">(GMT -12:00) Eniwetok, Kwajalein</option>
