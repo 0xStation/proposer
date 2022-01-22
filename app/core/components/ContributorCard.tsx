@@ -25,10 +25,11 @@ type ContributorCardProps = {
   contributor: Account
   accepted: Boolean
   endorse: Boolean
+  value?: number
   openEndorseModal?: () => void
   openApplicantModal?: () => void
   setSelectedUserToEndorse?: Dispatch<SetStateAction<Account | null>>
-  setselectedApplicantToView?: Dispatch<SetStateAction<Account | null>>
+  setselectedApplicantToView?: Dispatch<SetStateAction<number>>
   activeUser?: Account | null
 }
 
@@ -36,6 +37,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
   contributor,
   accepted,
   endorse,
+  value,
   openEndorseModal,
   openApplicantModal,
   setSelectedUserToEndorse,
@@ -52,6 +54,20 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
 
   const isContributorDirectory = openEndorseModal && setSelectedUserToEndorse
   const isWaitingRoom = !accepted
+  const handleRequestClick = (event, person, setSelectedUserToEndorse, openEndorseModal) => {
+    if (event.stopPropagation()) event.stopPropagation()
+    myLogiccForMyButton(person, setSelectedUserToEndorse, openEndorseModal)
+  }
+  const myLogiccForMyButton = (person, setSelectedUserToEndorse, openEndorseModal) => {
+    // if (!status) {
+    //   if (setselectedApplicantToView && openApplicantModal) {
+    //     openApplicantModal()
+    //     setselectedApplicantToView(contributor)
+    //   }
+    // }
+    setSelectedUserToEndorse()
+    openEndorseModal()
+  }
   return (
     <div
       className={`flex flex-col flex-auto content-center ${
@@ -59,21 +75,22 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
       } text-marble-white border border-concrete cursor-pointer ${
         !isWaitingRoom && !isContributorDirectory && "w-[240px] min-h-[180px] max-h-[250px]"
       }`}
-      onClick={() => {
-        if (!accepted) {
+      onClick={(event) => {
+        if (!accepted && value != undefined) {
           if (setselectedApplicantToView && openApplicantModal) {
             openApplicantModal()
-            setselectedApplicantToView(contributor)
+            console.log(value)
+            setselectedApplicantToView(value)
           }
         }
       }}
     >
       <div className="flex flex-row flex-1 content-center mx-3 my-3 space-x-1">
         <div className="flex-2/5 content-center align-middle mr-1">
-          {contributor.data.pfpURL ? (
+          {contributor?.data.pfpURL ? (
             <div className="flex-2/5 m-auto">
               <img
-                src={contributor.data.pfpURL}
+                src={contributor?.data.pfpURL}
                 alt="PFP"
                 className="h-[40px] w-[40px] border border-marble-white rounded-full"
               />
@@ -84,15 +101,15 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
         </div>
         <div className="flex flex-col flex-3/5 content-center">
           <div className="flex flex-row flex-1 space-x-1">
-            <div className="flex-3/5 text-m">{contributor.data.handle}</div>
+            <div className="flex-3/5 text-m">{contributor?.data.handle}</div>
             <div className="flex-2/5 m-auto">
               <Image src={Verified} alt="Verified icon." width={10} height={10} />
             </div>
           </div>
           <div className="flex flex-row flex-1 text-xs text-concrete space-x-1">
-            <div className="flex-1">{contributor.data.wallet}</div>
+            <div className="flex-1">{contributor?.data.wallet}</div>
             <div className="flex-1">-</div>
-            <div className="flex-1">{contributor.data.pronouns}</div>
+            <div className="flex-1">{contributor?.data.pronouns}</div>
           </div>
         </div>
       </div>
@@ -106,7 +123,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
             <div className="flex flex-1 align-right place-content-end content-right text-sm">
               <Image
                 className="content-right text-sm"
-                src={roleSVG(contributor.data.role)}
+                src={roleSVG(contributor?.data.role)}
                 alt="Role icon."
                 height={17}
               />
@@ -134,9 +151,15 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
                 <button
                   type="submit"
                   className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
-                  onClick={() => {
-                    setSelectedUserToEndorse(contributor)
-                    openEndorseModal()
+                  onClick={(event) => {
+                    handleRequestClick(
+                      event,
+                      contributor,
+                      setSelectedUserToEndorse,
+                      openEndorseModal
+                    )
+                    // setSelectedUserToEndorse(contributor)
+                    // openEndorseModal()
                   }}
                 >
                   Endorse
@@ -196,9 +219,15 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
                 <button
                   type="submit"
                   className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
-                  onClick={() => {
-                    setSelectedUserToEndorse(contributor)
-                    openEndorseModal()
+                  onClick={(event) => {
+                    handleRequestClick(
+                      event,
+                      contributor,
+                      setSelectedUserToEndorse,
+                      openEndorseModal
+                    )
+                    // setSelectedUserToEndorse(contributor)
+                    // openEndorseModal()
                   }}
                 >
                   Endorse
