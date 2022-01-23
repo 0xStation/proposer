@@ -1,7 +1,7 @@
 import { AppProps } from "blitz"
 import "app/core/styles/index.css"
 import { providers } from "ethers"
-import { Provider, chain, defaultChains } from "wagmi"
+import { Provider, defaultChains } from "wagmi"
 import { InjectedConnector } from "wagmi/connectors/injected"
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect"
 import { WalletLinkConnector } from "wagmi/connectors/walletLink"
@@ -13,7 +13,6 @@ const provider = ({ chainId }) => new providers.AlchemyProvider(4, process.env.R
 
 // Set up connectors
 const connectors = ({ chainId }) => {
-  const rpcUrl = chains.find((x) => x.id === chainId)?.rpcUrls?.[0] ?? chain.mainnet.rpcUrls[0]
   return [
     // MetaMask
     new InjectedConnector({ chains }),
@@ -35,7 +34,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const getLayout = Component.getLayout || ((page) => page)
 
   return (
-    <Provider connectors={connectors} provider={provider}>
+    <Provider connectorStorageKey="station.wallet" connectors={connectors} provider={provider}>
       {getLayout(<Component {...pageProps} />)}
     </Provider>
   )

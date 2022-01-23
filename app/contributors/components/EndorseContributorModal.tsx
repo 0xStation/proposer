@@ -13,7 +13,8 @@ import {
   useDecimals,
 } from "app/core/contracts/contracts"
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
-import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import useStore from "app/core/hooks/useStore"
+import { Account } from "app/account/types"
 
 const MAX_ALLOWANCE = 100000000000000
 
@@ -21,6 +22,8 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
   const [{ data: accountData }] = useAccount({
     fetchEns: true,
   })
+
+  const activeUser: Account | null = useStore((state) => state.activeUser)
 
   const [allowance, setAllowance] = useState<number>()
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
@@ -88,11 +91,8 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
               setError("Please disconnect, refresh the page, and re-connect your account")
               return
             }
-            const currentAccount = await invoke(getAccountByAddress, {
-              address,
-            })
 
-            if (!currentAccount) {
+            if (!activeUser) {
               setError("Sorry something went wrong, please try again later")
               return
             }
@@ -110,7 +110,7 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
             await endorse({
               args: [
                 initiative,
-                currentAccount.data?.ticketId,
+                activeUser?.data.ticketId,
                 contributorData.ticketId,
                 endorsementAmount * Math.pow(10, decimals),
               ],
