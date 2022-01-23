@@ -36,7 +36,7 @@ const TerminalWaitingPage: BlitzPage = () => {
     { terminalId: terminalId },
     { suspense: false }
   )
-
+  //We'll be using this to update the applications based on toggle click once we have actual applications
   // const [newApplications] = useQuery(
   //   getApplicationsByInitiative,
   //   { initiativeId: selectedInitiative },
@@ -266,17 +266,10 @@ const TerminalWaitingPage: BlitzPage = () => {
       },
     },
   ]
-
-  // model InitiativeApplication {
-  //   id           Int                      @id @default(autoincrement())
-  //   applicant    Account                  @relation(fields: [applicantId], references: [id])
-  //   applicantId  Int
-  //   initiative   Initiative               @relation(fields: [initiativeId], references: [id])
-  //   initiativeId Int
-  //   endorsements ApplicationEndorsement[]
-  //   data         Json?
-  // }
-
+  const preSet = () => {
+    setSelectedInitiative(1)
+    setSelected(true)
+  }
   return (
     <TerminalNavigation>
       {!initiatives || !initiatives.length ? (
@@ -307,7 +300,6 @@ const TerminalWaitingPage: BlitzPage = () => {
                     onClick={() => {
                       setSelectedInitiative(initiative.localId)
                       setSelected(true)
-                      console.log(initiative.localId)
                     }}
                     className={`${
                       initiative.localId == selectedInitiative && "bg-marble-white text-concrete"
@@ -319,6 +311,7 @@ const TerminalWaitingPage: BlitzPage = () => {
                   </button>
                 )
               })}
+              {!selected && preSet()}
             </div>
             <div className="flex-auto text-marble-white">
               {!allApplications || !allApplications.length ? (
@@ -330,6 +323,7 @@ const TerminalWaitingPage: BlitzPage = () => {
                   )}
                 </div>
               ) : (
+                //We'll actually be using this once we have applications in the backend
                 // <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4" onClick={() => {}}>
                 //   {applications.map((application, index) => (
                 //     <ContributorCard
