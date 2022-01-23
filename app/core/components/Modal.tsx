@@ -1,6 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
 import { Image } from "blitz"
+import Exit from "/public/exit-button.svg"
 
 const checkBanner = (picture) => {
   if (picture) {
@@ -53,25 +54,31 @@ const Modal = ({
             leaveTo="opacity-0 scale-95"
           >
             <div className="inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle transition-all transform bg-tunnel-black border border-marble-white">
-              <div className="w-full h-full relative">
-                <button
-                  className="text-marble-white absolute z-50 left-2 top-2"
-                  onClick={() => toggle(!open)}
-                >
-                  X
-                </button>
-                {checkBanner(banner)}
-              </div>
+              {title !== "applicant" && (
+                <div className="w-full h-full relative">
+                  <button
+                    className="text-marble-white absolute z-50 left-2 top-2"
+                    onClick={() => toggle(!open)}
+                  >
+                    <Image src={Exit} alt="Close button" width={12} height={12} />
+                  </button>
+                  {checkBanner(banner)}
+                </div>
+              )}
               <div className="p-6">
-                <Dialog.Title
-                  as="h3"
-                  className="text-3xl font-medium leading-8 text-marble-white text-center"
-                >
-                  {title}
-                </Dialog.Title>
-                <Dialog.Description className="text-sm font-medium text-marble-white text-center mt-4">
-                  {subtitle}
-                </Dialog.Description>
+                {title && title !== "applicant" && (
+                  <Dialog.Title
+                    as="h3"
+                    className="text-3xl font-medium leading-8 text-marble-white text-center"
+                  >
+                    {title}
+                  </Dialog.Title>
+                )}
+                {subtitle && (
+                  <Dialog.Description className="text-sm font-medium text-marble-white text-center mt-4">
+                    {subtitle}
+                  </Dialog.Description>
+                )}
                 {children}
               </div>
             </div>

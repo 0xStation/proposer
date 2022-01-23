@@ -44,21 +44,13 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
   setselectedApplicantToView,
   activeUser,
 }) => {
-  // const [userTriggered, setUserTrigged] = useState(false)
-  // const setActiveModal = () => {}
-  // useEffect(() => {
-  //   if (userTriggered) {
-  //     setTimeout(() => setActiveModal(), 500)
-  //   }
-  // }, [])
-
   const isContributorDirectory = openEndorseModal && setSelectedUserToEndorse
   const isWaitingRoom = !accepted
   const handleRequestClick = (event, person, setSelectedUserToEndorse, openEndorseModal) => {
-    if (event.stopPropagation()) event.stopPropagation()
-    myLogiccForMyButton(person, setSelectedUserToEndorse, openEndorseModal)
+    myLogiccForMyButton(event, person, setSelectedUserToEndorse, openEndorseModal)
+    event.stopPropagation()
   }
-  const myLogiccForMyButton = (person, setSelectedUserToEndorse, openEndorseModal) => {
+  const myLogiccForMyButton = (event, person, setSelectedUserToEndorse, openEndorseModal) => {
     // if (!status) {
     //   if (setselectedApplicantToView && openApplicantModal) {
     //     openApplicantModal()
@@ -67,6 +59,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
     // }
     setSelectedUserToEndorse()
     openEndorseModal()
+    event.stopPropagation()
   }
   return (
     <div
@@ -75,11 +68,10 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
       } text-marble-white border border-concrete cursor-pointer ${
         !isWaitingRoom && !isContributorDirectory && "w-[240px] min-h-[180px] max-h-[250px]"
       }`}
-      onClick={(event) => {
+      onClick={() => {
         if (!accepted && value != undefined) {
           if (setselectedApplicantToView && openApplicantModal) {
             openApplicantModal()
-            console.log(value)
             setselectedApplicantToView(value)
           }
         }
@@ -160,6 +152,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
                     )
                     // setSelectedUserToEndorse(contributor)
                     // openEndorseModal()
+                    event.stopPropagation()
                   }}
                 >
                   Endorse
@@ -215,7 +208,12 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
           {setSelectedUserToEndorse &&
             openEndorseModal &&
             activeUser?.address !== contributor.address && (
-              <div className="flex flex-row align-center justify-center my-2">
+              <div
+                className="flex flex-row align-center justify-center my-2"
+                onClick={(event) => {
+                  event.stopPropagation()
+                }}
+              >
                 <button
                   type="submit"
                   className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
@@ -228,6 +226,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
                     )
                     // setSelectedUserToEndorse(contributor)
                     // openEndorseModal()
+                    event.stopPropagation()
                   }}
                 >
                   Endorse

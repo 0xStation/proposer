@@ -11,6 +11,7 @@ import { useEthers } from "@usedapp/core"
 import { users } from "app/core/utils/data"
 import ApplicantDetailsModal from "app/application/components/ApplicantDetailsModal"
 import { object } from "zod"
+import useStore from "app/core/hooks/useStore"
 
 const TerminalWaitingPage: BlitzPage = () => {
   const { account } = useEthers()
@@ -43,10 +44,11 @@ const TerminalWaitingPage: BlitzPage = () => {
   // )
   const [isApplicantOpen, setIsApplicantOpen] = useState(false)
   const openApplicantModal = () => setIsApplicantOpen(!isApplicantOpen)
+  const activeUser: Account | null = useStore((state) => state.activeUser)
 
   useEffect(() => {
     if (selectedInitiative == 1) {
-      const apps = [
+      const apps: Application[] = [
         {
           id: 0,
           applicant: dummyData[0] as Account,
@@ -65,8 +67,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             },
           },
           initiativeId: 0,
-          endorsements: [0],
-          points: 0,
+          endorsements: [dummyData[0] as Account],
           data: {
             skills: ["Frontend Development", "Product Management"],
             contact: "@abe",
@@ -93,7 +94,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             },
           },
           initiativeId: 1,
-          endorsements: [],
+          endorsements: [dummyData[0] as Account, dummyData[1] as Account],
           data: {
             skills: ["Frontend Development", "Product Management"],
             contact: "@abe",
@@ -211,6 +212,7 @@ const TerminalWaitingPage: BlitzPage = () => {
     } else {
       setAllApplications([])
     }
+    // This will actually be the only call within the function once we have applicants in the DB
     // setApplications(newApplications || [])
   }, [selectedInitiative])
 
@@ -281,11 +283,20 @@ const TerminalWaitingPage: BlitzPage = () => {
         <div>There are no active applications in this terminal.</div>
       ) : (
         <div>
-          <ApplicantDetailsModal
-            application={allApplications[selectedApplicantToView]}
-            isApplicantOpen={isApplicantOpen}
-            setIsApplicantOpen={setIsApplicantOpen}
-          />
+          {activeUser?.address ? (
+            <ApplicantDetailsModal
+              application={allApplications[selectedApplicantToView]}
+              isApplicantOpen={isApplicantOpen}
+              setIsApplicantOpen={setIsApplicantOpen}
+              activeUser={activeUser}
+            />
+          ) : (
+            <ApplicantDetailsModal
+              application={allApplications[selectedApplicantToView]}
+              isApplicantOpen={isApplicantOpen}
+              setIsApplicantOpen={setIsApplicantOpen}
+            />
+          )}
 
           <div className="flex flex-col space-y-10">
             <div className="flex-auto flex flex-row space-x-3 text-marble-white text-sm">

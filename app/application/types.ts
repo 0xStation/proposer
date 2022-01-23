@@ -6,6 +6,7 @@ export type ApplicationMetaData = {
   timezone?: string
   why?: string
   submission?: string[]
+  // endorsements?: Account[]
 }
 export type Application = {
   id: number
@@ -14,4 +15,5 @@ export type Application = {
   initiative: Initiative
   initiativeId: number
   data: ApplicationMetaData
+  endorsements: Account[]
 }
