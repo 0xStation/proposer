@@ -7,7 +7,7 @@ interface PaginationResults {
 }
 
 // basic hook for reusing client side "pagination"
-const usePagination = (data: any[], page: number, per_page: number): PaginationResults => {
+const usePagination = (data: any, page: number, per_page: number): PaginationResults => {
   if (!data) {
     return {
       results: [],

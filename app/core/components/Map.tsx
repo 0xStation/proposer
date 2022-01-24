@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useQuery } from "blitz"
 import { Popover, Transition } from "@headlessui/react"
 import ChevronIcon from "../icons/ChevronIcon"
@@ -8,25 +8,21 @@ import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
 import useStore from "app/core/hooks/useStore"
 import { Account } from "app/account/types"
 import usePagination from "app/core/hooks/usePagination"
-import { Terminal } from "app/terminal/types"
 
 const Map = () => {
   const activeUser: Account | null = useStore((state) => state.activeUser)
   const [contributorBoolean, setContributorBoolean] = useState(false)
   const [page, setPage] = useState(0)
-  const [terminals] = useQuery(getTerminals, { suspense: false })
+  const [terminals] = useQuery(getTerminals, {}, { suspense: false })
 
-  const [contributorTerminals] = useQuery(
+  const [contributorTerminals = []] = useQuery(
     getTerminalsByAccount,
     { address: activeUser?.address },
     { suspense: false }
   )
 
-  const { results, totalResults, totalPages, hasNext, hasPrev } = usePagination(
-    contributorBoolean ? contributorTerminals || [] : terminals,
-    page,
-    4
-  )
+  const data = contributorBoolean ? contributorTerminals : terminals
+  const { results, totalPages, hasNext, hasPrev } = usePagination(data, page, 4)
 
   return (
     <div className="px-4">

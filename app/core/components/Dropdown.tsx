@@ -10,7 +10,8 @@ interface DropdownProps {
 }
 interface Link {
   name: string
-  href: string
+  href?: string
+  onClick?: () => void
 }
 
 /**
@@ -48,6 +49,7 @@ const Dropdown = ({ button, items, side, className }: DropdownProps) => {
                         active && "text-neon-blue"
                       } group flex rounded-md items-center w-full px-4 py-2`}
                       href={item.href}
+                      onClick={item.onClick}
                     >
                       {item.name}
                     </a>

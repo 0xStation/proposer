@@ -1,4 +1,4 @@
-import { Image, useQuery, BlitzPage, useParam, Link, Routes } from "blitz"
+import { useQuery, BlitzPage, useParam, Link, Routes } from "blitz"
 import { useMemo, useState, useEffect } from "react"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
@@ -7,12 +7,15 @@ import getApplicationsByInitiative from "app/application/queries/getApplications
 import { Application } from "app/application/types"
 import ContributorCard from "app/core/components/ContributorCard"
 import { Account } from "app/account/types"
-import { useEthers } from "@usedapp/core"
 import { users } from "app/core/utils/data"
+import { useAccount } from "wagmi"
 
 const TerminalWaitingPage: BlitzPage = () => {
-  const { account } = useEthers()
-  const connectedUser: Account = useMemo(() => (account ? users[account] : null), [account])
+  const [{ data: accountData }] = useAccount()
+  const connectedUser: Account = useMemo(
+    () => (accountData?.address ? users[accountData?.address] : null),
+    [accountData?.address]
+  )
   const terminalId = useParam("terminalId", "number") || 1
   const [selectedInitiative, setSelectedInitiative] = useState(0)
   const [applications, setApplications] = useState<Application[]>([])

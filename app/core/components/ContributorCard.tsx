@@ -5,9 +5,6 @@ import Staff from "/public/role-staff.svg"
 import Commuter from "/public/role-commuter.svg"
 import Visitor from "/public/role-visitor.svg"
 import { Account } from "app/account/types"
-import { contributors } from "db/seed/contributors"
-import EndorseContributorModal from "app/contributors/components/EndorseContributorModal"
-import { connectContractToSigner } from "@usedapp/core"
 
 function roleSVG(role) {
   let svg
@@ -68,7 +65,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
           )}
         </div>
         <div className="flex flex-col flex-3/5 content-center">
-          <div className="flex flex-row flex-1 space-x-1">
+          <div className="flex flex-row space-x-1">
             <div className="flex-3/5 text-m">{contributor.data.handle}</div>
             <div className="flex-2/5 m-auto">
               <Image src={Verified} alt="Verified icon." width={10} height={10} />

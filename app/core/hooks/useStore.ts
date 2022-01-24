@@ -3,7 +3,7 @@ import { Account } from "../../account/types"
 
 interface StoreState {
   activeUser: Account | null
-  setActiveUser: (user: Account) => void
+  setActiveUser: (user: Account | null) => void
 }
 
 const useStore = create<StoreState>((set) => ({

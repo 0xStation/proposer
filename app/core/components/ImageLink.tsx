@@ -1,4 +1,4 @@
-import { Image, Link } from "blitz"
+import { Image } from "blitz"
 import Mirror from "/public/mirror-logo.svg"
 
 const ImageLink = (link) => {

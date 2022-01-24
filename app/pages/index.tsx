@@ -1,24 +1,17 @@
 import { Router } from "blitz"
-import { useMemo, useState, useEffect } from "react"
-import { useEthers } from "@usedapp/core"
-import { users } from "../core/utils/data"
+import { useEffect } from "react"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
 
 const Home: BlitzPage = () => {
-  const { activateBrowserWallet, account } = useEthers()
-  const connectedUser = useMemo(() => (account ? users[account] : null), [account])
-
-  const onError = (error: Error) => {
-    console.log(error.message)
+  const redirectToTerminal = () => {
+    // TODO: this function should open up the terminal map explorer
+    // which allows users to choose which terminal they want to "enter".
+    // In the meantime we will redirect them to Station since it's the
+    // only terminal.
+    const stationTerminalId = "1"
+    Router.push(`/terminal/${stationTerminalId}/contributors`)
   }
-
-  useEffect(() => {
-    if (connectedUser) {
-      const terminalId = window && window.location?.host?.includes("localhost") ? "1" : "3"
-      Router.push(`/terminal/${terminalId}/contributors`)
-    }
-  }, [connectedUser])
 
   const ConnectView = (
     <div className="flex items-center h-full ml-40">
@@ -31,9 +24,9 @@ const Home: BlitzPage = () => {
         <p className="text-marble-white text-sm mt-4">Join the ride.</p>
         <button
           className="mt-4 w-full py-2 text-center text-sm bg-magic-mint rounded"
-          onClick={() => activateBrowserWallet(onError)}
+          onClick={() => redirectToTerminal()}
         >
-          Enter Station
+          Explore Terminals
         </button>
       </div>
     </div>
