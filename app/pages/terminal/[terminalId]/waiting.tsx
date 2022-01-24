@@ -24,12 +24,6 @@ const TerminalWaitingPage: BlitzPage = () => {
   let [selectedApplicantToView, setselectedApplicantToView] = useState<number>(0)
 
   const accepted = false
-  let endorseAbility = false
-  if (connectedUser) {
-    if (connectedUser.data?.role !== "N/A") {
-      endorseAbility = true
-    }
-  }
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
@@ -69,11 +63,8 @@ const TerminalWaitingPage: BlitzPage = () => {
           initiativeId: 0,
           endorsements: [dummyData[0] as Account],
           data: {
-            skills: ["Frontend Development", "Product Management"],
-            contact: "@abe",
-            timezone: "Eastern Standard Time (GMT -5)",
             why: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquam laudantium officiavquibusdam ratione porro voluptate corporis ipsa quis? Officia assumenda quam aspernatur illo dicta doloribus nisi saepe atque consequuntur voluptates?",
-            submission: ["abe.com"],
+            url: "abe.com",
           },
         },
         {
@@ -96,11 +87,8 @@ const TerminalWaitingPage: BlitzPage = () => {
           initiativeId: 1,
           endorsements: [dummyData[0] as Account, dummyData[1] as Account],
           data: {
-            skills: ["Frontend Development", "Product Management"],
-            contact: "@abe",
-            timezone: "Eastern Standard Time (GMT -5)",
             why: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquam laudantium officiavquibusdam ratione porro voluptate corporis ipsa quis? Officia assumenda quam aspernatur illo dicta doloribus nisi saepe atque consequuntur voluptates?",
-            submission: ["abe.com"],
+            url: "abe.com",
           },
         },
         {
@@ -123,11 +111,8 @@ const TerminalWaitingPage: BlitzPage = () => {
           initiativeId: 2,
           endorsements: [],
           data: {
-            skills: ["Frontend Development", "Product Management"],
-            contact: "@abe",
-            timezone: "Eastern Standard Time (GMT -5)",
             why: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquam laudantium officiavquibusdam ratione porro voluptate corporis ipsa quis? Officia assumenda quam aspernatur illo dicta doloribus nisi saepe atque consequuntur voluptates?",
-            submission: ["abe.com"],
+            url: "abe.com",
           },
         },
       ]
@@ -154,11 +139,8 @@ const TerminalWaitingPage: BlitzPage = () => {
           initiativeId: 2,
           endorsements: [],
           data: {
-            skills: ["Frontend Development", "Product Management"],
-            contact: "@abe",
-            timezone: "Eastern Standard Time (GMT -5)",
             why: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquam laudantium officiavquibusdam ratione porro voluptate corporis ipsa quis? Officia assumenda quam aspernatur illo dicta doloribus nisi saepe atque consequuntur voluptates?",
-            submission: ["abe.com"],
+            url: "abe.com",
           },
         },
       ]
@@ -219,18 +201,19 @@ const TerminalWaitingPage: BlitzPage = () => {
   const dummyData: Account[] = [
     {
       id: 0,
-      address: "address",
+      address: "me",
       data: {
         name: "Abe",
         handle: "cryptoabe",
         pronouns: "he/him",
-        skills: [],
+        skills: ["Design"],
         discord: "cryptoabe#",
         verified: true,
         wallet: "0x420...6d9",
         role: "COMMUTER",
         twitterURL: "https://twitter.com/abenazer_mekete",
         pfpURL: "https://pbs.twimg.com/profile_images/1480266187934257155/aRArmGkH_400x400.jpg",
+        timezone: "Eastern Standard Time (GMT -5)",
       },
     },
     {
@@ -240,13 +223,14 @@ const TerminalWaitingPage: BlitzPage = () => {
         name: "Tina",
         handle: "fakepixels",
         pronouns: "she/her",
-        skills: [],
+        skills: ["Design"],
         discord: "fakepixels#",
         verified: true,
         wallet: "fkpixels.eth",
         role: "STAFF",
         twitterURL: "https://twitter.com/fkpxls",
         pfpURL: "https://pbs.twimg.com/profile_images/1470115904289574913/7t4TlLQd_400x400.jpg",
+        timezone: "Eastern Standard Time (GMT -5)",
       },
     },
     {
@@ -256,13 +240,14 @@ const TerminalWaitingPage: BlitzPage = () => {
         name: "Mind",
         handle: "mindapi",
         pronouns: "she/her",
-        skills: [],
+        skills: ["Design"],
         discord: "mindapi#",
         verified: true,
         wallet: "mindapi.eth",
         role: "STAFF",
         twitterURL: "https://twitter.com/mindapi_",
         pfpURL: "https://pbs.twimg.com/profile_images/1466504048006377472/KrC6aPam_400x400.jpg",
+        timezone: "Eastern Standard Time (GMT -5)",
       },
     },
   ]
@@ -270,6 +255,18 @@ const TerminalWaitingPage: BlitzPage = () => {
     setSelectedInitiative(1)
     setSelected(true)
   }
+
+  let endorseAbility = false
+  if (connectedUser) {
+    if (connectedUser.data?.role !== "N/A") {
+      endorseAbility = true
+    }
+  }
+  const setIniative = (id) => {
+    setSelectedInitiative(id)
+    setSelected(true)
+  }
+
   return (
     <TerminalNavigation>
       {!initiatives || !initiatives.length ? (
@@ -298,13 +295,14 @@ const TerminalWaitingPage: BlitzPage = () => {
                   <button
                     key={initiative.localId}
                     onClick={() => {
-                      setSelectedInitiative(initiative.localId)
-                      setSelected(true)
+                      setIniative(initiative.localId)
+                      // setSelectedInitiative(initiative.localId)
+                      // setSelected(true)
                     }}
                     className={`${
                       initiative.localId == selectedInitiative && "bg-marble-white text-concrete"
                     } border border-marble-white rounded-xl h-[29px] ${
-                      initiative.localId != selectedInitiative && " border border-marble-white"
+                      initiative.localId != selectedInitiative && "border border-marble-white"
                     } active:bg-marble-white active:text-concrete`}
                   >
                     <span className="m-4">{initiative.data?.name}</span>
@@ -347,6 +345,7 @@ const TerminalWaitingPage: BlitzPage = () => {
                         accepted={accepted}
                         openApplicantModal={openApplicantModal}
                         setselectedApplicantToView={setselectedApplicantToView}
+                        activeUser={activeUser}
                       />
                     ))}
                   </div>

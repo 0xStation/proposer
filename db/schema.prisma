@@ -49,10 +49,11 @@ model InitiativeApplication {
   applicantId  Int
   initiative   Initiative               @relation(fields: [initiativeId], references: [id])
   initiativeId Int
-  endorsements ApplicationEndorsement[]
+  endorsements ApplicationEndorsement[] //onchain
   data         Json?
 }
 
+//doesn't exist anymore
 model ApplicationEndorsement {
   id            Int                   @id @default(autoincrement())
   signature     String

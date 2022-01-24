@@ -11,8 +11,8 @@ export type AccountMetadata = {
   pronouns: string
   discord: string
   verified: boolean
+  timezone?: string
   role?: string
-  applications?: number[]
 }
 
 export type Account = {

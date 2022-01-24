@@ -19,6 +19,15 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   setIsApplicantOpen,
   activeUser,
 }) => {
+  const checkEndorseAbility = () => {
+    if (activeUser === undefined || activeUser === null) {
+      return false
+    } else if (activeUser?.address === application?.applicant.address) {
+      return false
+    } else {
+      return true
+    }
+  }
   return (
     <div>
       <Modal title="applicant" subtitle="" open={isApplicantOpen} toggle={setIsApplicantOpen}>
@@ -90,7 +99,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 </div>
                 <div className="text-sm font-normal">
                   <div className="flex flex-row space-x-2 overflow-x-scroll">
-                    {application?.data?.skills?.map((skill, index) => {
+                    {application?.applicant.data.skills.map((skill, index) => {
                       return (
                         <span key={index} className="text-marble-white">
                           {skill}
@@ -107,7 +116,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   <span>Contact</span>
                 </div>
                 <div className="text-sm font-normal">
-                  <span>{application?.data?.contact || "N/A"}</span>
+                  <span>@{application?.applicant.data.discord}</span>
                 </div>
               </div>
               <div className="flex flex-col flex-1">
@@ -115,19 +124,12 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   <span>Timezone</span>
                 </div>
                 <div className="text-sm font-normal">
-                  <span>{application?.data?.timezone || "N/A"}</span>
+                  <span>{application?.applicant.data.timezone || "N/A"}</span>
                 </div>
               </div>
             </div>
           </div>
           <div className="flex-auto flex flex-row border border-concrete left-0 right-0"></div>
-          {/* <div id="applications" className="flex-auto flex flex-row">
-            <button className="border border-marble-white h-[29px] rounded-xl bg-marble-white">
-              <span className="mx-3 text-concrete text-sm">
-                {application?.initiative?.data.name}
-              </span>
-            </button>
-          </div> */}
           <div id="why questions" className="flex-auto flex flex-col text-marble-white space-y-2">
             <div className="font-bold">
               <span>Why {application?.initiative?.data.name}?</span>
@@ -145,13 +147,9 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               </div>
               <div className="text-sm font-normal">
                 <div className="flex flex-row">
-                  {application?.data?.submission?.map((sub, index) => {
-                    return (
-                      <a key={index} href={sub} className="text-magic-mint">
-                        <span>{sub}</span>
-                      </a>
-                    )
-                  }) || "N/A"}
+                  <a href={application?.data?.url} className="text-magic-mint">
+                    <span>{application?.data?.url}</span>
+                  </a>
                 </div>
               </div>
             </div>
@@ -159,7 +157,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               <div className="font-bold">
                 <span>Points</span>
               </div>
-              <div className="text-sm font-normal">
+              <div className="text-sm font-normal text-concrete">
                 <span>RAILS</span>
               </div>
             </div>
@@ -169,43 +167,19 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               <span>Endorsers</span>
             </div>
             {application?.endorsements && application?.endorsements.length ? (
-              <div className="flex-auto">
-                {application.endorsements.length > 1 ? (
-                  <div className="flex-auto flex flex-row space-x-5">
-                    {application.endorsements.map((person, index) => (
-                      <div key={index} className="flex flex-col space-y-2 justify-center">
-                        <div className="flex-3/5 flex justify-center">
-                          <img
-                            src={person.data.pfpURL}
-                            alt="PFP"
-                            className="h-[52px] w-[52px] border border-marble-white rounded-full"
-                          />
-                        </div>
-                        <div className="flex-2/5">
-                          <div className="flex flex-1 justify-center">
-                            <div className="flex flex-row flex-1 space-x-1">
-                              <div className="flex-3/5 text-xs text-marble-white">
-                                {person.data.handle}
-                              </div>
-                              <div className="flex-2/5 m-auto flex justify-center">
-                                <Image src={Verified} alt="Verified icon." width={7} height={7} />
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex flex-1 justify-center">
-                            <span className="text-concrete text-xs text-normal">points</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex-auto border border-concrete">
+              <div
+                className={`"flex flex-col ${application.endorsements.length == 1 && "h-[60px]"}
+                 space-y-1 ${
+                   application.endorsements.length > 1 && "h-[100px] overflow-y-scroll"
+                 } overflow-y-scroll"`}
+              >
+                {application.endorsements.map((person, index) => (
+                  <div key={index} className="flex-auto border border-concrete">
                     <div className="flex flex-row m-3">
                       <div className="flex-1 flex flex-row space-x-2">
                         <div className="flex-1/3">
                           <img
-                            src={application.endorsements[0]?.data?.pfpURL}
+                            src={person.data.pfpURL}
                             alt="PFP"
                             className="h-[38px] w-[38px] border border-marble-white rounded-full"
                           />
@@ -214,7 +188,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                           <div className="flex-1">
                             <div className="flex flex-row flex-1 space-x-1">
                               <div className="flex-3/5 text-md font-bold text-marble-white">
-                                {application.endorsements[0]?.data?.handle}
+                                {person.data.handle}
                               </div>
                               <div className="flex-2/5 m-auto">
                                 <Image src={Verified} alt="Verified icon." width={10} height={10} />
@@ -223,25 +197,23 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                           </div>
                           <div className="flex-1 text-normal text-concrete">
                             <div className="flex flex-row flex-1 text-xs text-concrete space-x-1">
-                              <div className="flex-1">
-                                {application.endorsements[0]?.data?.wallet}
-                              </div>
+                              <div className="flex-1">{person.data.wallet}</div>
                               <div className="flex-1">-</div>
-                              <div className="flex-1">
-                                {application.endorsements[0]?.data?.pronouns}
-                              </div>
+                              <div className="flex-1">{person.data.pronouns}</div>
                             </div>
                           </div>
                         </div>
                       </div>
                       <div className="flex flex-1 justify-start">
-                        <span className="text-marble-white text-md text-normal">RAILS</span>
+                        <span className="text-concrete text-md text-normal">RAILS</span>
                       </div>
                     </div>
                   </div>
-                )}
+                ))}
               </div>
             ) : (
+              // )}
+              // </div>
               <div className="flex-auto">
                 <span className="text-marble-white font-normal text-sm">
                   Be the first to endorse this applicant!
@@ -249,8 +221,9 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               </div>
             )}
           </div>
-          <div id="buttons" className="flex-auto flex flex-row content-center justify-center">
-            {activeUser?.address && (
+          {checkEndorseAbility() && (
+            <div id="buttons" className="flex-auto flex flex-row content-center justify-center">
+              {console.log(JSON.stringify(activeUser))}
               <div className="flex flex-row space-x-3">
                 <div
                   //This is actually supposed to check if the active user is part of the initiative the person applied to
@@ -268,8 +241,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   </button>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </Modal>
     </div>

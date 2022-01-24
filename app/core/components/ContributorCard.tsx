@@ -61,6 +61,16 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
     openEndorseModal()
     event.stopPropagation()
   }
+
+  const checkEndorseAbility = () => {
+    if (activeUser === null || activeUser === undefined) {
+      return false
+    } else if (activeUser?.address === contributor.address) {
+      return false
+    } else {
+      return true
+    }
+  }
   return (
     <div
       className={`flex flex-col flex-auto content-center ${
@@ -77,7 +87,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
         }
       }}
     >
-      <div className="flex flex-row flex-1 content-center mx-3 my-3 space-x-1">
+      <div className="flex flex-row flex-auto content-center mx-3 my-3 space-x-1">
         <div className="flex-2/5 content-center align-middle mr-1">
           {contributor?.data.pfpURL ? (
             <div className="flex-2/5 m-auto">
@@ -127,13 +137,17 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
             </div>
 
             <div className="flex flex-1 align-right place-content-end content-right text-sm">
-              <span>people</span>
+              <div className="flex flex-row">
+                <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block"></span>
+                <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block ml-[-5px]"></span>
+                <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block ml-[-5px]"></span>
+              </div>
             </div>
           </div>
           <div className="flex flex-row flex-1 mx-3 ">
             <div className="flex-1 items-center justify-center text-sm mt-2">Points</div>
             <div className="flex-1 text-right justify-end content-end text-sm">
-              <span>number</span>
+              <span>RAILS</span>
             </div>
           </div>
           {setSelectedUserToEndorse &&
@@ -174,15 +188,21 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
             </div>
 
             <div className="flex flex-1 align-right place-content-end content-right text-sm">
-              <span>people</span>
+              <div className="flex flex-row">
+                <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block"></span>
+                <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block ml-[-5px]"></span>
+                <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block ml-[-5px]"></span>
+              </div>
             </div>
           </div>
-          <div className="flex flex-row flex-1 mx-3 ">
-            <div className="flex-1 items-center justify-center text-sm mt-2">Points</div>
-            <div className="flex-1 text-right justify-end content-end text-sm">
-              <span>number</span>
+          {activeUser && (
+            <div className="flex flex-row flex-1 mx-3 ">
+              <div className="flex-1 items-center justify-center text-sm mt-2">Points</div>
+              <div className="flex-1 text-right justify-end content-end text-sm">
+                <span>RAILS</span>
+              </div>
             </div>
-          </div>
+          )}
           <div className="flex flex-row flex-1 mx-3">
             <div className="flex-1 items-center justify-center text-sm">
               <div className="place-self-center mt-2">Role</div>
@@ -191,7 +211,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
               <span>N/A</span>
             </div>
           </div>
-          {endorse ? (
+          {openApplicantModal && setselectedApplicantToView && checkEndorseAbility() && (
             <div className="flex flex-row flex-1 align-center justify-center mt-2">
               <button
                 type="submit"
@@ -201,10 +221,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
                 Endorse
               </button>
             </div>
-          ) : (
-            <div></div>
           )}
-
           {setSelectedUserToEndorse &&
             openEndorseModal &&
             activeUser?.address !== contributor.address && (
@@ -233,7 +250,6 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
                 </button>
               </div>
             )}
-
           <div className="flex flex-row flex-1 mx-3">
             <div className="flex-1 items-center justify-center text-xs text-concrete my-2">
               Metadata

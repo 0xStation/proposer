@@ -1,12 +1,8 @@
 import { Account } from "app/account/types"
 import { Initiative } from "app/initiative/types"
 export type ApplicationMetaData = {
-  skills?: string[]
-  contact?: string
-  timezone?: string
   why?: string
-  submission?: string[]
-  // endorsements?: Account[]
+  url?: string
 }
 export type Application = {
   id: number
