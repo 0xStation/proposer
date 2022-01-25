@@ -66,9 +66,9 @@ const partnershipMetadata: InitiativeMetadata & { localId: number } = {
   ],
 }
 
-const networkSustainablity: InitiativeMetadata & { localId: number } = {
+const networkSustainability: InitiativeMetadata & { localId: number } = {
   localId: 5,
-  name: "Network Sustainablity",
+  name: "Network Sustainability",
   oneLiner:
     "Network Sustainability is an initiative focused on designing a sustainable economic engine for the Station Network.",
   description:
@@ -124,7 +124,7 @@ const stationInitiaitves = [
   waitingRoomMetadata,
   newstandMetadata,
   partnershipMetadata,
-  networkSustainablity,
+  networkSustainability,
   contributorExperience,
   midnightStation,
   brandIdentity,
