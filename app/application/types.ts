@@ -11,5 +11,5 @@ export type Application = {
   initiative: Initiative
   initiativeId: number
   data: ApplicationMetaData
-  endorsements: Account[]
+  endorsements: Account[] // this data field is here just for visualizing dummy data while designing waiting room
 }

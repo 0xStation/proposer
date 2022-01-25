@@ -7,12 +7,7 @@ import Visitor from "/public/role-visitor.svg"
 import { Account } from "app/account/types"
 import { useAccount, useBalance } from "wagmi"
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
-import {
-  useEndorsementGraphWrite,
-  useEndorsementTokenRead,
-  useEndorsementTokenWrite,
-  useDecimals,
-} from "app/core/contracts/contracts"
+import { useDecimals } from "app/core/contracts/contracts"
 
 function roleSVG(role) {
   let svg
@@ -51,17 +46,13 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
 }) => {
   const isContributorDirectory = openEndorseModal && setSelectedUserToEndorse
   const isWaitingRoom = !accepted
+
+  // I created the following functions for handing the event propagation when  clicking the div and the endorse button inside it but it's not working at the moment
   const handleRequestClick = (event, person, setSelectedUserToEndorse, openEndorseModal) => {
     endorseButtonClick(event, person, setSelectedUserToEndorse, openEndorseModal)
     event.stopPropagation()
   }
   const endorseButtonClick = (event, person, setSelectedUserToEndorse, openEndorseModal) => {
-    // if (!status) {
-    //   if (setselectedApplicantToView && openApplicantModal) {
-    //     openApplicantModal()
-    //     setselectedApplicantToView(contributor)
-    //   }
-    // }
     setSelectedUserToEndorse()
     openEndorseModal()
     event.stopPropagation()
@@ -79,7 +70,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
   const checkEndorseAbility = () => {
     if (activeUser === null || activeUser === undefined) {
       return false
-    } else if ("me" === contributor.address) {
+    } else if (activeUser.address === contributor.address) {
       return false
     } else if (!tokenBalance) {
       return false
@@ -175,8 +166,6 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
                 className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
                 onClick={(event) => {
                   handleRequestClick(event, contributor, setSelectedUserToEndorse, openEndorseModal)
-                  // setSelectedUserToEndorse(contributor)
-                  // openEndorseModal()
                   event.stopPropagation()
                 }}
               >
@@ -271,8 +260,6 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
                       setSelectedUserToEndorse,
                       openEndorseModal
                     )
-                    // setSelectedUserToEndorse(contributor)
-                    // openEndorseModal()
                     event.stopPropagation()
                   }}
                 >

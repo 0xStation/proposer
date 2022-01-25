@@ -12,7 +12,29 @@ import ApplicantDetailsModal from "app/application/components/ApplicantDetailsMo
 import { object } from "zod"
 import useStore from "app/core/hooks/useStore"
 import { useAccount } from "wagmi"
+import { request, gql } from "graphql-request"
 
+// const getEndorsmentData = async (id) => {
+//   // waiting on subgraph to turn this on but this just queries the subgraph for waiting room endorsement details
+//   // I choose to include this here rather than creating a query since we only need it for the waiting room but I might make it a query to clean it up
+//   // let FETCH_WAITING_ROOM_ENDORSEMENTS = gql`
+//   //   {
+//   //     initiatives (where: {localId: "${id}"}) {
+//   //       endorsees {
+//   //         address
+//   //         totalEndorsed
+//   //         endorsements { # list of endorsement objects
+//   //           from # address
+//   //           amount
+//   //           timestamp
+//   //         }
+//   //       }
+//   //     }
+//   //   }
+//   // `
+
+//   return endorsementData
+// }
 const TerminalWaitingPage: BlitzPage = () => {
   const [{ data: accountData }] = useAccount()
   const connectedUser: Account = useMemo(
@@ -24,7 +46,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [applications, setApplications] = useState<Application[]>([])
   const [allApplications, setAllApplications] = useState<Application[]>([])
   const [selected, setSelected] = useState<boolean>(false)
-  let [selectedApplicantToView, setselectedApplicantToView] = useState<number>(0)
+  const [selectedApplicantToView, setselectedApplicantToView] = useState<number>(0)
 
   const accepted = false
 
@@ -44,6 +66,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const activeUser: Account | null = useStore((state) => state.activeUser)
 
   useEffect(() => {
+    //this is all temporary dummy data
     if (selectedInitiative == 1) {
       const apps: Application[] = [
         {
@@ -197,7 +220,7 @@ const TerminalWaitingPage: BlitzPage = () => {
     } else {
       setAllApplications([])
     }
-    // This will actually be the only call within the function once we have applicants in the DB
+    // This will actually be the only call within this useEffect function once we have applicants in the DB
     // setApplications(newApplications || [])
   }, [selectedInitiative])
 
@@ -269,6 +292,8 @@ const TerminalWaitingPage: BlitzPage = () => {
     setSelectedInitiative(id)
     setSelected(true)
   }
+  //once sub graph is up, I'm going to pass this data into the contributor card and applicant modal
+  // const endorsementData = getEndorsmentData(selectedInitiative)
 
   return (
     <TerminalNavigation>
@@ -299,8 +324,6 @@ const TerminalWaitingPage: BlitzPage = () => {
                     key={initiative.localId}
                     onClick={() => {
                       setIniative(initiative.localId)
-                      // setSelectedInitiative(initiative.localId)
-                      // setSelected(true)
                     }}
                     className={`${
                       initiative.localId == selectedInitiative && "bg-marble-white text-concrete"
@@ -324,7 +347,7 @@ const TerminalWaitingPage: BlitzPage = () => {
                   )}
                 </div>
               ) : (
-                //We'll actually be using this once we have applications in the backend
+                //We'll actually be using this once we have application seed data in the backend
                 // <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4" onClick={() => {}}>
                 //   {applications.map((application, index) => (
                 //     <ContributorCard
@@ -337,6 +360,7 @@ const TerminalWaitingPage: BlitzPage = () => {
                 //     />
                 //   ))}
                 // </div>
+                //Currently using this to style the component
                 <div>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {allApplications.map((applications, index) => (

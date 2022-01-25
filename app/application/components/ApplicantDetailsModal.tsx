@@ -7,12 +7,7 @@ import Exit from "/public/exit-button.svg"
 import { Account } from "app/account/types"
 import { useAccount, useBalance } from "wagmi"
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
-import {
-  useEndorsementGraphWrite,
-  useEndorsementTokenRead,
-  useEndorsementTokenWrite,
-  useDecimals,
-} from "app/core/contracts/contracts"
+import { useDecimals } from "app/core/contracts/contracts"
 
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
@@ -39,7 +34,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   const checkEndorseAbility = () => {
     if (activeUser === null || activeUser === undefined) {
       return false
-    } else if ("me" === application?.applicant.address) {
+    } else if (activeUser.address === application?.applicant.address) {
       return false
     } else if (!tokenBalance) {
       return false
@@ -231,8 +226,6 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 ))}
               </div>
             ) : (
-              // )}
-              // </div>
               <div className="flex-auto">
                 <span className="text-marble-white font-normal text-sm">
                   Be the first to endorse this applicant!
@@ -243,21 +236,17 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
           {checkEndorseAbility() && (
             <div id="buttons" className="flex-auto flex flex-row content-center justify-center">
               <div className="flex flex-row space-x-3">
-                <div
-                  //This is actually supposed to check if the active user is part of the initiative the person applied to
-                  className={`"flex-1 flex ${
-                    activeUser?.data.role != "N/A" ? "justify-end" : "justify-center"
-                  }`}
-                >
+                <div className={`"flex-1 flex "justify-center"`}>
                   <button className="text-black border border-magic-mint h-[29px] w-[215px] bg-magic-mint rounded text-sm font-normal">
                     Endorse
                   </button>
                 </div>
-                <div className="flex-1 flex justify-start">
+                {/* The following element is not needed for p0 */}
+                {/* <div className="flex-1 flex justify-start">
                   <button className="text-magic-mint border border-magic-mint h-[29px] w-[190px] rounded text-sm font-normal">
                     Invite to Initiative
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
           )}
