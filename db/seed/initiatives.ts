@@ -3,12 +3,12 @@ import { Initiative, InitiativeMetadata } from "app/initiative/types"
 import { Symbol } from "app/types"
 import { contributors } from "./contributors"
 
-const protocolMetadata: InitiativeMetadata & { localId: number } = {
+const contributorReviewMetadata: InitiativeMetadata & { localId: number } = {
   localId: 1,
-  name: "Protocol",
+  name: "Contributor Review",
   description:
-    "Station's protocol is the smart contract engine that powers all of our app's on-chain capabilities.",
-  shortName: "PROTOCOl",
+    "Station's contributor review is the cornerstone of Station's reputation system, enabling contributors to recognize one another's work.",
+  shortName: "CONTRIBUTOR REVIEW",
   isAcceptingApplications: false,
   links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/protocol-v1" }],
   members: [
@@ -16,13 +16,15 @@ const protocolMetadata: InitiativeMetadata & { localId: number } = {
     contributors.akshay.address,
     contributors.calvin.address,
     contributors.nick.address,
+    contributors.kristen.address,
   ],
 }
-const webMetadata: InitiativeMetadata & { localId: number } = {
+const waitingRoomMetadata: InitiativeMetadata & { localId: number } = {
   localId: 2,
-  name: "Web",
-  description: "Station's web application is the home of our user experience.",
-  shortName: "WEB",
+  name: "Waiting Room",
+  description:
+    "Station's waiting room is the onboarding experience used by DAOs to recruit new members.",
+  shortName: "WAITING ROOM",
   isAcceptingApplications: false,
   links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/web" }],
   members: [
@@ -65,7 +67,12 @@ const partnershipMetadata: InitiativeMetadata & { localId: number } = {
   ],
 }
 
-const stationInitiaitves = [protocolMetadata, webMetadata, newstandMetadata, partnershipMetadata]
+const stationInitiaitves = [
+  contributorReviewMetadata,
+  waitingRoomMetadata,
+  newstandMetadata,
+  partnershipMetadata,
+]
 
 export async function seedInitiatives(terminals) {
   for (const name in stationInitiaitves) {
@@ -73,13 +80,13 @@ export async function seedInitiatives(terminals) {
     const ret = await db.initiative.upsert({
       where: {
         terminalInitiative: {
-          terminalTicket: terminals.station.ticketAddress,
+          terminalTicket: terminals.Station.ticketAddress,
           localId: initiative!.localId,
         },
       },
       create: {
-        terminalTicket: terminals.station.ticketAddress,
-        terminalId: terminals.station.id,
+        terminalTicket: terminals.Station.ticketAddress,
+        terminalId: terminals.Station.id,
         localId: initiative!.localId,
         data: initiative,
       },

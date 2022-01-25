@@ -55,7 +55,7 @@ const kristen: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "STAFF",
   twitterURL: "https://twitter.com/0xRie_",
-  pfpURL: "https://pbs.twimg.com/profile_images/1472492830362800130/IGUo8Pd__400x400.jpg",
+  pfpURL: "https://pbs.twimg.com/profile_images/1480639057914855424/LiE4wCe2_400x400.jpg",
 }
 const calvin: AccountMetadata & { address: string } = {
   name: "Calvin",
@@ -97,7 +97,7 @@ const michael: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/0xmcg",
-  pfpURL: "https://pbs.twimg.com/profile_images/1445182641972695054/hQlv1yTJ_400x400.png",
+  pfpURL: "https://pbs.twimg.com/profile_images/1480358868349714433/v7YwGkCb_400x400.jpg",
 }
 const abe: AccountMetadata & { address: string } = {
   name: "Abe",
@@ -181,7 +181,7 @@ const akshay: AccountMetadata & { address: string } = {
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/wagmiking",
-  pfpURL: "https://pbs.twimg.com/profile_images/1468635081874948099/hG0lDyef_400x400.jpg",
+  pfpURL: "https://pbs.twimg.com/profile_images/1484237821099405312/zYGmw04f_400x400.jpg",
 }
 
 export const contributors = {
@@ -200,13 +200,32 @@ export const contributors = {
   akshay,
 }
 
-export async function seedContributors() {
+export async function seedContributors(terminals) {
   for (const name in contributors) {
     const contributorData = contributors[name] as AccountMetadata & { address: string }
     await db.account.upsert({
       where: { address: contributorData!.address },
-      create: { address: contributorData!.address, data: contributorData },
-      update: { data: contributorData },
+      create: {
+        address: contributorData!.address,
+        data: contributorData,
+        tickets: {
+          create: [
+            {
+              ticketUrl:
+                "https://station.nyc3.digitaloceanspaces.com/tickets/ca77b341-502b-465e-b8ef-17a298ebd2e6.svg",
+              active: true,
+              terminal: {
+                connect: {
+                  id: terminals.Station.id,
+                },
+              },
+            },
+          ],
+        },
+      },
+      update: {
+        data: contributorData,
+      },
     })
   }
 }

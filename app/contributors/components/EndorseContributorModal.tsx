@@ -1,45 +1,80 @@
 import { useQuery, useParam, invoke, Image } from "blitz"
-import { useState } from "react"
-import { useEthers } from "@usedapp/core"
+import { useState, useEffect, useMemo } from "react"
+import { useAccount, useBalance } from "wagmi"
+import { BigNumberish, utils } from "ethers"
 import { Field, Form } from "react-final-form"
 import Verified from "public/check-mark.svg"
 import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTerminal"
 import Modal from "../../core/components/Modal"
 import {
-  NUMBER_OF_DECIMALS,
-  useEndorsementGraphMethod,
-  useEndorsementTokenBalance,
-  useEndorsementTokenMethod,
-  useAllowance,
+  useEndorsementGraphWrite,
+  useEndorsementTokenRead,
+  useEndorsementTokenWrite,
+  useDecimals,
 } from "app/core/contracts/contracts"
-import { TERMINAL } from "app/core/utils/constants"
-import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
+import useStore from "app/core/hooks/useStore"
+import { Account } from "app/account/types"
 
 const MAX_ALLOWANCE = 100000000000000
 
 const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: contributor }) => {
-  const { account, active } = useEthers()
+  const [{ data: accountData }] = useAccount({
+    fetchEns: true,
+  })
+
+  const activeUser: Account | null = useStore((state) => state.activeUser)
+
+  const [allowance, setAllowance] = useState<number>()
+  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
+
   const contributorData = contributor?.data || {}
 
   const terminalId = useParam("terminalId", "number") || 1
   const [initiatives] = useQuery(getInitiativesByTerminal, { terminalId }, { suspense: false })
 
-  const { send: endorse } = useEndorsementGraphMethod("endorse")
-  const { send: approveAllowance } = useEndorsementTokenMethod("approve")
-  const tokenBalance = useEndorsementTokenBalance(account)
-  const allowance = useAllowance(account)
+  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
+  const [{ data: balanceData }] = useBalance({
+    addressOrName: address,
+    token: TERMINAL.TOKEN_ADDRESS,
+    watch: true,
+    formatUnits: decimals,
+  })
+  const tokenBalance = parseFloat(balanceData?.formatted || "")
+
+  const { read: getAllowance } = useEndorsementTokenRead({
+    methodName: "allowance",
+  })
+
+  const { write: approveAllowance } = useEndorsementTokenWrite({ methodName: "approve" })
+
+  const { loading, write: endorse } = useEndorsementGraphWrite({ methodName: "endorse" })
+
+  useEffect(() => {
+    const getEndorsementTokenAllowance = async () => {
+      const { data: tokenAllowance, error } = await getAllowance({
+        args: [address, TERMINAL.GRAPH_ADDRESS],
+      })
+      setAllowance(parseFloat(utils.formatUnits((tokenAllowance as BigNumberish) || 0, decimals)))
+    }
+    getEndorsementTokenAllowance()
+  }, [decimals, address])
 
   const [error, setError] = useState("")
 
   const handleApproveAllowance = async (e) => {
     e.preventDefault()
     setError("")
-    if (!account) {
-      console.warn("account is not properly connected")
+    if (!address) {
+      alert("account is not properly connected")
       return
     }
-    await approveAllowance(TERMINAL.GRAPH_ADDRESS, MAX_ALLOWANCE)
+    await approveAllowance({ args: [TERMINAL.GRAPH_ADDRESS, MAX_ALLOWANCE] })
   }
+
+  const Spinner = () => (
+    <div className="animate-spin border w-5 h-5 border-solid rounded-full inline-block border-t-5 border-t-neon-carrot"></div>
+  )
 
   return (
     <Modal title="Endorse" open={isOpen} toggle={setIsOpen}>
@@ -52,13 +87,12 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
               setError("Please fill out required inputs")
               return
             }
-            if (!account || !active || !tokenBalance) {
+            if (!address) {
               setError("Please disconnect, refresh the page, and re-connect your account")
               return
             }
-            const currentAccount = await invoke(getAccountByAddress, { address: account })
 
-            if (!currentAccount) {
+            if (!activeUser) {
               setError("Sorry something went wrong, please try again later")
               return
             }
@@ -73,12 +107,14 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
               return
             }
 
-            await endorse(
-              initiative,
-              currentAccount.data?.ticketId,
-              contributorData.ticketId,
-              endorsementAmount * Math.pow(10, NUMBER_OF_DECIMALS)
-            )
+            await endorse({
+              args: [
+                initiative,
+                activeUser?.data.ticketId,
+                contributorData.ticketId,
+                endorsementAmount * Math.pow(10, decimals),
+              ],
+            })
           }}
           render={({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>
@@ -106,12 +142,12 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
                   Your Endorsement Budget
                 </div>
                 <div className="flex flex-1 align-right place-content-end content-right text-marble-white text-sm">
-                  {tokenBalance !== undefined ? (
-                    tokenBalance
-                  ) : (
+                  {tokenBalance === undefined || isNaN(tokenBalance) ? (
                     <span className="text-torch-red">
                       Please disconnect and reconnect your wallet
                     </span>
+                  ) : (
+                    tokenBalance
                   )}
                 </div>
               </div>
@@ -149,19 +185,21 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
                   className="mt-1 border border-concrete bg-concrete text-marble-white p-2"
                 />
               </div>
-              {allowance > 100 ? (
+              {allowance && allowance > 100 ? (
                 <button
                   type="submit"
                   className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-12 mx-auto block p-1"
                 >
-                  Endorse
+                  {loading ? <Spinner /> : "Endorse"}
                 </button>
               ) : (
                 <button
                   className="bg-magic-mint text-tunnel-black w-3/5 rounded mt-12 mx-auto block p-1"
                   onClick={handleApproveAllowance}
                 >
-                  Allow Station to move tokens on your behalf
+                  {address
+                    ? "Allow Station to move tokens on your behalf"
+                    : "Please connect your wallet"}
                 </button>
               )}
             </form>

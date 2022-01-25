@@ -1,15 +1,47 @@
-import { useEthers } from "@usedapp/core"
 import { Image } from "blitz"
-import Modal from "../../core/components/Modal"
+import Modal from "./Modal"
 import Metamask from "/public/metamask-logo.svg"
 import Coinbase from "/public/coinbase-logo.svg"
 import WalletConnect from "/public/wallet-logo.svg"
 import Banner from "/public/walletconnect-banner.svg"
+import { useConnect } from "wagmi"
 
 const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
-  const { activateBrowserWallet } = useEthers()
-  const onError = (error: Error) => {
-    console.log(error.message)
+  const [{ data: connectData }, connect] = useConnect()
+  const [metamaskWallet, walletConnect, coinbaseWallet] = connectData?.connectors
+
+  // https://github.com/NoahZinsmeister/web3-react/issues/300
+  // If a user is connecting their wallet for the first time and has both coinbase and metamask extensions,
+  // both wallets will be triggered at the same time when trying to connect either of the wallets.
+  // The multi-wallet triggering is attributed to the window.ethereum obj providing support
+  // for both metamask and coinbase at the same time via a multi-provider. The mult-provider contains a list of
+  // the different provdiers - whichever wallet is connected first will be the selected provider.
+  // Connecting to the second wallet will not update the selected provider.
+  // The reason for this design choice was so that dapps wouldn't have to worry about updating states when
+  // the user decides to connect the other wallet.
+  const activateInjectedProvider = (providerName: "metamask" | "coinbase") => {
+    const { ethereum } = window
+
+    // @ts-ignore
+    if (!ethereum?.providers) {
+      // user doesn't have multiple providers
+      return false
+    }
+    const providerLookupMap = {
+      // @ts-ignore
+      coinbase: ethereum.providers.find(({ isCoinbaseWallet }) => isCoinbaseWallet),
+      // @ts-ignore
+      metamask: ethereum.providers.find(({ isMetaMask }) => isMetaMask),
+    }
+
+    const provider = providerLookupMap[providerName]
+
+    if (provider) {
+      // @ts-ignore
+      ethereum.setSelectedProvider(provider)
+      return true
+    }
+    return false
   }
 
   return (
@@ -24,7 +56,11 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         <div className="flex flex-row space-x-3 mx-5 text-marble-white">
           <button
             className="flex-1 border border-marble-white  rounded-md content-center"
-            onClick={() => activateBrowserWallet(onError)}
+            onClick={async () => {
+              activateInjectedProvider("metamask")
+              // @ts-ignore
+              await connect(metamaskWallet)
+            }}
           >
             <div className="flex flex-row flex-1 justify-center items-center space-x-2 my-1">
               <div className="flex-3/5">
@@ -37,7 +73,10 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           </button>
           <button
             className="flex-1  border border-marble-white rounded-md content-center"
-            onClick={() => activateBrowserWallet(onError)}
+            onClick={async () => {
+              // @ts-ignore
+              await connect(walletConnect)
+            }}
           >
             <div className="flex flex-row flex-1 justify-center align-middle items-center space-x-2 my-1 mx-auto">
               <div className="flex-3/5">
@@ -50,7 +89,11 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           </button>
           <button
             className="flex-1 border border-marble-white rounded-md content-center"
-            onClick={() => activateBrowserWallet(onError)}
+            onClick={async () => {
+              activateInjectedProvider("coinbase")
+              // @ts-ignore
+              await connect(coinbaseWallet)
+            }}
           >
             <div className="flex flex-row flex-1 justify-center items-center align-middle space-x-2 my-1">
               <div className="flex-3/5">

@@ -11,8 +11,7 @@ This is a [Blitz.js](https://github.com/blitz-js/blitz) app.
 **Make environment file copies**
 
 ```
-cp .env.template .env.local
-cp .env.template .env.test.local
+cp template.env .env.development
 ```
 
 **Set database username**
