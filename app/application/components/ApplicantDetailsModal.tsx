@@ -5,6 +5,14 @@ import { Dispatch, SetStateAction } from "react"
 import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
 import { Account } from "app/account/types"
+import { useAccount, useBalance } from "wagmi"
+import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
+import {
+  useEndorsementGraphWrite,
+  useEndorsementTokenRead,
+  useEndorsementTokenWrite,
+  useDecimals,
+} from "app/core/contracts/contracts"
 
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
@@ -19,10 +27,21 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   setIsApplicantOpen,
   activeUser,
 }) => {
+  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
+  const [{ data: balanceData }] = useBalance({
+    addressOrName: activeUser?.address,
+    token: TERMINAL.TOKEN_ADDRESS,
+    watch: true,
+    formatUnits: decimals,
+  })
+  const tokenBalance = parseFloat(balanceData?.formatted || "")
+
   const checkEndorseAbility = () => {
-    if (activeUser === undefined || activeUser === null) {
+    if (activeUser === null || activeUser === undefined) {
       return false
-    } else if (activeUser?.address === application?.applicant.address) {
+    } else if ("me" === application?.applicant.address) {
+      return false
+    } else if (!tokenBalance) {
       return false
     } else {
       return true

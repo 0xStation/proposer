@@ -5,6 +5,14 @@ import Staff from "/public/role-staff.svg"
 import Commuter from "/public/role-commuter.svg"
 import Visitor from "/public/role-visitor.svg"
 import { Account } from "app/account/types"
+import { useAccount, useBalance } from "wagmi"
+import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
+import {
+  useEndorsementGraphWrite,
+  useEndorsementTokenRead,
+  useEndorsementTokenWrite,
+  useDecimals,
+} from "app/core/contracts/contracts"
 
 function roleSVG(role) {
   let svg
@@ -44,10 +52,10 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
   const isContributorDirectory = openEndorseModal && setSelectedUserToEndorse
   const isWaitingRoom = !accepted
   const handleRequestClick = (event, person, setSelectedUserToEndorse, openEndorseModal) => {
-    myLogiccForMyButton(event, person, setSelectedUserToEndorse, openEndorseModal)
+    endorseButtonClick(event, person, setSelectedUserToEndorse, openEndorseModal)
     event.stopPropagation()
   }
-  const myLogiccForMyButton = (event, person, setSelectedUserToEndorse, openEndorseModal) => {
+  const endorseButtonClick = (event, person, setSelectedUserToEndorse, openEndorseModal) => {
     // if (!status) {
     //   if (setselectedApplicantToView && openApplicantModal) {
     //     openApplicantModal()
@@ -59,10 +67,21 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
     event.stopPropagation()
   }
 
+  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
+  const [{ data: balanceData }] = useBalance({
+    addressOrName: activeUser?.address,
+    token: TERMINAL.TOKEN_ADDRESS,
+    watch: true,
+    formatUnits: decimals,
+  })
+  const tokenBalance = parseFloat(balanceData?.formatted || "")
+
   const checkEndorseAbility = () => {
     if (activeUser === null || activeUser === undefined) {
       return false
-    } else if (activeUser?.address === contributor.address) {
+    } else if ("me" === contributor.address) {
+      return false
+    } else if (!tokenBalance) {
       return false
     } else {
       return true
@@ -211,7 +230,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
               <span>N/A</span>
             </div>
           </div>
-          {openApplicantModal && setselectedApplicantToView && checkEndorseAbility() && (
+          {openApplicantModal && setselectedApplicantToView && checkEndorseAbility() ? (
             <div className="flex flex-row flex-1 align-center justify-center mt-2">
               <button
                 type="submit"
@@ -220,6 +239,17 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
               >
                 Endorse
               </button>
+            </div>
+          ) : (
+            <div>
+              {openApplicantModal &&
+              setselectedApplicantToView &&
+              activeUser &&
+              activeUser?.address !== contributor.address ? (
+                <div className="flex flex-row align-center justify-center my-2 h-[26px]"></div>
+              ) : (
+                <div></div>
+              )}
             </div>
           )}
           {setSelectedUserToEndorse &&
