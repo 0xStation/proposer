@@ -47,7 +47,6 @@ const AccountModal = ({
   })
 
   const uploadFile = async (acceptedFiles) => {
-    console.log("Uploading....")
     setUploadingState("UPLOADING")
     const formData = new FormData()
     formData.append("file", acceptedFiles[0])
@@ -72,7 +71,6 @@ const AccountModal = ({
       <div className="mt-8">
         <Form
           onSubmit={async (values: ApplicationParams) => {
-            // console.log(values)
             try {
               await createAccountMutation({ ...values, address })
             } catch (error) {
