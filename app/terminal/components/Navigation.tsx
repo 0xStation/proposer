@@ -21,7 +21,7 @@ const Navigation = ({ children }: { children?: any }) => {
       className="w-full h-full bg-cover bg-center bg-no-repeat border"
       style={{ backgroundImage: "url('/station-cover.png')" }}
     >
-      <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36">
+      <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36 relative">
         <div className="grid gap-0 grid-cols-1 md:grid-cols-3 xl:grid-cols-4 max-w-screen-xl h-full mx-auto">
           <div className="col-span-1 pl-4 text-2xl border-concrete border-b pb-12 md:border-b-0 md:border-r md:pr-6 h-full">
             <div className="flex items-center mt-12">
@@ -76,6 +76,10 @@ const Navigation = ({ children }: { children?: any }) => {
             <div className="mt-12">{children}</div>
           </div>
         </div>
+        <img
+          className="absolute bottom-4 right-4 h-[300px]"
+          src="https://station.nyc3.digitaloceanspaces.com/tickets/station/frog.svg"
+        />
       </div>
     </div>
   )
