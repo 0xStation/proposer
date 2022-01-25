@@ -223,7 +223,6 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
           </div>
           {checkEndorseAbility() && (
             <div id="buttons" className="flex-auto flex flex-row content-center justify-center">
-              {console.log(JSON.stringify(activeUser))}
               <div className="flex flex-row space-x-3">
                 <div
                   //This is actually supposed to check if the active user is part of the initiative the person applied to

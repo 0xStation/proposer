@@ -1,6 +1,7 @@
 import db from "db"
 import * as z from "zod"
 import { Application } from "app/application/types"
+import { request, gql } from "graphql-request"
 
 const GetApplicationsByInitiative = z.object({
   initiativeId: z.number(),
@@ -10,6 +11,28 @@ export default async function getApplicationsByInitiative(
   input: z.infer<typeof GetApplicationsByInitiative>
 ) {
   const data = GetApplicationsByInitiative.parse(input)
+
+  let FETCH_WAITING_ROOM_ENDORSEMENTS = gql`
+    {
+      initiatives (where: {localId: "${data.initiativeId}"}) {
+        endorsees {
+          address
+          totalEndorsed
+          endorsements { # list of endorsement objects
+            from # address
+            amount
+            timestamp
+          }
+        }
+      }
+    }
+  `
+
+  let endorsementData = await request(
+    "https://api.thegraph.com/subgraphs/name/akshaymahajans/stationtest",
+    FETCH_WAITING_ROOM_ENDORSEMENTS
+  )
+
   const applications = await db.initiativeApplication.findMany({
     where: { initiativeId: data.initiativeId },
     include: { applicant: true },

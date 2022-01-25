@@ -151,28 +151,25 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
             </div>
           </div>
           {setSelectedUserToEndorse &&
-            openEndorseModal &&
-            activeUser?.address !== contributor.address && (
-              <div className="flex flex-row align-center justify-center my-2">
-                <button
-                  type="submit"
-                  className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
-                  onClick={(event) => {
-                    handleRequestClick(
-                      event,
-                      contributor,
-                      setSelectedUserToEndorse,
-                      openEndorseModal
-                    )
-                    // setSelectedUserToEndorse(contributor)
-                    // openEndorseModal()
-                    event.stopPropagation()
-                  }}
-                >
-                  Endorse
-                </button>
-              </div>
-            )}
+          openEndorseModal &&
+          activeUser?.address !== contributor.address ? (
+            <div className="flex flex-row align-center justify-center my-2">
+              <button
+                type="submit"
+                className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
+                onClick={(event) => {
+                  handleRequestClick(event, contributor, setSelectedUserToEndorse, openEndorseModal)
+                  // setSelectedUserToEndorse(contributor)
+                  // openEndorseModal()
+                  event.stopPropagation()
+                }}
+              >
+                Endorse
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-row align-center justify-center my-2 h-[26px]"></div>
+          )}
 
           <div className="flex flex-row flex-1 mx-3 ">
             <div className="flex-1 items-center justify-center text-xs text-concrete mt-2">
