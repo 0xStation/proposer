@@ -1,12 +1,26 @@
 import { useState } from "react"
-import { useMutation } from "blitz"
+import { useMutation, useQuery } from "blitz"
 import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
 import createAccount from "../mutations/createAccount"
 import useStore from "app/core/hooks/useStore"
 import getSkills from "app/skills/queries/getSkills"
 import { useDropzone } from "react-dropzone"
-import { AccountMetadata } from "../types"
+import CreatableSelect from "react-select/creatable"
+
+interface ApplicationParams {
+  handle: string
+  discordId: string
+  pronouns: string
+  timezone: string
+  address: string
+  skills: {
+    label: string
+    value: string
+  }[]
+}
+
+const MultiSelectAdapter = ({ input, ...rest }) => <CreatableSelect isMulti {...input} {...rest} />
 
 const AccountModal = ({
   isOpen,
@@ -20,17 +34,17 @@ const AccountModal = ({
   const [uploadingState, setUploadingState] = useState("")
   const [imageURL, setImageURL] = useState("")
   const setActiveUser = useStore((state) => state.setActiveUser)
+
   const [createAccountMutation] = useMutation(createAccount, {
     onSuccess: (data) => {
       setActiveUser(data)
     },
   })
 
-  // we dont need to worry about skills for now
-  // const [skills] = useQuery(getSkills, {}, { suspense: false })
-  // const options = skills?.map((skill) => {
-  //   return { value: skill.name, label: skill.name }
-  // })
+  const [skills] = useQuery(getSkills, {}, { suspense: false })
+  const skillOptions = skills?.map((skill) => {
+    return { value: skill.name, label: skill.name }
+  })
 
   const uploadFile = async (acceptedFiles) => {
     console.log("Uploading....")
@@ -57,13 +71,13 @@ const AccountModal = ({
     >
       <div className="mt-8">
         <Form
-          onSubmit={async (values: AccountMetadata) => {
-            console.log(values)
-            // try {
-            //   await createAccountMutation({ ...values, address })
-            // } catch (error) {
-            //   alert("Error applying.")
-            // }
+          onSubmit={async (values: ApplicationParams) => {
+            // console.log(values)
+            try {
+              await createAccountMutation({ ...values, address })
+            } catch (error) {
+              alert("Error applying.")
+            }
           }}
           render={({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>
@@ -109,12 +123,22 @@ const AccountModal = ({
                     >
                       <input {...getInputProps()} />
                       {isDragActive ? (
-                        <p>Drop the files here ...</p>
+                        <p>Drop your file here ...</p>
                       ) : (
-                        <p>Drag n drop some files here, or click to select files</p>
+                        <p>
+                          Drag and drop a file here, or click to select a file from your device.
+                        </p>
                       )}
                     </div>
                   )}
+                </div>
+                <div className="flex flex-col col-span-2">
+                  <label htmlFor="skills" className="text-marble-white">
+                    Skills
+                  </label>
+                  <div>
+                    <Field name="skills" component={MultiSelectAdapter} options={skillOptions} />
+                  </div>
                 </div>
 
                 <div className="flex flex-col col-span-2">
