@@ -1,5 +1,7 @@
 import db from "../index"
 import { AccountMetadata } from "app/account/types"
+import uploadToS3 from "app/utils/uploadToS3"
+import { genSVG } from "app/ticket/svg"
 
 const mind: AccountMetadata & { address: string } = {
   name: "Mind",
@@ -203,7 +205,8 @@ export const contributors = {
 export async function seedContributors(terminals) {
   for (const name in contributors) {
     const contributorData = contributors[name] as AccountMetadata & { address: string }
-    await db.account.upsert({
+
+    const existingAccount = await db.account.upsert({
       where: { address: contributorData!.address },
       create: {
         address: contributorData!.address,
@@ -226,6 +229,24 @@ export async function seedContributors(terminals) {
       update: {
         data: contributorData,
       },
+    })
+
+    let props = {
+      address: contributorData!.address,
+      name: contributorData!.name,
+      role: contributorData!.role || "VISITOR",
+      terminal: "Station",
+    }
+
+    let ticketSVG = genSVG(props)
+
+    const path = `tickets/station/${contributorData.handle}.svg`
+    const uploadedImageResponse = await uploadToS3(ticketSVG, path)
+    const uploadedImagePath = uploadedImageResponse.Location
+
+    await db.account.update({
+      where: { address: props.address },
+      data: { data: { ...(existingAccount.data as {}), ticketImage: uploadedImagePath } },
     })
   }
 }
