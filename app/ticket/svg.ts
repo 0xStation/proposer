@@ -30,11 +30,11 @@ export const genSVG = (props: SVGProps) => {
     return stitchSVG(props, VISITOR_ARRANGEMENT)
   }
 
-  if (props.role === "CONTRIBUTOR") {
+  if (props.role === "COMMUTER") {
     return stitchSVG(props, CONTRIBUTOR_ARRANGEMENT)
   }
 
-  if (props.role === "CORE") {
+  if (props.role === "STAFF") {
     const ARRANGEMENTS = [CORE_ARRANGEMENT_ONE, CORE_ARRANGEMENT_TWO, CORE_ARRANGEMENT_THREE]
     return stitchSVG(props, getRandomElement(ARRANGEMENTS))
   }
@@ -156,7 +156,7 @@ interface BaseProps {
  */
 const genBase = (props: BaseProps) => {
   let gradientColor
-  if (props.role === "CORE") {
+  if (props.role === "STAFF") {
     gradientColor = getRandomElement(GRADIENTS)
   }
 
@@ -164,11 +164,11 @@ const genBase = (props: BaseProps) => {
   <g clip-path="url(#corners)">
     <rect fill="white" stroke="rgba(255,255,255,0.2)" x="0px" y="0px" rx="24" ry="24" width="240px" height="400px" />
     ${
-      (props.role === "CONTRIBUTOR" || props.role === "CORE") &&
+      (props.role === "COMMUTER" || props.role === "STAFF") &&
       `<rect fill="url(#shine)" stroke="rgba(255,255,255,0.2)" x="0px" y="0px" rx="24" ry="24" width="240px" height="400px" />`
     }
     ${
-      props.role === "CORE" &&
+      props.role === "STAFF" &&
       `<rect fill="url(#${gradientColor})"
         x="0px" y="0px" width="240px" height="400px"
         rx="24" ry="24" fill-opacity="0.5" style="mix-blend-mode: color"

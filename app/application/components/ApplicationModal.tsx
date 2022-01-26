@@ -1,4 +1,4 @@
-import { useMutation, useRouter, useParam } from "blitz"
+import { useMutation, useRouter, useParam, useQuery } from "blitz"
 import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
@@ -21,6 +21,7 @@ const ApplicationModal = ({
       router.push(`/terminal/${terminalId}/waiting`)
     },
   })
+
   const activeUser: Account | null = useStore((state) => state.activeUser)
 
   if (!activeUser) {
