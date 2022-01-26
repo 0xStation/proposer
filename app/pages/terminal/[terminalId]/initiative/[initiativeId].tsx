@@ -32,7 +32,7 @@ const Project: BlitzPage = () => {
   const address = useMemo(() => accountData?.address, [accountData?.address])
 
   const setActiveModal = () => {
-    accountData?.address
+    address
       ? activeUser
         ? setApplicationModalOpen(true)
         : setAccountModalOpen(true)
@@ -101,7 +101,7 @@ const Project: BlitzPage = () => {
         <AccountModal
           isOpen={accountModalOpen}
           setIsOpen={setAccountModalOpen}
-          address={accountData?.address || ""}
+          address={address || ""}
         />
         <ConnectWalletModal isWalletOpen={walletModalOpen} setIsWalletOpen={setWalletModalOpen} />
         <Layout>
