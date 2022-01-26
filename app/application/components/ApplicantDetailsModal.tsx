@@ -124,7 +124,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   <span>Contact</span>
                 </div>
                 <div className="text-sm font-normal">
-                  <span>@{application?.applicant.data.discord}</span>
+                  <span>@{application?.applicant.data.discordId}</span>
                 </div>
               </div>
               <div className="flex flex-col flex-1">

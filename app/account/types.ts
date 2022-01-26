@@ -12,7 +12,6 @@ export type AccountMetadata = {
   discordId: string
   timezone: string
   verified: boolean
-  timezone?: string
   role?: string
 }
 
