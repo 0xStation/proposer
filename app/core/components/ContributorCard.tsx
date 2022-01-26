@@ -178,9 +178,16 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
           )}
 
           <div className="flex flex-row flex-1 mx-3 ">
-            <div className="flex-1 items-center justify-center text-xs text-concrete mt-2">
-              Metadata
-            </div>
+            {contributor && application?.createdAt ? (
+              <div className="flex-1 items-center justify-center text-xs text-concrete my-2">
+                {console.log(JSON.stringify(application?.createdAt.toDateString))}
+                {application?.createdAt.toDateString}
+              </div>
+            ) : (
+              <div className="flex-1 items-center justify-center text-xs text-concrete my-2">
+                Metadata
+              </div>
+            )}
           </div>
         </div>
       ) : (
@@ -263,7 +270,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
               </div>
             )}
           <div className="flex flex-row flex-1 mx-3">
-            {application && application?.createdAt ? (
+            {application && application.createdAt ? (
               <div className="flex-1 items-center justify-center text-xs text-concrete my-2">
                 {console.log(JSON.stringify(application?.createdAt.toDateString))}
                 {application?.createdAt.toDateString}
