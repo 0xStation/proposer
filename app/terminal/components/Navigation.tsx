@@ -1,6 +1,17 @@
+import { useMemo } from "react"
 import { useParam } from "blitz"
 import { Link, Routes, useRouter, useQuery } from "blitz"
 import getTerminalById from "app/terminal/queries/getTerminalById"
+import useStore from "app/core/hooks/useStore"
+import { useAccount, useBalance } from "wagmi"
+import {
+  useEndorsementGraphWrite,
+  useEndorsementTokenRead,
+  useEndorsementTokenWrite,
+  useDecimals,
+} from "app/core/contracts/contracts"
+import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
+import { Account } from "app/account/types"
 
 const Navigation = ({ children }: { children?: any }) => {
   // need a better way of catching undefined here than defaulting to 1
@@ -10,6 +21,20 @@ const Navigation = ({ children }: { children?: any }) => {
   // I was getting a weird error that suspense was not supported by react-dom so I had to disable it.
   const [terminal] = useQuery(getTerminalById, { id: terminalId }, { suspense: false })
   const router = useRouter()
+  const activeUser: Account | null = useStore((state) => state.activeUser)
+
+  const [{ data: accountData }] = useAccount({
+    fetchEns: true,
+  })
+  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
+  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
+  const [{ data: balanceData }] = useBalance({
+    addressOrName: address,
+    token: TERMINAL.TOKEN_ADDRESS,
+    watch: true,
+    formatUnits: decimals,
+  })
+  const tokenBalance = parseFloat(balanceData?.formatted || "0")
 
   // obviously need better error page if the terminal is not found, but this will do.
   if (!terminal) {
@@ -76,10 +101,19 @@ const Navigation = ({ children }: { children?: any }) => {
             <div className="mt-12">{children}</div>
           </div>
         </div>
-        <img
-          className="absolute bottom-4 right-4 h-[300px]"
-          src="https://station.nyc3.digitaloceanspaces.com/tickets/station/frog.svg"
-        />
+        <div className="fixed bottom-4 right-8">
+          {activeUser?.data.ticketImage ? (
+            <img className="h-[300px]" src={activeUser?.data.ticketImage} />
+          ) : (
+            <div className="h-[300px] w-[180px] border border-concrete rounded-2xl border-dashed text-concrete text-4xl text-center flex flex-col justify-center align-middle">
+              FUTURE TICKET GOES HERE
+            </div>
+          )}
+          <div className="mt-2 flex justify-between px-1">
+            <span className="text-marble-white font-bold">Balance</span>
+            <span className="text-marble-white font-light">{tokenBalance}ⓔ</span>
+          </div>
+        </div>
       </div>
     </div>
   )
