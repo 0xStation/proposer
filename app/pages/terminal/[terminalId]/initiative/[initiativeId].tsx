@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useAccount } from "wagmi"
 import { Image, useQuery, BlitzPage, useParam, Link, Routes } from "blitz"
 import Layout from "app/core/layouts/Layout"
@@ -29,9 +29,10 @@ const Project: BlitzPage = () => {
   let [accountModalOpen, setAccountModalOpen] = useState(false)
   let [applicationModalOpen, setApplicationModalOpen] = useState(false)
   const [userTriggered, setUserTrigged] = useState(false)
+  const address = useMemo(() => accountData?.address, [accountData?.address])
 
   const setActiveModal = () => {
-    accountData
+    address
       ? activeUser
         ? setApplicationModalOpen(true)
         : setAccountModalOpen(true)
@@ -52,7 +53,7 @@ const Project: BlitzPage = () => {
       // the modal is active does not properly clean itself up.
       setTimeout(() => setActiveModal(), 500)
     }
-  }, [accountData, activeUser])
+  }, [address, activeUser])
 
   const accepted = true
   const endorse = false
@@ -100,7 +101,7 @@ const Project: BlitzPage = () => {
         <AccountModal
           isOpen={accountModalOpen}
           setIsOpen={setAccountModalOpen}
-          address={accountData?.address || ""}
+          address={address || ""}
         />
         <ConnectWalletModal isWalletOpen={walletModalOpen} setIsWalletOpen={setWalletModalOpen} />
         <Layout>
