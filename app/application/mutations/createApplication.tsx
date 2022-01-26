@@ -3,7 +3,7 @@ import * as z from "zod"
 
 const CreateApplication = z.object({
   url: z.string(),
-  why: z.string(),
+  entryDesription: z.string(),
   applicantId: z.number(),
   initiativeId: z.number(),
 })
@@ -15,7 +15,7 @@ export default async function createApplication(input: z.infer<typeof CreateAppl
     data: {
       approved: false,
       url: params.url,
-      why: params.why,
+      entryDesription: params.entryDesription,
     },
     applicant: { connect: { id: params.applicantId } },
     initiative: { connect: { id: params.initiativeId } },

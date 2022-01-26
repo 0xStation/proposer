@@ -8,6 +8,7 @@ import { Account } from "app/account/types"
 import { useAccount, useBalance } from "wagmi"
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
+import { Application } from "app/application/types"
 
 function roleSVG(role) {
   let svg
@@ -29,8 +30,9 @@ type ContributorCardProps = {
   openEndorseModal?: () => void
   openApplicantModal?: () => void
   setSelectedUserToEndorse?: Dispatch<SetStateAction<Account | null>>
-  setselectedApplicantToView?: Dispatch<SetStateAction<number>>
+  setSelectedApplicantToView?: Dispatch<SetStateAction<number>>
   activeUser?: Account | null
+  application?: Application
 }
 
 const ContributorCard: React.FC<ContributorCardProps> = ({
@@ -41,8 +43,9 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
   openEndorseModal,
   openApplicantModal,
   setSelectedUserToEndorse,
-  setselectedApplicantToView,
+  setSelectedApplicantToView,
   activeUser,
+  application,
 }) => {
   const isContributorDirectory = openEndorseModal && setSelectedUserToEndorse
   const isWaitingRoom = !accepted
@@ -67,17 +70,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
   })
   const tokenBalance = parseFloat(balanceData?.formatted || "")
 
-  const checkEndorseAbility = () => {
-    if (activeUser === null || activeUser === undefined) {
-      return false
-    } else if (activeUser.address === contributor.address) {
-      return false
-    } else if (!tokenBalance) {
-      return false
-    } else {
-      return true
-    }
-  }
+  const isEndorsable = tokenBalance && activeUser && activeUser.address !== contributor.address
   return (
     <div
       className={`flex flex-col flex-auto content-center ${
@@ -86,10 +79,10 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
         !isWaitingRoom && !isContributorDirectory && "w-[240px] min-h-[180px] max-h-[250px]"
       }`}
       onClick={() => {
-        if (!accepted && value != undefined) {
-          if (setselectedApplicantToView && openApplicantModal) {
+        if (!accepted && value !== undefined) {
+          if (setSelectedApplicantToView && openApplicantModal) {
             openApplicantModal()
-            setselectedApplicantToView(value)
+            setSelectedApplicantToView(value)
           }
         }
       }}
@@ -174,7 +167,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
             </div>
           ) : (
             <div>
-              {isContributorDirectory || (openApplicantModal && setselectedApplicantToView) ? (
+              {isContributorDirectory || (openApplicantModal && setSelectedApplicantToView) ? (
                 <div className="flex flex-row align-center justify-center my-2 h-[26px]"></div>
               ) : (
                 <div></div>
@@ -219,7 +212,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
               <span>N/A</span>
             </div>
           </div>
-          {openApplicantModal && setselectedApplicantToView && checkEndorseAbility() ? (
+          {openApplicantModal && setSelectedApplicantToView && isEndorsable ? (
             <div className="flex flex-row flex-1 align-center justify-center mt-2">
               <button
                 type="submit"
@@ -232,7 +225,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
           ) : (
             <div>
               {openApplicantModal &&
-              setselectedApplicantToView &&
+              setSelectedApplicantToView &&
               activeUser &&
               activeUser?.address !== contributor.address ? (
                 <div className="flex flex-row align-center justify-center my-2 h-[26px]"></div>
@@ -268,9 +261,16 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
               </div>
             )}
           <div className="flex flex-row flex-1 mx-3">
-            <div className="flex-1 items-center justify-center text-xs text-concrete my-2">
-              Metadata
-            </div>
+            {application && application?.createdAt ? (
+              <div className="flex-1 items-center justify-center text-xs text-concrete my-2">
+                {console.log(JSON.stringify(application?.createdAt.toDateString))}
+                {application?.createdAt.toDateString}
+              </div>
+            ) : (
+              <div className="flex-1 items-center justify-center text-xs text-concrete my-2">
+                Metadata
+              </div>
+            )}
           </div>
         </div>
       )}

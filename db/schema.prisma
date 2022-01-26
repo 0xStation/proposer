@@ -63,6 +63,7 @@ model InitiativeApplication {
   initiative   Initiative               @relation(fields: [initiativeId], references: [id])
   initiativeId Int
   endorsements ApplicationEndorsement[] //onchain
+  createdAt    DateTime                 @default(now())
   data         Json?
 }
 

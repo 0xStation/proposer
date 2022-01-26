@@ -25,7 +25,13 @@ const ApplicationModal = ({
 
   if (!activeUser) {
     return (
-      <Modal title="Oops!" subtitle="You must be logged in." open={isOpen} toggle={setIsOpen} />
+      <Modal
+        title="Oops!"
+        subtitle="You must be logged in."
+        open={isOpen}
+        toggle={setIsOpen}
+        showTitle={true}
+      />
     )
   }
 
@@ -38,7 +44,7 @@ const ApplicationModal = ({
     >
       <div className="mt-8">
         <Form
-          onSubmit={async (values: { url: string; why: string }) => {
+          onSubmit={async (values: { url: string; entryDesription: string }) => {
             try {
               await createApplicationMutation({
                 ...values,

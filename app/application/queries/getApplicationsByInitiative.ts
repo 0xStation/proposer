@@ -12,26 +12,26 @@ export default async function getApplicationsByInitiative(
 ) {
   const data = GetApplicationsByInitiative.parse(input)
 
-  let FETCH_WAITING_ROOM_ENDORSEMENTS = gql`
-    {
-      initiatives (where: {localId: "${data.initiativeId}"}) {
-        endorsees {
-          address
-          totalEndorsed
-          endorsements { # list of endorsement objects
-            from # address
-            amount
-            timestamp
-          }
-        }
-      }
-    }
-  `
+  // let FETCH_WAITING_ROOM_ENDORSEMENTS = gql`
+  //   {
+  //     initiatives (where: {localId: "${data.initiativeId}"}) {
+  //       endorsees {
+  //         address
+  //         totalEndorsed
+  //         endorsements { # list of endorsement objects
+  //           from # address
+  //           amount
+  //           timestamp
+  //         }
+  //       }
+  //     }
+  //   }
+  // `
 
-  let endorsementData = await request(
-    "https://api.thegraph.com/subgraphs/name/akshaymahajans/stationtest",
-    FETCH_WAITING_ROOM_ENDORSEMENTS
-  )
+  // let endorsementData = await request(
+  //   "https://thegraph.com/hosted-service/subgraph/0xstation/station",
+  //   FETCH_WAITING_ROOM_ENDORSEMENTS
+  // )
 
   const applications = await db.initiativeApplication.findMany({
     where: { initiativeId: data.initiativeId },

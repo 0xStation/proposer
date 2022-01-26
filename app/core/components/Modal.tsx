@@ -16,10 +16,12 @@ const Modal = ({
   subtitle,
   children,
   banner,
+  showTitle,
 }: {
-  title: string
   open: boolean
   toggle: React.Dispatch<React.SetStateAction<boolean>>
+  title?: string
+  showTitle?: boolean
   subtitle?: string
   children?: any
   banner?: any
@@ -54,7 +56,7 @@ const Modal = ({
             leaveTo="opacity-0 scale-95"
           >
             <div className="inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle transition-all transform bg-tunnel-black border border-marble-white">
-              {title !== "applicant" && (
+              {showTitle && (
                 <div className="w-full h-full relative">
                   <button
                     className="text-marble-white absolute z-50 left-2 top-2"
@@ -66,7 +68,7 @@ const Modal = ({
                 </div>
               )}
               <div className="p-6">
-                {title && title !== "applicant" && (
+                {showTitle && (
                   <Dialog.Title
                     as="h3"
                     className="text-3xl font-medium leading-8 text-marble-white text-center"

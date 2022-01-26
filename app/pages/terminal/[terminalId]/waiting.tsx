@@ -14,27 +14,9 @@ import useStore from "app/core/hooks/useStore"
 import { useAccount } from "wagmi"
 import { request, gql } from "graphql-request"
 
-// const getEndorsmentData = async (id) => {
-//   // waiting on subgraph to turn this on but this just queries the subgraph for waiting room endorsement details
-//   // I choose to include this here rather than creating a query since we only need it for the waiting room but I might make it a query to clean it up
-//   // let FETCH_WAITING_ROOM_ENDORSEMENTS = gql`
-//   //   {
-//   //     initiatives (where: {localId: "${id}"}) {
-//   //       endorsees {
-//   //         address
-//   //         totalEndorsed
-//   //         endorsements { # list of endorsement objects
-//   //           from # address
-//   //           amount
-//   //           timestamp
-//   //         }
-//   //       }
-//   //     }
-//   //   }
-//   // `
+const date: Date = new Date(1995, 8, 1)
+console.log(JSON.stringify(date.toDateString))
 
-//   return endorsementData
-// }
 const TerminalWaitingPage: BlitzPage = () => {
   const [{ data: accountData }] = useAccount()
   const connectedUser: Account = useMemo(
@@ -46,7 +28,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [applications, setApplications] = useState<Application[]>([])
   const [allApplications, setAllApplications] = useState<Application[]>([])
   const [selected, setSelected] = useState<boolean>(false)
-  const [selectedApplicantToView, setselectedApplicantToView] = useState<number>(0)
+  const [selectedApplicantToView, setSelectedApplicantToView] = useState<number>(0)
 
   const accepted = false
 
@@ -89,9 +71,11 @@ const TerminalWaitingPage: BlitzPage = () => {
           initiativeId: 0,
           endorsements: [dummyData[0] as Account],
           data: {
-            why: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquam laudantium officiavquibusdam ratione porro voluptate corporis ipsa quis? Officia assumenda quam aspernatur illo dicta doloribus nisi saepe atque consequuntur voluptates?",
+            entryDesription:
+              "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquam laudantium officiavquibusdam ratione porro voluptate corporis ipsa quis? Officia assumenda quam aspernatur illo dicta doloribus nisi saepe atque consequuntur voluptates?",
             url: "abe.com",
           },
+          createdAt: new Date(1995, 8, 1) as Date,
         },
         {
           id: 1,
@@ -113,9 +97,11 @@ const TerminalWaitingPage: BlitzPage = () => {
           initiativeId: 1,
           endorsements: [dummyData[0] as Account, dummyData[1] as Account],
           data: {
-            why: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquam laudantium officiavquibusdam ratione porro voluptate corporis ipsa quis? Officia assumenda quam aspernatur illo dicta doloribus nisi saepe atque consequuntur voluptates?",
+            entryDesription:
+              "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquam laudantium officiavquibusdam ratione porro voluptate corporis ipsa quis? Officia assumenda quam aspernatur illo dicta doloribus nisi saepe atque consequuntur voluptates?",
             url: "abe.com",
           },
+          createdAt: new Date(1995, 8, 1) as Date,
         },
         {
           id: 2,
@@ -137,9 +123,11 @@ const TerminalWaitingPage: BlitzPage = () => {
           initiativeId: 2,
           endorsements: [],
           data: {
-            why: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquam laudantium officiavquibusdam ratione porro voluptate corporis ipsa quis? Officia assumenda quam aspernatur illo dicta doloribus nisi saepe atque consequuntur voluptates?",
+            entryDesription:
+              "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquam laudantium officiavquibusdam ratione porro voluptate corporis ipsa quis? Officia assumenda quam aspernatur illo dicta doloribus nisi saepe atque consequuntur voluptates?",
             url: "abe.com",
           },
+          createdAt: new Date(1995, 8, 1) as Date,
         },
       ]
       setAllApplications(apps)
@@ -165,9 +153,11 @@ const TerminalWaitingPage: BlitzPage = () => {
           initiativeId: 2,
           endorsements: [],
           data: {
-            why: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquam laudantium officiavquibusdam ratione porro voluptate corporis ipsa quis? Officia assumenda quam aspernatur illo dicta doloribus nisi saepe atque consequuntur voluptates?",
+            entryDesription:
+              "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Aliquam laudantium officiavquibusdam ratione porro voluptate corporis ipsa quis? Officia assumenda quam aspernatur illo dicta doloribus nisi saepe atque consequuntur voluptates?",
             url: "abe.com",
           },
+          createdAt: new Date(1995, 8, 1) as Date,
         },
       ]
       setAllApplications(apps)
@@ -193,6 +183,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           initiativeId: 1,
           endorsements: [],
           data: {},
+          createdAt: new Date(1995, 8, 1) as Date,
         },
         {
           id: 2,
@@ -214,6 +205,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           initiativeId: 2,
           endorsements: [],
           data: {},
+          createdAt: new Date(1995, 8, 1) as Date,
         },
       ]
       setAllApplications(apps)
@@ -317,7 +309,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           )}
 
           <div className="flex flex-col space-y-10">
-            <div className="flex-auto flex flex-row space-x-3 text-marble-white text-sm">
+            <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm">
               {initiatives.map((initiative) => {
                 return (
                   <button
@@ -331,7 +323,7 @@ const TerminalWaitingPage: BlitzPage = () => {
                       initiative.localId != selectedInitiative && "border border-marble-white"
                     } active:bg-marble-white active:text-concrete`}
                   >
-                    <span className="m-4">{initiative.data?.name}</span>
+                    <span className="m-4">{initiative.data?.name.toUpperCase()}</span>
                   </button>
                 )
               })}
@@ -356,23 +348,24 @@ const TerminalWaitingPage: BlitzPage = () => {
                 //       endorse={endorseAbility}
                 //       accepted={accepted}
                 //       openApplicantModal={openApplicantModal}
-                //       setselectedApplicantToView={setselectedApplicantToView}
+                //       setSelectedApplicantToView={setSelectedApplicantToView}
                 //     />
                 //   ))}
                 // </div>
                 //Currently using this to style the component
                 <div>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {allApplications.map((applications, index) => (
+                    {allApplications.map((application, index) => (
                       <ContributorCard
                         key={index}
                         value={index}
-                        contributor={applications.applicant as Account}
+                        contributor={application.applicant as Account}
                         endorse={endorseAbility}
                         accepted={accepted}
                         openApplicantModal={openApplicantModal}
-                        setselectedApplicantToView={setselectedApplicantToView}
+                        setSelectedApplicantToView={setSelectedApplicantToView}
                         activeUser={activeUser}
+                        application={application}
                       />
                     ))}
                   </div>
