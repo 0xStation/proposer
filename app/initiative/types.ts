@@ -4,6 +4,7 @@ export type InitiativeMetadata = {
   name: string
   description: string
   shortName: string
+  oneLiner?: string
   bannerURL?: string
   contributeText?: string[]
   rewardText?: string

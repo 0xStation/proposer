@@ -1,5 +1,7 @@
 import db from "../index"
 import { AccountMetadata } from "app/account/types"
+import uploadToS3 from "app/utils/uploadToS3"
+import { genSVG } from "app/ticket/svg"
 
 const mind: AccountMetadata & { address: string } = {
   name: "Mind",
@@ -8,8 +10,9 @@ const mind: AccountMetadata & { address: string } = {
   ticketId: 2, // TODO: remove this when subgraph is ready
   pronouns: "she/her",
   skills: [],
-  discord: "mindapi#",
+  discordId: "mindapi#",
   verified: true,
+  timezone: "EST",
   wallet: "mindapi.eth",
   role: "STAFF",
   twitterURL: "https://twitter.com/mindapi_",
@@ -22,8 +25,9 @@ const tina: AccountMetadata & { address: string } = {
   ticketId: 3, // TODO: remove this when subgraph is ready
   pronouns: "she/her",
   skills: [],
-  discord: "fakepixels#",
+  discordId: "fakepixels#",
   verified: true,
+  timezone: "EST",
   wallet: "fkpixels.eth",
   role: "STAFF",
   twitterURL: "https://twitter.com/fkpxls",
@@ -36,8 +40,9 @@ const conner: AccountMetadata & { address: string } = {
   ticketId: 0, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
   skills: [],
-  discord: "symmtry#",
+  discordId: "symmtry#",
   verified: true,
+  timezone: "EST",
   wallet: "symmtry.eth",
   role: "STAFF",
   twitterURL: "https://twitter.com/symmtry69",
@@ -50,8 +55,9 @@ const kristen: AccountMetadata & { address: string } = {
   ticketId: 7, // TODO: remove this when subgraph is ready
   pronouns: "she/her",
   skills: [],
-  discord: "rie#",
+  discordId: "rie#",
   verified: true,
+  timezone: "EST",
   wallet: "0x420...6d9",
   role: "STAFF",
   twitterURL: "https://twitter.com/0xRie_",
@@ -64,8 +70,9 @@ const calvin: AccountMetadata & { address: string } = {
   ticketId: 6, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
   skills: [],
-  discord: "cc2#",
+  discordId: "cc2#",
   verified: true,
+  timezone: "EST",
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/cchengasaurus",
@@ -78,8 +85,9 @@ const brendan: AccountMetadata & { address: string } = {
   ticketId: 4, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
   skills: [],
-  discord: "brendo#",
+  discordId: "brendo#",
   verified: true,
+  timezone: "EST",
   wallet: "brendo.eth",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/brendanelliot_",
@@ -92,8 +100,9 @@ const michael: AccountMetadata & { address: string } = {
   ticketId: 1, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
   skills: [],
-  discord: "frog#",
+  discordId: "frog#",
   verified: true,
+  timezone: "EST",
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/0xmcg",
@@ -106,8 +115,9 @@ const abe: AccountMetadata & { address: string } = {
   ticketId: 12, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
   skills: [],
-  discord: "cryptoabe#",
+  discordId: "cryptoabe#",
   verified: true,
+  timezone: "EST",
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/abenazer_mekete",
@@ -120,8 +130,9 @@ const nick: AccountMetadata & { address: string } = {
   ticketId: 13, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
   skills: [],
-  discord: "zy2#",
+  discordId: "zy2#",
   verified: true,
+  timezone: "EST",
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/zy22yz",
@@ -134,8 +145,9 @@ const alli: AccountMetadata & { address: string } = {
   ticketId: 10, // TODO: remove this when subgraph is ready
   pronouns: "she/her",
   skills: [],
-  discord: "alli#",
+  discordId: "alli#",
   verified: true,
+  timezone: "EST",
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/sonofalli",
@@ -148,8 +160,9 @@ const kassen: AccountMetadata & { address: string } = {
   ticketId: 11, // TODO: remove this when subgraph is ready
   pronouns: "she/her",
   skills: [],
-  discord: "kassen#",
+  discordId: "kassen#",
   verified: true,
+  timezone: "EST",
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/kassenq",
@@ -162,8 +175,9 @@ const alex: AccountMetadata & { address: string } = {
   ticketId: 14, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
   skills: [],
-  discord: "ahs#",
+  discordId: "ahs#",
   verified: true,
+  timezone: "EST",
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/alexhughsam",
@@ -176,8 +190,9 @@ const akshay: AccountMetadata & { address: string } = {
   ticketId: 9, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
   skills: [],
-  discord: "wagmiking#",
+  discordId: "wagmiking#",
   verified: true,
+  timezone: "EST",
   wallet: "0x420...6d9",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/wagmiking",
@@ -203,7 +218,8 @@ export const contributors = {
 export async function seedContributors(terminals) {
   for (const name in contributors) {
     const contributorData = contributors[name] as AccountMetadata & { address: string }
-    await db.account.upsert({
+
+    const existingAccount = await db.account.upsert({
       where: { address: contributorData!.address },
       create: {
         address: contributorData!.address,
@@ -226,6 +242,24 @@ export async function seedContributors(terminals) {
       update: {
         data: contributorData,
       },
+    })
+
+    let props = {
+      address: contributorData!.address,
+      name: contributorData!.name,
+      role: contributorData!.role || "VISITOR",
+      terminal: "Station",
+    }
+
+    let ticketSVG = genSVG(props)
+
+    const path = `tickets/station/${contributorData.handle}.svg`
+    const uploadedImageResponse = await uploadToS3(ticketSVG, path)
+    const uploadedImagePath = uploadedImageResponse.Location
+
+    await db.account.update({
+      where: { address: props.address },
+      data: { data: { ...(existingAccount.data as {}), ticketImage: uploadedImagePath } },
     })
   }
 }

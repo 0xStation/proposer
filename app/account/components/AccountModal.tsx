@@ -1,8 +1,26 @@
-import { useMutation } from "blitz"
+import { useState } from "react"
+import { useMutation, useQuery } from "blitz"
 import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
 import createAccount from "../mutations/createAccount"
 import useStore from "app/core/hooks/useStore"
+import getSkills from "app/skills/queries/getSkills"
+import { useDropzone } from "react-dropzone"
+import CreatableSelect from "react-select/creatable"
+
+interface ApplicationParams {
+  handle: string
+  discordId: string
+  pronouns: string
+  timezone: string
+  address: string
+  skills: {
+    label: string
+    value: string
+  }[]
+}
+
+const MultiSelectAdapter = ({ input, ...rest }) => <CreatableSelect isMulti {...input} {...rest} />
 
 const AccountModal = ({
   isOpen,
@@ -13,12 +31,35 @@ const AccountModal = ({
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   address: string
 }) => {
+  const [uploadingState, setUploadingState] = useState("")
+  const [imageURL, setImageURL] = useState("")
   const setActiveUser = useStore((state) => state.setActiveUser)
+
   const [createAccountMutation] = useMutation(createAccount, {
     onSuccess: (data) => {
       setActiveUser(data)
     },
   })
+
+  const [skills] = useQuery(getSkills, {}, { suspense: false })
+  const skillOptions = skills?.map((skill) => {
+    return { value: skill.name, label: skill.name }
+  })
+
+  const uploadFile = async (acceptedFiles) => {
+    setUploadingState("UPLOADING")
+    const formData = new FormData()
+    formData.append("file", acceptedFiles[0])
+    let res = await fetch("http://localhost:3000/api/uploadImage", {
+      method: "POST",
+      body: formData,
+    })
+    const data = await res.json()
+    setImageURL(data.url)
+    setUploadingState("UPLOADED")
+  }
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: uploadFile })
 
   return (
     <Modal
@@ -29,13 +70,7 @@ const AccountModal = ({
     >
       <div className="mt-8">
         <Form
-          onSubmit={async (values: {
-            name: string
-            discordId: string
-            address: string
-            pronouns: string
-            timezone: string
-          }) => {
+          onSubmit={async (values: ApplicationParams) => {
             try {
               await createAccountMutation({ ...values, address })
             } catch (error) {
@@ -52,11 +87,59 @@ const AccountModal = ({
                   <Field
                     component="input"
                     name="name"
-                    placeholder="Name"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
+                    placeholder="name"
+                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>
                 <div className="flex flex-col">
+                  <label htmlFor="handle" className="text-marble-white">
+                    Handle
+                  </label>
+                  <Field
+                    component="input"
+                    name="handle"
+                    placeholder="@handle"
+                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
+                  />
+                </div>
+                <div className="flex flex-col col-span-2">
+                  <label htmlFor="pfp" className="text-marble-white">
+                    PFP
+                  </label>
+                  {uploadingState === "UPLOADED" ? (
+                    <div>
+                      <img
+                        alt="Profile picture uploaded by the user."
+                        src={imageURL}
+                        className="w-16 h-16 rounded-full border border-concrete"
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      {...getRootProps()}
+                      className="text-sm text-concrete bg-wet-concrete border border-dotted border-concrete p-4 text-center"
+                    >
+                      <input {...getInputProps()} />
+                      {isDragActive ? (
+                        <p>Drop your file here ...</p>
+                      ) : (
+                        <p>
+                          Drag and drop a file here, or click to select a file from your device.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col col-span-2">
+                  <label htmlFor="skills" className="text-marble-white">
+                    Skills
+                  </label>
+                  <div>
+                    <Field name="skills" component={MultiSelectAdapter} options={skillOptions} />
+                  </div>
+                </div>
+
+                <div className="flex flex-col col-span-2">
                   <label htmlFor="discordId" className="text-marble-white">
                     Discord ID
                   </label>
@@ -64,7 +147,7 @@ const AccountModal = ({
                     component="input"
                     name="discordId"
                     placeholder="Discord ID"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
+                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>
                 <div className="flex flex-col">
@@ -75,7 +158,7 @@ const AccountModal = ({
                     component="input"
                     name="pronouns"
                     placeholder="Enter your pronouns"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
+                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>
                 <div className="flex flex-col">
@@ -86,7 +169,7 @@ const AccountModal = ({
                     component="select"
                     name="timezone"
                     placeholder="Select one"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
+                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   >
                     <option />
                     <option value="-12:00">(GMT -12:00) Eniwetok, Kwajalein</option>
