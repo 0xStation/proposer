@@ -17,8 +17,9 @@ model Account {
   address             String                   @unique
   applications        InitiativeApplication[]
   pledgedEndorsements ApplicationEndorsement[]
-  data                Json?
+  skills              SkillsOnAccounts[]
   tickets             AccountTerminal[]
+  data                Json?
 }
 
 // Each DAO is represented by a terminal.
@@ -55,7 +56,7 @@ model Initiative {
   @@unique([terminalTicket, localId], name: "terminalInitiative")
 }
 
-// An application into a certain initiative
+// AKA "application"
 model InitiativeApplication {
   id           Int                      @id @default(autoincrement())
   applicant    Account                  @relation(fields: [applicantId], references: [id])
@@ -64,6 +65,21 @@ model InitiativeApplication {
   initiativeId Int
   endorsements ApplicationEndorsement[]
   data         Json?
+}
+
+model Skill {
+  id       Int                @id @default(autoincrement())
+  name     String             @unique
+  accounts SkillsOnAccounts[]
+}
+
+model SkillsOnAccounts {
+  skill     Skill   @relation(fields: [skillId], references: [id])
+  skillId   Int
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId Int
+
+  @@id([skillId, accountId])
 }
 
 model ApplicationEndorsement {

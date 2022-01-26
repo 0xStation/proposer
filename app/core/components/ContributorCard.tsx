@@ -51,7 +51,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
       }}
     >
       <div className="flex flex-row flex-1 content-center mx-3 my-3 space-x-1">
-        <div className="flex-2/5 content-center align-middle mr-1">
+        <div className="content-center align-middle mr-1">
           {contributor.data.pfpURL ? (
             <div className="flex-2/5 m-auto">
               <img
@@ -64,17 +64,19 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
             <div className="h-[40px] w-[40px] place-self-center border border-marble-white rounded-full place-items-center"></div>
           )}
         </div>
-        <div className="flex flex-col flex-3/5 content-center">
-          <div className="flex flex-row space-x-1">
-            <div className="flex-3/5 text-m">{contributor.data.handle}</div>
-            <div className="flex-2/5 m-auto">
+        <div className="flex flex-col flex-1 content-center">
+          <div className="flex flex-row items-center flex-1 space-x-1">
+            <div className="text-m">{contributor.data.handle}</div>
+            <div className="m-auto">
               <Image src={Verified} alt="Verified icon." width={10} height={10} />
             </div>
           </div>
-          <div className="flex flex-row flex-1 text-xs text-concrete space-x-1">
-            <div className="flex-1">{contributor.data.wallet}</div>
-            <div className="flex-1">-</div>
-            <div className="flex-1">{contributor.data.pronouns}</div>
+          <div className="flex flex-row flex-1 text-xs text-concrete space-x-1 overflow-hidden">
+            <div className="max-w-[150px] truncate">
+              {contributor.data.wallet || contributor.address}
+            </div>
+            <div className="">-</div>
+            <div className="">{contributor.data.pronouns}</div>
           </div>
         </div>
       </div>
