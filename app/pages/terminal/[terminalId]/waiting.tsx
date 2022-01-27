@@ -320,12 +320,6 @@ const TerminalWaitingPage: BlitzPage = () => {
             setIsSuccessModalOpen={setIsSuccessModalOpen}
             selectedUserToEndorse={contributor}
           />
-          <button
-            className="bg-neon-carrot border border-marble-white "
-            onClick={() => setIsEndorseModalOpen(true)}
-          >
-            Endorse Modal
-          </button>
           <div>
             {activeUser?.address ? (
               <ApplicantDetailsModal
