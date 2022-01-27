@@ -24,6 +24,12 @@ const Map = () => {
   const data = contributorBoolean ? contributorTerminals : terminals
   const { results, totalPages, hasNext, hasPrev } = usePagination(data, page, 4)
 
+  // hides the map if there are less than two terminals (button in navigation and popover)
+  // the thinking is that it doesnt make much sense to have a map with only one terminal
+  if (!terminals || terminals?.length < 2) {
+    return <></>
+  }
+
   return (
     <div className="px-4">
       <Popover className="relative">
