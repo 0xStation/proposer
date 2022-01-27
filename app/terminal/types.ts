@@ -8,5 +8,6 @@ export type TerminalMetadata = {
 export type Terminal = {
   id: number
   ticketAddress: string
+  handle: string
   data: TerminalMetadata
 }

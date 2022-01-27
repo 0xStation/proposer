@@ -6,11 +6,11 @@ import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTer
 import getAllAccounts from "app/account/queries/getAllAccounts"
 
 const TerminalInitiativePage: BlitzPage = () => {
-  const terminalId = useParam("terminalId", "number") || 1
+  const terminalHandle = useParam("terminalHandle", "string") as string
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
-    { terminalId: terminalId },
+    { terminalHandle: terminalHandle },
     { suspense: false }
   )
 
@@ -29,7 +29,7 @@ const TerminalInitiativePage: BlitzPage = () => {
             return (
               <Link
                 key={initiative.localId}
-                href={Routes.Project({ terminalId, initiativeId: initiative.localId })}
+                href={Routes.Project({ terminalHandle, initiativeId: initiative.localId })}
               >
                 <a>
                   <InitiativeCard

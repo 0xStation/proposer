@@ -15,7 +15,7 @@ import Back from "/public/back-icon.svg"
 import Page404 from "../../../404"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
 import { Account } from "app/account/types"
-import getTerminalById from "app/terminal/queries/getTerminalById"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import AccountModal from "app/account/components/AccountModal"
 import ApplicationModal from "app/application/components/ApplicationModal"
 import useStore from "app/core/hooks/useStore"
@@ -57,10 +57,10 @@ const Project: BlitzPage = () => {
 
   const accepted = true
   const endorse = false
-  const terminalId = useParam("terminalId", "number") || 1
-  const initiativeLocalId = useParam("initiativeId", "number") || 0
+  const terminalHandle = useParam("terminalHandle") as string
+  const initiativeLocalId = useParam("initiativeId", "number") as number
 
-  const [terminal] = useQuery(getTerminalById, { id: terminalId }, { suspense: false })
+  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
   const [initiative] = useQuery(
     getInitiativeByLocalId,
@@ -99,7 +99,7 @@ const Project: BlitzPage = () => {
         <Layout>
           <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col">
             <div className="mx-4 mt-4">
-              <Link href={Routes.TerminalInitiativePage({ terminalId })}>
+              <Link href={Routes.TerminalInitiativePage({ terminalHandle })}>
                 <Image
                   className="cursor-pointer"
                   src={Back}
