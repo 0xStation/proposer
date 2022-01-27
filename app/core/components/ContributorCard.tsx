@@ -70,7 +70,20 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
   })
   const tokenBalance = parseFloat(balanceData?.formatted || "")
 
-  const isEndorsable = tokenBalance && activeUser && activeUser.address !== contributor.address
+  // const isEndorsable = tokenBalance && activeUser && activeUser.address !== contributor.address
+  //using this instead of the check above since it renders the component faster
+  const isEndorsable = () => {
+    if (!activeUser || activeUser === null || activeUser === undefined) {
+      return false
+    } else if (activeUser.address === contributor.address) {
+      return false
+    } else if (!tokenBalance) {
+      return false
+    } else {
+      return true
+    }
+  }
+
   return (
     <div
       className={`flex flex-col flex-auto content-center ${
@@ -218,10 +231,21 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
               <div className="place-self-center mt-2">Role</div>
             </div>
             <div className="flex flex-1 align-right place-content-end content-right text-sm">
-              <span>N/A</span>
+              {application?.applicant.data.role ? (
+                <div>
+                  <Image
+                    className="content-right text-sm"
+                    src={roleSVG(application?.applicant.data.role)}
+                    alt="Role icon."
+                    height={17}
+                  />
+                </div>
+              ) : (
+                <span>N/A</span>
+              )}
             </div>
           </div>
-          {openApplicantModal && setSelectedApplicantToView && isEndorsable ? (
+          {openApplicantModal && setSelectedApplicantToView && isEndorsable() ? (
             <div className="flex flex-row flex-1 align-center justify-center mt-2">
               <button
                 type="submit"

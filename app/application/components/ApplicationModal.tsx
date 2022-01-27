@@ -4,6 +4,23 @@ import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
 import useStore from "../../core/hooks/useStore"
 import { Account } from "../../account/types"
+import Staff from "/public/role-staff.svg"
+import Commuter from "/public/role-commuter.svg"
+import Visitor from "/public/role-visitor.svg"
+
+function roleSVG(role) {
+  let svg
+  if (role === "STAFF") {
+    svg = Staff
+  } else if (role === "COMMUTER") {
+    svg = Commuter
+  } else if (role === "VISITOR") {
+    svg = Visitor
+  } else {
+    svg = "N/A"
+  }
+  return svg
+}
 
 const ApplicationModal = ({
   isOpen,

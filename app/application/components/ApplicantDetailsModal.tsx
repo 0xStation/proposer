@@ -33,8 +33,21 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   const tokenBalance = parseFloat(balanceData?.formatted || "")
 
   // this refers to when a contributor applies to another initiative in the same terminal
-  const isEndorsable =
-    tokenBalance && activeUser && activeUser.address !== application?.applicant?.address
+
+  // const isEndorsable =
+  //   tokenBalance && activeUser && activeUser.address !== application?.applicant?.address
+  //using this instead of the check above since it renders the component faster
+  const isEndorsable = () => {
+    if (activeUser === null || activeUser === undefined) {
+      return false
+    } else if (activeUser.address === application?.applicant?.address) {
+      return false
+    } else if (!tokenBalance) {
+      return false
+    } else {
+      return true
+    }
+  }
 
   return (
     <div>
@@ -49,7 +62,13 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               </div>
             </div>
             <div className="flex flex-1 justify-end absolute top-2 right-2 z-50">
-              <span className="text-xs text-concrete font-normal">METADATA</span>
+              {(application && application.createdAt !== null) || undefined ? (
+                <span className="text-xs text-concrete font-normal">
+                  {application?.createdAt.toDateString}
+                </span>
+              ) : (
+                <span className="text-xs text-concrete font-normal">Metadata</span>
+              )}
             </div>
           </div>
           <div id="pfp and handle" className="flex-auto">
@@ -89,28 +108,33 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
             className="flex-auto flex flex-col text-marble-white space-y-5"
           >
             <div className="flex flex-row flex-auto">
-              <div className="flex flex-col flex-1">
+              <div className="flex flex-col flex-1 text-marble-white">
                 <div className="font-bold">
                   <span>Role</span>
                 </div>
-                <div className="text-sm font-normal">
+                <div className="text-xs font-normal flex flex-row">
                   {application?.applicant.data.role ? (
-                    <span>{application?.applicant.data.role}</span>
+                    <span className="text-xs rounded-lg text-eletric-violet bg-[#211831] py-1 px-2">
+                      {application?.applicant.data.role.toUpperCase()}
+                    </span>
                   ) : (
                     <span>N/A</span>
                   )}
                 </div>
               </div>
               <div className="flex flex-col flex-1">
-                <div className="font-bold">
+                <div className="font-bold text-marble-white">
                   <span>Skills</span>
                 </div>
-                <div className="text-sm font-normal">
-                  <div className="flex flex-row space-x-2 overflow-x-scroll">
+                <div className="text-sm font-normal text-neon-carrot">
+                  <div className="flex flex-row space-x-2 overflow-x-scroll text-neon-carrot">
                     {application?.applicant.data.skills.map((skill, index) => {
                       return (
-                        <span key={index} className="text-marble-white">
-                          {skill}
+                        <span
+                          key={index}
+                          className="text-xs rounded-lg text-neon-carrot bg-[#302013] py-1 px-2"
+                        >
+                          {skill.toUpperCase()}
                         </span>
                       )
                     }) || "N/A"}
@@ -118,7 +142,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 </div>
               </div>
             </div>
-            <div className="flex flex-row flex-auto">
+            <div className="flex flex-row flex-auto text-marble-white">
               <div className="flex flex-col flex-1">
                 <div className="font-bold">
                   <span>Contact</span>
@@ -127,11 +151,11 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   <span>@{application?.applicant.data.discordId}</span>
                 </div>
               </div>
-              <div className="flex flex-col flex-1">
+              <div className="flex flex-col flex-1 text-marble-white">
                 <div className="font-bold">
                   <span>Timezone</span>
                 </div>
-                <div className="text-sm font-normal">
+                <div className="text-sm font-normal text-marble-white">
                   <span>{application?.applicant.data.timezone || "N/A"}</span>
                 </div>
               </div>
@@ -193,7 +217,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               </div>
             )}
           </div>
-          {isEndorsable && (
+          {isEndorsable() && (
             <div id="buttons" className="flex-auto flex flex-row content-center justify-center">
               <div className="flex flex-row space-x-3">
                 <div className={`"flex-1 flex "justify-center"`}>
