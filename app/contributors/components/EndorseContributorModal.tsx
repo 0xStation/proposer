@@ -77,7 +77,7 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
   )
 
   return (
-    <Modal title="Endorse" open={isOpen} toggle={setIsOpen}>
+    <Modal title="Endorse" open={isOpen} toggle={setIsOpen} showTitle={true}>
       <div className="mt-8">
         <Form
           onSubmit={async (values) => {

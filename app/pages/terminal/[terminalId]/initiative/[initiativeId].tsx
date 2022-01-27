@@ -136,7 +136,7 @@ const Project: BlitzPage = () => {
 
                   <div className="h-auto mt-3">
                     <Image
-                      src={Newstand}
+                      src={initiative.data.bannerURL || Newstand}
                       alt="Project details banner image."
                       width={766}
                       height={227}
