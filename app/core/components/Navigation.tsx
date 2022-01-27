@@ -54,7 +54,7 @@ const Navigation = () => {
             { name: "twitter", href: "https://twitter.com/0xstation" },
           ]}
         />
-        <div className="flex items-center">
+        <div className="flex items-center border-l border-l-concrete">
           <Map />
           {user ? (
             <Dropdown
