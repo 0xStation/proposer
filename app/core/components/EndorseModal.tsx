@@ -112,7 +112,7 @@ const EndorseModal = ({
     }
 
     // TODO: allowance max should be the issuance of the user
-    if (allowance > 100) {
+    if (allowance < 100) {
       const { data: allowanceData, error: allowanceError } = await approveAllowance({
         args: [TERMINAL.GRAPH_ADDRESS, MAX_ALLOWANCE],
       })

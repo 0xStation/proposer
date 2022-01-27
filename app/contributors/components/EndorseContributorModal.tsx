@@ -185,7 +185,7 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
                   className="mt-1 border border-concrete bg-concrete text-marble-white p-2"
                 />
               </div>
-              {allowance && allowance < 100000 ? (
+              {allowance && allowance > 100 ? (
                 <button
                   type="submit"
                   className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-12 mx-auto block p-1"

@@ -8,6 +8,8 @@ const markClassName =
   "absolute border-[5px] border-solid border-marble-white rounded align-middle bottom-[calc(50%-6px)]"
 
 const Slider = ({ onChange, contributor, disabled }) => {
+  // commenting out the "mark" implementation for now since it's not responsive.
+  // Planning on coming up with a responsive design post-mvp
   return (
     <ReactSlider
       className={horizontalSlider}
@@ -16,11 +18,13 @@ const Slider = ({ onChange, contributor, disabled }) => {
       markClassName={markClassName}
       disabled={disabled}
       step={1}
+      // marks={[1, 50, 100]}
       min={1}
       max={100}
       renderThumb={(props, state) => {
         const { valueNow } = state
         props.style.left = parseFloat(props?.style?.left || "0") * 1.03
+        console.log("this is props.style.left", props.style.left)
         return (
           <div {...props} style={props.style}>
             <p className="text-marble-white text-center text-xs">{contributor.data.handle}</p>
@@ -33,10 +37,10 @@ const Slider = ({ onChange, contributor, disabled }) => {
           </div>
         )
       }}
-      renderMark={(props) => {
-        // override the styling offset that's automatically applied based on the thumb-size
-        return <div {...props} style={{ left: `calc(1.1 * ${props?.style?.left}px` }}></div>
-      }}
+      // renderMark={(props) => {
+      //   // override the styling offset that's automatically applied based on the thumb-size
+      //   return <div {...props} style={{ left: `calc(1.1 * ${props?.style?.left}px` }}></div>
+      // }}
     />
   )
 }
