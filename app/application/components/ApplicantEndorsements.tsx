@@ -4,9 +4,10 @@ import Verified from "/public/check-mark.svg"
 
 type ApplicantEndorsementsProps = {
   person: Account
+  isEndorsable?: boolean
 }
 
-const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({ person }) => {
+const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({ person, isEndorsable }) => {
   return (
     <div>
       <div className="flex-auto border border-concrete">
@@ -40,7 +41,7 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({ person })
             </div>
           </div>
           <div className="flex flex-1 justify-start">
-            <span className="text-concrete text-md text-normal">RAILS</span>
+            {isEndorsable && <span className="text-concrete text-md text-normal">RAILS</span>}
           </div>
         </div>
       </div>

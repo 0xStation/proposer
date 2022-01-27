@@ -37,14 +37,19 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   // const isEndorsable =
   //   tokenBalance && activeUser && activeUser.address !== application?.applicant?.address
   //using this instead of the check above since it renders the component faster
+  let endorable
   const isEndorsable = () => {
     if (activeUser === null || activeUser === undefined) {
+      endorable = false
       return false
     } else if (activeUser.address === application?.applicant?.address) {
+      endorable = false
       return false
     } else if (!tokenBalance) {
+      endorable = false
       return false
     } else {
+      endorable = true
       return true
     }
   }
@@ -186,12 +191,16 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               </div>
             </div>
             <div className="flex flex-col flex-1">
-              <div className="font-bold">
-                <span>Points</span>
-              </div>
-              <div className="text-sm font-normal text-concrete">
-                <span>RAILS</span>
-              </div>
+              {isEndorsable() && (
+                <div>
+                  <div className="font-bold">
+                    <span>Points</span>
+                  </div>
+                  <div className="text-sm font-normal text-concrete">
+                    <span>RAILS</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <div id="endorsers" className="flex-auto flex flex-col space-y-2">
@@ -206,7 +215,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                  } overflow-y-scroll"`}
               >
                 {application.endorsements.map((person, index) => (
-                  <ApplicantEndorsements key={index} person={person} />
+                  <ApplicantEndorsements key={index} person={person} isEndorsable={endorable} />
                 ))}
               </div>
             ) : (
