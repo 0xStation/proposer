@@ -1,5 +1,4 @@
 import { Router } from "blitz"
-import { useEffect } from "react"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
 
