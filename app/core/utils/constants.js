@@ -5,3 +5,5 @@ export const TERMINAL = {
 }
 
 export const DEFAULT_NUMBER_OF_DECIMALS = 6
+
+export const MAX_ALLOWANCE = 100000000000000
