@@ -13,7 +13,6 @@ export type AccountMetadata = {
   timezone: string
   verified: boolean
   role?: string
-  applications?: number[]
 }
 
 export type Account = {

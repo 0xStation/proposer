@@ -51,6 +51,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
       open={isWalletOpen}
       toggle={setIsWalletOpen}
       banner={Banner}
+      showTitle={true}
     >
       <div className="mt-8">
         <div className="flex flex-row space-x-3 mx-5 text-marble-white">
