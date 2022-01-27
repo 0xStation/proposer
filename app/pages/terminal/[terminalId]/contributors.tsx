@@ -15,9 +15,10 @@ const TerminalContributorsPage: BlitzPage = () => {
     contributors = []
   }
 
-  let [endorseModalIsOpen, setEndorseModalIsOpen] = useState(false)
+  let [endorseContributorModalIsOpen, setEndorseContributorModalIsOpen] = useState(false)
   let [selectedUserToEndorse, setSelectedUserToEndorse] = useState<Account | null>(null)
-  const openEndorseModal = () => setEndorseModalIsOpen(!endorseModalIsOpen)
+  const openEndorseContributorModal = () =>
+    setEndorseContributorModalIsOpen(!endorseContributorModalIsOpen)
   const activeUser: Account | null = useStore((state) => state.activeUser)
   const accepted = true
   const endorse = false
@@ -26,8 +27,8 @@ const TerminalContributorsPage: BlitzPage = () => {
       {contributors.length ? (
         <>
           <EndorseContributorModal
-            isOpen={endorseModalIsOpen}
-            setIsOpen={setEndorseModalIsOpen}
+            isOpen={endorseContributorModalIsOpen}
+            setIsOpen={setEndorseContributorModalIsOpen}
             selectedUserToEndorse={selectedUserToEndorse}
           />
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -43,7 +44,7 @@ const TerminalContributorsPage: BlitzPage = () => {
                     contributor={contributor as Account}
                     endorse={endorse}
                     accepted={accepted}
-                    openEndorseModal={openEndorseModal}
+                    openEndorseContributorModal={openEndorseContributorModal}
                     setSelectedUserToEndorse={setSelectedUserToEndorse}
                     activeUser={activeUser}
                   />

@@ -22,7 +22,7 @@ type ContributorCardProps = {
   contributor: Account
   accepted: Boolean
   endorse: Boolean
-  openEndorseModal?: () => void
+  openEndorseContributorModal?: () => void
   setSelectedUserToEndorse?: Dispatch<SetStateAction<Account | null>>
   activeUser?: Account | null
 }
@@ -31,11 +31,11 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
   contributor,
   accepted,
   endorse,
-  openEndorseModal,
+  openEndorseContributorModal,
   setSelectedUserToEndorse,
   activeUser,
 }) => {
-  const isContributorDirectory = openEndorseModal && setSelectedUserToEndorse
+  const isContributorDirectory = openEndorseContributorModal && setSelectedUserToEndorse
   const isWaitingRoom = !accepted
   return (
     <div
@@ -112,7 +112,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
             </div>
           </div>
           {setSelectedUserToEndorse &&
-            openEndorseModal &&
+            openEndorseContributorModal &&
             activeUser?.address !== contributor.address && (
               <div className="flex flex-row align-center justify-center my-2">
                 <button
@@ -120,7 +120,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
                   className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
                   onClick={() => {
                     setSelectedUserToEndorse(contributor)
-                    openEndorseModal()
+                    openEndorseContributorModal()
                   }}
                 >
                   Endorse
@@ -174,7 +174,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
           )}
 
           {setSelectedUserToEndorse &&
-            openEndorseModal &&
+            openEndorseContributorModal &&
             activeUser?.address !== contributor.address && (
               <div className="flex flex-row align-center justify-center my-2">
                 <button
@@ -182,7 +182,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
                   className="border-solid border border-magic-mint text-magic-mint hover:bg-concrete w-full mt-0 mb-2 mx-2 rounded"
                   onClick={() => {
                     setSelectedUserToEndorse(contributor)
-                    openEndorseModal()
+                    openEndorseContributorModal()
                   }}
                 >
                   Endorse

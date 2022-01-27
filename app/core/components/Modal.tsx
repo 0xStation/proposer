@@ -15,13 +15,15 @@ const Modal = ({
   subtitle,
   children,
   banner,
+  error,
 }: {
   title: string
   open: boolean
-  toggle: React.Dispatch<React.SetStateAction<boolean>>
+  toggle: (open) => void
   subtitle?: string
   children?: any
   banner?: any
+  error?: boolean
 }) => {
   return (
     <Transition appear show={open} as={Fragment}>
@@ -52,7 +54,11 @@ const Modal = ({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <div className="inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle transition-all transform bg-tunnel-black border border-marble-white">
+            <div
+              className={`inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle transition-all transform bg-tunnel-black border ${
+                error ? "border-torch-red" : "border-marble-white"
+              }`}
+            >
               <div className="w-full h-full relative">
                 <button
                   className="text-marble-white absolute z-50 left-2 top-2"
