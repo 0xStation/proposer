@@ -3,7 +3,7 @@ import { useAccount } from "wagmi"
 import { Image, useQuery, BlitzPage, useParam, Link, Routes } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import ConnectWalletModal from "app/core/components/ConnectWalletModal"
-import ContributorCard from "../../../../core/components/ContributorCard"
+import { TalentIdentityUnit as ContributorCard } from "app/core/components/TalentIdentityUnit/index"
 import ImageLink from "../../../../core/components/ImageLink"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
 import Newstand from "/public/newstand-banner.png"
@@ -78,14 +78,6 @@ const Project: BlitzPage = () => {
     contributors = []
   } else if (contributors.length > 3) {
     contributors = contributors.slice(0, 3)
-  }
-
-  var settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
   }
 
   if (!initiative) {
@@ -173,16 +165,9 @@ const Project: BlitzPage = () => {
                     <div className="flex flex-row">
                       <span className="flex-1 text-marble-white text-lg">Contributors</span>
                     </div>
-                    <div className="flex flex-row overflow-x-scroll space-x-4">
+                    <div className="grid grid-cols-3 gap-3">
                       {contributors.map((contributor, index) => {
-                        return (
-                          <ContributorCard
-                            key={index}
-                            contributor={contributor as Account}
-                            endorse={endorse}
-                            accepted={accepted}
-                          />
-                        )
+                        return <ContributorCard key={index} user={contributor} />
                       })}
                     </div>
                   </div>

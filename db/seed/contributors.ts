@@ -251,15 +251,20 @@ export async function seedContributors(terminals) {
       terminal: "Station",
     }
 
-    let ticketSVG = genSVG(props)
+    // let ticketSVG = genSVG(props)
 
-    const path = `tickets/station/${contributorData.handle}.svg`
-    const uploadedImageResponse = await uploadToS3(ticketSVG, path)
-    const uploadedImagePath = uploadedImageResponse.Location
+    // const path = `tickets/station/${contributorData.handle}.svg`
+    // const uploadedImageResponse = await uploadToS3(ticketSVG, path)
+    // const uploadedImagePath = uploadedImageResponse.Location
 
     await db.account.update({
       where: { address: props.address },
-      data: { data: { ...(existingAccount.data as {}), ticketImage: uploadedImagePath } },
+      data: {
+        data: {
+          ...(existingAccount.data as {}),
+          // ticketImage: uploadedImagePath,
+        },
+      },
     })
   }
 }
