@@ -37,7 +37,12 @@ const AccountModal = ({
 
   const [createAccountMutation] = useMutation(createAccount, {
     onSuccess: (data) => {
+      setIsOpen(false)
+      console.log(data)
       setActiveUser(data)
+    },
+    onError: (error) => {
+      console.log(error)
     },
   })
 
