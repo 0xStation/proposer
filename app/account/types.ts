@@ -19,4 +19,5 @@ export type Account = {
   id: number
   address: string
   data: AccountMetadata
+  role?: string
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { BlitzPage, useQuery, useParam } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
-import getAllAccounts from "app/account/queries/getAllAccounts"
+import getAccountsByRole from "app/account/queries/getAccountsByRole"
 import ContributorCard from "app/core/components/ContributorCard"
 import { Account } from "app/account/types"
 import EndorseContributorModal from "app/contributors/components/EndorseContributorModal"
@@ -23,7 +23,7 @@ const TerminalContributorsPage: BlitzPage = () => {
 
   const roles = ["STAFF", "COMMUTER", "VISITOR"]
 
-  let [allContributors] = useQuery(getAllAccounts, {}, { suspense: false })
+  let [allContributors] = useQuery(getAccountsByRole, { role: selectedRole }, { suspense: false })
   if (!allContributors) {
     allContributors = []
   }
@@ -43,7 +43,7 @@ const TerminalContributorsPage: BlitzPage = () => {
 
   return (
     <TerminalNavigation>
-      {allContributors.length ? (
+      {allContributors ? (
         <>
           <EndorseContributorModal
             isOpen={endorseModalIsOpen}
@@ -71,26 +71,32 @@ const TerminalContributorsPage: BlitzPage = () => {
                 )
               })}
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {allContributors.length &&
-                allContributors
-                  .filter(
-                    (contributor) =>
-                      typeof contributor.data.ticketId === "number" &&
-                      contributor.data.ticketId >= 0
-                  )
-                  .map((contributor, index) => (
-                    <ContributorCard
-                      key={index}
-                      contributor={contributor as Account}
-                      endorse={endorse}
-                      accepted={accepted}
-                      openEndorseModal={openEndorseModal}
-                      setSelectedUserToEndorse={setSelectedUserToEndorse}
-                      activeUser={activeUser}
-                    />
-                  ))}
-            </div>
+            {allContributors.length ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {allContributors.length &&
+                  allContributors
+                    .filter(
+                      (contributor) =>
+                        typeof contributor.data.ticketId === "number" &&
+                        contributor.data.ticketId >= 0
+                    )
+                    .map((contributor, index) => (
+                      <ContributorCard
+                        key={index}
+                        contributor={contributor as Account}
+                        endorse={endorse}
+                        accepted={accepted}
+                        openEndorseModal={openEndorseModal}
+                        setSelectedUserToEndorse={setSelectedUserToEndorse}
+                        activeUser={activeUser}
+                      />
+                    ))}
+              </div>
+            ) : (
+              <div className="text-marble-white">
+                There are no {selectedRole.toLowerCase()}s in this terminal.
+              </div>
+            )}
           </div>
         </>
       ) : (

@@ -8,7 +8,7 @@ const GetAccountByRole = z.object({
 
 export default async function getAccountByRole(input: z.infer<typeof GetAccountByRole>) {
   const data = GetAccountByRole.parse(input)
-  const accounts = await db.account.findMany({ where: {} })
+  const accounts = await db.account.findMany({ where: { role: data.role } })
 
   if (!accounts) {
     return null

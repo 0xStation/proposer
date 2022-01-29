@@ -19,6 +19,7 @@ model Account {
   pledgedEndorsements ApplicationEndorsement[]
   skills              SkillsOnAccounts[]
   tickets             AccountTerminal[]
+  role                String?
   data                Json?
 }
 
