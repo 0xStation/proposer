@@ -80,14 +80,6 @@ const Project: BlitzPage = () => {
     contributors = contributors.slice(0, 3)
   }
 
-  var settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-  }
-
   if (!initiative) {
     return <Page404 />
   } else {
@@ -175,15 +167,6 @@ const Project: BlitzPage = () => {
                     </div>
                     <div className="grid grid-cols-3 gap-3">
                       {contributors.map((contributor, index) => {
-                        // address: string
-                        // pfpURL?: string
-                        // handle: string
-                        // wallet?: string
-                        // pronouns: string
-                        // role?: string
-                        // points?: number
-                        // onClick?: (e) => void
-                        // dateMetadata?: any
                         return <ContributorCard key={index} user={contributor} />
                       })}
                     </div>
