@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { BlitzPage, useQuery, useParam } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
@@ -10,44 +10,87 @@ import useStore from "app/core/hooks/useStore"
 
 const TerminalContributorsPage: BlitzPage = () => {
   // TODO: get accounts by terminal id
-  let [contributors] = useQuery(getAllAccounts, {}, { suspense: false })
-  if (!contributors) {
-    contributors = []
-  }
 
   let [endorseModalIsOpen, setEndorseModalIsOpen] = useState(false)
   let [selectedUserToEndorse, setSelectedUserToEndorse] = useState<Account | null>(null)
+  let [selectedRole, setRole] = useState("STAFF")
+  let [selectedContributors, setSelectedContributors] = useState<Account[] | null>(null)
   const openEndorseModal = () => setEndorseModalIsOpen(!endorseModalIsOpen)
   const activeUser: Account | null = useStore((state) => state.activeUser)
+
   const accepted = true
   const endorse = false
+
+  const roles = ["STAFF", "COMMUTER", "VISITOR"]
+
+  let [allContributors] = useQuery(getAllAccounts, {}, { suspense: false })
+  if (!allContributors) {
+    allContributors = []
+  }
+
+  // const sorted = (role)=>{
+  //   all
+  //   return ()
+  // }
+
+  useEffect(() => {
+    // if (!allContributors){
+    //   setSelectedContributors(null)
+    // } else {
+    //   const roleContributors =  allContributors.forEach(sorted(selectedRole))
+    // }
+  }, [selectedRole])
+
   return (
     <TerminalNavigation>
-      {contributors.length ? (
+      {allContributors.length ? (
         <>
           <EndorseContributorModal
             isOpen={endorseModalIsOpen}
             setIsOpen={setEndorseModalIsOpen}
             selectedUserToEndorse={selectedUserToEndorse}
           />
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {contributors.length &&
-              contributors
-                .filter(
-                  (contributor) =>
-                    typeof contributor.data.ticketId === "number" && contributor.data.ticketId >= 0
-                )
-                .map((contributor, index) => (
-                  <ContributorCard
+          <div className="flex flex-col space-y-10">
+            <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm space-y-3">
+              {roles.map((role, index) => {
+                return (
+                  <button
                     key={index}
-                    contributor={contributor as Account}
-                    endorse={endorse}
-                    accepted={accepted}
-                    openEndorseModal={openEndorseModal}
-                    setSelectedUserToEndorse={setSelectedUserToEndorse}
-                    activeUser={activeUser}
-                  />
-                ))}
+                    id={role}
+                    onClick={() => {
+                      setRole(role)
+                    }}
+                    className={`${
+                      selectedRole == role && "bg-marble-white text-tunnel-black"
+                    } border border-marble-white rounded-xl h-[29px] ${
+                      selectedRole != role && "border border-marble-white"
+                    } active:bg-marble-white active:text-tunnel-black`}
+                  >
+                    <span className="m-4">{role}</span>
+                  </button>
+                )
+              })}
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {allContributors.length &&
+                allContributors
+                  .filter(
+                    (contributor) =>
+                      typeof contributor.data.ticketId === "number" &&
+                      contributor.data.ticketId >= 0
+                  )
+                  .map((contributor, index) => (
+                    <ContributorCard
+                      key={index}
+                      contributor={contributor as Account}
+                      endorse={endorse}
+                      accepted={accepted}
+                      openEndorseModal={openEndorseModal}
+                      setSelectedUserToEndorse={setSelectedUserToEndorse}
+                      activeUser={activeUser}
+                    />
+                  ))}
+            </div>
           </div>
         </>
       ) : (

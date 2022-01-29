@@ -4,6 +4,7 @@ import { Image } from "blitz"
 import { Dispatch, SetStateAction } from "react"
 import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
+import DiscordIcon from "/public/discord-icon.svg"
 import { Account } from "app/account/types"
 import { useAccount, useBalance } from "wagmi"
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
@@ -67,13 +68,13 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   </button>
                 </div>
               </div>
-              <div className="flex flex-1 justify-end absolute top-1 right-2 z-50">
+              <div className="flex flex-1 justify-end absolute top-2 right-2 z-50">
                 {(application && application.createdAt !== null) || undefined ? (
                   <span className="text-xs text-concrete font-normal">
-                    {application?.createdAt.toDateString}
+                    SUBMITTED ON {application?.createdAt.toDateString}
                   </span>
                 ) : (
-                  <span className="text-xs text-concrete font-normal">Metadata</span>
+                  <span className="text-xs text-concrete font-normal">SUBMITTED ON ...</span>
                 )}
               </div>
             </div>
@@ -118,7 +119,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   <div className="font-bold">
                     <span>Role</span>
                   </div>
-                  <div className="text-xs font-normal flex flex-row">
+                  <div className="text-xs font-normal flex flex-row content-end">
                     {application?.applicant.data.role ? (
                       <span className="text-xs rounded-lg text-eletric-violet bg-[#211831] py-1 px-2">
                         {application?.applicant.data.role.toUpperCase()}
@@ -133,7 +134,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     <span>Skills</span>
                   </div>
                   <div className="text-sm font-normal text-neon-carrot">
-                    <div className="flex flex-row space-x-2 overflow-x-scroll text-neon-carrot">
+                    <div className="flex flex-row space-x-2 overflow-x-scroll text-neon-carrot content-end">
                       {application?.applicant.data.skills.map((skill, index) => {
                         return (
                           <span
@@ -153,8 +154,13 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   <div className="font-bold">
                     <span>Contact</span>
                   </div>
-                  <div className="text-sm font-normal">
-                    <span>@{application?.applicant.data.discordId}</span>
+                  <div className="text-sm font-normal flex flex-row space-x-1">
+                    <div className="flex content-end">
+                      <Image src={DiscordIcon} alt="Discord icon" width={16} height={13} />
+                    </div>
+                    <div className="">
+                      <span>@{application?.applicant.data.discordId}</span>
+                    </div>
                   </div>
                 </div>
                 <div className="flex flex-col flex-1 text-marble-white">

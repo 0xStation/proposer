@@ -318,10 +318,11 @@ const TerminalWaitingPage: BlitzPage = () => {
                       setIniative(initiative.localId)
                     }}
                     className={`${
-                      initiative.localId == selectedInitiative && "bg-marble-white text-concrete"
+                      initiative.localId == selectedInitiative &&
+                      "bg-marble-white text-tunnel-black"
                     } border border-marble-white rounded-xl h-[29px] ${
                       initiative.localId != selectedInitiative && "border border-marble-white"
-                    } active:bg-marble-white active:text-concrete`}
+                    } active:bg-marble-white active:text-tunnel-black`}
                   >
                     <span className="m-4">{initiative.data?.name.toUpperCase()}</span>
                   </button>
