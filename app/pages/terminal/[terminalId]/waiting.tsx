@@ -1,21 +1,19 @@
-import { useQuery, BlitzPage, useParam, Link, Routes } from "blitz"
+import { useQuery, BlitzPage, useParam } from "blitz"
 import { useMemo, useState, useEffect } from "react"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
 import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTerminal"
-import getApplicationsByInitiative from "app/application/queries/getApplicationsByInitiative"
 import { Application } from "app/application/types"
 import ContributorCard from "app/core/components/ContributorCard"
 import { Account } from "app/account/types"
 import { users } from "app/core/utils/data"
 import ApplicantDetailsModal from "app/application/components/ApplicantDetailsModal"
-import { object } from "zod"
 import useStore from "app/core/hooks/useStore"
 import { useAccount } from "wagmi"
-import { request, gql } from "graphql-request"
+import EndorseModal from "app/core/components/EndorseModal"
+import SuccessModal from "app/core/components/SuccessModal"
 
 const date: Date = new Date(1995, 8, 1)
-console.log(JSON.stringify(date.toDateString))
 
 const TerminalWaitingPage: BlitzPage = () => {
   const [{ data: accountData }] = useAccount()
@@ -26,6 +24,8 @@ const TerminalWaitingPage: BlitzPage = () => {
   const terminalId = useParam("terminalId", "number") || 1
   const [selectedInitiative, setSelectedInitiative] = useState<number>()
   const [applications, setApplications] = useState<Application[]>([])
+  const [isEndorseModalOpen, setIsEndorseModalOpen] = useState(false)
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [allApplications, setAllApplications] = useState<Application[]>([])
   const [selected, setSelected] = useState<boolean>(false)
   const [selectedApplicantToView, setSelectedApplicantToView] = useState<number>(0)
@@ -216,6 +216,22 @@ const TerminalWaitingPage: BlitzPage = () => {
     // setApplications(newApplications || [])
   }, [selectedInitiative])
 
+  const contributor = {
+    data: {
+      name: "Mind",
+      handle: "mindapi",
+      address: "0xd32FA3e71737a19eE4CA44334b9f3c52665a6CDB",
+      ticketId: 2, // TODO: remove this when subgraph is ready
+      pronouns: "she/her",
+      skills: [],
+      discord: "mindapi#",
+      verified: true,
+      wallet: "mindapi.eth",
+      role: "STAFF",
+      twitterURL: "https://twitter.com/mindapi_",
+      pfpURL: "https://pbs.twimg.com/profile_images/1466504048006377472/KrC6aPam_400x400.jpg",
+    },
+  }
   const dummyData: Account[] = [
     {
       id: 0,
@@ -292,89 +308,103 @@ const TerminalWaitingPage: BlitzPage = () => {
       {!initiatives || !initiatives.length ? (
         <div>There are no active applications in this terminal.</div>
       ) : (
-        <div>
-          {activeUser?.address ? (
-            <ApplicantDetailsModal
-              application={allApplications[selectedApplicantToView]}
-              isApplicantOpen={isApplicantOpen}
-              setIsApplicantOpen={setIsApplicantOpen}
-              activeUser={activeUser}
-            />
-          ) : (
-            <ApplicantDetailsModal
-              application={allApplications[selectedApplicantToView]}
-              isApplicantOpen={isApplicantOpen}
-              setIsApplicantOpen={setIsApplicantOpen}
-            />
-          )}
+        <>
+          <EndorseModal
+            isEndorseModalOpen={isEndorseModalOpen}
+            setIsEndorseModalOpen={setIsEndorseModalOpen}
+            setIsSuccessModalOpen={setIsSuccessModalOpen}
+            selectedUserToEndorse={contributor}
+          />
+          <SuccessModal
+            isSuccessModalOpen={isSuccessModalOpen}
+            setIsSuccessModalOpen={setIsSuccessModalOpen}
+            selectedUserToEndorse={contributor}
+          />
+          <div>
+            {activeUser?.address ? (
+              <ApplicantDetailsModal
+                application={allApplications[selectedApplicantToView]}
+                isApplicantOpen={isApplicantOpen}
+                setIsApplicantOpen={setIsApplicantOpen}
+                activeUser={activeUser}
+              />
+            ) : (
+              <ApplicantDetailsModal
+                application={allApplications[selectedApplicantToView]}
+                isApplicantOpen={isApplicantOpen}
+                setIsApplicantOpen={setIsApplicantOpen}
+              />
+            )}
 
-          <div className="flex flex-col space-y-10">
-            <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm space-y-3">
-              {initiatives.map((initiative) => {
-                return (
-                  <button
-                    key={initiative.localId}
-                    onClick={() => {
-                      setIniative(initiative.localId)
-                    }}
-                    className={`${
-                      initiative.localId == selectedInitiative &&
-                      "bg-marble-white text-tunnel-black"
-                    } border border-marble-white rounded-xl h-[29px] ${
-                      initiative.localId != selectedInitiative && "border border-marble-white"
-                    } active:bg-marble-white active:text-tunnel-black`}
-                  >
-                    <span className="m-4">{initiative.data?.name.toUpperCase()}</span>
-                  </button>
-                )
-              })}
-              {!selected && preSet()}
-            </div>
-            <div className="flex-auto text-marble-white">
-              {!allApplications || !allApplications.length ? (
-                <div>
-                  {selected ? (
-                    <div>There are no active applications for this initiative.</div>
-                  ) : (
-                    <div>Please select an initiative to view applications.</div>
-                  )}
-                </div>
-              ) : (
-                //We'll actually be using this once we have application seed data in the backend
-                // <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4" onClick={() => {}}>
-                //   {applications.map((application, index) => (
-                //     <ContributorCard
-                //       key={index}
-                //       contributor={application.applicant as Account}
-                //       endorse={endorseAbility}
-                //       accepted={accepted}
-                //       openApplicantModal={openApplicantModal}
-                //       setSelectedApplicantToView={setSelectedApplicantToView}
-                //     />
-                //   ))}
-                // </div>
-                //Currently using this to style the component
-                <div>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {allApplications.map((application, index) => (
-                      <ContributorCard
-                        key={index}
-                        value={index}
-                        contributor={application.applicant as Account}
-                        endorse={endorseAbility}
-                        accepted={accepted}
-                        openApplicantModal={openApplicantModal}
-                        setSelectedApplicantToView={setSelectedApplicantToView}
-                        activeUser={activeUser}
-                        application={application}
-                      />
-                    ))}
+            <div className="flex flex-col space-y-10">
+              <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm space-y-3">
+                {initiatives.map((initiative) => {
+                  return (
+                    <button
+                      key={initiative.localId}
+                      onClick={() => {
+                        setIniative(initiative.localId)
+                      }}
+                      className={`${
+                        initiative.localId == selectedInitiative &&
+                        "bg-marble-white text-tunnel-black"
+                      } border border-marble-white rounded-xl h-[29px] ${
+                        initiative.localId != selectedInitiative && "border border-marble-white"
+                      } active:bg-marble-white active:text-tunnel-black`}
+                    >
+                      <span className="m-4">{initiative.data?.name.toUpperCase()}</span>
+                    </button>
+                  )
+                })}
+                {!selected && preSet()}
+              </div>
+              <div className="flex-auto text-marble-white">
+                {!allApplications || !allApplications.length ? (
+                  <div>
+                    {selected ? (
+                      <div>There are no active applications for this initiative.</div>
+                    ) : (
+                      <div>Please select an initiative to view applications.</div>
+                    )}
                   </div>
-                </div>
-              )}
+                ) : (
+                  //We'll actually be using this once we have application seed data in the backend
+                  // <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4" onClick={() => {}}>
+                  //   {applications.map((application, index) => (
+                  //     <ContributorCard
+                  //       key={index}
+                  //       contributor={application.applicant as Account}
+                  //       endorse={endorseAbility}
+                  //       accepted={accepted}
+                  //       openApplicantModal={openApplicantModal}
+                  //       setSelectedApplicantToView={setSelectedApplicantToView}
+                  //     />
+                  //   ))}
+                  // </div>
+                  //Currently using this to style the component
+                  <div>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {allApplications.map((application, index) => (
+                        <ContributorCard
+                          key={index}
+                          value={index}
+                          contributor={application.applicant as Account}
+                          endorse={endorseAbility}
+                          accepted={accepted}
+                          openApplicantModal={openApplicantModal}
+                          setSelectedApplicantToView={setSelectedApplicantToView}
+                          activeUser={activeUser}
+                          application={application}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+          <div />
+        </>
       )}
     </TerminalNavigation>
   )

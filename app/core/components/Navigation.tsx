@@ -62,12 +62,20 @@ const Navigation = () => {
               className="p-4 pr-0 border-l border-l-concrete"
               button={
                 <div className="flex items-center">
-                  <span className="w-7 h-7 rounded-full bg-concrete border border-marble-white mr-2"></span>
+                  {user?.data?.pfpURL ? (
+                    <img
+                      src={user?.data.pfpURL}
+                      alt="PFP"
+                      className="w-7 h-7 border border-marble-white rounded-full mr-2"
+                    />
+                  ) : (
+                    <span className="w-7 h-7 rounded-full bg-concrete border border-marble-white mr-2"></span>
+                  )}
                   <span>{accountData?.ens?.name || user?.data?.handle || "Handle"}</span>
                 </div>
               }
               items={[
-                { name: "profile", href: "/newstand" },
+                { name: "profile", href: "/profile" },
                 {
                   name: "disconnect",
                   onClick: disconnect,

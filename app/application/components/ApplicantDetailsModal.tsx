@@ -121,7 +121,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   </div>
                   <div className="text-xs font-normal flex flex-row content-end">
                     {application?.applicant.data.role ? (
-                      <span className="text-xs rounded-lg text-eletric-violet bg-[#211831] py-1 px-2">
+                      <span className="text-xs rounded-lg text-electric-violet bg-[#211831] py-1 px-2">
                         {application?.applicant.data.role.toUpperCase()}
                       </span>
                     ) : (

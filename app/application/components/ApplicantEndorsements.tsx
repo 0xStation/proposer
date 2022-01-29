@@ -42,7 +42,7 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({ person, i
           </div>
           <div className="flex flex-1 justify-center content-center">
             {person && (
-              <span className="text-xs rounded-lg text-eletric-violet bg-[#211831] py-1 m-2 px-2">
+              <span className="text-xs rounded-lg text-electric-violet bg-[#211831] py-1 m-2 px-2">
                 {person.data.role?.toUpperCase()}
               </span>
             )}
