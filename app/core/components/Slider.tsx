@@ -24,7 +24,6 @@ const Slider = ({ onChange, contributor, disabled }) => {
       renderThumb={(props, state) => {
         const { valueNow } = state
         props.style.left = parseFloat(props?.style?.left || "0") * 1.03
-        console.log("this is props.style.left", props.style.left)
         return (
           <div {...props} style={props.style}>
             <p className="text-marble-white text-center text-xs">{contributor.data.handle}</p>

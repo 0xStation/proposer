@@ -1,12 +1,34 @@
 import { Loader } from "./Loader"
-export const Button = ({ onClick, className, children, loading, disabled }) => (
-  <button
-    disabled={disabled}
-    onClick={onClick}
-    className={`bg-magic-mint text-tunnel-black rounded mt-8 mx-auto block p-1 ${className}`}
-  >
-    {loading ? <Loader /> : children}
-  </button>
-)
+
+type ButtonProps = {
+  onClick: (e) => void
+  secondary?: boolean
+  className?: string
+  children?: any
+  loading?: boolean
+  disabled?: boolean
+}
+export const Button = ({
+  onClick,
+  secondary = false,
+  className,
+  children,
+  loading = false,
+  disabled = false,
+}: ButtonProps) => {
+  const primaryStyling = "bg-magic-mint text-tunnel-black"
+  const secondaryStyling = "border-solid border border-magic-mint text-magic-mint hover:bg-concrete"
+  const buttonStyling = secondary ? secondaryStyling : primaryStyling
+
+  return (
+    <button
+      disabled={disabled}
+      onClick={onClick}
+      className={`${buttonStyling} rounded mx-auto block p-1 ${className}`}
+    >
+      {loading ? <Loader /> : children}
+    </button>
+  )
+}
 
 export default Button

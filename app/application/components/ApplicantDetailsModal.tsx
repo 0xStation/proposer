@@ -9,6 +9,7 @@ import { useAccount, useBalance } from "wagmi"
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
 import ApplicantEndorsements from "./ApplicantEndorsements"
+import useStore from "app/core/hooks/useStore"
 
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
@@ -21,8 +22,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   application,
   isApplicantOpen,
   setIsApplicantOpen,
-  activeUser,
 }) => {
+  const activeUser: Account | null = useStore((state) => state.activeUser)
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
   const [{ data: balanceData }] = useBalance({
     addressOrName: activeUser?.address,
