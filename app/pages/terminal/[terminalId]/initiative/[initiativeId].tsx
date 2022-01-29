@@ -3,7 +3,7 @@ import { useAccount } from "wagmi"
 import { Image, useQuery, BlitzPage, useParam, Link, Routes } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import ConnectWalletModal from "app/core/components/ConnectWalletModal"
-import ContributorCard from "../../../../core/components/ContributorCard"
+import { TalentIdentityUnit as ContributorCard } from "app/core/components/TalentIdentityUnit/index"
 import ImageLink from "../../../../core/components/ImageLink"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
 import Newstand from "/public/newstand-banner.png"
@@ -174,20 +174,12 @@ const Project: BlitzPage = () => {
                     <div className="flex flex-row">
                       <span className="flex-1 text-marble-white text-lg">Contributors</span>
                     </div>
-                    {/* <div className="flex flex-row overflow-x-scroll space-x-4">
-
-                      {contributors.map((contributor, index) => {
-                        return (
-                          <ContributorCard
-                            key={index}
-                            contributor={contributor as Account}
-                            endorse={endorse}
-                            accepted={accepted}
-                          />
-                        )
+                    <div className="grid grid-cols-3 gap-3">
+                      {results.map((contributor, index) => {
+                        return <ContributorCard key={index} user={contributor} />
                       })}
-                    </div> */}
-                    <div className="mt-4 grid gap-4 grid-cols-3">
+                    </div>
+                    {/* <div className="mt-4 grid gap-4 grid-cols-3">
                       {results.map((contributor, index) => {
                         return (
                           // <div
@@ -210,132 +202,131 @@ const Project: BlitzPage = () => {
                             accepted={accepted}
                           />
                         )
-                      })}
-                    </div>
-                    <div className="flex flex-row">
-                      <div className="flex-1 flex justify-start">
-                        {hasPrev && (
-                          <div
-                            onClick={() => setPage(page - 1)}
-                            className="cursor-pointer flex justify-self-start rotate-180"
+                      })} */}
+                  </div>
+                  <div className="flex flex-row mt-4">
+                    <div className="flex-1 flex justify-start">
+                      {hasPrev && (
+                        <div
+                          onClick={() => setPage(page - 1)}
+                          className="cursor-pointer flex justify-self-start rotate-180"
+                        >
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 12 12"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
-                            <svg
-                              width="12"
-                              height="12"
-                              viewBox="0 0 12 12"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                clipRule="evenodd"
-                                d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
-                                fill="#F2EFEF"
-                              />
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex flex-row justify-center">
-                          {[...Array(totalPages)].map((_, idx) => {
-                            return (
-                              <span
-                                key={idx}
-                                className={`h-1 w-1  rounded-full mr-1 ${
-                                  page === idx ? "bg-marble-white" : "bg-concrete"
-                                }`}
-                              ></span>
-                            )
-                          })}
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
+                              fill="#F2EFEF"
+                            />
+                          </svg>
                         </div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex flex-row justify-center">
+                        {[...Array(totalPages)].map((_, idx) => {
+                          return (
+                            <span
+                              key={idx}
+                              className={`h-1 w-1  rounded-full mr-1 ${
+                                page === idx ? "bg-marble-white" : "bg-concrete"
+                              }`}
+                            ></span>
+                          )
+                        })}
                       </div>
-                      <div className="flex-1 flex justify-end">
-                        {hasNext && (
-                          <div
-                            onClick={() => setPage(page + 1)}
-                            className="cursor-pointer flex justify-self-end"
+                    </div>
+                    <div className="flex-1 flex justify-end">
+                      {hasNext && (
+                        <div
+                          onClick={() => setPage(page + 1)}
+                          className="cursor-pointer flex justify-self-end"
+                        >
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 12 12"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
-                            <svg
-                              width="12"
-                              height="12"
-                              viewBox="0 0 12 12"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                clipRule="evenodd"
-                                d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
-                                fill="#F2EFEF"
-                              />
-                            </svg>
-                          </div>
-                        )}
-                      </div>
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
+                              fill="#F2EFEF"
+                            />
+                          </svg>
+                        </div>
+                      )}
                     </div>
                   </div>
+                </div>
 
-                  <div className="flex flex-col text-marble-white my-8 space-y-5">
-                    <div>
-                      <span className="text-lg">Whats next?</span>
+                <div className="flex flex-col text-marble-white my-8 space-y-5">
+                  <div>
+                    <span className="text-lg">Whats next?</span>
+                  </div>
+                  <div className="flex flex-row space-x-4">
+                    <div className="flex-1 space-y-4">
+                      <div>
+                        <Image src={StepOne} alt="Step one." width={24} height={24} />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <span className="font-bold">Submit interest</span>
+                        <div>
+                          <span className="text-sm">
+                            Share a little bit about yourself, your best work, and your pitch.
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex flex-row space-x-4">
-                      <div className="flex-1 space-y-4">
+                    <div className="flex-1 space-y-4">
+                      <div>
+                        <Image src={StepTwo} alt="Step two." width={24} height={24} />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <span className="font-bold">Gather endorsements</span>
                         <div>
-                          <Image src={StepOne} alt="Step one." width={24} height={24} />
-                        </div>
-                        <div className="flex-1 space-y-2">
-                          <span className="font-bold">Submit interest</span>
-                          <div>
-                            <span className="text-sm">
-                              Share a little bit about yourself, your best work, and your pitch.
-                            </span>
-                          </div>
+                          <span className="text-sm">
+                            Trust us, endorsements from contributors help. Reach out to get to know
+                            them.
+                          </span>
                         </div>
                       </div>
-                      <div className="flex-1 space-y-4">
-                        <div>
-                          <Image src={StepTwo} alt="Step two." width={24} height={24} />
-                        </div>
-                        <div className="flex-1 space-y-2">
-                          <span className="font-bold">Gather endorsements</span>
-                          <div>
-                            <span className="text-sm">
-                              Trust us, endorsements from contributors help. Reach out to get to
-                              know them.
-                            </span>
-                          </div>
-                        </div>
+                    </div>
+                    <div className="flex-1 space-y-4">
+                      <div>
+                        <Image src={StepThree} alt="Step three." width={24} height={24} />
                       </div>
-                      <div className="flex-1 space-y-4">
+                      <div className="flex-1 space-y-2">
+                        <span className="font-bold">Start contributing</span>
                         <div>
-                          <Image src={StepThree} alt="Step three." width={24} height={24} />
-                        </div>
-                        <div className="flex-1 space-y-2">
-                          <span className="font-bold">Start contributing</span>
-                          <div>
-                            <span className="text-sm">
-                              If selected, a team member will reach out to partner with you to
-                              amplify your unique perspective.
-                            </span>
-                          </div>
+                          <span className="text-sm">
+                            If selected, a team member will reach out to partner with you to amplify
+                            your unique perspective.
+                          </span>
                         </div>
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  <div className="flex justify-center items-center">
-                    <button
-                      className="mt-4 py-2 text-center text-sm bg-magic-mint rounded item-center w-[280px]"
-                      onClick={() => {
-                        setUserTrigged(true)
-                        setActiveModal()
-                      }}
-                    >
-                      Submit interest
-                    </button>
-                  </div>
+                <div className="flex justify-center items-center">
+                  <button
+                    className="mt-4 py-2 text-center text-sm bg-magic-mint rounded item-center w-[280px]"
+                    onClick={() => {
+                      setUserTrigged(true)
+                      setActiveModal()
+                    }}
+                  >
+                    Submit interest
+                  </button>
                 </div>
               </div>
             </div>

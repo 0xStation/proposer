@@ -6,11 +6,11 @@ import getAccountsByRole from "app/account/queries/getAccountsByRole"
 import ContributorCard from "app/core/components/ContributorCard"
 import { Account } from "app/account/types"
 import EndorseContributorModal from "app/contributors/components/EndorseContributorModal"
+import { Pill } from "app/core/components/Pill"
 import useStore from "app/core/hooks/useStore"
+import { TalentIdentityUnit as ApplicationCard } from "app/core/components/TalentIdentityUnit/index"
 
 const TerminalContributorsPage: BlitzPage = () => {
-  // TODO: get accounts by terminal id
-
   let [endorseModalIsOpen, setEndorseModalIsOpen] = useState(false)
   let [selectedUserToEndorse, setSelectedUserToEndorse] = useState<Account | null>(null)
   let [selectedRole, setRole] = useState("STAFF")
@@ -28,19 +28,6 @@ const TerminalContributorsPage: BlitzPage = () => {
     contributors = []
   }
 
-  // const sorted = (role)=>{
-  //   all
-  //   return ()
-  // }
-
-  useEffect(() => {
-    // if (!allContributors){
-    //   setSelectedContributors(null)
-    // } else {
-    //   const roleContributors =  allContributors.forEach(sorted(selectedRole))
-    // }
-  }, [selectedRole])
-
   return (
     <TerminalNavigation>
       {contributors ? (
@@ -54,20 +41,15 @@ const TerminalContributorsPage: BlitzPage = () => {
             <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm space-y-3">
               {roles.map((role, index) => {
                 return (
-                  <button
-                    key={index}
-                    id={role}
+                  <Pill
+                    key={index.toString()}
+                    active={selectedRole == role}
                     onClick={() => {
                       setRole(role)
                     }}
-                    className={`${
-                      selectedRole == role && "bg-marble-white text-tunnel-black"
-                    } border border-marble-white rounded-xl h-[29px] ${
-                      selectedRole != role && "border border-marble-white"
-                    } active:bg-marble-white active:text-tunnel-black`}
                   >
                     <span className="m-4">{role}</span>
-                  </button>
+                  </Pill>
                 )
               })}
             </div>
