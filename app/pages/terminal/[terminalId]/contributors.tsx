@@ -23,9 +23,9 @@ const TerminalContributorsPage: BlitzPage = () => {
 
   const roles = ["STAFF", "COMMUTER", "VISITOR"]
 
-  let [allContributors] = useQuery(getAccountsByRole, { role: selectedRole }, { suspense: false })
-  if (!allContributors) {
-    allContributors = []
+  let [contributors] = useQuery(getAccountsByRole, { role: selectedRole }, { suspense: false })
+  if (!contributors) {
+    contributors = []
   }
 
   // const sorted = (role)=>{
@@ -43,7 +43,7 @@ const TerminalContributorsPage: BlitzPage = () => {
 
   return (
     <TerminalNavigation>
-      {allContributors ? (
+      {contributors ? (
         <>
           <EndorseContributorModal
             isOpen={endorseModalIsOpen}
@@ -71,10 +71,10 @@ const TerminalContributorsPage: BlitzPage = () => {
                 )
               })}
             </div>
-            {allContributors.length ? (
+            {contributors.length ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {allContributors.length &&
-                  allContributors
+                {contributors.length &&
+                  contributors
                     .filter(
                       (contributor) =>
                         typeof contributor.data.ticketId === "number" &&
