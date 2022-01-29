@@ -1,7 +1,7 @@
 import { Account } from "app/account/types"
 import { Initiative } from "app/initiative/types"
-export type ApplicationMetaData = {
-  entryDesription?: string
+export type ApplicationMetadata = {
+  entryDescription?: string
   url?: string
 }
 export type Application = {
@@ -11,7 +11,7 @@ export type Application = {
   initiative: Initiative
   initiativeId: number
   points: number
-  data: ApplicationMetaData
+  data: ApplicationMetadata
   endorsements: Account[] // this data field is here just for visualizing dummy data while designing waiting room
   createdAt: Date
 }

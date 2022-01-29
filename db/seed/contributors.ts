@@ -235,7 +235,7 @@ export async function seedContributors(terminals) {
               active: true,
               terminal: {
                 connect: {
-                  id: terminals.Station.id,
+                  id: terminals.station.id,
                 },
               },
             },
@@ -260,14 +260,14 @@ export async function seedContributors(terminals) {
     // const uploadedImageResponse = await uploadToS3(ticketSVG, path)
     // const uploadedImagePath = uploadedImageResponse.Location
 
-    await db.account.update({
-      where: { address: props.address },
-      data: {
-        data: {
-          ...(existingAccount.data as {}),
-          // ticketImage: uploadedImagePath,
-        },
-      },
-    })
+    // await db.account.update({
+    //   where: { address: props.address },
+    //   data: {
+    //     data: {
+    //       ...(existingAccount.data as {}),
+    //       // ticketImage: uploadedImagePath
+    //     },
+    //   },
+    // })
   }
 }

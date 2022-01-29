@@ -30,7 +30,7 @@ export async function seedTerminals() {
       },
     })) as Terminal
 
-    terminals[updatedTerminal.data.name] = updatedTerminal
+    terminals[updatedTerminal.data.handle] = updatedTerminal
   }
   console.log(`Updated terminals`)
   return terminals

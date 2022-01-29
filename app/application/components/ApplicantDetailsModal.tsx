@@ -178,7 +178,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               </div>
               <div>
                 <p className="text-marble-white font-normal text-base">
-                  {application?.data?.entryDesription || "N/A"}
+                  {application?.data?.entryDescription || "N/A"}
                 </p>
               </div>
             </div>

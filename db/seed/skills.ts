@@ -1,10 +1,14 @@
 import db from "../index"
 
 export async function seedSkills() {
-  const skills = await db.skill.createMany({
-    data: [{ name: "Javascript" }, { name: "React" }, { name: "Figma" }, { name: "Storytelling" }],
-  })
-
+  const skills = ["Javascript", "React", "Figm", "Storytelling"]
   console.log(skills)
-  console.log("creating skills")
+
+  for (const s in skills) {
+    db.skill.upsert({
+      where: { name: s },
+      create: { name: s },
+      update: { name: s },
+    })
+  }
 }
