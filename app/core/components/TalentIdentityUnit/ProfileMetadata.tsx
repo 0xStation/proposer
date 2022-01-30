@@ -4,7 +4,7 @@ import Verified from "/public/check-mark.svg"
 type ProfileMetadataProps = {
   address: string
   pfpURL?: string
-  handle: string
+  handle?: string
   wallet?: string
   pronouns?: string
   verified?: boolean
@@ -12,7 +12,6 @@ type ProfileMetadataProps = {
 
 export const ProfileMetadata = ({
   pfpURL,
-  handle,
   wallet,
   address,
   pronouns,
@@ -39,7 +38,7 @@ export const ProfileMetadata = ({
       <div className="flex-2/5 content-center align-middle mr-1">{profileImage}</div>
       <div className="flex flex-col flex-1 content-center">
         <div className="flex flex-row items-center flex-1 space-x-1">
-          <div className="text-lg">{handle}</div>
+          <div className="text-lg">{address}</div>
           {verified && (
             <div className="m-auto">
               <Image src={Verified} alt="Verified icon." width={10} height={10} />

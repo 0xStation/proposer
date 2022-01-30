@@ -46,7 +46,7 @@ const Navigation = () => {
     if (address) {
       getUserAccount(address)
     }
-  }, [address, getUserAccount])
+  }, [address])
 
   return (
     <>

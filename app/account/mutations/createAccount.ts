@@ -3,7 +3,6 @@ import * as z from "zod"
 import { Account } from "../types"
 
 const CreateAccount = z.object({
-  handle: z.string(),
   discordId: z.string(),
   pronouns: z.string(),
   timezone: z.string(),
@@ -23,7 +22,6 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
   const payload = {
     address: params.address,
     data: {
-      handle: params.handle,
       discordId: params.discordId,
       pronouns: params.pronouns,
       timezone: params.timezone,

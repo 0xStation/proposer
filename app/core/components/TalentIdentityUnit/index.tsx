@@ -16,7 +16,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
 
   const {
     address,
-    data: { pfpURL, handle, wallet, pronouns, role },
+    data: { pfpURL, wallet, pronouns, role },
   } = user
 
   const railPoints = typeof points === "number" && (
@@ -67,7 +67,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
 
   return (
     <Card onClick={onClick}>
-      <ProfileMetadata {...{ pfpURL, handle, wallet, pronouns, role, address }} />
+      <ProfileMetadata {...{ pfpURL, wallet, pronouns, role, address }} />
       <div className="flex flex-row flex-1 mx-3">
         <div className="flex-1 items-center justify-center text-base">
           <div className="place-self-center mt-1 font-bold">Role</div>
