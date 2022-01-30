@@ -50,7 +50,7 @@ const Navigation = () => {
           items={[
             { name: "newstand", href: "https://station.mirror.xyz/" },
             { name: "contact the staff", href: "mailto:staff@station.express" },
-            { name: "discord", href: "https://discord.gg/pJEFvQ3w9w" },
+            { name: "support", href: "https://6vdcjqzyfj3.typeform.com/to/kTlOjkdT" },
             { name: "twitter", href: "https://twitter.com/0xstation" },
           ]}
         />
