@@ -58,15 +58,15 @@ const Navigation = ({ children }: { children?: any }) => {
               </div>
               <div className="flex flex-col">
                 <h1 className="text-2xl text-marble-white">{terminal.data.name}</h1>
-                <span className="text-sm text-concrete">@{terminal.data.handle}</span>
+                <span className="text-base text-concrete">@{terminal.data.handle}</span>
               </div>
             </div>
-            <h3 className="text-marble-white text-sm mt-6">{terminal.data.description}</h3>
+            <h3 className="text-marble-white text-base mt-6">{terminal.data.description}</h3>
             <ul className="mt-9 text-lg">
               <li
                 className={`${
                   router.pathname === Routes.TerminalInitiativePage({ terminalHandle }).pathname
-                    ? "text-marble-white"
+                    ? "text-marble-white font-bold"
                     : "text-concrete"
                 } cursor-pointer hover:text-marble-white`}
               >
@@ -77,7 +77,7 @@ const Navigation = ({ children }: { children?: any }) => {
               <li
                 className={`${
                   router.pathname === Routes.TerminalContributorsPage({ terminalHandle }).pathname
-                    ? "text-marble-white"
+                    ? "text-marble-white font-bold"
                     : "text-concrete"
                 } cursor-pointer hover:text-marble-white`}
               >
@@ -88,7 +88,7 @@ const Navigation = ({ children }: { children?: any }) => {
               <li
                 className={`${
                   router.pathname === Routes.TerminalWaitingPage({ terminalHandle }).pathname
-                    ? "text-marble-white"
+                    ? "text-marble-white font-bold"
                     : "text-concrete"
                 } cursor-pointer hover:text-marble-white`}
               >

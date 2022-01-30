@@ -117,7 +117,7 @@ const AccountModal = ({
                   ) : (
                     <div
                       {...getRootProps()}
-                      className="text-sm text-concrete bg-wet-concrete border border-dotted border-concrete p-4 text-center"
+                      className="text-base text-concrete bg-wet-concrete border border-dotted border-concrete p-4 text-center"
                     >
                       <input {...getInputProps()} />
                       {isDragActive ? (

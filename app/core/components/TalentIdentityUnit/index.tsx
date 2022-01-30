@@ -21,10 +21,10 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
 
   const railPoints = typeof points === "number" && (
     <div className="flex flex-row flex-1 mx-3">
-      <div className="flex-1 items-center justify-center text-sm">
+      <div className="flex-1 items-center justify-center text-base">
         <div className="place-self-center mt-1 font-bold">Points</div>
       </div>
-      <div className="flex flex-1 align-right place-content-end content-right text-sm">
+      <div className="flex flex-1 align-right place-content-end content-right text-base">
         {points} RAIL
       </div>
     </div>
@@ -58,7 +58,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
     }
     dateMetadata = (
       <div className="flex flex-row flex-1 mx-3 mt-3.5">
-        <div className="flex-1 items-center justify-center text-xs text-concrete">
+        <div className="flex-1 items-center justify-center text-base text-concrete">
           {dateMetadataMessage}
         </div>
       </div>
@@ -69,19 +69,19 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
     <Card onClick={onClick}>
       <ProfileMetadata {...{ pfpURL, handle, wallet, pronouns, role, address }} />
       <div className="flex flex-row flex-1 mx-3">
-        <div className="flex-1 items-center justify-center text-sm">
+        <div className="flex-1 items-center justify-center text-base">
           <div className="place-self-center mt-1 font-bold">Role</div>
         </div>
-        <div className="flex flex-1 align-right place-content-end content-right text-sm">
+        <div className="flex flex-1 align-right place-content-end content-right text-base">
           <RoleTag role={role} />
         </div>
       </div>
       <div className="flex flex-row flex-1 mx-3 my-2">
-        <div className="flex-1 items-center justify-center text-sm">
+        <div className="flex-1 items-center justify-center text-base">
           <div className="place-self-center font-bold">Endorsers</div>
         </div>
         {/* TODO: make endorsers dynamic */}
-        <div className="flex flex-1 align-right place-content-end content-right text-sm">
+        <div className="flex flex-1 align-right place-content-end content-right text-base">
           <div className="flex flex-row">
             <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block"></span>
             <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block ml-[-5px]"></span>

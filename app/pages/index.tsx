@@ -14,18 +14,18 @@ const Home: BlitzPage = () => {
 
   const ConnectView = (
     <div className="flex items-center h-full ml-40">
-      <div className="bg-tunnel-black border border-marble-white p-4 w-128">
+      <div className="bg-tunnel-black border border-marble-white pt-10 px-5 pb-5 w-128">
         <h3 className="text-marble-white text-3xl">Welcome to Station</h3>
-        <p className="text-marble-white text-sm mt-4">
+        <p className="text-marble-white text-base mt-4">
           This is where contributors come together and discover and participate in some of the most
           exciting communities in Web3.
         </p>
-        <p className="text-marble-white text-sm mt-4">Join the ride.</p>
+        <p className="text-marble-white text-base mt-4">Join the ride.</p>
         <button
-          className="mt-4 w-full py-2 text-center text-sm bg-magic-mint rounded"
+          className="mt-4 w-full py-2 text-center text-base bg-magic-mint rounded"
           onClick={() => redirectToTerminal()}
         >
-          Explore Terminals
+          Enter Station
         </button>
       </div>
     </div>

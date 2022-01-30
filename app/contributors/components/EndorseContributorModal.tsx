@@ -118,12 +118,14 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
           }}
           render={({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>
-              <div className="flex items-center justify-center text-torch-red text-sm">{error}</div>
+              <div className="flex items-center justify-center text-torch-red text-base">
+                {error}
+              </div>
               <div className="flex flex-row flex-1">
-                <div className="flex-1 items-center justify-center text-marble-white text-sm">
+                <div className="flex-1 items-center justify-center text-marble-white text-base">
                   Contributor
                 </div>
-                <div className="flex flex-1 align-right place-content-end content-right text-marble-white text-sm">
+                <div className="flex flex-1 align-right place-content-end content-right text-marble-white text-base">
                   {contributorData.pfpURL ? (
                     <img
                       src={contributor.data.pfpURL}
@@ -138,10 +140,10 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
                 </div>
               </div>
               <div className="flex flex-row flex-1">
-                <div className="flex-1 items-center justify-center text-marble-white text-sm">
+                <div className="flex-1 items-center justify-center text-marble-white text-base">
                   Your Endorsement Budget
                 </div>
-                <div className="flex flex-1 align-right place-content-end content-right text-marble-white text-sm">
+                <div className="flex flex-1 align-right place-content-end content-right text-marble-white text-base">
                   {tokenBalance === undefined || isNaN(tokenBalance) ? (
                     <span className="text-torch-red">
                       Please disconnect and reconnect your wallet
