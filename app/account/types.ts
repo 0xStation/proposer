@@ -20,4 +20,8 @@ export type Account = {
   id: number
   address: string
   data: AccountMetadata
+  role?: string
+  points?: number
+  joinedAt?: Date
+  initiatives?: []
 }

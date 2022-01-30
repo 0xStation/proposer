@@ -40,8 +40,15 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({ person, i
               </div>
             </div>
           </div>
-          <div className="flex flex-1 justify-start">
-            {isEndorsable && <span className="text-concrete text-md text-normal">RAILS</span>}
+          <div className="flex flex-1 justify-center content-center">
+            {person && (
+              <span className="text-xs rounded-lg text-electric-violet bg-[#211831] py-1 m-2 px-2">
+                {person.data.role?.toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-1 content-center justify-center">
+            {isEndorsable && <span className="text-concrete text-md text-normal m-2">RAILS</span>}
           </div>
         </div>
       </div>

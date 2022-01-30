@@ -68,7 +68,7 @@ const apps = {
       id: 0,
       applicant: dummyData[0] as Account,
       applicantId: 0,
-      points: 71230,
+      points: 45,
       initiative: {
         id: 0,
         terminalId: 0,

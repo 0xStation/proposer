@@ -217,13 +217,16 @@ export const contributors = {
 
 export async function seedContributors(terminals) {
   for (const name in contributors) {
-    const contributorData = contributors[name] as AccountMetadata & { address: string }
+    const contributorData = contributors[name] as AccountMetadata & {
+      address: string
+    }
 
     const existingAccount = await db.account.upsert({
       where: { address: contributorData!.address },
       create: {
         address: contributorData!.address,
         data: contributorData,
+        role: contributorData.role,
         tickets: {
           create: [
             {

@@ -4,6 +4,7 @@ import { Image } from "blitz"
 import { Dispatch, SetStateAction } from "react"
 import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
+import DiscordIcon from "/public/discord-icon.svg"
 import { Account } from "app/account/types"
 import { useAccount, useBalance } from "wagmi"
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
@@ -68,13 +69,13 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   </button>
                 </div>
               </div>
-              <div className="flex flex-1 justify-end absolute top-1 right-2 z-50">
+              <div className="flex flex-1 justify-end absolute top-2 right-2 z-50">
                 {(application && application.createdAt !== null) || undefined ? (
-                  <span className="text-base text-concrete font-normal">
-                    {application?.createdAt.toDateString}
+                  <span className="text-xs text-concrete font-normal">
+                    SUBMITTED ON {application?.createdAt.toDateString}
                   </span>
                 ) : (
-                  <span className="text-base text-concrete font-normal">Metadata</span>
+                  <span className="text-xs text-concrete font-normal">SUBMITTED ON ...</span>
                 )}
               </div>
             </div>

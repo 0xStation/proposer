@@ -19,8 +19,7 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import AccountModal from "app/account/components/AccountModal"
 import ApplicationModal from "app/application/components/ApplicationModal"
 import useStore from "app/core/hooks/useStore"
-import "slick-carousel/slick/slick.css"
-import "slick-carousel/slick/slick-theme.css"
+import usePagination from "app/core/hooks/usePagination"
 
 const Project: BlitzPage = () => {
   const [{ data: accountData }] = useAccount()
@@ -28,6 +27,7 @@ const Project: BlitzPage = () => {
   let [walletModalOpen, setWalletModalOpen] = useState(false)
   let [accountModalOpen, setAccountModalOpen] = useState(false)
   let [applicationModalOpen, setApplicationModalOpen] = useState(false)
+  const [page, setPage] = useState(0)
   const [userTriggered, setUserTrigged] = useState(false)
   const address = useMemo(() => accountData?.address, [accountData?.address])
 
@@ -74,11 +74,20 @@ const Project: BlitzPage = () => {
     { suspense: false }
   )
 
-  if (!contributors) {
-    contributors = []
-  } else if (contributors.length > 3) {
-    contributors = contributors.slice(0, 3)
-  }
+  // if (!contributors) {
+  //   contributors = []
+  //   // } else if (contributors.length > 3) {
+  //   //   const { results, totalPages, hasNext, hasPrev } = usePagination(contributors, page, 3)
+  // }
+
+  const { results, totalPages, hasNext, hasPrev } = usePagination(contributors, page, 3)
+  // var settings = {
+  //   dots: true,
+  //   infinite: true,
+  //   speed: 500,
+  //   slidesToShow: 3,
+  //   slidesToScroll: 1,
+  // }
 
   if (!initiative) {
     return <Page404 />
@@ -166,72 +175,157 @@ const Project: BlitzPage = () => {
                       <span className="flex-1 text-marble-white text-2xl">Contributors</span>
                     </div>
                     <div className="grid grid-cols-3 gap-3">
-                      {contributors.map((contributor, index) => {
+                      {results.map((contributor, index) => {
                         return <ContributorCard key={index} user={contributor} />
                       })}
                     </div>
-                  </div>
+                    {/* <div className="mt-4 grid gap-4 grid-cols-3">
+                      {results.map((contributor, index) => {
+                        return (
+                          // <div
+                          //   key={idx}
+                          //   className="flex flex-col items-center cursor-pointer w-16"
+                          // >
+                          //   <img
+                          //     className="border border-marble-white h-16 w-16 rounded-full bg-concrete"
+                          //     src={terminal.data.pfpURL}
+                          //   />
 
-                  <div className="flex flex-col text-marble-white my-8 space-y-5">
-                    <div>
-                      <span className="text-2xl">Whats next?</span>
+                          //   <span className="text-marble-white text-xs mt-1 text-center whitespace-nowrap text-ellipsis overflow-hidden w-full">
+                          //     {terminal.data.name}
+                          //   </span>
+                          // </div>
+                          <ContributorCard
+                            key={index}
+                            contributor={contributor as Account}
+                            endorse={endorse}
+                            accepted={accepted}
+                          />
+                        )
+                      })} */}
+                  </div>
+                  <div className="flex flex-row mt-4">
+                    <div className="flex-1 flex justify-start">
+                      {hasPrev && (
+                        <div
+                          onClick={() => setPage(page - 1)}
+                          className="cursor-pointer flex justify-self-start rotate-180"
+                        >
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 12 12"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
+                              fill="#F2EFEF"
+                            />
+                          </svg>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex flex-row space-x-4">
-                      <div className="flex-1 space-y-4">
-                        <div>
-                          <Image src={StepOne} alt="Step one." width={24} height={24} />
-                        </div>
-                        <div className="flex-1 space-y-2">
-                          <span className="font-bold">Submit interest</span>
-                          <div>
-                            <span className="text-base">
-                              Share a little bit about yourself, your best work, and your pitch.
-                            </span>
-                          </div>
-                        </div>
+                    <div className="flex-1">
+                      <div className="flex flex-row justify-center">
+                        {[...Array(totalPages)].map((_, idx) => {
+                          return (
+                            <span
+                              key={idx}
+                              className={`h-1 w-1  rounded-full mr-1 ${
+                                page === idx ? "bg-marble-white" : "bg-concrete"
+                              }`}
+                            ></span>
+                          )
+                        })}
                       </div>
-                      <div className="flex-1 space-y-4">
-                        <div>
-                          <Image src={StepTwo} alt="Step two." width={24} height={24} />
+                    </div>
+                    <div className="flex-1 flex justify-end">
+                      {hasNext && (
+                        <div
+                          onClick={() => setPage(page + 1)}
+                          className="cursor-pointer flex justify-self-end"
+                        >
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 12 12"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
+                              fill="#F2EFEF"
+                            />
+                          </svg>
                         </div>
-                        <div className="flex-1 space-y-2">
-                          <span className="font-bold">Gather endorsements</span>
-                          <div>
-                            <span className="text-base">
-                              Trust us, endorsements from contributors help. Reach out to get to
-                              know them.
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex-1 space-y-4">
-                        <div>
-                          <Image src={StepThree} alt="Step three." width={24} height={24} />
-                        </div>
-                        <div className="flex-1 space-y-2">
-                          <span className="font-bold">Start contributing</span>
-                          <div>
-                            <span className="text-base">
-                              If selected, a team member will reach out to partner with you to
-                              amplify your unique perspective.
-                            </span>
-                          </div>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   </div>
+                </div>
 
-                  <div className="flex justify-center items-center">
-                    <button
-                      className="mt-4 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
-                      onClick={() => {
-                        setUserTrigged(true)
-                        setActiveModal()
-                      }}
-                    >
-                      Submit interest
-                    </button>
+                <div className="flex flex-col text-marble-white my-8 space-y-5">
+                  <div>
+                    <span className="text-2xl">Whats next?</span>
                   </div>
+                  <div className="flex flex-row space-x-4">
+                    <div className="flex-1 space-y-4">
+                      <div>
+                        <Image src={StepOne} alt="Step one." width={24} height={24} />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <span className="font-bold">Submit interest</span>
+                        <div>
+                          <span className="text-base">
+                            Share a little bit about yourself, your best work, and your pitch.
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex-1 space-y-4">
+                      <div>
+                        <Image src={StepTwo} alt="Step two." width={24} height={24} />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <span className="font-bold">Gather endorsements</span>
+                        <div>
+                          <span className="text-base">
+                            Trust us, endorsements from contributors help. Reach out to get to know
+                            them.
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex-1 space-y-4">
+                      <div>
+                        <Image src={StepThree} alt="Step three." width={24} height={24} />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <span className="font-bold">Start contributing</span>
+                        <div>
+                          <span className="text-base">
+                            If selected, a team member will reach out to partner with you to amplify
+                            your unique perspective.
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-center items-center">
+                  <button
+                    className="mt-4 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
+                    onClick={() => {
+                      setUserTrigged(true)
+                      setActiveModal()
+                    }}
+                  >
+                    Submit interest
+                  </button>
                 </div>
               </div>
             </div>

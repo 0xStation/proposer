@@ -19,4 +19,5 @@ export type Initiative = {
   terminalTicket: string
   localId: number
   data: InitiativeMetadata
+  contributors?: []
 }
