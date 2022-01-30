@@ -66,7 +66,7 @@ const Navigation = ({ children }: { children?: any }) => {
               <li
                 className={`${
                   router.pathname === Routes.TerminalInitiativePage({ terminalHandle }).pathname
-                    ? "text-marble-white"
+                    ? "text-marble-white font-bold"
                     : "text-concrete"
                 } cursor-pointer hover:text-marble-white`}
               >
@@ -77,7 +77,7 @@ const Navigation = ({ children }: { children?: any }) => {
               <li
                 className={`${
                   router.pathname === Routes.TerminalContributorsPage({ terminalHandle }).pathname
-                    ? "text-marble-white"
+                    ? "text-marble-white font-bold"
                     : "text-concrete"
                 } cursor-pointer hover:text-marble-white`}
               >
@@ -88,7 +88,7 @@ const Navigation = ({ children }: { children?: any }) => {
               <li
                 className={`${
                   router.pathname === Routes.TerminalWaitingPage({ terminalHandle }).pathname
-                    ? "text-marble-white"
+                    ? "text-marble-white font-bold"
                     : "text-concrete"
                 } cursor-pointer hover:text-marble-white`}
               >

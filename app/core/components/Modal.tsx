@@ -73,7 +73,7 @@ const Modal = ({
                   {checkBanner(banner)}
                 </div>
               )}
-              <div className="p-6">
+              <div className="px-4 pt-[3.75rem] pb-4">
                 {showTitle && (
                   <Dialog.Title
                     as="h3"

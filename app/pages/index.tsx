@@ -14,7 +14,7 @@ const Home: BlitzPage = () => {
 
   const ConnectView = (
     <div className="flex items-center h-full ml-40">
-      <div className="bg-tunnel-black border border-marble-white p-4 w-128">
+      <div className="bg-tunnel-black border border-marble-white p-10 w-128">
         <h3 className="text-marble-white text-3xl">Welcome to Station</h3>
         <p className="text-marble-white text-sm mt-4">
           This is where contributors come together and discover and participate in some of the most

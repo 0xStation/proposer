@@ -114,7 +114,7 @@ const Project: BlitzPage = () => {
                 <div className="flex flex-col">
                   <div className="flex flex-col text-marble-white items-center space-y-1">
                     <div className="flex flex-col items-center content-center space-y-3">
-                      <span className="uppercase text-3xl">{initiative.data.shortName}</span>
+                      <span className="capitalize text-3xl">{initiative.data.name}</span>
                       <span className="text-sm mx-[60px] text-center">
                         {initiative.data.description}
                       </span>
