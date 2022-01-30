@@ -74,20 +74,7 @@ const Project: BlitzPage = () => {
     { suspense: false }
   )
 
-  // if (!contributors) {
-  //   contributors = []
-  //   // } else if (contributors.length > 3) {
-  //   //   const { results, totalPages, hasNext, hasPrev } = usePagination(contributors, page, 3)
-  // }
-
   const { results, totalPages, hasNext, hasPrev } = usePagination(contributors, page, 3)
-  // var settings = {
-  //   dots: true,
-  //   infinite: true,
-  //   speed: 500,
-  //   slidesToShow: 3,
-  //   slidesToScroll: 1,
-  // }
 
   if (!initiative) {
     return <Page404 />
@@ -119,8 +106,8 @@ const Project: BlitzPage = () => {
               </Link>
             </div>
             <div className="flex justify-center items-center">
-              <div className="bg-tunnel-black content-center items-center h-full w-[766px] mt-5">
-                <div className="flex flex-col">
+              <div className="bg-tunnel-black content-center items-center h-full w-[766px] mt-5 space-y-12">
+                <div className="flex flex-col space-y-12">
                   <div className="flex flex-col text-marble-white items-center space-y-1">
                     <div className="flex flex-col items-center content-center space-y-3">
                       <span className="capitalize text-3xl">{initiative.data.name}</span>
@@ -144,28 +131,59 @@ const Project: BlitzPage = () => {
                     />
                   </div>
 
-                  <div className=" text-marble-white flex flex-row my-4 gap-12">
-                    <div className="w-3/5 flex-col items-center space-y-4">
+                  <div className="flex flex-col space-y-4 text-marble-white">
+                    <div>
+                      <span className="text-2xl">About</span>
+                    </div>
+                    <div className="space-y-3">
+                      {initiative.data.contributeText?.map((item, index) => {
+                        return (
+                          <span className="text-base flow-root" key={index}>
+                            {item}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="text-marble-white flex flex-row my-4 gap-12">
+                    <div className="flex-1 space-y-4">
                       <div>
-                        <span className="text-2xl">Calling for contributors</span>
+                        <span className="text-2xl">Rewards</span>
                       </div>
-                      <div className="space-y-3">
-                        {initiative.data.contributeText?.map((item, index) => {
+                      <div className="space-y-1 flex flex-col">
+                        {initiative.data.rewardText?.map((reward, index) => {
                           return (
-                            <span className="text-base flow-root" key={index}>
-                              {item}
+                            <span key={index} className="text-base">
+                              {reward}
                             </span>
                           )
                         })}
                       </div>
                     </div>
-
-                    <div className="w-2/5 space-y-4">
+                    <div className="flex-1 space-y-4">
                       <div>
-                        <span className="text-2xl">Rewards</span>
+                        <span className="text-2xl">Commitment</span>
                       </div>
-                      <div className="space-y-5">
-                        <span className="text-base">{initiative.data.rewardText}</span>
+                      <div className="space-y-1">
+                        <span className="text-base">{initiative.data.commitment}</span>
+                      </div>
+                    </div>
+                    <div className="flex-1 space-y-4">
+                      <div>
+                        <span className="text-2xl">Skills</span>
+                      </div>
+                      <div className="space-x-2 flex flex-wrap">
+                        {initiative.data.skills?.map((skills, index) => {
+                          return (
+                            <span
+                              key={index}
+                              className="text-sm rounded-lg text-neon-carrot bg-[#302013] py-1 px-2"
+                            >
+                              {skills}
+                            </span>
+                          )
+                        })}
                       </div>
                     </div>
                   </div>
@@ -179,96 +197,72 @@ const Project: BlitzPage = () => {
                         return <ContributorCard key={index} user={contributor} />
                       })}
                     </div>
-                    {/* <div className="mt-4 grid gap-4 grid-cols-3">
-                      {results.map((contributor, index) => {
-                        return (
-                          // <div
-                          //   key={idx}
-                          //   className="flex flex-col items-center cursor-pointer w-16"
-                          // >
-                          //   <img
-                          //     className="border border-marble-white h-16 w-16 rounded-full bg-concrete"
-                          //     src={terminal.data.pfpURL}
-                          //   />
-
-                          //   <span className="text-marble-white text-xs mt-1 text-center whitespace-nowrap text-ellipsis overflow-hidden w-full">
-                          //     {terminal.data.name}
-                          //   </span>
-                          // </div>
-                          <ContributorCard
-                            key={index}
-                            contributor={contributor as Account}
-                            endorse={endorse}
-                            accepted={accepted}
-                          />
-                        )
-                      })} */}
-                  </div>
-                  <div className="flex flex-row mt-4">
-                    <div className="flex-1 flex justify-start">
-                      {hasPrev && (
-                        <div
-                          onClick={() => setPage(page - 1)}
-                          className="cursor-pointer flex justify-self-start rotate-180"
-                        >
-                          <svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 12 12"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
+                    <div className="flex flex-row">
+                      <div className="flex-1 flex justify-start">
+                        {hasPrev && (
+                          <div
+                            onClick={() => setPage(page - 1)}
+                            className="cursor-pointer flex justify-self-start rotate-180"
                           >
-                            <path
-                              fillRule="evenodd"
-                              clipRule="evenodd"
-                              d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
-                              fill="#F2EFEF"
-                            />
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex flex-row justify-center">
-                        {[...Array(totalPages)].map((_, idx) => {
-                          return (
-                            <span
-                              key={idx}
-                              className={`h-1 w-1  rounded-full mr-1 ${
-                                page === idx ? "bg-marble-white" : "bg-concrete"
-                              }`}
-                            ></span>
-                          )
-                        })}
+                            <svg
+                              width="12"
+                              height="12"
+                              viewBox="0 0 12 12"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                clipRule="evenodd"
+                                d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
+                                fill="#F2EFEF"
+                              />
+                            </svg>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                    <div className="flex-1 flex justify-end">
-                      {hasNext && (
-                        <div
-                          onClick={() => setPage(page + 1)}
-                          className="cursor-pointer flex justify-self-end"
-                        >
-                          <svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 12 12"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              clipRule="evenodd"
-                              d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
-                              fill="#F2EFEF"
-                            />
-                          </svg>
+                      <div className="flex-1">
+                        <div className="flex flex-row justify-center">
+                          {[...Array(totalPages)].map((_, idx) => {
+                            return (
+                              <span
+                                key={idx}
+                                className={`h-1 w-1  rounded-full mr-1 ${
+                                  page === idx ? "bg-marble-white" : "bg-concrete"
+                                }`}
+                              ></span>
+                            )
+                          })}
                         </div>
-                      )}
+                      </div>
+                      <div className="flex-1 flex justify-end">
+                        {hasNext && (
+                          <div
+                            onClick={() => setPage(page + 1)}
+                            className="cursor-pointer flex justify-self-end"
+                          >
+                            <svg
+                              width="12"
+                              height="12"
+                              viewBox="0 0 12 12"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                clipRule="evenodd"
+                                d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
+                                fill="#F2EFEF"
+                              />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col text-marble-white my-8 space-y-5">
+                <div className="flex flex-col text-marble-white space-y-5">
                   <div>
                     <span className="text-2xl">Whats next?</span>
                   </div>
@@ -316,7 +310,7 @@ const Project: BlitzPage = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-center items-center">
+                <div className="flex justify-center items-center mt-12">
                   <button
                     className="mt-4 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
                     onClick={() => {

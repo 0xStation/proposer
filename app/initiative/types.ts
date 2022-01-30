@@ -7,10 +7,12 @@ export type InitiativeMetadata = {
   oneLiner?: string
   bannerURL?: string
   contributeText?: string[]
-  rewardText?: string
+  rewardText?: string[]
   isAcceptingApplications: boolean
   links: ExternalLink[]
   members?: string[]
+  commitment?: string
+  skills?: string[]
 }
 
 export type Initiative = {
