@@ -11,7 +11,7 @@ import { TalentIdentityUnit as ContributorCard } from "app/core/components/Talen
 const TerminalContributorsPage: BlitzPage = () => {
   const [endorseModalIsOpen, setEndorseModalIsOpen] = useState(false)
   const [selectedUserToEndorse, setSelectedUserToEndorse] = useState<Account | null>(null)
-  const [selectedRole, setRole] = useState("STAFF")
+  const [selectedRole, setRole] = useState<String>("STAFF")
   const [selectedContributors, setSelectedContributors] = useState<Account[] | null>(null)
 
   const roles = ["STAFF", "COMMUTER", "VISITOR"]
@@ -27,9 +27,9 @@ const TerminalContributorsPage: BlitzPage = () => {
   }, [selectedRole])
 
   const contributorCards = selectedContributors?.map((contributor, idx) => {
-    const { id, points, createdAt } = contributor
+    const { id, points, joinedAt, role } = contributor
     const {
-      data: { role, timezone },
+      data: { timezone },
     } = contributor
     let onClick
     if (role) {
@@ -43,8 +43,8 @@ const TerminalContributorsPage: BlitzPage = () => {
       user: contributor,
       points,
       onClick,
-      dateMetadata: createdAt && {
-        createdAt,
+      dateMetadata: joinedAt && {
+        joinedAt,
         timezone,
       },
     }

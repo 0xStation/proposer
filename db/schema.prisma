@@ -21,6 +21,7 @@ model Account {
   tickets             AccountTerminal[]
   role                String?
   data                Json?
+  joinedAt            DateTime                 @default(now())
 }
 
 // Each DAO is represented by a terminal.

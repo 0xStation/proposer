@@ -22,5 +22,5 @@ export type Account = {
   data: AccountMetadata
   role?: string
   points?: number
-  createdAt?: Date
+  joinedAt?: Date
 }
