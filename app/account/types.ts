@@ -1,6 +1,6 @@
 export type AccountMetadata = {
   name: string
-  handle: string
+  handle?: string
   wallet?: string
   ticketId?: number // TODO: remove this when subgraph is ready
   pfpURL?: string

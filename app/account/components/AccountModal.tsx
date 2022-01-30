@@ -9,7 +9,6 @@ import { useDropzone } from "react-dropzone"
 import CreatableSelect from "react-select/creatable"
 
 interface ApplicationParams {
-  handle: string
   discordId: string
   pronouns: string
   timezone: string
@@ -98,7 +97,7 @@ const AccountModal = ({
   return (
     <Modal
       title="Complete your profile"
-      subtitle="Complete your profile to continue submitting your interest."
+      subtitle="Complete your profile to explore initiatives."
       open={isOpen}
       toggle={setIsOpen}
     >
@@ -114,7 +113,7 @@ const AccountModal = ({
           render={({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-y-4 gap-x-2">
-                <div className="flex flex-col">
+                <div className="flex flex-col col-span-2">
                   <label htmlFor="name" className="text-marble-white">
                     Name
                   </label>
@@ -122,17 +121,6 @@ const AccountModal = ({
                     component="input"
                     name="name"
                     placeholder="name"
-                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <label htmlFor="handle" className="text-marble-white">
-                    Handle
-                  </label>
-                  <Field
-                    component="input"
-                    name="handle"
-                    placeholder="@handle"
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>
