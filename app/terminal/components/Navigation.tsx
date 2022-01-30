@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { useParam } from "blitz"
 import { Link, Routes, useRouter, useQuery } from "blitz"
-import getTerminalById from "app/terminal/queries/getTerminalById"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import useStore from "app/core/hooks/useStore"
 import { useAccount, useBalance } from "wagmi"
 import {
@@ -14,12 +14,11 @@ import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { Account } from "app/account/types"
 
 const Navigation = ({ children }: { children?: any }) => {
-  // need a better way of catching undefined here than defaulting to 1
-  // it will never happen, but TS doesn't know that
-  const terminalId = useParam("terminalId", "number") || 1
-
+  // casting type as string to avoid the "undefined" type which could happen
+  // but we will catch that at the terminal query level
+  const terminalHandle = useParam("terminalHandle", "string") as string
   // I was getting a weird error that suspense was not supported by react-dom so I had to disable it.
-  const [terminal] = useQuery(getTerminalById, { id: terminalId }, { suspense: false })
+  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
   const router = useRouter()
   const activeUser: Account | null = useStore((state) => state.activeUser)
 
@@ -59,41 +58,43 @@ const Navigation = ({ children }: { children?: any }) => {
               </div>
               <div className="flex flex-col">
                 <h1 className="text-2xl text-marble-white">{terminal.data.name}</h1>
-                <span className="text-sm text-concrete">@{terminal.data.handle}</span>
+                <span className="text-base text-concrete">@{terminal.data.handle}</span>
               </div>
             </div>
-            <h3 className="text-marble-white text-sm mt-6">{terminal.data.description}</h3>
+            <h3 className="text-marble-white text-base mt-6">{terminal.data.description}</h3>
             <ul className="mt-9 text-lg">
               <li
                 className={`${
-                  router.pathname === Routes.TerminalInitiativePage({ terminalId }).pathname
-                    ? "text-marble-white"
+                  router.pathname === Routes.TerminalInitiativePage({ terminalHandle }).pathname
+                    ? "text-marble-white font-bold"
                     : "text-concrete"
                 } cursor-pointer hover:text-marble-white`}
               >
-                <Link href={Routes.TerminalInitiativePage({ terminalId })}>
+                <Link href={Routes.TerminalInitiativePage({ terminalHandle })}>
                   &#8594; Initiative Board
                 </Link>
               </li>
               <li
                 className={`${
-                  router.pathname === Routes.TerminalContributorsPage({ terminalId }).pathname
-                    ? "text-marble-white"
+                  router.pathname === Routes.TerminalContributorsPage({ terminalHandle }).pathname
+                    ? "text-marble-white font-bold"
                     : "text-concrete"
                 } cursor-pointer hover:text-marble-white`}
               >
-                <Link href={Routes.TerminalContributorsPage({ terminalId })}>
+                <Link href={Routes.TerminalContributorsPage({ terminalHandle })}>
                   &#8594; Contributor Directory
                 </Link>
               </li>
               <li
                 className={`${
-                  router.pathname === Routes.TerminalWaitingPage({ terminalId }).pathname
-                    ? "text-marble-white"
+                  router.pathname === Routes.TerminalWaitingPage({ terminalHandle }).pathname
+                    ? "text-marble-white font-bold"
                     : "text-concrete"
                 } cursor-pointer hover:text-marble-white`}
               >
-                <Link href={Routes.TerminalWaitingPage({ terminalId })}>&#8594; Waiting Room</Link>
+                <Link href={Routes.TerminalWaitingPage({ terminalHandle })}>
+                  &#8594; Waiting Room
+                </Link>
               </li>
             </ul>
           </div>

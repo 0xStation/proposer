@@ -15,7 +15,7 @@ import Back from "/public/back-icon.svg"
 import Page404 from "../../../404"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
 import { Account } from "app/account/types"
-import getTerminalById from "app/terminal/queries/getTerminalById"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import AccountModal from "app/account/components/AccountModal"
 import ApplicationModal from "app/application/components/ApplicationModal"
 import useStore from "app/core/hooks/useStore"
@@ -57,10 +57,10 @@ const Project: BlitzPage = () => {
 
   const accepted = true
   const endorse = false
-  const terminalId = useParam("terminalId", "number") || 1
-  const initiativeLocalId = useParam("initiativeId", "number") || 0
+  const terminalHandle = useParam("terminalHandle") as string
+  const initiativeLocalId = useParam("initiativeId", "number") as number
 
-  const [terminal] = useQuery(getTerminalById, { id: terminalId }, { suspense: false })
+  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
   const [initiative] = useQuery(
     getInitiativeByLocalId,
@@ -108,7 +108,7 @@ const Project: BlitzPage = () => {
         <Layout>
           <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col">
             <div className="mx-4 mt-4">
-              <Link href={Routes.TerminalInitiativePage({ terminalId })}>
+              <Link href={Routes.TerminalInitiativePage({ terminalHandle })}>
                 <Image
                   className="cursor-pointer"
                   src={Back}
@@ -123,8 +123,8 @@ const Project: BlitzPage = () => {
                 <div className="flex flex-col">
                   <div className="flex flex-col text-marble-white items-center space-y-1">
                     <div className="flex flex-col items-center content-center space-y-3">
-                      <span className="uppercase text-3xl">{initiative.data.shortName}</span>
-                      <span className="text-sm mx-[60px] text-center">
+                      <span className="capitalize text-3xl">{initiative.data.name}</span>
+                      <span className="text-base mx-[60px] text-center">
                         {initiative.data.description}
                       </span>
                     </div>
@@ -147,12 +147,12 @@ const Project: BlitzPage = () => {
                   <div className=" text-marble-white flex flex-row my-4 gap-12">
                     <div className="w-3/5 flex-col items-center space-y-4">
                       <div>
-                        <span className="text-lg">Calling for contributors</span>
+                        <span className="text-2xl">Calling for contributors</span>
                       </div>
                       <div className="space-y-3">
                         {initiative.data.contributeText?.map((item, index) => {
                           return (
-                            <span className="text-sm flow-root" key={index}>
+                            <span className="text-base flow-root" key={index}>
                               {item}
                             </span>
                           )
@@ -162,17 +162,17 @@ const Project: BlitzPage = () => {
 
                     <div className="w-2/5 space-y-4">
                       <div>
-                        <span className="text-lg">Rewards</span>
+                        <span className="text-2xl">Rewards</span>
                       </div>
                       <div className="space-y-5">
-                        <span className="text-sm">{initiative.data.rewardText}</span>
+                        <span className="text-base">{initiative.data.rewardText}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <div className="flex flex-row">
-                      <span className="flex-1 text-marble-white text-lg">Contributors</span>
+                      <span className="flex-1 text-marble-white text-2xl">Contributors</span>
                     </div>
                     <div className="grid grid-cols-3 gap-3">
                       {results.map((contributor, index) => {
@@ -270,7 +270,7 @@ const Project: BlitzPage = () => {
 
                 <div className="flex flex-col text-marble-white my-8 space-y-5">
                   <div>
-                    <span className="text-lg">Whats next?</span>
+                    <span className="text-2xl">Whats next?</span>
                   </div>
                   <div className="flex flex-row space-x-4">
                     <div className="flex-1 space-y-4">
@@ -280,7 +280,7 @@ const Project: BlitzPage = () => {
                       <div className="flex-1 space-y-2">
                         <span className="font-bold">Submit interest</span>
                         <div>
-                          <span className="text-sm">
+                          <span className="text-base">
                             Share a little bit about yourself, your best work, and your pitch.
                           </span>
                         </div>
@@ -293,7 +293,7 @@ const Project: BlitzPage = () => {
                       <div className="flex-1 space-y-2">
                         <span className="font-bold">Gather endorsements</span>
                         <div>
-                          <span className="text-sm">
+                          <span className="text-base">
                             Trust us, endorsements from contributors help. Reach out to get to know
                             them.
                           </span>
@@ -307,7 +307,7 @@ const Project: BlitzPage = () => {
                       <div className="flex-1 space-y-2">
                         <span className="font-bold">Start contributing</span>
                         <div>
-                          <span className="text-sm">
+                          <span className="text-base">
                             If selected, a team member will reach out to partner with you to amplify
                             your unique perspective.
                           </span>
@@ -316,10 +316,9 @@ const Project: BlitzPage = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className="flex justify-center items-center">
                   <button
-                    className="mt-4 py-2 text-center text-sm bg-magic-mint rounded item-center w-[280px]"
+                    className="mt-4 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
                     onClick={() => {
                       setUserTrigged(true)
                       setActiveModal()

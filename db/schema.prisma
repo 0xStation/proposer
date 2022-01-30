@@ -29,6 +29,7 @@ model Account {
 model Terminal {
   id            Int               @id @default(autoincrement())
   ticketAddress String            @unique
+  handle        String            @unique
   initiatives   Initiative[]
   data          Json?
   tickets       AccountTerminal[]

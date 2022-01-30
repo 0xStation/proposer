@@ -14,6 +14,7 @@ const CreateAccount = z.object({
     })
     .array(),
   address: z.string(),
+  pfpURL: z.string(),
 })
 
 export default async function createAccount(input: z.infer<typeof CreateAccount>) {
@@ -26,6 +27,7 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
       discordId: params.discordId,
       pronouns: params.pronouns,
       timezone: params.timezone,
+      pfpURL: params.pfpURL,
     },
     skills: {
       create: params.skills.map((skill) => {

@@ -46,7 +46,7 @@ export const ProfileMetadata = ({
             </div>
           )}
         </div>
-        <div className="flex flex-row flex-1 text-xs text-concrete space-x-1 overflow-hidden">
+        <div className="flex flex-row flex-1 text-base text-concrete space-x-1 overflow-hidden">
           <div className="max-w-[150px] truncate">{wallet || address}</div>
           <div className="">{pronouns}</div>
         </div>

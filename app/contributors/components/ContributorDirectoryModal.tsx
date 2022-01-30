@@ -50,7 +50,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
   return (
     <div>
       <Modal subtitle="" open={isOpen} toggle={setIsOpen} showTitle={false}>
-        <div className="flex flex-col space-y-6">
+        <div className="flex flex-col">
           <div className="flex flex- auto flex-col space-y-6 overflow-y-scroll">
             <div id="close and meta data" className="flex-auto flex flex-row">
               <div className="flex flex-1 justify-start absolute top-1 left-2">

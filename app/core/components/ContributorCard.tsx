@@ -121,7 +121,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
               <Image src={Verified} alt="Verified icon." width={10} height={10} />
             </div>
           </div>
-          <div className="flex flex-row flex-1 text-xs text-concrete space-x-1 overflow-hidden">
+          <div className="flex flex-row flex-1 text-base text-concrete space-x-1 overflow-hidden">
             <div className="max-w-[150px] truncate">
               {contributor.data.wallet || contributor.address}
             </div>
@@ -133,13 +133,13 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
       {accepted === true ? (
         <div>
           <div className="flex flex-row flex-1 mx-3">
-            <div className="flex-1 items-center justify-center text-sm">
+            <div className="flex-1 items-center justify-center text-base">
               <div className="place-self-center mt-2">Role</div>
             </div>
 
-            <div className="flex flex-1 align-right place-content-end content-right text-sm">
+            <div className="flex flex-1 align-right place-content-end content-right text-base">
               <Image
-                className="content-right text-sm"
+                className="content-right text-base"
                 src={roleSVG(contributor?.data.role)}
                 alt="Role icon."
                 height={17}
@@ -147,11 +147,11 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
             </div>
           </div>
           <div className="flex flex-row flex-1 mx-3">
-            <div className="flex-1 items-center justify-center text-sm">
+            <div className="flex-1 items-center justify-center text-base">
               <div className="place-self-center mt-2">Endorsers</div>
             </div>
 
-            <div className="flex flex-1 align-right place-content-end content-right text-sm">
+            <div className="flex flex-1 align-right place-content-end content-right text-base">
               <div className="flex flex-row">
                 <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block"></span>
                 <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block ml-[-5px]"></span>
@@ -160,8 +160,8 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
             </div>
           </div>
           <div className="flex flex-row flex-1 mx-3 ">
-            <div className="flex-1 items-center justify-center text-sm mt-2">Points</div>
-            <div className="flex-1 text-right justify-end content-end text-sm">
+            <div className="flex-1 items-center justify-center text-base mt-2">Points</div>
+            <div className="flex-1 text-right justify-end content-end text-base">
               <span>RAILS</span>
             </div>
           </div>
@@ -192,12 +192,12 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
 
           <div className="flex flex-row flex-1 mx-3 ">
             {contributor && application?.createdAt ? (
-              <div className="flex-1 items-center justify-center text-xs text-concrete my-2">
+              <div className="flex-1 items-center justify-center text-base text-concrete my-2">
                 {console.log(JSON.stringify(application?.createdAt.toDateString))}
                 {application?.createdAt.toDateString}
               </div>
             ) : (
-              <div className="flex-1 items-center justify-center text-xs text-concrete my-2">
+              <div className="flex-1 items-center justify-center text-base text-concrete my-2">
                 Metadata
               </div>
             )}
@@ -206,11 +206,11 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
       ) : (
         <div>
           <div className="flex flex-row flex-1 mx-3">
-            <div className="flex-1 items-center justify-center text-sm">
+            <div className="flex-1 items-center justify-center text-base">
               <div className="place-self-center mt-2">Endorsers</div>
             </div>
 
-            <div className="flex flex-1 align-right place-content-end content-right text-sm">
+            <div className="flex flex-1 align-right place-content-end content-right text-base">
               <div className="flex flex-row">
                 <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block"></span>
                 <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block ml-[-5px]"></span>
@@ -220,21 +220,21 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
           </div>
           {activeUser && (
             <div className="flex flex-row flex-1 mx-3 ">
-              <div className="flex-1 items-center justify-center text-sm mt-2">Points</div>
-              <div className="flex-1 text-right justify-end content-end text-sm">
+              <div className="flex-1 items-center justify-center text-base mt-2">Points</div>
+              <div className="flex-1 text-right justify-end content-end text-base">
                 <span>RAILS</span>
               </div>
             </div>
           )}
           <div className="flex flex-row flex-1 mx-3">
-            <div className="flex-1 items-center justify-center text-sm">
+            <div className="flex-1 items-center justify-center text-base">
               <div className="place-self-center mt-2">Role</div>
             </div>
-            <div className="flex flex-1 align-right place-content-end content-right text-sm">
+            <div className="flex flex-1 align-right place-content-end content-right text-base">
               {application?.applicant.data.role ? (
                 <div>
                   <Image
-                    className="content-right text-sm"
+                    className="content-right text-base"
                     src={roleSVG(application?.applicant.data.role)}
                     alt="Role icon."
                     height={17}
@@ -295,12 +295,12 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
             )}
           <div className="flex flex-row flex-1 mx-3">
             {application && application.createdAt ? (
-              <div className="flex-1 items-center justify-center text-xs text-concrete my-2">
+              <div className="flex-1 items-center justify-center text-base text-concrete my-2">
                 {console.log(JSON.stringify(application?.createdAt.toDateString))}
                 {application?.createdAt.toDateString}
               </div>
             ) : (
-              <div className="flex-1 items-center justify-center text-xs text-concrete my-2">
+              <div className="flex-1 items-center justify-center text-base text-concrete my-2">
                 Metadata
               </div>
             )}

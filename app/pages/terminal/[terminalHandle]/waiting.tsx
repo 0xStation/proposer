@@ -21,7 +21,7 @@ const TerminalWaitingPage: BlitzPage = () => {
     () => (accountData?.address ? users[accountData?.address] : null),
     [accountData?.address]
   )
-  const terminalId = useParam("terminalId", "number") || 1
+  const terminalHandle = useParam("terminalHandle") as string
   const [selectedInitiative, setSelectedInitiative] = useState<number>()
   const [applications, setApplications] = useState<Application[]>([])
   const [isEndorseModalOpen, setIsEndorseModalOpen] = useState(false)
@@ -30,7 +30,7 @@ const TerminalWaitingPage: BlitzPage = () => {
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
-    { terminalId: terminalId },
+    { terminalHandle: terminalHandle },
     { suspense: false }
   )
 
@@ -96,7 +96,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           setIsApplicantOpen={setIsApplicantOpen}
         />
         <div className="flex flex-col space-y-10">
-          <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm space-y-3">
+          <div className="flex-auto flex-wrap space-x-3 text-marble-white text-base space-y-3">
             {initiatives.map((initiative, idx) => {
               return (
                 <Pill

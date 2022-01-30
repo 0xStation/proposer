@@ -20,7 +20,31 @@ interface ApplicationParams {
   }[]
 }
 
-const MultiSelectAdapter = ({ input, ...rest }) => <CreatableSelect isMulti {...input} {...rest} />
+const customStyles = {
+  control: (provided, state) => ({
+    ...provided,
+    backgroundColor: "#2E2E2E",
+    color: "#646464",
+    borderColor: "#646464",
+  }),
+  menuList: (provided, state) => ({
+    ...provided,
+    backgroundColor: "#2E2E2E",
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: "#2E2E2E",
+    color: "#646464",
+    "&:hover": {
+      color: "white",
+      cursor: "pointer",
+    },
+  }),
+}
+
+const MultiSelectAdapter = ({ input, ...rest }) => (
+  <CreatableSelect isMulti {...input} {...rest} styles={customStyles} />
+)
 
 const AccountModal = ({
   isOpen,
@@ -32,12 +56,17 @@ const AccountModal = ({
   address: string
 }) => {
   const [uploadingState, setUploadingState] = useState("")
-  const [imageURL, setImageURL] = useState("")
+  const [pfpURL, setPfpURL] = useState("")
   const setActiveUser = useStore((state) => state.setActiveUser)
 
   const [createAccountMutation] = useMutation(createAccount, {
     onSuccess: (data) => {
+      setIsOpen(false)
+      console.log(data)
       setActiveUser(data)
+    },
+    onError: (error) => {
+      console.log(error)
     },
   })
 
@@ -50,13 +79,18 @@ const AccountModal = ({
     setUploadingState("UPLOADING")
     const formData = new FormData()
     formData.append("file", acceptedFiles[0])
-    let res = await fetch("http://localhost:3000/api/uploadImage", {
+    let res = await fetch("/api/uploadImage", {
       method: "POST",
       body: formData,
     })
     const data = await res.json()
-    setImageURL(data.url)
+    setPfpURL(data.url)
     setUploadingState("UPLOADED")
+  }
+
+  const removeFile = () => {
+    setUploadingState("")
+    setPfpURL("")
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: uploadFile })
@@ -72,7 +106,7 @@ const AccountModal = ({
         <Form
           onSubmit={async (values: ApplicationParams) => {
             try {
-              await createAccountMutation({ ...values, address })
+              await createAccountMutation({ ...values, address, pfpURL })
             } catch (error) {
               alert("Error applying.")
             }
@@ -107,17 +141,25 @@ const AccountModal = ({
                     PFP
                   </label>
                   {uploadingState === "UPLOADED" ? (
-                    <div>
+                    <div className="flex flex-row items-center">
                       <img
                         alt="Profile picture uploaded by the user."
-                        src={imageURL}
-                        className="w-16 h-16 rounded-full border border-concrete"
+                        src={pfpURL}
+                        className="w-16 h-16 rounded-full border border-concrete mr-2"
                       />
+                      <span
+                        className="text-torch-red text-sm cursor-pointer"
+                        onClick={() => removeFile()}
+                      >
+                        Remove
+                      </span>
                     </div>
+                  ) : uploadingState === "UPLOADING" ? (
+                    <p className="text-sm text-marble-white">Upload in progress...</p>
                   ) : (
                     <div
                       {...getRootProps()}
-                      className="text-sm text-concrete bg-wet-concrete border border-dotted border-concrete p-4 text-center"
+                      className="text-base text-concrete bg-wet-concrete border border-dotted border-concrete p-4 text-center"
                     >
                       <input {...getInputProps()} />
                       {isDragActive ? (
@@ -134,6 +176,9 @@ const AccountModal = ({
                   <label htmlFor="skills" className="text-marble-white">
                     Skills
                   </label>
+                  <span className="text-concrete text-xs mb-2">
+                    (Type to add additional skills)
+                  </span>
                   <div>
                     <Field name="skills" component={MultiSelectAdapter} options={skillOptions} />
                   </div>
