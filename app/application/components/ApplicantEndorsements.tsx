@@ -23,7 +23,7 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({ person, i
             <div className="flex-2/3 flex flex-col justify-center">
               <div className="flex-1">
                 <div className="flex flex-row flex-1 space-x-1">
-                  <div className="flex-3/5 text-md font-bold text-marble-white">
+                  <div className="flex-3/5 text-lg font-bold text-marble-white">
                     {person.data.handle}
                   </div>
                   <div className="flex-2/5 m-auto">
@@ -48,7 +48,7 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({ person, i
             )}
           </div>
           <div className="flex flex-1 content-center justify-center">
-            {isEndorsable && <span className="text-concrete text-md text-normal m-2">RAILS</span>}
+            {isEndorsable && <span className="text-concrete text-lg text-normal m-2">RAILS</span>}
           </div>
         </div>
       </div>

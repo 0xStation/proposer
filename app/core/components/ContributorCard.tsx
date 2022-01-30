@@ -116,7 +116,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
         </div>
         <div className="flex flex-col flex-1 content-center">
           <div className="flex flex-row items-center flex-1 space-x-1">
-            <div className="text-m">{contributor.data.handle}</div>
+            <div className="text-lg">{contributor.data.handle}</div>
             <div className="m-auto">
               <Image src={Verified} alt="Verified icon." width={10} height={10} />
             </div>

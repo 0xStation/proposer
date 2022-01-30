@@ -8,8 +8,7 @@ const Home: BlitzPage = () => {
     // which allows users to choose which terminal they want to "enter".
     // In the meantime we will redirect them to Station since it's the
     // only terminal.
-    const stationTerminalId = "station"
-    Router.push(`/terminal/${stationTerminalId}/contributors`)
+    Router.push(`/terminal/station/initiative`)
   }
 
   const ConnectView = (

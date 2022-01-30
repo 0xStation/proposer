@@ -28,12 +28,6 @@ const Navigation = () => {
   const setActiveUser = useStore((state) => state.setActiveUser)
   const activeUser = useStore((state) => state.activeUser)
 
-  useEffect(() => {
-    if (address) {
-      getUserAccount(address)
-    }
-  }, [address])
-
   const getUserAccount = async (address) => {
     let user = await invoke(getAccountByAddress, { address })
     console.log(address)
@@ -47,6 +41,12 @@ const Navigation = () => {
       setAccountModalOpen(true)
     }
   }
+
+  useEffect(() => {
+    if (address) {
+      getUserAccount(address)
+    }
+  }, [address, getUserAccount])
 
   return (
     <>
@@ -64,6 +64,7 @@ const Navigation = () => {
           className="self-center"
           button={<Image src={logo} alt="Station logo, the letters station spelled out." />}
           items={[
+            { name: "home", href: "/" },
             { name: "newstand", href: "https://station.mirror.xyz/" },
             { name: "contact the staff", href: "mailto:staff@station.express" },
             { name: "support", href: "https://6vdcjqzyfj3.typeform.com/to/kTlOjkdT" },
@@ -104,7 +105,10 @@ const Navigation = () => {
               button={
                 <div className="flex items-center">
                   <span className="w-7 h-7 rounded-full bg-concrete border border-marble-white mr-2"></span>
-                  <span>{wallet.address}</span>
+                  <span>{`${wallet.address.slice(0, 6)}...${wallet.address.slice(
+                    wallet.address.length - 6,
+                    wallet.address.length
+                  )}`}</span>
                 </div>
               }
               items={[
