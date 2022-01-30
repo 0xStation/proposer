@@ -47,7 +47,7 @@ const Dropdown = ({ button, items, side, className }: DropdownProps) => {
                     <a
                       className={`${
                         active && "text-neon-blue"
-                      } group flex rounded-md items-center w-full px-4 py-2`}
+                      } group flex rounded-md items-center w-full px-4 py-2 cursor-pointer`}
                       href={item.href}
                       onClick={item.onClick}
                     >
