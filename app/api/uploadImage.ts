@@ -28,6 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log(err)
       return res.status(500)
     }
+    // we should make sure all of the filenames are unique
     const file = fs.readFileSync(files.file.path)
     s3.upload({
       Bucket: "station",
