@@ -270,7 +270,7 @@ const Project: BlitzPage = () => {
 
                 <div className="flex flex-col text-marble-white my-8 space-y-5">
                   <div>
-                    <span className="text-2xl">Whats next?</span>
+                    <span className="text-2xl">What&apos;s next?</span>
                   </div>
                   <div className="flex flex-row space-x-4">
                     <div className="flex-1 space-y-4">
