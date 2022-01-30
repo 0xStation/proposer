@@ -1,6 +1,17 @@
+import { useMemo } from "react"
 import { useParam } from "blitz"
 import { Link, Routes, useRouter, useQuery } from "blitz"
 import getTerminalById from "app/terminal/queries/getTerminalById"
+import useStore from "app/core/hooks/useStore"
+import { useAccount, useBalance } from "wagmi"
+import {
+  useEndorsementGraphWrite,
+  useEndorsementTokenRead,
+  useEndorsementTokenWrite,
+  useDecimals,
+} from "app/core/contracts/contracts"
+import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
+import { Account } from "app/account/types"
 
 const Navigation = ({ children }: { children?: any }) => {
   // need a better way of catching undefined here than defaulting to 1
@@ -10,6 +21,20 @@ const Navigation = ({ children }: { children?: any }) => {
   // I was getting a weird error that suspense was not supported by react-dom so I had to disable it.
   const [terminal] = useQuery(getTerminalById, { id: terminalId }, { suspense: false })
   const router = useRouter()
+  const activeUser: Account | null = useStore((state) => state.activeUser)
+
+  const [{ data: accountData }] = useAccount({
+    fetchEns: true,
+  })
+  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
+  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
+  const [{ data: balanceData }] = useBalance({
+    addressOrName: address,
+    token: TERMINAL.TOKEN_ADDRESS,
+    watch: true,
+    formatUnits: decimals,
+  })
+  const tokenBalance = parseFloat(balanceData?.formatted || "0")
 
   // obviously need better error page if the terminal is not found, but this will do.
   if (!terminal) {
@@ -21,7 +46,7 @@ const Navigation = ({ children }: { children?: any }) => {
       className="w-full h-full bg-cover bg-center bg-no-repeat border"
       style={{ backgroundImage: "url('/station-cover.png')" }}
     >
-      <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36">
+      <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36 relative">
         <div className="grid gap-0 grid-cols-1 md:grid-cols-3 xl:grid-cols-4 max-w-screen-xl h-full mx-auto">
           <div className="col-span-1 pl-4 text-2xl border-concrete border-b pb-12 md:border-b-0 md:border-r md:pr-6 h-full">
             <div className="flex items-center mt-12">
@@ -74,6 +99,19 @@ const Navigation = ({ children }: { children?: any }) => {
           </div>
           <div className="col-span-2 xl:col-span-3 px-6 pb-12">
             <div className="mt-12">{children}</div>
+          </div>
+        </div>
+        <div className="fixed bottom-4 right-8">
+          {activeUser?.data.ticketImage ? (
+            <img className="h-[300px]" src={activeUser?.data.ticketImage} />
+          ) : (
+            <div className="h-[300px] w-[180px] border border-concrete rounded-2xl border-dashed text-concrete text-4xl text-center flex flex-col justify-center align-middle">
+              FUTURE TICKET GOES HERE
+            </div>
+          )}
+          <div className="mt-2 flex justify-between px-1">
+            <span className="text-marble-white font-bold">Balance</span>
+            <span className="text-marble-white font-light">{tokenBalance}ⓔ</span>
           </div>
         </div>
       </div>

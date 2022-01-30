@@ -7,6 +7,7 @@ export type AccountMetadata = {
   webURL?: string
   githubURL?: string
   twitterURL?: string
+  ticketImage?: string
   skills: string[]
   pronouns: string
   discordId: string
