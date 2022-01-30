@@ -106,8 +106,8 @@ const Project: BlitzPage = () => {
               </Link>
             </div>
             <div className="flex justify-center items-center">
-              <div className="bg-tunnel-black content-center items-center h-full w-[766px] mt-5 space-y-12">
-                <div className="flex flex-col space-y-12">
+              <div className="bg-tunnel-black content-center items-center h-full w-[766px] mt-5 space-y-10">
+                <div className="flex flex-col space-y-10">
                   <div className="flex flex-col text-marble-white items-center space-y-1">
                     <div className="flex flex-col items-center content-center space-y-3">
                       <span className="capitalize text-3xl">{initiative.data.name}</span>
@@ -122,13 +122,23 @@ const Project: BlitzPage = () => {
                     </div>
                   </div>
 
-                  <div className="h-auto mt-3">
+                  <div className="h-auto">
                     <Image
-                      src={initiative.data.bannerURL || Newstand}
+                      src={Newstand}
                       alt="Project details banner image."
                       width={766}
                       height={227}
                     />
+                    {initiative.data.isAcceptingApplications && (
+                      <div className="relative h-5 bg-tunnel-black flex overflow-hidden">
+                        <div className="animate-marquee whitespace-nowrap text-magic-mint font-vt323 text-xl w-full">
+                          <p>
+                            CALLING FOR CONTRIBUTORS. CALLING FOR CONTRIBUTORS. CALLING FOR
+                            CONTRIBUTORS. CALLING FOR CONTRIBUTORS.
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col space-y-4 text-marble-white">
@@ -310,7 +320,7 @@ const Project: BlitzPage = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-center items-center mt-12">
+                <div className="flex justify-center items-center mt-10">
                   <button
                     className="mt-4 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
                     onClick={() => {
