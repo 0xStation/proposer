@@ -16,10 +16,10 @@ import useStore from "../hooks/useStore"
 
 const TokenContext = ({ className, issuanceAmount, symbol, context = "" }) => (
   <div className={className}>
-    <p className="text-sm font-bold">
+    <p className="text-base font-bold">
       {issuanceAmount} {symbol}
     </p>
-    {context && <p className="text-sm">{context}</p>}
+    {context && <p className="text-base">{context}</p>}
   </div>
 )
 
@@ -80,7 +80,9 @@ const EndorseModal = ({
     const padding = endorsementMessage ? "" : "p-2"
 
     return (
-      <p className={`${messageColor} text-center text-xs mt-1 mb-[-10px] ${padding}`}>{children}</p>
+      <p className={`${messageColor} text-center text-base mt-1 mb-[-10px] ${padding}`}>
+        {children}
+      </p>
     )
   }
 

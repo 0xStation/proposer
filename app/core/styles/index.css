@@ -16,6 +16,13 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: "Favorit Pro";
+  src: url("../../../public/fonts/FavoritPro-Bold.otf") format("otf");
+  font-weight: 700;
+  font-style: normal;
+}
+
 body {
   background-color: #000000;
   font-family: "Favorit Pro";

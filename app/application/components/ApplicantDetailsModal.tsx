@@ -70,11 +70,11 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               </div>
               <div className="flex flex-1 justify-end absolute top-1 right-2 z-50">
                 {(application && application.createdAt !== null) || undefined ? (
-                  <span className="text-xs text-concrete font-normal">
+                  <span className="text-base text-concrete font-normal">
                     {application?.createdAt.toDateString}
                   </span>
                 ) : (
-                  <span className="text-xs text-concrete font-normal">Metadata</span>
+                  <span className="text-base text-concrete font-normal">Metadata</span>
                 )}
               </div>
             </div>
@@ -102,7 +102,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                       <Image src={Verified} alt="Verified icon." width={10} height={10} />
                     </div>
                   </div>
-                  <div className="flex flex-row flex-1 text-sm text-concrete space-x-1">
+                  <div className="flex flex-row flex-1 text-base text-concrete space-x-1">
                     <div className="flex-1">{application?.applicant.data.wallet}</div>
                     <div className="flex-1">-</div>
                     <div className="flex-1">{application?.applicant.data.pronouns}</div>
@@ -119,9 +119,9 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   <div className="font-bold">
                     <span>Role</span>
                   </div>
-                  <div className="text-xs font-normal flex flex-row">
+                  <div className="text-base font-normal flex flex-row">
                     {application?.applicant.data.role ? (
-                      <span className="text-xs rounded-lg text-eletric-violet bg-[#211831] py-1 px-2">
+                      <span className="text-base rounded-lg text-eletric-violet bg-[#211831] py-1 px-2">
                         {application?.applicant.data.role.toUpperCase()}
                       </span>
                     ) : (
@@ -133,13 +133,13 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   <div className="font-bold text-marble-white">
                     <span>Skills</span>
                   </div>
-                  <div className="text-sm font-normal text-neon-carrot">
+                  <div className="text-base font-normal text-neon-carrot">
                     <div className="flex flex-row space-x-2 overflow-x-scroll text-neon-carrot">
                       {application?.applicant.data.skills.map((skill, index) => {
                         return (
                           <span
                             key={index}
-                            className="text-xs rounded-lg text-neon-carrot bg-[#302013] py-1 px-2"
+                            className="text-base rounded-lg text-neon-carrot bg-[#302013] py-1 px-2"
                           >
                             {skill.toUpperCase()}
                           </span>
@@ -154,7 +154,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   <div className="font-bold">
                     <span>Contact</span>
                   </div>
-                  <div className="text-sm font-normal">
+                  <div className="text-base font-normal">
                     <span>@{application?.applicant.data.discordId}</span>
                   </div>
                 </div>
@@ -162,7 +162,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   <div className="font-bold">
                     <span>Timezone</span>
                   </div>
-                  <div className="text-sm font-normal text-marble-white">
+                  <div className="text-base font-normal text-marble-white">
                     <span>{application?.applicant.data.timezone || "N/A"}</span>
                   </div>
                 </div>
@@ -176,7 +176,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 <span>Why {application?.initiative?.data.name}?</span>
               </div>
               <div>
-                <p className="text-marble-white font-normal text-sm">
+                <p className="text-marble-white font-normal text-base">
                   {application?.data?.entryDesription || "N/A"}
                 </p>
               </div>
@@ -186,7 +186,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 <div className="font-bold">
                   <span>Submission</span>
                 </div>
-                <div className="text-sm font-normal">
+                <div className="text-base font-normal">
                   <div className="flex flex-row">
                     <a href={application?.data?.url} className="text-magic-mint">
                       <span>{application?.data?.url}</span>
@@ -200,7 +200,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     <div className="font-bold">
                       <span>Points</span>
                     </div>
-                    <div className="text-sm font-normal text-concrete">
+                    <div className="text-base font-normal text-concrete">
                       <span>RAILS</span>
                     </div>
                   </div>
@@ -225,7 +225,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 </div>
               ) : (
                 <div className="flex-auto">
-                  <span className="text-marble-white font-normal text-sm">
+                  <span className="text-marble-white font-normal text-base">
                     Be the first to endorse this applicant!
                   </span>
                 </div>
@@ -236,13 +236,13 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
             <div id="buttons" className="flex-auto flex flex-row content-center justify-center">
               <div className="flex flex-row space-x-3">
                 <div className={`"flex-1 flex "justify-center"`}>
-                  <button className="text-black border border-magic-mint h-[29px] w-[215px] bg-magic-mint rounded text-sm font-normal">
+                  <button className="text-black border border-magic-mint h-[29px] w-[215px] bg-magic-mint rounded text-base font-normal">
                     Endorse
                   </button>
                 </div>
                 {/* The following element is not needed for p0 */}
                 {/* <div className="flex-1 flex justify-start">
-                  <button className="text-magic-mint border border-magic-mint h-[29px] w-[190px] rounded text-sm font-normal">
+                  <button className="text-magic-mint border border-magic-mint h-[29px] w-[190px] rounded text-base font-normal">
                     Invite to Initiative
                   </button>
                 </div> */}

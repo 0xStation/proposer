@@ -96,7 +96,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           setIsApplicantOpen={setIsApplicantOpen}
         />
         <div className="flex flex-col space-y-10">
-          <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm space-y-3">
+          <div className="flex-auto flex-wrap space-x-3 text-marble-white text-base space-y-3">
             {initiatives.map((initiative, idx) => {
               return (
                 <Pill

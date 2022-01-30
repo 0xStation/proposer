@@ -63,7 +63,7 @@ const Map = () => {
                             !contributorBoolean
                               ? "text-tunnel-black bg-marble-white"
                               : "text-marble-white"
-                          } py-1 px-3 border border-marble-white rounded-full text-sm mr-2 hover:bg-marble-white hover:text-tunnel-black`}
+                          } py-1 px-3 border border-marble-white rounded-full text-base mr-2 hover:bg-marble-white hover:text-tunnel-black`}
                         >
                           ALL ({terminals?.length || 0})
                         </button>
@@ -75,7 +75,7 @@ const Map = () => {
                             contributorBoolean
                               ? "text-tunnel-black bg-marble-white"
                               : "text-marble-white"
-                          } py-1 px-3 border border-marble-white rounded-full text-sm mr-2 hover:bg-marble-white hover:text-tunnel-black`}
+                          } py-1 px-3 border border-marble-white rounded-full text-base mr-2 hover:bg-marble-white hover:text-tunnel-black`}
                         >
                           CONTRIBUTING ({contributorTerminals?.length || 0})
                         </button>
@@ -92,7 +92,7 @@ const Map = () => {
                                 src={terminal.data.pfpURL}
                               />
 
-                              <span className="text-marble-white text-xs mt-1 text-center whitespace-nowrap text-ellipsis overflow-hidden w-full">
+                              <span className="text-marble-white text-base mt-1 text-center whitespace-nowrap text-ellipsis overflow-hidden w-full">
                                 {terminal.data.name}
                               </span>
                             </div>
