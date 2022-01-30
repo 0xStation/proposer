@@ -4,13 +4,14 @@ import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
 import getAccountsByRole from "app/account/queries/getAccountsByRole"
 import { Account } from "app/account/types"
-import EndorseContributorModal from "app/contributors/components/EndorseContributorModal"
+import ContributorDirectoryModal from "app/contributors/components/ContributorDirectoryModal"
 import { Pill } from "app/core/components/Pill"
 import { TalentIdentityUnit as ContributorCard } from "app/core/components/TalentIdentityUnit/index"
+import { contributors } from "db/seed/contributors"
 
 const TerminalContributorsPage: BlitzPage = () => {
-  const [endorseModalIsOpen, setEndorseModalIsOpen] = useState(false)
-  const [selectedUserToEndorse, setSelectedUserToEndorse] = useState<Account | null>(null)
+  const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
+  const [selectedContributorToView, setSelectedContributorToView] = useState<Account | null>(null)
   const [selectedRole, setRole] = useState<String>("STAFF")
   const [selectedContributors, setSelectedContributors] = useState<Account[] | null>(null)
 
@@ -34,8 +35,8 @@ const TerminalContributorsPage: BlitzPage = () => {
     let onClick
     if (role) {
       onClick = () => {
-        setSelectedUserToEndorse(contributor)
-        setEndorseModalIsOpen(true)
+        setSelectedContributorToView(contributor)
+        setContributorDirectoryModalOpen(true)
       }
     }
 
@@ -55,11 +56,13 @@ const TerminalContributorsPage: BlitzPage = () => {
     <TerminalNavigation>
       {selectedContributors ? (
         <>
-          <EndorseContributorModal
-            isOpen={endorseModalIsOpen}
-            setIsOpen={setEndorseModalIsOpen}
-            selectedUserToEndorse={selectedUserToEndorse}
-          />
+          {selectedContributorToView && (
+            <ContributorDirectoryModal
+              contributor={selectedContributorToView}
+              isOpen={contributorDirectoryModalIsOpen}
+              setIsOpen={setContributorDirectoryModalOpen}
+            />
+          )}
           <div className="flex flex-col space-y-10">
             <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm space-y-3">
               {roles.map((role, index) => {
