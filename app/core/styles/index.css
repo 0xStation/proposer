@@ -18,7 +18,7 @@
 
 @font-face {
   font-family: "Favorit Pro";
-  src: url("../../../public/fonts/FavoritPro-Bold.otf") format("otf");
+  src: url("../../../public/fonts/favoritpro-bold-webfont.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
 }
