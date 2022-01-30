@@ -79,7 +79,7 @@ const AccountModal = ({
     setUploadingState("UPLOADING")
     const formData = new FormData()
     formData.append("file", acceptedFiles[0])
-    let res = await fetch("http://localhost:3000/api/uploadImage", {
+    let res = await fetch("/api/uploadImage", {
       method: "POST",
       body: formData,
     })
