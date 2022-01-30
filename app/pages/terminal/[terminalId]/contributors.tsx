@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react"
-import { BlitzPage, useQuery, useParam } from "blitz"
+import { BlitzPage, useQuery, useParam, invoke } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
 import getAccountsByRole from "app/account/queries/getAccountsByRole"
-import ContributorCard from "app/core/components/ContributorCard"
+// import ContributorCard from "app/core/components/ContributorCard"
 import { Account } from "app/account/types"
 import EndorseContributorModal from "app/contributors/components/EndorseContributorModal"
 import { Pill } from "app/core/components/Pill"
 import useStore from "app/core/hooks/useStore"
-import { TalentIdentityUnit as ApplicationCard } from "app/core/components/TalentIdentityUnit/index"
+import { TalentIdentityUnit as ContributorCard } from "app/core/components/TalentIdentityUnit/index"
 
 const TerminalContributorsPage: BlitzPage = () => {
-  let [endorseModalIsOpen, setEndorseModalIsOpen] = useState(false)
-  let [selectedUserToEndorse, setSelectedUserToEndorse] = useState<Account | null>(null)
-  let [selectedRole, setRole] = useState("STAFF")
-  let [selectedContributors, setSelectedContributors] = useState<Account[] | null>(null)
+  const [endorseModalIsOpen, setEndorseModalIsOpen] = useState(false)
+  const [selectedUserToEndorse, setSelectedUserToEndorse] = useState<Account | null>(null)
+  const [selectedRole, setRole] = useState("STAFF")
+  const [selectedContributors, setSelectedContributors] = useState<Account[] | null>(null)
   const openEndorseModal = () => setEndorseModalIsOpen(!endorseModalIsOpen)
   const activeUser: Account | null = useStore((state) => state.activeUser)
 
@@ -23,14 +23,49 @@ const TerminalContributorsPage: BlitzPage = () => {
 
   const roles = ["STAFF", "COMMUTER", "VISITOR"]
 
-  let [contributors] = useQuery(getAccountsByRole, { role: selectedRole }, { suspense: false })
-  if (!contributors) {
-    contributors = []
-  }
+  useEffect(() => {
+    // if (!allContributors){
+    //   setSelectedContributors(null)
+    // } else {
+    //   const roleContributors =  allContributors.forEach(sorted(selectedRole))
+    // }
+    if (selectedRole) {
+      const getApplicationsFromInitiative = async () => {
+        let contributors = await invoke(getAccountsByRole, { role: selectedRole })
+        setSelectedContributors(contributors)
+      }
+      getApplicationsFromInitiative()
+    }
+  }, [selectedRole])
+
+  const contributorCards = selectedContributors?.map((contributor, idx) => {
+    const { id, points, createdAt } = contributor
+    const {
+      data: { role, timezone },
+    } = contributor
+    let onClick
+    if (role) {
+      onClick = () => {
+        setSelectedUserToEndorse(contributor)
+        setEndorseModalIsOpen(true)
+      }
+    }
+
+    const contributorCardProps = {
+      user: contributor,
+      points,
+      onClick,
+      dateMetadata: createdAt && {
+        createdAt,
+        timezone,
+      },
+    }
+    return <ContributorCard key={idx} {...contributorCardProps} />
+  })
 
   return (
     <TerminalNavigation>
-      {contributors ? (
+      {selectedContributors ? (
         <>
           <EndorseContributorModal
             isOpen={endorseModalIsOpen}
@@ -53,7 +88,31 @@ const TerminalContributorsPage: BlitzPage = () => {
                 )
               })}
             </div>
-            {contributors.length ? (
+            {/* <div className="flex-auto text-marble-white">
+            {!applications || !applications.length ? (
+              <div>
+                {selectedInitiative ? (
+                  <div>There are no active applications for this initiative.</div>
+                ) : (
+                  <div>Please select an initiative to view applications.</div>
+                )}
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">{applicationCards}</div>
+            )}
+          </div> */}
+            {!selectedContributors || !selectedContributors.length ? (
+              <div className="text-marble-white">
+                {selectedRole ? (
+                  <div>There are no {selectedRole.toLowerCase()}s in this terminal.</div>
+                ) : (
+                  <div>Please select a role to view contributors.</div>
+                )}
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">{contributorCards}</div>
+            )}
+            {/* {contributors.length ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {contributors.length &&
                   contributors
@@ -78,7 +137,7 @@ const TerminalContributorsPage: BlitzPage = () => {
               <div className="text-marble-white">
                 There are no {selectedRole.toLowerCase()}s in this terminal.
               </div>
-            )}
+            )} */}
           </div>
         </>
       ) : (

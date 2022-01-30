@@ -20,4 +20,6 @@ export type Account = {
   address: string
   data: AccountMetadata
   role?: string
+  points?: number
+  createdAt?: Date
 }
