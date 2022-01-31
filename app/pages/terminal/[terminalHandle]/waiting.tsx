@@ -61,13 +61,12 @@ const TerminalWaitingPage: BlitzPage = () => {
     const {
       data: { role, timezone },
     } = applicant
-    let onClick
-    if (role) {
-      onClick = () => {
-        setSelectedApplication(application)
-        setIsApplicantOpen(true)
-      }
-    }
+    const onClick = activeUser
+      ? () => {
+          setSelectedApplication(application)
+          setIsApplicantOpen(true)
+        }
+      : undefined
 
     const applicationCardProps = {
       user: applicant,
@@ -90,20 +89,26 @@ const TerminalWaitingPage: BlitzPage = () => {
         initiative={currentInitiative}
         isApplicantOpen={isApplicantOpen}
         setIsApplicantOpen={setIsApplicantOpen}
+        setIsEndorseModalOpen={setIsEndorseModalOpen}
       />
     ) : null
+
+  const endorseModalView = selectedInitiative && localIds[selectedInitiative] && (
+    <EndorseModal
+      isEndorseModalOpen={isEndorseModalOpen}
+      setIsEndorseModalOpen={setIsEndorseModalOpen}
+      setIsSuccessModalOpen={setIsSuccessModalOpen}
+      selectedUserToEndorse={selectedApplication?.applicant}
+      initiativeId={localIds[selectedInitiative]}
+    />
+  )
 
   const waitingRoomView =
     !initiatives || (Array.isArray(initiatives) && !initiatives.length) ? (
       <div className="text-marble-white">There are no initiatives in this terminal.</div>
     ) : (
       <>
-        <EndorseModal
-          isEndorseModalOpen={isEndorseModalOpen}
-          setIsEndorseModalOpen={setIsEndorseModalOpen}
-          setIsSuccessModalOpen={setIsSuccessModalOpen}
-          selectedUserToEndorse={selectedApplication?.applicant}
-        />
+        {endorseModalView}
         <SuccessModal
           isSuccessModalOpen={isSuccessModalOpen}
           setIsSuccessModalOpen={setIsSuccessModalOpen}
@@ -115,7 +120,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             {initiatives.map((initiative, idx) => {
               return (
                 <Pill
-                  key={idx.toString()}
+                  key={idx}
                   active={initiative.localId === selectedInitiative}
                   onClick={() => setSelectedInitiative(initiative.localId)}
                 >
