@@ -1,18 +1,19 @@
 import { Account } from "app/account/types"
-export type ApplicationMetaData = {
+
+export type ApplicationMetadata = {
   entryDescription?: string
   url?: string
 }
 
-export type Referral = {
+export type ApplicationReferral = {
   from: Account
   amount: number
 }
 
 export type Application = {
   createdAt: Date
-  data: ApplicationMetaData
+  data: ApplicationMetadata
   applicant: Account
   points: number
-  referrals: Referral[]
+  referrals: ApplicationReferral[]
 }

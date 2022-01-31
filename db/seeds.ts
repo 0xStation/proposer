@@ -2,19 +2,22 @@ import { seedContributors } from "./seed/contributors"
 import { seedTerminals } from "./seed/terminals"
 import { seedInitiatives } from "./seed/initiatives"
 import { seedSkills } from "./seed/skills"
+import { seedApplications } from "./seed/applications"
 
 /*
  * This seed function is executed when you run `blitz db seed`.
  */
 const seed = async () => {
   console.log("Seeding terminals...")
-  const terminals = await seedTerminals()
+  let terminals = await seedTerminals()
   console.log("Seeding initiatives...")
-  await seedInitiatives(terminals)
+  terminals = await seedInitiatives(terminals)
   console.log("Seeding contributors...")
   await seedContributors(terminals)
   console.log("Seeding skills")
   await seedSkills()
+  console.log("Seeding applications")
+  await seedApplications()
 }
 
 export default seed

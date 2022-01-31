@@ -1,11 +1,13 @@
 import { utils } from "ethers"
-import { TERMINAL } from "../utils/constants"
+import { TERMINAL, CONTRACTS } from "../utils/constants"
 import endorsementTokenAbi from "../abi/EndorsementToken.json"
 import endorsementGraphAbi from "../abi/EndorsementGraph.json"
+import waitingRoomAbi from "../abi/WaitingRoom.json"
 import { useContractRead, useContractWrite, useToken } from "wagmi"
 
 const endorseContractInterface = new utils.Interface(endorsementGraphAbi)
 const endorsementTokenInterface = new utils.Interface(endorsementTokenAbi)
+const waitingRoomInterface = new utils.Interface(waitingRoomAbi)
 
 // call write functions from the endorsment graph
 export const useEndorsementGraphRead = ({ methodName }) => {
@@ -24,6 +26,17 @@ export const useEndorsementGraphWrite = ({ methodName }) => {
     {
       addressOrName: TERMINAL.GRAPH_ADDRESS,
       contractInterface: endorseContractInterface,
+    },
+    methodName
+  )
+  return { data, error, loading, write }
+}
+
+export const useWaitingRoomWrite = ({ methodName }) => {
+  const [{ data, error, loading }, write] = useContractWrite(
+    {
+      addressOrName: CONTRACTS.WAITING_ROOM,
+      contractInterface: waitingRoomInterface,
     },
     methodName
   )

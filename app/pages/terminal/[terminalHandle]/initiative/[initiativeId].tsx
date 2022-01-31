@@ -12,7 +12,6 @@ import StepTwo from "/public/step-2.svg"
 import StepThree from "/public/step-3.svg"
 
 import Back from "/public/back-icon.svg"
-import Page404 from "../../../404"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
 import { Account } from "app/account/types"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
@@ -74,15 +73,15 @@ const Project: BlitzPage = () => {
 
   const { results, totalPages, hasNext, hasPrev } = usePagination(contributors, page, 3)
 
-  const initiatvePageView = !initiative ? (
-    <Page404 />
-  ) : (
+  return (
     <>
-      <ApplicationModal
-        isOpen={applicationModalOpen}
-        setIsOpen={setApplicationModalOpen}
-        initiativeId={initiative.id}
-      />
+      {initiative && (
+        <ApplicationModal
+          isOpen={applicationModalOpen}
+          setIsOpen={setApplicationModalOpen}
+          initiativeId={initiative.id}
+        />
+      )}
       <AccountModal
         isOpen={accountModalOpen}
         setIsOpen={setAccountModalOpen}
@@ -95,31 +94,34 @@ const Project: BlitzPage = () => {
             <Image className="cursor-pointer" src={Back} alt="Back Icon" width={25} height={22} />
           </Link>
         </div>
-        <div className="flex flex-col justify-center items-center">
-          <div className="bg-tunnel-black content-center items-center h-full md:w-[766px] mt-5 space-y-10">
+        <div className="flex justify-center items-center">
+          <div className="bg-tunnel-black content-center items-center h-full w-[766px] mt-5 space-y-10">
             <div className="flex flex-col space-y-10">
               <div className="flex flex-col text-marble-white items-center space-y-1">
                 <div className="flex flex-col items-center content-center space-y-3">
-                  <span className="capitalize text-3xl">{initiative.data.name}</span>
+                  <span className="capitalize text-3xl">
+                    {initiative?.data.name || "loading..."}
+                  </span>
                   <span className="text-base mx-[60px] text-center">
-                    {initiative.data.description}
+                    {initiative?.data.description || "loading..."}
                   </span>
                 </div>
                 <div className="cursor-pointer">
-                  {initiative.data.links?.map?.((item, index) => (
-                    <ImageLink link={item} key={index} />
-                  ))}
+                  {initiative &&
+                    initiative.data.links?.map?.((item, index) => (
+                      <ImageLink link={item} key={index} />
+                    ))}
                 </div>
               </div>
 
               <div className="h-auto">
                 <Image
-                  src={Newstand || initiative.data.bannerURL}
+                  src={Newstand}
                   alt="Project details banner image."
                   width={766}
                   height={227}
                 />
-                {initiative.data.isAcceptingApplications && (
+                {initiative && initiative.data.isAcceptingApplications && (
                   <div className="relative h-5 bg-tunnel-black flex overflow-hidden">
                     <div className="animate-marquee whitespace-nowrap text-magic-mint font-vt323 text-xl w-full">
                       <p>
@@ -136,13 +138,14 @@ const Project: BlitzPage = () => {
                   <span className="text-2xl">About</span>
                 </div>
                 <div className="space-y-3">
-                  {initiative.data.contributeText?.map?.((item, index) => {
-                    return (
-                      <span className="text-base flow-root" key={index}>
-                        {item}
-                      </span>
-                    )
-                  })}
+                  {initiative &&
+                    initiative.data.contributeText?.map?.((item, index) => {
+                      return (
+                        <span className="text-base flow-root" key={index}>
+                          {item}
+                        </span>
+                      )
+                    })}
                 </div>
               </div>
               <div className="text-marble-white flex flex-row my-4 gap-12">
@@ -151,13 +154,14 @@ const Project: BlitzPage = () => {
                     <span className="text-2xl">Rewards</span>
                   </div>
                   <div className="space-y-1 flex flex-col">
-                    {initiative.data.rewardText?.map?.((reward, index) => {
-                      return (
-                        <span key={index} className="text-base">
-                          {reward}
-                        </span>
-                      )
-                    })}
+                    {initiative &&
+                      initiative.data.rewardText?.map?.((reward, index) => {
+                        return (
+                          <span key={index} className="text-base">
+                            {reward}
+                          </span>
+                        )
+                      })}
                   </div>
                 </div>
                 <div className="flex-1 space-y-4">
@@ -165,7 +169,7 @@ const Project: BlitzPage = () => {
                     <span className="text-2xl">Commitment</span>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-base">{initiative.data.commitment}</span>
+                    <span className="text-base">{initiative && initiative.data.commitment}</span>
                   </div>
                 </div>
                 <div className="flex-1 space-y-4">
@@ -173,16 +177,17 @@ const Project: BlitzPage = () => {
                     <span className="text-2xl">Skills</span>
                   </div>
                   <div className="space-x-2 flex flex-wrap">
-                    {initiative.data.skills?.map?.((skills, index) => {
-                      return (
-                        <span
-                          key={index}
-                          className="text-sm rounded-lg text-neon-carrot bg-[#302013] py-1 px-2"
-                        >
-                          {skills}
-                        </span>
-                      )
-                    })}
+                    {initiative &&
+                      initiative.data.skills?.map?.((skills, index) => {
+                        return (
+                          <span
+                            key={index}
+                            className="text-sm rounded-lg text-neon-carrot bg-[#302013] py-1 px-2"
+                          >
+                            {skills}
+                          </span>
+                        )
+                      })}
                   </div>
                 </div>
               </div>
@@ -325,7 +330,6 @@ const Project: BlitzPage = () => {
       </main>
     </>
   )
-  return initiatvePageView
 }
 
 Project.suppressFirstRenderFlicker = true

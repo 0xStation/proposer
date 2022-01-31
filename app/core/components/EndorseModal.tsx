@@ -9,9 +9,9 @@ import {
   useDecimals,
   useEndorsementTokenRead,
   useEndorsementTokenWrite,
-  useEndorsementGraphWrite,
+  useWaitingRoomWrite,
 } from "../contracts/contracts"
-import { DEFAULT_NUMBER_OF_DECIMALS, TERMINAL, MAX_ALLOWANCE } from "../utils/constants"
+import { DEFAULT_NUMBER_OF_DECIMALS, TERMINAL, MAX_ALLOWANCE, CONTRACTS } from "../utils/constants"
 import useStore from "../hooks/useStore"
 
 const TokenContext = ({ className, issuanceAmount, symbol, context = "" }) => (
@@ -28,6 +28,7 @@ const EndorseModal = ({
   setIsEndorseModalOpen,
   setIsSuccessModalOpen,
   selectedUserToEndorse: contributor,
+  initiativeId,
 }) => {
   const [{ data: accountData }] = useAccount()
 
@@ -45,11 +46,9 @@ const EndorseModal = ({
     methodName: "approve",
   })
 
-  const { loading: endorseLoading, write: endorse } = useEndorsementGraphWrite({
+  const { loading: endorseLoading, write: endorse } = useWaitingRoomWrite({
     methodName: "endorse",
   })
-
-  const contributorData = contributor?.data || {}
 
   const [, wait] = useWaitForTransaction({
     skip: true,
@@ -116,7 +115,7 @@ const EndorseModal = ({
     // TODO: allowance max should be the issuance of the user
     if (allowance < 100) {
       const { data: allowanceData, error: allowanceError } = await approveAllowance({
-        args: [TERMINAL.GRAPH_ADDRESS, MAX_ALLOWANCE],
+        args: [CONTRACTS.WAITING_ROOM, MAX_ALLOWANCE],
       })
 
       let allowanceTransaction
@@ -138,10 +137,10 @@ const EndorseModal = ({
 
     const { data: endorseData, error: endorseError } = await endorse({
       args: [
-        0,
-        activeUser?.data?.ticketId,
-        contributorData.ticketId,
+        TERMINAL.REFERRAL_GRAPH,
+        contributor.address,
         endorsementAmount * Math.pow(10, decimals),
+        initiativeId,
       ],
     })
 
@@ -201,7 +200,7 @@ const EndorseModal = ({
   useEffect(() => {
     const getEndorsementTokenAllowance = async () => {
       const { data: tokenAllowance, error } = await getAllowance({
-        args: [address, TERMINAL.GRAPH_ADDRESS],
+        args: [address, CONTRACTS.WAITING_ROOM],
       })
       setAllowance(parseFloat(utils.formatUnits((tokenAllowance as BigNumberish) || 0, decimals)))
     }

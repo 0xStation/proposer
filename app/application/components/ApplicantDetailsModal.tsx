@@ -16,6 +16,7 @@ import useStore from "app/core/hooks/useStore"
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
   setIsApplicantOpen: Dispatch<SetStateAction<boolean>>
+  setIsEndorseModalOpen: Dispatch<SetStateAction<boolean>>
   application: Application
   initiative: Initiative
 }
@@ -25,6 +26,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   initiative,
   isApplicantOpen,
   setIsApplicantOpen,
+  setIsEndorseModalOpen,
 }) => {
   const activeUser: Account | null = useStore((state) => state.activeUser)
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
@@ -214,7 +216,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               <div className="flex-auto text-marble-white font-bold">
                 <span>Endorsers</span>
               </div>
-              {/* {application?.endorsements && application?.endorsements.length ? (
+              {application?.referrals && application?.referrals.length ? (
                 //   <div
                 //   className={`"flex flex-col space-y-1 ${application.endorsements.length === 1 && "h-[60px]"}
                 //    space-y-1 ${
@@ -222,8 +224,13 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 //    } overflow-y-scroll"`}
                 // >
                 <div className="flex flex-col space-y-1">
-                  {application.endorsements.map((person, index) => (
-                    <ApplicantEndorsements key={index} person={person} isEndorsable={endorable} />
+                  {application.referrals.map(({ from: account, amount }, index) => (
+                    <ApplicantEndorsements
+                      key={index}
+                      person={account}
+                      amount={amount}
+                      isEndorsable={endorable}
+                    />
                   ))}
                 </div>
               ) : (
@@ -232,14 +239,20 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     Be the first to endorse this applicant!
                   </span>
                 </div>
-              )} */}
+              )}
             </div>
           </div>
           {isEndorsable() && (
             <div id="buttons" className="flex-auto flex flex-row content-center justify-center">
               <div className="flex flex-row space-x-3">
                 <div className={`"flex-1 flex "justify-center"`}>
-                  <button className="text-black border border-magic-mint h-[29px] w-[215px] bg-magic-mint rounded text-base font-normal">
+                  <button
+                    onClick={() => {
+                      setIsApplicantOpen(false)
+                      setIsEndorseModalOpen(true)
+                    }}
+                    className="text-black border border-magic-mint h-[29px] w-[215px] bg-magic-mint rounded text-base font-normal"
+                  >
                     Endorse
                   </button>
                 </div>

@@ -34,6 +34,11 @@ const TerminalWaitingPage: BlitzPage = () => {
     { suspense: false }
   )
 
+  const localIds = {}
+  initiatives?.forEach((i) => {
+    localIds[i.id] = i.localId
+  })
+
   const [isApplicantOpen, setIsApplicantOpen] = useState(false)
   const activeUser: Account | null = useStore((state) => state.activeUser)
 
@@ -41,6 +46,8 @@ const TerminalWaitingPage: BlitzPage = () => {
     if (selectedInitiative) {
       const getApplicationsFromInitiative = async () => {
         let applications = await invoke(getApplicationsByInitiative, {
+          referralGraphAddress: "0x7D9D3BE8219069F3a947Fb20bd7b1A6b1944e16E", // todo: dynmically load from local state
+          initiativeLocalId: localIds[selectedInitiative],
           initiativeId: selectedInitiative,
         })
         setApplications(applications)
@@ -54,13 +61,12 @@ const TerminalWaitingPage: BlitzPage = () => {
     const {
       data: { role, timezone },
     } = applicant
-    let onClick
-    if (role) {
-      onClick = () => {
-        setSelectedApplication(application)
-        setIsApplicantOpen(true)
-      }
-    }
+    const onClick = activeUser
+      ? () => {
+          setSelectedApplication(application)
+          setIsApplicantOpen(true)
+        }
+      : undefined
 
     const applicationCardProps = {
       user: applicant,
@@ -83,20 +89,26 @@ const TerminalWaitingPage: BlitzPage = () => {
         initiative={currentInitiative}
         isApplicantOpen={isApplicantOpen}
         setIsApplicantOpen={setIsApplicantOpen}
+        setIsEndorseModalOpen={setIsEndorseModalOpen}
       />
     ) : null
+
+  const endorseModalView = selectedInitiative && localIds[selectedInitiative] && (
+    <EndorseModal
+      isEndorseModalOpen={isEndorseModalOpen}
+      setIsEndorseModalOpen={setIsEndorseModalOpen}
+      setIsSuccessModalOpen={setIsSuccessModalOpen}
+      selectedUserToEndorse={selectedApplication?.applicant}
+      initiativeId={localIds[selectedInitiative]}
+    />
+  )
 
   const waitingRoomView =
     !initiatives || (Array.isArray(initiatives) && !initiatives.length) ? (
       <div className="text-marble-white">There are no initiatives in this terminal.</div>
     ) : (
       <>
-        <EndorseModal
-          isEndorseModalOpen={isEndorseModalOpen}
-          setIsEndorseModalOpen={setIsEndorseModalOpen}
-          setIsSuccessModalOpen={setIsSuccessModalOpen}
-          selectedUserToEndorse={selectedApplication?.applicant}
-        />
+        {endorseModalView}
         <SuccessModal
           isSuccessModalOpen={isSuccessModalOpen}
           setIsSuccessModalOpen={setIsSuccessModalOpen}
@@ -108,7 +120,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             {initiatives.map((initiative, idx) => {
               return (
                 <Pill
-                  key={idx.toString()}
+                  key={idx}
                   active={initiative.localId === selectedInitiative}
                   onClick={() => setSelectedInitiative(initiative.localId)}
                 >
