@@ -32,6 +32,7 @@ const tina: AccountMetadata & { address: string } = {
   role: "STAFF",
   twitterURL: "https://twitter.com/fkpxls",
   pfpURL: "https://pbs.twimg.com/profile_images/1470115904289574913/7t4TlLQd_400x400.jpg",
+  initiatives: [3, 4, 6],
 }
 const conner: AccountMetadata & { address: string } = {
   name: "Conner",

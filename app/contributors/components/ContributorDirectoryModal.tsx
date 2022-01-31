@@ -1,6 +1,6 @@
 import Modal from "../../core/components/Modal"
 import Verified from "/public/check-mark.svg"
-import { Image, invoke } from "blitz"
+import { Image, invoke, Link, Routes, useParam } from "blitz"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
@@ -11,7 +11,8 @@ import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
 import useStore from "app/core/hooks/useStore"
 import { Initiative } from "app/initiative/types"
-// import getInitiativesByContributor from "app/initiative/queries/getInitiativesByContributor"
+import InitiativeCard from "app/initiative/components/InitiativeCard"
+import getInitiativesByLocalIds from "app/initiative/queries/getInitiativesByLocalIds"
 
 type ContributorDirectoryModalProps = {
   isOpen: boolean
@@ -19,12 +20,12 @@ type ContributorDirectoryModalProps = {
   contributor?: Account
   activeUser?: Account
 }
-
 const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
   contributor,
   isOpen,
   setIsOpen,
 }) => {
+  const terminalHandle = useParam("terminalHandle", "string") as string
   const activeUser: Account | null = useStore((state) => state.activeUser)
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
   const [{ data: balanceData }] = useBalance({
@@ -35,23 +36,23 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
   })
   const [initiatives, setInitiatives] = useState<Initiative[]>()
 
-  // useEffect(() => {
-  //   if (isOpen) {
-  //     const getInitiativesFromContributor = async () => {
-  //       let involvements = await invoke(getInitiativesByContributor, {
-  //         contributorId: contributor?.id,
-  //       })
-  //       setInitiatives(involvements)
-  //     }
-  //     getInitiativesFromContributor()
-  //   }
-  // }, [contributor])
+  useEffect(() => {
+    if (isOpen) {
+      const getInitiativesFromContributor = async () => {
+        let involvements = await invoke(getInitiativesByLocalIds, {
+          localIds: contributor?.data.initiatives || [],
+        })
+        setInitiatives(involvements)
+      }
+      getInitiativesFromContributor()
+    }
+  }, [contributor, isOpen])
 
   return (
     <div>
       <Modal subtitle="" open={isOpen} toggle={setIsOpen} showTitle={false}>
         <div className="flex flex-col">
-          <div className="flex flex- auto flex-col space-y-6 overflow-y-scroll">
+          <div className="flex flex-auto flex-col space-y-6">
             <div id="close and meta data" className="flex-auto flex flex-row">
               <div className="flex flex-1 justify-start absolute top-1 left-2">
                 <div className="w-[12px] h-[12px]">
@@ -126,18 +127,22 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                     <span>Skills</span>
                   </div>
                   <div className="text-sm font-normal text-neon-carrot">
-                    <div className="flex flex-row space-x-2 overflow-x-scroll text-neon-carrot content-end">
-                      {contributor?.data?.skills.map((skill, index) => {
-                        return (
-                          <span
-                            key={index}
-                            className="text-xs rounded-lg text-neon-carrot bg-[#302013] py-1 px-2"
-                          >
-                            {skill.toUpperCase()}
-                          </span>
-                        )
-                      }) || "N/A"}
-                    </div>
+                    {contributor?.data?.skills && contributor?.data?.skills.length ? (
+                      <div className="flex flex-row space-x-2 overflow-x-scroll text-neon-carrot content-end">
+                        {contributor?.data?.skills.map((skill, index) => {
+                          return (
+                            <span
+                              key={index}
+                              className="text-xs rounded-lg text-neon-carrot bg-[#302013] py-1 px-2"
+                            >
+                              {skill.toUpperCase()}
+                            </span>
+                          )
+                        })}
+                      </div>
+                    ) : (
+                      <span className="text-marble-white">N/A</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -166,10 +171,33 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
               </div>
             </div>
             <div className="flex-auto flex flex-row border border-concrete left-0 right-0 max-h-0"></div>
-          </div>
-          <div className="flex flex-col space-y-6">
-            <div className="flex-auto text-marble-white font-bold">Initiatives</div>
-            <div className="flex-auto flex flex-row space-x-3"></div>
+            <div className="flex flex-col space-y-4">
+              <div className="flex-auto text-marble-white font-bold">Initiatives</div>
+              {initiatives && initiatives.length ? (
+                <div className="grid grid-cols-2 gap-4 h-[300px] overflow-y-scroll">
+                  {initiatives.map((initiative) => {
+                    return (
+                      <Link
+                        key={initiative.localId}
+                        href={Routes.Project({ terminalHandle, initiativeId: initiative.localId })}
+                      >
+                        <a>
+                          <InitiativeCard
+                            title={initiative?.data?.name || "Title"}
+                            description={initiative?.data?.description || "Description"}
+                            contributors={initiative.contributors}
+                          />
+                        </a>
+                      </Link>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="text-marble-white font-normal text-sm">
+                  {contributor?.data.name} is not involved in any active initiatives at this time.
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </Modal>
