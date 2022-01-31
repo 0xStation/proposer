@@ -6,6 +6,7 @@ import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
 import DiscordIcon from "/public/discord-icon.svg"
 import { Account } from "app/account/types"
+import { Initiative } from "app/initiative/types"
 import { useAccount, useBalance } from "wagmi"
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
@@ -15,12 +16,13 @@ import useStore from "app/core/hooks/useStore"
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
   setIsApplicantOpen: Dispatch<SetStateAction<boolean>>
-  application?: Application
-  activeUser?: Account
+  application: Application
+  initiative: Initiative
 }
 
 const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   application,
+  initiative,
   isApplicantOpen,
   setIsApplicantOpen,
 }) => {
@@ -156,7 +158,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     <span>Contact</span>
                   </div>
                   <div className="text-base font-normal">
-                    <span>@{application?.applicant.data.discordId}</span>
+                    <span>@{application?.applicant?.data?.discordId}</span>
                   </div>
                 </div>
                 <div className="flex flex-col flex-1 text-marble-white">
@@ -164,7 +166,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     <span>Timezone</span>
                   </div>
                   <div className="text-base font-normal text-marble-white">
-                    <span>{application?.applicant.data.timezone || "N/A"}</span>
+                    <span>{application?.applicant?.data?.timezone || "N/A"}</span>
                   </div>
                 </div>
               </div>
@@ -174,7 +176,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
             </div>
             <div id="why questions" className="flex-auto flex flex-col text-marble-white space-y-2">
               <div className="font-bold">
-                <span>Why {application?.initiative?.data.name}?</span>
+                <span>Why {initiative?.data?.name}?</span>
               </div>
               <div>
                 <p className="text-marble-white font-normal text-base">
@@ -235,7 +237,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     Be the first to endorse this applicant!
                   </span>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
           {isEndorsable() && (

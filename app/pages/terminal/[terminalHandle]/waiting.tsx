@@ -52,7 +52,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   }, [selectedInitiative])
 
   const applicationCards = applications?.map((application, idx) => {
-    const { id, applicant, createdAt, points } = application
+    const { applicant, createdAt, points, referrals } = application
     const {
       data: { role, timezone },
     } = applicant
@@ -76,6 +76,18 @@ const TerminalWaitingPage: BlitzPage = () => {
     return <ApplicationCard key={idx} {...applicationCardProps} />
   })
 
+  const currentInitiative = initiatives?.find((initiative) => initiative.id === selectedInitiative)
+
+  const applicantDetailsModalView =
+    selectedApplication && selectedInitiative && currentInitiative ? (
+      <ApplicantDetailsModal
+        application={selectedApplication}
+        initiative={currentInitiative}
+        isApplicantOpen={isApplicantOpen}
+        setIsApplicantOpen={setIsApplicantOpen}
+      />
+    ) : null
+
   const waitingRoomView =
     !initiatives || (Array.isArray(initiatives) && !initiatives.length) ? (
       <div className="text-marble-white">There are no initiatives in this terminal.</div>
@@ -92,11 +104,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           setIsSuccessModalOpen={setIsSuccessModalOpen}
           selectedUserToEndorse={selectedApplication?.applicant}
         />
-        <ApplicantDetailsModal
-          application={selectedApplication}
-          isApplicantOpen={isApplicantOpen}
-          setIsApplicantOpen={setIsApplicantOpen}
-        />
+        {applicantDetailsModalView}
         <div className="flex flex-col space-y-10">
           <div className="flex-auto flex-wrap space-x-3 text-marble-white text-base space-y-3">
             {initiatives.map((initiative, idx) => {
