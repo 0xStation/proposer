@@ -13,15 +13,14 @@ generator client {
 // The account of user of Station
 // user's wallet address is primary key
 model Account {
-  id                  Int                      @id @default(autoincrement())
-  address             String                   @unique
-  applications        InitiativeApplication[]
-  pledgedEndorsements ApplicationEndorsement[]
-  skills              SkillsOnAccounts[]
-  tickets             AccountTerminal[]
-  role                String?
-  data                Json?
-  joinedAt            DateTime                 @default(now())
+  id           Int                     @id @default(autoincrement())
+  address      String                  @unique
+  applications InitiativeApplication[]
+  skills       SkillsOnAccounts[]
+  tickets      AccountTerminal[]
+  role         String?
+  data         Json?
+  joinedAt     DateTime                @default(now())
 }
 
 // Each DAO is represented by a terminal.
@@ -61,13 +60,12 @@ model Initiative {
 
 // AKA "application"
 model InitiativeApplication {
-  id           Int                      @id @default(autoincrement())
-  applicant    Account                  @relation(fields: [applicantId], references: [id])
+  id           Int        @id @default(autoincrement())
+  applicant    Account    @relation(fields: [applicantId], references: [id])
   applicantId  Int
-  initiative   Initiative               @relation(fields: [initiativeId], references: [id])
+  initiative   Initiative @relation(fields: [initiativeId], references: [id])
   initiativeId Int
-  endorsements ApplicationEndorsement[] //onchain
-  createdAt    DateTime                 @default(now())
+  createdAt    DateTime   @default(now())
   data         Json?
 }
 
@@ -84,15 +82,4 @@ model SkillsOnAccounts {
   accountId Int
 
   @@id([skillId, accountId])
-}
-
-//doesn't exist anymore
-model ApplicationEndorsement {
-  id            Int                   @id @default(autoincrement())
-  signature     String
-  value         Int
-  application   InitiativeApplication @relation(fields: [applicationId], references: [id])
-  applicationId Int
-  endorser      Account               @relation(fields: [accountId], references: [id])
-  accountId     Int
 }
