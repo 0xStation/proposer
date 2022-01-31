@@ -116,7 +116,7 @@ const Project: BlitzPage = () => {
                       </span>
                     </div>
                     <div className="cursor-pointer">
-                      {initiative.data.links?.map((item, index) => (
+                      {initiative.data.links?.map?.((item, index) => (
                         <ImageLink link={item} key={index} />
                       ))}
                     </div>
@@ -146,7 +146,7 @@ const Project: BlitzPage = () => {
                       <span className="text-2xl">About</span>
                     </div>
                     <div className="space-y-3">
-                      {initiative.data.contributeText?.map((item, index) => {
+                      {initiative.data.contributeText?.map?.((item, index) => {
                         return (
                           <span className="text-base flow-root" key={index}>
                             {item}
@@ -155,14 +155,13 @@ const Project: BlitzPage = () => {
                       })}
                     </div>
                   </div>
-
                   <div className="text-marble-white flex flex-row my-4 gap-12">
                     <div className="flex-1 space-y-4">
                       <div>
                         <span className="text-2xl">Rewards</span>
                       </div>
                       <div className="space-y-1 flex flex-col">
-                        {initiative.data.rewardText?.map((reward, index) => {
+                        {initiative.data.rewardText?.map?.((reward, index) => {
                           return (
                             <span key={index} className="text-base">
                               {reward}
@@ -184,7 +183,7 @@ const Project: BlitzPage = () => {
                         <span className="text-2xl">Skills</span>
                       </div>
                       <div className="space-x-2 flex flex-wrap">
-                        {initiative.data.skills?.map((skills, index) => {
+                        {initiative.data.skills?.map?.((skills, index) => {
                           return (
                             <span
                               key={index}
@@ -203,7 +202,7 @@ const Project: BlitzPage = () => {
                       <span className="flex-1 text-marble-white text-2xl">Contributors</span>
                     </div>
                     <div className="grid grid-cols-3 gap-3">
-                      {results.map((contributor, index) => {
+                      {results?.map?.((contributor, index) => {
                         return <ContributorCard key={index} user={contributor} />
                       })}
                     </div>
