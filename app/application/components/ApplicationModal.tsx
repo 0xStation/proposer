@@ -62,7 +62,7 @@ const ApplicationModal = ({
     >
       <div className="mt-8">
         <Form
-          onSubmit={async (values: { url: string; entryDesription: string }) => {
+          onSubmit={async (values: { url: string; entryDescription: string }) => {
             try {
               await createApplicationMutation({
                 ...values,

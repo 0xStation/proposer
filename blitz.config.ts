@@ -8,7 +8,7 @@ const config: BlitzConfig = {
     }),
   ],
   images: {
-    domains: ["pbs.twimg.com"],
+    domains: ["pbs.twimg.com", "user-images.githubusercontent.com"],
   },
   /* Uncomment this to customize the webpack config
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {

@@ -31,7 +31,7 @@ const tina: AccountMetadata & { address: string } = {
   wallet: "fkpixels.eth",
   role: "STAFF",
   twitterURL: "https://twitter.com/fkpxls",
-  pfpURL: "https://pbs.twimg.com/profile_images/1470115904289574913/7t4TlLQd_400x400.jpg",
+  pfpURL: "https://pbs.twimg.com/profile_images/1484598066955104260/wfsgem53_400x400.jpg",
 }
 const conner: AccountMetadata & { address: string } = {
   name: "Conner",
@@ -235,7 +235,7 @@ export async function seedContributors(terminals) {
               active: true,
               terminal: {
                 connect: {
-                  id: terminals.Station.id,
+                  id: terminals.station.id,
                 },
               },
             },
@@ -260,14 +260,14 @@ export async function seedContributors(terminals) {
     // const uploadedImageResponse = await uploadToS3(ticketSVG, path)
     // const uploadedImagePath = uploadedImageResponse.Location
 
-    await db.account.update({
-      where: { address: props.address },
-      data: {
-        data: {
-          ...(existingAccount.data as {}),
-          // ticketImage: uploadedImagePath,
-        },
-      },
-    })
+    // await db.account.update({
+    //   where: { address: props.address },
+    //   data: {
+    //     data: {
+    //       ...(existingAccount.data as {}),
+    //       // ticketImage: uploadedImagePath
+    //     },
+    //   },
+    // })
   }
 }
