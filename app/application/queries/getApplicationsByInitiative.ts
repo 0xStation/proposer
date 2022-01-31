@@ -51,10 +51,10 @@ export default async function getApplicationsByInitiative(
     //////
 
     subgraphQuery.waitingRoomInitiative.applicants.forEach((a) => {
-      applicants[a.address] = a
+      applicants[a.address.toLowerCase()] = a
       a.referrals.forEach((r) => {
         // default data, will be overriden if account with address r.from exists later
-        referrers[r.from] = {
+        referrers[r.from.toLowerCase()] = {
           data: {
             name: getWalletString(r.from),
             wallet: getWalletString(r.from),
@@ -76,11 +76,12 @@ export default async function getApplicationsByInitiative(
     if (Object.keys(referrers).length > 0) {
       // fetch metadata from accounts matching referrer addresses
       const accounts = await db.account.findMany({
-        where: { address: { in: Object.keys(referrers) } },
+        where: { address: { in: Object.keys(referrers), mode: "insensitive" } },
+        // addresses come from the subgraph lowered, but database may or may not lower so insensitive filtering used
         select: { address: true, data: true },
       })
       // update per-referrer store with account metadata
-      accounts.forEach((r) => (referrers[r.address].data = r.data))
+      accounts.forEach((r) => (referrers[r.address.toLowerCase()].data = r.data))
     }
   }
 
@@ -106,7 +107,7 @@ export default async function getApplicationsByInitiative(
           (applicant?.referrals.map((r) => {
             return {
               amount: r.amount,
-              from: referrers[r.from],
+              from: referrers[r.from.toLowerCase()],
             }
           }) as ApplicationReferral[]) || [],
       }
