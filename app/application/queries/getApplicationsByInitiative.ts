@@ -70,13 +70,15 @@ export default async function getApplicationsByInitiative(
   // Merge db account data with subgraph referrers
   //////
 
-  // fetch metadata from accounts matching referrer addresses
-  const accounts = await db.account.findMany({
-    where: { address: { in: Object.keys(referrers) } },
-    select: { address: true, data: true },
-  })
-  // update per-referrer store with account metadata
-  accounts.forEach((r) => (referrers[r.address].data = r.data))
+  if (Object.keys(referrers).length > 0) {
+    // fetch metadata from accounts matching referrer addresses
+    const accounts = await db.account.findMany({
+      where: { address: { in: Object.keys(referrers) } },
+      select: { address: true, data: true },
+    })
+    // update per-referrer store with account metadata
+    accounts.forEach((r) => (referrers[r.address].data = r.data))
+  }
 
   //////
   // Merge db initiative application data with sugraph referrals
@@ -89,19 +91,21 @@ export default async function getApplicationsByInitiative(
   })
 
   // merge database data and subgraph data
-  const merged = applications.map((a) => {
-    const applicant = applicants[a.applicant.address.toLowerCase()]
-    return {
-      ...a,
-      points: applicant.points,
-      referrals: applicant.referrals.map((r) => {
-        return {
-          amount: r.amount,
-          from: referrers[r.from],
-        }
-      }),
-    }
-  })
+  const merged =
+    applications?.map((a) => {
+      const applicant = applicants[a.applicant.address.toLowerCase()]
+      return {
+        ...a,
+        points: applicant?.points || 0,
+        referrals:
+          applicant?.referrals.map((r) => {
+            return {
+              amount: r.amount,
+              from: referrers[r.from],
+            }
+          }) || [],
+      }
+    }) || []
 
   return merged
 }
