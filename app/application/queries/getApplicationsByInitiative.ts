@@ -2,6 +2,7 @@ import db from "db"
 import * as z from "zod"
 import { request, gql } from "graphql-request"
 import { getWalletString } from "app/utils/getWalletString"
+import { Application } from "../types"
 
 const GetApplicationsByInitiative = z.object({
   referralGraphAddress: z.string(),
@@ -13,7 +14,7 @@ export default async function getApplicationsByInitiative(
   input: z.infer<typeof GetApplicationsByInitiative>
 ) {
   const data = GetApplicationsByInitiative.parse(input)
-  const { initiativeId } = data
+  const { referralGraphAddress, initiativeLocalId, initiativeId } = data
 
   //////
   // Query subgraph for initiative-level referral data
@@ -21,7 +22,7 @@ export default async function getApplicationsByInitiative(
 
   let queryWaitingRoom = gql`
     {
-      waitingRoomInitiative(id: "${data.referralGraphAddress}:${data.initiativeLocalId}.0") {
+      waitingRoomInitiative(id: "${referralGraphAddress}:${initiativeLocalId}.0") {
         localId
         applicants {
           address
@@ -86,7 +87,7 @@ export default async function getApplicationsByInitiative(
 
   // get all applications for the initiative
   const applications = await db.initiativeApplication.findMany({
-    where: { initiativeId: data.initiativeId },
+    where: { initiativeId: initiativeId },
     include: { applicant: true },
   })
 
@@ -107,5 +108,5 @@ export default async function getApplicationsByInitiative(
       }
     }) || []
 
-  return merged
+  return merged as Application[]
 }

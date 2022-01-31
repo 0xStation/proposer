@@ -212,7 +212,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               <div className="flex-auto text-marble-white font-bold">
                 <span>Endorsers</span>
               </div>
-              {application?.endorsements && application?.endorsements.length ? (
+              {application?.referrals && application?.referrals.length ? (
                 //   <div
                 //   className={`"flex flex-col space-y-1 ${application.endorsements.length === 1 && "h-[60px]"}
                 //    space-y-1 ${
@@ -220,8 +220,13 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 //    } overflow-y-scroll"`}
                 // >
                 <div className="flex flex-col space-y-1">
-                  {application.endorsements.map((person, index) => (
-                    <ApplicantEndorsements key={index} person={person} isEndorsable={endorable} />
+                  {application.referrals.map(({ from: account, amount }, index) => (
+                    <ApplicantEndorsements
+                      key={index}
+                      person={account}
+                      amount={amount}
+                      isEndorsable={endorable}
+                    />
                   ))}
                 </div>
               ) : (

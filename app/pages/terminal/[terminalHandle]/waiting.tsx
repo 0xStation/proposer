@@ -41,6 +41,8 @@ const TerminalWaitingPage: BlitzPage = () => {
     if (selectedInitiative) {
       const getApplicationsFromInitiative = async () => {
         let applications = await invoke(getApplicationsByInitiative, {
+          referralGraphAddress: "", // todo: add to local state
+          initiativeLocalId: 0, // todo: add to local stateg
           initiativeId: selectedInitiative,
         })
         setApplications(applications)
