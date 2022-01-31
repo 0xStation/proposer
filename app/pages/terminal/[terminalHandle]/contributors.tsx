@@ -52,54 +52,52 @@ const TerminalContributorsPage: BlitzPage = () => {
     return <ContributorCard key={idx} {...contributorCardProps} />
   })
 
-  return (
-    <TerminalNavigation>
-      {selectedContributors ? (
-        <>
-          {selectedContributorToView && (
-            <ContributorDirectoryModal
-              contributor={selectedContributorToView}
-              isOpen={contributorDirectoryModalIsOpen}
-              setIsOpen={setContributorDirectoryModalOpen}
-            />
-          )}
-          <div className="flex flex-col space-y-10">
-            <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm space-y-3">
-              {roles.map((role, index) => {
-                return (
-                  <Pill
-                    key={index.toString()}
-                    active={selectedRole == role}
-                    onClick={() => {
-                      setRole(role)
-                    }}
-                  >
-                    <span className="m-4">{role}</span>
-                  </Pill>
-                )
-              })}
-            </div>
-            {!selectedContributors || !selectedContributors.length ? (
-              <div className="text-marble-white">
-                {selectedRole ? (
-                  <div>There are no {selectedRole.toLowerCase()}s in this terminal.</div>
-                ) : (
-                  <div>Please select a role to view contributors.</div>
-                )}
-              </div>
+  const contributorDirectoryView = !selectedContributors ? (
+    <span className="text-marble-white">This terminal does not have any contributors yet.</span>
+  ) : (
+    <>
+      {selectedContributorToView && (
+        <ContributorDirectoryModal
+          contributor={selectedContributorToView}
+          isOpen={contributorDirectoryModalIsOpen}
+          setIsOpen={setContributorDirectoryModalOpen}
+        />
+      )}
+      <div className="flex flex-col space-y-10">
+        <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm space-y-3">
+          {roles.map((role, index) => {
+            return (
+              <Pill
+                key={index.toString()}
+                active={selectedRole == role}
+                onClick={() => {
+                  setRole(role)
+                }}
+              >
+                <span className="m-4">{role}</span>
+              </Pill>
+            )
+          })}
+        </div>
+        {!selectedContributors || !selectedContributors.length ? (
+          <div className="text-marble-white">
+            {selectedRole ? (
+              <div>There are no {selectedRole.toLowerCase()}s in this terminal.</div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">{contributorCards}</div>
+              <div>Please select a role to view contributors.</div>
             )}
           </div>
-        </>
-      ) : (
-        <span className="text-marble-white">COMING SOON</span>
-      )}
-    </TerminalNavigation>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">{contributorCards}</div>
+        )}
+      </div>
+    </>
   )
+
+  return <TerminalNavigation>{contributorDirectoryView}</TerminalNavigation>
 }
 
 TerminalContributorsPage.suppressFirstRenderFlicker = true
-TerminalContributorsPage.getLayout = (page) => <Layout title="Initiatives">{page}</Layout>
+TerminalContributorsPage.getLayout = (page) => <Layout title="Contributors">{page}</Layout>
 
 export default TerminalContributorsPage

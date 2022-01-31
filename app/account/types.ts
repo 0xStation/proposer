@@ -14,6 +14,7 @@ export type AccountMetadata = {
   timezone: string
   verified: boolean
   role?: string
+  initiatives?: number[]
 }
 
 export type Account = {
@@ -23,5 +24,4 @@ export type Account = {
   role?: string
   points?: number
   joinedAt?: Date
-  initiatives?: []
 }
