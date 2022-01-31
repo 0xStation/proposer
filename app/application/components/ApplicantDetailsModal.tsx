@@ -237,7 +237,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     Be the first to endorse this applicant!
                   </span>
                 </div>
-              )} */}
+              )}
             </div>
           </div>
           {isEndorsable() && (

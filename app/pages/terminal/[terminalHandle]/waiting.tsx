@@ -34,6 +34,11 @@ const TerminalWaitingPage: BlitzPage = () => {
     { suspense: false }
   )
 
+  const localIds = {}
+  initiatives?.forEach((i) => {
+    localIds[i.id] = i.localId
+  })
+
   const [isApplicantOpen, setIsApplicantOpen] = useState(false)
   const activeUser: Account | null = useStore((state) => state.activeUser)
 
@@ -41,8 +46,8 @@ const TerminalWaitingPage: BlitzPage = () => {
     if (selectedInitiative) {
       const getApplicationsFromInitiative = async () => {
         let applications = await invoke(getApplicationsByInitiative, {
-          referralGraphAddress: "", // todo: add to local state
-          initiativeLocalId: 0, // todo: add to local stateg
+          referralGraphAddress: "0x7D9D3BE8219069F3a947Fb20bd7b1A6b1944e16E", // todo: dynmically load from local state
+          initiativeLocalId: localIds[selectedInitiative],
           initiativeId: selectedInitiative,
         })
         setApplications(applications)
