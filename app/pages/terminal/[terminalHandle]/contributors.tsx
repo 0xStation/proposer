@@ -19,11 +19,11 @@ const TerminalContributorsPage: BlitzPage = () => {
 
   useEffect(() => {
     if (selectedRole) {
-      const getApplicationsFromInitiative = async () => {
+      const getContributorsByRole = async () => {
         let contributors = await invoke(getAccountsByRole, { role: selectedRole })
         setSelectedContributors(contributors)
       }
-      getApplicationsFromInitiative()
+      getContributorsByRole()
     }
   }, [selectedRole])
 
