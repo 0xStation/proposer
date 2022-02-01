@@ -62,7 +62,6 @@ export default async function getApplicationsByInitiative(
             pfpURL:
               "https://user-images.githubusercontent.com/38736612/151722561-ba3b7d89-cb9f-4ad2-86de-73ff3dc3d286.png",
             verified: false,
-            pronouns: "",
             role: "N/A",
           },
         }
@@ -107,7 +106,10 @@ export default async function getApplicationsByInitiative(
           (applicant?.referrals.map((r) => {
             return {
               amount: r.amount,
-              from: referrers[r.from.toLowerCase()],
+              from: {
+                address: r.from,
+                data: referrers[r.from.toLowerCase()].data,
+              },
             }
           }) as ApplicationReferral[]) || [],
       }

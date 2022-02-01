@@ -26,7 +26,7 @@ const Slider = ({ onChange, contributor, disabled }) => {
         props.style.left = parseFloat(props?.style?.left || "0") * 1.03
         return (
           <div {...props} style={props.style}>
-            <p className="text-marble-white text-center text-base">{contributor.data.handle}</p>
+            <p className="text-marble-white text-center text-base">{contributor.data.name}</p>
             <p className="text-marble-white text-center text-base">{valueNow} RAILⒺ</p>
             <img
               src={contributor.data.pfpURL}

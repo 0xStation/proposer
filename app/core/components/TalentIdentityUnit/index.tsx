@@ -26,7 +26,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
 
   const {
     address,
-    data: { pfpURL, wallet, pronouns, role },
+    data: { pfpURL, name, ens, pronouns, role, verified },
   } = user
 
   const railPoints = (
@@ -108,7 +108,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
 
   return (
     <Card onClick={onClick}>
-      <ProfileMetadata {...{ pfpURL, wallet, pronouns, role, address }} />
+      <ProfileMetadata {...{ pfpURL, name, ens, pronouns, role, address, verified }} />
       <div className="flex flex-row flex-1 mx-3">
         <div className="flex-1 items-center justify-center text-base">
           <div className="place-self-center mt-1 font-bold">Role</div>

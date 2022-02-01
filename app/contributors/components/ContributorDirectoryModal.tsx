@@ -13,6 +13,7 @@ import useStore from "app/core/hooks/useStore"
 import { Initiative } from "app/initiative/types"
 import InitiativeCard from "app/initiative/components/InitiativeCard"
 import getInitiativesByLocalIds from "app/initiative/queries/getInitiativesByLocalIds"
+import { getWalletString } from "app/utils/getWalletString"
 
 type ContributorDirectoryModalProps = {
   isOpen: boolean
@@ -89,15 +90,17 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                 <div className="flex flex-col flex-3/5 content-center">
                   <div className="flex flex-row flex-1 space-x-1">
                     <div className="flex-3/5 text-xl text-marble-white">
-                      {contributor?.data?.handle}
+                      {contributor?.data?.name}
                     </div>
                     <div className="flex-2/5 m-auto">
                       <Image src={Verified} alt="Verified icon." width={10} height={10} />
                     </div>
                   </div>
                   <div className="flex flex-row flex-1 text-sm text-concrete space-x-1">
-                    <div className="flex-1">{contributor?.data?.wallet}</div>
-                    <div className="flex-1">-</div>
+                    <div className="flex-1">
+                      {getWalletString(contributor?.address || "", contributor?.data?.ens)}
+                    </div>
+                    <div className="flex-1">•</div>
                     <div className="flex-1">{contributor?.data?.pronouns}</div>
                   </div>
                 </div>
@@ -156,7 +159,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                       <Image src={DiscordIcon} alt="Discord icon" width={16} height={13} />
                     </div>
                     <div className="">
-                      <span>@{contributor?.data?.discordId}</span>
+                      <span>{contributor?.data?.discordId}</span>
                     </div>
                   </div>
                 </div>

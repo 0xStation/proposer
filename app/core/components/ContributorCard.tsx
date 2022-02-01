@@ -9,6 +9,7 @@ import { useAccount, useBalance } from "wagmi"
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
 import { Application } from "app/application/types"
+import { getWalletString } from "app/utils/getWalletString"
 
 function roleSVG(role) {
   let svg
@@ -116,17 +117,18 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
         </div>
         <div className="flex flex-col flex-1 content-center">
           <div className="flex flex-row items-center flex-1 space-x-1">
-            <div className="text-lg">{contributor.data.handle}</div>
-            <div className="m-auto">
-              <Image src={Verified} alt="Verified icon." width={10} height={10} />
-            </div>
+            <div className="text-lg">{contributor.data.name}</div>
+            {contributor.data.verified && (
+              <div className="m-auto">
+                <Image src={Verified} alt="Verified icon." width={10} height={10} />
+              </div>
+            )}
           </div>
           <div className="flex flex-row flex-1 text-base text-concrete space-x-1 overflow-hidden">
             <div className="max-w-[150px] truncate">
-              {contributor.data.wallet || contributor.address}
+              {getWalletString(contributor.address, contributor.data.ens)}
             </div>
-            <div className="">-</div>
-            <div className="">{contributor.data.pronouns}</div>
+            {contributor.data.pronouns && <div className="">• {contributor.data.pronouns}</div>}
           </div>
         </div>
       </div>
@@ -193,8 +195,8 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
           <div className="flex flex-row flex-1 mx-3 ">
             {contributor && application?.createdAt ? (
               <div className="flex-1 items-center justify-center text-base text-concrete my-2">
-                {console.log(JSON.stringify(application?.createdAt.toDateString))}
-                {application?.createdAt.toDateString}
+                {console.log(JSON.stringify(application?.createdAt.toDateString()))}
+                {application?.createdAt.toDateString()}
               </div>
             ) : (
               <div className="flex-1 items-center justify-center text-base text-concrete my-2">
@@ -296,8 +298,8 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
           <div className="flex flex-row flex-1 mx-3">
             {application && application.createdAt ? (
               <div className="flex-1 items-center justify-center text-base text-concrete my-2">
-                {console.log(JSON.stringify(application?.createdAt.toDateString))}
-                {application?.createdAt.toDateString}
+                {console.log(JSON.stringify(application?.createdAt.toDateString()))}
+                {application?.createdAt.toDateString()}
               </div>
             ) : (
               <div className="flex-1 items-center justify-center text-base text-concrete my-2">

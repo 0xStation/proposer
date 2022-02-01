@@ -183,7 +183,7 @@ const EndorseModal = ({
       endorsementAmount < tokenBalance
     ) {
       setEndorsementMessage(
-        `You're giving ${contributor?.data?.handle} ${endorsementBudgetPercentage.toFixed(
+        `You're giving ${contributor?.data?.name} ${endorsementBudgetPercentage.toFixed(
           2
         )}% of your balance`
       )
