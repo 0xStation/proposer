@@ -19,7 +19,9 @@ interface Wallet {
  * Navigation Component
  */
 const Navigation = () => {
+  // a list of the modals that are active on the screen
   const [wallet, setWallet] = useState<Wallet | null>()
+
   let [walletModalOpen, setWalletModalOpen] = useState(false)
   let [accountModalOpen, setAccountModalOpen] = useState(false)
   const [{ data: accountData }, disconnect] = useAccount({
@@ -31,20 +33,21 @@ const Navigation = () => {
 
   const getUserAccount = async (address) => {
     let user = await invoke(getAccountByAddress, { address })
-
     if (user) {
       setActiveUser(user)
       setWalletModalOpen(false)
     } else {
       setWalletModalOpen(false)
-      setWallet({ address: address })
-      setAccountModalOpen(true)
+      setTimeout(() => {
+        setWallet({ address: address })
+        setAccountModalOpen(true)
+      }, 500)
     }
   }
 
   useEffect(() => {
     if (address) {
-      getUserAccount(address)
+      setTimeout(() => getUserAccount(address), 500)
     } else {
       setActiveUser(null)
       setWallet(null)

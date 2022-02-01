@@ -39,13 +39,13 @@ const Project: BlitzPage = () => {
   }
 
   useEffect(() => {
+    setAccountModalOpen(false)
+    setApplicationModalOpen(false)
+    setWalletModalOpen(false)
     // need to check if the effect was actually triggered by the user (pressing the button)
     // if we don't then the page load account changing from null -> account while it loads
     // will trigger this to run, which we don't want.
     if (userTriggered) {
-      setAccountModalOpen(false)
-      setApplicationModalOpen(false)
-      setWalletModalOpen(false)
       // the modal was locking the screen unless I put a timeout between modal transitions.
       // I think it has something to do with the previous modal cleaning up after it closes
       // and the "fixed" state that locks the modal to prevent the user from scrolling while
