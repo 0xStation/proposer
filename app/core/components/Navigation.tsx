@@ -4,7 +4,6 @@ import Dropdown from "../components/Dropdown"
 import Map from "../components/Map"
 import logo from "../../../public/station-logo.svg"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
-import { Account } from "../../account/types"
 import useStore from "../hooks/useStore"
 import ConnectWalletModal from "app/core/components/ConnectWalletModal"
 import { useAccount } from "wagmi"
@@ -21,26 +20,25 @@ interface Wallet {
 const Navigation = () => {
   // a list of the modals that are active on the screen
   const [wallet, setWallet] = useState<Wallet | null>()
-
-  let [walletModalOpen, setWalletModalOpen] = useState(false)
-  let [accountModalOpen, setAccountModalOpen] = useState(false)
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
   })
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
+  const setAddress = useStore((state) => state.setAddress)
   const setActiveUser = useStore((state) => state.setActiveUser)
   const activeUser = useStore((state) => state.activeUser)
+  const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  const toggleAccountModal = useStore((state) => state.toggleAccountModal)
 
   const getUserAccount = async (address) => {
+    toggleWalletModal(false)
     let user = await invoke(getAccountByAddress, { address })
     if (user) {
       setActiveUser(user)
-      setWalletModalOpen(false)
     } else {
-      setWalletModalOpen(false)
       setTimeout(() => {
         setWallet({ address: address })
-        setAccountModalOpen(true)
+        toggleAccountModal(true)
       }, 500)
     }
   }
@@ -56,10 +54,6 @@ const Navigation = () => {
 
   return (
     <>
-      {address && (
-        <AccountModal isOpen={accountModalOpen} setIsOpen={setAccountModalOpen} address={address} />
-      )}
-      <ConnectWalletModal isWalletOpen={walletModalOpen} setIsWalletOpen={setWalletModalOpen} />
       <div className="h-12 w-full px-4 bg-tunnel-black flex flex-row justify-between border-b border-b-concrete">
         <Dropdown
           side="left"
@@ -111,7 +105,7 @@ const Navigation = () => {
                 </div>
               }
               items={[
-                { name: "Create Account", onClick: () => setAccountModalOpen(true) },
+                { name: "Create Account", onClick: () => toggleAccountModal(true) },
                 {
                   name: "disconnect",
                   onClick: disconnect,
@@ -121,7 +115,7 @@ const Navigation = () => {
           ) : (
             <span
               className="p-4 pr-0 uppercase text-magic-mint text-lg border-l border-l-concrete cursor-pointer"
-              onClick={() => setWalletModalOpen(true)}
+              onClick={() => toggleWalletModal(true)}
             >
               Enter Station
             </span>
