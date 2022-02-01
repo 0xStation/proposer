@@ -249,12 +249,12 @@ export async function seedContributors(terminals) {
       },
     })
 
-    let props = {
-      address: contributorData!.address,
-      name: contributorData!.name,
-      role: contributorData!.role || "VISITOR",
-      terminal: "Station",
-    }
+    // let props = {
+    //   address: contributorData!.address,
+    //   name: contributorData!.name,
+    //   role: contributorData!.role || "VISITOR",
+    //   terminal: "Station",
+    // }
 
     // let ticketSVG = genSVG(props)
 
@@ -262,14 +262,14 @@ export async function seedContributors(terminals) {
     // const uploadedImageResponse = await uploadToS3(ticketSVG, path)
     // const uploadedImagePath = uploadedImageResponse.Location
 
-    await db.account.update({
-      where: { address: props.address },
-      data: {
-        data: {
-          ...(existingAccount.data as {}),
-          // ticketImage: uploadedImagePath
-        },
-      },
-    })
+    // await db.account.update({
+    //   where: { address: props.address },
+    //   data: {
+    //     data: {
+    //       ...(existingAccount.data as {}),
+    //       // ticketImage: uploadedImagePath
+    //     },
+    //   },
+    // })
   }
 }
