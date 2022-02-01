@@ -9,6 +9,7 @@ import useStore from "../hooks/useStore"
 import ConnectWalletModal from "app/core/components/ConnectWalletModal"
 import { useAccount } from "wagmi"
 import AccountModal from "app/account/components/AccountModal"
+import truncateString from "../utils/truncateString"
 
 interface Wallet {
   address: string
@@ -30,8 +31,7 @@ const Navigation = () => {
 
   const getUserAccount = async (address) => {
     let user = await invoke(getAccountByAddress, { address })
-    console.log(address)
-    console.log(user)
+
     if (user) {
       setActiveUser(user)
       setWalletModalOpen(false)
@@ -45,17 +45,16 @@ const Navigation = () => {
   useEffect(() => {
     if (address) {
       getUserAccount(address)
+    } else {
+      setActiveUser(null)
+      setWallet(null)
     }
   }, [address])
 
   return (
     <>
-      {wallet && (
-        <AccountModal
-          isOpen={accountModalOpen}
-          setIsOpen={setAccountModalOpen}
-          address={wallet.address}
-        />
+      {address && (
+        <AccountModal isOpen={accountModalOpen} setIsOpen={setAccountModalOpen} address={address} />
       )}
       <ConnectWalletModal isWalletOpen={walletModalOpen} setIsWalletOpen={setWalletModalOpen} />
       <div className="h-12 w-full px-4 bg-tunnel-black flex flex-row justify-between border-b border-b-concrete">
@@ -98,17 +97,14 @@ const Navigation = () => {
                 },
               ]}
             />
-          ) : wallet ? (
+          ) : address ? (
             <Dropdown
               side="right"
               className="p-4 pr-0 border-l border-l-concrete"
               button={
                 <div className="flex items-center">
                   <span className="w-7 h-7 rounded-full bg-concrete border border-marble-white mr-2"></span>
-                  <span>{`${wallet.address.slice(0, 6)}...${wallet.address.slice(
-                    wallet.address.length - 6,
-                    wallet.address.length
-                  )}`}</span>
+                  <span>{truncateString(address)}</span>
                 </div>
               }
               items={[
