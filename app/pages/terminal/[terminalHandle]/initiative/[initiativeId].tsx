@@ -114,13 +114,11 @@ const Project: BlitzPage = () => {
                 </div>
               </div>
 
-              <div className="h-auto">
-                <Image
-                  src={Newstand}
-                  alt="Project details banner image."
-                  width={766}
-                  height={227}
-                />
+              <div className="flex h-auto justify-center">
+                {initiative?.data.bannerURL && (
+                  <img src={initiative.data.bannerURL} alt="Project banner image." />
+                )}
+
                 {initiative && initiative.data.isAcceptingApplications && (
                   <div className="relative h-5 bg-tunnel-black flex overflow-hidden">
                     <div className="animate-marquee whitespace-nowrap text-magic-mint font-vt323 text-xl w-full">
@@ -176,13 +174,13 @@ const Project: BlitzPage = () => {
                   <div>
                     <span className="text-2xl">Skills</span>
                   </div>
-                  <div className="space-x-2 flex flex-wrap">
+                  <div className="flex flex-wrap">
                     {initiative &&
                       initiative.data.skills?.map?.((skills, index) => {
                         return (
                           <span
                             key={index}
-                            className="text-sm rounded-lg text-neon-carrot bg-[#302013] py-1 px-2"
+                            className="text-sm rounded-lg text-neon-carrot bg-[#302013] py-1 px-2 m-1"
                           >
                             {skills}
                           </span>

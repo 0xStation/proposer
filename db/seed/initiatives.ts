@@ -11,16 +11,35 @@ const contributorReviewMetadata: InitiativeMetadata & { localId: number } = {
     "Station's contributor review is the cornerstone of Station's reputation system, enabling contributors to recognize one another's work.",
   shortName: "CONTRIBUTOR REVIEW",
   isAcceptingApplications: false,
+  contributeText: [
+    "Contributor Review looks to create a peer-to-peer oracle that signal the distribution of trust and responsibility across the network. In absence of a centralized management team, we need to design a system that adapts dynamically to the emergent behaviors of contributors. Through the act of elevating one another, we’re collectively getting close to a consensus who has contributed the most value to the organization. Our goal is to design an autonomous system that not only reflects the aggregated opinion across the network, but also protects against bad behaviors.",
+  ],
+  rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
+  skills: ["Solidity"],
+  commitment: "Full-time, Part-time",
   links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/protocol-v1" }],
-  members: [contributors.conner.address, contributors.calvin.address, contributors.kristen.address],
+  members: [
+    contributors.conner.address,
+    contributors.calvin.address,
+    contributors.kristen.address,
+    contributors.nick.address,
+  ],
 }
 const waitingRoomMetadata: InitiativeMetadata & { localId: number } = {
   localId: 2,
   name: "Waiting Room",
-  description:
-    "Station's waiting room is the onboarding experience used by DAOs to recruit new members.",
+  description: "Making hiring more transparent and participatory.",
   shortName: "WAITING ROOM",
+  oneLiner: "Making hiring more transparent and participatory.",
+  contributeText: [
+    "The traditional hiring process as we know it no longer aligns well the increasingly permissionless and digitally-native work, where community-driven proof-of-work matters more than institutional affiliations and overly-theoretical credentials.",
+    "Waiting Room enables community members to endorse anyone who expresses their interests in joining an initiative of a community. With some proof-of-work and value, contributors can signal their desire to work. Rather than a top-down recruiting process, the community, based on their roles and commitment, can collectively signal whether to “promote” the contributor and sometimes invite them to be a part of the core team. By making hiring influence more contribution-driven and participatory, we hope to help organizations grow more healthily and make access to opportunities more meritocratic.",
+  ],
+  rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
+  skills: ["Solidity", "Front-end", "Back-end", "Product Design", "Data Analytics", "Subgraph"],
+  commitment: "Full-time, Part-time",
   isAcceptingApplications: false,
+  bannerURL: "/waiting-room-banner.png",
   links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/web" }],
   members: [
     contributors.mind.address,
@@ -28,6 +47,8 @@ const waitingRoomMetadata: InitiativeMetadata & { localId: number } = {
     contributors.michael.address,
     contributors.abe.address,
     contributors.conner.address,
+    contributors.brendan.address,
+    contributors.tina.address,
   ],
 }
 const newstandMetadata: InitiativeMetadata & { localId: number } = {
@@ -41,30 +62,39 @@ const newstandMetadata: InitiativeMetadata & { localId: number } = {
   isAcceptingApplications: true,
   contributeText: [
     "Working on the Internet is hardly something new. While crypto unlocks new primitives for work to be done on the Internet, the exuberant optimism obfuscates the day-to-day conditions, operating details, and human stories behind each contributor.",
-    "We're inviting writers, artists, technologists, and researchers across all disciplines to push forward radical imaginations around the future of work unlocked by crypto while critically examine the current state of existence through a human lens.",
+    "From gaming forums in the 90s to Discord channels for NFT projects, people come together on the Internet to find others with shared passions. Web3 isn't changing that very fact, but it did add an additional layer of economic value whose impact can no longer be overlooked. Introducing a highly liquid financial layer leads to a three-body problem — where price, purpose, and politics intertwine to unlock something completely unknown to the past.",
+    "We're calling for writers, artists, technologists, and researchers across all disciplines to push forward radical imaginations around the future of work unlocked by crypto while critically examine the current state of existence through a human lens.",
     "We are a decentralized media publication where every contributor will have ownership over the work they create while sharing the upside from the piece fairly.",
   ],
   links: [{ symbol: Symbol.MIRROR, url: "https://station.mirror.xyz/" }],
   rewardText: ["800 USDC", "Station Visitor Ticket NFT"],
-  bannerURL: "/public/newstand-banner.png",
-  members: [contributors.tina.address, contributors.mind.address, contributors.alli.address],
-  commitment: "Part-time (7-10 hrs/week)",
-  skills: ["Writing", "Journalism Editing"],
+  bannerURL: "/newstand-banner.png",
+  members: [contributors.tina.address, contributors.alli.address],
+  commitment: "One-time",
+  skills: ["Writing", "Graphic Design", "Editorial Design"],
 }
 
 const partnershipMetadata: InitiativeMetadata & { localId: number } = {
   localId: 4,
-  name: "Partnerships",
+  name: "Terminal Partnerships",
   oneLiner: "Inviting the best DAOs to mobilize contributors on Station.",
   description: "Forming GTM plans to onboard our Beta Terminal partners.",
   shortName: "PARTNERSHIP",
   isAcceptingApplications: false,
+  contributeText: [
+    "Station exists to serve contributors. We exist to surface the most interesting opportunities for a wide range of skill sets and interests. First, we need to bootstrap the supply side of the market by inviting the best DAOs to mobilize contributors on Station.",
+    "In the early stages of Station’s product and protocol development, Terminal Partnerships have three primary goals: build ecosystem trust and awareness, crystallize Station’s product-market-fit, and battle test our products and protocols IRL.",
+    "Our product and protocol development philosophy is “show, don’t tell”. We demonstrate the value of our protocols and products by using them to power Station’s own operations. In the long run, the value of the Station Network is the aggregate of the strength of Station’s relationships with each of our Terminal partners. By partnering early with values-aligned communities, we ensure that we’re designing the infrastructure that can serve contributors from diverse backgrounds.",
+  ],
+  rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
+  skills: ["Writing", "Partnerships"],
+  commitment: "One-time, Part-time",
   links: [],
   members: [
     contributors.tina.address,
-    contributors.alli.address,
-    contributors.kassen.address,
+    contributors.mind.address,
     contributors.alex.address,
+    contributors.kassen.address,
   ],
 }
 
@@ -75,20 +105,42 @@ const networkSustainability: InitiativeMetadata & { localId: number } = {
     "Network Sustainability is an initiative focused on designing a sustainable economic engine for the Station Network.",
   description:
     "Network Sustainability is an initiative focused on designing a sustainable economic engine for the Station Network.",
+  contributeText: [
+    "Station looks to become a decentralized contributor network and marketplace. How can we incentivize all participants to become curators and nurturers of the network? How does value accrue to our network, our protocols, and our products? These are the fundamental questions that the Network Sustainability group aims to solve.",
+    "The Station Network will be governed by the RAIL token. The token will power a sustainable RAIL network with aligned incentives and ensure fair distribution to all its participants based on their contribution to the network — be it labor or capital.",
+  ],
+  rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
   shortName: "NETWORK SUSTAINABILITY",
+  skills: [
+    "Python",
+    "Data Analytics",
+    "Token Design",
+    "Dune Analytics",
+    "Economic Design",
+    "Quantitative Analysis",
+  ],
+  commitment: "One-time, Part-time",
   isAcceptingApplications: false,
   links: [],
-  members: [contributors.calvin.address, contributors.nick.address],
+  bannerURL: "/network-sustainability-banner.png",
+  members: [contributors.calvin.address, contributors.nick.address, contributors.tina.address],
 }
 
 const contributorExperience: InitiativeMetadata & { localId: number } = {
   localId: 6,
   name: "Contributor Experience",
   oneLiner:
-    "Contributor Experience is an initiative to make new contributors feel welcomed, existing contributors feel recognized and belonged, and graduated contributors feel proud that they’ve been part of the ride. ",
+    "Contributor Experience is an initiative to make new contributors feel welcomed, existing contributors feel recognized and belonged, and graduated contributors feel proud that they’ve been part of the ride.",
   description:
-    "Contributor Experience is an initiative to make new contributors feel welcomed, existing contributors feel recognized and belonged, and graduated contributors feel proud that they’ve been part of the ride. ",
+    "Contributor Experience is an initiative to make new contributors feel welcomed, existing contributors feel recognized and belonged, and graduated contributors feel proud that they’ve been part of the ride.",
   shortName: "CONTRIBUTOR EXPERIENCE",
+  contributeText: [
+    "From the first touch point with the Station community to the day they eventually depart, we want to push ourselves to refine every step of the journey to delight, inform, inspire, and amplify.",
+    "We’re here to delight newcomers with Station’s breadth and diversity of skills and perspectives. We’re here to inform ways to get involved and align on our operational principles and philosophy. We’re here to inspire innovations on the edge of the industry through bold and rigorous questioning. We’re here to amplify those that have made a mark on our journey, no matter if they’re here for a week or a year.",
+    "The initiative produces important operating documentation and workflows to ensure that we provide such experience to everyone we onboard.",
+  ],
+  rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
+  skills: ["Discord", "Community Management", "HR", "Mod"],
   isAcceptingApplications: false,
   links: [],
   members: [contributors.kassen.address, contributors.tina.address],
@@ -97,11 +149,21 @@ const contributorExperience: InitiativeMetadata & { localId: number } = {
 const midnightStation: InitiativeMetadata & { localId: number } = {
   localId: 7,
   name: "Midnight Station",
-  oneLiner: "",
-  description: "",
+  oneLiner:
+    "A creatively-unbounded cultural initiative, currently serving as a radio show that features Station’s contributors.",
+  description:
+    "A creatively-unbounded cultural initiative, currently serving as a radio show that features Station’s contributors.",
   shortName: "MIDNIGHT STATION",
+  contributeText: [
+    "When Station’s contributors get together irl, the gaps in-between web3 are filled with energetic heart-to-hearts and stories of inspiration and resolution. While these conversations aren’t directly tied to the metaverse, they’ve fueled a refreshing take on what Station can provide for its community.",
+    "We don’t want these conversations to end because we are collectively dispersed and draft agendas solely focused on what happens online. As Station grows its contributor network, the opportunity to generate a richer web of thought is at-hand. Midnight Station is Station’s first step to blurring the line on what it means to be  web3 and hosts a home away from home to effect ranging conversations and ideas that are top of mind.",
+    "We encourage contributors from all backgrounds to come hang out, listen in, and/or provide your unique cultural point of view. It’s a rough sketch, but this is only the start.",
+  ],
+  rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
+  skills: ["Sound Editing", "Communication"],
   isAcceptingApplications: false,
   links: [],
+  bannerURL: "/midnight-station-banner.png",
   members: [
     contributors.brendan.address,
     contributors.kristen.address,
@@ -113,11 +175,18 @@ const midnightStation: InitiativeMetadata & { localId: number } = {
 const brandIdentity: InitiativeMetadata & { localId: number } = {
   localId: 8,
   name: "Brand Identity",
-  oneLiner: "",
-  description: "",
+  oneLiner: "Architecting the visual system of Station",
+  description: "Architecting the visual system of Station",
   shortName: "BRAND IDENTITY",
+  contributeText: [
+    "Station” as a concept was born on a morning subway ride, surrounded by commuters heading uptown to their respective workplaces. It embodies not only how we’re transporting talent to the future of work that’s more participatory and permissionless, but also the freedom and mobility that the very future will unlock.",
+    "From Shibuya station floorplan and NYC subway system to Neon Genesis Evangelion and David Bowie’s Station to Station, we draw inspirations from all sorts of mediums and experiences and weave them into a coherent theme of “retro-futuristic.",
+  ],
+  rewardText: ["Project-based in USDC", "Station Commuter Ticket NFT"],
+  skills: ["Graphic Design", "Creative Direction", "Animation", "Illustration"],
   isAcceptingApplications: false,
   links: [],
+  bannerURL: "/brand-identity-banner.png",
   members: [contributors.mind.address],
 }
 
