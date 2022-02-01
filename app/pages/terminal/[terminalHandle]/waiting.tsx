@@ -42,7 +42,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           initiativeLocalId: selectedInitiativeLocalId,
           initiativeId: currentInitiative?.id,
         })
-        setApplications(applications)
+        setApplications(applications || [])
       }
       getApplicationsFromInitiative()
     }
