@@ -28,7 +28,7 @@ const EndorseModal = ({
   setIsEndorseModalOpen,
   setIsSuccessModalOpen,
   selectedUserToEndorse: contributor,
-  initiativeId,
+  initiativeLocalId,
 }) => {
   const [{ data: accountData }] = useAccount()
 
@@ -140,7 +140,7 @@ const EndorseModal = ({
         TERMINAL.REFERRAL_GRAPH,
         contributor.address,
         endorsementAmount * Math.pow(10, decimals),
-        initiativeId,
+        initiativeLocalId,
       ],
     })
 

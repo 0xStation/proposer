@@ -40,25 +40,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
 
   // this refers to when a contributor applies to another initiative in the same terminal
 
-  // const isEndorsable =
-  //   tokenBalance && activeUser && activeUser.address !== application?.applicant?.address
-  //using this instead of the check above since it renders the component faster
-  let endorable
-  const isEndorsable = () => {
-    if (activeUser === null || activeUser === undefined) {
-      endorable = false
-      return false
-    } else if (activeUser.address === application?.applicant?.address) {
-      endorable = false
-      return false
-    } else if (!tokenBalance) {
-      endorable = false
-      return false
-    } else {
-      endorable = true
-      return true
-    }
-  }
+  const isEndorsable =
+    tokenBalance && activeUser && activeUser.address !== application?.applicant?.address
 
   return (
     <div>
@@ -200,7 +183,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 </div>
               </div>
               <div className="flex flex-col flex-1">
-                {isEndorsable() && (
+                {isEndorsable && (
                   <div>
                     <div className="font-bold">
                       <span>Points</span>
@@ -229,7 +212,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                       key={index}
                       person={account}
                       amount={amount}
-                      isEndorsable={endorable}
+                      isEndorsable={isEndorsable || false}
                     />
                   ))}
                 </div>
@@ -242,7 +225,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               )}
             </div>
           </div>
-          {isEndorsable() && (
+          {isEndorsable && (
             <div id="buttons" className="flex-auto flex flex-row content-center justify-center">
               <div className="flex flex-row space-x-3">
                 <div className={`"flex-1 flex "justify-center"`}>
