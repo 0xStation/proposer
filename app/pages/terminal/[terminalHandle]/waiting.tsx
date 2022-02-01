@@ -60,9 +60,6 @@ const TerminalWaitingPage: BlitzPage = () => {
       setIsApplicantOpen(true)
     }
 
-    console.log(referrals)
-    console.log(applicant.address)
-
     const applicationCardProps = {
       user: applicant,
       points: points * Math.pow(10, 0 - decimals),

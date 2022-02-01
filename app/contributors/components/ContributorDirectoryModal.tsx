@@ -13,7 +13,7 @@ import useStore from "app/core/hooks/useStore"
 import { Initiative } from "app/initiative/types"
 import InitiativeCard from "app/initiative/components/InitiativeCard"
 import getInitiativesByLocalIds from "app/initiative/queries/getInitiativesByLocalIds"
-import { getWalletString } from "app/utils/getWalletString"
+import { truncateString } from "app/core/utils/truncateString"
 
 type ContributorDirectoryModalProps = {
   isOpen: boolean
@@ -98,7 +98,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                   </div>
                   <div className="flex flex-row flex-1 text-sm text-concrete space-x-1">
                     <div className="flex-1">
-                      {getWalletString(contributor?.address || "", contributor?.data?.ens)}
+                      {truncateString(contributor?.data?.ens || contributor?.address)}
                     </div>
                     <div className="flex-1">•</div>
                     <div className="flex-1">{contributor?.data?.pronouns}</div>
