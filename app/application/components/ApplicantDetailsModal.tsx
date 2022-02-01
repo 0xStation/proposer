@@ -12,7 +12,7 @@ import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
 import ApplicantEndorsements from "./ApplicantEndorsements"
 import useStore from "app/core/hooks/useStore"
-import { getWalletString } from "app/utils/getWalletString"
+import { truncateString } from "app/core/utils/truncateString"
 
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
@@ -95,9 +95,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   </div>
                   <div className="flex flex-row flex-1 text-base text-concrete space-x-1">
                     <div className="flex-1">
-                      {getWalletString(
-                        application?.applicant.address,
-                        application?.applicant.data.ens
+                      {truncateString(
+                        application?.applicant.data.ens || application?.applicant.address
                       )}
                     </div>
                     {application?.applicant.data.pronouns && (
