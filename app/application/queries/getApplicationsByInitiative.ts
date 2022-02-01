@@ -96,26 +96,26 @@ export default async function getApplicationsByInitiative(
       include: { applicant: true },
     })
 
-  // merge database data and subgraph data
-  const merged =
-    applications?.map((a) => {
-      const applicant = applicants[a.applicant.address.toLowerCase()]
-      return {
-        ...a,
-        data: a.data as ApplicationMetadata,
-        points: parseFloat(applicant?.points || "0"),
-        referrals:
-          (applicant?.referrals.map((r) => {
-            return {
-              amount: r.amount,
-              from: {
-                address: referrers[r.from.toLowerCase()].address,
-                data: referrers[r.from.toLowerCase()].data,
-              },
-            }
-          }) as ApplicationReferral[]) || [],
-      }
-    }) || []
+    // merge database data and subgraph data
+    const merged =
+      applications?.map((a) => {
+        const applicant = applicants[a.applicant.address.toLowerCase()]
+        return {
+          ...a,
+          data: a.data as ApplicationMetadata,
+          points: parseFloat(applicant?.points || "0"),
+          referrals:
+            (applicant?.referrals.map((r) => {
+              return {
+                amount: r.amount,
+                from: {
+                  address: referrers[r.from.toLowerCase()].address,
+                  data: referrers[r.from.toLowerCase()].data,
+                },
+              }
+            }) as ApplicationReferral[]) || [],
+        }
+      }) || []
 
     return merged as unknown as Application[]
   }
