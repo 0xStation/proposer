@@ -114,40 +114,43 @@ const Project: BlitzPage = () => {
                 </div>
               </div>
 
-              <div className="flex h-auto justify-center">
-                {initiative?.data.bannerURL && (
-                  <img src={initiative.data.bannerURL} alt="Project banner image." />
-                )}
-
-                {initiative && initiative.data.isAcceptingApplications && (
-                  <div className="relative h-5 bg-tunnel-black flex overflow-hidden">
-                    <div className="animate-marquee whitespace-nowrap text-magic-mint font-vt323 text-xl w-full">
-                      <p>
-                        CALLING FOR CONTRIBUTORS. CALLING FOR CONTRIBUTORS. CALLING FOR
-                        CONTRIBUTORS. CALLING FOR CONTRIBUTORS.
-                      </p>
+              <div className="flex flex-col h-auto justify-center">
+                <div>
+                  {initiative?.data.bannerURL && (
+                    <img src={initiative.data.bannerURL} alt="Project banner image." />
+                  )}
+                </div>
+                <div>
+                  {initiative && initiative.data.isAcceptingApplications && (
+                    <div className="relative h-5 bg-tunnel-black flex overflow-hidden">
+                      <div className="animate-marquee whitespace-nowrap text-magic-mint font-vt323 text-xl w-full">
+                        <p>
+                          CALLING FOR CONTRIBUTORS. CALLING FOR CONTRIBUTORS. CALLING FOR
+                          CONTRIBUTORS. CALLING FOR CONTRIBUTORS.
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
               <div className="flex flex-col space-y-4 text-marble-white">
                 <div>
                   <span className="text-2xl">About</span>
                 </div>
-                <div className="space-y-3">
+                <div className="flex flex-col space-y-3">
                   {initiative &&
                     initiative.data.contributeText?.map?.((item, index) => {
                       return (
-                        <span className="text-base flow-root" key={index}>
+                        <span className="flex text-base flow-root" key={index}>
                           {item}
                         </span>
                       )
                     })}
                 </div>
               </div>
-              <div className="text-marble-white flex flex-row my-4 gap-12">
-                <div className="flex-1 space-y-4">
+              <div className="text-marble-white flex grid md:grid-cols-3 gap-12">
+                <div className="space-y-4">
                   <div>
                     <span className="text-2xl">Rewards</span>
                   </div>
@@ -162,7 +165,7 @@ const Project: BlitzPage = () => {
                       })}
                   </div>
                 </div>
-                <div className="flex-1 space-y-4">
+                <div className="space-y-4">
                   <div>
                     <span className="text-2xl">Commitment</span>
                   </div>
@@ -170,7 +173,7 @@ const Project: BlitzPage = () => {
                     <span className="text-base">{initiative && initiative.data.commitment}</span>
                   </div>
                 </div>
-                <div className="flex-1 space-y-4">
+                <div className="space-y-4">
                   <div>
                     <span className="text-2xl">Skills</span>
                   </div>
@@ -194,7 +197,7 @@ const Project: BlitzPage = () => {
                 <div className="flex flex-row">
                   <span className="flex-1 text-marble-white text-2xl">Contributors</span>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="flex grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
                   {results?.map?.((contributor, index) => {
                     return <ContributorCard key={index} user={contributor} />
                   })}
@@ -268,7 +271,7 @@ const Project: BlitzPage = () => {
               <div>
                 <span className="text-2xl">What&apos;s next?</span>
               </div>
-              <div className="flex flex-row space-x-4">
+              <div className="flex grid md:grid-cols-3 gap-3">
                 <div className="flex-1 space-y-4">
                   <div>
                     <Image src={StepOne} alt="Step one." width={24} height={24} />
