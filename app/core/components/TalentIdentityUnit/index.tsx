@@ -58,7 +58,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
     }
     dateMetadata = (
       <div className="flex flex-row flex-1 mx-3 mt-3.5">
-        <div className="flex-1 items-center justify-center text-base text-concrete">
+        <div className="flex-1 items-center justify-center text-xs text-concrete">
           {dateMetadataMessage}
         </div>
       </div>
