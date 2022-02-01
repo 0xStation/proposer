@@ -40,39 +40,51 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
     </div>
   )
 
-  const referralPfps = referrals?.length ? (
+  const referralPfps = (
     <div className="flex flex-row flex-1 mx-3 my-2">
       <div className="flex-1 items-center justify-center text-base">
         <div className="place-self-center font-bold">Endorsers</div>
       </div>
       <div className="flex flex-1 align-right place-content-end content-right text-base">
         <div className="flex flex-row">
-          {referrals.slice(0, 4).map(
-            (
-              {
-                from: {
-                  data: { pfpURL },
-                },
-              },
-              idx
-            ) => {
-              const pfpStyling = "h-6 w-6 rounded-full border block border-marble-white"
-              const nestedStyling = idx ? "ml-[-5px]" : ""
-              let pfpBubble = pfpURL ? (
-                <span
-                  className={`bg-contain bg-clip-padding ${pfpStyling} ${nestedStyling}`}
-                  style={{ backgroundImage: `url(${pfpURL})` }}
-                ></span>
-              ) : (
-                <span className={`bg-concrete ${pfpStyling} ${nestedStyling}`}></span>
+          {referrals?.length
+            ? referrals.slice(0, 5).map(
+                (
+                  {
+                    from: {
+                      data: { pfpURL },
+                    },
+                  },
+                  idx
+                ) => {
+                  const pfpStyling = "h-6 w-6 rounded-full border block border-marble-white"
+                  const nestedStyling = idx ? "ml-[-5px]" : ""
+                  if (idx === 4) {
+                    const additionalReferrals = referrals.length - 4
+                    return (
+                      <span
+                        className={`bg-neon-blue text-[10px] text-center items-center ${pfpStyling} ${nestedStyling}`}
+                      >
+                        {additionalReferrals}+
+                      </span>
+                    )
+                  }
+                  let pfpBubble = pfpURL ? (
+                    <span
+                      className={`bg-contain bg-clip-padding ${pfpStyling} ${nestedStyling}`}
+                      style={{ backgroundImage: `url(${pfpURL})` }}
+                    ></span>
+                  ) : (
+                    <span className={`bg-concrete ${pfpStyling} ${nestedStyling}`}></span>
+                  )
+                  return pfpBubble
+                }
               )
-              return pfpBubble
-            }
-          )}
+            : "N/A"}
         </div>
       </div>
     </div>
-  ) : null
+  )
 
   const ctaButton = onClick ? (
     <div className="flex flex-row flex-1 mx-2.5">
