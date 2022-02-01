@@ -4,23 +4,6 @@ import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
 import useStore from "../../core/hooks/useStore"
 import { Account } from "../../account/types"
-import Staff from "/public/role-staff.svg"
-import Commuter from "/public/role-commuter.svg"
-import Visitor from "/public/role-visitor.svg"
-
-function roleSVG(role) {
-  let svg
-  if (role === "STAFF") {
-    svg = Staff
-  } else if (role === "COMMUTER") {
-    svg = Commuter
-  } else if (role === "VISITOR") {
-    svg = Visitor
-  } else {
-    svg = "N/A"
-  }
-  return svg
-}
 
 const ApplicationModal = ({
   isOpen,
@@ -32,10 +15,10 @@ const ApplicationModal = ({
   initiativeId: number
 }) => {
   const router = useRouter()
-  const terminalId = useParam("terminalId", "number") || 1
+  const terminalHandle = useParam("terminalHandle") as string
   const [createApplicationMutation] = useMutation(createApplication, {
     onSuccess: () => {
-      router.push(`/terminal/${terminalId}/waiting`)
+      router.push(`/terminal/${terminalHandle}/waiting`)
     },
   })
 
@@ -88,12 +71,12 @@ const ApplicationModal = ({
                   />
                 </div>
                 <div className="flex flex-col col-span-2">
-                  <label htmlFor="why" className="text-marble-white">
+                  <label htmlFor="entryDescription" className="text-marble-white">
                     Why this initiative?
                   </label>
                   <Field
                     component="input"
-                    name="why"
+                    name="entryDescription"
                     placeholder="..."
                     className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
                   />
