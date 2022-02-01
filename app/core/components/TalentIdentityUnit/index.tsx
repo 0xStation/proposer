@@ -63,6 +63,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
                     const additionalReferrals = referrals.length - 4
                     return (
                       <span
+                        key={idx}
                         className={`bg-neon-blue text-[10px] text-center items-center ${pfpStyling} ${nestedStyling}`}
                       >
                         {additionalReferrals}+
@@ -71,11 +72,12 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
                   }
                   let pfpBubble = pfpURL ? (
                     <span
+                      key={idx}
                       className={`bg-contain bg-clip-padding ${pfpStyling} ${nestedStyling}`}
                       style={{ backgroundImage: `url(${pfpURL})` }}
                     ></span>
                   ) : (
-                    <span className={`bg-concrete ${pfpStyling} ${nestedStyling}`}></span>
+                    <span key={idx} className={`bg-concrete ${pfpStyling} ${nestedStyling}`}></span>
                   )
                   return pfpBubble
                 }
