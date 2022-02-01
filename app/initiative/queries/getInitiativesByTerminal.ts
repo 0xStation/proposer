@@ -17,11 +17,23 @@ export default async function getInitiativesByTerminal(
     return []
   }
 
-  const initiatives = await db.initiative.findMany({ where: { terminalId: terminal.id } })
+  const initiatives = await db.initiative.findMany({
+    where: { terminalId: terminal.id },
+    include: {
+      _count: {
+        select: { applications: true },
+      },
+    },
+  })
 
   if (!initiatives) {
     return []
   }
 
-  return initiatives as Initiative[]
+  return initiatives.map((i) => {
+    return {
+      ...i,
+      applicationCount: i._count.applications,
+    }
+  }) as unknown as Initiative[]
 }

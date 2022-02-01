@@ -22,4 +22,5 @@ export type Initiative = {
   localId: number
   data: InitiativeMetadata
   contributors?: []
+  applicationCount?: number
 }
