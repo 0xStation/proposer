@@ -33,7 +33,7 @@ const Navigation = ({ children }: { children?: any }) => {
     watch: true,
     formatUnits: decimals,
   })
-  const tokenBalance = parseFloat(balanceData?.formatted || "0")
+  const tokenBalance = parseFloat(balanceData?.formatted || "0").toFixed(1)
 
   // obviously need better error page if the terminal is not found, but this will do.
   if (!terminal) {
@@ -112,7 +112,7 @@ const Navigation = ({ children }: { children?: any }) => {
           )}
           <div className="mt-2 flex justify-between px-1">
             <span className="text-marble-white font-bold">Balance</span>
-            <span className="text-marble-white font-light">{tokenBalance}ⓔ</span>
+            <span className="text-marble-white font-light">{tokenBalance} RAILⒺ</span>
           </div>
         </div>
       </div>

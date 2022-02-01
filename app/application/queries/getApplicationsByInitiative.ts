@@ -55,6 +55,7 @@ export default async function getApplicationsByInitiative(
       a.referrals.forEach((r) => {
         // default data, will be overriden if account with address r.from exists later
         referrers[r.from.toLowerCase()] = {
+          address: r.from,
           data: {
             name: getWalletString(r.from),
             wallet: getWalletString(r.from),
@@ -80,19 +81,20 @@ export default async function getApplicationsByInitiative(
         select: { address: true, data: true },
       })
       // update per-referrer store with account metadata
-      accounts.forEach((r) => (referrers[r.address.toLowerCase()].data = r.data))
+      accounts.forEach((a) => {
+        referrers[a.address.toLowerCase()].address = a.address
+        referrers[a.address.toLowerCase()].data = a.data
+      })
     }
-  }
+    //////
+    // Merge db initiative application data with sugraph referrals
+    //////
 
-  //////
-  // Merge db initiative application data with sugraph referrals
-  //////
-
-  // get all applications for the initiative
-  const applications = await db.initiativeApplication.findMany({
-    where: { initiativeId: initiativeId },
-    include: { applicant: true },
-  })
+    // get all applications for the initiative
+    const applications = await db.initiativeApplication.findMany({
+      where: { initiativeId: initiativeId },
+      include: { applicant: true },
+    })
 
   // merge database data and subgraph data
   const merged =
@@ -107,7 +109,7 @@ export default async function getApplicationsByInitiative(
             return {
               amount: r.amount,
               from: {
-                address: r.from,
+                address: referrers[r.from.toLowerCase()].address,
                 data: referrers[r.from.toLowerCase()].data,
               },
             }
@@ -115,5 +117,6 @@ export default async function getApplicationsByInitiative(
       }
     }) || []
 
-  return merged as unknown as Application[]
+    return merged as unknown as Application[]
+  }
 }
