@@ -249,7 +249,11 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   <button
                     onClick={() => {
                       setIsApplicantOpen(false)
-                      setIsEndorseModalOpen(true)
+                      // allow time for applicant modal to clean up
+                      // before opening the next modal and causing
+                      // a memory leak + scroll lock
+                      // see https://github.com/tailwindlabs/headlessui/issues/825
+                      setTimeout(() => setIsEndorseModalOpen(true), 500)
                     }}
                     className="text-black border border-magic-mint h-[29px] w-[215px] bg-magic-mint rounded text-base font-normal"
                   >

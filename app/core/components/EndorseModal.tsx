@@ -171,7 +171,11 @@ const EndorseModal = ({
     setEndorsementMessage("")
     setExplorerLink("")
     setIsEndorseModalOpen(false)
-    setIsSuccessModalOpen(true)
+    // allow time for applicant modal to clean up
+    // before opening the next modal and causing
+    // a memory leak + scroll lock
+    // see https://github.com/tailwindlabs/headlessui/issues/825
+    setTimeout(() => setIsSuccessModalOpen(true), 550)
   }
 
   useEffect(() => {
