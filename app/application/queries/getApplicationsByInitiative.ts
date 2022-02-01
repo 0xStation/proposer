@@ -102,7 +102,7 @@ export default async function getApplicationsByInitiative(
       return {
         ...a,
         data: a.data as ApplicationMetadata,
-        points: (applicant?.points as number) || 0,
+        points: parseFloat(applicant?.points || "0"),
         referrals:
           (applicant?.referrals.map((r) => {
             return {

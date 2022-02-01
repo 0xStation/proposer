@@ -17,7 +17,7 @@ type TalentIdentityUnitProps = {
 export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
   const {
     user,
-    points = undefined,
+    points,
     referrals,
     onClick,
     isEndorsable = false,
@@ -56,7 +56,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
               },
               idx
             ) => {
-              const pfpStyling = "h-5 w-5 rounded-full border block border-marble-white"
+              const pfpStyling = "h-6 w-6 rounded-full border block border-marble-white"
               const nestedStyling = idx ? "ml-[-5px]" : ""
               let pfpBubble = pfpURL ? (
                 <span

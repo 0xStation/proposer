@@ -4,7 +4,7 @@ type CardProps = {
 }
 
 export const Card = ({ onClick, children }: CardProps) => {
-  const hoverStyling = onClick ? "hover:border-neon-blue" : ""
+  const hoverStyling = onClick ? "hover:border-marble-white" : ""
   const tabIndex = onClick ? 0 : -1
   return (
     <div

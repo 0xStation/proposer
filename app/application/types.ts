@@ -14,6 +14,6 @@ export type Application = {
   createdAt: Date
   data: ApplicationMetadata
   applicant: Account
-  points: string
+  points: number
   referrals: ApplicationReferral[]
 }

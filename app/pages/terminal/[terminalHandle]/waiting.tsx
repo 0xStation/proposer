@@ -51,7 +51,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   }, [selectedInitiativeLocalId])
 
   const applicationCards = applications?.map((application, idx) => {
-    const { applicant, createdAt, points = "0", referrals } = application
+    const { applicant, createdAt, points, referrals } = application
     const {
       data: { role, timezone },
     } = applicant
@@ -62,7 +62,7 @@ const TerminalWaitingPage: BlitzPage = () => {
 
     const applicationCardProps = {
       user: applicant,
-      points: parseFloat(points) * Math.pow(10, 0 - decimals),
+      points: points * Math.pow(10, 0 - decimals),
       onClick,
       isEndorsable: !!activeUser?.data?.role,
       referrals,
