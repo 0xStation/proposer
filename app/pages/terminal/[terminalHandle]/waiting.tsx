@@ -60,6 +60,9 @@ const TerminalWaitingPage: BlitzPage = () => {
         }
       : undefined
 
+    console.log(referrals)
+    console.log(applicant.address)
+
     const applicationCardProps = {
       user: applicant,
       points,

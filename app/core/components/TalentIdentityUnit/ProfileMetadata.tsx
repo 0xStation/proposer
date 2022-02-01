@@ -1,19 +1,21 @@
 import { Image } from "blitz"
 import Verified from "/public/check-mark.svg"
-import { truncateString } from "../../utils/truncateString"
+import { getWalletString } from "app/utils/getWalletString"
 
 type ProfileMetadataProps = {
   address: string
   pfpURL?: string
+  name?: string
   handle?: string
-  wallet?: string
+  ens?: string
   pronouns?: string
   verified?: boolean
 }
 
 export const ProfileMetadata = ({
   pfpURL,
-  wallet,
+  name,
+  ens,
   address,
   pronouns,
   verified = false,
@@ -39,7 +41,7 @@ export const ProfileMetadata = ({
       <div className="flex-2/5 content-center align-middle mr-1">{profileImage}</div>
       <div className="flex flex-col flex-1 content-center">
         <div className="flex flex-row items-center flex-1 space-x-1">
-          <div className="text-lg">{truncateString(address)}</div>
+          <div className="text-lg">{name}</div>
           {verified && (
             <div className="m-auto">
               <Image src={Verified} alt="Verified icon." width={10} height={10} />
@@ -47,8 +49,8 @@ export const ProfileMetadata = ({
           )}
         </div>
         <div className="flex flex-row flex-1 text-base text-concrete space-x-1 overflow-hidden">
-          <div className="max-w-[150px] truncate">{truncateString(wallet || address)}</div>
-          <div className="">{pronouns}</div>
+          <div className="max-w-[150px] truncate">{getWalletString(address, ens)}</div>
+          {pronouns && <div className="">• {pronouns}</div>}
         </div>
       </div>
     </div>

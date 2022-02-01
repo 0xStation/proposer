@@ -135,7 +135,7 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
                   ) : (
                     <div className="h-[20px] w-[20px] place-self-center border border-marble-white rounded-full place-items-center mr-1"></div>
                   )}
-                  <div className="mr-1">{contributorData.handle || "N/A"}</div>
+                  <div className="mr-1">{contributorData.name || "N/A"}</div>
                   <Image src={Verified} alt="Verified icon." width={10} height={10} />
                 </div>
               </div>
