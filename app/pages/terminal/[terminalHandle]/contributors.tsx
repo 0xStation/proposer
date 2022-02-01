@@ -7,15 +7,17 @@ import { Account } from "app/account/types"
 import ContributorDirectoryModal from "app/contributors/components/ContributorDirectoryModal"
 import { Pill } from "app/core/components/Pill"
 import { TalentIdentityUnit as ContributorCard } from "app/core/components/TalentIdentityUnit/index"
-import { contributors } from "db/seed/contributors"
+import { Role } from "app/types"
 
 const TerminalContributorsPage: BlitzPage = () => {
   const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
   const [selectedContributorToView, setSelectedContributorToView] = useState<Account | null>(null)
-  const [selectedRole, setRole] = useState<String>("STAFF")
+  const [selectedRole, setRole] = useState<String>(Role.STAFF)
   const [selectedContributors, setSelectedContributors] = useState<Account[] | null>(null)
 
-  const roles = ["STAFF", "COMMUTER", "VISITOR"]
+  const roles = Object.keys(Role).map((key) => {
+    return key.split("_").join(" ")
+  })
 
   useEffect(() => {
     if (selectedRole) {
@@ -73,7 +75,7 @@ const TerminalContributorsPage: BlitzPage = () => {
                 key={index.toString()}
                 active={selectedRole == role}
                 onClick={() => {
-                  setRole(role)
+                  setRole(Role[role.split(" ").join("_")])
                 }}
               >
                 <span className="m-4">{role}</span>
