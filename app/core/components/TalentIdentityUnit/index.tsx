@@ -1,4 +1,5 @@
 import { Account } from "app/account/types"
+import { ApplicationReferral } from "app/application/types"
 import Button from "../Button"
 import Card from "./Card"
 import ProfileMetadata from "./ProfileMetadata"
@@ -9,17 +10,26 @@ type TalentIdentityUnitProps = {
   points?: number
   onClick?: (user) => void
   dateMetadata?: any
+  isEndorsable?: boolean
+  referrals?: ApplicationReferral[]
 }
 
 export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
-  const { user, points = undefined, onClick, dateMetadata: dateMetadataProp = {} } = props
+  const {
+    user,
+    points = undefined,
+    referrals,
+    onClick,
+    isEndorsable = false,
+    dateMetadata: dateMetadataProp = {},
+  } = props
 
   const {
     address,
     data: { pfpURL, wallet, pronouns, role },
   } = user
 
-  const railPoints = typeof points === "number" && (
+  const railPoints = (
     <div className="flex flex-row flex-1 mx-3">
       <div className="flex-1 items-center justify-center text-base">
         <div className="place-self-center mt-1 font-bold">Points</div>
@@ -29,6 +39,40 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
       </div>
     </div>
   )
+
+  const referralPfps = referrals?.length ? (
+    <div className="flex flex-row flex-1 mx-3 my-2">
+      <div className="flex-1 items-center justify-center text-base">
+        <div className="place-self-center font-bold">Endorsers</div>
+      </div>
+      <div className="flex flex-1 align-right place-content-end content-right text-base">
+        <div className="flex flex-row">
+          {referrals.slice(0, 4).map(
+            (
+              {
+                from: {
+                  data: { pfpURL },
+                },
+              },
+              idx
+            ) => {
+              const pfpStyling = "h-5 w-5 rounded-full border block border-marble-white"
+              const nestedStyling = idx ? "ml-[-5px]" : ""
+              let pfpBubble = pfpURL ? (
+                <span
+                  className={`bg-contain bg-clip-padding ${pfpStyling} ${nestedStyling}`}
+                  style={{ backgroundImage: `url(${pfpURL})` }}
+                ></span>
+              ) : (
+                <span className={`bg-concrete ${pfpStyling} ${nestedStyling}`}></span>
+              )
+              return pfpBubble
+            }
+          )}
+        </div>
+      </div>
+    </div>
+  ) : null
 
   const ctaButton = onClick ? (
     <div className="flex flex-row flex-1 mx-2.5">
@@ -44,9 +88,6 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
     if (dateMetadataProp.joinedAt) {
       const date = dateMetadataProp.joinedAt.toLocaleDateString("en-US", {
         timeZone: dateMetadataProp.timezone,
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
       })
 
       dateMetadataMessage = `JOINED SINCE ${date}`
@@ -76,21 +117,9 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
           <RoleTag role={role} />
         </div>
       </div>
-      <div className="flex flex-row flex-1 mx-3 my-2">
-        <div className="flex-1 items-center justify-center text-base">
-          <div className="place-self-center font-bold">Endorsers</div>
-        </div>
-        {/* TODO: make endorsers dynamic */}
-        <div className="flex flex-1 align-right place-content-end content-right text-base">
-          <div className="flex flex-row">
-            <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block"></span>
-            <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block ml-[-5px]"></span>
-            <span className="h-4 w-4 rounded-full bg-concrete border border-marble-white block ml-[-5px]"></span>
-          </div>
-        </div>
-      </div>
-      {railPoints}
-      {ctaButton}
+      {referralPfps}
+      {isEndorsable && railPoints}
+      {isEndorsable && ctaButton}
       {dateMetadata}
     </Card>
   )

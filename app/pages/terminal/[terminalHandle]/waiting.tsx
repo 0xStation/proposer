@@ -12,10 +12,12 @@ import EndorseModal from "app/core/components/EndorseModal"
 import SuccessModal from "app/core/components/SuccessModal"
 import { Pill } from "app/core/components/Pill"
 import getApplicationsByInitiative from "app/application/queries/getApplicationsByInitiative"
-import { TERMINAL } from "app/core/utils/constants"
+import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
+import { useDecimals } from "app/core/contracts/contracts"
 
 const TerminalWaitingPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
+  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
   const [selectedInitiativeLocalId, setSelectedInitiativeLocalId] = useState<number>()
   const [applications, setApplications] = useState<Application[]>([])
   const [isEndorseModalOpen, setIsEndorseModalOpen] = useState(false)
@@ -49,21 +51,21 @@ const TerminalWaitingPage: BlitzPage = () => {
   }, [selectedInitiativeLocalId])
 
   const applicationCards = applications?.map((application, idx) => {
-    const { applicant, createdAt, points, referrals } = application
+    const { applicant, createdAt, points = "0", referrals } = application
     const {
       data: { role, timezone },
     } = applicant
-    const onClick = activeUser
-      ? () => {
-          setSelectedApplication(application)
-          setIsApplicantOpen(true)
-        }
-      : undefined
+    const onClick = () => {
+      setSelectedApplication(application)
+      setIsApplicantOpen(true)
+    }
 
     const applicationCardProps = {
       user: applicant,
-      points,
+      points: parseFloat(points) * Math.pow(10, 0 - decimals),
       onClick,
+      isEndorsable: !!activeUser?.data?.role,
+      referrals,
       dateMetadata: createdAt && {
         createdAt,
         timezone,
