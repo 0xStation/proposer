@@ -126,7 +126,7 @@ const ContributorCard: React.FC<ContributorCardProps> = ({
             <div className="max-w-[150px] truncate">
               {getWalletString(contributor.address, contributor.data.ens)}
             </div>
-            <div className="">-</div>
+            <div className="">•</div>
             <div className="">{contributor.data.pronouns}</div>
           </div>
         </div>

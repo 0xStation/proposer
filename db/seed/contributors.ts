@@ -15,7 +15,8 @@ const mind: AccountMetadata & { address: string } = {
   ens: "spicypaprika.eth",
   role: "STAFF",
   twitterURL: "https://twitter.com/mindapi_",
-  pfpURL: "https://pbs.twimg.com/profile_images/1466504048006377472/KrC6aPam_400x400.jpg",
+  pfpURL:
+    "https://user-images.githubusercontent.com/38736612/152036023-44570a89-315b-42cb-8a97-fc48c60f1e7a.png",
 }
 const tina: AccountMetadata & { address: string } = {
   name: "fakepixels",
@@ -29,11 +30,12 @@ const tina: AccountMetadata & { address: string } = {
   ens: "fkpixels.eth",
   role: "STAFF",
   twitterURL: "https://twitter.com/fkpxls",
-  pfpURL: "https://pbs.twimg.com/profile_images/1470115904289574913/7t4TlLQd_400x400.jpg",
+  pfpURL:
+    "https://user-images.githubusercontent.com/38736612/152036016-db43df6c-e240-4f63-aaff-6843d278a2ba.png",
   initiatives: [3, 4, 6],
 }
 const conner: AccountMetadata & { address: string } = {
-  name: "symmtry",
+  name: "symmetry",
   address: "0x016562aA41A8697720ce0943F003141f5dEAe006",
   ticketId: 0, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
@@ -44,7 +46,8 @@ const conner: AccountMetadata & { address: string } = {
   ens: "symmtry.eth",
   role: "STAFF",
   twitterURL: "https://twitter.com/symmtry69",
-  pfpURL: "https://pbs.twimg.com/profile_images/1466148504934309888/mighngBe_400x400.jpg",
+  pfpURL:
+    "https://user-images.githubusercontent.com/38736612/152036030-3c4f0d7b-0946-4ccc-b03b-03fb6e57328e.png",
 }
 const kristen: AccountMetadata & { address: string } = {
   name: "rie",
@@ -58,7 +61,8 @@ const kristen: AccountMetadata & { address: string } = {
   ens: "rielity.eth",
   role: "STAFF",
   twitterURL: "https://twitter.com/0xRie_",
-  pfpURL: "https://pbs.twimg.com/profile_images/1480639057914855424/LiE4wCe2_400x400.jpg",
+  pfpURL:
+    "https://user-images.githubusercontent.com/38736612/152036026-9e4d09b3-8d1b-4261-8a2c-e121146f7d63.png",
 }
 const calvin: AccountMetadata & { address: string } = {
   name: "cc2",
@@ -72,7 +76,8 @@ const calvin: AccountMetadata & { address: string } = {
   // ens: "",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/cchengasaurus",
-  pfpURL: "https://pbs.twimg.com/profile_images/1383273360986054659/A3pwCK_O_400x400.png",
+  pfpURL:
+    "https://user-images.githubusercontent.com/38736612/152036007-6e11bb26-6edd-4c9b-9c1c-aa1814e36f11.png",
 }
 const brendan: AccountMetadata & { address: string } = {
   name: "brendo",
@@ -86,7 +91,8 @@ const brendan: AccountMetadata & { address: string } = {
   ens: "brendo.eth",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/brendanelliot_",
-  pfpURL: "https://pbs.twimg.com/profile_images/1474473416354902023/sJMCansO_400x400.jpg",
+  pfpURL:
+    "https://user-images.githubusercontent.com/38736612/152036006-018105d4-e8d4-4fb7-bc82-997351d38d2d.png",
 }
 const michael: AccountMetadata & { address: string } = {
   name: "frog",
@@ -100,7 +106,8 @@ const michael: AccountMetadata & { address: string } = {
   ens: "0xmcg.eth",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/0xmcg",
-  pfpURL: "https://pbs.twimg.com/profile_images/1480358868349714433/v7YwGkCb_400x400.jpg",
+  pfpURL:
+    "https://user-images.githubusercontent.com/38736612/152036018-25f65c4d-a968-4c6c-b328-15958acdb649.png",
 }
 const abe: AccountMetadata & { address: string } = {
   name: "cryptoabe",
@@ -114,7 +121,8 @@ const abe: AccountMetadata & { address: string } = {
   // ens: "",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/abenazer_mekete",
-  pfpURL: "https://pbs.twimg.com/profile_images/1480266187934257155/aRArmGkH_400x400.jpg",
+  pfpURL:
+    "https://user-images.githubusercontent.com/38736612/152036010-b47feac0-99c5-43a6-963d-89a89aa47ff7.png",
 }
 const nick: AccountMetadata & { address: string } = {
   name: "zy2",
@@ -128,7 +136,8 @@ const nick: AccountMetadata & { address: string } = {
   ens: "zy22yz.eth",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/zy22yz",
-  pfpURL: "https://pbs.twimg.com/profile_images/1480623159048957952/YMEGfCbN_400x400.jpg",
+  pfpURL:
+    "https://user-images.githubusercontent.com/38736612/152036033-abee8f5d-544a-491f-b442-67d4b90639b1.png",
 }
 const alli: AccountMetadata & { address: string } = {
   name: "alli",
@@ -142,7 +151,8 @@ const alli: AccountMetadata & { address: string } = {
   ens: "sonofalli.eth",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/sonofalli",
-  pfpURL: "https://pbs.twimg.com/profile_images/1467974510540251142/8Tld5x0g_400x400.jpg",
+  pfpURL:
+    "https://user-images.githubusercontent.com/38736612/152036002-396279ab-0f10-4c61-b2dc-23dea07236f9.png",
 }
 const kassen: AccountMetadata & { address: string } = {
   name: "kassen",
@@ -156,7 +166,8 @@ const kassen: AccountMetadata & { address: string } = {
   ens: "kassen.eth",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/kassenq",
-  pfpURL: "https://pbs.twimg.com/profile_images/1447546582019289089/6FTxfXBw_400x400.jpg",
+  pfpURL:
+    "https://user-images.githubusercontent.com/38736612/152036021-6bb5fde3-aef3-4a76-a543-3036c99b8ad0.png",
 }
 const alex: AccountMetadata & { address: string } = {
   name: "ahs",
@@ -170,7 +181,8 @@ const alex: AccountMetadata & { address: string } = {
   // ens: "",
   role: "COMMUTER",
   twitterURL: "https://twitter.com/alexhughsam",
-  pfpURL: "https://pbs.twimg.com/profile_images/1444053434383147017/NHJoWE9j_400x400.jpg",
+  pfpURL:
+    "https://user-images.githubusercontent.com/38736612/152035995-3aabcfcc-8fee-4d5c-9c37-17b7f51cfcfd.png",
 }
 const akshay: AccountMetadata & { address: string } = {
   name: "wagmiking",
@@ -184,7 +196,8 @@ const akshay: AccountMetadata & { address: string } = {
   // ens: "",
   role: "VISITOR",
   twitterURL: "https://twitter.com/wagmiking",
-  pfpURL: "https://pbs.twimg.com/profile_images/1484237821099405312/zYGmw04f_400x400.jpg",
+  pfpURL:
+    "https://user-images.githubusercontent.com/38736612/152036031-7d5b3fd2-69b7-42f1-8aca-23fece63fc91.png",
 }
 
 export const contributors = {
@@ -232,6 +245,7 @@ export async function seedContributors(terminals) {
       },
       update: {
         data: contributorData,
+        role: contributorData.role,
       },
     })
 

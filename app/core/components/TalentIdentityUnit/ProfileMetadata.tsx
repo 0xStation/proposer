@@ -50,6 +50,7 @@ export const ProfileMetadata = ({
         </div>
         <div className="flex flex-row flex-1 text-base text-concrete space-x-1 overflow-hidden">
           <div className="max-w-[150px] truncate">{getWalletString(address, ens)}</div>
+          <div className="">•</div>
           <div className="">{pronouns}</div>
         </div>
       </div>
