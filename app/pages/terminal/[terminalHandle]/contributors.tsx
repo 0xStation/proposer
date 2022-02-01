@@ -48,6 +48,8 @@ const TerminalContributorsPage: BlitzPage = () => {
         joinedAt,
         timezone,
       },
+      referrals: [],
+      isEndorsable: false,
     }
     return <ContributorCard key={idx} {...contributorCardProps} />
   })
