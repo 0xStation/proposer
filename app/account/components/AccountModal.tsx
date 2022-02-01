@@ -82,6 +82,7 @@ const AccountModal = ({
       method: "POST",
       body: formData,
     })
+    console.log(res)
     const data = await res.json()
     setPfpURL(data.url)
     setUploadingState("UPLOADED")
