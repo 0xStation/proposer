@@ -77,7 +77,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               <div className="flex flex-1 justify-end absolute top-2 right-2 z-50">
                 {(application && application.createdAt !== null) || undefined ? (
                   <span className="text-xs text-concrete font-normal">
-                    SUBMITTED ON {application?.createdAt.toDateString}
+                    SUBMITTED ON {application.createdAt.toDateString()}
                   </span>
                 ) : (
                   <span className="text-xs text-concrete font-normal">SUBMITTED ON ...</span>
@@ -104,9 +104,11 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     <div className="flex-3/5 text-xl text-marble-white">
                       {application?.applicant.data.name}
                     </div>
-                    <div className="flex-2/5 m-auto">
-                      <Image src={Verified} alt="Verified icon." width={10} height={10} />
-                    </div>
+                    {application?.applicant.data.verified && (
+                      <div className="flex-2/5 m-auto">
+                        <Image src={Verified} alt="Verified icon." width={10} height={10} />
+                      </div>
+                    )}
                   </div>
                   <div className="flex flex-row flex-1 text-base text-concrete space-x-1">
                     <div className="flex-1">
@@ -115,8 +117,9 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                         application?.applicant.data.ens
                       )}
                     </div>
-                    <div className="flex-1">-</div>
-                    <div className="flex-1">{application?.applicant.data.pronouns}</div>
+                    {application?.applicant.data.pronouns && (
+                      <div className="flex-1">• {application?.applicant.data.pronouns}</div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -165,8 +168,13 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   <div className="font-bold">
                     <span>Contact</span>
                   </div>
-                  <div className="text-base font-normal">
-                    <span>@{application?.applicant?.data?.discordId}</span>
+                  <div className="text-sm font-normal flex flex-row space-x-1">
+                    <div className="flex content-end">
+                      <Image src={DiscordIcon} alt="Discord icon" width={16} height={13} />
+                    </div>
+                    <div className="text-base font-normal">
+                      <span>{application?.applicant?.data?.discordId}</span>
+                    </div>
                   </div>
                 </div>
                 <div className="flex flex-col flex-1 text-marble-white">
@@ -212,7 +220,9 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                       <span>Points</span>
                     </div>
                     <div className="text-base font-normal text-concrete">
-                      <span>RAILS</span>
+                      <span>{`${(
+                        (application.points as number) / 1000000
+                      ).toString()} RAILⒺ`}</span>
                     </div>
                   </div>
                 )}

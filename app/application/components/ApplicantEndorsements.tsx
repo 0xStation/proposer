@@ -32,22 +32,23 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({
                   <div className="flex-3/5 text-lg font-bold text-marble-white">
                     {person.data.name}
                   </div>
-                  <div className="flex-2/5 m-auto">
-                    <Image src={Verified} alt="Verified icon." width={10} height={10} />
-                  </div>
+                  {person.data.verified && (
+                    <div className="flex-2/5 m-auto">
+                      <Image src={Verified} alt="Verified icon." width={10} height={10} />
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex-1 text-normal text-concrete">
                 <div className="flex flex-row flex-1 text-base text-concrete space-x-1">
                   <div className="flex-1">{getWalletString(person.address, person.data.ens)}</div>
-                  <div className="flex-1">-</div>
-                  <div className="flex-1">{person.data.pronouns}</div>
+                  {person.data.pronouns && <div className="flex-1">• {person.data.pronouns}</div>}
                 </div>
               </div>
             </div>
           </div>
           <div className="flex flex-1 justify-center content-center">
-            {person && (
+            {person.data.role != "N/A" && (
               <span className="text-xs rounded-lg text-electric-violet bg-[#211831] py-1 m-2 px-2">
                 {person.data.role?.toUpperCase()}
               </span>
@@ -55,7 +56,9 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({
           </div>
           <div className="flex flex-1 content-center justify-center">
             {isEndorsable && (
-              <span className="text-concrete text-lg text-normal m-2">{`${amount} RAILⒺ`}</span>
+              <span className="text-concrete text-lg text-normal m-2">{`${(
+                (amount as number) / 1000000
+              ).toString()} RAILⒺ`}</span>
             )}
           </div>
         </div>

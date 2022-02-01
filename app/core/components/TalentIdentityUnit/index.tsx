@@ -19,6 +19,8 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
     data: { pfpURL, name, ens, pronouns, role, verified },
   } = user
 
+  console.log(address)
+
   const railPoints = typeof points === "number" && (
     <div className="flex flex-row flex-1 mx-3">
       <div className="flex-1 items-center justify-center text-base">

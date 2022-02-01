@@ -159,7 +159,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                       <Image src={DiscordIcon} alt="Discord icon" width={16} height={13} />
                     </div>
                     <div className="">
-                      <span>@{contributor?.data?.discordId}</span>
+                      <span>{contributor?.data?.discordId}</span>
                     </div>
                   </div>
                 </div>
