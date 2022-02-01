@@ -12,6 +12,7 @@ import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
 import ApplicantEndorsements from "./ApplicantEndorsements"
 import useStore from "app/core/hooks/useStore"
+import { getWalletString } from "app/utils/getWalletString"
 
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
@@ -101,14 +102,19 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 <div className="flex flex-col flex-3/5 content-center">
                   <div className="flex flex-row flex-1 space-x-1">
                     <div className="flex-3/5 text-xl text-marble-white">
-                      {application?.applicant.data.handle}
+                      {application?.applicant.data.name}
                     </div>
                     <div className="flex-2/5 m-auto">
                       <Image src={Verified} alt="Verified icon." width={10} height={10} />
                     </div>
                   </div>
                   <div className="flex flex-row flex-1 text-base text-concrete space-x-1">
-                    <div className="flex-1">{application?.applicant.data.wallet}</div>
+                    <div className="flex-1">
+                      {getWalletString(
+                        application?.applicant.address,
+                        application?.applicant.data.ens
+                      )}
+                    </div>
                     <div className="flex-1">-</div>
                     <div className="flex-1">{application?.applicant.data.pronouns}</div>
                   </div>

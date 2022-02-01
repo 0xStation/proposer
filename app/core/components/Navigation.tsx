@@ -88,7 +88,7 @@ const Navigation = () => {
                   ) : (
                     <span className="w-7 h-7 rounded-full bg-concrete border border-marble-white mr-2"></span>
                   )}
-                  <span>{accountData?.ens?.name || activeUser?.data?.handle || "Handle"}</span>
+                  <span>{accountData?.ens?.name || activeUser?.data?.name || "Handle"}</span>
                 </div>
               }
               items={[

@@ -1,6 +1,7 @@
 import { Account } from "app/account/types"
 import { Image } from "blitz"
 import Verified from "/public/check-mark.svg"
+import { getWalletString } from "app/utils/getWalletString"
 
 type ApplicantEndorsementsProps = {
   person: Account
@@ -29,7 +30,7 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({
               <div className="flex-1">
                 <div className="flex flex-row flex-1 space-x-1">
                   <div className="flex-3/5 text-lg font-bold text-marble-white">
-                    {person.data.handle}
+                    {person.data.name}
                   </div>
                   <div className="flex-2/5 m-auto">
                     <Image src={Verified} alt="Verified icon." width={10} height={10} />
@@ -38,7 +39,7 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({
               </div>
               <div className="flex-1 text-normal text-concrete">
                 <div className="flex flex-row flex-1 text-base text-concrete space-x-1">
-                  <div className="flex-1">{person.data.wallet}</div>
+                  <div className="flex-1">{getWalletString(person.address, person.data.ens)}</div>
                   <div className="flex-1">-</div>
                   <div className="flex-1">{person.data.pronouns}</div>
                 </div>
