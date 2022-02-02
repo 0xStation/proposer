@@ -30,8 +30,6 @@ const Project: BlitzPage = () => {
   const [userTriggered, setUserTrigged] = useState(false)
   const address = useMemo(() => accountData?.address, [accountData?.address])
 
-  console.log(activeUser)
-
   const setActiveModal = () => {
     address
       ? activeUser

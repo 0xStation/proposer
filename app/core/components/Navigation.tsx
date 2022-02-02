@@ -5,9 +5,7 @@ import Map from "../components/Map"
 import logo from "../../../public/station-logo.svg"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import useStore from "../hooks/useStore"
-import ConnectWalletModal from "app/core/components/ConnectWalletModal"
 import { useAccount } from "wagmi"
-import AccountModal from "app/account/components/AccountModal"
 import truncateString from "../utils/truncateString"
 
 interface Wallet {
@@ -24,13 +22,14 @@ const Navigation = () => {
     fetchEns: true,
   })
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
-  const setAddress = useStore((state) => state.setAddress)
   const setActiveUser = useStore((state) => state.setActiveUser)
   const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const toggleAccountModal = useStore((state) => state.toggleAccountModal)
 
   const getUserAccount = async (address) => {
+    // closing the wallet modal
+    // we have the address (since this is called from the useEffect hook)
     toggleWalletModal(false)
     let user = await invoke(getAccountByAddress, { address })
     if (user) {
