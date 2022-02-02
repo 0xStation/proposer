@@ -40,6 +40,7 @@ export default async function getInitiativeByLocalId(
   }
 
   return {
+    id: initiative.id,
     localId: initiative.localId,
     data: initiative.data as InitiativeMetadata,
     contributors: initiative.accounts

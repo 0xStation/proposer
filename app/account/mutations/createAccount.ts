@@ -4,7 +4,7 @@ import { Account } from "../types"
 
 const CreateAccount = z.object({
   discordId: z.string(),
-  pronouns: z.string(),
+  pronouns: z.optional(z.string()),
   timezone: z.string(),
   skills: z
     .object({
@@ -23,7 +23,7 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
     address: params.address,
     data: {
       discordId: params.discordId,
-      pronouns: params.pronouns,
+      pronouns: params.pronouns || "",
       timezone: params.timezone,
       pfpURL: params.pfpURL,
     },
