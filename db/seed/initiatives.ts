@@ -17,6 +17,7 @@ const contributorReviewMetadata: InitiativeMetadata & { localId: number } = {
   rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
   skills: ["Solidity"],
   commitment: "Full-time, Part-time",
+  bannerURL: "/contributor-review-banner.png",
   links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/protocol-v1" }],
   members: [
     contributors.conner.address,
@@ -89,6 +90,7 @@ const partnershipMetadata: InitiativeMetadata & { localId: number } = {
   rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
   skills: ["Writing", "Partnerships"],
   commitment: "One-time, Part-time",
+  bannerURL: "/terminal-partnership-banner.png",
   links: [],
   members: [
     contributors.tina.address,
@@ -142,6 +144,7 @@ const contributorExperience: InitiativeMetadata & { localId: number } = {
   rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
   skills: ["Discord", "Community Management", "HR", "Mod"],
   isAcceptingApplications: false,
+  bannerURL: "/contributor-experience-banner.png",
   links: [],
   members: [contributors.kassen.address, contributors.tina.address],
 }
@@ -190,6 +193,27 @@ const brandIdentity: InitiativeMetadata & { localId: number } = {
   members: [contributors.mind.address],
 }
 
+const stationDigest: InitiativeMetadata & { localId: number } = {
+  localId: 9,
+  name: "Station Digest",
+  oneLiner:
+    "Sharing updates, celebrating contributors, surfacing interesting and thoughtful discussions from different corners of Station.",
+  description:
+    "Sharing updates, celebrating contributors, surfacing interesting and thoughtful discussions from different corners of Station.",
+  shortName: "STATION DIGEST",
+  contributeText: [
+    "We know that commuters, visitors, and staff at Station have busy lives. In the hustle and bustle of daily work in web3, filtering through Discord channels and attempting to follow different projects or conversations can appear impossible.",
+    "We don’t want those important conversations, project updates, and nuggets of wisdom to get lost in the noise, so we created Station Digest. This bi-weekly newsletter is created by, and for members of Station’s vibrant community. It summarizes updates from Station’s guilds, thoughtful conversations from the depths of Discord, all the best reads, and exciting announcements or achievements from members of our community– all in a quick, commute or morning-coffee-friendly read for you to digest at your leisure.",
+  ],
+  commitment: "Part-time",
+  rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
+  skills: ["Writing"],
+  isAcceptingApplications: false,
+  links: [],
+  bannerURL: "/brand-identity-banner.png",
+  members: [contributors.alex.address, contributors.alli.address],
+}
+
 const stationInitiaitves = [
   contributorReviewMetadata,
   waitingRoomMetadata,
@@ -199,6 +223,7 @@ const stationInitiaitves = [
   contributorExperience,
   midnightStation,
   brandIdentity,
+  stationDigest,
 ]
 
 export async function seedInitiatives(terminals) {
