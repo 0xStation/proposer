@@ -35,13 +35,13 @@ model Terminal {
 
 // A role within a terminal
 model Role {
-  terminal   Terminal @relation(fields: [terminalId], references: [id])
+  terminal   Terminal          @relation(fields: [terminalId], references: [id])
   terminalId Int
-  localId    Int      @default(autoincrement())
+  localId    Int               @default(autoincrement())
+  tickets    AccountTerminal[]
   data       Json?
 
   @@id([terminalId, localId], name: "terminalRoleId")
-  AccountTerminal AccountTerminal[]
 }
 
 model AccountTerminal {
@@ -52,7 +52,7 @@ model AccountTerminal {
   role        Role     @relation(fields: [terminalId, roleLocalId], references: [terminalId, localId])
   roleLocalId Int
   joinedAt    DateTime @default(now())
-  active      Boolean
+  active      Boolean  @default(true)
   ticketUrl   String?
 
   @@id([accountId, terminalId])
