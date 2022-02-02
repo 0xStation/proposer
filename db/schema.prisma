@@ -49,8 +49,8 @@ model AccountTerminal {
   accountId   Int
   terminal    Terminal @relation(fields: [terminalId], references: [id])
   terminalId  Int
-  role        Role     @relation(fields: [terminalId, roleLocalId], references: [terminalId, localId])
-  roleLocalId Int
+  role        Role?    @relation(fields: [terminalId, roleLocalId], references: [terminalId, localId])
+  roleLocalId Int?
   joinedAt    DateTime @default(now())
   active      Boolean  @default(true)
   ticketUrl   String?

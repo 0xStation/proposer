@@ -3,7 +3,6 @@
 
   - You are about to drop the column `joinedAt` on the `Account` table. All the data in the column will be lost.
   - You are about to drop the column `role` on the `Account` table. All the data in the column will be lost.
-  - Added the required column `roleLocalId` to the `AccountTerminal` table without a default value. This is not possible if the table is not empty.
 
 */
 -- AlterTable
@@ -12,7 +11,7 @@ DROP COLUMN "role";
 
 -- AlterTable
 ALTER TABLE "AccountTerminal" ADD COLUMN     "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-ADD COLUMN     "roleLocalId" INTEGER NOT NULL,
+ADD COLUMN     "roleLocalId" INTEGER,
 ALTER COLUMN "ticketUrl" DROP NOT NULL,
 ALTER COLUMN "active" SET DEFAULT true;
 

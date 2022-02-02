@@ -33,7 +33,7 @@ export default async function getAccountsByTerminalRole(
     return {
       address: t.account.address,
       data: t.account.data as AccountMetadata,
-      role: (t.role.data as RoleMetadata)?.value,
+      role: (t.role?.data as RoleMetadata)?.value,
     }
   })
 
