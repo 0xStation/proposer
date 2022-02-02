@@ -37,7 +37,7 @@ const mind: AccountMetadata & AccountSeed = {
   name: "paprika",
   ticketId: 2, // TODO: remove this when subgraph is ready
   pronouns: "she/her",
-  skills: [],
+  skills: ["design", "product strategy", "creative direction"],
   discordId: "paprika#0027",
   verified: true,
   timezone: "EST",
@@ -59,7 +59,7 @@ const tina: AccountMetadata & AccountSeed = {
   name: "fakepixels",
   ticketId: 3, // TODO: remove this when subgraph is ready
   pronouns: "she/her",
-  skills: [],
+  skills: ["partnerships", "tokenomics", "product strategy", "hiring"],
   discordId: "fakepixels#6258",
   verified: true,
   timezone: "EST",
@@ -83,7 +83,7 @@ const conner: AccountMetadata & AccountSeed = {
   name: "symmetry",
   ticketId: 0, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
-  skills: [],
+  skills: ["solidity", "subgraph", "backend"],
   discordId: "symmtry#0069",
   verified: true,
   timezone: "EST",
@@ -101,7 +101,7 @@ const calvin: AccountMetadata & AccountSeed = {
   name: "cc2",
   ticketId: 6, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
-  skills: [],
+  skills: ["tokenomics", "partnerships"],
   discordId: "cc2#2803",
   verified: true,
   timezone: "EST",
@@ -119,7 +119,7 @@ const kristen: AccountMetadata & AccountSeed = {
   name: "rie",
   ticketId: 7, // TODO: remove this when subgraph is ready
   pronouns: "she/her",
-  skills: [],
+  skills: ["frontend", "product strategy"],
   discordId: "rie#9502",
   verified: true,
   timezone: "EST",
@@ -141,7 +141,7 @@ const brendan: AccountMetadata & AccountSeed = {
   name: "brendo",
   ticketId: 4, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
-  skills: [],
+  skills: ["design"],
   discordId: "brendo#9038",
   verified: true,
   timezone: "EST",
@@ -159,7 +159,7 @@ const michael: AccountMetadata & AccountSeed = {
   name: "frog",
   ticketId: 1, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
-  skills: [],
+  skills: ["frontend", "backend"],
   discordId: "frog#3881",
   verified: true,
   timezone: "EST",
@@ -177,7 +177,7 @@ const abe: AccountMetadata & AccountSeed = {
   name: "cryptoabe",
   ticketId: 12, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
-  skills: [],
+  skills: ["frontend", "product strategy"],
   discordId: "cryptoabe#3656",
   verified: true,
   timezone: "EST",
@@ -195,7 +195,7 @@ const nick: AccountMetadata & AccountSeed = {
   name: "zy2",
   ticketId: 13, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
-  skills: [],
+  skills: ["solidity", "product strategy"],
   discordId: "zy2#2240",
   verified: true,
   timezone: "EST",
@@ -213,7 +213,7 @@ const alli: AccountMetadata & AccountSeed = {
   name: "alli",
   ticketId: 10, // TODO: remove this when subgraph is ready
   pronouns: "she/her",
-  skills: [],
+  skills: ["writing", "marketing", "project management", "product strategy"],
   discordId: "alli#3226",
   verified: true,
   timezone: "EST",
@@ -231,7 +231,7 @@ const kassen: AccountMetadata & AccountSeed = {
   name: "kassen",
   ticketId: 11, // TODO: remove this when subgraph is ready
   pronouns: "she/her",
-  skills: [],
+  skills: ["partnerships", "product strategy", "project management", "content writing"],
   discordId: "kass#7081",
   verified: true,
   timezone: "EST",
@@ -249,7 +249,7 @@ const alex: AccountMetadata & AccountSeed = {
   name: "ahs",
   ticketId: 14, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
-  skills: [],
+  skills: ["content writing", "knowledge management", "project management"],
   discordId: "ahs#6679",
   verified: true,
   timezone: "EST",
@@ -267,7 +267,7 @@ const akshay: AccountMetadata & AccountSeed = {
   name: "wagmiking",
   ticketId: 9, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
-  skills: [],
+  skills: ["solidity", "data science", "product strategy"],
   discordId: "wagmiking#0978",
   verified: true,
   timezone: "EST",
@@ -368,6 +368,39 @@ export async function seedContributors(terminals) {
       })
 
       console.log(`      contributor to: ${(initiative as Initiative).data?.name}`)
+    }
+
+    for (const i in contributorData.skills) {
+      const skill = await db.skill.upsert({
+        where: {
+          name: contributorData.skills[i],
+        },
+        create: {
+          name: contributorData.skills[i] || "",
+        },
+        update: {
+          name: contributorData.skills[i],
+        },
+      })
+
+      await db.skillsOnAccounts.upsert({
+        where: {
+          skillId_accountId: {
+            skillId: skill.id,
+            accountId: account.id,
+          },
+        },
+        create: {
+          skillId: skill.id,
+          accountId: account.id,
+        },
+        update: {
+          skillId: skill.id,
+          accountId: account.id,
+        },
+      })
+
+      console.log(`      has skill: ${skill.name}`)
     }
   }
 }
