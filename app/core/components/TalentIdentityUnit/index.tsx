@@ -96,12 +96,10 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
     </div>
   ) : null
 
-  console.log("this is dateMetadataProp", dateMetadataProp)
-
   let dateMetadata
   let dateMetadataMessage
   if (Object.keys(dateMetadataProp).length) {
-    if (dateMetadataProp.joinedAt && dateMetadataProp.timezone) {
+    if (dateMetadataProp.joinedAt) {
       const date = dateMetadataProp.joinedAt.toLocaleDateString("en-US", {
         timeZone: dateMetadataProp.timezone,
       })
