@@ -14,6 +14,7 @@ import { Pill } from "app/core/components/Pill"
 import getApplicationsByInitiative from "app/application/queries/getApplicationsByInitiative"
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 
 const hasBeenAirDroppedTokens = false
 
@@ -25,11 +26,15 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [isEndorseModalOpen, setIsEndorseModalOpen] = useState(false)
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
+
+  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
-    { terminalHandle: terminalHandle },
+    { terminalId: terminal?.id || 0 },
     { suspense: false }
   )
+
   const currentInitiative = useMemo(
     () => initiatives?.find((initiative) => initiative.localId === selectedInitiativeLocalId),
     [selectedInitiativeLocalId]
@@ -45,6 +50,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           referralGraphAddress: TERMINAL.REFERRAL_GRAPH, // todo: dynmically load from local state
           initiativeLocalId: selectedInitiativeLocalId,
           initiativeId: currentInitiative?.id,
+          terminalId: terminal?.id,
         })
         setApplications(applications || [])
       }
@@ -53,17 +59,17 @@ const TerminalWaitingPage: BlitzPage = () => {
   }, [selectedInitiativeLocalId])
 
   const applicationCards = applications?.map((application, idx) => {
-    const { applicant, createdAt, points, referrals } = application
-    const {
-      data: { timezone },
-    } = applicant
+    const { account, createdAt, points, referrals } = application
+    // const {
+    //   data: { timezone },
+    // } = account
     const onClick = () => {
       setSelectedApplication(application)
       setIsApplicantOpen(true)
     }
 
     const applicationCardProps = {
-      user: applicant,
+      user: account,
       points: points * Math.pow(10, 0 - decimals),
       onClick,
       isEndorsable: !!activeUser?.role || hasBeenAirDroppedTokens,
@@ -72,6 +78,7 @@ const TerminalWaitingPage: BlitzPage = () => {
         createdAt,
       },
     }
+
     return <ApplicationCard key={idx} {...applicationCardProps} />
   })
 
@@ -100,14 +107,14 @@ const TerminalWaitingPage: BlitzPage = () => {
             isEndorseModalOpen={isEndorseModalOpen}
             setIsEndorseModalOpen={setIsEndorseModalOpen}
             setIsSuccessModalOpen={setIsSuccessModalOpen}
-            selectedUserToEndorse={selectedApplication?.applicant}
+            selectedUserToEndorse={selectedApplication?.account}
             initiativeLocalId={selectedInitiativeLocalId}
           />
         )}
         <SuccessModal
           isSuccessModalOpen={isSuccessModalOpen}
           setIsSuccessModalOpen={setIsSuccessModalOpen}
-          selectedUserToEndorse={selectedApplication?.applicant}
+          selectedUserToEndorse={selectedApplication?.account}
         />
         <div className="flex flex-col space-y-10">
           <div className="flex-auto flex-wrap space-x-3 text-marble-white text-base space-y-3">

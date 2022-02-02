@@ -43,7 +43,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   // this refers to when a contributor applies to another initiative in the same terminal
 
   const isEndorsable =
-    tokenBalance && activeUser && activeUser.address !== application?.applicant?.address
+    tokenBalance && activeUser && activeUser.address !== application?.account?.address
 
   return (
     <div>
@@ -71,10 +71,10 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
             <div id="pfp and handle" className="flex-auto">
               <div className="flex flex-row flex-1 content-center space-x-1">
                 <div className="flex-2/5 content-center align-middle mr-1">
-                  {application?.applicant.data.pfpURL ? (
+                  {application?.account.data.pfpURL ? (
                     <div className="flex-2/5 m-auto">
                       <img
-                        src={application?.applicant.data.pfpURL}
+                        src={application?.account.data.pfpURL}
                         alt="PFP"
                         className="h-[52px] w-[52px] border border-marble-white rounded-full"
                       />
@@ -86,9 +86,9 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 <div className="flex flex-col flex-3/5 content-center">
                   <div className="flex flex-row flex-1 space-x-1">
                     <div className="flex-3/5 text-xl text-marble-white">
-                      {application?.applicant.data.name}
+                      {application?.account.data.name}
                     </div>
-                    {application?.applicant.data.verified && (
+                    {application?.account.data.verified && (
                       <div className="flex-2/5 m-auto">
                         <Image src={Verified} alt="Verified icon." width={10} height={10} />
                       </div>
@@ -97,11 +97,11 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   <div className="flex flex-row flex-1 text-base text-concrete space-x-1">
                     <div className="flex-1">
                       {truncateString(
-                        application?.applicant.data.ens || application?.applicant.address
+                        application?.account.data.ens || application?.account.address
                       )}
                     </div>
-                    {application?.applicant.data.pronouns && (
-                      <div className="flex-1">• {application?.applicant.data.pronouns}</div>
+                    {application?.account.data.pronouns && (
+                      <div className="flex-1">• {application?.account.data.pronouns}</div>
                     )}
                   </div>
                 </div>
@@ -117,9 +117,9 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     <span>Role</span>
                   </div>
                   <div className="text-base font-normal flex flex-row">
-                    {application?.applicant.role ? (
+                    {application?.account.role ? (
                       <span className="text-base rounded-lg text-eletric-violet bg-[#211831] py-1 px-2">
-                        {application?.applicant.role.toUpperCase()}
+                        {application?.account.role.toUpperCase()}
                       </span>
                     ) : (
                       <span>N/A</span>
@@ -132,7 +132,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   </div>
                   <div className="text-base font-normal text-neon-carrot">
                     <div className="flex flex-row space-x-2 overflow-x-scroll text-neon-carrot">
-                      {application?.applicant.data.skills.map((skill, index) => {
+                      {application?.account.data.skills?.map((skill, index) => {
                         return (
                           <span
                             key={index}
@@ -156,7 +156,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                       <Image src={DiscordIcon} alt="Discord icon" width={16} height={13} />
                     </div>
                     <div className="text-base font-normal">
-                      <span>{application?.applicant?.data?.discordId}</span>
+                      <span>{application?.account?.data?.discordId}</span>
                     </div>
                   </div>
                 </div>
@@ -165,7 +165,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     <span>Timezone</span>
                   </div>
                   <div className="text-base font-normal text-marble-white">
-                    <span>{application?.applicant?.data?.timezone || "N/A"}</span>
+                    <span>{application?.account?.data?.timezone || "N/A"}</span>
                   </div>
                 </div>
               </div>

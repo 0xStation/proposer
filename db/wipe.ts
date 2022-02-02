@@ -4,7 +4,7 @@ import db from "./index"
  */
 const seed = async () => {
   console.log("Wiping all database rows...")
-  await db.initiativeApplication.deleteMany({})
+  await db.accountInitiative.deleteMany({})
   await db.initiative.deleteMany({})
   await db.terminal.deleteMany({})
   await db.account.deleteMany({})

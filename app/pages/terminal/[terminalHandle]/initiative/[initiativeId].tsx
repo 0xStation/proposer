@@ -57,17 +57,15 @@ const Project: BlitzPage = () => {
 
   const [initiative] = useQuery(
     getInitiativeByLocalId,
-    { terminalTicket: terminal?.ticketAddress || "", localId: initiativeLocalId },
+    {
+      terminalTicket: terminal?.ticketAddress || "",
+      terminalId: terminal?.id || 0,
+      localId: initiativeLocalId,
+    },
     { suspense: false }
   )
 
-  let [contributors] = useQuery(
-    getAccountsByAddresses,
-    { addresses: initiative?.data.members || [] },
-    { suspense: false }
-  )
-
-  const contributorCards = contributors?.map((contributor, idx) => {
+  const contributorCards = initiative?.contributors?.map((contributor, idx) => {
     const { id, points, joinedAt } = contributor
     const {
       data: { timezone },
@@ -108,6 +106,7 @@ const Project: BlitzPage = () => {
           contributor={selectedContributorToView}
           isOpen={contributorDirectoryModalIsOpen}
           setIsOpen={setContributorDirectoryModalOpen}
+          terminalId={terminal?.id || 0}
         />
       )}
       <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col p-3">
@@ -130,7 +129,7 @@ const Project: BlitzPage = () => {
                 </div>
                 <div className="cursor-pointer">
                   {initiative &&
-                    initiative.data.links?.map?.((item, index) => (
+                    initiative.data.links?.map((item, index) => (
                       <ImageLink link={item} key={index} />
                     ))}
                 </div>
@@ -205,9 +204,11 @@ const Project: BlitzPage = () => {
                         return (
                           <span
                             key={index}
-                            className="text-sm rounded-lg text-neon-carrot bg-[#302013] py-1 px-2 m-1"
+                            className="rounded-full bg-neon-carrot/30 h-[17px] w-fit p-2.5 flex flex-center items-center"
                           >
-                            {skills}
+                            <span className="text-neon-carrot font-bold text-center text-[10px] uppercase">
+                              {skills}
+                            </span>
                           </span>
                         )
                       })}
