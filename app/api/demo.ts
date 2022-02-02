@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   })
 
   s3.upload({
-    Bucket: "station",
+    Bucket: "station-images",
     ACL: "public-read",
     Key: "test",
     Body: "<svg></svg>",
