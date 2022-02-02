@@ -15,7 +15,7 @@ type UploadOptions = {
 }
 
 const OPTION_DEFAULTS = {
-  Bucket: "station",
+  Bucket: "station-images",
   ACL: "public-read",
   ContentType: "image/svg+xml",
 }

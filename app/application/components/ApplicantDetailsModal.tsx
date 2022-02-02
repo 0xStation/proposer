@@ -13,6 +13,7 @@ import { useDecimals } from "app/core/contracts/contracts"
 import ApplicantEndorsements from "./ApplicantEndorsements"
 import useStore from "app/core/hooks/useStore"
 import { truncateString } from "app/core/utils/truncateString"
+import { formatDate } from "app/core/utils/formatDate"
 
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
@@ -60,7 +61,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               <div className="flex flex-1 justify-end absolute top-2 right-2 z-50">
                 {(application && application.createdAt !== null) || undefined ? (
                   <span className="text-xs text-concrete font-normal">
-                    SUBMITTED ON {application.createdAt.toDateString()}
+                    SUBMITTED ON {formatDate(application.createdAt)}
                   </span>
                 ) : (
                   <span className="text-xs text-concrete font-normal">SUBMITTED ON ...</span>
@@ -116,9 +117,9 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     <span>Role</span>
                   </div>
                   <div className="text-base font-normal flex flex-row">
-                    {application?.applicant.data.role ? (
+                    {application?.applicant.role ? (
                       <span className="text-base rounded-lg text-eletric-violet bg-[#211831] py-1 px-2">
-                        {application?.applicant.data.role.toUpperCase()}
+                        {application?.applicant.role.toUpperCase()}
                       </span>
                     ) : (
                       <span>N/A</span>

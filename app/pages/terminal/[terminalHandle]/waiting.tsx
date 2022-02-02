@@ -15,6 +15,8 @@ import getApplicationsByInitiative from "app/application/queries/getApplications
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
 
+const hasBeenAirDroppedTokens = false
+
 const TerminalWaitingPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
@@ -53,7 +55,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const applicationCards = applications?.map((application, idx) => {
     const { applicant, createdAt, points, referrals } = application
     const {
-      data: { role, timezone },
+      data: { timezone },
     } = applicant
     const onClick = () => {
       setSelectedApplication(application)
@@ -64,11 +66,10 @@ const TerminalWaitingPage: BlitzPage = () => {
       user: applicant,
       points: points * Math.pow(10, 0 - decimals),
       onClick,
-      isEndorsable: !!activeUser?.data?.role,
+      isEndorsable: !!activeUser?.role || hasBeenAirDroppedTokens,
       referrals,
       dateMetadata: createdAt && {
         createdAt,
-        timezone,
       },
     }
     return <ApplicationCard key={idx} {...applicationCardProps} />

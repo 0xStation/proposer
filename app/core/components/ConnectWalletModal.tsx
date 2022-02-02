@@ -5,6 +5,7 @@ import Coinbase from "/public/coinbase-logo.svg"
 import WalletConnect from "/public/wallet-logo.svg"
 import Banner from "/public/walletconnect-banner.svg"
 import { useConnect } from "wagmi"
+import { LOCAL_STORAGE } from "../utils/constants"
 
 const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   const [{ data: connectData }, connect] = useConnect()
@@ -44,6 +45,16 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
     return false
   }
 
+  const appConnect = (connector, wallet) => {
+    if (wallet) {
+      activateInjectedProvider(wallet)
+    }
+    connect(connector)
+    // we're reading from localStorage at the app level
+    // to see if we need to maintain a wallet connection
+    localStorage.setItem(LOCAL_STORAGE.CONNECTION, "true")
+  }
+
   return (
     <Modal
       title="Enter Station"
@@ -61,6 +72,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
               activateInjectedProvider("metamask")
               // @ts-ignore
               await connect(metamaskWallet)
+              appConnect(metamaskWallet, "metamask")
             }}
           >
             <div className="flex flex-row flex-1 justify-center items-center space-x-2 my-1">
@@ -75,8 +87,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           <button
             className="flex-1  border border-marble-white rounded-md content-center"
             onClick={async () => {
-              // @ts-ignore
-              await connect(walletConnect)
+              appConnect(walletConnect, undefined)
             }}
           >
             <div className="flex flex-row flex-1 justify-center align-middle items-center space-x-2 my-1 mx-auto">
@@ -91,9 +102,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           <button
             className="flex-1 border border-marble-white rounded-md content-center"
             onClick={async () => {
-              activateInjectedProvider("coinbase")
-              // @ts-ignore
-              await connect(coinbaseWallet)
+              appConnect(metamaskWallet, "coinbase")
             }}
           >
             <div className="flex flex-row flex-1 justify-center items-center align-middle space-x-2 my-1">

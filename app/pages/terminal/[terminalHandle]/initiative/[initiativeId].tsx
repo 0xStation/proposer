@@ -8,6 +8,7 @@ import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalI
 import StepOne from "/public/step-1.svg"
 import StepTwo from "/public/step-2.svg"
 import StepThree from "/public/step-3.svg"
+import ContributorDirectoryModal from "app/contributors/components/ContributorDirectoryModal"
 
 import Back from "/public/back-icon.svg"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
@@ -26,6 +27,8 @@ const Project: BlitzPage = () => {
   const [page, setPage] = useState(0)
   const [userTriggered, setUserTrigged] = useState(false)
   const address = useMemo(() => accountData?.address, [accountData?.address])
+  const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
+  const [selectedContributorToView, setSelectedContributorToView] = useState<Account | null>(null)
 
   const setActiveModal = () => {
     address
@@ -38,19 +41,10 @@ const Project: BlitzPage = () => {
   useEffect(() => {
     setApplicationModalOpen(false)
     toggleWalletModal(false)
-    // need to check if the effect was actually triggered by the user (pressing the button)
-    // if we don't then the page load account changing from null -> account while it loads
-    // will trigger this to run, which we don't want.
     let handler
     if (userTriggered) {
-      // the modal was locking the screen unless I put a timeout between modal transitions.
-      // I think it has something to do with the previous modal cleaning up after it closes
-      // and the "fixed" state that locks the modal to prevent the user from scrolling while
-      // the modal is active does not properly clean itself up.
       handler = setTimeout(() => setActiveModal(), 550)
     }
-
-    // clear the timeout if a new change comes in the time window
     return () => {
       clearTimeout(handler)
     }
@@ -73,7 +67,32 @@ const Project: BlitzPage = () => {
     { suspense: false }
   )
 
-  const { results, totalPages, hasNext, hasPrev } = usePagination(contributors, page, 3)
+  const contributorCards = contributors?.map((contributor, idx) => {
+    const { id, points, joinedAt } = contributor
+    const {
+      data: { timezone },
+    } = contributor
+    let onClick
+
+    onClick = () => {
+      setSelectedContributorToView(contributor)
+      setContributorDirectoryModalOpen(true)
+    }
+
+    const contributorCardProps = {
+      user: contributor,
+      points,
+      onClick,
+      dateMetadata: joinedAt && {
+        joinedAt,
+      },
+      referrals: [],
+      isEndorsable: false,
+    }
+    return <ContributorCard key={idx} {...contributorCardProps} />
+  })
+
+  const { results, totalPages, hasNext, hasPrev } = usePagination(contributorCards, page, 3)
 
   return (
     <>
@@ -84,21 +103,28 @@ const Project: BlitzPage = () => {
           initiativeId={initiative.id}
         />
       )}
-      <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col">
-        <div className="mx-4 mt-4">
+      {selectedContributorToView && (
+        <ContributorDirectoryModal
+          contributor={selectedContributorToView}
+          isOpen={contributorDirectoryModalIsOpen}
+          setIsOpen={setContributorDirectoryModalOpen}
+        />
+      )}
+      <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col p-3">
+        <div className="flex sm:mx-1 md:mx-4 my-4">
           <Link href={Routes.TerminalInitiativePage({ terminalHandle })}>
             <Image className="cursor-pointer" src={Back} alt="Back Icon" width={25} height={22} />
           </Link>
         </div>
-        <div className="flex justify-center items-center">
-          <div className="bg-tunnel-black content-center items-center h-full w-[766px] mt-5 space-y-10">
-            <div className="flex flex-col space-y-10">
+        <div className="gird grid-cols-1 md:place-self-center">
+          <div className="flex flex-col md:w-[766px] space-y-10 justify-center">
+            <div className="flex-auto flex flex-col space-y-10">
               <div className="flex flex-col text-marble-white items-center space-y-1">
                 <div className="flex flex-col items-center content-center space-y-3">
-                  <span className="capitalize text-3xl">
+                  <span className="flex capitalize text-3xl">
                     {initiative?.data.name || "loading..."}
                   </span>
-                  <span className="text-base mx-[60px] text-center">
+                  <span className="flex text-base md:mx-[60px] text-center">
                     {initiative?.data.description || "loading..."}
                   </span>
                 </div>
@@ -110,40 +136,43 @@ const Project: BlitzPage = () => {
                 </div>
               </div>
 
-              <div className="flex h-auto justify-center">
-                {initiative?.data.bannerURL && (
-                  <img src={initiative.data.bannerURL} alt="Project banner image." />
-                )}
-
-                {initiative && initiative.data.isAcceptingApplications && (
-                  <div className="relative h-5 bg-tunnel-black flex overflow-hidden">
-                    <div className="animate-marquee whitespace-nowrap text-magic-mint font-vt323 text-xl w-full">
-                      <p>
-                        CALLING FOR CONTRIBUTORS. CALLING FOR CONTRIBUTORS. CALLING FOR
-                        CONTRIBUTORS. CALLING FOR CONTRIBUTORS.
-                      </p>
+              <div className="flex flex-col h-auto justify-center">
+                <div>
+                  {initiative?.data.bannerURL && (
+                    <img src={initiative.data.bannerURL} alt="Project banner image." />
+                  )}
+                </div>
+                <div>
+                  {initiative && initiative.data.isAcceptingApplications && (
+                    <div className="relative h-5 bg-tunnel-black flex overflow-hidden">
+                      <div className="animate-marquee whitespace-nowrap text-magic-mint font-vt323 text-xl w-full">
+                        <p>
+                          CALLING FOR CONTRIBUTORS. CALLING FOR CONTRIBUTORS. CALLING FOR
+                          CONTRIBUTORS. CALLING FOR CONTRIBUTORS.
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
               <div className="flex flex-col space-y-4 text-marble-white">
                 <div>
                   <span className="text-2xl">About</span>
                 </div>
-                <div className="space-y-3">
+                <div className="flex flex-col space-y-3">
                   {initiative &&
                     initiative.data.contributeText?.map?.((item, index) => {
                       return (
-                        <span className="text-base flow-root" key={index}>
+                        <span className="flex flex-col text-base flow-root" key={index}>
                           {item}
                         </span>
                       )
                     })}
                 </div>
               </div>
-              <div className="text-marble-white flex flex-row my-4 gap-12">
-                <div className="flex-1 space-y-4">
+              <div className="text-marble-white flex grid md:grid-cols-3 gap-12">
+                <div className="space-y-4">
                   <div>
                     <span className="text-2xl">Rewards</span>
                   </div>
@@ -158,7 +187,7 @@ const Project: BlitzPage = () => {
                       })}
                   </div>
                 </div>
-                <div className="flex-1 space-y-4">
+                <div className="space-y-4">
                   <div>
                     <span className="text-2xl">Commitment</span>
                   </div>
@@ -166,7 +195,7 @@ const Project: BlitzPage = () => {
                     <span className="text-base">{initiative && initiative.data.commitment}</span>
                   </div>
                 </div>
-                <div className="flex-1 space-y-4">
+                <div className="space-y-4">
                   <div>
                     <span className="text-2xl">Skills</span>
                   </div>
@@ -192,9 +221,9 @@ const Project: BlitzPage = () => {
                 <div className="flex flex-row">
                   <span className="flex-1 text-marble-white text-2xl">Contributors</span>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="flex grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
                   {results?.map?.((contributor, index) => {
-                    return <ContributorCard key={index} user={contributor} />
+                    return contributor
                   })}
                 </div>
                 <div className="flex flex-row">
@@ -262,11 +291,11 @@ const Project: BlitzPage = () => {
               </div>
             </div>
 
-            <div className="flex flex-col text-marble-white space-y-5">
+            <div className="flex-auto flex flex-col text-marble-white space-y-5">
               <div>
                 <span className="text-2xl">What&apos;s next?</span>
               </div>
-              <div className="flex flex-row space-x-4">
+              <div className="flex grid md:grid-cols-3 gap-3">
                 <div className="flex-1 space-y-4">
                   <div>
                     <Image src={StepOne} alt="Step one." width={24} height={24} />
@@ -310,9 +339,9 @@ const Project: BlitzPage = () => {
                 </div>
               </div>
             </div>
-            <div className="flex justify-center items-center mt-10">
+            <div className="flex-auto flex justify-center mt-10 sticky bottom-0">
               <button
-                className="mt-4 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
+                className="mt-4 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px] m-4"
                 onClick={() => {
                   setUserTrigged(true)
                   setActiveModal()

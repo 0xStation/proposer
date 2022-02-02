@@ -4,6 +4,7 @@ import Button from "../Button"
 import Card from "./Card"
 import ProfileMetadata from "./ProfileMetadata"
 import RoleTag from "./RoleTag"
+import { formatDate } from "../../utils/formatDate"
 
 type TalentIdentityUnitProps = {
   user: Account
@@ -26,7 +27,8 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
 
   const {
     address,
-    data: { pfpURL, name, ens, pronouns, role, verified },
+    role,
+    data: { pfpURL, name, ens, pronouns, verified },
   } = user
 
   const railPoints = (
@@ -100,15 +102,10 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
   let dateMetadataMessage
   if (Object.keys(dateMetadataProp).length) {
     if (dateMetadataProp.joinedAt) {
-      const date = dateMetadataProp.joinedAt.toLocaleDateString("en-US", {
-        timeZone: dateMetadataProp.timezone,
-      })
-
+      const date = formatDate(dateMetadataProp.joinedAt)
       dateMetadataMessage = `JOINED SINCE ${date}`
     } else {
-      const date = dateMetadataProp.createdAt.toLocaleDateString("en-US", {
-        timeZone: dateMetadataProp.timezone,
-      })
+      const date = formatDate(dateMetadataProp.createdAt)
       dateMetadataMessage = `SUBMITTED ON ${date}`
     }
     dateMetadata = (

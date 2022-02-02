@@ -14,6 +14,7 @@ import { Initiative } from "app/initiative/types"
 import InitiativeCard from "app/initiative/components/InitiativeCard"
 import getInitiativesByLocalIds from "app/initiative/queries/getInitiativesByLocalIds"
 import { truncateString } from "app/core/utils/truncateString"
+import { formatDate } from "app/core/utils/formatDate"
 
 type ContributorDirectoryModalProps = {
   isOpen: boolean
@@ -49,6 +50,13 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
     }
   }, [contributor, isOpen])
 
+  let joinedDate
+  if (contributor?.joinedAt) {
+    const formattedDate = formatDate(contributor.joinedAt)
+
+    joinedDate = `JOINED SINCE ${formattedDate}`
+  }
+
   return (
     <div>
       <Modal subtitle="" open={isOpen} toggle={setIsOpen} showTitle={false}>
@@ -64,9 +72,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
               </div>
               <div className="flex flex-1 justify-end absolute top-2 right-2 z-50">
                 {(contributor && contributor.joinedAt !== null) || undefined ? (
-                  <span className="text-xs text-concrete font-normal">
-                    JOINED SINCE {contributor?.joinedAt?.toDateString}
-                  </span>
+                  <span className="text-xs text-concrete font-normal">{joinedDate}</span>
                 ) : (
                   <span className="text-xs text-concrete font-normal">JOINED SINCE ...</span>
                 )}
@@ -116,9 +122,9 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                     <span>Role</span>
                   </div>
                   <div className="text-xs font-normal flex flex-row content-end">
-                    {contributor?.data?.role ? (
+                    {contributor?.role ? (
                       <span className="text-xs rounded-lg text-electric-violet bg-[#211831] py-1 px-2">
-                        {contributor?.data?.role.toUpperCase()}
+                        {contributor?.role.toUpperCase()}
                       </span>
                     ) : (
                       <span>N/A</span>
@@ -188,7 +194,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                           <InitiativeCard
                             title={initiative?.data?.name || "Title"}
                             description={initiative?.data?.description || "Description"}
-                            contributors={initiative.contributors}
+                            members={initiative.contributors}
                           />
                         </a>
                       </Link>
