@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // we should make sure all of the filenames are unique
     const file = fs.readFileSync(files.file.path)
     s3.upload({
-      Bucket: "station",
+      Bucket: "station-images",
       ACL: "public-read",
       Key: files.file.name,
       Body: file,
