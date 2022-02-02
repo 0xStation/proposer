@@ -1,3 +1,4 @@
+import { Account } from "aws-sdk"
 import db from "db"
 import * as z from "zod"
 import { Initiative } from "../types"
@@ -15,8 +16,8 @@ export default async function getInitiativesByTerminal(
     where: { terminalId: data.terminalId },
     include: {
       accounts: {
-        select: {
-          status: true,
+        include: {
+          account: true,
         },
       },
     },
@@ -30,6 +31,13 @@ export default async function getInitiativesByTerminal(
     return {
       ...i,
       applicationCount: i.accounts.filter((a) => a.status == "APPLIED").length,
+      contributors: i.accounts
+        .filter((a) => a.status == "CONTRIBUTOR")
+        .map((a) => {
+          return {
+            ...a.account,
+          }
+        }),
     }
   }) as unknown as Initiative[]
 }

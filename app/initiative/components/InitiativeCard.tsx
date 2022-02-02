@@ -1,13 +1,7 @@
 import { useQuery } from "blitz"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
 
-const InitiativeCard = ({ title, description, members }) => {
-  let [contributors] = useQuery(
-    getAccountsByAddresses,
-    { addresses: members || [] },
-    { suspense: false }
-  )
-
+const InitiativeCard = ({ title, description, contributors }) => {
   return (
     <div className="border border-concrete p-4 flex flex-col cursor-pointer h-full hover:border-marble-white">
       <h3 className="text-marble-white text-2xl">{title}</h3>

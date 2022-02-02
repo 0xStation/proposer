@@ -57,17 +57,15 @@ const Project: BlitzPage = () => {
 
   const [initiative] = useQuery(
     getInitiativeByLocalId,
-    { terminalTicket: terminal?.ticketAddress || "", localId: initiativeLocalId },
+    {
+      terminalTicket: terminal?.ticketAddress || "",
+      terminalId: terminal?.id || 0,
+      localId: initiativeLocalId,
+    },
     { suspense: false }
   )
 
-  let [contributors] = useQuery(
-    getAccountsByAddresses,
-    { addresses: initiative?.data.members || [] },
-    { suspense: false }
-  )
-
-  const contributorCards = contributors?.map((contributor, idx) => {
+  const contributorCards = initiative?.contributors?.map((contributor, idx) => {
     const { id, points, joinedAt } = contributor
     const {
       data: { timezone },
@@ -108,6 +106,7 @@ const Project: BlitzPage = () => {
           contributor={selectedContributorToView}
           isOpen={contributorDirectoryModalIsOpen}
           setIsOpen={setContributorDirectoryModalOpen}
+          terminalId={terminal?.id || 0}
         />
       )}
       <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col p-3">
