@@ -4,6 +4,17 @@ import uploadToS3 from "app/utils/uploadToS3"
 import { genSVG } from "app/ticket/svg"
 import { Role } from "app/types"
 
+const initiaitveIds = {
+  contributorReviewId: 1,
+  waitingRoomId: 2,
+  newstandId: 3,
+  partnershipId: 4,
+  networkSustainabilityId: 5,
+  contributorExperienceId: 6,
+  midnightStationId: 7,
+  brandIdentityId: 8,
+  stationDigestId: 9,
+}
 const mind: AccountMetadata & { address: string } = {
   name: "paprika",
   address: "0xd32FA3e71737a19eE4CA44334b9f3c52665a6CDB",
@@ -18,6 +29,11 @@ const mind: AccountMetadata & { address: string } = {
   twitterURL: "https://twitter.com/mindapi_",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036023-44570a89-315b-42cb-8a97-fc48c60f1e7a.png",
+  initiatives: [
+    initiaitveIds.waitingRoomId,
+    initiaitveIds.brandIdentityId,
+    initiaitveIds.partnershipId,
+  ],
 }
 const tina: AccountMetadata & { address: string } = {
   name: "fakepixels",
@@ -33,7 +49,13 @@ const tina: AccountMetadata & { address: string } = {
   twitterURL: "https://twitter.com/fkpxls",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036016-db43df6c-e240-4f63-aaff-6843d278a2ba.png",
-  initiatives: [3, 4, 6],
+  initiatives: [
+    initiaitveIds.newstandId,
+    initiaitveIds.partnershipId,
+    initiaitveIds.contributorExperienceId,
+    initiaitveIds.networkSustainabilityId,
+    initiaitveIds.waitingRoomId,
+  ],
 }
 const conner: AccountMetadata & { address: string } = {
   name: "symmetry",
@@ -49,6 +71,7 @@ const conner: AccountMetadata & { address: string } = {
   twitterURL: "https://twitter.com/symmtry69",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036030-3c4f0d7b-0946-4ccc-b03b-03fb6e57328e.png",
+  initiatives: [initiaitveIds.contributorReviewId, initiaitveIds.waitingRoomId],
 }
 const kristen: AccountMetadata & { address: string } = {
   name: "rie",
@@ -64,6 +87,11 @@ const kristen: AccountMetadata & { address: string } = {
   twitterURL: "https://twitter.com/0xRie_",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036026-9e4d09b3-8d1b-4261-8a2c-e121146f7d63.png",
+  initiatives: [
+    initiaitveIds.contributorReviewId,
+    initiaitveIds.waitingRoomId,
+    initiaitveIds.midnightStationId,
+  ],
 }
 const calvin: AccountMetadata & { address: string } = {
   name: "cc2",
@@ -79,6 +107,7 @@ const calvin: AccountMetadata & { address: string } = {
   twitterURL: "https://twitter.com/cchengasaurus",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036007-6e11bb26-6edd-4c9b-9c1c-aa1814e36f11.png",
+  initiatives: [initiaitveIds.contributorReviewId, initiaitveIds.networkSustainabilityId],
 }
 const brendan: AccountMetadata & { address: string } = {
   name: "brendo",
@@ -94,6 +123,7 @@ const brendan: AccountMetadata & { address: string } = {
   twitterURL: "https://twitter.com/brendanelliot_",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036006-018105d4-e8d4-4fb7-bc82-997351d38d2d.png",
+  initiatives: [initiaitveIds.waitingRoomId, initiaitveIds.midnightStationId],
 }
 const michael: AccountMetadata & { address: string } = {
   name: "frog",
@@ -109,6 +139,7 @@ const michael: AccountMetadata & { address: string } = {
   twitterURL: "https://twitter.com/0xmcg",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036018-25f65c4d-a968-4c6c-b328-15958acdb649.png",
+  initiatives: [initiaitveIds.waitingRoomId, initiaitveIds.midnightStationId],
 }
 const abe: AccountMetadata & { address: string } = {
   name: "cryptoabe",
@@ -124,6 +155,7 @@ const abe: AccountMetadata & { address: string } = {
   twitterURL: "https://twitter.com/abenazer_mekete",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036010-b47feac0-99c5-43a6-963d-89a89aa47ff7.png",
+  initiatives: [initiaitveIds.waitingRoomId, initiaitveIds.midnightStationId],
 }
 const nick: AccountMetadata & { address: string } = {
   name: "zy2",
@@ -139,6 +171,7 @@ const nick: AccountMetadata & { address: string } = {
   twitterURL: "https://twitter.com/zy22yz",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036033-abee8f5d-544a-491f-b442-67d4b90639b1.png",
+  initiatives: [initiaitveIds.networkSustainabilityId, initiaitveIds.contributorReviewId],
 }
 const alli: AccountMetadata & { address: string } = {
   name: "alli",
@@ -154,6 +187,7 @@ const alli: AccountMetadata & { address: string } = {
   twitterURL: "https://twitter.com/sonofalli",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036002-396279ab-0f10-4c61-b2dc-23dea07236f9.png",
+  initiatives: [initiaitveIds.newstandId, initiaitveIds.stationDigestId],
 }
 const kassen: AccountMetadata & { address: string } = {
   name: "kassen",
@@ -169,6 +203,7 @@ const kassen: AccountMetadata & { address: string } = {
   twitterURL: "https://twitter.com/kassenq",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036021-6bb5fde3-aef3-4a76-a543-3036c99b8ad0.png",
+  initiatives: [initiaitveIds.partnershipId, initiaitveIds.contributorExperienceId],
 }
 const alex: AccountMetadata & { address: string } = {
   name: "ahs",
@@ -184,6 +219,7 @@ const alex: AccountMetadata & { address: string } = {
   twitterURL: "https://twitter.com/alexhughsam",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152035995-3aabcfcc-8fee-4d5c-9c37-17b7f51cfcfd.png",
+  initiatives: [initiaitveIds.partnershipId, initiaitveIds.stationDigestId],
 }
 const akshay: AccountMetadata & { address: string } = {
   name: "wagmiking",
@@ -199,6 +235,7 @@ const akshay: AccountMetadata & { address: string } = {
   twitterURL: "https://twitter.com/wagmiking",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036031-7d5b3fd2-69b7-42f1-8aca-23fece63fc91.png",
+  initiatives: [initiaitveIds.waitingRoomId],
 }
 
 export const contributors = {
