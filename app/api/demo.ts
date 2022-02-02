@@ -8,8 +8,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     secretAccessKey: process.env.SPACES_SECRET_KEY,
   })
 
-  console.log("just trying to view the processes")
-  res.json({
-    s3: s3,
+  s3.upload({
+    Bucket: "station",
+    ACL: "public-read",
+    Key: "test",
+    Body: "<svg></svg>",
+    ContentType: "image/svg+xml",
+  }).send((err, data) => {
+    if (err) {
+      res.json({
+        error: err,
+      })
+    }
+    if (data) {
+      res.json({
+        url: data.Location,
+      })
+    }
   })
 }

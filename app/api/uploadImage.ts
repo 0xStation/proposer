@@ -21,9 +21,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     secretAccessKey: process.env.SPACES_SECRET_KEY,
   })
 
-  console.log("what is this process")
-  console.log(process.env.SPACES_ACCESS_KEY_ID)
-
   const form = new formidable.IncomingForm()
 
   form.parse(req, async (err, _fields, files) => {
