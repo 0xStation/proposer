@@ -15,6 +15,8 @@ import getApplicationsByInitiative from "app/application/queries/getApplications
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
 
+const hasBeenAirDroppedTokens = false
+
 const TerminalWaitingPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
@@ -64,7 +66,7 @@ const TerminalWaitingPage: BlitzPage = () => {
       user: applicant,
       points: points * Math.pow(10, 0 - decimals),
       onClick,
-      isEndorsable: !!activeUser?.data?.role,
+      isEndorsable: !!activeUser?.data?.role || hasBeenAirDroppedTokens,
       referrals,
       dateMetadata: createdAt && {
         createdAt,

@@ -15,10 +15,6 @@ const TerminalContributorsPage: BlitzPage = () => {
   const [selectedRole, setRole] = useState<String>(Role.STAFF)
   const [selectedContributors, setSelectedContributors] = useState<Account[] | null>(null)
 
-  const roles = Object.keys(Role).map((key) => {
-    return key.split("_").join(" ")
-  })
-
   useEffect(() => {
     if (selectedRole) {
       const getContributorsByRole = async () => {
@@ -69,13 +65,13 @@ const TerminalContributorsPage: BlitzPage = () => {
       )}
       <div className="flex flex-col space-y-10">
         <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm space-y-3">
-          {roles.map((role, index) => {
+          {Object.entries(Role).map(([, role], index) => {
             return (
               <Pill
-                key={index.toString()}
-                active={selectedRole == role}
+                key={index}
+                active={selectedRole === role}
                 onClick={() => {
-                  setRole(Role[role.split(" ").join("_")])
+                  setRole(role)
                 }}
               >
                 <span className="m-4">{role}</span>
