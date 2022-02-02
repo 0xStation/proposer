@@ -88,21 +88,21 @@ const Project: BlitzPage = () => {
         address={address || ""}
       />
       <ConnectWalletModal isWalletOpen={walletModalOpen} setIsWalletOpen={setWalletModalOpen} />
-      <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col">
-        <div className="mx-4 mt-4">
+      <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col p-3">
+        <div className="flex sm:mx-1 md:mx-4 my-4">
           <Link href={Routes.TerminalInitiativePage({ terminalHandle })}>
             <Image className="cursor-pointer" src={Back} alt="Back Icon" width={25} height={22} />
           </Link>
         </div>
-        <div className="flex justify-center items-center">
-          <div className="bg-tunnel-black content-center items-center h-full w-[766px] mt-5 space-y-10">
-            <div className="flex flex-col space-y-10">
+        <div className="gird grid-cols-1 md:place-self-center">
+          <div className="flex flex-col md:w-[766px] space-y-10 justify-center">
+            <div className="flex-auto flex flex-col space-y-10">
               <div className="flex flex-col text-marble-white items-center space-y-1">
                 <div className="flex flex-col items-center content-center space-y-3">
-                  <span className="capitalize text-3xl">
+                  <span className="flex capitalize text-3xl">
                     {initiative?.data.name || "loading..."}
                   </span>
-                  <span className="text-base mx-[60px] text-center">
+                  <span className="flex text-base md:mx-[60px] text-center">
                     {initiative?.data.description || "loading..."}
                   </span>
                 </div>
@@ -142,7 +142,7 @@ const Project: BlitzPage = () => {
                   {initiative &&
                     initiative.data.contributeText?.map?.((item, index) => {
                       return (
-                        <span className="flex text-base flow-root" key={index}>
+                        <span className="flex flex-col text-base flow-root" key={index}>
                           {item}
                         </span>
                       )
@@ -267,7 +267,7 @@ const Project: BlitzPage = () => {
               </div>
             </div>
 
-            <div className="flex flex-col text-marble-white space-y-5">
+            <div className="flex-auto flex flex-col text-marble-white space-y-5">
               <div>
                 <span className="text-2xl">What&apos;s next?</span>
               </div>
@@ -315,7 +315,7 @@ const Project: BlitzPage = () => {
                 </div>
               </div>
             </div>
-            <div className="flex justify-center items-center mt-10">
+            <div className="flex-auto flex justify-center mt-10">
               <button
                 className="mt-4 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
                 onClick={() => {
