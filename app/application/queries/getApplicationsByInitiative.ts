@@ -91,15 +91,15 @@ export default async function getApplicationsByInitiative(
     //////
 
     // get all applications for the initiative
-    const applications = await db.initiativeApplication.findMany({
-      where: { initiativeId: initiativeId },
-      include: { applicant: true },
+    const applications = await db.accountInitiative.findMany({
+      where: { initiativeId: initiativeId, status: "APPLIED" },
+      include: { account: true },
     })
 
     // merge database data and subgraph data
     const merged =
       applications?.map((a) => {
-        const applicant = applicants[a.applicant.address.toLowerCase()]
+        const applicant = applicants[a.account.address.toLowerCase()]
         return {
           ...a,
           data: a.data as ApplicationMetadata,

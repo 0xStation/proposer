@@ -50,7 +50,7 @@ const ApplicationModal = ({
               await createApplicationMutation({
                 ...values,
                 initiativeId: initiativeId,
-                applicantId: activeUser.id,
+                accountId: activeUser.id,
               })
             } catch (error) {
               alert("Error applying.")

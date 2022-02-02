@@ -13,6 +13,11 @@ export default async function getInitiativeByLocalId(
   const data = GetInitiativeByLocalId.parse(input)
   const initiative = await db.initiative.findUnique({
     where: { terminalInitiative: { terminalTicket: data.terminalTicket, localId: data.localId } },
+    // include: {
+    //   accounts: {
+    //     include: account,
+    //   },
+    // },
   })
 
   if (!initiative) {

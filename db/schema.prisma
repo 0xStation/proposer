@@ -13,12 +13,12 @@ generator client {
 // The account of user of Station
 // user's wallet address is primary key
 model Account {
-  id           Int                     @id @default(autoincrement())
-  address      String                  @unique
-  applications InitiativeApplication[]
-  skills       SkillsOnAccounts[]
-  tickets      AccountTerminal[]
-  data         Json?
+  id          Int                 @id @default(autoincrement())
+  address     String              @unique
+  skills      SkillsOnAccounts[]
+  tickets     AccountTerminal[]
+  initiatives AccountInitiative[]
+  data        Json?
 }
 
 // Each DAO is represented by a terminal.
@@ -60,26 +60,29 @@ model AccountTerminal {
 
 // An initiative within a terminal
 model Initiative {
-  id             Int                     @id @default(autoincrement())
-  terminal       Terminal                @relation(fields: [terminalId], references: [id])
+  id             Int                 @id @default(autoincrement())
+  terminal       Terminal            @relation(fields: [terminalId], references: [id])
   terminalId     Int
   terminalTicket String
-  localId        Int                     @default(autoincrement())
-  applications   InitiativeApplication[]
+  localId        Int                 @default(autoincrement())
+  accounts       AccountInitiative[]
   data           Json?
 
   @@unique([terminalTicket, localId], name: "terminalInitiative")
 }
 
 // AKA "application"
-model InitiativeApplication {
-  id           Int        @id @default(autoincrement())
-  applicant    Account    @relation(fields: [applicantId], references: [id])
-  applicantId  Int
-  initiative   Initiative @relation(fields: [initiativeId], references: [id])
+model AccountInitiative {
+  id           Int                     @id @default(autoincrement())
+  account      Account                 @relation(fields: [accountId], references: [id])
+  accountId    Int
+  initiative   Initiative              @relation(fields: [initiativeId], references: [id])
   initiativeId Int
-  createdAt    DateTime   @default(now())
+  createdAt    DateTime                @default(now())
+  status       AccountInitiativeStatus @default(APPLIED)
   data         Json?
+
+  @@unique([accountId, initiativeId])
 }
 
 model Skill {
@@ -95,4 +98,11 @@ model SkillsOnAccounts {
   accountId Int
 
   @@id([skillId, accountId])
+}
+
+enum AccountInitiativeStatus {
+  APPLIED
+  INVITED
+  CONTRIBUTOR
+  INACTIVE
 }

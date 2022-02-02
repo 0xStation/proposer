@@ -1,11 +1,13 @@
 import db from "../index"
 import { Account, AccountMetadata } from "app/account/types"
+import { Initiative } from "app/initiative/types"
 
 interface AccountSeed {
   address: string
   role: number
   active: boolean
   joinedAt: Date
+  initiatives: number[]
 }
 
 const initiaitveIds = {
@@ -296,6 +298,8 @@ export async function seedContributors(terminals) {
   for (const name in stationContributors) {
     const contributorData = stationContributors[name] as AccountMetadata & AccountSeed
 
+    console.log(`  ${contributorData.name.toUpperCase()}`)
+
     const account = await db.account.upsert({
       where: { address: contributorData!.address },
       create: {
@@ -328,8 +332,42 @@ export async function seedContributors(terminals) {
       },
     })
 
-    console.log(
-      `  ${(account as Account).data?.name} holds Station ticket with role: ${ticket.roleLocalId}`
-    )
+    console.log(`      Station role: ${ticket.roleLocalId}`)
+
+    for (const name in contributorData.initiatives) {
+      const localId = contributorData.initiatives[name] as number
+      const initiative = await db.initiative.findUnique({
+        where: {
+          terminalInitiative: {
+            localId,
+            terminalTicket: terminals.station.ticketAddress,
+          },
+        },
+      })
+
+      if (!initiative) {
+        console.log(`could not find localId of ${localId}`)
+        continue
+      }
+
+      const membership = await db.accountInitiative.upsert({
+        where: {
+          accountId_initiativeId: {
+            accountId: account.id,
+            initiativeId: initiative.id,
+          },
+        },
+        create: {
+          accountId: account.id,
+          initiativeId: initiative.id,
+          status: "CONTRIBUTOR",
+        },
+        update: {
+          status: "CONTRIBUTOR",
+        },
+      })
+
+      console.log(`      contributor to: ${(initiative as Initiative).data?.name}`)
+    }
   }
 }

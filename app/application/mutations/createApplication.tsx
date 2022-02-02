@@ -4,7 +4,7 @@ import * as z from "zod"
 const CreateApplication = z.object({
   url: z.string(),
   entryDescription: z.string(),
-  applicantId: z.number(),
+  accountId: z.number(),
   initiativeId: z.number(),
 })
 
@@ -17,10 +17,10 @@ export default async function createApplication(input: z.infer<typeof CreateAppl
       url: params.url,
       entryDescription: params.entryDescription,
     },
-    applicant: { connect: { id: params.applicantId } },
+    account: { connect: { id: params.accountId } },
     initiative: { connect: { id: params.initiativeId } },
   }
 
-  const application = await db.initiativeApplication.create({ data: payload })
+  const application = await db.accountInitiative.create({ data: payload })
   return application
 }
