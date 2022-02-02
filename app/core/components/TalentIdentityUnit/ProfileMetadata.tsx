@@ -1,6 +1,6 @@
 import { Image } from "blitz"
 import Verified from "/public/check-mark.svg"
-import { getWalletString } from "app/utils/getWalletString"
+import { truncateString } from "app/core/utils/truncateString"
 
 type ProfileMetadataProps = {
   address: string
@@ -49,7 +49,7 @@ export const ProfileMetadata = ({
           )}
         </div>
         <div className="flex flex-row flex-1 text-base text-concrete space-x-1 overflow-hidden">
-          <div className="max-w-[150px] truncate">{getWalletString(address, ens)}</div>
+          <div className="max-w-[150px] truncate">{truncateString(ens || address)}</div>
           {pronouns && <div className="">• {pronouns}</div>}
         </div>
       </div>

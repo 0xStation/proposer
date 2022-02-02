@@ -1,10 +1,5 @@
 import db from "../index"
-import { Application, ApplicationMetadata } from "app/application/types"
-import { Symbol } from "app/types"
-import { contributors } from "./contributors"
-import { request, gql } from "graphql-request"
-import { wait } from "@testing-library/dom"
-import { getWalletString } from "app/utils/getWalletString"
+import { ApplicationMetadata } from "app/application/types"
 
 const applicant1: ApplicationMetadata & { id: number; applicantId: number; initiativeId: number } =
   {

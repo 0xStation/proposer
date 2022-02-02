@@ -60,9 +60,6 @@ const TerminalWaitingPage: BlitzPage = () => {
       setIsApplicantOpen(true)
     }
 
-    console.log(referrals)
-    console.log(applicant.address)
-
     const applicationCardProps = {
       user: applicant,
       points: points * Math.pow(10, 0 - decimals),
@@ -113,17 +110,19 @@ const TerminalWaitingPage: BlitzPage = () => {
         />
         <div className="flex flex-col space-y-10">
           <div className="flex-auto flex-wrap space-x-3 text-marble-white text-base space-y-3">
-            {initiatives.map((initiative, idx) => {
-              return (
-                <Pill
-                  key={idx}
-                  active={initiative.localId === selectedInitiativeLocalId}
-                  onClick={() => setSelectedInitiativeLocalId(initiative.localId)}
-                >
-                  {initiative.data?.name?.toUpperCase()}
-                </Pill>
-              )
-            })}
+            {initiatives
+              .filter((initiative) => initiative?.applicationCount) // filter on initiatives with applications
+              .map((initiative, idx) => {
+                return (
+                  <Pill
+                    key={idx}
+                    active={initiative.localId === selectedInitiativeLocalId}
+                    onClick={() => setSelectedInitiativeLocalId(initiative.localId)}
+                  >
+                    {`${initiative.data?.name?.toUpperCase()} (${initiative.applicationCount})`}
+                  </Pill>
+                )
+              })}
           </div>
           <div className="flex-auto text-marble-white">
             {!applications || !applications.length ? (

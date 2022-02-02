@@ -1,7 +1,7 @@
 import { Account } from "app/account/types"
 import { Image } from "blitz"
 import Verified from "/public/check-mark.svg"
-import { getWalletString } from "app/utils/getWalletString"
+import { truncateString } from "app/core/utils/truncateString"
 
 type ApplicantEndorsementsProps = {
   person: Account
@@ -41,7 +41,7 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({
               </div>
               <div className="flex-1 text-normal text-concrete">
                 <div className="flex flex-row flex-1 text-base text-concrete space-x-1">
-                  <div className="flex-1">{getWalletString(person.address, person.data.ens)}</div>
+                  <div className="flex-1">{truncateString(person.data.ens || person.address)}</div>
                   {person.data.pronouns && <div className="flex-1">• {person.data.pronouns}</div>}
                 </div>
               </div>
