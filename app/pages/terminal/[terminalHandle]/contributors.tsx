@@ -22,8 +22,6 @@ const TerminalContributorsPage: BlitzPage = () => {
     { suspense: false }
   )
 
-  console.log(roles)
-
   useEffect(() => {
     if (selectedRoleLocalId) {
       const getContributorsByRole = async () => {
@@ -38,10 +36,7 @@ const TerminalContributorsPage: BlitzPage = () => {
   }, [selectedRoleLocalId])
 
   const contributorCards = selectedContributors?.map((contributor, idx) => {
-    const { id, points, joinedAt, role } = contributor
-    const {
-      data: { timezone },
-    } = contributor
+    const { points, joinedAt, role } = contributor
     let onClick
     if (role) {
       onClick = () => {
@@ -56,7 +51,6 @@ const TerminalContributorsPage: BlitzPage = () => {
       onClick,
       dateMetadata: joinedAt && {
         joinedAt,
-        timezone,
       },
       referrals: [],
       isEndorsable: false,

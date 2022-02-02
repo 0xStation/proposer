@@ -14,6 +14,7 @@ import { Initiative } from "app/initiative/types"
 import InitiativeCard from "app/initiative/components/InitiativeCard"
 import getInitiativesByLocalIds from "app/initiative/queries/getInitiativesByLocalIds"
 import { truncateString } from "app/core/utils/truncateString"
+import { formatDate } from "app/core/utils/formatDate"
 
 type ContributorDirectoryModalProps = {
   isOpen: boolean
@@ -51,11 +52,9 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
 
   let joinedDate
   if (contributor?.joinedAt) {
-    const date = contributor.joinedAt.toLocaleDateString("en-US", {
-      timeZone: contributor?.data.timezone,
-    })
+    const formattedDate = formatDate(contributor.joinedAt)
 
-    joinedDate = `JOINED SINCE ${date}`
+    joinedDate = `JOINED SINCE ${formattedDate}`
   }
 
   return (
