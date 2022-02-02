@@ -64,10 +64,10 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
     <div>
       <Modal subtitle="" open={isOpen} toggle={setIsOpen} showTitle={false}>
         <div className="flex flex-col">
-          <div className="flex flex-auto flex-col space-y-6">
+          <div className="flex flex-auto flex-col space-y-6 h-[570px] overflow-y-scroll">
             <div id="close and meta data" className="flex-auto flex flex-row">
               <div className="flex flex-1 justify-start absolute top-1 left-2">
-                <div className="w-[12px] h-[12px]">
+                <div className="">
                   <button className="text-marble-white" onClick={() => setIsOpen(false)}>
                     <Image src={Exit} alt="Close button" width={12} height={12} />
                   </button>
@@ -186,7 +186,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
             <div className="flex flex-col space-y-4">
               <div className="flex-auto text-marble-white font-bold">Initiatives</div>
               {initiatives && initiatives.length ? (
-                <div className="grid grid-cols-2 gap-4 h-[300px] overflow-y-scroll">
+                <div className="grid grid-cols-2 gap-4">
                   {initiatives.map((initiative) => {
                     return (
                       <Link
@@ -196,7 +196,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                         <a>
                           <InitiativeCard
                             title={initiative?.data?.name || "Title"}
-                            description={initiative?.data?.description || "Description"}
+                            oneLiner={initiative?.data?.oneLiner || "One Liner"}
                             contributors={initiative.contributors}
                             isAcceptingApplications={initiative.data.isAcceptingApplications}
                           />

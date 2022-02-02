@@ -125,7 +125,7 @@ const Project: BlitzPage = () => {
                     {initiative?.data.name || "loading..."}
                   </span>
                   <span className="flex text-base md:mx-[60px] text-center">
-                    {initiative?.data.description || "loading..."}
+                    {initiative?.data.oneLiner || "loading..."}
                   </span>
                 </div>
                 <div className="cursor-pointer">

@@ -24,7 +24,7 @@ const TerminalInitiativePage: BlitzPage = () => {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {initiatives?.map?.(
-            ({ localId, contributors, data: { name, description, isAcceptingApplications } }) => {
+            ({ localId, contributors, data: { name, oneLiner, isAcceptingApplications } }) => {
               return (
                 <Link
                   key={localId}
@@ -33,7 +33,7 @@ const TerminalInitiativePage: BlitzPage = () => {
                   <a>
                     <InitiativeCard
                       title={name || "Title"}
-                      description={description || "Description"}
+                      oneLiner={oneLiner || "One Liner"}
                       contributors={contributors}
                       isAcceptingApplications={isAcceptingApplications}
                     />
