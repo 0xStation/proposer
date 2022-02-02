@@ -103,51 +103,51 @@ export default async function getApplicationsByInitiative(
     //////
     // Merge db initiative application data with sugraph referrals
     //////
+  }
 
-    // get all applications for the initiative
-    const applications = await db.accountInitiative.findMany({
-      where: { initiativeId: initiativeId, status: "APPLIED" },
-      include: {
-        account: {
-          include: {
-            tickets: {
-              where: {
-                terminalId: data.terminalId,
-              },
-              include: {
-                role: true,
-              },
+  // get all applications for the initiative
+  const applications = await db.accountInitiative.findMany({
+    where: { initiativeId: initiativeId, status: "APPLIED" },
+    include: {
+      account: {
+        include: {
+          tickets: {
+            where: {
+              terminalId: data.terminalId,
+            },
+            include: {
+              role: true,
             },
           },
         },
       },
-    })
+    },
+  })
 
-    // merge database data and subgraph data
-    const merged =
-      applications?.map((a) => {
-        const applicant = applicants[a.account.address.toLowerCase()]
-        return {
-          account: {
-            ...a.account,
-            role: (a.account.tickets[0]?.role as Role)?.data.value || "N/A",
-          },
-          data: a.data as ApplicationMetadata,
-          points: parseFloat(applicant?.points || "0"),
-          referrals:
-            (applicant?.referrals.map((r) => {
-              return {
-                amount: r.amount,
-                from: {
-                  address: referrers[r.from.toLowerCase()].address,
-                  data: referrers[r.from.toLowerCase()].data,
-                  role: referrers[r.from.toLowerCase()].role,
-                },
-              }
-            }) as ApplicationReferral[]) || [],
-        }
-      }) || []
+  // merge database data and subgraph data
+  const merged =
+    applications?.map((a) => {
+      const applicant = applicants[a.account.address.toLowerCase()]
+      return {
+        account: {
+          ...a.account,
+          role: (a.account.tickets[0]?.role as Role)?.data.value || "N/A",
+        },
+        data: a.data as ApplicationMetadata,
+        points: parseFloat(applicant?.points || "0"),
+        referrals:
+          (applicant?.referrals.map((r) => {
+            return {
+              amount: r.amount,
+              from: {
+                address: referrers[r.from.toLowerCase()].address,
+                data: referrers[r.from.toLowerCase()].data,
+                role: referrers[r.from.toLowerCase()].role,
+              },
+            }
+          }) as ApplicationReferral[]) || [],
+      }
+    }) || []
 
-    return merged as unknown as Application[]
-  }
+  return merged as unknown as Application[]
 }
