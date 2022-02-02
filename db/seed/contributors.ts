@@ -2,6 +2,7 @@ import db from "../index"
 import { AccountMetadata } from "app/account/types"
 import uploadToS3 from "app/utils/uploadToS3"
 import { genSVG } from "app/ticket/svg"
+import { Role } from "app/types"
 
 const mind: AccountMetadata & { address: string } = {
   name: "paprika",
@@ -13,7 +14,7 @@ const mind: AccountMetadata & { address: string } = {
   verified: true,
   timezone: "EST",
   ens: "spicypaprika.eth",
-  role: "STAFF",
+  role: Role.STAFF,
   twitterURL: "https://twitter.com/mindapi_",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036023-44570a89-315b-42cb-8a97-fc48c60f1e7a.png",
@@ -28,7 +29,7 @@ const tina: AccountMetadata & { address: string } = {
   verified: true,
   timezone: "EST",
   ens: "fkpixels.eth",
-  role: "STAFF",
+  role: Role.STAFF,
   twitterURL: "https://twitter.com/fkpxls",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036016-db43df6c-e240-4f63-aaff-6843d278a2ba.png",
@@ -44,7 +45,7 @@ const conner: AccountMetadata & { address: string } = {
   verified: true,
   timezone: "EST",
   ens: "symmtry.eth",
-  role: "STAFF",
+  role: Role.STAFF,
   twitterURL: "https://twitter.com/symmtry69",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036030-3c4f0d7b-0946-4ccc-b03b-03fb6e57328e.png",
@@ -59,7 +60,7 @@ const kristen: AccountMetadata & { address: string } = {
   verified: true,
   timezone: "EST",
   ens: "rielity.eth",
-  role: "STAFF",
+  role: Role.STAFF,
   twitterURL: "https://twitter.com/0xRie_",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036026-9e4d09b3-8d1b-4261-8a2c-e121146f7d63.png",
@@ -74,7 +75,7 @@ const calvin: AccountMetadata & { address: string } = {
   verified: true,
   timezone: "EST",
   // ens: "",
-  role: "COMMUTER",
+  role: Role.DAILY_COMMUTER,
   twitterURL: "https://twitter.com/cchengasaurus",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036007-6e11bb26-6edd-4c9b-9c1c-aa1814e36f11.png",
@@ -89,7 +90,7 @@ const brendan: AccountMetadata & { address: string } = {
   verified: true,
   timezone: "EST",
   ens: "brendo.eth",
-  role: "COMMUTER",
+  role: Role.DAILY_COMMUTER,
   twitterURL: "https://twitter.com/brendanelliot_",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036006-018105d4-e8d4-4fb7-bc82-997351d38d2d.png",
@@ -104,7 +105,7 @@ const michael: AccountMetadata & { address: string } = {
   verified: true,
   timezone: "EST",
   ens: "0xmcg.eth",
-  role: "COMMUTER",
+  role: Role.DAILY_COMMUTER,
   twitterURL: "https://twitter.com/0xmcg",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036018-25f65c4d-a968-4c6c-b328-15958acdb649.png",
@@ -119,7 +120,7 @@ const abe: AccountMetadata & { address: string } = {
   verified: true,
   timezone: "EST",
   // ens: "",
-  role: "COMMUTER",
+  role: Role.DAILY_COMMUTER,
   twitterURL: "https://twitter.com/abenazer_mekete",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036010-b47feac0-99c5-43a6-963d-89a89aa47ff7.png",
@@ -134,7 +135,7 @@ const nick: AccountMetadata & { address: string } = {
   verified: true,
   timezone: "EST",
   ens: "zy22yz.eth",
-  role: "COMMUTER",
+  role: Role.WEEKEND_COMMUTER,
   twitterURL: "https://twitter.com/zy22yz",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036033-abee8f5d-544a-491f-b442-67d4b90639b1.png",
@@ -149,7 +150,7 @@ const alli: AccountMetadata & { address: string } = {
   verified: true,
   timezone: "EST",
   ens: "sonofalli.eth",
-  role: "COMMUTER",
+  role: Role.DAILY_COMMUTER,
   twitterURL: "https://twitter.com/sonofalli",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036002-396279ab-0f10-4c61-b2dc-23dea07236f9.png",
@@ -164,7 +165,7 @@ const kassen: AccountMetadata & { address: string } = {
   verified: true,
   timezone: "EST",
   ens: "kassen.eth",
-  role: "COMMUTER",
+  role: Role.DAILY_COMMUTER,
   twitterURL: "https://twitter.com/kassenq",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036021-6bb5fde3-aef3-4a76-a543-3036c99b8ad0.png",
@@ -179,7 +180,7 @@ const alex: AccountMetadata & { address: string } = {
   verified: true,
   timezone: "EST",
   // ens: "",
-  role: "COMMUTER",
+  role: Role.WEEKEND_COMMUTER,
   twitterURL: "https://twitter.com/alexhughsam",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152035995-3aabcfcc-8fee-4d5c-9c37-17b7f51cfcfd.png",
@@ -194,7 +195,7 @@ const akshay: AccountMetadata & { address: string } = {
   verified: true,
   timezone: "EST",
   // ens: "",
-  role: "VISITOR",
+  role: Role.VISITOR,
   twitterURL: "https://twitter.com/wagmiking",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036031-7d5b3fd2-69b7-42f1-8aca-23fece63fc91.png",

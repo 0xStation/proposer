@@ -23,8 +23,8 @@ import usePagination from "app/core/hooks/usePagination"
 const Project: BlitzPage = () => {
   const [{ data: accountData }] = useAccount()
   const activeUser: Account | null = useStore((state) => state.activeUser)
-  let [walletModalOpen, setWalletModalOpen] = useState(false)
-  let [accountModalOpen, setAccountModalOpen] = useState(false)
+  const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  const toggleAccountModal = useStore((state) => state.toggleAccountModal)
   let [applicationModalOpen, setApplicationModalOpen] = useState(false)
   const [page, setPage] = useState(0)
   const [userTriggered, setUserTrigged] = useState(false)
@@ -34,23 +34,28 @@ const Project: BlitzPage = () => {
     address
       ? activeUser
         ? setApplicationModalOpen(true)
-        : setAccountModalOpen(true)
-      : setWalletModalOpen(true)
+        : toggleAccountModal(true)
+      : toggleWalletModal(true)
   }
 
   useEffect(() => {
+    setApplicationModalOpen(false)
+    toggleWalletModal(false)
     // need to check if the effect was actually triggered by the user (pressing the button)
     // if we don't then the page load account changing from null -> account while it loads
     // will trigger this to run, which we don't want.
+    let handler
     if (userTriggered) {
-      setAccountModalOpen(false)
-      setApplicationModalOpen(false)
-      setWalletModalOpen(false)
       // the modal was locking the screen unless I put a timeout between modal transitions.
       // I think it has something to do with the previous modal cleaning up after it closes
       // and the "fixed" state that locks the modal to prevent the user from scrolling while
       // the modal is active does not properly clean itself up.
-      setTimeout(() => setActiveModal(), 500)
+      handler = setTimeout(() => setActiveModal(), 550)
+    }
+
+    // clear the timeout if a new change comes in the time window
+    return () => {
+      clearTimeout(handler)
     }
   }, [address, activeUser])
 
@@ -82,12 +87,6 @@ const Project: BlitzPage = () => {
           initiativeId={initiative.id}
         />
       )}
-      <AccountModal
-        isOpen={accountModalOpen}
-        setIsOpen={setAccountModalOpen}
-        address={address || ""}
-      />
-      <ConnectWalletModal isWalletOpen={walletModalOpen} setIsWalletOpen={setWalletModalOpen} />
       <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col">
         <div className="mx-4 mt-4">
           <Link href={Routes.TerminalInitiativePage({ terminalHandle })}>
