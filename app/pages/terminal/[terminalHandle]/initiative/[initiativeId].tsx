@@ -2,11 +2,9 @@ import { useState, useEffect, useMemo } from "react"
 import { useAccount } from "wagmi"
 import { Image, useQuery, BlitzPage, useParam, Link, Routes } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import ConnectWalletModal from "app/core/components/ConnectWalletModal"
 import { TalentIdentityUnit as ContributorCard } from "app/core/components/TalentIdentityUnit/index"
 import ImageLink from "../../../../core/components/ImageLink"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
-import Newstand from "/public/newstand-banner.png"
 import StepOne from "/public/step-1.svg"
 import StepTwo from "/public/step-2.svg"
 import StepThree from "/public/step-3.svg"
@@ -15,7 +13,6 @@ import Back from "/public/back-icon.svg"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
 import { Account } from "app/account/types"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import AccountModal from "app/account/components/AccountModal"
 import ApplicationModal from "app/application/components/ApplicationModal"
 import useStore from "app/core/hooks/useStore"
 import usePagination from "app/core/hooks/usePagination"
@@ -179,9 +176,11 @@ const Project: BlitzPage = () => {
                         return (
                           <span
                             key={index}
-                            className="text-sm rounded-lg text-neon-carrot bg-[#302013] py-1 px-2 m-1"
+                            className="rounded-full bg-neon-carrot/30 h-[17px] w-fit p-2.5 flex flex-center items-center"
                           >
-                            {skills}
+                            <span className="text-neon-carrot font-bold text-center text-[10px] uppercase">
+                              {skills}
+                            </span>
                           </span>
                         )
                       })}
