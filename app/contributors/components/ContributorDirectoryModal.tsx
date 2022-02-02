@@ -198,6 +198,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                             title={initiative?.data?.name || "Title"}
                             description={initiative?.data?.description || "Description"}
                             contributors={initiative.contributors}
+                            isAcceptingApplications={initiative.data.isAcceptingApplications}
                           />
                         </a>
                       </Link>

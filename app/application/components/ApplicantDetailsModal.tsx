@@ -132,7 +132,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   </div>
                   <div className="text-base font-normal text-neon-carrot">
                     <div className="flex flex-row space-x-2 overflow-x-scroll text-neon-carrot">
-                      {application?.account.data.skills.map((skill, index) => {
+                      {application?.account.data.skills?.map((skill, index) => {
                         return (
                           <span
                             key={index}
