@@ -123,9 +123,9 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                     <span>Role</span>
                   </div>
                   <div className="text-xs font-normal flex flex-row content-end">
-                    {contributor?.data?.role ? (
+                    {contributor?.role ? (
                       <span className="text-xs rounded-lg text-electric-violet bg-[#211831] py-1 px-2">
-                        {contributor?.data?.role.toUpperCase()}
+                        {contributor?.role.toUpperCase()}
                       </span>
                     ) : (
                       <span>N/A</span>
