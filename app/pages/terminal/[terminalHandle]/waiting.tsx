@@ -70,7 +70,6 @@ const TerminalWaitingPage: BlitzPage = () => {
       referrals,
       dateMetadata: createdAt && {
         createdAt,
-        timezone,
       },
     }
     return <ApplicationCard key={idx} {...applicationCardProps} />

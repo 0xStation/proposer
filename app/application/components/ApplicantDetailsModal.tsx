@@ -13,6 +13,7 @@ import { useDecimals } from "app/core/contracts/contracts"
 import ApplicantEndorsements from "./ApplicantEndorsements"
 import useStore from "app/core/hooks/useStore"
 import { truncateString } from "app/core/utils/truncateString"
+import { formatDate } from "app/core/utils/formatDate"
 
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
@@ -60,7 +61,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               <div className="flex flex-1 justify-end absolute top-2 right-2 z-50">
                 {(application && application.createdAt !== null) || undefined ? (
                   <span className="text-xs text-concrete font-normal">
-                    SUBMITTED ON {application.createdAt.toDateString()}
+                    SUBMITTED ON {formatDate(application.createdAt)}
                   </span>
                 ) : (
                   <span className="text-xs text-concrete font-normal">SUBMITTED ON ...</span>

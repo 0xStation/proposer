@@ -85,7 +85,6 @@ const Project: BlitzPage = () => {
       onClick,
       dateMetadata: joinedAt && {
         joinedAt,
-        timezone,
       },
       referrals: [],
       isEndorsable: false,
