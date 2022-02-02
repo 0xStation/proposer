@@ -117,9 +117,9 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     <span>Role</span>
                   </div>
                   <div className="text-base font-normal flex flex-row">
-                    {application?.applicant.data.role ? (
+                    {application?.applicant.role ? (
                       <span className="text-base rounded-lg text-eletric-violet bg-[#211831] py-1 px-2">
-                        {application?.applicant.data.role.toUpperCase()}
+                        {application?.applicant.role.toUpperCase()}
                       </span>
                     ) : (
                       <span>N/A</span>

@@ -1,7 +1,7 @@
 import db from "../index"
 import { Initiative, InitiativeMetadata } from "app/initiative/types"
 import { Symbol } from "app/types"
-import { contributors } from "./contributors"
+import { stationContributors as contributors } from "./contributors"
 
 const contributorReviewMetadata: InitiativeMetadata & { localId: number } = {
   localId: 1,

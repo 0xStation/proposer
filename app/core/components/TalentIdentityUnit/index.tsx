@@ -27,7 +27,8 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
 
   const {
     address,
-    data: { pfpURL, name, ens, pronouns, role, verified },
+    role,
+    data: { pfpURL, name, ens, pronouns, verified },
   } = user
 
   const railPoints = (
