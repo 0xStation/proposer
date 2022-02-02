@@ -4,12 +4,8 @@ import { Link, Routes, useRouter, useQuery } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import useStore from "app/core/hooks/useStore"
 import { useAccount, useBalance } from "wagmi"
-import {
-  useEndorsementGraphWrite,
-  useEndorsementTokenRead,
-  useEndorsementTokenWrite,
-  useDecimals,
-} from "app/core/contracts/contracts"
+import TicketWrapper from "app/core/components/TicketWrapper"
+import { useDecimals } from "app/core/contracts/contracts"
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { Account } from "app/account/types"
 
@@ -102,19 +98,7 @@ const Navigation = ({ children }: { children?: any }) => {
             <div className="mt-12">{children}</div>
           </div>
         </div>
-        <div className="fixed bottom-4 right-8">
-          {activeUser?.data.ticketImage ? (
-            <img className="h-[300px]" src={activeUser?.data.ticketImage} />
-          ) : (
-            <div className="h-[300px] w-[180px] border border-concrete rounded-2xl border-dashed text-concrete text-4xl text-center flex flex-col justify-center align-middle">
-              FUTURE TICKET GOES HERE
-            </div>
-          )}
-          <div className="mt-2 flex justify-between px-1">
-            <span className="text-marble-white font-bold">Balance</span>
-            <span className="text-marble-white font-light">{tokenBalance} RAILⒺ</span>
-          </div>
-        </div>
+        <TicketWrapper activeUser={activeUser} tokenBalance={tokenBalance} />
       </div>
     </div>
   )
