@@ -56,7 +56,6 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
   let joinedDate
   if (contributor?.joinedAt) {
     const formattedDate = formatDate(contributor.joinedAt)
-
     joinedDate = `JOINED SINCE ${formattedDate}`
   }
 
@@ -64,22 +63,19 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
     <div>
       <Modal subtitle="" open={isOpen} toggle={setIsOpen} showTitle={false}>
         <div className="flex flex-col">
-          <div className="flex flex-auto flex-col space-y-6">
-            <div id="close and meta data" className="flex-auto flex flex-row">
-              <div className="flex flex-1 justify-start absolute top-1 left-2">
-                <div className="w-[12px] h-[12px]">
-                  <button className="text-marble-white" onClick={() => setIsOpen(false)}>
-                    <Image src={Exit} alt="Close button" width={12} height={12} />
-                  </button>
-                </div>
+          <div className="flex flex-auto space-y-6 flex-col h-[500px] overflow-y-scroll">
+            <div className="absolute top-1 left-2">
+              <div className="w-[12px] h-[12px]">
+                <button className="text-marble-white" onClick={() => setIsOpen(false)}>
+                  <Image src={Exit} alt="Close button" width={12} height={12} />
+                </button>
               </div>
-              <div className="flex flex-1 justify-end absolute top-2 right-2 z-50">
-                {(contributor && contributor.joinedAt !== null) || undefined ? (
+            </div>
+            <div className="absolute top-2 right-2 z-50">
+              {(contributor && contributor.joinedAt !== null) ||
+                (undefined && (
                   <span className="text-xs text-concrete font-normal">{joinedDate}</span>
-                ) : (
-                  <span className="text-xs text-concrete font-normal">JOINED SINCE ...</span>
-                )}
-              </div>
+                ))}
             </div>
             <div id="pfp and handle" className="flex-auto">
               <div className="flex flex-row flex-1 content-center space-x-1">
@@ -126,7 +122,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                   </div>
                   <div className="text-xs font-normal flex flex-row content-end">
                     {contributor?.role ? (
-                      <span className="text-xs rounded-lg text-electric-violet bg-[#211831] py-1 px-2">
+                      <span className="text-xs rounded-lg text-electric-violet bg-[#211831] py-0.5 px-2 my-1">
                         {contributor?.role.toUpperCase()}
                       </span>
                     ) : (
@@ -186,7 +182,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
             <div className="flex flex-col space-y-4">
               <div className="flex-auto text-marble-white font-bold">Initiatives</div>
               {initiatives && initiatives.length ? (
-                <div className="grid grid-cols-2 gap-4 h-[300px] overflow-y-scroll">
+                <div className="grid grid-cols-2 gap-4">
                   {initiatives.map((initiative) => {
                     return (
                       <Link
