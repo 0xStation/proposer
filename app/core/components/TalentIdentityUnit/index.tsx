@@ -3,7 +3,7 @@ import { ApplicationReferral } from "app/application/types"
 import Button from "../Button"
 import Card from "./Card"
 import ProfileMetadata from "./ProfileMetadata"
-import RoleTag from "./RoleTag"
+import Tag from "../Tag"
 import { formatDate } from "../../utils/formatDate"
 
 type TalentIdentityUnitProps = {
@@ -125,7 +125,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
           <div className="place-self-center mt-1 font-bold">Role</div>
         </div>
         <div className="flex flex-1 align-right place-content-end content-right text-base">
-          <RoleTag role={role} />
+          {role ? <Tag type={"role"}>{role}</Tag> : <p className="text-marble-white">N/A</p>}
         </div>
       </div>
       {referralPfps}
