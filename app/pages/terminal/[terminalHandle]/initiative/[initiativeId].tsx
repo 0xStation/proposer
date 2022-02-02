@@ -129,7 +129,7 @@ const Project: BlitzPage = () => {
                 </div>
                 <div className="cursor-pointer">
                   {initiative &&
-                    initiative.data.links?.map?.((item, index) => (
+                    initiative.data.links?.map((item, index) => (
                       <ImageLink link={item} key={index} />
                     ))}
                 </div>
@@ -204,9 +204,11 @@ const Project: BlitzPage = () => {
                         return (
                           <span
                             key={index}
-                            className="text-sm rounded-lg text-neon-carrot bg-[#302013] py-1 px-2 m-1"
+                            className="rounded-full bg-neon-carrot/30 h-[17px] w-fit p-2.5 flex flex-center items-center"
                           >
-                            {skills}
+                            <span className="text-neon-carrot font-bold text-center text-[10px] uppercase">
+                              {skills}
+                            </span>
                           </span>
                         )
                       })}
