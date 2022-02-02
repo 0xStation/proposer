@@ -2,20 +2,18 @@ import { useState, useEffect, useMemo } from "react"
 import { useAccount } from "wagmi"
 import { Image, useQuery, BlitzPage, useParam, Link, Routes } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import ConnectWalletModal from "app/core/components/ConnectWalletModal"
 import { TalentIdentityUnit as ContributorCard } from "app/core/components/TalentIdentityUnit/index"
 import ImageLink from "../../../../core/components/ImageLink"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
-import Newstand from "/public/newstand-banner.png"
 import StepOne from "/public/step-1.svg"
 import StepTwo from "/public/step-2.svg"
 import StepThree from "/public/step-3.svg"
+import ContributorDirectoryModal from "app/contributors/components/ContributorDirectoryModal"
 
 import Back from "/public/back-icon.svg"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
 import { Account } from "app/account/types"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import AccountModal from "app/account/components/AccountModal"
 import ApplicationModal from "app/application/components/ApplicationModal"
 import useStore from "app/core/hooks/useStore"
 import usePagination from "app/core/hooks/usePagination"
@@ -29,6 +27,8 @@ const Project: BlitzPage = () => {
   const [page, setPage] = useState(0)
   const [userTriggered, setUserTrigged] = useState(false)
   const address = useMemo(() => accountData?.address, [accountData?.address])
+  const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
+  const [selectedContributorToView, setSelectedContributorToView] = useState<Account | null>(null)
 
   const setActiveModal = () => {
     address
@@ -41,19 +41,10 @@ const Project: BlitzPage = () => {
   useEffect(() => {
     setApplicationModalOpen(false)
     toggleWalletModal(false)
-    // need to check if the effect was actually triggered by the user (pressing the button)
-    // if we don't then the page load account changing from null -> account while it loads
-    // will trigger this to run, which we don't want.
     let handler
     if (userTriggered) {
-      // the modal was locking the screen unless I put a timeout between modal transitions.
-      // I think it has something to do with the previous modal cleaning up after it closes
-      // and the "fixed" state that locks the modal to prevent the user from scrolling while
-      // the modal is active does not properly clean itself up.
       handler = setTimeout(() => setActiveModal(), 550)
     }
-
-    // clear the timeout if a new change comes in the time window
     return () => {
       clearTimeout(handler)
     }
@@ -76,7 +67,33 @@ const Project: BlitzPage = () => {
     { suspense: false }
   )
 
-  const { results, totalPages, hasNext, hasPrev } = usePagination(contributors, page, 3)
+  const contributorCards = contributors?.map((contributor, idx) => {
+    const { id, points, joinedAt } = contributor
+    const {
+      data: { timezone },
+    } = contributor
+    let onClick
+
+    onClick = () => {
+      setSelectedContributorToView(contributor)
+      setContributorDirectoryModalOpen(true)
+    }
+
+    const contributorCardProps = {
+      user: contributor,
+      points,
+      onClick,
+      dateMetadata: joinedAt && {
+        joinedAt,
+        timezone,
+      },
+      referrals: [],
+      isEndorsable: false,
+    }
+    return <ContributorCard key={idx} {...contributorCardProps} />
+  })
+
+  const { results, totalPages, hasNext, hasPrev } = usePagination(contributorCards, page, 3)
 
   return (
     <>
@@ -85,6 +102,13 @@ const Project: BlitzPage = () => {
           isOpen={applicationModalOpen}
           setIsOpen={setApplicationModalOpen}
           initiativeId={initiative.id}
+        />
+      )}
+      {selectedContributorToView && (
+        <ContributorDirectoryModal
+          contributor={selectedContributorToView}
+          isOpen={contributorDirectoryModalIsOpen}
+          setIsOpen={setContributorDirectoryModalOpen}
         />
       )}
       <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col p-3">
@@ -198,7 +222,7 @@ const Project: BlitzPage = () => {
                 </div>
                 <div className="flex grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
                   {results?.map?.((contributor, index) => {
-                    return <ContributorCard key={index} user={contributor} />
+                    return contributor
                   })}
                 </div>
                 <div className="flex flex-row">

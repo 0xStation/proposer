@@ -49,6 +49,15 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
     }
   }, [contributor, isOpen])
 
+  let joinedDate
+  if (contributor?.joinedAt) {
+    const date = contributor.joinedAt.toLocaleDateString("en-US", {
+      timeZone: contributor?.data.timezone,
+    })
+
+    joinedDate = `JOINED SINCE ${date}`
+  }
+
   return (
     <div>
       <Modal subtitle="" open={isOpen} toggle={setIsOpen} showTitle={false}>
@@ -64,9 +73,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
               </div>
               <div className="flex flex-1 justify-end absolute top-2 right-2 z-50">
                 {(contributor && contributor.joinedAt !== null) || undefined ? (
-                  <span className="text-xs text-concrete font-normal">
-                    JOINED SINCE {contributor?.joinedAt?.toDateString}
-                  </span>
+                  <span className="text-xs text-concrete font-normal">{joinedDate}</span>
                 ) : (
                   <span className="text-xs text-concrete font-normal">JOINED SINCE ...</span>
                 )}
