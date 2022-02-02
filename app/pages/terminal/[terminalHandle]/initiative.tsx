@@ -25,17 +25,14 @@ const TerminalInitiativePage: BlitzPage = () => {
         <div>There are no active initiatves in this terminal.</div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {initiatives.map((initiative) => {
+          {initiatives?.map?.(({ localId, data: { name, description, members } }) => {
             return (
-              <Link
-                key={initiative.localId}
-                href={Routes.Project({ terminalHandle, initiativeId: initiative.localId })}
-              >
+              <Link key={localId} href={Routes.Project({ terminalHandle, initiativeId: localId })}>
                 <a>
                   <InitiativeCard
-                    title={initiative?.data?.name || "Title"}
-                    description={initiative?.data?.description || "Description"}
-                    contributors={contributors}
+                    title={name || "Title"}
+                    description={description || "Description"}
+                    members={members}
                   />
                 </a>
               </Link>
