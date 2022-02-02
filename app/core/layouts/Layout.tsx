@@ -1,6 +1,7 @@
 import { Head, BlitzLayout } from "blitz"
 import Ticker from "../components/Ticker"
 import Navigation from "../components/Navigation"
+import ModalContainer from "../components/ModalContainer"
 
 const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
   return (
@@ -9,6 +10,7 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
         <title>{title || "Station"}</title>
         <link rel="icon" href="/station-logo-favicon.ico" />
       </Head>
+      <ModalContainer />
       <Navigation />
       <Ticker />
       {children}
