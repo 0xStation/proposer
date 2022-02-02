@@ -48,9 +48,9 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({
             </div>
           </div>
           <div className="flex flex-1 justify-center content-center">
-            {person.data.role != "N/A" && (
+            {person.role != "N/A" && (
               <span className="text-xs rounded-lg text-electric-violet bg-[#211831] py-1 m-2 px-2">
-                {person.data.role?.toUpperCase()}
+                {person.role?.toUpperCase()}
               </span>
             )}
           </div>

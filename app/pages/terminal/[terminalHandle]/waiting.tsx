@@ -53,7 +53,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const applicationCards = applications?.map((application, idx) => {
     const { applicant, createdAt, points, referrals } = application
     const {
-      data: { role, timezone },
+      data: { timezone },
     } = applicant
     const onClick = () => {
       setSelectedApplication(application)
@@ -64,7 +64,7 @@ const TerminalWaitingPage: BlitzPage = () => {
       user: applicant,
       points: points * Math.pow(10, 0 - decimals),
       onClick,
-      isEndorsable: !!activeUser?.data?.role,
+      isEndorsable: !!activeUser?.role,
       referrals,
       dateMetadata: createdAt && {
         createdAt,

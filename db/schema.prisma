@@ -18,9 +18,7 @@ model Account {
   applications InitiativeApplication[]
   skills       SkillsOnAccounts[]
   tickets      AccountTerminal[]
-  role         String?
   data         Json?
-  joinedAt     DateTime                @default(now())
 }
 
 // Each DAO is represented by a terminal.
@@ -30,17 +28,32 @@ model Terminal {
   ticketAddress String            @unique
   handle        String            @unique
   initiatives   Initiative[]
-  data          Json?
+  roles         Role[]
   tickets       AccountTerminal[]
+  data          Json?
+}
+
+// A role within a terminal
+model Role {
+  terminal   Terminal          @relation(fields: [terminalId], references: [id])
+  terminalId Int
+  localId    Int               @default(autoincrement())
+  tickets    AccountTerminal[]
+  data       Json?
+
+  @@id([terminalId, localId], name: "terminalRoleId")
 }
 
 model AccountTerminal {
-  account    Account  @relation(fields: [accountId], references: [id])
-  accountId  Int
-  terminal   Terminal @relation(fields: [terminalId], references: [id])
-  terminalId Int
-  ticketUrl  String
-  active     Boolean
+  account     Account  @relation(fields: [accountId], references: [id])
+  accountId   Int
+  terminal    Terminal @relation(fields: [terminalId], references: [id])
+  terminalId  Int
+  role        Role     @relation(fields: [terminalId, roleLocalId], references: [terminalId, localId])
+  roleLocalId Int
+  joinedAt    DateTime @default(now())
+  active      Boolean  @default(true)
+  ticketUrl   String?
 
   @@id([accountId, terminalId])
 }
