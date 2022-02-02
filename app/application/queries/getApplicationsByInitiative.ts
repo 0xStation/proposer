@@ -3,11 +3,13 @@ import * as z from "zod"
 import { request, gql } from "graphql-request"
 import { getWalletString } from "app/utils/getWalletString"
 import { Application, ApplicationMetadata, ApplicationReferral } from "../types"
+import { Role } from "app/role/types"
 
 const GetApplicationsByInitiative = z.object({
   referralGraphAddress: z.string(),
   initiativeLocalId: z.number(),
   initiativeId: z.number(),
+  terminalId: z.number(),
 })
 
 export default async function getApplicationsByInitiative(
@@ -56,6 +58,7 @@ export default async function getApplicationsByInitiative(
         // default data, will be overriden if account with address r.from exists later
         referrers[r.from.toLowerCase()] = {
           address: r.from,
+          role: "N/A",
           data: {
             name: getWalletString(r.from),
             wallet: getWalletString(r.from),
@@ -63,7 +66,6 @@ export default async function getApplicationsByInitiative(
             pfpURL:
               "https://user-images.githubusercontent.com/38736612/151722561-ba3b7d89-cb9f-4ad2-86de-73ff3dc3d286.png",
             verified: false,
-            role: "N/A",
           },
         }
       })
@@ -78,12 +80,24 @@ export default async function getApplicationsByInitiative(
       const accounts = await db.account.findMany({
         where: { address: { in: Object.keys(referrers), mode: "insensitive" } },
         // addresses come from the subgraph lowered, but database may or may not lower so insensitive filtering used
-        select: { address: true, data: true },
+        select: {
+          address: true,
+          data: true,
+          tickets: {
+            where: {
+              terminalId: data.terminalId,
+            },
+            select: {
+              role: true,
+            },
+          },
+        },
       })
       // update per-referrer store with account metadata
       accounts.forEach((a) => {
         referrers[a.address.toLowerCase()].address = a.address
         referrers[a.address.toLowerCase()].data = a.data
+        referrers[a.address.toLowerCase()].role = (a.tickets[0]?.role as Role)?.data.value || "N/A"
       })
     }
     //////
@@ -91,17 +105,33 @@ export default async function getApplicationsByInitiative(
     //////
 
     // get all applications for the initiative
-    const applications = await db.initiativeApplication.findMany({
-      where: { initiativeId: initiativeId },
-      include: { applicant: true },
+    const applications = await db.accountInitiative.findMany({
+      where: { initiativeId: initiativeId, status: "APPLIED" },
+      include: {
+        account: {
+          include: {
+            tickets: {
+              where: {
+                terminalId: data.terminalId,
+              },
+              include: {
+                role: true,
+              },
+            },
+          },
+        },
+      },
     })
 
     // merge database data and subgraph data
     const merged =
       applications?.map((a) => {
-        const applicant = applicants[a.applicant.address.toLowerCase()]
+        const applicant = applicants[a.account.address.toLowerCase()]
         return {
-          ...a,
+          account: {
+            ...a.account,
+            role: (a.account.tickets[0]?.role as Role)?.data.value || "N/A",
+          },
           data: a.data as ApplicationMetadata,
           points: parseFloat(applicant?.points || "0"),
           referrals:
@@ -111,6 +141,7 @@ export default async function getApplicationsByInitiative(
                 from: {
                   address: referrers[r.from.toLowerCase()].address,
                   data: referrers[r.from.toLowerCase()].data,
+                  role: referrers[r.from.toLowerCase()].role,
                 },
               }
             }) as ApplicationReferral[]) || [],

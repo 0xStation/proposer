@@ -19,12 +19,12 @@ const contributorReviewMetadata: InitiativeMetadata & { localId: number } = {
   commitment: "Full-time, Part-time",
   bannerURL: "/contributor-review-banner.png",
   links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/protocol-v1" }],
-  members: [
-    contributors.conner.address,
-    contributors.calvin.address,
-    contributors.kristen.address,
-    contributors.nick.address,
-  ],
+  // members: [
+  //   contributors.conner.address,
+  //   contributors.calvin.address,
+  //   contributors.kristen.address,
+  //   contributors.nick.address,
+  // ],
 }
 const waitingRoomMetadata: InitiativeMetadata & { localId: number } = {
   localId: 2,
@@ -42,15 +42,15 @@ const waitingRoomMetadata: InitiativeMetadata & { localId: number } = {
   isAcceptingApplications: false,
   bannerURL: "/waiting-room-banner.png",
   links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/web" }],
-  members: [
-    contributors.mind.address,
-    contributors.kristen.address,
-    contributors.michael.address,
-    contributors.abe.address,
-    contributors.conner.address,
-    contributors.brendan.address,
-    contributors.tina.address,
-  ],
+  // members: [
+  //   contributors.mind.address,
+  //   contributors.kristen.address,
+  //   contributors.michael.address,
+  //   contributors.abe.address,
+  //   contributors.conner.address,
+  //   contributors.brendan.address,
+  //   contributors.tina.address,
+  // ],
 }
 const newstandMetadata: InitiativeMetadata & { localId: number } = {
   localId: 3,
@@ -70,9 +70,9 @@ const newstandMetadata: InitiativeMetadata & { localId: number } = {
   links: [{ symbol: Symbol.MIRROR, url: "https://station.mirror.xyz/" }],
   rewardText: ["800 USDC", "Station Visitor Ticket NFT"],
   bannerURL: "/newstand-banner.png",
-  members: [contributors.tina.address, contributors.alli.address],
   commitment: "One-time",
   skills: ["Writing", "Graphic Design", "Editorial Design"],
+  // members: [contributors.tina.address, contributors.alli.address],
 }
 
 const partnershipMetadata: InitiativeMetadata & { localId: number } = {
@@ -92,12 +92,12 @@ const partnershipMetadata: InitiativeMetadata & { localId: number } = {
   commitment: "One-time, Part-time",
   bannerURL: "/terminal-partnership-banner.png",
   links: [],
-  members: [
-    contributors.tina.address,
-    contributors.mind.address,
-    contributors.alex.address,
-    contributors.kassen.address,
-  ],
+  // members: [
+  //   contributors.tina.address,
+  //   contributors.mind.address,
+  //   contributors.alex.address,
+  //   contributors.kassen.address,
+  // ],
 }
 
 const networkSustainability: InitiativeMetadata & { localId: number } = {
@@ -125,7 +125,7 @@ const networkSustainability: InitiativeMetadata & { localId: number } = {
   isAcceptingApplications: false,
   links: [],
   bannerURL: "/network-sustainability-banner.png",
-  members: [contributors.calvin.address, contributors.nick.address, contributors.tina.address],
+  // members: [contributors.calvin.address, contributors.nick.address, contributors.tina.address],
 }
 
 const contributorExperience: InitiativeMetadata & { localId: number } = {
@@ -146,7 +146,7 @@ const contributorExperience: InitiativeMetadata & { localId: number } = {
   isAcceptingApplications: false,
   bannerURL: "/contributor-experience-banner.png",
   links: [],
-  members: [contributors.kassen.address, contributors.tina.address],
+  // members: [contributors.kassen.address, contributors.tina.address],
 }
 
 const midnightStation: InitiativeMetadata & { localId: number } = {
@@ -167,12 +167,12 @@ const midnightStation: InitiativeMetadata & { localId: number } = {
   isAcceptingApplications: false,
   links: [],
   bannerURL: "/midnight-station-banner.png",
-  members: [
-    contributors.brendan.address,
-    contributors.kristen.address,
-    contributors.abe.address,
-    contributors.michael.address,
-  ],
+  // members: [
+  //   contributors.brendan.address,
+  //   contributors.kristen.address,
+  //   contributors.abe.address,
+  //   contributors.michael.address,
+  // ],
 }
 
 const brandIdentity: InitiativeMetadata & { localId: number } = {
@@ -190,7 +190,7 @@ const brandIdentity: InitiativeMetadata & { localId: number } = {
   isAcceptingApplications: false,
   links: [],
   bannerURL: "/brand-identity-banner.png",
-  members: [contributors.mind.address],
+  // members: [contributors.mind.address],
 }
 
 const stationDigest: InitiativeMetadata & { localId: number } = {
@@ -211,7 +211,7 @@ const stationDigest: InitiativeMetadata & { localId: number } = {
   isAcceptingApplications: false,
   links: [],
   bannerURL: "/brand-identity-banner.png",
-  members: [contributors.alex.address, contributors.alli.address],
+  // members: [contributors.alex.address, contributors.alli.address],
 }
 
 const stationInitiaitves = [

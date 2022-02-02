@@ -4,6 +4,7 @@ import { useAccount, useBalance } from "wagmi"
 import { BigNumberish, utils } from "ethers"
 import { Field, Form } from "react-final-form"
 import Verified from "public/check-mark.svg"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTerminal"
 import Modal from "../../core/components/Modal"
 import {
@@ -31,7 +32,14 @@ const EndorseContributorModal = ({ isOpen, setIsOpen, selectedUserToEndorse: con
   const contributorData = contributor?.data || {}
 
   const terminalHandle = useParam("terminalHandle") as string
-  const [initiatives] = useQuery(getInitiativesByTerminal, { terminalHandle }, { suspense: false })
+
+  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+
+  const [initiatives] = useQuery(
+    getInitiativesByTerminal,
+    { terminalId: terminal?.id || 0 },
+    { suspense: false }
+  )
 
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
   const [{ data: balanceData }] = useBalance({
