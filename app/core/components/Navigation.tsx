@@ -7,6 +7,7 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import useStore from "../hooks/useStore"
 import { useAccount } from "wagmi"
 import truncateString from "../utils/truncateString"
+import { LOCAL_STORAGE } from "../utils/constants"
 
 interface Wallet {
   address: string
@@ -51,6 +52,15 @@ const Navigation = () => {
     }
   }, [address])
 
+  const appDisconnect = () => {
+    // we're reading from localStorage at the app level
+    // to see if we need to maintain a wallet connection
+    if (localStorage.getItem(LOCAL_STORAGE.CONNECTION)) {
+      localStorage.removeItem(LOCAL_STORAGE.CONNECTION)
+    }
+    disconnect()
+  }
+
   return (
     <>
       <div className="h-12 w-full px-4 bg-tunnel-black flex flex-row justify-between border-b border-b-concrete">
@@ -89,7 +99,7 @@ const Navigation = () => {
               items={[
                 {
                   name: "disconnect",
-                  onClick: disconnect,
+                  onClick: appDisconnect,
                 },
               ]}
             />
