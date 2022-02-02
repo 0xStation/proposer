@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { BlitzPage, useQuery, useParam, invoke } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getAccountsByTerminalRole from "app/account/queries/getAccountsByTerminalRole"
 import getRolesByTerminal from "app/role/queries/getRolesByTerminal"
 import { Account } from "app/account/types"
@@ -16,9 +17,12 @@ const TerminalContributorsPage: BlitzPage = () => {
   const [selectedContributors, setSelectedContributors] = useState<Account[] | null>(null)
 
   const terminalHandle = useParam("terminalHandle") as string
+
+  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+
   const [roles] = useQuery(
     getRolesByTerminal,
-    { terminalHandle: terminalHandle },
+    { terminalId: terminal?.id || 0 },
     { suspense: false }
   )
 
@@ -26,7 +30,7 @@ const TerminalContributorsPage: BlitzPage = () => {
     if (selectedRoleLocalId) {
       const getContributorsByRole = async () => {
         let contributors = await invoke(getAccountsByTerminalRole, {
-          terminalHandle,
+          terminalId: terminal?.id || 0,
           roleLocalId: selectedRoleLocalId,
         })
         setSelectedContributors(contributors)
@@ -67,6 +71,7 @@ const TerminalContributorsPage: BlitzPage = () => {
           contributor={selectedContributorToView}
           isOpen={contributorDirectoryModalIsOpen}
           setIsOpen={setContributorDirectoryModalOpen}
+          terminalId={terminal?.id || 0}
         />
       )}
       <div className="flex flex-col space-y-10">

@@ -12,7 +12,7 @@ import { useDecimals } from "app/core/contracts/contracts"
 import useStore from "app/core/hooks/useStore"
 import { Initiative } from "app/initiative/types"
 import InitiativeCard from "app/initiative/components/InitiativeCard"
-import getInitiativesByLocalIds from "app/initiative/queries/getInitiativesByLocalIds"
+import getInitiativesByContributor from "app/initiative/queries/getInitiativesByContributor"
 import { truncateString } from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 
@@ -21,11 +21,13 @@ type ContributorDirectoryModalProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>
   contributor?: Account
   activeUser?: Account
+  terminalId?: number
 }
 const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
   contributor,
   isOpen,
   setIsOpen,
+  terminalId,
 }) => {
   const terminalHandle = useParam("terminalHandle", "string") as string
   const activeUser: Account | null = useStore((state) => state.activeUser)
@@ -41,8 +43,9 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       const getInitiativesFromContributor = async () => {
-        let involvements = await invoke(getInitiativesByLocalIds, {
-          localIds: contributor?.data.initiatives || [],
+        let involvements = await invoke(getInitiativesByContributor, {
+          terminalId,
+          accountId: contributor?.id,
         })
         setInitiatives(involvements)
       }
@@ -194,7 +197,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                           <InitiativeCard
                             title={initiative?.data?.name || "Title"}
                             description={initiative?.data?.description || "Description"}
-                            members={initiative.contributors}
+                            contributors={initiative.contributors}
                           />
                         </a>
                       </Link>

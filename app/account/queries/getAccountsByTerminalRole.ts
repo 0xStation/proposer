@@ -4,7 +4,7 @@ import { Account, AccountMetadata } from "../types"
 import { Role, RoleMetadata } from "app/role/types"
 
 const GetAccountsByTerminalRole = z.object({
-  terminalHandle: z.string(),
+  terminalId: z.number(),
   roleLocalId: z.number(),
 })
 
@@ -13,15 +13,8 @@ export default async function getAccountsByTerminalRole(
 ) {
   const data = GetAccountsByTerminalRole.parse(input)
 
-  const terminal = await db.terminal.findUnique({ where: { handle: data.terminalHandle } })
-
-  // no terminal exist for that handle, so no initiatives can exist either
-  if (!terminal) {
-    return []
-  }
-
   const tickets = await db.accountTerminal.findMany({
-    where: { terminalId: terminal.id, roleLocalId: data.roleLocalId },
+    where: { terminalId: data.terminalId, roleLocalId: data.roleLocalId },
     include: { account: true, role: true },
   })
 
@@ -31,6 +24,7 @@ export default async function getAccountsByTerminalRole(
 
   const accounts = tickets.map((t) => {
     return {
+      id: t.account.id,
       address: t.account.address,
       data: t.account.data as AccountMetadata,
       role: (t.role?.data as RoleMetadata)?.value,
