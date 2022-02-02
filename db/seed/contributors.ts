@@ -7,7 +7,7 @@ interface AccountSeed {
   role: number
   active: boolean
   joinedAt: Date
-  // initiatives: number[]
+  initiatives: number[]
 }
 
 const initiaitveIds = {
@@ -45,11 +45,11 @@ const mind: AccountMetadata & AccountSeed = {
   twitterURL: "https://twitter.com/mindapi_",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036023-44570a89-315b-42cb-8a97-fc48c60f1e7a.png",
-  // initiatives: [
-  //   initiaitveIds.waitingRoomId,
-  //   initiaitveIds.brandIdentityId,
-  //   initiaitveIds.partnershipId,
-  // ],
+  initiatives: [
+    initiaitveIds.waitingRoomId,
+    initiaitveIds.brandIdentityId,
+    initiaitveIds.partnershipId,
+  ],
 }
 const tina: AccountMetadata & AccountSeed = {
   address: "0x78918036a8e4B9179bEE3CAB57110A3397986E44",
@@ -67,13 +67,13 @@ const tina: AccountMetadata & AccountSeed = {
   twitterURL: "https://twitter.com/fkpxls",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036016-db43df6c-e240-4f63-aaff-6843d278a2ba.png",
-  // initiatives: [
-  //   initiaitveIds.newstandId,
-  //   initiaitveIds.partnershipId,
-  //   initiaitveIds.contributorExperienceId,
-  //   initiaitveIds.networkSustainabilityId,
-  //   initiaitveIds.waitingRoomId,
-  // ],
+  initiatives: [
+    initiaitveIds.newstandId,
+    initiaitveIds.partnershipId,
+    initiaitveIds.contributorExperienceId,
+    initiaitveIds.networkSustainabilityId,
+    initiaitveIds.waitingRoomId,
+  ],
 }
 const conner: AccountMetadata & AccountSeed = {
   address: "0x016562aA41A8697720ce0943F003141f5dEAe006",
@@ -91,7 +91,7 @@ const conner: AccountMetadata & AccountSeed = {
   twitterURL: "https://twitter.com/symmtry69",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036030-3c4f0d7b-0946-4ccc-b03b-03fb6e57328e.png",
-  // initiatives: [initiaitveIds.contributorReviewId, initiaitveIds.waitingRoomId],
+  initiatives: [initiaitveIds.contributorReviewId, initiaitveIds.waitingRoomId],
 }
 const calvin: AccountMetadata & AccountSeed = {
   address: "0xB0F0bA31aA582726E36Dc0c79708E9e072455eD2",
@@ -109,7 +109,7 @@ const calvin: AccountMetadata & AccountSeed = {
   twitterURL: "https://twitter.com/cchengasaurus",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036007-6e11bb26-6edd-4c9b-9c1c-aa1814e36f11.png",
-  // initiatives: [initiaitveIds.contributorReviewId, initiaitveIds.networkSustainabilityId],
+  initiatives: [initiaitveIds.contributorReviewId, initiaitveIds.networkSustainabilityId],
 }
 const kristen: AccountMetadata & AccountSeed = {
   address: "0xaE55f61f85935BBB68b8809d5c02142e4CbA9a13",
@@ -127,11 +127,11 @@ const kristen: AccountMetadata & AccountSeed = {
   twitterURL: "https://twitter.com/0xRie_",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036026-9e4d09b3-8d1b-4261-8a2c-e121146f7d63.png",
-  // initiatives: [
-  //   initiaitveIds.contributorReviewId,
-  //   initiaitveIds.waitingRoomId,
-  //   initiaitveIds.midnightStationId,
-  // ],
+  initiatives: [
+    initiaitveIds.contributorReviewId,
+    initiaitveIds.waitingRoomId,
+    initiaitveIds.midnightStationId,
+  ],
 }
 const brendan: AccountMetadata & AccountSeed = {
   address: "0x17B7163E708A06De4DdA746266277470dd42C53f",
@@ -149,7 +149,7 @@ const brendan: AccountMetadata & AccountSeed = {
   twitterURL: "https://twitter.com/brendanelliot_",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036006-018105d4-e8d4-4fb7-bc82-997351d38d2d.png",
-  // initiatives: [initiaitveIds.waitingRoomId, initiaitveIds.midnightStationId],
+  initiatives: [initiaitveIds.waitingRoomId, initiaitveIds.midnightStationId],
 }
 const michael: AccountMetadata & AccountSeed = {
   address: "0x65A3870F48B5237f27f674Ec42eA1E017E111D63",
@@ -167,7 +167,7 @@ const michael: AccountMetadata & AccountSeed = {
   twitterURL: "https://twitter.com/0xmcg",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036018-25f65c4d-a968-4c6c-b328-15958acdb649.png",
-  // initiatives: [initiaitveIds.waitingRoomId, initiaitveIds.midnightStationId],
+  initiatives: [initiaitveIds.waitingRoomId, initiaitveIds.midnightStationId],
 }
 const abe: AccountMetadata & AccountSeed = {
   address: "0x237c9dbB180C4Fbc7A8DBfd2b70A9aab2518A33f",
@@ -185,7 +185,7 @@ const abe: AccountMetadata & AccountSeed = {
   twitterURL: "https://twitter.com/abenazer_mekete",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036010-b47feac0-99c5-43a6-963d-89a89aa47ff7.png",
-  // initiatives: [initiaitveIds.waitingRoomId, initiaitveIds.midnightStationId],
+  initiatives: [initiaitveIds.waitingRoomId, initiaitveIds.midnightStationId],
 }
 const nick: AccountMetadata & AccountSeed = {
   address: "0x2f40e3Fb0e892240E3cd5682D10ce1860275174C",
@@ -203,7 +203,7 @@ const nick: AccountMetadata & AccountSeed = {
   twitterURL: "https://twitter.com/zy22yz",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036033-abee8f5d-544a-491f-b442-67d4b90639b1.png",
-  // initiatives: [initiaitveIds.networkSustainabilityId, initiaitveIds.contributorReviewId],
+  initiatives: [initiaitveIds.networkSustainabilityId, initiaitveIds.contributorReviewId],
 }
 const alli: AccountMetadata & AccountSeed = {
   address: "0x32447704a3ac5ed491b6091497ffb67a7733b624",
@@ -221,7 +221,7 @@ const alli: AccountMetadata & AccountSeed = {
   twitterURL: "https://twitter.com/sonofalli",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036002-396279ab-0f10-4c61-b2dc-23dea07236f9.png",
-  // initiatives: [initiaitveIds.newstandId, initiaitveIds.stationDigestId],
+  initiatives: [initiaitveIds.newstandId, initiaitveIds.stationDigestId],
 }
 const kassen: AccountMetadata & AccountSeed = {
   address: "0x90A0233A0c27D15ffA23E293EC8dd6f2Ef2942e2",
@@ -239,7 +239,7 @@ const kassen: AccountMetadata & AccountSeed = {
   twitterURL: "https://twitter.com/kassenq",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036021-6bb5fde3-aef3-4a76-a543-3036c99b8ad0.png",
-  // initiatives: [initiaitveIds.partnershipId, initiaitveIds.contributorExperienceId],
+  initiatives: [initiaitveIds.partnershipId, initiaitveIds.contributorExperienceId],
 }
 const alex: AccountMetadata & AccountSeed = {
   address: "0x69F35Bed06115Dd05AB5452058d9dbe8a7AD80f1",
@@ -257,7 +257,7 @@ const alex: AccountMetadata & AccountSeed = {
   twitterURL: "https://twitter.com/alexhughsam",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152035995-3aabcfcc-8fee-4d5c-9c37-17b7f51cfcfd.png",
-  // initiatives: [initiaitveIds.partnershipId, initiaitveIds.stationDigestId],
+  initiatives: [initiaitveIds.partnershipId, initiaitveIds.stationDigestId],
 }
 const akshay: AccountMetadata & AccountSeed = {
   address: "0x8FAA5498Ca6fc9A61BA967E07fBc9420aab99E55",
@@ -275,7 +275,7 @@ const akshay: AccountMetadata & AccountSeed = {
   twitterURL: "https://twitter.com/wagmiking",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036031-7d5b3fd2-69b7-42f1-8aca-23fece63fc91.png",
-  // initiatives: [initiaitveIds.waitingRoomId],
+  initiatives: [initiaitveIds.waitingRoomId],
 }
 
 export const stationContributors = {
@@ -334,40 +334,40 @@ export async function seedContributors(terminals) {
 
     console.log(`      Station role: ${ticket.roleLocalId}`)
 
-    // for (const name in contributorData.initiatives) {
-    //   const localId = contributorData.initiatives[name] as number
-    //   const initiative = await db.initiative.findUnique({
-    //     where: {
-    //       terminalInitiative: {
-    //         localId,
-    //         terminalTicket: terminals.station.ticketAddress,
-    //       },
-    //     },
-    //   })
+    for (const name in contributorData.initiatives) {
+      const localId = contributorData.initiatives[name] as number
+      const initiative = await db.initiative.findUnique({
+        where: {
+          terminalInitiative: {
+            localId,
+            terminalTicket: terminals.station.ticketAddress,
+          },
+        },
+      })
 
-    //   if (!initiative) {
-    //     console.log(`could not find localId of ${localId}`)
-    //     continue
-    //   }
+      if (!initiative) {
+        console.log(`could not find localId of ${localId}`)
+        continue
+      }
 
-    //   const membership = await db.accountInitiative.upsert({
-    //     where: {
-    //       accountId_initiativeId: {
-    //         accountId: account.id,
-    //         initiativeId: initiative.id,
-    //       },
-    //     },
-    //     create: {
-    //       accountId: account.id,
-    //       initiativeId: initiative.id,
-    //       status: "CONTRIBUTOR",
-    //     },
-    //     update: {
-    //       status: "CONTRIBUTOR",
-    //     },
-    //   })
+      const membership = await db.accountInitiative.upsert({
+        where: {
+          accountId_initiativeId: {
+            accountId: account.id,
+            initiativeId: initiative.id,
+          },
+        },
+        create: {
+          accountId: account.id,
+          initiativeId: initiative.id,
+          status: "CONTRIBUTOR",
+        },
+        update: {
+          status: "CONTRIBUTOR",
+        },
+      })
 
-    //   console.log(`      contributor to: ${(initiative as Initiative).data?.name}`)
-    // }
+      console.log(`      contributor to: ${(initiative as Initiative).data?.name}`)
+    }
   }
 }
