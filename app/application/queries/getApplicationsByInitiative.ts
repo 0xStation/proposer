@@ -133,6 +133,7 @@ export default async function getApplicationsByInitiative(
           ...a.account,
           role: (a.account.tickets[0]?.role as Role)?.data.value || "N/A",
         },
+        createdAt: a.createdAt,
         data: a.data as ApplicationMetadata,
         points: parseFloat(applicant?.points || "0"),
         referrals:

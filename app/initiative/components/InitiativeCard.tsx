@@ -1,5 +1,3 @@
-import { useQuery } from "blitz"
-import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
 
 const InitiativeCard = ({ title, oneLiner, contributors, isAcceptingApplications }) => {
   return (
