@@ -109,8 +109,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                     <div className="flex-1">
                       {truncateString(contributor?.data?.ens || contributor?.address)}
                     </div>
-                    <div className="flex-1">•</div>
-                    <div className="flex-1">{contributor?.data?.pronouns}</div>
+                    {/* <div className="flex-1">• {contributor?.data?.pronouns}</div> */}
                   </div>
                 </div>
               </div>
