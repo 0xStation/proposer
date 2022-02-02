@@ -188,7 +188,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                           <InitiativeCard
                             title={initiative?.data?.name || "Title"}
                             description={initiative?.data?.description || "Description"}
-                            contributors={initiative.contributors}
+                            members={initiative.contributors}
                           />
                         </a>
                       </Link>
