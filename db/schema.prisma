@@ -71,7 +71,7 @@ model Initiative {
   @@unique([terminalTicket, localId], name: "terminalInitiative")
 }
 
-// AKA "application"
+// Associates accounts with initiatives for applications and contributor membership
 model AccountInitiative {
   id           Int                     @id @default(autoincrement())
   account      Account                 @relation(fields: [accountId], references: [id])

@@ -20,8 +20,10 @@ export default async function getInitiativesByTerminal(
   const initiatives = await db.initiative.findMany({
     where: { terminalId: terminal.id },
     include: {
-      _count: {
-        select: { applications: true },
+      accounts: {
+        select: {
+          status: true,
+        },
       },
     },
   })
@@ -33,7 +35,7 @@ export default async function getInitiativesByTerminal(
   return initiatives.map((i) => {
     return {
       ...i,
-      applicationCount: i._count.applications,
+      applicationCount: i.accounts.filter((a) => a.status == "APPLIED").length,
     }
   }) as unknown as Initiative[]
 }

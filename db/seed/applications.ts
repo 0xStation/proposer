@@ -16,14 +16,17 @@ export async function seedApplications() {
     const application = stationApplications[name]
     const ret = await db.accountInitiative.upsert({
       where: {
-        id: 1,
+        accountId_initiativeId: {
+          accountId: application?.accountId || 1,
+          initiativeId: application?.initiativeId || 1,
+        },
       },
       create: {
         accountId: application!.accountId,
         initiativeId: application!.initiativeId,
         data: application,
       },
-      update: { data: application },
+      update: { data: application, status: "APPLIED" },
     })
     console.log(`  application created: ${ret}`)
   }

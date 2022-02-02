@@ -30,6 +30,7 @@ const TerminalWaitingPage: BlitzPage = () => {
     { terminalHandle: terminalHandle },
     { suspense: false }
   )
+
   const currentInitiative = useMemo(
     () => initiatives?.find((initiative) => initiative.localId === selectedInitiativeLocalId),
     [selectedInitiativeLocalId]
@@ -53,17 +54,17 @@ const TerminalWaitingPage: BlitzPage = () => {
   }, [selectedInitiativeLocalId])
 
   const applicationCards = applications?.map((application, idx) => {
-    const { applicant, createdAt, points, referrals } = application
-    const {
-      data: { timezone },
-    } = applicant
+    const { account, createdAt, points, referrals } = application
+    // const {
+    //   data: { timezone },
+    // } = account
     const onClick = () => {
       setSelectedApplication(application)
       setIsApplicantOpen(true)
     }
 
     const applicationCardProps = {
-      user: applicant,
+      user: account,
       points: points * Math.pow(10, 0 - decimals),
       onClick,
       isEndorsable: !!activeUser?.role || hasBeenAirDroppedTokens,
@@ -72,6 +73,7 @@ const TerminalWaitingPage: BlitzPage = () => {
         createdAt,
       },
     }
+
     return <ApplicationCard key={idx} {...applicationCardProps} />
   })
 
@@ -100,14 +102,14 @@ const TerminalWaitingPage: BlitzPage = () => {
             isEndorseModalOpen={isEndorseModalOpen}
             setIsEndorseModalOpen={setIsEndorseModalOpen}
             setIsSuccessModalOpen={setIsSuccessModalOpen}
-            selectedUserToEndorse={selectedApplication?.applicant}
+            selectedUserToEndorse={selectedApplication?.account}
             initiativeLocalId={selectedInitiativeLocalId}
           />
         )}
         <SuccessModal
           isSuccessModalOpen={isSuccessModalOpen}
           setIsSuccessModalOpen={setIsSuccessModalOpen}
-          selectedUserToEndorse={selectedApplication?.applicant}
+          selectedUserToEndorse={selectedApplication?.account}
         />
         <div className="flex flex-col space-y-10">
           <div className="flex-auto flex-wrap space-x-3 text-marble-white text-base space-y-3">
