@@ -338,9 +338,9 @@ const Project: BlitzPage = () => {
                 </div>
               </div>
             </div>
-            <div className="flex-auto flex justify-center mt-10">
+            <div className="flex-auto flex justify-center mt-10 sticky bottom-0">
               <button
-                className="mt-4 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
+                className="mt-4 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px] m-4"
                 onClick={() => {
                   setUserTrigged(true)
                   setActiveModal()
