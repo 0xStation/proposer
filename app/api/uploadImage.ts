@@ -21,7 +21,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     secretAccessKey: process.env.SPACES_SECRET_KEY,
   })
 
-  console.log(process.env.SPACES_ENDPOINT)
+  console.log("what is this process")
+  console.log(process.env.SPACES_ACCESS_KEY_ID)
 
   const form = new formidable.IncomingForm()
 
@@ -30,6 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log(err)
       return res.status(500)
     }
+
     // we should make sure all of the filenames are unique
     const file = fs.readFileSync(files.file.path)
     s3.upload({
