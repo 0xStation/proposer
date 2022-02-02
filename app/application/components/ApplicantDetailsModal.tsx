@@ -100,9 +100,9 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                         application?.account.data.ens || application?.account.address
                       )}
                     </div>
-                    {application?.account.data.pronouns && (
+                    {/* {application?.account.data.pronouns && (
                       <div className="flex-1">• {application?.account.data.pronouns}</div>
-                    )}
+                    )} */}
                   </div>
                 </div>
               </div>

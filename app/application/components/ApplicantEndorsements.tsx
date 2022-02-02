@@ -42,7 +42,7 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({
               <div className="flex-1 text-normal text-concrete">
                 <div className="flex flex-row flex-1 text-base text-concrete space-x-1">
                   <div className="flex-1">{truncateString(person.data.ens || person.address)}</div>
-                  {person.data.pronouns && <div className="flex-1">• {person.data.pronouns}</div>}
+                  {/* {person.data.pronouns && <div className="flex-1">• {person.data.pronouns}</div>} */}
                 </div>
               </div>
             </div>
