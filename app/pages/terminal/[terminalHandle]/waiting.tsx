@@ -14,6 +14,7 @@ import { Pill } from "app/core/components/Pill"
 import getApplicationsByInitiative from "app/application/queries/getApplicationsByInitiative"
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 
 const hasBeenAirDroppedTokens = false
 
@@ -25,9 +26,12 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [isEndorseModalOpen, setIsEndorseModalOpen] = useState(false)
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
+
+  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
-    { terminalHandle: terminalHandle },
+    { terminalId: terminal?.id || 0 },
     { suspense: false }
   )
 
@@ -46,6 +50,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           referralGraphAddress: TERMINAL.REFERRAL_GRAPH, // todo: dynmically load from local state
           initiativeLocalId: selectedInitiativeLocalId,
           initiativeId: currentInitiative?.id,
+          terminalId: terminal?.id,
         })
         setApplications(applications || [])
       }
