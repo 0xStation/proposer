@@ -17,6 +17,7 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import ApplicationModal from "app/application/components/ApplicationModal"
 import useStore from "app/core/hooks/useStore"
 import usePagination from "app/core/hooks/usePagination"
+import Tag from "app/core/components/Tag"
 
 const Project: BlitzPage = () => {
   const [{ data: accountData }] = useAccount()
@@ -200,16 +201,11 @@ const Project: BlitzPage = () => {
                   </div>
                   <div className="flex flex-wrap">
                     {initiative &&
-                      initiative.data.skills?.map?.((skills, index) => {
+                      initiative.data.skills?.map?.((skill, index) => {
                         return (
-                          <span
-                            key={index}
-                            className="rounded-full bg-neon-carrot/30 h-[17px] w-fit p-2.5 flex flex-center items-center"
-                          >
-                            <span className="text-neon-carrot font-bold text-center text-[10px] uppercase">
-                              {skills}
-                            </span>
-                          </span>
+                          <Tag key={index} type={"skill"}>
+                            {skill}
+                          </Tag>
                         )
                       })}
                   </div>

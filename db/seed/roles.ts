@@ -10,13 +10,13 @@ const staff: RoleMetadata & { localId: number } = {
 const dailyCommuter: RoleMetadata & { localId: number } = {
   localId: 2,
   name: "DAILY COMMUTER",
-  value: "DLY COMMUTER",
+  value: "DAILY COMMUTER",
 }
 
 const weekendCommuter: RoleMetadata & { localId: number } = {
   localId: 3,
   name: "WEEKEND COMMUTER",
-  value: "WKD COMMUTER",
+  value: "WEEKEND COMMUTER",
 }
 
 const visitor: RoleMetadata & { localId: number } = {

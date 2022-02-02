@@ -60,9 +60,6 @@ const TerminalWaitingPage: BlitzPage = () => {
 
   const applicationCards = applications?.map((application, idx) => {
     const { account, createdAt, points, referrals } = application
-    // const {
-    //   data: { timezone },
-    // } = account
     const onClick = () => {
       setSelectedApplication(application)
       setIsApplicantOpen(true)
@@ -72,7 +69,11 @@ const TerminalWaitingPage: BlitzPage = () => {
       user: account,
       points: points * Math.pow(10, 0 - decimals),
       onClick,
-      isEndorsable: !!activeUser?.role || hasBeenAirDroppedTokens,
+      isEndorsable:
+        !!activeUser?.role ||
+        hasBeenAirDroppedTokens ||
+        selectedApplication?.account?.address !== activeUser?.address,
+      // user shouldn't be able to endorse themself^
       referrals,
       dateMetadata: createdAt && {
         createdAt,

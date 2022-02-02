@@ -8,7 +8,6 @@ module.exports = {
       "neon-carrot": "#FF9956",
       "magic-mint": "#63EBAF",
       "electric-violet": "#AD72FF",
-      "electric-violet-20": "#AD7233",
       concrete: "#646464",
       "wet-concrete": "#2E2E2E",
       "torch-red": "#FF5650",
