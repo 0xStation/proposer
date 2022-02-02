@@ -1,6 +1,3 @@
-import { useQuery } from "blitz"
-import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
-
 const InitiativeCard = ({ title, description, contributors, isAcceptingApplications }) => {
   return (
     <div className="border border-concrete p-4 flex flex-col cursor-pointer h-full hover:border-marble-white">

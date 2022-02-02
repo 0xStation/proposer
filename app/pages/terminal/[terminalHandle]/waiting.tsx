@@ -45,7 +45,7 @@ const TerminalWaitingPage: BlitzPage = () => {
 
   useEffect(() => {
     if (selectedInitiativeLocalId) {
-      const getApplicationsFromInitiative = async () => {
+      ;(async () => {
         let applications = await invoke(getApplicationsByInitiative, {
           referralGraphAddress: TERMINAL.REFERRAL_GRAPH, // todo: dynmically load from local state
           initiativeLocalId: selectedInitiativeLocalId,
@@ -53,8 +53,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           terminalId: terminal?.id,
         })
         setApplications(applications || [])
-      }
-      getApplicationsFromInitiative()
+      })()
     }
   }, [selectedInitiativeLocalId])
 
@@ -72,8 +71,8 @@ const TerminalWaitingPage: BlitzPage = () => {
       isEndorsable:
         !!activeUser?.role ||
         hasBeenAirDroppedTokens ||
+        // user shouldn't be able to endorse themself
         selectedApplication?.account?.address !== activeUser?.address,
-      // user shouldn't be able to endorse themself^
       referrals,
       dateMetadata: createdAt && {
         createdAt,
