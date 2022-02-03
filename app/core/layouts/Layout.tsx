@@ -21,8 +21,8 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
             <div className="text-marble-white text-center">
               <h1 className="text-4xl">Incorrect Network</h1>
               <p className="max-w-lg mt-4">
-                Currently, the Station network only supports Rinkby. Please switch your connection
-                to the Rinkby chain.
+                Currently, the Station network only supports Rinkeby. Please switch your connection
+                to the Rinkeby chain.
               </p>
 
               {switchNetwork && (
@@ -30,7 +30,7 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
                   className="rounded-lg px-2 py-1 mt-4 bg-magic-mint text-tunnel-black"
                   onClick={() => switchNetwork(4)}
                 >
-                  Switch to Rinkby
+                  Switch to Rinkeby
                 </button>
               )}
             </div>
