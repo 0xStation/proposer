@@ -9,16 +9,17 @@ const ApplicationModal = ({
   isOpen,
   setIsOpen,
   initiativeId,
+  setSubmitted,
 }: {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   initiativeId: number
+  setSubmitted: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
-  const router = useRouter()
-  const terminalHandle = useParam("terminalHandle") as string
   const [createApplicationMutation] = useMutation(createApplication, {
     onSuccess: () => {
-      router.push(`/terminal/${terminalHandle}/waiting-room`)
+      setSubmitted(true)
+      setIsOpen(false)
     },
   })
 
