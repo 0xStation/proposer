@@ -16,6 +16,7 @@ import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getRoleByAccountTerminal from "app/role/queries/getRoleByAccountTerminal"
+import { Role } from "app/role/types"
 
 const TerminalWaitingPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -26,6 +27,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
   const activeUser: Account | null = useStore((state) => state.activeUser)
+  const [roleOfActiveUser, setRoleOfActiveUser] = useState<Role | null>()
 
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
@@ -40,14 +42,17 @@ const TerminalWaitingPage: BlitzPage = () => {
     [selectedInitiativeLocalId]
   )
 
-  const [roleData] = useQuery(
-    getRoleByAccountTerminal,
-    {
-      terminalId: terminal?.id || 0,
-      accountId: activeUser?.id as number,
-    },
-    { suspense: false }
-  )
+  useEffect(() => {
+    if (activeUser?.id) {
+      ;(async () => {
+        const role = await invoke(getRoleByAccountTerminal, {
+          terminalId: terminal?.id || 0,
+          accountId: activeUser?.id as number,
+        })
+        setRoleOfActiveUser(role)
+      })()
+    }
+  }, [activeUser?.id])
 
   const [isApplicantOpen, setIsApplicantOpen] = useState(false)
 
@@ -79,7 +84,7 @@ const TerminalWaitingPage: BlitzPage = () => {
       points: points * Math.pow(10, 0 - decimals),
       onClick,
       isEndorsable:
-        !!roleData?.data?.value ||
+        !!roleOfActiveUser?.data?.value ||
         hasBeenAirDroppedTokens ||
         // user shouldn't be able to endorse themself
         selectedApplication?.account?.address !== activeUser?.address,
@@ -111,7 +116,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             isApplicantOpen={isApplicantOpen}
             setIsApplicantOpen={setIsApplicantOpen}
             setIsEndorseModalOpen={setIsEndorseModalOpen}
-            roleOfActiveUser={roleData?.data?.value}
+            roleOfActiveUser={roleOfActiveUser?.data?.value}
           />
         )}
         {selectedInitiativeLocalId && selectedInitiativeLocalId && (
