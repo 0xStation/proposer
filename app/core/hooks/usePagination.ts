@@ -27,7 +27,7 @@ const usePagination = (data: any, page: number, per_page: number): PaginationRes
     results,
     totalResults,
     hasPrev: page > 0,
-    hasNext: start + end < totalResults,
+    hasNext: start + per_page < totalResults,
     totalPages: Math.ceil(totalResults / per_page),
   }
 }
