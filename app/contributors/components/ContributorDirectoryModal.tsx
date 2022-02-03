@@ -141,7 +141,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                           return (
                             <div
                               key={index}
-                              className="text-xs rounded-lg text-neon-carrot bg-[#302013] py-0.5 px-2 h-[20px]"
+                              className="text-xs rounded-lg text-neon-carrot bg-[#302013] py-0.5 px-2 whitespace-nowrap"
                             >
                               {skill.toUpperCase()}
                             </div>

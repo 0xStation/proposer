@@ -64,10 +64,14 @@ const Navigation = () => {
           button={<Image src={logo} alt="Station logo, the letters station spelled out." />}
           items={[
             { name: "home", href: "/" },
+            { name: "join waitlist", href: "https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6" },
             { name: "newstand", href: "https://station.mirror.xyz/" },
-            { name: "contact the staff", href: "mailto:staff@station.express" },
-            { name: "support", href: "https://6vdcjqzyfj3.typeform.com/to/kTlOjkdT" },
             { name: "twitter", href: "https://twitter.com/0xstation" },
+            { name: "help desk", href: "https://6vdcjqzyfj3.typeform.com/to/kTlOjkdT" },
+            {
+              name: "legal & privacy",
+              href: "https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176",
+            },
           ]}
         />
         <div className="flex items-center border-l border-l-concrete">
