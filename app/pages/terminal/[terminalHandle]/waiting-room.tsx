@@ -84,8 +84,7 @@ const TerminalWaitingPage: BlitzPage = () => {
       points: points * Math.pow(10, 0 - decimals),
       onClick,
       isEndorsable:
-        !!roleOfActiveUser?.data?.value ||
-        hasBeenAirDroppedTokens ||
+        (!!roleOfActiveUser?.data?.value || hasBeenAirDroppedTokens) &&
         // user shouldn't be able to endorse themself
         selectedApplication?.account?.address !== activeUser?.address,
       referrals,
