@@ -84,7 +84,7 @@ const conner: AccountMetadata & AccountSeed = {
   ticketId: 0, // TODO: remove this when subgraph is ready
   pronouns: "he/him",
   skills: ["solidity", "subgraph", "backend"],
-  discordId: "symmtry#0069",
+  discordId: "symmetry#0069",
   verified: true,
   timezone: "-08:00",
   ens: "symmtry.eth",
