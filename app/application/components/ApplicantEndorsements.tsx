@@ -1,7 +1,4 @@
 import { Account } from "app/account/types"
-import { Image } from "blitz"
-import Verified from "/public/check-mark.svg"
-import { truncateString } from "app/core/utils/truncateString"
 import { Tag } from "app/core/components/Tag"
 import ProfileMetadata from "app/core/components/TalentIdentityUnit/ProfileMetadata"
 
@@ -38,7 +35,7 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({
             <ProfileMetadata {...profileMetdataProps} />
           </div>
           <div className="flex flex-col pt-3">
-            {role != "N/A" && <Tag type="role">{role?.toUpperCase()}</Tag>}
+            {role && role !== "N/A" && <Tag type="role">{role?.toUpperCase()}</Tag>}
           </div>
           <div className="flex flex-col ">
             {isEndorsable && (

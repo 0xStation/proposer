@@ -1,5 +1,4 @@
 import Modal from "../../core/components/Modal"
-import Verified from "/public/check-mark.svg"
 import { Image } from "blitz"
 import { Dispatch, SetStateAction } from "react"
 import { Application } from "app/application/types"
@@ -13,7 +12,6 @@ import ApplicantEndorsements from "./ApplicantEndorsements"
 import useStore from "app/core/hooks/useStore"
 import { formatDate } from "app/core/utils/formatDate"
 import { ProfileMetadata } from "app/core/components/TalentIdentityUnit/ProfileMetadata"
-import { RoleTag } from "app/core/components/TalentIdentityUnit/RoleTag"
 import { Tag } from "app/core/components/Tag"
 import { Button } from "app/core/components/Button"
 
@@ -58,8 +56,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   )
 
   const { points = 0 } = application
-  const { data, address } = application?.account || {}
-  const { pfpURL, name, ens, pronouns, verified } = data
+  const { data: accountData, address, role } = application?.account || {}
+  const { pfpURL, name, ens, pronouns, verified, skills, discordId, timezone } = accountData
   const profileMetadataProps = {
     pfpURL,
     name,
@@ -91,19 +89,21 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 <div className="flex flex-col flex-1 text-marble-white">
                   <div className="font-bold">Role</div>
                   <div className="text-base font-normal flex flex-row pt-2">
-                    <RoleTag role={application?.account?.role} />
+                    {role && role !== "N/A" ? <Tag type="role">{role}</Tag> : "N/A"}
                   </div>
                 </div>
                 <div className="flex flex-col flex-1">
                   <div className="font-bold text-marble-white">Skills</div>
-                  <div className="flex flex-row space-x-2 flex-wrap text-neon-carrot">
-                    {application?.account?.data?.skills?.map?.((skill, index) => {
-                      return (
-                        <Tag key={index} type="skill">
-                          {skill}
-                        </Tag>
-                      )
-                    }) || "N/A"}
+                  <div className="flex flex-row space-x-2 flex-wrap text-marble-white">
+                    {(skills?.length &&
+                      skills?.map?.((skill, index) => {
+                        return (
+                          <Tag key={index} type="skill">
+                            {skill}
+                          </Tag>
+                        )
+                      })) ||
+                      "N/A"}
                   </div>
                 </div>
               </div>
@@ -117,7 +117,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                       <Image src={DiscordIcon} alt="Discord icon" width={16} height={13} />
                     </div>
                     <div className="text-base font-normal">
-                      <span>{application?.account?.data?.discordId}</span>
+                      <span>{discordId}</span>
                     </div>
                   </div>
                 </div>
@@ -126,12 +126,12 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     <span>Timezone</span>
                   </div>
                   <div className="text-base font-normal text-marble-white">
-                    <span>{application?.account?.data?.timezone || "N/A"}</span>
+                    <span>{timezone || "N/A"}</span>
                   </div>
                 </div>
               </div>
             </div>
-            <hr className="border-[.5] border-solid border-concrete w-3/2 mx-[-1.5rem] my-5" />
+            <hr className="border-[.5] border-solid border-concrete mx-[-2rem] my-5" />
             <div
               id="why questions"
               className="flex-auto flex flex-col text-marble-white space-y-2 mt-2"
@@ -163,7 +163,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                       <span>Points</span>
                     </div>
                     <div className="text-base font-normal text-marble-white">
-                      {`${points * Math.pow(10, 0 - decimals)} RAIL`}
+                      {`${points * Math.pow(10, 0 - decimals)} RAILⓅ`}
                     </div>
                   </div>
                 )}

@@ -5,6 +5,7 @@ import Card from "./Card"
 import ProfileMetadata from "./ProfileMetadata"
 import Tag from "../Tag"
 import { formatDate } from "../../utils/formatDate"
+import useStore from "app/core/hooks/useStore"
 
 type TalentIdentityUnitProps = {
   user: Account
@@ -26,6 +27,8 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
     dateMetadata: dateMetadataProp = {},
     waitingRoom,
   } = props
+
+  const activeUser: Account | null = useStore((state) => state.activeUser)
 
   const {
     address,
@@ -129,12 +132,16 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
           <div className="place-self-center mt-1 font-bold">Role</div>
         </div>
         <div className="flex flex-1 align-right place-content-end content-right text-base">
-          {role ? <Tag type={"role"}>{role}</Tag> : <p className="text-marble-white">N/A</p>}
+          {role && role !== "N/A" ? (
+            <Tag type={"role"}>{role}</Tag>
+          ) : (
+            <p className="text-marble-white">N/A</p>
+          )}
         </div>
       </div>
       {referralPfps}
-      {isEndorsable && railPoints}
-      {isEndorsable && ctaButton}
+      {activeUser && isEndorsable && railPoints}
+      {activeUser && isEndorsable && ctaButton}
       {dateMetadata}
     </Card>
   )

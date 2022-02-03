@@ -1,6 +1,12 @@
-export const Tag = ({ children, type }) => {
+type TagProps = {
+  children: string
+  type: string
+}
+export const Tag = ({ children, type }: TagProps) => {
   const colorMap = {
     skill: {
+      // note: I wasn't able to use template syntax w/ just the color -
+      // opacity scale has to be included.
       bg: "bg-neon-carrot/30",
       text: "neon-carrot",
     },
