@@ -57,6 +57,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     <p className="text-xs text-concrete font-normal">SUBMITTED ON ...</p>
   )
 
+  const skills = ["figma", "pasta-making", "surfing", "jamming", "javascript"]
+
   const { points = 0 } = application
   const { data, address } = application?.account || {}
   const { pfpURL, name, ens, pronouns, verified } = data
@@ -90,22 +92,20 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               <div className="flex flex-row flex-auto">
                 <div className="flex flex-col flex-1 text-marble-white">
                   <div className="font-bold">Role</div>
-                  <div className="text-base font-normal flex flex-row">
+                  <div className="text-base font-normal flex flex-row pt-2">
                     <RoleTag role={application?.account?.role} />
                   </div>
                 </div>
                 <div className="flex flex-col flex-1">
                   <div className="font-bold text-marble-white">Skills</div>
-                  <div className="text-base font-normal text-neon-carrot">
-                    <div className="flex flex-row space-x-2 flex-wrap text-neon-carrot">
-                      {application?.account.data?.skills?.map?.((skill, index) => {
-                        return (
-                          <Tag key={index} type="skill">
-                            {skill}
-                          </Tag>
-                        )
-                      }) || "N/A"}
-                    </div>
+                  <div className="flex flex-row space-x-2 flex-wrap text-neon-carrot">
+                    {skills?.map?.((skill, index) => {
+                      return (
+                        <Tag key={index} type="skill">
+                          {skill}
+                        </Tag>
+                      )
+                    }) || "N/A"}
                   </div>
                 </div>
               </div>
@@ -134,10 +134,11 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               </div>
             </div>
             <hr className="border-[.5] border-solid border-concrete w-3/2 mx-[-1.5rem] my-5" />
-            <div id="why questions" className="flex-auto flex flex-col text-marble-white space-y-2">
-              <div className="font-bold">
-                <span>Why {initiative?.data?.name}?</span>
-              </div>
+            <div
+              id="why questions"
+              className="flex-auto flex flex-col text-marble-white space-y-2 mt-2"
+            >
+              <div className="font-bold">Why {initiative?.data?.name}?</div>
               <div>
                 <p className="text-marble-white font-normal text-base">
                   {application?.data?.entryDescription || "N/A"}
