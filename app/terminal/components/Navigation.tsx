@@ -54,7 +54,7 @@ const Navigation = ({ children }: { children?: any }) => {
               </div>
               <div className="flex flex-col">
                 <h1 className="text-2xl text-marble-white">{terminal.data.name}</h1>
-                <span className="text-base text-concrete">@{terminal.data.handle}</span>
+                <span className="text-base text-concrete">@{terminal.handle}</span>
               </div>
             </div>
             <h3 className="text-marble-white text-base mt-6">{terminal.data.description}</h3>
