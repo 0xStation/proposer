@@ -102,9 +102,12 @@ const EndorseModal = ({
   }
 
   const ViewExplorer = explorerLink && (
-    <a href={explorerLink} target="_blank" className="text-magic-mint" rel="noreferrer">
-      Explorer
-    </a>
+    <>
+      <a href={explorerLink} target="_blank" className="text-magic-mint" rel="noreferrer">
+        Explorer
+      </a>
+      .
+    </>
   )
 
   const handleEndorseClick = async () => {
@@ -189,7 +192,7 @@ const EndorseModal = ({
       setEndorsementMessage(
         `You're giving ${contributor?.data?.name} ${endorsementBudgetPercentage.toFixed(
           2
-        )}% of your balance`
+        )}% of your balance.`
       )
     }
   }, [tokenBalance, endorsementBudgetPercentage])
@@ -197,7 +200,7 @@ const EndorseModal = ({
   useEffect(() => {
     if (allowanceApprovalLoading || endorseLoading) {
       setError(false)
-      setEndorsementMessage("Please check your wallet to complete the endorsement")
+      setEndorsementMessage("Please check your wallet to complete the endorsement.")
     }
   }, [allowanceApprovalLoading, endorseLoading])
 
