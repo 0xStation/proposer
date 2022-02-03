@@ -9,6 +9,7 @@ import { useDropzone } from "react-dropzone"
 import CreatableSelect from "react-select/creatable"
 
 interface ApplicationParams {
+  name: string
   discordId: string
   pronouns: string
   timezone: string
