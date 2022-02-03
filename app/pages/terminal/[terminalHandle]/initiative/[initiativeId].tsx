@@ -67,10 +67,7 @@ const Project: BlitzPage = () => {
   )
 
   const contributorCards = initiative?.contributors?.map((contributor, idx) => {
-    const { id, points, joinedAt } = contributor
-    const {
-      data: { timezone },
-    } = contributor
+    const { points, joinedAt } = contributor
     let onClick
 
     onClick = () => {
@@ -314,8 +311,8 @@ const Project: BlitzPage = () => {
                         <span className="font-bold">Gather endorsements</span>
                         <div>
                           <span className="text-base">
-                            Trust us, endorsements from contributors help. Reach out to get to know
-                            them.
+                            Reach out to contributors to get to know them and see how you can help.
+                            Trust us, endorsements from contributors help.
                           </span>
                         </div>
                       </div>
@@ -328,8 +325,7 @@ const Project: BlitzPage = () => {
                         <span className="font-bold">Start contributing</span>
                         <div>
                           <span className="text-base">
-                            If selected, a team member will reach out to partner with you to amplify
-                            your unique perspective.
+                            If selected, a team member will reach out to officially onboard you.
                           </span>
                         </div>
                       </div>
