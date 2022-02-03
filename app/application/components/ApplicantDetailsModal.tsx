@@ -24,6 +24,7 @@ type ApplicantDetailsModalProps = {
   roleOfActiveUser?: string
 }
 
+const hasBeenAirDroppedTokens = false
 const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   application,
   initiative,
@@ -35,7 +36,10 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
   const activeUser: Account | null = useStore((state) => state.activeUser)
 
-  const isEndorsable = roleOfActiveUser && activeUser?.address !== application?.account?.address
+  const isEndorsable =
+    activeUser &&
+    (roleOfActiveUser || hasBeenAirDroppedTokens) &&
+    activeUser?.address !== application?.account?.address
 
   const CloseButton = ({ onClick }) => (
     <div className="flex flex-1 justify-start absolute top-1 left-2">
