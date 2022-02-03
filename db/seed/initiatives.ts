@@ -7,8 +7,6 @@ const contributorReviewMetadata: InitiativeMetadata & { localId: number } = {
   localId: 1,
   name: "Contributor Review",
   oneLiner: "Peer-to-peer recognition that publicizes your proof of contribution.",
-  description:
-    "Station's contributor review is the cornerstone of Station's reputation system, enabling contributors to recognize one another's work.",
   shortName: "CONTRIBUTOR REVIEW",
   isAcceptingApplications: false,
   contributeText: [
@@ -18,7 +16,8 @@ const contributorReviewMetadata: InitiativeMetadata & { localId: number } = {
   skills: ["Solidity"],
   commitment: "Full-time, Part-time",
   bannerURL: "/contributor-review-banner.png",
-  links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/protocol-v1" }],
+  links: [],
+  // links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/protocol" }],
   // members: [
   //   contributors.conner.address,
   //   contributors.calvin.address,
@@ -29,9 +28,9 @@ const contributorReviewMetadata: InitiativeMetadata & { localId: number } = {
 const waitingRoomMetadata: InitiativeMetadata & { localId: number } = {
   localId: 2,
   name: "Waiting Room",
-  description: "Making hiring more transparent and participatory.",
   shortName: "WAITING ROOM",
-  oneLiner: "Making hiring more transparent and participatory.",
+  oneLiner:
+    "Product to empower organizations with decentralized hiring and Station's first launch.",
   contributeText: [
     "The traditional hiring process as we know it no longer aligns well the increasingly permissionless and digitally-native work, where community-driven proof-of-work matters more than institutional affiliations and overly-theoretical credentials.",
     "Waiting Room enables community members to endorse anyone who expresses their interests in joining an initiative of a community. With some proof-of-work and value, contributors can signal their desire to work. Rather than a top-down recruiting process, the community, based on their roles and commitment, can collectively signal whether to “promote” the contributor and sometimes invite them to be a part of the core team. By making hiring influence more contribution-driven and participatory, we hope to help organizations grow more healthily and make access to opportunities more meritocratic.",
@@ -41,7 +40,8 @@ const waitingRoomMetadata: InitiativeMetadata & { localId: number } = {
   commitment: "Full-time, Part-time",
   isAcceptingApplications: false,
   bannerURL: "/waiting-room-banner.png",
-  links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/web" }],
+  links: [],
+  // links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/web" }],
   // members: [
   //   contributors.mind.address,
   //   contributors.kristen.address,
@@ -55,11 +55,9 @@ const waitingRoomMetadata: InitiativeMetadata & { localId: number } = {
 const newstandMetadata: InitiativeMetadata & { localId: number } = {
   localId: 3,
   name: "Newstand",
-  description:
-    "Station Network’s publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity.",
   shortName: "NEWSTAND",
   oneLiner:
-    "Newstand is Station Network’s publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity.",
+    "Publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity.",
   isAcceptingApplications: true,
   contributeText: [
     "Working on the Internet is hardly something new. While crypto unlocks new primitives for work to be done on the Internet, the exuberant optimism obfuscates the day-to-day conditions, operating details, and human stories behind each contributor.",
@@ -79,7 +77,6 @@ const partnershipMetadata: InitiativeMetadata & { localId: number } = {
   localId: 4,
   name: "Terminal Partnerships",
   oneLiner: "Inviting the best DAOs to mobilize contributors on Station.",
-  description: "Forming GTM plans to onboard our Beta Terminal partners.",
   shortName: "PARTNERSHIP",
   isAcceptingApplications: false,
   contributeText: [
@@ -103,10 +100,7 @@ const partnershipMetadata: InitiativeMetadata & { localId: number } = {
 const networkSustainability: InitiativeMetadata & { localId: number } = {
   localId: 5,
   name: "Network Sustainability",
-  oneLiner:
-    "Network Sustainability is an initiative focused on designing a sustainable economic engine for the Station Network.",
-  description:
-    "Network Sustainability is an initiative focused on designing a sustainable economic engine for the Station Network.",
+  oneLiner: "Designing a sustainable economic engine for the Station Network.",
   contributeText: [
     "Station looks to become a decentralized contributor network and marketplace. How can we incentivize all participants to become curators and nurturers of the network? How does value accrue to our network, our protocols, and our products? These are the fundamental questions that the Network Sustainability group aims to solve.",
     "The Station Network will be governed by the RAIL token. The token will power a sustainable RAIL network with aligned incentives and ensure fair distribution to all its participants based on their contribution to the network — be it labor or capital.",
@@ -123,18 +117,15 @@ const networkSustainability: InitiativeMetadata & { localId: number } = {
   ],
   commitment: "One-time, Part-time",
   isAcceptingApplications: false,
-  links: [],
   bannerURL: "/network-sustainability-banner.png",
+  links: [],
   // members: [contributors.calvin.address, contributors.nick.address, contributors.tina.address],
 }
 
 const contributorExperience: InitiativeMetadata & { localId: number } = {
   localId: 6,
-  name: "Contributor Experience",
-  oneLiner:
-    "Contributor Experience is an initiative to make new contributors feel welcomed, existing contributors feel recognized and belonged, and graduated contributors feel proud that they’ve been part of the ride.",
-  description:
-    "Contributor Experience is an initiative to make new contributors feel welcomed, existing contributors feel recognized and belonged, and graduated contributors feel proud that they’ve been part of the ride.",
+  name: "Community",
+  oneLiner: "Welcoming new contributors and fostering a culture of intellectual thoughtfullness.",
   shortName: "CONTRIBUTOR EXPERIENCE",
   contributeText: [
     "From the first touch point with the Station community to the day they eventually depart, we want to push ourselves to refine every step of the journey to delight, inform, inspire, and amplify.",
@@ -152,10 +143,7 @@ const contributorExperience: InitiativeMetadata & { localId: number } = {
 const midnightStation: InitiativeMetadata & { localId: number } = {
   localId: 7,
   name: "Midnight Station",
-  oneLiner:
-    "A creatively-unbounded cultural initiative, currently serving as a radio show that features Station’s contributors.",
-  description:
-    "A creatively-unbounded cultural initiative, currently serving as a radio show that features Station’s contributors.",
+  oneLiner: "Radio show highlighting Station punks and passengers.",
   shortName: "MIDNIGHT STATION",
   contributeText: [
     "When Station’s contributors get together irl, the gaps in-between web3 are filled with energetic heart-to-hearts and stories of inspiration and resolution. While these conversations aren’t directly tied to the metaverse, they’ve fueled a refreshing take on what Station can provide for its community.",
@@ -178,8 +166,7 @@ const midnightStation: InitiativeMetadata & { localId: number } = {
 const brandIdentity: InitiativeMetadata & { localId: number } = {
   localId: 8,
   name: "Brand Identity",
-  oneLiner: "Architecting the visual system of Station",
-  description: "Architecting the visual system of Station",
+  oneLiner: "Architecting the visual system of Station.",
   shortName: "BRAND IDENTITY",
   contributeText: [
     "Station” as a concept was born on a morning subway ride, surrounded by commuters heading uptown to their respective workplaces. It embodies not only how we’re transporting talent to the future of work that’s more participatory and permissionless, but also the freedom and mobility that the very future will unlock.",
@@ -197,9 +184,7 @@ const stationDigest: InitiativeMetadata & { localId: number } = {
   localId: 9,
   name: "Station Digest",
   oneLiner:
-    "Sharing updates, celebrating contributors, surfacing interesting and thoughtful discussions from different corners of Station.",
-  description:
-    "Sharing updates, celebrating contributors, surfacing interesting and thoughtful discussions from different corners of Station.",
+    "Surfacing impactful contributions and thoughtful discussions from different corners of Station.",
   shortName: "STATION DIGEST",
   contributeText: [
     "We know that commuters, visitors, and staff at Station have busy lives. In the hustle and bustle of daily work in web3, filtering through Discord channels and attempting to follow different projects or conversations can appear impossible.",
