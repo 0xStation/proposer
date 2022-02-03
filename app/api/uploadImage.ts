@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import formidable from "formidable-serverless"
 import fs from "fs"
 import aws from "aws-sdk"
+import { v4 as uuidv4 } from "uuid"
 
 // excuse my language here but WTF this is the dumbest thing ever lol
 // I spent like an hour trying to figure out what was going wrong
@@ -22,18 +23,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   })
 
   const form = new formidable.IncomingForm()
+  let pathnameUUID = uuidv4()
 
   form.parse(req, async (err, _fields, files) => {
     if (err) {
       console.log(err)
       return res.status(500)
     }
-    // we should make sure all of the filenames are unique
     const file = fs.readFileSync(files.file.path)
     s3.upload({
       Bucket: "station-images",
       ACL: "public-read",
-      Key: files.file.name,
+      Key: pathnameUUID,
       Body: file,
       ContentType: files.file.type,
     }).send((err, data) => {
