@@ -30,8 +30,6 @@ const Project: BlitzPage = () => {
   const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
   const [selectedContributorToView, setSelectedContributorToView] = useState<Account | null>(null)
 
-  console.log(activeUser)
-
   const setActiveModal = () => {
     address
       ? activeUser
