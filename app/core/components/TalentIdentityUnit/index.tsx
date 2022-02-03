@@ -39,7 +39,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
         <div className="place-self-center mt-1 font-bold">Points</div>
       </div>
       <div className="flex flex-1 align-right place-content-end content-right text-base">
-        {points} RAIL
+        {points} RAILⓅ
       </div>
     </div>
   )

@@ -16,7 +16,8 @@ const contributorReviewMetadata: InitiativeMetadata & { localId: number } = {
   skills: ["Solidity"],
   commitment: "Full-time, Part-time",
   bannerURL: "/contributor-review-banner.png",
-  links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/protocol-v1" }],
+  links: [],
+  // links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/protocol" }],
   // members: [
   //   contributors.conner.address,
   //   contributors.calvin.address,
@@ -39,7 +40,8 @@ const waitingRoomMetadata: InitiativeMetadata & { localId: number } = {
   commitment: "Full-time, Part-time",
   isAcceptingApplications: false,
   bannerURL: "/waiting-room-banner.png",
-  links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/web" }],
+  links: [],
+  // links: [{ symbol: Symbol.GITHUB, url: "https://github.com/0xStation/web" }],
   // members: [
   //   contributors.mind.address,
   //   contributors.kristen.address,
@@ -115,8 +117,8 @@ const networkSustainability: InitiativeMetadata & { localId: number } = {
   ],
   commitment: "One-time, Part-time",
   isAcceptingApplications: false,
-  links: [],
   bannerURL: "/network-sustainability-banner.png",
+  links: [],
   // members: [contributors.calvin.address, contributors.nick.address, contributors.tina.address],
 }
 

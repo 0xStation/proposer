@@ -286,65 +286,71 @@ const Project: BlitzPage = () => {
               </div>
             </div>
 
-            <div className="flex-auto flex flex-col text-marble-white space-y-5">
-              <div>
-                <span className="text-2xl">What&apos;s next?</span>
-              </div>
-              <div className="flex grid md:grid-cols-3 gap-3">
-                <div className="flex-1 space-y-4">
+            {initiative?.data.isAcceptingApplications ? (
+              <>
+                <div className="flex-auto flex flex-col text-marble-white space-y-5">
                   <div>
-                    <Image src={StepOne} alt="Step one." width={24} height={24} />
+                    <span className="text-2xl">What&apos;s next?</span>
                   </div>
-                  <div className="flex-1 space-y-2">
-                    <span className="font-bold">Submit interest</span>
-                    <div>
-                      <span className="text-base">
-                        Share a little bit about yourself, your best work, and your pitch.
-                      </span>
+                  <div className="flex grid md:grid-cols-3 gap-3">
+                    <div className="flex-1 space-y-4">
+                      <div>
+                        <Image src={StepOne} alt="Step one." width={24} height={24} />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <span className="font-bold">Submit interest</span>
+                        <div>
+                          <span className="text-base">
+                            Share a little bit about yourself, your best work, and your pitch.
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex-1 space-y-4">
+                      <div>
+                        <Image src={StepTwo} alt="Step two." width={24} height={24} />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <span className="font-bold">Gather endorsements</span>
+                        <div>
+                          <span className="text-base">
+                            Trust us, endorsements from contributors help. Reach out to get to know
+                            them.
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex-1 space-y-4">
+                      <div>
+                        <Image src={StepThree} alt="Step three." width={24} height={24} />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <span className="font-bold">Start contributing</span>
+                        <div>
+                          <span className="text-base">
+                            If selected, a team member will reach out to partner with you to amplify
+                            your unique perspective.
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="flex-1 space-y-4">
-                  <div>
-                    <Image src={StepTwo} alt="Step two." width={24} height={24} />
-                  </div>
-                  <div className="flex-1 space-y-2">
-                    <span className="font-bold">Gather endorsements</span>
-                    <div>
-                      <span className="text-base">
-                        Trust us, endorsements from contributors help. Reach out to get to know
-                        them.
-                      </span>
-                    </div>
-                  </div>
+                <div className="flex-auto flex justify-center mt-10 sticky bottom-0 bg-tunnel-black">
+                  <button
+                    className="m-2 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
+                    onClick={() => {
+                      setUserTrigged(true)
+                      setActiveModal()
+                    }}
+                  >
+                    Submit Interest
+                  </button>
                 </div>
-                <div className="flex-1 space-y-4">
-                  <div>
-                    <Image src={StepThree} alt="Step three." width={24} height={24} />
-                  </div>
-                  <div className="flex-1 space-y-2">
-                    <span className="font-bold">Start contributing</span>
-                    <div>
-                      <span className="text-base">
-                        If selected, a team member will reach out to partner with you to amplify
-                        your unique perspective.
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="flex-auto flex justify-center mt-10 sticky bottom-0 bg-tunnel-black">
-              <button
-                className="m-2 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
-                onClick={() => {
-                  setUserTrigged(true)
-                  setActiveModal()
-                }}
-              >
-                Submit Interest
-              </button>
-            </div>
+              </>
+            ) : (
+              <div className="h-[100px]"></div>
+            )}
           </div>
         </div>
       </main>
