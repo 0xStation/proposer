@@ -98,7 +98,7 @@ const Navigation = ({ children }: { children?: any }) => {
             <div className="mt-12">{children}</div>
           </div>
         </div>
-        <TicketWrapper activeUser={activeUser} tokenBalance={tokenBalance} />
+        {activeUser && <TicketWrapper activeUser={activeUser} tokenBalance={tokenBalance} />}
       </div>
     </div>
   )

@@ -40,7 +40,7 @@ const mind: AccountMetadata & AccountSeed = {
   skills: ["design", "product strategy", "creative direction"],
   discordId: "paprika#0027",
   verified: true,
-  timezone: "EST",
+  timezone: "-05:00",
   ens: "spicypaprika.eth",
   twitterURL: "https://twitter.com/mindapi_",
   pfpURL:
@@ -62,7 +62,7 @@ const tina: AccountMetadata & AccountSeed = {
   skills: ["partnerships", "tokenomics", "product strategy", "hiring"],
   discordId: "fakepixels#6258",
   verified: true,
-  timezone: "EST",
+  timezone: "-05:00",
   ens: "fkpixels.eth",
   twitterURL: "https://twitter.com/fkpxls",
   pfpURL:
@@ -86,7 +86,7 @@ const conner: AccountMetadata & AccountSeed = {
   skills: ["solidity", "subgraph", "backend"],
   discordId: "symmtry#0069",
   verified: true,
-  timezone: "EST",
+  timezone: "-08:00",
   ens: "symmtry.eth",
   twitterURL: "https://twitter.com/symmtry69",
   pfpURL:
@@ -104,7 +104,7 @@ const calvin: AccountMetadata & AccountSeed = {
   skills: ["tokenomics", "partnerships"],
   discordId: "cc2#2803",
   verified: true,
-  timezone: "EST",
+  timezone: "-05:00",
   // ens: "",
   twitterURL: "https://twitter.com/cchengasaurus",
   pfpURL:
@@ -122,7 +122,7 @@ const kristen: AccountMetadata & AccountSeed = {
   skills: ["frontend", "product strategy"],
   discordId: "rie#9502",
   verified: true,
-  timezone: "EST",
+  timezone: "-08:00",
   ens: "rielity.eth",
   twitterURL: "https://twitter.com/0xRie_",
   pfpURL:
@@ -144,7 +144,7 @@ const brendan: AccountMetadata & AccountSeed = {
   skills: ["design"],
   discordId: "brendo#9038",
   verified: true,
-  timezone: "EST",
+  timezone: "-05:00",
   ens: "brendo.eth",
   twitterURL: "https://twitter.com/brendanelliot_",
   pfpURL:
@@ -162,7 +162,7 @@ const michael: AccountMetadata & AccountSeed = {
   skills: ["frontend", "backend"],
   discordId: "frog#3881",
   verified: true,
-  timezone: "EST",
+  timezone: "-07:00",
   ens: "0xmcg.eth",
   twitterURL: "https://twitter.com/0xmcg",
   pfpURL:
@@ -180,7 +180,7 @@ const abe: AccountMetadata & AccountSeed = {
   skills: ["frontend", "product strategy"],
   discordId: "cryptoabe#3656",
   verified: true,
-  timezone: "EST",
+  timezone: "-05:00",
   // ens: "",
   twitterURL: "https://twitter.com/abenazer_mekete",
   pfpURL:
@@ -198,7 +198,7 @@ const nick: AccountMetadata & AccountSeed = {
   skills: ["solidity", "product strategy"],
   discordId: "zy2#2240",
   verified: true,
-  timezone: "EST",
+  timezone: "-05:00",
   ens: "zy22yz.eth",
   twitterURL: "https://twitter.com/zy22yz",
   pfpURL:
@@ -216,7 +216,7 @@ const alli: AccountMetadata & AccountSeed = {
   skills: ["writing", "marketing", "project management", "product strategy"],
   discordId: "alli#3226",
   verified: true,
-  timezone: "EST",
+  timezone: "-05:00",
   ens: "sonofalli.eth",
   twitterURL: "https://twitter.com/sonofalli",
   pfpURL:
@@ -234,7 +234,7 @@ const kassen: AccountMetadata & AccountSeed = {
   skills: ["partnerships", "product strategy", "project management", "content writing"],
   discordId: "kass#7081",
   verified: true,
-  timezone: "EST",
+  timezone: "-05:00",
   ens: "kassen.eth",
   twitterURL: "https://twitter.com/kassenq",
   pfpURL:
@@ -252,7 +252,7 @@ const alex: AccountMetadata & AccountSeed = {
   skills: ["content writing", "knowledge management", "project management"],
   discordId: "ahs#6679",
   verified: true,
-  timezone: "EST",
+  timezone: "-05:00",
   // ens: "",
   twitterURL: "https://twitter.com/alexhughsam",
   pfpURL:
@@ -270,7 +270,7 @@ const akshay: AccountMetadata & AccountSeed = {
   skills: ["solidity", "data science", "product strategy"],
   discordId: "wagmiking#0978",
   verified: true,
-  timezone: "EST",
+  timezone: "-05:00",
   // ens: "",
   twitterURL: "https://twitter.com/wagmiking",
   pfpURL:

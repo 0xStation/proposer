@@ -24,7 +24,7 @@ const Home: BlitzPage = () => {
           className="mt-4 w-full py-2 text-center text-base bg-magic-mint rounded"
           onClick={() => redirectToTerminal()}
         >
-          Enter Station
+          Start Exploring
         </button>
       </div>
     </div>
