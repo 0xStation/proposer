@@ -62,9 +62,7 @@ const TerminalContributorsPage: BlitzPage = () => {
     return <ContributorCard key={idx} {...contributorCardProps} />
   })
 
-  const contributorDirectoryView = !selectedContributors ? (
-    <span className="text-marble-white">This terminal does not have any contributors yet.</span>
-  ) : (
+  const contributorDirectoryView = roles ? (
     <>
       {selectedContributorToView && (
         <ContributorDirectoryModal
@@ -76,7 +74,7 @@ const TerminalContributorsPage: BlitzPage = () => {
       )}
       <div className="flex flex-col space-y-10">
         <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm space-y-3">
-          {roles?.map((role, index) => {
+          {roles.map((role, index) => {
             return (
               <Pill
                 key={index.toString()}
@@ -103,6 +101,8 @@ const TerminalContributorsPage: BlitzPage = () => {
         )}
       </div>
     </>
+  ) : (
+    <span className="text-marble-white">This terminal does not have any contributors yet.</span>
   )
 
   return <TerminalNavigation>{contributorDirectoryView}</TerminalNavigation>
