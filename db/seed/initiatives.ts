@@ -169,8 +169,8 @@ const brandIdentity: InitiativeMetadata & { localId: number } = {
   oneLiner: "Architecting the visual system of Station.",
   shortName: "BRAND IDENTITY",
   contributeText: [
-    "Station” as a concept was born on a morning subway ride, surrounded by commuters heading uptown to their respective workplaces. It embodies not only how we’re transporting talent to the future of work that’s more participatory and permissionless, but also the freedom and mobility that the very future will unlock.",
-    "From Shibuya station floorplan and NYC subway system to Neon Genesis Evangelion and David Bowie’s Station to Station, we draw inspirations from all sorts of mediums and experiences and weave them into a coherent theme of “retro-futuristic.",
+    "Station as a concept was born on a morning subway ride, surrounded by commuters heading uptown to their respective workplaces. It embodies not only how we’re transporting talent to the future of work that’s more participatory and permissionless, but also the freedom and mobility that the very future will unlock.",
+    'From Shibuya station floorplan and NYC subway system to Neon Genesis Evangelion and David Bowie’s Station to Station, we draw inspirations from all sorts of mediums and experiences and weave them into a coherent theme of "retro-futuristic."',
   ],
   rewardText: ["Project-based in USDC", "Station Commuter Ticket NFT"],
   skills: ["Graphic Design", "Creative Direction", "Animation", "Illustration"],
