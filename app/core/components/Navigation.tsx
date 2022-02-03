@@ -9,19 +9,15 @@ import { useAccount } from "wagmi"
 import truncateString from "../utils/truncateString"
 import { LOCAL_STORAGE } from "../utils/constants"
 
-interface Wallet {
-  address: string
-}
-
 /**
  * Navigation Component
  */
 const Navigation = () => {
   // a list of the modals that are active on the screen
-  const [wallet, setWallet] = useState<Wallet | null>()
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
   })
+
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const setActiveUser = useStore((state) => state.setActiveUser)
   const activeUser = useStore((state) => state.activeUser)
@@ -37,7 +33,6 @@ const Navigation = () => {
       setActiveUser(user)
     } else {
       setTimeout(() => {
-        setWallet({ address: address })
         toggleAccountModal(true)
       }, 500)
     }
@@ -48,7 +43,6 @@ const Navigation = () => {
       setTimeout(() => getUserAccount(address), 500)
     } else {
       setActiveUser(null)
-      setWallet(null)
     }
   }, [address])
 
