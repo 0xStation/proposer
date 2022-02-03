@@ -5,13 +5,13 @@ export async function seedSkills() {
     "backend",
     "content writing",
     "creative direction",
-    "data science",
+    "data",
     "design",
     "frontend",
     "hiring",
-    "javascript",
     "knowledge management",
     "marketing",
+    "math",
     "partnership",
     "product strategy",
     "project management",
@@ -26,9 +26,9 @@ export async function seedSkills() {
 
   for (const s in skills) {
     db.skill.upsert({
-      where: { name: s },
-      create: { name: s },
-      update: { name: s },
+      where: { name: s.toLowerCase() },
+      create: { name: s.toLowerCase() },
+      update: { name: s.toLowerCase() },
     })
   }
 }

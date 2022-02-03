@@ -35,10 +35,10 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
           skill: {
             connectOrCreate: {
               where: {
-                name: skill.value,
+                name: skill.value.toLowerCase(),
               },
               create: {
-                name: skill.value,
+                name: skill.value.toLowerCase(),
               },
             },
           },
