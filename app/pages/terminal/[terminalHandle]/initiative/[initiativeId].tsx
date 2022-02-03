@@ -341,16 +341,16 @@ const Project: BlitzPage = () => {
                   </div>
                 </div>
                 <div className="flex-auto flex justify-center mt-10 sticky bottom-0 bg-tunnel-black">
-              <button
-                className="m-2 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
-                onClick={() => {
-                  setUserTrigged(true)
-                  setActiveModal()
-                }}
-              >
-                Submit Interest
-              </button>
-            </div>
+                  <button
+                    className="m-2 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
+                    onClick={() => {
+                      setUserTrigged(true)
+                      setActiveModal()
+                    }}
+                  >
+                    Submit Interest
+                  </button>
+                </div>
               </>
             ) : (
               <div className="h-[100px]"></div>
