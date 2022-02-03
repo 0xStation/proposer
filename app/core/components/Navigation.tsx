@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { Image, invoke } from "blitz"
 import Dropdown from "../components/Dropdown"
 import Map from "../components/Map"
