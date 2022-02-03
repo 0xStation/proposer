@@ -8,7 +8,6 @@ export type AccountMetadata = {
   githubURL?: string
   twitterURL?: string
   ticketImage?: string
-  skills: string[]
   pronouns?: string
   discordId: string
   timezone: string
@@ -23,4 +22,5 @@ export type Account = {
   role?: string
   points?: number
   joinedAt?: Date
+  skills: string[]
 }

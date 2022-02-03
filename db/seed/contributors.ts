@@ -8,6 +8,7 @@ interface AccountSeed {
   active: boolean
   joinedAt: Date
   initiatives: number[]
+  skills: string[]
 }
 
 const initiaitveIds = {

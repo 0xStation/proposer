@@ -119,6 +119,11 @@ export default async function getApplicationsByInitiative(
               role: true,
             },
           },
+          skills: {
+            include: {
+              skill: true,
+            },
+          },
         },
       },
     },
@@ -132,6 +137,7 @@ export default async function getApplicationsByInitiative(
         account: {
           ...a.account,
           role: (a.account.tickets[0]?.role as Role)?.data.value || "N/A",
+          skills: a.account.skills.map(({ skill }) => skill.name),
         },
         createdAt: a.createdAt,
         data: a.data as ApplicationMetadata,

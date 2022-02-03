@@ -27,6 +27,11 @@ export default async function getInitiativeByLocalId(
                   role: true,
                 },
               },
+              skills: {
+                include: {
+                  skill: true,
+                },
+              },
             },
           },
         },
@@ -48,6 +53,7 @@ export default async function getInitiativeByLocalId(
         return {
           ...a.account,
           role: (a.account.tickets[0]?.role as Role)?.data.value,
+          skills: a.account.skills.map(({ skill }) => skill.name),
         }
       }),
   } as Initiative
