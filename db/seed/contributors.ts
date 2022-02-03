@@ -8,6 +8,7 @@ interface AccountSeed {
   active: boolean
   joinedAt: Date
   initiatives: number[]
+  skills: string[]
 }
 
 const initiaitveIds = {
@@ -315,12 +316,12 @@ export async function seedContributors(terminals) {
       where: {
         accountId_terminalId: {
           accountId: account.id,
-          terminalId: terminals.station.id,
+          terminalId: terminals.StationLabs.id,
         },
       },
       create: {
         accountId: account.id,
-        terminalId: terminals.station.id,
+        terminalId: terminals.StationLabs.id,
         roleLocalId: contributorData.role,
         joinedAt: contributorData.joinedAt,
         active: contributorData.active,
@@ -338,9 +339,9 @@ export async function seedContributors(terminals) {
       const localId = contributorData.initiatives[name] as number
       const initiative = await db.initiative.findUnique({
         where: {
-          terminalInitiative: {
+          terminalId_localId: {
+            terminalId: terminals.StationLabs.id,
             localId,
-            terminalTicket: terminals.station.ticketAddress,
           },
         },
       })
@@ -383,20 +384,20 @@ export async function seedContributors(terminals) {
         },
       })
 
-      await db.skillsOnAccounts.upsert({
+      await db.accountSkill.upsert({
         where: {
-          skillId_accountId: {
-            skillId: skill.id,
+          accountId_skillId: {
             accountId: account.id,
+            skillId: skill.id,
           },
         },
         create: {
-          skillId: skill.id,
           accountId: account.id,
+          skillId: skill.id,
         },
         update: {
-          skillId: skill.id,
           accountId: account.id,
+          skillId: skill.id,
         },
       })
 

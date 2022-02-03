@@ -88,6 +88,7 @@ export default async function handler(
   res.status(200).json({
     name: "Terminal Ticket",
     description: "This is the ticket. Wow!",
-    image: linkedTicket.ticketUrl || "",
+    image: "",
+    // image: linkedTicket.data?.ticketUrl || "",
   })
 }

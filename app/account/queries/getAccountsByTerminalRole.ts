@@ -15,7 +15,18 @@ export default async function getAccountsByTerminalRole(
 
   const tickets = await db.accountTerminal.findMany({
     where: { terminalId: data.terminalId, roleLocalId: data.roleLocalId },
-    include: { account: true, role: true },
+    include: {
+      account: {
+        include: {
+          skills: {
+            include: {
+              skill: true,
+            },
+          },
+        },
+      },
+      role: true,
+    },
   })
 
   if (!tickets) {
@@ -28,6 +39,7 @@ export default async function getAccountsByTerminalRole(
       address: t.account.address,
       data: t.account.data as AccountMetadata,
       role: (t.role?.data as RoleMetadata)?.value,
+      skills: t.account.skills.map(({ skill }) => skill.name),
     }
   })
 

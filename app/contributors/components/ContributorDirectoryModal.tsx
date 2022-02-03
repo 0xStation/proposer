@@ -132,8 +132,8 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                   </div>
                   <div className="text-sm font-normal">
                     <div className="flex flex-row space-x-2 flex-wrap text-marble-white">
-                      {(contributor?.data?.skills?.length &&
-                        contributor?.data?.skills?.map?.((skill, index) => {
+                      {(contributor?.skills?.length &&
+                        contributor?.skills?.map?.((skill, index) => {
                           return (
                             <Tag key={index} type="skill">
                               {skill}

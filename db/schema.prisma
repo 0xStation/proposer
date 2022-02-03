@@ -15,7 +15,7 @@ generator client {
 model Account {
   id          Int                 @id @default(autoincrement())
   address     String              @unique
-  skills      SkillsOnAccounts[]
+  skills      AccountSkill[]
   tickets     AccountTerminal[]
   initiatives AccountInitiative[]
   data        Json?
@@ -41,7 +41,7 @@ model Role {
   tickets    AccountTerminal[]
   data       Json?
 
-  @@id([terminalId, localId], name: "terminalRoleId")
+  @@id([terminalId, localId])
 }
 
 model AccountTerminal {
@@ -53,27 +53,25 @@ model AccountTerminal {
   roleLocalId Int?
   joinedAt    DateTime @default(now())
   active      Boolean  @default(true)
-  ticketUrl   String?
+  data        Json?
 
   @@id([accountId, terminalId])
 }
 
 // An initiative within a terminal
 model Initiative {
-  id             Int                 @id @default(autoincrement())
-  terminal       Terminal            @relation(fields: [terminalId], references: [id])
-  terminalId     Int
-  terminalTicket String
-  localId        Int                 @default(autoincrement())
-  accounts       AccountInitiative[]
-  data           Json?
+  id         Int                 @id @default(autoincrement())
+  terminal   Terminal            @relation(fields: [terminalId], references: [id])
+  terminalId Int
+  localId    Int                 @default(autoincrement())
+  accounts   AccountInitiative[]
+  data       Json?
 
-  @@unique([terminalTicket, localId], name: "terminalInitiative")
+  @@unique([terminalId, localId])
 }
 
 // Associates accounts with initiatives for applications and contributor membership
 model AccountInitiative {
-  id           Int                     @id @default(autoincrement())
   account      Account                 @relation(fields: [accountId], references: [id])
   accountId    Int
   initiative   Initiative              @relation(fields: [initiativeId], references: [id])
@@ -82,22 +80,22 @@ model AccountInitiative {
   status       AccountInitiativeStatus @default(APPLIED)
   data         Json?
 
-  @@unique([accountId, initiativeId])
+  @@id([accountId, initiativeId])
 }
 
 model Skill {
-  id       Int                @id @default(autoincrement())
-  name     String             @unique
-  accounts SkillsOnAccounts[]
+  id       Int            @id @default(autoincrement())
+  name     String         @unique
+  accounts AccountSkill[]
 }
 
-model SkillsOnAccounts {
-  skill     Skill   @relation(fields: [skillId], references: [id])
-  skillId   Int
+model AccountSkill {
   account   Account @relation(fields: [accountId], references: [id])
   accountId Int
+  skill     Skill   @relation(fields: [skillId], references: [id])
+  skillId   Int
 
-  @@id([skillId, accountId])
+  @@id([accountId, skillId])
 }
 
 enum AccountInitiativeStatus {

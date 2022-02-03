@@ -60,8 +60,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   )
 
   const { points = 0 } = application
-  const { data: accountData, address, role } = application?.account || {}
-  const { pfpURL, name, ens, pronouns, verified, skills, discordId, timezone } = accountData
+  const { data: accountData, address, role, skills } = application?.account || {}
+  const { pfpURL, name, ens, pronouns, verified, discordId, timezone } = accountData
   const profileMetadataProps = {
     pfpURL,
     name,

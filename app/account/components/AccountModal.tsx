@@ -70,9 +70,20 @@ const AccountModal = ({
     },
   })
 
+  function capitalizeWord(word: string) {
+    return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase()
+  }
+
+  function capitalizeSkill(skill: string) {
+    return skill
+      .split(" ")
+      .map((w) => capitalizeWord(w))
+      .join(" ")
+  }
+
   const [skills] = useQuery(getSkills, {}, { suspense: false })
   const skillOptions = skills?.map((skill) => {
-    return { value: skill.name, label: skill.name }
+    return { value: skill.name, label: capitalizeSkill(skill.name) }
   })
 
   const uploadFile = async (acceptedFiles) => {
