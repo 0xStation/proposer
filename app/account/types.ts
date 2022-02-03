@@ -9,7 +9,7 @@ export type AccountMetadata = {
   twitterURL?: string
   ticketImage?: string
   skills: string[]
-  pronouns: string
+  pronouns?: string
   discordId: string
   timezone: string
   verified: boolean

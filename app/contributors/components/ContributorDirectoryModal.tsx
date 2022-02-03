@@ -141,7 +141,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                           )
                         })) ||
                         "N/A"}
-                     </div>
+                    </div>
                   </div>
                 </div>
               </div>
