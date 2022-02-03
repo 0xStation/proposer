@@ -61,7 +61,6 @@ const Project: BlitzPage = () => {
   const [initiative] = useQuery(
     getInitiativeByLocalId,
     {
-      terminalTicket: terminal?.ticketAddress || "",
       terminalId: terminal?.id || 0,
       localId: initiativeLocalId,
     },

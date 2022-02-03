@@ -212,26 +212,25 @@ const stationInitiaitves = [
 ]
 
 export async function seedInitiatives(terminals) {
-  terminals.station.initiatives = {}
+  terminals.StationLabs.initiatives = {}
   for (const name in stationInitiaitves) {
     const initiative = stationInitiaitves[name]
     const ret = await db.initiative.upsert({
       where: {
-        terminalInitiative: {
-          terminalTicket: terminals.station.ticketAddress,
+        terminalId_localId: {
+          terminalId: terminals.StationLabs.id,
           localId: initiative!.localId,
         },
       },
       create: {
-        terminalTicket: terminals.station.ticketAddress,
-        terminalId: terminals.station.id,
+        terminalId: terminals.StationLabs.id,
         localId: initiative!.localId,
         data: initiative,
       },
       update: { data: initiative },
     })
     console.log(`  ${(ret as Initiative).data?.name} localId: ${ret.localId}`)
-    terminals.station.initiatives[ret.localId] = ret
+    terminals.StationLabs.initiatives[ret.localId] = ret
   }
   return terminals
 }

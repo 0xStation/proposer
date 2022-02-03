@@ -28,25 +28,25 @@ const visitor: RoleMetadata & { localId: number } = {
 const stationRoles = [staff, dailyCommuter, weekendCommuter, visitor]
 
 export async function seedRoles(terminals) {
-  terminals.station.roles = {}
+  terminals.StationLabs.roles = {}
   for (const name in stationRoles) {
     const role = stationRoles[name]
     const ret = await db.role.upsert({
       where: {
-        terminalRoleId: {
-          terminalId: terminals.station.id,
+        terminalId_localId: {
+          terminalId: terminals.StationLabs.id,
           localId: role!.localId,
         },
       },
       create: {
-        terminalId: terminals.station.id,
+        terminalId: terminals.StationLabs.id,
         localId: role!.localId,
         data: role,
       },
       update: { data: role },
     })
     console.log(`  ${(ret as Role).data?.name} localId: ${ret.localId}`)
-    terminals.station.roles[ret.localId] = ret
+    terminals.StationLabs.roles[ret.localId] = ret
   }
   return terminals
 }
