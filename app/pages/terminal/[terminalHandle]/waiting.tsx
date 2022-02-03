@@ -1,4 +1,4 @@
-import { useQuery, BlitzPage, useParam, invoke } from "blitz"
+import { useQuery, BlitzPage, useParam, useRouterQuery, invoke } from "blitz"
 import { useMemo, useState, useEffect } from "react"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
@@ -15,18 +15,24 @@ import getApplicationsByInitiative from "app/application/queries/getApplications
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
+import Modal from "app/core/components/Modal"
 
 const hasBeenAirDroppedTokens = false
 
 const TerminalWaitingPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
+  const { directedFrom, initiative } = useRouterQuery()
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
   const [selectedInitiativeLocalId, setSelectedInitiativeLocalId] = useState<number>()
   const [applications, setApplications] = useState<Application[]>([])
+  const [isRedirectModalOpen, setIsRedirectModalOpen] = useState(false)
   const [isEndorseModalOpen, setIsEndorseModalOpen] = useState(false)
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
 
+  useEffect(() => {
+    setIsRedirectModalOpen(directedFrom === "application")
+  }, [directedFrom])
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
   const [initiatives] = useQuery(
@@ -94,6 +100,26 @@ const TerminalWaitingPage: BlitzPage = () => {
       <div className="text-marble-white">There are no initiatives in this terminal.</div>
     ) : (
       <>
+        <Modal
+          open={isRedirectModalOpen}
+          toggle={setIsRedirectModalOpen}
+          title="You're in the waiting room!"
+        >
+          <div className="max-w-lg mx-auto">
+            <p className="text-marble-white mt-4 text-sm text-center">
+              {
+                "You're now in the Waiting Room where Station contributors visit, view your profile, and vouch for you. Reach out to the team, get to know them, and start contributing."
+              }
+            </p>
+            <button
+              className="rounded bg-magic-mint px-24 py-1 mx-auto block mt-12"
+              onClick={() => setIsRedirectModalOpen(false)}
+            >
+              Continue
+            </button>
+          </div>
+        </Modal>
+
         {selectedApplication && currentInitiative && (
           <ApplicantDetailsModal
             application={selectedApplication}
