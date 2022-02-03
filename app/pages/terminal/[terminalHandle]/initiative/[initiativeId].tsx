@@ -145,7 +145,7 @@ const Project: BlitzPage = () => {
                 <div>
                   {initiative && initiative.data.isAcceptingApplications && (
                     <div className="relative h-5 bg-tunnel-black flex overflow-hidden">
-                      <div className="animate-marquee whitespace-nowrap text-magic-mint font-vt323 text-xl w-full">
+                      <div className="whitespace-nowrap text-magic-mint font-vt323 text-xl w-full">
                         <p>
                           CALLING FOR CONTRIBUTORS. CALLING FOR CONTRIBUTORS. CALLING FOR
                           CONTRIBUTORS. CALLING FOR CONTRIBUTORS.
@@ -340,17 +340,17 @@ const Project: BlitzPage = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex-auto flex justify-center mt-10 sticky bottom-0">
-                  <button
-                    className="mt-4 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px] m-4"
-                    onClick={() => {
-                      setUserTrigged(true)
-                      setActiveModal()
-                    }}
-                  >
-                    Submit interest
-                  </button>
-                </div>
+                <div className="flex-auto flex justify-center mt-10 sticky bottom-0 bg-tunnel-black">
+              <button
+                className="m-2 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
+                onClick={() => {
+                  setUserTrigged(true)
+                  setActiveModal()
+                }}
+              >
+                Submit Interest
+              </button>
+            </div>
               </>
             ) : (
               <div className="h-[100px]"></div>

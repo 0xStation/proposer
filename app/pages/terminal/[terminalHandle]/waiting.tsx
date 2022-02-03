@@ -77,6 +77,7 @@ const TerminalWaitingPage: BlitzPage = () => {
       dateMetadata: createdAt && {
         createdAt,
       },
+      waitingRoom: true,
     }
 
     return <ApplicationCard key={idx} {...applicationCardProps} />
