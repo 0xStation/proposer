@@ -73,7 +73,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     <div>
       <Modal subtitle="" open={isApplicantOpen} toggle={setIsApplicantOpen} showTitle={false}>
         <div className="flex flex-col space-y-6">
-          <div className="flex flex- auto flex-col space-y-6 overflow-y-scroll h-[585px]">
+          <div className="flex flex- auto flex-col space-y-6 overflow-y-scroll overflow-x-hidden h-[585px]">
             <div id="close and meta data" className="flex-auto flex flex-row">
               <CloseButton onClick={() => setIsApplicantOpen(false)} />
               <div className="flex flex-1 justify-end absolute top-2 right-2 z-50">
@@ -133,7 +133,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 </div>
               </div>
             </div>
-            <div className="flex-auto flex flex-row border border-concrete left-0 right-0 max-h-0"></div>
+            <hr className="border-[.5] border-solid border-concrete w-3/2 mx-[-1.5rem] my-5" />
             <div id="why questions" className="flex-auto flex flex-col text-marble-white space-y-2">
               <div className="font-bold">
                 <span>Why {initiative?.data?.name}?</span>
