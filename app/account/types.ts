@@ -23,4 +23,5 @@ export type Account = {
   points?: number
   joinedAt?: Date
   skills: string[]
+  initiatives?: any[]
 }

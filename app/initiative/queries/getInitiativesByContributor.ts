@@ -1,7 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { Initiative, InitiativeMetadata } from "../types"
-import { Role } from "app/role/types"
+import { Initiative } from "../types"
 
 const GetInitiativesByContributor = z.object({
   accountId: z.number(),

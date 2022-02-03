@@ -10,7 +10,6 @@ import StepTwo from "/public/step-2.svg"
 import StepThree from "/public/step-3.svg"
 import ContributorDirectoryModal from "app/contributors/components/ContributorDirectoryModal"
 import Back from "/public/back-icon.svg"
-import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
 import { Account } from "app/account/types"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import ApplicationModal from "app/application/components/ApplicationModal"
@@ -19,6 +18,7 @@ import usePagination from "app/core/hooks/usePagination"
 import Tag from "app/core/components/Tag"
 
 const Project: BlitzPage = () => {
+  const [hasApplied, setHasApplied] = useState(false)
   const [{ data: accountData }] = useAccount()
   const activeUser: Account | null = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
@@ -52,6 +52,17 @@ const Project: BlitzPage = () => {
 
   const terminalHandle = useParam("terminalHandle") as string
   const initiativeLocalId = useParam("initiativeId", "number") as number
+
+  useEffect(() => {
+    if (activeUser && initiativeLocalId) {
+      let currentInit = activeUser.initiatives?.find(
+        (init) => init.initiativeId === initiativeLocalId
+      )
+      if (currentInit) {
+        setHasApplied(true)
+      }
+    }
+  }, [activeUser, initiativeLocalId])
 
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
@@ -331,15 +342,21 @@ const Project: BlitzPage = () => {
                   </div>
                 </div>
                 <div className="flex-auto flex justify-center mt-10 sticky bottom-0 bg-tunnel-black">
-                  <button
-                    className="m-2 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
-                    onClick={() => {
-                      setUserTrigged(true)
-                      setActiveModal()
-                    }}
-                  >
-                    Submit Interest
-                  </button>
+                  {hasApplied ? (
+                    <button className="m-2 py-2 text-center text-base bg-concrete rounded item-center w-[280px]">
+                      {`You've already applied!`}
+                    </button>
+                  ) : (
+                    <button
+                      className="m-2 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
+                      onClick={() => {
+                        setUserTrigged(true)
+                        setActiveModal()
+                      }}
+                    >
+                      Submit Interest
+                    </button>
+                  )}
                 </div>
               </>
             ) : (
