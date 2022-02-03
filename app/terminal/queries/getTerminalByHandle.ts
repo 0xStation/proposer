@@ -8,8 +8,13 @@ const GetTerminalByHandle = z.object({
 
 export default async function getTerminalByHandle(input: z.infer<typeof GetTerminalByHandle>) {
   const data = GetTerminalByHandle.parse(input)
-  const terminal = await db.terminal.findUnique({
-    where: { handle: data.handle },
+  const terminal = await db.terminal.findFirst({
+    where: {
+      handle: {
+        equals: data.handle,
+        mode: "insensitive",
+      },
+    },
   })
   if (!terminal) {
     return null
