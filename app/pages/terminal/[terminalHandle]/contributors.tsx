@@ -85,7 +85,7 @@ const TerminalContributorsPage: BlitzPage = () => {
                   setRoleLocalId(role.localId)
                 }}
               >
-                <span className="m-4">{`${role.data.name} (${role.ticketCount})`}</span>
+                <span className="">{`${role.data.name} (${role.ticketCount})`}</span>
               </Pill>
             )
           })}
