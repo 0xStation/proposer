@@ -1,6 +1,7 @@
 import { Router } from "blitz"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
+import { useAccount } from "wagmi"
 
 const Home: BlitzPage = () => {
   const redirectToTerminal = () => {
@@ -10,6 +11,10 @@ const Home: BlitzPage = () => {
     // only terminal.
     Router.push(`/terminal/stationlabs/initiative-board`)
   }
+
+  const [{ data: accountData }] = useAccount({
+    fetchEns: true,
+  })
 
   const ConnectView = (
     <div className="flex items-center h-full ml-40">
@@ -24,7 +29,7 @@ const Home: BlitzPage = () => {
           className="mt-4 w-full py-2 text-center text-base bg-magic-mint rounded"
           onClick={() => redirectToTerminal()}
         >
-          Start Exploring
+          {accountData?.address ? "Start Exploring" : "Enter Station"}
         </button>
       </div>
     </div>
