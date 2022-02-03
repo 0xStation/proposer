@@ -184,7 +184,7 @@ const AccountModal = ({
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>
-                <div className="flex flex-col">
+                {/* <div className="flex flex-col">
                   <label htmlFor="pronouns" className="text-marble-white">
                     Pronouns
                   </label>
@@ -194,8 +194,8 @@ const AccountModal = ({
                     placeholder="Enter your pronouns"
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
-                </div>
-                <div className="flex flex-col">
+                </div> */}
+                <div className="flex flex-col col-span-2">
                   <label htmlFor="timezone" className="text-marble-white">
                     Timezone
                   </label>

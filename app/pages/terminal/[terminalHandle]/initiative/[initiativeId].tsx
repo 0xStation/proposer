@@ -9,6 +9,7 @@ import StepOne from "/public/step-1.svg"
 import StepTwo from "/public/step-2.svg"
 import StepThree from "/public/step-3.svg"
 import ContributorDirectoryModal from "app/contributors/components/ContributorDirectoryModal"
+import SuccessModal from "app/application/components/SuccessModal"
 
 import Back from "/public/back-icon.svg"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
@@ -30,6 +31,7 @@ const Project: BlitzPage = () => {
   const address = useMemo(() => accountData?.address, [accountData?.address])
   const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
   const [selectedContributorToView, setSelectedContributorToView] = useState<Account | null>(null)
+  const [submitted, setSubmited] = useState(false)
 
   const setActiveModal = () => {
     address
@@ -95,11 +97,19 @@ const Project: BlitzPage = () => {
 
   return (
     <>
+      {submitted && initiative && (
+        <SuccessModal
+          isOpen={submitted}
+          setIsOpen={setSubmited}
+          initiativeName={initiative.data.name}
+        />
+      )}
       {initiative && (
         <ApplicationModal
           isOpen={applicationModalOpen}
           setIsOpen={setApplicationModalOpen}
           initiativeId={initiative.id}
+          setSubmitted={setSubmited}
         />
       )}
       {selectedContributorToView && (
