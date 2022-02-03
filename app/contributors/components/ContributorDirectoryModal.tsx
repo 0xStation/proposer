@@ -15,6 +15,7 @@ import InitiativeCard from "app/initiative/components/InitiativeCard"
 import getInitiativesByContributor from "app/initiative/queries/getInitiativesByContributor"
 import { truncateString } from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
+import { DirectiveLocation } from "graphql"
 
 type ContributorDirectoryModalProps = {
   isOpen: boolean
@@ -120,7 +121,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                   <div className="font-bold">
                     <span>Role</span>
                   </div>
-                  <div className="text-xs font-normal flex flex-row content-end">
+                  <div className="text-xs font-normal flex flex-row content-end m-1">
                     {contributor?.role ? (
                       <span className="text-xs rounded-lg text-electric-violet bg-[#211831] py-0.5 px-2 my-1">
                         {contributor?.role.toUpperCase()}
@@ -134,17 +135,17 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                   <div className="font-bold text-marble-white">
                     <span>Skills</span>
                   </div>
-                  <div className="text-sm font-normal text-neon-carrot">
+                  <div className="text-sm font-normal text-neon-carrot w-[319px] overflow-x-scroll">
                     {contributor?.data?.skills && contributor?.data?.skills.length ? (
-                      <div className="flex flex-row space-x-2 overflow-x-scroll text-neon-carrot content-end">
+                      <div className="flex flex-row space-x-2">
                         {contributor?.data?.skills.map((skill, index) => {
                           return (
-                            <span
+                            <div
                               key={index}
-                              className="text-xs rounded-lg text-neon-carrot bg-[#302013] py-1 px-2"
+                              className="text-xs rounded-lg text-neon-carrot bg-[#302013] py-0.5 px-2 h-[20px]"
                             >
                               {skill.toUpperCase()}
-                            </span>
+                            </div>
                           )
                         })}
                       </div>
@@ -192,7 +193,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                         <a>
                           <InitiativeCard
                             title={initiative?.data?.name || "Title"}
-                            description={initiative?.data?.description || "Description"}
+                            oneLiner={initiative?.data?.oneLiner || "One Liner"}
                             contributors={initiative.contributors}
                             isAcceptingApplications={initiative.data.isAcceptingApplications}
                           />

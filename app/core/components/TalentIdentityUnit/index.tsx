@@ -13,6 +13,7 @@ type TalentIdentityUnitProps = {
   dateMetadata?: any
   isEndorsable?: boolean
   referrals?: ApplicationReferral[]
+  waitingRoom?: boolean
 }
 
 export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
@@ -23,6 +24,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
     onClick,
     isEndorsable = false,
     dateMetadata: dateMetadataProp = {},
+    waitingRoom,
   } = props
 
   const {
@@ -42,7 +44,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
     </div>
   )
 
-  const referralPfps = (
+  const referralPfps = waitingRoom && (
     <div className="flex flex-row flex-1 mx-3 my-2">
       <div className="flex-1 items-center justify-center text-base">
         <div className="place-self-center font-bold">Endorsers</div>

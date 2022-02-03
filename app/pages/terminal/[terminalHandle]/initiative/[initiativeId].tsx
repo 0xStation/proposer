@@ -125,7 +125,7 @@ const Project: BlitzPage = () => {
                     {initiative?.data.name || "loading..."}
                   </span>
                   <span className="flex text-base md:mx-[60px] text-center">
-                    {initiative?.data.description || "loading..."}
+                    {initiative?.data.oneLiner || "loading..."}
                   </span>
                 </div>
                 <div className="cursor-pointer">
@@ -145,7 +145,7 @@ const Project: BlitzPage = () => {
                 <div>
                   {initiative && initiative.data.isAcceptingApplications && (
                     <div className="relative h-5 bg-tunnel-black flex overflow-hidden">
-                      <div className="animate-marquee whitespace-nowrap text-magic-mint font-vt323 text-xl w-full">
+                      <div className="whitespace-nowrap text-magic-mint font-vt323 text-xl w-full">
                         <p>
                           CALLING FOR CONTRIBUTORS. CALLING FOR CONTRIBUTORS. CALLING FOR
                           CONTRIBUTORS. CALLING FOR CONTRIBUTORS.
@@ -342,7 +342,7 @@ const Project: BlitzPage = () => {
                   setActiveModal()
                 }}
               >
-                Submit interest
+                Submit Interest
               </button>
             </div>
           </div>
