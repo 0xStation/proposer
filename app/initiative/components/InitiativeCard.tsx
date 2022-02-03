@@ -1,7 +1,7 @@
 const InitiativeCard = ({ title, oneLiner, contributors, isAcceptingApplications }) => {
   return (
     <div className="border border-concrete p-4 flex flex-col cursor-pointer h-full hover:border-marble-white">
-      <h3 className="text-marble-white text-2xl font-bold">{title}</h3>
+      <h3 className="text-marble-white text-2xl">{title}</h3>
       <p className="text-marble-white text-base mt-2 grow">{oneLiner}</p>
       <div className="flex flex-row space-x-3">
         <div className="mt-8 flex flex-row flex-auto">
