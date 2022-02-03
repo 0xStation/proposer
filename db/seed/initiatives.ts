@@ -66,7 +66,7 @@ const newstandMetadata: InitiativeMetadata & { localId: number } = {
     "We are a decentralized media publication where every contributor will have ownership over the work they create while sharing the upside from the piece fairly.",
   ],
   links: [{ symbol: Symbol.MIRROR, url: "https://station.mirror.xyz/" }],
-  rewardText: ["800 USDC", "Station Visitor Ticket NFT"],
+  rewardText: ["Starting from 800 USDC", "Station Visitor Ticket NFT"],
   bannerURL: "/newstand-banner.png",
   commitment: "One-time",
   skills: ["Writing", "Graphic Design", "Editorial Design"],
