@@ -205,7 +205,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     <div className="text-base font-normal text-concrete">
                       <span>{`${(
                         (application.points as number) / 1000000
-                      ).toString()} RAILⒺ`}</span>
+                      ).toString()} RAILⓅ`}</span>
                     </div>
                   </div>
                 )}
