@@ -1,5 +1,3 @@
-import { data } from "autoprefixer"
-
 export const Tag = ({ children, type }) => {
   const colorMap = {
     skill: {

@@ -15,8 +15,7 @@ import getApplicationsByInitiative from "app/application/queries/getApplications
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-
-const hasBeenAirDroppedTokens = false
+import getRoleByAccountTerminal from "app/role/queries/getRoleByAccountTerminal"
 
 const TerminalWaitingPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -26,6 +25,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [isEndorseModalOpen, setIsEndorseModalOpen] = useState(false)
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
+  const activeUser: Account | null = useStore((state) => state.activeUser)
 
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
@@ -40,8 +40,16 @@ const TerminalWaitingPage: BlitzPage = () => {
     [selectedInitiativeLocalId]
   )
 
+  const [roleData] = useQuery(
+    getRoleByAccountTerminal,
+    {
+      terminalId: terminal?.id || 0,
+      accountId: activeUser?.id as number,
+    },
+    { suspense: false }
+  )
+
   const [isApplicantOpen, setIsApplicantOpen] = useState(false)
-  const activeUser: Account | null = useStore((state) => state.activeUser)
 
   useEffect(() => {
     if (selectedInitiativeLocalId) {
@@ -63,13 +71,15 @@ const TerminalWaitingPage: BlitzPage = () => {
       setSelectedApplication(application)
       setIsApplicantOpen(true)
     }
+    // TODO: make this variable come from the subgraph
+    const hasBeenAirDroppedTokens = false
 
     const applicationCardProps = {
       user: account,
       points: points * Math.pow(10, 0 - decimals),
       onClick,
       isEndorsable:
-        !!activeUser?.role ||
+        !!roleData?.data?.value ||
         hasBeenAirDroppedTokens ||
         // user shouldn't be able to endorse themself
         selectedApplication?.account?.address !== activeUser?.address,
@@ -101,6 +111,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             isApplicantOpen={isApplicantOpen}
             setIsApplicantOpen={setIsApplicantOpen}
             setIsEndorseModalOpen={setIsEndorseModalOpen}
+            roleOfActiveUser={roleData?.data?.value}
           />
         )}
         {selectedInitiativeLocalId && selectedInitiativeLocalId && (
