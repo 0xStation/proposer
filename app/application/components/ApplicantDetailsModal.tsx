@@ -149,7 +149,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   <span>Submission</span>
                 </div>
                 <div className="text-base font-normal">
-                  <div className="flex flex-row">
+                  <div className="flex flex-row max-w-xs break-all mr-2">
                     <a href={application?.data?.url} className="text-magic-mint">
                       {application?.data?.url}
                     </a>

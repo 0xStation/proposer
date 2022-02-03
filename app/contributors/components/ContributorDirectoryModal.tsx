@@ -2,7 +2,6 @@ import Modal from "../../core/components/Modal"
 import Verified from "/public/check-mark.svg"
 import { Image, invoke, Link, Routes, useParam } from "blitz"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
-import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
 import DiscordIcon from "/public/discord-icon.svg"
 import { Account } from "app/account/types"
@@ -15,7 +14,7 @@ import InitiativeCard from "app/initiative/components/InitiativeCard"
 import getInitiativesByContributor from "app/initiative/queries/getInitiativesByContributor"
 import { truncateString } from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
-import { DirectiveLocation } from "graphql"
+import { Tag } from "app/core/components/Tag"
 
 type ContributorDirectoryModalProps = {
   isOpen: boolean
@@ -106,7 +105,6 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                     <div className="flex-1">
                       {truncateString(contributor?.data?.ens || contributor?.address)}
                     </div>
-                    {/* <div className="flex-1">• {contributor?.data?.pronouns}</div> */}
                   </div>
                 </div>
               </div>
@@ -120,13 +118,11 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                   <div className="font-bold">
                     <span>Role</span>
                   </div>
-                  <div className="text-xs font-normal flex flex-row content-end">
-                    {contributor?.role ? (
-                      <span className="text-xs rounded-lg text-electric-violet bg-[#211831] py-0.5 px-2">
-                        {contributor?.role.toUpperCase()}
-                      </span>
+                  <div className="text-xs font-normal flex flex-row content-end text-marble-white">
+                    {contributor?.role && contributor?.role !== "N/A" ? (
+                      <Tag type="role">{contributor?.role}</Tag>
                     ) : (
-                      <span>N/A</span>
+                      "N/A"
                     )}
                   </div>
                 </div>
@@ -134,23 +130,19 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                   <div className="font-bold text-marble-white">
                     <span>Skills</span>
                   </div>
-                  <div className="text-sm font-normal text-neon-carrot w-[319px] overflow-x-scroll">
+                  <div className="text-sm font-normal">
                     {contributor?.data?.skills && contributor?.data?.skills.length ? (
-                      <div className="flex flex-row space-x-2">
-                        {contributor?.data?.skills.map((skill, index) => {
-                          return (
-                            <div
-                              key={index}
-                              className="text-xs rounded-lg text-neon-carrot bg-[#302013] py-0.5 px-2 whitespace-nowrap"
-                            >
-                              {skill.toUpperCase()}
-                            </div>
-                          )
-                        })}
+                      <div className="flex flex-row space-x-2 flex-wrap text-marble-white">
+                        {(contributor?.data?.skills?.length &&
+                          contributor?.data?.skills?.map?.((skill, index) => {
+                            return (
+                              <Tag key={index} type="skill">
+                                {skill}
+                              </Tag>
+                            )
+                          })) ||
+                          "N/A"}
                       </div>
-                    ) : (
-                      <span className="text-marble-white">N/A</span>
-                    )}
                   </div>
                 </div>
               </div>
