@@ -8,7 +8,12 @@ const GetAccountByAddress = z.object({
 
 export default async function getAccountByAddress(input: z.infer<typeof GetAccountByAddress>) {
   const data = GetAccountByAddress.parse(input)
-  const account = await db.account.findFirst({ where: { address: data.address } })
+  const account = await db.account.findFirst({
+    where: { address: data.address },
+    include: {
+      initiatives: true,
+    },
+  })
 
   if (!account) {
     return null
