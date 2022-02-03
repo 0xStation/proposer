@@ -22,7 +22,11 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
               <h1 className="text-4xl">Incorrect Network</h1>
               <p className="max-w-lg mt-4">
                 Currently, the Station network only supports Rinkeby. Please switch your connection
-                to the Rinkeby chain.
+                to the Rinkeby chain. If you are having trouble connecting to Rinkeby, check out our
+                FAQ{" "}
+                <a href="https://0xstation.notion.site/How-to-install-Rinkeby-ab71688f687c44faab6524daf19ab73a">
+                  here.
+                </a>
               </p>
 
               {switchNetwork && (
