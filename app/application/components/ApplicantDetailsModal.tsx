@@ -57,8 +57,6 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     <p className="text-xs text-concrete font-normal">SUBMITTED ON ...</p>
   )
 
-  const skills = ["figma", "pasta-making", "surfing", "jamming", "javascript"]
-
   const { points = 0 } = application
   const { data, address } = application?.account || {}
   const { pfpURL, name, ens, pronouns, verified } = data
@@ -99,7 +97,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 <div className="flex flex-col flex-1">
                   <div className="font-bold text-marble-white">Skills</div>
                   <div className="flex flex-row space-x-2 flex-wrap text-neon-carrot">
-                    {skills?.map?.((skill, index) => {
+                    {application?.account?.data?.skills?.map?.((skill, index) => {
                       return (
                         <Tag key={index} type="skill">
                           {skill}
