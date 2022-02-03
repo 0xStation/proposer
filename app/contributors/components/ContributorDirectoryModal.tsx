@@ -164,7 +164,9 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                     <span>Timezone</span>
                   </div>
                   <div className="text-sm font-normal text-marble-white">
-                    <span>{contributor?.data?.timezone || "N/A"}</span>
+                    <span>
+                      {contributor?.data?.timezone ? `GMT ${contributor?.data?.timezone}` : "N/A"}
+                    </span>
                   </div>
                 </div>
               </div>
