@@ -27,3 +27,7 @@ body {
   background-color: #000000;
   font-family: "Favorit Pro";
 }
+
+::-webkit-scrollbar {
+  display: none;
+}

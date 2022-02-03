@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { Image, invoke } from "blitz"
 import Dropdown from "../components/Dropdown"
 import Map from "../components/Map"
@@ -9,19 +9,15 @@ import { useAccount } from "wagmi"
 import truncateString from "../utils/truncateString"
 import { LOCAL_STORAGE } from "../utils/constants"
 
-interface Wallet {
-  address: string
-}
-
 /**
  * Navigation Component
  */
 const Navigation = () => {
   // a list of the modals that are active on the screen
-  const [wallet, setWallet] = useState<Wallet | null>()
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
   })
+
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const setActiveUser = useStore((state) => state.setActiveUser)
   const activeUser = useStore((state) => state.activeUser)
@@ -37,7 +33,6 @@ const Navigation = () => {
       setActiveUser(user)
     } else {
       setTimeout(() => {
-        setWallet({ address: address })
         toggleAccountModal(true)
       }, 500)
     }
@@ -48,7 +43,6 @@ const Navigation = () => {
       setTimeout(() => getUserAccount(address), 500)
     } else {
       setActiveUser(null)
-      setWallet(null)
     }
   }, [address])
 
@@ -70,10 +64,14 @@ const Navigation = () => {
           button={<Image src={logo} alt="Station logo, the letters station spelled out." />}
           items={[
             { name: "home", href: "/" },
+            { name: "join waitlist", href: "https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6" },
             { name: "newstand", href: "https://station.mirror.xyz/" },
-            { name: "contact the staff", href: "mailto:staff@station.express" },
-            { name: "support", href: "https://6vdcjqzyfj3.typeform.com/to/kTlOjkdT" },
             { name: "twitter", href: "https://twitter.com/0xstation" },
+            { name: "help desk", href: "https://6vdcjqzyfj3.typeform.com/to/kTlOjkdT" },
+            {
+              name: "legal & privacy",
+              href: "https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176",
+            },
           ]}
         />
         <div className="flex items-center border-l border-l-concrete">

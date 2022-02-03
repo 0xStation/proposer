@@ -18,7 +18,7 @@ const ApplicationModal = ({
   const terminalHandle = useParam("terminalHandle") as string
   const [createApplicationMutation] = useMutation(createApplication, {
     onSuccess: () => {
-      router.push(`/terminal/${terminalHandle}/waiting?directedFrom=application`)
+      router.push(`/terminal/${terminalHandle}/waiting-room?directedFrom=application`)
     },
   })
 

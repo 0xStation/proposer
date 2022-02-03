@@ -11,7 +11,7 @@ import CreatableSelect from "react-select/creatable"
 interface ApplicationParams {
   name: string
   discordId: string
-  pronouns: string
+  pronouns?: string
   timezone: string
   address: string
   skills: {
@@ -93,7 +93,10 @@ const AccountModal = ({
     setPfpURL("")
   }
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop: uploadFile })
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: uploadFile,
+    accept: "image/jpeg, image/jpg, image/png",
+  })
 
   return (
     <Modal
@@ -121,7 +124,7 @@ const AccountModal = ({
                   <Field
                     component="input"
                     name="name"
-                    placeholder="name"
+                    placeholder="Name"
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>
@@ -154,9 +157,12 @@ const AccountModal = ({
                       {isDragActive ? (
                         <p>Drop your file here ...</p>
                       ) : (
-                        <p>
-                          Drag and drop a file here, or click to select a file from your device.
-                        </p>
+                        <>
+                          <p>
+                            Drag and drop a file here, or click to select a file from your device.
+                          </p>
+                          <p>( Only *.jpeg, *.jpg, and *.png will be accepted )</p>
+                        </>
                       )}
                     </div>
                   )}
@@ -184,18 +190,7 @@ const AccountModal = ({
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>
-                <div className="flex flex-col">
-                  <label htmlFor="pronouns" className="text-marble-white">
-                    Pronouns
-                  </label>
-                  <Field
-                    component="input"
-                    name="pronouns"
-                    placeholder="Enter your pronouns"
-                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
-                  />
-                </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col col-span-2">
                   <label htmlFor="timezone" className="text-marble-white">
                     Timezone
                   </label>

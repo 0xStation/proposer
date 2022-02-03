@@ -45,11 +45,11 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
     return false
   }
 
-  const appConnect = (connector, wallet) => {
+  const appConnect = async (connector, wallet) => {
     if (wallet) {
       activateInjectedProvider(wallet)
     }
-    connect(connector)
+    await connect(connector)
     // we're reading from localStorage at the app level
     // to see if we need to maintain a wallet connection
     localStorage.setItem(LOCAL_STORAGE.CONNECTION, "true")
@@ -58,7 +58,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   return (
     <Modal
       title="Enter Station"
-      subtitle="Connect your wallet to enter Station and submit your interest."
+      subtitle="Connect your wallet to enter Station and explore initiatives."
       open={isWalletOpen}
       toggle={setIsWalletOpen}
       banner={Banner}
@@ -69,10 +69,8 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           <button
             className="flex-1 border border-marble-white  rounded-md content-center"
             onClick={async () => {
-              activateInjectedProvider("metamask")
               // @ts-ignore
-              await connect(metamaskWallet)
-              appConnect(metamaskWallet, "metamask")
+              await appConnect(metamaskWallet, "metamask")
             }}
           >
             <div className="flex flex-row flex-1 justify-center items-center space-x-2 my-1">
@@ -87,7 +85,8 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           <button
             className="flex-1  border border-marble-white rounded-md content-center"
             onClick={async () => {
-              appConnect(walletConnect, undefined)
+              // @ts-ignore
+              await connect(walletConnect)
             }}
           >
             <div className="flex flex-row flex-1 justify-center align-middle items-center space-x-2 my-1 mx-auto">
@@ -102,7 +101,8 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           <button
             className="flex-1 border border-marble-white rounded-md content-center"
             onClick={async () => {
-              appConnect(metamaskWallet, "coinbase")
+              // @ts-ignore
+              await appConnect(coinbaseWallet, "coinbase")
             }}
           >
             <div className="flex flex-row flex-1 justify-center items-center align-middle space-x-2 my-1">

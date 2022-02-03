@@ -8,8 +8,8 @@ const SuccessModal = ({
 }) => {
   return (
     <Modal
-      title={`You've endorsed ${contributor?.data?.handle}`}
-      subtitle={`Share with your team how amazing they are.`}
+      title={`You've endorsed ${contributor?.data?.name}!`}
+      subtitle={`You can help ${contributor?.data?.name} gather more endorsements by collaborating on projects and talking about their contribution in your community.`}
       open={isSuccessModalOpen}
       toggle={(close) => {
         setIsSuccessModalOpen(close)

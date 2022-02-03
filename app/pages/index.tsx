@@ -8,7 +8,7 @@ const Home: BlitzPage = () => {
     // which allows users to choose which terminal they want to "enter".
     // In the meantime we will redirect them to Station since it's the
     // only terminal.
-    Router.push(`/terminal/station/initiative`)
+    Router.push(`/terminal/station/initiative-board`)
   }
 
   const ConnectView = (
@@ -16,22 +16,22 @@ const Home: BlitzPage = () => {
       <div className="bg-tunnel-black border border-marble-white pt-10 px-5 pb-5 w-128">
         <h3 className="text-marble-white text-3xl">Welcome to Station</h3>
         <p className="text-marble-white text-base mt-4">
-          This is where contributors come together and discover and participate in some of the most
-          exciting communities in Web3.
+          This is where contributors come together, discover, and participate in the most exciting
+          places in Web3.
         </p>
         <p className="text-marble-white text-base mt-4">Join the ride.</p>
         <button
           className="mt-4 w-full py-2 text-center text-base bg-magic-mint rounded"
           onClick={() => redirectToTerminal()}
         >
-          Enter Station
+          Start Exploring
         </button>
       </div>
     </div>
   )
 
   return (
-    <Layout title="Home">
+    <Layout title="Station">
       <main
         className="w-full h-[calc(100vh-6rem)] bg-cover bg-no-repeat"
         style={{ backgroundImage: "url('/station-cover.png')" }}
