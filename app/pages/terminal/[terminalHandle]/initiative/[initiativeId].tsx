@@ -286,10 +286,6 @@ const Project: BlitzPage = () => {
               </div>
             </div>
 
-            {/* 
-            condition ? stuff : other stuff
-            */}
-
             {initiative?.data.isAcceptingApplications ? (
               <>
                 <div className="flex-auto flex flex-col text-marble-white space-y-5">
