@@ -1,5 +1,5 @@
 import Modal from "../../core/components/Modal"
-import { Image } from "blitz"
+import { Image, invoke } from "blitz"
 import { Dispatch, SetStateAction } from "react"
 import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
@@ -19,6 +19,7 @@ type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
   setIsApplicantOpen: Dispatch<SetStateAction<boolean>>
   setIsEndorseModalOpen: Dispatch<SetStateAction<boolean>>
+  setIsInviteSuccessModalOpen: Dispatch<SetStateAction<boolean>>
   application: Application
   initiative: Initiative
   roleOfActiveUser?: string
@@ -31,15 +32,29 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   isApplicantOpen,
   setIsApplicantOpen,
   setIsEndorseModalOpen,
+  setIsInviteSuccessModalOpen,
   roleOfActiveUser,
 }) => {
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
   const activeUser: Account | null = useStore((state) => state.activeUser)
+  const { points = 0 } = application
+  const { data: applicantData, address, role, skills } = application?.account || {}
+  const { pfpURL, name, ens, pronouns, verified, discordId, timezone } = applicantData
+  const profileMetadataProps = {
+    pfpURL,
+    name,
+    ens,
+    pronouns,
+    verified,
+    address,
+  }
 
   const isEndorsable =
     activeUser &&
     (roleOfActiveUser || hasBeenAirDroppedTokens) &&
     activeUser?.address !== application?.account?.address
+
+  const canInvite = role === "STAFF"
 
   const CloseButton = ({ onClick }) => (
     <div className="flex flex-1 justify-start absolute top-1 left-2">
@@ -58,18 +73,6 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   ) : (
     <p className="text-xs text-concrete font-normal">SUBMITTED ON ...</p>
   )
-
-  const { points = 0 } = application
-  const { data: accountData, address, role, skills } = application?.account || {}
-  const { pfpURL, name, ens, pronouns, verified, discordId, timezone } = accountData
-  const profileMetadataProps = {
-    pfpURL,
-    name,
-    ens,
-    pronouns,
-    verified,
-    address,
-  }
 
   return (
     <div>
@@ -201,9 +204,9 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
             </div>
           </div>
           {isEndorsable && (
-            <div id="buttons" className="flex-auto flex flex-row content-center justify-center">
+            <div className="mx-auto">
               <Button
-                className="px-28"
+                className={canInvite ? "px-20 mr-2 inline" : "px-28"}
                 onClick={() => {
                   setIsApplicantOpen(false)
                   // allow time for applicant modal to clean up
@@ -215,6 +218,23 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               >
                 Endorse
               </Button>
+              {canInvite && (
+                <Button
+                  secondary
+                  className="inline px-6"
+                  onClick={async () => {
+                    // TODO: @symmetry
+                    // invoke(inviteAccountToinitiative, {
+                    // applicantId: application?.account?.id,
+                    // initiativeId: initiative?.id
+                    // })
+                    setIsApplicantOpen(false)
+                    setTimeout(() => setIsInviteSuccessModalOpen(true), 550)
+                  }}
+                >
+                  Invite to initiative
+                </Button>
+              )}
             </div>
           )}
         </div>

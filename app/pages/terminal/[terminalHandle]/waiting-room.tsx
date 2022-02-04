@@ -28,6 +28,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [isRedirectModalOpen, setIsRedirectModalOpen] = useState(false)
   const [isEndorseModalOpen, setIsEndorseModalOpen] = useState(false)
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
+  const [isInviteSuccessModalOpen, setIsInviteSuccessModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
   const activeUser: Account | null = useStore((state) => state.activeUser)
   const [roleOfActiveUser, setRoleOfActiveUser] = useState<Role | null>()
@@ -142,6 +143,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             setIsApplicantOpen={setIsApplicantOpen}
             setIsEndorseModalOpen={setIsEndorseModalOpen}
             roleOfActiveUser={roleOfActiveUser?.data?.value}
+            setIsInviteSuccessModalOpen={setIsInviteSuccessModalOpen}
           />
         )}
         {selectedInitiativeLocalId && selectedInitiativeLocalId && (
@@ -158,6 +160,15 @@ const TerminalWaitingPage: BlitzPage = () => {
           setIsSuccessModalOpen={setIsSuccessModalOpen}
           selectedUserToEndorse={selectedApplication?.account}
         />
+        <Modal
+          title={`You've invited ${selectedApplication?.account?.data?.name} to ${currentInitiative?.data?.name}!`}
+          open={isInviteSuccessModalOpen}
+          toggle={(close) => {
+            setIsInviteSuccessModalOpen(close)
+          }}
+        >
+          <p className="p-6 text-marble-white text-center">{`Reach out and let ${selectedApplication?.account?.data?.name} know. Once the Ticket is claimed, ${selectedApplication?.account?.data?.name}’s profile will appear in Contributor Directory.`}</p>
+        </Modal>
         <div className="flex flex-col space-y-10">
           <div className="flex-auto flex-wrap space-x-3 text-marble-white text-base space-y-3">
             {initiatives
