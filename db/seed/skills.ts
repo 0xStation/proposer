@@ -1,6 +1,6 @@
 import db from "../index"
 
-export async function seedSkills() {
+export async function seed() {
   const skills = [
     "backend",
     "content writing",

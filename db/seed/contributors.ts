@@ -312,96 +312,96 @@ export async function seedContributors(terminals) {
       },
     })
 
-    const ticket = await db.accountTerminal.upsert({
-      where: {
-        accountId_terminalId: {
-          accountId: account.id,
-          terminalId: terminals.StationLabs.id,
-        },
-      },
-      create: {
-        accountId: account.id,
-        terminalId: terminals.StationLabs.id,
-        roleLocalId: contributorData.role,
-        joinedAt: contributorData.joinedAt,
-        active: contributorData.active,
-      },
-      update: {
-        roleLocalId: contributorData.role,
-        joinedAt: contributorData.joinedAt,
-        active: contributorData.active,
-      },
-    })
+    // const ticket = await db.accountTerminal.upsert({
+    //   where: {
+    //     accountId_terminalId: {
+    //       accountId: account.id,
+    //       terminalId: terminals.StationLabs.id,
+    //     },
+    //   },
+    //   create: {
+    //     accountId: account.id,
+    //     terminalId: terminals.StationLabs.id,
+    //     roleLocalId: contributorData.role,
+    //     joinedAt: contributorData.joinedAt,
+    //     active: contributorData.active,
+    //   },
+    //   update: {
+    //     roleLocalId: contributorData.role,
+    //     joinedAt: contributorData.joinedAt,
+    //     active: contributorData.active,
+    //   },
+    // })
 
-    console.log(`      Station role: ${ticket.roleLocalId}`)
+    // console.log(`      Station role: ${ticket.roleLocalId}`)
 
-    for (const name in contributorData.initiatives) {
-      const localId = contributorData.initiatives[name] as number
-      const initiative = await db.initiative.findUnique({
-        where: {
-          terminalId_localId: {
-            terminalId: terminals.StationLabs.id,
-            localId,
-          },
-        },
-      })
+    // for (const name in contributorData.initiatives) {
+    //   const localId = contributorData.initiatives[name] as number
+    //   const initiative = await db.initiative.findUnique({
+    //     where: {
+    //       terminalId_localId: {
+    //         terminalId: terminals.StationLabs.id,
+    //         localId,
+    //       },
+    //     },
+    //   })
 
-      if (!initiative) {
-        console.log(`could not find localId of ${localId}`)
-        continue
-      }
+    //   if (!initiative) {
+    //     console.log(`could not find localId of ${localId}`)
+    //     continue
+    //   }
 
-      const membership = await db.accountInitiative.upsert({
-        where: {
-          accountId_initiativeId: {
-            accountId: account.id,
-            initiativeId: initiative.id,
-          },
-        },
-        create: {
-          accountId: account.id,
-          initiativeId: initiative.id,
-          status: "CONTRIBUTOR",
-        },
-        update: {
-          status: "CONTRIBUTOR",
-        },
-      })
+    //   const membership = await db.accountInitiative.upsert({
+    //     where: {
+    //       accountId_initiativeId: {
+    //         accountId: account.id,
+    //         initiativeId: initiative.id,
+    //       },
+    //     },
+    //     create: {
+    //       accountId: account.id,
+    //       initiativeId: initiative.id,
+    //       status: "CONTRIBUTOR",
+    //     },
+    //     update: {
+    //       status: "CONTRIBUTOR",
+    //     },
+    //   })
 
-      console.log(`      contributor to: ${(initiative as Initiative).data?.name}`)
-    }
+    //   console.log(`      contributor to: ${(initiative as Initiative).data?.name}`)
+    // }
 
-    for (const i in contributorData.skills) {
-      const skill = await db.skill.upsert({
-        where: {
-          name: contributorData.skills[i],
-        },
-        create: {
-          name: contributorData.skills[i] || "",
-        },
-        update: {
-          name: contributorData.skills[i],
-        },
-      })
+    // for (const i in contributorData.skills) {
+    //   const skill = await db.skill.upsert({
+    //     where: {
+    //       name: contributorData.skills[i],
+    //     },
+    //     create: {
+    //       name: contributorData.skills[i] || "",
+    //     },
+    //     update: {
+    //       name: contributorData.skills[i],
+    //     },
+    //   })
 
-      await db.accountSkill.upsert({
-        where: {
-          accountId_skillId: {
-            accountId: account.id,
-            skillId: skill.id,
-          },
-        },
-        create: {
-          accountId: account.id,
-          skillId: skill.id,
-        },
-        update: {
-          accountId: account.id,
-          skillId: skill.id,
-        },
-      })
+    //   await db.accountSkill.upsert({
+    //     where: {
+    //       accountId_skillId: {
+    //         accountId: account.id,
+    //         skillId: skill.id,
+    //       },
+    //     },
+    //     create: {
+    //       accountId: account.id,
+    //       skillId: skill.id,
+    //     },
+    //     update: {
+    //       accountId: account.id,
+    //       skillId: skill.id,
+    //     },
+    //   })
 
-      console.log(`      has skill: ${skill.name}`)
-    }
+    //   console.log(`      has skill: ${skill.name}`)
+    // }
   }
 }
