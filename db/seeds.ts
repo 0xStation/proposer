@@ -18,8 +18,8 @@ const seed = async () => {
   // await seedStationTerminalContributors()
   // console.log("seeding initiative contributors...")
   // await seedStationInitiativeContributors()
-  console.log("seeding station contributor details...")
-  seedStationContributorDetails()
+  // console.log("seeding station contributor details...")
+  // seedStationContributorDetails()
 }
 
 export default seed

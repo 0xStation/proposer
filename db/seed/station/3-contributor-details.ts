@@ -1,7 +1,5 @@
 import db from "../../index"
-import { Initiative, InitiativeMetadata } from "app/initiative/types"
 import { AccountMetadata } from "app/account/types"
-import { data } from "autoprefixer"
 
 interface ContributorSeed {
   address: string
