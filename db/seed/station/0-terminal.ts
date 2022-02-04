@@ -38,8 +38,15 @@ const station: TerminalSeed = {
 // ROLES
 //////
 
+export const roleIds = {
+  staff: 1,
+  dailyCommuter: 2,
+  weekendCommuter: 3,
+  visitor: 4,
+}
+
 const staff: RoleSeed = {
-  localId: 1,
+  localId: roleIds.staff,
   data: {
     name: "STAFF",
     value: "STAFF",
@@ -47,7 +54,7 @@ const staff: RoleSeed = {
 }
 
 const dailyCommuter: RoleSeed = {
-  localId: 2,
+  localId: roleIds.dailyCommuter,
   data: {
     name: "DAILY COMMUTER",
     value: "DAILY COMMUTER",
@@ -55,7 +62,7 @@ const dailyCommuter: RoleSeed = {
 }
 
 const weekendCommuter: RoleSeed = {
-  localId: 3,
+  localId: roleIds.weekendCommuter,
   data: {
     name: "WEEKEND COMMUTER",
     value: "WEEKEND COMMUTER",
@@ -63,7 +70,7 @@ const weekendCommuter: RoleSeed = {
 }
 
 const visitor: RoleSeed = {
-  localId: 4,
+  localId: roleIds.visitor,
   data: {
     name: "VISITOR",
     value: "VISITOR",
@@ -76,8 +83,20 @@ const stationRoles = [staff, dailyCommuter, weekendCommuter, visitor]
 // INITIATIVES
 //////
 
+export const initiativeIds = {
+  contributorReview: 1,
+  waitingRoom: 2,
+  newstand: 3,
+  partnership: 4,
+  networkSustainability: 5,
+  community: 6,
+  midnightStation: 7,
+  brandIdentity: 8,
+  stationDigest: 9,
+}
+
 const contributorReview: InitiativeSeed = {
-  localId: 1,
+  localId: initiativeIds.contributorReview,
   data: {
     name: "Contributor Review",
     oneLiner: "Peer-to-peer recognition that publicizes your proof of contribution.",
@@ -94,7 +113,7 @@ const contributorReview: InitiativeSeed = {
   },
 }
 const waitingRoom: InitiativeSeed = {
-  localId: 2,
+  localId: initiativeIds.waitingRoom,
   data: {
     name: "Waiting Room",
     shortName: "WAITING ROOM",
@@ -113,7 +132,7 @@ const waitingRoom: InitiativeSeed = {
   },
 }
 const newstand: InitiativeSeed = {
-  localId: 3,
+  localId: initiativeIds.newstand,
   data: {
     name: "Newstand",
     shortName: "NEWSTAND",
@@ -134,7 +153,7 @@ const newstand: InitiativeSeed = {
   },
 }
 const partnership: InitiativeSeed = {
-  localId: 4,
+  localId: initiativeIds.partnership,
   data: {
     name: "Terminal Partnerships",
     oneLiner: "Inviting the best DAOs to mobilize contributors on Station.",
@@ -153,7 +172,7 @@ const partnership: InitiativeSeed = {
   },
 }
 const networkSustainability: InitiativeSeed = {
-  localId: 5,
+  localId: initiativeIds.networkSustainability,
   data: {
     name: "Network Sustainability",
     oneLiner: "Designing a sustainable economic engine for the Station Network.",
@@ -178,7 +197,7 @@ const networkSustainability: InitiativeSeed = {
   },
 }
 const community: InitiativeSeed = {
-  localId: 6,
+  localId: initiativeIds.community,
   data: {
     name: "Community",
     oneLiner: "Welcoming new contributors and fostering a culture of intellectual thoughtfullness.",
@@ -196,7 +215,7 @@ const community: InitiativeSeed = {
   },
 }
 const midnightStation: InitiativeSeed = {
-  localId: 7,
+  localId: initiativeIds.midnightStation,
   data: {
     name: "Midnight Station",
     oneLiner: "Radio show highlighting Station punks and passengers.",
@@ -214,7 +233,7 @@ const midnightStation: InitiativeSeed = {
   },
 }
 const brandIdentity: InitiativeSeed = {
-  localId: 8,
+  localId: initiativeIds.brandIdentity,
   data: {
     name: "Brand Identity",
     oneLiner: "Architecting the visual system of Station.",
@@ -231,7 +250,7 @@ const brandIdentity: InitiativeSeed = {
   },
 }
 const stationDigest: InitiativeSeed = {
-  localId: 9,
+  localId: initiativeIds.stationDigest,
   data: {
     name: "Station Digest",
     oneLiner:
