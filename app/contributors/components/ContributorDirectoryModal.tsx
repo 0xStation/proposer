@@ -5,10 +5,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import Exit from "/public/exit-button.svg"
 import DiscordIcon from "/public/discord-icon.svg"
 import { Account } from "app/account/types"
-import { useAccount, useBalance } from "wagmi"
-import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
-import { useDecimals } from "app/core/contracts/contracts"
-import useStore from "app/core/hooks/useStore"
 import { Initiative } from "app/initiative/types"
 import InitiativeCard from "app/initiative/components/InitiativeCard"
 import getInitiativesByContributor from "app/initiative/queries/getInitiativesByContributor"
@@ -20,7 +16,6 @@ type ContributorDirectoryModalProps = {
   isOpen: boolean
   setIsOpen: Dispatch<SetStateAction<boolean>>
   contributor?: Account
-  activeUser?: Account
   terminalId?: number
 }
 const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
@@ -30,14 +25,6 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
   terminalId,
 }) => {
   const terminalHandle = useParam("terminalHandle", "string") as string
-  const activeUser: Account | null = useStore((state) => state.activeUser)
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
-  const [{ data: balanceData }] = useBalance({
-    addressOrName: activeUser?.address,
-    token: TERMINAL.TOKEN_ADDRESS,
-    watch: true,
-    formatUnits: decimals,
-  })
   const [initiatives, setInitiatives] = useState<Initiative[]>()
 
   useEffect(() => {
