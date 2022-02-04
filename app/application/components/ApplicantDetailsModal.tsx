@@ -130,7 +130,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     <span>Timezone</span>
                   </div>
                   <div className="text-base font-normal text-marble-white">
-                    <span>{timezone || "N/A"}</span>
+                    <span>{timezone ? `GMT ${timezone}` : "N/A"}</span>
                   </div>
                 </div>
               </div>
