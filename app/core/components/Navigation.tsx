@@ -64,7 +64,7 @@ const Navigation = () => {
           button={<Image src={logo} alt="Station logo, the letters station spelled out." />}
           items={[
             { name: "home", href: "/" },
-            { name: "join waitlist", href: "https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6" },
+            { name: "open terminal", href: "https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6" },
             { name: "newstand", href: "https://station.mirror.xyz/" },
             { name: "twitter", href: "https://twitter.com/0xstation" },
             { name: "help desk", href: "https://6vdcjqzyfj3.typeform.com/to/kTlOjkdT" },
