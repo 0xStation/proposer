@@ -6,9 +6,10 @@ import { data } from "autoprefixer"
 interface ContributorSeed {
   address: string
   data: {
-    name: string
+    name?: string
     ens?: string
-    verified: boolean
+    verified?: boolean
+    pfpURL?: string
   }
 }
 
@@ -109,19 +110,27 @@ const alex: ContributorSeed = {
   },
 }
 
+const custom: ContributorSeed = {
+  address: "0xC9d20533c5b8a79526377e5d05dC79b87B28E92F",
+  data: {
+    pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/detactical.jpeg",
+  },
+}
+
 export const stationContributors = {
-  tina,
-  mind,
-  conner,
-  kristen,
-  calvin,
-  brendan,
-  michael,
-  abe,
-  nick,
-  alli,
-  kassen,
-  alex,
+  //   tina,
+  //   mind,
+  //   conner,
+  //   kristen,
+  //   calvin,
+  //   brendan,
+  //   michael,
+  //   abe,
+  //   nick,
+  //   alli,
+  //   kassen,
+  //   alex,
+  //   custom,
 }
 
 export async function seed() {
@@ -141,9 +150,18 @@ export async function seed() {
 
     const dataCopy = JSON.parse(JSON.stringify(account.data)) as AccountMetadata
 
-    dataCopy.name = contributorSeed.data.name
-    dataCopy.ens = contributorSeed.data.ens
-    dataCopy.verified = contributorSeed.data.verified
+    if (contributorSeed.data.name) {
+      dataCopy.name = contributorSeed.data.name
+    }
+    if (contributorSeed.data.ens) {
+      dataCopy.ens = contributorSeed.data.ens
+    }
+    if (contributorSeed.data.verified) {
+      dataCopy.verified = contributorSeed.data.verified
+    }
+    if (contributorSeed.data.pfpURL) {
+      dataCopy.pfpURL = contributorSeed.data.pfpURL
+    }
 
     await db.account.update({
       where: {
