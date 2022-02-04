@@ -154,7 +154,12 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 </div>
                 <div className="text-base font-normal">
                   <div className="flex flex-row max-w-xs break-all mr-2">
-                    <a href={application?.data?.url} className="text-magic-mint">
+                    <a
+                      target="_blank"
+                      href={application?.data?.url}
+                      className="text-magic-mint"
+                      rel="noreferrer"
+                    >
                       {application?.data?.url}
                     </a>
                   </div>
