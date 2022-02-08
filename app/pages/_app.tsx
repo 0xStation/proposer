@@ -6,6 +6,7 @@ import { InjectedConnector } from "wagmi/connectors/injected"
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect"
 import { WalletLinkConnector } from "wagmi/connectors/walletLink"
 import { LOCAL_STORAGE } from "app/core/utils/constants"
+import * as FullStory from "@fullstory/browser"
 
 // Chains for connectors to support
 const chains = defaultChains
@@ -46,6 +47,8 @@ export default function App({ Component, pageProps }: AppProps) {
   if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
     const connection = localStorage.getItem(LOCAL_STORAGE.CONNECTION)
     autoConnect = !!connection
+
+    FullStory.init({ orgId: "1875XG" })
   }
 
   return (
