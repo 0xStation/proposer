@@ -108,7 +108,7 @@ const contributorReview: InitiativeSeed = {
     rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
     skills: ["solidity", "subgraph", "backend", "frontend", "design", "quantitative analysis"],
     commitment: "Full-time, Part-time",
-    bannerURL: "/contributor-review-banner.png",
+    bannerURL: "/banners/contributor-review.png",
     links: [],
   },
 }
@@ -127,7 +127,7 @@ const waitingRoom: InitiativeSeed = {
     skills: ["solidity", "frontend", "backend", "product design", "data analytics", "subgraph"],
     commitment: "Full-time, Part-time",
     isAcceptingApplications: false,
-    bannerURL: "/waiting-room-banner.png",
+    bannerURL: "/banners/waiting-room.png",
     links: [],
   },
 }
@@ -147,7 +147,7 @@ const newstand: InitiativeSeed = {
     ],
     links: [{ symbol: Symbol.MIRROR, url: "https://station.mirror.xyz/" }],
     rewardText: ["Starting from 800 USDC", "Station Visitor Ticket NFT"],
-    bannerURL: "/newstand-banner.png",
+    bannerURL: "/banners/newstand.png",
     commitment: "One-time",
     skills: ["writing", "graphic design", "editorial design"],
   },
@@ -167,7 +167,7 @@ const partnership: InitiativeSeed = {
     rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
     skills: ["writing", "partnerships"],
     commitment: "One-time, Part-time",
-    bannerURL: "/terminal-partnership-banner.png",
+    bannerURL: "/banners/terminal-partnership.png",
     links: [],
   },
 }
@@ -192,14 +192,14 @@ const networkSustainability: InitiativeSeed = {
     ],
     commitment: "One-time, Part-time",
     isAcceptingApplications: false,
-    bannerURL: "/network-sustainability-banner.png",
+    bannerURL: "/banners/network-sustainability.png",
     links: [],
   },
 }
 const community: InitiativeSeed = {
   localId: initiativeIds.community,
   data: {
-    name: "Community",
+    name: "Contributor Experience",
     oneLiner: "Welcoming new contributors and fostering a culture of intellectual thoughtfullness.",
     shortName: "CONTRIBUTOR EXPERIENCE",
     contributeText: [
@@ -210,7 +210,7 @@ const community: InitiativeSeed = {
     rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
     skills: ["discord", "community management", "hr", "moderation"],
     isAcceptingApplications: false,
-    bannerURL: "/contributor-experience-banner.png",
+    bannerURL: "/banners/contributor-experience.png",
     links: [],
   },
 }
@@ -229,7 +229,7 @@ const midnightStation: InitiativeSeed = {
     skills: ["sound editing", "communication"],
     isAcceptingApplications: false,
     links: [],
-    bannerURL: "/midnight-station-banner.png",
+    bannerURL: "/banners/midnight-station.png",
   },
 }
 const brandIdentity: InitiativeSeed = {
@@ -246,7 +246,7 @@ const brandIdentity: InitiativeSeed = {
     skills: ["graphic design", "creative direction", "animation", "illustration"],
     isAcceptingApplications: false,
     links: [],
-    bannerURL: "/brand-identity-banner.png",
+    bannerURL: "/banners/brand-identity.png",
   },
 }
 const stationDigest: InitiativeSeed = {
@@ -265,7 +265,7 @@ const stationDigest: InitiativeSeed = {
     skills: ["writing", "organization"],
     isAcceptingApplications: false,
     links: [],
-    bannerURL: "/brand-identity-banner.png",
+    bannerURL: "/banners/digest.png",
   },
 }
 
