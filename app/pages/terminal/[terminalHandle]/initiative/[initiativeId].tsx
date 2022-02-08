@@ -151,7 +151,7 @@ const Project: BlitzPage = () => {
                 <div>
                   {initiative && initiative.data.isAcceptingApplications && (
                     <div className="relative h-5 bg-tunnel-black flex overflow-hidden">
-                      <div className="whitespace-nowrap text-magic-mint font-vt323 text-xl w-full">
+                      <div className="whitespace-nowrap text-magic-mint font-lores text-xl w-full">
                         <p>
                           CALLING FOR CONTRIBUTORS. CALLING FOR CONTRIBUTORS. CALLING FOR
                           CONTRIBUTORS. CALLING FOR CONTRIBUTORS.

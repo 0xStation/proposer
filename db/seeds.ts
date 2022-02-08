@@ -8,12 +8,12 @@ import { seed as seedStationContributorDetails } from "./seed/station/3-contribu
  * This seed function is executed when you run `blitz db seed`.
  */
 const seed = async () => {
-  ////// PHASE 1
+  // //// PHASE 1
   // console.log("Seeding skills...")
   // await seedSkills()
   // console.log("Seeding station terminal...")
   // await seedStationTerminal()
-  ////// PHASE 2
+  // //// PHASE 2
   // console.log("seeding terminal contributors...")
   // await seedStationTerminalContributors()
   // console.log("seeding initiative contributors...")
