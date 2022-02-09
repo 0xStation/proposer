@@ -159,7 +159,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           selectedUserToEndorse={selectedApplication?.account}
         />
         <div className="flex flex-col space-y-10">
-          <div className="flex-auto flex-wrap space-x-3 text-marble-white text-base space-y-3">
+          <div className="text-marble-white text-base overflow-x-scroll whitespace-nowrap space-x-3">
             {initiatives
               .filter((initiative) => initiative?.applicationCount) // filter on initiatives with applications
               .map((initiative, idx) => {

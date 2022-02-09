@@ -6,7 +6,7 @@ export const Pill = ({ onClick, active = false, children }) => {
   return (
     <button
       onClick={onClick}
-      className={`rounded-xl h-[29px] ${selectedStyling} active:bg-marble-white active:text-concrete hover:bg-marble-white hover:text-tunnel-black`}
+      className={`rounded-xl ${selectedStyling} active:bg-marble-white active:text-concrete hover:bg-marble-white hover:text-tunnel-black`}
     >
       <span className="m-4 text-sm">{children}</span>
     </button>
