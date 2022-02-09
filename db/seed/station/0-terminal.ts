@@ -167,7 +167,7 @@ const partnership: InitiativeSeed = {
     rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
     skills: ["writing", "partnerships"],
     commitment: "One-time, Part-time",
-    bannerURL: "/banners/terminal-partnership.png",
+    bannerURL: "/banners/terminal-partnerships.png",
     links: [],
   },
 }
