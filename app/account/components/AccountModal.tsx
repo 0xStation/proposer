@@ -34,9 +34,9 @@ const customStyles = {
   option: (provided, state) => ({
     ...provided,
     backgroundColor: "#2E2E2E",
-    color: "#646464",
+    color: "#FFF",
     "&:hover": {
-      color: "white",
+      color: "#DDD",
       cursor: "pointer",
     },
   }),
@@ -162,7 +162,7 @@ const AccountModal = ({
                   ) : (
                     <div
                       {...getRootProps()}
-                      className="text-base text-concrete bg-wet-concrete border border-dotted border-concrete p-4 text-center"
+                      className="text-base text-concrete bg-wet-concrete border border-dotted border-concrete p-4 text-center cursor-pointer"
                     >
                       <input {...getInputProps()} />
                       {isDragActive ? (
