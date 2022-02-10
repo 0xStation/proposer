@@ -34,9 +34,10 @@ const customStyles = {
   option: (provided, state) => ({
     ...provided,
     backgroundColor: "#2E2E2E",
-    color: "#FFF",
+    color: "#F2EFEF",
     "&:hover": {
-      color: "#DDD",
+      backgroundColor: "#F2EFEF",
+      color: "#2E2E2E",
       cursor: "pointer",
     },
   }),
