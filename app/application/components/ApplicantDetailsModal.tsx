@@ -54,7 +54,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     (roleOfActiveUser || hasBeenAirDroppedTokens) &&
     activeUser?.address !== application?.account?.address
 
-  const canInvite = role === "STAFF"
+  const canInvite = roleOfActiveUser === "STAFF"
 
   const CloseButton = ({ onClick }) => (
     <div className="flex flex-1 justify-start absolute top-1 left-2">
