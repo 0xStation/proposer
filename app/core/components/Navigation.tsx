@@ -75,7 +75,7 @@ const Navigation = () => {
           ]}
         />
         <div className="flex items-center border-l border-l-concrete">
-          <Map />
+          {/* <Map /> */}
           {activeUser ? (
             <Dropdown
               side="right"
