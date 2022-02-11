@@ -17,6 +17,7 @@ module.exports = {
       vt323: ["VT323", "Monospace"],
       sans: ["Graphik", "sans-serif"],
       serif: ["Merriweather", "serif"],
+      lores: ["LoRes9PlusOT", "Monospace"],
     },
     extend: {
       spacing: {
