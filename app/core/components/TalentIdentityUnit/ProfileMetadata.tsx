@@ -48,7 +48,7 @@ export const ProfileMetadata = ({
       <div className="flex-2/5 content-center align-middle mr-1">{profileImage}</div>
       <div className="flex flex-col flex-1 content-center">
         <div className="flex flex-row items-center flex-1 space-x-1">
-          <div className={`${large && "font-bold"} text-lg text-marble-white`}>@{name}</div>
+          <div className={`${large && "font-bold"} text-lg text-marble-white`}>{name}</div>
           {verified && (
             <div className="m-auto">
               <Image src={Verified} alt="Verified icon." width={10} height={10} />
@@ -56,7 +56,7 @@ export const ProfileMetadata = ({
           )}
         </div>
         <div className="flex flex-row flex-1 text-sm text-concrete space-x-1 overflow-hidden">
-          <div className="w-max truncate">{truncateString(ens || address)}</div>
+          <div className="w-max truncate">@{truncateString(ens || address)}</div>
         </div>
       </div>
     </div>
