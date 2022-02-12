@@ -53,7 +53,7 @@ const TicketWrapper = ({ activeUser, tokenBalance }) => {
                   </div>
                   <div className="mt-2 justify-between px-1 text-base flex">
                     <span className="text-tunnel-black font-bold mr-2">Balance</span>
-                    <span className="text-tunnel-black font-light">{tokenBalance} RAILⒺ</span>
+                    <span className="text-tunnel-black font-light">{tokenBalance} RAIL🅔</span>
                   </div>
                 </div>
               </div>
@@ -69,7 +69,7 @@ const TicketWrapper = ({ activeUser, tokenBalance }) => {
           <div className="mt-2 hidden justify-between px-1 text-sm 2xl:flex">
             <span className="text-marble-white font-bold mr-2">Balance</span>
             <span className="text-marble-white font-light">
-              {tokenBalance} RAIL<span className="text-xs">Ⓔ</span>
+              {tokenBalance} RAIL<span className="text-xs">🅔</span>
             </span>
           </div>
         </div>

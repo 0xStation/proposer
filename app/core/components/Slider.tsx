@@ -27,7 +27,7 @@ const Slider = ({ onChange, contributor, disabled }) => {
         return (
           <div {...props} style={props.style}>
             <p className="text-marble-white text-center text-base">{contributor.data.name}</p>
-            <p className="text-marble-white text-center text-base">{valueNow} RAILⒺ</p>
+            <p className="text-marble-white text-center text-base">{valueNow} RAIL🅔</p>
             <img
               src={contributor.data.pfpURL}
               alt="PFP"

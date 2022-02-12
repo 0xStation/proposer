@@ -90,7 +90,7 @@ const EndorseModal = ({
       if (endorsementAmt > tokenBalance) {
         setEndorsementBudgetPercentage((endorsementAmt / tokenBalance) * 100)
         setEndorsementMessage(
-          "Insufficient RAILⒺ balance. Please wait for the refill and endorse again later."
+          "Insufficient RAIL🅔 balance. Please wait for the refill and endorse again later."
         )
         setError(true)
       } else {
@@ -238,18 +238,18 @@ const EndorseModal = ({
           <TokenContext
             className="text-concrete mr-auto text-center w-[115px] ml-[-2%] pt-[.9rem] pl-[.4rem]"
             issuanceAmount={1}
-            symbol={"RAILⒺ"}
+            symbol={"RAIL🅔"}
             context="Like what I've seen so far"
           />
           <TokenContext
             className="text-concrete text-center w-[100px] pt-[.9rem] pl-[1.1rem]"
             issuanceAmount={50}
-            symbol={"RAILⒺ"}
+            symbol={"RAIL🅔"}
           />
           <TokenContext
             className="text-concrete ml-auto text-center w-[115px] pt-[.9rem] pl-[2.2rem]"
             issuanceAmount={100}
-            symbol={"RAILⒺ"}
+            symbol={"RAIL🅔"}
             context="Crazy not to bring them onboard"
           />
         </div>
