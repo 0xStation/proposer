@@ -172,7 +172,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                       <span>Points</span>
                     </div>
                     <div className="text-base font-normal text-marble-white">
-                      {`${points * Math.pow(10, 0 - decimals)} RAILⓅ`}
+                      {`${points * Math.pow(10, 0 - decimals)} RAIL🅟`}
                     </div>
                   </div>
                 )}
