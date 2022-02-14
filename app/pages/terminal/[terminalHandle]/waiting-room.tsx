@@ -30,6 +30,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
   const activeUser: Account | null = useStore((state) => state.activeUser)
+  const [selected, setSelected] = useState<boolean>(false)
   const [roleOfActiveUser, setRoleOfActiveUser] = useState<Role | null>()
 
   useEffect(() => {
@@ -76,6 +77,16 @@ const TerminalWaitingPage: BlitzPage = () => {
     }
   }, [selectedInitiativeLocalId])
 
+  const preSet = (id) => {
+    setSelectedInitiativeLocalId(id)
+    setSelected(true)
+  }
+
+  const setIniative = (id) => {
+    setSelectedInitiativeLocalId(id)
+    setSelected(true)
+  }
+
   const applicationCards = applications?.map((application, idx) => {
     const { account, createdAt, points, referrals } = application
     const onClick = () => {
@@ -102,11 +113,8 @@ const TerminalWaitingPage: BlitzPage = () => {
 
     return <ApplicationCard key={idx} {...applicationCardProps} />
   })
-
-  const noApplicationsView = selectedInitiativeLocalId ? (
+  const noApplicationsView = selectedInitiativeLocalId && (
     <div>There are no active applications for this initiative.</div>
-  ) : (
-    <div>Please select an initiative to view applications.</div>
   )
 
   const waitingRoomView =
@@ -167,12 +175,13 @@ const TerminalWaitingPage: BlitzPage = () => {
                   <Pill
                     key={idx}
                     active={initiative.localId === selectedInitiativeLocalId}
-                    onClick={() => setSelectedInitiativeLocalId(initiative.localId)}
+                    onClick={() => setIniative(initiative.localId)}
                   >
                     {`${initiative.data?.name?.toUpperCase()} (${initiative.applicationCount})`}
                   </Pill>
                 )
               })}
+            {!selected && initiatives[0] && preSet(initiatives[0].localId)}
           </div>
           <div className="flex-auto text-marble-white">
             {!applications || !applications.length ? (

@@ -183,11 +183,13 @@ const AccountModal = ({
                   <label htmlFor="skills" className="text-marble-white">
                     Skills
                   </label>
-                  <span className="text-concrete text-xs mb-2">
-                    (Type to add additional skills)
-                  </span>
                   <div>
-                    <Field name="skills" component={MultiSelectAdapter} options={skillOptions} />
+                    <Field
+                      name="skills"
+                      component={MultiSelectAdapter}
+                      options={skillOptions}
+                      placeholder="Select or insert up to 5 skills"
+                    />
                   </div>
                 </div>
 
