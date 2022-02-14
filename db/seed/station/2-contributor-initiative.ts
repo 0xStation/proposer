@@ -69,6 +69,26 @@ const alex: ContributorSeed = {
   address: "0x69F35Bed06115Dd05AB5452058d9dbe8a7AD80f1",
   initiativeLocalIds: [initiativeIds.partnership, initiativeIds.stationDigest],
 }
+const katie: ContributorSeed = {
+  address: "0x28B4DE9c45AF6cb1A5a46c19909108f2BB74a2BE",
+  initiativeLocalIds: [initiativeIds.newstand],
+}
+const reggie: ContributorSeed = {
+  address: "0x06Ac1F9f86520225b73EFCe4982c9d9505753251",
+  initiativeLocalIds: [initiativeIds.newstand],
+}
+const ruby: ContributorSeed = {
+  address: "0x87fB7c717A4145095Eb076e239BC0F8Fba42cf49",
+  initiativeLocalIds: [initiativeIds.newstand],
+}
+const jasmine: ContributorSeed = {
+  address: "0x29668d39c163f64a1c177c272a8e2D9ecc85F0dE",
+  initiativeLocalIds: [initiativeIds.newstand],
+}
+const stephanie: ContributorSeed = {
+  address: "0x6D2c778705D5278eb0f379b067A3B093bCD25f86",
+  initiativeLocalIds: [initiativeIds.brandIdentity],
+}
 
 export const stationContributors = {
   //   tina,
@@ -83,6 +103,11 @@ export const stationContributors = {
   //   alli,
   //   kassen,
   //   alex,
+  katie,
+  reggie,
+  ruby,
+  jasmine,
+  stephanie,
 }
 
 export async function seed() {
