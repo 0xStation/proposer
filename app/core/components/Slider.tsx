@@ -8,8 +8,6 @@ const markClassName =
   "absolute border-[5px] border-solid border-marble-white rounded align-middle bottom-[calc(50%-6px)]"
 
 const Slider = ({ onChange, contributor, disabled }) => {
-  // commenting out the "mark" implementation for now since it's not responsive.
-  // Planning on coming up with a responsive design post-mvp
   return (
     <ReactSlider
       className={horizontalSlider}
@@ -18,28 +16,28 @@ const Slider = ({ onChange, contributor, disabled }) => {
       markClassName={markClassName}
       disabled={disabled}
       step={1}
-      // marks={[1, 50, 100]}
       min={1}
       max={100}
       renderThumb={(props, state) => {
         const { valueNow } = state
-        props.style.left = parseFloat(props?.style?.left || "0") * 1.03
         return (
-          <div {...props} style={props.style}>
+          <div {...props}>
             <p className="text-marble-white text-center text-base">{contributor.data.name}</p>
-            <p className="text-marble-white text-center text-base">{valueNow} RAILⒺ</p>
-            <img
-              src={contributor.data.pfpURL}
-              alt="PFP"
-              className="h-[40px] w-[40px] border border-marble-white rounded-full m-auto"
-            />
+            <p className="text-marble-white text-center text-base">{valueNow} RAIL🅔</p>
+            {contributor.data.pfpURL ? (
+              <img
+                src={contributor.data.pfpURL}
+                alt="PFP"
+                className="h-[40px] w-[40px] border border-marble-white rounded-full m-auto"
+              />
+            ) : (
+              <div
+                className={`h-[40px] w-[40px] place-self-center border border-marble-white bg-concrete rounded-full place-items-center`}
+              ></div>
+            )}
           </div>
         )
       }}
-      // renderMark={(props) => {
-      //   // override the styling offset that's automatically applied based on the thumb-size
-      //   return <div {...props} style={{ left: `calc(1.1 * ${props?.style?.left}px` }}></div>
-      // }}
     />
   )
 }

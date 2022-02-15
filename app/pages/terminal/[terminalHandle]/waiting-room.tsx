@@ -170,7 +170,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           <p className="p-6 text-marble-white text-center">{`Reach out and let ${selectedApplication?.account?.data?.name} know. Once the Ticket is claimed, ${selectedApplication?.account?.data?.name}’s profile will appear in Contributor Directory.`}</p>
         </Modal>
         <div className="flex flex-col space-y-10">
-          <div className="flex-auto flex-wrap space-x-3 text-marble-white text-base space-y-3">
+          <div className="text-marble-white text-base overflow-x-scroll whitespace-nowrap space-x-3">
             {initiatives
               .filter((initiative) => initiative?.applicationCount) // filter on initiatives with applications
               .map((initiative, idx) => {

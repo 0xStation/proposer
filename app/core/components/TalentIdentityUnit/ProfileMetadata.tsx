@@ -56,7 +56,7 @@ export const ProfileMetadata = ({
           )}
         </div>
         <div className="flex flex-row flex-1 text-sm text-concrete space-x-1 overflow-hidden">
-          <div className="w-max truncate">{truncateString(ens || address)}</div>
+          <div className="w-max truncate">@{truncateString(ens || address)}</div>
         </div>
       </div>
     </div>

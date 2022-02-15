@@ -24,7 +24,7 @@ export default async function getApplicationsByInitiative(
 
   let queryWaitingRoom = gql`
     {
-      waitingRoomInitiative(id: "${referralGraphAddress.toLowerCase()}:${initiativeLocalId}.0") {
+      waitingRoomInitiative(id: "${referralGraphAddress.toLowerCase()}:${initiativeLocalId}") {
         localId
         applicants {
           address
