@@ -98,7 +98,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 </div>
                 <div className="flex flex-col flex-1">
                   <div className="font-bold text-marble-white">Skills</div>
-                  <div className="flex flex-row space-x-2 flex-wrap text-marble-white">
+                  <div className="flex flex-row flex-wrap text-marble-white">
                     {(skills?.length &&
                       skills?.map?.((skill, index) => {
                         return (
