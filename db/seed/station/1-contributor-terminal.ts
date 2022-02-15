@@ -69,18 +69,18 @@ const alex: ContributorSeed = {
 }
 
 export const stationContributors = {
-  // tina,
-  // mind,
-  // conner,
-  // kristen,
-  // calvin,
-  // brendan,
-  // michael,
-  // abe,
-  // nick,
-  // alli,
-  // kassen,
-  // alex,
+  tina,
+  mind,
+  conner,
+  kristen,
+  calvin,
+  brendan,
+  michael,
+  abe,
+  nick,
+  alli,
+  kassen,
+  alex,
 }
 
 export async function seed() {

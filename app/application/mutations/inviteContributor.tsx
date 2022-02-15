@@ -1,5 +1,6 @@
 import db from "db"
 import * as z from "zod"
+import { canInvite } from "app/utils/permissions"
 
 const InviteContributor = z.object({
   invitedByAccountId: z.number(),
@@ -12,10 +13,20 @@ const InviteContributor = z.object({
 export default async function inviteContributor(input: z.infer<typeof InviteContributor>) {
   const params = InviteContributor.parse(input)
 
-  const terminal = await db.terminal.findUnique({
-    where: { id: params.terminalId },
-  })
+  // check that this invitation is valid
+  const validInvite = await canInvite(
+    params.invitedByAccountId,
+    params.terminalId,
+    params.accountId,
+    params.initiativeId
+  )
 
+  if (!validInvite) {
+    console.log("Not a valid invite pair.")
+    return
+  }
+
+  // update the application to show that the status is accepted
   const accountInitiative = await db.accountInitiative.update({
     where: {
       accountId_initiativeId: {
@@ -37,16 +48,20 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
     },
   })
 
-  if (!existingMembership) {
-    await db.accountTerminal.create({
-      data: {
-        accountId: params.accountId,
-        terminalId: params.terminalId,
-        roleLocalId: params.roleLocalId,
-        data: {
-          invitedBy: params.invitedByAccountId,
-        },
-      },
-    })
+  // if the user already exists, we do not want to "re-invite" them
+  // but what if this is not meant to be a first time invite but a promotion?
+  if (existingMembership) {
+    console.log("This user is already part of the terminal.")
   }
+
+  await db.accountTerminal.create({
+    data: {
+      accountId: params.accountId,
+      terminalId: params.terminalId,
+      roleLocalId: params.roleLocalId,
+      data: {
+        invitedBy: params.invitedByAccountId,
+      },
+    },
+  })
 }

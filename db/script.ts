@@ -1,24 +1,17 @@
-import { useMutation, useRouter, useParam, useQuery } from "blitz"
 import inviteContributor from "app/application/mutations/inviteContributor"
 /*
  * This seed function is executed when you run `blitz db seed -f db/wipe.ts`.
  */
 const seed = async () => {
-  console.log("Wiping all database rows...")
+  console.log("testing")
 
-  const [createApplicationMutation] = useMutation(inviteContributor, {
-    onSuccess: () => {
-      console.log("completed")
-    },
-  })
-
-  const accountId = 1
-  const initiativeId = 1
-  const terminalId = 1
+  const accountId = 4
+  const initiativeId = 10
+  const terminalId = 2
   const roleLocalId = 1
-  const inviterId = 1
+  const inviterId = 3
 
-  await createApplicationMutation({
+  await inviteContributor({
     invitedByAccountId: inviterId,
     accountId: accountId,
     initiativeId: initiativeId,
