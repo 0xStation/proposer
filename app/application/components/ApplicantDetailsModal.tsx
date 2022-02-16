@@ -19,7 +19,7 @@ type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
   setIsApplicantOpen: Dispatch<SetStateAction<boolean>>
   setIsEndorseModalOpen: Dispatch<SetStateAction<boolean>>
-  setIsInviteSuccessModalOpen: Dispatch<SetStateAction<boolean>>
+  setIsInviteModalOpen: Dispatch<SetStateAction<boolean>>
   application: Application
   initiative: Initiative
   roleOfActiveUser?: string
@@ -32,7 +32,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   isApplicantOpen,
   setIsApplicantOpen,
   setIsEndorseModalOpen,
-  setIsInviteSuccessModalOpen,
+  setIsInviteModalOpen,
   roleOfActiveUser,
 }) => {
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
@@ -223,13 +223,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   secondary
                   className="inline px-6"
                   onClick={async () => {
-                    // TODO: @symmetry
-                    // invoke(inviteAccountToinitiative, {
-                    // applicantId: application?.account?.id,
-                    // initiativeId: initiative?.id
-                    // })
                     setIsApplicantOpen(false)
-                    setTimeout(() => setIsInviteSuccessModalOpen(true), 550)
+                    setTimeout(() => setIsInviteModalOpen(true), 550)
                   }}
                 >
                   Invite to initiative
