@@ -1,5 +1,5 @@
 import Modal from "../../core/components/Modal"
-import { Image, invoke } from "blitz"
+import { Image } from "blitz"
 import { Dispatch, SetStateAction } from "react"
 import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
@@ -54,6 +54,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     (roleOfActiveUser || hasBeenAirDroppedTokens) &&
     activeUser?.address !== application?.account?.address
 
+  // TODO: query permissions here and assign to `canInvite`
   const canInvite = roleOfActiveUser === "STAFF"
 
   const CloseButton = ({ onClick }) => (

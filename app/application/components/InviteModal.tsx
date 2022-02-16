@@ -41,14 +41,20 @@ export const InviteModal = ({
     setRole(e.target.value)
   }
 
-  const inviteModalView = applicantTicket ? (
-    <div className="mt-12 mx-12 text-marble-white text-center">
-      <h1 className="text-3xl">{`Adding ${selectedApplication?.account?.data?.name} to ${terminal?.data?.name}?`}</h1>
-      <Button className="mt-10 w-72" onClick={handleInvite}>
+  // If an applicant is internally applying to an initiative
+  // we don't need to create a new ticket for them and therefore
+  // don't need a role dropdown.
+  const existingTerminalMemberView = (
+    <div className="mt-8 mx-12 text-marble-white text-center">
+      <h1 className="text-3xl">{`Adding ${selectedApplication?.account?.data?.name} to`}</h1>
+      <h1 className="text-3xl">{`${currentInitiative?.data?.name}?`}</h1>
+      <Button className="mt-10 mb-3 w-72" onClick={handleInvite}>
         Confirm
       </Button>
     </div>
-  ) : (
+  )
+
+  const newTerminalMemberView = (
     <div className="pt-12 px-1">
       <label className="text-marble-white">Role</label>
       <select
@@ -67,27 +73,29 @@ export const InviteModal = ({
     </div>
   )
 
+  const successfulInvitationView = (
+    <div className="mt-[3.25rem] mx-12 text-marble-white text-center">
+      <h1 className="text-3xl">{`${selectedApplication?.account?.data?.name} is now a ${role} at ${terminal?.data?.name} and a part of ${currentInitiative?.data?.name}! `}</h1>
+      <p className="mt-3 mb-8">{`Reach out to let ${selectedApplication?.account?.data?.name} know.`}</p>
+    </div>
+  )
+
+  const inviteModalView = applicantTicket ? existingTerminalMemberView : newTerminalMemberView
+  const title = applicantTicket || inviteSuccessful ? "" : `Add to ${currentInitiative?.data?.name}`
+  const subtitle =
+    applicantTicket || inviteSuccessful
+      ? ""
+      : `Select ${selectedApplication?.account?.data?.name}'s starting role at ${terminal?.data?.name}.`
   return (
     <Modal
-      title={applicantTicket || inviteSuccessful ? "" : `Add to ${currentInitiative?.data?.name}`}
-      subtitle={
-        applicantTicket || inviteSuccessful
-          ? ""
-          : `Select ${selectedApplication?.account?.data?.name}'s starting role at ${terminal?.data?.name}`
-      }
+      title={title}
+      subtitle={subtitle}
       open={isInviteModalOpen}
       toggle={(close) => {
         setIsInviteModalOpen(close)
       }}
     >
-      {inviteSuccessful ? (
-        <div className="mt-[3.25rem] mx-12 text-marble-white text-center">
-          <h1 className="text-3xl">{`${selectedApplication?.account?.data?.name} is now a ${role} at ${terminal?.data?.name} and a part of ${currentInitiative?.data?.name}! `}</h1>
-          <p className="mt-3 mb-8">{`Reach out to let ${selectedApplication?.account?.data?.name} know`}</p>
-        </div>
-      ) : (
-        inviteModalView
-      )}
+      {inviteSuccessful ? successfulInvitationView : inviteModalView}
     </Modal>
   )
 }
