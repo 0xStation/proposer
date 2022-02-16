@@ -18,6 +18,9 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Modal from "app/core/components/Modal"
 import getRoleByAccountTerminal from "app/role/queries/getRoleByAccountTerminal"
 import { Role } from "app/role/types"
+import { InviteModal } from "app/application/components/InviteModal"
+import getTicket from "app/ticket/queries/getTicket"
+import { Ticket } from "app/ticket/types"
 
 const TerminalWaitingPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -28,7 +31,9 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [isRedirectModalOpen, setIsRedirectModalOpen] = useState(false)
   const [isEndorseModalOpen, setIsEndorseModalOpen] = useState(false)
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
+  const [selectedApplicantTicket, setSelectedApplicantTicket] = useState<Ticket | null>()
   const activeUser: Account | null = useStore((state) => state.activeUser)
   const [roleOfActiveUser, setRoleOfActiveUser] = useState<Role | null>()
 
@@ -47,6 +52,16 @@ const TerminalWaitingPage: BlitzPage = () => {
     () => initiatives?.find((initiative) => initiative.localId === selectedInitiativeLocalId),
     [selectedInitiativeLocalId]
   )
+
+  useEffect(() => {
+    ;(async () => {
+      const applicantTicket = await invoke(getTicket, {
+        terminalId: terminal?.id || 0,
+        accountId: selectedApplication?.account?.id as number,
+      })
+      setSelectedApplicantTicket(applicantTicket)
+    })()
+  }, [selectedApplication])
 
   useEffect(() => {
     if (activeUser?.id) {
@@ -142,6 +157,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             setIsApplicantOpen={setIsApplicantOpen}
             setIsEndorseModalOpen={setIsEndorseModalOpen}
             roleOfActiveUser={roleOfActiveUser?.data?.value}
+            setIsInviteModalOpen={setIsInviteModalOpen}
           />
         )}
         {selectedInitiativeLocalId && selectedInitiativeLocalId && (
@@ -157,6 +173,13 @@ const TerminalWaitingPage: BlitzPage = () => {
           isSuccessModalOpen={isSuccessModalOpen}
           setIsSuccessModalOpen={setIsSuccessModalOpen}
           selectedUserToEndorse={selectedApplication?.account}
+        />
+        <InviteModal
+          selectedApplication={selectedApplication}
+          currentInitiative={currentInitiative}
+          isInviteModalOpen={isInviteModalOpen}
+          setIsInviteModalOpen={setIsInviteModalOpen}
+          applicantTicket={selectedApplicantTicket}
         />
         <div className="flex flex-col space-y-10">
           <div className="text-marble-white text-base overflow-x-scroll whitespace-nowrap space-x-3">
