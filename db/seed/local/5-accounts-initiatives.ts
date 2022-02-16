@@ -1,13 +1,13 @@
 import db from "../../index"
 import { initiativeIds } from "./4-initiatives"
 
-const michael = {
-  address: "0x65A3870F48B5237f27f674Ec42eA1E017E111D63",
+const mima = {
+  address: "0x65A3870F48B5237f27f674Ec42eA1E017E111ABC",
   initiatives: [initiativeIds.contributorReview],
 }
 
 const seed = async () => {
-  const contributors = [michael]
+  const contributors = [mima]
 
   const terminal = await db.terminal.findUnique({ where: { handle: "stationlabs" } })
 
@@ -44,7 +44,7 @@ const seed = async () => {
           accountId: account.id,
           initiativeId: initiative.id,
           createdAt: new Date(),
-          status: "CONTRIBUTOR",
+          status: "APPLIED",
         },
       })
     }

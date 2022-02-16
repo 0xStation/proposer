@@ -16,7 +16,7 @@ const roleIds = {
 const michael: ContributorSeed = {
   address: "0x65A3870F48B5237f27f674Ec42eA1E017E111D63",
   joinedAt: new Date("2021-12-01"),
-  role: roleIds.dailyCommuter,
+  role: roleIds.staff, // making it easy to allow myself to invite people
 }
 
 const seed = async () => {

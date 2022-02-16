@@ -27,7 +27,7 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
   }
 
   // update the application to show that the status is accepted
-  const accountInitiative = await db.accountInitiative.update({
+  await db.accountInitiative.update({
     where: {
       accountId_initiativeId: {
         accountId: params.accountId,
