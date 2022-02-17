@@ -5,7 +5,7 @@ import useStore from "../hooks/useStore"
 import { useAccount } from "wagmi"
 
 const ModalContainer = () => {
-  const [{ data: accountData }, disconnect] = useAccount({
+  const [{ data: accountData }] = useAccount({
     fetchEns: true,
   })
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
