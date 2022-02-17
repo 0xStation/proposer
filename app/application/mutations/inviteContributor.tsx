@@ -3,7 +3,7 @@ import * as z from "zod"
 import { canInvite } from "app/utils/permissions"
 
 const InviteContributor = z.object({
-  invitedByAccountId: z.number(),
+  referrerId: z.number(),
   accountId: z.number(),
   initiativeId: z.number(),
   terminalId: z.number(),
@@ -15,7 +15,7 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
 
   // check that this invitation is valid
   const validInvite = await canInvite(
-    params.invitedByAccountId,
+    params.referrerId,
     params.terminalId,
     params.accountId,
     params.initiativeId
@@ -60,7 +60,7 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
       terminalId: params.terminalId,
       roleLocalId: params.roleLocalId,
       data: {
-        invitedBy: params.invitedByAccountId,
+        invitedBy: params.referrerId,
       },
     },
   })

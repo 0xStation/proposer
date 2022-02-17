@@ -50,10 +50,9 @@ export const InviteModal = ({
   )
 
   const handleInvite = async () => {
-    console.log(chosenRole)
     if (chosenRole) {
-      let c = await inviteContributor({
-        invitedByAccountId: activeUser.id,
+      await inviteContributor({
+        referrerId: activeUser.id,
         accountId: selectedApplication.account.id,
         terminalId: currentInitiative.terminalId,
         roleLocalId: chosenRole.localId,
