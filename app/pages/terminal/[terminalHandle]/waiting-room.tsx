@@ -9,7 +9,7 @@ import ApplicantDetailsModal from "app/application/components/ApplicantDetailsMo
 import useStore from "app/core/hooks/useStore"
 import { Account } from "app/account/types"
 import EndorseModal from "app/core/components/EndorseModal"
-import SuccessModal from "app/core/components/SuccessModal"
+import EndorseSuccessModal from "app/core/components/EndorseSuccessModal"
 import { Pill } from "app/core/components/Pill"
 import getApplicationsByInitiative from "app/application/queries/getApplicationsByInitiative"
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
@@ -24,18 +24,19 @@ import { Ticket } from "app/ticket/types"
 
 const TerminalWaitingPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
-  const { directedFrom, initiative } = useRouterQuery()
+  const { directedFrom } = useRouterQuery()
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
   const [selectedInitiativeLocalId, setSelectedInitiativeLocalId] = useState<number>()
   const [applications, setApplications] = useState<Application[]>([])
   const [isRedirectModalOpen, setIsRedirectModalOpen] = useState(false)
   const [isEndorseModalOpen, setIsEndorseModalOpen] = useState(false)
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
+  const [isEndorseSuccessModalOpen, setIsEndorseSuccessModalOpen] = useState(false)
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
   const [selectedApplicantTicket, setSelectedApplicantTicket] = useState<Ticket | null>()
   const activeUser: Account | null = useStore((state) => state.activeUser)
   const [roleOfActiveUser, setRoleOfActiveUser] = useState<Role | null>()
+  const [refreshApplications, setRefreshApplications] = useState<boolean>(false)
 
   useEffect(() => {
     setIsRedirectModalOpen(directedFrom === "application")
@@ -44,8 +45,8 @@ const TerminalWaitingPage: BlitzPage = () => {
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
-    { terminalId: terminal?.id || 0 },
-    { suspense: false }
+    { terminalId: terminal?.id as number },
+    { enabled: !!terminal?.id, suspense: false }
   )
 
   const currentInitiative = useMemo(
@@ -54,13 +55,15 @@ const TerminalWaitingPage: BlitzPage = () => {
   )
 
   useEffect(() => {
-    ;(async () => {
-      const applicantTicket = await invoke(getTicket, {
-        terminalId: terminal?.id || 0,
-        accountId: selectedApplication?.account?.id as number,
-      })
-      setSelectedApplicantTicket(applicantTicket)
-    })()
+    if (terminal?.id && selectedApplication?.account?.id) {
+      ;(async () => {
+        const applicantTicket = await invoke(getTicket, {
+          terminalId: terminal.id,
+          accountId: selectedApplication?.account?.id as number,
+        })
+        setSelectedApplicantTicket(applicantTicket)
+      })()
+    }
   }, [selectedApplication])
 
   useEffect(() => {
@@ -81,7 +84,7 @@ const TerminalWaitingPage: BlitzPage = () => {
     if (selectedInitiativeLocalId) {
       ;(async () => {
         let applications = await invoke(getApplicationsByInitiative, {
-          referralGraphAddress: TERMINAL.REFERRAL_GRAPH, // todo: dynmically load from local state
+          referralGraphAddress: TERMINAL.REFERRAL_GRAPH,
           initiativeLocalId: selectedInitiativeLocalId,
           initiativeId: currentInitiative?.id,
           terminalId: terminal?.id,
@@ -89,7 +92,7 @@ const TerminalWaitingPage: BlitzPage = () => {
         setApplications(applications || [])
       })()
     }
-  }, [selectedInitiativeLocalId])
+  }, [selectedInitiativeLocalId, refreshApplications])
 
   const applicationCards = applications?.map((application, idx) => {
     const { account, createdAt, points, referrals } = application
@@ -123,6 +126,28 @@ const TerminalWaitingPage: BlitzPage = () => {
   ) : (
     <div>Please select an initiative to view applications.</div>
   )
+
+  const applicationsView =
+    !applications || !applications.length ? (
+      noApplicationsView
+    ) : (
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">{applicationCards}</div>
+    )
+
+  const initiativePills = initiatives
+    // filter out initiatives that don't have applications
+    ?.filter((initiative) => initiative?.applicationCount)
+    .map((initiative, idx) => {
+      return (
+        <Pill
+          key={idx}
+          active={initiative.localId === selectedInitiativeLocalId}
+          onClick={() => setSelectedInitiativeLocalId(initiative.localId)}
+        >
+          {`${initiative.data?.name?.toUpperCase()} (${initiative.applicationCount})`}
+        </Pill>
+      )
+    })
 
   const waitingRoomView =
     !initiatives || (Array.isArray(initiatives) && !initiatives.length) ? (
@@ -164,14 +189,14 @@ const TerminalWaitingPage: BlitzPage = () => {
           <EndorseModal
             isEndorseModalOpen={isEndorseModalOpen}
             setIsEndorseModalOpen={setIsEndorseModalOpen}
-            setIsSuccessModalOpen={setIsSuccessModalOpen}
+            setIsSuccessModalOpen={setIsEndorseSuccessModalOpen}
             selectedUserToEndorse={selectedApplication?.account}
             initiativeLocalId={selectedInitiativeLocalId}
           />
         )}
-        <SuccessModal
-          isSuccessModalOpen={isSuccessModalOpen}
-          setIsSuccessModalOpen={setIsSuccessModalOpen}
+        <EndorseSuccessModal
+          isSuccessModalOpen={isEndorseSuccessModalOpen}
+          setIsSuccessModalOpen={setIsEndorseSuccessModalOpen}
           selectedUserToEndorse={selectedApplication?.account}
         />
         <InviteModal
@@ -180,30 +205,13 @@ const TerminalWaitingPage: BlitzPage = () => {
           isInviteModalOpen={isInviteModalOpen}
           setIsInviteModalOpen={setIsInviteModalOpen}
           applicantTicket={selectedApplicantTicket}
+          setRefreshApplications={setRefreshApplications}
         />
         <div className="flex flex-col space-y-10">
           <div className="text-marble-white text-base overflow-x-scroll whitespace-nowrap space-x-3">
-            {initiatives
-              .filter((initiative) => initiative?.applicationCount) // filter on initiatives with applications
-              .map((initiative, idx) => {
-                return (
-                  <Pill
-                    key={idx}
-                    active={initiative.localId === selectedInitiativeLocalId}
-                    onClick={() => setSelectedInitiativeLocalId(initiative.localId)}
-                  >
-                    {`${initiative.data?.name?.toUpperCase()} (${initiative.applicationCount})`}
-                  </Pill>
-                )
-              })}
+            {initiativePills}
           </div>
-          <div className="flex-auto text-marble-white">
-            {!applications || !applications.length ? (
-              noApplicationsView
-            ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">{applicationCards}</div>
-            )}
-          </div>
+          <div className="flex-auto text-marble-white">{applicationsView}</div>
         </div>
       </>
     )

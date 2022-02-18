@@ -1,4 +1,3 @@
-import { Account } from "aws-sdk"
 import db from "db"
 import * as z from "zod"
 import { Initiative } from "../types"

@@ -8,6 +8,7 @@ import InviteContributor from "app/application/mutations/inviteContributor"
 import useStore from "app/core/hooks/useStore"
 import { Account } from "app/account/types"
 import { Role } from "app/role/types"
+import { titleCase } from "app/core/utils/titleCase"
 
 export const InviteModal = ({
   selectedApplication,
@@ -15,6 +16,7 @@ export const InviteModal = ({
   isInviteModalOpen,
   setIsInviteModalOpen,
   applicantTicket,
+  setRefreshApplications,
 }) => {
   const [inviteSuccessful, setInviteSuccessful] = useState<boolean>(false)
   const [chosenRole, setChosenRole] = useState<Role>()
@@ -49,7 +51,7 @@ export const InviteModal = ({
     { suspense: false }
   )
 
-  const handleInvite = async () => {
+  const handleInviteClick = async () => {
     if (chosenRole) {
       await inviteContributor({
         referrerId: activeUser.id,
@@ -59,8 +61,8 @@ export const InviteModal = ({
         initiativeId: currentInitiative.id,
       })
     }
-
     setInviteSuccessful(true)
+    setRefreshApplications(true)
   }
 
   const handleRoleDropdown = (e) => {
@@ -72,12 +74,12 @@ export const InviteModal = ({
 
   // If an applicant is internally applying to an initiative
   // we don't need to create a new ticket for them and therefore
-  // don't need a role dropdown.
+  // show a different view without a role dropdown.
   const existingTerminalMemberView = (
     <div className="mt-8 mx-12 text-marble-white text-center">
       <h1 className="text-3xl">{`Adding ${selectedApplication?.account?.data?.name} to`}</h1>
       <h1 className="text-3xl">{`${currentInitiative?.data?.name}?`}</h1>
-      <Button className="mt-10 mb-3 w-72" onClick={handleInvite}>
+      <Button className="mt-10 mb-3 w-72" onClick={handleInviteClick}>
         Confirm
       </Button>
     </div>
@@ -92,20 +94,24 @@ export const InviteModal = ({
       >
         {roles?.map((role, idx) => (
           <option key={idx} value={role.localId}>
-            {role.data?.name}
+            {titleCase(role.data?.name || "")}
           </option>
         ))}
       </select>
-      <Button className="mt-10 w-72" onClick={handleInvite}>
+      <Button className="mt-10 w-72" onClick={handleInviteClick}>
         Invite
       </Button>
     </div>
   )
 
   const successfulInvitationView = (
-    <div className="mt-[3.25rem] mx-12 text-marble-white text-center">
-      <h1 className="text-3xl">{`${selectedApplication?.account?.data?.name} is now a ${chosenRole?.data.name} at ${terminal?.data?.name} and a part of ${currentInitiative?.data?.name}! `}</h1>
-      <p className="mt-3 mb-8">{`Reach out to let ${selectedApplication?.account?.data?.name} know.`}</p>
+    <div className="mt-[2rem] mx-28 text-marble-white text-center">
+      <h1 className="text-3xl">
+        {selectedApplication?.account?.data?.name} is now a{" "}
+        <span className="text-electric-violet">{titleCase(chosenRole?.data.name || "")}</span> at{" "}
+        {terminal?.data?.name} and a part of {currentInitiative?.data?.name}!
+      </h1>
+      <p className="mt-3 mb-8">Reach out to let {selectedApplication?.account?.data?.name} know.</p>
     </div>
   )
 
