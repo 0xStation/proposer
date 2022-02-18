@@ -48,10 +48,10 @@ createdb station
 blitz prisma migrate dev
 ```
 
-**Seed database**
+**Seed database with local dev seeds**
 
 ```
-blitz db seed
+blitz db seed -f db/seed/local/seed.ts
 ```
 
 ### Run Application
