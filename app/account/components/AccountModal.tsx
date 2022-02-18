@@ -181,14 +181,14 @@ const AccountModal = ({
                 </div>
                 <div className="flex flex-col col-span-2">
                   <label htmlFor="skills" className="text-marble-white">
-                    Skills
+                    Select or insert up to 5 skills
                   </label>
                   <div>
                     <Field
                       name="skills"
                       component={MultiSelectAdapter}
                       options={skillOptions}
-                      placeholder="Select or insert up to 5 skills"
+                      placeholder="Product Design, Protocol Architecture..."
                     />
                   </div>
                 </div>
