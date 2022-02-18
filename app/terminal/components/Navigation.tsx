@@ -49,11 +49,11 @@ const Navigation = ({ children }: { children?: any }) => {
                 <img
                   src={terminal.data.pfpURL}
                   alt="PFP"
-                  className="h-[52px] w-[52px] border border-marble-white rounded-full"
+                  className="h-[52px] min-w-[52px] border border-marble-white rounded-full"
                 />
               </div>
               <div className="flex flex-col">
-                <h1 className="text-2xl text-marble-white">{terminal.data.name}</h1>
+                <h1 className="text-2xl text-marble-white">Crypto Culture & Society</h1>
                 <span className="text-base text-concrete">@{terminal.handle}</span>
               </div>
             </div>
