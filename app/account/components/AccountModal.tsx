@@ -200,7 +200,7 @@ const AccountModal = ({
                   <Field
                     component="input"
                     name="discordId"
-                    placeholder="Discord ID"
+                    placeholder="station#000"
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>

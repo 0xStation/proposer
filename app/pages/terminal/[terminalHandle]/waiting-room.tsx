@@ -35,7 +35,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [selectedApplication, setSelectedApplication] = useState<Application>()
   const [selectedApplicantTicket, setSelectedApplicantTicket] = useState<Ticket | null>()
   const activeUser: Account | null = useStore((state) => state.activeUser)
-  const [selected, setSelected] = useState<boolean>(false)
+  const [isInitiativeSelected, setIsInitiativeSelected] = useState<boolean>(false)
   const [roleOfActiveUser, setRoleOfActiveUser] = useState<Role | null>()
 
   useEffect(() => {
@@ -55,13 +55,15 @@ const TerminalWaitingPage: BlitzPage = () => {
   )
 
   useEffect(() => {
-    ;(async () => {
-      const applicantTicket = await invoke(getTicket, {
-        terminalId: terminal?.id || 0,
-        accountId: selectedApplication?.account?.id as number,
-      })
-      setSelectedApplicantTicket(applicantTicket)
-    })()
+    if (selectedApplication) {
+      ;(async () => {
+        const applicantTicket = await invoke(getTicket, {
+          terminalId: terminal?.id || 0,
+          accountId: selectedApplication.account?.id as number,
+        })
+        setSelectedApplicantTicket(applicantTicket)
+      })()
+    }
   }, [selectedApplication])
 
   useEffect(() => {
@@ -92,16 +94,14 @@ const TerminalWaitingPage: BlitzPage = () => {
     }
   }, [selectedInitiativeLocalId])
 
-  const preSet = (id) => {
+  const setSelectedInitiative = (id) => {
+    setIsInitiativeSelected(true)
     setSelectedInitiativeLocalId(id)
-    setSelected(true)
   }
 
-  const setIniative = (id) => {
-    setSelectedInitiativeLocalId(id)
-    setSelected(true)
+  if (!isInitiativeSelected && initiatives && initiatives[0]) {
+    setSelectedInitiative(initiatives[0].localId)
   }
-
   const applicationCards = applications?.map((application, idx) => {
     const { account, createdAt, points, referrals } = application
     const onClick = () => {
@@ -198,13 +198,12 @@ const TerminalWaitingPage: BlitzPage = () => {
                   <Pill
                     key={idx}
                     active={initiative.localId === selectedInitiativeLocalId}
-                    onClick={() => setIniative(initiative.localId)}
+                    onClick={() => setSelectedInitiative(initiative.localId)}
                   >
                     {`${initiative.data?.name?.toUpperCase()} (${initiative.applicationCount})`}
                   </Pill>
                 )
               })}
-            {!selected && initiatives[0] && preSet(initiatives[0].localId)}
           </div>
           <div className="flex-auto text-marble-white">
             {!applications || !applications.length ? (
