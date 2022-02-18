@@ -28,11 +28,7 @@ const tina: ContributorSeed = {
 }
 const conner: ContributorSeed = {
   address: "0x016562aA41A8697720ce0943F003141f5dEAe006",
-  initiativeLocalIds: [
-    initiativeIds.newstand,
-    initiativeIds.contributorReview,
-    initiativeIds.waitingRoom,
-  ],
+  initiativeLocalIds: [initiativeIds.contributorReview, initiativeIds.waitingRoom],
 }
 const calvin: ContributorSeed = {
   address: "0xB0F0bA31aA582726E36Dc0c79708E9e072455eD2",
@@ -41,7 +37,6 @@ const calvin: ContributorSeed = {
 const kristen: ContributorSeed = {
   address: "0xaE55f61f85935BBB68b8809d5c02142e4CbA9a13",
   initiativeLocalIds: [
-    initiativeIds.newstand,
     initiativeIds.contributorReview,
     initiativeIds.waitingRoom,
     initiativeIds.midnightStation,
@@ -49,19 +44,11 @@ const kristen: ContributorSeed = {
 }
 const brendan: ContributorSeed = {
   address: "0x17B7163E708A06De4DdA746266277470dd42C53f",
-  initiativeLocalIds: [
-    initiativeIds.newstand,
-    initiativeIds.waitingRoom,
-    initiativeIds.midnightStation,
-  ],
+  initiativeLocalIds: [initiativeIds.waitingRoom, initiativeIds.midnightStation],
 }
 const michael: ContributorSeed = {
   address: "0x65A3870F48B5237f27f674Ec42eA1E017E111D63",
-  initiativeLocalIds: [
-    initiativeIds.newstand,
-    initiativeIds.waitingRoom,
-    initiativeIds.midnightStation,
-  ],
+  initiativeLocalIds: [initiativeIds.waitingRoom, initiativeIds.midnightStation],
 }
 const abe: ContributorSeed = {
   address: "0x237c9dbB180C4Fbc7A8DBfd2b70A9aab2518A33f",
