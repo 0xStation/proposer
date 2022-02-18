@@ -44,16 +44,16 @@ const Navigation = ({ children }: { children?: any }) => {
       <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36 relative">
         <div className="grid gap-0 grid-cols-1 md:grid-cols-3 xl:grid-cols-4 max-w-screen-xl h-full mx-auto">
           <div className="col-span-1 pl-4 text-2xl border-concrete border-b pb-12 md:border-b-0 md:border-r md:pr-6 h-full">
-            <div className="flex items-center mt-12">
-              <div className="flex-2/5 mr-4">
+            <div className="flex mt-12">
+              <div className="mr-4 mt-2">
                 <img
                   src={terminal.data.pfpURL}
                   alt="PFP"
-                  className="h-[52px] w-[52px] border border-marble-white rounded-full"
+                  className="h-[52px] w-[52px] min-w-[52px] border border-marble-white rounded-full"
                 />
               </div>
               <div className="flex flex-col">
-                <h1 className="text-2xl text-marble-white">{terminal.data.name}</h1>
+                <h1 className="text-2xl text-marble-white">Crypto Culture and Society</h1>
                 <span className="text-base text-concrete">@{terminal.handle}</span>
               </div>
             </div>
