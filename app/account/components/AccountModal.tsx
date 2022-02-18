@@ -35,7 +35,6 @@ const customStyles = {
     ...provided,
     backgroundColor: "#2E2E2E",
     color: "#F2EFEF",
-    padding: "0px",
     "&:hover": {
       backgroundColor: "#F2EFEF",
       color: "#2E2E2E",
