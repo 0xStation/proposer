@@ -4,9 +4,7 @@ import { seed as seedStationTerminalContributors } from "./seed/station/1-contri
 import { seed as seedStationInitiativeContributors } from "./seed/station/2-contributor-initiative"
 import { seed as seedStationContributorDetails } from "./seed/station/3-contributor-details"
 
-/*
- * This seed function is executed when you run `blitz db seed`.
- */
+// This seed function is executed when you run `blitz db seed -f db/steward.ts`.
 const seed = async () => {
   // //// PHASE 1
   // console.log("Seeding skills...")
@@ -14,10 +12,10 @@ const seed = async () => {
   // console.log("Seeding station terminal...")
   // await seedStationTerminal()
   // //// PHASE 2
-  //   console.log("seeding terminal contributors...")
-  //   await seedStationTerminalContributors()
-  console.log("seeding initiative contributors...")
-  await seedStationInitiativeContributors()
+  // console.log("seeding terminal contributors...")
+  // await seedStationTerminalContributors()
+  // console.log("seeding initiative contributors...")
+  // await seedStationInitiativeContributors()
   // console.log("seeding station contributor details...")
   // seedStationContributorDetails()
 }

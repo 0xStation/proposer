@@ -1,7 +1,7 @@
 import { AccountMetadata } from "app/account/types"
 import db from "./index"
 
-/** This seed function is executed when you run `blitz db seed -f db/wipe.ts`.*/
+// This seed function is executed when you run `blitz db seed -f db/discord.ts`
 const seed = async () => {
   console.log("Fetching discord handles and addresses...")
   let accounts = await db.account.findMany({})

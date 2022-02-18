@@ -13,6 +13,7 @@ const mind: ContributorSeed = {
     initiativeIds.waitingRoom,
     initiativeIds.brandIdentity,
     initiativeIds.partnership,
+    initiativeIds.newstand,
   ],
 }
 const tina: ContributorSeed = {
@@ -91,23 +92,23 @@ const stephanie: ContributorSeed = {
 }
 
 export const stationContributors = {
-  //   tina,
-  //   mind,
-  //   conner,
-  //   kristen,
-  //   calvin,
-  //   brendan,
-  //   michael,
-  //   abe,
-  //   nick,
-  //   alli,
-  //   kassen,
-  //   alex,
-  katie,
-  reggie,
-  ruby,
-  jasmine,
-  stephanie,
+  // tina,
+  // mind,
+  // conner,
+  // kristen,
+  // calvin,
+  // brendan,
+  // michael,
+  // abe,
+  // nick,
+  // alli,
+  // kassen,
+  // alex,
+  // katie,
+  // reggie,
+  // ruby,
+  // jasmine,
+  // stephanie,
 }
 
 export async function seed() {
