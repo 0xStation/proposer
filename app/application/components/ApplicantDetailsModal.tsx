@@ -14,7 +14,7 @@ import { formatDate } from "app/core/utils/formatDate"
 import { ProfileMetadata } from "app/core/components/TalentIdentityUnit/ProfileMetadata"
 import { Tag } from "app/core/components/Tag"
 import { Button } from "app/core/components/Button"
-import getInvitePermissions from "../queries/getInvitePermissions"
+import hasInvitePermissions from "../queries/hasInvitePermissions"
 
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
@@ -42,7 +42,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   const { data: applicantData, address, role, skills } = application?.account || {}
   const { pfpURL, name, ens, pronouns, verified, discordId, timezone } = applicantData
   const [canInvite] = useQuery(
-    getInvitePermissions,
+    hasInvitePermissions,
     { referrerId: activeUser?.id, terminalId: initiative?.terminalId },
     { suspense: false }
   )

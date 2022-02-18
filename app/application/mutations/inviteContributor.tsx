@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { getInvitePermissions } from "app/application/queries/getInvitePermissions"
+import { hasInvitePermissions } from "app/application/queries/hasInvitePermissions"
 
 const InviteContributor = z.object({
   referrerId: z.number(),
@@ -15,7 +15,7 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
   const { referrerId, terminalId, accountId, initiativeId, roleLocalId } = params
 
   // check that this invitation is valid
-  const canInvite = await getInvitePermissions({ referrerId, terminalId })
+  const canInvite = await hasInvitePermissions({ referrerId, terminalId })
 
   if (!canInvite) {
     console.log("Not a valid invite pair.")

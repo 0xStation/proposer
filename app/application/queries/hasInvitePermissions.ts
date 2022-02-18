@@ -2,13 +2,13 @@ import db from "../../../db/index"
 import { Terminal } from "app/terminal/types"
 import { z } from "zod"
 
-const GetInvitePermissions = z.object({
+const HasInvitePermissions = z.object({
   referrerId: z.number(),
   terminalId: z.number(),
 })
 
-export const getInvitePermissions = async (input) => {
-  const data = GetInvitePermissions.parse(input)
+export const hasInvitePermissions = async (input) => {
+  const data = HasInvitePermissions.parse(input)
   // the invitee / terminal relation
   // required so we can see which role the invitee has
   // to tell if this is a valid invitation
@@ -42,4 +42,4 @@ export const getInvitePermissions = async (input) => {
   return permissions?.invite?.rolesAllowedToInvite?.includes(invitedByRole)
 }
 
-export default getInvitePermissions
+export default hasInvitePermissions
