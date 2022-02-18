@@ -10,7 +10,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "prepare": "husky install",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "seed": "blitz run db seed",
+    "steward": "blitz run db seed -f db/steward.ts -e production"
   },
   "prisma": {
     "schema": "db/schema.prisma"

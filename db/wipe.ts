@@ -1,7 +1,6 @@
 import db from "./index"
-/*
- * This seed function is executed when you run `blitz db seed -f db/wipe.ts`.
- */
+
+// This seed function is executed when you run `blitz db seed -f db/wipe.ts`
 const seed = async () => {
   console.log("Wiping all database rows...")
   await db.accountInitiative.deleteMany({})
