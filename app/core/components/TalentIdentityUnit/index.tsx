@@ -15,6 +15,7 @@ type TalentIdentityUnitProps = {
   isEndorsable?: boolean
   referrals?: ApplicationReferral[]
   waitingRoom?: boolean
+  pointsSymbol?: string
 }
 
 export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
@@ -26,6 +27,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
     isEndorsable = false,
     dateMetadata: dateMetadataProp = {},
     waitingRoom,
+    pointsSymbol,
   } = props
 
   const activeUser: Account | null = useStore((state) => state.activeUser)
@@ -42,7 +44,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
         <div className="place-self-center mt-1 font-bold">Points</div>
       </div>
       <div className="flex flex-1 align-right place-content-end content-right text-base">
-        {points} RAIL🅟
+        {points} {pointsSymbol}
       </div>
     </div>
   )

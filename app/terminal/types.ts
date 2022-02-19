@@ -7,6 +7,18 @@ export type TerminalMetadata = {
       rolesAllowedToInvite: number[]
     }
   }
+  contracts: {
+    addresses: {
+      endorsements: string
+      points: string
+      referrals: string
+    }
+    symbols: {
+      endorsements: string
+      points: string
+      referrals: string
+    }
+  }
 }
 
 export type Terminal = {

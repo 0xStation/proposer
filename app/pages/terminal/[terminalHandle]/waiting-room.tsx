@@ -84,7 +84,7 @@ const TerminalWaitingPage: BlitzPage = () => {
     if (selectedInitiativeLocalId) {
       ;(async () => {
         let applications = await invoke(getApplicationsByInitiative, {
-          referralGraphAddress: TERMINAL.REFERRAL_GRAPH,
+          referralGraphAddress: terminal?.data.contracts.addresses.referrals,
           initiativeLocalId: selectedInitiativeLocalId,
           initiativeId: currentInitiative?.id,
           terminalId: terminal?.id,
@@ -122,6 +122,7 @@ const TerminalWaitingPage: BlitzPage = () => {
         createdAt,
       },
       waitingRoom: true,
+      pointsSymbol: terminal?.data.contracts.symbols.points,
     }
 
     return <ApplicationCard key={idx} {...applicationCardProps} />
@@ -186,6 +187,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             setIsEndorseModalOpen={setIsEndorseModalOpen}
             roleOfActiveUser={roleOfActiveUser?.data?.value}
             setIsInviteModalOpen={setIsInviteModalOpen}
+            terminalData={terminal?.data}
           />
         )}
         {selectedInitiativeLocalId && selectedInitiativeLocalId && (
@@ -195,6 +197,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             setIsSuccessModalOpen={setIsEndorseSuccessModalOpen}
             selectedUserToEndorse={selectedApplication?.account}
             initiativeLocalId={selectedInitiativeLocalId}
+            terminal={terminal}
           />
         )}
         <EndorseSuccessModal

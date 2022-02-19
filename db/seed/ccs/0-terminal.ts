@@ -37,6 +37,18 @@ const ccs: TerminalSeed = {
     permissions: {
       invite: [1, 2], // local id for STAFF and TEAM LEAD
     },
+    contracts: {
+      addresses: {
+        endorsements: "0xCF59217bf47b6faC02060Ef7F61Db9340a8Bf065",
+        points: "0x9ACBfAF1e08aF96b297d44E7D896B63A199C71e8",
+        referrals: "0xEbdd02Ed4f6D9b76bF2d1251f64a073b3947Bfcc",
+      },
+      symbols: {
+        endorsements: "SOCIETY🅔",
+        points: "SOCIETY🅟",
+        referrals: "SOCIETY🅡",
+      },
+    },
   },
 }
 

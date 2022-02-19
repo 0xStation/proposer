@@ -58,6 +58,7 @@ const TerminalContributorsPage: BlitzPage = () => {
       },
       referrals: [],
       isEndorsable: false,
+      pointsSymbol: terminal?.data.contracts.symbols.points,
     }
     return <ContributorCard key={idx} {...contributorCardProps} />
   })

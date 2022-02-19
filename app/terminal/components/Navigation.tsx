@@ -25,10 +25,11 @@ const Navigation = ({ children }: { children?: any }) => {
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
   const [{ data: balanceData }] = useBalance({
     addressOrName: address,
-    token: TERMINAL.TOKEN_ADDRESS,
+    token: terminal?.data.contracts.addresses.endorsements,
     watch: true,
     formatUnits: decimals,
   })
+  console.log(balanceData)
   const tokenBalance = parseFloat(balanceData?.formatted || "0").toFixed(1)
 
   // obviously need better error page if the terminal is not found, but this will do.
@@ -99,7 +100,13 @@ const Navigation = ({ children }: { children?: any }) => {
             <div className="mt-12">{children}</div>
           </div>
         </div>
-        {activeUser && <TicketWrapper activeUser={activeUser} tokenBalance={tokenBalance} />}
+        {activeUser && (
+          <TicketWrapper
+            activeUser={activeUser}
+            tokenBalance={tokenBalance}
+            endorsementsSymbol={terminal.data.contracts.symbols.endorsements}
+          />
+        )}
       </div>
     </div>
   )

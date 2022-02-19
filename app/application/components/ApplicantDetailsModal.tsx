@@ -15,6 +15,7 @@ import { ProfileMetadata } from "app/core/components/TalentIdentityUnit/ProfileM
 import { Tag } from "app/core/components/Tag"
 import { Button } from "app/core/components/Button"
 import hasInvitePermissions from "../queries/hasInvitePermissions"
+import { TerminalMetadata } from "app/terminal/types"
 
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
@@ -24,6 +25,7 @@ type ApplicantDetailsModalProps = {
   application: Application
   initiative: Initiative
   roleOfActiveUser?: string
+  terminalData?: TerminalMetadata
 }
 
 const hasBeenAirDroppedTokens = false
@@ -35,6 +37,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   setIsEndorseModalOpen,
   setIsInviteModalOpen,
   roleOfActiveUser,
+  terminalData,
 }) => {
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
   const activeUser: Account | null = useStore((state) => state.activeUser)
@@ -180,7 +183,9 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                       <span>Points</span>
                     </div>
                     <div className="text-base font-normal text-marble-white">
-                      {`${points * Math.pow(10, 0 - decimals)} RAIL🅟`}
+                      {`${points * Math.pow(10, 0 - decimals)} ${
+                        terminalData?.contracts.symbols.points
+                      }`}
                     </div>
                   </div>
                 )}
@@ -199,6 +204,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                         endorser={account}
                         amount={amount * Math.pow(10, 0 - decimals)}
                         isEndorsable={isEndorsable || false}
+                        symbol={terminalData?.contracts.symbols.points}
                       />
                     ))}
                   </div>
