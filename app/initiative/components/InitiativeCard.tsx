@@ -6,11 +6,11 @@ const InitiativeCard = ({ title, oneLiner, contributors, isAcceptingApplications
       <div className="flex flex-row space-x-3">
         <div className="mt-8 flex flex-row flex-auto">
           {contributors?.length
-            ? contributors.slice(0, 5).map(({ data: { pfpURL } }, idx) => {
+            ? contributors.slice(0, 4).map(({ data: { pfpURL } }, idx) => {
                 const pfpStyling = "h-6 w-6 rounded-full border block border-marble-white"
                 const nestedStyling = idx ? "ml-[-5px]" : ""
-                if (idx === 4) {
-                  const additionalContributors = (contributors?.length || 0) - 4
+                if (idx === 3) {
+                  const additionalContributors = (contributors?.length || 0) - 3
                   return (
                     <span
                       key={idx}
@@ -35,7 +35,7 @@ const InitiativeCard = ({ title, oneLiner, contributors, isAcceptingApplications
         </div>
         {isAcceptingApplications && (
           <div className="flex-auto grid place-content-end">
-            <span className="text-magic-mint text-xs">CALLING FOR CONTRIBUTORS</span>
+            <span className="text-neon-blue text-xs">OPEN FOR SUBMISSIONS</span>
           </div>
         )}
       </div>
