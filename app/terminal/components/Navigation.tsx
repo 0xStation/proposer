@@ -31,7 +31,7 @@ const Navigation = ({ children }: { children?: any }) => {
     watch: true,
     formatUnits: decimals,
   })
-  console.log(balanceData)
+
   const tokenBalance = parseFloat(balanceData?.formatted || "0").toFixed(1)
 
   // obviously need better error page if the terminal is not found, but this will do.
