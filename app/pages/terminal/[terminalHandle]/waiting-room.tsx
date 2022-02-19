@@ -55,10 +55,10 @@ const TerminalWaitingPage: BlitzPage = () => {
   )
 
   useEffect(() => {
-    if (selectedApplication) {
+    if (selectedApplication && terminal?.id) {
       ;(async () => {
         const applicantTicket = await invoke(getTicket, {
-          terminalId: terminal?.id || 0,
+          terminalId: terminal.id,
           accountId: selectedApplication.account?.id as number,
         })
         setSelectedApplicantTicket(applicantTicket)
@@ -94,14 +94,12 @@ const TerminalWaitingPage: BlitzPage = () => {
     }
   }, [selectedInitiativeLocalId])
 
-  const setSelectedInitiative = (id) => {
-    setIsInitiativeSelected(true)
-    setSelectedInitiativeLocalId(id)
-  }
+  useEffect(() => {
+    if (initiatives) {
+      setSelectedInitiativeLocalId(initiatives[0]?.localId)
+    }
+  }, [initiatives])
 
-  if (!isInitiativeSelected && initiatives && initiatives[0]) {
-    setSelectedInitiative(initiatives[0].localId)
-  }
   const applicationCards = applications?.map((application, idx) => {
     const { account, createdAt, points, referrals } = application
     const onClick = () => {

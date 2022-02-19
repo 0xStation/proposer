@@ -181,14 +181,17 @@ const AccountModal = ({
                 </div>
                 <div className="flex flex-col col-span-2">
                   <label htmlFor="skills" className="text-marble-white">
-                    Select or insert up to 5 skills
+                    Skills
                   </label>
+                  <span className="text-concrete text-xs mb-2">
+                    (Select or insert up to 5 skills)
+                  </span>
                   <div>
                     <Field
                       name="skills"
                       component={MultiSelectAdapter}
                       options={skillOptions}
-                      placeholder="Product Design, Protocol Architecture..."
+                      placeholder="Product Design, Writing..."
                     />
                   </div>
                 </div>
@@ -200,7 +203,7 @@ const AccountModal = ({
                   <Field
                     component="input"
                     name="discordId"
-                    placeholder="station#000"
+                    placeholder="<username>#0000"
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>
