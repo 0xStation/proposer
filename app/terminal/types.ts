@@ -3,7 +3,9 @@ export type TerminalMetadata = {
   description: string
   pfpURL: string
   permissions: {
-    invite: number[] // list of role local ids
+    invite: {
+      rolesAllowedToInvite: number[]
+    }
   }
 }
 
