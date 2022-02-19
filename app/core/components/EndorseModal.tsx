@@ -29,6 +29,7 @@ const EndorseModal = ({
   setIsSuccessModalOpen,
   selectedUserToEndorse: contributor,
   initiativeLocalId,
+  terminal,
 }) => {
   const [{ data: accountData }] = useAccount()
 
@@ -44,6 +45,7 @@ const EndorseModal = ({
 
   const { loading: allowanceApprovalLoading, write: approveAllowance } = useEndorsementTokenWrite({
     methodName: "approve",
+    contract: terminal.data?.contracts.addresses.endorsements,
   })
 
   const { loading: endorseLoading, write: endorse } = useWaitingRoomWrite({
@@ -54,10 +56,14 @@ const EndorseModal = ({
     skip: true,
   })
 
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
+  const endorsementsSymbol = terminal.data?.contracts?.symbols.endorsements
+
+  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
+    terminal.data?.contracts.addresses.endorsements
+  )
   const [{ data: balanceData }] = useBalance({
     addressOrName: address,
-    token: TERMINAL.TOKEN_ADDRESS,
+    token: terminal.data?.contracts?.addresses?.endorsements,
     watch: true,
     formatUnits: decimals,
   })
@@ -71,6 +77,7 @@ const EndorseModal = ({
 
   const { read: getAllowance } = useEndorsementTokenRead({
     methodName: "allowance",
+    contract: terminal.data?.contracts.addresses.endorsements,
   })
 
   const EndorsingStateMessage = ({ children, error }) => {
@@ -90,7 +97,7 @@ const EndorseModal = ({
       if (endorsementAmt > tokenBalance) {
         setEndorsementBudgetPercentage((endorsementAmt / tokenBalance) * 100)
         setEndorsementMessage(
-          "Insufficient RAIL🅔 balance. Please wait for the refill and endorse again later."
+          `Insufficient ${endorsementsSymbol} balance. Please wait for the refill and endorse again later.`
         )
         setError(true)
       } else {
@@ -140,7 +147,7 @@ const EndorseModal = ({
 
     const { data: endorseData, error: endorseError } = await endorse({
       args: [
-        TERMINAL.REFERRAL_GRAPH,
+        terminal.data?.contracts?.addresses.referrals,
         contributor.address,
         endorsementAmount * Math.pow(10, decimals),
         initiativeLocalId,
@@ -232,24 +239,25 @@ const EndorseModal = ({
             onChange={handleSliderChange}
             contributor={contributor}
             disabled={allowanceApprovalLoading || endorseLoading || transactionPending}
+            endorsementsSymbol={terminal.data?.contracts.symbols.endorsements}
           />
         </div>
         <div className="flex flex-row">
           <TokenContext
             className="text-concrete mr-auto text-center w-[115px] ml-[-2%] pt-[.9rem] pl-[.4rem]"
             issuanceAmount={1}
-            symbol={"RAIL🅔"}
+            symbol={endorsementsSymbol}
             context="Like what I've seen so far"
           />
           <TokenContext
             className="text-concrete text-center w-[100px] pt-[.9rem] pl-[1.1rem]"
             issuanceAmount={50}
-            symbol={"RAIL🅔"}
+            symbol={endorsementsSymbol}
           />
           <TokenContext
             className="text-concrete ml-auto text-center w-[115px] pt-[.9rem] pl-[2.2rem]"
             issuanceAmount={100}
-            symbol={"RAIL🅔"}
+            symbol={endorsementsSymbol}
             context="Crazy not to bring them onboard"
           />
         </div>

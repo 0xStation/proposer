@@ -36,6 +36,18 @@ const station: TerminalSeed = {
         rolesAllowedToInvite: [1], // local id for STAFF
       },
     },
+    contracts: {
+      addresses: {
+        endorsements: "0xABf03EDC17De11e80008C3e89919b82AbA34521A",
+        points: "0x09B29bcb130E4A642f270AF3F6bDf2480D065835",
+        referrals: "0x488d547e5C383d66815c67fB1356A3F35d3885CF",
+      },
+      symbols: {
+        endorsements: "RAIL🅔",
+        points: "RAIL🅟",
+        referrals: "RAIL🅡",
+      },
+    },
   },
 }
 

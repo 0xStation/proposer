@@ -10,10 +10,11 @@ const endorsementTokenInterface = new utils.Interface(endorsementTokenAbi)
 const waitingRoomInterface = new utils.Interface(waitingRoomAbi)
 
 // call write functions from the endorsment graph
-export const useEndorsementGraphRead = ({ methodName }) => {
+export const useEndorsementGraphRead = ({ methodName, contract }) => {
   const [{ data, error, loading }, read] = useContractRead(
     {
-      addressOrName: TERMINAL.GRAPH_ADDRESS,
+      // addressOrName: TERMINAL.GRAPH_ADDRESS,
+      addressOrName: contract || TERMINAL.GRAPH_ADDRESS,
       contractInterface: endorseContractInterface,
     },
     methodName
@@ -21,10 +22,11 @@ export const useEndorsementGraphRead = ({ methodName }) => {
   return { data, error, loading, read }
 }
 
-export const useEndorsementGraphWrite = ({ methodName }) => {
+export const useEndorsementGraphWrite = ({ methodName, contract }) => {
   const [{ data, error, loading }, write] = useContractWrite(
     {
-      addressOrName: TERMINAL.GRAPH_ADDRESS,
+      // addressOrName: TERMINAL.GRAPH_ADDRESS,
+      addressOrName: contract || TERMINAL.GRAPH_ADDRESS,
       contractInterface: endorseContractInterface,
     },
     methodName
@@ -43,10 +45,11 @@ export const useWaitingRoomWrite = ({ methodName }) => {
   return { data, error, loading, write }
 }
 
-export const useEndorsementTokenRead = ({ methodName }) => {
+export const useEndorsementTokenRead = ({ methodName, contract }) => {
   const [{ data, error, loading }, read] = useContractRead(
     {
-      addressOrName: TERMINAL.TOKEN_ADDRESS,
+      // addressOrName: TERMINAL.TOKEN_ADDRESS,
+      addressOrName: contract || TERMINAL.TOKEN_ADDRESS,
       contractInterface: endorsementTokenInterface,
     },
     methodName
@@ -54,10 +57,11 @@ export const useEndorsementTokenRead = ({ methodName }) => {
   return { data, error, loading, read }
 }
 
-export const useEndorsementTokenWrite = ({ methodName }) => {
+export const useEndorsementTokenWrite = ({ methodName, contract }) => {
   const [{ data, error, loading }, write] = useContractWrite(
     {
-      addressOrName: TERMINAL.TOKEN_ADDRESS,
+      // addressOrName: TERMINAL.TOKEN_ADDRESS,
+      addressOrName: contract || TERMINAL.TOKEN_ADDRESS,
       contractInterface: endorsementTokenInterface,
     },
     methodName
@@ -65,11 +69,11 @@ export const useEndorsementTokenWrite = ({ methodName }) => {
   return { data, error, loading, write }
 }
 
-export const useDecimals = () => {
+export const useDecimals = (contract) => {
   const {
     data: decimals,
     error: decimalsError,
     loading: decimalsLoading,
-  } = useEndorsementTokenRead({ methodName: "decimals" })
+  } = useEndorsementTokenRead({ methodName: "decimals", contract })
   return { decimals: decimals as unknown as number, decimalsError, decimalsLoading }
 }
