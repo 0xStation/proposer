@@ -102,7 +102,7 @@ export const InviteModal = ({
         ))}
       </select>
       <Button className="mt-10 w-72" onClick={handleInviteClick}>
-        Invite
+        Confirm
       </Button>
     </div>
   )
