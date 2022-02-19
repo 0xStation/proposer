@@ -35,7 +35,7 @@ const ccs: TerminalSeed = {
       "A learning DAO building the liberal arts for crypto and exploring web3’s broader societal impact.",
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/ccs.jpeg",
     permissions: {
-      invite: [1], // local id for STAFF
+      invite: [1, 2], // local id for STAFF and TEAM LEAD
     },
   },
 }
@@ -90,7 +90,13 @@ const ccsRoles = [staff, teamLead, coreContributor, guestContributor]
 //////
 
 export const initiativeIds = {
-  // fill in!
+  journal: 1,
+  workshops: 2,
+  community: 3,
+  education: 4,
+  brand: 5,
+  strategy: 6,
+  electives: 7,
 }
 
 export async function seed() {
