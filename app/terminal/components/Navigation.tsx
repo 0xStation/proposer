@@ -15,6 +15,7 @@ const Navigation = ({ children }: { children?: any }) => {
   const terminalHandle = useParam("terminalHandle", "string") as string
   // I was getting a weird error that suspense was not supported by react-dom so I had to disable it.
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+
   const router = useRouter()
   const activeUser: Account | null = useStore((state) => state.activeUser)
 
@@ -43,7 +44,7 @@ const Navigation = ({ children }: { children?: any }) => {
     <div>
       <img
         className="w-full h-[185px] object-cover object-no-repeat object-[0,38%]"
-        src={"/station-cover.png"}
+        src={terminal.data.coverURL}
       />
       <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] relative">
         <div className="grid gap-0 grid-cols-1 md:grid-cols-3 xl:grid-cols-4 max-w-screen-xl h-full mx-auto">

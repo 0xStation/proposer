@@ -2,6 +2,7 @@ export type TerminalMetadata = {
   name: string
   description: string
   pfpURL: string
+  coverURL?: string
   permissions: {
     invite: {
       rolesAllowedToInvite: number[]
