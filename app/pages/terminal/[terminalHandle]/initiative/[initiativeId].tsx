@@ -53,8 +53,6 @@ const Project: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const initiativeLocalId = useParam("initiativeId", "number") as number
 
-  console.log(activeUser)
-
   useEffect(() => {
     if (terminal) {
       if (activeUser && initiativeLocalId) {
