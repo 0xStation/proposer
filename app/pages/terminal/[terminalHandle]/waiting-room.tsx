@@ -25,7 +25,6 @@ import { Ticket } from "app/ticket/types"
 const TerminalWaitingPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const { directedFrom } = useRouterQuery()
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
   const [selectedInitiativeLocalId, setSelectedInitiativeLocalId] = useState<number>()
   const [applications, setApplications] = useState<Application[]>([])
   const [isRedirectModalOpen, setIsRedirectModalOpen] = useState(false)
@@ -42,6 +41,9 @@ const TerminalWaitingPage: BlitzPage = () => {
     setIsRedirectModalOpen(directedFrom === "application")
   }, [directedFrom])
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
+    terminal?.data.contracts.addresses.endorsements
+  )
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
@@ -84,7 +86,7 @@ const TerminalWaitingPage: BlitzPage = () => {
     if (selectedInitiativeLocalId) {
       ;(async () => {
         let applications = await invoke(getApplicationsByInitiative, {
-          referralGraphAddress: TERMINAL.REFERRAL_GRAPH,
+          referralGraphAddress: terminal?.data.contracts.addresses.referrals,
           initiativeLocalId: selectedInitiativeLocalId,
           initiativeId: currentInitiative?.id,
           terminalId: terminal?.id,
@@ -122,6 +124,7 @@ const TerminalWaitingPage: BlitzPage = () => {
         createdAt,
       },
       waitingRoom: true,
+      pointsSymbol: terminal?.data.contracts.symbols.points,
     }
 
     return <ApplicationCard key={idx} {...applicationCardProps} />
@@ -186,6 +189,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             setIsEndorseModalOpen={setIsEndorseModalOpen}
             roleOfActiveUser={roleOfActiveUser?.data?.value}
             setIsInviteModalOpen={setIsInviteModalOpen}
+            terminalData={terminal?.data}
           />
         )}
         {selectedInitiativeLocalId && selectedInitiativeLocalId && (
@@ -195,6 +199,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             setIsSuccessModalOpen={setIsEndorseSuccessModalOpen}
             selectedUserToEndorse={selectedApplication?.account}
             initiativeLocalId={selectedInitiativeLocalId}
+            terminal={terminal}
           />
         )}
         <EndorseSuccessModal

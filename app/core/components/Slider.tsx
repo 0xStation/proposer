@@ -7,7 +7,7 @@ const thumbClassName =
 const markClassName =
   "absolute border-[5px] border-solid border-marble-white rounded align-middle bottom-[calc(50%-6px)]"
 
-const Slider = ({ onChange, contributor, disabled }) => {
+const Slider = ({ onChange, contributor, disabled, endorsementsSymbol }) => {
   return (
     <ReactSlider
       className={horizontalSlider}
@@ -23,7 +23,9 @@ const Slider = ({ onChange, contributor, disabled }) => {
         return (
           <div {...props}>
             <p className="text-marble-white text-center text-base">{contributor.data.name}</p>
-            <p className="text-marble-white text-center text-base">{valueNow} RAIL🅔</p>
+            <p className="text-marble-white text-center text-base">
+              {valueNow} {endorsementsSymbol}
+            </p>
             {contributor.data.pfpURL ? (
               <img
                 src={contributor.data.pfpURL}

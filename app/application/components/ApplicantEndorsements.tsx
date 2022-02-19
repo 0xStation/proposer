@@ -6,12 +6,14 @@ type ApplicantEndorsementsProps = {
   endorser: Account
   amount: number
   isEndorsable?: boolean
+  symbol?: string
 }
 
 const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({
   endorser,
   amount,
   isEndorsable,
+  symbol,
 }) => {
   const {
     address,
@@ -39,7 +41,7 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({
           </div>
           <div className="flex flex-col ">
             {isEndorsable && (
-              <span className="text-marble-white text-lg text-normal m-2 justify-center">{`${amount} RAIL🅟`}</span>
+              <span className="text-marble-white text-lg text-normal m-2 justify-center">{`${amount} ${symbol}`}</span>
             )}
           </div>
         </div>
