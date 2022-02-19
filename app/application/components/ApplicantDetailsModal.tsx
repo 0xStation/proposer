@@ -16,6 +16,7 @@ import { Tag } from "app/core/components/Tag"
 import { Button } from "app/core/components/Button"
 import hasInvitePermissions from "../queries/hasInvitePermissions"
 import { TerminalMetadata } from "app/terminal/types"
+import { useBalance } from "wagmi"
 
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
@@ -28,7 +29,6 @@ type ApplicantDetailsModalProps = {
   terminalData?: TerminalMetadata
 }
 
-const hasBeenAirDroppedTokens = false
 const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   application,
   initiative,
@@ -52,6 +52,13 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     { suspense: false }
   )
 
+  const [{ data: balanceData }] = useBalance({
+    addressOrName: activeUser?.address,
+    token: terminalData?.contracts?.addresses?.endorsements,
+    watch: false,
+    formatUnits: decimals,
+  })
+
   const profileMetadataProps = {
     pfpURL,
     name,
@@ -63,7 +70,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
 
   const isEndorsable =
     activeUser &&
-    (roleOfActiveUser || hasBeenAirDroppedTokens) &&
+    (roleOfActiveUser || parseFloat(balanceData?.formatted || "0")) &&
     activeUser?.address !== application?.account?.address
 
   const CloseButton = ({ onClick }) => (
@@ -242,7 +249,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     setTimeout(() => setIsInviteModalOpen(true), 550)
                   }}
                 >
-                  Invite to initiative
+                  Add to Initiative
                 </Button>
               )}
             </div>
