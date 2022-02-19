@@ -151,11 +151,11 @@ const Project: BlitzPage = () => {
                 </div>
                 <div>
                   {initiative && initiative.data.isAcceptingApplications && (
-                    <div className="relative h-5 bg-tunnel-black flex overflow-hidden">
-                      <div className="whitespace-nowrap text-magic-mint font-lores text-xl w-full">
+                    <div className="relative h-6 bg-tunnel-black flex overflow-hidden">
+                      <div className="whitespace-nowrap text-center text-neon-blue text-xl ml-[-12rem] w-full">
                         <p>
-                          CALLING FOR CONTRIBUTORS. CALLING FOR CONTRIBUTORS. CALLING FOR
-                          CONTRIBUTORS. CALLING FOR CONTRIBUTORS.
+                          OPEN FOR SUBMISSIONS. OPEN FOR SUBMISSIONS. OPEN FOR SUBMISSIONS. OPEN FOR
+                          SUBMISSIONS.
                         </p>
                       </div>
                     </div>

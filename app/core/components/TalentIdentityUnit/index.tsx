@@ -57,7 +57,7 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
       <div className="flex flex-1 align-right place-content-end content-right text-base">
         <div className="flex flex-row">
           {referrals?.length
-            ? referrals.slice(0, 5).map(
+            ? referrals.slice(0, 4).map(
                 (
                   {
                     from: {
@@ -68,8 +68,8 @@ export const TalentIdentityUnit = (props: TalentIdentityUnitProps) => {
                 ) => {
                   const pfpStyling = "h-6 w-6 rounded-full border block border-marble-white"
                   const nestedStyling = idx ? "ml-[-5px]" : ""
-                  if (idx === 4) {
-                    const additionalReferrals = referrals.length - 4
+                  if (idx === 3) {
+                    const additionalReferrals = referrals.length - 3
                     return (
                       <span
                         key={idx}
