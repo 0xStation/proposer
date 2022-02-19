@@ -1,7 +1,7 @@
 export const Pill = ({ onClick, active = false, children }) => {
   const selectedStyling = active
-    ? "bg-marble-white text-tunnel-black"
-    : "border border-marble-white hover:bg-wet-concrete hover:concrete "
+    ? "bg-marble-white border border-marble-white text-tunnel-black"
+    : "border border-marble-white hover:bg-wet-concrete"
 
   return (
     <button
