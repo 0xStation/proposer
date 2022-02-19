@@ -55,7 +55,9 @@ const Project: BlitzPage = () => {
 
   useEffect(() => {
     if (activeUser && initiativeLocalId) {
-      let currentInit = activeUser.initiatives?.find((init) => init.localId === initiativeLocalId)
+      let currentInit = activeUser.initiatives?.find(
+        (init) => init.initiative.localId === initiativeLocalId
+      )
       if (currentInit) {
         setHasApplied(true)
       }
