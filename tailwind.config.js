@@ -18,6 +18,7 @@ module.exports = {
       sans: ["Graphik", "sans-serif"],
       serif: ["Merriweather", "serif"],
       lores: ["LoRes9PlusOT", "Monospace"],
+      grotesque: ["TerminalGrotesque", "Monospace"],
     },
     extend: {
       spacing: {

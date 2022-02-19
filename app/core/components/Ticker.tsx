@@ -7,8 +7,11 @@
 const Ticker = () => {
   return (
     <div className="relative h-10 bg-tunnel-black flex overflow-hidden border-b border-concrete">
-      <div className="animate-marquee whitespace-nowrap text-neon-blue font-lores text-4xl w-full">
-        <p>WELCOME TO STATION. WELCOME TO STATION. WELCOME TO STATION. WELCOME TO STATION.</p>
+      <div className="animate-marquee whitespace-nowrap text-neon-blue font-grotesque text-4xl w-full">
+        <p>
+          WELCOME TO STATION. WELCOME TO STATION. WELCOME TO STATION. WELCOME TO STATION. WELCOME TO
+          STATION.
+        </p>
       </div>
     </div>
   )
