@@ -11,7 +11,11 @@ export default async function getAccountByAddress(input: z.infer<typeof GetAccou
   const account = await db.account.findFirst({
     where: { address: data.address },
     include: {
-      initiatives: true,
+      initiatives: {
+        include: {
+          initiative: true,
+        },
+      },
     },
   })
 
