@@ -53,13 +53,18 @@ const Project: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const initiativeLocalId = useParam("initiativeId", "number") as number
 
+  console.log(activeUser)
+
   useEffect(() => {
-    if (activeUser && initiativeLocalId) {
-      let currentInit = activeUser.initiatives?.find(
-        (init) => init.initiative.localId === initiativeLocalId
-      )
-      if (currentInit) {
-        setHasApplied(true)
+    if (terminal) {
+      if (activeUser && initiativeLocalId) {
+        let currentInit = activeUser.initiatives?.find(
+          (init) =>
+            init.initiative.localId === initiativeLocalId && terminal.handle == terminalHandle
+        )
+        if (currentInit) {
+          setHasApplied(true)
+        }
       }
     }
   }, [activeUser, initiativeLocalId])
