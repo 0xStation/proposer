@@ -7,6 +7,7 @@ import useStore from "app/core/hooks/useStore"
 import getSkills from "app/skills/queries/getSkills"
 import { useDropzone } from "react-dropzone"
 import CreatableSelect from "react-select/creatable"
+import { components } from "react-select"
 import { titleCase } from "app/core/utils/titleCase"
 interface ApplicationParams {
   name: string
@@ -43,8 +44,34 @@ const customStyles = {
   }),
 }
 
+const MAX_NUMBER_OF_SKILLS = 5
+
+const Menu = (props) => {
+  const optionSelectedLength = props.getValue().length || 0
+  return (
+    <components.Menu {...props}>
+      {optionSelectedLength < 5 ? (
+        props.children
+      ) : (
+        <div className="m-2 text-torch-red bg-wet-concrete">
+          Please select up to {MAX_NUMBER_OF_SKILLS} skills
+        </div>
+      )}
+    </components.Menu>
+  )
+}
+
 const MultiSelectAdapter = ({ input, ...rest }) => (
-  <CreatableSelect isMulti {...input} {...rest} styles={customStyles} />
+  <CreatableSelect
+    components={{ Menu }}
+    isValidNewOption={(inputValue, selectValue) =>
+      inputValue.length > 0 && selectValue.length < MAX_NUMBER_OF_SKILLS
+    }
+    isMulti
+    {...input}
+    {...rest}
+    styles={customStyles}
+  />
 )
 
 const AccountModal = ({
