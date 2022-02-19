@@ -7,7 +7,7 @@ import useStore from "app/core/hooks/useStore"
 import getSkills from "app/skills/queries/getSkills"
 import { useDropzone } from "react-dropzone"
 import CreatableSelect from "react-select/creatable"
-
+import { titleCase } from "app/core/utils/titleCase"
 interface ApplicationParams {
   name: string
   discordId: string
@@ -71,20 +71,9 @@ const AccountModal = ({
     },
   })
 
-  function capitalizeWord(word: string) {
-    return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase()
-  }
-
-  function capitalizeSkill(skill: string) {
-    return skill
-      .split(" ")
-      .map((w) => capitalizeWord(w))
-      .join(" ")
-  }
-
   const [skills] = useQuery(getSkills, {}, { suspense: false })
   const skillOptions = skills?.map((skill) => {
-    return { value: skill.name, label: capitalizeSkill(skill.name) }
+    return { value: skill.name, label: titleCase(skill.name) }
   })
 
   const uploadFile = async (acceptedFiles) => {

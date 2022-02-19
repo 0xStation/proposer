@@ -62,6 +62,9 @@ export const InviteModal = ({
       })
     }
     setInviteSuccessful(true)
+
+    // Remove application from waiting room when applicant is invited.
+    // TODO: make it so that applications automatically refreshes via dependency hook
     setRefreshApplications(true)
   }
 
@@ -94,7 +97,7 @@ export const InviteModal = ({
       >
         {roles?.map((role, idx) => (
           <option key={idx} value={role.localId}>
-            {titleCase(role.data?.name || "")}
+            {titleCase(role.data?.name)}
           </option>
         ))}
       </select>
@@ -108,7 +111,7 @@ export const InviteModal = ({
     <div className="mt-[2rem] mx-28 text-marble-white text-center">
       <h1 className="text-3xl">
         {selectedApplication?.account?.data?.name} is now a{" "}
-        <span className="text-electric-violet">{titleCase(chosenRole?.data.name || "")}</span> at{" "}
+        <span className="text-electric-violet">{titleCase(chosenRole?.data.name)}</span> at{" "}
         {terminal?.data?.name} and a part of {currentInitiative?.data?.name}!
       </h1>
       <p className="mt-3 mb-8">Reach out to let {selectedApplication?.account?.data?.name} know.</p>
