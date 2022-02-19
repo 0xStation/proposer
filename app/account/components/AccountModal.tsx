@@ -184,10 +184,15 @@ const AccountModal = ({
                     Skills
                   </label>
                   <span className="text-concrete text-xs mb-2">
-                    (Type to add additional skills)
+                    (Select or insert up to 5 skills)
                   </span>
                   <div>
-                    <Field name="skills" component={MultiSelectAdapter} options={skillOptions} />
+                    <Field
+                      name="skills"
+                      component={MultiSelectAdapter}
+                      options={skillOptions}
+                      placeholder="Product Design, Writing..."
+                    />
                   </div>
                 </div>
 
@@ -198,7 +203,7 @@ const AccountModal = ({
                   <Field
                     component="input"
                     name="discordId"
-                    placeholder="Discord ID"
+                    placeholder="<username>#0000"
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>

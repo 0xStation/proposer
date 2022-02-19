@@ -35,6 +35,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [selectedApplication, setSelectedApplication] = useState<Application>()
   const [selectedApplicantTicket, setSelectedApplicantTicket] = useState<Ticket | null>()
   const activeUser: Account | null = useStore((state) => state.activeUser)
+  const [isInitiativeSelected, setIsInitiativeSelected] = useState<boolean>(false)
   const [roleOfActiveUser, setRoleOfActiveUser] = useState<Role | null>()
 
   useEffect(() => {
@@ -54,13 +55,15 @@ const TerminalWaitingPage: BlitzPage = () => {
   )
 
   useEffect(() => {
-    ;(async () => {
-      const applicantTicket = await invoke(getTicket, {
-        terminalId: terminal?.id || 0,
-        accountId: selectedApplication?.account?.id as number,
-      })
-      setSelectedApplicantTicket(applicantTicket)
-    })()
+    if (selectedApplication && terminal?.id) {
+      ;(async () => {
+        const applicantTicket = await invoke(getTicket, {
+          terminalId: terminal.id,
+          accountId: selectedApplication.account?.id as number,
+        })
+        setSelectedApplicantTicket(applicantTicket)
+      })()
+    }
   }, [selectedApplication])
 
   useEffect(() => {
@@ -91,6 +94,12 @@ const TerminalWaitingPage: BlitzPage = () => {
     }
   }, [selectedInitiativeLocalId])
 
+  useEffect(() => {
+    if (initiatives) {
+      setSelectedInitiativeLocalId(initiatives[0]?.localId)
+    }
+  }, [initiatives])
+
   const applicationCards = applications?.map((application, idx) => {
     const { account, createdAt, points, referrals } = application
     const onClick = () => {
@@ -117,11 +126,8 @@ const TerminalWaitingPage: BlitzPage = () => {
 
     return <ApplicationCard key={idx} {...applicationCardProps} />
   })
-
-  const noApplicationsView = selectedInitiativeLocalId ? (
+  const noApplicationsView = selectedInitiativeLocalId && (
     <div>There are no active applications for this initiative.</div>
-  ) : (
-    <div>Please select an initiative to view applications.</div>
   )
 
   const waitingRoomView =
