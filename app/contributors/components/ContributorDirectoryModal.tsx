@@ -60,7 +60,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
           )}
           <div className="flex flex-row">
             <div className="mr-2">
-              {!contributor?.data?.pfpURL ? (
+              {contributor?.data?.pfpURL ? (
                 <img
                   src={contributor?.data?.pfpURL}
                   alt="PFP"
