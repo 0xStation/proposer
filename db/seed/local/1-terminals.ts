@@ -15,7 +15,9 @@ const station: CreateTerminalParams = {
     description: "Creating on-chain infrastructure for a new genre of work.",
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/station.jpeg",
     permissions: {
-      invite: [1], // local id for STAFF
+      invite: {
+        rolesAllowedToInvite: [1], // local id for STAFF
+      },
     },
   },
 }
@@ -25,7 +27,7 @@ const seed = async () => {
   const terminals = [station]
   for (const name in terminals) {
     const terminalData = terminals[name] as CreateTerminalParams
-    let terminal = (await db.terminal.create({
+    ;(await db.terminal.create({
       data: terminalData,
     })) as Terminal
   }

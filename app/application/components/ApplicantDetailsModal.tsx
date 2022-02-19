@@ -1,5 +1,5 @@
 import Modal from "../../core/components/Modal"
-import { Image } from "blitz"
+import { Image, useQuery } from "blitz"
 import { Dispatch, SetStateAction } from "react"
 import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
@@ -14,6 +14,7 @@ import { formatDate } from "app/core/utils/formatDate"
 import { ProfileMetadata } from "app/core/components/TalentIdentityUnit/ProfileMetadata"
 import { Tag } from "app/core/components/Tag"
 import { Button } from "app/core/components/Button"
+import hasInvitePermissions from "../queries/hasInvitePermissions"
 
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
@@ -40,6 +41,12 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   const { points = 0 } = application
   const { data: applicantData, address, role, skills } = application?.account || {}
   const { pfpURL, name, ens, pronouns, verified, discordId, timezone } = applicantData
+  const [canInvite] = useQuery(
+    hasInvitePermissions,
+    { referrerId: activeUser?.id, terminalId: initiative?.terminalId },
+    { suspense: false }
+  )
+
   const profileMetadataProps = {
     pfpURL,
     name,
@@ -53,9 +60,6 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     activeUser &&
     (roleOfActiveUser || hasBeenAirDroppedTokens) &&
     activeUser?.address !== application?.account?.address
-
-  // TODO: query permissions here and assign to `canInvite`
-  const canInvite = roleOfActiveUser === "STAFF"
 
   const CloseButton = ({ onClick }) => (
     <div className="flex flex-1 justify-start absolute top-1 left-2">
@@ -182,27 +186,29 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 )}
               </div>
             </div>
-            <div id="endorsers" className="flex-auto flex flex-col space-y-2">
-              <div className="flex-auto text-marble-white font-bold">
-                <span>Endorsers</span>
-              </div>
-              {application?.referrals && application?.referrals.length ? (
-                <div className="flex flex-col space-y-1">
-                  {application?.referrals?.map?.(({ from: account, amount = 0 }, index) => (
-                    <ApplicantEndorsements
-                      key={index}
-                      endorser={account}
-                      amount={amount * Math.pow(10, 0 - decimals)}
-                      isEndorsable={isEndorsable || false}
-                    />
-                  ))}
+            {isEndorsable && (
+              <div id="endorsers" className="flex-auto flex flex-col space-y-2">
+                <div className="flex-auto text-marble-white font-bold">
+                  <span>Endorsers</span>
                 </div>
-              ) : (
-                <p className="text-marble-white text-base">
-                  Be the first to endorse this applicant!
-                </p>
-              )}
-            </div>
+                {application?.referrals && application?.referrals.length ? (
+                  <div className="flex flex-col space-y-1">
+                    {application?.referrals?.map?.(({ from: account, amount = 0 }, index) => (
+                      <ApplicantEndorsements
+                        key={index}
+                        endorser={account}
+                        amount={amount * Math.pow(10, 0 - decimals)}
+                        isEndorsable={isEndorsable || false}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-marble-white text-base">
+                    Be the first to endorse this applicant!
+                  </p>
+                )}
+              </div>
+            )}
           </div>
           {isEndorsable && (
             <div className="mx-auto">

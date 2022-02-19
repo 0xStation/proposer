@@ -8,6 +8,7 @@ import getSkills from "app/skills/queries/getSkills"
 import { useDropzone } from "react-dropzone"
 import CreatableSelect from "react-select/creatable"
 import { components } from "react-select"
+import { titleCase } from "app/core/utils/titleCase"
 interface ApplicationParams {
   name: string
   discordId: string
@@ -97,20 +98,9 @@ const AccountModal = ({
     },
   })
 
-  function capitalizeWord(word: string) {
-    return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase()
-  }
-
-  function capitalizeSkill(skill: string) {
-    return skill
-      .split(" ")
-      .map((w) => capitalizeWord(w))
-      .join(" ")
-  }
-
   const [skills] = useQuery(getSkills, {}, { suspense: false })
   const skillOptions = skills?.map((skill) => {
-    return { value: skill.name, label: capitalizeSkill(skill.name) }
+    return { value: skill.name, label: titleCase(skill.name) }
   })
 
   const uploadFile = async (acceptedFiles) => {
@@ -210,10 +200,15 @@ const AccountModal = ({
                     Skills
                   </label>
                   <span className="text-concrete text-xs mb-2">
-                    (Type to add additional skills)
+                    (Select or insert up to 5 skills)
                   </span>
                   <div>
-                    <Field name="skills" component={MultiSelectAdapter} options={skillOptions} />
+                    <Field
+                      name="skills"
+                      component={MultiSelectAdapter}
+                      options={skillOptions}
+                      placeholder="Product Design, Writing..."
+                    />
                   </div>
                 </div>
 
@@ -224,7 +219,7 @@ const AccountModal = ({
                   <Field
                     component="input"
                     name="discordId"
-                    placeholder="Discord ID"
+                    placeholder="<username>#0000"
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
                 </div>

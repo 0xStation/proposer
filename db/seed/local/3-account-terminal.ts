@@ -13,14 +13,14 @@ const roleIds = {
   visitor: 4,
 }
 
-const michael: ContributorSeed = {
-  address: "0x65A3870F48B5237f27f674Ec42eA1E017E111D63",
+const kristen: ContributorSeed = {
+  address: "0xaE55f61f85935BBB68b8809d5c02142e4CbA9a13",
   joinedAt: new Date("2021-12-01"),
   role: roleIds.staff, // making it easy to allow myself to invite people
 }
 
 const seed = async () => {
-  const contributors = [michael]
+  const contributors = [kristen]
   const terminal = await db.terminal.findUnique({ where: { handle: "stationlabs" } })
 
   if (!terminal) {
