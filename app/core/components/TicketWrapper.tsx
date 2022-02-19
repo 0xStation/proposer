@@ -46,9 +46,9 @@ const TicketWrapper = ({ activeUser, tokenBalance }) => {
                     {activeUser?.data.ticketImage ? (
                       <img className="h-[400px] mx-auto block" src={activeUser?.data.ticketImage} />
                     ) : (
-                      <div className="h-[400px] w-[240px] border border-concrete rounded-2xl border-dashed text-concrete text-5xl text-center flex flex-col justify-center align-middle mx-auto">
-                        FUTURE TICKET GOES HERE
-                      </div>
+                      <p className="h-[400px] w-[240px] border border-concrete rounded-2xl border-dashed text-concrete text-3xl text-center flex flex-col justify-center align-middle mx-auto">
+                        FUTURE CONTRIBUTOR ID GOES HERE
+                      </p>
                     )}
                   </div>
                   <div className="mt-2 justify-between px-1 text-base flex">

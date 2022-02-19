@@ -37,11 +37,12 @@ const Navigation = ({ children }: { children?: any }) => {
   }
 
   return (
-    <div
-      className="w-full h-full bg-cover bg-center bg-no-repeat border"
-      style={{ backgroundImage: "url('/station-cover.png')" }}
-    >
-      <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36 relative">
+    <div>
+      <img
+        className="w-full h-[185px] object-cover object-no-repeat object-[0,38%]"
+        src={"/station-cover.png"}
+      />
+      <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] relative">
         <div className="grid gap-0 grid-cols-1 md:grid-cols-3 xl:grid-cols-4 max-w-screen-xl h-full mx-auto">
           <div className="col-span-1 pl-4 text-2xl border-concrete border-b pb-12 md:border-b-0 md:border-r md:pr-6 h-full">
             <div className="flex items-center mt-12">
@@ -49,7 +50,7 @@ const Navigation = ({ children }: { children?: any }) => {
                 <img
                   src={terminal.data.pfpURL}
                   alt="PFP"
-                  className="h-[52px] w-[52px] border border-marble-white rounded-full"
+                  className="h-[52px] min-w-[52px] border border-marble-white rounded-full"
                 />
               </div>
               <div className="flex flex-col">
