@@ -73,7 +73,7 @@ const TerminalContributorsPage: BlitzPage = () => {
         />
       )}
       <div className="flex flex-col space-y-10">
-        <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm space-y-3">
+        <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm">
           {roles.map((role, index) => {
             return (
               <Pill

@@ -94,6 +94,12 @@ const TerminalWaitingPage: BlitzPage = () => {
     }
   }, [selectedInitiativeLocalId, refreshApplications])
 
+  useEffect(() => {
+    if (initiatives) {
+      setSelectedInitiativeLocalId(initiatives[0]?.localId)
+    }
+  }, [initiatives])
+
   const applicationCards = applications?.map((application, idx) => {
     const { account, createdAt, points, referrals } = application
     const onClick = () => {
@@ -120,11 +126,8 @@ const TerminalWaitingPage: BlitzPage = () => {
 
     return <ApplicationCard key={idx} {...applicationCardProps} />
   })
-
-  const noApplicationsView = selectedInitiativeLocalId ? (
+  const noApplicationsView = selectedInitiativeLocalId && (
     <div>There are no active applications for this initiative.</div>
-  ) : (
-    <div>Please select an initiative to view applications.</div>
   )
 
   const applicationsView =
@@ -208,9 +211,11 @@ const TerminalWaitingPage: BlitzPage = () => {
           setRefreshApplications={setRefreshApplications}
         />
         <div className="flex flex-col space-y-10">
-          <div className="text-marble-white text-base overflow-x-scroll whitespace-nowrap space-x-3">
-            {initiativePills}
-          </div>
+          {initiatives.filter((initiative) => initiative?.applicationCount).length > 0 && (
+            <div className="text-marble-white text-sm overflow-x-scroll whitespace-nowrap space-x-3">
+              {initiativePills}
+            </div>
+          )}
           <div className="flex-auto text-marble-white">{applicationsView}</div>
         </div>
       </>

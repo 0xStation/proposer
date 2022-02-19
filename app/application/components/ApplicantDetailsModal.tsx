@@ -186,27 +186,29 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 )}
               </div>
             </div>
-            <div id="endorsers" className="flex-auto flex flex-col space-y-2">
-              <div className="flex-auto text-marble-white font-bold">
-                <span>Endorsers</span>
-              </div>
-              {application?.referrals && application?.referrals.length ? (
-                <div className="flex flex-col space-y-1">
-                  {application?.referrals?.map?.(({ from: account, amount = 0 }, index) => (
-                    <ApplicantEndorsements
-                      key={index}
-                      endorser={account}
-                      amount={amount * Math.pow(10, 0 - decimals)}
-                      isEndorsable={isEndorsable || false}
-                    />
-                  ))}
+            {isEndorsable && (
+              <div id="endorsers" className="flex-auto flex flex-col space-y-2">
+                <div className="flex-auto text-marble-white font-bold">
+                  <span>Endorsers</span>
                 </div>
-              ) : (
-                <p className="text-marble-white text-base">
-                  Be the first to endorse this applicant!
-                </p>
-              )}
-            </div>
+                {application?.referrals && application?.referrals.length ? (
+                  <div className="flex flex-col space-y-1">
+                    {application?.referrals?.map?.(({ from: account, amount = 0 }, index) => (
+                      <ApplicantEndorsements
+                        key={index}
+                        endorser={account}
+                        amount={amount * Math.pow(10, 0 - decimals)}
+                        isEndorsable={isEndorsable || false}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-marble-white text-base">
+                    Be the first to endorse this applicant!
+                  </p>
+                )}
+              </div>
+            )}
           </div>
           {isEndorsable && (
             <div className="mx-auto">
