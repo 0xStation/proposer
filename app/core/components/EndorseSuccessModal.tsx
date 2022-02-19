@@ -1,7 +1,7 @@
 import Modal from "./Modal"
 import Button from "./Button"
 
-const SuccessModal = ({
+const EndorseSuccessModal = ({
   isSuccessModalOpen,
   setIsSuccessModalOpen,
   selectedUserToEndorse: contributor,
@@ -22,4 +22,4 @@ const SuccessModal = ({
   )
 }
 
-export default SuccessModal
+export default EndorseSuccessModal

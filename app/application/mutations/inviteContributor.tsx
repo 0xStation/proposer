@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { canInvite } from "app/utils/permissions"
+import { hasInvitePermissions } from "app/application/queries/hasInvitePermissions"
 
 const InviteContributor = z.object({
   referrerId: z.number(),
@@ -12,16 +12,12 @@ const InviteContributor = z.object({
 
 export default async function inviteContributor(input: z.infer<typeof InviteContributor>) {
   const params = InviteContributor.parse(input)
+  const { referrerId, terminalId, accountId, initiativeId, roleLocalId } = params
 
   // check that this invitation is valid
-  const validInvite = await canInvite(
-    params.referrerId,
-    params.terminalId,
-    params.accountId,
-    params.initiativeId
-  )
+  const canInvite = await hasInvitePermissions({ referrerId, terminalId })
 
-  if (!validInvite) {
+  if (!canInvite) {
     console.log("Not a valid invite pair.")
     return
   }
@@ -30,8 +26,8 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
   await db.accountInitiative.update({
     where: {
       accountId_initiativeId: {
-        accountId: params.accountId,
-        initiativeId: params.initiativeId,
+        accountId: accountId,
+        initiativeId: initiativeId,
       },
     },
     data: {
@@ -42,8 +38,8 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
   const existingMembership = await db.accountTerminal.findUnique({
     where: {
       accountId_terminalId: {
-        accountId: params.accountId,
-        terminalId: params.terminalId,
+        accountId: accountId,
+        terminalId: terminalId,
       },
     },
   })
@@ -56,11 +52,11 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
 
   await db.accountTerminal.create({
     data: {
-      accountId: params.accountId,
-      terminalId: params.terminalId,
-      roleLocalId: params.roleLocalId,
+      accountId: accountId,
+      terminalId: terminalId,
+      roleLocalId: roleLocalId,
       data: {
-        invitedBy: params.referrerId,
+        invitedBy: referrerId,
       },
     },
   })

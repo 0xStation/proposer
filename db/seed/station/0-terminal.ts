@@ -32,7 +32,9 @@ const station: TerminalSeed = {
     description: "Creating on-chain infrastructure for a new genre of work.",
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/station.jpeg",
     permissions: {
-      invite: [1], // local id for STAFF
+      invite: {
+        rolesAllowedToInvite: [1], // local id for STAFF
+      },
     },
   },
 }
