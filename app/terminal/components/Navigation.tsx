@@ -22,7 +22,9 @@ const Navigation = ({ children }: { children?: any }) => {
     fetchEns: true,
   })
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
+  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
+    terminal?.data.contracts.addresses.endorsements
+  )
   const [{ data: balanceData }] = useBalance({
     addressOrName: address,
     token: terminal?.data.contracts.addresses.endorsements,

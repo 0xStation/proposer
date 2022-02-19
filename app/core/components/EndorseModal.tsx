@@ -45,6 +45,7 @@ const EndorseModal = ({
 
   const { loading: allowanceApprovalLoading, write: approveAllowance } = useEndorsementTokenWrite({
     methodName: "approve",
+    contract: terminal.data?.contracts.addresses.endorsements,
   })
 
   const { loading: endorseLoading, write: endorse } = useWaitingRoomWrite({
@@ -57,7 +58,9 @@ const EndorseModal = ({
 
   const endorsementsSymbol = terminal.data?.contracts?.symbols.endorsements
 
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
+  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
+    terminal.data?.contracts.addresses.endorsements
+  )
   const [{ data: balanceData }] = useBalance({
     addressOrName: address,
     token: terminal.data?.contracts?.addresses?.endorsements,
@@ -74,6 +77,7 @@ const EndorseModal = ({
 
   const { read: getAllowance } = useEndorsementTokenRead({
     methodName: "allowance",
+    contract: terminal.data?.contracts.addresses.endorsements,
   })
 
   const EndorsingStateMessage = ({ children, error }) => {

@@ -25,7 +25,6 @@ import { Ticket } from "app/ticket/types"
 const TerminalWaitingPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const { directedFrom } = useRouterQuery()
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
   const [selectedInitiativeLocalId, setSelectedInitiativeLocalId] = useState<number>()
   const [applications, setApplications] = useState<Application[]>([])
   const [isRedirectModalOpen, setIsRedirectModalOpen] = useState(false)
@@ -42,6 +41,9 @@ const TerminalWaitingPage: BlitzPage = () => {
     setIsRedirectModalOpen(directedFrom === "application")
   }, [directedFrom])
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
+    terminal?.data.contracts.addresses.endorsements
+  )
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,

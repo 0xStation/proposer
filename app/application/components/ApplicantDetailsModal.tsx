@@ -39,7 +39,9 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   roleOfActiveUser,
   terminalData,
 }) => {
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals()
+  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
+    terminalData?.contracts.addresses.endorsements
+  )
   const activeUser: Account | null = useStore((state) => state.activeUser)
   const { points = 0 } = application
   const { data: applicantData, address, role, skills } = application?.account || {}
