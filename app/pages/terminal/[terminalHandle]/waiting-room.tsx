@@ -104,12 +104,6 @@ const TerminalWaitingPage: BlitzPage = () => {
     }
   }, [selectedInitiativeLocalId, refreshApplications])
 
-  useEffect(() => {
-    if (initiatives) {
-      setSelectedInitiativeLocalId(initiatives[0]?.localId)
-    }
-  }, [initiatives])
-
   const applicationCards = applications?.map((application, idx) => {
     const { account, createdAt, points, referrals } = application
     const onClick = () => {
