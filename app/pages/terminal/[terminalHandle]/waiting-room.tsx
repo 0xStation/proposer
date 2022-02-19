@@ -14,6 +14,7 @@ import { Pill } from "app/core/components/Pill"
 import getApplicationsByInitiative from "app/application/queries/getApplicationsByInitiative"
 import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
+import { useBalance } from "wagmi"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Modal from "app/core/components/Modal"
 import getRoleByAccountTerminal from "app/role/queries/getRoleByAccountTerminal"
@@ -44,6 +45,13 @@ const TerminalWaitingPage: BlitzPage = () => {
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
     terminal?.data.contracts.addresses.endorsements
   )
+
+  const [{ data: balanceData }] = useBalance({
+    addressOrName: activeUser?.address,
+    token: terminal?.data?.contracts?.addresses?.endorsements,
+    watch: false,
+    formatUnits: decimals,
+  })
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
@@ -116,7 +124,13 @@ const TerminalWaitingPage: BlitzPage = () => {
       points: points * Math.pow(10, 0 - decimals),
       onClick,
       isEndorsable:
-        (!!roleOfActiveUser?.data?.value || hasBeenAirDroppedTokens) &&
+        // We want to reward people in the discord with tokens
+        // to endorse, but they don't have a role. Instead, we are checking their balance
+        // to see if they have the ability to endorse.
+        // Ideally, the parseFloat logic should be replaced by `hasBeenAirDroppedTokens`, but
+        // we are checking users's balances for now until `hasBeenAirDroppedTokens` is set up
+        // to come from the subgraph.
+        (!!roleOfActiveUser?.data?.value || !!parseFloat(balanceData?.formatted || "0")) &&
         // user shouldn't be able to endorse themself
         selectedApplication?.account?.address !== activeUser?.address,
       referrals,

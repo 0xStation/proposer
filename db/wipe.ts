@@ -4,8 +4,10 @@ import db from "./index"
 const seed = async () => {
   console.log("Wiping all database rows...")
   await db.accountInitiative.deleteMany({})
+  await db.accountSkill.deleteMany({})
   await db.accountTerminal.deleteMany({})
   await db.role.deleteMany({})
+  await db.skill.deleteMany({})
   await db.initiative.deleteMany({})
   await db.terminal.deleteMany({})
   await db.account.deleteMany({})
