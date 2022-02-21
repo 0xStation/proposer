@@ -98,7 +98,7 @@ const olly: ContributorSeed = {
   data: {
     name: "Olly Hunt",
     ens: "olly.eth",
-    pfpURL: "",
+    pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/ccs-olly-hunt.jpeg",
     discordId: "olly#2792",
     timezone: "-05:00",
     verified: true,
@@ -154,20 +154,32 @@ const sara: ContributorSeed = {
   },
   skills: ["writing", "editing", "marketing"],
 }
+const aaron: ContributorSeed = {
+  address: "0x48ff4d06Ceb0d69C958EE7856A2629Bb568Cffdc",
+  data: {
+    name: "Aaron Lamphere",
+    pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/ccs-aaron.jpeg",
+    discordId: "",
+    timezone: "-05:00",
+    verified: true,
+  },
+  skills: ["partnerships", "events", "marketing", "curricula design"],
+}
 
 export const ccsContributors = {
-  bhaumik,
-  melvin,
-  nick,
-  liam,
-  tasha,
-  courtland,
-  thomas,
-  olly,
-  kemi,
-  caryn,
-  kassen,
-  sara,
+  // bhaumik,
+  // melvin,
+  // nick,
+  // liam,
+  // tasha,
+  // courtland,
+  // thomas,
+  // olly,
+  // kemi,
+  // caryn,
+  // kassen,
+  // sara,
+  // aaron,
 }
 
 export async function seed() {

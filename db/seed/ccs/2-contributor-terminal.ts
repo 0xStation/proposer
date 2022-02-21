@@ -67,20 +67,26 @@ const sara: ContributorSeed = {
   joinedAt: new Date("2022-02-01"),
   role: roleIds.teamLead,
 }
+const aaron: ContributorSeed = {
+  address: "0x48ff4d06Ceb0d69C958EE7856A2629Bb568Cffdc",
+  joinedAt: new Date("2022-02-01"),
+  role: roleIds.teamLead,
+}
 
 export const ccsContributors = {
-  bhaumik,
-  melvin,
-  nick,
-  liam,
-  tasha,
-  courtland,
-  thomas,
-  olly,
-  kemi,
-  caryn,
-  kassen,
-  sara,
+  // bhaumik,
+  // melvin,
+  // nick,
+  // liam,
+  // tasha,
+  // courtland,
+  // thomas,
+  // olly,
+  // kemi,
+  // caryn,
+  // kassen,
+  // sara,
+  // aaron,
 }
 
 export async function seed() {

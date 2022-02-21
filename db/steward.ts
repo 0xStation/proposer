@@ -15,9 +15,9 @@ const seed = async () => {
   // //// PHASE 1
   // console.log("Seeding skills...")
   // await seedSkills()
-  console.log("Seeding terminals...")
-  await seedCCSTerminal()
-  await seedStationTerminal()
+  // console.log("Seeding terminals...")
+  // await seedCCSTerminal()
+  // await seedStationTerminal()
   // await seedCCSContributors()
   // await seedCCSTerminalContributors()
   // await seedCCSInitiativeContributors()

@@ -33,20 +33,21 @@ const ccs: TerminalSeed = {
     name: "Crypto, Culture and Society",
     description:
       "A learning DAO building the liberal arts for crypto and exploring web3’s broader societal impact.",
+    coverURL: "https://station-images.nyc3.digitaloceanspaces.com/css_cover.png",
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/ccs.jpeg",
     permissions: {
       invite: { rolesAllowedToInvite: [1, 2] }, // local id for STAFF and TEAM LEAD
     },
     contracts: {
       addresses: {
-        endorsements: "0xCF59217bf47b6faC02060Ef7F61Db9340a8Bf065",
-        points: "0x9ACBfAF1e08aF96b297d44E7D896B63A199C71e8",
-        referrals: "0xEbdd02Ed4f6D9b76bF2d1251f64a073b3947Bfcc",
+        endorsements: "0x7C3EAb35c5B87F4BBea7E3127Ebfb3ba55E94B0C",
+        points: "0xECf0f56d3976aFdD67504C49d957987bA712d686",
+        referrals: "0xCb4ECe9DcA605A7109eDB02d94e8292AF76F71b8",
       },
       symbols: {
-        endorsements: "SOCIETY🅔",
-        points: "SOCIETY🅟",
-        referrals: "SOCIETY🅡",
+        endorsements: "LEARN🅔",
+        points: "LEARN🅟",
+        referrals: "LEARN🅡",
       },
     },
   },
@@ -128,22 +129,22 @@ export async function seed() {
 
   console.log("CCS updated:", terminal)
 
-  for (const name in ccsRoles) {
-    const roleSeed = ccsRoles[name]!
-    const role = await db.role.upsert({
-      where: {
-        terminalId_localId: {
-          terminalId: terminal.id,
-          localId: roleSeed.localId,
-        },
-      },
-      create: {
-        terminalId: terminal.id,
-        localId: roleSeed.localId,
-        data: roleSeed.data,
-      },
-      update: { data: roleSeed.data },
-    })
-    console.log(`  ${(role as Role).data?.name} localId: ${roleSeed.localId}`)
-  }
+  // for (const name in ccsRoles) {
+  //   const roleSeed = ccsRoles[name]!
+  //   const role = await db.role.upsert({
+  //     where: {
+  //       terminalId_localId: {
+  //         terminalId: terminal.id,
+  //         localId: roleSeed.localId,
+  //       },
+  //     },
+  //     create: {
+  //       terminalId: terminal.id,
+  //       localId: roleSeed.localId,
+  //       data: roleSeed.data,
+  //     },
+  //     update: { data: roleSeed.data },
+  //   })
+  //   console.log(`  ${(role as Role).data?.name} localId: ${roleSeed.localId}`)
+  // }
 }
