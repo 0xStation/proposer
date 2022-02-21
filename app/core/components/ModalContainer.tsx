@@ -17,9 +17,9 @@ const ModalContainer = () => {
   return (
     <Fragment>
       <ConnectWalletModal isWalletOpen={walletModalOpen} setIsWalletOpen={toggleWalletModal} />
-      {address && (
+      {/* {address && (
         <AccountModal isOpen={accountModalOpen} setIsOpen={toggleAccountModal} address={address} />
-      )}
+      )} */}
     </Fragment>
   )
 }

@@ -15,8 +15,6 @@ const ProfileHome: BlitzPage = () => {
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const activeUser: Account | null = useStore((state) => state.activeUser)
 
-  console.log(activeUser)
-
   // todo: return something better
   if (!activeUser) {
     return <></>

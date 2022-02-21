@@ -5,7 +5,10 @@ import createAccount from "../mutations/createAccount"
 import useStore from "app/core/hooks/useStore"
 import getSkills from "app/skills/queries/getSkills"
 import { useDropzone } from "react-dropzone"
-import CreatableSelect from "react-select/creatable"
+import Select from "app/core/components/form/Select"
+import MultiSelect from "app/core/components/form/MultiSelect"
+import TimezoneOptions from "app/utils/timezoneOptions"
+import UploadIcon from "app/core/icons/UploadIcon"
 
 interface ApplicationParams {
   name: string
@@ -19,32 +22,85 @@ interface ApplicationParams {
   }[]
 }
 
-const customStyles = {
-  control: (provided, state) => ({
-    ...provided,
-    backgroundColor: "#2E2E2E",
-    color: "#646464",
-    borderColor: "#646464",
-  }),
-  menuList: (provided, state) => ({
-    ...provided,
-    backgroundColor: "#2E2E2E",
-  }),
-  option: (provided, state) => ({
-    ...provided,
-    backgroundColor: "#2E2E2E",
-    color: "#F2EFEF",
-    "&:hover": {
-      backgroundColor: "#F2EFEF",
-      color: "#2E2E2E",
-      cursor: "pointer",
-    },
-  }),
+const CoverPhotoInput = () => {
+  const [uploadingState, setUploadingState] = useState("")
+  const [coverURL, setCoverURL] = useState("")
+
+  const uploadFile = async (acceptedFiles) => {
+    setUploadingState("UPLOADING")
+    const formData = new FormData()
+    formData.append("file", acceptedFiles[0])
+    let res = await fetch("/api/uploadImage", {
+      method: "POST",
+      body: formData,
+    })
+    const data = await res.json()
+    setCoverURL(data.url)
+    setUploadingState("UPLOADED")
+  }
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: uploadFile,
+    accept: "image/jpeg, image/jpg, image/png",
+  })
+
+  return (
+    <div className="w-full h-[100px] bg-wet-concrete border border-concrete" {...getRootProps()}>
+      <img
+        alt="Profile picture uploaded by the user."
+        src={coverURL}
+        className="w-full h-full object-cover object-no-repeat"
+      />
+      <span className="absolute right-2 bottom-2">
+        <UploadIcon />
+      </span>
+      <input {...getInputProps()} />
+    </div>
+  )
 }
 
-const MultiSelectAdapter = ({ input, ...rest }) => (
-  <CreatableSelect isMulti {...input} {...rest} styles={customStyles} />
-)
+const PfpInput = () => {
+  const [uploadingState, setUploadingState] = useState("")
+  const [pfpURL, setPfpURL] = useState("")
+
+  const uploadFile = async (acceptedFiles) => {
+    setUploadingState("UPLOADING")
+    const formData = new FormData()
+    formData.append("file", acceptedFiles[0])
+    let res = await fetch("/api/uploadImage", {
+      method: "POST",
+      body: formData,
+    })
+    const data = await res.json()
+    setPfpURL(data.url)
+    setUploadingState("UPLOADED")
+  }
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: uploadFile,
+    accept: "image/jpeg, image/jpg, image/png",
+  })
+
+  return (
+    <div
+      className="w-[76px] h-[76px] rounded-full bg-wet-concrete border border-concrete flex items-center justify-center cursor-pointer absolute bottom-[-38px] left-4"
+      {...getRootProps()}
+    >
+      {uploadingState === "UPLOADED" ? (
+        <img
+          alt="Profile picture uploaded by the user."
+          src={pfpURL}
+          className="w-full h-full rounded-full"
+        />
+      ) : (
+        <>
+          <UploadIcon />
+          <input {...getInputProps()} />
+        </>
+      )}
+    </div>
+  )
+}
 
 const AccountForm = ({ onSuccess, address }: { onSuccess: () => void; address: string }) => {
   const [uploadingState, setUploadingState] = useState("")
@@ -111,7 +167,16 @@ const AccountForm = ({ onSuccess, address }: { onSuccess: () => void; address: s
       }}
       render={({ handleSubmit }) => (
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 gap-y-4 gap-x-2">
+          <div className="grid grid-cols-2 gap-y-6 gap-x-2">
+            <div className="flex flex-col col-span-2">
+              <label htmlFor="name" className="text-marble-white mb-2">
+                Images
+              </label>
+              <div className="w-full h-[100px] relative mb-8">
+                <CoverPhotoInput />
+                <PfpInput />
+              </div>
+            </div>
             <div className="flex flex-col col-span-2">
               <label htmlFor="name" className="text-marble-white">
                 Name
@@ -119,55 +184,20 @@ const AccountForm = ({ onSuccess, address }: { onSuccess: () => void; address: s
               <Field
                 component="input"
                 name="name"
-                placeholder="Name"
+                placeholder="Satoshi"
                 className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
               />
             </div>
             <div className="flex flex-col col-span-2">
-              <label htmlFor="pfp" className="text-marble-white">
-                PFP
+              <label htmlFor="bio" className="text-marble-white">
+                Bio
               </label>
-              {uploadingState === "UPLOADED" ? (
-                <div className="flex flex-row items-center">
-                  <img
-                    alt="Profile picture uploaded by the user."
-                    src={pfpURL}
-                    className="w-16 h-16 rounded-full border border-concrete mr-2"
-                  />
-                  <span
-                    className="text-torch-red text-sm cursor-pointer"
-                    onClick={() => removeFile()}
-                  >
-                    Remove
-                  </span>
-                </div>
-              ) : uploadingState === "UPLOADING" ? (
-                <p className="text-sm text-marble-white">Upload in progress...</p>
-              ) : (
-                <div
-                  {...getRootProps()}
-                  className="text-base text-concrete bg-wet-concrete border border-dotted border-concrete p-4 text-center cursor-pointer"
-                >
-                  <input {...getInputProps()} />
-                  {isDragActive ? (
-                    <p>Drop your file here ...</p>
-                  ) : (
-                    <>
-                      <p>Drag and drop a file here, or click to select a file from your device.</p>
-                      <p>( Only *.jpeg, *.jpg, and *.png will be accepted )</p>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-            <div className="flex flex-col col-span-2">
-              <label htmlFor="skills" className="text-marble-white">
-                Skills
-              </label>
-              <span className="text-concrete text-xs mb-2">(Type to add additional skills)</span>
-              <div>
-                <Field name="skills" component={MultiSelectAdapter} options={skillOptions} />
-              </div>
+              <Field
+                component="textarea"
+                name="bio"
+                placeholder="Write about yourself"
+                className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
+              />
             </div>
 
             <div className="flex flex-col col-span-2">
@@ -181,66 +211,26 @@ const AccountForm = ({ onSuccess, address }: { onSuccess: () => void; address: s
                 className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
               />
             </div>
+
             <div className="flex flex-col col-span-2">
-              <label htmlFor="timezone" className="text-marble-white">
+              <label htmlFor="skills" className="text-marble-white">
+                Skills
+              </label>
+              <span className="text-concrete text-xs mb-2">(Type to add additional skills)</span>
+              <div>
+                <MultiSelect
+                  name="skills"
+                  placeholder="type to add or search skills"
+                  options={skillOptions}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col col-span-2">
+              <label htmlFor="timezone" className="text-marble-white mb-2">
                 Timezone
               </label>
-              <Field
-                component="select"
-                name="timezone"
-                placeholder="Select one"
-                className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
-              >
-                <option />
-                <option value="-12:00">(GMT -12:00) Eniwetok, Kwajalein</option>
-                <option value="-11:00">(GMT -11:00) Midway Island, Samoa</option>
-                <option value="-10:00">(GMT -10:00) Hawaii</option>
-                <option value="-09:50">(GMT -9:30) Taiohae</option>
-                <option value="-09:00">(GMT -9:00) Alaska</option>
-                <option value="-08:00">(GMT -8:00) Pacific Time (US &amp; Canada)</option>
-                <option value="-07:00">(GMT -7:00) Mountain Time (US &amp; Canada)</option>
-                <option value="-06:00">
-                  (GMT -6:00) Central Time (US &amp; Canada), Mexico City
-                </option>
-                <option value="-05:00">
-                  (GMT -5:00) Eastern Time (US &amp; Canada), Bogota, Lima
-                </option>
-                <option value="-04:50">(GMT -4:30) Caracas</option>
-                <option value="-04:00">(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz</option>
-                <option value="-03:50">(GMT -3:30) Newfoundland</option>
-                <option value="-03:00">(GMT -3:00) Brazil, Buenos Aires, Georgetown</option>
-                <option value="-02:00">(GMT -2:00) Mid-Atlantic</option>
-                <option value="-01:00">(GMT -1:00) Azores, Cape Verde Islands</option>
-                <option value="+00:00">
-                  (GMT) Western Europe Time, London, Lisbon, Casablanca
-                </option>
-                <option value="+01:00">(GMT +1:00) Brussels, Copenhagen, Madrid, Paris</option>
-                <option value="+02:00">(GMT +2:00) Kaliningrad, South Africa</option>
-                <option value="+03:00">(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg</option>
-                <option value="+03:50">(GMT +3:30) Tehran</option>
-                <option value="+04:00">(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi</option>
-                <option value="+04:50">(GMT +4:30) Kabul</option>
-                <option value="+05:00">
-                  (GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent
-                </option>
-                <option value="+05:50">(GMT +5:30) Bombay, Calcutta, Madras, New Delhi</option>
-                <option value="+05:75">(GMT +5:45) Kathmandu, Pokhara</option>
-                <option value="+06:00">(GMT +6:00) Almaty, Dhaka, Colombo</option>
-                <option value="+06:50">(GMT +6:30) Yangon, Mandalay</option>
-                <option value="+07:00">(GMT +7:00) Bangkok, Hanoi, Jakarta</option>
-                <option value="+08:00">(GMT +8:00) Beijing, Perth, Singapore, Hong Kong</option>
-                <option value="+08:75">(GMT +8:45) Eucla</option>
-                <option value="+09:00">(GMT +9:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk</option>
-                <option value="+09:50">(GMT +9:30) Adelaide, Darwin</option>
-                <option value="+10:00">(GMT +10:00) Eastern Australia, Guam, Vladivostok</option>
-                <option value="+10:50">(GMT +10:30) Lord Howe Island</option>
-                <option value="+11:00">(GMT +11:00) Magadan, Solomon Islands, New Caledonia</option>
-                <option value="+11:50">(GMT +11:30) Norfolk Island</option>
-                <option value="+12:00">(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka</option>
-                <option value="+12:75">(GMT +12:45) Chatham Islands</option>
-                <option value="+13:00">(GMT +13:00) Apia, Nukualofa</option>
-                <option value="+14:00">(GMT +14:00) Line Islands, Tokelau</option>
-              </Field>
+              <Select name="timezone" placeholder="Select one" options={TimezoneOptions} />
             </div>
           </div>
 
