@@ -58,7 +58,8 @@ const Project: BlitzPage = () => {
       if (activeUser && initiativeLocalId) {
         let currentInit = activeUser.initiatives?.find(
           (init) =>
-            init.initiative.localId === initiativeLocalId && terminal.handle == terminalHandle
+            init.initiative.localId === initiativeLocalId &&
+            init.initiative.terminalId == terminal.id
         )
         if (currentInit) {
           setHasApplied(true)
