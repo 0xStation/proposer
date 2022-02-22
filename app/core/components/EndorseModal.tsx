@@ -185,8 +185,12 @@ const EndorseModal = ({
 
   // hook to show endorsement message of how much a user is endorsing.
   useEffect(() => {
+    if (!isEndorseModalOpen) {
+      return
+    }
+
     validateAmountAndShowFeedback(endorsementAmount)
-  }, [tokenBalance, endorsementAmount])
+  }, [tokenBalance, endorsementAmount, isEndorseModalOpen])
 
   useEffect(() => {
     if (allowanceApprovalLoading || endorseLoading) {
