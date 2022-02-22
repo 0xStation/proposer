@@ -1,8 +1,6 @@
 import Modal from "./Modal"
 import { useState, useEffect, useMemo } from "react"
 import { useAccount, useBalance, useWaitForTransaction } from "wagmi"
-import Slider from "./Slider"
-import { Account } from "app/account/types"
 import { utils, BigNumberish } from "ethers"
 import { Button } from "./Button"
 import {
@@ -12,16 +10,6 @@ import {
   useWaitingRoomWrite,
 } from "../contracts/contracts"
 import { DEFAULT_NUMBER_OF_DECIMALS, TERMINAL, MAX_ALLOWANCE, CONTRACTS } from "../utils/constants"
-import useStore from "../hooks/useStore"
-
-const TokenContext = ({ className, issuanceAmount, symbol, context = "" }) => (
-  <div className={className}>
-    <p className="text-base font-bold">
-      {issuanceAmount} {symbol}
-    </p>
-    {context && <p className="text-base">{context}</p>}
-  </div>
-)
 
 const EndorseModal = ({
   isEndorseModalOpen,
@@ -32,14 +20,12 @@ const EndorseModal = ({
   terminal,
 }) => {
   const [{ data: accountData }] = useAccount()
-
   const [endorsementAmount, setEndorsementAmount] = useState<number>(1)
-  const [endorsementBudgetPercentage, setEndorsementBudgetPercentage] = useState(0)
   const [allowance, setAllowance] = useState<number>(0)
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
-  const activeUser: Account | null = useStore((state) => state.activeUser)
   const [endorsementMessage, setEndorsementMessage] = useState<string>("")
   const [error, setError] = useState<boolean>(false)
+  const [invalidInput, setInvalidInput] = useState<boolean>(false)
   const [transactionPending, setTransactionPending] = useState<boolean>(false)
   const [explorerLink, setExplorerLink] = useState<string>()
 
@@ -70,7 +56,7 @@ const EndorseModal = ({
 
   const tokenBalance = useMemo(
     () => balanceData?.formatted && parseFloat(balanceData?.formatted || "0"),
-    [parseFloat(balanceData?.formatted || "")]
+    [parseFloat(balanceData?.formatted || "0")]
   )
 
   const tokenBalanceIsDefined = typeof tokenBalance === "number"
@@ -80,32 +66,39 @@ const EndorseModal = ({
     contract: terminal.data?.contracts.addresses.endorsements,
   })
 
-  const EndorsingStateMessage = ({ children, error }) => {
-    const messageColor = error ? "text-torch-red" : "text-marble-white"
-
-    const padding = endorsementMessage ? "" : "p-2"
-
-    return (
-      <p className={`${messageColor} text-center text-base mt-1 mb-[-10px] ${padding}`}>
-        {children}
-      </p>
-    )
-  }
-
-  const handleSliderChange = (endorsementAmt) => {
+  const validateAmountAndShowFeedback = (endorsementAmt) => {
     if (tokenBalanceIsDefined) {
-      if (endorsementAmt > tokenBalance) {
-        setEndorsementBudgetPercentage((endorsementAmt / tokenBalance) * 100)
+      if (endorsementAmount <= tokenBalance && endorsementAmount > 0) {
         setEndorsementMessage(
-          `Insufficient ${endorsementsSymbol} balance. Please wait for the refill and endorse again later.`
+          `You're endorsing ${endorsementAmount} of your ${tokenBalance} ${endorsementsSymbol}.`
         )
-        setError(true)
+      } else if (isNaN(endorsementAmt)) {
+        setEndorsementMessage("Please enter a valid amount.")
+        setInvalidInput(true)
+      } else if (endorsementAmt > tokenBalance) {
+        setEndorsementMessage(
+          `Amount exceeds your balance of ${tokenBalance} ${endorsementsSymbol}.`
+        )
+        setInvalidInput(true)
+      } else if (endorsementAmt <= 0) {
+        setEndorsementMessage(`Please enter an amount greater than 0.`)
+        setInvalidInput(true)
       } else {
-        setEndorsementBudgetPercentage((endorsementAmt / tokenBalance) * 100)
+        setInvalidInput(false)
         setError(false)
       }
     }
+  }
+
+  const handleEndorsementAmountChange = (event) => {
+    // `event.target.validity.valid` is valid if numbers and/or decimal followed by "0" is entered
+    const endorsementAmt = event.target.validity.valid
+      ? parseInt(event.target.value)
+      : endorsementAmount
+
     setEndorsementAmount(endorsementAmt)
+
+    validateAmountAndShowFeedback(endorsementAmt)
   }
 
   const ViewExplorer = explorerLink && (
@@ -118,7 +111,7 @@ const EndorseModal = ({
   )
 
   const handleEndorseClick = async () => {
-    if (tokenBalanceIsDefined && endorsementAmount > tokenBalance) {
+    if (tokenBalanceIsDefined && endorsementAmount > tokenBalance && endorsementAmount < 0) {
       return
     }
 
@@ -128,6 +121,7 @@ const EndorseModal = ({
         args: [CONTRACTS.WAITING_ROOM, MAX_ALLOWANCE],
       })
 
+      // poll for on-chain allowance data until we have an error or the results data
       let allowanceTransaction
       while (!allowanceTransaction?.data && !allowanceError) {
         setTransactionPending(true)
@@ -154,6 +148,7 @@ const EndorseModal = ({
       ],
     })
 
+    // poll for on-chain endorse data until we have an error or the results data
     let endorseTransaction
     while (!endorseTransaction?.data && !endorseError) {
       setTransactionPending(true)
@@ -188,21 +183,10 @@ const EndorseModal = ({
     setTimeout(() => setIsSuccessModalOpen(true), 550)
   }
 
+  // hook to show endorsement message of how much a user is endorsing.
   useEffect(() => {
-    // since we're reading tokenBalance from on-chain, we need to check
-    // first if tokenBalance is defined before we can show any messaging
-    if (
-      typeof tokenBalance === "number" &&
-      endorsementBudgetPercentage &&
-      endorsementAmount < tokenBalance
-    ) {
-      setEndorsementMessage(
-        `You're giving ${contributor?.data?.name} ${endorsementBudgetPercentage.toFixed(
-          2
-        )}% of your balance.`
-      )
-    }
-  }, [tokenBalance, endorsementBudgetPercentage])
+    validateAmountAndShowFeedback(endorsementAmount)
+  }, [tokenBalance, endorsementAmount])
 
   useEffect(() => {
     if (allowanceApprovalLoading || endorseLoading) {
@@ -213,7 +197,7 @@ const EndorseModal = ({
 
   useEffect(() => {
     const getEndorsementTokenAllowance = async () => {
-      const { data: tokenAllowance, error } = await getAllowance({
+      const { data: tokenAllowance } = await getAllowance({
         args: [address, CONTRACTS.WAITING_ROOM],
       })
       setAllowance(parseFloat(utils.formatUnits((tokenAllowance as BigNumberish) || 0, decimals)))
@@ -224,55 +208,52 @@ const EndorseModal = ({
   return (
     <Modal
       title="Endorse"
+      subtitle={`Signal your magnitude of support for ${contributor?.data?.name}.`}
       open={isEndorseModalOpen}
       toggle={(close) => {
+        setInvalidInput(false)
         setError(false)
         setEndorsementMessage("")
         setIsEndorseModalOpen(close)
-        setEndorsementBudgetPercentage(0)
       }}
-      error={error}
+      error={error || invalidInput}
     >
-      <div className="mt-20 px-[24px]">
-        <div className="flex justify-center">
-          <Slider
-            onChange={handleSliderChange}
-            contributor={contributor}
-            disabled={allowanceApprovalLoading || endorseLoading || transactionPending}
-            endorsementsSymbol={terminal.data?.contracts.symbols.endorsements}
-          />
-        </div>
-        <div className="flex flex-row">
-          <TokenContext
-            className="text-concrete mr-auto text-center w-[115px] ml-[-2%] pt-[.9rem] pl-[.4rem]"
-            issuanceAmount={1}
-            symbol={endorsementsSymbol}
-            context="Like what I've seen so far"
-          />
-          <TokenContext
-            className="text-concrete text-center w-[100px] pt-[.9rem] pl-[1.1rem]"
-            issuanceAmount={50}
-            symbol={endorsementsSymbol}
-          />
-          <TokenContext
-            className="text-concrete ml-auto text-center w-[115px] pt-[.9rem] pl-[2.2rem]"
-            issuanceAmount={100}
-            symbol={endorsementsSymbol}
-            context="Crazy not to bring them onboard"
-          />
-        </div>
+      <div className="mt-6 px-[24px] flex-col items-center">
+        <input
+          className="mx-auto mb-6 block bg-tunnel-black text-marble-white w-24 h-fit text-center text-5xl"
+          placeholder="1"
+          onChange={handleEndorsementAmountChange}
+          // input gives a warning if the value results to NaN, but does not
+          // when the value results to an empty string.
+          value={isNaN(endorsementAmount) ? "" : Math.floor(endorsementAmount)}
+          max="100"
+          min="0"
+          type="number"
+          pattern="[0-9]*"
+          onBlur={(e) => {
+            // remove decimals on blur
+            e.target.value = parseInt(e.target.value).toString()
+          }}
+        ></input>
         <Button
+          type="submit"
           onClick={handleEndorseClick}
           className="w-1/2 p-1"
           loading={allowanceApprovalLoading || endorseLoading || transactionPending}
-          disabled={allowanceApprovalLoading || endorseLoading || transactionPending}
+          disabled={
+            invalidInput || allowanceApprovalLoading || endorseLoading || transactionPending
+          }
         >
           Endorse
         </Button>
-        <EndorsingStateMessage error={error}>
+        <p
+          className={`${
+            error || invalidInput ? "text-torch-red" : "text-marble-white"
+          } text-center text-base mt-1 mb-[-10px] p-2`}
+        >
           {endorsementMessage}
           {ViewExplorer}
-        </EndorsingStateMessage>
+        </p>
       </div>
     </Modal>
   )

@@ -200,7 +200,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             terminalData={terminal?.data}
           />
         )}
-        {selectedInitiativeLocalId && selectedInitiativeLocalId && (
+        {selectedInitiativeLocalId && selectedInitiativeLocalId && selectedApplication?.account && (
           <EndorseModal
             isEndorseModalOpen={isEndorseModalOpen}
             setIsEndorseModalOpen={setIsEndorseModalOpen}
