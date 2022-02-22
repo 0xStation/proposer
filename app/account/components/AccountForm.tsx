@@ -12,9 +12,9 @@ import UploadIcon from "app/core/icons/UploadIcon"
 
 interface ApplicationParams {
   name: string
-  discordId: string
+  contactURL: string
   pronouns?: string
-  timezone: string
+  timezone: { label: string; value: string }
   address: string
   skills: {
     label: string
@@ -22,9 +22,8 @@ interface ApplicationParams {
   }[]
 }
 
-const CoverPhotoInput = () => {
+const CoverPhotoInput = ({ coverURL, onUpload }) => {
   const [uploadingState, setUploadingState] = useState("")
-  const [coverURL, setCoverURL] = useState("")
 
   const uploadFile = async (acceptedFiles) => {
     setUploadingState("UPLOADING")
@@ -35,22 +34,27 @@ const CoverPhotoInput = () => {
       body: formData,
     })
     const data = await res.json()
-    setCoverURL(data.url)
+    onUpload(data.url)
     setUploadingState("UPLOADED")
   }
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop: uploadFile,
     accept: "image/jpeg, image/jpg, image/png",
   })
 
   return (
-    <div className="w-full h-[100px] bg-wet-concrete border border-concrete" {...getRootProps()}>
-      <img
-        alt="Profile picture uploaded by the user."
-        src={coverURL}
-        className="w-full h-full object-cover object-no-repeat"
-      />
+    <div
+      className="w-full h-[100px] bg-wet-concrete border border-concrete cursor-pointer"
+      {...getRootProps()}
+    >
+      {uploadingState === "UPLOADED" && (
+        <img
+          alt="Cover picture uploaded by the user."
+          src={coverURL}
+          className="w-full h-full object-cover object-no-repeat"
+        />
+      )}
       <span className="absolute right-2 bottom-2">
         <UploadIcon />
       </span>
@@ -59,9 +63,8 @@ const CoverPhotoInput = () => {
   )
 }
 
-const PfpInput = () => {
+const PfpInput = ({ pfpURL, onUpload }) => {
   const [uploadingState, setUploadingState] = useState("")
-  const [pfpURL, setPfpURL] = useState("")
 
   const uploadFile = async (acceptedFiles) => {
     setUploadingState("UPLOADING")
@@ -72,11 +75,11 @@ const PfpInput = () => {
       body: formData,
     })
     const data = await res.json()
-    setPfpURL(data.url)
+    onUpload(data.url)
     setUploadingState("UPLOADED")
   }
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop: uploadFile,
     accept: "image/jpeg, image/jpg, image/png",
   })
@@ -103,7 +106,7 @@ const PfpInput = () => {
 }
 
 const AccountForm = ({ onSuccess, address }: { onSuccess: () => void; address: string }) => {
-  const [uploadingState, setUploadingState] = useState("")
+  const [coverURL, setCoverURL] = useState("")
   const [pfpURL, setPfpURL] = useState("")
   const setActiveUser = useStore((state) => state.setActiveUser)
 
@@ -133,34 +136,17 @@ const AccountForm = ({ onSuccess, address }: { onSuccess: () => void; address: s
     return { value: skill.name, label: capitalizeSkill(skill.name) }
   })
 
-  const uploadFile = async (acceptedFiles) => {
-    setUploadingState("UPLOADING")
-    const formData = new FormData()
-    formData.append("file", acceptedFiles[0])
-    let res = await fetch("/api/uploadImage", {
-      method: "POST",
-      body: formData,
-    })
-    const data = await res.json()
-    setPfpURL(data.url)
-    setUploadingState("UPLOADED")
-  }
-
-  const removeFile = () => {
-    setUploadingState("")
-    setPfpURL("")
-  }
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: uploadFile,
-    accept: "image/jpeg, image/jpg, image/png",
-  })
-
   return (
     <Form
       onSubmit={async (values: ApplicationParams) => {
         try {
-          await createAccountMutation({ ...values, address, pfpURL })
+          await createAccountMutation({
+            ...values,
+            address,
+            pfpURL,
+            coverURL,
+            timezone: values.timezone.value,
+          })
         } catch (error) {
           alert("Error applying.")
         }
@@ -173,8 +159,8 @@ const AccountForm = ({ onSuccess, address }: { onSuccess: () => void; address: s
                 Images
               </label>
               <div className="w-full h-[100px] relative mb-8">
-                <CoverPhotoInput />
-                <PfpInput />
+                <CoverPhotoInput coverURL={coverURL} onUpload={(url) => setCoverURL(url)} />
+                <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
               </div>
             </div>
             <div className="flex flex-col col-span-2">
@@ -201,15 +187,20 @@ const AccountForm = ({ onSuccess, address }: { onSuccess: () => void; address: s
             </div>
 
             <div className="flex flex-col col-span-2">
-              <label htmlFor="discordId" className="text-marble-white">
-                Discord ID
+              <label htmlFor="contactURL" className="text-marble-white">
+                Contact
               </label>
-              <Field
-                component="input"
-                name="discordId"
-                placeholder="Discord ID"
-                className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
-              />
+              <span className="text-concrete text-xs mb-2">
+                URL of the best way to contact you (twitter profile, discord ID, calendy)
+              </span>
+              <div className="flex flex-row mt-1">
+                <Field
+                  component="input"
+                  name="contactURL"
+                  placeholder="link"
+                  className="border border-concrete bg-wet-concrete text-marble-white p-2 flex-1"
+                />
+              </div>
             </div>
 
             <div className="flex flex-col col-span-2">

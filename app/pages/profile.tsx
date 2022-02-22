@@ -23,7 +23,7 @@ const ProfileHome: BlitzPage = () => {
   return (
     <div
       className="w-full h-full bg-cover bg-center bg-no-repeat border"
-      style={{ backgroundImage: "url('/station-cover.png')" }}
+      style={{ backgroundImage: activeUser.data.coverURL }}
     >
       <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36 relative">
         <div className="grid gap-0 grid-cols-1 md:grid-cols-3 xl:grid-cols-4 max-w-screen-xl h-full mx-auto">
