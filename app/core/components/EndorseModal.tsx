@@ -66,28 +66,13 @@ const EndorseModal = ({
     contract: terminal.data?.contracts.addresses.endorsements,
   })
 
-  const EndorsingStateMessage = ({ children, error }) => {
-    const messageColor = error ? "text-torch-red" : "text-marble-white"
-
-    const padding = endorsementMessage ? "p-1" : "p-2"
-
-    return (
-      <p className={`${messageColor} text-center text-base mt-1 mb-[-10px] ${padding}`}>
-        {children}
-      </p>
-    )
-  }
-
-  const handleEndorsementAmountChange = (event) => {
-    // only valid if numbers / decimals are entered
-    const endorsementAmt = event.target.validity.valid
-      ? parseInt(event.target.value)
-      : endorsementAmount
-
-    setEndorsementAmount(endorsementAmt)
-
+  const validateAmountAndShowFeedback = (endorsementAmt) => {
     if (tokenBalanceIsDefined) {
-      if (isNaN(endorsementAmt)) {
+      if (endorsementAmount <= tokenBalance && endorsementAmount > 0) {
+        setEndorsementMessage(
+          `You're endorsing ${endorsementAmount} of your ${tokenBalance} ${endorsementsSymbol}.`
+        )
+      } else if (isNaN(endorsementAmt)) {
         setEndorsementMessage("Please enter a valid amount.")
         setInvalidInput(true)
       } else if (endorsementAmt > tokenBalance) {
@@ -103,6 +88,17 @@ const EndorseModal = ({
         setError(false)
       }
     }
+  }
+
+  const handleEndorsementAmountChange = (event) => {
+    // `event.target.validity.valid` is valid if numbers and/or decimal followed by "0" is entered
+    const endorsementAmt = event.target.validity.valid
+      ? parseInt(event.target.value)
+      : endorsementAmount
+
+    setEndorsementAmount(endorsementAmt)
+
+    validateAmountAndShowFeedback(endorsementAmt)
   }
 
   const ViewExplorer = explorerLink && (
@@ -125,6 +121,7 @@ const EndorseModal = ({
         args: [CONTRACTS.WAITING_ROOM, MAX_ALLOWANCE],
       })
 
+      // poll for on-chain allowance data until we have an error or the results data
       let allowanceTransaction
       while (!allowanceTransaction?.data && !allowanceError) {
         setTransactionPending(true)
@@ -151,6 +148,7 @@ const EndorseModal = ({
       ],
     })
 
+    // poll for on-chain endorse data until we have an error or the results data
     let endorseTransaction
     while (!endorseTransaction?.data && !endorseError) {
       setTransactionPending(true)
@@ -185,21 +183,10 @@ const EndorseModal = ({
     setTimeout(() => setIsSuccessModalOpen(true), 550)
   }
 
+  // hook to show endorsement message of how much a user is endorsing.
   useEffect(() => {
-    // since we're reading tokenBalance from on-chain, we need to check
-    // first if tokenBalance is defined before we can show any messaging
-    if (
-      typeof tokenBalance === "number" &&
-      endorsementAmount <= tokenBalance &&
-      endorsementAmount > 0 &&
-      contributor &&
-      isEndorseModalOpen
-    ) {
-      setEndorsementMessage(
-        `You're endorsing ${endorsementAmount} of your ${tokenBalance} ${endorsementsSymbol}.`
-      )
-    }
-  }, [tokenBalance, endorsementAmount, isEndorseModalOpen])
+    validateAmountAndShowFeedback(endorsementAmount)
+  }, [tokenBalance, endorsementAmount])
 
   useEffect(() => {
     if (allowanceApprovalLoading || endorseLoading) {
