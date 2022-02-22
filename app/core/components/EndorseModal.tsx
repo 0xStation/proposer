@@ -88,7 +88,9 @@ const EndorseModal = ({
         setEndorsementMessage("Please enter a valid amount.")
         setInvalidInput(true)
       } else if (endorsementAmt > tokenBalance) {
-        setEndorsementMessage(`Insufficient ${endorsementsSymbol} balance.`)
+        setEndorsementMessage(
+          `Amount exceeds your balance of ${tokenBalance} ${endorsementsSymbol}.`
+        )
         setInvalidInput(true)
       } else if (endorsementAmt <= 0) {
         setEndorsementMessage(`Please enter an amount greater than 0.`)
@@ -191,9 +193,7 @@ const EndorseModal = ({
       isEndorseModalOpen
     ) {
       setEndorsementMessage(
-        `You have ${tokenBalance} ${endorsementsSymbol} left and you're giving ${
-          contributor?.data?.name
-        } ${endorsementAmount || 0} ${endorsementsSymbol}.`
+        `You're endorsing ${endorsementAmount} of your ${tokenBalance} ${endorsementsSymbol}.`
       )
     }
   }, [tokenBalance, endorsementAmount, isEndorseModalOpen])
@@ -218,7 +218,7 @@ const EndorseModal = ({
   return (
     <Modal
       title="Endorse"
-      subtitle={`Enter the amount of endorsements you’d like to give ${contributor?.data?.name}.`}
+      subtitle={`Enter an amount that reflects your support for ${contributor?.data?.name}.`}
       open={isEndorseModalOpen}
       toggle={(close) => {
         setError(false)

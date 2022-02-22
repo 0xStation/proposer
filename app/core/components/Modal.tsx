@@ -83,7 +83,7 @@ const Modal = ({
                   </Dialog.Title>
                 )}
                 {subtitle && (
-                  <Dialog.Description className="text-base font-medium text-marble-white text-center mt-4">
+                  <Dialog.Description className="text-lg font-medium text-marble-white text-center mt-4">
                     {subtitle}
                   </Dialog.Description>
                 )}
