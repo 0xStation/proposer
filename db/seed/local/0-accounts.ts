@@ -14,6 +14,7 @@ interface CreateAccountParams {
   address: string
   pfpURL: string
   pronouns?: string
+  contactURL: string
 }
 
 const kristen: CreateAccountParams = {
@@ -23,6 +24,7 @@ const kristen: CreateAccountParams = {
   skills: [],
   discordId: "rie#9502",
   timezone: "PST",
+  contactURL: "twitter.com",
   pfpURL: "https://pbs.twimg.com/profile_images/1480639057914855424/LiE4wCe2_400x400.jpg",
 }
 
@@ -33,6 +35,7 @@ const mima: CreateAccountParams = {
   skills: [],
   discordId: "mima#3881",
   timezone: "EST",
+  contactURL: "twitter.com",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036018-25f65c4d-a968-4c6c-b328-15958acdb649.png",
 }
