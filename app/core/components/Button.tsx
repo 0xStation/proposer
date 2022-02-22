@@ -24,7 +24,9 @@ export const Button = ({
     <button
       disabled={disabled}
       onClick={onClick}
-      className={`${buttonStyling} rounded mx-auto block p-1 ${className}`}
+      className={`${
+        disabled ? "opacity-50" : ""
+      } ${buttonStyling} rounded mx-auto block p-1 ${className}`}
     >
       {loading ? <Loader /> : children}
     </button>

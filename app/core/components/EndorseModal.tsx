@@ -1,8 +1,6 @@
 import Modal from "./Modal"
 import { useState, useEffect, useMemo } from "react"
 import { useAccount, useBalance, useWaitForTransaction } from "wagmi"
-import Slider from "./Slider"
-import { Account } from "app/account/types"
 import { utils, BigNumberish } from "ethers"
 import { Button } from "./Button"
 import {
@@ -12,16 +10,6 @@ import {
   useWaitingRoomWrite,
 } from "../contracts/contracts"
 import { DEFAULT_NUMBER_OF_DECIMALS, TERMINAL, MAX_ALLOWANCE, CONTRACTS } from "../utils/constants"
-import useStore from "../hooks/useStore"
-
-const TokenContext = ({ className, issuanceAmount, symbol, context = "" }) => (
-  <div className={className}>
-    <p className="text-base font-bold">
-      {issuanceAmount} {symbol}
-    </p>
-    {context && <p className="text-base">{context}</p>}
-  </div>
-)
 
 const EndorseModal = ({
   isEndorseModalOpen,
@@ -34,10 +22,8 @@ const EndorseModal = ({
   const [{ data: accountData }] = useAccount()
 
   const [endorsementAmount, setEndorsementAmount] = useState<number>(1)
-  const [endorsementBudgetPercentage, setEndorsementBudgetPercentage] = useState(0)
   const [allowance, setAllowance] = useState<number>(0)
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
-  const activeUser: Account | null = useStore((state) => state.activeUser)
   const [endorsementMessage, setEndorsementMessage] = useState<string>("")
   const [error, setError] = useState<boolean>(false)
   const [transactionPending, setTransactionPending] = useState<boolean>(false)
@@ -70,7 +56,7 @@ const EndorseModal = ({
 
   const tokenBalance = useMemo(
     () => balanceData?.formatted && parseFloat(balanceData?.formatted || "0"),
-    [parseFloat(balanceData?.formatted || "")]
+    [parseFloat(balanceData?.formatted || "0")]
   )
 
   const tokenBalanceIsDefined = typeof tokenBalance === "number"
@@ -83,7 +69,7 @@ const EndorseModal = ({
   const EndorsingStateMessage = ({ children, error }) => {
     const messageColor = error ? "text-torch-red" : "text-marble-white"
 
-    const padding = endorsementMessage ? "" : "p-2"
+    const padding = endorsementMessage ? "p-1" : "p-2"
 
     return (
       <p className={`${messageColor} text-center text-base mt-1 mb-[-10px] ${padding}`}>
@@ -92,20 +78,19 @@ const EndorseModal = ({
     )
   }
 
-  const handleSliderChange = (endorsementAmt) => {
+  const handleEndorsementAmountChange = (event) => {
+    const endorsementAmt = event.target.value
+    setEndorsementAmount(endorsementAmt)
     if (tokenBalanceIsDefined) {
       if (endorsementAmt > tokenBalance) {
-        setEndorsementBudgetPercentage((endorsementAmt / tokenBalance) * 100)
         setEndorsementMessage(
           `Insufficient ${endorsementsSymbol} balance. Please wait for the refill and endorse again later.`
         )
         setError(true)
       } else {
-        setEndorsementBudgetPercentage((endorsementAmt / tokenBalance) * 100)
         setError(false)
       }
     }
-    setEndorsementAmount(endorsementAmt)
   }
 
   const ViewExplorer = explorerLink && (
@@ -193,16 +178,17 @@ const EndorseModal = ({
     // first if tokenBalance is defined before we can show any messaging
     if (
       typeof tokenBalance === "number" &&
-      endorsementBudgetPercentage &&
-      endorsementAmount < tokenBalance
+      endorsementAmount < tokenBalance &&
+      contributor &&
+      isEndorseModalOpen
     ) {
       setEndorsementMessage(
-        `You're giving ${contributor?.data?.name} ${endorsementBudgetPercentage.toFixed(
-          2
-        )}% of your balance.`
+        `You have ${tokenBalance} ${endorsementsSymbol} left and you're giving ${
+          contributor?.data?.name
+        } ${endorsementAmount || 0} ${endorsementsSymbol}.`
       )
     }
-  }, [tokenBalance, endorsementBudgetPercentage])
+  }, [tokenBalance, endorsementAmount, isEndorseModalOpen])
 
   useEffect(() => {
     if (allowanceApprovalLoading || endorseLoading) {
@@ -224,48 +210,29 @@ const EndorseModal = ({
   return (
     <Modal
       title="Endorse"
+      subtitle={`Enter the amount of endorsements you’d like to give ${contributor?.data?.name}.`}
       open={isEndorseModalOpen}
       toggle={(close) => {
         setError(false)
         setEndorsementMessage("")
         setIsEndorseModalOpen(close)
-        setEndorsementBudgetPercentage(0)
       }}
       error={error}
     >
-      <div className="mt-20 px-[24px]">
-        <div className="flex justify-center">
-          <Slider
-            onChange={handleSliderChange}
-            contributor={contributor}
-            disabled={allowanceApprovalLoading || endorseLoading || transactionPending}
-            endorsementsSymbol={terminal.data?.contracts.symbols.endorsements}
-          />
-        </div>
-        <div className="flex flex-row">
-          <TokenContext
-            className="text-concrete mr-auto text-center w-[115px] ml-[-2%] pt-[.9rem] pl-[.4rem]"
-            issuanceAmount={1}
-            symbol={endorsementsSymbol}
-            context="Like what I've seen so far"
-          />
-          <TokenContext
-            className="text-concrete text-center w-[100px] pt-[.9rem] pl-[1.1rem]"
-            issuanceAmount={50}
-            symbol={endorsementsSymbol}
-          />
-          <TokenContext
-            className="text-concrete ml-auto text-center w-[115px] pt-[.9rem] pl-[2.2rem]"
-            issuanceAmount={100}
-            symbol={endorsementsSymbol}
-            context="Crazy not to bring them onboard"
-          />
-        </div>
+      <div className="mt-6 px-[24px] flex-col items-center">
+        <input
+          className="mx-auto mb-6 block bg-tunnel-black text-marble-white w-24 h-fit text-center text-5xl"
+          placeholder="1"
+          onChange={handleEndorsementAmountChange}
+          value={endorsementAmount}
+          max="100"
+          type="number"
+        ></input>
         <Button
           onClick={handleEndorseClick}
           className="w-1/2 p-1"
           loading={allowanceApprovalLoading || endorseLoading || transactionPending}
-          disabled={allowanceApprovalLoading || endorseLoading || transactionPending}
+          disabled={error || allowanceApprovalLoading || endorseLoading || transactionPending}
         >
           Endorse
         </Button>
