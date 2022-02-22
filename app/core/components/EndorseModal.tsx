@@ -79,7 +79,10 @@ const EndorseModal = ({
   }
 
   const handleEndorsementAmountChange = (event) => {
-    const endorsementAmt = parseFloat(event.target.value)
+    // only valid if numbers / decimals are entered
+    const endorsementAmt = event.target.validity.valid
+      ? parseInt(event.target.value)
+      : endorsementAmount
 
     setEndorsementAmount(endorsementAmt)
 
@@ -218,9 +221,10 @@ const EndorseModal = ({
   return (
     <Modal
       title="Endorse"
-      subtitle={`Enter an amount that reflects your support for ${contributor?.data?.name}.`}
+      subtitle={`Signal your magnitude of support for ${contributor?.data?.name}.`}
       open={isEndorseModalOpen}
       toggle={(close) => {
+        setInvalidInput(false)
         setError(false)
         setEndorsementMessage("")
         setIsEndorseModalOpen(close)
@@ -234,12 +238,18 @@ const EndorseModal = ({
           onChange={handleEndorsementAmountChange}
           // input gives a warning if the value results to NaN, but does not
           // when the value results to an empty string.
-          value={isNaN(endorsementAmount) ? "" : endorsementAmount}
+          value={isNaN(endorsementAmount) ? "" : Math.floor(endorsementAmount)}
           max="100"
           min="0"
           type="number"
+          pattern="[0-9]*"
+          onBlur={(e) => {
+            // remove decimals on blur
+            e.target.value = parseInt(e.target.value).toString()
+          }}
         ></input>
         <Button
+          type="submit"
           onClick={handleEndorseClick}
           className="w-1/2 p-1"
           loading={allowanceApprovalLoading || endorseLoading || transactionPending}
@@ -249,10 +259,14 @@ const EndorseModal = ({
         >
           Endorse
         </Button>
-        <EndorsingStateMessage error={error || invalidInput}>
+        <p
+          className={`${
+            error || invalidInput ? "text-torch-red" : "text-marble-white"
+          } text-center text-base mt-1 mb-[-10px] p-2`}
+        >
           {endorsementMessage}
           {ViewExplorer}
-        </EndorsingStateMessage>
+        </p>
       </div>
     </Modal>
   )
