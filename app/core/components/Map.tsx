@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useQuery } from "blitz"
+import { Link, Routes, useRouter, useQuery } from "blitz"
 import { Popover, Transition } from "@headlessui/react"
 import ChevronIcon from "../icons/ChevronIcon"
 import { Fragment } from "react"
@@ -36,7 +36,7 @@ const Map = () => {
         {({ open }) => (
           <>
             <Popover.Button className="text-marble-white group rounded-md h-[28px] inline-flex items-center text-base font-medium">
-              <span className="text-marble-white">MAP</span>
+              <span className="text-marble-white">EXPLORE</span>
               <ChevronIcon isUp={open} className="ml-2" />
             </Popover.Button>
             <Transition
@@ -83,19 +83,23 @@ const Map = () => {
                       <div className="mt-4 grid gap-4 grid-cols-4">
                         {results.map((terminal, idx) => {
                           return (
-                            <div
+                            <Link
                               key={idx}
-                              className="flex flex-col items-center cursor-pointer w-16"
+                              href={Routes.TerminalInitiativePage({
+                                terminalHandle: terminal.handle,
+                              })}
                             >
-                              <img
-                                className="border border-marble-white h-16 w-16 rounded-full bg-concrete"
-                                src={terminal.data.pfpURL}
-                              />
+                              <div className="flex flex-col items-center cursor-pointer w-16">
+                                <img
+                                  className="border border-marble-white h-16 w-16 rounded-full bg-concrete"
+                                  src={terminal.data.pfpURL}
+                                />
 
-                              <span className="text-marble-white text-base mt-1 text-center whitespace-nowrap text-ellipsis overflow-hidden w-full">
-                                {terminal.data.name}
-                              </span>
-                            </div>
+                                <span className="text-marble-white text-base mt-1 text-center whitespace-nowrap text-ellipsis overflow-hidden w-full">
+                                  {terminal.data.name}
+                                </span>
+                              </div>
+                            </Link>
                           )
                         })}
                       </div>
