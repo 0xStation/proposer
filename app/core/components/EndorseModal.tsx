@@ -20,12 +20,12 @@ const EndorseModal = ({
   terminal,
 }) => {
   const [{ data: accountData }] = useAccount()
-
   const [endorsementAmount, setEndorsementAmount] = useState<number>(1)
   const [allowance, setAllowance] = useState<number>(0)
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [endorsementMessage, setEndorsementMessage] = useState<string>("")
   const [error, setError] = useState<boolean>(false)
+  const [invalidInput, setInvalidInput] = useState<boolean>(false)
   const [transactionPending, setTransactionPending] = useState<boolean>(false)
   const [explorerLink, setExplorerLink] = useState<string>()
 
@@ -79,15 +79,22 @@ const EndorseModal = ({
   }
 
   const handleEndorsementAmountChange = (event) => {
-    const endorsementAmt = event.target.value
+    const endorsementAmt = parseFloat(event.target.value)
+
     setEndorsementAmount(endorsementAmt)
+
     if (tokenBalanceIsDefined) {
-      if (endorsementAmt > tokenBalance) {
-        setEndorsementMessage(
-          `Insufficient ${endorsementsSymbol} balance. Please wait for the refill and endorse again later.`
-        )
-        setError(true)
+      if (isNaN(endorsementAmt)) {
+        setEndorsementMessage("Please enter a valid amount.")
+        setInvalidInput(true)
+      } else if (endorsementAmt > tokenBalance) {
+        setEndorsementMessage(`Insufficient ${endorsementsSymbol} balance.`)
+        setInvalidInput(true)
+      } else if (endorsementAmt <= 0) {
+        setEndorsementMessage(`Please enter an amount greater than 0.`)
+        setInvalidInput(true)
       } else {
+        setInvalidInput(false)
         setError(false)
       }
     }
@@ -103,7 +110,7 @@ const EndorseModal = ({
   )
 
   const handleEndorseClick = async () => {
-    if (tokenBalanceIsDefined && endorsementAmount > tokenBalance) {
+    if (tokenBalanceIsDefined && endorsementAmount > tokenBalance && endorsementAmount < 0) {
       return
     }
 
@@ -178,7 +185,8 @@ const EndorseModal = ({
     // first if tokenBalance is defined before we can show any messaging
     if (
       typeof tokenBalance === "number" &&
-      endorsementAmount < tokenBalance &&
+      endorsementAmount <= tokenBalance &&
+      endorsementAmount > 0 &&
       contributor &&
       isEndorseModalOpen
     ) {
@@ -199,7 +207,7 @@ const EndorseModal = ({
 
   useEffect(() => {
     const getEndorsementTokenAllowance = async () => {
-      const { data: tokenAllowance, error } = await getAllowance({
+      const { data: tokenAllowance } = await getAllowance({
         args: [address, CONTRACTS.WAITING_ROOM],
       })
       setAllowance(parseFloat(utils.formatUnits((tokenAllowance as BigNumberish) || 0, decimals)))
@@ -217,26 +225,31 @@ const EndorseModal = ({
         setEndorsementMessage("")
         setIsEndorseModalOpen(close)
       }}
-      error={error}
+      error={error || invalidInput}
     >
       <div className="mt-6 px-[24px] flex-col items-center">
         <input
           className="mx-auto mb-6 block bg-tunnel-black text-marble-white w-24 h-fit text-center text-5xl"
           placeholder="1"
           onChange={handleEndorsementAmountChange}
-          value={endorsementAmount}
+          // input gives a warning if the value results to NaN, but does not
+          // when the value results to an empty string.
+          value={isNaN(endorsementAmount) ? "" : endorsementAmount}
           max="100"
+          min="0"
           type="number"
         ></input>
         <Button
           onClick={handleEndorseClick}
           className="w-1/2 p-1"
           loading={allowanceApprovalLoading || endorseLoading || transactionPending}
-          disabled={error || allowanceApprovalLoading || endorseLoading || transactionPending}
+          disabled={
+            invalidInput || allowanceApprovalLoading || endorseLoading || transactionPending
+          }
         >
           Endorse
         </Button>
-        <EndorsingStateMessage error={error}>
+        <EndorsingStateMessage error={error || invalidInput}>
           {endorsementMessage}
           {ViewExplorer}
         </EndorsingStateMessage>
