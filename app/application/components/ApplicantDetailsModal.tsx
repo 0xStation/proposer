@@ -168,23 +168,25 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               </div>
             </div>
             <div id="points and submission" className="flex flex-row flex-auto text-marble-white">
-              <div className="flex flex-col flex-1">
-                <div className="font-bold">
-                  <span>Submission</span>
-                </div>
-                <div className="text-base font-normal">
-                  <div className="flex flex-row max-w-xs break-all mr-2">
-                    <a
-                      target="_blank"
-                      href={application?.data?.url}
-                      className="text-magic-mint"
-                      rel="noreferrer"
-                    >
-                      {application?.data?.url}
-                    </a>
+              {application?.data?.url && (
+                <div className="flex flex-col flex-1">
+                  <div className="font-bold">
+                    <span>Submission</span>
+                  </div>
+                  <div className="text-base font-normal">
+                    <div className="flex flex-row max-w-xs break-all mr-2">
+                      <a
+                        target="_blank"
+                        href={`//${application?.data?.url.replace(/^https?:\/\//, "")}`}
+                        className="text-magic-mint"
+                        rel="noreferrer"
+                      >
+                        {application?.data?.url.replace(/^https?:\/\//, "")}
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
               <div className="flex flex-col flex-1">
                 {isEndorsable && (
                   <div>
