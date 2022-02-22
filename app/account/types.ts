@@ -10,6 +10,8 @@ export type AccountMetadata = {
   ticketImage?: string
   pronouns?: string
   discordId: string
+  contactURL?: string
+  coverURL?: string
   timezone: string
   verified: boolean
   initiatives?: number[]
