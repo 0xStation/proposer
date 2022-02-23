@@ -5,7 +5,6 @@ import ProfileMetadata from "app/core/ProfileMetadata"
 type ApplicantEndorsementsProps = {
   endorser: Account
   amount: number
-  isEndorsable?: boolean
   symbol?: string
 }
 
