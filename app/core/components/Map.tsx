@@ -17,8 +17,8 @@ const Map = () => {
 
   const [contributorTerminals = []] = useQuery(
     getTerminalsByAccount,
-    { address: activeUser?.address },
-    { suspense: false }
+    { accountId: activeUser?.id as number },
+    { enabled: !!activeUser?.id, suspense: false }
   )
 
   const data = contributorBoolean ? contributorTerminals : terminals
