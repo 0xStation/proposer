@@ -11,7 +11,7 @@ import { useDecimals } from "app/core/contracts/contracts"
 import ApplicantEndorsements from "./ApplicantEndorsements"
 import useStore from "app/core/hooks/useStore"
 import { formatDate } from "app/core/utils/formatDate"
-import { ProfileMetadata } from "app/core/components/TalentIdentityUnit/ProfileMetadata"
+import { ProfileMetadata } from "app/core/ProfileMetadata"
 import { Tag } from "app/core/components/Tag"
 import { Button } from "app/core/components/Button"
 import hasInvitePermissions from "../queries/hasInvitePermissions"
@@ -187,8 +187,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   </div>
                 </div>
               )}
-              <div className="flex flex-col flex-1">
-                {isEndorsable && (
+              {terminalData ? (
+                <div className="flex flex-col flex-1">
                   <div>
                     <div className="font-bold">
                       <span>Points</span>
@@ -199,8 +199,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                       }`}
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              ) : null}
             </div>
             {isEndorsable && (
               <div id="endorsers" className="flex-auto flex flex-col space-y-2">

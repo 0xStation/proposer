@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react"
 import { useAccount } from "wagmi"
 import { Image, useQuery, BlitzPage, useParam, Link, Routes } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import { TalentIdentityUnit as ContributorCard } from "app/core/components/TalentIdentityUnit/index"
 import ImageLink from "../../../../core/components/ImageLink"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
 import StepOne from "/public/step-1.svg"
@@ -16,6 +15,8 @@ import ApplicationModal from "app/application/components/ApplicationModal"
 import useStore from "app/core/hooks/useStore"
 import usePagination from "app/core/hooks/usePagination"
 import Tag from "app/core/components/Tag"
+import { ProfileMetadata } from "app/core/ProfileMetadata"
+import Card from "app/core/components/Card"
 
 const Project: BlitzPage = () => {
   const [hasApplied, setHasApplied] = useState(false)
@@ -80,7 +81,11 @@ const Project: BlitzPage = () => {
   )
 
   const contributorCards = initiative?.contributors?.map((contributor, idx) => {
-    const { points, joinedAt } = contributor
+    const {
+      role,
+      address,
+      data: { pfpURL, name, ens, pronouns, verified },
+    } = contributor
     let onClick
 
     onClick = () => {
@@ -88,18 +93,22 @@ const Project: BlitzPage = () => {
       setContributorDirectoryModalOpen(true)
     }
 
-    const contributorCardProps = {
-      user: contributor,
-      points,
-      onClick,
-      dateMetadata: joinedAt && {
-        joinedAt,
-      },
-      referrals: [],
-      isEndorsable: false,
-      pointsSymbol: terminal?.data.contracts.symbols.points,
-    }
-    return <ContributorCard key={idx} {...contributorCardProps} />
+    return (
+      <Card onClick={onClick} key={idx}>
+        <ProfileMetadata
+          {...{ pfpURL, name, ens, pronouns, role, address, verified, className: "mx-3 my-3" }}
+        />
+        <div className="flex flex-row flex-1 mx-3">
+          <div className="flex-1 items-center justify-center text-base">
+            {role && role !== "N/A" ? (
+              <Tag type={"role"}>{role}</Tag>
+            ) : (
+              <p className="text-marble-white">N/A</p>
+            )}
+          </div>
+        </div>
+      </Card>
+    )
   })
 
   const { results, totalPages, hasNext, hasPrev } = usePagination(contributorCards, page, 3)

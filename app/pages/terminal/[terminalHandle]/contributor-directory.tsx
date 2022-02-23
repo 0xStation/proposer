@@ -8,7 +8,9 @@ import getRolesByTerminal from "app/role/queries/getRolesByTerminal"
 import { Account } from "app/account/types"
 import ContributorDirectoryModal from "app/contributors/components/ContributorDirectoryModal"
 import { Pill } from "app/core/components/Pill"
-import { TalentIdentityUnit as ContributorCard } from "app/core/components/TalentIdentityUnit/index"
+import { Card } from "app/core/components/Card"
+import { Tag } from "app/core/components/Tag"
+import ProfileMetadata from "app/core/ProfileMetadata"
 
 const TerminalContributorsPage: BlitzPage = () => {
   const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
@@ -40,7 +42,12 @@ const TerminalContributorsPage: BlitzPage = () => {
   }, [selectedRoleLocalId])
 
   const contributorCards = selectedContributors?.map((contributor, idx) => {
-    const { points, joinedAt, role } = contributor
+    const {
+      role,
+      address,
+      data: { pfpURL, name, ens, pronouns, verified },
+    } = contributor
+
     let onClick
     if (role) {
       onClick = () => {
@@ -49,18 +56,22 @@ const TerminalContributorsPage: BlitzPage = () => {
       }
     }
 
-    const contributorCardProps = {
-      user: contributor,
-      points,
-      onClick,
-      dateMetadata: joinedAt && {
-        joinedAt,
-      },
-      referrals: [],
-      isEndorsable: false,
-      pointsSymbol: terminal?.data.contracts.symbols.points,
-    }
-    return <ContributorCard key={idx} {...contributorCardProps} />
+    return (
+      <Card onClick={onClick} key={idx}>
+        <ProfileMetadata
+          {...{ pfpURL, name, ens, pronouns, role, address, verified, className: "mx-3 my-3" }}
+        />
+        <div className="flex flex-row flex-1 mx-3">
+          <div className="flex-1 items-center justify-center text-base">
+            {role && role !== "N/A" ? (
+              <Tag type={"role"}>{role}</Tag>
+            ) : (
+              <p className="text-marble-white">N/A</p>
+            )}
+          </div>
+        </div>
+      </Card>
+    )
   })
 
   const contributorDirectoryView = roles ? (
