@@ -159,7 +159,7 @@ const aaron: ContributorSeed = {
   data: {
     name: "Aaron Lamphere",
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/ccs-aaron.jpeg",
-    discordId: "",
+    discordId: "adl5166#8577",
     timezone: "-05:00",
     verified: true,
   },
