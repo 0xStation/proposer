@@ -11,6 +11,7 @@ const conner = {
   pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/symmetry-square-small.jpg",
 }
 
+// blitz db seed -f db/pfp.ts
 export default async function seed() {
   const contributorSeed = conner
 
