@@ -68,7 +68,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     address,
   }
 
-  const isEndorsable =
+  const canActiveUserEndorse =
     activeUser &&
     (roleOfActiveUser || parseFloat(balanceData?.formatted || "0")) &&
     activeUser?.address !== application?.account?.address
@@ -202,32 +202,29 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 </div>
               ) : null}
             </div>
-            {isEndorsable && (
-              <div id="endorsers" className="flex-auto flex flex-col space-y-2">
-                <div className="flex-auto text-marble-white font-bold">
-                  <span>Endorsers</span>
-                </div>
-                {application?.referrals && application?.referrals.length ? (
-                  <div className="flex flex-col space-y-1">
-                    {application?.referrals?.map?.(({ from: account, amount = 0 }, index) => (
-                      <ApplicantEndorsements
-                        key={index}
-                        endorser={account}
-                        amount={amount * Math.pow(10, 0 - decimals)}
-                        isEndorsable={isEndorsable || false}
-                        symbol={terminalData?.contracts.symbols.points}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-marble-white text-base">
-                    Be the first to endorse this applicant!
-                  </p>
-                )}
+            <div id="endorsers" className="flex-auto flex flex-col space-y-2">
+              <div className="flex-auto text-marble-white font-bold">
+                <span>Endorsers</span>
               </div>
-            )}
+              {application?.referrals && application?.referrals.length ? (
+                <div className="flex flex-col space-y-1">
+                  {application?.referrals?.map?.(({ from: account, amount = 0 }, index) => (
+                    <ApplicantEndorsements
+                      key={index}
+                      endorser={account}
+                      amount={amount * Math.pow(10, 0 - decimals)}
+                      symbol={terminalData?.contracts.symbols.points}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className="text-marble-white text-base">
+                  Be the first to endorse this applicant!
+                </p>
+              )}
+            </div>
           </div>
-          {isEndorsable && (
+          {canActiveUserEndorse && (
             <div className="mx-auto">
               <Button
                 className={canInvite ? "px-20 mr-2 inline" : "px-28"}
