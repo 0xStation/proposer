@@ -43,7 +43,6 @@ export default async function getInitiativeByLocalId(
   if (!initiative) {
     return null
   }
-  console.log(initiative)
 
   return {
     id: initiative.id,

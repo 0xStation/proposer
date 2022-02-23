@@ -117,11 +117,11 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
         <div className="flex-1 items-center justify-center text-base">
           <div className="place-self-center mt-1 font-bold">Points</div>
         </div>
-        <div className="flex flex-1 align-right place-content-end content-right text-base">
-          {endorsementPoints && pointsSymbol
-            ? `${endorsementPoints} ${pointsSymbol}`
-            : `0 ${pointsSymbol}`}
-        </div>
+        {pointsSymbol && (
+          <div className="flex flex-1 align-right place-content-end content-right text-base">
+            {endorsementPoints ? `${endorsementPoints} ${pointsSymbol}` : `0 ${pointsSymbol}`}
+          </div>
+        )}
       </div>
       {activeUser && canActiveUserEndorse && onApplicantCardClick && (
         <div className="flex flex-row flex-1 mx-2.5">
