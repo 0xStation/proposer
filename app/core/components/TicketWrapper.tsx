@@ -51,11 +51,11 @@ const TicketWrapper = ({ activeUser, tokenBalance, terminal, endorsementsSymbol 
               >
                 <div className="flex flex-row space-x-24 items-center">
                   <div className="flex flex-col justify-center">
-                    <div className="bg-concrete min-w-[400px]">
-                      {ticket?.data.ticketImageUrl ? (
+                    <div className="min-w-[400px]">
+                      {ticket?.data?.ticketImageUrl ? (
                         <img
                           className="h-[400px] mx-auto block"
-                          src={ticket?.data.ticketImageUrl}
+                          src={ticket?.data?.ticketImageUrl}
                         />
                       ) : (
                         <p className="h-[400px] w-[240px] border border-concrete rounded-2xl border-dashed text-concrete text-3xl text-center flex flex-col justify-center align-middle mx-auto bg-tunnel-black">
