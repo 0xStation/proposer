@@ -9,6 +9,7 @@ interface Skill {
 interface CreateAccountParams {
   name: string
   discordId: string
+  bio: string
   timezone: string
   skills: Skill[]
   address: string
@@ -20,6 +21,7 @@ interface CreateAccountParams {
 const kristen: CreateAccountParams = {
   address: "0xaE55f61f85935BBB68b8809d5c02142e4CbA9a13",
   name: "rie",
+  bio: "a great dev",
   pronouns: "she/her",
   skills: [],
   discordId: "rie#9502",
@@ -31,6 +33,7 @@ const kristen: CreateAccountParams = {
 const mima: CreateAccountParams = {
   address: "0x65A3870F48B5237f27f674Ec42eA1E017E111D63",
   name: "mima",
+  bio: "a great movie star",
   pronouns: "she/her",
   skills: [],
   discordId: "mima#3881",

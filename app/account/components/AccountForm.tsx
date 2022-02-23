@@ -1,17 +1,20 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useMutation, useQuery } from "blitz"
 import { Field, Form } from "react-final-form"
+import updateAccount from "../mutations/updateAccount"
 import createAccount from "../mutations/createAccount"
 import useStore from "app/core/hooks/useStore"
 import getSkills from "app/skills/queries/getSkills"
 import { useDropzone } from "react-dropzone"
 import Select from "app/core/components/form/Select"
 import MultiSelect from "app/core/components/form/MultiSelect"
-import TimezoneOptions from "app/utils/timezoneOptions"
+import { TimezoneOptions, getTimezoneOptionFromValue } from "app/utils/timezoneOptions"
 import UploadIcon from "app/core/icons/UploadIcon"
+import { Account } from "app/account/types"
 
 interface ApplicationParams {
   name: string
+  bio: string
   contactURL: string
   pronouns?: string
   timezone: { label: string; value: string }
@@ -48,13 +51,14 @@ const CoverPhotoInput = ({ coverURL, onUpload }) => {
       className="w-full h-[100px] bg-wet-concrete border border-concrete cursor-pointer"
       {...getRootProps()}
     >
-      {uploadingState === "UPLOADED" && (
-        <img
-          alt="Cover picture uploaded by the user."
-          src={coverURL}
-          className="w-full h-full object-cover object-no-repeat"
-        />
-      )}
+      {uploadingState === "UPLOADED" ||
+        (coverURL && (
+          <img
+            alt="Cover picture uploaded by the user."
+            src={coverURL}
+            className="w-full h-full object-cover object-no-repeat"
+          />
+        ))}
       <span className="absolute right-2 bottom-2">
         <UploadIcon />
       </span>
@@ -89,7 +93,7 @@ const PfpInput = ({ pfpURL, onUpload }) => {
       className="w-[76px] h-[76px] rounded-full bg-wet-concrete border border-concrete flex items-center justify-center cursor-pointer absolute bottom-[-38px] left-4"
       {...getRootProps()}
     >
-      {uploadingState === "UPLOADED" ? (
+      {uploadingState === "UPLOADED" || pfpURL ? (
         <img
           alt="Profile picture uploaded by the user."
           src={pfpURL}
@@ -105,7 +109,17 @@ const PfpInput = ({ pfpURL, onUpload }) => {
   )
 }
 
-const AccountForm = ({ onSuccess, address }: { onSuccess: () => void; address: string }) => {
+const AccountForm = ({
+  onSuccess,
+  address,
+  account,
+  isEdit,
+}: {
+  onSuccess: () => void
+  address: string
+  account?: Account
+  isEdit: boolean
+}) => {
   const [coverURL, setCoverURL] = useState("")
   const [pfpURL, setPfpURL] = useState("")
   const setActiveUser = useStore((state) => state.setActiveUser)
@@ -119,6 +133,22 @@ const AccountForm = ({ onSuccess, address }: { onSuccess: () => void; address: s
       console.log(error)
     },
   })
+
+  const [updateAccountMutation] = useMutation(updateAccount, {
+    onSuccess: (data) => {
+      onSuccess()
+    },
+    onError: (error) => {
+      console.log(error)
+    },
+  })
+
+  useEffect(() => {
+    if (account) {
+      setPfpURL(account.data.pfpURL || "")
+      setCoverURL(account.data.coverURL || "")
+    }
+  }, [account])
 
   function capitalizeWord(word: string) {
     return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase()
@@ -136,18 +166,38 @@ const AccountForm = ({ onSuccess, address }: { onSuccess: () => void; address: s
     return { value: skill.name, label: capitalizeSkill(skill.name) }
   })
 
+  const existingSkills =
+    account?.skills.map((skill) => {
+      return { value: skill.skill.name, label: skill.skill.name, id: skill.skill.id }
+    }) || []
+
+  const existingTimezone = getTimezoneOptionFromValue(account?.data.timezone)
+
   return (
     <Form
+      initialValues={account?.data || {}}
       onSubmit={async (values: ApplicationParams) => {
         try {
-          await createAccountMutation({
-            ...values,
-            address,
-            pfpURL,
-            coverURL,
-            timezone: values.timezone.value,
-          })
+          if (isEdit) {
+            await updateAccountMutation({
+              ...values,
+              address,
+              pfpURL,
+              coverURL,
+              existingSkills,
+              timezone: values.timezone.value,
+            })
+          } else {
+            await createAccountMutation({
+              ...values,
+              address,
+              pfpURL,
+              coverURL,
+              timezone: values.timezone.value,
+            })
+          }
         } catch (error) {
+          console.log(error)
           alert("Error applying.")
         }
       }}
@@ -213,6 +263,7 @@ const AccountForm = ({ onSuccess, address }: { onSuccess: () => void; address: s
                   name="skills"
                   placeholder="type to add or search skills"
                   options={skillOptions}
+                  initialValue={existingSkills}
                 />
               </div>
             </div>
@@ -221,7 +272,12 @@ const AccountForm = ({ onSuccess, address }: { onSuccess: () => void; address: s
               <label htmlFor="timezone" className="text-marble-white mb-2">
                 Timezone
               </label>
-              <Select name="timezone" placeholder="Select one" options={TimezoneOptions} />
+              <Select
+                name="timezone"
+                placeholder="Select one"
+                options={TimezoneOptions}
+                initialValue={existingTimezone}
+              />
             </div>
           </div>
 

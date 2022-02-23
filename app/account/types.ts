@@ -1,3 +1,5 @@
+import { Skill } from "app/skills/types"
+
 export type AccountMetadata = {
   name: string
   handle?: string
@@ -24,6 +26,6 @@ export type Account = {
   role?: string
   points?: number
   joinedAt?: Date
-  skills: string[]
+  skills: any[]
   initiatives?: any[]
 }

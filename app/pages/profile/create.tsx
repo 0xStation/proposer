@@ -44,7 +44,7 @@ const CreateProfile: BlitzPage = () => {
       <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36 relative">
         <h1 className="text-marble-white text-3xl text-center pt-12 mb-4">Complete your profile</h1>
         <div className="mx-auto max-w-2xl pb-12">
-          <AccountForm onSuccess={() => console.log("done")} address={address} />
+          <AccountForm onSuccess={() => console.log("done")} address={address} isEdit={false} />
         </div>
       </div>
     </div>

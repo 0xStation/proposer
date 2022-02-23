@@ -41,4 +41,8 @@ const TimezoneOptions = [
   { value: "GMT +14:00", label: "(GMT +14:00) Line Islands, Tokelau" },
 ]
 
-export default TimezoneOptions
+const getTimezoneOptionFromValue = (value) => {
+  return TimezoneOptions.find((tz) => tz.value === value)
+}
+
+export { TimezoneOptions, getTimezoneOptionFromValue }
