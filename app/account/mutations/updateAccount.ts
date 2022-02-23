@@ -28,6 +28,25 @@ const UpdateAccount = z.object({
 export default async function updateAccount(input: z.infer<typeof UpdateAccount>) {
   const params = UpdateAccount.parse(input)
 
+  const existingSkillValues = params.existingSkills.map((skill) => skill.value)
+  const incomingSkillValues = params.skills.map((skill) => skill.value)
+
+  const newSkills = params.skills.filter((skill) => !existingSkillValues.includes(skill.value))
+  const removedSkills = params.existingSkills.filter(
+    (skill) => !incomingSkillValues.includes(skill.value)
+  )
+
+  const existingAccount = await db.account.findUnique({
+    where: {
+      address: params.address,
+    },
+  })
+
+  if (!existingAccount) {
+    console.log("cannot update an account that does not exist")
+    return null
+  }
+
   const payload = {
     address: params.address,
     data: {
@@ -38,29 +57,38 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
       coverURL: params.coverURL,
       name: params.name,
     },
-    // skills: {
-    //   create: newSkills.map((skill) => {
-    //     if (params.existingSkills.includes(skill)) {
-    //       return {
-    //         skill: {
-    //           set: { id: skill.id },
-    //         },
-    //       }
-    //     }
-    //     return {
-    //       skill: {
-    //         connectOrCreate: {
-    //           where: {
-    //             name: skill.value.toLowerCase(),
-    //           },
-    //           create: {
-    //             name: skill.value.toLowerCase(),
-    //           },
-    //         },
-    //       },
-    //     }
-    //   }),
-    // },
+    skills: {
+      delete: removedSkills.map((skill) => {
+        return {
+          accountId_skillId: {
+            accountId: existingAccount.id,
+            skillId: skill.id,
+          },
+        }
+      }),
+      // delete: [
+      //   {
+      //     accountId_skillId: {
+      //       accountId: 20,
+      //       skillId: 3,
+      //     },
+      //   },
+      // ],
+      create: newSkills.map((skill) => {
+        return {
+          skill: {
+            connectOrCreate: {
+              where: {
+                name: skill.value.toLowerCase(),
+              },
+              create: {
+                name: skill.value.toLowerCase(),
+              },
+            },
+          },
+        }
+      }),
+    },
   }
 
   const account = await db.account.update({
