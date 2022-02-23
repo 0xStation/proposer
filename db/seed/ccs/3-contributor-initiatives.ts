@@ -55,20 +55,25 @@ const sara: ContributorSeed = {
   address: "0xa139d29Cf66171d83E816D7b1dF768e07c9BC6Ab",
   initiativeLocalIds: [initiativeIds.journal],
 }
+const aaron: ContributorSeed = {
+  address: "0x48ff4d06Ceb0d69C958EE7856A2629Bb568Cffdc",
+  initiativeLocalIds: [initiativeIds.education],
+}
 
 export const ccsContributors = {
-  bhaumik,
-  melvin,
-  nick,
-  liam,
-  tasha,
-  courtland,
-  thomas,
-  olly,
-  kemi,
-  caryn,
-  kassen,
-  sara,
+  // bhaumik,
+  // melvin,
+  // nick,
+  // liam,
+  // tasha,
+  // courtland,
+  // thomas,
+  // olly,
+  // kemi,
+  // caryn,
+  // kassen,
+  // sara,
+  // aaron,
 }
 
 export async function seed() {

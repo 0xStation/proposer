@@ -30,6 +30,7 @@ const station: TerminalSeed = {
   data: {
     name: "Station Labs",
     description: "Creating on-chain infrastructure for a new genre of work.",
+    coverURL: "https://station-images.nyc3.digitaloceanspaces.com/station-cover.png",
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/station.jpeg",
     permissions: {
       invite: {
