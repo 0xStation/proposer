@@ -17,6 +17,7 @@ import usePagination from "app/core/hooks/usePagination"
 import Tag from "app/core/components/Tag"
 import { ProfileMetadata } from "app/core/ProfileMetadata"
 import Card from "app/core/components/Card"
+import { formatDate } from "app/core/utils/formatDate"
 
 const Project: BlitzPage = () => {
   const [hasApplied, setHasApplied] = useState(false)
@@ -85,6 +86,7 @@ const Project: BlitzPage = () => {
       role,
       address,
       data: { pfpURL, name, ens, pronouns, verified },
+      joinedAt,
     } = contributor
     let onClick
 
@@ -105,6 +107,11 @@ const Project: BlitzPage = () => {
             ) : (
               <p className="text-marble-white">N/A</p>
             )}
+          </div>
+        </div>
+        <div className="flex flex-row flex-1 mx-3 mt-3.5">
+          <div className="flex-1 items-center justify-center text-xs text-concrete">
+            {`JOINED SINCE ${formatDate(joinedAt)}`}
           </div>
         </div>
       </Card>

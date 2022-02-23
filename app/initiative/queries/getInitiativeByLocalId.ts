@@ -25,6 +25,7 @@ export default async function getInitiativeByLocalId(
                 },
                 select: {
                   role: true,
+                  joinedAt: true,
                 },
               },
               skills: {
@@ -42,6 +43,7 @@ export default async function getInitiativeByLocalId(
   if (!initiative) {
     return null
   }
+  console.log(initiative)
 
   return {
     id: initiative.id,
@@ -53,6 +55,7 @@ export default async function getInitiativeByLocalId(
         return {
           ...a.account,
           role: (a.account.tickets[0]?.role as Role)?.data.value,
+          joinedAt: a.account.tickets[0]?.joinedAt,
           skills: a.account.skills.map(({ skill }) => skill.name),
         }
       }),

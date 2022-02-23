@@ -95,14 +95,6 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
     </div>
   )
 
-  const ctaButton = onApplicantCardClick ? (
-    <div className="flex flex-row flex-1 mx-2.5">
-      <Button secondary={true} onClick={onApplicantCardClick} className="w-full mt-3">
-        Endorse
-      </Button>
-    </div>
-  ) : null
-
   return (
     <Card onClick={onApplicantCardClick}>
       <ProfileMetadata
@@ -131,7 +123,13 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
             : `0 ${pointsSymbol}`}
         </div>
       </div>
-      {activeUser && canActiveUserEndorse && ctaButton}
+      {activeUser && canActiveUserEndorse && onApplicantCardClick && (
+        <div className="flex flex-row flex-1 mx-2.5">
+          <Button secondary={true} onClick={onApplicantCardClick} className="w-full mt-3">
+            Endorse
+          </Button>
+        </div>
+      )}
       <div className="flex flex-row flex-1 mx-3 mt-3.5">
         <div className="flex-1 items-center justify-center text-xs text-concrete">
           {`SUBMITTED ON ${formatDate(createdAt)}`}

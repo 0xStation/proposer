@@ -11,6 +11,7 @@ import { Pill } from "app/core/components/Pill"
 import { Card } from "app/core/components/Card"
 import { Tag } from "app/core/components/Tag"
 import ProfileMetadata from "app/core/ProfileMetadata"
+import { formatDate } from "app/core/utils/formatDate"
 
 const TerminalContributorsPage: BlitzPage = () => {
   const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
@@ -46,6 +47,7 @@ const TerminalContributorsPage: BlitzPage = () => {
       role,
       address,
       data: { pfpURL, name, ens, pronouns, verified },
+      joinedAt,
     } = contributor
 
     let onClick
@@ -68,6 +70,11 @@ const TerminalContributorsPage: BlitzPage = () => {
             ) : (
               <p className="text-marble-white">N/A</p>
             )}
+          </div>
+        </div>
+        <div className="flex flex-row flex-1 mx-3 mt-3.5">
+          <div className="flex-1 items-center justify-center text-xs text-concrete">
+            {`JOINED SINCE ${formatDate(joinedAt)}`}
           </div>
         </div>
       </Card>
