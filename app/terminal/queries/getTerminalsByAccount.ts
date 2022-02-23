@@ -1,5 +1,6 @@
 import db from "db"
 import * as z from "zod"
+import { TerminalMetadata } from "../types"
 
 const GetTerminalsByAccount = z.object({
   accountId: z.number(),
@@ -16,7 +17,9 @@ export default async function getTerminalsByAccount(input: z.infer<typeof GetTer
     },
   })
 
-  return tickets.map((ticket) => ({
-    ...ticket.terminal,
-  }))
+  return tickets
+    .map((ticket) => ({
+      ...ticket.terminal,
+    }))
+    .filter((t) => !(t.data as TerminalMetadata).hide)
 }
