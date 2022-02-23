@@ -40,8 +40,8 @@ const ccs: TerminalSeed = {
     },
     contracts: {
       addresses: {
-        endorsements: "0x0000000000000000000000000000000000000000",
-        points: "0x0000000000000000000000000000000000000000",
+        endorsements: "0x6566075DfdAc6740A076b3c856dB2988e14a26F0", // dead erc20 token
+        points: "0x6566075DfdAc6740A076b3c856dB2988e14a26F0", // dead erc20 token
         referrals: "0x0000000000000000000000000000000000000000",
       },
       symbols: {
