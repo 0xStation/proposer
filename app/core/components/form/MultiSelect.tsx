@@ -49,26 +49,29 @@ const customStyles = {
   }),
 }
 
-const MultiSelectAdapter = ({ input, ...rest }) => (
-  <CreatableSelect
-    components={{ Menu }}
-    isValidNewOption={(inputValue, selectValue) =>
-      inputValue.length > 0 && selectValue.length < MAX_NUMBER_OF_SKILLS
-    }
-    isMulti
-    {...input}
-    {...rest}
-    styles={customStyles}
-  />
-)
-const MultiSelect = ({ name, options, placeholder }) => {
+const MultiSelectAdapter = ({ input, ...rest }) => {
+  return (
+    <CreatableSelect
+      components={{ Menu }}
+      isValidNewOption={(inputValue, selectValue) =>
+        inputValue.length > 0 && selectValue.length < MAX_NUMBER_OF_SKILLS
+      }
+      isMulti
+      {...input}
+      {...rest}
+      styles={customStyles}
+    />
+  )
+}
+const MultiSelect = ({ name, options, placeholder, initialValue }) => {
   return (
     <Field
       component={MultiSelectAdapter}
       name={name}
       placeholder={placeholder}
       options={options}
-    ></Field>
+      initialValue={initialValue}
+    />
   )
 }
 

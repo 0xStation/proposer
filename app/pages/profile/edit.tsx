@@ -1,39 +1,25 @@
-import { useMemo } from "react"
-import { BlitzPage } from "blitz"
-import { useAccount } from "wagmi"
+import { BlitzPage, useQuery } from "blitz"
 import AccountForm from "app/account/components/AccountForm"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import { Account } from "app/account/types"
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
-// todo: make this edit and not create
-// just scaffolding pages for now :p
 const EditProfile: BlitzPage = () => {
-  const [{ data: accountData }] = useAccount({
-    fetchEns: true,
-  })
-  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const activeUser: Account | null = useStore((state) => state.activeUser)
 
-  if (!address) {
+  const [account] = useQuery(
+    getAccountByAddress,
+    { address: activeUser?.address },
+    { suspense: false }
+  )
+
+  if (!activeUser || !account) {
     return (
       <div className="mx-auto max-w-2xl py-12">
         <h1 className="text-marble-white text-3xl text-center">
-          Your wallet needs to be connected to create an account
+          You need an account before you can edit!
         </h1>
-      </div>
-    )
-  }
-
-  // todo: make edit a link
-  // would be cool to have a better error state
-  if (activeUser) {
-    return (
-      <div className="mx-auto max-w-2xl py-12">
-        <h1 className="text-marble-white text-3xl text-center">Your already have a profile!</h1>
-        <p className="text-marble-white text-center mt-2">
-          Do you want to edit your profile instead?
-        </p>
       </div>
     )
   }
@@ -46,7 +32,12 @@ const EditProfile: BlitzPage = () => {
       <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36 relative">
         <h1 className="text-marble-white text-3xl text-center pt-12">Complete your profile</h1>
         <div className="mx-auto max-w-2xl pb-12">
-          <AccountForm onSuccess={() => console.log("done")} address={address} />
+          <AccountForm
+            onSuccess={() => console.log("done")}
+            address={activeUser.address}
+            account={account}
+            isEdit={true}
+          />
         </div>
       </div>
     </div>

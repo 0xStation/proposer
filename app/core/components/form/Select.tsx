@@ -35,18 +35,23 @@ const customStyles = {
   }),
 }
 
-const SelectAdaptor = ({ input, ...rest }) => (
-  <ReactSelect {...input} {...rest} styles={customStyles} />
-)
-
-const Select = ({ name, options, placeholder }) => {
+const Select = ({ name, options, placeholder, initialValue }) => {
   return (
     <Field
-      component={SelectAdaptor}
       name={name}
-      placeholder={placeholder}
-      options={options}
-    ></Field>
+      initialValue={initialValue}
+      render={(props) => {
+        return (
+          <ReactSelect
+            {...props.input}
+            placeholder={placeholder}
+            name={name}
+            options={options}
+            styles={customStyles}
+          />
+        )
+      }}
+    />
   )
 }
 

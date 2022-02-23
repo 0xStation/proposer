@@ -18,7 +18,7 @@ const AccountModal = ({
       toggle={setIsOpen}
     >
       <div className="mt-8">
-        <AccountForm onSuccess={() => setIsOpen(false)} address={address} />
+        <AccountForm onSuccess={() => setIsOpen(false)} address={address} isEdit={false} />
       </div>
     </Modal>
   )

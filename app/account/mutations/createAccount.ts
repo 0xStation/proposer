@@ -4,6 +4,7 @@ import { Account } from "../types"
 
 const CreateAccount = z.object({
   name: z.string(),
+  bio: z.string(),
   contactURL: z.string(),
   timezone: z.string(),
   skills: z
@@ -23,6 +24,7 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
   const payload = {
     address: params.address,
     data: {
+      bio: params.bio,
       contactURL: params.contactURL,
       timezone: params.timezone,
       pfpURL: params.pfpURL,
