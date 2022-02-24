@@ -35,7 +35,7 @@ const startupy: TerminalSeed = {
     coverURL: "https://station-images.nyc3.digitaloceanspaces.com/startupy-banner.jpeg",
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/startupy-pfp.jpeg",
     permissions: {
-      invite: { rolesAllowedToInvite: [] }, // local id for STAFF and TEAM LEAD
+      invite: {}, // local id for STAFF and TEAM LEAD
     },
     contracts: {
       addresses: {

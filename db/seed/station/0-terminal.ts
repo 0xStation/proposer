@@ -21,6 +21,17 @@ type InitiativeSeed = {
 }
 
 //////
+// ROLES
+//////
+
+export const roleIds = {
+  staff: 1,
+  dailyCommuter: 2,
+  weekendCommuter: 3,
+  visitor: 4,
+}
+
+//////
 // TERMINAL
 //////
 
@@ -34,7 +45,12 @@ const station: TerminalSeed = {
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/station.jpeg",
     permissions: {
       invite: {
-        rolesAllowedToInvite: [1], // local id for STAFF
+        [roleIds.staff]: [
+          roleIds.staff,
+          roleIds.dailyCommuter,
+          roleIds.weekendCommuter,
+          roleIds.visitor,
+        ], // local id for STAFF
       },
     },
     contracts: {
@@ -50,17 +66,6 @@ const station: TerminalSeed = {
       },
     },
   },
-}
-
-//////
-// ROLES
-//////
-
-export const roleIds = {
-  staff: 1,
-  dailyCommuter: 2,
-  weekendCommuter: 3,
-  visitor: 4,
 }
 
 const staff: RoleSeed = {

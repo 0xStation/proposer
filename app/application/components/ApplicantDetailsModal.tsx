@@ -49,7 +49,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   const [canInvite] = useQuery(
     hasInvitePermissions,
     { referrerId: activeUser?.id, terminalId: initiative?.terminalId },
-    { suspense: false }
+    { enabled: !!(activeUser?.id && initiative?.terminalId), suspense: false }
   )
 
   const [{ data: balanceData }] = useBalance({

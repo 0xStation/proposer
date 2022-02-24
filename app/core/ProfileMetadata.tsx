@@ -25,11 +25,6 @@ export const ProfileMetadata = ({
   large = false,
 }: ProfileMetadataProps) => {
   const pfpSize = large ? "h-[52px] w-[52px]" : "h-[40px] w-[40px]"
-  const fallbackProfile = (
-    <div
-      className={`${pfpSize} place-self-center border border-marble-white bg-concrete rounded-full place-items-center`}
-    ></div>
-  )
 
   const profileImage = pfpURL ? (
     <div className="flex-2/5 m-auto">
@@ -40,7 +35,9 @@ export const ProfileMetadata = ({
       />
     </div>
   ) : (
-    fallbackProfile
+    <div
+      className={`${pfpSize} place-self-center border border-marble-white bg-concrete rounded-full place-items-center`}
+    ></div>
   )
 
   return (

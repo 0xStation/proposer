@@ -17,7 +17,7 @@ const station: CreateTerminalParams = {
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/station.jpeg",
     permissions: {
       invite: {
-        rolesAllowedToInvite: [1], // local id for STAFF
+        1: [1, 2, 3, 4], // local id for STAFF
       },
     },
     contracts: {

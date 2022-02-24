@@ -2,13 +2,13 @@ import { useState, useEffect } from "react"
 import Modal from "../../core/components/Modal"
 import { useQuery, useMutation } from "blitz"
 import Button from "../../core/components/Button"
-import getRolesByTerminal from "app/role/queries/getRolesByTerminal"
 import getTerminalById from "app/terminal/queries/getTerminalById"
 import InviteContributor from "app/application/mutations/inviteContributor"
 import useStore from "app/core/hooks/useStore"
 import { Account } from "app/account/types"
 import { Role } from "app/role/types"
 import { titleCase } from "app/core/utils/titleCase"
+import getInvitePermissions from "../queries/getInvitePermissions"
 
 export const InviteModal = ({
   selectedApplication,
@@ -39,10 +39,10 @@ export const InviteModal = ({
     }
   }, [currentInitiative])
 
-  const [roles] = useQuery(
-    getRolesByTerminal,
-    { terminalId: currentInitiative?.terminalId || 0 },
-    { suspense: false }
+  const [rolesId] = useQuery(
+    getInvitePermissions,
+    { terminalId: currentInitiative?.terminalId || 0, referrerId: activeUser?.id },
+    { enabled: !!(currentInitiative?.terminalId && activeUser?.id), suspense: false }
   )
 
   const [terminal] = useQuery(
@@ -69,8 +69,9 @@ export const InviteModal = ({
   }
 
   const handleRoleDropdown = (e) => {
-    const role = roles?.find((role) => role.localId === parseInt(e.target.value))
-    if (role) {
+    const roleId = rolesId?.find((id) => id === parseInt(e.target.value))
+    if (roleId) {
+      const role = terminal?.roles.find((role) => role.localId === roleId)
       setChosenRole(role)
     }
   }
@@ -95,11 +96,13 @@ export const InviteModal = ({
         onChange={handleRoleDropdown}
         className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 w-full"
       >
-        {roles?.map((role, idx) => (
-          <option key={idx} value={role.localId}>
-            {titleCase(role.data?.name)}
-          </option>
-        ))}
+        {terminal?.roles
+          ?.filter((role) => rolesId?.includes(role?.localId))
+          .map((role, idx) => (
+            <option key={idx} value={role.localId}>
+              {titleCase(role.data?.name)}
+            </option>
+          ))}
       </select>
       <Button className="mt-10 w-72" onClick={handleInviteClick}>
         Confirm
