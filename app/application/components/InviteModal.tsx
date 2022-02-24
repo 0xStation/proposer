@@ -39,7 +39,7 @@ export const InviteModal = ({
     }
   }, [currentInitiative])
 
-  const [rolesId] = useQuery(
+  const [invitePermissionedRoleLocalIds] = useQuery(
     getInvitePermissions,
     { terminalId: currentInitiative?.terminalId || 0, referrerId: activeUser?.id },
     { enabled: !!(currentInitiative?.terminalId && activeUser?.id), suspense: false }
@@ -69,9 +69,11 @@ export const InviteModal = ({
   }
 
   const handleRoleDropdown = (e) => {
-    const roleId = rolesId?.find((id) => id === parseInt(e.target.value))
-    if (roleId) {
-      const role = terminal?.roles.find((role) => role.localId === roleId)
+    const roleLocalId = invitePermissionedRoleLocalIds?.find(
+      (id) => id === parseInt(e.target.value)
+    )
+    if (roleLocalId) {
+      const role = terminal?.roles.find((role) => role.localId === roleLocalId)
       setChosenRole(role)
     }
   }
@@ -97,7 +99,7 @@ export const InviteModal = ({
         className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 w-full"
       >
         {terminal?.roles
-          ?.filter((role) => rolesId?.includes(role?.localId))
+          ?.filter((role) => invitePermissionedRoleLocalIds?.includes(role?.localId))
           .map((role, idx) => (
             <option key={idx} value={role.localId}>
               {titleCase(role.data?.name)}
