@@ -17,3 +17,5 @@ export type Application = {
   points: number
   referrals: ApplicationReferral[]
 }
+
+export type ApplicationStatus = "APPLIED" | "INVITED" | "CONTRIBUTOR" | "INACTIVE"

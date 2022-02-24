@@ -1,6 +1,9 @@
-import { useMemo } from "react"
+import { useState } from "react"
 import { BlitzPage } from "blitz"
-import { useAccount } from "wagmi"
+import { Tag } from "app/core/components/Tag"
+import TerminalCard from "app/terminal/components/TerminalCard"
+import ApplicationCard from "app/application/components/ApplicationCard"
+import ApplicationSlider from "app/application/components/ApplicationSlider"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import { Account } from "app/account/types"
@@ -9,10 +12,9 @@ import { getWalletString } from "app/utils/getWalletString"
 // the profile homepage
 // can see a users initiatives + termials + profile info at a glance
 const ProfileHome: BlitzPage = () => {
-  const [{ data: accountData }] = useAccount({
-    fetchEns: true,
-  })
-  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
+  const [sliderOpen, setSliderOpen] = useState(false)
+  const [activeApplication, setActiveApplication] = useState()
+  const [subpage, setSubpage] = useState<"TERMINALS" | "INITIATIVES">("TERMINALS")
   const activeUser: Account | null = useStore((state) => state.activeUser)
 
   // todo: return something better
@@ -20,64 +22,134 @@ const ProfileHome: BlitzPage = () => {
     return <></>
   }
 
+  console.log(activeUser)
+
+  const activeLinkStyles = "text-marble-white"
+  const inactiveLinkStyles = "text-concrete hover:text-wet-concrete"
+
   return (
-    <div
-      className="w-full h-full bg-cover bg-center bg-no-repeat border"
-      style={{ backgroundImage: activeUser.data.coverURL }}
-    >
-      <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36 relative">
-        <div className="grid gap-0 grid-cols-1 md:grid-cols-3 xl:grid-cols-4 max-w-screen-xl h-full mx-auto">
-          <div className="col-span-1 pl-4 text-2xl border-concrete border-b pb-12 md:border-b-0 md:border-r md:pr-6 h-full">
-            <div className="border-b border-concrete pb-4">
-              <div className="flex items-center mt-12">
-                <div className="flex-2/5 mr-4">
-                  <img
-                    src={activeUser.data.pfpURL}
-                    alt="PFP"
-                    className="h-[52px] w-[52px] border border-marble-white rounded-full"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <h1 className="text-2xl text-marble-white">{activeUser.data.name}</h1>
-                  <span className="text-base text-concrete">
-                    {getWalletString(activeUser.address)}
-                  </span>
-                </div>
-              </div>
-              <div className="mt-4 space-y-4">
-                <div className="flex flex-col">
-                  <h3 className="text-marble-white text-base font-bold">Skills</h3>
-                  {/* {activeUser.skills.map((skill) => {
-                    return <div className="text-marble-white">{skill.name}</div>
-                  })} */}
-                </div>
-                <div className="flex flex-col">
-                  <h3 className="text-marble-white text-base font-bold">Timezone</h3>
-                  <span className="text-marble-white text-base">{activeUser.data.timezone}</span>
-                </div>
-                <div className="flex flex-col">
-                  <h3 className="text-marble-white text-base font-bold">Contact</h3>
-                  <span className="text-marble-white text-base">{activeUser.data.discordId}</span>
-                </div>
-                <button className="border border-marble-white text-marble-white text-base w-full rounded-md hover:text-tunnel-black hover:bg-marble-white">
-                  Edit Profile
-                </button>
+    <div className="w-full grid grid-cols-1 xl:grid-cols-4 min-h-[calc(100vh-88px)] h-[1px]">
+      <ApplicationSlider
+        isOpen={sliderOpen}
+        setIsOpen={setSliderOpen}
+        application={activeApplication}
+      />
+      <div className="col-span-1 text-2xl md:border-r border-concrete h-full">
+        <div className="h-[185px] relative mb-[116px]">
+          <img
+            alt="The logged in user's cover photo."
+            src={activeUser.data.coverURL}
+            className="w-full h-full object-cover"
+          />
+          <img
+            src={activeUser.data.pfpURL}
+            alt="The logged in user's profile picture."
+            className="w-[200px] h-[200px] border border-marble-white rounded-full absolute bottom-[-100px] left-0 right-0 mx-auto"
+          />
+        </div>
+        <div className="px-8">
+          <div className="flex flex-col">
+            <h1 className="text-2xl text-marble-white">{activeUser.data.name}</h1>
+            <span className="text-base text-concrete">{getWalletString(activeUser.address)}</span>
+          </div>
+
+          <h3 className="text-marble-white text-base mt-4 font-normal">{activeUser.data.bio}</h3>
+          <a href={activeUser.data.contactURL}>
+            <button className="mt-4 py-.5 border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete">
+              Get in touch
+            </button>
+          </a>
+
+          <div className="mt-8 space-y-8">
+            <div className="flex flex-col">
+              <h3 className="text-marble-white text-base font-bold">Top Endorsers</h3>
+            </div>
+            <div className="flex flex-col">
+              <h3 className="text-marble-white text-base font-bold">Skills</h3>
+              <div className="mt-1">
+                {activeUser.skills.map((account_skill, index) => {
+                  return (
+                    <Tag key={index} type="skill">
+                      {account_skill.skill.name}
+                    </Tag>
+                  )
+                })}
               </div>
             </div>
-            <ul className="mt-4 text-lg">
-              <li className={`cursor-pointer hover:text-marble-white text-marble-white font-bold`}>
-                Terminals
-              </li>
-              <li className={`cursor-pointer hover:text-marble-white text-concrete font-bold`}>
-                Initiatives
-              </li>
-            </ul>
-          </div>
-          <div className="col-span-2 xl:col-span-3 px-6 pb-12">
-            <div className="mt-12">
-              <div className="text-marble-white">stuff goes here</div>
+            <div className="flex flex-col">
+              <h3 className="text-marble-white text-base font-bold">Timezone</h3>
+              <span className="mt-1 text-marble-white text-base">{activeUser.data.timezone}</span>
             </div>
           </div>
+        </div>
+      </div>
+      <div className="col-span-2 xl:col-span-3 px-12 relative">
+        <div className="mt-12">
+          {((activeUser.tickets && activeUser.tickets.length > 0) ||
+            (activeUser.initiatives && activeUser.initiatives.length > 0)) && (
+            <>
+              <div className="flex flex-row z-10">
+                <span
+                  onClick={() => setSubpage("TERMINALS")}
+                  className={`${
+                    subpage === "TERMINALS" ? activeLinkStyles : inactiveLinkStyles
+                  } cursor-pointer text-2xl mr-12`}
+                >
+                  Terminals
+                </span>
+                <span
+                  onClick={() => setSubpage("INITIATIVES")}
+                  className={`${
+                    subpage === "INITIATIVES" ? activeLinkStyles : inactiveLinkStyles
+                  } cursor-pointer text-2xl mr-12`}
+                >
+                  Initiatives
+                </span>
+              </div>
+              {subpage === "TERMINALS" && (
+                <div className="flex space-x-4 mt-12">
+                  {activeUser.tickets &&
+                    activeUser.tickets.map((ticket, index) => {
+                      return <TerminalCard key={index} ticket={ticket} />
+                    })}
+                </div>
+              )}
+
+              {subpage === "INITIATIVES" && (
+                <div className="flex space-x-4 mt-12">
+                  {activeUser.initiatives &&
+                    activeUser.initiatives.map((application, index) => {
+                      return (
+                        <ApplicationCard
+                          key={index}
+                          application={application}
+                          onClick={() => {
+                            setActiveApplication(application)
+                            setSliderOpen(true)
+                          }}
+                        />
+                      )
+                    })}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Show if user is active in terminal but has no initiatives, or if the user is not in any terminals or initiatives */}
+          {((activeUser.initiatives &&
+            activeUser.initiatives.length === 0 &&
+            subpage === "INITIATIVES") ||
+            (activeUser.tickets && activeUser.tickets.length === 0 && subpage === "TERMINALS")) && (
+            <div className="w-full h-full flex items-center flex-col justify-center absolute top-0 z-[-10]">
+              <p className="text-marble-white text-2xl font-bold">Join intiatives</p>
+              <p className="mt-2 text-marble-white text-base w-[300px] text-center">
+                Explore Terminals, submit interests to initiatives, and start contributing.
+              </p>
+              <button className="mt-4 bg-magic-mint w-[300px] py-1 rounded-md">
+                Start exploring
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
