@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { AppProps } from "blitz"
 import "app/core/styles/index.css"
 import { providers } from "ethers"
@@ -49,13 +50,15 @@ export default function App({ Component, pageProps }: AppProps) {
   }
 
   return (
-    <Provider
-      connectorStorageKey={LOCAL_STORAGE.WAGMI_WALLET}
-      connectors={connectors}
-      provider={provider}
-      autoConnect={autoConnect}
-    >
-      {getLayout(<Component {...pageProps} />)}
-    </Provider>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Provider
+        connectorStorageKey={LOCAL_STORAGE.WAGMI_WALLET}
+        connectors={connectors}
+        provider={provider}
+        autoConnect={autoConnect}
+      >
+        {getLayout(<Component {...pageProps} />)}
+      </Provider>
+    </Suspense>
   )
 }

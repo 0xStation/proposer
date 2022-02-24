@@ -38,12 +38,12 @@ const TerminalWaitingPage: BlitzPage = () => {
   useEffect(() => {
     setIsRedirectModalOpen(directedFrom === "application")
   }, [directedFrom])
-  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle })
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
     { terminalId: terminal?.id as number },
-    { enabled: !!terminal?.id, suspense: false }
+    { enabled: !!terminal?.id }
   )
 
   const currentInitiative = useMemo(
