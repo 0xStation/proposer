@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { TerminalMetadata } from "app/terminal/types"
+import getInvitePermissions from "../queries/getInvitePermissions"
 
 const InviteContributor = z.object({
   referrerId: z.number(),
@@ -14,19 +14,7 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
   const params = InviteContributor.parse(input)
   const { referrerId, terminalId, accountId, initiativeId, roleLocalId } = params
 
-  const referrerTicket = await db.accountTerminal.findUnique({
-    where: {
-      accountId_terminalId: {
-        accountId: params?.referrerId,
-        terminalId: params?.terminalId,
-      },
-    },
-    include: { role: true, terminal: true },
-  })
-
-  const permissions = (referrerTicket?.terminal.data as TerminalMetadata).permissions.invite[
-    referrerTicket?.role?.localId as number
-  ]
+  const permissions = await getInvitePermissions({ referrerId, terminalId })
 
   if (!permissions || !permissions.includes(roleLocalId)) {
     console.log("Not a valid invite pair.")
