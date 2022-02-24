@@ -24,9 +24,9 @@ type InitiativeSeed = {
 // TERMINAL
 //////
 
-export const terminalId = 2
+export const terminalId = 3
 
-const ccs: TerminalSeed = {
+const forefront: TerminalSeed = {
   handle: "forefront",
   ticketAddress: "0xforefront",
   data: {
@@ -36,7 +36,7 @@ const ccs: TerminalSeed = {
     coverURL: "https://station-images.nyc3.digitaloceanspaces.com/forefront-banner.png",
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/forefront-pfp.png",
     permissions: {
-      invite: { rolesAllowedToInvite: [1] }, // local id for STAFF and TEAM LEAD
+      invite: { rolesAllowedToInvite: [] }, // local id for STAFF and TEAM LEAD
     },
     contracts: {
       addresses: {
@@ -70,16 +70,16 @@ export const initiativeIds = {}
 
 export async function seed() {
   let terminal = (await db.terminal.upsert({
-    where: { handle: ccs.handle.toLowerCase() },
+    where: { handle: forefront.handle.toLowerCase() },
     create: {
-      ticketAddress: ccs.ticketAddress,
-      handle: ccs.handle.toLowerCase(),
-      data: ccs.data,
+      ticketAddress: forefront.ticketAddress,
+      handle: forefront.handle.toLowerCase(),
+      data: forefront.data,
     },
     update: {
-      ticketAddress: ccs.ticketAddress,
-      handle: ccs.handle.toLowerCase(),
-      data: ccs.data,
+      ticketAddress: forefront.ticketAddress,
+      handle: forefront.handle.toLowerCase(),
+      data: forefront.data,
     },
   })) as Terminal
 
