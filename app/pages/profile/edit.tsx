@@ -8,11 +8,7 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 const EditProfile: BlitzPage = () => {
   const activeUser: Account | null = useStore((state) => state.activeUser)
 
-  const [account] = useQuery(
-    getAccountByAddress,
-    { address: activeUser?.address },
-    { suspense: false }
-  )
+  const [account] = useQuery(getAccountByAddress, { address: activeUser?.address })
 
   if (!activeUser || !account) {
     return (

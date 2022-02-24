@@ -16,6 +16,7 @@ export type AccountMetadata = {
   coverURL?: string
   timezone: string
   verified: boolean
+  bio?: string
   initiatives?: number[]
 }
 
@@ -27,5 +28,6 @@ export type Account = {
   points?: number
   joinedAt?: Date
   skills: any[]
+  tickets?: any[]
   initiatives?: any[]
 }
