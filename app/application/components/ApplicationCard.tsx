@@ -1,22 +1,7 @@
-import { ApplicationStatus } from "app/application/types"
+import getStatusColor from "app/utils/getStatusColor"
 
 // I don't really love this name because it only feels like an application before they are accepted
 const ApplicationCard = ({ application, onClick }) => {
-  const statusColor = (status: ApplicationStatus) => {
-    switch (status) {
-      case "APPLIED":
-        return "bg-torch-red"
-
-      case "INVITED":
-        return "bg-neon-blue"
-
-      default:
-        return "bg-magic-mint"
-    }
-  }
-
-  console.log(application)
-
   return (
     <div
       onClick={onClick}
@@ -24,7 +9,7 @@ const ApplicationCard = ({ application, onClick }) => {
     >
       <span className="flex flex-row items-center">
         <span
-          className={`${statusColor(application.status)} h-2 w-2 rounded-full block mr-1`}
+          className={`${getStatusColor(application.status)} h-2 w-2 rounded-full block mr-1`}
         ></span>
         <span className="text-xs text-marble-white uppercase tracking-wider">
           {application.status}

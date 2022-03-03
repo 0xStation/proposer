@@ -1,6 +1,8 @@
-import { Fragment, useState } from "react"
+import { Fragment } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { XIcon } from "@heroicons/react/outline"
+import { formatDate } from "app/core/utils/formatDate"
+import getStatusColor from "app/utils/getStatusColor"
 
 const ApplicationSlider = ({ isOpen, setIsOpen, application }) => {
   console.log(application)
@@ -31,24 +33,49 @@ const ApplicationSlider = ({ isOpen, setIsOpen, application }) => {
               leaveTo="translate-x-full"
             >
               <div className="pointer-events-auto w-screen max-w-2xl">
-                <div className="flex h-full flex-col overflow-y-scroll bg-tunnel-black py-6 border-l border-concrete">
-                  <div className="px-4 sm:px-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex h-7 items-center">
-                        <button
-                          type="button"
-                          className="rounded-md bg-tunnel-black text-marble-white hover:text-concrete focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <span className="sr-only">Close panel</span>
-                          <XIcon className="h-4 w-4" aria-hidden="true" />
-                        </button>
-                      </div>
-                      <Dialog.Title className="text-lg font-medium text-marble-white"></Dialog.Title>
-                    </div>
+                <div className="flex h-full flex-col overflow-y-scroll bg-tunnel-black border-l border-concrete">
+                  <div className="px-4">
                     {application && (
                       <>
-                        <div className="flex flex-col border-b border-concrete pb-8 mb-8">
+                        <div className="flex items-start justify-between w-full">
+                          <div className="flex justify-between h-7 items-center w-full">
+                            <button
+                              type="button"
+                              className="rounded-md bg-tunnel-black text-marble-white hover:text-concrete focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                              onClick={() => setIsOpen(false)}
+                            >
+                              <span className="sr-only">Close panel</span>
+                              <XIcon className="h-4 w-4" aria-hidden="true" />
+                            </button>
+                            <span className="text-concrete text-sm uppercase">
+                              submitted on: {formatDate(application.createdAt) || "DATE"}
+                            </span>
+                          </div>
+                          <Dialog.Title className="text-lg font-medium text-marble-white"></Dialog.Title>
+                        </div>
+                        <div className="flex flex-row justify-between items-center mt-4">
+                          <div className="flex flex-row items-center">
+                            <img
+                              className="h-8 w-8 rounded-full border border-tunnel-white mr-2"
+                              src={application.initiative.terminal.data.pfpURL}
+                            />
+                            <h3 className="text-marble-white">
+                              {application.initiative.terminal.data.name}
+                            </h3>
+                          </div>
+                          <div className="flex flex-row items-center">
+                            <span
+                              className={`h-2 w-2 rounded-full mr-2 ${getStatusColor(
+                                application.status
+                              )}`}
+                            ></span>
+                            <span className="text-marble-white text-xs uppercase tracking-wider">
+                              {application.status || "status"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col border-b border-concrete pb-8 mt-8">
                           <span className="text-2xl font-medium text-marble-white">
                             {application.initiative.data.name}
                           </span>
@@ -56,13 +83,24 @@ const ApplicationSlider = ({ isOpen, setIsOpen, application }) => {
                             {application.initiative.data.oneLiner}
                           </span>
                         </div>
-                        <div className="flex flex-col border-b border-concrete pb-8 mb-8">
+                        <div className="flex flex-col mt-8">
                           <span className="text-base font-bold text-marble-white">
                             Why Newstand?
                           </span>
                           <span className="mt-2 text-base text-marble-white">
                             {application.data.entryDescription}
                           </span>
+                        </div>
+                        <div className="flex flex-col border-b border-concrete pb-8 mt-8">
+                          <span className="text-base font-bold text-marble-white">Submission</span>
+                          <a
+                            className="mt-2 text-base text-magic-mint cursor-pointer hover:underline"
+                            href={application.data.url}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {application.data.url}
+                          </a>
                         </div>
                       </>
                     )}
