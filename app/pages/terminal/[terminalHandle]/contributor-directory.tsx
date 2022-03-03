@@ -16,8 +16,9 @@ import { formatDate } from "app/core/utils/formatDate"
 const TerminalContributorsPage: BlitzPage = () => {
   const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
   const [selectedContributorToView, setSelectedContributorToView] = useState<Account | null>(null)
-  const [selectedRoleLocalId, setRoleLocalId] = useState<number>(1)
+  const [selectedRoleLocalId, setRoleLocalId] = useState<number>()
   const [selectedContributors, setSelectedContributors] = useState<Account[] | null>(null)
+  const [firstContributorRender, setFirstContributorRender] = useState<boolean>(true)
 
   const terminalHandle = useParam("terminalHandle") as string
 
@@ -30,6 +31,13 @@ const TerminalContributorsPage: BlitzPage = () => {
   )
 
   useEffect(() => {
+    if (firstContributorRender && roles && Array.isArray(roles) && roles[0]) {
+      // first role pill is automatically selected
+      setRoleLocalId(roles[0].localId)
+    }
+  }, [roles])
+
+  useEffect(() => {
     if (selectedRoleLocalId) {
       const getContributorsByRole = async () => {
         let contributors = await invoke(getAccountsByTerminalRole, {
@@ -37,6 +45,7 @@ const TerminalContributorsPage: BlitzPage = () => {
           roleLocalId: selectedRoleLocalId,
         })
         setSelectedContributors(contributors)
+        setFirstContributorRender(false)
       }
       getContributorsByRole()
     }
@@ -93,31 +102,53 @@ const TerminalContributorsPage: BlitzPage = () => {
       )}
       <div className="flex flex-col space-y-10">
         <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm">
-          {roles.map((role, index) => {
-            return (
-              <Pill
-                key={index.toString()}
-                active={selectedRoleLocalId == role.localId}
-                onClick={() => {
-                  setRoleLocalId(role.localId)
-                }}
-              >
-                {`${role.data.name} (${role.ticketCount})`}
-              </Pill>
-            )
-          })}
+          {!roles ? (
+            <div className="overflow-x-scroll whitespace-nowrap space-x-3 motion-safe:animate-pulse">
+              <div className="inline-block rounded-full h-[30px] w-[200px] m-0">
+                <span className="border-marble-white bg-gradient-to-r from-concrete to-wet-concrete"></span>
+              </div>
+              <div className="inline-block rounded-full h-[30px] w-[150px] m-0">
+                <span className="border-marble-white bg-gradient-to-r from-concrete to-wet-concrete"></span>
+              </div>
+            </div>
+          ) : (
+            roles.map((role, index) => {
+              return (
+                <Pill
+                  key={index}
+                  active={selectedRoleLocalId == role.localId}
+                  onClick={() => {
+                    setRoleLocalId(role.localId)
+                  }}
+                >
+                  {`${role.data.name} (${role.ticketCount})`}
+                </Pill>
+              )
+            })
+          )}
         </div>
-        {!selectedContributors || !selectedContributors.length ? (
-          <div className="text-marble-white">
-            {selectedRoleLocalId ? (
-              <div>There are no contributors with this role.</div>
-            ) : (
-              <div>Please select a role to view contributors.</div>
-            )}
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">{contributorCards}</div>
-        )}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {!selectedContributors || !selectedContributors.length ? (
+            <>
+              {firstContributorRender ? (
+                Array.from(Array(16)).map((idx) => (
+                  <div
+                    key={idx}
+                    className="border border-concrete bg-wet-concrete shadow border-solid h-full motion-safe:animate-pulse"
+                  >
+                    <div className="bg-gradient-to-r from-concrete to-wet-concrete h-[142px]"></div>
+                  </div>
+                ))
+              ) : selectedRoleLocalId ? (
+                <div>There are no contributors with this role.</div>
+              ) : (
+                <div>Please select a role to view contributors.</div>
+              )}
+            </>
+          ) : (
+            <>{contributorCards}</>
+          )}
+        </div>
       </div>
     </>
   ) : (
