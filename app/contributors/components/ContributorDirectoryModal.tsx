@@ -103,7 +103,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                   <span>Skills</span>
                 </div>
                 <div className="text-sm font-normal">
-                  <div className="flex flex-row space-x-2 flex-wrap">
+                  <div className="flex flex-row flex-wrap">
                     {(contributor?.skills?.length &&
                       contributor?.skills?.map?.((skill, index) => {
                         return (
