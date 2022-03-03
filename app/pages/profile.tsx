@@ -22,18 +22,18 @@ const ProfileHome: BlitzPage = () => {
     return <></>
   }
 
-  console.log(activeUser)
-
   const activeLinkStyles = "text-marble-white"
   const inactiveLinkStyles = "text-concrete hover:text-wet-concrete"
 
   return (
     <div className="w-full grid grid-cols-1 xl:grid-cols-4 min-h-[calc(100vh-88px)] h-[1px]">
-      <ApplicationSlider
-        isOpen={sliderOpen}
-        setIsOpen={setSliderOpen}
-        application={activeApplication}
-      />
+      {activeApplication && (
+        <ApplicationSlider
+          isOpen={sliderOpen}
+          setIsOpen={setSliderOpen}
+          application={activeApplication}
+        />
+      )}
       <div className="col-span-1 text-2xl md:border-r border-concrete h-full">
         <div className="h-[185px] relative mb-[116px]">
           <img
@@ -55,7 +55,7 @@ const ProfileHome: BlitzPage = () => {
 
           <h3 className="text-marble-white text-base mt-4 font-normal">{activeUser.data.bio}</h3>
           <a href={activeUser.data.contactURL}>
-            <button className="mt-4 py-.5 border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete">
+            <button className="mt-4 py-.5 border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer">
               Get in touch
             </button>
           </a>
@@ -145,7 +145,7 @@ const ProfileHome: BlitzPage = () => {
               <p className="mt-2 text-marble-white text-base w-[300px] text-center">
                 Explore Terminals, submit interests to initiatives, and start contributing.
               </p>
-              <button className="mt-4 bg-magic-mint w-[300px] py-1 rounded-md">
+              <button className="mt-4 bg-magic-mint w-[300px] py-1 rounded-md cursor-pointer">
                 Start exploring
               </button>
             </div>

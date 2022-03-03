@@ -23,7 +23,11 @@ export default async function getAccountByAddress(input: z.infer<typeof GetAccou
       },
       initiatives: {
         include: {
-          initiative: true,
+          initiative: {
+            include: {
+              terminal: true,
+            },
+          },
         },
       },
       skills: {
