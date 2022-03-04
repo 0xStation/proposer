@@ -3,7 +3,7 @@ import * as z from "zod"
 import getInvitePermissions from "../queries/getInvitePermissions"
 
 const InviteContributor = z.object({
-  referrerId: z.number(),
+  inviterId: z.number(),
   accountId: z.number(),
   initiativeId: z.number(),
   terminalId: z.number(),
@@ -12,9 +12,9 @@ const InviteContributor = z.object({
 
 export default async function inviteContributor(input: z.infer<typeof InviteContributor>) {
   const params = InviteContributor.parse(input)
-  const { referrerId, terminalId, accountId, initiativeId, roleLocalId } = params
+  const { inviterId, terminalId, accountId, initiativeId, roleLocalId } = params
 
-  const permissions = await getInvitePermissions({ referrerId, terminalId })
+  const permissions = await getInvitePermissions({ inviterId, terminalId })
 
   if (!permissions || !permissions.includes(roleLocalId)) {
     console.log("Not a valid invite pair.")
@@ -47,6 +47,7 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
   // but what if this is not meant to be a first time invite but a promotion?
   if (existingMembership) {
     console.log("This user is already part of the terminal.")
+    return
   }
 
   await db.accountTerminal.create({
@@ -55,7 +56,7 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
       terminalId: terminalId,
       roleLocalId: roleLocalId,
       data: {
-        invitedBy: referrerId,
+        invitedBy: inviterId,
       },
     },
   })

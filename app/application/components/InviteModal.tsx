@@ -41,7 +41,7 @@ export const InviteModal = ({
 
   const [invitePermissionedRoleLocalIds] = useQuery(
     getInvitePermissions,
-    { terminalId: currentInitiative?.terminalId || 0, referrerId: activeUser?.id },
+    { terminalId: currentInitiative?.terminalId || 0, inviterId: activeUser?.id },
     { enabled: !!(currentInitiative?.terminalId && activeUser?.id), suspense: false }
   )
 
@@ -54,7 +54,7 @@ export const InviteModal = ({
   const handleInviteClick = async () => {
     if (chosenRole) {
       await inviteContributor({
-        referrerId: activeUser.id,
+        inviterId: activeUser.id,
         accountId: selectedApplication.account.id,
         terminalId: currentInitiative.terminalId,
         roleLocalId: chosenRole.localId,

@@ -7,6 +7,13 @@ interface CreateTerminalParams {
   data: TerminalMetadata
 }
 
+export const roleIds = {
+  staff: 1,
+  dailyCommuter: 2,
+  weekendCommuter: 3,
+  visitor: 4,
+}
+
 const station: CreateTerminalParams = {
   handle: "stationlabs",
   ticketAddress: "0xbe26ee78ba287e5c6a862258db9c5e7fe7538f56",
@@ -17,7 +24,12 @@ const station: CreateTerminalParams = {
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/station.jpeg",
     permissions: {
       invite: {
-        1: [1, 2, 3, 4], // local id for STAFF
+        [roleIds.staff]: [
+          roleIds.staff,
+          roleIds.dailyCommuter,
+          roleIds.weekendCommuter,
+          roleIds.visitor,
+        ], // local id for STAFF
       },
     },
     contracts: {

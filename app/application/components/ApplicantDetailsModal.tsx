@@ -48,7 +48,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   const { pfpURL, name, ens, pronouns, verified, discordId, timezone } = applicantData
   const [canInvite] = useQuery(
     hasInvitePermissions,
-    { referrerId: activeUser?.id, terminalId: initiative?.terminalId },
+    { inviterId: activeUser?.id, terminalId: initiative?.terminalId },
     { enabled: !!(activeUser?.id && initiative?.terminalId), suspense: false }
   )
 

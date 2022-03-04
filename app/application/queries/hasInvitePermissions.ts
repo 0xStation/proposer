@@ -3,27 +3,29 @@ import { Terminal } from "app/terminal/types"
 import { z } from "zod"
 
 const HasInvitePermissions = z.object({
-  referrerId: z.number(),
+  inviterId: z.number(),
   terminalId: z.number(),
 })
 
+// Given the inviter's id and terminal id, we're checking
+// whether the inviter is in the terminal and has inviting permissions
+// based on their given role. We then return a boolean that returns true
+// if the inviter has any inviting permissions.
 export const hasInvitePermissions = async (input) => {
   const data = HasInvitePermissions.parse(input)
-  // the invitee / terminal relation
-  // required so we can see which role the invitee has
-  // to tell if this is a valid invitation
-  const inviteeTerminal = await db.accountTerminal.findUnique({
+
+  const inviterTerminal = await db.accountTerminal.findUnique({
     where: {
       accountId_terminalId: {
-        accountId: data?.referrerId,
+        accountId: data?.inviterId,
         terminalId: data?.terminalId,
       },
     },
     include: { role: true },
   })
 
-  if (!inviteeTerminal) {
-    console.log("This invitee is not found in the provided terminal")
+  if (!inviterTerminal) {
+    console.log("This inviter is not found in the provided terminal")
     return
   }
 
@@ -36,7 +38,10 @@ export const hasInvitePermissions = async (input) => {
     return
   }
 
-  return !!terminal.data.permissions?.invite[inviteeTerminal.role?.localId as number]
+  // `inviterTerminal.terminal.data.permissions.invite` is a lookup map
+  // that will return the list of role local ids that the inviter's role is allowed
+  // to invite.
+  return !!terminal.data.permissions?.invite[inviterTerminal.role?.localId as number]
 }
 
 export default hasInvitePermissions

@@ -26,12 +26,12 @@ const kristen: CreateAccountParams = {
   pfpURL: "https://pbs.twimg.com/profile_images/1480639057914855424/LiE4wCe2_400x400.jpg",
 }
 
-const mima: CreateAccountParams = {
-  address: "0x65A3870F48B5237f27f674Ec42eA1E017E111D63",
-  name: "mima",
+const chiyoko: CreateAccountParams = {
+  address: "0x1E8f3C0286b4949e8eB1F5d705b49016dc84D288",
+  name: "chiyoko",
   pronouns: "she/her",
   skills: [],
-  discordId: "mima#3881",
+  discordId: "chiyoko#3881",
   timezone: "EST",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036018-25f65c4d-a968-4c6c-b328-15958acdb649.png",
@@ -39,7 +39,7 @@ const mima: CreateAccountParams = {
 
 const seed = async () => {
   console.log("Seeding Accounts")
-  const users = [kristen, mima]
+  const users = [kristen, chiyoko]
   for (const name in users) {
     const contributorData = users[name] as CreateAccountParams
     const account = await db.account.findUnique({

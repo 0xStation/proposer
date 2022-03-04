@@ -1,4 +1,5 @@
 import db from "../../index"
+import { roleIds } from "./1-terminals"
 
 interface ContributorSeed {
   address: string
@@ -6,11 +7,10 @@ interface ContributorSeed {
   role: number
 }
 
-const roleIds = {
-  staff: 1,
-  dailyCommuter: 2,
-  weekendCommuter: 3,
-  visitor: 4,
+const chiyoko: ContributorSeed = {
+  address: "0x1E8f3C0286b4949e8eB1F5d705b49016dc84D288",
+  joinedAt: new Date("2022-1-27"),
+  role: roleIds.visitor, // making it easy to allow myself to invite people
 }
 
 const kristen: ContributorSeed = {
@@ -20,7 +20,7 @@ const kristen: ContributorSeed = {
 }
 
 const seed = async () => {
-  const contributors = [kristen]
+  const contributors = [kristen, chiyoko]
   const terminal = await db.terminal.findUnique({ where: { handle: "stationlabs" } })
 
   if (!terminal) {
@@ -37,7 +37,7 @@ const seed = async () => {
       continue
     }
 
-    const accountTerminal = await db.accountTerminal.create({
+    await db.accountTerminal.create({
       data: {
         accountId: account.id,
         terminalId: terminal.id,
