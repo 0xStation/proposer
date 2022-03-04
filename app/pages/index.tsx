@@ -2,6 +2,7 @@ import { Router } from "blitz"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import { useAccount } from "wagmi"
+import Button from "app/core/components/Button"
 
 const Home: BlitzPage = () => {
   const redirectToTerminal = () => {
@@ -25,12 +26,12 @@ const Home: BlitzPage = () => {
           places in Web3.
         </p>
         <p className="text-marble-white text-base mt-4">Join the ride.</p>
-        <button
-          className="mt-4 w-full py-2 text-center text-base bg-magic-mint rounded"
+        <Button
+          className="mt-4 w-full py-2 text-center text-base"
           onClick={() => redirectToTerminal()}
         >
           {accountData?.address ? "Start Exploring" : "Enter Station"}
-        </button>
+        </Button>
       </div>
     </div>
   )

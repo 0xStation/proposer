@@ -94,6 +94,14 @@ const Navigation = () => {
               }
               items={[
                 {
+                  name: "Profile",
+                  onClick: () => router.push("/profile"),
+                },
+                {
+                  name: "Edit Profile",
+                  onClick: () => router.push("/profile/edit"),
+                },
+                {
                   name: "disconnect",
                   onClick: appDisconnect,
                 },

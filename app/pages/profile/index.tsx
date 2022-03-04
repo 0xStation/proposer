@@ -8,6 +8,7 @@ import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import { Account } from "app/account/types"
 import { getWalletString } from "app/utils/getWalletString"
+import Button from "app/core/components/Button"
 
 // the profile homepage
 // can see a users initiatives + termials + profile info at a glance
@@ -37,13 +38,13 @@ const ProfileHome: BlitzPage = () => {
       <div className="col-span-1 text-2xl md:border-r border-concrete h-full">
         <div className="h-[185px] relative mb-[116px]">
           <img
-            alt="The logged in user's cover photo."
+            alt="The logged-in user's cover photo."
             src={activeUser.data.coverURL}
             className="w-full h-full object-cover"
           />
           <img
             src={activeUser.data.pfpURL}
-            alt="The logged in user's profile picture."
+            alt="The logged-in user's profile picture."
             className="w-[200px] h-[200px] border border-marble-white rounded-full absolute bottom-[-100px] left-0 right-0 mx-auto"
           />
         </div>
@@ -61,9 +62,6 @@ const ProfileHome: BlitzPage = () => {
           </a>
 
           <div className="mt-8 space-y-8">
-            <div className="flex flex-col">
-              <h3 className="text-marble-white text-base font-bold">Top Endorsers</h3>
-            </div>
             <div className="flex flex-col">
               <h3 className="text-marble-white text-base font-bold">Skills</h3>
               <div className="mt-1">
@@ -141,13 +139,11 @@ const ProfileHome: BlitzPage = () => {
             subpage === "INITIATIVES") ||
             (activeUser.tickets && activeUser.tickets.length === 0 && subpage === "TERMINALS")) && (
             <div className="w-full h-full flex items-center flex-col justify-center absolute top-0 z-[-10]">
-              <p className="text-marble-white text-2xl font-bold">Join intiatives</p>
+              <p className="text-marble-white text-2xl font-bold">Join initiatives</p>
               <p className="mt-2 text-marble-white text-base w-[300px] text-center">
                 Explore Terminals, submit interests to initiatives, and start contributing.
               </p>
-              <button className="mt-4 bg-magic-mint w-[300px] py-1 rounded-md cursor-pointer">
-                Start exploring
-              </button>
+              <Button className="cursor-pointer mt-4 w-[300px] py-1">Start exploring</Button>
             </div>
           )}
         </div>
