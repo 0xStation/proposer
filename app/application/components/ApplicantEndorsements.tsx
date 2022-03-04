@@ -1,18 +1,16 @@
 import { Account } from "app/account/types"
 import { Tag } from "app/core/components/Tag"
-import ProfileMetadata from "app/core/components/TalentIdentityUnit/ProfileMetadata"
+import ProfileMetadata from "app/core/ProfileMetadata"
 
 type ApplicantEndorsementsProps = {
   endorser: Account
   amount: number
-  isEndorsable?: boolean
   symbol?: string
 }
 
 const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({
   endorser,
   amount,
-  isEndorsable,
   symbol,
 }) => {
   const {
@@ -40,9 +38,7 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({
             {role && role !== "N/A" && <Tag type="role">{role?.toUpperCase()}</Tag>}
           </div>
           <div className="flex flex-col ">
-            {isEndorsable && (
-              <span className="text-marble-white text-lg text-normal m-2 justify-center">{`${amount} ${symbol}`}</span>
-            )}
+            <span className="text-marble-white text-lg text-normal m-2 justify-center">{`${amount} ${symbol}`}</span>
           </div>
         </div>
       </div>

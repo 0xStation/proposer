@@ -30,6 +30,7 @@ const station: TerminalSeed = {
   data: {
     name: "Station Labs",
     description: "Creating on-chain infrastructure for a new genre of work.",
+    coverURL: "https://station-images.nyc3.digitaloceanspaces.com/station-cover.png",
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/station.jpeg",
     permissions: {
       invite: {
@@ -117,7 +118,6 @@ const contributorReview: InitiativeSeed = {
   data: {
     name: "Contributor Review",
     oneLiner: "Peer-to-peer recognition that publicizes your proof of contribution.",
-    shortName: "CONTRIBUTOR REVIEW",
     isAcceptingApplications: false,
     contributeText: [
       "Contributor Review looks to create a peer-to-peer oracle that signal the distribution of trust and responsibility across the network. In absence of a centralized management team, we need to design a system that adapts dynamically to the emergent behaviors of contributors. Through the act of elevating one another, we’re collectively getting close to a consensus who has contributed the most value to the organization. Our goal is to design an autonomous system that not only reflects the aggregated opinion across the network, but also protects against bad behaviors.",
@@ -133,7 +133,6 @@ const waitingRoom: InitiativeSeed = {
   localId: initiativeIds.waitingRoom,
   data: {
     name: "Waiting Room",
-    shortName: "WAITING ROOM",
     oneLiner:
       "Product to empower organizations with decentralized hiring and Station's first launch.",
     contributeText: [
@@ -152,7 +151,6 @@ const newstand: InitiativeSeed = {
   localId: initiativeIds.newstand,
   data: {
     name: "Newstand",
-    shortName: "NEWSTAND",
     oneLiner:
       "Publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity.",
     isAcceptingApplications: true,
@@ -174,7 +172,6 @@ const partnership: InitiativeSeed = {
   data: {
     name: "Terminal Partnerships",
     oneLiner: "Inviting the best DAOs to mobilize contributors on Station.",
-    shortName: "PARTNERSHIP",
     isAcceptingApplications: false,
     contributeText: [
       "Station exists to serve contributors. We exist to surface the most interesting opportunities for a wide range of skill sets and interests. First, we need to bootstrap the supply side of the market by inviting the best DAOs to mobilize contributors on Station.",
@@ -198,7 +195,6 @@ const networkSustainability: InitiativeSeed = {
       "The Station Network will be governed by the RAIL token. The token will power a sustainable RAIL network with aligned incentives and ensure fair distribution to all its participants based on their contribution to the network — be it labor or capital.",
     ],
     rewardText: ["Monthly salary in USDC", "Station Commuter Ticket NFT"],
-    shortName: "NETWORK SUSTAINABILITY",
     skills: [
       "python",
       "data analytics",
@@ -218,7 +214,6 @@ const community: InitiativeSeed = {
   data: {
     name: "Contributor Experience",
     oneLiner: "Welcoming new contributors and fostering a culture of intellectual thoughtfullness.",
-    shortName: "CONTRIBUTOR EXPERIENCE",
     contributeText: [
       "From the first touch point with the Station community to the day they eventually depart, we want to push ourselves to refine every step of the journey to delight, inform, inspire, and amplify.",
       "We’re here to delight newcomers with Station’s breadth and diversity of skills and perspectives. We’re here to inform ways to get involved and align on our operational principles and philosophy. We’re here to inspire innovations on the edge of the industry through bold and rigorous questioning. We’re here to amplify those that have made a mark on our journey, no matter if they’re here for a week or a year.",
@@ -236,7 +231,6 @@ const midnightStation: InitiativeSeed = {
   data: {
     name: "Midnight Station",
     oneLiner: "Radio show highlighting Station punks and passengers.",
-    shortName: "MIDNIGHT STATION",
     contributeText: [
       "When Station’s contributors get together irl, the gaps in-between web3 are filled with energetic heart-to-hearts and stories of inspiration and resolution. While these conversations aren’t directly tied to the metaverse, they’ve fueled a refreshing take on what Station can provide for its community.",
       "We don’t want these conversations to end because we are collectively dispersed and draft agendas solely focused on what happens online. As Station grows its contributor network, the opportunity to generate a richer web of thought is at-hand. Midnight Station is Station’s first step to blurring the line on what it means to be  web3 and hosts a home away from home to effect ranging conversations and ideas that are top of mind.",
@@ -254,7 +248,6 @@ const brandIdentity: InitiativeSeed = {
   data: {
     name: "Brand Identity",
     oneLiner: "Architecting the visual system of Station.",
-    shortName: "BRAND IDENTITY",
     contributeText: [
       "Station as a concept was born on a morning subway ride, surrounded by commuters heading uptown to their respective workplaces. It embodies not only how we’re transporting talent to the future of work that’s more participatory and permissionless, but also the freedom and mobility that the very future will unlock.",
       'From Shibuya station floorplan and NYC subway system to Neon Genesis Evangelion and David Bowie’s Station to Station, we draw inspirations from all sorts of mediums and experiences and weave them into a coherent theme of "retro-futuristic."',
@@ -272,7 +265,6 @@ const stationDigest: InitiativeSeed = {
     name: "Station Digest",
     oneLiner:
       "Surfacing impactful contributions and thoughtful discussions from different corners of Station.",
-    shortName: "STATION DIGEST",
     contributeText: [
       "We know that commuters, visitors, and staff at Station have busy lives. In the hustle and bustle of daily work in web3, filtering through Discord channels and attempting to follow different projects or conversations can appear impossible.",
       "We don’t want those important conversations, project updates, and nuggets of wisdom to get lost in the noise, so we created Station Digest. This bi-weekly newsletter is created by, and for members of Station’s vibrant community. It summarizes updates from Station’s guilds, thoughtful conversations from the depths of Discord, all the best reads, and exciting announcements or achievements from members of our community– all in a quick, commute or morning-coffee-friendly read for you to digest at your leisure.",

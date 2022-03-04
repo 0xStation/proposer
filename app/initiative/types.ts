@@ -2,7 +2,6 @@ import { ExternalLink } from "app/types"
 
 export type InitiativeMetadata = {
   name: string
-  shortName: string
   oneLiner?: string
   bannerURL?: string
   contributeText?: string[]

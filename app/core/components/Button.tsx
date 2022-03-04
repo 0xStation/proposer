@@ -7,6 +7,7 @@ type ButtonProps = {
   children?: any
   loading?: boolean
   disabled?: boolean
+  type?: "button" | "reset" | "submit"
 }
 export const Button = ({
   onClick,
@@ -15,6 +16,7 @@ export const Button = ({
   children,
   loading = false,
   disabled = false,
+  type,
 }: ButtonProps) => {
   const primaryStyling = "bg-magic-mint text-tunnel-black"
   const secondaryStyling = "border-solid border border-magic-mint text-magic-mint hover:bg-concrete"
@@ -22,9 +24,12 @@ export const Button = ({
 
   return (
     <button
+      type={type}
       disabled={disabled}
       onClick={onClick}
-      className={`${buttonStyling} rounded mx-auto block p-1 ${className}`}
+      className={`${
+        disabled ? "opacity-50" : ""
+      } ${buttonStyling} rounded mx-auto block p-1 ${className}`}
     >
       {loading ? <Loader /> : children}
     </button>

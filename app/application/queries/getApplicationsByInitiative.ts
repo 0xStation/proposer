@@ -16,7 +16,7 @@ export default async function getApplicationsByInitiative(
   input: z.infer<typeof GetApplicationsByInitiative>
 ) {
   const data = GetApplicationsByInitiative.parse(input)
-  const { referralGraphAddress, initiativeLocalId, initiativeId } = data
+  const { referralGraphAddress, initiativeLocalId, initiativeId, terminalId } = data
 
   //////
   // Query subgraph for initiative-level referral data
@@ -85,7 +85,7 @@ export default async function getApplicationsByInitiative(
           data: true,
           tickets: {
             where: {
-              terminalId: data.terminalId,
+              terminalId: terminalId,
             },
             select: {
               role: true,

@@ -40,6 +40,7 @@ export default async function getAccountsByTerminalRole(
       data: t.account.data as AccountMetadata,
       role: (t.role?.data as RoleMetadata)?.value,
       skills: t.account.skills.map(({ skill }) => skill.name),
+      joinedAt: t.joinedAt,
     }
   })
 

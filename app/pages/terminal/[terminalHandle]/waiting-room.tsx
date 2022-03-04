@@ -4,7 +4,7 @@ import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
 import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTerminal"
 import { Application } from "app/application/types"
-import { TalentIdentityUnit as ApplicationCard } from "app/core/components/TalentIdentityUnit/index"
+import { ApplicantCard } from "app/core/components/ApplicantCard"
 import ApplicantDetailsModal from "app/application/components/ApplicantDetailsModal"
 import useStore from "app/core/hooks/useStore"
 import { Account } from "app/account/types"
@@ -12,9 +12,6 @@ import EndorseModal from "app/core/components/EndorseModal"
 import EndorseSuccessModal from "app/core/components/EndorseSuccessModal"
 import { Pill } from "app/core/components/Pill"
 import getApplicationsByInitiative from "app/application/queries/getApplicationsByInitiative"
-import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
-import { useDecimals } from "app/core/contracts/contracts"
-import { useBalance } from "wagmi"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Modal from "app/core/components/Modal"
 import getRoleByAccountTerminal from "app/role/queries/getRoleByAccountTerminal"
@@ -42,16 +39,6 @@ const TerminalWaitingPage: BlitzPage = () => {
     setIsRedirectModalOpen(directedFrom === "application")
   }, [directedFrom])
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
-    terminal?.data.contracts.addresses.endorsements
-  )
-
-  const [{ data: balanceData }] = useBalance({
-    addressOrName: activeUser?.address,
-    token: terminal?.data?.contracts?.addresses?.endorsements,
-    watch: false,
-    formatUnits: decimals,
-  })
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
@@ -105,38 +92,21 @@ const TerminalWaitingPage: BlitzPage = () => {
   }, [selectedInitiativeLocalId, refreshApplications])
 
   const applicationCards = applications?.map((application, idx) => {
-    const { account, createdAt, points, referrals } = application
-    const onClick = () => {
+    const onApplicantCardClick = () => {
       setSelectedApplication(application)
       setIsApplicantOpen(true)
     }
-    // TODO: make this variable come from the subgraph
-    const hasBeenAirDroppedTokens = false
 
     const applicationCardProps = {
-      user: account,
-      points: points * Math.pow(10, 0 - decimals),
-      onClick,
-      isEndorsable:
-        // We want to reward people in the discord with tokens
-        // to endorse, but they don't have a role. Instead, we are checking their balance
-        // to see if they have the ability to endorse.
-        // Ideally, the parseFloat logic should be replaced by `hasBeenAirDroppedTokens`, but
-        // we are checking users's balances for now until `hasBeenAirDroppedTokens` is set up
-        // to come from the subgraph.
-        (!!roleOfActiveUser?.data?.value || !!parseFloat(balanceData?.formatted || "0")) &&
-        // user shouldn't be able to endorse themself
-        selectedApplication?.account?.address !== activeUser?.address,
-      referrals,
-      dateMetadata: createdAt && {
-        createdAt,
-      },
-      waitingRoom: true,
-      pointsSymbol: terminal?.data.contracts.symbols.points,
+      terminal,
+      application,
+      onApplicantCardClick,
+      roleOfActiveUser,
     }
 
-    return <ApplicationCard key={idx} {...applicationCardProps} />
+    return <ApplicantCard key={idx} {...applicationCardProps} />
   })
+
   const noApplicationsView = selectedInitiativeLocalId && (
     <div>There are no active applications for this initiative.</div>
   )
@@ -200,7 +170,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             terminalData={terminal?.data}
           />
         )}
-        {selectedInitiativeLocalId && selectedInitiativeLocalId && (
+        {selectedInitiativeLocalId && selectedInitiativeLocalId && selectedApplication?.account && (
           <EndorseModal
             isEndorseModalOpen={isEndorseModalOpen}
             setIsEndorseModalOpen={setIsEndorseModalOpen}

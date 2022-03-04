@@ -6,14 +6,8 @@ import db from "./index"
 // This seed function is executed when you run `blitz db seed -f db/query.ts`
 const seed = async () => {
   console.log("Querying...")
-  let initiatives = await db.initiative.findMany({
-    where: {
-      terminalId: 2,
-    },
-  })
-  initiatives.forEach((i) => {
-    console.log(`${i.id}, ${i.localId}, ${(i.data as AccountMetadata)?.name}`)
-  })
+  let count = await db.account.count({})
+  console.log(count)
 }
 
 export default seed

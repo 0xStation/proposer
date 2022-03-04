@@ -20,6 +20,7 @@ export type TerminalMetadata = {
       referrals: string
     }
   }
+  hide?: boolean
 }
 
 export type Terminal = {

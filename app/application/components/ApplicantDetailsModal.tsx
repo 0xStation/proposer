@@ -11,7 +11,7 @@ import { useDecimals } from "app/core/contracts/contracts"
 import ApplicantEndorsements from "./ApplicantEndorsements"
 import useStore from "app/core/hooks/useStore"
 import { formatDate } from "app/core/utils/formatDate"
-import { ProfileMetadata } from "app/core/components/TalentIdentityUnit/ProfileMetadata"
+import { ProfileMetadata } from "app/core/ProfileMetadata"
 import { Tag } from "app/core/components/Tag"
 import { Button } from "app/core/components/Button"
 import hasInvitePermissions from "../queries/hasInvitePermissions"
@@ -68,7 +68,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     address,
   }
 
-  const isEndorsable =
+  const canActiveUserEndorse =
     activeUser &&
     (roleOfActiveUser || parseFloat(balanceData?.formatted || "0")) &&
     activeUser?.address !== application?.account?.address
@@ -168,25 +168,27 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               </div>
             </div>
             <div id="points and submission" className="flex flex-row flex-auto text-marble-white">
-              <div className="flex flex-col flex-1">
-                <div className="font-bold">
-                  <span>Submission</span>
-                </div>
-                <div className="text-base font-normal">
-                  <div className="flex flex-row max-w-xs break-all mr-2">
-                    <a
-                      target="_blank"
-                      href={application?.data?.url}
-                      className="text-magic-mint"
-                      rel="noreferrer"
-                    >
-                      {application?.data?.url}
-                    </a>
+              {application?.data?.url && (
+                <div className="flex flex-col flex-1">
+                  <div className="font-bold">
+                    <span>Submission</span>
+                  </div>
+                  <div className="text-base font-normal">
+                    <div className="flex flex-row max-w-xs break-all mr-2">
+                      <a
+                        target="_blank"
+                        href={`//${application?.data?.url.replace(/^https?:\/\//, "")}`}
+                        className="text-magic-mint"
+                        rel="noreferrer"
+                      >
+                        {application?.data?.url.replace(/^https?:\/\//, "")}
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex flex-col flex-1">
-                {isEndorsable && (
+              )}
+              {terminalData ? (
+                <div className="flex flex-col flex-1">
                   <div>
                     <div className="font-bold">
                       <span>Points</span>
@@ -197,35 +199,32 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                       }`}
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
-            {isEndorsable && (
-              <div id="endorsers" className="flex-auto flex flex-col space-y-2">
-                <div className="flex-auto text-marble-white font-bold">
-                  <span>Endorsers</span>
                 </div>
-                {application?.referrals && application?.referrals.length ? (
-                  <div className="flex flex-col space-y-1">
-                    {application?.referrals?.map?.(({ from: account, amount = 0 }, index) => (
-                      <ApplicantEndorsements
-                        key={index}
-                        endorser={account}
-                        amount={amount * Math.pow(10, 0 - decimals)}
-                        isEndorsable={isEndorsable || false}
-                        symbol={terminalData?.contracts.symbols.points}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-marble-white text-base">
-                    Be the first to endorse this applicant!
-                  </p>
-                )}
+              ) : null}
+            </div>
+            <div id="endorsers" className="flex-auto flex flex-col space-y-2">
+              <div className="flex-auto text-marble-white font-bold">
+                <span>Endorsers</span>
               </div>
-            )}
+              {application?.referrals && application?.referrals.length ? (
+                <div className="flex flex-col space-y-1">
+                  {application?.referrals?.map?.(({ from: account, amount = 0 }, index) => (
+                    <ApplicantEndorsements
+                      key={index}
+                      endorser={account}
+                      amount={amount * Math.pow(10, 0 - decimals)}
+                      symbol={terminalData?.contracts.symbols.points}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className="text-marble-white text-base">
+                  Be the first to endorse this applicant!
+                </p>
+              )}
+            </div>
           </div>
-          {isEndorsable && (
+          {canActiveUserEndorse && (
             <div className="mx-auto">
               <Button
                 className={canInvite ? "px-20 mr-2 inline" : "px-28"}

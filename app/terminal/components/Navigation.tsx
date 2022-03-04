@@ -33,7 +33,7 @@ const Navigation = ({ children }: { children?: any }) => {
     formatUnits: decimals,
   })
 
-  const tokenBalance = parseFloat(balanceData?.formatted || "0").toFixed(1)
+  const tokenBalance = parseInt(balanceData?.formatted || "0")
 
   // obviously need better error page if the terminal is not found, but this will do.
   if (!terminal) {
