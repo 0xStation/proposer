@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react"
-import { Image, invoke } from "blitz"
+import { Image, invoke, useRouter } from "blitz"
 import Dropdown from "../components/Dropdown"
 import Map from "../components/Map"
 import logo from "../../../public/station-logo.svg"
@@ -13,6 +13,7 @@ import { LOCAL_STORAGE } from "../utils/constants"
  * Navigation Component
  */
 const Navigation = () => {
+  const router = useRouter()
   // a list of the modals that are active on the screen
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
@@ -22,7 +23,6 @@ const Navigation = () => {
   const setActiveUser = useStore((state) => state.setActiveUser)
   const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
-  const toggleAccountModal = useStore((state) => state.toggleAccountModal)
 
   const getUserAccount = async (address) => {
     // closing the wallet modal
@@ -32,9 +32,7 @@ const Navigation = () => {
     if (user) {
       setActiveUser(user)
     } else {
-      setTimeout(() => {
-        toggleAccountModal(true)
-      }, 500)
+      router.push("/profile/create")
     }
   }
 
@@ -112,7 +110,7 @@ const Navigation = () => {
                 </div>
               }
               items={[
-                { name: "Create Account", onClick: () => toggleAccountModal(true) },
+                { name: "Create Account", onClick: () => router.push("/profile/create") },
                 {
                   name: "disconnect",
                   onClick: disconnect,

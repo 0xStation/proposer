@@ -15,7 +15,7 @@ const contributorReview: InitiativeSeed = {
   data: {
     name: "Contributor Review",
     oneLiner: "Peer-to-peer recognition that publicizes your proof of contribution.",
-    isAcceptingApplications: false,
+    isAcceptingApplications: true,
     contributeText: [
       "Contributor Review looks to create a peer-to-peer oracle that signal the distribution of trust and responsibility across the network. In absence of a centralized management team, we need to design a system that adapts dynamically to the emergent behaviors of contributors. Through the act of elevating one another, we’re collectively getting close to a consensus who has contributed the most value to the organization. Our goal is to design an autonomous system that not only reflects the aggregated opinion across the network, but also protects against bad behaviors.",
     ],

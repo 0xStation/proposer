@@ -26,7 +26,7 @@ const Map = () => {
 
   // hides the map if there are less than two terminals (button in navigation and popover)
   // the thinking is that it doesnt make much sense to have a map with only one terminal
-  if (!terminals || terminals?.length < 2) {
+  if (!terminals) {
     return <></>
   }
 

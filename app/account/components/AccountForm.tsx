@@ -241,7 +241,7 @@ const AccountForm = ({
                 Contact
               </label>
               <span className="text-concrete text-xs mb-2">
-                URL of the best way to contact you (twitter profile, discord ID, calendy)
+                URL of the best way to contact you (Twitter profile, Discord ID, Calendly)
               </span>
               <div className="flex flex-row mt-1">
                 <Field
