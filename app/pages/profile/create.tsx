@@ -17,7 +17,7 @@ const CreateProfile: BlitzPage = () => {
     return (
       <div className="mx-auto max-w-2xl py-12">
         <h1 className="text-marble-white text-3xl text-center">
-          Your wallet needs to be connected to create an account
+          Connect your wallet to create an account.
         </h1>
       </div>
     )
@@ -38,7 +38,7 @@ const CreateProfile: BlitzPage = () => {
 
   return (
     <div
-      className="w-full h-full bg-cover bg-center bg-no-repeat border"
+      className="w-full h-full bg-cover bg-center bg-no-repeat border border-tunnel-black"
       style={{ backgroundImage: "url('/station-cover.png')" }}
     >
       <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36 relative">

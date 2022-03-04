@@ -102,7 +102,7 @@ const Navigation = () => {
                   onClick: () => router.push("/profile/edit"),
                 },
                 {
-                  name: "disconnect",
+                  name: "Disconnect",
                   onClick: appDisconnect,
                 },
               ]}
@@ -121,7 +121,7 @@ const Navigation = () => {
                 { name: "Create Account", onClick: () => router.push("/profile/create") },
                 {
                   name: "disconnect",
-                  onClick: disconnect,
+                  onClick: appDisconnect,
                 },
               ]}
             />

@@ -18,6 +18,7 @@ import Tag from "app/core/components/Tag"
 import { ProfileMetadata } from "app/core/ProfileMetadata"
 import Card from "app/core/components/Card"
 import { formatDate } from "app/core/utils/formatDate"
+import Button from "app/core/components/Button"
 
 const Project: BlitzPage = () => {
   const [hasApplied, setHasApplied] = useState(false)
@@ -376,15 +377,15 @@ const Project: BlitzPage = () => {
                       {`You've already applied!`}
                     </button>
                   ) : (
-                    <button
-                      className="m-2 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
+                    <Button
+                      className="m-2 py-2 text-center text-base w-[280px]"
                       onClick={() => {
                         setUserTrigged(true)
                         handleSubmitInterestClick()
                       }}
                     >
                       Submit Interest
-                    </button>
+                    </Button>
                   )}
                 </div>
               </>

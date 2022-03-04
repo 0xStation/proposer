@@ -22,7 +22,7 @@ const EditProfile: BlitzPage = () => {
     return (
       <div className="mx-auto max-w-2xl py-12">
         <h1 className="text-marble-white text-3xl text-center">
-          You need an account before you can edit!
+          Please connect your wallet to edit your account.
         </h1>
       </div>
     )
