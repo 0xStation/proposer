@@ -25,11 +25,14 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
                 to the Rinkeby chain. If you are having trouble connecting to Rinkeby, check out our
                 FAQ{" "}
                 <a
-                  className="text-base font-bold"
+                  target="_blank"
+                  className="text-magic-mint"
                   href="https://0xstation.notion.site/How-to-install-Rinkeby-ab71688f687c44faab6524daf19ab73a"
+                  rel="noreferrer"
                 >
-                  here.
+                  here
                 </a>
+                .
               </p>
 
               {switchNetwork && (
