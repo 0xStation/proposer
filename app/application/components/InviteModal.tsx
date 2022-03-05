@@ -18,26 +18,11 @@ export const InviteModal = ({
   applicantTicket,
   setRefreshApplications,
 }) => {
+  const [roleNotSelectedError, setRoleNotSelectedError] = useState<boolean>(false)
   const [inviteSuccessful, setInviteSuccessful] = useState<boolean>(false)
   const [chosenRole, setChosenRole] = useState<Role>()
   const [inviteContributor] = useMutation(InviteContributor)
   const activeUser = useStore((state) => state.activeUser) as Account
-
-  // if the user does not choose a role from the dropdown
-  // because they see staff and want to keep it on staff
-  // it won't register as a change, so the handler wont fire.
-  // thus, we need to set the chosenRole to that first role by default.
-  useEffect(() => {
-    if (currentInitiative && !chosenRole) {
-      const DEFAULT_ROLE = {
-        terminalId: currentInitiative.terminalId,
-        localId: 1,
-        data: { name: "STAFF", value: "STAFF" },
-      }
-
-      setChosenRole(DEFAULT_ROLE)
-    }
-  }, [currentInitiative])
 
   const [invitePermissionedRoleLocalIds] = useQuery(
     getInvitePermissions,
@@ -52,30 +37,37 @@ export const InviteModal = ({
   )
 
   const handleInviteClick = async () => {
-    if (chosenRole) {
+    if (!chosenRole && !applicantTicket) {
+      // if the applicant isn't an existing ticket holder and a chosenRole isn't selected
+      // we show an error because the inviter needs to select a role first.
+      setRoleNotSelectedError(true)
+    } else {
       await inviteContributor({
         inviterId: activeUser.id,
         accountId: selectedApplication.account.id,
         terminalId: currentInitiative.terminalId,
-        roleLocalId: chosenRole.localId,
+        // if applicant already holds a ticket we return the same roleLocalId on their ticket
+        // and upsert them to the new initiative.
+        roleLocalId: chosenRole?.localId || applicantTicket?.roleLocalId,
         initiativeId: currentInitiative.id,
       })
-    }
-    setInviteSuccessful(true)
+      setInviteSuccessful(true)
 
-    // Remove application from waiting room when applicant is invited.
-    // TODO: make it so that applications automatically refreshes via dependency hook
-    setRefreshApplications(true)
+      // Remove application from waiting room when applicant is invited.
+      // TODO: make it so that applications automatically refreshes via dependency hook
+      setRefreshApplications(true)
+    }
   }
 
   const handleRoleDropdown = (e) => {
+    setRoleNotSelectedError(false)
     const roleLocalId = invitePermissionedRoleLocalIds?.find(
       (id) => id === parseInt(e.target.value)
     )
-    if (roleLocalId) {
-      const role = terminal?.roles.find((role) => role.localId === roleLocalId)
-      setChosenRole(role)
-    }
+    // Find role name for role's local id. If none exists, set chosen role to `undefined` and set error
+    // when user tries to confirm role.
+    const role = roleLocalId && terminal?.roles.find((role) => role.localId === roleLocalId)
+    setChosenRole(role)
   }
 
   // If an applicant is internally applying to an initiative
@@ -98,27 +90,36 @@ export const InviteModal = ({
         onChange={handleRoleDropdown}
         className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 w-full"
       >
+        <option value={undefined}>Please select a role:</option>
         {terminal?.roles
           ?.filter((role) => invitePermissionedRoleLocalIds?.includes(role?.localId))
+          .reverse()
           .map((role, idx) => (
             <option key={idx} value={role.localId}>
               {titleCase(role.data?.name)}
             </option>
           ))}
       </select>
-      <Button className="mt-10 w-72" onClick={handleInviteClick}>
+      <Button className="mt-10 w-72" onClick={handleInviteClick} disabled={roleNotSelectedError}>
         Confirm
       </Button>
+      {roleNotSelectedError && <p className="text-torch-red text-center">Please select a role.</p>}
     </div>
   )
 
   const successfulInvitationView = (
     <div className="mt-[2rem] mx-28 text-marble-white text-center">
-      <h1 className="text-3xl">
-        {selectedApplication?.account?.data?.name} is now a{" "}
-        <span className="text-electric-violet">{titleCase(chosenRole?.data.name)}</span> at{" "}
-        {terminal?.data?.name} and a part of {currentInitiative?.data?.name}!
-      </h1>
+      {applicantTicket ? (
+        <h1 className="text-3xl">
+          {selectedApplication?.account?.data?.name} is now part of {currentInitiative?.data?.name}!
+        </h1>
+      ) : (
+        <h1 className="text-3xl">
+          {selectedApplication?.account?.data?.name} is now a{" "}
+          <span className="text-electric-violet">{titleCase(chosenRole?.data.name)}</span> at{" "}
+          {terminal?.data?.name} and a part of {currentInitiative?.data?.name}!
+        </h1>
+      )}
       <p className="mt-3 mb-8">Reach out to let {selectedApplication?.account?.data?.name} know.</p>
     </div>
   )
@@ -135,8 +136,10 @@ export const InviteModal = ({
       subtitle={subtitle}
       open={isInviteModalOpen}
       toggle={(close) => {
+        setRoleNotSelectedError(false)
         setIsInviteModalOpen(close)
       }}
+      error={roleNotSelectedError}
     >
       {inviteSuccessful ? successfulInvitationView : inviteModalView}
     </Modal>

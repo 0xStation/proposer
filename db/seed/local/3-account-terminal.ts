@@ -10,7 +10,7 @@ interface ContributorSeed {
 const chiyoko: ContributorSeed = {
   address: "0x1E8f3C0286b4949e8eB1F5d705b49016dc84D288",
   joinedAt: new Date("2022-1-27"),
-  role: roleIds.visitor, // making it easy to allow myself to invite people
+  role: roleIds.visitor,
 }
 
 const kristen: ContributorSeed = {
@@ -20,7 +20,7 @@ const kristen: ContributorSeed = {
 }
 
 const seed = async () => {
-  const contributors = [kristen, chiyoko]
+  const contributors = [kristen]
   const terminal = await db.terminal.findUnique({ where: { handle: "stationlabs" } })
 
   if (!terminal) {

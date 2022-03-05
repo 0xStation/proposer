@@ -34,24 +34,14 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
     },
   })
 
-  const existingMembership = await db.accountTerminal.findUnique({
+  await db.accountTerminal.upsert({
     where: {
       accountId_terminalId: {
         accountId: accountId,
         terminalId: terminalId,
       },
     },
-  })
-
-  // if the user already exists, we do not want to "re-invite" them
-  // but what if this is not meant to be a first time invite but a promotion?
-  if (existingMembership) {
-    console.log("This user is already part of the terminal.")
-    return
-  }
-
-  await db.accountTerminal.create({
-    data: {
+    create: {
       accountId: accountId,
       terminalId: terminalId,
       roleLocalId: roleLocalId,
@@ -59,5 +49,6 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
         invitedBy: inviterId,
       },
     },
+    update: {},
   })
 }
