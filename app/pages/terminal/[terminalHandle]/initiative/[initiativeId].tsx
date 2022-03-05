@@ -137,8 +137,8 @@ const Project: BlitzPage = () => {
           terminalId={terminal?.id || 0}
         />
       )}
-      <main className="w-full h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col p-3">
-        <div className="flex sm:mx-1 md:mx-4 my-4">
+      <main className="w-full min-h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col px-6 sm:px-0 sm:p-3 pb-6">
+        <div className="flex sm:mx-1 md:mx-4 my-4 ml-[-.5rem] sm:ml-0">
           <Link href={Routes.TerminalInitiativePage({ terminalHandle })}>
             <Image className="cursor-pointer" src={Back} alt="Back Icon" width={25} height={22} />
           </Link>
@@ -313,7 +313,7 @@ const Project: BlitzPage = () => {
               </div>
             </div>
 
-            {initiative?.data.isAcceptingApplications ? (
+            {initiative?.data.isAcceptingApplications && (
               <>
                 <div className="flex-auto flex flex-col text-marble-white space-y-5">
                   <div>
@@ -362,7 +362,7 @@ const Project: BlitzPage = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex-auto flex justify-center mt-10 sticky bottom-0 bg-tunnel-black">
+                <div className="flex-auto flex justify-center mt-10 sticky bottom-0">
                   {hasApplied ? (
                     <button className="m-2 py-2 text-center text-base bg-concrete rounded item-center w-[280px]">
                       {`You've already applied!`}
@@ -380,8 +380,6 @@ const Project: BlitzPage = () => {
                   )}
                 </div>
               </>
-            ) : (
-              <div className="h-[100px]"></div>
             )}
           </div>
         </div>
