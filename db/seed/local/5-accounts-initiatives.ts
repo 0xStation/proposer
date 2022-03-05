@@ -6,8 +6,13 @@ const chiyoko = {
   initiatives: [initiativeIds.newstand],
 }
 
+const setsuko = {
+  address: "0x4038d6B8fa427812869cf406BaD5041D31F0a17C",
+  initiatives: [initiativeIds.newstand],
+}
+
 const seed = async () => {
-  const contributors = [chiyoko]
+  const contributors = [chiyoko, setsuko]
 
   const terminal = await db.terminal.findUnique({ where: { handle: "stationlabs" } })
 

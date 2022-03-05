@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Modal from "../../core/components/Modal"
 import { useQuery, useMutation } from "blitz"
 import Button from "../../core/components/Button"
@@ -138,6 +138,9 @@ export const InviteModal = ({
       toggle={(close) => {
         setRoleNotSelectedError(false)
         setIsInviteModalOpen(close)
+        setInviteSuccessful(false)
+        setRefreshApplications(false)
+        setChosenRole(undefined)
       }}
       error={roleNotSelectedError}
     >
