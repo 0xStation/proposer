@@ -101,7 +101,9 @@ const visitor: RoleSeed = {
   },
 }
 
-const stationRoles = [staff, dailyCommuter, weekendCommuter, visitor]
+const stationRoles = [
+  // staff, dailyCommuter, weekendCommuter, visitor
+]
 
 //////
 // INITIATIVES
@@ -285,15 +287,15 @@ const stationDigest: InitiativeSeed = {
 }
 
 const stationInitiatives = [
-  contributorReview,
-  waitingRoom,
-  newstand,
-  partnership,
-  networkSustainability,
-  community,
-  midnightStation,
-  brandIdentity,
-  stationDigest,
+  // contributorReview,
+  // waitingRoom,
+  // newstand,
+  // partnership,
+  // networkSustainability,
+  // community,
+  // midnightStation,
+  // brandIdentity,
+  // stationDigest,
 ]
 
 export async function seed() {
@@ -313,41 +315,41 @@ export async function seed() {
 
   console.log("Station updated:", terminal)
 
-  for (const name in stationRoles) {
-    const roleSeed = stationRoles[name]!
-    const role = await db.role.upsert({
-      where: {
-        terminalId_localId: {
-          terminalId: terminal.id,
-          localId: roleSeed.localId,
-        },
-      },
-      create: {
-        terminalId: terminal.id,
-        localId: roleSeed.localId,
-        data: roleSeed.data,
-      },
-      update: { data: roleSeed.data },
-    })
-    console.log(`  ${(role as Role).data?.name} localId: ${roleSeed.localId}`)
-  }
+  // for (const name in stationRoles) {
+  //   const roleSeed = stationRoles[name]!
+  //   const role = await db.role.upsert({
+  //     where: {
+  //       terminalId_localId: {
+  //         terminalId: terminal.id,
+  //         localId: roleSeed.localId,
+  //       },
+  //     },
+  //     create: {
+  //       terminalId: terminal.id,
+  //       localId: roleSeed.localId,
+  //       data: roleSeed.data,
+  //     },
+  //     update: { data: roleSeed.data },
+  //   })
+  //   console.log(`  ${(role as Role).data?.name} localId: ${roleSeed.localId}`)
+  // }
 
-  for (const name in stationInitiatives) {
-    const initiativeSeed = stationInitiatives[name]!
-    const initiative = await db.initiative.upsert({
-      where: {
-        terminalId_localId: {
-          terminalId: terminal.id,
-          localId: initiativeSeed.localId,
-        },
-      },
-      create: {
-        terminalId: terminal.id,
-        localId: initiativeSeed.localId,
-        data: initiativeSeed.data,
-      },
-      update: { data: initiativeSeed.data },
-    })
-    console.log(`  ${(initiative as Initiative).data?.name} localId: ${initiative.localId}`)
-  }
+  // for (const name in stationInitiatives) {
+  //   const initiativeSeed = stationInitiatives[name]!
+  //   const initiative = await db.initiative.upsert({
+  //     where: {
+  //       terminalId_localId: {
+  //         terminalId: terminal.id,
+  //         localId: initiativeSeed.localId,
+  //       },
+  //     },
+  //     create: {
+  //       terminalId: terminal.id,
+  //       localId: initiativeSeed.localId,
+  //       data: initiativeSeed.data,
+  //     },
+  //     update: { data: initiativeSeed.data },
+  //   })
+  //   console.log(`  ${(initiative as Initiative).data?.name} localId: ${initiative.localId}`)
+  // }
 }

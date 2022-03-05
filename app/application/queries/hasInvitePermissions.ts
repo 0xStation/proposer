@@ -25,8 +25,8 @@ export const hasInvitePermissions = async (input) => {
   })
 
   if (!inviterTerminal) {
-    console.log("This inviter is not found in the provided terminal")
-    return
+    console.warn("This inviter is not found in the provided terminal")
+    return false
   }
 
   const terminal = (await db.terminal.findUnique({
@@ -34,8 +34,8 @@ export const hasInvitePermissions = async (input) => {
   })) as Terminal
 
   if (!terminal) {
-    console.log(`No terminal found with id ${data?.terminalId}`)
-    return
+    console.warn(`No terminal found with id ${data?.terminalId}`)
+    return false
   }
 
   // `inviterTerminal.terminal.data.permissions.invite` is a lookup map

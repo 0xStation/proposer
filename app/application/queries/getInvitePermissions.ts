@@ -25,7 +25,7 @@ export const getInvitePermissions = async (input) => {
 
   if (!inviterTerminal) {
     console.warn("This inviter is not found in the provided terminal")
-    return
+    return []
   }
 
   // `inviterTerminal.terminal.data.permissions.invite` is a lookup map
