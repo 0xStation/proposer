@@ -11,6 +11,7 @@ export type InitiativeMetadata = {
   members?: string[]
   commitment?: string
   skills?: string[]
+  prompt?: string
 }
 
 export type Initiative = {

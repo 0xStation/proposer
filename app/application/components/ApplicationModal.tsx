@@ -4,15 +4,16 @@ import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
 import useStore from "../../core/hooks/useStore"
 import { Account } from "../../account/types"
+import { Initiative } from "../../initiative/types"
 
 const ApplicationModal = ({
   isOpen,
   setIsOpen,
-  initiativeId,
+  initiative,
 }: {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-  initiativeId: number
+  initiative: Initiative
 }) => {
   const router = useRouter()
   const terminalHandle = useParam("terminalHandle") as string
@@ -49,7 +50,7 @@ const ApplicationModal = ({
             try {
               await createApplicationMutation({
                 ...values,
-                initiativeId: initiativeId,
+                initiativeId: initiative.id,
                 accountId: activeUser.id,
               })
             } catch (error) {
@@ -72,7 +73,7 @@ const ApplicationModal = ({
                 </div>
                 <div className="flex flex-col col-span-2">
                   <label htmlFor="entryDescription" className="text-marble-white">
-                    Why this initiative?
+                    {initiative.data.prompt || "Why this initiative?"}
                   </label>
                   <Field
                     component="input"
