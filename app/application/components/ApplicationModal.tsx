@@ -1,9 +1,37 @@
-import { useMutation, useRouter, useParam } from "blitz"
+import { useMutation, useRouter, useParam, invoke, useQuery } from "blitz"
 import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
 import useStore from "../../core/hooks/useStore"
 import { Account } from "../../account/types"
+import sendDiscordNotification from "app/application/queries/sendDiscordNotification"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
+import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
+import getAccountById from "app/account/queries/getAccountById"
+
+const GetDetailsForDiscord = async (handle, initiativeId, applicantId) => {
+  console.log("send notifcation was hit")
+  const terminal = await invoke(getTerminalByHandle, { handle })
+  const [initiative] = await useQuery(
+    getInitiativeByLocalId,
+    {
+      terminalId: terminal?.id || 0,
+      localId: initiativeId,
+    },
+    { suspense: false }
+  )
+  const applicant = await invoke(getAccountById, { applicantId })
+
+  initiative &&
+    applicant &&
+    terminal &&
+    sendDiscordNotification(
+      handle.toUpperCase(),
+      terminal.data.discordWebHook,
+      initiative.data.name,
+      applicant.data.name
+    )
+}
 
 const ApplicationModal = ({
   isOpen,
@@ -35,7 +63,9 @@ const ApplicationModal = ({
       />
     )
   }
-
+  function sendNotification() {
+    GetDetailsForDiscord(terminalHandle, initiativeId, activeUser?.id)
+  }
   return (
     <Modal
       title="Contribute"
@@ -52,6 +82,7 @@ const ApplicationModal = ({
                 initiativeId: initiativeId,
                 accountId: activeUser.id,
               })
+              sendNotification()
             } catch (error) {
               alert("Error applying.")
             }
