@@ -34,15 +34,5 @@ export default async function generateTicketVisual(input: z.infer<typeof Generat
   const uploadedImageResponse = await uploadToS3(ticketSVG, path)
   const uploadedImagePath = uploadedImageResponse.Location
 
-  const updatedAccount = await db.account.update({
-    where: { address: params.accountAddress },
-    data: { data: { ...(existingAccount.data as {}), ticketImage: uploadedImagePath } },
-  })
-
-  // ^^^ note on the above
-  // Spread types may only be created from object types.
-  // existingAccount.data is of type Prisma.JsonValue which _is_ an object
-  // but for some reason TS doesn't think so, hence the `as {}`
-
-  return updatedAccount as Account
+  return uploadedImagePath
 }

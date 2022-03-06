@@ -105,6 +105,7 @@ const Navigation = ({ children }: { children?: any }) => {
         </div>
         {activeUser && (
           <TicketWrapper
+            terminal={terminal}
             activeUser={activeUser}
             tokenBalance={tokenBalance}
             endorsementsSymbol={terminal.data.contracts.symbols.endorsements}

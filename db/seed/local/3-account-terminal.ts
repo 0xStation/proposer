@@ -4,6 +4,9 @@ interface ContributorSeed {
   address: string
   joinedAt: Date
   role: number
+  data: {
+    ticketImageUrl: string
+  }
 }
 
 const roleIds = {
@@ -17,6 +20,9 @@ const kristen: ContributorSeed = {
   address: "0xaE55f61f85935BBB68b8809d5c02142e4CbA9a13",
   joinedAt: new Date("2021-12-01"),
   role: roleIds.staff, // making it easy to allow myself to invite people
+  data: {
+    ticketImageUrl: "https://station-images.nyc3.digitaloceanspaces.com/Semester2.gif",
+  },
 }
 
 const seed = async () => {
