@@ -5,7 +5,6 @@ import { formatDate } from "app/core/utils/formatDate"
 import getStatusColor from "app/utils/getStatusColor"
 
 const ApplicationSlider = ({ isOpen, setIsOpen, application }) => {
-  console.log(application)
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog as="div" className="fixed inset-0 overflow-hidden" onClose={setIsOpen}>
@@ -88,18 +87,19 @@ const ApplicationSlider = ({ isOpen, setIsOpen, application }) => {
                             Why Newstand?
                           </span>
                           <span className="mt-2 text-base text-marble-white">
-                            {application.data.entryDescription}
+                            {/* note: need optional chaining on entryDescription and url since they can be `null` */}
+                            {application?.data?.entryDescription}
                           </span>
                         </div>
                         <div className="flex flex-col border-b border-concrete pb-8 mt-8">
                           <span className="text-base font-bold text-marble-white">Submission</span>
                           <a
                             className="mt-2 text-base text-magic-mint cursor-pointer hover:underline"
-                            href={application.data.url}
+                            href={application?.data?.url}
                             target="_blank"
                             rel="noreferrer"
                           >
-                            {application.data.url}
+                            {application?.data?.url}
                           </a>
                         </div>
                       </>

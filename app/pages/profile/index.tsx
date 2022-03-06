@@ -57,14 +57,12 @@ const ProfileHome: BlitzPage = () => {
             <h1 className="text-2xl text-marble-white">{activeUser?.data.name}</h1>
             <span className="text-base text-concrete">{getWalletString(activeUser?.address)}</span>
           </div>
-
           <h3 className="text-marble-white text-base mt-4 font-normal">{activeUser?.data.bio}</h3>
           <a href={activeUser?.data.contactURL}>
             <button className="mt-4 py-.5 border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer">
               Get in touch
             </button>
           </a>
-
           <div className="mt-8 space-y-8">
             <div className="flex flex-col">
               <h3 className="text-marble-white text-base font-bold">Skills</h3>
@@ -91,22 +89,24 @@ const ProfileHome: BlitzPage = () => {
             (activeUser?.initiatives && activeUser?.initiatives.length > 0)) && (
             <>
               <div className="flex flex-row z-10">
-                <span
+                <button
+                  tabIndex={0}
                   onClick={() => setSubpage("TERMINALS")}
                   className={`${
                     subpage === "TERMINALS" ? activeLinkStyles : inactiveLinkStyles
                   } cursor-pointer text-2xl mr-12`}
                 >
                   Terminals
-                </span>
-                <span
+                </button>
+                <button
+                  tabIndex={0}
                   onClick={() => setSubpage("INITIATIVES")}
                   className={`${
                     subpage === "INITIATIVES" ? activeLinkStyles : inactiveLinkStyles
                   } cursor-pointer text-2xl mr-12`}
                 >
                   Initiatives
-                </span>
+                </button>
               </div>
               {subpage === "TERMINALS" && (
                 <div className="flex space-x-4 mt-12">
@@ -116,7 +116,6 @@ const ProfileHome: BlitzPage = () => {
                     })}
                 </div>
               )}
-
               {subpage === "INITIATIVES" && (
                 <div className="flex space-x-4 mt-12">
                   {activeUser?.initiatives &&
@@ -136,7 +135,6 @@ const ProfileHome: BlitzPage = () => {
               )}
             </>
           )}
-
           {/* Show if user is active in terminal but has no initiatives, or if the user is not in any terminals or initiatives */}
           {((activeUser?.initiatives &&
             activeUser?.initiatives.length === 0 &&
@@ -144,12 +142,17 @@ const ProfileHome: BlitzPage = () => {
             (activeUser?.tickets &&
               activeUser?.tickets.length === 0 &&
               subpage === "TERMINALS")) && (
-            <div className="w-full h-full flex items-center flex-col justify-center absolute top-0 z-[-10]">
+            <div className="w-full h-full flex items-center flex-col justify-center mt-[15%]">
               <p className="text-marble-white text-2xl font-bold">Join initiatives</p>
               <p className="mt-2 text-marble-white text-base w-[300px] text-center">
                 Explore Terminals, submit interests to initiatives, and start contributing.
               </p>
-              <Button className="cursor-pointer mt-4 w-[300px] py-1">Start exploring</Button>
+              <Button
+                className="cursor-pointer mt-4 w-[300px] py-1"
+                onClick={() => console.log("clicked!")}
+              >
+                Start exploring
+              </Button>
             </div>
           )}
         </div>
