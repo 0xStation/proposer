@@ -30,7 +30,7 @@ const EditProfile: BlitzPage = () => {
 
   return (
     <div
-      className="w-full h-full bg-cover bg-center bg-no-repeat border"
+      className="w-full h-full bg-cover bg-center bg-no-repeat border border-tunnel-black"
       style={{ backgroundImage: "url('/station-cover.png')" }}
     >
       <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36 relative">

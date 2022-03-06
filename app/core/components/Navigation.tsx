@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react"
 import { Image, invoke, useRouter } from "blitz"
 import Dropdown from "../components/Dropdown"
-import Map from "../components/Map"
+import ExplorePopover from "../components/Explore/ExplorePopover"
 import logo from "../../../public/station-logo.svg"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import useStore from "../hooks/useStore"
@@ -73,7 +73,7 @@ const Navigation = () => {
           ]}
         />
         <div className="flex items-center border-l border-l-concrete">
-          <Map />
+          <ExplorePopover />
           {activeUser ? (
             <Dropdown
               side="right"

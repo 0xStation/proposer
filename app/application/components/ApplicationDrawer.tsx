@@ -4,7 +4,7 @@ import { XIcon } from "@heroicons/react/outline"
 import { formatDate } from "app/core/utils/formatDate"
 import getStatusColor from "app/utils/getStatusColor"
 
-const ApplicationSlider = ({ isOpen, setIsOpen, application }) => {
+const ApplicationDrawer = ({ isOpen, setIsOpen, application }) => {
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog as="div" className="fixed inset-0 overflow-hidden" onClose={setIsOpen}>
@@ -115,4 +115,4 @@ const ApplicationSlider = ({ isOpen, setIsOpen, application }) => {
   )
 }
 
-export default ApplicationSlider
+export default ApplicationDrawer
