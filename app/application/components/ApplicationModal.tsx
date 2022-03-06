@@ -73,7 +73,7 @@ const ApplicationModal = ({
                 </div>
                 <div className="flex flex-col col-span-2">
                   <label htmlFor="entryDescription" className="text-marble-white">
-                    {initiative.data.applicationQuestion || "Why this initiative?"}
+                    {initiative.data.applicationQuestion || "Why this initiative"}?
                   </label>
                   <Field
                     component="input"
