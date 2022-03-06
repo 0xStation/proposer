@@ -126,7 +126,7 @@ const Project: BlitzPage = () => {
         <ApplicationModal
           isOpen={applicationModalOpen}
           setIsOpen={setApplicationModalOpen}
-          initiativeId={initiative.id}
+          initiative={initiative}
         />
       )}
       {selectedContributorToView && (
