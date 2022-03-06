@@ -30,7 +30,7 @@ const TicketWrapper = ({ activeUser, tokenBalance, terminal, endorsementsSymbol 
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Dialog.Overlay className="fixed inset-0 bg-tunnel-black opacity-70" />
+              <Dialog.Overlay className="fixed inset-0 bg-tunnel-black opacity-80" />
             </Transition.Child>
 
             {/* This element is to trick the browser into centering the modal contents. */}
@@ -58,7 +58,7 @@ const TicketWrapper = ({ activeUser, tokenBalance, terminal, endorsementsSymbol 
                           src={ticket?.data?.ticketImageUrl}
                         />
                       ) : (
-                        <p className="h-[400px] w-[240px] border border-concrete rounded-2xl border-dashed text-concrete text-3xl text-center flex flex-col justify-center align-middle mx-auto bg-tunnel-black">
+                        <p className="h-[400px] w-[240px] border border-marble-white rounded-2xl border-dashed text-marble-white text-3xl text-center flex flex-col justify-center align-middle mx-auto bg-tunnel-black">
                           FUTURE CONTRIBUTOR ID GOES HERE
                         </p>
                       )}

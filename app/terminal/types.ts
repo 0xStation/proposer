@@ -1,12 +1,12 @@
+import { Role } from "app/role/types"
+
 export type TerminalMetadata = {
   name: string
   description: string
   pfpURL: string
   coverURL?: string
   permissions: {
-    invite: {
-      rolesAllowedToInvite: number[]
-    }
+    invite: any
   }
   contracts: {
     addresses: {
@@ -28,4 +28,5 @@ export type Terminal = {
   ticketAddress: string
   handle: string
   data: TerminalMetadata
+  roles: Role[]
 }
