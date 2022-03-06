@@ -32,7 +32,7 @@ const Map = () => {
 
   return (
     <div className="px-4">
-      <Popover className="relative">
+      <Popover className="sm:relative">
         {({ open }) => (
           <>
             <Popover.Button className="text-marble-white group rounded-md h-[28px] inline-flex items-center text-base font-medium">
@@ -48,8 +48,8 @@ const Map = () => {
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Popover.Panel className="absolute z-10 w-[450px] px-4 mt-[9px] right-0 sm:px-0 lg:max-w-3xl">
-                <div className="relative right-[-17px] bg-tunnel-black border border-marble-white p-4 h-full">
+              <Popover.Panel className="absolute z-10 w-[100vw] sm:w-[450px] mt-[9px] right-0 lg:max-w-3xl">
+                <div className="relative sm:right-[-17px] bg-tunnel-black border border-marble-white p-4 h-full">
                   {!results ? (
                     "loading"
                   ) : (

@@ -4,4 +4,9 @@ export type Ticket = {
   roleLocalId: number
   joinedAt: Date
   active: boolean
+  data: TicketMetaData
+}
+
+export type TicketMetaData = {
+  ticketImageUrl: string
 }

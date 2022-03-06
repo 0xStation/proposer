@@ -143,7 +143,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
           <div className="flex flex-col mt-8">
             <div className="flex-auto text-marble-white font-bold">Initiatives</div>
             {initiatives && initiatives.length ? (
-              <div className="mt-2 grid grid-cols-2 gap-4">
+              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 sm:gap-4">
                 {initiatives.map((initiative) => {
                   return (
                     <Link

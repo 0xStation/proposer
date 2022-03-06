@@ -1,16 +1,10 @@
 import db from "../../index"
 import { RoleMetadata } from "app/role/types"
+import { roleIds } from "./1-terminals"
 
 type RoleSeed = {
   localId: number
   data: RoleMetadata
-}
-
-export const roleIds = {
-  staff: 1,
-  dailyCommuter: 2,
-  weekendCommuter: 3,
-  visitor: 4,
 }
 
 const staff: RoleSeed = {
