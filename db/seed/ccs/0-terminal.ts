@@ -44,7 +44,6 @@ const ccs: TerminalSeed = {
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/ccs.jpeg",
     permissions: {
       invite: {
-        rolesAllowedToInvite: [1, 2],
         [roleIds.staff]: [
           roleIds.staff,
           roleIds.teamLead,
