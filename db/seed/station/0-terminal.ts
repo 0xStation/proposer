@@ -45,7 +45,6 @@ const station: TerminalSeed = {
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/station.jpeg",
     permissions: {
       invite: {
-        rolesAllowedToInvite: [1], // local id for STAFF
         [roleIds.staff]: [
           roleIds.staff,
           roleIds.dailyCommuter,
