@@ -24,9 +24,15 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
                 Currently, the Station network only supports Rinkeby. Please switch your connection
                 to the Rinkeby chain. If you are having trouble connecting to Rinkeby, check out our
                 FAQ{" "}
-                <a href="https://0xstation.notion.site/How-to-install-Rinkeby-ab71688f687c44faab6524daf19ab73a">
-                  here.
+                <a
+                  target="_blank"
+                  className="text-magic-mint"
+                  href="https://0xstation.notion.site/How-to-install-Rinkeby-ab71688f687c44faab6524daf19ab73a"
+                  rel="noreferrer"
+                >
+                  here
                 </a>
+                .
               </p>
 
               {switchNetwork && (

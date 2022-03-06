@@ -160,7 +160,9 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               id="why questions"
               className="flex-auto flex flex-col text-marble-white space-y-2 mt-2"
             >
-              <div className="font-bold">Why {initiative?.data?.name}?</div>
+              <div className="font-bold">
+                {initiative.data.applicationQuestion || `Why ${initiative?.data?.name}`}?
+              </div>
               <div>
                 <p className="text-marble-white font-normal text-base">
                   {application?.data?.entryDescription || "N/A"}

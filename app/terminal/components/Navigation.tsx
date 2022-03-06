@@ -48,9 +48,9 @@ const Navigation = ({ children }: { children?: any }) => {
       />
       <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] relative">
         <div className="grid gap-0 grid-cols-1 md:grid-cols-3 xl:grid-cols-4 max-w-screen-xl h-full mx-auto">
-          <div className="col-span-1 pl-4 text-2xl border-concrete border-b pb-12 md:border-b-0 md:border-r md:pr-6 h-full">
+          <div className="col-span-1 pl-4 text-2xl border-concrete border-b pb-12 md:border-b-0 md:border-r pr-4 md:pr-6 h-full">
             <div className="flex items-center mt-12">
-              <div className="flex-2/5 mr-4">
+              <div className="mr-4 max-w-[52px]">
                 <img
                   src={terminal.data.pfpURL}
                   alt="PFP"
@@ -105,6 +105,7 @@ const Navigation = ({ children }: { children?: any }) => {
         </div>
         {activeUser && (
           <TicketWrapper
+            terminal={terminal}
             activeUser={activeUser}
             tokenBalance={tokenBalance}
             endorsementsSymbol={terminal.data.contracts.symbols.endorsements}

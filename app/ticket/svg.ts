@@ -23,14 +23,14 @@ const GRADIENTS = ["orange-purple", "blue-green", "green-red"]
  */
 export const genSVG = (props: SVGProps) => {
   if (props === undefined) {
-    return
+    return "no props"
   }
 
   if (props.role === "VISITOR") {
     return stitchSVG(props, VISITOR_ARRANGEMENT)
   }
 
-  if (props.role === "COMMUTER") {
+  if (props.role === "DAILY COMMUTER" || props.role === "WEEKEND COMMUTER") {
     return stitchSVG(props, CONTRIBUTOR_ARRANGEMENT)
   }
 
@@ -164,7 +164,9 @@ const genBase = (props: BaseProps) => {
   <g clip-path="url(#corners)">
     <rect fill="white" stroke="rgba(255,255,255,0.2)" x="0px" y="0px" rx="24" ry="24" width="240px" height="400px" />
     ${
-      (props.role === "COMMUTER" || props.role === "STAFF") &&
+      (props.role === "DAILY COMMUTER" ||
+        props.role === "WEEKEND COMMUTER" ||
+        props.role === "STAFF") &&
       `<rect fill="url(#shine)" stroke="rgba(255,255,255,0.2)" x="0px" y="0px" rx="24" ry="24" width="240px" height="400px" />`
     }
     ${
