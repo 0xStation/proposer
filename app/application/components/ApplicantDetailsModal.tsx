@@ -161,7 +161,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               className="flex-auto flex flex-col text-marble-white space-y-2 mt-2"
             >
               <div className="font-bold">
-                {initiative.data.prompt || `Why ${initiative?.data?.name}`}?
+                {initiative.data.applicationQuestion || `Why ${initiative?.data?.name}`}?
               </div>
               <div>
                 <p className="text-marble-white font-normal text-base">
