@@ -110,6 +110,9 @@ const aaron: ContributorSeed = {
   address: "0x48ff4d06Ceb0d69C958EE7856A2629Bb568Cffdc",
   joinedAt: new Date("2022-02-01"),
   role: roleIds.teamLead,
+  data: {
+    ticketImageUrl: "https://station-images.nyc3.digitaloceanspaces.com/Semester2.gif",
+  },
 }
 
 export const ccsContributors = {

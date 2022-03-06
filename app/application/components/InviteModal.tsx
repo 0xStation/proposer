@@ -26,14 +26,14 @@ export const InviteModal = ({
 
   const [invitePermissionedRoleLocalIds] = useQuery(
     getInvitePermissions,
-    { terminalId: currentInitiative?.terminalId || 0, inviterId: activeUser?.id },
+    { terminalId: currentInitiative?.terminalId, inviterId: activeUser?.id },
     { enabled: !!(currentInitiative?.terminalId && activeUser?.id), suspense: false }
   )
 
   const [terminal] = useQuery(
     getTerminalById,
-    { id: currentInitiative?.terminalId || 0 },
-    { suspense: false }
+    { id: currentInitiative?.terminalId },
+    { enabled: !!currentInitiative?.terminalId, suspense: false }
   )
 
   const handleInviteClick = async () => {
