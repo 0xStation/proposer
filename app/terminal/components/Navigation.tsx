@@ -54,7 +54,7 @@ const Navigation = ({ children }: { children?: any }) => {
                 <img
                   src={terminal.data.pfpURL}
                   alt="PFP"
-                  className="h-[52px] min-w-[52px] border border-marble-white rounded-full"
+                  className="h-[52px] min-w-[52px] border border-marble-white rounded"
                 />
               </div>
               <div className="flex flex-col">

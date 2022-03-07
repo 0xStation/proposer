@@ -25,7 +25,7 @@ const ProfileHome: BlitzPage = () => {
     if (router.isReady) {
       router.push("/")
     } else {
-      return <></>
+      return <div></div>
     }
   }
 
@@ -154,9 +154,10 @@ const ProfileHome: BlitzPage = () => {
                 activeUser?.tickets.length === 0 &&
                 subpage === "TERMINALS")) && (
               <div className="w-full h-full flex items-center flex-col justify-center mt-[15%]">
-                <p className="text-marble-white text-2xl font-bold">Join initiatives</p>
-                <p className="mt-2 text-marble-white text-base w-[300px] text-center">
-                  Explore Terminals, submit interests to initiatives, and start contributing.
+                <p className="text-marble-white text-2xl font-bold">Explore Terminals</p>
+                <p className="mt-2 text-marble-white text-base w-[400px] text-center">
+                  Check out different DAO communities, submit interests to initiatives, and start
+                  contributing.
                 </p>
                 <Button
                   className="cursor-pointer mt-4 w-[300px] py-1"

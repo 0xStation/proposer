@@ -66,13 +66,9 @@ const ExploreView = ({ className = "" }) => {
                 >
                   <div className="flex flex-col items-center cursor-pointer w-16">
                     <img
-                      className="border border-marble-white h-16 w-16 rounded-full bg-concrete"
+                      className="border border-marble-white h-16 w-16 rounded bg-concrete"
                       src={terminal.data.pfpURL}
                     />
-
-                    <span className="text-marble-white text-base mt-1 text-center whitespace-nowrap text-ellipsis overflow-hidden w-full">
-                      {terminal.data.name}
-                    </span>
                   </div>
                 </Link>
               )

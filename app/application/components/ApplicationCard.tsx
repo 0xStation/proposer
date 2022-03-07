@@ -2,6 +2,9 @@ import getStatusColor from "app/utils/getStatusColor"
 
 // I don't really love this name because it only feels like an application before they are accepted
 const ApplicationCard = ({ application, onClick }) => {
+  const { terminal } = application?.initiative
+  console.log(application)
+
   return (
     <button
       role="button"
@@ -22,12 +25,16 @@ const ApplicationCard = ({ application, onClick }) => {
         {application.initiative.data.oneLiner}
       </p>
       <div className="flex-auto flex justify-between mt-12 w-full">
-        <span className="h-6 w-6 rounded-full bg-concrete border border-marble-white block place-content-start"></span>
+        <img
+          src={terminal.data.pfpURL}
+          alt={`Terminal ${terminal && terminal?.data?.name} PFP`}
+          className="h-8 w-8 rounded border border-marble-white block place-content-start"
+        />
         {application.status === "APPLIED" ? (
           <div className="place-content-end flex flex-row space-x-[-5px]">
-            <span className="h-6 w-6 rounded-full bg-concrete border border-marble-white block"></span>
-            <span className="h-6 w-6 rounded-full bg-concrete border border-marble-white block"></span>
-            <span className="h-6 w-6 rounded-full bg-concrete border border-marble-white block"></span>
+            <span className="h-8 w-8 rounded-full bg-concrete border border-marble-white block"></span>
+            <span className="h-8 w-8 rounded-full bg-concrete border border-marble-white block"></span>
+            <span className="h-8 w-8 rounded-full bg-concrete border border-marble-white block"></span>
           </div>
         ) : (
           <div className="text-marble-white">12 POINTS</div>
