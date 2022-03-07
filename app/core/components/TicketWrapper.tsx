@@ -1,8 +1,16 @@
 import { useState } from "react"
+import { useQuery } from "blitz"
 import { Dialog, Transition } from "@headlessui/react"
+import getTicket from "app/ticket/queries/getTicket"
 import { Fragment } from "react"
 
-const TicketWrapper = ({ activeUser, tokenBalance, endorsementsSymbol }) => {
+const TicketWrapper = ({ activeUser, tokenBalance, terminal, endorsementsSymbol }) => {
+  const [ticket] = useQuery(
+    getTicket,
+    { terminalId: terminal.id, accountId: activeUser.id },
+    { suspense: false }
+  )
+
   const [modalOpen, setModalOpen] = useState(false)
   return (
     <>
@@ -22,7 +30,7 @@ const TicketWrapper = ({ activeUser, tokenBalance, endorsementsSymbol }) => {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Dialog.Overlay className="fixed inset-0 bg-marble-white opacity-90" />
+              <Dialog.Overlay className="fixed inset-0 bg-tunnel-black opacity-80" />
             </Transition.Child>
 
             {/* This element is to trick the browser into centering the modal contents. */}
@@ -39,23 +47,43 @@ const TicketWrapper = ({ activeUser, tokenBalance, endorsementsSymbol }) => {
               leaveTo="opacity-0 scale-95"
             >
               <div
-                className={`inline-block w-full max-w-[240px] my-8 overflow-hidden text-left align-middle transition-all transform`}
+                className={`inline-block w-full max-w-[1000px] my-8 overflow-hidden text-left align-middle transition-all transform`}
               >
-                <div className="flex flex-col justify-center">
-                  <div>
-                    {activeUser?.data.ticketImage ? (
-                      <img className="h-[400px] mx-auto block" src={activeUser?.data.ticketImage} />
-                    ) : (
-                      <p className="h-[400px] w-[240px] border border-concrete rounded-2xl border-dashed text-concrete text-3xl text-center flex flex-col justify-center align-middle mx-auto">
-                        FUTURE CONTRIBUTOR ID GOES HERE
-                      </p>
-                    )}
+                <div className="flex flex-row space-x-24 items-center">
+                  <div className="flex flex-col justify-center">
+                    <div className="min-w-[400px]">
+                      {ticket?.data?.ticketImageUrl ? (
+                        <img
+                          className="h-[400px] mx-auto block"
+                          src={ticket?.data?.ticketImageUrl}
+                        />
+                      ) : (
+                        <p className="h-[400px] w-[240px] border border-marble-white rounded-2xl border-dashed text-marble-white text-3xl text-center flex flex-col justify-center align-middle mx-auto bg-tunnel-black">
+                          FUTURE CONTRIBUTOR ID GOES HERE
+                        </p>
+                      )}
+                    </div>
+                    <div className="w-full mt-2 justify-between px-1 text-base flex mx-auto">
+                      <span className="text-marble-white font-bold mr-2">Balance</span>
+                      <span className="text-marble-white font-light">
+                        {tokenBalance} {endorsementsSymbol}
+                      </span>
+                    </div>
                   </div>
-                  <div className="mt-2 justify-between px-1 text-base flex">
-                    <span className="text-tunnel-black font-bold mr-2">Balance</span>
-                    <span className="text-tunnel-black font-light">
-                      {tokenBalance} {endorsementsSymbol}
-                    </span>
+                  <div className="flex-1">
+                    <p className="text-marble-white text-2xl">
+                      <span className="text-neon-blue">
+                        {terminal.data.contracts.symbols.endorsements}
+                      </span>{" "}
+                      gives you the power to signal your support for prospective contributors and
+                      curate the <span className="text-neon-blue">{terminal.data.name}</span>{" "}
+                      community.{" "}
+                    </p>
+                    <p className="mt-8 text-marble-white text-2xl">
+                      The balance is granted based on your role in the organization. It gets
+                      replenished when <span className="text-neon-blue">{terminal.data.name}</span>{" "}
+                      open up more initiatives for submissions.
+                    </p>
                   </div>
                 </div>
               </div>

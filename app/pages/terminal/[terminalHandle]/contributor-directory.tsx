@@ -101,7 +101,7 @@ const TerminalContributorsPage: BlitzPage = () => {
         />
       )}
       <div className="flex flex-col space-y-10">
-        <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm">
+        <div className="flex-auto flex-wrap text-marble-white text-sm space-y-3 mt-[-0.75rem]">
           {!roles ? (
             <div className="overflow-x-scroll whitespace-nowrap space-x-3 motion-safe:animate-pulse">
               <div className="inline-block rounded-full h-[30px] w-[200px] m-0">
