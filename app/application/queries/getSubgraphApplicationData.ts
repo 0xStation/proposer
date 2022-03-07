@@ -12,7 +12,7 @@ const GetSubgraphApplicationData = z.object({
   address: z.string(),
 })
 
-export default async function getApplicationsByInitiative(
+export default async function getSubgraphApplicationData(
   input: z.infer<typeof GetSubgraphApplicationData>
 ) {
   const data = GetSubgraphApplicationData.parse(input)
