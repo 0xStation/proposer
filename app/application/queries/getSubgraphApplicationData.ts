@@ -1,0 +1,122 @@
+import db from "db"
+import * as z from "zod"
+import { request, gql } from "graphql-request"
+import { getWalletString } from "app/utils/getWalletString"
+import { ApplicationReferral, ApplicationSubgraphData } from "../types"
+import { Role } from "app/role/types"
+
+const GetSubgraphApplicationData = z.object({
+  referralGraphAddress: z.string(),
+  initiativeLocalId: z.number(),
+  terminalId: z.number(),
+  address: z.string(),
+})
+
+export default async function getApplicationsByInitiative(
+  input: z.infer<typeof GetSubgraphApplicationData>
+) {
+  const data = GetSubgraphApplicationData.parse(input)
+  const { referralGraphAddress, initiativeLocalId, terminalId, address } = data
+
+  //////
+  // Query subgraph for initiative-level referral data
+  //////
+
+  let queryWaitingRoom = gql`
+    {
+      waitingRoomInitiative(id: "${referralGraphAddress.toLowerCase()}:${initiativeLocalId}") {
+        localId
+        applicants(where: {address: "${address.toLowerCase()}"}) {
+          address
+          points
+          referrals {
+            from
+            amount
+          }
+        }
+      }
+    }
+  `
+  let subgraphPayload = await request(
+    "https://api.thegraph.com/subgraphs/name/0xstation/station",
+    queryWaitingRoom
+  )
+
+  if (
+    !subgraphPayload?.waitingRoomInitiative ||
+    !Array.isArray(subgraphPayload?.waitingRoomInitiative?.applicants) ||
+    !subgraphPayload?.waitingRoomInitiative?.applicants?.length
+  ) {
+    console.warn(
+      `Warning: no subgraph data found for ${address}, payload returned with ${subgraphPayload}`
+    )
+    return {}
+  }
+
+  //////
+  // Construct objects for applicants and referrers to merge with db data
+  //////
+  const applicantData = subgraphPayload.waitingRoomInitiative.applicants[0]
+
+  // per-referrer store for account metadata
+  const referrers = {}
+  applicantData?.referrals?.forEach((referral) => {
+    // default data, will be overriden if account with address r.from exists later
+    referrers[referral.from.toLowerCase()] = {
+      address: referral.from,
+      role: "N/A",
+      data: {
+        name: getWalletString(referral.from),
+        wallet: getWalletString(referral.from),
+        address: referral.from,
+        pfpURL: "",
+        verified: false,
+      },
+    }
+  })
+
+  //////
+  // Merge db account data with subgraph referrers
+  //////
+
+  if (Object.keys(referrers).length > 0) {
+    // fetch metadata from accounts matching referrer addresses
+    const accounts = await db.account.findMany({
+      where: { address: { in: Object.keys(referrers), mode: "insensitive" } },
+      // addresses come from the subgraph lowered, but database may or may not lower so insensitive filtering used
+      select: {
+        address: true,
+        data: true,
+        tickets: {
+          where: {
+            terminalId: terminalId,
+          },
+          select: {
+            role: true,
+          },
+        },
+      },
+    })
+    // update per-referrer store with account metadata
+    accounts.forEach((a) => {
+      referrers[a.address.toLowerCase()].address = a.address
+      referrers[a.address.toLowerCase()].data = a.data
+      referrers[a.address.toLowerCase()].role = (a.tickets[0]?.role as Role)?.data.value || "N/A"
+    })
+  }
+
+  return {
+    points: parseFloat(applicantData?.points || "0"),
+    referrals:
+      (applicantData?.referrals.map((referral) => {
+        return {
+          amount: referral.amount,
+          from: {
+            address: referrers[referral.from.toLowerCase()].address,
+            data: referrers[referral.from.toLowerCase()].data,
+            role: referrers[referral.from.toLowerCase()].role,
+          },
+        }
+      }) as ApplicationReferral[]) || [],
+  } as ApplicationSubgraphData
+}
