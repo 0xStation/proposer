@@ -20,11 +20,36 @@ import { InviteModal } from "app/application/components/InviteModal"
 import getTicket from "app/ticket/queries/getTicket"
 import { Ticket } from "app/ticket/types"
 
+const skeletonLoadingScreen = (
+  <div className="flex flex-col space-y-10">
+    {/* skeleton loader pills */}
+    <div className="overflow-x-scroll whitespace-nowrap space-x-3 motion-safe:animate-pulse">
+      <div className="inline-block rounded-full border-marble-white bg-gradient-to-r from-concrete to-wet-concrete h-[30px] w-[200px] m-0">
+        <span></span>
+      </div>
+      <div className="inline-block rounded-full border-marble-white bg-gradient-to-r from-concrete to-wet-concrete h-[30px] w-[150px] m-0">
+        <span></span>
+      </div>
+    </div>
+    <div className="flex-auto text-marble-white">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from(Array(9)).map((idx) => (
+          <div
+            key={idx}
+            className="border border-concrete bg-wet-concrete shadow border-solid h-full motion-safe:animate-pulse"
+          >
+            <div className="bg-gradient-to-r from-concrete to-wet-concrete h-[260px]"></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+)
+
 const TerminalWaitingPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const { directedFrom } = useRouterQuery()
-  const [selectedInitiativeLocalId, setSelectedInitiativeLocalId] = useState<number>()
-  const [applications, setApplications] = useState<Application[]>([])
+  const [selectedInitiativeLocalId, setSelectedInitiativeLocalId] = useState<number | null>()
   const [isRedirectModalOpen, setIsRedirectModalOpen] = useState(false)
   const [isEndorseModalOpen, setIsEndorseModalOpen] = useState(false)
   const [isEndorseSuccessModalOpen, setIsEndorseSuccessModalOpen] = useState(false)
@@ -34,7 +59,8 @@ const TerminalWaitingPage: BlitzPage = () => {
   const activeUser: Account | null = useStore((state) => state.activeUser)
   const [roleOfActiveUser, setRoleOfActiveUser] = useState<Role | null>()
   const [refreshApplications, setRefreshApplications] = useState<boolean>(false)
-  const [firstApplicationRender, setFirstApplicationRender] = useState<boolean>(true)
+  const [initialPageLoading, setInitialPageLoading] = useState<boolean>(true)
+  const [isApplicantOpen, setIsApplicantOpen] = useState(false)
 
   useEffect(() => {
     setIsRedirectModalOpen(directedFrom === "application")
@@ -47,19 +73,40 @@ const TerminalWaitingPage: BlitzPage = () => {
     {
       enabled: !!terminal?.id,
       suspense: false,
+      onSuccess: (initiatives) => {
+        if (Array.isArray(initiatives) && initiatives.length) {
+          const firstInitiative = initiatives.find((init) => init.applicationCount !== 0)
+          setSelectedInitiativeLocalId(firstInitiative?.localId)
+        }
+      },
     }
   )
-
-  useEffect(() => {
-    if (firstApplicationRender && Array.isArray(initiatives) && initiatives.length) {
-      const firstInitiative = initiatives.find((init) => init.applicationCount !== 0)
-      setSelectedInitiativeLocalId(firstInitiative?.localId)
-    }
-  }, [initiatives])
 
   const currentInitiative = useMemo(
     () => initiatives?.find((initiative) => initiative.localId === selectedInitiativeLocalId),
     [selectedInitiativeLocalId]
+  )
+
+  const [applications, { isLoading: applicationsLoading }] = useQuery(
+    getApplicationsByInitiative,
+    {
+      referralGraphAddress: terminal?.data.contracts.addresses.referrals as string,
+      initiativeLocalId: selectedInitiativeLocalId as number,
+      initiativeId: currentInitiative?.id as number,
+      terminalId: terminal?.id as number,
+    },
+    {
+      suspense: false,
+      enabled:
+        (!!terminal?.data.contracts.addresses.referrals &&
+          !!selectedInitiativeLocalId &&
+          !!currentInitiative?.id &&
+          !!terminal?.id) ||
+        refreshApplications,
+      onSuccess: () => {
+        setInitialPageLoading(false)
+      },
+    }
   )
 
   useEffect(() => {
@@ -67,7 +114,7 @@ const TerminalWaitingPage: BlitzPage = () => {
       ;(async () => {
         const applicantTicket = await invoke(getTicket, {
           terminalId: terminal.id,
-          accountId: selectedApplication?.account?.id as number,
+          accountId: selectedApplication.account.id as number,
         })
         setSelectedApplicantTicket(applicantTicket)
       })()
@@ -75,33 +122,16 @@ const TerminalWaitingPage: BlitzPage = () => {
   }, [selectedApplication])
 
   useEffect(() => {
-    if (activeUser?.id) {
+    if (activeUser?.id && terminal?.id) {
       ;(async () => {
         const role = await invoke(getRoleByAccountTerminal, {
-          terminalId: terminal?.id || 0,
-          accountId: activeUser?.id as number,
+          terminalId: terminal.id,
+          accountId: activeUser.id as number,
         })
         setRoleOfActiveUser(role)
       })()
     }
   }, [activeUser?.id])
-
-  const [isApplicantOpen, setIsApplicantOpen] = useState(false)
-
-  useEffect(() => {
-    if (selectedInitiativeLocalId) {
-      ;(async () => {
-        let applications = await invoke(getApplicationsByInitiative, {
-          referralGraphAddress: terminal?.data.contracts.addresses.referrals,
-          initiativeLocalId: selectedInitiativeLocalId,
-          initiativeId: currentInitiative?.id,
-          terminalId: terminal?.id,
-        })
-        setApplications(applications || [])
-        setFirstApplicationRender(false)
-      })()
-    }
-  }, [selectedInitiativeLocalId, refreshApplications])
 
   const applicationCards = applications?.map((application, idx) => {
     const onApplicantCardClick = () => {
@@ -119,27 +149,12 @@ const TerminalWaitingPage: BlitzPage = () => {
     return <ApplicantCard key={idx} {...applicationCardProps} />
   })
 
-  const noApplicationsView = selectedInitiativeLocalId && (
-    <div>There are no active applications for this initiative.</div>
-  )
-
   const applicationsView =
-    !applications || !applications.length ? noApplicationsView : applicationCards
-
-  const initiativePills = initiatives
-    // filter out initiatives that don't have applications
-    ?.filter((initiative) => initiative?.applicationCount)
-    .map((initiative, idx) => {
-      return (
-        <Pill
-          key={idx}
-          active={initiative.localId === selectedInitiativeLocalId}
-          onClick={() => setSelectedInitiativeLocalId(initiative.localId)}
-        >
-          {`${initiative.data?.name?.toUpperCase()} (${initiative.applicationCount})`}
-        </Pill>
-      )
-    })
+    !applications || !applications.length ? (
+      <div>There are no active applications for this initiative.</div>
+    ) : (
+      applicationCards
+    )
 
   const waitingRoomView = (
     <>
@@ -162,7 +177,6 @@ const TerminalWaitingPage: BlitzPage = () => {
           </button>
         </div>
       </Modal>
-
       {selectedApplication && currentInitiative && (
         <ApplicantDetailsModal
           application={selectedApplication}
@@ -199,42 +213,42 @@ const TerminalWaitingPage: BlitzPage = () => {
         setRefreshApplications={setRefreshApplications}
       />
       <div className="flex flex-col space-y-10">
-        {!initiatives ? (
-          // skeleton loader pills
-          <div className="overflow-x-scroll whitespace-nowrap space-x-3 motion-safe:animate-pulse">
-            <div className="inline-block rounded-full border-marble-white bg-gradient-to-r from-concrete to-wet-concrete h-[30px] w-[200px] m-0">
-              <span></span>
-            </div>
-            <div className="inline-block rounded-full border-marble-white bg-gradient-to-r from-concrete to-wet-concrete h-[30px] w-[150px] m-0">
-              <span></span>
-            </div>
-          </div>
-        ) : (
-          initiatives.filter((initiative) => initiative?.applicationCount).length && (
-            <div className="text-marble-white text-sm overflow-x-scroll whitespace-nowrap space-x-3">
-              {initiativePills}
-            </div>
+        {initiatives ? (
+          initiatives?.filter((initiative) => initiative?.applicationCount).length && (
+            <>
+              <div className="text-marble-white text-sm overflow-x-scroll whitespace-nowrap space-x-3">
+                {initiatives
+                  // filter out initiatives that don't have applications
+                  ?.filter((initiative) => initiative?.applicationCount)
+                  .map((initiative, idx) => {
+                    return (
+                      <Pill
+                        key={idx}
+                        active={initiative.localId === selectedInitiativeLocalId}
+                        onClick={() => setSelectedInitiativeLocalId(initiative.localId)}
+                      >
+                        {`${initiative.data?.name?.toUpperCase()} (${initiative.applicationCount})`}
+                      </Pill>
+                    )
+                  })}
+              </div>
+              <div className="flex-auto text-marble-white">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">{applicationsView}</div>
+              </div>
+            </>
           )
+        ) : (
+          <div>There are currently no initatives in the Waiting Room</div>
         )}
-        <div className="flex-auto text-marble-white">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {firstApplicationRender
-              ? Array.from(Array(9)).map((idx) => (
-                  <div
-                    key={idx}
-                    className="border border-concrete bg-wet-concrete shadow border-solid h-full motion-safe:animate-pulse"
-                  >
-                    <div className="bg-gradient-to-r from-concrete to-wet-concrete h-[260px]"></div>
-                  </div>
-                ))
-              : applicationsView}
-          </div>
-        </div>
       </div>
     </>
   )
 
-  return <TerminalNavigation>{waitingRoomView}</TerminalNavigation>
+  return (
+    <TerminalNavigation>
+      {initialPageLoading || applicationsLoading ? skeletonLoadingScreen : waitingRoomView}
+    </TerminalNavigation>
+  )
 }
 
 TerminalWaitingPage.suppressFirstRenderFlicker = true
