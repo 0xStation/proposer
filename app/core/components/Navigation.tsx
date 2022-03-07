@@ -124,7 +124,7 @@ const Navigation = () => {
               className="p-4 pr-0 uppercase text-magic-mint text-lg border-l border-l-concrete cursor-pointer"
               onClick={() => toggleWalletModal(true)}
             >
-              Enter Station
+              Connect Wallet
             </span>
           )}
         </div>
