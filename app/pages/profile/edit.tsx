@@ -6,7 +6,7 @@ import { Account } from "app/account/types"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
 const EditProfile: BlitzPage = () => {
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
 
   const [account, { isLoading }] = useQuery(
     getAccountByAddress,

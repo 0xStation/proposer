@@ -7,7 +7,7 @@ import { Account } from "app/account/types"
 import usePagination from "app/core/hooks/usePagination"
 
 const ExploreView = ({ className = "" }) => {
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
   const [contributorBoolean, setContributorBoolean] = useState(false)
   const [page, setPage] = useState(0)
   const [terminals] = useQuery(getTerminals, {}, { suspense: false })

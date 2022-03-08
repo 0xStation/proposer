@@ -21,8 +21,6 @@ const ProfileHome: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
 
-  console.log(activeUser)
-
   if (activeUser === null) {
     if (router.isReady) {
       router.push("/")

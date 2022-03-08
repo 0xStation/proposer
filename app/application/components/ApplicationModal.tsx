@@ -23,7 +23,7 @@ const ApplicationModal = ({
     },
   })
 
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
 
   if (!activeUser) {
     return (

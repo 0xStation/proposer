@@ -11,7 +11,7 @@ const CreateProfile: BlitzPage = () => {
     fetchEns: true,
   })
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
 
   if (!address) {
     return (

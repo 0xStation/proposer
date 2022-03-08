@@ -17,7 +17,7 @@ const Navigation = ({ children }: { children?: any }) => {
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
   const router = useRouter()
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
 
   const [{ data: accountData }] = useAccount({
     fetchEns: true,

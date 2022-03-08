@@ -31,7 +31,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
   const [selectedApplicantTicket, setSelectedApplicantTicket] = useState<Ticket | null>()
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
   const [roleOfActiveUser, setRoleOfActiveUser] = useState<Role | null>()
   const [refreshApplications, setRefreshApplications] = useState<boolean>(false)
 

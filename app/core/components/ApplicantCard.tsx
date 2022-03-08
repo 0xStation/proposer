@@ -24,7 +24,7 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
   const { account: applicant, createdAt, points, referrals } = application
   const pointsSymbol = terminal?.data.contracts.symbols.points
 
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
     terminal?.data.contracts.addresses.endorsements
   )

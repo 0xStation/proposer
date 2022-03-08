@@ -23,7 +23,7 @@ import Button from "app/core/components/Button"
 const Project: BlitzPage = () => {
   const [hasApplied, setHasApplied] = useState(false)
   const [{ data: accountData }] = useAccount()
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const toggleAccountModal = useStore((state) => state.toggleAccountModal)
   let [applicationModalOpen, setApplicationModalOpen] = useState(false)
