@@ -2,16 +2,16 @@ import create from "zustand"
 import { Account } from "../../account/types"
 
 interface StoreState {
-  activeUser: Account | null
+  activeUser: undefined | Account | null
   walletModalOpen: boolean
   accountModalOpen: boolean
   toggleWalletModal: (boolean) => void
   toggleAccountModal: (boolean) => void
-  setActiveUser: (user: Account | null) => void
+  setActiveUser: (user: undefined | Account | null) => void
 }
 
 const useStore = create<StoreState>((set) => ({
-  activeUser: null,
+  activeUser: undefined, // undefined on start, Account if found, null if not found
   walletModalOpen: false,
   accountModalOpen: false,
   toggleWalletModal: (state) => {

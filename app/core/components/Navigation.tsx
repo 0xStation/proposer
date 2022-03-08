@@ -38,8 +38,8 @@ const Navigation = () => {
 
   useEffect(() => {
     if (address) {
-      setTimeout(() => getUserAccount(address), 500)
-    } else {
+      getUserAccount(address)
+    } else if (!localStorage.getItem(LOCAL_STORAGE.CONNECTION)) {
       setActiveUser(null)
     }
   }, [address])

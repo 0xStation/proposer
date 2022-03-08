@@ -55,7 +55,7 @@ const ApplicationDrawer = ({ isOpen, setIsOpen, application }) => {
                         <div className="flex flex-row justify-between items-center mt-4">
                           <div className="flex flex-row items-center">
                             <img
-                              className="h-8 w-8 rounded-full border border-tunnel-white mr-2"
+                              className="h-8 w-8 rounded border border-tunnel-white mr-2"
                               src={application.initiative.terminal.data.pfpURL}
                             />
                             <h3 className="text-marble-white">

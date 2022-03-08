@@ -18,10 +18,12 @@ const ProfileHome: BlitzPage = () => {
   const [sliderOpen, setSliderOpen] = useState(false)
   const [activeApplication, setActiveApplication] = useState()
   const [subpage, setSubpage] = useState<"TERMINALS" | "INITIATIVES">("TERMINALS")
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
 
-  if (!activeUser) {
+  console.log(activeUser)
+
+  if (activeUser === null) {
     if (router.isReady) {
       router.push("/")
     } else {
