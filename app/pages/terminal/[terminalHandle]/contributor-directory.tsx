@@ -17,7 +17,6 @@ const TerminalContributorsPage: BlitzPage = () => {
   const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
   const [selectedContributorToView, setSelectedContributorToView] = useState<Account | null>(null)
   const [selectedRoleLocalId, setRoleLocalId] = useState<number>()
-  const [pageLoading, setPageLoading] = useState<boolean>(true)
 
   const terminalHandle = useParam("terminalHandle") as string
 
@@ -30,10 +29,8 @@ const TerminalContributorsPage: BlitzPage = () => {
       suspense: false,
       onSuccess: (roles) => {
         if (roles && Array.isArray(roles) && roles[0]) {
-          // first role pill is automatically selected
+          // First role pill is automatically selected.
           setRoleLocalId(roles[0].localId)
-        } else {
-          setPageLoading(false)
         }
       },
     }
@@ -48,9 +45,6 @@ const TerminalContributorsPage: BlitzPage = () => {
     {
       suspense: false,
       enabled: !!selectedRoleLocalId && !!terminal?.id,
-      onSuccess: (selectedContributors) => {
-        setPageLoading(false)
-      },
     }
   )
 
@@ -105,30 +99,19 @@ const TerminalContributorsPage: BlitzPage = () => {
       )}
       <div className="flex flex-col space-y-10">
         <div className="flex-auto flex-wrap text-marble-white text-sm space-y-3 mt-[-0.75rem]">
-          {!roles ? (
-            <div className="overflow-x-scroll whitespace-nowrap space-x-3 motion-safe:animate-pulse">
-              <div className="inline-block rounded-full h-[30px] w-[200px] m-0">
-                <span className="border-marble-white bg-gradient-to-r from-concrete to-wet-concrete"></span>
-              </div>
-              <div className="inline-block rounded-full h-[30px] w-[150px] m-0">
-                <span className="border-marble-white bg-gradient-to-r from-concrete to-wet-concrete"></span>
-              </div>
-            </div>
-          ) : (
-            roles.map((role, index) => {
-              return (
-                <Pill
-                  key={index}
-                  active={selectedRoleLocalId == role.localId}
-                  onClick={() => {
-                    setRoleLocalId(role.localId)
-                  }}
-                >
-                  {`${role.data.name} (${role.ticketCount})`}
-                </Pill>
-              )
-            })
-          )}
+          {roles.map((role, index) => {
+            return (
+              <Pill
+                key={index}
+                active={selectedRoleLocalId == role.localId}
+                onClick={() => {
+                  setRoleLocalId(role.localId)
+                }}
+              >
+                {`${role.data.name} (${role.ticketCount})`}
+              </Pill>
+            )
+          })}
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {!selectedContributors || !selectedContributors.length ? (
@@ -150,7 +133,9 @@ const TerminalContributorsPage: BlitzPage = () => {
   )
 
   return (
-    <TerminalNavigation>{pageLoading ? <div></div> : contributorDirectoryView}</TerminalNavigation>
+    <TerminalNavigation>
+      {!Array.isArray(roles) ? <div></div> : contributorDirectoryView}
+    </TerminalNavigation>
   )
 }
 
