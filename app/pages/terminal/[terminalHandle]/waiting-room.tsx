@@ -74,9 +74,14 @@ const TerminalWaitingPage: BlitzPage = () => {
       enabled: !!terminal?.id,
       suspense: false,
       onSuccess: (initiatives) => {
-        if (Array.isArray(initiatives) && initiatives.length) {
+        if (
+          Array.isArray(initiatives) &&
+          initiatives?.filter((initiative) => initiative?.applicationCount).length
+        ) {
           const firstInitiative = initiatives.find((init) => init.applicationCount !== 0)
           setSelectedInitiativeLocalId(firstInitiative?.localId)
+        } else {
+          setInitialPageLoading(false)
         }
       },
     }
@@ -213,32 +218,32 @@ const TerminalWaitingPage: BlitzPage = () => {
         setRefreshApplications={setRefreshApplications}
       />
       <div className="flex flex-col space-y-10">
-        {initiatives ? (
-          initiatives?.filter((initiative) => initiative?.applicationCount).length && (
-            <>
-              <div className="text-marble-white text-sm overflow-x-scroll whitespace-nowrap space-x-3">
-                {initiatives
-                  // filter out initiatives that don't have applications
-                  ?.filter((initiative) => initiative?.applicationCount)
-                  .map((initiative, idx) => {
-                    return (
-                      <Pill
-                        key={idx}
-                        active={initiative.localId === selectedInitiativeLocalId}
-                        onClick={() => setSelectedInitiativeLocalId(initiative.localId)}
-                      >
-                        {`${initiative.data?.name?.toUpperCase()} (${initiative.applicationCount})`}
-                      </Pill>
-                    )
-                  })}
-              </div>
-              <div className="flex-auto text-marble-white">
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">{applicationsView}</div>
-              </div>
-            </>
-          )
+        {initiatives && initiatives?.filter((initiative) => initiative?.applicationCount).length ? (
+          <>
+            <div className="text-marble-white text-sm overflow-x-scroll whitespace-nowrap space-x-3">
+              {initiatives
+                // filter out initiatives that don't have applications
+                ?.filter((initiative) => initiative?.applicationCount)
+                .map((initiative, idx) => {
+                  return (
+                    <Pill
+                      key={idx}
+                      active={initiative.localId === selectedInitiativeLocalId}
+                      onClick={() => setSelectedInitiativeLocalId(initiative.localId)}
+                    >
+                      {`${initiative.data?.name?.toUpperCase()} (${initiative.applicationCount})`}
+                    </Pill>
+                  )
+                })}
+            </div>
+            <div className="flex-auto text-marble-white">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">{applicationsView}</div>
+            </div>
+          </>
         ) : (
-          <div>There are currently no initatives in the Waiting Room</div>
+          <div className="text-marble-white">
+            There are currently no initiatives in the Waiting Room.
+          </div>
         )}
       </div>
     </>
