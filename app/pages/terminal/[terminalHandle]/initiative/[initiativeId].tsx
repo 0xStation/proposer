@@ -200,14 +200,14 @@ const Project: BlitzPage = () => {
                   {initiative &&
                     initiative.data.contributeText?.map?.((item, index) => {
                       return (
-                        <span className="flex flex-col text-base flow-root" key={index}>
-                          {item}
+                        <span className="flex flex-col text-base" key={index}>
+                          <p dangerouslySetInnerHTML={{ __html: item }} />
                         </span>
                       )
                     })}
                 </div>
               </div>
-              <div className="text-marble-white flex grid md:grid-cols-3 gap-12">
+              <div className="text-marble-white grid md:grid-cols-3 gap-12">
                 <div className="space-y-4">
                   <div>
                     <span className="text-2xl">Rewards</span>
