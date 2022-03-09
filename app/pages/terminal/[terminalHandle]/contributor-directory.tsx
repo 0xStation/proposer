@@ -24,9 +24,10 @@ const TerminalContributorsPage: BlitzPage = () => {
 
   const [roles] = useQuery(
     getRolesByTerminal,
-    { terminalId: terminal?.id || 0 },
+    { terminalId: terminal?.id as number },
     {
       suspense: false,
+      enabled: !!terminal?.id,
       onSuccess: (roles) => {
         if (roles && Array.isArray(roles) && roles[0]) {
           // First role pill is automatically selected.
@@ -87,50 +88,51 @@ const TerminalContributorsPage: BlitzPage = () => {
     )
   })
 
-  const contributorDirectoryView = roles ? (
-    <>
-      {selectedContributorToView && (
-        <ContributorDirectoryModal
-          contributor={selectedContributorToView}
-          isOpen={contributorDirectoryModalIsOpen}
-          setIsOpen={setContributorDirectoryModalOpen}
-          terminalId={terminal?.id || 0}
-        />
-      )}
-      <div className="flex flex-col space-y-10">
-        <div className="flex-auto flex-wrap text-marble-white text-sm space-y-3 mt-[-0.75rem]">
-          {roles.map((role, index) => {
-            return (
-              <Pill
-                key={index}
-                active={selectedRoleLocalId == role.localId}
-                onClick={() => {
-                  setRoleLocalId(role.localId)
-                }}
-              >
-                {`${role.data.name} (${role.ticketCount})`}
-              </Pill>
-            )
-          })}
+  const contributorDirectoryView =
+    roles && roles.length ? (
+      <>
+        {selectedContributorToView && (
+          <ContributorDirectoryModal
+            contributor={selectedContributorToView}
+            isOpen={contributorDirectoryModalIsOpen}
+            setIsOpen={setContributorDirectoryModalOpen}
+            terminalId={terminal?.id || 0}
+          />
+        )}
+        <div className="flex flex-col space-y-10">
+          <div className="flex-auto flex-wrap text-marble-white text-sm space-y-3 mt-[-0.75rem]">
+            {roles.map((role, index) => {
+              return (
+                <Pill
+                  key={index}
+                  active={selectedRoleLocalId == role.localId}
+                  onClick={() => {
+                    setRoleLocalId(role.localId)
+                  }}
+                >
+                  {`${role.data.name} (${role.ticketCount})`}
+                </Pill>
+              )
+            })}
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {!selectedContributors || !selectedContributors.length ? (
+              <>
+                {selectedRoleLocalId ? (
+                  <p className="text-marble-white">There are no contributors with this role.</p>
+                ) : (
+                  <p className="text-marble-white">Please select a role to view contributors.</p>
+                )}
+              </>
+            ) : (
+              <>{contributorCards}</>
+            )}
+          </div>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {!selectedContributors || !selectedContributors.length ? (
-            <>
-              {selectedRoleLocalId ? (
-                <div className="text-marble-white">There are no contributors with this role.</div>
-              ) : (
-                <div className="text-marble-white">Please select a role to view contributors.</div>
-              )}
-            </>
-          ) : (
-            <>{contributorCards}</>
-          )}
-        </div>
-      </div>
-    </>
-  ) : (
-    <span className="text-marble-white">This terminal does not have any contributors yet.</span>
-  )
+      </>
+    ) : (
+      <p className="text-marble-white">This terminal does not have any contributors yet.</p>
+    )
 
   return (
     <TerminalNavigation>
