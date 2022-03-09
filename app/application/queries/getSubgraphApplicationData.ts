@@ -16,17 +16,18 @@ export default async function getSubgraphApplicationData(
   input: z.infer<typeof GetSubgraphApplicationData>
 ) {
   const data = GetSubgraphApplicationData.parse(input)
-  const { referralGraphAddress, initiativeLocalId, terminalId, address } = data
 
   //////
   // Query subgraph for initiative-level referral data
   //////
 
-  let queryWaitingRoom = gql`
+  const queryWaitingRoom = gql`
     {
-      waitingRoomInitiative(id: "${referralGraphAddress.toLowerCase()}:${initiativeLocalId}") {
+      waitingRoomInitiative(id: "${data.referralGraphAddress.toLowerCase()}:${
+    data.initiativeLocalId
+  }") {
         localId
-        applicants(where: {address: "${address.toLowerCase()}"}) {
+        applicants(where: {address: "${data.address.toLowerCase()}"}) {
           address
           points
           referrals {
@@ -37,7 +38,7 @@ export default async function getSubgraphApplicationData(
       }
     }
   `
-  let subgraphPayload = await request(
+  const subgraphPayload = await request(
     "https://api.thegraph.com/subgraphs/name/0xstation/station",
     queryWaitingRoom
   )
@@ -48,7 +49,7 @@ export default async function getSubgraphApplicationData(
     !subgraphPayload?.waitingRoomInitiative?.applicants?.length
   ) {
     console.warn(
-      `Warning: no subgraph data found for ${address}, payload returned with ${subgraphPayload}`
+      `Warning: no subgraph data found for ${data.address}, payload returned with ${subgraphPayload}`
     )
     return {}
   }
@@ -89,7 +90,7 @@ export default async function getSubgraphApplicationData(
         data: true,
         tickets: {
           where: {
-            terminalId: terminalId,
+            terminalId: data.terminalId,
           },
           select: {
             role: true,
@@ -100,8 +101,8 @@ export default async function getSubgraphApplicationData(
     // update per-referrer store with account metadata
     accounts.forEach((a) => {
       referrers[a.address.toLowerCase()].address = a.address
-      referrers[a.address.toLowerCase()].data = a.data
       referrers[a.address.toLowerCase()].role = (a.tickets[0]?.role as Role)?.data.value || "N/A"
+      referrers[a.address.toLowerCase()].data = a.data
     })
   }
 
@@ -111,11 +112,7 @@ export default async function getSubgraphApplicationData(
       (applicantData?.referrals.map((referral) => {
         return {
           amount: referral.amount,
-          from: {
-            address: referrers[referral.from.toLowerCase()].address,
-            data: referrers[referral.from.toLowerCase()].data,
-            role: referrers[referral.from.toLowerCase()].role,
-          },
+          from: JSON.parse(JSON.stringify(referrers[referral.from.toLowerCase()])),
         }
       }) as ApplicationReferral[]) || [],
   } as ApplicationSubgraphData
