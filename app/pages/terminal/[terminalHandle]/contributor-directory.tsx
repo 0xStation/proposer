@@ -117,9 +117,9 @@ const TerminalContributorsPage: BlitzPage = () => {
           {!selectedContributors || !selectedContributors.length ? (
             <>
               {selectedRoleLocalId ? (
-                <div>There are no contributors with this role.</div>
+                <div className="text-marble-white">There are no contributors with this role.</div>
               ) : (
-                <div>Please select a role to view contributors.</div>
+                <div className="text-marble-white">Please select a role to view contributors.</div>
               )}
             </>
           ) : (
