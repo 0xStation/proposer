@@ -16,8 +16,7 @@ import { formatDate } from "app/core/utils/formatDate"
 const TerminalContributorsPage: BlitzPage = () => {
   const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
   const [selectedContributorToView, setSelectedContributorToView] = useState<Account | null>(null)
-  const [selectedRoleLocalId, setRoleLocalId] = useState<number>(1)
-  const [selectedContributors, setSelectedContributors] = useState<Account[] | null>(null)
+  const [selectedRoleLocalId, setRoleLocalId] = useState<number>()
 
   const terminalHandle = useParam("terminalHandle") as string
 
@@ -26,21 +25,28 @@ const TerminalContributorsPage: BlitzPage = () => {
   const [roles] = useQuery(
     getRolesByTerminal,
     { terminalId: terminal?.id || 0 },
-    { suspense: false }
+    {
+      suspense: false,
+      onSuccess: (roles) => {
+        if (roles && Array.isArray(roles) && roles[0]) {
+          // First role pill is automatically selected.
+          setRoleLocalId(roles[0].localId)
+        }
+      },
+    }
   )
 
-  useEffect(() => {
-    if (selectedRoleLocalId) {
-      const getContributorsByRole = async () => {
-        let contributors = await invoke(getAccountsByTerminalRole, {
-          terminalId: terminal?.id || 0,
-          roleLocalId: selectedRoleLocalId,
-        })
-        setSelectedContributors(contributors)
-      }
-      getContributorsByRole()
+  const [selectedContributors] = useQuery(
+    getAccountsByTerminalRole,
+    {
+      terminalId: terminal?.id || 0,
+      roleLocalId: selectedRoleLocalId as number,
+    },
+    {
+      suspense: false,
+      enabled: !!selectedRoleLocalId && !!terminal?.id,
     }
-  }, [selectedRoleLocalId])
+  )
 
   const contributorCards = selectedContributors?.map((contributor, idx) => {
     const {
@@ -96,7 +102,7 @@ const TerminalContributorsPage: BlitzPage = () => {
           {roles.map((role, index) => {
             return (
               <Pill
-                key={index.toString()}
+                key={index}
                 active={selectedRoleLocalId == role.localId}
                 onClick={() => {
                   setRoleLocalId(role.localId)
@@ -107,24 +113,30 @@ const TerminalContributorsPage: BlitzPage = () => {
             )
           })}
         </div>
-        {!selectedContributors || !selectedContributors.length ? (
-          <div className="text-marble-white">
-            {selectedRoleLocalId ? (
-              <div>There are no contributors with this role.</div>
-            ) : (
-              <div>Please select a role to view contributors.</div>
-            )}
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">{contributorCards}</div>
-        )}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {!selectedContributors || !selectedContributors.length ? (
+            <>
+              {selectedRoleLocalId ? (
+                <div>There are no contributors with this role.</div>
+              ) : (
+                <div>Please select a role to view contributors.</div>
+              )}
+            </>
+          ) : (
+            <>{contributorCards}</>
+          )}
+        </div>
       </div>
     </>
   ) : (
     <span className="text-marble-white">This terminal does not have any contributors yet.</span>
   )
 
-  return <TerminalNavigation>{contributorDirectoryView}</TerminalNavigation>
+  return (
+    <TerminalNavigation>
+      {!Array.isArray(roles) ? <div></div> : contributorDirectoryView}
+    </TerminalNavigation>
+  )
 }
 
 TerminalContributorsPage.suppressFirstRenderFlicker = true
