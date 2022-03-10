@@ -4,6 +4,7 @@ import { titleCase } from "app/core/utils/titleCase"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { RoleMetadata } from "app/role/types"
 import { InitiativeMetadata } from "app/initiative/types"
+import { AccountMetadata } from "app/account/types"
 
 type TicketQuery = {
   ticket: string
@@ -82,7 +83,7 @@ const handler: BlitzApiHandler = async (req, res) => {
   }
 
   let payload = {
-    name: "Station Contributor NFT",
+    name: (account.data as AccountMetadata)?.name,
     description: "Contributor NFT for the Station Labs Terminal.",
     external_url: "https://station.express/",
     image: imageMap[terminal.tickets[0]?.role?.localId || 4],
