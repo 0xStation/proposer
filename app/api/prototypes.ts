@@ -35,6 +35,23 @@ const handler: BlitzApiHandler = (req, res) => {
         trait_type: "Points",
         value: "900",
       },
+      {
+        trait_type: "Last Contributed",
+        value: "1629286851",
+        display_type: "date",
+      },
+      {
+        trait_type: "Guild",
+        value: "Protocol",
+      },
+      {
+        trait_type: "Guild",
+        value: "Backend",
+      },
+      {
+        trait_type: "Guild",
+        value: "Product",
+      },
     ],
   }
   res.end(JSON.stringify(payload))
