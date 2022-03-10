@@ -32,7 +32,7 @@ const handler: BlitzApiHandler = async (req, res) => {
   }
 
   const terminal = await db.terminal.findUnique({
-    where: { ticketAddress: query.ticket },
+    where: { ticketAddress: toChecksumAddress(query.ticket) },
     include: {
       tickets: {
         where: {
