@@ -1,8 +1,8 @@
 import { BlitzApiHandler, useRouterQuery } from "blitz"
 import db from "db"
 import { titleCase } from "app/core/utils/titleCase"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { RoleMetadata } from "app/role/types"
-import { number } from "zod"
 import { InitiativeMetadata } from "app/initiative/types"
 
 type TicketQuery = {
@@ -21,7 +21,7 @@ const handler: BlitzApiHandler = async (req, res) => {
   const query = req.query as TicketQuery
 
   const account = await db.account.findUnique({
-    where: { address: query.owner },
+    where: { address: toChecksumAddress(query.owner) },
   })
 
   if (!account) {
