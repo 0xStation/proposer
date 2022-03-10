@@ -39,13 +39,12 @@ const ProfileHome: BlitzPage = () => {
         setIsExploreModalOpen={setIsExploreModalOpen}
       />
       <div className="w-full grid grid-cols-1 xl:grid-cols-4 min-h-[calc(100vh-88px)] h-[1px]">
-        {activeApplication && (
-          <ApplicationDrawer
-            isOpen={sliderOpen}
-            setIsOpen={setSliderOpen}
-            application={activeApplication}
-          />
-        )}
+        <ApplicationDrawer
+          isOpen={sliderOpen}
+          setIsOpen={setSliderOpen}
+          application={activeApplication}
+        />
+
         <div className="col-span-1 text-2xl md:border-r border-concrete h-full">
           <div className="h-[185px] relative mb-[116px]">
             <img
@@ -135,6 +134,7 @@ const ProfileHome: BlitzPage = () => {
                       activeUser?.initiatives.map((application, index) => {
                         return (
                           <ApplicationCard
+                            address={activeUser.address}
                             key={index}
                             application={application}
                             onClick={() => {
