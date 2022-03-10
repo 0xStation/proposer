@@ -45,7 +45,7 @@ const handler: BlitzApiHandler = async (req, res) => {
       initiatives: {
         include: {
           accounts: {
-            where: { accountId: account.id },
+            where: { accountId: account.id, status: "CONTRIBUTOR" },
           },
         },
       },
