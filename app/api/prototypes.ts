@@ -25,8 +25,8 @@ const handler: BlitzApiHandler = async (req, res) => {
   })
 
   if (!account) {
-    console.log("no account!")
     res.statusCode = 404
+    res.end("account not found")
     return
   }
 
@@ -52,8 +52,8 @@ const handler: BlitzApiHandler = async (req, res) => {
   })
 
   if (!terminal) {
-    console.log("no terminal!")
     res.statusCode = 404
+    res.end("terminal not found")
     return
   }
 
