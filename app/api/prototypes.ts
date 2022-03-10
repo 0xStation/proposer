@@ -1,10 +1,19 @@
 import { BlitzApiHandler, useRouterQuery } from "blitz"
 import db from "db"
 import { titleCase } from "app/core/utils/titleCase"
+import { RoleMetadata } from "app/role/types"
+import { number } from "zod"
+import { InitiativeMetadata } from "app/initiative/types"
 
 type TicketQuery = {
   ticket: string
   owner: string
+}
+
+type Attribute = {
+  trait_type: string
+  value: string | number
+  display_type?: string
 }
 
 // fetch from [endpoint]/api/prototypes
@@ -48,17 +57,20 @@ const handler: BlitzApiHandler = async (req, res) => {
     return
   }
 
-  let attributes = [{ trait_type: "Status", value: "Active" }]
-  attributes.push({ trait_type: "Role", value: titleCase(terminal.tickets[0]?.role?.data.name) })
+  let attributes: Attribute[] = [{ trait_type: "Status", value: "Active" }]
+  attributes.push({
+    trait_type: "Role",
+    value: titleCase((terminal.tickets[0]?.role?.data as RoleMetadata)?.name),
+  })
   attributes.push({
     trait_type: "Joined At",
     display_type: "date",
-    value: Math.round(terminal.tickets[0]?.joinedAt.getTime() / 1000),
+    value: Math.round(terminal.tickets[0]?.joinedAt.getTime() || 0 / 1000),
   })
 
   terminal?.initiatives.forEach((i) => {
     if (i.accounts.length > 0) {
-      attributes.push({ trait_type: "Initiative", value: i.data.name })
+      attributes.push({ trait_type: "Initiative", value: (i.data as InitiativeMetadata)?.name })
     }
   })
 
