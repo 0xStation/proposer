@@ -74,11 +74,18 @@ const handler: BlitzApiHandler = async (req, res) => {
     }
   })
 
+  const imageMap = {
+    1: "https://station-images.nyc3.digitaloceanspaces.com/ticket-4.png",
+    2: "https://station-images.nyc3.digitaloceanspaces.com/ticket-3.png",
+    3: "https://station-images.nyc3.digitaloceanspaces.com/ticket-2.png",
+    4: "https://station-images.nyc3.digitaloceanspaces.com/ticket-1.png",
+  }
+
   let payload = {
     name: "Station Contributor NFT",
     description: "Contributor NFT for the Station Labs Terminal.",
     external_url: "https://station.express/",
-    image: "https://pbs.twimg.com/profile_images/1465787628553310211/DOMgJi5d_400x400.jpg",
+    image: imageMap[terminal.tickets[0]?.role?.localId || 4],
     attributes,
   }
 
