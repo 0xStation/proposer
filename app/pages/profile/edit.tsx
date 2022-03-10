@@ -1,11 +1,11 @@
-import { BlitzPage, useQuery } from "blitz"
+import { BlitzPage, useQuery, useRouter } from "blitz"
 import AccountForm from "app/account/components/AccountForm"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
-import { Account } from "app/account/types"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
 const EditProfile: BlitzPage = () => {
+  const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
 
   const [account, { isLoading }] = useQuery(
@@ -37,7 +37,7 @@ const EditProfile: BlitzPage = () => {
         <h1 className="text-marble-white text-3xl text-center pt-12">Complete your profile</h1>
         <div className="mx-auto max-w-2xl pb-12">
           <AccountForm
-            onSuccess={() => console.log("done")}
+            onSuccess={() => router.push("/profile")}
             address={activeUser.address}
             account={account}
             isEdit={true}

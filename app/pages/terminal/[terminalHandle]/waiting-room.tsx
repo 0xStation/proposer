@@ -170,7 +170,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             }
           </p>
           <button
-            className="rounded bg-magic-mint px-24 py-1 mx-auto block mt-12"
+            className="rounded bg-magic-mint px-24 py-1 mx-auto block mt-12 text-tunnel-black"
             onClick={() => setIsRedirectModalOpen(false)}
           >
             Continue

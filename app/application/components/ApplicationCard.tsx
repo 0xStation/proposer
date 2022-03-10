@@ -31,13 +31,13 @@ const ApplicationCard = ({ application, onClick }) => {
           className="h-8 w-8 rounded border border-marble-white block self-end"
         />
         {application.status === "APPLIED" ? (
+          <div className="text-marble-white self-end">12 POINTS</div>
+        ) : (
           <div className="self-end flex flex-row space-x-[-5px]">
             <span className="h-8 w-8 rounded-full bg-concrete border border-marble-white block"></span>
             <span className="h-8 w-8 rounded-full bg-concrete border border-marble-white block"></span>
             <span className="h-8 w-8 rounded-full bg-concrete border border-marble-white block"></span>
           </div>
-        ) : (
-          <div className="text-marble-white self-end">12 POINTS</div>
         )}
       </div>
     </button>

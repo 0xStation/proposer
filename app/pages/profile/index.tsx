@@ -67,11 +67,13 @@ const ProfileHome: BlitzPage = () => {
               </span>
             </div>
             <h3 className="text-marble-white text-base mt-4 font-normal">{activeUser?.data.bio}</h3>
-            <a href={activeUser?.data.contactURL}>
-              <button className="mt-4 py-.5 border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer">
-                Get in touch
-              </button>
-            </a>
+            {activeUser?.data?.contactURL && (
+              <a href={`//${activeUser?.data?.contactURL.replace(/^https?:\/\//, "")}`}>
+                <button className="mt-4 py-.5 border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer">
+                  Get in touch
+                </button>
+              </a>
+            )}
             <div className="mt-8 space-y-8">
               <div className="flex flex-col">
                 <h3 className="text-marble-white text-base font-bold">Skills</h3>
