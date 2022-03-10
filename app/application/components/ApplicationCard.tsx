@@ -19,13 +19,10 @@ const ApplicationCard = ({ application, address, onClick }) => {
   const [subgraphData]: [ApplicationSubgraphData | undefined, any] = useQuery(
     getSubgraphApplicationData,
     {
-      // referralGraphAddress: application.initiative.terminal.data.contracts.addresses.referrals,
-      referralGraphAddress: "0x488d547e5c383d66815c67fb1356a3f35d3885cf",
-      initiativeLocalId: 3,
-      // initiativeLocalId: application.initiative.localId,
+      referralGraphAddress: application.initiative.terminal.data.contracts.addresses.referrals,
+      initiativeLocalId: application.initiative.localId,
       terminalId: application.initiative.terminalId,
-      // address: "address",
-      address: "0x0259d65954dfbd0735e094c9cdacc256e5a29dd4",
+      address: address,
     },
     { suspense: false }
   )
