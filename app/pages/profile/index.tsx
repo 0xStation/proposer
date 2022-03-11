@@ -54,10 +54,10 @@ const ProfileHome: BlitzPage = () => {
             <img
               src={activeUser?.data.pfpURL}
               alt="The logged-in user's profile picture."
-              className="w-[200px] h-[200px] border border-marble-white rounded-full absolute bottom-[-100px] left-0 right-0 mx-auto"
+              className="w-[200px] h-[200px] border border-marble-white rounded-full absolute bottom-[-100px] left-0 right-0 ml-[8rem]"
             />
           </div>
-          <div className="px-8">
+          <div className="px-8 ml-20 mr-10">
             <div className="flex flex-col">
               <h1 className="text-2xl text-marble-white">{activeUser?.data.name}</h1>
               <span className="text-base text-concrete">
@@ -66,8 +66,12 @@ const ProfileHome: BlitzPage = () => {
             </div>
             <h3 className="text-marble-white text-base mt-4 font-normal">{activeUser?.data.bio}</h3>
             {activeUser?.data?.contactURL && (
-              <a href={`//${activeUser?.data?.contactURL.replace(/^https?:\/\//, "")}`}>
-                <button className="mt-4 py-.5 border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer">
+              <a
+                target="_blank"
+                href={`//${activeUser?.data?.contactURL.replace(/^https?:\/\//, "")}`}
+                rel="noreferrer"
+              >
+                <button className="mt-4 p-[0.20rem] border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer">
                   Get in touch
                 </button>
               </a>
@@ -75,7 +79,7 @@ const ProfileHome: BlitzPage = () => {
             <div className="mt-8 space-y-8">
               <div className="flex flex-col">
                 <h3 className="text-marble-white text-base font-bold">Skills</h3>
-                <div className="mt-1">
+                <div className="mt-1 flex flex-row flex-wrap">
                   {activeUser?.skills?.map((account_skill, index) => {
                     return (
                       <Tag key={index} type="skill">

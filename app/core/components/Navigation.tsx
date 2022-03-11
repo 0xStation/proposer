@@ -1,13 +1,13 @@
 import { useEffect, useMemo } from "react"
 import { Image, invoke, useRouter } from "blitz"
 import Dropdown from "../components/Dropdown"
-import ExplorePopover from "./explore/ExplorePopover"
 import logo from "../../../public/station-logo.svg"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import useStore from "../hooks/useStore"
 import { useAccount } from "wagmi"
 import truncateString from "../utils/truncateString"
 import { LOCAL_STORAGE } from "../utils/constants"
+import ExplorePopover from "./explore/ExplorePopover"
 
 /**
  * Navigation Component
