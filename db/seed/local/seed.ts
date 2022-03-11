@@ -7,6 +7,7 @@ import seedInitiatives from "../local/4-initiatives"
 import seedAccountInitiatives from "../local/5-accounts-initiatives"
 
 const seed = async () => {
+  await wipe()
   // seeding all data
   await seedAccounts()
   await seedTerminals()

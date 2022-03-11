@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { BlitzPage, useRouter } from "blitz"
 import { useAccount } from "wagmi"
 import AccountForm from "app/account/components/AccountForm"
@@ -12,6 +12,7 @@ const CreateProfile: BlitzPage = () => {
   })
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const activeUser = useStore((state) => state.activeUser)
+  const [accountCreationLoading, setAccountCreationLoading] = useState<boolean>(false)
 
   if (!address) {
     return (
@@ -23,7 +24,18 @@ const CreateProfile: BlitzPage = () => {
     )
   }
 
-  if (activeUser) {
+  // show a loading state after a new profile is created,
+  // otherwise, `activeUser` will be set and notify the user they alreayd have an account
+  // before we redirect to the user's profile page on account creation.
+  if (accountCreationLoading) {
+    return (
+      <div className="min-h-screen text-center grid place-content-center text-marble-white">
+        ...Loading
+      </div>
+    )
+  }
+
+  if (activeUser && !accountCreationLoading) {
     return (
       <div className="mx-auto max-w-2xl py-12">
         <h1 className="text-marble-white text-3xl text-center">Your already have a profile!</h1>
@@ -46,7 +58,14 @@ const CreateProfile: BlitzPage = () => {
       <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36 relative">
         <h1 className="text-marble-white text-3xl text-center pt-12 mb-4">Complete your profile</h1>
         <div className="mx-auto max-w-2xl pb-12">
-          <AccountForm onSuccess={() => router.push("/profile")} address={address} isEdit={false} />
+          <AccountForm
+            onSuccess={() => {
+              setAccountCreationLoading(true)
+              router.push("/profile")
+            }}
+            address={address}
+            isEdit={false}
+          />
         </div>
       </div>
     </div>

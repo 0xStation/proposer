@@ -7,8 +7,8 @@ import { Field } from "react-final-form"
 const customStyles = {
   control: (provided, _state) => ({
     ...provided,
-    backgroundColor: "#2E2E2E",
-    color: "#646464",
+    backgroundColor: "#2E2E2E", // wet-concrete
+    color: "#646464", // concrete
     borderColor: "#646464",
   }),
   menuList: (provided, _state) => ({
@@ -17,7 +17,7 @@ const customStyles = {
   }),
   singleValue: (provided, _state) => ({
     ...provided,
-    color: "#F2EFEF",
+    color: "#F2EFEF", // marble white
   }),
   input: (provided, _state) => ({
     ...provided,

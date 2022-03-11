@@ -26,10 +26,7 @@ interface ApplicationParams {
 }
 
 const CoverPhotoInput = ({ coverURL, onUpload }) => {
-  const [uploadingState, setUploadingState] = useState("")
-
   const uploadFile = async (acceptedFiles) => {
-    setUploadingState("UPLOADING")
     const formData = new FormData()
     formData.append("file", acceptedFiles[0])
     let res = await fetch("/api/uploadImage", {
@@ -38,7 +35,6 @@ const CoverPhotoInput = ({ coverURL, onUpload }) => {
     })
     const data = await res.json()
     onUpload(data.url)
-    setUploadingState("UPLOADED")
   }
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -51,14 +47,13 @@ const CoverPhotoInput = ({ coverURL, onUpload }) => {
       className="w-full h-[100px] bg-wet-concrete border border-concrete cursor-pointer"
       {...getRootProps()}
     >
-      {uploadingState === "UPLOADED" ||
-        (coverURL && (
-          <img
-            alt="Cover picture uploaded by the user."
-            src={coverURL}
-            className="w-full h-full object-cover object-no-repeat"
-          />
-        ))}
+      {coverURL && (
+        <img
+          alt="Cover picture uploaded by the user."
+          src={coverURL}
+          className="w-full h-full object-cover object-no-repeat"
+        />
+      )}
       <span className="absolute right-2 bottom-2">
         <UploadIcon />
       </span>
@@ -197,7 +192,7 @@ const AccountForm = ({
             })
           }
         } catch (error) {
-          console.log(error)
+          console.error(`Error creating account: ${error}`)
           alert("Error applying.")
         }
       }}
@@ -220,7 +215,7 @@ const AccountForm = ({
               <Field
                 component="input"
                 name="name"
-                placeholder="Satoshi"
+                placeholder="Name"
                 className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
               />
             </div>
@@ -231,23 +226,20 @@ const AccountForm = ({
               <Field
                 component="textarea"
                 name="bio"
-                placeholder="Write about yourself"
+                placeholder="Tell us about yourself"
                 className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
               />
             </div>
-
             <div className="flex flex-col col-span-2">
               <label htmlFor="contactURL" className="text-marble-white">
                 Contact
               </label>
-              <span className="text-concrete text-xs mb-2">
-                URL of the best way to contact you (Twitter profile, Discord ID, Calendly)
-              </span>
+              <p className="text-concrete text-sm mb-2">What&quot;s the best way to contact you?</p>
               <div className="flex flex-row mt-1">
                 <Field
                   component="input"
                   name="contactURL"
-                  placeholder="link"
+                  placeholder="Contact URL (eg: Twitter, Discord, Calendly)"
                   className="border border-concrete bg-wet-concrete text-marble-white p-2 flex-1"
                 />
               </div>
@@ -257,11 +249,11 @@ const AccountForm = ({
               <label htmlFor="skills" className="text-marble-white">
                 Skills
               </label>
-              <span className="text-concrete text-xs mb-2">(Type to add additional skills)</span>
+              <p className="text-concrete text-sm mb-2">(Type to add or search skills)</p>
               <div>
                 <MultiSelect
                   name="skills"
-                  placeholder="type to add or search skills"
+                  placeholder="Type to add or search skills"
                   options={skillOptions}
                   initialValue={existingSkills}
                 />

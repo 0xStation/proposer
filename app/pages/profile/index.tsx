@@ -77,7 +77,7 @@ const ProfileHome: BlitzPage = () => {
               <div className="flex flex-col">
                 <h3 className="text-marble-white text-base font-bold">Skills</h3>
                 <div className="mt-1">
-                  {activeUser?.skills.map((account_skill, index) => {
+                  {activeUser?.skills?.map((account_skill, index) => {
                     return (
                       <Tag key={index} type="skill">
                         {account_skill.skill.name}
