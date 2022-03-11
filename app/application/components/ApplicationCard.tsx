@@ -26,8 +26,6 @@ const ApplicationCard = ({ application, address, onClick }) => {
     { suspense: false }
   )
 
-  console.log(!!parseDecimals(subgraphData?.points, decimals))
-
   return (
     <button
       role="button"

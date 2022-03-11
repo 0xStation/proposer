@@ -141,8 +141,14 @@ const ProfileHome: BlitzPage = () => {
                             key={index}
                             application={application}
                             onClick={() => {
-                              setActiveApplication(application)
-                              setSliderOpen(true)
+                              if (application.status === "APPLIED") {
+                                setActiveApplication(application)
+                                setSliderOpen(true)
+                              } else if (application.status === "CONTRIBUTOR") {
+                                router.push(
+                                  `/terminal/${application.initiative.terminal.handle}/initiative/${application.initiative.localId}`
+                                )
+                              }
                             }}
                           />
                         )
