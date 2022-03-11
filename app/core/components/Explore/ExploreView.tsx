@@ -3,7 +3,6 @@ import { Link, Routes, useQuery } from "blitz"
 import getTerminals from "app/terminal/queries/getTerminals"
 import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
 import useStore from "app/core/hooks/useStore"
-import { Account } from "app/account/types"
 import usePagination from "app/core/hooks/usePagination"
 
 const ExploreView = ({ className = "" }) => {
@@ -21,10 +20,8 @@ const ExploreView = ({ className = "" }) => {
   const data = contributorBoolean ? contributorTerminals : terminals
   const { results, totalPages, hasNext, hasPrev } = usePagination(data, page, 4)
 
-  // hides the map if there are less than two terminals (button in navigation and popover)
-  // the thinking is that it doesnt make much sense to have a map with only one terminal
   if (!terminals) {
-    return <></>
+    return null
   }
 
   return (
@@ -66,7 +63,7 @@ const ExploreView = ({ className = "" }) => {
                 >
                   <div className="flex flex-col items-center cursor-pointer w-16">
                     <img
-                      className="border border-marble-white h-16 w-16 rounded bg-concrete"
+                      className="border border-marble-white h-16 w-16 rounded-full bg-concrete"
                       src={terminal.data.pfpURL}
                     />
                   </div>

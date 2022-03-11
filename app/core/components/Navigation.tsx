@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react"
 import { Image, invoke, useRouter } from "blitz"
 import Dropdown from "../components/Dropdown"
-import ExplorePopover from "../components/Explore/ExplorePopover"
+import ExplorePopover from "./explore/ExplorePopover"
 import logo from "../../../public/station-logo.svg"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import useStore from "../hooks/useStore"

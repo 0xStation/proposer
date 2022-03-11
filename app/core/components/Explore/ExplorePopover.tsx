@@ -3,7 +3,7 @@ import ChevronIcon from "../../icons/ChevronIcon"
 import { Fragment } from "react"
 import ExploreView from "./ExploreView"
 
-const Map = () => {
+const ExplorePopover = () => {
   return (
     <div className="px-4">
       <Popover className="sm:relative">
@@ -33,4 +33,4 @@ const Map = () => {
   )
 }
 
-export default Map
+export default ExplorePopover

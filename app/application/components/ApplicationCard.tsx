@@ -8,12 +8,11 @@ import { ApplicationSubgraphData } from "app/application/types"
 const parseDecimals = (val, decimals) => {
   return val * Math.pow(10, 0 - decimals)
 }
-
 // I don't really love this name because it only feels like an application before they are accepted
 const ApplicationCard = ({ application, address, onClick }) => {
   const { terminal } = application?.initiative
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
-    terminal?.contracts?.addresses.endorsements
+    terminal.contracts?.addresses?.endorsements
   )
 
   const [subgraphData]: [ApplicationSubgraphData | undefined, any] = useQuery(
@@ -27,7 +26,7 @@ const ApplicationCard = ({ application, address, onClick }) => {
     { suspense: false }
   )
 
-  console.log(subgraphData)
+  console.log(!!parseDecimals(subgraphData?.points, decimals))
 
   return (
     <button
@@ -52,11 +51,12 @@ const ApplicationCard = ({ application, address, onClick }) => {
         <img
           src={terminal.data.pfpURL}
           alt={`Terminal ${terminal && terminal?.data?.name} PFP`}
-          className="h-8 w-8 rounded border border-marble-white block self-end"
+          className="h-8 w-8 rounded-full border border-marble-white block self-end"
         />
         {application.status === "APPLIED" ? (
           <div className="text-marble-white self-end">
-            {subgraphData && parseDecimals(subgraphData.points, decimals)} POINTS
+            {(subgraphData && parseDecimals(subgraphData.points, decimals)) || "0"}{" "}
+            {terminal.data.contracts.symbols.points}
           </div>
         ) : (
           <div className="self-end flex flex-row space-x-[-5px]">

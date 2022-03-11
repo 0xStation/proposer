@@ -6,10 +6,9 @@ import ApplicationCard from "app/application/components/ApplicationCard"
 import ApplicationDrawer from "app/application/components/ApplicationDrawer"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
-import { Account } from "app/account/types"
 import { getWalletString } from "app/utils/getWalletString"
 import Button from "app/core/components/Button"
-import ExploreModal from "app/core/components/Explore/ExploreModal"
+import ExploreModal from "app/core/components/explore/ExploreModal"
 
 // the profile homepage
 // can see a users initiatives + termials + profile info at a glance
@@ -149,26 +148,22 @@ const ProfileHome: BlitzPage = () => {
               </>
             )}
             {/* Show if user is active in terminal but has no initiatives, or if the user is not in any terminals or initiatives */}
-            {((activeUser?.initiatives &&
-              activeUser?.initiatives.length === 0 &&
-              subpage === "INITIATIVES") ||
-              (activeUser?.tickets &&
-                activeUser?.tickets.length === 0 &&
-                subpage === "TERMINALS")) && (
-              <div className="w-full h-full flex items-center flex-col justify-center mt-[15%]">
-                <p className="text-marble-white text-2xl font-bold">Explore Terminals</p>
-                <p className="mt-2 text-marble-white text-base w-[400px] text-center">
-                  Check out different DAO communities, submit interests to initiatives, and start
-                  contributing.
-                </p>
-                <Button
-                  className="cursor-pointer mt-4 w-[300px] py-1"
-                  onClick={() => setIsExploreModalOpen(true)}
-                >
-                  Start exploring
-                </Button>
-              </div>
-            )}
+            {(!activeUser?.initiatives?.length && subpage === "INITIATIVES") ||
+              (!activeUser?.tickets?.length && subpage === "TERMINALS" && (
+                <div className="w-full h-full flex items-center flex-col justify-center mt-[15%]">
+                  <p className="text-marble-white text-2xl font-bold">Explore Terminals</p>
+                  <p className="mt-2 text-marble-white text-base w-[400px] text-center">
+                    Check out different DAO communities, submit interests to initiatives, and start
+                    contributing.
+                  </p>
+                  <Button
+                    className="cursor-pointer mt-4 w-[300px] py-1"
+                    onClick={() => setIsExploreModalOpen(true)}
+                  >
+                    Start exploring
+                  </Button>
+                </div>
+              ))}
           </div>
         </div>
       </div>
