@@ -58,13 +58,7 @@ const ApplicationCard = ({ application, address, onClick }) => {
             {(subgraphData && parseDecimals(subgraphData.points, decimals)) || "0"}{" "}
             {terminal.data.contracts.symbols.points}
           </div>
-        ) : (
-          <div className="self-end flex flex-row space-x-[-5px]">
-            <span className="h-8 w-8 rounded-full bg-concrete border border-marble-white block"></span>
-            <span className="h-8 w-8 rounded-full bg-concrete border border-marble-white block"></span>
-            <span className="h-8 w-8 rounded-full bg-concrete border border-marble-white block"></span>
-          </div>
-        )}
+        ) : null}
       </div>
     </button>
   )
