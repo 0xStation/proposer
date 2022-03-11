@@ -8,7 +8,7 @@ import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import { getWalletString } from "app/utils/getWalletString"
 import Button from "app/core/components/Button"
-import ExploreModal from "app/core/components/explore/ExploreModal"
+import ExploreModal from "app/core/components/Explore/ExploreModal"
 
 // the profile homepage
 // can see a users initiatives + termials + profile info at a glance
