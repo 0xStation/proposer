@@ -7,7 +7,7 @@ import useStore from "../hooks/useStore"
 import { useAccount } from "wagmi"
 import truncateString from "../utils/truncateString"
 import { LOCAL_STORAGE } from "../utils/constants"
-import ExplorePopover from "../components/explore/ExplorePopover"
+import ExplorePopover from "app/core/components/explore/ExplorePopover"
 
 /**
  * Navigation Component
