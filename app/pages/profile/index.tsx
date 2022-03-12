@@ -160,10 +160,10 @@ const ProfileHome: BlitzPage = () => {
             {/* Show if user is active in terminal but has no initiatives, or if the user is not in any terminals or initiatives */}
             {(!activeUser?.initiatives?.length && subpage === "INITIATIVES") ||
               (!activeUser?.tickets?.length && subpage === "TERMINALS" && (
-                <div className="w-full h-full flex items-center flex-col justify-center mt-[15%]">
+                <div className="w-full h-full flex items-center flex-col justify-center mt-[25%]">
                   <p className="text-marble-white text-2xl font-bold">Explore Terminals</p>
                   <p className="mt-2 text-marble-white text-base w-[400px] text-center">
-                    Check out different DAO communities, submit interests to initiatives, and start
+                    Discover DAOs and communities, submit interests to initiatives, and start
                     contributing.
                   </p>
                   <Button
