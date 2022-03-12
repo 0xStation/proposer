@@ -219,10 +219,12 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     />
                   ))}
                 </div>
-              ) : (
+              ) : canActiveUserEndorse ? (
                 <p className="text-marble-white text-base">
                   Be the first to endorse this applicant!
                 </p>
+              ) : (
+                <p className="text-marble-white text-base">N/A</p>
               )}
             </div>
           </div>
