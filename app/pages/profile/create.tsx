@@ -51,22 +51,17 @@ const CreateProfile: BlitzPage = () => {
   }
 
   return (
-    <div
-      className="w-full h-full bg-cover bg-center bg-no-repeat border border-tunnel-black"
-      style={{ backgroundImage: "url('/station-cover.png')" }}
-    >
-      <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36 relative">
-        <h1 className="text-marble-white text-3xl text-center pt-12 mb-4">Complete your profile</h1>
-        <div className="mx-auto max-w-2xl pb-12">
-          <AccountForm
-            onSuccess={() => {
-              setAccountCreationLoading(true)
-              router.push("/profile")
-            }}
-            address={address}
-            isEdit={false}
-          />
-        </div>
+    <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] relative">
+      <h1 className="text-marble-white text-4xl text-center pt-12 mb-4">Complete your profile</h1>
+      <div className="mx-auto max-w-2xl">
+        <AccountForm
+          onSuccess={() => {
+            setAccountCreationLoading(true)
+            router.push("/profile")
+          }}
+          address={address}
+          isEdit={false}
+        />
       </div>
     </div>
   )

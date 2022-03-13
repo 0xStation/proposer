@@ -1,8 +1,9 @@
-import { BlitzPage, useQuery, useRouter } from "blitz"
+import { BlitzPage, useQuery, useRouter, Image } from "blitz"
 import AccountForm from "app/account/components/AccountForm"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import Exit from "public/exit-button.svg"
 
 const EditProfile: BlitzPage = () => {
   const router = useRouter()
@@ -29,12 +30,16 @@ const EditProfile: BlitzPage = () => {
   }
 
   return (
-    <div
-      className="w-full h-full bg-cover bg-center bg-no-repeat border border-tunnel-black"
-      style={{ backgroundImage: "url('/station-cover.png')" }}
-    >
-      <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] mt-36 relative">
-        <h1 className="text-marble-white text-3xl text-center pt-12">Complete your profile</h1>
+    <>
+      <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] relative">
+        <div className="absolute top-3 left-5">
+          <div className="w-[24px] h-[24px]">
+            <button className="text-marble-white" onClick={() => router.push("/profile")}>
+              <Image src={Exit} alt="Close button" width={24} height={24} />
+            </button>
+          </div>
+        </div>
+        <h1 className="text-marble-white text-4xl text-center pt-12">Edit your profile</h1>
         <div className="mx-auto max-w-2xl pb-12">
           <AccountForm
             onSuccess={() => router.push("/profile")}
@@ -44,7 +49,7 @@ const EditProfile: BlitzPage = () => {
           />
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

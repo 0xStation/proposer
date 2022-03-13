@@ -43,21 +43,24 @@ const CoverPhotoInput = ({ coverURL, onUpload }) => {
   })
 
   return (
-    <div
-      className="w-full h-[100px] bg-wet-concrete border border-concrete cursor-pointer"
-      {...getRootProps()}
-    >
-      {coverURL && (
-        <img
-          alt="Cover picture uploaded by the user."
-          src={coverURL}
-          className="w-full h-full object-cover object-no-repeat"
-        />
-      )}
-      <span className="absolute right-2 bottom-2">
-        <UploadIcon />
-      </span>
-      <input {...getInputProps()} />
+    <div className="flex-col">
+      <label className="font-bold text-base">Cover</label>
+      <div
+        className="w-96 h-52 bg-wet-concrete border border-concrete cursor-pointer relative mt-4"
+        {...getRootProps()}
+      >
+        {coverURL && (
+          <img
+            alt="Cover picture uploaded by the user."
+            src={coverURL}
+            className="w-full h-full object-cover object-no-repeat"
+          />
+        )}
+        <span className="absolute bottom-0 right-0 mb-3 mr-3">
+          <UploadIcon />
+        </span>
+        <input {...getInputProps()} />
+      </div>
     </div>
   )
 }
@@ -84,22 +87,25 @@ const PfpInput = ({ pfpURL, onUpload }) => {
   })
 
   return (
-    <div
-      className="w-[76px] h-[76px] rounded-full bg-wet-concrete border border-concrete flex items-center justify-center cursor-pointer absolute bottom-[-38px] left-4"
-      {...getRootProps()}
-    >
-      {uploadingState === "UPLOADED" || pfpURL ? (
-        <img
-          alt="Profile picture uploaded by the user."
-          src={pfpURL}
-          className="w-full h-full rounded-full"
-        />
-      ) : (
-        <>
-          <UploadIcon />
-          <input {...getInputProps()} />
-        </>
-      )}
+    <div className="flex-col">
+      <label className="font-bold text-base">PFP</label>
+      <div
+        className="w-52 h-52 rounded-full bg-wet-concrete border border-concrete flex items-center justify-center cursor-pointer mt-4"
+        {...getRootProps()}
+      >
+        {uploadingState === "UPLOADED" || pfpURL ? (
+          <img
+            alt="Profile picture uploaded by the user."
+            src={pfpURL}
+            className="w-full h-full rounded-full"
+          />
+        ) : (
+          <>
+            <UploadIcon />
+            <input {...getInputProps()} />
+          </>
+        )}
+      </div>
     </div>
   )
 }
@@ -200,16 +206,17 @@ const AccountForm = ({
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-y-6 gap-x-2">
             <div className="flex flex-col col-span-2">
-              <label htmlFor="name" className="text-marble-white mb-2">
-                Images
-              </label>
-              <div className="w-full h-[100px] relative mb-8">
-                <CoverPhotoInput coverURL={coverURL} onUpload={(url) => setCoverURL(url)} />
+              <div className="mt-10 mb-9">
+                <h1 className="font-bold text-2xl">Personal Info</h1>
+                <p className="mt-3">Populate your profile with your story and your work.</p>
+              </div>
+              <div className="w-full h-44 flex flex-row justify-between mb-8">
                 <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
+                <CoverPhotoInput coverURL={coverURL} onUpload={(url) => setCoverURL(url)} />
               </div>
             </div>
-            <div className="flex flex-col col-span-2">
-              <label htmlFor="name" className="text-marble-white">
+            <div className="flex flex-col col-span-2 mt-10">
+              <label htmlFor="name" className="text-marble-white text-base font-bold">
                 Name
               </label>
               <Field
@@ -220,7 +227,7 @@ const AccountForm = ({
               />
             </div>
             <div className="flex flex-col col-span-2">
-              <label htmlFor="bio" className="text-marble-white">
+              <label htmlFor="bio" className="text-marble-white font-bold">
                 Bio
               </label>
               <Field
@@ -231,22 +238,21 @@ const AccountForm = ({
               />
             </div>
             <div className="flex flex-col col-span-2">
-              <label htmlFor="contactURL" className="text-marble-white">
+              <label htmlFor="contactURL" className="text-marble-white text-base font-bold">
                 Contact
               </label>
-              <p className="text-concrete text-sm mb-2">What&quot;s the best way to contact you?</p>
+              <p className="text-concrete text-sm mb-2">What&apos;s the best way to contact you?</p>
               <div className="flex flex-row mt-1">
                 <Field
                   component="input"
                   name="contactURL"
-                  placeholder="Contact URL (eg: Twitter, Discord, Calendly)"
+                  placeholder="Contact URL (eg: Twitter, Calendly)"
                   className="border border-concrete bg-wet-concrete text-marble-white p-2 flex-1"
                 />
               </div>
             </div>
-
             <div className="flex flex-col col-span-2">
-              <label htmlFor="skills" className="text-marble-white">
+              <label htmlFor="skills" className="text-marble-white text-base font-bold">
                 Skills
               </label>
               <p className="text-concrete text-sm mb-2">(Type to add or search skills)</p>
@@ -259,9 +265,8 @@ const AccountForm = ({
                 />
               </div>
             </div>
-
             <div className="flex flex-col col-span-2">
-              <label htmlFor="timezone" className="text-marble-white mb-2">
+              <label htmlFor="timezone" className="text-marble-white mb-2 text-base font-bold">
                 Timezone
               </label>
               <Select
@@ -272,12 +277,11 @@ const AccountForm = ({
               />
             </div>
           </div>
-
           <button
             type="submit"
-            className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-12 mx-auto block p-2"
+            className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-14 mx-auto block p-2"
           >
-            Submit
+            {isEdit ? "Save" : "Submit"}
           </button>
         </form>
       )}

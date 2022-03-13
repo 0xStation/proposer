@@ -65,17 +65,12 @@ const ProfileHome: BlitzPage = () => {
               </span>
             </div>
             <h3 className="text-marble-white text-base mt-4 font-normal">{activeUser?.data.bio}</h3>
-            {activeUser?.data?.contactURL && (
-              <a
-                target="_blank"
-                href={`//${activeUser?.data?.contactURL.replace(/^https?:\/\//, "")}`}
-                rel="noreferrer"
-              >
-                <button className="mt-4 p-[0.20rem] border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer">
-                  Get in touch
-                </button>
-              </a>
-            )}
+            <button
+              onClick={() => router.push("/profile/edit")}
+              className="mt-4 p-[0.20rem] border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer"
+            >
+              Edit Profile
+            </button>
             <div className="mt-8 space-y-8">
               <div className="flex flex-col">
                 <h3 className="text-marble-white text-base font-bold">Skills</h3>

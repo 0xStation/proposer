@@ -98,10 +98,6 @@ const Navigation = () => {
                   onClick: () => router.push("/profile"),
                 },
                 {
-                  name: "Edit Profile",
-                  onClick: () => router.push("/profile/edit"),
-                },
-                {
                   name: "Disconnect",
                   onClick: appDisconnect,
                 },
