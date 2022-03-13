@@ -95,8 +95,8 @@ const ProfileHome: BlitzPage = () => {
         </div>
         <div className="col-span-2 xl:col-span-3 px-12 relative">
           <div className="mt-12">
-            {((activeUser?.tickets && activeUser?.tickets.length > 0) ||
-              (activeUser?.initiatives && activeUser?.initiatives.length > 0)) && (
+            {((activeUser?.tickets && activeUser?.tickets.length) ||
+              (activeUser?.initiatives && activeUser?.initiatives.length)) && (
               <>
                 <div className="flex flex-row z-10">
                   <button
@@ -119,7 +119,7 @@ const ProfileHome: BlitzPage = () => {
                   </button>
                 </div>
                 {subpage === "TERMINALS" && (
-                  <div className="flex space-x-4 mt-12">
+                  <div className="grid grid-cols-3 gap-y-3 gap-x-3 mt-12">
                     {activeUser?.tickets &&
                       activeUser?.tickets.map((ticket, index) => {
                         return <TerminalCard key={index} ticket={ticket} />
@@ -127,7 +127,7 @@ const ProfileHome: BlitzPage = () => {
                   </div>
                 )}
                 {subpage === "INITIATIVES" && (
-                  <div className="flex space-x-4 mt-12">
+                  <div className="grid grid-cols-3 gap-y-3 gap-x-3 mt-12">
                     {activeUser?.initiatives &&
                       activeUser?.initiatives.map((application, index) => {
                         return (
@@ -155,7 +155,7 @@ const ProfileHome: BlitzPage = () => {
             {/* Show if user is active in terminal but has no initiatives, or if the user is not in any terminals or initiatives */}
             {(!activeUser?.initiatives?.length && subpage === "INITIATIVES") ||
               (!activeUser?.tickets?.length && subpage === "TERMINALS" && (
-                <div className="w-full h-full flex items-center flex-col justify-center mt-[25%]">
+                <div className="w-full h-full flex items-center flex-col justify-center mt-[23%]">
                   <p className="text-marble-white text-2xl font-bold">Explore Terminals</p>
                   <p className="mt-2 text-marble-white text-base w-[400px] text-center">
                     Discover DAOs and communities, submit interests to initiatives, and start

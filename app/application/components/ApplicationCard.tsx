@@ -1,9 +1,9 @@
-import getStatusColor from "app/utils/getStatusColor"
 import { useQuery } from "blitz"
 import getSubgraphApplicationData from "app/application/queries/getSubgraphApplicationData"
 import { DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
 import { ApplicationSubgraphData } from "app/application/types"
+import { APPLICATION_STATUS_MAP } from "app/core/utils/constants"
 
 const parseDecimals = (val, decimals) => {
   return val * Math.pow(10, 0 - decimals)
@@ -31,14 +31,16 @@ const ApplicationCard = ({ application, address, onClick }) => {
       role="button"
       tabIndex={0}
       onClick={onClick}
-      className="border border-concrete w-[320px] cursor-pointer hover:border-marble-white p-3 flex flex-col"
+      className="border border-concrete cursor-pointer hover:border-marble-white p-3 flex flex-col"
     >
       <span className="flex flex-row items-center">
         <span
-          className={`${getStatusColor(application.status)} h-2 w-2 rounded-full block mr-1`}
+          className={`${
+            APPLICATION_STATUS_MAP[application.status]?.color
+          } h-2 w-2 rounded-full block mr-1`}
         ></span>
         <span className="text-xs text-marble-white uppercase tracking-wider">
-          {application.status}
+          {APPLICATION_STATUS_MAP[application.status]?.status}
         </span>
       </span>
       <h2 className="mt-2 text-2xl text-marble-white">{application.initiative.data.name}</h2>

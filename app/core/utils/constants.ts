@@ -17,3 +17,18 @@ export const LOCAL_STORAGE = {
   WAGMI_WALLET: "station.wallet",
   CONNECTION: "station.connection",
 }
+
+export const APPLICATION_STATUS_MAP = {
+  APPLIED: {
+    status: "INTERESTED",
+    color: "bg-neon-carrot",
+  },
+  INVITED: {
+    status: "INVITED",
+    color: "bg-neon-blue",
+  },
+  CONTRIBUTOR: {
+    status: "CONTRIBUTING",
+    color: "bg-magic-mint",
+  },
+}

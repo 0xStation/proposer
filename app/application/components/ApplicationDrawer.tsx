@@ -2,7 +2,7 @@ import { Fragment } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { XIcon } from "@heroicons/react/outline"
 import { formatDate } from "app/core/utils/formatDate"
-import getStatusColor from "app/utils/getStatusColor"
+import { APPLICATION_STATUS_MAP } from "app/core/utils/constants"
 
 const ApplicationDrawer = ({ isOpen, setIsOpen, application }) => {
   return (
@@ -64,12 +64,12 @@ const ApplicationDrawer = ({ isOpen, setIsOpen, application }) => {
                           </div>
                           <div className="flex flex-row items-center">
                             <span
-                              className={`h-2 w-2 rounded-full mr-2 ${getStatusColor(
-                                application.status
-                              )}`}
+                              className={`h-2 w-2 rounded-full mr-2 ${
+                                APPLICATION_STATUS_MAP[application.status]?.color
+                              }`}
                             ></span>
                             <span className="text-marble-white text-xs uppercase tracking-wider">
-                              {application.status || "status"}
+                              {APPLICATION_STATUS_MAP[application.status]?.status}
                             </span>
                           </div>
                         </div>
