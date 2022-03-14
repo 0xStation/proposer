@@ -4,34 +4,9 @@ import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
 import useStore from "../../core/hooks/useStore"
 import { Account } from "../../account/types"
-import sendDiscordNotification from "app/application/queries/sendDiscordNotification"
-import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
+import getTerminalById from "app/terminal/queries/getTerminalById"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
-import getAccountById from "app/account/queries/getAccountById"
-
-const GetDetailsForDiscord = async (handle, initiativeId, applicantId) => {
-  console.log("send notifcation was hit")
-  const terminal = await invoke(getTerminalByHandle, { handle })
-  const [initiative] = await useQuery(
-    getInitiativeByLocalId,
-    {
-      terminalId: terminal?.id || 0,
-      localId: initiativeId,
-    },
-    { suspense: false }
-  )
-  const applicant = await invoke(getAccountById, { applicantId })
-
-  initiative &&
-    applicant &&
-    terminal &&
-    sendDiscordNotification(
-      handle.toUpperCase(),
-      terminal.data.discordWebHook,
-      initiative.data.name,
-      applicant.data.name
-    )
-}
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 
 const ApplicationModal = ({
   isOpen,
@@ -52,6 +27,13 @@ const ApplicationModal = ({
 
   const activeUser: Account | null = useStore((state) => state.activeUser)
 
+  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+  const terminalId = terminal?.id || 0
+  const [initiative] = useQuery(getInitiativeByLocalId, {
+    terminalId: terminalId,
+    localId: initiativeId,
+  })
+
   if (!activeUser) {
     return (
       <Modal
@@ -63,8 +45,35 @@ const ApplicationModal = ({
       />
     )
   }
-  function sendNotification() {
-    GetDetailsForDiscord(terminalHandle, initiativeId, activeUser?.id)
+
+  const webhook = terminal?.data.discordWebHook
+
+  async function sendDiscordNotification(handle, hook) {
+    const title = `${activeUser?.data.name} just submitted an application to ${initiative?.data.name}!`
+    const description = `https://station.express/terminal/${terminalHandle}/waiting-room`
+    const notification = {
+      content: `New Application Submitted to ${handle.toUpperCase()}`,
+      embeds: [
+        {
+          title: title,
+          description: description,
+        },
+      ],
+    }
+    const url = hook
+    await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(notification),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+  }
+
+  async function queNotification() {
+    if (webhook) {
+      await sendDiscordNotification(terminalHandle, webhook)
+    }
   }
   return (
     <Modal
@@ -82,10 +91,10 @@ const ApplicationModal = ({
                 initiativeId: initiativeId,
                 accountId: activeUser.id,
               })
-              sendNotification()
             } catch (error) {
               alert("Error applying.")
             }
+            queNotification()
           }}
           render={({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>
