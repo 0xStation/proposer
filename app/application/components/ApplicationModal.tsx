@@ -29,11 +29,6 @@ const ApplicationModal = ({
   const activeUser: Account | null = useStore((state) => state.activeUser)
 
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
-  const terminalId = terminal?.id || 0
-  // const [initiative] = useQuery(getInitiativeByLocalId, {
-  //   terminalId: terminalId,
-  //   localId: initiativeId,
-  // })
 
   if (!activeUser) {
     return (
