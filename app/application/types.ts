@@ -17,3 +17,8 @@ export type Application = {
   points: number
   referrals: ApplicationReferral[]
 }
+
+export type ApplicationSubgraphData = {
+  points: number
+  referrals: ApplicationReferral[]
+}

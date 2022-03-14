@@ -26,6 +26,13 @@ type InitiativeSeed = {
 
 export const terminalId = 2
 
+export const roleIds = {
+  staff: 1,
+  teamLead: 2,
+  coreContributor: 3,
+  guestContributor: 4,
+}
+
 const ccs: TerminalSeed = {
   handle: "ccs",
   ticketAddress: "0x",
@@ -36,7 +43,15 @@ const ccs: TerminalSeed = {
     coverURL: "https://station-images.nyc3.digitaloceanspaces.com/css_cover.png",
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/ccs.jpeg",
     permissions: {
-      invite: { rolesAllowedToInvite: [1, 2] }, // local id for STAFF and TEAM LEAD
+      invite: {
+        [roleIds.staff]: [
+          roleIds.staff,
+          roleIds.teamLead,
+          roleIds.coreContributor,
+          roleIds.guestContributor,
+        ],
+        [roleIds.teamLead]: [roleIds.coreContributor, roleIds.guestContributor],
+      }, // local id for STAFF and TEAM LEAD
     },
     contracts: {
       addresses: {
@@ -56,13 +71,6 @@ const ccs: TerminalSeed = {
 //////
 // ROLES
 //////
-
-export const roleIds = {
-  staff: 1,
-  teamLead: 2,
-  coreContributor: 3,
-  guestContributor: 4,
-}
 
 const staff: RoleSeed = {
   localId: roleIds.staff,

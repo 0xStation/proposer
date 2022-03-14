@@ -16,8 +16,7 @@ import { formatDate } from "app/core/utils/formatDate"
 const TerminalContributorsPage: BlitzPage = () => {
   const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
   const [selectedContributorToView, setSelectedContributorToView] = useState<Account | null>(null)
-  const [selectedRoleLocalId, setRoleLocalId] = useState<number>(1)
-  const [selectedContributors, setSelectedContributors] = useState<Account[] | null>(null)
+  const [selectedRoleLocalId, setRoleLocalId] = useState<number>()
 
   const terminalHandle = useParam("terminalHandle") as string
 
@@ -25,22 +24,30 @@ const TerminalContributorsPage: BlitzPage = () => {
 
   const [roles] = useQuery(
     getRolesByTerminal,
-    { terminalId: terminal?.id || 0 },
-    { suspense: false }
+    { terminalId: terminal?.id as number },
+    {
+      suspense: false,
+      enabled: !!terminal?.id,
+      onSuccess: (roles) => {
+        if (roles && Array.isArray(roles) && roles[0]) {
+          // First role pill is automatically selected.
+          setRoleLocalId(roles[0].localId)
+        }
+      },
+    }
   )
 
-  useEffect(() => {
-    if (selectedRoleLocalId) {
-      const getContributorsByRole = async () => {
-        let contributors = await invoke(getAccountsByTerminalRole, {
-          terminalId: terminal?.id || 0,
-          roleLocalId: selectedRoleLocalId,
-        })
-        setSelectedContributors(contributors)
-      }
-      getContributorsByRole()
+  const [selectedContributors] = useQuery(
+    getAccountsByTerminalRole,
+    {
+      terminalId: terminal?.id || 0,
+      roleLocalId: selectedRoleLocalId as number,
+    },
+    {
+      suspense: false,
+      enabled: !!selectedRoleLocalId && !!terminal?.id,
     }
-  }, [selectedRoleLocalId])
+  )
 
   const contributorCards = selectedContributors?.map((contributor, idx) => {
     const {
@@ -81,50 +88,57 @@ const TerminalContributorsPage: BlitzPage = () => {
     )
   })
 
-  const contributorDirectoryView = roles ? (
-    <>
-      {selectedContributorToView && (
-        <ContributorDirectoryModal
-          contributor={selectedContributorToView}
-          isOpen={contributorDirectoryModalIsOpen}
-          setIsOpen={setContributorDirectoryModalOpen}
-          terminalId={terminal?.id || 0}
-        />
-      )}
-      <div className="flex flex-col space-y-10">
-        <div className="flex-auto flex-wrap space-x-3 text-marble-white text-sm">
-          {roles.map((role, index) => {
-            return (
-              <Pill
-                key={index.toString()}
-                active={selectedRoleLocalId == role.localId}
-                onClick={() => {
-                  setRoleLocalId(role.localId)
-                }}
-              >
-                {`${role.data.name} (${role.ticketCount})`}
-              </Pill>
-            )
-          })}
-        </div>
-        {!selectedContributors || !selectedContributors.length ? (
-          <div className="text-marble-white">
-            {selectedRoleLocalId ? (
-              <div>There are no contributors with this role.</div>
+  const contributorDirectoryView =
+    roles && roles.length ? (
+      <>
+        {selectedContributorToView && (
+          <ContributorDirectoryModal
+            contributor={selectedContributorToView}
+            isOpen={contributorDirectoryModalIsOpen}
+            setIsOpen={setContributorDirectoryModalOpen}
+            terminalId={terminal?.id || 0}
+          />
+        )}
+        <div className="flex flex-col space-y-10">
+          <div className="flex-auto flex-wrap text-marble-white text-sm space-y-3 mt-[-0.75rem]">
+            {roles.map((role, index) => {
+              return (
+                <Pill
+                  key={index}
+                  active={selectedRoleLocalId == role.localId}
+                  onClick={() => {
+                    setRoleLocalId(role.localId)
+                  }}
+                >
+                  {`${role.data.name} (${role.ticketCount})`}
+                </Pill>
+              )
+            })}
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {!selectedContributors || !selectedContributors.length ? (
+              <>
+                {selectedRoleLocalId ? (
+                  <p className="text-marble-white">There are no contributors with this role.</p>
+                ) : (
+                  <p className="text-marble-white">Please select a role to view contributors.</p>
+                )}
+              </>
             ) : (
-              <div>Please select a role to view contributors.</div>
+              <>{contributorCards}</>
             )}
           </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">{contributorCards}</div>
-        )}
-      </div>
-    </>
-  ) : (
-    <span className="text-marble-white">This terminal does not have any contributors yet.</span>
-  )
+        </div>
+      </>
+    ) : (
+      <p className="text-marble-white">This terminal does not have any contributors yet.</p>
+    )
 
-  return <TerminalNavigation>{contributorDirectoryView}</TerminalNavigation>
+  return (
+    <TerminalNavigation>
+      {!Array.isArray(roles) ? <div></div> : contributorDirectoryView}
+    </TerminalNavigation>
+  )
 }
 
 TerminalContributorsPage.suppressFirstRenderFlicker = true

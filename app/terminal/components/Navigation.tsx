@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useParam } from "blitz"
 import { Link, Routes, useRouter, useQuery } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
@@ -6,15 +6,19 @@ import useStore from "app/core/hooks/useStore"
 import { useAccount, useBalance } from "wagmi"
 import TicketWrapper from "app/core/components/TicketWrapper"
 import { useDecimals } from "app/core/contracts/contracts"
-import { TERMINAL, DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
+import { DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { Account } from "app/account/types"
 
 const Navigation = ({ children }: { children?: any }) => {
+  const [pageLoading, setPageLoading] = useState<boolean>(true)
   // casting type as string to avoid the "undefined" type which could happen
   // but we will catch that at the terminal query level
   const terminalHandle = useParam("terminalHandle", "string") as string
-  // I was getting a weird error that suspense was not supported by react-dom so I had to disable it.
-  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+  const [terminal] = useQuery(
+    getTerminalByHandle,
+    { handle: terminalHandle },
+    { suspense: false, onSuccess: () => setPageLoading(false) }
+  )
 
   const router = useRouter()
   const activeUser: Account | null = useStore((state) => state.activeUser)
@@ -35,12 +39,7 @@ const Navigation = ({ children }: { children?: any }) => {
 
   const tokenBalance = parseInt(balanceData?.formatted || "0")
 
-  // obviously need better error page if the terminal is not found, but this will do.
-  if (!terminal) {
-    return <div className="max-w-screen-xl mx-auto text-marble-white">Terminal not found.</div>
-  }
-
-  return (
+  const navView = terminal ? (
     <div>
       <img
         className="w-full h-[185px] object-cover object-no-repeat object-[0,38%]"
@@ -48,9 +47,9 @@ const Navigation = ({ children }: { children?: any }) => {
       />
       <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] relative">
         <div className="grid gap-0 grid-cols-1 md:grid-cols-3 xl:grid-cols-4 max-w-screen-xl h-full mx-auto">
-          <div className="col-span-1 pl-4 text-2xl border-concrete border-b pb-12 md:border-b-0 md:border-r md:pr-6 h-full">
+          <div className="col-span-1 pl-4 text-2xl border-concrete border-b pb-12 md:border-b-0 md:border-r pr-4 md:pr-6 h-full">
             <div className="flex items-center mt-12">
-              <div className="flex-2/5 mr-4">
+              <div className="mr-4 max-w-[52px]">
                 <img
                   src={terminal.data.pfpURL}
                   alt="PFP"
@@ -105,6 +104,7 @@ const Navigation = ({ children }: { children?: any }) => {
         </div>
         {activeUser && (
           <TicketWrapper
+            terminal={terminal}
             activeUser={activeUser}
             tokenBalance={tokenBalance}
             endorsementsSymbol={terminal.data.contracts.symbols.endorsements}
@@ -112,7 +112,13 @@ const Navigation = ({ children }: { children?: any }) => {
         )}
       </div>
     </div>
+  ) : (
+    <div className="min-h-screen text-center grid place-content-center text-marble-white">
+      Terminal not found.
+    </div>
   )
+
+  return pageLoading ? <div></div> : navView
 }
 
 export default Navigation

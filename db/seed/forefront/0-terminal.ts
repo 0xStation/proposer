@@ -36,7 +36,7 @@ const forefront: TerminalSeed = {
     coverURL: "https://station-images.nyc3.digitaloceanspaces.com/forefront-banner.png",
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/forefront-pfp.png",
     permissions: {
-      invite: { rolesAllowedToInvite: [] }, // local id for STAFF and TEAM LEAD
+      invite: {}, // local id for STAFF and TEAM LEAD
     },
     contracts: {
       addresses: {

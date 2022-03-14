@@ -1,9 +1,9 @@
 import db from "db"
 import * as z from "zod"
-import { hasInvitePermissions } from "app/application/queries/hasInvitePermissions"
+import getInvitePermissions from "../queries/getInvitePermissions"
 
 const InviteContributor = z.object({
-  referrerId: z.number(),
+  inviterId: z.number(),
   accountId: z.number(),
   initiativeId: z.number(),
   terminalId: z.number(),
@@ -12,12 +12,11 @@ const InviteContributor = z.object({
 
 export default async function inviteContributor(input: z.infer<typeof InviteContributor>) {
   const params = InviteContributor.parse(input)
-  const { referrerId, terminalId, accountId, initiativeId, roleLocalId } = params
+  const { inviterId, terminalId, accountId, initiativeId, roleLocalId } = params
 
-  // check that this invitation is valid
-  const canInvite = await hasInvitePermissions({ referrerId, terminalId })
+  const permissions = await getInvitePermissions({ inviterId, terminalId })
 
-  if (!canInvite) {
+  if (!permissions || !permissions.includes(roleLocalId)) {
     console.log("Not a valid invite pair.")
     return
   }
@@ -35,29 +34,21 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
     },
   })
 
-  const existingMembership = await db.accountTerminal.findUnique({
+  await db.accountTerminal.upsert({
     where: {
       accountId_terminalId: {
         accountId: accountId,
         terminalId: terminalId,
       },
     },
-  })
-
-  // if the user already exists, we do not want to "re-invite" them
-  // but what if this is not meant to be a first time invite but a promotion?
-  if (existingMembership) {
-    console.log("This user is already part of the terminal.")
-  }
-
-  await db.accountTerminal.create({
-    data: {
+    create: {
       accountId: accountId,
       terminalId: terminalId,
       roleLocalId: roleLocalId,
       data: {
-        invitedBy: referrerId,
+        invitedBy: inviterId,
       },
     },
+    update: {},
   })
 }

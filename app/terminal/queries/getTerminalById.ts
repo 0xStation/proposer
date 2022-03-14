@@ -10,6 +10,7 @@ export default async function getTerminalById(input: z.infer<typeof GetTerminalB
   const data = GetTerminalById.parse(input)
   const terminal = await db.terminal.findFirst({
     where: { id: data.id },
+    include: { roles: true },
   })
   if (!terminal) {
     return null

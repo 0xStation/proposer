@@ -7,15 +7,16 @@ import { Account } from "../../account/types"
 import getTerminalById from "app/terminal/queries/getTerminalById"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
+import { Initiative } from "../../initiative/types"
 
 const ApplicationModal = ({
   isOpen,
   setIsOpen,
-  initiativeId,
+  initiative,
 }: {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-  initiativeId: number
+  initiative: Initiative
 }) => {
   const router = useRouter()
   const terminalHandle = useParam("terminalHandle") as string
@@ -29,10 +30,10 @@ const ApplicationModal = ({
 
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
   const terminalId = terminal?.id || 0
-  const [initiative] = useQuery(getInitiativeByLocalId, {
-    terminalId: terminalId,
-    localId: initiativeId,
-  })
+  // const [initiative] = useQuery(getInitiativeByLocalId, {
+  //   terminalId: terminalId,
+  //   localId: initiativeId,
+  // })
 
   if (!activeUser) {
     return (
@@ -49,7 +50,7 @@ const ApplicationModal = ({
   const webhook = terminal?.data.discordWebHook
 
   async function sendDiscordNotification(handle, hook) {
-    const title = `${activeUser?.data.name} just submitted an application to ${initiative?.data.name}!`
+    const title = `${activeUser?.data.name} just submitted an application to ${initiative.data.name}!`
     const description = `https://station.express/terminal/${terminalHandle}/waiting-room`
     const notification = {
       content: `New Application Submitted to ${handle.toUpperCase()}`,
@@ -88,7 +89,7 @@ const ApplicationModal = ({
             try {
               await createApplicationMutation({
                 ...values,
-                initiativeId: initiativeId,
+                initiativeId: initiative.id,
                 accountId: activeUser.id,
               })
             } catch (error) {
@@ -112,7 +113,7 @@ const ApplicationModal = ({
                 </div>
                 <div className="flex flex-col col-span-2">
                   <label htmlFor="entryDescription" className="text-marble-white">
-                    Why this initiative?
+                    {initiative.data.applicationQuestion || "Why this initiative"}?
                   </label>
                   <Field
                     component="input"
