@@ -130,7 +130,7 @@ const Project: BlitzPage = () => {
   const { results, totalPages, hasNext, hasPrev } = usePagination(contributorCards, page, 3)
 
   return (
-    <>
+    <Layout title={`${initiative?.data.name || "Initiative"}`}>
       {initiative && (
         <ApplicationModal
           isOpen={applicationModalOpen}
@@ -252,7 +252,7 @@ const Project: BlitzPage = () => {
                 <div className="flex flex-row">
                   <span className="flex-1 text-marble-white text-2xl">Contributors</span>
                 </div>
-                <div className="flex grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
+                <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
                   {results?.map?.((contributor, index) => {
                     return contributor
                   })}
@@ -328,7 +328,7 @@ const Project: BlitzPage = () => {
                   <div>
                     <span className="text-2xl">What&apos;s next?</span>
                   </div>
-                  <div className="flex grid md:grid-cols-3 gap-3">
+                  <div className="grid md:grid-cols-3 gap-3">
                     <div className="flex-1 space-y-4">
                       <div>
                         <Image src={StepOne} alt="Step one." width={24} height={24} />
@@ -393,11 +393,10 @@ const Project: BlitzPage = () => {
           </div>
         </div>
       </main>
-    </>
+    </Layout>
   )
 }
 
 Project.suppressFirstRenderFlicker = true
-Project.getLayout = (page) => <Layout title="Project">{page}</Layout>
 
 export default Project

@@ -250,13 +250,14 @@ const TerminalWaitingPage: BlitzPage = () => {
   )
 
   return (
-    <TerminalNavigation>
-      {initialPageLoading || applicationsLoading ? skeletonLoadingScreen : waitingRoomView}
-    </TerminalNavigation>
+    <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Waiting Room`}>
+      <TerminalNavigation>
+        {initialPageLoading || applicationsLoading ? skeletonLoadingScreen : waitingRoomView}
+      </TerminalNavigation>
+    </Layout>
   )
 }
 
 TerminalWaitingPage.suppressFirstRenderFlicker = true
-TerminalWaitingPage.getLayout = (page) => <Layout title="Initiatives">{page}</Layout>
 
 export default TerminalWaitingPage

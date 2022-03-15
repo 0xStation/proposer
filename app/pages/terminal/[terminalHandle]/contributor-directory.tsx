@@ -135,13 +135,14 @@ const TerminalContributorsPage: BlitzPage = () => {
     )
 
   return (
-    <TerminalNavigation>
-      {!Array.isArray(roles) ? <div></div> : contributorDirectoryView}
-    </TerminalNavigation>
+    <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Contributors`}>
+      <TerminalNavigation>
+        {!Array.isArray(roles) ? <div></div> : contributorDirectoryView}
+      </TerminalNavigation>
+    </Layout>
   )
 }
 
 TerminalContributorsPage.suppressFirstRenderFlicker = true
-TerminalContributorsPage.getLayout = (page) => <Layout title="Contributors">{page}</Layout>
 
 export default TerminalContributorsPage
