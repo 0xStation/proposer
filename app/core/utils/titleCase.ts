@@ -1,4 +1,4 @@
-export const titleCase = (testString = "") => {
+export const toTitleCase = (testString = "") => {
   return testString
     .trim()
     .toLowerCase()

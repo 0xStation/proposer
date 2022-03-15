@@ -17,3 +17,10 @@ export const LOCAL_STORAGE = {
   WAGMI_WALLET: "station.wallet",
   CONNECTION: "station.connection",
 }
+
+export enum AccountInitiativeStatus {
+  APPLIED = "APPLIED",
+  INVITED = "INVITED",
+  CONTRIBUTOR = "CONTRIBUTOR",
+  INACTIVE = "INACTIVE",
+}

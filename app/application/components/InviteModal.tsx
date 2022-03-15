@@ -7,7 +7,7 @@ import InviteContributor from "app/application/mutations/inviteContributor"
 import useStore from "app/core/hooks/useStore"
 import { Account } from "app/account/types"
 import { Role } from "app/role/types"
-import { titleCase } from "app/core/utils/titleCase"
+import { toTitleCase } from "app/core/utils/toTitleCase"
 import getInvitePermissions from "../queries/getInvitePermissions"
 
 export const InviteModal = ({
@@ -96,7 +96,7 @@ export const InviteModal = ({
           .reverse()
           .map((role, idx) => (
             <option key={idx} value={role.localId}>
-              {titleCase(role.data?.name)}
+              {toTitleCase(role.data?.name)}
             </option>
           ))}
       </select>
@@ -116,7 +116,7 @@ export const InviteModal = ({
       ) : (
         <h1 className="text-3xl">
           {selectedApplication?.account?.data?.name} is now a{" "}
-          <span className="text-electric-violet">{titleCase(chosenRole?.data.name)}</span> at{" "}
+          <span className="text-electric-violet">{toTitleCase(chosenRole?.data.name)}</span> at{" "}
           {terminal?.data?.name} and a part of {currentInitiative?.data?.name}!
         </h1>
       )}

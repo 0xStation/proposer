@@ -1,17 +1,21 @@
 const createKeccakHash = require("keccak")
 
-export const toChecksumAddress = (address) => {
+// Addresses are case-insensitive unique, but a "checksum" represents an algorithmic
+// way to determine the proper casing of an address. All wallet providers leverage
+// this checksum algorithm from EIP-55 for determining their address casing.
+// Implementation taken from the EIP: https://eips.ethereum.org/EIPS/eip-55
+export const toChecksumAddress = (address: string) => {
   address = address.toLowerCase().replace("0x", "")
-  var hash = createKeccakHash("keccak256").update(address).digest("hex")
-  var ret = "0x"
+  const hash = createKeccakHash("keccak256").update(address).digest("hex")
+  let checksummed = "0x"
 
-  for (var i = 0; i < address.length; i++) {
+  for (let i = 0; i < address.length; i++) {
     if (parseInt(hash[i], 16) >= 8) {
-      ret += address[i].toUpperCase()
+      checksummed += address.substring(i, i + 1).toUpperCase()
     } else {
-      ret += address[i]
+      checksummed += address[i]
     }
   }
 
-  return ret
+  return checksummed
 }

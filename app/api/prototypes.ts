@@ -1,10 +1,12 @@
-import { BlitzApiHandler, useRouterQuery } from "blitz"
+import { BlitzApiRequest, BlitzApiResponse, useRouterQuery } from "blitz"
 import db from "db"
-import { titleCase } from "app/core/utils/titleCase"
+import { toTitleCase } from "app/core/utils/titleCase"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { RoleMetadata } from "app/role/types"
 import { InitiativeMetadata } from "app/initiative/types"
 import { AccountMetadata } from "app/account/types"
+import { AccountInitiativeStatus } from "app/core/utils/constants"
+import { TerminalMetadata } from "app/terminal/types"
 
 type TicketQuery = {
   ticket: string
@@ -17,22 +19,30 @@ type Attribute = {
   display_type?: string
 }
 
-// fetch from [endpoint]/api/prototypes
-const handler: BlitzApiHandler = async (req, res) => {
-  const query = req.query as TicketQuery
+const errorMessage = (message: string) => {
+  return JSON.stringify({
+    error: message,
+  })
+}
+
+// Public endpoint for returning Station's metadata for a particular terminal and account.
+// Station-minted Contributor NFTs will point to this route by default, allowing our
+// metadata to render in Opensea's trait-based system and all products built on top of their API.
+export default async function handler(req: BlitzApiRequest, res: BlitzApiResponse) {
+  const { ticket, owner } = req.query as TicketQuery
 
   const account = await db.account.findUnique({
-    where: { address: toChecksumAddress(query.owner) },
+    where: { address: toChecksumAddress(owner) },
   })
 
   if (!account) {
     res.statusCode = 404
-    res.end("account not found")
+    res.end(errorMessage("account not found"))
     return
   }
 
   const terminal = await db.terminal.findUnique({
-    where: { ticketAddress: toChecksumAddress(query.ticket) },
+    where: { ticketAddress: toChecksumAddress(ticket) },
     include: {
       tickets: {
         where: {
@@ -45,7 +55,7 @@ const handler: BlitzApiHandler = async (req, res) => {
       initiatives: {
         include: {
           accounts: {
-            where: { accountId: account.id, status: "CONTRIBUTOR" },
+            where: { accountId: account.id, status: AccountInitiativeStatus.CONTRIBUTOR },
           },
         },
       },
@@ -54,19 +64,31 @@ const handler: BlitzApiHandler = async (req, res) => {
 
   if (!terminal) {
     res.statusCode = 404
-    res.end("terminal not found")
+    res.end(errorMessage("terminal not found"))
     return
   }
 
-  let attributes: Attribute[] = [{ trait_type: "Status", value: "Active" }]
+  const accountTerminal = terminal.tickets[0]
+
+  if (!accountTerminal) {
+    res.statusCode = 404
+    res.end(errorMessage("account is not member of terminal"))
+    return
+  }
+
+  let attributes: Attribute[] = []
   attributes.push({
-    trait_type: "Role",
-    value: titleCase((terminal.tickets[0]?.role?.data as RoleMetadata)?.name),
+    trait_type: "Status",
+    value: accountTerminal.active ? "Active" : "Inactive",
   })
   attributes.push({
-    trait_type: "Joined At",
+    trait_type: "Role",
+    value: toTitleCase((accountTerminal.role?.data as RoleMetadata)?.name),
+  })
+  attributes.push({
+    trait_type: "Joined Since",
     display_type: "date",
-    value: Math.round(terminal.tickets[0]?.joinedAt.getTime() || 0 / 1000),
+    value: Math.round(accountTerminal.joinedAt.getTime() || 0 / 1000),
   })
 
   terminal?.initiatives.forEach((i) => {
@@ -84,7 +106,8 @@ const handler: BlitzApiHandler = async (req, res) => {
 
   let payload = {
     name: (account.data as AccountMetadata)?.name,
-    description: "Contributor NFT for the Station Labs Terminal.",
+    description: `Contributor NFT for the ${(terminal.data as TerminalMetadata)?.name} Terminal.`,
+    // TODO: add link to contributor's public profile page to description once complete
     external_url: "https://station.express/",
     image: imageMap[terminal.tickets[0]?.role?.localId || 4],
     attributes,
@@ -94,4 +117,3 @@ const handler: BlitzApiHandler = async (req, res) => {
   res.setHeader("Content-Type", "application/json")
   res.end(JSON.stringify(payload))
 }
-export default handler
