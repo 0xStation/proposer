@@ -47,13 +47,13 @@ const ProfileHome: BlitzPage = () => {
         <div className="col-span-1 text-2xl md:border-r border-concrete h-full">
           <div className="h-[185px] relative mb-[116px]">
             <img
-              alt="The logged-in user's cover photo."
+              alt="The connected user's cover photo."
               src={activeUser?.data.coverURL}
               className="w-full h-full object-cover"
             />
             <img
               src={activeUser?.data.pfpURL}
-              alt="The logged-in user's profile picture."
+              alt="The connected user's profile picture."
               className="w-[200px] h-[200px] border border-marble-white rounded-full absolute bottom-[-100px] left-0 right-0 ml-[8rem]"
             />
           </div>
@@ -95,8 +95,8 @@ const ProfileHome: BlitzPage = () => {
         </div>
         <div className="col-span-2 xl:col-span-3 px-12 relative">
           <div className="mt-12">
-            {((activeUser?.tickets && activeUser?.tickets.length) ||
-              (activeUser?.initiatives && activeUser?.initiatives.length)) && (
+            {((activeUser?.tickets && activeUser?.tickets.length > 0) ||
+              (activeUser?.initiatives && activeUser?.initiatives.length > 0)) && (
               <>
                 <div className="flex flex-row z-10">
                   <button

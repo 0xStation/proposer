@@ -3,7 +3,6 @@ import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
 import useStore from "../../core/hooks/useStore"
-import { Account } from "../../account/types"
 import { Initiative } from "../../initiative/types"
 
 const ApplicationModal = ({
