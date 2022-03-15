@@ -121,7 +121,7 @@ const Project: BlitzPage = () => {
   const { results, totalPages, hasNext, hasPrev } = usePagination(contributorCards, page, 3)
 
   return (
-    <Layout title={`${initiative?.data.name || "Project"}`}>
+    <Layout title={`${initiative?.data.name || "Initiative"}`}>
       {initiative && (
         <ApplicationModal
           isOpen={applicationModalOpen}
