@@ -26,37 +26,38 @@ const TerminalInitiativePage: BlitzPage = () => {
   }, [initiatives])
 
   return (
-    <TerminalNavigation>
-      {!initiatives ? (
-        <div>There are no active initiatves in this terminal.</div>
-      ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sortedInitiatives?.map?.(
-            ({ localId, contributors, data: { name, oneLiner, isAcceptingApplications } }) => {
-              return (
-                <Link
-                  key={localId}
-                  href={Routes.Project({ terminalHandle, initiativeId: localId })}
-                >
-                  <a>
-                    <InitiativeCard
-                      title={name || "Title"}
-                      oneLiner={oneLiner || "One Liner"}
-                      contributors={contributors}
-                      isAcceptingApplications={isAcceptingApplications}
-                    />
-                  </a>
-                </Link>
-              )
-            }
-          )}
-        </div>
-      )}
-    </TerminalNavigation>
+    <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Initiatives`}>
+      <TerminalNavigation>
+        {!initiatives ? (
+          <div>There are no active initiatves in this terminal.</div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {sortedInitiatives?.map?.(
+              ({ localId, contributors, data: { name, oneLiner, isAcceptingApplications } }) => {
+                return (
+                  <Link
+                    key={localId}
+                    href={Routes.Project({ terminalHandle, initiativeId: localId })}
+                  >
+                    <a>
+                      <InitiativeCard
+                        title={name || "Title"}
+                        oneLiner={oneLiner || "One Liner"}
+                        contributors={contributors}
+                        isAcceptingApplications={isAcceptingApplications}
+                      />
+                    </a>
+                  </Link>
+                )
+              }
+            )}
+          </div>
+        )}
+      </TerminalNavigation>
+    </Layout>
   )
 }
 
 TerminalInitiativePage.suppressFirstRenderFlicker = true
-TerminalInitiativePage.getLayout = (page) => <Layout title="Initiatives">{page}</Layout>
 
 export default TerminalInitiativePage
