@@ -1,5 +1,6 @@
 import create from "zustand"
 import { Account } from "../../account/types"
+import produce from "immer"
 
 interface StoreState {
   activeUser: undefined | Account | null
@@ -8,6 +9,7 @@ interface StoreState {
   toggleWalletModal: (boolean) => void
   toggleAccountModal: (boolean) => void
   setActiveUser: (user: undefined | Account | null) => void
+  setActiveUserApplications: (initiatives: any[] | undefined) => void
 }
 
 const useStore = create<StoreState>((set) => ({
@@ -28,6 +30,14 @@ const useStore = create<StoreState>((set) => ({
     set(() => {
       return { activeUser: user }
     }),
+  setActiveUserApplications: (applications) =>
+    set(
+      produce((draft) => {
+        if (draft.activeUser) {
+          draft.activeUser.applications = applications
+        }
+      })
+    ),
 }))
 
 export default useStore

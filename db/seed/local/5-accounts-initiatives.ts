@@ -18,7 +18,7 @@ const kristen = {
     initiativeIds.waitingRoom,
     initiativeIds.midnightStation,
     initiativeIds.contributorReview,
-    initiativeIds.newstand,
+    initiativeIds.partnership,
     initiativeIds.brandIdentity,
     initiativeIds.stationDigest,
     initiativeIds.networkSustainability,
