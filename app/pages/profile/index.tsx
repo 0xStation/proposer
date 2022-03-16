@@ -54,7 +54,7 @@ const ProfileHome: BlitzPage = () => {
             <img
               src={activeUser?.data.pfpURL}
               alt="The connected user's profile picture."
-              className="w-[200px] h-[200px] border border-marble-white rounded-full absolute bottom-[-100px] left-0 right-0 ml-[8rem]"
+              className="w-[200px] h-[200px] border border-marble-white rounded-full absolute bottom-[-100px] left-0 right-0 mx-auto"
             />
           </div>
           <div className="px-8 ml-20 mr-10">
