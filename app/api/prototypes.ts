@@ -7,6 +7,7 @@ import { InitiativeMetadata } from "app/initiative/types"
 import { AccountMetadata } from "app/account/types"
 import { AccountInitiativeStatus } from "app/core/utils/constants"
 import { TerminalMetadata } from "app/terminal/types"
+import { getImage } from "app/utils/getNFTImage"
 
 type TicketQuery = {
   ticket: string
@@ -76,40 +77,44 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
     return
   }
 
-  let attributes: Attribute[] = []
-  attributes.push({
-    trait_type: "Status",
-    value: accountTerminal.active ? "Active" : "Inactive",
-  })
-  attributes.push({
-    trait_type: "Role",
-    value: toTitleCase((accountTerminal.role?.data as RoleMetadata)?.name),
-  })
-  attributes.push({
-    trait_type: "Joined Since",
-    display_type: "date",
-    value: Math.round(accountTerminal.joinedAt.getTime() || 0 / 1000),
-  })
+  let image = getImage({ terminal, account, ticket: accountTerminal })
 
-  terminal?.initiatives.forEach((i) => {
-    if (i.accounts.length > 0) {
-      attributes.push({ trait_type: "Initiative", value: (i.data as InitiativeMetadata)?.name })
-    }
-  })
-
-  const imageMap = {
-    1: "https://station-images.nyc3.digitaloceanspaces.com/ticket-4.png",
-    2: "https://station-images.nyc3.digitaloceanspaces.com/ticket-3.png",
-    3: "https://station-images.nyc3.digitaloceanspaces.com/ticket-2.png",
-    4: "https://station-images.nyc3.digitaloceanspaces.com/ticket-1.png",
+  if (image == "") {
+    res.statusCode = 404
+    res.end(errorMessage("image could not load"))
+    return
   }
+
+  let attributes: Attribute[] = [
+    {
+      trait_type: "Status",
+      value: accountTerminal.active ? "Active" : "Inactive",
+    },
+    {
+      trait_type: "Role",
+      value: toTitleCase((accountTerminal.role?.data as RoleMetadata)?.name),
+    },
+    {
+      trait_type: "Joined Since",
+      display_type: "date",
+      value: Math.round(accountTerminal.joinedAt.getTime() || 0 / 1000),
+    },
+    ...terminal?.initiatives
+      .filter((i) => i.accounts.length > 0)
+      .map((i) => {
+        return {
+          trait_type: "Initiative",
+          value: (i.data as InitiativeMetadata)?.name,
+        }
+      }),
+  ]
 
   let payload = {
     name: (account.data as AccountMetadata)?.name,
     description: `Contributor NFT for the ${(terminal.data as TerminalMetadata)?.name} Terminal.`,
     // TODO: add link to contributor's public profile page to description once complete
     external_url: "https://station.express/",
-    image: imageMap[terminal.tickets[0]?.role?.localId || 4],
+    image,
     attributes,
   }
 

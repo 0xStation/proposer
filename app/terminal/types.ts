@@ -1,5 +1,10 @@
 import { Role } from "app/role/types"
 
+export enum MetadataImageLogicType {
+  ROLE = "ROLE", // images are created per role, e.g. CCS NFT
+  INDIVIDUAL = "INDIVIDUAL", // images are generated per individual, e.g. Station NFT
+}
+
 export type TerminalMetadata = {
   name: string
   description: string
@@ -21,6 +26,12 @@ export type TerminalMetadata = {
     }
   }
   hide?: boolean
+  metadata?: {
+    image: {
+      logicType: string
+      roleMap?: Record<number, string> // maps from Role localId's to a URL, only used if logicType is ROLE
+    }
+  }
 }
 
 export type Terminal = {

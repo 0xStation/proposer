@@ -7,7 +7,7 @@ import InviteContributor from "app/application/mutations/inviteContributor"
 import useStore from "app/core/hooks/useStore"
 import { Account } from "app/account/types"
 import { Role } from "app/role/types"
-import { toTitleCase } from "app/core/utils/toTitleCase"
+import { toTitleCase } from "app/core/utils/titleCase"
 import getInvitePermissions from "../queries/getInvitePermissions"
 
 export const InviteModal = ({

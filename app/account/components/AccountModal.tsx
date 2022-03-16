@@ -8,7 +8,7 @@ import getSkills from "app/skills/queries/getSkills"
 import { useDropzone } from "react-dropzone"
 import CreatableSelect from "react-select/creatable"
 import { components } from "react-select"
-import { toTitleCase } from "app/core/utils/toTitleCase"
+import { toTitleCase } from "app/core/utils/titleCase"
 interface ApplicationParams {
   name: string
   discordId: string
