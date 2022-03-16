@@ -93,7 +93,7 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
     return
   }
 
-  let image = getImage({ terminal, account, ticket: accountTerminal })
+  let image = getImage(terminal, accountTerminal)
 
   // construct attributes list per Opensea's metadata standard schema: https://docs.opensea.io/docs/metadata-standards
   // note that Opensea renders in alphabetical order by trait type
