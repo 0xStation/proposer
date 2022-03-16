@@ -8,7 +8,7 @@ import getSkills from "app/skills/queries/getSkills"
 import { useDropzone } from "react-dropzone"
 import CreatableSelect from "react-select/creatable"
 import { components } from "react-select"
-import { titleCase } from "app/core/utils/titleCase"
+import { toTitleCase } from "app/core/utils/titleCase"
 interface ApplicationParams {
   name: string
   discordId: string
@@ -100,7 +100,7 @@ const AccountModal = ({
 
   const [skills] = useQuery(getSkills, {}, { suspense: false })
   const skillOptions = skills?.map((skill) => {
-    return { value: skill.name, label: titleCase(skill.name) }
+    return { value: skill.name, label: toTitleCase(skill.name) }
   })
 
   const uploadFile = async (acceptedFiles) => {
