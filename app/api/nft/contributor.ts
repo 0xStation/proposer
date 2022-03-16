@@ -24,13 +24,16 @@ type Attribute = {
 const makeAttribute = (
   traitType: string,
   value: string | number,
-  displayType: string = DisplayTypes.STRING
+  displayType?: string
 ): Attribute => {
-  return {
+  let attr = {
     trait_type: traitType,
     value,
-    display_type: displayType,
   }
+  if (displayType) {
+    attr["display_type"] = displayType
+  }
+  return attr
 }
 
 const errorMessage = (message: string) => {
@@ -93,18 +96,18 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
   let image = getImage({ terminal, account, ticket: accountTerminal })
 
   // construct attributes list per Opensea's metadata standard schema: https://docs.opensea.io/docs/metadata-standards
-  // Opensea renders in reverse order so pre-reverse to have status and role first
+  // note that Opensea renders in alphabetical order by trait type
   let attributes: Attribute[] = [
-    ...terminal?.initiatives
-      .filter((i) => i.accounts.length > 0) // from the join query, `accounts` is length 1 if the account is a contributor to the initiative
-      .map((i) => makeAttribute(TraitTypes.INITIATIVE, (i.data as InitiativeMetadata)?.name)),
+    makeAttribute(TraitTypes.STATUS, accountTerminal.active ? "Active" : "Inactive"),
+    makeAttribute(TraitTypes.ROLE, toTitleCase((accountTerminal.role?.data as RoleMetadata)?.name)),
     makeAttribute(
       TraitTypes.JOINED_SINCE,
       Math.round(accountTerminal.joinedAt.getTime() || 0 / 1000),
       DisplayTypes.DATE
     ),
-    makeAttribute(TraitTypes.ROLE, toTitleCase((accountTerminal.role?.data as RoleMetadata)?.name)),
-    makeAttribute(TraitTypes.STATUS, accountTerminal.active ? "Active" : "Inactive"),
+    ...terminal?.initiatives
+      .filter((i) => i.accounts.length > 0) // from the join query, `accounts` is length 1 if the account is a contributor to the initiative
+      .map((i) => makeAttribute(TraitTypes.INITIATIVE, (i.data as InitiativeMetadata)?.name)),
   ]
 
   let payload = {
