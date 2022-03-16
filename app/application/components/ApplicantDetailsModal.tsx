@@ -67,10 +67,11 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     address,
   }
 
-  const canActiveUserEndorse =
+  const canActiveUserEndorse = !!(
     activeUser &&
     (roleOfActiveUser || parseFloat(balanceData?.formatted || "0")) &&
     activeUser?.address !== application?.account?.address
+  )
 
   const CloseButton = ({ onClick }) => (
     <div className="flex flex-1 justify-start absolute top-1 left-2">
@@ -207,7 +208,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               <div className="flex-auto text-marble-white font-bold">
                 <span>Endorsers</span>
               </div>
-              {application?.referrals && application?.referrals.length ? (
+              {application?.referrals?.length ? (
                 <div className="flex flex-col space-y-1">
                   {application?.referrals?.map?.(({ from: account, amount = 0 }, index) => (
                     <ApplicantEndorsements
@@ -227,7 +228,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               )}
             </div>
           </div>
-          {canActiveUserEndorse && (
+          {canActiveUserEndorse ? (
             <div className="mx-auto">
               <Button
                 className={canInvite ? "px-20 mr-2 inline" : "px-28"}
@@ -255,7 +256,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 </Button>
               )}
             </div>
-          )}
+          ) : null}
         </div>
       </Modal>
     </div>
