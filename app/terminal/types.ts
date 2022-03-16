@@ -27,7 +27,7 @@ export type TerminalMetadata = {
   }
   hide?: boolean
   metadata?: {
-    image: {
+    imageConfig: {
       logicType: string
       roleMap?: Record<number, string> // maps from Role localId's to a URL, only used if logicType is ROLE
     }

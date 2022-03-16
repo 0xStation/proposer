@@ -1,4 +1,4 @@
-import { BlitzApiRequest, BlitzApiResponse, useRouterQuery } from "blitz"
+import { BlitzApiRequest, BlitzApiResponse } from "blitz"
 import db from "db"
 import { toTitleCase } from "app/core/utils/titleCase"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
@@ -8,6 +8,7 @@ import { AccountMetadata } from "app/account/types"
 import { AccountInitiativeStatus } from "app/core/utils/constants"
 import { TerminalMetadata } from "app/terminal/types"
 import { getImage } from "app/utils/getNFTImage"
+import { TraitTypes, DisplayTypes } from "app/ticket/types"
 
 type TicketQuery = {
   ticket: string
@@ -18,6 +19,18 @@ type Attribute = {
   trait_type: string
   value: string | number
   display_type?: string
+}
+
+const makeAttribute = (
+  traitType: string,
+  value: string | number,
+  displayType: string = DisplayTypes.LABEL
+): Attribute => {
+  return {
+    trait_type: traitType,
+    value,
+    display_type: displayType,
+  }
 }
 
 const errorMessage = (message: string) => {
@@ -69,7 +82,7 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
     return
   }
 
-  const accountTerminal = terminal.tickets[0]
+  const accountTerminal = terminal.tickets[0] // from join query, should be 1 object list if ticket exists for account or empty list if not
 
   if (!accountTerminal) {
     res.statusCode = 404
@@ -85,28 +98,18 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
     return
   }
 
+  // construct attributes list per Opensea's metadata standard schema: https://docs.opensea.io/docs/metadata-standards
   let attributes: Attribute[] = [
-    {
-      trait_type: "Status",
-      value: accountTerminal.active ? "Active" : "Inactive",
-    },
-    {
-      trait_type: "Role",
-      value: toTitleCase((accountTerminal.role?.data as RoleMetadata)?.name),
-    },
-    {
-      trait_type: "Joined Since",
-      display_type: "date",
-      value: Math.round(accountTerminal.joinedAt.getTime() || 0 / 1000),
-    },
+    makeAttribute(TraitTypes.STATUS, accountTerminal.active ? "Active" : "Inactive"),
+    makeAttribute(TraitTypes.ROLE, toTitleCase((accountTerminal.role?.data as RoleMetadata)?.name)),
+    makeAttribute(
+      TraitTypes.JOINED_SINCE,
+      Math.round(accountTerminal.joinedAt.getTime() || 0 / 1000),
+      DisplayTypes.DATE
+    ),
     ...terminal?.initiatives
-      .filter((i) => i.accounts.length > 0)
-      .map((i) => {
-        return {
-          trait_type: "Initiative",
-          value: (i.data as InitiativeMetadata)?.name,
-        }
-      }),
+      .filter((i) => i.accounts.length > 0) // from the join query, `accounts` is length 1 if the account is a contributor to the initiative
+      .map((i) => makeAttribute(TraitTypes.INITIATIVE, (i.data as InitiativeMetadata)?.name)),
   ]
 
   let payload = {
@@ -115,7 +118,7 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
     // TODO: add link to contributor's public profile page to description once complete
     external_url: "https://station.express/",
     image,
-    attributes,
+    attributes: attributes.reverse(), // Opensea renders in reverse order
   }
 
   res.statusCode = 200
