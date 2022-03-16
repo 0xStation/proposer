@@ -22,5 +22,9 @@ export const getImage = (context: imageContext) => {
       (context.ticket.data as TicketMetadata)?.ticketImageUrl,
   }
 
-  return logicMapping[imageConfig?.logicType as string]() || ""
+  return (
+    logicMapping[imageConfig?.logicType as string]() ||
+    // to allow other metadata to return, default empty image to placeholder
+    "https://station-images.nyc3.digitaloceanspaces.com/6a3fe074-5d4d-437e-9b59-8c06c1c1ca8d.png"
+  )
 }

@@ -90,34 +90,21 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
     return
   }
 
-  let image = ""
-
-  try {
-    image = getImage({ terminal, account, ticket: accountTerminal })
-  } catch (e) {
-    res.statusCode = 500
-    res.end(errorMessage(e))
-    return
-  }
-
-  if (image == "") {
-    res.statusCode = 404
-    res.end(errorMessage("image could not load"))
-    return
-  }
+  let image = getImage({ terminal, account, ticket: accountTerminal })
 
   // construct attributes list per Opensea's metadata standard schema: https://docs.opensea.io/docs/metadata-standards
+  // Opensea renders in reverse order so pre-reverse to have status and role first
   let attributes: Attribute[] = [
-    makeAttribute(TraitTypes.STATUS, accountTerminal.active ? "Active" : "Inactive"),
-    makeAttribute(TraitTypes.ROLE, toTitleCase((accountTerminal.role?.data as RoleMetadata)?.name)),
+    ...terminal?.initiatives
+      .filter((i) => i.accounts.length > 0) // from the join query, `accounts` is length 1 if the account is a contributor to the initiative
+      .map((i) => makeAttribute(TraitTypes.INITIATIVE, (i.data as InitiativeMetadata)?.name)),
     makeAttribute(
       TraitTypes.JOINED_SINCE,
       Math.round(accountTerminal.joinedAt.getTime() || 0 / 1000),
       DisplayTypes.DATE
     ),
-    ...terminal?.initiatives
-      .filter((i) => i.accounts.length > 0) // from the join query, `accounts` is length 1 if the account is a contributor to the initiative
-      .map((i) => makeAttribute(TraitTypes.INITIATIVE, (i.data as InitiativeMetadata)?.name)),
+    makeAttribute(TraitTypes.ROLE, toTitleCase((accountTerminal.role?.data as RoleMetadata)?.name)),
+    makeAttribute(TraitTypes.STATUS, accountTerminal.active ? "Active" : "Inactive"),
   ]
 
   let payload = {
@@ -126,7 +113,7 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
     // TODO: add link to contributor's public profile page to description once complete
     external_url: "https://station.express/",
     image,
-    attributes: attributes.reverse(), // Opensea renders in reverse order
+    attributes,
   }
 
   res.statusCode = 200
