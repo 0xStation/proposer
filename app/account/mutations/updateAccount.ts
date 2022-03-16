@@ -66,14 +66,6 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
           },
         }
       }),
-      // delete: [
-      //   {
-      //     accountId_skillId: {
-      //       accountId: 20,
-      //       skillId: 3,
-      //     },
-      //   },
-      // ],
       create: newSkills.map((skill) => {
         return {
           skill: {
@@ -96,6 +88,27 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
       address: params.address,
     },
     data: payload,
+    include: {
+      tickets: {
+        include: {
+          terminal: true,
+        },
+      },
+      initiatives: {
+        include: {
+          initiative: {
+            include: {
+              terminal: true,
+            },
+          },
+        },
+      },
+      skills: {
+        include: {
+          skill: true,
+        },
+      },
+    },
   })
   return account as Account
 }

@@ -138,6 +138,7 @@ const AccountForm = ({
   const [updateAccountMutation] = useMutation(updateAccount, {
     onSuccess: (data) => {
       onSuccess()
+      setActiveUser(data)
     },
     onError: (error) => {
       console.log(error)

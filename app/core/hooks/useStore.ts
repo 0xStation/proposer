@@ -34,7 +34,7 @@ const useStore = create<StoreState>((set) => ({
     set(
       produce((draft) => {
         if (draft.activeUser) {
-          draft.activeUser.applications = applications
+          draft.activeUser.initiatives = applications
         }
       })
     ),

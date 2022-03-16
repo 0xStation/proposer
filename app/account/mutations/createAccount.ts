@@ -49,6 +49,16 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
     },
   }
 
-  const account = await db.account.create({ data: payload })
+  const account = await db.account.create({
+    data: payload,
+    include: {
+      skills: {
+        include: {
+          skill: true,
+        },
+      },
+    },
+  })
+
   return account as Account
 }
