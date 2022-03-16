@@ -20,6 +20,6 @@ export enum TraitTypes {
 }
 
 export enum DisplayTypes {
-  LABEL = "label",
+  STRING = "string",
   DATE = "date",
 }

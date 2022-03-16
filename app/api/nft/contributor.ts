@@ -24,7 +24,7 @@ type Attribute = {
 const makeAttribute = (
   traitType: string,
   value: string | number,
-  displayType: string = DisplayTypes.LABEL
+  displayType: string = DisplayTypes.STRING
 ): Attribute => {
   return {
     trait_type: traitType,

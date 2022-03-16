@@ -15,10 +15,12 @@ export const getImage = (context: imageContext) => {
 
   const logicMapping = {
     // Terminal uses per-role images, grab image URL from terminal metadata by providing role localId
-    [MetadataImageLogicType.ROLE]: imageConfig?.roleMap![context.ticket.roleLocalId as number],
+    [MetadataImageLogicType.ROLE]: () =>
+      imageConfig?.roleMap![context.ticket.roleLocalId as number],
     // Terminal uses per-individual images, grab image URL from ticket metadata
-    [MetadataImageLogicType.INDIVIDUAL]: (context.ticket.data as TicketMetadata)?.ticketImageUrl,
+    [MetadataImageLogicType.INDIVIDUAL]: () =>
+      (context.ticket.data as TicketMetadata)?.ticketImageUrl,
   }
 
-  return logicMapping[imageConfig?.logicType as string] || ""
+  return logicMapping[imageConfig?.logicType as string]() || ""
 }
