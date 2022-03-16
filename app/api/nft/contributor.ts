@@ -90,7 +90,15 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
     return
   }
 
-  let image = getImage({ terminal, account, ticket: accountTerminal })
+  let image = ""
+
+  try {
+    image = getImage({ terminal, account, ticket: accountTerminal })
+  } catch (e) {
+    res.statusCode = 500
+    res.end(errorMessage(e))
+    return
+  }
 
   if (image == "") {
     res.statusCode = 404
