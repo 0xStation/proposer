@@ -4,6 +4,11 @@ export type Ticket = {
   roleLocalId: number
   joinedAt: Date
   active: boolean
+  data?: TicketMetadata
+}
+
+export type TicketMetadata = {
+  ticketImageUrl: string
 }
 
 export enum TraitTypes {
