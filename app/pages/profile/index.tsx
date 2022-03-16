@@ -32,7 +32,7 @@ const ProfileHome: BlitzPage = () => {
   const inactiveLinkStyles = "text-concrete hover:text-wet-concrete"
 
   return (
-    <>
+    <Layout title={`${activeUser ? `${activeUser?.data?.name} | ` : ""}Profile`}>
       <ExploreModal
         isExploreModalOpen={isExploreModalOpen}
         setIsExploreModalOpen={setIsExploreModalOpen}
@@ -61,7 +61,7 @@ const ProfileHome: BlitzPage = () => {
             <div className="flex flex-col">
               <h1 className="text-2xl text-marble-white">{activeUser?.data.name}</h1>
               <span className="text-base text-concrete">
-                {getWalletString(activeUser?.address)}
+                {`@${getWalletString(activeUser?.address)}`}
               </span>
             </div>
             <h3 className="text-marble-white text-base mt-4 font-normal">{activeUser?.data.bio}</h3>
@@ -172,11 +172,10 @@ const ProfileHome: BlitzPage = () => {
           </div>
         </div>
       </div>
-    </>
+    </Layout>
   )
 }
 
 ProfileHome.suppressFirstRenderFlicker = true
-ProfileHome.getLayout = (page) => <Layout title="My Station Profile">{page}</Layout>
 
 export default ProfileHome
