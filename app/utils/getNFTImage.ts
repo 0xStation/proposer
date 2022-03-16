@@ -1,6 +1,6 @@
 import { Account, AccountTerminal, Terminal } from "@prisma/client"
 import { MetadataImageLogicType, TerminalMetadata } from "app/terminal/types"
-import { TicketMetaData } from "app/ticket/types"
+import { TicketMetadata } from "app/ticket/types"
 
 type imageContext = {
   terminal: Terminal
@@ -19,7 +19,7 @@ export const getImage = (context: imageContext) => {
       imageConfig?.roleMap![context.ticket.roleLocalId as number],
     // Terminal uses per-individual images, grab image URL from ticket metadata
     [MetadataImageLogicType.INDIVIDUAL]: () =>
-      (context.ticket.data as TicketMetaData)?.ticketImageUrl,
+      (context.ticket.data as TicketMetadata)?.ticketImageUrl,
   }
 
   return logicMapping[imageConfig?.logicType || ""] || ""
