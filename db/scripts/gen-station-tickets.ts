@@ -64,7 +64,6 @@ const seed = async () => {
       data: {
         data: {
           ...dataCopy,
-          ticketImageUrl,
         },
       },
     })

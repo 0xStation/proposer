@@ -5,27 +5,18 @@ interface ContributorSeed {
   address: string
   joinedAt: Date
   role: number
-  data: {
-    ticketImageUrl: string
-  }
 }
 
 const chiyoko: ContributorSeed = {
   address: "0x1E8f3C0286b4949e8eB1F5d705b49016dc84D288",
   joinedAt: new Date("2022-1-27"),
   role: roleIds.visitor,
-  data: {
-    ticketImageUrl: "https://station-images.nyc3.digitaloceanspaces.com/Semester2.gif",
-  },
 }
 
 const kristen: ContributorSeed = {
   address: "0xaE55f61f85935BBB68b8809d5c02142e4CbA9a13",
   joinedAt: new Date("2021-12-01"),
-  role: roleIds.staff,
-  data: {
-    ticketImageUrl: "https://station-images.nyc3.digitaloceanspaces.com/Semester2.gif",
-  },
+  role: roleIds.staff, // making it easy to allow myself to invite peopl
 }
 
 const seed = async () => {

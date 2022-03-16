@@ -1,16 +1,8 @@
 import { useState } from "react"
-import { useQuery } from "blitz"
 import { Dialog, Transition } from "@headlessui/react"
-import getTicket from "app/ticket/queries/getTicket"
 import { Fragment } from "react"
 
 const TicketWrapper = ({ activeUser, tokenBalance, terminal, endorsementsSymbol }) => {
-  const [ticket] = useQuery(
-    getTicket,
-    { terminalId: terminal.id, accountId: activeUser.id },
-    { suspense: false }
-  )
-
   const [modalOpen, setModalOpen] = useState(false)
   return (
     <>
@@ -30,7 +22,7 @@ const TicketWrapper = ({ activeUser, tokenBalance, terminal, endorsementsSymbol 
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Dialog.Overlay className="fixed inset-0 bg-tunnel-black opacity-80" />
+              <Dialog.Overlay className="fixed inset-0 bg-tunnel-black opacity-90" />
             </Transition.Child>
 
             {/* This element is to trick the browser into centering the modal contents. */}
@@ -52,16 +44,14 @@ const TicketWrapper = ({ activeUser, tokenBalance, terminal, endorsementsSymbol 
                 <div className="flex flex-row space-x-24 items-center">
                   <div className="flex flex-col justify-center">
                     <div className="min-w-[400px]">
-                      {ticket?.data?.ticketImageUrl ? (
-                        <img
-                          className="h-[400px] mx-auto block"
-                          src={ticket?.data?.ticketImageUrl}
-                        />
-                      ) : (
-                        <p className="h-[400px] w-[240px] border border-marble-white rounded-2xl border-dashed text-marble-white text-3xl text-center flex flex-col justify-center align-middle mx-auto bg-tunnel-black">
-                          TEMPORARY CONTRIBUTOR ID
-                        </p>
-                      )}
+                      {/* TODO: @symmetry to replace the absolute url with a dynamic url that
+                       renders the contributor nft id's custom visual  */}
+                      <img
+                        className="h-[400px] mx-auto block"
+                        src={
+                          "https://station-images.nyc3.digitaloceanspaces.com/temporary_contributor_id.svg"
+                        }
+                      />
                     </div>
                     <div className="w-full mt-2 justify-between px-1 text-base flex mx-auto">
                       <span className="text-marble-white font-bold mr-2">Balance</span>

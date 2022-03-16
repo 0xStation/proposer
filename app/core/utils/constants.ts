@@ -32,3 +32,10 @@ export const APPLICATION_STATUS_MAP = {
     color: "bg-magic-mint",
   },
 }
+
+export enum AccountInitiativeStatus {
+  APPLIED = "APPLIED",
+  INVITED = "INVITED",
+  CONTRIBUTOR = "CONTRIBUTOR",
+  INACTIVE = "INACTIVE",
+}
