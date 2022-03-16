@@ -24,13 +24,16 @@ type Attribute = {
 const makeAttribute = (
   traitType: string,
   value: string | number,
-  displayType: string = DisplayTypes.LABEL
+  displayType?: string
 ): Attribute => {
-  return {
+  let attr = {
     trait_type: traitType,
     value,
-    display_type: displayType,
   }
+  if (displayType) {
+    attr["display_type"] = displayType
+  }
+  return attr
 }
 
 const errorMessage = (message: string) => {
@@ -92,13 +95,8 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
 
   let image = getImage({ terminal, account, ticket: accountTerminal })
 
-  if (image == "") {
-    res.statusCode = 404
-    res.end(errorMessage("image could not load"))
-    return
-  }
-
   // construct attributes list per Opensea's metadata standard schema: https://docs.opensea.io/docs/metadata-standards
+  // note that Opensea renders in alphabetical order by trait type
   let attributes: Attribute[] = [
     makeAttribute(TraitTypes.STATUS, accountTerminal.active ? "Active" : "Inactive"),
     makeAttribute(TraitTypes.ROLE, toTitleCase((accountTerminal.role?.data as RoleMetadata)?.name)),
@@ -118,7 +116,7 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
     // TODO: add link to contributor's public profile page to description once complete
     external_url: "https://station.express/",
     image,
-    attributes: attributes.reverse(), // Opensea renders in reverse order
+    attributes,
   }
 
   res.statusCode = 200

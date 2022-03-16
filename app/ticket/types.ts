@@ -24,6 +24,5 @@ export enum TraitTypes {
 }
 
 export enum DisplayTypes {
-  LABEL = "label",
   DATE = "date",
 }

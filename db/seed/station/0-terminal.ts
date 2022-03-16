@@ -1,5 +1,5 @@
 import db from "../../index"
-import { Terminal, TerminalMetadata } from "app/terminal/types"
+import { Terminal, TerminalMetadata, MetadataImageLogicType } from "app/terminal/types"
 import { Initiative, InitiativeMetadata } from "app/initiative/types"
 import { Role, RoleMetadata } from "app/role/types"
 import { Symbol } from "app/types"
@@ -37,7 +37,7 @@ export const roleIds = {
 
 const station: TerminalSeed = {
   handle: "stationlabs",
-  ticketAddress: "0xbe26ee78ba287e5c6a862258db9c5e7fe7538f56",
+  ticketAddress: "0x288563ac5f82FE5d970383AB56282b8fb4E9bC79",
   data: {
     name: "Station Labs",
     description: "Creating on-chain infrastructure for a new genre of work.",
@@ -63,6 +63,11 @@ const station: TerminalSeed = {
         endorsements: "RAIL🅔",
         points: "RAIL🅟",
         referrals: "RAIL🅡",
+      },
+    },
+    metadata: {
+      imageConfig: {
+        logicType: MetadataImageLogicType.INDIVIDUAL,
       },
     },
   },
