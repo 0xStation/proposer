@@ -52,6 +52,8 @@ const TicketWrapper = ({ activeUser, tokenBalance, terminal, endorsementsSymbol 
                 <div className="flex flex-row space-x-24 items-center">
                   <div className="flex flex-col justify-center">
                     <div className="min-w-[400px]">
+                      {/* TODO: @symmetry to replace the absolute url with a dynamic url that
+                       renders the contributor nft id's custom visual  */}
                       <img
                         className="h-[400px] mx-auto block"
                         src={
