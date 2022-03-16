@@ -22,7 +22,7 @@ const TerminalCard = ({ ticket }) => {
         </div>
         <img
           alt="The terminal's ticket."
-          src={ticket?.data?.ticketImageUrl || ""}
+          src={"https://station-images.nyc3.digitaloceanspaces.com/temporary_contributor_id.svg"}
           className="h-[300px] w-full"
         />
         <div className="flex flex-row items-center p-2 border-t border-concrete justify-between">

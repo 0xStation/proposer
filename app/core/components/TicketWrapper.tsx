@@ -59,7 +59,7 @@ const TicketWrapper = ({ activeUser, tokenBalance, terminal, endorsementsSymbol 
                         />
                       ) : (
                         <p className="h-[400px] w-[240px] border border-marble-white rounded-2xl border-dashed text-marble-white text-3xl text-center flex flex-col justify-center align-middle mx-auto bg-tunnel-black">
-                          FUTURE CONTRIBUTOR ID GOES HERE
+                          TEMPORARY CONTRIBUTOR ID
                         </p>
                       )}
                     </div>
