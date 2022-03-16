@@ -1,18 +1,19 @@
 import { useEffect, useMemo } from "react"
-import { Image, invoke } from "blitz"
+import { Image, invoke, useRouter } from "blitz"
 import Dropdown from "../components/Dropdown"
-import Map from "../components/Map"
 import logo from "../../../public/station-logo.svg"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import useStore from "../hooks/useStore"
 import { useAccount } from "wagmi"
 import truncateString from "../utils/truncateString"
 import { LOCAL_STORAGE } from "../utils/constants"
+import ExplorePopover from "./Explore/ExplorePopover"
 
 /**
  * Navigation Component
  */
 const Navigation = () => {
+  const router = useRouter()
   // a list of the modals that are active on the screen
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
@@ -22,7 +23,6 @@ const Navigation = () => {
   const setActiveUser = useStore((state) => state.setActiveUser)
   const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
-  const toggleAccountModal = useStore((state) => state.toggleAccountModal)
 
   const getUserAccount = async (address) => {
     // closing the wallet modal
@@ -32,16 +32,14 @@ const Navigation = () => {
     if (user) {
       setActiveUser(user)
     } else {
-      setTimeout(() => {
-        toggleAccountModal(true)
-      }, 500)
+      router.push("/profile/create")
     }
   }
 
   useEffect(() => {
     if (address) {
-      setTimeout(() => getUserAccount(address), 500)
-    } else {
+      getUserAccount(address)
+    } else if (!localStorage.getItem(LOCAL_STORAGE.CONNECTION)) {
       setActiveUser(null)
     }
   }, [address])
@@ -75,7 +73,7 @@ const Navigation = () => {
           ]}
         />
         <div className="flex items-center border-l border-l-concrete">
-          <Map />
+          <ExplorePopover />
           {activeUser ? (
             <Dropdown
               side="right"
@@ -96,7 +94,11 @@ const Navigation = () => {
               }
               items={[
                 {
-                  name: "disconnect",
+                  name: "Profile",
+                  onClick: () => router.push("/profile"),
+                },
+                {
+                  name: "Disconnect",
                   onClick: appDisconnect,
                 },
               ]}
@@ -112,10 +114,10 @@ const Navigation = () => {
                 </div>
               }
               items={[
-                { name: "Create Account", onClick: () => toggleAccountModal(true) },
+                { name: "Create Account", onClick: () => router.push("/profile/create") },
                 {
                   name: "disconnect",
-                  onClick: disconnect,
+                  onClick: appDisconnect,
                 },
               ]}
             />

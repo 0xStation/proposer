@@ -18,6 +18,21 @@ export const LOCAL_STORAGE = {
   CONNECTION: "station.connection",
 }
 
+export const APPLICATION_STATUS_MAP = {
+  APPLIED: {
+    status: "INTERESTED",
+    color: "bg-neon-carrot",
+  },
+  INVITED: {
+    status: "INVITED",
+    color: "bg-neon-blue",
+  },
+  CONTRIBUTOR: {
+    status: "CONTRIBUTING",
+    color: "bg-magic-mint",
+  },
+}
+
 export enum AccountInitiativeStatus {
   APPLIED = "APPLIED",
   INVITED = "INVITED",

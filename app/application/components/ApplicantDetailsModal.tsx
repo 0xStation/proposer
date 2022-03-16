@@ -4,7 +4,6 @@ import { Dispatch, SetStateAction } from "react"
 import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
 import DiscordIcon from "/public/discord-icon.svg"
-import { Account } from "app/account/types"
 import { Initiative } from "app/initiative/types"
 import { DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
@@ -42,7 +41,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
     terminalData?.contracts.addresses.endorsements
   )
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
   const { points = 0 } = application
   const { data: applicantData, address, role, skills } = application?.account || {}
   const { pfpURL, name, ens, pronouns, verified, discordId, timezone } = applicantData

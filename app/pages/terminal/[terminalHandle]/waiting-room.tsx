@@ -56,7 +56,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
   const [selectedApplicantTicket, setSelectedApplicantTicket] = useState<Ticket | null>()
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
   const [roleOfActiveUser, setRoleOfActiveUser] = useState<Role | null>()
   const [refreshApplications, setRefreshApplications] = useState<boolean>(false)
   const [initialPageLoading, setInitialPageLoading] = useState<boolean>(true)
@@ -175,7 +175,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             }
           </p>
           <button
-            className="rounded bg-magic-mint px-24 py-1 mx-auto block mt-12"
+            className="rounded bg-magic-mint px-24 py-1 mx-auto block mt-12 text-tunnel-black"
             onClick={() => setIsRedirectModalOpen(false)}
           >
             Continue

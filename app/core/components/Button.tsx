@@ -1,7 +1,7 @@
 import { Loader } from "./Loader"
 
 type ButtonProps = {
-  onClick: (e) => void
+  onClick?: (e) => void
   secondary?: boolean
   className?: string
   children?: any

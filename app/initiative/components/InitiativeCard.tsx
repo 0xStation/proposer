@@ -31,7 +31,7 @@ const InitiativeCard = ({ title, oneLiner, contributors, isAcceptingApplications
                 )
                 return pfpBubble
               })
-            : "N/A"}
+            : ""}
         </div>
         {isAcceptingApplications && (
           <div className="flex-auto grid place-content-end">

@@ -21,7 +21,7 @@ const Navigation = ({ children }: { children?: any }) => {
   )
 
   const router = useRouter()
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
 
   const [{ data: accountData }] = useAccount({
     fetchEns: true,

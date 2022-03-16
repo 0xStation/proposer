@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react"
 import { useAccount } from "wagmi"
-import { Image, useQuery, BlitzPage, useParam, Link, Routes } from "blitz"
+import { Image, useQuery, BlitzPage, useParam, Link, Routes, useRouter } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import ImageLink from "../../../../core/components/ImageLink"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
@@ -18,11 +18,12 @@ import Tag from "app/core/components/Tag"
 import { ProfileMetadata } from "app/core/ProfileMetadata"
 import Card from "app/core/components/Card"
 import { formatDate } from "app/core/utils/formatDate"
+import Button from "app/core/components/Button"
 
 const Project: BlitzPage = () => {
   const [hasApplied, setHasApplied] = useState(false)
   const [{ data: accountData }] = useAccount()
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const toggleAccountModal = useStore((state) => state.toggleAccountModal)
   let [applicationModalOpen, setApplicationModalOpen] = useState(false)
@@ -31,13 +32,21 @@ const Project: BlitzPage = () => {
   const address = useMemo(() => accountData?.address, [accountData?.address])
   const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
   const [selectedContributorToView, setSelectedContributorToView] = useState<Account | null>(null)
+  const router = useRouter()
 
-  const setActiveModal = () => {
-    address
-      ? activeUser
-        ? setApplicationModalOpen(true)
-        : toggleAccountModal(true)
-      : toggleWalletModal(true)
+  const handleSubmitInterestClick = () => {
+    if (address) {
+      if (activeUser) {
+        // user already has an account, redirect to application creation
+        setApplicationModalOpen(true)
+      } else {
+        // user is connected but doesn't have an account
+        router.push("/profile/create")
+      }
+    } else {
+      // user isn't connected
+      toggleWalletModal(true)
+    }
   }
 
   useEffect(() => {
@@ -45,7 +54,7 @@ const Project: BlitzPage = () => {
     toggleWalletModal(false)
     let handler
     if (userTriggered) {
-      handler = setTimeout(() => setActiveModal(), 550)
+      handler = setTimeout(() => handleSubmitInterestClick(), 550)
     }
     return () => {
       clearTimeout(handler)
@@ -368,15 +377,15 @@ const Project: BlitzPage = () => {
                       {`You've already applied!`}
                     </button>
                   ) : (
-                    <button
-                      className="m-2 py-2 text-center text-base bg-magic-mint rounded item-center w-[280px]"
+                    <Button
+                      className="m-2 py-2 text-center text-base w-[280px]"
                       onClick={() => {
                         setUserTrigged(true)
-                        setActiveModal()
+                        handleSubmitInterestClick()
                       }}
                     >
                       Submit Interest
-                    </button>
+                    </Button>
                   )}
                 </div>
               </>

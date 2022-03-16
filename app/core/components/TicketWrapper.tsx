@@ -1,16 +1,8 @@
 import { useState } from "react"
-import { useQuery } from "blitz"
 import { Dialog, Transition } from "@headlessui/react"
-import getTicket from "app/ticket/queries/getTicket"
 import { Fragment } from "react"
 
 const TicketWrapper = ({ activeUser, tokenBalance, terminal, endorsementsSymbol }) => {
-  const [ticket] = useQuery(
-    getTicket,
-    { terminalId: terminal.id, accountId: activeUser.id },
-    { suspense: false }
-  )
-
   const [modalOpen, setModalOpen] = useState(false)
   return (
     <>
