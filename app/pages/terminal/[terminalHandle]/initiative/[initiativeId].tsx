@@ -148,9 +148,9 @@ const Project: BlitzPage = () => {
       )}
       <main className="w-full min-h-[calc(100vh-6rem)] bg-tunnel-black flex flex-col px-6 sm:px-0 sm:p-3 pb-6">
         <div className="flex sm:mx-1 md:mx-4 my-4 ml-[-.5rem] sm:ml-0">
-          <Link href={Routes.TerminalInitiativePage({ terminalHandle })}>
+          <button onClick={() => router.back()}>
             <Image className="cursor-pointer" src={Back} alt="Back Icon" width={25} height={22} />
-          </Link>
+          </button>
         </div>
         <div className="gird grid-cols-1 md:place-self-center">
           <div className="flex flex-col md:w-[766px] space-y-10 justify-center">
