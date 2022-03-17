@@ -11,10 +11,6 @@ export type TicketMetadata = {
   ticketImageUrl: string
 }
 
-export type TicketMetaData = {
-  ticketImageUrl: string
-}
-
 export enum TraitTypes {
   STATUS = "STATUS",
   ROLE = "ROLE",

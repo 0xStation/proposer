@@ -26,12 +26,7 @@ export type TerminalMetadata = {
     }
   }
   hide?: boolean
-  metadata?: {
-    imageConfig: {
-      logicType: string
-      roleMap?: Record<number, string> // maps from Role localId's to a URL, only used if logicType is ROLE
-    }
-  }
+  visualizeNFTMethod?: string
 }
 
 export type Terminal = {

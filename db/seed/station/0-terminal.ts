@@ -65,11 +65,7 @@ const station: TerminalSeed = {
         referrals: "RAIL🅡",
       },
     },
-    metadata: {
-      imageConfig: {
-        logicType: MethodToVisualizeContributorsNFT.INDIVIDUAL,
-      },
-    },
+    visualizeNFTMethod: MethodToVisualizeContributorsNFT.INDIVIDUAL,
   },
 }
 
