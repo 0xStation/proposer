@@ -1,6 +1,6 @@
 import { Role } from "app/role/types"
 
-export enum MetadataImageLogicType {
+export enum MethodToVisualizeContributorsNFT {
   ROLE = "ROLE", // images are created per role, e.g. CCS NFT
   INDIVIDUAL = "INDIVIDUAL", // images are generated per individual, e.g. Station NFT
 }
