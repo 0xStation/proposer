@@ -73,6 +73,14 @@ const ProfileHome: BlitzPage = () => {
             </button>
             <div className="mt-8 space-y-8">
               <div className="flex flex-col">
+                <h3 className="text-marble-white text-base font-bold">Contact</h3>
+                <span className="mt-1 text-base">
+                  <a href={activeUser?.data.contactURL} className="text-magic-mint">
+                    {activeUser?.data.contactURL}
+                  </a>
+                </span>
+              </div>
+              <div className="flex flex-col">
                 <h3 className="text-marble-white text-base font-bold">Skills</h3>
                 <div className="mt-1 flex flex-row flex-wrap">
                   {activeUser?.skills?.map((account_skill, index) => {
