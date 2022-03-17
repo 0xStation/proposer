@@ -46,7 +46,7 @@ const CoverPhotoInput = ({ coverURL, onUpload }) => {
     <div className="flex-col">
       <label className="font-bold text-base">Cover</label>
       <div
-        className="w-96 h-52 bg-wet-concrete border border-concrete cursor-pointer relative mt-4"
+        className="w-96 h-52 bg-gradient-to-b object-cover from-electric-violet to-magic-mint border border-concrete cursor-pointer relative mt-4"
         {...getRootProps()}
       >
         {coverURL && (
@@ -90,7 +90,7 @@ const PfpInput = ({ pfpURL, onUpload }) => {
     <div className="flex-col">
       <label className="font-bold text-base">PFP</label>
       <div
-        className="w-52 h-52 rounded-full bg-wet-concrete border border-concrete flex items-center justify-center cursor-pointer mt-4"
+        className="w-52 h-52 rounded-full bg-gradient-to-b object-cover from-electric-violet to-magic-mint border-concrete flex items-center justify-center cursor-pointer mt-4"
         {...getRootProps()}
       >
         {uploadingState === "UPLOADED" || pfpURL ? (

@@ -46,16 +46,24 @@ const ProfileHome: BlitzPage = () => {
 
         <div className="col-span-1 text-2xl md:border-r border-concrete h-full">
           <div className="h-[185px] relative mb-[116px]">
-            <img
-              alt="The connected user's cover photo."
-              src={activeUser?.data.coverURL}
-              className="w-full h-full object-cover"
-            />
-            <img
-              src={activeUser?.data.pfpURL}
-              alt="The connected user's profile picture."
-              className="w-[200px] h-[200px] border border-marble-white rounded-full absolute bottom-[-100px] left-0 right-0 mx-auto"
-            />
+            {activeUser?.data.coverURL ? (
+              <img
+                alt="The connected user's cover photo."
+                src={activeUser?.data.coverURL}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="bg-gradient-to-b object-cover from-electric-violet to-magic-mint h-full w-full"></div>
+            )}
+            {activeUser?.data.pfpURL ? (
+              <img
+                src={activeUser?.data.pfpURL}
+                alt="The connected user's profile picture."
+                className="bg-gradient-to-b from-electric-violet to-magic-mint w-[200px] h-[200px] border border-marble-white rounded-full absolute bottom-[-100px] left-0 right-0 mx-auto"
+              />
+            ) : (
+              <div className="bg-gradient-to-b from-electric-violet to-magic-mint w-[200px] h-[200px] border border-marble-white rounded-full absolute bottom-[-100px] left-0 right-0 mx-auto"></div>
+            )}
           </div>
           <div className="px-8 ml-20 mr-10">
             <div className="flex flex-col">
@@ -72,32 +80,38 @@ const ProfileHome: BlitzPage = () => {
               Edit Profile
             </button>
             <div className="mt-8 space-y-8">
-              <div className="flex flex-col">
-                <h3 className="text-marble-white text-base font-bold">Contact</h3>
-                <span className="mt-1 text-base">
-                  <a href={activeUser?.data.contactURL} className="text-magic-mint">
-                    {activeUser?.data.contactURL}
-                  </a>
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <h3 className="text-marble-white text-base font-bold">Skills</h3>
-                <div className="mt-1 flex flex-row flex-wrap">
-                  {activeUser?.skills?.map((account_skill, index) => {
-                    return (
-                      <Tag key={index} type="skill">
-                        {account_skill.skill.name}
-                      </Tag>
-                    )
-                  })}
+              {activeUser?.data.contactURL ? (
+                <div className="flex flex-col">
+                  <h3 className="text-marble-white text-base font-bold">Contact</h3>
+                  <span className="mt-1 text-base">
+                    <a href={activeUser?.data.contactURL} className="text-magic-mint">
+                      {activeUser?.data.contactURL}
+                    </a>
+                  </span>
                 </div>
-              </div>
-              <div className="flex flex-col">
-                <h3 className="text-marble-white text-base font-bold">Timezone</h3>
-                <span className="mt-1 text-marble-white text-base">
-                  {activeUser?.data.timezone}
-                </span>
-              </div>
+              ) : null}
+              {activeUser?.skills?.length ? (
+                <div className="flex flex-col">
+                  <h3 className="text-marble-white text-base font-bold">Skills</h3>
+                  <div className="mt-1 flex flex-row flex-wrap">
+                    {activeUser?.skills?.map((account_skill, index) => {
+                      return (
+                        <Tag key={index} type="skill">
+                          {account_skill.skill.name}
+                        </Tag>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : null}
+              {activeUser?.data.timezone ? (
+                <div className="flex flex-col">
+                  <h3 className="text-marble-white text-base font-bold">Timezone</h3>
+                  <span className="mt-1 text-marble-white text-base">
+                    {activeUser?.data.timezone}
+                  </span>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>

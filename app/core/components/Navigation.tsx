@@ -87,7 +87,7 @@ const Navigation = () => {
                       className="w-7 h-7 border border-marble-white rounded-full mr-2"
                     />
                   ) : (
-                    <span className="w-7 h-7 rounded-full bg-concrete border border-marble-white mr-2"></span>
+                    <span className="w-7 h-7 rounded-full bg-gradient-to-b object-cover from-electric-violet to-magic-mint border border-marble-white mr-2"></span>
                   )}
                   <span>{accountData?.ens?.name || activeUser?.data?.name || "Handle"}</span>
                 </div>
@@ -109,7 +109,7 @@ const Navigation = () => {
               className="p-4 pr-0 border-l border-l-concrete"
               button={
                 <div className="flex items-center">
-                  <span className="w-7 h-7 rounded-full bg-concrete border border-marble-white mr-2"></span>
+                  <span className="w-7 h-7 rounded-full bg-gradient-to-b from-electric-violet to-magic-mint border border-marble-white mr-2"></span>
                   <span>{truncateString(address)}</span>
                 </div>
               }
