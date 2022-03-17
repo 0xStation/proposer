@@ -7,7 +7,7 @@ import { InitiativeMetadata } from "app/initiative/types"
 import { AccountMetadata } from "app/account/types"
 import { AccountInitiativeStatus } from "app/core/utils/constants"
 import { TerminalMetadata } from "app/terminal/types"
-import { getImage } from "app/utils/getNFTImage"
+import { getImageUrl } from "app/utils/getNFTImage"
 import { TraitTypes, DisplayTypes } from "app/ticket/types"
 
 type TicketQuery = {
@@ -93,7 +93,7 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
     return
   }
 
-  let image = getImage(terminal, accountTerminal)
+  let image = getImageUrl(terminal, accountTerminal)
 
   // construct attributes list per Opensea's metadata standard schema: https://docs.opensea.io/docs/metadata-standards
   // note that Opensea renders in alphabetical order by trait type

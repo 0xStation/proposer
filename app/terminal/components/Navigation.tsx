@@ -8,20 +8,23 @@ import TicketWrapper from "app/core/components/TicketWrapper"
 import { useDecimals } from "app/core/contracts/contracts"
 import { DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { Account } from "app/account/types"
+import getTicket from "app/ticket/queries/getTicket"
 
 const Navigation = ({ children }: { children?: any }) => {
   const [pageLoading, setPageLoading] = useState<boolean>(true)
   // casting type as string to avoid the "undefined" type which could happen
   // but we will catch that at the terminal query level
   const terminalHandle = useParam("terminalHandle", "string") as string
-  const [terminal] = useQuery(
-    getTerminalByHandle,
-    { handle: terminalHandle },
-    { suspense: false, onSuccess: () => setPageLoading(false) }
-  )
+  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
+
+  const [ticket] = useQuery(
+    getTicket,
+    { terminalId: terminal?.id, accountId: activeUser?.id },
+    { suspense: false, onSuccess: () => setPageLoading(false) }
+  )
 
   const [{ data: accountData }] = useAccount({
     fetchEns: true,
@@ -105,7 +108,7 @@ const Navigation = ({ children }: { children?: any }) => {
         {activeUser && (
           <TicketWrapper
             terminal={terminal}
-            activeUser={activeUser}
+            ticket={ticket}
             tokenBalance={tokenBalance}
             endorsementsSymbol={terminal.data.contracts.symbols.endorsements}
           />
