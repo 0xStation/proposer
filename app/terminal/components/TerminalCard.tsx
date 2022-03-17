@@ -27,7 +27,9 @@ const TerminalCard = ({ ticket }) => {
           className="h-[300px] w-full"
         />
         <div className="flex flex-row items-center p-2 border-t border-concrete justify-between">
-          <Tag type="role">{ticket?.terminal?.handle === "ccs" ? "LEARNER" : "STAFF"}</Tag>
+          <Tag type="role">
+            {ticket?.terminal.roles.find((r) => r.localId === ticket?.roleLocalId).data.value}
+          </Tag>
           <p className="text-concrete text-xs">
             SINCE {ticket?.joinedAt?.toISOString().split("T")[0]}
           </p>

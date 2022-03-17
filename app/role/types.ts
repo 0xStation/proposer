@@ -3,6 +3,7 @@ import { AccountTerminal } from "@prisma/client"
 export type RoleMetadata = {
   name: string
   value: string
+  imageURL?: string
 }
 
 export type Role = {
