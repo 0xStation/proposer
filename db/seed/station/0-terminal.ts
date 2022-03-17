@@ -1,5 +1,5 @@
 import db from "../../index"
-import { Terminal, TerminalMetadata, MetadataImageLogicType } from "app/terminal/types"
+import { Terminal, TerminalMetadata, MethodToVisualizeContributorsNFT } from "app/terminal/types"
 import { Initiative, InitiativeMetadata } from "app/initiative/types"
 import { Role, RoleMetadata } from "app/role/types"
 import { Symbol } from "app/types"
@@ -67,7 +67,7 @@ const station: TerminalSeed = {
     },
     metadata: {
       imageConfig: {
-        logicType: MetadataImageLogicType.INDIVIDUAL,
+        logicType: MethodToVisualizeContributorsNFT.INDIVIDUAL,
       },
     },
   },

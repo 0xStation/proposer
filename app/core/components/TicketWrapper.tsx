@@ -1,8 +1,9 @@
 import { useState } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
+import { getImageUrl } from "app/utils/getNFTImage"
 
-const TicketWrapper = ({ activeUser, tokenBalance, terminal, endorsementsSymbol }) => {
+const TicketWrapper = ({ terminal, ticket, tokenBalance, endorsementsSymbol }) => {
   const [modalOpen, setModalOpen] = useState(false)
   return (
     <>
@@ -44,13 +45,9 @@ const TicketWrapper = ({ activeUser, tokenBalance, terminal, endorsementsSymbol 
                 <div className="flex flex-row space-x-24 items-center">
                   <div className="flex flex-col justify-center">
                     <div className="min-w-[400px]">
-                      {/* TODO: @symmetry to replace the absolute url with a dynamic url that
-                       renders the contributor nft id's custom visual  */}
                       <img
                         className="h-[400px] mx-auto block"
-                        src={
-                          "https://station-images.nyc3.digitaloceanspaces.com/temporary_contributor_id.svg"
-                        }
+                        src={getImageUrl(terminal, ticket)}
                       />
                     </div>
                     <div className="w-full mt-2 justify-between px-1 text-base flex mx-auto">

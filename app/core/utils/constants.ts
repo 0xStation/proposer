@@ -39,3 +39,6 @@ export enum AccountInitiativeStatus {
   CONTRIBUTOR = "CONTRIBUTOR",
   INACTIVE = "INACTIVE",
 }
+
+export const defaultTicketImageUrl: string =
+  "https://station-images.nyc3.digitaloceanspaces.com/e0ed554e-b0b7-4e03-90f4-221708b159e0.svg"
