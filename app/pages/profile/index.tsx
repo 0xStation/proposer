@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { BlitzPage, useRouter } from "blitz"
+import { useState, useEffect } from "react"
+import { BlitzPage, useRouter, useRouterQuery } from "blitz"
 import { Tag } from "app/core/components/Tag"
 import TerminalCard from "app/terminal/components/TerminalCard"
 import ApplicationCard from "app/application/components/ApplicationCard"
@@ -9,16 +9,29 @@ import useStore from "app/core/hooks/useStore"
 import { getWalletString } from "app/utils/getWalletString"
 import Button from "app/core/components/Button"
 import ExploreModal from "app/core/components/Explore/ExploreModal"
+import { QUERY_PARAMETERS, PROFILE_TABS } from "app/core/utils/constants"
+
+type ProfileTabs = "TERMINALS" | "INITIATIVES"
 
 // the profile homepage
 // can see a users initiatives + termials + profile info at a glance
 const ProfileHome: BlitzPage = () => {
+  const { setTab } = useRouterQuery()
   const [isExploreModalOpen, setIsExploreModalOpen] = useState<boolean>(false)
   const [sliderOpen, setSliderOpen] = useState(false)
   const [activeApplication, setActiveApplication] = useState()
-  const [subpage, setSubpage] = useState<"TERMINALS" | "INITIATIVES">("TERMINALS")
+  const [subpage, setSubpage] = useState<ProfileTabs>(PROFILE_TABS.TERMINALS as ProfileTabs)
   const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
+  const { DIRECTED_FROM, SET_TAB } = QUERY_PARAMETERS
+
+  useEffect(() => {
+    if (setTab === SET_TAB.INITIATIVES) {
+      setSubpage(PROFILE_TABS.INITIATIVES as ProfileTabs)
+    } else if (setTab === SET_TAB.TERMINALS) {
+      setSubpage(PROFILE_TABS.TERMINALS as ProfileTabs)
+    }
+  }, [setTab])
 
   if (activeUser === null) {
     if (router.isReady) {
@@ -123,7 +136,7 @@ const ProfileHome: BlitzPage = () => {
                 <div className="flex flex-row z-10">
                   <button
                     tabIndex={0}
-                    onClick={() => setSubpage("TERMINALS")}
+                    onClick={() => setSubpage(PROFILE_TABS.TERMINALS as ProfileTabs)}
                     className={`${
                       subpage === "TERMINALS" ? activeLinkStyles : inactiveLinkStyles
                     } cursor-pointer text-2xl mr-12`}
@@ -132,7 +145,7 @@ const ProfileHome: BlitzPage = () => {
                   </button>
                   <button
                     tabIndex={0}
-                    onClick={() => setSubpage("INITIATIVES")}
+                    onClick={() => setSubpage(PROFILE_TABS.INITIATIVES as ProfileTabs)}
                     className={`${
                       subpage === "INITIATIVES" ? activeLinkStyles : inactiveLinkStyles
                     } cursor-pointer text-2xl mr-12`}
@@ -140,7 +153,7 @@ const ProfileHome: BlitzPage = () => {
                     Initiatives
                   </button>
                 </div>
-                {subpage === "TERMINALS" && (
+                {subpage === PROFILE_TABS.TERMINALS && (
                   <div className="grid grid-cols-3 gap-y-3 gap-x-3 mt-12">
                     {activeUser?.tickets &&
                       activeUser?.tickets.map((ticket, index) => {
@@ -148,7 +161,7 @@ const ProfileHome: BlitzPage = () => {
                       })}
                   </div>
                 )}
-                {subpage === "INITIATIVES" && (
+                {subpage === PROFILE_TABS.INITIATIVES && (
                   <div className="grid grid-cols-3 gap-y-3 gap-x-3 mt-12">
                     {activeUser?.initiatives &&
                       activeUser?.initiatives.map((application, index) => {
@@ -163,7 +176,7 @@ const ProfileHome: BlitzPage = () => {
                                 setSliderOpen(true)
                               } else if (application.status === "CONTRIBUTOR") {
                                 router.push(
-                                  `/terminal/${application.initiative.terminal.handle}/initiative/${application.initiative.localId}`
+                                  `/terminal/${application.initiative.terminal.handle}/initiative/${application.initiative.localId}?directedFrom=${DIRECTED_FROM.PROFILE}`
                                 )
                               }
                             }}
@@ -175,8 +188,8 @@ const ProfileHome: BlitzPage = () => {
               </>
             )}
             {/* Show if user is active in terminal but has no initiatives, or if the user is not in any terminals or initiatives */}
-            {(!activeUser?.initiatives?.length && subpage === "INITIATIVES") ||
-              (!activeUser?.tickets?.length && subpage === "TERMINALS" && (
+            {(!activeUser?.initiatives?.length && subpage === PROFILE_TABS.INITIATIVES) ||
+              (!activeUser?.tickets?.length && subpage === PROFILE_TABS.TERMINALS && (
                 <div className="w-full h-full flex items-center flex-col justify-center mt-[23%]">
                   <p className="text-marble-white text-2xl font-bold">Explore Terminals</p>
                   <p className="mt-2 text-marble-white text-base w-[400px] text-center">

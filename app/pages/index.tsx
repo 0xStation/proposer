@@ -6,10 +6,6 @@ import Button from "app/core/components/Button"
 
 const Home: BlitzPage = () => {
   const redirectToTerminal = () => {
-    // TODO: this function should open up the terminal map explorer
-    // which allows users to choose which terminal they want to "enter".
-    // In the meantime we will redirect them to Station since it's the
-    // only terminal.
     Router.push(`/terminal/stationlabs/initiative-board`)
   }
 

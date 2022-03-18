@@ -42,3 +42,20 @@ export enum AccountInitiativeStatus {
 
 export const defaultTicketImageUrl: string =
   "https://station-images.nyc3.digitaloceanspaces.com/e0ed554e-b0b7-4e03-90f4-221708b159e0.svg"
+
+export const QUERY_PARAMETERS = {
+  DIRECTED_FROM: {
+    SUBMITTED_APPLICATION: "submitted_application",
+    PROFILE: "profile",
+    INITIATIVE_BOARD: "initiative-board",
+  },
+  SET_TAB: {
+    INITIATIVES: "initiatives",
+    TERMINALS: "terminals",
+  },
+}
+
+export const PROFILE_TABS = {
+  INITIATIVES: "INITIATIVES",
+  TERMINALS: "TERMINALS",
+}

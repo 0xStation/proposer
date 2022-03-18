@@ -5,6 +5,7 @@ import createApplication from "../mutations/createApplication"
 import useStore from "../../core/hooks/useStore"
 import { Initiative } from "../../initiative/types"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import { QUERY_PARAMETERS } from "app/core/utils/constants"
 
 const ApplicationModal = ({
   isOpen,
@@ -15,11 +16,14 @@ const ApplicationModal = ({
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   initiative: Initiative
 }) => {
+  const { DIRECTED_FROM } = QUERY_PARAMETERS
   const router = useRouter()
   const terminalHandle = useParam("terminalHandle") as string
   const [createApplicationMutation] = useMutation(createApplication, {
     onSuccess: () => {
-      router.push(`/terminal/${terminalHandle}/waiting-room?directedFrom=application`)
+      router.push(
+        `/terminal/${terminalHandle}/waiting-room?directedFrom=${DIRECTED_FROM.SUBMITTED_APPLICATION}`
+      )
     },
   })
   const setActiveUserApplications = useStore((state) => state.setActiveUserApplications)
