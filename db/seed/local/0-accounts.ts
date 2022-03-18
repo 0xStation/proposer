@@ -15,6 +15,7 @@ interface CreateAccountParams {
   pfpURL?: string
   contactURL: string
   coverURL?: string
+  discordId?: string
 }
 
 const kristen: CreateAccountParams = {
@@ -26,6 +27,7 @@ const kristen: CreateAccountParams = {
   contactURL: "twitter.com",
   coverURL: "",
   pfpURL: "https://pbs.twimg.com/profile_images/1480639057914855424/LiE4wCe2_400x400.jpg",
+  discordId: "rie#9502",
 }
 
 const chiyoko: CreateAccountParams = {

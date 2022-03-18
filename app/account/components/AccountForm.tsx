@@ -56,9 +56,12 @@ const CoverPhotoInput = ({ coverURL, onUpload }) => {
             className="w-full h-full object-cover object-no-repeat"
           />
         )}
-        <span className="absolute bottom-0 right-0 mb-3 mr-3">
+        <div className="absolute bottom-0 right-0 mb-1 mr-1 h-5 w-5 z-10">
           <UploadIcon />
-        </span>
+        </div>
+        <div className="absolute bottom-0 right-0 mb-2 mr-[.55rem] h-5 w-5 rounded-full bg-tunnel-black opacity-50">
+          <span className=" h-full w-full"></span>
+        </div>
         <input {...getInputProps()} />
       </div>
     </div>
@@ -101,7 +104,12 @@ const PfpInput = ({ pfpURL, onUpload }) => {
           />
         ) : (
           <>
-            <UploadIcon />
+            <span className="z-10">
+              <UploadIcon />
+            </span>
+            <div className="rounded-full bg-tunnel-black opacity-50 h-5 w-5 absolute">
+              <span className=" h-full w-full"></span>
+            </div>
             <input {...getInputProps()} />
           </>
         )}
@@ -123,7 +131,14 @@ const AccountForm = ({
 }) => {
   const [coverURL, setCoverURL] = useState("")
   const [pfpURL, setPfpURL] = useState("")
+  const activeUser = useStore((state) => state.activeUser)
   const setActiveUser = useStore((state) => state.setActiveUser)
+
+  let existingActiveUserParams = {
+    ens: activeUser?.data?.ens,
+    discordId: activeUser?.data?.discordId,
+    verified: activeUser?.data?.verified,
+  }
 
   const [createAccountMutation] = useMutation(createAccount, {
     onSuccess: (data) => {
@@ -182,6 +197,7 @@ const AccountForm = ({
         try {
           if (isEdit) {
             await updateAccountMutation({
+              ...existingActiveUserParams,
               ...values,
               address,
               pfpURL,
@@ -207,11 +223,7 @@ const AccountForm = ({
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-y-6 gap-x-2">
             <div className="flex flex-col col-span-2">
-              <div className="mt-10 mb-9">
-                <h1 className="font-bold text-2xl">Personal Info</h1>
-                <p className="mt-3">Populate your profile with your story and your work.</p>
-              </div>
-              <div className="w-full h-44 flex flex-row justify-between mb-8">
+              <div className="w-full h-44 flex flex-row justify-between mb-8 mt-10">
                 <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
                 <CoverPhotoInput coverURL={coverURL} onUpload={(url) => setCoverURL(url)} />
               </div>

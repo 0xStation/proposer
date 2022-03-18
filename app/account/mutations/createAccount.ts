@@ -16,6 +16,9 @@ const CreateAccount = z.object({
   address: z.string(),
   pfpURL: z.string().optional(),
   coverURL: z.string().optional(),
+  discordId: z.string().optional(),
+  ens: z.string().optional(),
+  verified: z.string().optional(),
 })
 
 export default async function createAccount(input: z.infer<typeof CreateAccount>) {
@@ -30,6 +33,9 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
       pfpURL: params.pfpURL,
       coverURL: params.coverURL,
       name: params.name,
+      discordId: params.discordId,
+      ens: params.ens,
+      verified: params.verified,
     },
     skills: {
       create: params.skills.map((skill) => {
