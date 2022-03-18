@@ -8,6 +8,9 @@ const UpdateAccount = z.object({
   bio: z.string().optional(),
   contactURL: z.string().optional(),
   timezone: z.string().optional(),
+  discordId: z.string().optional(),
+  ens: z.string().optional(),
+  verified: z.boolean().optional(),
   skills: z
     .object({
       value: z.string(),
@@ -56,6 +59,9 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
       pfpURL: params.pfpURL,
       coverURL: params.coverURL,
       name: params.name,
+      discordId: params.discordId,
+      ens: params.ens,
+      verified: params.verified,
     },
     skills: {
       delete: removedSkills.map((skill) => {

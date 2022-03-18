@@ -131,7 +131,14 @@ const AccountForm = ({
 }) => {
   const [coverURL, setCoverURL] = useState("")
   const [pfpURL, setPfpURL] = useState("")
+  const activeUser = useStore((state) => state.activeUser)
   const setActiveUser = useStore((state) => state.setActiveUser)
+
+  let existingActiveUserParams = {
+    ens: activeUser?.data?.ens,
+    discordId: activeUser?.data?.discordId,
+    verified: activeUser?.data?.verified,
+  }
 
   const [createAccountMutation] = useMutation(createAccount, {
     onSuccess: (data) => {
@@ -190,6 +197,7 @@ const AccountForm = ({
         try {
           if (isEdit) {
             await updateAccountMutation({
+              ...existingActiveUserParams,
               ...values,
               address,
               pfpURL,
