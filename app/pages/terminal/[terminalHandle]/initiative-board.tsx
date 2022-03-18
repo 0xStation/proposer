@@ -51,10 +51,9 @@ const TerminalInitiativePage: BlitzPage = () => {
                       initiativeId: localId,
                       directedFrom: DIRECTED_FROM.INITIATIVE_BOARD,
                     })}
-                    editLink={Routes.Project({
+                    editLink={Routes.TerminalInitiativeEditPage({
                       terminalHandle,
                       initiativeId: localId,
-                      directedFrom: DIRECTED_FROM.INITIATIVE_BOARD,
                     })}
                     editable={userCanEdit}
                     title={name || "Title"}
