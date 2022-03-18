@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
-import { getImageUrl } from "app/utils/getNFTImage"
+import { getNftImageUrl } from "app/utils/getNftImageUrl"
 
 const TicketWrapper = ({ terminal, ticket, tokenBalance, endorsementsSymbol }) => {
   const [modalOpen, setModalOpen] = useState(false)
@@ -47,7 +47,7 @@ const TicketWrapper = ({ terminal, ticket, tokenBalance, endorsementsSymbol }) =
                     <div className="min-w-[400px]">
                       <img
                         className="h-[400px] mx-auto block"
-                        src={getImageUrl(terminal, ticket)}
+                        src={getNftImageUrl(terminal, ticket)}
                       />
                     </div>
                     <div className="w-full mt-2 justify-between px-1 text-base flex mx-auto">
