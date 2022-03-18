@@ -1,5 +1,5 @@
 import db from "../../index"
-import { Terminal, TerminalMetadata, MethodToVisualizeContributorsNFT } from "app/terminal/types"
+import { Terminal, TerminalMetadata, MethodToVisualizeContributorsNft } from "app/terminal/types"
 import { Initiative, InitiativeMetadata } from "app/initiative/types"
 import { Role, RoleMetadata } from "app/role/types"
 import { Symbol } from "app/types"
@@ -65,11 +65,7 @@ const station: TerminalSeed = {
         referrals: "RAIL🅡",
       },
     },
-    metadata: {
-      imageConfig: {
-        logicType: MethodToVisualizeContributorsNFT.INDIVIDUAL,
-      },
-    },
+    visualizeNftMethod: MethodToVisualizeContributorsNft.INDIVIDUAL,
   },
 }
 

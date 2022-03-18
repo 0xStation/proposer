@@ -1,6 +1,6 @@
 import { Role } from "app/role/types"
 
-export enum MethodToVisualizeContributorsNFT {
+export enum MethodToVisualizeContributorsNft {
   ROLE = "ROLE", // images are created per role, e.g. CCS NFT
   INDIVIDUAL = "INDIVIDUAL", // images are generated per individual, e.g. Station NFT
 }
@@ -26,12 +26,7 @@ export type TerminalMetadata = {
     }
   }
   hide?: boolean
-  metadata?: {
-    imageConfig: {
-      logicType: string
-      roleMap?: Record<number, string> // maps from Role localId's to a URL, only used if logicType is ROLE
-    }
-  }
+  visualizeNftMethod?: string
 }
 
 export type Terminal = {

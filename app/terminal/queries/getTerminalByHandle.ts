@@ -15,6 +15,9 @@ export default async function getTerminalByHandle(input: z.infer<typeof GetTermi
         mode: "insensitive",
       },
     },
+    include: {
+      roles: true,
+    },
   })
   if (!terminal) {
     return null

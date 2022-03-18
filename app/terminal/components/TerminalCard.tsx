@@ -1,5 +1,5 @@
 import Tag from "app/core/components/Tag"
-import { getImageUrl } from "app/utils/getNFTImage"
+import { getNftImageUrl } from "app/utils/getNftImageUrl"
 import { Link, Routes } from "blitz"
 
 const TerminalCard = ({ ticket }) => {
@@ -23,11 +23,13 @@ const TerminalCard = ({ ticket }) => {
         </div>
         <img
           alt="The terminal's ticket."
-          src={getImageUrl(ticket?.terminal, ticket)}
+          src={getNftImageUrl(ticket?.terminal, ticket)}
           className="h-[300px] w-full"
         />
         <div className="flex flex-row items-center p-2 border-t border-concrete justify-between">
-          <Tag type="role">{ticket?.terminal?.handle === "ccs" ? "LEARNER" : "STAFF"}</Tag>
+          <Tag type="role">
+            {ticket?.terminal.roles.find((r) => r.localId === ticket?.roleLocalId).data.value}
+          </Tag>
           <p className="text-concrete text-xs">
             SINCE {ticket?.joinedAt?.toISOString().split("T")[0]}
           </p>

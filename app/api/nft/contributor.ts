@@ -3,12 +3,12 @@ import db from "db"
 import { toTitleCase } from "app/core/utils/titleCase"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { RoleMetadata } from "app/role/types"
-import { InitiativeMetadata } from "app/initiative/types"
+import { Initiative, InitiativeMetadata } from "app/initiative/types"
 import { AccountMetadata } from "app/account/types"
 import { AccountInitiativeStatus } from "app/core/utils/constants"
-import { TerminalMetadata } from "app/terminal/types"
-import { getImageUrl } from "app/utils/getNFTImage"
-import { TraitTypes, DisplayTypes } from "app/ticket/types"
+import { Terminal, TerminalMetadata } from "app/terminal/types"
+import { getNftImageUrl } from "app/utils/getNftImageUrl"
+import { TraitTypes, DisplayTypes, Ticket } from "app/ticket/types"
 
 type TicketQuery = {
   ticket: string
@@ -61,12 +61,10 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
   const terminal = await db.terminal.findUnique({
     where: { ticketAddress: toChecksumAddress(ticket) },
     include: {
+      roles: true,
       tickets: {
         where: {
           accountId: account.id,
-        },
-        include: {
-          role: true,
         },
       },
       initiatives: {
@@ -93,19 +91,27 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
     return
   }
 
-  let image = getImageUrl(terminal, accountTerminal)
+  let image = getNftImageUrl(terminal as unknown as Terminal, accountTerminal as unknown as Ticket)
 
   // construct attributes list per Opensea's metadata standard schema: https://docs.opensea.io/docs/metadata-standards
   // note that Opensea renders in alphabetical order by trait type
   let attributes: Attribute[] = [
     makeAttribute(TraitTypes.STATUS, accountTerminal.active ? "Active" : "Inactive"),
-    makeAttribute(TraitTypes.ROLE, toTitleCase((accountTerminal.role?.data as RoleMetadata)?.name)),
+    makeAttribute(
+      TraitTypes.ROLE,
+      toTitleCase(
+        (
+          terminal?.roles?.find((r) => r.localId === accountTerminal.roleLocalId)
+            ?.data as RoleMetadata
+        )?.name
+      )
+    ),
     makeAttribute(
       TraitTypes.JOINED_SINCE,
       Math.round(accountTerminal.joinedAt.getTime() || 0 / 1000),
       DisplayTypes.DATE
     ),
-    ...terminal?.initiatives
+    ...terminal.initiatives
       .filter((i) => i.accounts.length > 0) // from the join query, `accounts` is length 1 if the account is a contributor to the initiative
       .map((i) => makeAttribute(TraitTypes.INITIATIVE, (i.data as InitiativeMetadata)?.name)),
   ]

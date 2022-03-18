@@ -18,7 +18,11 @@ export default async function getAccountByAddress(input: z.infer<typeof GetAccou
     include: {
       tickets: {
         include: {
-          terminal: true,
+          terminal: {
+            include: {
+              roles: true,
+            },
+          },
         },
       },
       initiatives: {
