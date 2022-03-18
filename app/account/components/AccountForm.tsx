@@ -69,10 +69,7 @@ const CoverPhotoInput = ({ coverURL, onUpload }) => {
 }
 
 const PfpInput = ({ pfpURL, onUpload }) => {
-  const [uploadingState, setUploadingState] = useState("")
-
   const uploadFile = async (acceptedFiles) => {
-    setUploadingState("UPLOADING")
     const formData = new FormData()
     formData.append("file", acceptedFiles[0])
     let res = await fetch("/api/uploadImage", {
@@ -81,7 +78,6 @@ const PfpInput = ({ pfpURL, onUpload }) => {
     })
     const data = await res.json()
     onUpload(data.url)
-    setUploadingState("UPLOADED")
   }
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -96,23 +92,22 @@ const PfpInput = ({ pfpURL, onUpload }) => {
         className="w-52 h-52 rounded-full bg-gradient-to-b object-cover from-electric-violet to-magic-mint border-concrete flex items-center justify-center cursor-pointer mt-4"
         {...getRootProps()}
       >
-        {uploadingState === "UPLOADED" || pfpURL ? (
-          <img
-            alt="Profile picture uploaded by the user."
-            src={pfpURL}
-            className="w-full h-full rounded-full"
-          />
-        ) : (
-          <>
-            <span className="z-10">
-              <UploadIcon />
-            </span>
-            <div className="rounded-full bg-tunnel-black opacity-50 h-5 w-5 absolute">
-              <span className=" h-full w-full"></span>
-            </div>
-            <input {...getInputProps()} />
-          </>
-        )}
+        <>
+          {pfpURL && (
+            <img
+              alt="Profile picture uploaded by the user."
+              src={pfpURL}
+              className="w-full h-full rounded-full"
+            />
+          )}
+          <span className="absolute z-10">
+            <UploadIcon />
+          </span>
+          <div className="rounded-full bg-tunnel-black opacity-50 h-5 w-5 absolute">
+            <span className=" h-full w-full"></span>
+          </div>
+          <input {...getInputProps()} />
+        </>
       </div>
     </div>
   )
