@@ -6,7 +6,7 @@ import { Ticket } from "app/ticket/types"
 // can add more schemes over time to support wider customer needs
 
 // NOTE: I'm going to change this soon as I build out the modular metadata retrieval system
-export const getImageUrl = (terminal: Terminal, ticket: Ticket) => {
+export const getNftImageUrl = (terminal: Terminal, ticket: Ticket) => {
   const { visualizeNftMethod } = terminal.data as TerminalMetadata
 
   let url
