@@ -5,8 +5,10 @@ import TerminalNavigation from "app/terminal/components/Navigation"
 import InitiativeCard from "app/initiative/components/InitiativeCard"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTerminal"
+import { QUERY_PARAMETERS } from "app/core/utils/constants"
 
 const TerminalInitiativePage: BlitzPage = () => {
+  const { DIRECTED_FROM } = QUERY_PARAMETERS
   const [sortedInitiatives, setSortedInitiatives] = useState<any[]>()
   const terminalHandle = useParam("terminalHandle", "string") as string
 
@@ -37,7 +39,11 @@ const TerminalInitiativePage: BlitzPage = () => {
                 return (
                   <Link
                     key={localId}
-                    href={Routes.Project({ terminalHandle, initiativeId: localId })}
+                    href={Routes.Project({
+                      terminalHandle,
+                      initiativeId: localId,
+                      directedFrom: DIRECTED_FROM.INITIATIVE_BOARD,
+                    })}
                   >
                     <a>
                       <InitiativeCard
