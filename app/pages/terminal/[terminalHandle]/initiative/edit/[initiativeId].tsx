@@ -5,7 +5,7 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
 import { canEdit } from "app/core/utils/permissions"
 import Exit from "public/exit-button.svg"
-import InitiativeFrom from "app/initiative/components/InitiativeForm"
+import InitiativeForm from "app/initiative/components/InitiativeForm"
 
 const TerminalInitiativeEditPage: BlitzPage = () => {
   const router = useRouter()
@@ -13,10 +13,14 @@ const TerminalInitiativeEditPage: BlitzPage = () => {
   const initiativeId = useParam("initiativeId", "number") as number
   const activeUser = useStore((state) => state.activeUser)
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
-  const [initiative] = useQuery(getInitiativeByLocalId, {
-    terminalId: terminal?.id,
-    localId: initiativeId,
-  })
+  const [initiative] = useQuery(
+    getInitiativeByLocalId,
+    {
+      terminalId: terminal?.id,
+      localId: initiativeId,
+    },
+    { suspense: false }
+  )
   const userCanEdit = activeUser ? canEdit(activeUser, terminal?.id) : false
 
   // todo: better error for unauthed users
@@ -38,11 +42,11 @@ const TerminalInitiativeEditPage: BlitzPage = () => {
           </div>
           <h1 className="text-marble-white text-4xl text-center pt-12">Edit Initiative</h1>
           <div className="mx-auto max-w-2xl pb-12">
-            <InitiativeFrom
+            <InitiativeForm
               initiative={initiative}
               isEdit={true}
               onSuccess={() => {
-                console.log("dogs")
+                router.push(Routes.TerminalInitiativePage({ terminalHandle }))
               }}
             />
           </div>

@@ -1,20 +1,21 @@
 import { Field, Form } from "react-final-form"
-import { useMutation, useParam } from "blitz"
+import { useMutation } from "blitz"
 import updateInitiative from "../mutations/updateInitiative"
 import { Initiative } from "../types"
 
+// rewardText and contributeText
+// have odd type of string[] | string bc of the hacky workaround of using commas to separate paragraphs
+// will change soon
 interface InitiativeParams {
   bannerURL: string
   name: string
   oneLiner: string
   commitment: string
-  rewardText: string
-  contributeText: string
+  rewardText: string[] | string
+  contributeText: string[] | string
+  skills: string[]
+  links: string[]
   isAcceptingApplications: boolean
-  skills: {
-    label: string
-    value: string
-  }[]
 }
 
 const InitiativeForm = ({
@@ -26,8 +27,6 @@ const InitiativeForm = ({
   initiative?: Initiative | null
   isEdit: boolean
 }) => {
-  console.log(initiative)
-  const initiativeId = useParam("initiativeId", "number") as number
   const [updateInitiativeMutation] = useMutation(updateInitiative, {
     onSuccess: (data) => {
       onSuccess()
@@ -37,15 +36,25 @@ const InitiativeForm = ({
     },
   })
 
+  const parseParagraphs = (text) => {
+    if (Array.isArray(text)) {
+      return text
+    }
+    return text.split(",")
+  }
+
   return (
     <Form
       initialValues={initiative?.data || {}}
       onSubmit={async (values: InitiativeParams) => {
         try {
           if (isEdit) {
+            console.log(values)
             await updateInitiativeMutation({
-              id: initiativeId,
               ...values,
+              id: initiative?.id || 1,
+              contributeText: parseParagraphs(values.contributeText),
+              rewardText: parseParagraphs(values.rewardText),
             })
           }
         } catch (error) {

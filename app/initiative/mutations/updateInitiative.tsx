@@ -2,21 +2,18 @@ import db from "db"
 import * as z from "zod"
 import { Initiative } from "../types"
 
+// todo, we are accidentally wiping out existing skills
 const UpdateInitiative = z.object({
   id: z.number(),
   name: z.string(),
   oneLiner: z.string(),
   bannerURL: z.string(),
   commitment: z.string(),
-  rewardText: z.string(),
-  contributeText: z.string(),
+  rewardText: z.union([z.string(), z.string().array()]),
+  contributeText: z.union([z.string(), z.string().array()]),
   isAcceptingApplications: z.boolean(),
-  skills: z
-    .object({
-      value: z.string(),
-      label: z.string(),
-    })
-    .array(),
+  skills: z.string().array(),
+  links: z.string().array(),
 })
 
 export default async function updateInitiative(input: z.infer<typeof UpdateInitiative>) {
@@ -39,8 +36,9 @@ export default async function updateInitiative(input: z.infer<typeof UpdateIniti
       commitment: params.commitment,
       rewardText: params.rewardText,
       contributeText: params.contributeText,
+      skills: params.skills,
+      links: params.links,
       isAcceptingApplications: params.isAcceptingApplications,
-      skills: params.skills.map((skill) => skill.label),
     },
   }
 
@@ -50,5 +48,6 @@ export default async function updateInitiative(input: z.infer<typeof UpdateIniti
     },
     data: payload,
   })
+  console.log(initiative)
   return initiative as Initiative
 }
