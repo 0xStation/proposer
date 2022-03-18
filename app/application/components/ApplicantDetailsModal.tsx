@@ -44,7 +44,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   const activeUser = useStore((state) => state.activeUser)
   const { points = 0 } = application
   const { data: applicantData, address, role, skills } = application?.account || {}
-  const { pfpURL, name, ens, pronouns, verified, discordId, timezone } = applicantData
+  const { pfpURL, name, ens, pronouns, verified, discordId, timezone, contactURL } = applicantData
   const [canInvite] = useQuery(
     hasInvitePermissions,
     { inviterId: activeUser?.id, terminalId: initiative?.terminalId },
@@ -132,19 +132,31 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 </div>
               </div>
               <div className="flex flex-row flex-auto text-marble-white">
-                <div className="flex flex-col flex-1">
-                  <div className="font-bold">
-                    <span>Contact</span>
-                  </div>
-                  <div className="text-sm font-normal flex flex-row space-x-1">
-                    <div className="flex content-end">
-                      <Image src={DiscordIcon} alt="Discord icon" width={16} height={13} />
+                {contactURL || discordId ? (
+                  <div className="flex flex-col flex-1">
+                    <div className="font-bold">
+                      <span>Contact</span>
                     </div>
-                    <div className="text-base font-normal">
-                      <span>{discordId}</span>
-                    </div>
+                    {contactURL ? (
+                      <div className="text-sm font-normal flex flex-row space-x-1">
+                        <div className="text-base font-normal">
+                          <a href={contactURL} className="text-magic-mint">
+                            {contactURL}
+                          </a>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-sm font-normal flex flex-row space-x-1">
+                        <div className="flex content-end">
+                          <Image src={DiscordIcon} alt="Discord icon" width={16} height={13} />
+                        </div>
+                        <div className="text-base font-normal">
+                          <span>{discordId}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
+                ) : null}
                 <div className="flex flex-col flex-1 text-marble-white">
                   <div className="font-bold">
                     <span>Timezone</span>
