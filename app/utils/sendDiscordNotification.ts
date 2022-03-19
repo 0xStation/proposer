@@ -8,7 +8,7 @@ export async function sendNewApplicationNotification(
     await fetch(discordWebhookUrl, {
       method: "POST",
       body: JSON.stringify({
-        content: `New interest submission for **${initiativeName}** from: ${userName}\nhttps://station.express/terminal/${terminalHandle}/waiting-room`,
+        content: `New interest submission for **${initiativeName}** from: ${userName}\nhttps://app.station.express/terminal/${terminalHandle}/waiting-room`,
       }),
       headers: {
         "Content-Type": "application/json",
