@@ -36,7 +36,7 @@ export const ProfileMetadata = ({
     </div>
   ) : (
     <div
-      className={`${pfpSize} place-self-center border border-marble-white bg-concrete rounded-full place-items-center`}
+      className={`${pfpSize} place-self-center border border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center`}
     ></div>
   )
 

@@ -4,7 +4,6 @@ import { Dispatch, SetStateAction } from "react"
 import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
 import DiscordIcon from "/public/discord-icon.svg"
-import { Account } from "app/account/types"
 import { Initiative } from "app/initiative/types"
 import { DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
 import { useDecimals } from "app/core/contracts/contracts"
@@ -42,10 +41,10 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
     terminalData?.contracts.addresses.endorsements
   )
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
   const { points = 0 } = application
   const { data: applicantData, address, role, skills } = application?.account || {}
-  const { pfpURL, name, ens, pronouns, verified, discordId, timezone } = applicantData
+  const { pfpURL, name, ens, pronouns, verified, discordId, timezone, contactURL } = applicantData
   const [canInvite] = useQuery(
     hasInvitePermissions,
     { inviterId: activeUser?.id, terminalId: initiative?.terminalId },
@@ -68,10 +67,11 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     address,
   }
 
-  const canActiveUserEndorse =
+  const canActiveUserEndorse = !!(
     activeUser &&
     (roleOfActiveUser || parseFloat(balanceData?.formatted || "0")) &&
     activeUser?.address !== application?.account?.address
+  )
 
   const CloseButton = ({ onClick }) => (
     <div className="flex flex-1 justify-start absolute top-1 left-2">
@@ -132,19 +132,31 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 </div>
               </div>
               <div className="flex flex-row flex-auto text-marble-white">
-                <div className="flex flex-col flex-1">
-                  <div className="font-bold">
-                    <span>Contact</span>
-                  </div>
-                  <div className="text-sm font-normal flex flex-row space-x-1">
-                    <div className="flex content-end">
-                      <Image src={DiscordIcon} alt="Discord icon" width={16} height={13} />
+                {contactURL || discordId ? (
+                  <div className="flex flex-col flex-1">
+                    <div className="font-bold">
+                      <span>Contact</span>
                     </div>
-                    <div className="text-base font-normal">
-                      <span>{discordId}</span>
-                    </div>
+                    {contactURL ? (
+                      <div className="text-sm font-normal flex flex-row space-x-1">
+                        <div className="text-base font-normal">
+                          <a href={contactURL} className="text-magic-mint">
+                            {contactURL}
+                          </a>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-sm font-normal flex flex-row space-x-1">
+                        <div className="flex content-end">
+                          <Image src={DiscordIcon} alt="Discord icon" width={16} height={13} />
+                        </div>
+                        <div className="text-base font-normal">
+                          <span>{discordId}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
+                ) : null}
                 <div className="flex flex-col flex-1 text-marble-white">
                   <div className="font-bold">
                     <span>Timezone</span>
@@ -208,7 +220,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               <div className="flex-auto text-marble-white font-bold">
                 <span>Endorsers</span>
               </div>
-              {application?.referrals && application?.referrals.length ? (
+              {application?.referrals?.length ? (
                 <div className="flex flex-col space-y-1">
                   {application?.referrals?.map?.(({ from: account, amount = 0 }, index) => (
                     <ApplicantEndorsements
@@ -228,7 +240,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               )}
             </div>
           </div>
-          {canActiveUserEndorse && (
+          {canActiveUserEndorse ? (
             <div className="mx-auto">
               <Button
                 className={canInvite ? "px-20 mr-2 inline" : "px-28"}
@@ -256,7 +268,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 </Button>
               )}
             </div>
-          )}
+          ) : null}
         </div>
       </Modal>
     </div>

@@ -8,31 +8,36 @@ interface Skill {
 
 interface CreateAccountParams {
   name: string
-  discordId: string
+  bio: string
   timezone: string
   skills: Skill[]
   address: string
-  pfpURL: string
-  pronouns?: string
+  pfpURL?: string
+  contactURL: string
+  coverURL?: string
+  discordId?: string
 }
 
 const kristen: CreateAccountParams = {
   address: "0xaE55f61f85935BBB68b8809d5c02142e4CbA9a13",
   name: "rie",
-  pronouns: "she/her",
+  bio: "a great dev",
   skills: [],
-  discordId: "rie#9502",
   timezone: "PST",
+  contactURL: "twitter.com",
+  coverURL: "",
   pfpURL: "https://pbs.twimg.com/profile_images/1480639057914855424/LiE4wCe2_400x400.jpg",
+  discordId: "rie#9502",
 }
 
 const chiyoko: CreateAccountParams = {
   address: "0x1E8f3C0286b4949e8eB1F5d705b49016dc84D288",
   name: "chiyoko",
-  pronouns: "she/her",
+  bio: "a great movie star",
   skills: [],
-  discordId: "chiyoko#3881",
   timezone: "EST",
+  contactURL: "twitter.com",
+  coverURL: "",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036018-25f65c4d-a968-4c6c-b328-15958acdb649.png",
 }
@@ -40,10 +45,11 @@ const chiyoko: CreateAccountParams = {
 const setsuko: CreateAccountParams = {
   address: "0x4038d6B8fa427812869cf406BaD5041D31F0a17C",
   name: "setsuko",
-  pronouns: "she/her",
+  bio: "also a great movie star",
   skills: [],
-  discordId: "setsuko#4214",
   timezone: "EST",
+  contactURL: "twitter.com",
+  coverURL: "",
   pfpURL:
     "https://user-images.githubusercontent.com/38736612/152036018-25f65c4d-a968-4c6c-b328-15958acdb649.png",
 }

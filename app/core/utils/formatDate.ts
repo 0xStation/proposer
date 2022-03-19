@@ -21,5 +21,3 @@ export const formatDate = (date) => {
 
   return `${day}-${monthMapper[month]}-${year}`
 }
-
-export default formatDate

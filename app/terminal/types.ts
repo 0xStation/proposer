@@ -1,5 +1,10 @@
 import { Role } from "app/role/types"
 
+export enum MethodToVisualizeContributorsNft {
+  ROLE = "ROLE", // images are created per role, e.g. CCS NFT
+  INDIVIDUAL = "INDIVIDUAL", // images are generated per individual, e.g. Station NFT
+}
+
 export type TerminalMetadata = {
   name: string
   description: string
@@ -22,6 +27,7 @@ export type TerminalMetadata = {
   }
   hide?: boolean
   discordWebhookUrl?: string
+  visualizeNftMethod?: string
 }
 
 export type Terminal = {

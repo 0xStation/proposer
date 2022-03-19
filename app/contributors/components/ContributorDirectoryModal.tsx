@@ -117,15 +117,26 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
               </div>
             </div>
             <div className="flex flex-row pb-8 border-b border-concrete">
-              <div className="flex flex-col flex-1">
-                <div className="font-bold">
-                  <span>Contact</span>
+              {contributor?.data.contactURL || contributor?.data.discordId ? (
+                <div className="flex flex-col flex-1">
+                  <div className="font-bold">
+                    <span>Contact</span>
+                  </div>
+
+                  {contributor?.data.contactURL ? (
+                    <div className="text-sm flex flex-row space-x-2 mt-2">
+                      <a href={contributor?.data.contactURL} className="text-magic-mint">
+                        {contributor?.data.contactURL}
+                      </a>
+                    </div>
+                  ) : (
+                    <div className="text-sm flex flex-row space-x-2 mt-2">
+                      <Image src={DiscordIcon} alt="Discord icon" width={16} height={13} />
+                      <span>@{contributor?.data?.discordId}</span>
+                    </div>
+                  )}
                 </div>
-                <div className="text-sm flex flex-row space-x-2 mt-2">
-                  <Image src={DiscordIcon} alt="Discord icon" width={16} height={13} />
-                  <span>@{contributor?.data?.discordId}</span>
-                </div>
-              </div>
+              ) : null}
               <div className="flex flex-col flex-1">
                 <div className="font-bold">
                   <span>Timezone</span>
@@ -154,8 +165,8 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                         <InitiativeCard
                           title={initiative?.data?.name || "Title"}
                           oneLiner={initiative?.data?.oneLiner || "One Liner"}
-                          contributors={initiative.contributors}
-                          isAcceptingApplications={initiative.data.isAcceptingApplications}
+                          contributors={initiative?.contributors}
+                          isAcceptingApplications={initiative?.data?.isAcceptingApplications}
                         />
                       </a>
                     </Link>

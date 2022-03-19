@@ -1,3 +1,5 @@
+import { Skill } from "app/skills/types"
+
 export type AccountMetadata = {
   name: string
   handle?: string
@@ -10,8 +12,11 @@ export type AccountMetadata = {
   ticketImage?: string
   pronouns?: string
   discordId: string
+  contactURL?: string
+  coverURL?: string
   timezone: string
   verified: boolean
+  bio?: string
   initiatives?: number[]
 }
 
@@ -22,6 +27,7 @@ export type Account = {
   role?: string
   points?: number
   joinedAt?: Date
-  skills: string[]
+  skills: any[]
+  tickets?: any[]
   initiatives?: any[]
 }

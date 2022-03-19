@@ -1,11 +1,12 @@
-import { useMutation, useRouter, useParam } from "blitz"
+import { useMutation, useRouter, useParam, invoke } from "blitz"
 import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
 import useStore from "../../core/hooks/useStore"
-import { Account } from "../../account/types"
 import { Initiative } from "../../initiative/types"
 import { sendNewApplicationNotification } from "app/utils/sendDiscordNotification"
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import { QUERY_PARAMETERS } from "app/core/utils/constants"
 
 const ApplicationModal = ({
   isOpen,
@@ -18,15 +19,18 @@ const ApplicationModal = ({
   initiative: Initiative
   discordWebhookUrl?: string
 }) => {
+  const { DIRECTED_FROM } = QUERY_PARAMETERS
   const router = useRouter()
   const terminalHandle = useParam("terminalHandle") as string
   const [createApplicationMutation] = useMutation(createApplication, {
     onSuccess: () => {
-      router.push(`/terminal/${terminalHandle}/waiting-room?directedFrom=application`)
+      router.push(
+        `/terminal/${terminalHandle}/waiting-room?directedFrom=${DIRECTED_FROM.SUBMITTED_APPLICATION}`
+      )
     },
   })
-
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const setActiveUserApplications = useStore((state) => state.setActiveUserApplications)
+  const activeUser = useStore((state) => state.activeUser)
 
   if (!activeUser) {
     return (
@@ -56,12 +60,21 @@ const ApplicationModal = ({
                 initiativeId: initiative.id,
                 accountId: activeUser.id,
               })
+              // send message to terminal's #station-notifications discord channel if applicable
               await sendNewApplicationNotification(
                 terminalHandle,
                 initiative.data.name,
                 activeUser.data.name,
                 discordWebhookUrl
               )
+              // TODO: this is a less than ideal solution at querying to refresh the `activeUser` state.
+              // We need to refresh the state so that the profile page and initiative details page pull
+              // in the correct information from the user's account object. This is a temporary solution
+              // while I (kristen) figure out how we want to query data from the client.
+              let user = await invoke(getAccountByAddress, { address: activeUser.address })
+              if (user) {
+                setActiveUserApplications(user?.initiatives)
+              }
             } catch (error) {
               alert("Error applying.")
             }

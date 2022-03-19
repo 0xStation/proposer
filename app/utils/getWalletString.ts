@@ -1,4 +1,4 @@
-export function getWalletString(address: string, ens?: string) {
+export const getWalletString = (address = "", ens?: string) => {
   // query for ENS on Ethereum mainnet
 
   // check if hardcoded ENS

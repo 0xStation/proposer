@@ -27,11 +27,14 @@ const InitiativeCard = ({ title, oneLiner, contributors, isAcceptingApplications
                     style={{ backgroundImage: `url(${pfpURL})` }}
                   ></span>
                 ) : (
-                  <span key={idx} className={`bg-concrete ${pfpStyling} ${nestedStyling}`}></span>
+                  <span
+                    key={idx}
+                    className={`bg-gradient-to-b object-cover from-electric-violet to-magic-mint ${pfpStyling} ${nestedStyling}`}
+                  ></span>
                 )
                 return pfpBubble
               })
-            : "N/A"}
+            : ""}
         </div>
         {isAcceptingApplications && (
           <div className="flex-auto grid place-content-end">

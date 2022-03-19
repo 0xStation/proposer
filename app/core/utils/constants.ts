@@ -17,3 +17,45 @@ export const LOCAL_STORAGE = {
   WAGMI_WALLET: "station.wallet",
   CONNECTION: "station.connection",
 }
+
+export const APPLICATION_STATUS_MAP = {
+  APPLIED: {
+    status: "INTERESTED",
+    color: "bg-neon-carrot",
+  },
+  INVITED: {
+    status: "INVITED",
+    color: "bg-neon-blue",
+  },
+  CONTRIBUTOR: {
+    status: "CONTRIBUTING",
+    color: "bg-magic-mint",
+  },
+}
+
+export enum AccountInitiativeStatus {
+  APPLIED = "APPLIED",
+  INVITED = "INVITED",
+  CONTRIBUTOR = "CONTRIBUTOR",
+  INACTIVE = "INACTIVE",
+}
+
+export const defaultTicketImageUrl: string =
+  "https://station-images.nyc3.digitaloceanspaces.com/e0ed554e-b0b7-4e03-90f4-221708b159e0.svg"
+
+export const QUERY_PARAMETERS = {
+  DIRECTED_FROM: {
+    SUBMITTED_APPLICATION: "submitted_application",
+    PROFILE: "profile",
+    INITIATIVE_BOARD: "initiative-board",
+  },
+  SET_TAB: {
+    INITIATIVES: "initiatives",
+    TERMINALS: "terminals",
+  },
+}
+
+export const PROFILE_TABS = {
+  INITIATIVES: "INITIATIVES",
+  TERMINALS: "TERMINALS",
+}

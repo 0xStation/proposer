@@ -4,8 +4,8 @@ import { Account } from "../types"
 
 const CreateAccount = z.object({
   name: z.string(),
-  discordId: z.string(),
-  pronouns: z.optional(z.string()),
+  bio: z.string(),
+  contactURL: z.string(),
   timezone: z.string(),
   skills: z
     .object({
@@ -14,7 +14,11 @@ const CreateAccount = z.object({
     })
     .array(),
   address: z.string(),
-  pfpURL: z.string(),
+  pfpURL: z.string().optional(),
+  coverURL: z.string().optional(),
+  discordId: z.string().optional(),
+  ens: z.string().optional(),
+  verified: z.string().optional(),
 })
 
 export default async function createAccount(input: z.infer<typeof CreateAccount>) {
@@ -23,11 +27,15 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
   const payload = {
     address: params.address,
     data: {
-      discordId: params.discordId,
-      pronouns: params.pronouns || "",
+      bio: params.bio,
+      contactURL: params.contactURL,
       timezone: params.timezone,
       pfpURL: params.pfpURL,
+      coverURL: params.coverURL,
       name: params.name,
+      discordId: params.discordId,
+      ens: params.ens,
+      verified: params.verified,
     },
     skills: {
       create: params.skills.map((skill) => {
@@ -47,6 +55,16 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
     },
   }
 
-  const account = await db.account.create({ data: payload })
+  const account = await db.account.create({
+    data: payload,
+    include: {
+      skills: {
+        include: {
+          skill: true,
+        },
+      },
+    },
+  })
+
   return account as Account
 }

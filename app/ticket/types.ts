@@ -4,9 +4,21 @@ export type Ticket = {
   roleLocalId: number
   joinedAt: Date
   active: boolean
-  data: TicketMetaData
+  data?: TicketMetadata
 }
 
-export type TicketMetaData = {
+export type TicketMetadata = {
   ticketImageUrl: string
+}
+
+export enum TraitTypes {
+  STATUS = "STATUS",
+  ROLE = "ROLE",
+  INITIATIVE = "INITIATIVE",
+  GUILD = "GUILD",
+  JOINED_SINCE = "JOINED_SINCE",
+}
+
+export enum DisplayTypes {
+  DATE = "date",
 }

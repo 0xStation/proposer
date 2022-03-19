@@ -7,7 +7,6 @@ import { Application } from "app/application/types"
 import { ApplicantCard } from "app/core/components/ApplicantCard"
 import ApplicantDetailsModal from "app/application/components/ApplicantDetailsModal"
 import useStore from "app/core/hooks/useStore"
-import { Account } from "app/account/types"
 import EndorseModal from "app/core/components/EndorseModal"
 import EndorseSuccessModal from "app/core/components/EndorseSuccessModal"
 import { Pill } from "app/core/components/Pill"
@@ -19,6 +18,7 @@ import { Role } from "app/role/types"
 import { InviteModal } from "app/application/components/InviteModal"
 import getTicket from "app/ticket/queries/getTicket"
 import { Ticket } from "app/ticket/types"
+import { QUERY_PARAMETERS } from "app/core/utils/constants"
 
 const skeletonLoadingScreen = (
   <div className="flex flex-col space-y-10">
@@ -56,14 +56,15 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
   const [selectedApplicantTicket, setSelectedApplicantTicket] = useState<Ticket | null>()
-  const activeUser: Account | null = useStore((state) => state.activeUser)
+  const activeUser = useStore((state) => state.activeUser)
   const [roleOfActiveUser, setRoleOfActiveUser] = useState<Role | null>()
   const [refreshApplications, setRefreshApplications] = useState<boolean>(false)
   const [initialPageLoading, setInitialPageLoading] = useState<boolean>(true)
   const [isApplicantOpen, setIsApplicantOpen] = useState(false)
+  const { DIRECTED_FROM } = QUERY_PARAMETERS
 
   useEffect(() => {
-    setIsRedirectModalOpen(directedFrom === "application")
+    setIsRedirectModalOpen(directedFrom === DIRECTED_FROM.SUBMITTED_APPLICATION)
   }, [directedFrom])
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
@@ -175,7 +176,7 @@ const TerminalWaitingPage: BlitzPage = () => {
             }
           </p>
           <button
-            className="rounded bg-magic-mint px-24 py-1 mx-auto block mt-12"
+            className="rounded bg-magic-mint px-24 py-1 mx-auto block mt-12 text-tunnel-black"
             onClick={() => setIsRedirectModalOpen(false)}
           >
             Continue

@@ -1,0 +1,48 @@
+const TimezoneOptions = [
+  { value: "GMT -12:00", label: "GMT -12:00 Eniwetok, Kwajalein" },
+  { value: "GMT -11:00", label: "(GMT -11:00) Midway Island, Samoa" },
+  { value: "GMT -10:00", label: "(GMT -10:00) Hawaii" },
+  { value: "GMT -09:50", label: "(GMT -9:30) Taiohae" },
+  { value: "GMT -09:00", label: "(GMT -9:00) Alaska" },
+  { value: "GMT -08:00", label: "(GMT -8:00) Pacific Time (US & Canada)" },
+  { value: "GMT -07:00", label: "(GMT -7:00) Mountain Time (US & Canada)" },
+  { value: "GMT -06:00", label: "(GMT -6:00) Central Time (US & Canada), Mexico City" },
+  { value: "GMT -05:00", label: "(GMT -5:00) Eastern Time (US & Canada), Bogota, Lima" },
+  { value: "GMT -04:50", label: "(GMT -4:30) Caracas" },
+  { value: "GMT -04:00", label: "(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz" },
+  { value: "GMT -03:50", label: "(GMT -3:30) Newfoundland" },
+  { value: "GMT -03:00", label: "(GMT -3:00) Brazil, Buenos Aires, Georgetown" },
+  { value: "GMT -02:00", label: "(GMT -2:00) Mid-Atlantic" },
+  { value: "GMT -01:00", label: "(GMT -1:00) Azores, Cape Verde Islands" },
+  { value: "GMT +00:00", label: "(GMT) Western Europe Time, London, Lisbon, Casablanca" },
+  { value: "GMT +01:00", label: "(GMT +1:00) Brussels, Copenhagen, Madrid, Paris" },
+  { value: "GMT +02:00", label: "(GMT +2:00) Kaliningrad, South Africa" },
+  { value: "GMT +03:00", label: "(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg" },
+  { value: "GMT +03:50", label: "(GMT +3:30) Tehran" },
+  { value: "GMT +04:00", label: "(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi" },
+  { value: "GMT +04:50", label: "(GMT +4:30) Kabul" },
+  { value: "GMT +05:00", label: "(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent" },
+  { value: "GMT +05:50", label: "(GMT +5:30) Bombay, Calcutta, Madras, New Delhi" },
+  { value: "GMT +05:75", label: "(GMT +5:45) Kathmandu, Pokhara" },
+  { value: "GMT +06:00", label: "(GMT +6:00) Almaty, Dhaka, Colombo" },
+  { value: "GMT +06:50", label: "(GMT +6:30) Yangon, Mandalay" },
+  { value: "GMT +07:00", label: "(GMT +7:00) Bangkok, Hanoi, Jakarta" },
+  { value: "GMT +08:00", label: "(GMT +8:00) Beijing, Perth, Singapore, Hong Kong" },
+  { value: "GMT +08:75", label: "(GMT +8:45) Eucla" },
+  { value: "GMT +09:00", label: "(GMT +9:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk" },
+  { value: "GMT +09:50", label: "(GMT +9:30) Adelaide, Darwin" },
+  { value: "GMT +10:00", label: "(GMT +10:00) Eastern Australia, Guam, Vladivostok" },
+  { value: "GMT +10:50", label: "(GMT +10:30) Lord Howe Island" },
+  { value: "GMT +11:00", label: "(GMT +11:00) Magadan, Solomon Islands, New Caledonia" },
+  { value: "GMT +11:50", label: "(GMT +11:30) Norfolk Island" },
+  { value: "GMT +12:00", label: "(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka" },
+  { value: "GMT +12:75", label: "(GMT +12:45) Chatham Islands" },
+  { value: "GMT +13:00", label: "(GMT +13:00) Apia, Nukualofa" },
+  { value: "GMT +14:00", label: "(GMT +14:00) Line Islands, Tokelau" },
+]
+
+const getTimezoneOptionFromValue = (value) => {
+  return TimezoneOptions.find((tz) => tz.value === value)
+}
+
+export { TimezoneOptions, getTimezoneOptionFromValue }

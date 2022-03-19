@@ -2,13 +2,10 @@ import { Router } from "blitz"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import { useAccount } from "wagmi"
+import Button from "app/core/components/Button"
 
 const Home: BlitzPage = () => {
   const redirectToTerminal = () => {
-    // TODO: this function should open up the terminal map explorer
-    // which allows users to choose which terminal they want to "enter".
-    // In the meantime we will redirect them to Station since it's the
-    // only terminal.
     Router.push(`/terminal/stationlabs/initiative-board`)
   }
 
@@ -25,12 +22,12 @@ const Home: BlitzPage = () => {
           places in Web3.
         </p>
         <p className="text-marble-white text-base mt-4">Join the ride.</p>
-        <button
-          className="mt-4 w-full py-2 text-center text-base bg-magic-mint rounded"
+        <Button
+          className="mt-4 w-full py-2 text-center text-base"
           onClick={() => redirectToTerminal()}
         >
           {accountData?.address ? "Start Exploring" : "Enter Station"}
-        </button>
+        </Button>
       </div>
     </div>
   )

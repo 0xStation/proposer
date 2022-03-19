@@ -49,7 +49,9 @@ export default async function getSubgraphApplicationData(
     !subgraphPayload?.waitingRoomInitiative?.applicants?.length
   ) {
     console.warn(
-      `Warning: no subgraph data found for ${data.address}, payload returned with ${subgraphPayload}`
+      `Log: no subgraph data found for account address ${
+        data.address
+      }, payload returned with ${JSON.stringify(subgraphPayload)}`
     )
     return {}
   }
