@@ -127,6 +127,7 @@ const Project: BlitzPage = () => {
           isOpen={applicationModalOpen}
           setIsOpen={setApplicationModalOpen}
           initiative={initiative}
+          discordWebhookUrl={terminal?.data.discordWebhookUrl}
         />
       )}
       {selectedContributorToView && (

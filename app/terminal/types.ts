@@ -21,7 +21,7 @@ export type TerminalMetadata = {
     }
   }
   hide?: boolean
-  discordWebHook?: string
+  discordWebhookUrl?: string
 }
 
 export type Terminal = {

@@ -1,22 +1,22 @@
-import { useMutation, useRouter, useParam, invoke, useQuery } from "blitz"
+import { useMutation, useRouter, useParam } from "blitz"
 import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
 import useStore from "../../core/hooks/useStore"
 import { Account } from "../../account/types"
-import getTerminalById from "app/terminal/queries/getTerminalById"
-import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
-import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { Initiative } from "../../initiative/types"
+import { sendNewApplicationNotification } from "app/utils/sendDiscordNotification"
 
 const ApplicationModal = ({
   isOpen,
   setIsOpen,
   initiative,
+  discordWebhookUrl,
 }: {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   initiative: Initiative
+  discordWebhookUrl?: string
 }) => {
   const router = useRouter()
   const terminalHandle = useParam("terminalHandle") as string
@@ -27,8 +27,6 @@ const ApplicationModal = ({
   })
 
   const activeUser: Account | null = useStore((state) => state.activeUser)
-
-  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
   if (!activeUser) {
     return (
@@ -42,35 +40,6 @@ const ApplicationModal = ({
     )
   }
 
-  const webhook = terminal?.data.discordWebHook
-
-  async function sendDiscordNotification(handle, hook) {
-    const title = `${activeUser?.data.name} just submitted an application to ${initiative.data.name}!`
-    const description = `https://station.express/terminal/${terminalHandle}/waiting-room`
-    const notification = {
-      content: `New Application Submitted to ${handle.toUpperCase()}`,
-      embeds: [
-        {
-          title: title,
-          description: description,
-        },
-      ],
-    }
-    const url = hook
-    await fetch(url, {
-      method: "POST",
-      body: JSON.stringify(notification),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-  }
-
-  async function queNotification() {
-    if (webhook) {
-      await sendDiscordNotification(terminalHandle, webhook)
-    }
-  }
   return (
     <Modal
       title="Contribute"
@@ -87,10 +56,15 @@ const ApplicationModal = ({
                 initiativeId: initiative.id,
                 accountId: activeUser.id,
               })
+              await sendNewApplicationNotification(
+                terminalHandle,
+                initiative.data.name,
+                activeUser.data.name,
+                discordWebhookUrl
+              )
             } catch (error) {
               alert("Error applying.")
             }
-            queNotification()
           }}
           render={({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>
