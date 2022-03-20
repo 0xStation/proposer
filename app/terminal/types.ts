@@ -12,6 +12,7 @@ export type TerminalMetadata = {
   coverURL?: string
   permissions: {
     invite: any
+    edit: any
   }
   contracts: {
     addresses: {

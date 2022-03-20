@@ -19,9 +19,9 @@ const TerminalInitiativeEditPage: BlitzPage = () => {
       terminalId: terminal?.id,
       localId: initiativeId,
     },
-    { suspense: false }
+    { suspense: false, enabled: !!terminal?.id }
   )
-  const userCanEdit = activeUser ? canEdit(activeUser, terminal?.id) : false
+  const userCanEdit = activeUser ? canEdit(activeUser, terminal?.id, "initiative") : false
 
   // todo: better error for unauthed users
   return (

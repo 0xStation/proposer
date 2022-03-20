@@ -52,6 +52,9 @@ const station: TerminalSeed = {
           roleIds.visitor,
         ], // local id for STAFF
       },
+      edit: {
+        initiatives: [roleIds.staff],
+      },
     },
     contracts: {
       addresses: {

@@ -21,39 +21,6 @@ type InitiativeSeed = {
 }
 
 //////
-// TERMINAL
-//////
-
-export const terminalId = 4
-
-const startupy: TerminalSeed = {
-  handle: "startupy",
-  ticketAddress: "0xstartupy",
-  data: {
-    name: "Startupy",
-    description: "Startupy is where you stat up to speed on the pulse of startup culture.",
-    coverURL: "https://station-images.nyc3.digitaloceanspaces.com/startupy-banner.jpeg",
-    pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/startupy-pfp.jpeg",
-    permissions: {
-      invite: {}, // local id for STAFF and TEAM LEAD
-    },
-    contracts: {
-      addresses: {
-        endorsements: "0x6566075DfdAc6740A076b3c856dB2988e14a26F0", // dead erc20 token
-        points: "0x6566075DfdAc6740A076b3c856dB2988e14a26F0", // dead erc20 token
-        referrals: "0x0000000000000000000000000000000000000000",
-      },
-      symbols: {
-        endorsements: "STARTUPY🅔",
-        points: "STARTUPY🅟",
-        referrals: "STARTUPY🅡",
-      },
-    },
-    hide: true,
-  },
-}
-
-//////
 // ROLES
 //////
 
@@ -88,6 +55,42 @@ const member: RoleSeed = {
 }
 
 const startupyRoles = [core, curator, member]
+
+//////
+// TERMINAL
+//////
+
+export const terminalId = 4
+
+const startupy: TerminalSeed = {
+  handle: "startupy",
+  ticketAddress: "0xstartupy",
+  data: {
+    name: "Startupy",
+    description: "Startupy is where you stat up to speed on the pulse of startup culture.",
+    coverURL: "https://station-images.nyc3.digitaloceanspaces.com/startupy-banner.jpeg",
+    pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/startupy-pfp.jpeg",
+    permissions: {
+      invite: {},
+      edit: {
+        initiative: [roleIds.core],
+      },
+    },
+    contracts: {
+      addresses: {
+        endorsements: "0x6566075DfdAc6740A076b3c856dB2988e14a26F0", // dead erc20 token
+        points: "0x6566075DfdAc6740A076b3c856dB2988e14a26F0", // dead erc20 token
+        referrals: "0x0000000000000000000000000000000000000000",
+      },
+      symbols: {
+        endorsements: "STARTUPY🅔",
+        points: "STARTUPY🅟",
+        referrals: "STARTUPY🅡",
+      },
+    },
+    hide: true,
+  },
+}
 
 //////
 // INITIATIVES

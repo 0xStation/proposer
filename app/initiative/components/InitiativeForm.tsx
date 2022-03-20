@@ -32,7 +32,7 @@ const InitiativeForm = ({
       onSuccess()
     },
     onError: (error) => {
-      console.log(error)
+      console.error(error)
     },
   })
 
@@ -49,7 +49,6 @@ const InitiativeForm = ({
       onSubmit={async (values: InitiativeParams) => {
         try {
           if (isEdit) {
-            console.log(values)
             await updateInitiativeMutation({
               ...values,
               id: initiative?.id || 1,

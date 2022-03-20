@@ -52,6 +52,9 @@ const ccs: TerminalSeed = {
         ],
         [roleIds.teamLead]: [roleIds.coreContributor, roleIds.guestContributor],
       }, // local id for STAFF and TEAM LEAD
+      edit: {
+        initiatives: [roleIds.staff],
+      },
     },
     contracts: {
       addresses: {

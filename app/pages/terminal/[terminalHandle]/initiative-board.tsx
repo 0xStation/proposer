@@ -16,7 +16,7 @@ const TerminalInitiativePage: BlitzPage = () => {
 
   const activeUser = useStore((state) => state.activeUser)
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
-  const userCanEdit = activeUser ? canEdit(activeUser, terminal?.id) : false
+  const userCanEdit = activeUser ? canEdit(activeUser, terminal?.id, "initiative") : false
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,

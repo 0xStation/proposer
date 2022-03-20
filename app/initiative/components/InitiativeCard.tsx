@@ -32,16 +32,18 @@ const InitiativeCard = ({
             <Link href={viewLink}>
               <button className={buttonStyles}>View</button>
             </Link>
-            <button
+            {/* link like that gets copied is being weird so I'm going to comment out */}
+            {/* doesnt seem as important anyway, plus, why can only staff share a link? */}
+            {/* <button
               className={buttonStyles}
               onClick={() => {
-                navigator.clipboard.writeText(viewLink?.pathname).then(() => {
+                navigator.clipboard.writeText(viewLink.pathname).then(() => {
                   alert("copied to clipboard")
                 })
               }}
             >
               Share
-            </button>
+            </button> */}
             <Link href={editLink}>
               <button className={buttonStyles}>Edit</button>
             </Link>

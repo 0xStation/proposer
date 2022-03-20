@@ -24,7 +24,7 @@ export default async function updateInitiative(input: z.infer<typeof UpdateIniti
   })
 
   if (!existingInitiative) {
-    console.log("cannot update an initiative that does not exist")
+    console.error("cannot update an initiative that does not exist")
     return null
   }
 
@@ -48,6 +48,5 @@ export default async function updateInitiative(input: z.infer<typeof UpdateIniti
     },
     data: payload,
   })
-  console.log(initiative)
   return initiative as Initiative
 }

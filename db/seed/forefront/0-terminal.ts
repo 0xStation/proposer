@@ -21,6 +21,14 @@ type InitiativeSeed = {
 }
 
 //////
+// ROLES
+//////
+
+export const roleIds = {
+  staff: 1,
+}
+
+//////
 // TERMINAL
 //////
 
@@ -37,6 +45,9 @@ const forefront: TerminalSeed = {
     pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/forefront-pfp.png",
     permissions: {
       invite: {}, // local id for STAFF and TEAM LEAD
+      edit: {
+        initiatives: [roleIds.staff],
+      },
     },
     contracts: {
       addresses: {
@@ -53,14 +64,6 @@ const forefront: TerminalSeed = {
     hide: true,
   },
 }
-
-//////
-// ROLES
-//////
-
-export const roleIds = {}
-
-const forefrontRoles = []
 
 //////
 // INITIATIVES

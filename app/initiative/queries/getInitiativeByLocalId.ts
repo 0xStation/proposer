@@ -14,7 +14,7 @@ export default async function getInitiativeByLocalId(
   const data = GetInitiativeByLocalId.parse(input)
 
   if (!data.terminalId) {
-    return undefined
+    return null
   }
 
   const initiative = await db.initiative.findUnique({

@@ -31,6 +31,9 @@ const station: CreateTerminalParams = {
           roleIds.visitor,
         ], // local id for STAFF
       },
+      edit: {
+        initiative: [roleIds.staff],
+      },
     },
     contracts: {
       addresses: {
