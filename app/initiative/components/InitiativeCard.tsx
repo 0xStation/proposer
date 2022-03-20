@@ -100,7 +100,7 @@ const InitiativeCard = ({
     return cardJSX
   }
 
-  return <Link href={editLink}>{cardJSX}</Link>
+  return <Link href={viewLink}>{cardJSX}</Link>
 }
 
 export default InitiativeCard
