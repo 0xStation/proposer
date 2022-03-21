@@ -1,6 +1,8 @@
 import { Field, Form } from "react-final-form"
 import { useMutation } from "blitz"
 import updateInitiative from "../mutations/updateInitiative"
+import MultiSelect from "app/core/components/form/MultiSelect"
+import { toTitleCase } from "app/core/utils/titleCase"
 import { Initiative } from "../types"
 
 // rewardText and contributeText
@@ -13,7 +15,10 @@ interface InitiativeParams {
   commitment: string
   rewardText: string[] | string
   contributeText: string[] | string
-  skills: string[]
+  skills: {
+    label: string
+    value: string
+  }[]
   links: string[]
   isAcceptingApplications: boolean
 }
@@ -27,6 +32,7 @@ const InitiativeForm = ({
   initiative?: Initiative | null
   isEdit: boolean
 }) => {
+  console.log(initiative)
   const [updateInitiativeMutation] = useMutation(updateInitiative, {
     onSuccess: (data) => {
       onSuccess()
@@ -35,6 +41,15 @@ const InitiativeForm = ({
       console.error(error)
     },
   })
+
+  const skillOptions = initiative?.skills?.map((skill) => {
+    return { value: skill.skill.name, label: toTitleCase(skill.skill.name) }
+  })
+
+  const existingSkills =
+    initiative?.skills.map((skill) => {
+      return { value: skill.skill.name, label: skill.skill.name, id: skill.skill.id }
+    }) || []
 
   const parseParagraphs = (text) => {
     if (Array.isArray(text)) {
@@ -52,6 +67,7 @@ const InitiativeForm = ({
             await updateInitiativeMutation({
               ...values,
               id: initiative?.id || 1,
+              existingSkills,
               contributeText: parseParagraphs(values.contributeText),
               rewardText: parseParagraphs(values.rewardText),
             })
@@ -128,6 +144,20 @@ const InitiativeForm = ({
                 placeholder="Name"
                 className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
               />
+            </div>
+            <div className="flex flex-col col-span-2">
+              <label htmlFor="skills" className="text-marble-white text-base font-bold">
+                Skills
+              </label>
+              <p className="text-concrete text-sm mb-2">(Type to add or search skills)</p>
+              <div>
+                <MultiSelect
+                  name="skills"
+                  placeholder="Type to add or search skills"
+                  options={skillOptions}
+                  initialValue={existingSkills}
+                />
+              </div>
             </div>
           </div>
           <button
