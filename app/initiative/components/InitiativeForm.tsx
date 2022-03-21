@@ -98,12 +98,13 @@ const InitiativeForm = ({
               <label htmlFor="contactURL" className="text-marble-white text-base font-bold">
                 Full Description
               </label>
+              <p className="text-concrete text-sm mb-2">Separate paragraphs by comma</p>
               <div className="flex flex-row mt-1">
                 <Field
                   component="textarea"
                   name="contributeText"
                   placeholder="Contribute text"
-                  className="border border-concrete bg-wet-concrete text-marble-white p-2 flex-1"
+                  className="border border-concrete bg-wet-concrete text-marble-white p-2 flex-1  h-36"
                 />
               </div>
             </div>
@@ -111,6 +112,7 @@ const InitiativeForm = ({
               <label htmlFor="name" className="text-marble-white text-base font-bold">
                 Rewards
               </label>
+              <p className="text-concrete text-sm mb-2">Separate rewards by comma</p>
               <Field
                 component="input"
                 name="rewardText"

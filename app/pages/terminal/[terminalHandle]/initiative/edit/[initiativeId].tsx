@@ -4,24 +4,27 @@ import useStore from "app/core/hooks/useStore"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
 import { canEdit } from "app/core/utils/permissions"
+import { EditPermissionTypes } from "app/core/utils/constants"
 import Exit from "public/exit-button.svg"
 import InitiativeForm from "app/initiative/components/InitiativeForm"
 
 const TerminalInitiativeEditPage: BlitzPage = () => {
   const router = useRouter()
   const terminalHandle = useParam("terminalHandle", "string") as string
-  const initiativeId = useParam("initiativeId", "number") as number
+  const initiativeLocalId = useParam("initiativeId", "number") as number
   const activeUser = useStore((state) => state.activeUser)
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
   const [initiative] = useQuery(
     getInitiativeByLocalId,
     {
       terminalId: terminal?.id,
-      localId: initiativeId,
+      localId: initiativeLocalId,
     },
     { suspense: false, enabled: !!terminal?.id }
   )
-  const userCanEdit = activeUser ? canEdit(activeUser, terminal?.id, "initiative") : false
+  const userCanEdit = activeUser
+    ? canEdit(activeUser, terminal?.id, EditPermissionTypes.INITIATIVE)
+    : false
 
   // todo: better error for unauthed users
   return (

@@ -33,6 +33,10 @@ export const APPLICATION_STATUS_MAP = {
   },
 }
 
+export enum EditPermissionTypes {
+  INITIATIVE = "initiative",
+}
+
 export enum AccountInitiativeStatus {
   APPLIED = "APPLIED",
   INVITED = "INVITED",

@@ -9,5 +9,6 @@ export const canEdit = (activeUser, terminalId, type) => {
     return false
   }
 
-  return !!ticket.terminal.data.permissions?.edit[type]?.includes(ticket.roleLocalId as number)
+  const editPerms = ticket.terminal.data.permissions?.edit
+  return !!(editPerms ? editPerms[type]?.includes(ticket.roleLocalId as number) : false)
 }

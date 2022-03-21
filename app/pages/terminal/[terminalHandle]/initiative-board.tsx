@@ -8,6 +8,7 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTerminal"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
 import { canEdit } from "app/core/utils/permissions"
+import { EditPermissionTypes } from "app/core/utils/constants"
 
 const TerminalInitiativePage: BlitzPage = () => {
   const { DIRECTED_FROM } = QUERY_PARAMETERS
@@ -16,7 +17,9 @@ const TerminalInitiativePage: BlitzPage = () => {
 
   const activeUser = useStore((state) => state.activeUser)
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
-  const userCanEdit = activeUser ? canEdit(activeUser, terminal?.id, "initiative") : false
+  const userCanEdit = activeUser
+    ? canEdit(activeUser, terminal?.id, EditPermissionTypes.INITIATIVE)
+    : false
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
