@@ -26,7 +26,6 @@ const Project: BlitzPage = () => {
   const [{ data: accountData }] = useAccount()
   const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
-  const toggleAccountModal = useStore((state) => state.toggleAccountModal)
   let [applicationModalOpen, setApplicationModalOpen] = useState(false)
   const [page, setPage] = useState(0)
   const [userTriggered, setUserTrigged] = useState(false)
@@ -92,6 +91,8 @@ const Project: BlitzPage = () => {
     },
     { suspense: false }
   )
+
+  console.log(initiative)
 
   const contributorCards = initiative?.contributors?.map((contributor, idx) => {
     const {
@@ -248,10 +249,10 @@ const Project: BlitzPage = () => {
                   </div>
                   <div className="flex flex-wrap">
                     {initiative &&
-                      initiative.data.skills?.map?.((skill, index) => {
+                      initiative.skills?.map?.((skill, index) => {
                         return (
                           <Tag key={index} type={"skill"}>
-                            {skill}
+                            {skill.skill.name}
                           </Tag>
                         )
                       })}

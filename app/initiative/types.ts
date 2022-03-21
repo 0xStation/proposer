@@ -1,4 +1,5 @@
 import { ExternalLink } from "app/types"
+import { InitiativeSkill } from "app/skills/types"
 
 export type InitiativeMetadata = {
   name: string
@@ -20,5 +21,6 @@ export type Initiative = {
   localId: number
   data: InitiativeMetadata
   contributors?: []
+  skills: InitiativeSkill[]
   applicationCount?: number
 }

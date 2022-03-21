@@ -42,6 +42,11 @@ export default async function getInitiativeByLocalId(
           },
         },
       },
+      skills: {
+        include: {
+          skill: true,
+        },
+      },
     },
   })
 
@@ -53,6 +58,7 @@ export default async function getInitiativeByLocalId(
     id: initiative.id,
     localId: initiative.localId,
     data: initiative.data as InitiativeMetadata,
+    skills: initiative.skills,
     contributors: initiative.accounts
       .filter((a) => a.status == "CONTRIBUTOR")
       .map((a) => {
