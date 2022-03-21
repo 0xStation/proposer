@@ -65,7 +65,9 @@ model Initiative {
   terminalId Int
   localId    Int                 @default(autoincrement())
   accounts   AccountInitiative[]
+  skills     InitiativeSkill[]
   data       Json?
+
 
   @@unique([terminalId, localId])
 }
@@ -84,9 +86,10 @@ model AccountInitiative {
 }
 
 model Skill {
-  id       Int            @id @default(autoincrement())
-  name     String         @unique
-  accounts AccountSkill[]
+  id              Int               @id @default(autoincrement())
+  name            String            @unique
+  accounts        AccountSkill[]
+  InitiativeSkill InitiativeSkill[]
 }
 
 model AccountSkill {
@@ -96,6 +99,15 @@ model AccountSkill {
   skillId   Int
 
   @@id([accountId, skillId])
+}
+
+model InitiativeSkill {
+  initiative   Initiative @relation(fields: [initiativeId], references: [id])
+  initiativeId Int
+  skill        Skill      @relation(fields: [skillId], references: [id])
+  skillId      Int
+
+  @@id([initiativeId, skillId])
 }
 
 enum AccountInitiativeStatus {
