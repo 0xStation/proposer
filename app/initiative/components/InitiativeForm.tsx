@@ -14,7 +14,7 @@ interface InitiativeParams {
   rewardText: string[] | string
   contributeText: string[] | string
   skills: string[]
-  links: string[]
+  links?: string[]
   isAcceptingApplications: boolean
 }
 

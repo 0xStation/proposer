@@ -13,7 +13,7 @@ const UpdateInitiative = z.object({
   contributeText: z.union([z.string(), z.string().array()]),
   isAcceptingApplications: z.boolean(),
   skills: z.string().array(),
-  links: z.string().array(),
+  links: z.string().array().optional(),
 })
 
 export default async function updateInitiative(input: z.infer<typeof UpdateInitiative>) {

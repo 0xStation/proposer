@@ -21,7 +21,7 @@ const InitiativeCard = ({
   editLink,
 }: InitiatveCardProps) => {
   const buttonStyles =
-    "bg-tunnel-black text-magic-mint hover:text-marble-white border border-magic-mint hover:border-marble-white rounded w-24"
+    "bg-tunnel-black text-magic-mint border border-magic-mint hover:bg-wet-concrete rounded w-24"
 
   const cardJSX = (
     <div className="border border-concrete p-4 flex flex-col cursor-pointer h-full hover:border-marble-white relative group">
