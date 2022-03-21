@@ -32,7 +32,6 @@ const InitiativeForm = ({
   initiative?: Initiative | null
   isEdit: boolean
 }) => {
-  console.log(initiative)
   const [updateInitiativeMutation] = useMutation(updateInitiative, {
     onSuccess: (data) => {
       onSuccess()

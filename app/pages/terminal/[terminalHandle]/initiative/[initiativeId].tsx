@@ -92,8 +92,6 @@ const Project: BlitzPage = () => {
     { suspense: false }
   )
 
-  console.log(initiative)
-
   const contributorCards = initiative?.contributors?.map((contributor, idx) => {
     const {
       role,
