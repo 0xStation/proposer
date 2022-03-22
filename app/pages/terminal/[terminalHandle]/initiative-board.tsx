@@ -41,6 +41,17 @@ const TerminalInitiativePage: BlitzPage = () => {
           <div>There are no active initiatves in this terminal.</div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {userCanEdit && (
+              <Link
+                href={Routes.TerminalInitiativeCreatePage({
+                  terminalHandle,
+                })}
+              >
+                <div className="border border-dashed flex items-center justify-center text-2xl cursor-pointer hover:bg-wet-concrete">
+                  Create Initiative
+                </div>
+              </Link>
+            )}
             {sortedInitiatives?.map?.(
               (
                 { localId, contributors, data: { name, oneLiner, isAcceptingApplications } },
