@@ -155,21 +155,24 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
             <div className="flex-auto text-marble-white font-bold">Initiatives</div>
             {initiatives && initiatives.length ? (
               <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 sm:gap-4">
-                {initiatives.map((initiative) => {
+                {initiatives.map((initiative, idx) => {
                   return (
-                    <Link
-                      key={initiative.localId}
-                      href={Routes.Project({ terminalHandle, initiativeId: initiative.localId })}
-                    >
-                      <a>
-                        <InitiativeCard
-                          title={initiative?.data?.name || "Title"}
-                          oneLiner={initiative?.data?.oneLiner || "One Liner"}
-                          contributors={initiative?.contributors}
-                          isAcceptingApplications={initiative?.data?.isAcceptingApplications}
-                        />
-                      </a>
-                    </Link>
+                    <InitiativeCard
+                      key={idx}
+                      editable={false}
+                      editLink={Routes.Project({
+                        terminalHandle,
+                        initiativeId: initiative.localId,
+                      })}
+                      viewLink={Routes.Project({
+                        terminalHandle,
+                        initiativeId: initiative.localId,
+                      })}
+                      title={initiative?.data?.name}
+                      oneLiner={initiative?.data?.oneLiner || "One Liner"}
+                      contributors={initiative?.contributors}
+                      isAcceptingApplications={initiative?.data?.isAcceptingApplications}
+                    />
                   )
                 })}
               </div>

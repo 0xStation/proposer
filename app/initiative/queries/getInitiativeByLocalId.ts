@@ -4,7 +4,7 @@ import { Initiative, InitiativeMetadata } from "../types"
 import { Role } from "app/role/types"
 
 const GetInitiativeByLocalId = z.object({
-  terminalId: z.number(),
+  terminalId: z.number().optional(),
   localId: z.number(),
 })
 
@@ -12,6 +12,11 @@ export default async function getInitiativeByLocalId(
   input: z.infer<typeof GetInitiativeByLocalId>
 ) {
   const data = GetInitiativeByLocalId.parse(input)
+
+  if (!data.terminalId) {
+    return null
+  }
+
   const initiative = await db.initiative.findUnique({
     where: { terminalId_localId: { terminalId: data.terminalId, localId: data.localId } },
     include: {
