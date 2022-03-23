@@ -13,8 +13,11 @@ interface InitiativeParams {
   commitment: string
   rewardText: string[] | string
   contributeText: string[] | string
+  links?: {
+    url: string
+    symbol: number
+  }[]
   skills: string[]
-  links?: string[]
   isAcceptingApplications: boolean
 }
 
