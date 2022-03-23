@@ -1,5 +1,6 @@
 import { Account } from "app/account/types"
 import { Link, RouteUrlObject } from "blitz"
+import { genPathFromUrlObject } from "app/utils/genPathFromUrlObject"
 
 type InitiatveCardProps = {
   title: string
@@ -32,18 +33,17 @@ const InitiativeCard = ({
             <Link href={viewLink}>
               <button className={buttonStyles}>View</button>
             </Link>
-            {/* link like that gets copied is being weird so I'm going to comment out */}
-            {/* doesnt seem as important anyway, plus, why can only staff share a link? */}
-            {/* <button
+            <button
               className={buttonStyles}
               onClick={() => {
-                navigator.clipboard.writeText(viewLink.pathname).then(() => {
+                const path = genPathFromUrlObject(viewLink)
+                navigator.clipboard.writeText(path).then(() => {
                   alert("copied to clipboard")
                 })
               }}
             >
               Share
-            </button> */}
+            </button>
             <Link href={editLink}>
               <button className={buttonStyles}>Edit</button>
             </Link>

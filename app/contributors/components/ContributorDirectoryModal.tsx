@@ -168,7 +168,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                         terminalHandle,
                         initiativeId: initiative.localId,
                       })}
-                      title={initiative?.data?.name || "Title"}
+                      title={initiative?.data?.name}
                       oneLiner={initiative?.data?.oneLiner || "One Liner"}
                       contributors={initiative?.contributors}
                       isAcceptingApplications={initiative?.data?.isAcceptingApplications}
