@@ -13,8 +13,11 @@ interface InitiativeParams {
   commitment: string
   rewardText: string[] | string
   contributeText: string[] | string
+  links?: {
+    url: string
+    symbol: number
+  }[]
   skills: string[]
-  links?: string[]
   isAcceptingApplications: boolean
 }
 
@@ -49,6 +52,7 @@ const InitiativeForm = ({
       onSubmit={async (values: InitiativeParams) => {
         try {
           if (isEdit) {
+            console.log(values)
             await updateInitiativeMutation({
               ...values,
               id: initiative?.id || 1,

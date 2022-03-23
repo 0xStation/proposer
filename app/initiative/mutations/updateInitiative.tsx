@@ -8,7 +8,13 @@ const UpdateInitiative = z.object({
   contributeText: z.union([z.string(), z.string().array()]),
   id: z.number(),
   isAcceptingApplications: z.boolean(),
-  links: z.string().array().optional(),
+  links: z
+    .object({
+      url: z.string(),
+      symbol: z.number(),
+    })
+    .array()
+    .optional(),
   name: z.string(),
   oneLiner: z.string(),
   rewardText: z.union([z.string(), z.string().array()]),
