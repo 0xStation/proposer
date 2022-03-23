@@ -3,6 +3,7 @@ import { Account } from "app/account/types"
 export type ApplicationMetadata = {
   entryDescription?: string
   url?: string
+  pointsValue?: number
 }
 
 export type ApplicationReferral = {

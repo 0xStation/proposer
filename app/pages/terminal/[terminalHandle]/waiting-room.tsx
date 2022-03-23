@@ -201,7 +201,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           setIsEndorseModalOpen={setIsEndorseModalOpen}
           setIsSuccessModalOpen={setIsEndorseSuccessModalOpen}
           selectedUserToEndorse={selectedApplication?.account}
-          initiativeLocalId={selectedInitiativeLocalId}
+          initiativeId={currentInitiative?.id}
           terminal={terminal}
         />
       )}
