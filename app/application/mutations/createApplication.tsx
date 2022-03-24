@@ -6,7 +6,6 @@ const CreateApplication = z.object({
   entryDescription: z.string(),
   accountId: z.number(),
   initiativeId: z.number(),
-  pointsValue: z.number().optional(),
 })
 
 export default async function createApplication(input: z.infer<typeof CreateApplication>) {
@@ -17,7 +16,6 @@ export default async function createApplication(input: z.infer<typeof CreateAppl
       approved: false,
       url: params.url,
       entryDescription: params.entryDescription,
-      pointsValue: params.pointsValue || 0,
     },
     account: { connect: { id: params.accountId } },
     initiative: { connect: { id: params.initiativeId } },

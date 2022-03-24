@@ -1,4 +1,3 @@
-import { Account } from "app/account/types"
 import { Application } from "app/application/types"
 import Button from "../components/Button"
 import Card from "../components/Card"
@@ -6,10 +5,11 @@ import ProfileMetadata from "../ProfileMetadata"
 import Tag from "../components/Tag"
 import { formatDate } from "../utils/formatDate"
 import useStore from "app/core/hooks/useStore"
-import { DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
-import { useDecimals } from "app/core/contracts/contracts"
-import { useBalance } from "wagmi"
 import { Terminal } from "app/terminal/types"
+import { useQuery } from "blitz"
+import getEndorsementValueSumByApplication from "app/endorsements/queries/getEndorsementValueSumByApplication"
+import { Initiative } from "app/initiative/types"
+import getEndorsersByApplication from "app/endorsements/queries/getEndorsersByApplication"
 
 type ApplicantCardProps = {
   application: Application
@@ -17,29 +17,29 @@ type ApplicantCardProps = {
   onApplicantCardClick?: (user) => void
   roleOfActiveUser?: any
   terminal?: Terminal | null
+  initiative: Initiative
 }
 
 export const ApplicantCard = (props: ApplicantCardProps) => {
-  const { application, onApplicantCardClick, roleOfActiveUser, terminal } = props
-  const { account: applicant, createdAt, points, referrals } = application
+  const { application, onApplicantCardClick, roleOfActiveUser, terminal, initiative } = props
+  const { account: applicant, createdAt } = application
   const pointsSymbol = terminal?.data.contracts.symbols.points
 
-  const activeUser = useStore((state) => state.activeUser)
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
-    terminal?.data.contracts.addresses.endorsements
-  )
-  const [{ data: balanceData }] = useBalance({
-    addressOrName: activeUser?.address,
-    token: terminal?.data?.contracts?.addresses?.endorsements,
-    watch: false,
-    formatUnits: decimals,
+  const [totalEndorsementPoints] = useQuery(getEndorsementValueSumByApplication, {
+    initiativeId: initiative?.id,
+    endorseeId: applicant?.id,
   })
-  const endorsementPoints = points * Math.pow(10, 0 - decimals)
+  const [endorsers] = useQuery(getEndorsersByApplication, {
+    initiativeId: initiative?.id,
+    endorseeId: applicant?.id,
+  })
+
+  const activeUser = useStore((state) => state.activeUser)
+
   const canActiveUserEndorse =
     // if active user has a role or they have an endorsement balance (ex: friends of Station)
     // AND they're not endorsing themself, then they are allowed to endorse the applicant.
-    (!!roleOfActiveUser?.data?.value || !!parseFloat(balanceData?.formatted || "0")) &&
-    applicant?.address !== activeUser?.address
+    !!roleOfActiveUser?.data?.value && applicant?.address !== activeUser?.address
 
   const {
     address,
@@ -54,41 +54,32 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
       </div>
       <div className="flex flex-1 align-right place-content-end content-right text-base">
         <div className="flex flex-row">
-          {referrals?.length
-            ? referrals.slice(0, 4).map(
-                (
-                  {
-                    from: {
-                      data: { pfpURL },
-                    },
-                  },
-                  idx
-                ) => {
-                  const pfpStyling = "h-6 w-6 rounded-full border block border-marble-white"
-                  const nestedStyling = idx ? "ml-[-5px]" : ""
-                  if (idx === 3) {
-                    const additionalReferrals = referrals.length - 3
-                    return (
-                      <span
-                        key={idx}
-                        className={`bg-neon-blue text-[10px] text-center items-center ${pfpStyling} ${nestedStyling}`}
-                      >
-                        {additionalReferrals}+
-                      </span>
-                    )
-                  }
-                  let pfpBubble = pfpURL ? (
+          {endorsers?.length
+            ? endorsers.slice(0, 4).map((endorser, idx) => {
+                const pfpStyling = "h-6 w-6 rounded-full border block border-marble-white"
+                const nestedStyling = idx ? "ml-[-5px]" : ""
+                if (idx === 3) {
+                  const additionalReferrals = endorsers.length - 3
+                  return (
                     <span
                       key={idx}
-                      className={`bg-contain bg-clip-padding ${pfpStyling} ${nestedStyling}`}
-                      style={{ backgroundImage: `url(${pfpURL})` }}
-                    ></span>
-                  ) : (
-                    <span key={idx} className={`bg-concrete ${pfpStyling} ${nestedStyling}`}></span>
+                      className={`bg-neon-blue text-[10px] text-center items-center ${pfpStyling} ${nestedStyling}`}
+                    >
+                      {additionalReferrals}+
+                    </span>
                   )
-                  return pfpBubble
                 }
-              )
+                let pfpBubble = endorser?.data?.pfpURL ? (
+                  <span
+                    key={idx}
+                    className={`bg-contain bg-clip-padding ${pfpStyling} ${nestedStyling}`}
+                    style={{ backgroundImage: `url(${endorser?.data?.pfpURL})` }}
+                  ></span>
+                ) : (
+                  <span key={idx} className={`bg-concrete ${pfpStyling} ${nestedStyling}`}></span>
+                )
+                return pfpBubble
+              })
             : "N/A"}
         </div>
       </div>
@@ -119,7 +110,7 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
         </div>
         {pointsSymbol && (
           <div className="flex flex-1 align-right place-content-end content-right text-base">
-            {endorsementPoints ? `${endorsementPoints} ${pointsSymbol}` : `0 ${pointsSymbol}`}
+            {totalEndorsementPoints ? `${totalEndorsementPoints}` : `0`}
           </div>
         )}
       </div>
