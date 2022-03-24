@@ -119,7 +119,7 @@ const InitiativeForm = ({
               <Field
                 component="input"
                 name="rewardText"
-                placeholder="Name"
+                placeholder="e.g. NFT, 1000 USDC"
                 className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
               />
             </div>
@@ -130,7 +130,7 @@ const InitiativeForm = ({
               <Field
                 component="input"
                 name="commitment"
-                placeholder="Name"
+                placeholder="e.g. full-time"
                 className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
               />
             </div>
