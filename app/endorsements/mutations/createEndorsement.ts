@@ -4,8 +4,8 @@ import { Endorsement } from "../types"
 
 const CreateEndorsement = z.object({
   initiativeId: z.number(),
-  endorserId: z.number(),
   endorseeId: z.number(),
+  endorserId: z.number(),
   endorsementValue: z.number(),
 })
 
@@ -20,14 +20,13 @@ export async function createEndorsement(input: z.infer<typeof CreateEndorsement>
           // we may add a multiplier to apply to points down the road.
           inputValue: params.endorsementValue,
         },
-        endorsementValue: params.endorsementValue,
+        initiativeId: params.initiativeId,
+        endorseeId: params.endorseeId,
         endorser: { connect: { id: params.endorserId } },
-        endorsee: { connect: { id: params.endorseeId } },
-        initiative: { connect: { id: params.initiativeId } },
+        endorsementValue: params.endorsementValue,
       },
       include: {
         endorser: true,
-        endorsee: true,
       },
     })
     return endorsement as Endorsement

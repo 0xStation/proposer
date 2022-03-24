@@ -13,8 +13,12 @@ export type Endorsement = {
   endorserId: number
   endorseeId: number
   endorser: Account
-  endorsee: Account
   timestamp: Date
   endorsementValue: number
   data: EndorsementMetadata
+}
+
+export type Referral = {
+  endorser: Account
+  endorsementValue: number
 }

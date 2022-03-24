@@ -15,7 +15,8 @@ import { Tag } from "app/core/components/Tag"
 import { Button } from "app/core/components/Button"
 import hasInvitePermissions from "../queries/hasInvitePermissions"
 import { TerminalMetadata } from "app/terminal/types"
-import { useBalance } from "wagmi"
+import getEndorsementValueSumByApplication from "app/endorsements/queries/getEndorsementValueSumByApplication"
+import getReferralsByApplication from "app/endorsements/queries/getReferralsByApplication"
 
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
@@ -38,12 +39,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   roleOfActiveUser,
   terminalData,
 }) => {
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
-    terminalData?.contracts.addresses.endorsements
-  )
   const activeUser = useStore((state) => state.activeUser)
-  const { points = 0 } = application
-  const { data: applicantData, address, role, skills } = application?.account || {}
+  const { data: applicantData, address, role, skills, id: applicantId } = application?.account || {}
   const { pfpURL, name, ens, pronouns, verified, discordId, timezone, contactURL } = applicantData
   const [canInvite] = useQuery(
     hasInvitePermissions,
@@ -51,11 +48,13 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     { enabled: !!(activeUser?.id && initiative?.terminalId), suspense: false }
   )
 
-  const [{ data: balanceData }] = useBalance({
-    addressOrName: activeUser?.address,
-    token: terminalData?.contracts?.addresses?.endorsements,
-    watch: false,
-    formatUnits: decimals,
+  const [totalEndorsementPoints] = useQuery(getEndorsementValueSumByApplication, {
+    initiativeId: initiative.id,
+    endorseeId: applicantId,
+  })
+  const [referrals] = useQuery(getReferralsByApplication, {
+    initiativeId: initiative.id,
+    endorseeId: applicantId,
   })
 
   const profileMetadataProps = {
@@ -69,7 +68,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
 
   const canActiveUserEndorse = !!(
     activeUser &&
-    (roleOfActiveUser || parseFloat(balanceData?.formatted || "0")) &&
+    roleOfActiveUser &&
     activeUser?.address !== application?.account?.address
   )
 
@@ -208,9 +207,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                       <span>Points</span>
                     </div>
                     <div className="text-base font-normal text-marble-white">
-                      {`${points * Math.pow(10, 0 - decimals)} ${
-                        terminalData?.contracts.symbols.points
-                      }`}
+                      {totalEndorsementPoints || "0"}
                     </div>
                   </div>
                 </div>
@@ -220,14 +217,13 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               <div className="flex-auto text-marble-white font-bold">
                 <span>Endorsers</span>
               </div>
-              {application?.referrals?.length ? (
+              {referrals?.length ? (
                 <div className="flex flex-col space-y-1">
-                  {application?.referrals?.map?.(({ from: account, amount = 0 }, index) => (
+                  {referrals?.map?.(({ endorser: account, endorsementValue }, index) => (
                     <ApplicantEndorsements
                       key={index}
                       endorser={account}
-                      amount={amount * Math.pow(10, 0 - decimals)}
-                      symbol={terminalData?.contracts.symbols.points}
+                      amount={endorsementValue || 0}
                     />
                   ))}
                 </div>

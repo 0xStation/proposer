@@ -9,7 +9,7 @@ import { Terminal } from "app/terminal/types"
 import { useQuery } from "blitz"
 import getEndorsementValueSumByApplication from "app/endorsements/queries/getEndorsementValueSumByApplication"
 import { Initiative } from "app/initiative/types"
-import getEndorsersByApplication from "app/endorsements/queries/getEndorsersByApplication"
+import getReferralsByApplication from "app/endorsements/queries/getReferralsByApplication"
 
 type ApplicantCardProps = {
   application: Application
@@ -29,7 +29,7 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
     initiativeId: initiative?.id,
     endorseeId: applicant?.id,
   })
-  const [endorsers] = useQuery(getEndorsersByApplication, {
+  const [referrals] = useQuery(getReferralsByApplication, {
     initiativeId: initiative?.id,
     endorseeId: applicant?.id,
   })
@@ -54,12 +54,12 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
       </div>
       <div className="flex flex-1 align-right place-content-end content-right text-base">
         <div className="flex flex-row">
-          {endorsers?.length
-            ? endorsers.slice(0, 4).map((endorser, idx) => {
+          {referrals?.length
+            ? referrals.slice(0, 4).map(({ endorser }, idx) => {
                 const pfpStyling = "h-6 w-6 rounded-full border block border-marble-white"
                 const nestedStyling = idx ? "ml-[-5px]" : ""
                 if (idx === 3) {
-                  const additionalReferrals = endorsers.length - 3
+                  const additionalReferrals = referrals.length - 3
                   return (
                     <span
                       key={idx}

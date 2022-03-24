@@ -1,5 +1,6 @@
 import db from "db"
 import * as z from "zod"
+import { Endorsement } from "../types"
 
 const GetEndorsementsByApplication = z.object({
   initiativeId: z.number(),
@@ -11,18 +12,24 @@ export async function getEndorsementsByApplication(
 ) {
   const params = GetEndorsementsByApplication.parse(input)
 
-  const endorsements = await db.endorsement.findMany({
-    where: {
-      initiativeId: params.initiativeId,
-      endorseeId: params.endorseeId,
-    },
-    include: {
-      endorser: true,
-      endorsee: true,
-    },
-  })
+  try {
+    const endorsements = await db.endorsement.findMany({
+      where: {
+        initiativeId: params.initiativeId,
+        endorseeId: params.endorseeId,
+      },
+      include: {
+        endorser: true,
+      },
+    })
 
-  return endorsements
+    return endorsements as Endorsement[]
+  } catch (err) {
+    console.error(
+      `Error fetching endorsements with endorseeId ${params.endorseeId} and initiativeId ${params.initiativeId}. Failed with error ${err}`
+    )
+    return []
+  }
 }
 
 export default getEndorsementsByApplication

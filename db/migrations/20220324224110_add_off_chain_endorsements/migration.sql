@@ -12,10 +12,4 @@ CREATE TABLE "Endorsement" (
 );
 
 -- AddForeignKey
-ALTER TABLE "Endorsement" ADD CONSTRAINT "Endorsement_initiativeId_fkey" FOREIGN KEY ("initiativeId") REFERENCES "Initiative"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Endorsement" ADD CONSTRAINT "Endorsement_endorserId_fkey" FOREIGN KEY ("endorserId") REFERENCES "Account"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Endorsement" ADD CONSTRAINT "Endorsement_endorseeId_fkey" FOREIGN KEY ("endorseeId") REFERENCES "Account"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
