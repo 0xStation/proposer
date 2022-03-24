@@ -1,4 +1,5 @@
 import { ExternalLink } from "app/types"
+import { Skill } from "app/skills/types"
 
 export type InitiativeMetadata = {
   name: string
@@ -10,7 +11,6 @@ export type InitiativeMetadata = {
   links: ExternalLink[]
   members?: string[]
   commitment?: string
-  skills?: string[]
   applicationQuestion?: string
 }
 
@@ -19,6 +19,7 @@ export type Initiative = {
   terminalId: number
   localId: number
   data: InitiativeMetadata
+  skills: Skill[]
   contributors?: []
   applicationCount?: number
 }
