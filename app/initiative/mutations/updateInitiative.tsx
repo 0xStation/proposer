@@ -4,8 +4,8 @@ import { Initiative } from "../types"
 
 const UpdateInitiative = z.object({
   bannerURL: z.string(),
-  commitment: z.string(),
-  contributeText: z.union([z.string(), z.string().array()]),
+  commitment: z.string().optional(),
+  contributeText: z.union([z.string(), z.string().array()]).optional(),
   id: z.number(),
   isAcceptingApplications: z.boolean(),
   links: z
