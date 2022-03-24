@@ -14,7 +14,7 @@ generator client {
 // user's wallet address is primary key
 model Account {
   id          Int                 @id @default(autoincrement())
-  address     String         x     @unique
+  address     String              @unique
   skills      AccountSkill[]
   tickets     AccountTerminal[]
   initiatives AccountInitiative[]
