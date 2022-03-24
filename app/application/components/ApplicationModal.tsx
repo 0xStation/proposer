@@ -48,7 +48,7 @@ const ApplicationModal = ({
       open={isOpen}
       toggle={setIsOpen}
     >
-      <div className="mt-8">
+      <div className="mt-8 mx-2">
         <Form
           onSubmit={async (values: { url: string; entryDescription: string }) => {
             try {
@@ -75,7 +75,7 @@ const ApplicationModal = ({
               <div className="grid grid-cols-2 gap-y-4 gap-x-2">
                 <div className="flex flex-col col-span-2">
                   <label htmlFor="url" className="text-marble-white">
-                    URL
+                    Share a link to an example of your past contribution or a project proposal:*
                   </label>
                   <Field
                     component="input"
@@ -84,14 +84,18 @@ const ApplicationModal = ({
                     className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
                   />
                 </div>
-                <div className="flex flex-col col-span-2">
+                <div className="flex flex-col col-span-2 mt-4">
                   <label htmlFor="entryDescription" className="text-marble-white">
-                    {initiative.data.applicationQuestion || "Why this initiative"}?
+                    {initiative.data.applicationQuestion ||
+                      `What unique value are you looking to bring to ${
+                        initiative.data.name || "this initiative"
+                      }?`}
+                    *
                   </label>
                   <Field
                     component="input"
                     name="entryDescription"
-                    placeholder="..."
+                    placeholder="Highlight your unique value in 3-5 sentences"
                     className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
                   />
                 </div>
