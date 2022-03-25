@@ -7,7 +7,6 @@ import { useAccount, useBalance } from "wagmi"
 import TicketWrapper from "app/core/components/TicketWrapper"
 import { useDecimals } from "app/core/contracts/contracts"
 import { DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
-import { Account } from "app/account/types"
 import getTicket from "app/ticket/queries/getTicket"
 
 const Navigation = ({ children }: { children?: any }) => {
