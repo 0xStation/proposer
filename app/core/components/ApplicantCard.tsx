@@ -25,10 +25,14 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
   const { account: applicant, createdAt } = application
   const pointsSymbol = terminal?.data.contracts.symbols.points
 
-  const [totalEndorsementPoints] = useQuery(getEndorsementValueSumByApplication, {
-    initiativeId: initiative?.id,
-    endorseeId: applicant?.id,
-  })
+  const [totalEndorsementPoints] = useQuery(
+    getEndorsementValueSumByApplication,
+    {
+      initiativeId: initiative?.id,
+      endorseeId: applicant?.id,
+    },
+    { suspense: false, enabled: !!(initiative?.id && applicant?.id) }
+  )
   const [referrals] = useQuery(getReferralsByApplication, {
     initiativeId: initiative?.id,
     endorseeId: applicant?.id,

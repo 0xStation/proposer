@@ -5,8 +5,6 @@ import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
 import DiscordIcon from "/public/discord-icon.svg"
 import { Initiative } from "app/initiative/types"
-import { DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
-import { useDecimals } from "app/core/contracts/contracts"
 import ApplicantEndorsements from "./ApplicantEndorsements"
 import useStore from "app/core/hooks/useStore"
 import { formatDate } from "app/core/utils/formatDate"
@@ -48,10 +46,14 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     { enabled: !!(activeUser?.id && initiative?.terminalId), suspense: false }
   )
 
-  const [totalEndorsementPoints] = useQuery(getEndorsementValueSumByApplication, {
-    initiativeId: initiative.id,
-    endorseeId: applicantId,
-  })
+  const [totalEndorsementPoints] = useQuery(
+    getEndorsementValueSumByApplication,
+    {
+      initiativeId: initiative.id,
+      endorseeId: applicantId,
+    },
+    { suspense: false, enabled: !!(initiative.id && applicantId) }
+  )
   const [referrals] = useQuery(getReferralsByApplication, {
     initiativeId: initiative.id,
     endorseeId: applicantId,

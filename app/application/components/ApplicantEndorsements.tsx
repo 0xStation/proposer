@@ -25,19 +25,12 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({ endorser,
   }
   return (
     <div>
-      <div className="flex-auto border border-concrete">
-        <div className="grid grid-cols-3 p-3">
-          <div className="flex flex-col">
-            <ProfileMetadata {...profileMetdataProps} />
-          </div>
-          <div className="flex flex-col pt-3">
-            {role && role !== "N/A" && <Tag type="role">{role?.toUpperCase()}</Tag>}
-          </div>
-          <div className="flex flex-col ">
-            <span className="text-marble-white text-lg text-normal m-2 justify-center">
-              {amount}
-            </span>
-          </div>
+      <div className="flex flex-row border border-concrete space-x-52 p-3">
+        <div className="flex flex-col">
+          <ProfileMetadata {...profileMetdataProps} />
+        </div>
+        <div className="flex flex-col ">
+          <span className="text-marble-white text-lg text-normal m-2 justify-center">{amount}</span>
         </div>
       </div>
     </div>
