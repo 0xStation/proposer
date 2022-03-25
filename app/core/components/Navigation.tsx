@@ -58,7 +58,7 @@ const Navigation = () => {
       <div className="h-12 w-full bg-tunnel-black flex flex-row justify-between border-b border-b-concrete">
         <Dropdown
           side="left"
-          className="h-full pt-2 hover:bg-wet-concrete pl-4 pr-1"
+          className="h-full pt-[.60rem] hover:bg-wet-concrete pl-4 pr-1"
           button={
             <div className="h-full flex items-center">
               <Image src={logo} alt="Station logo, the letters station spelled out." />
@@ -127,7 +127,7 @@ const Navigation = () => {
             />
           ) : (
             <span
-              className="p-4 pr-0 uppercase text-magic-mint text-lg border-l border-l-concrete cursor-pointer"
+              className="p-4 uppercase text-magic-mint text-lg border-l border-l-concrete cursor-pointer hover:bg-wet-concrete"
               onClick={() => toggleWalletModal(true)}
             >
               Connect Wallet

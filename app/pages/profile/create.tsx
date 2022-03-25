@@ -53,7 +53,7 @@ const CreateProfile: BlitzPage = () => {
   return (
     <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] relative">
       <h1 className="text-marble-white text-4xl text-center pt-12 mb-4">Complete your profile</h1>
-      <div className="mx-auto max-w-2xl">
+      <div className="mx-auto max-w-2xl pb-10">
         <AccountForm
           onSuccess={() => {
             setAccountCreationLoading(true)
