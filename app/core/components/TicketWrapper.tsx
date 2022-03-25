@@ -3,7 +3,7 @@ import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
 import { getNftImageUrl } from "app/utils/getNftImageUrl"
 
-const TicketWrapper = ({ terminal, ticket, tokenBalance, endorsementsSymbol }) => {
+const TicketWrapper = ({ terminal, ticket }) => {
   const [modalOpen, setModalOpen] = useState(false)
   return (
     <>
@@ -49,12 +49,6 @@ const TicketWrapper = ({ terminal, ticket, tokenBalance, endorsementsSymbol }) =
                         className="h-[400px] mx-auto block"
                         src={getNftImageUrl(terminal, ticket)}
                       />
-                    </div>
-                    <div className="w-full mt-2 justify-between px-1 text-base flex mx-auto">
-                      <span className="text-marble-white font-bold mr-2">Balance</span>
-                      <span className="text-marble-white font-light">
-                        {tokenBalance} {endorsementsSymbol}
-                      </span>
                     </div>
                   </div>
                   <div className="flex-1">

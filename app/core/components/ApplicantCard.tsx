@@ -23,7 +23,6 @@ type ApplicantCardProps = {
 export const ApplicantCard = (props: ApplicantCardProps) => {
   const { application, onApplicantCardClick, roleOfActiveUser, terminal, initiative } = props
   const { account: applicant, createdAt } = application
-  const pointsSymbol = terminal?.data.contracts.symbols.points
 
   const [totalEndorsementPoints] = useQuery(
     getEndorsementValueSumByApplication,
@@ -112,11 +111,9 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
         <div className="flex-1 items-center justify-center text-base">
           <div className="place-self-center mt-1 font-bold">Points</div>
         </div>
-        {pointsSymbol && (
-          <div className="flex flex-1 align-right place-content-end content-right text-base">
-            {totalEndorsementPoints ? `${totalEndorsementPoints}` : `0`}
-          </div>
-        )}
+        <div className="flex flex-1 align-right place-content-end content-right text-base">
+          {totalEndorsementPoints ? `${totalEndorsementPoints}` : `0`}
+        </div>
       </div>
       {activeUser && canActiveUserEndorse && onApplicantCardClick && (
         <div className="flex flex-row flex-1 mx-2.5">
