@@ -26,7 +26,7 @@ model Account {
 // roleNameOverrides overrides default role names
 model Terminal {
   id            Int               @id @default(autoincrement())
-  ticketAddress String            @unique
+  ticketAddress String?           @unique
   handle        String            @unique
   initiatives   Initiative[]
   roles         Role[]

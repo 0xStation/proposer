@@ -67,7 +67,7 @@ export const InviteModal = ({
     // Find role name for role's local id. If none exists, set chosen role to `undefined` and set error
     // when user tries to confirm role.
     const role = roleLocalId && terminal?.roles.find((role) => role.localId === roleLocalId)
-    setChosenRole(role)
+    setChosenRole(role as Role)
   }
 
   // If an applicant is internally applying to an initiative

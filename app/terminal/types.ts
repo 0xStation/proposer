@@ -11,7 +11,8 @@ export type TerminalMetadata = {
   pfpURL: string
   coverURL?: string
   permissions: {
-    invite: any
+    invite: Record<string, number[]>
+    edit: Record<string, number[]>
   }
   contracts: {
     addresses: {
