@@ -102,7 +102,7 @@ const ApplicationModal = ({
               </div>
               <button
                 type="submit"
-                className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-12 mx-auto block p-2"
+                className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-12 mx-auto block p-2 hover:opacity-70"
               >
                 Submit
               </button>
