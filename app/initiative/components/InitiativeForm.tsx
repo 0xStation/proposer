@@ -75,7 +75,7 @@ const InitiativeForm = ({
               </label>
               <Field
                 component="input"
-                name="initiativeTitle"
+                name="name"
                 placeholder="Initiative Title"
                 className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
               />
