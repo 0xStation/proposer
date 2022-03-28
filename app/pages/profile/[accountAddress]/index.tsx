@@ -16,7 +16,7 @@ type ProfileTabs = "TERMINALS" | "INITIATIVES"
 
 // the profile homepage
 // can see a users initiatives + termials + profile info at a glance
-const ProfileView: BlitzPage = () => {
+const ProfileHome: BlitzPage = () => {
   const accountAddress = useParam("accountAddress") as string
   const { setTab } = useRouterQuery()
   const [isExploreModalOpen, setIsExploreModalOpen] = useState<boolean>(false)
@@ -84,7 +84,7 @@ const ProfileView: BlitzPage = () => {
             <h3 className="text-marble-white text-base mt-4 font-normal">{account?.data.bio}</h3>
             {activeUser?.address === accountAddress && (
               <button
-                onClick={() => router.push(`/profile/${accountAddress}/edit`)}
+                onClick={() => router.push("/profile/edit")}
                 className="mt-4 p-[0.20rem] border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer"
               >
                 Edit Profile
@@ -207,6 +207,6 @@ const ProfileView: BlitzPage = () => {
   )
 }
 
-ProfileView.suppressFirstRenderFlicker = true
+ProfileHome.suppressFirstRenderFlicker = true
 
-export default ProfileView
+export default ProfileHome

@@ -1,4 +1,4 @@
-import { BlitzPage, useQuery, useRouter, useParam, Image } from "blitz"
+import { BlitzPage, useQuery, useRouter, Image } from "blitz"
 import AccountForm from "app/account/components/AccountForm"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
@@ -6,13 +6,12 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import Exit from "public/exit-button.svg"
 
 const EditProfile: BlitzPage = () => {
-  const accountAddress = useParam("accountAddress") as string
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
 
   const [account, { isLoading }] = useQuery(
     getAccountByAddress,
-    { address: accountAddress },
+    { address: activeUser?.address },
     { suspense: false }
   )
 
@@ -20,7 +19,7 @@ const EditProfile: BlitzPage = () => {
     // return loading
   }
 
-  if (!activeUser || !account || activeUser.address !== account.address) {
+  if (!activeUser || !account) {
     return (
       <div className="mx-auto max-w-2xl py-12">
         <h1 className="text-marble-white text-3xl text-center">
@@ -37,7 +36,7 @@ const EditProfile: BlitzPage = () => {
           <div className="w-[24px] h-[24px]">
             <button
               className="text-marble-white"
-              onClick={() => router.push(`/profile/${accountAddress}`)}
+              onClick={() => router.push(`/profile/${activeUser.address}`)}
             >
               <Image src={Exit} alt="Close button" width={24} height={24} />
             </button>
@@ -46,7 +45,7 @@ const EditProfile: BlitzPage = () => {
         <h1 className="text-marble-white text-4xl text-center pt-12">Edit your profile</h1>
         <div className="mx-auto max-w-2xl pb-12">
           <AccountForm
-            onSuccess={() => router.push(`/profile/${accountAddress}`)}
+            onSuccess={() => router.push(`/profile/${activeUser.address}`)}
             address={activeUser.address}
             account={account}
             isEdit={true}

@@ -41,7 +41,7 @@ const CreateProfile: BlitzPage = () => {
         <h1 className="text-marble-white text-3xl text-center">Your already have a profile!</h1>
         <p className="text-marble-white text-center mt-2">
           Do you want to{" "}
-          <a href={`/profile/${activeUser.address}`} className="text-magic-mint hover:underline">
+          <a href={"/profile/edit"} className="text-magic-mint hover:underline">
             edit
           </a>{" "}
           your profile instead?
