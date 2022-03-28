@@ -1,6 +1,6 @@
 import Modal from "../../core/components/Modal"
 import Verified from "/public/check-mark.svg"
-import { Image, invoke, Link, Routes, useParam } from "blitz"
+import { Image, invoke, Link, Routes, useParam, useRouter } from "blitz"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import Exit from "/public/exit-button.svg"
 import DiscordIcon from "/public/discord-icon.svg"
@@ -24,6 +24,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
   setIsOpen,
   terminalId,
 }) => {
+  const router = useRouter()
   const terminalHandle = useParam("terminalHandle", "string") as string
   const [initiatives, setInitiatives] = useState<Initiative[]>()
 
@@ -65,6 +66,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                   src={contributor?.data?.pfpURL}
                   alt="PFP"
                   className="h-[52px] w-[52px] min-w-[52px] border border-marble-white rounded-full"
+                  onClick={() => router.push(`/profile/${contributor.address}`)}
                 />
               ) : (
                 <div className="h-[52px] w-[52px] bg-gradient-to-b to-magic-mint from-electric-violet border border-marble-white rounded-full"></div>
