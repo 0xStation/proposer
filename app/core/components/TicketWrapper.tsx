@@ -50,26 +50,16 @@ const TicketWrapper = ({ terminal, ticket, tokenBalance, endorsementsSymbol }) =
                         src={getNftImageUrl(terminal, ticket)}
                       />
                     </div>
-                    <div className="w-full mt-2 justify-between px-1 text-base flex mx-auto">
-                      <span className="text-marble-white font-bold mr-2">Balance</span>
-                      <span className="text-marble-white font-light">
-                        {tokenBalance} {endorsementsSymbol}
-                      </span>
-                    </div>
                   </div>
                   <div className="flex-1">
                     <p className="text-marble-white text-2xl">
                       <span className="text-neon-blue">
                         {terminal.data.contracts.symbols.endorsements}
                       </span>{" "}
-                      gives you the power to signal your support for prospective contributors and
-                      curate the <span className="text-neon-blue">{terminal.data.name}</span>{" "}
-                      community.{" "}
-                    </p>
-                    <p className="mt-8 text-marble-white text-2xl">
-                      The balance is granted based on your role in the organization. It gets
-                      replenished when <span className="text-neon-blue">{terminal.data.name}</span>{" "}
-                      open up more initiatives for submissions.
+                      enables you to <span className="text-neon-blue">endorse</span>, signaling your
+                      support for prospecive contributors and to access the{" "}
+                      <span className="text-neon-blue">token-gating applications</span> that Station
+                      labs uses.{" "}
                     </p>
                   </div>
                 </div>
