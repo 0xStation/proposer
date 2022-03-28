@@ -11,13 +11,14 @@ import Button from "app/core/components/Button"
 import ExploreModal from "app/core/components/Explore/ExploreModal"
 import { QUERY_PARAMETERS, PROFILE_TABS } from "app/core/utils/constants"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 type ProfileTabs = "TERMINALS" | "INITIATIVES"
 
 // the profile homepage
 // can see a users initiatives + termials + profile info at a glance
 const ProfileHome: BlitzPage = () => {
-  const accountAddress = useParam("accountAddress") as string
+  const accountAddress = useParam("accountAddress", "string") as string
   const { setTab } = useRouterQuery()
   const [isExploreModalOpen, setIsExploreModalOpen] = useState<boolean>(false)
   const [sliderOpen, setSliderOpen] = useState(false)
@@ -27,7 +28,11 @@ const ProfileHome: BlitzPage = () => {
   const router = useRouter()
   const { DIRECTED_FROM, SET_TAB } = QUERY_PARAMETERS
 
-  const [account] = useQuery(getAccountByAddress, { address: accountAddress }, { suspense: false })
+  const [account] = useQuery(
+    getAccountByAddress,
+    { address: toChecksumAddress(accountAddress) },
+    { enabled: !!accountAddress, suspense: false }
+  )
 
   useEffect(() => {
     if (setTab === SET_TAB.INITIATIVES) {
@@ -39,6 +44,15 @@ const ProfileHome: BlitzPage = () => {
 
   const activeLinkStyles = "text-marble-white"
   const inactiveLinkStyles = "text-concrete hover:text-wet-concrete"
+
+  if (!account) {
+    // TODO: replace with pulsating loading state
+    return (
+      <div className="mx-auto max-w-2xl py-12">
+        <h1 className="text-marble-white text-3xl text-center">Loading...</h1>
+      </div>
+    )
+  }
 
   return (
     <Layout title={`${account ? `${account?.data?.name} | ` : ""}Profile`}>
@@ -82,7 +96,7 @@ const ProfileHome: BlitzPage = () => {
               </span>
             </div>
             <h3 className="text-marble-white text-base mt-4 font-normal">{account?.data.bio}</h3>
-            {activeUser?.address === accountAddress && (
+            {activeUser?.address === account?.address && (
               <button
                 onClick={() => router.push("/profile/edit")}
                 className="mt-4 p-[0.20rem] border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer"
