@@ -57,7 +57,7 @@ const TicketWrapper = ({ terminal, ticket, tokenBalance, endorsementsSymbol }) =
                         {terminal.data.contracts.symbols.endorsements}
                       </span>{" "}
                       enables you to <span className="text-neon-blue">endorse</span>, signaling your
-                      support for prospecive contributors and to access the{" "}
+                      support for prospective contributors and to access the{" "}
                       <span className="text-neon-blue">token-gating applications</span> that Station
                       labs uses.{" "}
                     </p>
