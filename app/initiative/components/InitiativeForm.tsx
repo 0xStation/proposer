@@ -34,9 +34,6 @@ const InitiativeForm = ({
     onSuccess: (data) => {
       onSuccess()
     },
-    onError: (error) => {
-      console.error(error)
-    },
   })
 
   const parseParagraphs = (text) => {
@@ -66,8 +63,7 @@ const InitiativeForm = ({
             })
           }
         } catch (error) {
-          console.error(`Error creating account: ${error}`)
-          alert("Error applying.")
+          alert(`${error}`)
         }
       }}
       render={({ handleSubmit }) => (
@@ -75,12 +71,12 @@ const InitiativeForm = ({
           <div className="grid grid-cols-2 gap-y-6 gap-x-2">
             <div className="flex flex-col col-span-2">
               <label htmlFor="name" className="text-marble-white text-base font-bold">
-                Initiative title*
+                Initiative Title*
               </label>
               <Field
                 component="input"
-                name="name"
-                placeholder="Name"
+                name="initiativeTitle"
+                placeholder="Initiative Title"
                 className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
               />
             </div>

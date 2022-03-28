@@ -2,6 +2,18 @@ import db from "db"
 import * as z from "zod"
 import { Initiative } from "../types"
 
+const formatErrorMessage = (formattedError) => {
+  let errorMessage = ""
+  Object.keys(formattedError).forEach((field) => {
+    if (field === "_errors") return
+    errorMessage = errorMessage.concat(
+      "\n",
+      `${field}: ${JSON.stringify(formattedError[field]._errors)}`
+    )
+  })
+  return errorMessage
+}
+
 const UpdateInitiative = z.object({
   bannerURL: z.string(),
   commitment: z.string().optional(),
@@ -22,15 +34,21 @@ const UpdateInitiative = z.object({
 })
 
 export default async function updateInitiative(input: z.infer<typeof UpdateInitiative>) {
-  const params = UpdateInitiative.parse(input)
+  const response = UpdateInitiative.safeParse(input)
 
+  if (!response.success) {
+    const formattedError = response.error?.format()
+    const message = formatErrorMessage(formattedError)
+    throw new Error(message)
+  }
+
+  const params = response.data
   const existingInitiative = await db.initiative.findUnique({
     where: { id: params.id },
   })
 
   if (!existingInitiative) {
-    console.error("cannot update an initiative that does not exist")
-    return null
+    throw new Error("cannot update an initiative that does not exist")
   }
 
   const payload = {
