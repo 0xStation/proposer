@@ -42,6 +42,11 @@ export default async function getInitiativeByLocalId(
           },
         },
       },
+      skills: {
+        include: {
+          skill: true,
+        },
+      },
     },
   })
 
@@ -50,9 +55,11 @@ export default async function getInitiativeByLocalId(
   }
 
   return {
+    terminalId: data.terminalId,
     id: initiative.id,
     localId: initiative.localId,
     data: initiative.data as InitiativeMetadata,
+    skills: initiative.skills.map((s) => s.skill),
     contributors: initiative.accounts
       .filter((a) => a.status == "CONTRIBUTOR")
       .map((a) => {

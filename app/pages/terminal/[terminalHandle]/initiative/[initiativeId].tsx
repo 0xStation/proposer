@@ -248,10 +248,10 @@ const Project: BlitzPage = () => {
                   </div>
                   <div className="flex flex-wrap">
                     {initiative &&
-                      initiative.data.skills?.map?.((skill, index) => {
+                      initiative.skills?.map?.((skill, index) => {
                         return (
                           <Tag key={index} type={"skill"}>
-                            {skill}
+                            {skill.name}
                           </Tag>
                         )
                       })}

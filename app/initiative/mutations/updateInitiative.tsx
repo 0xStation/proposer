@@ -4,8 +4,15 @@ import { Initiative } from "../types"
 
 const UpdateInitiative = z.object({
   bannerURL: z.string(),
-  commitment: z.string().optional(),
+  commitment: z.string(),
   contributeText: z.union([z.string(), z.string().array()]).optional(),
+  existingSkills: z
+    .object({
+      value: z.string(),
+      label: z.string(),
+      id: z.number(),
+    })
+    .array(),
   id: z.number(),
   isAcceptingApplications: z.boolean(),
   links: z
@@ -18,7 +25,12 @@ const UpdateInitiative = z.object({
   name: z.string(),
   oneLiner: z.string(),
   rewardText: z.union([z.string(), z.string().array()]),
-  skills: z.string().array(),
+  skills: z
+    .object({
+      value: z.string(),
+      label: z.string(),
+    })
+    .array(),
 })
 
 export default async function updateInitiative(input: z.infer<typeof UpdateInitiative>) {
@@ -33,6 +45,14 @@ export default async function updateInitiative(input: z.infer<typeof UpdateIniti
     return null
   }
 
+  const existingSkillValues = params.existingSkills.map((skill) => skill.value)
+  const incomingSkillValues = params.skills.map((skill) => skill.value)
+
+  const newSkills = params.skills.filter((skill) => !existingSkillValues.includes(skill.value))
+  const removedSkills = params.existingSkills.filter(
+    (skill) => !incomingSkillValues.includes(skill.value)
+  )
+
   const payload = {
     data: {
       bannerURL: params.bannerURL,
@@ -43,7 +63,30 @@ export default async function updateInitiative(input: z.infer<typeof UpdateIniti
       name: params.name,
       oneLiner: params.oneLiner,
       rewardText: params.rewardText,
-      skills: params.skills,
+    },
+    skills: {
+      delete: removedSkills.map((skill) => {
+        return {
+          initiativeId_skillId: {
+            initiativeId: params.id,
+            skillId: skill.id,
+          },
+        }
+      }),
+      create: newSkills.map((skill) => {
+        return {
+          skill: {
+            connectOrCreate: {
+              where: {
+                name: skill.value.toLowerCase(),
+              },
+              create: {
+                name: skill.value.toLowerCase(),
+              },
+            },
+          },
+        }
+      }),
     },
   }
 

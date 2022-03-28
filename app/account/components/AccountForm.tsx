@@ -11,6 +11,7 @@ import MultiSelect from "app/core/components/form/MultiSelect"
 import { TimezoneOptions, getTimezoneOptionFromValue } from "app/utils/timezoneOptions"
 import UploadIcon from "app/core/icons/UploadIcon"
 import { Account } from "app/account/types"
+import { toTitleCase } from "app/core/utils/titleCase"
 
 interface ApplicationParams {
   name: string
@@ -162,20 +163,9 @@ const AccountForm = ({
     }
   }, [account])
 
-  function capitalizeWord(word: string) {
-    return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase()
-  }
-
-  function capitalizeSkill(skill: string) {
-    return skill
-      .split(" ")
-      .map((w) => capitalizeWord(w))
-      .join(" ")
-  }
-
   const [skills] = useQuery(getSkills, {}, { suspense: false })
   const skillOptions = skills?.map((skill) => {
-    return { value: skill.name, label: capitalizeSkill(skill.name) }
+    return { value: skill.name, label: toTitleCase(skill.name) }
   })
 
   const existingSkills =
