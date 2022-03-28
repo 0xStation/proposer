@@ -236,7 +236,7 @@ const AccountForm = ({
             </div>
             <div className="flex flex-col col-span-2">
               <label htmlFor="bio" className="text-marble-white font-bold">
-                Bio
+                Bio*
               </label>
               <Field
                 component="textarea"
@@ -275,7 +275,7 @@ const AccountForm = ({
             </div>
             <div className="flex flex-col col-span-2">
               <label htmlFor="timezone" className="text-marble-white mb-2 text-base font-bold">
-                Timezone
+                Timezone*
               </label>
               <Select
                 name="timezone"
