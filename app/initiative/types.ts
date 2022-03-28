@@ -11,6 +11,7 @@ export type InitiativeMetadata = {
   links: ExternalLink[]
   members?: string[]
   commitment?: string
+  skills?: string[]
   applicationQuestion?: string
 }
 
