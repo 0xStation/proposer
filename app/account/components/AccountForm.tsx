@@ -225,7 +225,7 @@ const AccountForm = ({
             </div>
             <div className="flex flex-col col-span-2 mt-10">
               <label htmlFor="name" className="text-marble-white text-base font-bold">
-                Name
+                Name*
               </label>
               <Field
                 component="input"
@@ -247,7 +247,7 @@ const AccountForm = ({
             </div>
             <div className="flex flex-col col-span-2">
               <label htmlFor="contactURL" className="text-marble-white text-base font-bold">
-                Contact
+                Contact*
               </label>
               <p className="text-concrete text-sm mb-2">What&apos;s the best way to contact you?</p>
               <div className="flex flex-row mt-1">
@@ -261,7 +261,7 @@ const AccountForm = ({
             </div>
             <div className="flex flex-col col-span-2">
               <label htmlFor="skills" className="text-marble-white text-base font-bold">
-                Skills
+                Skills*
               </label>
               <p className="text-concrete text-sm mb-2">(Type to add or search skills)</p>
               <div>

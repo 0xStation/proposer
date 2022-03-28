@@ -77,7 +77,7 @@ const InitiativeForm = ({
             </div> */}
             <div className="flex flex-col col-span-2">
               <label htmlFor="name" className="text-marble-white text-base font-bold">
-                Initiative Name
+                Initiative Name*
               </label>
               <Field
                 component="input"
@@ -88,7 +88,7 @@ const InitiativeForm = ({
             </div>
             <div className="flex flex-col col-span-2">
               <label htmlFor="bio" className="text-marble-white font-bold">
-                One Liner (short description)
+                One Liner (short description)*
               </label>
               <Field
                 component="input"
