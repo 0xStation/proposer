@@ -3,7 +3,7 @@ import * as z from "zod"
 import { Initiative } from "../types"
 
 const formatErrorMessage = (formattedError) => {
-  let errorMessage = ""
+  let errorMessage = "failed to update initiative -"
   Object.keys(formattedError).forEach((field) => {
     if (field === "_errors") return
     errorMessage = errorMessage.concat(
