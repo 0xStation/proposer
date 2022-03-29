@@ -11,6 +11,7 @@ import getInitiativesByContributor from "app/initiative/queries/getInitiativesBy
 import { truncateString } from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 import { Tag } from "app/core/components/Tag"
+import Button from "app/core/components/Button"
 
 type ContributorDirectoryModalProps = {
   isOpen: boolean
@@ -66,7 +67,6 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                   src={contributor?.data?.pfpURL}
                   alt="PFP"
                   className="h-[52px] w-[52px] min-w-[52px] border border-marble-white rounded-full"
-                  onClick={() => router.push(`/profile/${contributor.address}`)}
                 />
               ) : (
                 <div className="h-[52px] w-[52px] bg-gradient-to-b to-magic-mint from-electric-violet border border-marble-white rounded-full"></div>
@@ -156,7 +156,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
           <div className="flex flex-col mt-8">
             <div className="flex-auto text-marble-white font-bold">Initiatives</div>
             {initiatives && initiatives.length ? (
-              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 sm:gap-4">
+              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 sxm:gap-4">
                 {initiatives.map((initiative, idx) => {
                   return (
                     <InitiativeCard
@@ -183,6 +183,15 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                 {contributor?.data.name} is not involved in any active initiatives at this time.
               </div>
             )}
+          </div>
+          <div className="pt-5">
+            <Button
+              className="px-5"
+              secondary
+              onClick={() => router.push(`/profile/${contributor?.address}`)}
+            >
+              View Profile
+            </Button>
           </div>
         </div>
       </Modal>
