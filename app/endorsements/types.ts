@@ -19,6 +19,7 @@ export type Endorsement = {
 }
 
 export type Referral = {
+  endorserId: number
+  endorsementsGiven: number
   endorser: Account
-  endorsementValue: number
 }

@@ -14,6 +14,9 @@ const EndorseModal = ({
   terminal,
 }) => {
   const activeUser = useStore((state) => state.activeUser)
+  const setShouldRefetchEndorsementPoints = useStore(
+    (state) => state.setShouldRefetchEndorsementPoints
+  )
   const [endorsementMessage, setEndorsementMessage] = useState<string>("")
   const [error, setError] = useState<boolean>(false)
 
@@ -32,6 +35,7 @@ const EndorseModal = ({
     setError(false)
     setEndorsementMessage("")
     setIsEndorseModalOpen(false)
+    setShouldRefetchEndorsementPoints(true)
     // allow time for applicant modal to clean up
     // before opening the next modal and causing
     // a memory leak + scroll lock

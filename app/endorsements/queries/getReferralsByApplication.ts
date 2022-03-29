@@ -11,22 +11,34 @@ export async function getReferralsByApplication(input: z.infer<typeof GetReferra
   const params = GetReferralsByApplication.parse(input)
 
   try {
-    const referrals = await db.endorsement.findMany({
-      distinct: ["endorserId"],
+    const referrals = await db.endorsement.groupBy({
+      by: ["endorserId", "endorsementValue"],
+      _sum: {
+        endorsementValue: true,
+      },
       orderBy: {
-        endorsementValue: "desc",
+        _sum: {
+          endorsementValue: "desc",
+        },
       },
       where: {
         initiativeId: params.initiativeId,
         endorseeId: params.endorseeId,
       },
-      select: {
-        endorsementValue: true,
-        endorser: true,
-      },
+    })
+    const endorserIds = referrals.map((referral) => referral.endorserId)
+    const endorsers = await db.account.findMany({ where: { id: { in: endorserIds } } })
+
+    let referrers = [] as any[]
+    referrals.forEach((referral) => {
+      referrers.push({
+        endorserId: referral.endorserId,
+        endorsementsGiven: referral._sum.endorsementValue,
+        endorser: endorsers.find((endorser) => endorser.id === referral.endorserId),
+      })
     })
 
-    return referrals as Referral[]
+    return referrers as Referral[]
   } catch (err) {
     console.error(
       `Error retrieving referrals for endorsee ${params.endorseeId} and initiative ${params.initiativeId}. Failed with error ${err}`

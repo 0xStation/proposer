@@ -1,6 +1,6 @@
 import Modal from "../../core/components/Modal"
 import { Image, useQuery } from "blitz"
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, useEffect } from "react"
 import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
 import DiscordIcon from "/public/discord-icon.svg"
@@ -38,6 +38,10 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   terminalData,
 }) => {
   const activeUser = useStore((state) => state.activeUser)
+  const shouldRefetchEndorsementPoints = useStore((state) => state.shouldRefetchEndorsementPoints)
+  const setShouldRefetchEndorsementPoints = useStore(
+    (state) => state.setShouldRefetchEndorsementPoints
+  )
   const { data: applicantData, address, role, skills, id: applicantId } = application?.account || {}
   const { pfpURL, name, ens, pronouns, verified, discordId, timezone, contactURL } = applicantData
   const [canInvite] = useQuery(
@@ -54,10 +58,17 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     },
     { suspense: false, enabled: !!(initiative.id && applicantId) }
   )
-  const [referrals] = useQuery(getReferralsByApplication, {
+  const [referrals, { refetch: refetchReferrals }] = useQuery(getReferralsByApplication, {
     initiativeId: initiative.id,
     endorseeId: applicantId,
   })
+
+  useEffect(() => {
+    if (shouldRefetchEndorsementPoints) {
+      refetchReferrals()
+      setShouldRefetchEndorsementPoints(false)
+    }
+  }, [shouldRefetchEndorsementPoints])
 
   const profileMetadataProps = {
     pfpURL,
@@ -221,11 +232,11 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               </div>
               {referrals?.length ? (
                 <div className="flex flex-col space-y-1">
-                  {referrals?.map?.(({ endorser: account, endorsementValue }, index) => (
+                  {referrals?.map?.(({ endorsementsGiven, endorser }, index) => (
                     <ApplicantEndorsements
                       key={index}
-                      endorser={account}
-                      amount={endorsementValue || 0}
+                      endorser={endorser}
+                      amount={endorsementsGiven || 0}
                     />
                   ))}
                 </div>

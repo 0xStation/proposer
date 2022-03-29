@@ -130,11 +130,11 @@ const ApplicationDrawer = ({ isOpen, setIsOpen, application }) => {
                             Points ({totalEndorsementPoints || 0})
                           </span>
                         </div>
-                        {referrals?.map?.(({ endorser: account, endorsementValue }, index) => (
+                        {referrals?.map?.(({ endorser: account, endorsementsGiven }, index) => (
                           <ApplicantEndorsements
                             key={index}
                             endorser={account}
-                            amount={endorsementValue || 0}
+                            amount={endorsementsGiven || 0}
                           />
                         ))}
                       </>

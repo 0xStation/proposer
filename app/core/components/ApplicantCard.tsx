@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { Application } from "app/application/types"
 import Button from "../components/Button"
 import Card from "../components/Card"
@@ -21,10 +22,14 @@ type ApplicantCardProps = {
 }
 
 export const ApplicantCard = (props: ApplicantCardProps) => {
-  const { application, onApplicantCardClick, roleOfActiveUser, terminal, initiative } = props
+  const { application, onApplicantCardClick, roleOfActiveUser, initiative } = props
   const { account: applicant, createdAt } = application
+  const shouldRefetchEndorsementPoints = useStore((state) => state.shouldRefetchEndorsementPoints)
+  const setShouldRefetchEndorsementPoints = useStore(
+    (state) => state.setShouldRefetchEndorsementPoints
+  )
 
-  const [totalEndorsementPoints] = useQuery(
+  const [totalEndorsementPoints, { refetch: refetchEndorsementPoints }] = useQuery(
     getEndorsementValueSumByApplication,
     {
       initiativeId: initiative?.id,
@@ -36,6 +41,13 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
     initiativeId: initiative?.id,
     endorseeId: applicant?.id,
   })
+
+  useEffect(() => {
+    if (shouldRefetchEndorsementPoints) {
+      refetchEndorsementPoints()
+      setShouldRefetchEndorsementPoints(false)
+    }
+  }, [shouldRefetchEndorsementPoints])
 
   const activeUser = useStore((state) => state.activeUser)
 
