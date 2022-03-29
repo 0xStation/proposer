@@ -13,8 +13,8 @@ interface InitiativeParams {
   name: string
   oneLiner: string
   commitment: string
-  rewardText: string[] | string
-  contributeText: string[] | string
+  rewardText: string
+  contributeText: string
   links?: {
     url: string
     symbol: number
@@ -39,9 +39,6 @@ const InitiativeForm = ({
     onSuccess: (data) => {
       onSuccess()
     },
-    onError: (error) => {
-      console.error(error)
-    },
   })
 
   const skillOptions = initiative?.skills?.map((skill) => {
@@ -57,12 +54,18 @@ const InitiativeForm = ({
     if (Array.isArray(text)) {
       return text
     }
-    return text.split(",")
+    return text.split("\n")
+  }
+
+  const initialFormValues = {
+    ...initiative?.data,
+    contributeText: initiative?.data?.contributeText?.join("\n"),
+    rewardText: initiative?.data?.rewardText?.join("\n"),
   }
 
   return (
     <Form
-      initialValues={initiative?.data || {}}
+      initialValues={initialFormValues || {}}
       onSubmit={async (values: InitiativeParams) => {
         try {
           if (isEdit) {
@@ -75,29 +78,20 @@ const InitiativeForm = ({
             })
           }
         } catch (error) {
-          console.error(`Error creating account: ${error}`)
-          alert("Error applying.")
+          alert(`${error}`)
         }
       }}
       render={({ handleSubmit }) => (
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-y-6 gap-x-2">
-            {/* <div className="flex flex-col col-span-2">
-              <div className="mt-10 mb-9">
-                <h1 className="font-bold text-2xl">Initiative Info</h1>
-                <p className="mt-3">
-                  Provide details on your initiative to help prospective applicants learn more.
-                </p>
-              </div>
-            </div> */}
             <div className="flex flex-col col-span-2">
               <label htmlFor="name" className="text-marble-white text-base font-bold">
-                Initiative title*
+                Initiative Title*
               </label>
               <Field
                 component="input"
                 name="name"
-                placeholder="Name"
+                placeholder="Initiative Title"
                 className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
               />
             </div>
@@ -116,13 +110,12 @@ const InitiativeForm = ({
               <label htmlFor="contactURL" className="text-marble-white text-base font-bold">
                 About
               </label>
-              <p className="text-concrete text-sm mb-2">Separate paragraphs by comma</p>
               <div className="flex flex-row mt-1">
                 <Field
                   component="textarea"
                   name="contributeText"
                   placeholder="Contribute text"
-                  className="border border-concrete bg-wet-concrete text-marble-white p-2 flex-1  h-36"
+                  className="border border-concrete bg-wet-concrete text-marble-white p-2 flex-1 h-36"
                 />
               </div>
             </div>
@@ -130,9 +123,8 @@ const InitiativeForm = ({
               <label htmlFor="name" className="text-marble-white text-base font-bold">
                 Rewards
               </label>
-              <p className="text-concrete text-sm mb-2">Separate rewards by comma</p>
               <Field
-                component="input"
+                component="textarea"
                 name="rewardText"
                 placeholder="e.g. NFT, 1000 USDC"
                 className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
