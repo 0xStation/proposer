@@ -1,7 +1,7 @@
 import db from "db"
 import * as z from "zod"
 import { Account, AccountMetadata } from "../types"
-import { Role, RoleMetadata } from "app/role/types"
+import { RoleMetadata } from "app/role/types"
 
 const GetAccountsByTerminalRole = z.object({
   terminalId: z.number(),

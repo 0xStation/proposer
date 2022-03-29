@@ -19,6 +19,7 @@ import { InviteModal } from "app/application/components/InviteModal"
 import getTicket from "app/ticket/queries/getTicket"
 import { Ticket } from "app/ticket/types"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
+import { Initiative } from "app/initiative/types"
 
 const skeletonLoadingScreen = (
   <div className="flex flex-col space-y-10">
@@ -150,6 +151,7 @@ const TerminalWaitingPage: BlitzPage = () => {
       application,
       onApplicantCardClick,
       roleOfActiveUser,
+      initiative: currentInitiative as Initiative,
     }
 
     return <ApplicantCard key={idx} {...applicationCardProps} />
@@ -201,7 +203,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           setIsEndorseModalOpen={setIsEndorseModalOpen}
           setIsSuccessModalOpen={setIsEndorseSuccessModalOpen}
           selectedUserToEndorse={selectedApplication?.account}
-          initiativeLocalId={selectedInitiativeLocalId}
+          initiativeId={currentInitiative?.id}
           terminal={terminal}
         />
       )}

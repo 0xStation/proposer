@@ -1,3 +1,4 @@
+import { Initiative } from "app/initiative/types"
 import { Role } from "app/role/types"
 
 export enum MethodToVisualizeContributorsNft {
@@ -36,4 +37,5 @@ export type Terminal = {
   handle: string
   data: TerminalMetadata
   roles: Role[]
+  initiatives?: Initiative[]
 }
