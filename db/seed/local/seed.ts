@@ -6,6 +6,7 @@ import seedAccountTerminals from "../local/3-account-terminal"
 import seedInitiatives from "../local/4-initiatives"
 import seedAccountInitiatives from "../local/5-accounts-initiatives"
 
+// blitz db seed -f ./db/seed/local/seed.ts
 const seed = async () => {
   // wipe the database clean before loading up data
   await wipe()

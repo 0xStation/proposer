@@ -55,11 +55,15 @@ const Navigation = () => {
 
   return (
     <>
-      <div className="h-12 w-full px-4 bg-tunnel-black flex flex-row justify-between border-b border-b-concrete">
+      <div className="h-12 w-full bg-tunnel-black flex flex-row justify-between border-b border-b-concrete">
         <Dropdown
           side="left"
-          className="self-center"
-          button={<Image src={logo} alt="Station logo, the letters station spelled out." />}
+          className="h-full pt-[.60rem] hover:bg-wet-concrete pl-4 pr-1"
+          button={
+            <div className="h-full flex items-center">
+              <Image src={logo} alt="Station logo, the letters station spelled out." />
+            </div>
+          }
           items={[
             { name: "home", href: "/" },
             { name: "open terminal", href: "https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6" },
@@ -77,7 +81,7 @@ const Navigation = () => {
           {activeUser ? (
             <Dropdown
               side="right"
-              className="p-4 pr-0 border-l border-l-concrete"
+              className="p-4 border-l border-l-concrete hover:bg-wet-concrete w-full"
               button={
                 <div className="flex items-center">
                   {activeUser?.data?.pfpURL ? (
@@ -106,7 +110,7 @@ const Navigation = () => {
           ) : address ? (
             <Dropdown
               side="right"
-              className="p-4 pr-0 border-l border-l-concrete"
+              className="p-4 border-l border-l-concrete hover:bg-wet-concrete w-full"
               button={
                 <div className="flex items-center">
                   <span className="w-7 h-7 rounded-full bg-gradient-to-b from-electric-violet to-magic-mint border border-marble-white mr-2"></span>
@@ -123,7 +127,7 @@ const Navigation = () => {
             />
           ) : (
             <span
-              className="p-4 pr-0 uppercase text-magic-mint text-lg border-l border-l-concrete cursor-pointer"
+              className="p-4 uppercase text-magic-mint text-lg border-l border-l-concrete cursor-pointer hover:bg-wet-concrete"
               onClick={() => toggleWalletModal(true)}
             >
               Connect Wallet

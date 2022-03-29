@@ -75,7 +75,7 @@ const ApplicationModal = ({
               <div className="grid grid-cols-2 gap-y-4 gap-x-2">
                 <div className="flex flex-col col-span-2">
                   <label htmlFor="url" className="text-marble-white">
-                    Share a link to a project proposal or past contribution:*
+                    Share a link to a proposal or a project you&apos;re proud of:*
                   </label>
                   <Field
                     component="input"
@@ -102,7 +102,7 @@ const ApplicationModal = ({
               </div>
               <button
                 type="submit"
-                className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-12 mx-auto block p-2"
+                className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-12 mx-auto block p-2 hover:opacity-70"
               >
                 Submit
               </button>
