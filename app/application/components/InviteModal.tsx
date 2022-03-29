@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Modal from "../../core/components/Modal"
 import { useQuery, useMutation } from "blitz"
 import Button from "../../core/components/Button"
@@ -9,6 +9,12 @@ import { Account } from "app/account/types"
 import { Role } from "app/role/types"
 import { toTitleCase } from "app/core/utils/titleCase"
 import getInvitePermissions from "../queries/getInvitePermissions"
+import {
+  // useIdentityTokenRead,
+  useIdentityAdminWrite,
+} from "app/core/contracts/contracts"
+import { useAccount, useBalance, useWaitForTransaction } from "wagmi"
+import { BigNumber } from "ethers"
 
 export const InviteModal = ({
   selectedApplication,
@@ -18,10 +24,16 @@ export const InviteModal = ({
   applicantTicket,
   setRefreshApplications,
 }) => {
+  const [{ data: accountData }] = useAccount()
+  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
+  const [explorerLink, setExplorerLink] = useState<string>()
+  const [mintMessage, setMintMessage] = useState<string>("")
+  const [error, setError] = useState<boolean>(false)
   const [roleNotSelectedError, setRoleNotSelectedError] = useState<boolean>(false)
   const [inviteSuccessful, setInviteSuccessful] = useState<boolean>(false)
   const [chosenRole, setChosenRole] = useState<Role>()
   const [inviteContributor] = useMutation(InviteContributor)
+  const [transactionPending, setTransactionPending] = useState<boolean>(false)
   const activeUser = useStore((state) => state.activeUser) as Account
 
   const [invitePermissionedRoleLocalIds] = useQuery(
@@ -36,12 +48,86 @@ export const InviteModal = ({
     { enabled: !!currentInitiative?.terminalId, suspense: false }
   )
 
-  const handleInviteClick = async () => {
+  const { loading: mintLoading, write: mint } = useIdentityAdminWrite({
+    methodName: "mint",
+  })
+
+  const [, wait] = useWaitForTransaction({
+    skip: true,
+  })
+
+  const ViewExplorer = explorerLink && (
+    <>
+      <a href={explorerLink} target="_blank" className="text-magic-mint" rel="noreferrer">
+        Explorer
+      </a>
+      .
+    </>
+  )
+
+  const handleExistingMemberInviteClick = async () => {
+    await inviteContributor({
+      inviterId: activeUser.id,
+      accountId: selectedApplication.account.id,
+      terminalId: currentInitiative.terminalId,
+      // if applicant already holds a ticket we return the same roleLocalId on their ticket
+      // and upsert them to the new initiative.
+      roleLocalId: chosenRole?.localId || applicantTicket?.roleLocalId,
+      initiativeId: currentInitiative.id,
+    })
+
+    // tear down state
+    setInviteSuccessful(true)
+
+    // Remove application from waiting room when applicant is invited.
+    // TODO: make it so that applications automatically refreshes via dependency hook
+    setRefreshApplications(true)
+  }
+
+  const handleNewMemberInviteClick = async () => {
     if (!chosenRole && !applicantTicket) {
       // if the applicant isn't an existing ticket holder and a chosenRole isn't selected
       // we show an error because the inviter needs to select a role first.
       setRoleNotSelectedError(true)
     } else {
+      const tags = BigNumber.from(Math.pow(2, chosenRole?.localId || 0)) // convert roleLocalId into on-chain representation
+      const { data: mintData, error: mintError } = await mint({
+        args: [terminal?.ticketAddress, selectedApplication?.account.address, tags],
+      })
+
+      // // poll for on-chain endorse data until we have an error or the results data
+      let mintTransaction
+      while (!mintTransaction?.data && !mintError) {
+        setTransactionPending(true)
+        console.log("pending true")
+        let mintPendingMsg
+        if (mintData?.hash) {
+          mintPendingMsg = "Mint is pending. View the status on "
+          setExplorerLink(`https://rinkeby.etherscan.io/tx/${mintData?.hash}`)
+        } else {
+          mintPendingMsg = "Mint is pending. Hang tight."
+        }
+        setMintMessage(mintPendingMsg)
+        mintTransaction = await wait({
+          hash: mintData?.hash,
+        })
+      }
+
+      if (mintError) {
+        const msg = mintError.message.substring(
+          mintError.message.indexOf("execution reverted"),
+          mintError.message.indexOf('","data') // execution reverted: ..... ","data":{...}
+        )
+        setError(true)
+        setTransactionPending(false)
+        setMintMessage(msg)
+        return
+      }
+
+      setTransactionPending(false)
+      setMintMessage("")
+      setExplorerLink("")
+
       await inviteContributor({
         inviterId: activeUser.id,
         accountId: selectedApplication.account.id,
@@ -51,6 +137,8 @@ export const InviteModal = ({
         roleLocalId: chosenRole?.localId || applicantTicket?.roleLocalId,
         initiativeId: currentInitiative.id,
       })
+
+      // tear down state
       setInviteSuccessful(true)
 
       // Remove application from waiting room when applicant is invited.
@@ -77,7 +165,7 @@ export const InviteModal = ({
     <div className="mt-8 mx-12 text-marble-white text-center">
       <h1 className="text-3xl">{`Adding ${selectedApplication?.account?.data?.name} to`}</h1>
       <h1 className="text-3xl">{`${currentInitiative?.data?.name}?`}</h1>
-      <Button className="mt-10 mb-3 w-72" onClick={handleInviteClick}>
+      <Button className="mt-10 mb-3 w-72" onClick={handleExistingMemberInviteClick}>
         Confirm
       </Button>
     </div>
@@ -100,10 +188,23 @@ export const InviteModal = ({
             </option>
           ))}
       </select>
-      <Button className="mt-10 w-72" onClick={handleInviteClick} disabled={roleNotSelectedError}>
+      <Button
+        className="mt-10 w-72"
+        onClick={handleNewMemberInviteClick}
+        loading={mintLoading || transactionPending}
+        disabled={roleNotSelectedError || mintLoading || transactionPending}
+      >
         Confirm
       </Button>
       {roleNotSelectedError && <p className="text-torch-red text-center">Please select a role.</p>}
+      <p
+        className={`${
+          error ? "text-torch-red" : "text-marble-white"
+        } text-center text-base mt-1 mb-[-10px] p-2`}
+      >
+        {mintMessage}
+        {ViewExplorer}
+      </p>
     </div>
   )
 
@@ -141,6 +242,8 @@ export const InviteModal = ({
         setInviteSuccessful(false)
         setRefreshApplications(false)
         setChosenRole(undefined)
+        setMintMessage("")
+        setError(false)
       }}
       error={roleNotSelectedError}
     >
