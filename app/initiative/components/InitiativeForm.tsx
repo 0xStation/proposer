@@ -18,7 +18,6 @@ interface InitiativeParams {
   oneLiner: string
   commitment: string
   rewardText: string
-  contributeText: string
   links?: {
     url: string
     symbol: number
@@ -44,7 +43,7 @@ const InitiativeForm = ({
   initiative?: Initiative | null
   isEdit: boolean
 }) => {
-  const [about, setAbout] = useState()
+  const [about, setAbout] = useState(initiative?.data.about)
   const [updateInitiativeMutation] = useMutation(updateInitiative, {
     onSuccess: (data) => {
       onSuccess()
@@ -71,7 +70,6 @@ const InitiativeForm = ({
 
   const initialFormValues = {
     ...initiative?.data,
-    contributeText: initiative?.data?.contributeText?.join("\n"),
     rewardText: initiative?.data?.rewardText?.join("\n"),
   }
 
@@ -86,7 +84,6 @@ const InitiativeForm = ({
               id: initiative?.id || 1,
               existingSkills,
               about: about,
-              contributeText: parseParagraphs(values.contributeText),
               rewardText: parseParagraphs(values.rewardText),
             })
           }
@@ -178,15 +175,6 @@ const InitiativeForm = ({
                   />
                 </div>
               </div>
-              <div className="flex flex-col col-span-2">
-                <label htmlFor="demo" className="text-marble-white text-base font-bold">
-                  About
-                </label>
-                <div>
-                  <RichTextarea onChange={setAbout} initialValue={initiative?.data.about} />
-                </div>
-              </div>
-              <div></div>
             </div>
             <button
               type="submit"

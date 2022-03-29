@@ -8,7 +8,15 @@ import {
   Element as SlateElement,
 } from "slate"
 import { useSlate, Slate, Editable, withReact, ReactEditor } from "slate-react"
-import { XIcon } from "@heroicons/react/outline"
+import LooksOneIcon from "@mui/icons-material/LooksOne"
+import LooksTwoIcon from "@mui/icons-material/LooksTwo"
+import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered"
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted"
+import FormatItalicIcon from "@mui/icons-material/FormatItalic"
+import FormatBoldIcon from "@mui/icons-material/FormatBold"
+import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined"
+import CodeIcon from "@mui/icons-material/Code"
+import FormatQuoteIcon from "@mui/icons-material/FormatQuote"
 import { CustomElement, CustomText } from "app/initiative/types"
 
 declare module "slate" {
@@ -47,56 +55,38 @@ const RichTextarea = ({ onChange, initialValue }) => {
       >
         <ul className="px-1 flex items-center sticky top-0 bg-white z-1 h-[33px]">
           <li>
-            <MarkButton format="bold" icon={<XIcon className="h-4 w-4" aria-hidden="true" />} />
+            <MarkButton format="bold" icon={<FormatBoldIcon />} />
           </li>
           <li>
-            <MarkButton format="italic" icon={<XIcon className="h-4 w-4" aria-hidden="true" />} />
+            <MarkButton format="italic" icon={<FormatItalicIcon />} />
           </li>
           <li>
-            <MarkButton
-              format="underline"
-              icon={<XIcon className="h-4 w-4" aria-hidden="true" />}
-            />
+            <MarkButton format="underline" icon={<FormatUnderlinedIcon />} />
           </li>
           <li>
-            <MarkButton format="code" icon={<XIcon className="h-4 w-4" aria-hidden="true" />} />
+            <MarkButton format="code" icon={<CodeIcon />} />
           </li>
           <li>
-            <BlockButton
-              format="heading-one"
-              icon={<XIcon className="h-4 w-4" aria-hidden="true" />}
-            />
+            <BlockButton format="heading-one" icon={<LooksOneIcon />} />
           </li>
           <li>
-            <BlockButton
-              format="heading-two"
-              icon={<XIcon className="h-4 w-4" aria-hidden="true" />}
-            />
+            <BlockButton format="heading-two" icon={<LooksTwoIcon />} />
           </li>
           <li>
-            <BlockButton
-              format="block-quote"
-              icon={<XIcon className="h-4 w-4" aria-hidden="true" />}
-            />
+            <BlockButton format="block-quote" icon={<FormatQuoteIcon />} />
           </li>
           <li>
-            <BlockButton
-              format="numbered-list"
-              icon={<XIcon className="h-4 w-4" aria-hidden="true" />}
-            />
+            <BlockButton format="numbered-list" icon={<FormatListNumberedIcon />} />
           </li>
           <li>
-            <BlockButton
-              format="bulleted-list"
-              icon={<XIcon className="h-4 w-4" aria-hidden="true" />}
-            />
+            <BlockButton format="bulleted-list" icon={<FormatListBulletedIcon />} />
           </li>
         </ul>
       </div>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
-        className="bg-wet-concrete border-concrete border p-2 block min-h-36 prose text-marble-white prose-h1:text-marble-white prose-h2:text-marble-white"
+        className="bg-wet-concrete border-concrete border p-2 prose text-marble-white prose-headings:text-marble-white  prose-strong:text-marble-white prose-code:text-marble-white prose-blockquote:text-marble-white prose-headings:m-0 prose-p:m-0 prose-blockquote:m-0"
         placeholder="Enter some rich text…"
       />
     </Slate>

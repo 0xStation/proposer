@@ -15,7 +15,7 @@ const ReadonlyTextarea = ({ value }: { value: CustomElement[] }) => {
         readOnly
         renderElement={renderElement}
         renderLeaf={renderLeaf}
-        className="prose text-marble-white prose-h1:text-marble-white prose-h2:text-marble-white"
+        className="prose text-marble-white prose-headings:text-marble-white  prose-strong:text-marble-white prose-code:text-marble-white prose-blockquote:text-marble-white prose-headings:m-0 prose-p:m-0 prose-blockquote:m-0"
       />
     </Slate>
   )

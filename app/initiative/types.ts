@@ -9,7 +9,6 @@ export type InitiativeMetadata = {
   name: string
   oneLiner?: string
   bannerURL?: string
-  contributeText?: string[]
   rewardText?: string[]
   isAcceptingApplications: boolean
   links: ExternalLink[]

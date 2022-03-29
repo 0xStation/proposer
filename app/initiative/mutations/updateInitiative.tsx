@@ -18,7 +18,6 @@ const UpdateInitiative = z.object({
   about: z.any(),
   bannerURL: z.string(),
   commitment: z.string(),
-  contributeText: z.union([z.string(), z.string().array()]).optional(),
   existingSkills: z
     .object({
       value: z.string(),
@@ -51,7 +50,15 @@ const UpdateInitiative = z.object({
 })
 
 export default async function updateInitiative(input: z.infer<typeof UpdateInitiative>) {
-  const params = UpdateInitiative.parse(input)
+  const response = UpdateInitiative.safeParse(input)
+
+  if (!response.success) {
+    const formattedError = response.error?.format()
+    const message = formatErrorMessage(formattedError)
+    throw new Error(message)
+  }
+
+  const params = response.data
   const existingInitiative = await db.initiative.findUnique({
     where: { id: params.id },
   })
@@ -73,7 +80,6 @@ export default async function updateInitiative(input: z.infer<typeof UpdateIniti
       about: params.about,
       bannerURL: params.bannerURL,
       commitment: params.commitment,
-      contributeText: params.contributeText,
       isAcceptingApplications: params.isAcceptingApplications,
       links: params.links,
       name: params.name,
