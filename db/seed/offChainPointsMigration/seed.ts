@@ -43,7 +43,7 @@ export const seed = async () => {
     // iterate over initiatives
     initiatives.map(async (initiative) => {
       const applications = (await db.accountInitiative.findMany({
-        where: { initiativeId: initiative.id as number, status: "APPLIED" },
+        where: { initiativeId: initiative.id as number },
         include: {
           account: true,
         },
