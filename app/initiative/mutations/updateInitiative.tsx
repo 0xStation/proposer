@@ -15,6 +15,7 @@ const formatErrorMessage = (formattedError) => {
 }
 
 const UpdateInitiative = z.object({
+  about: z.any(),
   bannerURL: z.string(),
   commitment: z.string(),
   contributeText: z.union([z.string(), z.string().array()]).optional(),
@@ -43,18 +44,14 @@ const UpdateInitiative = z.object({
       label: z.string(),
     })
     .array(),
+  status: z.object({
+    value: z.string(),
+    label: z.string(),
+  }),
 })
 
 export default async function updateInitiative(input: z.infer<typeof UpdateInitiative>) {
-  const response = UpdateInitiative.safeParse(input)
-
-  if (!response.success) {
-    const formattedError = response.error?.format()
-    const message = formatErrorMessage(formattedError)
-    throw new Error(message)
-  }
-
-  const params = response.data
+  const params = UpdateInitiative.parse(input)
   const existingInitiative = await db.initiative.findUnique({
     where: { id: params.id },
   })
@@ -73,6 +70,7 @@ export default async function updateInitiative(input: z.infer<typeof UpdateIniti
 
   const payload = {
     data: {
+      about: params.about,
       bannerURL: params.bannerURL,
       commitment: params.commitment,
       contributeText: params.contributeText,
@@ -81,6 +79,7 @@ export default async function updateInitiative(input: z.infer<typeof UpdateIniti
       name: params.name,
       oneLiner: params.oneLiner,
       rewardText: params.rewardText,
+      status: params.status.value,
     },
     skills: {
       delete: removedSkills.map((skill) => {

@@ -20,6 +20,7 @@ import Card from "app/core/components/Card"
 import { formatDate } from "app/core/utils/formatDate"
 import Button from "app/core/components/Button"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
+import ReadonlyTextarea from "app/core/components/form/ReadonlyTextarea"
 
 const Project: BlitzPage = () => {
   const [hasApplied, setHasApplied] = useState(false)
@@ -201,22 +202,14 @@ const Project: BlitzPage = () => {
                   )}
                 </div>
               </div>
-
-              <div className="flex flex-col space-y-4 text-marble-white">
-                <div>
-                  <span className="text-2xl">About</span>
+              {initiative?.data.about && (
+                <div className="flex flex-col space-y-4 text-marble-white">
+                  <div>
+                    <span className="text-2xl">About</span>
+                  </div>
+                  <ReadonlyTextarea value={initiative.data.about} />
                 </div>
-                <div className="flex flex-col space-y-3">
-                  {initiative &&
-                    initiative.data.contributeText?.map?.((item, index) => {
-                      return (
-                        <span className="flex flex-col text-base" key={index}>
-                          <p dangerouslySetInnerHTML={{ __html: item }} />
-                        </span>
-                      )
-                    })}
-                </div>
-              </div>
+              )}
               <div className="text-marble-white grid md:grid-cols-3 gap-12">
                 <div className="space-y-4">
                   <div>
@@ -257,79 +250,80 @@ const Project: BlitzPage = () => {
                   </div>
                 </div>
               </div>
-
-              <div className="space-y-4">
-                <div className="flex flex-row">
-                  <span className="flex-1 text-marble-white text-2xl">Contributors</span>
-                </div>
-                <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
-                  {results?.map?.((contributor, index) => {
-                    return contributor
-                  })}
-                </div>
-                <div className="flex flex-row">
-                  <div className="flex-1 flex justify-start">
-                    {hasPrev && (
-                      <div
-                        onClick={() => setPage(page - 1)}
-                        className="cursor-pointer flex justify-self-start rotate-180"
-                      >
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 12 12"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            clipRule="evenodd"
-                            d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
-                            fill="#F2EFEF"
-                          />
-                        </svg>
-                      </div>
-                    )}
+              {results.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex flex-row">
+                    <span className="flex-1 text-marble-white text-2xl">Contributors</span>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex flex-row justify-center">
-                      {[...Array(totalPages)].map((_, idx) => {
-                        return (
-                          <span
-                            key={idx}
-                            className={`h-1 w-1  rounded-full mr-1 ${
-                              page === idx ? "bg-marble-white" : "bg-concrete"
-                            }`}
-                          ></span>
-                        )
-                      })}
+                  <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
+                    {results?.map?.((contributor, index) => {
+                      return contributor
+                    })}
+                  </div>
+                  <div className="flex flex-row">
+                    <div className="flex-1 flex justify-start">
+                      {hasPrev && (
+                        <div
+                          onClick={() => setPage(page - 1)}
+                          className="cursor-pointer flex justify-self-start rotate-180"
+                        >
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 12 12"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
+                              fill="#F2EFEF"
+                            />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex flex-row justify-center">
+                        {[...Array(totalPages)].map((_, idx) => {
+                          return (
+                            <span
+                              key={idx}
+                              className={`h-1 w-1  rounded-full mr-1 ${
+                                page === idx ? "bg-marble-white" : "bg-concrete"
+                              }`}
+                            ></span>
+                          )
+                        })}
+                      </div>
+                    </div>
+                    <div className="flex-1 flex justify-end">
+                      {hasNext && (
+                        <div
+                          onClick={() => setPage(page + 1)}
+                          className="cursor-pointer flex justify-self-end"
+                        >
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 12 12"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
+                              fill="#F2EFEF"
+                            />
+                          </svg>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <div className="flex-1 flex justify-end">
-                    {hasNext && (
-                      <div
-                        onClick={() => setPage(page + 1)}
-                        className="cursor-pointer flex justify-self-end"
-                      >
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 12 12"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            clipRule="evenodd"
-                            d="M12 5.98753L5.97062 -1.05421e-06L5.001 0.974387L9.31593 5.3109L-2.83594e-06 5.3109L-3.07691e-06 6.6891L9.31593 6.6891L5.001 11.0256L5.97061 12L12 5.98753Z"
-                            fill="#F2EFEF"
-                          />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {initiative?.data.isAcceptingApplications && (

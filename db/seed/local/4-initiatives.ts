@@ -1,6 +1,7 @@
 import db from "../../index"
 import { InitiativeMetadata } from "app/initiative/types"
 import { Symbol } from "app/types"
+import { CustomElement } from "app/initiative/types"
 
 type InitiativeSeed = {
   localId: number
@@ -19,9 +20,17 @@ export const initiativeIds = {
   stationDigest: 9,
 }
 
+const defaultAbout: CustomElement[] = [
+  {
+    type: "paragraph",
+    children: [{ text: "Default about field." }],
+  },
+]
+
 const contributorReview: InitiativeSeed = {
   localId: initiativeIds.contributorReview,
   data: {
+    about: defaultAbout,
     name: "Contributor Review",
     oneLiner: "Peer-to-peer recognition that publicizes your proof of contribution.",
     isAcceptingApplications: true,
@@ -38,6 +47,7 @@ const contributorReview: InitiativeSeed = {
 const waitingRoom: InitiativeSeed = {
   localId: initiativeIds.waitingRoom,
   data: {
+    about: defaultAbout,
     name: "Waiting Room",
     oneLiner:
       "Product to empower organizations with decentralized hiring and Station's first launch.",
@@ -56,6 +66,7 @@ const waitingRoom: InitiativeSeed = {
 const newstand: InitiativeSeed = {
   localId: initiativeIds.newstand,
   data: {
+    about: defaultAbout,
     name: "Newstand",
     oneLiner:
       "Publication focused on exploring the possibilities of work in an era of hyper connectivity and fluidity.",
@@ -76,6 +87,7 @@ const newstand: InitiativeSeed = {
 const partnership: InitiativeSeed = {
   localId: initiativeIds.partnership,
   data: {
+    about: defaultAbout,
     name: "Terminal Partnerships",
     oneLiner: "Inviting the best DAOs to mobilize contributors on Station.",
     isAcceptingApplications: false,
@@ -94,6 +106,7 @@ const partnership: InitiativeSeed = {
 const networkSustainability: InitiativeSeed = {
   localId: initiativeIds.networkSustainability,
   data: {
+    about: defaultAbout,
     name: "Network Sustainability",
     oneLiner: "Designing a sustainable economic engine for the Station Network.",
     contributeText: [
@@ -118,6 +131,7 @@ const networkSustainability: InitiativeSeed = {
 const community: InitiativeSeed = {
   localId: initiativeIds.community,
   data: {
+    about: defaultAbout,
     name: "Contributor Experience",
     oneLiner: "Welcoming new contributors and fostering a culture of intellectual thoughtfullness.",
     contributeText: [
@@ -135,6 +149,7 @@ const community: InitiativeSeed = {
 const midnightStation: InitiativeSeed = {
   localId: initiativeIds.midnightStation,
   data: {
+    about: defaultAbout,
     name: "Midnight Station",
     oneLiner: "Radio show highlighting Station punks and passengers.",
     contributeText: [
@@ -152,6 +167,7 @@ const midnightStation: InitiativeSeed = {
 const brandIdentity: InitiativeSeed = {
   localId: initiativeIds.brandIdentity,
   data: {
+    about: defaultAbout,
     name: "Brand Identity",
     oneLiner: "Architecting the visual system of Station.",
     contributeText: [
@@ -168,6 +184,7 @@ const brandIdentity: InitiativeSeed = {
 const stationDigest: InitiativeSeed = {
   localId: initiativeIds.stationDigest,
   data: {
+    about: defaultAbout,
     name: "Station Digest",
     oneLiner:
       "Surfacing impactful contributions and thoughtful discussions from different corners of Station.",

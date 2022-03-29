@@ -1,7 +1,11 @@
 import { ExternalLink } from "app/types"
 import { Skill } from "app/skills/types"
 
+export type CustomElement = { type: "paragraph"; children: CustomText[] }
+export type CustomText = { text: string }
+
 export type InitiativeMetadata = {
+  about: CustomElement[]
   name: string
   oneLiner?: string
   bannerURL?: string
@@ -12,6 +16,7 @@ export type InitiativeMetadata = {
   members?: string[]
   commitment?: string
   skills?: string[]
+  status?: string
   applicationQuestion?: string
 }
 

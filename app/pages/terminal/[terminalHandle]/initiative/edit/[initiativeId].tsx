@@ -45,18 +45,20 @@ const TerminalInitiativeEditPage: BlitzPage = () => {
           </div>
           <h1 className="text-marble-white text-4xl text-center pt-12">Edit Initiative</h1>
           <div className="mx-auto max-w-2xl pb-12 mt-9">
-            <InitiativeForm
-              initiative={initiative}
-              isEdit={true}
-              onSuccess={() => {
-                router.push(
-                  Routes.Project({
-                    terminalHandle,
-                    initiativeId: initiativeLocalId,
-                  })
-                )
-              }}
-            />
+            {initiative && (
+              <InitiativeForm
+                initiative={initiative}
+                isEdit={true}
+                onSuccess={() => {
+                  router.push(
+                    Routes.Project({
+                      terminalHandle,
+                      initiativeId: initiativeLocalId,
+                    })
+                  )
+                }}
+              />
+            )}
           </div>
         </div>
       )}
