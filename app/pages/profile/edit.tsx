@@ -34,7 +34,10 @@ const EditProfile: BlitzPage = () => {
       <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] relative">
         <div className="absolute top-3 left-5">
           <div className="w-[24px] h-[24px]">
-            <button className="text-marble-white" onClick={() => router.push("/profile")}>
+            <button
+              className="text-marble-white"
+              onClick={() => router.push(`/profile/${activeUser.address}`)}
+            >
               <Image src={Exit} alt="Close button" width={24} height={24} />
             </button>
           </div>
@@ -42,7 +45,7 @@ const EditProfile: BlitzPage = () => {
         <h1 className="text-marble-white text-4xl text-center pt-12">Edit your profile</h1>
         <div className="mx-auto max-w-2xl pb-12">
           <AccountForm
-            onSuccess={() => router.push("/profile")}
+            onSuccess={() => router.push(`/profile/${activeUser.address}`)}
             address={activeUser.address}
             account={account}
             isEdit={true}

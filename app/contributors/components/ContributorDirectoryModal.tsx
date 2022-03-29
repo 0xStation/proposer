@@ -1,6 +1,6 @@
 import Modal from "../../core/components/Modal"
 import Verified from "/public/check-mark.svg"
-import { Image, invoke, Link, Routes, useParam } from "blitz"
+import { Image, invoke, Link, Routes, useParam, useRouter } from "blitz"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import Exit from "/public/exit-button.svg"
 import DiscordIcon from "/public/discord-icon.svg"
@@ -11,6 +11,7 @@ import getInitiativesByContributor from "app/initiative/queries/getInitiativesBy
 import { truncateString } from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 import { Tag } from "app/core/components/Tag"
+import Button from "app/core/components/Button"
 
 type ContributorDirectoryModalProps = {
   isOpen: boolean
@@ -24,6 +25,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
   setIsOpen,
   terminalId,
 }) => {
+  const router = useRouter()
   const terminalHandle = useParam("terminalHandle", "string") as string
   const [initiatives, setInitiatives] = useState<Initiative[]>()
 
@@ -154,7 +156,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
           <div className="flex flex-col mt-8">
             <div className="flex-auto text-marble-white font-bold">Initiatives</div>
             {initiatives && initiatives.length ? (
-              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 sm:gap-4">
+              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 sxm:gap-4">
                 {initiatives.map((initiative, idx) => {
                   return (
                     <InitiativeCard
@@ -181,6 +183,15 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                 {contributor?.data.name} is not involved in any active initiatives at this time.
               </div>
             )}
+          </div>
+          <div className="pt-5">
+            <Button
+              className="px-5"
+              secondary
+              onClick={() => router.push(`/profile/${contributor?.address}`)}
+            >
+              View Profile
+            </Button>
           </div>
         </div>
       </Modal>

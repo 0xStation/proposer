@@ -5,6 +5,9 @@ const createKeccakHash = require("keccak")
 // this checksum algorithm from EIP-55 for determining their address casing.
 // Implementation taken from the EIP: https://eips.ethereum.org/EIPS/eip-55
 export const toChecksumAddress = (address: string) => {
+  if (!address) {
+    return ""
+  }
   address = address.toLowerCase().replace("0x", "")
   const hash = createKeccakHash("keccak256").update(address).digest("hex")
   let checksummed = "0x"
