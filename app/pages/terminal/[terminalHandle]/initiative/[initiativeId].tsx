@@ -32,9 +32,9 @@ const Project: BlitzPage = () => {
   const address = useMemo(() => accountData?.address, [accountData?.address])
   const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
   const [selectedContributorToView, setSelectedContributorToView] = useState<Account | null>(null)
-  const { DIRECTED_FROM } = QUERY_PARAMETERS
+  const { DIRECTED_FROM, SET_TAB } = QUERY_PARAMETERS
   const router = useRouter()
-  const { directedFrom } = useRouterQuery()
+  const { directedFrom, address: addressParam } = useRouterQuery()
 
   const handleSubmitInterestClick = () => {
     if (address) {
@@ -153,7 +153,7 @@ const Project: BlitzPage = () => {
           <button
             onClick={() => {
               if (directedFrom === DIRECTED_FROM.PROFILE) {
-                router.push("/profile?setTab=initiatives")
+                router.push(`/profile/${addressParam}?setTab=${SET_TAB.INITIATIVES}`)
               } else {
                 router.push(`/terminal/${terminalHandle}/initiative-board`)
               }
