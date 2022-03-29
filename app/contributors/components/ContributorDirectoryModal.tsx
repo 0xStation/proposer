@@ -45,7 +45,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
   return (
     <div>
       <Modal subtitle="" open={isOpen} toggle={setIsOpen} showTitle={false}>
-        <div className="flex flex-col overflow-y-scroll">
+        <div className="flex flex-col overflow-y-scroll overflow-x-hidden h-[715px]">
           <div className="absolute top-1 left-2">
             <div className="w-[12px] h-[12px]">
               <button className="text-marble-white" onClick={() => setIsOpen(false)}>
@@ -153,10 +153,10 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
               </div>
             </div>
           </div>
-          <div className="flex flex-col mt-8">
+          <div className="flex flex-col mt-8 mb-auto">
             <div className="flex-auto text-marble-white font-bold">Initiatives</div>
             {initiatives && initiatives.length ? (
-              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 sxm:gap-4">
+              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 sm:gap-4">
                 {initiatives.map((initiative, idx) => {
                   return (
                     <InitiativeCard
@@ -179,12 +179,12 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                 })}
               </div>
             ) : (
-              <div className="text-marble-white font-normal text-sm">
+              <div className="text-marble-white font-normal text-sm pt-3">
                 {contributor?.data.name} is not involved in any active initiatives at this time.
               </div>
             )}
           </div>
-          <div className="pt-5">
+          <div className="pt-5 sticky bottom-0 bg-tunnel-black">
             <Button
               className="px-5"
               secondary
