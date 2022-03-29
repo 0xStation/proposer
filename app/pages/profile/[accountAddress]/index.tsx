@@ -186,7 +186,7 @@ const ProfileHome: BlitzPage = () => {
                                 setSliderOpen(true)
                               } else if (application.status === "CONTRIBUTOR") {
                                 router.push(
-                                  `/terminal/${application.initiative.terminal.handle}/initiative/${application.initiative.localId}?directedFrom=${DIRECTED_FROM.PROFILE}`
+                                  `/terminal/${application.initiative.terminal.handle}/initiative/${application.initiative.localId}?directedFrom=${DIRECTED_FROM.PROFILE}&address=${account.address}`
                                 )
                               }
                             }}
