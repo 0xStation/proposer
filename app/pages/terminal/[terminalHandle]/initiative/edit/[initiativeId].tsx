@@ -49,7 +49,12 @@ const TerminalInitiativeEditPage: BlitzPage = () => {
               initiative={initiative}
               isEdit={true}
               onSuccess={() => {
-                router.push(Routes.TerminalInitiativePage({ terminalHandle }))
+                router.push(
+                  Routes.Project({
+                    terminalHandle,
+                    initiativeId: initiativeLocalId,
+                  })
+                )
               }}
             />
           </div>

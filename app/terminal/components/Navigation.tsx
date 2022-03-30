@@ -3,7 +3,6 @@ import { useParam } from "blitz"
 import { Link, Routes, useRouter, useQuery } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import useStore from "app/core/hooks/useStore"
-import TicketWrapper from "app/core/components/TicketWrapper"
 import getTicket from "app/ticket/queries/getTicket"
 
 const Navigation = ({ children }: { children?: any }) => {
@@ -85,7 +84,6 @@ const Navigation = ({ children }: { children?: any }) => {
             <div className="mt-12">{children}</div>
           </div>
         </div>
-        {activeUser && <TicketWrapper terminal={terminal} ticket={ticket} />}
       </div>
     </div>
   ) : (

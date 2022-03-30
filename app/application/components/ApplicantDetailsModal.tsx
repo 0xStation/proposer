@@ -1,5 +1,5 @@
 import Modal from "../../core/components/Modal"
-import { Image, useQuery } from "blitz"
+import { Image, useQuery, useRouter } from "blitz"
 import { Dispatch, SetStateAction, useEffect } from "react"
 import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
@@ -37,6 +37,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   roleOfActiveUser,
   terminalData,
 }) => {
+  const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const shouldRefetchEndorsementPoints = useStore((state) => state.shouldRefetchEndorsementPoints)
   const setShouldRefetchEndorsementPoints = useStore(
@@ -114,8 +115,16 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 {DateMetadata}
               </div>
             </div>
-            <div id="pfp and handle" className="flex-auto ">
+            <div id="pfp and handle" className="flex-row inline-flex justify-between">
               <ProfileMetadata {...profileMetadataProps} large />
+              <div className="py-5 flex justify-between align-middle">
+                <button
+                  className="border rounded border-marble-white text-marble-white px-5 hover:bg-wet-concrete"
+                  onClick={() => router.push(`/profile/${address}`)}
+                >
+                  View Profile
+                </button>
+              </div>
             </div>
             <div
               id="person's details"
@@ -169,14 +178,6 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     )}
                   </div>
                 ) : null}
-                <div className="flex flex-col flex-1 text-marble-white">
-                  <div className="font-bold">
-                    <span>Timezone</span>
-                  </div>
-                  <div className="text-base font-normal text-marble-white">
-                    <span>{timezone ? `GMT ${timezone}` : "N/A"}</span>
-                  </div>
-                </div>
               </div>
             </div>
             <hr className="border-[.5] border-solid border-concrete mx-[-2rem] my-5" />

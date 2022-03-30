@@ -11,7 +11,6 @@ import getInitiativesByContributor from "app/initiative/queries/getInitiativesBy
 import { truncateString } from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 import { Tag } from "app/core/components/Tag"
-import Button from "app/core/components/Button"
 
 type ContributorDirectoryModalProps = {
   isOpen: boolean
@@ -149,18 +148,6 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                   )}
                 </div>
               ) : null}
-              <div className="flex flex-col flex-1">
-                <div className="font-bold">
-                  <span>Timezone</span>
-                </div>
-                <span className="text-sm mt-2">
-                  {contributor?.data?.timezone ? (
-                    `GMT ${contributor?.data?.timezone}`
-                  ) : (
-                    <span className="text-concrete mt-2">N/A</span>
-                  )}
-                </span>
-              </div>
             </div>
           </div>
           <div className="flex flex-col mt-8 mb-auto">
