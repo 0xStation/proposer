@@ -211,7 +211,7 @@ const ProfileHome: BlitzPage = () => {
                     </>
                   ) : (
                     <>
-                      <p className="font-bold text-2xl text-center w-[290px]">
+                      <p className="font-bold text-2xl text-center">
                         {`${account?.data?.name}`} is still exploring
                       </p>
                       <p className="font-bold text-2xl text-center w-[290px]">in Station</p>
