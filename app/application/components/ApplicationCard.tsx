@@ -9,7 +9,7 @@ const ApplicationCard = ({ application, address, onClick }) => {
       role="button"
       tabIndex={0}
       onClick={onClick}
-      className="border border-concrete cursor-pointer hover:border-marble-white p-3 flex flex-col"
+      className="border border-concrete cursor-pointer w-[375px] mr-3 mb-3 hover:border-marble-white p-3 flex flex-col"
     >
       <span className="flex flex-row items-center">
         <span

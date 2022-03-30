@@ -1,5 +1,5 @@
 import { Account } from "app/account/types"
-import { Link, RouteUrlObject } from "blitz"
+import { Link, RouteUrlObject, useRouter } from "blitz"
 import { genPathFromUrlObject } from "app/utils/genPathFromUrlObject"
 
 type InitiatveCardProps = {
@@ -21,21 +21,29 @@ const InitiativeCard = ({
   viewLink,
   editLink,
 }: InitiatveCardProps) => {
+  const router = useRouter()
   const buttonStyles =
-    "bg-tunnel-black text-magic-mint border border-magic-mint hover:bg-wet-concrete rounded w-24"
+    "bg-tunnel-black text-magic-mint border border-magic-mint hover:bg-wet-concrete rounded w-36 p-1"
 
   const cardJSX = (
-    <div className="border border-concrete p-4 flex flex-col cursor-pointer h-full hover:border-marble-white relative group">
+    <div
+      onClick={() => router.push(genPathFromUrlObject(viewLink))}
+      className="border border-concrete p-4 flex flex-col cursor-pointer h-full hover:border-marble-white relative group"
+    >
       {editable && (
         <>
           <div className="absolute h-full w-full bg-tunnel-black opacity-80 top-0 left-0 hidden group-hover:block"></div>
           <div className="absolute h-full w-full top-0 left-0 flex-col items-center justify-center space-y-2 hidden group-hover:flex">
             <Link href={viewLink}>
-              <button className={buttonStyles}>View</button>
+              <button className="bg-tunnel-black text-marble-white border border-marble-white hover:bg-wet-concrete rounded w-36 p-1">
+                View
+              </button>
             </Link>
             <button
               className={buttonStyles}
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
                 const path = genPathFromUrlObject(viewLink)
                 navigator.clipboard.writeText(path).then(() => {
                   alert("copied to clipboard")
@@ -44,9 +52,16 @@ const InitiativeCard = ({
             >
               Share
             </button>
-            <Link href={editLink}>
-              <button className={buttonStyles}>Edit</button>
-            </Link>
+            <button
+              className={buttonStyles}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                router.push(genPathFromUrlObject(editLink))
+              }}
+            >
+              Edit
+            </button>
           </div>
         </>
       )}

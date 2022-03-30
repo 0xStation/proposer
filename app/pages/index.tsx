@@ -3,6 +3,7 @@ import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import { useAccount } from "wagmi"
 import Button from "app/core/components/Button"
+import Ticker from "app/core/components/Ticker"
 
 const Home: BlitzPage = () => {
   const redirectToTerminal = () => {
@@ -34,6 +35,7 @@ const Home: BlitzPage = () => {
 
   return (
     <Layout title="Station">
+      <Ticker />
       <main
         className="w-full h-[calc(100vh-6rem)] bg-cover bg-no-repeat"
         style={{ backgroundImage: "url('/station-cover.png')" }}
