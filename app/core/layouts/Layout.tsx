@@ -16,7 +16,6 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
       {chainData?.chain?.id !== undefined && chainData?.chain?.id !== 4 ? (
         <>
           <Navigation />
-          <Ticker />
           <div className="flex items-center justify-center min-h-[calc(100vh-15rem)]">
             <div className="text-marble-white text-center">
               <h1 className="text-4xl">Incorrect Network</h1>
@@ -50,7 +49,6 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
         <>
           <ModalContainer />
           <Navigation />
-          <Ticker />
           {children}
         </>
       )}

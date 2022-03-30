@@ -81,7 +81,7 @@ const Navigation = () => {
           {activeUser ? (
             <Dropdown
               side="right"
-              className="p-4 border-l border-l-concrete hover:bg-wet-concrete w-full"
+              className="h-full p-2 border-l border-l-concrete hover:bg-wet-concrete w-full"
               button={
                 <div className="flex items-center">
                   {activeUser?.data?.pfpURL ? (
@@ -110,7 +110,7 @@ const Navigation = () => {
           ) : address ? (
             <Dropdown
               side="right"
-              className="p-4 border-l border-l-concrete hover:bg-wet-concrete w-full"
+              className="h-full p-2 border-l border-l-concrete hover:bg-wet-concrete w-full"
               button={
                 <div className="flex items-center">
                   <span className="w-7 h-7 rounded-full bg-gradient-to-b from-electric-violet to-magic-mint border border-marble-white mr-2"></span>
@@ -127,7 +127,7 @@ const Navigation = () => {
             />
           ) : (
             <span
-              className="p-4 uppercase text-magic-mint text-lg border-l border-l-concrete cursor-pointer hover:bg-wet-concrete"
+              className="h-full p-2 uppercase text-magic-mint text-lg border-l border-l-concrete cursor-pointer hover:bg-wet-concrete"
               onClick={() => toggleWalletModal(true)}
             >
               Connect Wallet

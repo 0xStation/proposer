@@ -19,7 +19,7 @@ interface Link {
  */
 const Dropdown = ({ button, items, side, className }: DropdownProps) => {
   return (
-    <Menu as="div" className={`relative ${className} origin-top `}>
+    <Menu as="div" className={`relative ${className}`}>
       {({ open }) => (
         <>
           <Menu.Button className="block h-[28px] text-marble-white">
@@ -39,7 +39,7 @@ const Dropdown = ({ button, items, side, className }: DropdownProps) => {
             <Menu.Items
               className={`${
                 side === "left" ? `left-[10px]` : `right-[2px]`
-              } uppercase text-marble-white text-lg origin-top mt-[9px] absolute bg-tunnel-black border border-[#646464] whitespace-nowrap z-10`}
+              } uppercase text-marble-white text-lg origin-top mt-[10px] absolute bg-tunnel-black border border-[#646464] whitespace-nowrap z-10`}
             >
               {items.map((item) => (
                 <Menu.Item key={item.name}>
