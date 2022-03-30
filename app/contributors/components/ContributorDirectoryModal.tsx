@@ -45,7 +45,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
   return (
     <div>
       <Modal subtitle="" open={isOpen} toggle={setIsOpen} showTitle={false}>
-        <div className="flex flex-col overflow-y-scroll overflow-x-hidden h-[715px]">
+        <div className="flex flex-col overflow-y-scroll overflow-x-hidden h-[705px]">
           <div className="absolute top-1 left-2">
             <div className="w-[12px] h-[12px]">
               <button className="text-marble-white" onClick={() => setIsOpen(false)}>
@@ -60,32 +60,42 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
               </span>
             </div>
           )}
-          <div className="flex flex-row">
-            <div className="mr-2">
-              {contributor?.data?.pfpURL ? (
-                <img
-                  src={contributor?.data?.pfpURL}
-                  alt="PFP"
-                  className="h-[52px] w-[52px] min-w-[52px] border border-marble-white rounded-full"
-                />
-              ) : (
-                <div className="h-[52px] w-[52px] bg-gradient-to-b to-magic-mint from-electric-violet border border-marble-white rounded-full"></div>
-              )}
+          <div className="flex flex-row justify-between pt-5">
+            <div className="flex">
+              <div className="mr-2">
+                {contributor?.data?.pfpURL ? (
+                  <img
+                    src={contributor?.data?.pfpURL}
+                    alt="PFP"
+                    className="h-[52px] w-[52px] min-w-[52px] border border-marble-white rounded-full"
+                  />
+                ) : (
+                  <div className="h-[52px] w-[52px] bg-gradient-to-b to-magic-mint from-electric-violet border border-marble-white rounded-full"></div>
+                )}
+              </div>
+              <div className="flex flex-col">
+                <div className="flex flex-row flex-1">
+                  <div className="text-xl text-marble-white mr-1">{contributor?.data?.name}</div>
+                  <img
+                    className="mt-1"
+                    src="/check-mark.svg"
+                    alt="Verified icon"
+                    width={14}
+                    height={14}
+                  />
+                </div>
+                <div className="flex-1 text-sm text-concrete">
+                  @{truncateString(contributor?.data?.ens || contributor?.address)}
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <div className="flex flex-row flex-1">
-                <div className="text-xl text-marble-white mr-1">{contributor?.data?.name}</div>
-                <img
-                  className="mt-1"
-                  src="/check-mark.svg"
-                  alt="Verified icon"
-                  width={14}
-                  height={14}
-                />
-              </div>
-              <div className="flex-1 text-sm text-concrete">
-                {truncateString(contributor?.data?.ens || contributor?.address)}
-              </div>
+            <div className="pt-5 flex flex-col justify-between">
+              <button
+                className="border rounded border-marble-white text-marble-white px-5 hover:bg-wet-concrete"
+                onClick={() => router.push(`/profile/${contributor?.address}`)}
+              >
+                View Profile
+              </button>
             </div>
           </div>
           <div className="mt-8 flex flex-col text-marble-white space-y-8">
@@ -183,15 +193,6 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                 {contributor?.data.name} is not involved in any active initiatives at this time.
               </div>
             )}
-          </div>
-          <div className="pt-5 sticky bottom-0 bg-tunnel-black">
-            <Button
-              className="px-5"
-              secondary
-              onClick={() => router.push(`/profile/${contributor?.address}`)}
-            >
-              View Profile
-            </Button>
           </div>
         </div>
       </Modal>
