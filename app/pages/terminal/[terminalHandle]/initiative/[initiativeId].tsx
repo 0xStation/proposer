@@ -4,9 +4,6 @@ import { Image, useQuery, BlitzPage, useParam, useRouter, useRouterQuery } from 
 import Layout from "app/core/layouts/Layout"
 import ImageLink from "../../../../core/components/ImageLink"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
-import StepOne from "/public/step-1.svg"
-import StepTwo from "/public/step-2.svg"
-import StepThree from "/public/step-3.svg"
 import ContributorDirectoryModal from "app/contributors/components/ContributorDirectoryModal"
 import Back from "/public/back-icon.svg"
 import { Account } from "app/account/types"
@@ -166,7 +163,7 @@ const Project: BlitzPage = () => {
         </div>
         <div className="gird grid-cols-1 md:place-self-center">
           <div className="flex flex-col md:w-[766px] space-y-10 justify-center">
-            <div className="flex-auto flex flex-col space-y-10">
+            <div className="flex-auto flex flex-col space-y-10 pb-12">
               <div className="mx-auto flex flex-row items-center">
                 <span
                   className={`h-2 w-2 block rounded-full mr-2 bg-${getInitiativeStatusColor(
@@ -193,78 +190,16 @@ const Project: BlitzPage = () => {
                     ))}
                 </div>
               </div>
-
-              <div className="flex flex-col h-auto justify-center">
-                <div>
-                  {initiative?.data.bannerURL && (
-                    <img src={initiative.data.bannerURL} alt="Project banner image." />
-                  )}
-                </div>
-                <div>
-                  {initiative && initiative.data.isAcceptingApplications && (
-                    <div className="relative h-6 bg-tunnel-black flex overflow-hidden">
-                      <div className="whitespace-nowrap text-center text-neon-blue text-xl ml-[-12rem] w-full">
-                        <p>
-                          OPEN FOR SUBMISSIONS. OPEN FOR SUBMISSIONS. OPEN FOR SUBMISSIONS. OPEN FOR
-                          SUBMISSIONS.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
+              <div>
+                {initiative?.data.bannerURL && (
+                  <img src={initiative.data.bannerURL} alt="Project banner image." />
+                )}
               </div>
-              {initiative?.data.about && (
-                <div className="flex flex-col space-y-4 text-marble-white">
-                  <div>
-                    <span className="text-2xl">About</span>
-                  </div>
-                  <ReadonlyTextarea value={initiative.data.about} />
-                </div>
-              )}
-              <div className="text-marble-white grid md:grid-cols-3 gap-12">
-                <div className="space-y-4">
-                  <div>
-                    <span className="text-2xl">Rewards</span>
-                  </div>
-                  <div className="space-y-1 flex flex-col">
-                    {initiative &&
-                      initiative.data.rewardText?.map?.((reward, index) => {
-                        return (
-                          <span key={index} className="text-base">
-                            {reward}
-                          </span>
-                        )
-                      })}
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <span className="text-2xl">Commitment</span>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base">{initiative && initiative.data.commitment}</span>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <span className="text-2xl">Skills</span>
-                  </div>
-                  <div className="flex flex-wrap">
-                    {initiative &&
-                      initiative.skills?.map?.((skill, index) => {
-                        return (
-                          <Tag key={index} type={"skill"}>
-                            {skill.name}
-                          </Tag>
-                        )
-                      })}
-                  </div>
-                </div>
-              </div>
+              {initiative?.data.about && <ReadonlyTextarea value={initiative.data.about} />}
               {results.length > 0 && (
                 <div className="space-y-4">
                   <div className="flex flex-row">
-                    <span className="flex-1 text-marble-white text-2xl">Contributors</span>
+                    <span className="flex-1 text-marble-white text-2xl">Team</span>
                   </div>
                   <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
                     {results?.map?.((contributor, index) => {
@@ -335,75 +270,60 @@ const Project: BlitzPage = () => {
                   </div>
                 </div>
               )}
+              <div className="text-marble-white flex flex-col space-y-8">
+                {initiative && initiative.data.rewardText && (
+                  <div className="space-y-2">
+                    <span className="text-2xl">Rewards</span>
+                    <div className="flex flex-col">
+                      {initiative.data.rewardText?.map?.((reward, index) => {
+                        return <span key={index}>{reward}</span>
+                      })}
+                    </div>
+                  </div>
+                )}
+                {initiative && initiative.data.commitment && (
+                  <div className="space-y-2">
+                    <span className="text-2xl">Commitment</span>
+                    <div>
+                      <span>{initiative.data.commitment}</span>
+                    </div>
+                  </div>
+                )}
+                {initiative && initiative.skills.length > 0 && (
+                  <div className="space-y-2">
+                    <span className="text-2xl">Skills</span>
+                    <div className="flex flex-wrap">
+                      {initiative.skills?.map?.((skill, index) => {
+                        return (
+                          <Tag key={index} type={"skill"}>
+                            {skill.name}
+                          </Tag>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {initiative?.data.isAcceptingApplications && (
-              <>
-                <div className="flex-auto flex flex-col text-marble-white space-y-5">
-                  <div>
-                    <span className="text-2xl">What&apos;s next?</span>
-                  </div>
-                  <div className="grid md:grid-cols-3 gap-3">
-                    <div className="flex-1 space-y-4">
-                      <div>
-                        <Image src={StepOne} alt="Step one." width={24} height={24} />
-                      </div>
-                      <div className="flex-1 space-y-2">
-                        <span className="font-bold">Submit interest</span>
-                        <div>
-                          <span className="text-base">
-                            Share a little bit about yourself, your best work, and your pitch.
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex-1 space-y-4">
-                      <div>
-                        <Image src={StepTwo} alt="Step two." width={24} height={24} />
-                      </div>
-                      <div className="flex-1 space-y-2">
-                        <span className="font-bold">Gather endorsements</span>
-                        <div>
-                          <span className="text-base">
-                            Reach out to contributors to get to know them and see how you can help.
-                            Trust us, endorsements from contributors help.
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex-1 space-y-4">
-                      <div>
-                        <Image src={StepThree} alt="Step three." width={24} height={24} />
-                      </div>
-                      <div className="flex-1 space-y-2">
-                        <span className="font-bold">Start contributing</span>
-                        <div>
-                          <span className="text-base">
-                            If selected, a team member will reach out to officially onboard you.
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex-auto flex justify-center mt-10 sticky bottom-0">
-                  {hasApplied ? (
-                    <button className="m-2 py-2 text-center text-base bg-concrete rounded item-center w-[280px]">
-                      {`You've already applied!`}
-                    </button>
-                  ) : (
-                    <Button
-                      className="m-2 py-2 text-center text-base w-[280px]"
-                      onClick={() => {
-                        setUserTrigged(true)
-                        handleSubmitInterestClick()
-                      }}
-                    >
-                      Submit Interest
-                    </Button>
-                  )}
-                </div>
-              </>
+              <div className="flex-auto flex justify-center mt-10 sticky bottom-0">
+                {hasApplied ? (
+                  <button className="m-2 py-2 text-center text-base bg-concrete rounded item-center w-[280px]">
+                    {`You've already applied!`}
+                  </button>
+                ) : (
+                  <Button
+                    className="m-2 py-2 text-center text-base w-[280px]"
+                    onClick={() => {
+                      setUserTrigged(true)
+                      handleSubmitInterestClick()
+                    }}
+                  >
+                    Submit Interest
+                  </Button>
+                )}
+              </div>
             )}
           </div>
         </div>
