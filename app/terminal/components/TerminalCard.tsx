@@ -9,7 +9,7 @@ const TerminalCard = ({ ticket }) => {
         terminalHandle: ticket?.terminal?.handle,
       })}
     >
-      <div className="border border-concrete w-[320px] cursor-pointer hover:border-marble-white">
+      <div className="border border-concrete min-w-[320px] cursor-pointer mr-4 mb-4 hover:border-marble-white">
         <div className="flex flex-row items-center p-2 border-b border-concrete">
           <img
             alt="The terminal's profile picture, or logo."
@@ -31,7 +31,10 @@ const TerminalCard = ({ ticket }) => {
             {ticket?.terminal.roles.find((r) => r.localId === ticket?.roleLocalId).data.value}
           </Tag>
           <p className="text-concrete text-xs">
-            SINCE {ticket?.joinedAt?.toISOString().split("T")[0]}
+            SINCE{" "}
+            {Object.prototype.toString.call(ticket?.joinedAt) === "[object Date]"
+              ? ticket?.joinedAt?.toISOString().split("T")[0]
+              : ""}
           </p>
         </div>
       </div>

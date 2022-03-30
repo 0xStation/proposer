@@ -164,7 +164,7 @@ const ProfileHome: BlitzPage = () => {
                   </button>
                 </div>
                 {subpage === PROFILE_TABS.TERMINALS && (
-                  <div className="grid grid-cols-3 gap-y-3 gap-x-3 mt-12">
+                  <div className="flex mt-12 flex-wrap">
                     {account?.tickets &&
                       account?.tickets.map((ticket, index) => {
                         return <TerminalCard key={index} ticket={ticket} />
@@ -172,7 +172,7 @@ const ProfileHome: BlitzPage = () => {
                   </div>
                 )}
                 {subpage === PROFILE_TABS.INITIATIVES && (
-                  <div className="grid grid-cols-3 gap-y-3 gap-x-3 mt-12">
+                  <div className="flex mt-12 flex-wrap">
                     {account?.initiatives &&
                       account?.initiatives.map((application, index) => {
                         return (

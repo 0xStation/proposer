@@ -57,7 +57,7 @@ const CreateProfile: BlitzPage = () => {
         <AccountForm
           onSuccess={() => {
             setAccountCreationLoading(true)
-            router.push(`/profile/${activeUser?.address}`)
+            router.push(`/profile/${address}`)
           }}
           address={address}
           isEdit={false}

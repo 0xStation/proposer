@@ -14,6 +14,43 @@ export const roleIds = {
   visitor: 4,
 }
 
+const ccs: CreateTerminalParams = {
+  handle: "ccs",
+  ticketAddress: "0x",
+  data: {
+    name: "Crypto, Culture and Society",
+    description:
+      "A learning DAO building the liberal arts for crypto and exploring web3’s broader societal impact.",
+    coverURL: "https://station-images.nyc3.digitaloceanspaces.com/css_cover.png",
+    pfpURL: "https://station-images.nyc3.digitaloceanspaces.com/ccs.jpeg",
+    permissions: {
+      invite: {
+        [roleIds.staff]: [
+          roleIds.staff,
+          roleIds.dailyCommuter,
+          roleIds.weekendCommuter,
+          roleIds.visitor,
+        ], // local id for STAFF
+      },
+      edit: {
+        initiative: [roleIds.staff],
+      },
+    },
+    contracts: {
+      addresses: {
+        endorsements: "0x7C3EAb35c5B87F4BBea7E3127Ebfb3ba55E94B0C",
+        points: "0xECf0f56d3976aFdD67504C49d957987bA712d686",
+        referrals: "0xCb4ECe9DcA605A7109eDB02d94e8292AF76F71b8",
+      },
+      symbols: {
+        endorsements: "LEARN🅔",
+        points: "LEARN🅟",
+        referrals: "LEARN🅡",
+      },
+    },
+  },
+}
+
 const station: CreateTerminalParams = {
   handle: "stationlabs",
   ticketAddress: "0xbe26ee78ba287e5c6a862258db9c5e7fe7538f56",
@@ -52,7 +89,7 @@ const station: CreateTerminalParams = {
 
 const seed = async () => {
   console.log("Seeding Terminals")
-  const terminals = [station]
+  const terminals = [station, ccs]
   for (const name in terminals) {
     const terminalData = terminals[name] as CreateTerminalParams
     ;(await db.terminal.create({

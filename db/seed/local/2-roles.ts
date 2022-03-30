@@ -43,8 +43,9 @@ const stationRoles = [staff, dailyCommuter, weekendCommuter, visitor]
 
 const seed = async () => {
   const terminal = await db.terminal.findUnique({ where: { handle: "stationlabs" } })
+  const ccsTerminal = await db.terminal.findUnique({ where: { handle: "ccs" } })
 
-  if (!terminal) {
+  if (!terminal || !ccsTerminal) {
     console.log("no terminal with handle 'stationlabs' is found.")
     return
   }
@@ -54,6 +55,14 @@ const seed = async () => {
     await db.role.create({
       data: {
         terminalId: terminal.id,
+        localId: roleSeed.localId,
+        data: roleSeed.data,
+      },
+    })
+
+    await db.role.create({
+      data: {
+        terminalId: ccsTerminal.id,
         localId: roleSeed.localId,
         data: roleSeed.data,
       },
