@@ -126,6 +126,14 @@ const InitiativeForm = ({
                 />
               </div>
               <div className="flex flex-col col-span-2">
+                <label htmlFor="demo" className="text-marble-white text-base font-bold">
+                  About
+                </label>
+                <div>
+                  <RichTextarea onChange={setAbout} initialValue={initiative?.data.about} />
+                </div>
+              </div>
+              <div className="flex flex-col col-span-2">
                 <label htmlFor="name" className="text-marble-white text-base font-bold">
                   Rewards*
                 </label>
