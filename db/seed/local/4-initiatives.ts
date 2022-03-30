@@ -30,6 +30,7 @@ const defaultAbout: CustomElement[] = [
 const contributorReview: InitiativeSeed = {
   localId: initiativeIds.contributorReview,
   data: {
+    status: "Active",
     about: defaultAbout,
     name: "Contributor Review",
     oneLiner: "Peer-to-peer recognition that publicizes your proof of contribution.",
@@ -44,6 +45,7 @@ const contributorReview: InitiativeSeed = {
 const waitingRoom: InitiativeSeed = {
   localId: initiativeIds.waitingRoom,
   data: {
+    status: "Active",
     about: defaultAbout,
     name: "Waiting Room",
     oneLiner:
@@ -59,6 +61,7 @@ const waitingRoom: InitiativeSeed = {
 const newstand: InitiativeSeed = {
   localId: initiativeIds.newstand,
   data: {
+    status: "Active",
     about: defaultAbout,
     name: "Newstand",
     oneLiner:
@@ -74,6 +77,7 @@ const newstand: InitiativeSeed = {
 const partnership: InitiativeSeed = {
   localId: initiativeIds.partnership,
   data: {
+    status: "Active",
     about: defaultAbout,
     name: "Terminal Partnerships",
     oneLiner: "Inviting the best DAOs to mobilize contributors on Station.",
@@ -88,6 +92,7 @@ const partnership: InitiativeSeed = {
 const networkSustainability: InitiativeSeed = {
   localId: initiativeIds.networkSustainability,
   data: {
+    status: "Active",
     about: defaultAbout,
     name: "Network Sustainability",
     oneLiner: "Designing a sustainable economic engine for the Station Network.",
@@ -109,6 +114,7 @@ const networkSustainability: InitiativeSeed = {
 const community: InitiativeSeed = {
   localId: initiativeIds.community,
   data: {
+    status: "Active",
     about: defaultAbout,
     name: "Contributor Experience",
     oneLiner: "Welcoming new contributors and fostering a culture of intellectual thoughtfullness.",
@@ -122,6 +128,7 @@ const community: InitiativeSeed = {
 const midnightStation: InitiativeSeed = {
   localId: initiativeIds.midnightStation,
   data: {
+    status: "Active",
     about: defaultAbout,
     name: "Midnight Station",
     oneLiner: "Radio show highlighting Station punks and passengers.",
@@ -136,6 +143,7 @@ const midnightStation: InitiativeSeed = {
 const brandIdentity: InitiativeSeed = {
   localId: initiativeIds.brandIdentity,
   data: {
+    status: "Active",
     about: defaultAbout,
     name: "Brand Identity",
     oneLiner: "Architecting the visual system of Station.",
@@ -149,6 +157,7 @@ const brandIdentity: InitiativeSeed = {
 const stationDigest: InitiativeSeed = {
   localId: initiativeIds.stationDigest,
   data: {
+    status: "Active",
     about: defaultAbout,
     name: "Station Digest",
     oneLiner:

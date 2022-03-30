@@ -21,6 +21,7 @@ import { formatDate } from "app/core/utils/formatDate"
 import Button from "app/core/components/Button"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
 import ReadonlyTextarea from "app/core/components/form/ReadonlyTextarea"
+import { getInitiativeStatusColor } from "app/utils/initiativeStatusOptions"
 
 const Project: BlitzPage = () => {
   const [hasApplied, setHasApplied] = useState(false)
@@ -166,6 +167,16 @@ const Project: BlitzPage = () => {
         <div className="gird grid-cols-1 md:place-self-center">
           <div className="flex flex-col md:w-[766px] space-y-10 justify-center">
             <div className="flex-auto flex flex-col space-y-10">
+              <div className="mx-auto flex flex-row items-center">
+                <span
+                  className={`h-2 w-2 block rounded-full mr-2 bg-${getInitiativeStatusColor(
+                    initiative?.data.status
+                  )}`}
+                />
+                <span className="text-center text-marble-white uppercase text-xs tracking-wide">
+                  {initiative?.data.status}
+                </span>
+              </div>
               <div className="flex flex-col text-marble-white items-center space-y-1">
                 <div className="flex flex-col items-center content-center space-y-3">
                   <span className="flex capitalize text-3xl">
