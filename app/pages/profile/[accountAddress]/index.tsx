@@ -129,12 +129,6 @@ const ProfileHome: BlitzPage = () => {
                   </div>
                 </div>
               ) : null}
-              {account?.data.timezone ? (
-                <div className="flex flex-col">
-                  <h3 className="text-marble-white text-base font-bold">Timezone</h3>
-                  <span className="mt-1 text-marble-white text-base">{account?.data.timezone}</span>
-                </div>
-              ) : null}
             </div>
           </div>
         </div>
@@ -201,17 +195,28 @@ const ProfileHome: BlitzPage = () => {
             {(!account?.initiatives?.length && subpage === PROFILE_TABS.INITIATIVES) ||
               (!account?.tickets?.length && subpage === PROFILE_TABS.TERMINALS && (
                 <div className="w-full h-full flex items-center flex-col justify-center mt-[23%]">
-                  <p className="text-marble-white text-2xl font-bold">Explore Terminals</p>
-                  <p className="mt-2 text-marble-white text-base w-[400px] text-center">
-                    Discover DAOs and communities, submit interests to initiatives, and start
-                    contributing.
-                  </p>
-                  <Button
-                    className="cursor-pointer mt-4 w-[300px] py-1"
-                    onClick={() => setIsExploreModalOpen(true)}
-                  >
-                    Start exploring
-                  </Button>
+                  {activeUser?.address === account?.address ? (
+                    <>
+                      <p className="text-marble-white text-2xl font-bold">Explore Terminals</p>
+                      <p className="mt-2 text-marble-white text-base w-[400px] text-center">
+                        Discover DAOs and communities, submit interests to initiatives, and start
+                        contributing.
+                      </p>
+                      <Button
+                        className="cursor-pointer mt-4 w-[300px] py-1"
+                        onClick={() => setIsExploreModalOpen(true)}
+                      >
+                        Start exploring
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-bold text-2xl text-center w-[290px]">
+                        {`${account?.data?.name}`} is still exploring
+                      </p>
+                      <p className="font-bold text-2xl text-center w-[290px]">in Station</p>
+                    </>
+                  )}
                 </div>
               ))}
           </div>
