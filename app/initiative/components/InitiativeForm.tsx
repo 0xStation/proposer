@@ -22,6 +22,7 @@ interface InitiativeParams {
     url: string
     symbol: number
   }[]
+  link?: string
   skills: {
     label: string
     value: string
@@ -126,35 +127,25 @@ const InitiativeForm = ({
                 />
               </div>
               <div className="flex flex-col col-span-2">
-                <label htmlFor="demo" className="text-marble-white text-base font-bold">
-                  About
+                <label htmlFor="status" className="text-marble-white text-base font-bold mb-1">
+                  Initiative Status*
+                </label>
+                <div>
+                  <Select
+                    name="status"
+                    placeholder="Select one"
+                    options={InitiativeStatusOptions}
+                    initialValue={existingStatus}
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col col-span-2">
+                <label htmlFor="demo" className="text-marble-white text-base font-bold mb-1">
+                  Description
                 </label>
                 <div>
                   <RichTextarea onChange={setAbout} initialValue={initiative?.data.about} />
                 </div>
-              </div>
-              <div className="flex flex-col col-span-2">
-                <label htmlFor="name" className="text-marble-white text-base font-bold">
-                  Rewards*
-                </label>
-                <p className="text-concrete text-sm mb-2">Separate rewards by comma</p>
-                <Field
-                  component="input"
-                  name="rewardText"
-                  placeholder="e.g. NFT, 1000 USDC"
-                  className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
-                />
-              </div>
-              <div className="flex flex-col col-span-2">
-                <label htmlFor="name" className="text-marble-white text-base font-bold">
-                  Commitment*
-                </label>
-                <Field
-                  component="input"
-                  name="commitment"
-                  placeholder="e.g. full-time"
-                  className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
-                />
               </div>
               <div className="flex flex-col col-span-2">
                 <label htmlFor="skills" className="text-marble-white text-base font-bold">
@@ -171,17 +162,15 @@ const InitiativeForm = ({
                 </div>
               </div>
               <div className="flex flex-col col-span-2">
-                <label htmlFor="status" className="text-marble-white text-base font-bold">
-                  Initiative Status*
+                <label htmlFor="link" className="text-marble-white font-bold">
+                  Link to more information
                 </label>
-                <div>
-                  <Select
-                    name="status"
-                    placeholder="Select one"
-                    options={InitiativeStatusOptions}
-                    initialValue={existingStatus}
-                  />
-                </div>
+                <Field
+                  component="input"
+                  name="link"
+                  placeholder="e.g. Notion document, Mirror..."
+                  className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
+                />
               </div>
             </div>
             <button

@@ -12,6 +12,7 @@ export type InitiativeMetadata = {
   rewardText?: string[]
   isAcceptingApplications: boolean
   links: ExternalLink[]
+  link?: string
   members?: string[]
   commitment?: string
   skills?: string[]

@@ -184,10 +184,7 @@ const Project: BlitzPage = () => {
                   </span>
                 </div>
                 <div className="cursor-pointer">
-                  {initiative &&
-                    initiative.data.links?.map((item, index) => (
-                      <ImageLink link={item} key={index} />
-                    ))}
+                  {initiative?.data.link && <ImageLink link={initiative.data.link} />}
                 </div>
               </div>
               <div>

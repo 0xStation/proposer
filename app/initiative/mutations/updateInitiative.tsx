@@ -34,6 +34,7 @@ const UpdateInitiative = z.object({
     })
     .array()
     .optional(),
+  link: z.string().optional(),
   name: z.string(),
   oneLiner: z.string(),
   rewardText: z.union([z.string(), z.string().array()]),
@@ -82,6 +83,7 @@ export default async function updateInitiative(input: z.infer<typeof UpdateIniti
       commitment: params.commitment,
       isAcceptingApplications: params.isAcceptingApplications,
       links: params.links,
+      link: params.link,
       name: params.name,
       oneLiner: params.oneLiner,
       rewardText: params.rewardText,
