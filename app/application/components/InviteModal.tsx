@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import Modal from "../../core/components/Modal"
 import { useQuery, useMutation } from "blitz"
 import Button from "../../core/components/Button"
@@ -9,11 +9,8 @@ import { Account } from "app/account/types"
 import { Role } from "app/role/types"
 import { toTitleCase } from "app/core/utils/titleCase"
 import getInvitePermissions from "../queries/getInvitePermissions"
-import {
-  // useIdentityTokenRead,
-  useIdentityAdminWrite,
-} from "app/core/contracts/contracts"
-import { useAccount, useBalance, useWaitForTransaction } from "wagmi"
+import { useIdentityAdminWrite } from "app/core/contracts/contracts"
+import { useWaitForTransaction } from "wagmi"
 import { BigNumber } from "ethers"
 
 export const InviteModal = ({
@@ -22,10 +19,9 @@ export const InviteModal = ({
   isInviteModalOpen,
   setIsInviteModalOpen,
   applicantTicket,
-  setRefreshApplications,
+  refreshApplications,
+  selectedApplicationHasNft,
 }) => {
-  const [{ data: accountData }] = useAccount()
-  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [explorerLink, setExplorerLink] = useState<string>()
   const [mintMessage, setMintMessage] = useState<string>("")
   const [error, setError] = useState<boolean>(false)
@@ -70,80 +66,83 @@ export const InviteModal = ({
       inviterId: activeUser.id,
       accountId: selectedApplication.account.id,
       terminalId: currentInitiative.terminalId,
-      // if applicant already holds a ticket we return the same roleLocalId on their ticket
+      // If applicant already holds a ticket we return the same roleLocalId on their ticket
       // and upsert them to the new initiative.
       roleLocalId: chosenRole?.localId || applicantTicket?.roleLocalId,
       initiativeId: currentInitiative.id,
     })
 
-    // tear down state
+    // Show success modal
     setInviteSuccessful(true)
 
     // Remove application from waiting room when applicant is invited.
-    // TODO: make it so that applications automatically refreshes via dependency hook
-    setRefreshApplications(true)
+    refreshApplications()
   }
 
   const handleNewMemberInviteClick = async () => {
-    if (!chosenRole && !applicantTicket) {
-      // if the applicant isn't an existing ticket holder and a chosenRole isn't selected
+    if (!chosenRole && !(applicantTicket && selectedApplicationHasNft)) {
+      // If the applicant isn't an existing ticket holder, doesn't have an nft, or a chosenRole isn't selected
       // we show an error because the inviter needs to select a role first.
       setRoleNotSelectedError(true)
     } else {
-      const tags = BigNumber.from(Math.pow(2, chosenRole?.localId || 0)) // convert roleLocalId into on-chain representation
-      const { data: mintData, error: mintError } = await mint({
-        args: [terminal?.ticketAddress, selectedApplication?.account.address, tags],
-      })
+      // Applicant doesn't already have an nft, we need to mint one
+      if (!selectedApplicationHasNft) {
+        const tags = BigNumber.from(Math.pow(2, chosenRole?.localId || 0)) // convert roleLocalId into on-chain representation
+        const { data: mintData, error: mintError } = await mint({
+          args: [terminal?.ticketAddress, selectedApplication?.account.address, tags],
+        })
 
-      // // poll for on-chain endorse data until we have an error or the results data
-      let mintTransaction
-      while (!mintTransaction?.data && !mintError) {
-        setTransactionPending(true)
-        console.log("pending true")
-        let mintPendingMsg
-        if (mintData?.hash) {
-          mintPendingMsg = "Mint is pending. View the status on "
-          setExplorerLink(`https://rinkeby.etherscan.io/tx/${mintData?.hash}`)
-        } else {
-          mintPendingMsg = "Mint is pending. Hang tight."
+        // Poll for on-chain endorse data until we have an error or the results data
+        let mintTransaction
+        while (!mintTransaction?.data && !mintError) {
+          setTransactionPending(true)
+          let mintPendingMsg
+          if (mintData?.hash) {
+            mintPendingMsg = "Mint is pending. View the status on "
+            setExplorerLink(`https://rinkeby.etherscan.io/tx/${mintData?.hash}`)
+          } else {
+            mintPendingMsg = "Mint is pending. Hang tight."
+          }
+          setMintMessage(mintPendingMsg)
+          mintTransaction = await wait({
+            hash: mintData?.hash,
+          })
         }
-        setMintMessage(mintPendingMsg)
-        mintTransaction = await wait({
-          hash: mintData?.hash,
+
+        if (mintError) {
+          const parsedMintError = JSON.parse(JSON.stringify(mintError))
+
+          if (parsedMintError?.error) {
+            setMintMessage(`Something went wrong - ${parsedMintError.error.message}`)
+          } else {
+            setMintMessage(`Something went wrong - ${parsedMintError.message}`)
+          }
+
+          setError(true)
+          setTransactionPending(false)
+          return
+        }
+
+        setTransactionPending(false)
+        setMintMessage("")
+        setExplorerLink("")
+      }
+
+      if (!applicantTicket) {
+        await inviteContributor({
+          inviterId: activeUser.id,
+          accountId: selectedApplication.account.id,
+          terminalId: currentInitiative.terminalId,
+          roleLocalId: chosenRole?.localId || applicantTicket?.roleLocalId,
+          initiativeId: currentInitiative.id,
         })
       }
 
-      if (mintError) {
-        const msg = mintError.message.substring(
-          mintError.message.indexOf("execution reverted"),
-          mintError.message.indexOf('","data') // execution reverted: ..... ","data":{...}
-        )
-        setError(true)
-        setTransactionPending(false)
-        setMintMessage(msg)
-        return
-      }
-
-      setTransactionPending(false)
-      setMintMessage("")
-      setExplorerLink("")
-
-      await inviteContributor({
-        inviterId: activeUser.id,
-        accountId: selectedApplication.account.id,
-        terminalId: currentInitiative.terminalId,
-        // if applicant already holds a ticket we return the same roleLocalId on their ticket
-        // and upsert them to the new initiative.
-        roleLocalId: chosenRole?.localId || applicantTicket?.roleLocalId,
-        initiativeId: currentInitiative.id,
-      })
-
-      // tear down state
+      // Show success modal
       setInviteSuccessful(true)
 
-      // Remove application from waiting room when applicant is invited.
-      // TODO: make it so that applications automatically refreshes via dependency hook
-      setRefreshApplications(true)
+      // Refetches applications from waiting room when applicant is invited.
+      refreshApplications()
     }
   }
 
@@ -225,10 +224,16 @@ export const InviteModal = ({
     </div>
   )
 
-  const inviteModalView = applicantTicket ? existingTerminalMemberView : newTerminalMemberView
-  const title = applicantTicket || inviteSuccessful ? "" : `Add to ${currentInitiative?.data?.name}`
+  const inviteModalView =
+    applicantTicket && selectedApplicationHasNft
+      ? existingTerminalMemberView
+      : newTerminalMemberView
+  const title =
+    (applicantTicket && selectedApplicationHasNft) || inviteSuccessful
+      ? ""
+      : `Add to ${currentInitiative?.data?.name}`
   const subtitle =
-    applicantTicket || inviteSuccessful
+    (applicantTicket && selectedApplicationHasNft) || inviteSuccessful
       ? ""
       : `Select ${selectedApplication?.account?.data?.name}'s starting role at ${terminal?.data?.name}.`
   return (
@@ -237,15 +242,15 @@ export const InviteModal = ({
       subtitle={subtitle}
       open={isInviteModalOpen}
       toggle={(close) => {
+        // tear down modal state when user closes modal
         setRoleNotSelectedError(false)
         setIsInviteModalOpen(close)
         setInviteSuccessful(false)
-        setRefreshApplications(false)
         setChosenRole(undefined)
         setMintMessage("")
         setError(false)
       }}
-      error={roleNotSelectedError}
+      error={roleNotSelectedError || error}
     >
       {inviteSuccessful ? successfulInvitationView : inviteModalView}
     </Modal>

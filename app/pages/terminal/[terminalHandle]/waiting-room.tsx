@@ -20,6 +20,8 @@ import getTicket from "app/ticket/queries/getTicket"
 import { Ticket } from "app/ticket/types"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
 import { Initiative } from "app/initiative/types"
+import { useContributorsRead } from "app/core/contracts/contracts"
+import { BigNumberish, utils } from "ethers"
 
 const skeletonLoadingScreen = (
   <div className="flex flex-col space-y-10">
@@ -56,18 +58,23 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [isEndorseSuccessModalOpen, setIsEndorseSuccessModalOpen] = useState(false)
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
+  const [selectedApplicationHasNft, setSelectedApplicationHasNft] = useState<boolean>(false)
   const [selectedApplicantTicket, setSelectedApplicantTicket] = useState<Ticket | null>()
   const activeUser = useStore((state) => state.activeUser)
   const [roleOfActiveUser, setRoleOfActiveUser] = useState<Role | null>()
-  const [refreshApplications, setRefreshApplications] = useState<boolean>(false)
   const [initialPageLoading, setInitialPageLoading] = useState<boolean>(true)
   const [isApplicantOpen, setIsApplicantOpen] = useState(false)
   const { DIRECTED_FROM } = QUERY_PARAMETERS
+  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
   useEffect(() => {
     setIsRedirectModalOpen(directedFrom === DIRECTED_FROM.SUBMITTED_APPLICATION)
   }, [directedFrom])
-  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+
+  const { read: readTokenOf } = useContributorsRead({
+    contract: terminal?.ticketAddress || "0x4A2De54eee273fb95bC861f71C90E5ee6705f01e",
+    methodName: "tokenOf",
+  })
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
@@ -94,7 +101,7 @@ const TerminalWaitingPage: BlitzPage = () => {
     [selectedInitiativeLocalId]
   )
 
-  const [applications, { isLoading: applicationsLoading }] = useQuery(
+  const [applications, { isLoading: applicationsLoading, refetch }] = useQuery(
     getApplicationsByInitiative,
     {
       referralGraphAddress: terminal?.data.contracts.addresses.referrals as string,
@@ -105,16 +112,30 @@ const TerminalWaitingPage: BlitzPage = () => {
     {
       suspense: false,
       enabled:
-        (!!terminal?.data.contracts.addresses.referrals &&
-          !!selectedInitiativeLocalId &&
-          !!currentInitiative?.id &&
-          !!terminal?.id) ||
-        refreshApplications,
+        !!terminal?.data.contracts.addresses.referrals &&
+        !!selectedInitiativeLocalId &&
+        !!currentInitiative?.id &&
+        !!terminal?.id,
       onSuccess: () => {
         setInitialPageLoading(false)
       },
     }
   )
+
+  useEffect(() => {
+    if (terminal?.id && selectedApplication?.account?.id) {
+      ;(async () => {
+        const tokenData = await readTokenOf({
+          args: [selectedApplication.account.address],
+        })
+        if (tokenData.data) {
+          setSelectedApplicationHasNft(
+            parseFloat(utils.formatUnits(tokenData.data as BigNumberish, 0)) > 0
+          )
+        }
+      })()
+    }
+  }, [selectedApplication])
 
   useEffect(() => {
     if (terminal?.id && selectedApplication?.account?.id) {
@@ -218,7 +239,8 @@ const TerminalWaitingPage: BlitzPage = () => {
         isInviteModalOpen={isInviteModalOpen}
         setIsInviteModalOpen={setIsInviteModalOpen}
         applicantTicket={selectedApplicantTicket}
-        setRefreshApplications={setRefreshApplications}
+        refreshApplications={refetch}
+        selectedApplicationHasNft={selectedApplicationHasNft}
       />
       <div className="flex flex-col space-y-10">
         {initiatives && initiatives?.filter((initiative) => initiative?.applicationCount).length ? (
