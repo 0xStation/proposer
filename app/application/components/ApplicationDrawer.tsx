@@ -104,7 +104,10 @@ const ApplicationDrawer = ({ isOpen, setIsOpen, application }) => {
                         </div>
                         <div className="flex flex-col mt-8">
                           <span className="text-base font-bold text-marble-white">
-                            Why Newstand?
+                            {application?.initiative.data.applicationQuestion ||
+                              `What unique value are you looking to bring to ${
+                                application?.initiative.data.name || "this initiative"
+                              }?`}
                           </span>
                           <span className="mt-2 text-base text-marble-white">
                             {/* note: need optional chaining on entryDescription and url since they can be `null` */}
