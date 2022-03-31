@@ -1,6 +1,6 @@
 import Modal from "../../core/components/Modal"
 import Verified from "/public/check-mark.svg"
-import { Image, invoke, Link, Routes, useParam } from "blitz"
+import { Image, invoke, Link, Routes, useParam, useRouter } from "blitz"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import Exit from "/public/exit-button.svg"
 import DiscordIcon from "/public/discord-icon.svg"
@@ -24,6 +24,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
   setIsOpen,
   terminalId,
 }) => {
+  const router = useRouter()
   const terminalHandle = useParam("terminalHandle", "string") as string
   const [initiatives, setInitiatives] = useState<Initiative[]>()
 
@@ -43,7 +44,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
   return (
     <div>
       <Modal subtitle="" open={isOpen} toggle={setIsOpen} showTitle={false}>
-        <div className="flex flex-col overflow-y-scroll">
+        <div className="flex flex-col overflow-y-scroll overflow-x-hidden h-[705px]">
           <div className="absolute top-1 left-2">
             <div className="w-[12px] h-[12px]">
               <button className="text-marble-white" onClick={() => setIsOpen(false)}>
@@ -58,32 +59,42 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
               </span>
             </div>
           )}
-          <div className="flex flex-row">
-            <div className="mr-2">
-              {contributor?.data?.pfpURL ? (
-                <img
-                  src={contributor?.data?.pfpURL}
-                  alt="PFP"
-                  className="h-[52px] w-[52px] min-w-[52px] border border-marble-white rounded-full"
-                />
-              ) : (
-                <div className="h-[52px] w-[52px] bg-gradient-to-b to-magic-mint from-electric-violet border border-marble-white rounded-full"></div>
-              )}
+          <div className="flex flex-row justify-between pt-5">
+            <div className="flex">
+              <div className="mr-2">
+                {contributor?.data?.pfpURL ? (
+                  <img
+                    src={contributor?.data?.pfpURL}
+                    alt="PFP"
+                    className="h-[52px] w-[52px] min-w-[52px] border border-marble-white rounded-full"
+                  />
+                ) : (
+                  <div className="h-[52px] w-[52px] bg-gradient-to-b to-magic-mint from-electric-violet border border-marble-white rounded-full"></div>
+                )}
+              </div>
+              <div className="flex flex-col">
+                <div className="flex flex-row flex-1">
+                  <div className="text-xl text-marble-white mr-1">{contributor?.data?.name}</div>
+                  <img
+                    className="mt-1"
+                    src="/check-mark.svg"
+                    alt="Verified icon"
+                    width={14}
+                    height={14}
+                  />
+                </div>
+                <div className="flex-1 text-sm text-concrete">
+                  @{truncateString(contributor?.data?.ens || contributor?.address)}
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <div className="flex flex-row flex-1">
-                <div className="text-xl text-marble-white mr-1">{contributor?.data?.name}</div>
-                <img
-                  className="mt-1"
-                  src="/check-mark.svg"
-                  alt="Verified icon"
-                  width={14}
-                  height={14}
-                />
-              </div>
-              <div className="flex-1 text-sm text-concrete">
-                {truncateString(contributor?.data?.ens || contributor?.address)}
-              </div>
+            <div className="pt-5 flex flex-col justify-between">
+              <button
+                className="border rounded border-marble-white text-marble-white px-5 hover:bg-wet-concrete"
+                onClick={() => router.push(`/profile/${contributor?.address}`)}
+              >
+                View Profile
+              </button>
             </div>
           </div>
           <div className="mt-8 flex flex-col text-marble-white space-y-8">
@@ -137,21 +148,9 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                   )}
                 </div>
               ) : null}
-              <div className="flex flex-col flex-1">
-                <div className="font-bold">
-                  <span>Timezone</span>
-                </div>
-                <span className="text-sm mt-2">
-                  {contributor?.data?.timezone ? (
-                    `GMT ${contributor?.data?.timezone}`
-                  ) : (
-                    <span className="text-concrete mt-2">N/A</span>
-                  )}
-                </span>
-              </div>
             </div>
           </div>
-          <div className="flex flex-col mt-8">
+          <div className="flex flex-col mt-8 mb-auto">
             <div className="flex-auto text-marble-white font-bold">Initiatives</div>
             {initiatives && initiatives.length ? (
               <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 sm:gap-4">
@@ -177,7 +176,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                 })}
               </div>
             ) : (
-              <div className="text-marble-white font-normal text-sm">
+              <div className="text-marble-white font-normal text-sm pt-3">
                 {contributor?.data.name} is not involved in any active initiatives at this time.
               </div>
             )}

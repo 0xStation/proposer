@@ -1,37 +1,15 @@
-import { useQuery } from "blitz"
-import getSubgraphApplicationData from "app/application/queries/getSubgraphApplicationData"
-import { DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
-import { useDecimals } from "app/core/contracts/contracts"
-import { ApplicationSubgraphData } from "app/application/types"
 import { APPLICATION_STATUS_MAP } from "app/core/utils/constants"
 
-const parseDecimals = (val, decimals) => {
-  return val * Math.pow(10, 0 - decimals)
-}
 // I don't really love this name because it only feels like an application before they are accepted
 const ApplicationCard = ({ application, address, onClick }) => {
   const { terminal } = application?.initiative
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
-    terminal.contracts?.addresses?.endorsements
-  )
-
-  const [subgraphData]: [ApplicationSubgraphData | undefined, any] = useQuery(
-    getSubgraphApplicationData,
-    {
-      referralGraphAddress: application.initiative.terminal.data.contracts.addresses.referrals,
-      initiativeLocalId: application.initiative.localId,
-      terminalId: application.initiative.terminalId,
-      address: address,
-    },
-    { suspense: false }
-  )
 
   return (
     <button
       role="button"
       tabIndex={0}
       onClick={onClick}
-      className="border border-concrete cursor-pointer hover:border-marble-white p-3 flex flex-col"
+      className="border border-concrete cursor-pointer w-[375px] mr-3 mb-3 hover:border-marble-white p-3 flex flex-col"
     >
       <span className="flex flex-row items-center">
         <span
@@ -53,12 +31,6 @@ const ApplicationCard = ({ application, address, onClick }) => {
           alt={`Terminal ${terminal && terminal?.data?.name} PFP`}
           className="h-8 w-8 rounded-full border border-marble-white block self-end"
         />
-        {application.status === "APPLIED" ? (
-          <div className="text-marble-white self-end">
-            {(subgraphData && parseDecimals(subgraphData.points, decimals)) || "0"}{" "}
-            {terminal.data.contracts.symbols.points}
-          </div>
-        ) : null}
       </div>
     </button>
   )

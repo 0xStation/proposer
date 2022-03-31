@@ -3,7 +3,7 @@ import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
 import { getNftImageUrl } from "app/utils/getNftImageUrl"
 
-const TicketWrapper = ({ terminal, ticket, tokenBalance, endorsementsSymbol }) => {
+const TicketWrapper = ({ terminal, ticket }) => {
   const [modalOpen, setModalOpen] = useState(false)
   return (
     <>
@@ -52,14 +52,12 @@ const TicketWrapper = ({ terminal, ticket, tokenBalance, endorsementsSymbol }) =
                     </div>
                   </div>
                   <div className="flex-1">
-                    <p className="text-marble-white text-2xl">
-                      <span className="text-neon-blue">
-                        {terminal.data.contracts.symbols.endorsements}
-                      </span>{" "}
-                      enables you to <span className="text-neon-blue">endorse</span>, signaling your
-                      support for prospective contributors and to access the{" "}
-                      <span className="text-neon-blue">token-gating applications</span> that Station
-                      labs uses.{" "}
+                    <p className="text-marble-white text-2xl px-2">
+                      {terminal.data.name} ID enables you to{" "}
+                      <span className="text-neon-blue">endorse</span>, which is the act of signaling
+                      your support for prospective contributors. Additionally, you can access{" "}
+                      <span className="text-neon-blue">token-gating applications</span> that{" "}
+                      {terminal.data.name} uses.
                     </p>
                   </div>
                 </div>
@@ -72,12 +70,6 @@ const TicketWrapper = ({ terminal, ticket, tokenBalance, endorsementsSymbol }) =
         <div className="flex flex-col items-center">
           <div className=" h-16 w-16 bg-marble-white rounded-full flex items-center justify-center">
             <div className="h-10 w-6 border-2 border-concrete rounded border-dashed flex flex-col items-center"></div>
-          </div>
-          <div className="mt-2 hidden justify-between px-1 text-sm 2xl:flex">
-            <span className="text-marble-white font-bold mr-2">Balance</span>
-            <span className="text-marble-white font-light">
-              {tokenBalance} {endorsementsSymbol}
-            </span>
           </div>
         </div>
       </div>

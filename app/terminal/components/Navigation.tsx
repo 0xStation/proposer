@@ -1,45 +1,14 @@
-import { useMemo, useState } from "react"
 import { useParam } from "blitz"
 import { Link, Routes, useRouter, useQuery } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import useStore from "app/core/hooks/useStore"
-import { useAccount, useBalance } from "wagmi"
-import TicketWrapper from "app/core/components/TicketWrapper"
-import { useDecimals } from "app/core/contracts/contracts"
-import { DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
-import getTicket from "app/ticket/queries/getTicket"
 
 const Navigation = ({ children }: { children?: any }) => {
-  const [pageLoading, setPageLoading] = useState<boolean>(true)
   // casting type as string to avoid the "undefined" type which could happen
   // but we will catch that at the terminal query level
   const terminalHandle = useParam("terminalHandle", "string") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
   const router = useRouter()
-  const activeUser = useStore((state) => state.activeUser)
-
-  const [ticket] = useQuery(
-    getTicket,
-    { terminalId: terminal?.id, accountId: activeUser?.id },
-    { suspense: false, onSuccess: () => setPageLoading(false) }
-  )
-
-  const [{ data: accountData }] = useAccount({
-    fetchEns: true,
-  })
-  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
-    terminal?.data.contracts.addresses.endorsements
-  )
-  const [{ data: balanceData }] = useBalance({
-    addressOrName: address,
-    token: terminal?.data.contracts.addresses.endorsements,
-    watch: true,
-    formatUnits: decimals,
-  })
-
-  const tokenBalance = parseInt(balanceData?.formatted || "0")
 
   const navView = terminal ? (
     <div>
@@ -104,23 +73,15 @@ const Navigation = ({ children }: { children?: any }) => {
             <div className="mt-12">{children}</div>
           </div>
         </div>
-        {activeUser && (
-          <TicketWrapper
-            terminal={terminal}
-            ticket={ticket}
-            tokenBalance={tokenBalance}
-            endorsementsSymbol={terminal.data.contracts.symbols.endorsements}
-          />
-        )}
       </div>
     </div>
   ) : (
     <div className="min-h-screen text-center grid place-content-center text-marble-white">
-      Terminal not found.
+      ...Loading.
     </div>
   )
 
-  return pageLoading ? <div></div> : navView
+  return navView
 }
 
 export default Navigation

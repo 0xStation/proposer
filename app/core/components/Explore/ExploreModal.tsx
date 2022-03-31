@@ -7,6 +7,7 @@ const ExploreModal = ({ isExploreModalOpen, setIsExploreModalOpen }) => {
       title="Explore"
       open={isExploreModalOpen}
       toggle={(close) => setIsExploreModalOpen(false)}
+      width="max-w-[34rem]"
     >
       <ExploreView className="h-[13rem]" />
     </Modal>

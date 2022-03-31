@@ -75,7 +75,7 @@ const ApplicationModal = ({
               <div className="grid grid-cols-2 gap-y-4 gap-x-2">
                 <div className="flex flex-col col-span-2">
                   <label htmlFor="url" className="text-marble-white">
-                    Share a link to a proposal or a project you&apos;re proud of:*
+                    Share a link to a proposal or a project you&apos;re proud of*
                   </label>
                   <Field
                     component="input"
@@ -89,7 +89,7 @@ const ApplicationModal = ({
                     {initiative.data.applicationQuestion ||
                       `What unique value are you looking to bring to ${
                         initiative.data.name || "this initiative"
-                      }?`}
+                      }`}
                     *
                   </label>
                   <Field

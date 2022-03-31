@@ -1,12 +1,10 @@
 import Modal from "../../core/components/Modal"
-import { Image, useQuery } from "blitz"
-import { Dispatch, SetStateAction } from "react"
+import { Image, useQuery, useRouter } from "blitz"
+import { Dispatch, SetStateAction, useEffect } from "react"
 import { Application } from "app/application/types"
 import Exit from "/public/exit-button.svg"
 import DiscordIcon from "/public/discord-icon.svg"
 import { Initiative } from "app/initiative/types"
-import { DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
-import { useDecimals } from "app/core/contracts/contracts"
 import ApplicantEndorsements from "./ApplicantEndorsements"
 import useStore from "app/core/hooks/useStore"
 import { formatDate } from "app/core/utils/formatDate"
@@ -15,7 +13,8 @@ import { Tag } from "app/core/components/Tag"
 import { Button } from "app/core/components/Button"
 import hasInvitePermissions from "../queries/hasInvitePermissions"
 import { TerminalMetadata } from "app/terminal/types"
-import { useBalance } from "wagmi"
+import getEndorsementValueSumByApplication from "app/endorsements/queries/getEndorsementValueSumByApplication"
+import getReferralsByApplication from "app/endorsements/queries/getReferralsByApplication"
 
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
@@ -38,12 +37,13 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   roleOfActiveUser,
   terminalData,
 }) => {
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
-    terminalData?.contracts.addresses.endorsements
-  )
+  const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
-  const { points = 0 } = application
-  const { data: applicantData, address, role, skills } = application?.account || {}
+  const shouldRefetchEndorsementPoints = useStore((state) => state.shouldRefetchEndorsementPoints)
+  const setShouldRefetchEndorsementPoints = useStore(
+    (state) => state.setShouldRefetchEndorsementPoints
+  )
+  const { data: applicantData, address, role, skills, id: applicantId } = application?.account || {}
   const { pfpURL, name, ens, pronouns, verified, discordId, timezone, contactURL } = applicantData
   const [canInvite] = useQuery(
     hasInvitePermissions,
@@ -51,12 +51,25 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     { enabled: !!(activeUser?.id && initiative?.terminalId), suspense: false }
   )
 
-  const [{ data: balanceData }] = useBalance({
-    addressOrName: activeUser?.address,
-    token: terminalData?.contracts?.addresses?.endorsements,
-    watch: false,
-    formatUnits: decimals,
+  const [totalEndorsementPoints] = useQuery(
+    getEndorsementValueSumByApplication,
+    {
+      initiativeId: initiative.id,
+      endorseeId: applicantId,
+    },
+    { suspense: false, enabled: !!(initiative.id && applicantId) }
+  )
+  const [referrals, { refetch: refetchReferrals }] = useQuery(getReferralsByApplication, {
+    initiativeId: initiative.id,
+    endorseeId: applicantId,
   })
+
+  useEffect(() => {
+    if (shouldRefetchEndorsementPoints) {
+      refetchReferrals()
+      setShouldRefetchEndorsementPoints(false)
+    }
+  }, [shouldRefetchEndorsementPoints])
 
   const profileMetadataProps = {
     pfpURL,
@@ -69,7 +82,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
 
   const canActiveUserEndorse = !!(
     activeUser &&
-    (roleOfActiveUser || parseFloat(balanceData?.formatted || "0")) &&
+    roleOfActiveUser &&
     activeUser?.address !== application?.account?.address
   )
 
@@ -102,8 +115,16 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                 {DateMetadata}
               </div>
             </div>
-            <div id="pfp and handle" className="flex-auto ">
+            <div id="pfp and handle" className="flex-row inline-flex justify-between">
               <ProfileMetadata {...profileMetadataProps} large />
+              <div className="py-5 flex justify-between align-middle">
+                <button
+                  className="border rounded border-marble-white text-marble-white px-5 hover:bg-wet-concrete"
+                  onClick={() => router.push(`/profile/${address}`)}
+                >
+                  View Profile
+                </button>
+              </div>
             </div>
             <div
               id="person's details"
@@ -157,14 +178,6 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     )}
                   </div>
                 ) : null}
-                <div className="flex flex-col flex-1 text-marble-white">
-                  <div className="font-bold">
-                    <span>Timezone</span>
-                  </div>
-                  <div className="text-base font-normal text-marble-white">
-                    <span>{timezone ? `GMT ${timezone}` : "N/A"}</span>
-                  </div>
-                </div>
               </div>
             </div>
             <hr className="border-[.5] border-solid border-concrete mx-[-2rem] my-5" />
@@ -208,9 +221,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                       <span>Points</span>
                     </div>
                     <div className="text-base font-normal text-marble-white">
-                      {`${points * Math.pow(10, 0 - decimals)} ${
-                        terminalData?.contracts.symbols.points
-                      }`}
+                      {totalEndorsementPoints || "0"}
                     </div>
                   </div>
                 </div>
@@ -220,14 +231,13 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               <div className="flex-auto text-marble-white font-bold">
                 <span>Endorsers</span>
               </div>
-              {application?.referrals?.length ? (
+              {referrals?.length ? (
                 <div className="flex flex-col space-y-1">
-                  {application?.referrals?.map?.(({ from: account, amount = 0 }, index) => (
+                  {referrals?.map?.(({ endorsementsGiven, endorser }, index) => (
                     <ApplicantEndorsements
                       key={index}
-                      endorser={account}
-                      amount={amount * Math.pow(10, 0 - decimals)}
-                      symbol={terminalData?.contracts.symbols.points}
+                      endorser={endorser}
+                      amount={endorsementsGiven || 0}
                     />
                   ))}
                 </div>

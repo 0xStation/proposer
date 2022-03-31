@@ -18,6 +18,7 @@ const Modal = ({
   banner,
   error,
   showTitle = true,
+  width = "max-w-2xl",
 }: {
   open: boolean
   toggle: (open) => void
@@ -27,6 +28,7 @@ const Modal = ({
   children?: any
   banner?: any
   error?: boolean
+  width?: string
 }) => {
   return (
     <Transition appear show={open} as={Fragment}>
@@ -58,7 +60,7 @@ const Modal = ({
             leaveTo="opacity-0 scale-95"
           >
             <div
-              className={`inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle transition-all transform bg-tunnel-black border ${
+              className={`inline-block w-full ${width} my-8 overflow-hidden text-left align-middle transition-all transform bg-tunnel-black border ${
                 error ? "border-torch-red" : "border-marble-white"
               }`}
             >
