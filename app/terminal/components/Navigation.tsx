@@ -1,25 +1,14 @@
-import { useState } from "react"
 import { useParam } from "blitz"
 import { Link, Routes, useRouter, useQuery } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import useStore from "app/core/hooks/useStore"
-import getTicket from "app/ticket/queries/getTicket"
 
 const Navigation = ({ children }: { children?: any }) => {
-  const [pageLoading, setPageLoading] = useState<boolean>(true)
   // casting type as string to avoid the "undefined" type which could happen
   // but we will catch that at the terminal query level
   const terminalHandle = useParam("terminalHandle", "string") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
   const router = useRouter()
-  const activeUser = useStore((state) => state.activeUser)
-
-  const [ticket] = useQuery(
-    getTicket,
-    { terminalId: terminal?.id, accountId: activeUser?.id },
-    { suspense: false, onSuccess: () => setPageLoading(false) }
-  )
 
   const navView = terminal ? (
     <div>
@@ -88,11 +77,11 @@ const Navigation = ({ children }: { children?: any }) => {
     </div>
   ) : (
     <div className="min-h-screen text-center grid place-content-center text-marble-white">
-      Terminal not found.
+      ...Loading.
     </div>
   )
 
-  return pageLoading ? <div></div> : navView
+  return navView
 }
 
 export default Navigation
