@@ -127,7 +127,7 @@ const Navigation = () => {
             />
           ) : (
             <span
-              className="h-full p-2 uppercase text-magic-mint text-lg border-l border-l-concrete cursor-pointer hover:bg-wet-concrete"
+              className="h-full p-2 uppercase text-magic-mint text-sm sm:text-lg border-l border-l-concrete cursor-pointer hover:bg-wet-concrete"
               onClick={() => toggleWalletModal(true)}
             >
               Connect Wallet
