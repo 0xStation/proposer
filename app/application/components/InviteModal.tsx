@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Modal from "../../core/components/Modal"
 import { useQuery, useMutation } from "blitz"
 import Button from "../../core/components/Button"
@@ -31,6 +31,12 @@ export const InviteModal = ({
   const [inviteContributor] = useMutation(InviteContributor)
   const [transactionPending, setTransactionPending] = useState<boolean>(false)
   const activeUser = useStore((state) => state.activeUser) as Account
+
+  useEffect(() => {
+    if (applicantTicket) {
+      setChosenRole(applicantTicket.role)
+    }
+  }, [applicantTicket])
 
   const [invitePermissionedRoleLocalIds] = useQuery(
     getInvitePermissions,
@@ -80,6 +86,9 @@ export const InviteModal = ({
   }
 
   const handleNewMemberInviteClick = async () => {
+    setError(false)
+    setRoleNotSelectedError(false)
+    setMintMessage("")
     if (!chosenRole && !(applicantTicket && selectedApplicationHasNft)) {
       // If the applicant isn't an existing ticket holder, doesn't have an nft, or a chosenRole isn't selected
       // we show an error because the inviter needs to select a role first.
@@ -128,15 +137,14 @@ export const InviteModal = ({
         setExplorerLink("")
       }
 
-      if (!applicantTicket) {
-        await inviteContributor({
-          inviterId: activeUser.id,
-          accountId: selectedApplication.account.id,
-          terminalId: currentInitiative.terminalId,
-          roleLocalId: chosenRole?.localId || applicantTicket?.roleLocalId,
-          initiativeId: currentInitiative.id,
-        })
-      }
+      // upsert new role if user already has an applicant ticket
+      await inviteContributor({
+        inviterId: activeUser.id,
+        accountId: selectedApplication.account.id,
+        terminalId: currentInitiative.terminalId,
+        roleLocalId: chosenRole?.localId || applicantTicket?.roleLocalId,
+        initiativeId: currentInitiative.id,
+      })
 
       // Show success modal
       setInviteSuccessful(true)
@@ -174,6 +182,7 @@ export const InviteModal = ({
     <div className="pt-12 px-1">
       <label className="text-marble-white">Role</label>
       <select
+        value={chosenRole?.localId}
         onChange={handleRoleDropdown}
         className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 w-full"
       >
@@ -249,6 +258,8 @@ export const InviteModal = ({
         setChosenRole(undefined)
         setMintMessage("")
         setError(false)
+        setTransactionPending(false)
+        setExplorerLink("")
       }}
       error={roleNotSelectedError || error}
     >

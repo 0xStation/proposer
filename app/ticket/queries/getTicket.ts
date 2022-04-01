@@ -21,11 +21,12 @@ export default async function getTicket(input: z.infer<typeof GetTicket>) {
         terminalId: data.terminalId,
       },
     },
+    include: { role: true },
   })
 
   if (!ticket) {
     return null
   }
 
-  return ticket as Ticket
+  return ticket as unknown as Ticket
 }
