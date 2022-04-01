@@ -13,7 +13,7 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
         <title>{title || "Station"}</title>
         <link rel="icon" href="/station-logo-favicon.ico" />
       </Head>
-      {chainData?.chain?.id !== undefined && chainData?.chain?.id !== 4 ? (
+      {/* {chainData?.chain?.id !== undefined && chainData?.chain?.id !== 4 ? (
         <>
           <Navigation />
           <div className="flex items-center justify-center min-h-[calc(100vh-15rem)]">
@@ -45,13 +45,13 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
             </div>
           </div>
         </>
-      ) : (
-        <>
-          <ModalContainer />
-          <Navigation />
-          {children}
-        </>
-      )}
+      ) : ( */}
+      <>
+        <ModalContainer />
+        <Navigation />
+        {children}
+      </>
+      {/* )} */}
     </>
   )
 }
