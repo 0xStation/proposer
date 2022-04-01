@@ -129,9 +129,6 @@ const ApplicationDrawer = ({ isOpen, setIsOpen, application }) => {
                           <span className="flex-col text-base font-bold text-marble-white">
                             Endorsers ({referrals?.length ? referrals.length : 0})
                           </span>
-                          <span className="flex-col text-base font-bold text-marble-white">
-                            Points ({totalEndorsementPoints || 0})
-                          </span>
                         </div>
                         {referrals?.map?.(({ endorser: account, endorsementsGiven }, index) => (
                           <ApplicantEndorsements

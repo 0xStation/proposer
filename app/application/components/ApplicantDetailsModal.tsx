@@ -11,9 +11,7 @@ import { formatDate } from "app/core/utils/formatDate"
 import { ProfileMetadata } from "app/core/ProfileMetadata"
 import { Tag } from "app/core/components/Tag"
 import { Button } from "app/core/components/Button"
-import hasInvitePermissions from "../queries/hasInvitePermissions"
 import { TerminalMetadata } from "app/terminal/types"
-import getEndorsementValueSumByApplication from "app/endorsements/queries/getEndorsementValueSumByApplication"
 import getReferralsByApplication from "app/endorsements/queries/getReferralsByApplication"
 
 type ApplicantDetailsModalProps = {
@@ -25,6 +23,7 @@ type ApplicantDetailsModalProps = {
   initiative: Initiative
   roleOfActiveUser?: string
   terminalData?: TerminalMetadata
+  canInvite?: boolean
 }
 
 const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
@@ -35,7 +34,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   setIsEndorseModalOpen,
   setIsInviteModalOpen,
   roleOfActiveUser,
-  terminalData,
+  canInvite = false,
 }) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
@@ -45,20 +44,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   )
   const { data: applicantData, address, role, skills, id: applicantId } = application?.account || {}
   const { pfpURL, name, ens, pronouns, verified, discordId, timezone, contactURL } = applicantData
-  const [canInvite] = useQuery(
-    hasInvitePermissions,
-    { inviterId: activeUser?.id, terminalId: initiative?.terminalId },
-    { enabled: !!(activeUser?.id && initiative?.terminalId), suspense: false }
-  )
 
-  const [totalEndorsementPoints] = useQuery(
-    getEndorsementValueSumByApplication,
-    {
-      initiativeId: initiative.id,
-      endorseeId: applicantId,
-    },
-    { suspense: false, enabled: !!(initiative.id && applicantId) }
-  )
   const [referrals, { refetch: refetchReferrals }] = useQuery(getReferralsByApplication, {
     initiativeId: initiative.id,
     endorseeId: applicantId,
@@ -137,20 +123,20 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                     {role && role !== "N/A" ? <Tag type="role">{role}</Tag> : "N/A"}
                   </div>
                 </div>
-                <div className="flex flex-col flex-1">
-                  <div className="font-bold text-marble-white">Skills</div>
-                  <div className="flex flex-row flex-wrap text-marble-white">
-                    {(skills?.length &&
-                      skills?.map?.((skill, index) => {
+                {skills?.length ? (
+                  <div className="flex flex-col flex-1">
+                    <div className="font-bold text-marble-white">Skills</div>
+                    <div className="flex flex-row flex-wrap text-marble-white">
+                      {skills?.map?.((skill, index) => {
                         return (
                           <Tag key={index} type="skill">
                             {skill}
                           </Tag>
                         )
-                      })) ||
-                      "N/A"}
+                      })}
+                    </div>
                   </div>
-                </div>
+                ) : null}
               </div>
               <div className="flex flex-row flex-auto text-marble-white">
                 {contactURL || discordId ? (
@@ -194,7 +180,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               </div>
               <div>
                 <p className="text-marble-white font-normal text-base">
-                  {application?.data?.entryDescription || "N/A"}
+                  {application?.data?.entryDescription}
                 </p>
               </div>
             </div>
@@ -218,18 +204,6 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                   </div>
                 </div>
               )}
-              {terminalData ? (
-                <div className="flex flex-col flex-1">
-                  <div>
-                    <div className="font-bold">
-                      <span>Points</span>
-                    </div>
-                    <div className="text-base font-normal text-marble-white">
-                      {totalEndorsementPoints || "0"}
-                    </div>
-                  </div>
-                </div>
-              ) : null}
             </div>
             <div id="endorsers" className="flex-auto flex flex-col space-y-2">
               <div className="flex-auto text-marble-white font-bold">

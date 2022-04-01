@@ -29,9 +29,6 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({ endorser,
         <div className="flex flex-col">
           <ProfileMetadata {...profileMetdataProps} />
         </div>
-        <div className="flex flex-col ">
-          <span className="text-marble-white text-lg text-normal m-2 justify-center">{amount}</span>
-        </div>
       </div>
     </div>
   )
