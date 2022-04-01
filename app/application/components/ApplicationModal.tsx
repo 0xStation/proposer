@@ -25,7 +25,7 @@ export const ApplicationConfirmationModal = ({
         You won&apos;t be able to edit your submission until the first day of next month. Would you
         like to send in your submission now?
       </p>
-      <Button className="px-5" onClick={() => onClick({ url: urlField, entryDescription })}>
+      <Button className="px-5" onClick={() => onClick({ urls: urlField, entryDescription })}>
         Confirm
       </Button>
     </Modal>
@@ -41,7 +41,7 @@ const ApplicationModal = ({
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   initiative: Initiative
 }) => {
-  const [urlField, setUrlField] = useState<string>("")
+  const [urlField, setUrlField] = useState<string[]>([])
   const [entryDescriptionField, setEntryDescriptionField] = useState<string>("")
   const [confirmationOpen, setIsConfirmationOpen] = useState<boolean>(false)
   const { DIRECTED_FROM } = QUERY_PARAMETERS
@@ -95,7 +95,7 @@ const ApplicationModal = ({
       />
       <div className="mt-8 mx-2">
         <Form
-          onSubmit={async (values: { url: string; entryDescription: string }) => {
+          onSubmit={async (values: { url: string[]; entryDescription: string }) => {
             const { url, entryDescription } = values
             setUrlField(url)
             setEntryDescriptionField(entryDescription)
@@ -108,11 +108,24 @@ const ApplicationModal = ({
                   <label htmlFor="url" className="text-marble-white">
                     Share a link to a proposal or a project you&apos;re proud of*
                   </label>
+                  <p className="text-concrete text-sm mb-2">At least one is required</p>
                   <Field
                     component="input"
-                    name="url"
+                    name="url[0]"
                     placeholder="Share your best work"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
+                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete"
+                  />
+                  <Field
+                    component="input"
+                    name="url[1]"
+                    placeholder="Share your best work"
+                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete"
+                  />
+                  <Field
+                    component="input"
+                    name="url[2]"
+                    placeholder="Share your best work"
+                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete"
                   />
                 </div>
                 <div className="flex flex-col col-span-2 mt-4">
@@ -127,7 +140,7 @@ const ApplicationModal = ({
                     component="textarea"
                     name="entryDescription"
                     placeholder="Highlight your unique value in 3-5 sentences"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
+                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete"
                   />
                 </div>
               </div>
