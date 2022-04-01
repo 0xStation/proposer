@@ -1,11 +1,36 @@
+import { useState } from "react"
 import { useMutation, useRouter, useParam, invoke } from "blitz"
 import { Field, Form } from "react-final-form"
 import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
 import useStore from "../../core/hooks/useStore"
 import { Initiative } from "../../initiative/types"
-import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
+import Button from "app/core/components/Button"
+
+export const ApplicationConfirmationModal = ({
+  confirmationOpen,
+  setIsConfirmationOpen,
+  urlField,
+  entryDescription,
+  onClick,
+}) => {
+  return (
+    <Modal
+      title="Confirm your submission"
+      open={confirmationOpen}
+      toggle={(close) => setIsConfirmationOpen(false)}
+    >
+      <p className="text-center py-10 px-5">
+        You won&apos;t be able to edit your submission until the first day of next month. Would you
+        like to send in your submission now?
+      </p>
+      <Button className="px-5" onClick={() => onClick({ url: urlField, entryDescription })}>
+        Confirm
+      </Button>
+    </Modal>
+  )
+}
 
 const ApplicationModal = ({
   isOpen,
@@ -16,17 +41,20 @@ const ApplicationModal = ({
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   initiative: Initiative
 }) => {
+  const [urlField, setUrlField] = useState<string>("")
+  const [entryDescriptionField, setEntryDescriptionField] = useState<string>("")
+  const [confirmationOpen, setIsConfirmationOpen] = useState<boolean>(false)
   const { DIRECTED_FROM } = QUERY_PARAMETERS
   const router = useRouter()
   const terminalHandle = useParam("terminalHandle") as string
   const [createApplicationMutation] = useMutation(createApplication, {
     onSuccess: () => {
+      setIsOpen(false)
       router.push(
         `/terminal/${terminalHandle}/waiting-room?directedFrom=${DIRECTED_FROM.SUBMITTED_APPLICATION}`
       )
     },
   })
-  const setActiveUserApplications = useStore((state) => state.setActiveUserApplications)
   const activeUser = useStore((state) => state.activeUser)
 
   if (!activeUser) {
@@ -48,27 +76,30 @@ const ApplicationModal = ({
       open={isOpen}
       toggle={setIsOpen}
     >
+      <ApplicationConfirmationModal
+        confirmationOpen={confirmationOpen}
+        setIsConfirmationOpen={setIsConfirmationOpen}
+        urlField={urlField}
+        entryDescription={entryDescriptionField}
+        onClick={async (values) => {
+          try {
+            await createApplicationMutation({
+              ...values,
+              initiativeId: initiative.id,
+              accountId: activeUser.id,
+            })
+          } catch (error) {
+            alert("Error applying.")
+          }
+        }}
+      />
       <div className="mt-8 mx-2">
         <Form
           onSubmit={async (values: { url: string; entryDescription: string }) => {
-            try {
-              await createApplicationMutation({
-                ...values,
-                initiativeId: initiative.id,
-                accountId: activeUser.id,
-              })
-
-              // TODO: this is a less than ideal solution at querying to refresh the `activeUser` state.
-              // We need to refresh the state so that the profile page and initiative details page pull
-              // in the correct information from the user's account object. This is a temporary solution
-              // while I (kristen) figure out how we want to query data from the client.
-              let user = await invoke(getAccountByAddress, { address: activeUser.address })
-              if (user) {
-                setActiveUserApplications(user?.initiatives)
-              }
-            } catch (error) {
-              alert("Error applying.")
-            }
+            const { url, entryDescription } = values
+            setUrlField(url)
+            setEntryDescriptionField(entryDescription)
+            setIsConfirmationOpen(true)
           }}
           render={({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>
@@ -93,7 +124,7 @@ const ApplicationModal = ({
                     *
                   </label>
                   <Field
-                    component="input"
+                    component="textarea"
                     name="entryDescription"
                     placeholder="Highlight your unique value in 3-5 sentences"
                     className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
