@@ -26,7 +26,7 @@ const Project: BlitzPage = () => {
   const [{ data: accountData }] = useAccount()
   const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
-  let [applicationModalOpen, setApplicationModalOpen] = useState(false)
+  const [applicationModalOpen, setApplicationModalOpen] = useState(false)
   const [page, setPage] = useState(0)
   const [userTriggered, setUserTrigged] = useState(false)
   const address = useMemo(() => accountData?.address, [accountData?.address])
