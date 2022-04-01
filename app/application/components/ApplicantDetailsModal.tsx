@@ -199,23 +199,27 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               </div>
             </div>
             <div id="points and submission" className="flex flex-row flex-auto text-marble-white">
-              {application?.data?.url && (
+              {application?.data?.urls && (
                 <div className="flex flex-col flex-1">
                   <div className="font-bold">
                     <span>Submission</span>
                   </div>
-                  <div className="text-base font-normal">
-                    <div className="flex flex-row max-w-xs break-all mr-2">
-                      <a
-                        target="_blank"
-                        href={`//${application?.data?.url.replace(/^https?:\/\//, "")}`}
-                        className="text-magic-mint"
-                        rel="noreferrer"
-                      >
-                        {application?.data?.url.replace(/^https?:\/\//, "")}
-                      </a>
-                    </div>
-                  </div>
+                  {application.data.urls.map((url, idx) => {
+                    return (
+                      <div className="text-base font-normal" key={idx}>
+                        <div className="flex flex-row max-w-xs break-all mr-2">
+                          <a
+                            target="_blank"
+                            href={`//${url.replace(/^https?:\/\//, "")}`}
+                            className="text-magic-mint"
+                            rel="noreferrer"
+                          >
+                            {url.replace(/^https?:\/\//, "")}
+                          </a>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               )}
               {terminalData ? (
