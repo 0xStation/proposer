@@ -5,7 +5,6 @@ import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
 import useStore from "../../core/hooks/useStore"
 import { Initiative } from "../../initiative/types"
-import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
 import Button from "app/core/components/Button"
 
@@ -56,7 +55,6 @@ const ApplicationModal = ({
       )
     },
   })
-  const setActiveUserApplications = useStore((state) => state.setActiveUserApplications)
   const activeUser = useStore((state) => state.activeUser)
 
   if (!activeUser) {
@@ -90,15 +88,6 @@ const ApplicationModal = ({
               initiativeId: initiative.id,
               accountId: activeUser.id,
             })
-
-            // TODO: this is a less than ideal solution at querying to refresh the `activeUser` state.
-            // We need to refresh the state so that the profile page and initiative details page pull
-            // in the correct information from the user's account object. This is a temporary solution
-            // while I (kristen) figure out how we want to query data from the client.
-            let user = await invoke(getAccountByAddress, { address: activeUser.address })
-            if (user) {
-              setActiveUserApplications(user?.initiatives)
-            }
           } catch (error) {
             alert("Error applying.")
           }
