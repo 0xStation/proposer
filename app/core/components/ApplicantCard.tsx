@@ -1,7 +1,5 @@
-import { Dispatch, SetStateAction, useEffect } from "react"
+import { Dispatch, SetStateAction } from "react"
 import { Application } from "app/application/types"
-import Button from "../components/Button"
-import Card from "../components/Card"
 import ProfileMetadata from "../ProfileMetadata"
 import Tag from "../components/Tag"
 import { formatDate } from "../utils/formatDate"
@@ -10,6 +8,7 @@ import { Terminal } from "app/terminal/types"
 import { useQuery } from "blitz"
 import { Initiative } from "app/initiative/types"
 import getReferralsByApplication from "app/endorsements/queries/getReferralsByApplication"
+import hasUserEndorsedApplicant from "app/endorsements/queries/hasUserEndorsedApplicant"
 
 type ApplicantCardProps = {
   application: Application
@@ -44,6 +43,16 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
   })
 
   const activeUser = useStore((state) => state.activeUser)
+
+  const [hasUserAlreadyEndorsedApplicant] = useQuery(
+    hasUserEndorsedApplicant,
+    {
+      initiativeId: initiative?.id,
+      endorseeId: applicant?.id,
+      endorserId: activeUser?.id as number,
+    },
+    { suspense: false, enabled: !!(initiative?.id && applicant?.id && activeUser?.id) }
+  )
 
   const canActiveUserEndorse =
     // if active user has a role or they have an endorsement balance (ex: friends of Station)
@@ -106,7 +115,7 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
       <>
         <div className="absolute h-full w-full bg-tunnel-black opacity-80 top-0 left-0 hidden group-hover:block"></div>
         <div className="absolute h-full w-full top-0 left-0 flex-col items-center justify-center space-y-2 hidden group-hover:flex">
-          {activeUser && canActiveUserEndorse && (
+          {activeUser && canActiveUserEndorse && !hasUserAlreadyEndorsedApplicant && (
             <button
               className={hoverButtonStyling}
               onClick={(e) => {
@@ -132,7 +141,6 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
               Add to Terminal
             </button>
           )}
-
           <button
             className={hoverButtonStyling}
             onClick={(e) => {

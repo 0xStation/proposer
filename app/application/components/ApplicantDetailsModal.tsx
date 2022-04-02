@@ -13,6 +13,7 @@ import { Tag } from "app/core/components/Tag"
 import { Button } from "app/core/components/Button"
 import { TerminalMetadata } from "app/terminal/types"
 import getReferralsByApplication from "app/endorsements/queries/getReferralsByApplication"
+import hasUserEndorsedApplicant from "app/endorsements/queries/hasUserEndorsedApplicant"
 
 type ApplicantDetailsModalProps = {
   isApplicantOpen: boolean
@@ -50,6 +51,16 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     endorseeId: applicantId,
   })
 
+  const [hasUserAlreadyEndorsedApplicant] = useQuery(
+    hasUserEndorsedApplicant,
+    {
+      initiativeId: initiative?.id,
+      endorseeId: applicantId,
+      endorserId: activeUser?.id as number,
+    },
+    { suspense: false, enabled: !!(initiative?.id && applicantId && activeUser?.id) }
+  )
+
   useEffect(() => {
     if (shouldRefetchEndorsementPoints) {
       refetchReferrals()
@@ -69,7 +80,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   const canActiveUserEndorse = !!(
     activeUser &&
     roleOfActiveUser &&
-    activeUser?.address !== application?.account?.address
+    activeUser?.address !== application?.account?.address &&
+    !hasUserAlreadyEndorsedApplicant
   )
 
   const CloseButton = ({ onClick }) => (
@@ -228,8 +240,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               )}
             </div>
           </div>
-          {canActiveUserEndorse ? (
-            <div className="mx-auto">
+          <div className="mx-auto">
+            {canActiveUserEndorse && (
               <Button
                 className={canInvite ? "px-20 mr-2 inline" : "px-28"}
                 onClick={() => {
@@ -243,20 +255,20 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
               >
                 Endorse
               </Button>
-              {canInvite && (
-                <Button
-                  secondary
-                  className="inline px-6"
-                  onClick={async () => {
-                    setIsApplicantOpen(false)
-                    setTimeout(() => setIsInviteModalOpen(true), 550)
-                  }}
-                >
-                  Add to Initiative
-                </Button>
-              )}
-            </div>
-          ) : null}
+            )}
+            {canInvite && (
+              <Button
+                secondary
+                className="inline px-6"
+                onClick={async () => {
+                  setIsApplicantOpen(false)
+                  setTimeout(() => setIsInviteModalOpen(true), 550)
+                }}
+              >
+                Add to Initiative
+              </Button>
+            )}
+          </div>
         </div>
       </Modal>
     </div>
