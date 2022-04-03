@@ -7,6 +7,7 @@ import useStore from "../../core/hooks/useStore"
 import { Initiative } from "../../initiative/types"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
 import Button from "app/core/components/Button"
+import { required, mustBeUrl, composeValidators } from "app/utils/validators"
 
 export const ApplicationConfirmationModal = ({
   confirmationOpen,
@@ -108,25 +109,51 @@ const ApplicationModal = ({
                   <label htmlFor="url" className="text-marble-white">
                     Share a link to a proposal or a project you&apos;re proud of*
                   </label>
-                  <p className="text-concrete text-sm mb-2">At least one is required</p>
-                  <Field
-                    component="input"
-                    name="url[0]"
-                    placeholder="Share your best work"
-                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete"
-                  />
-                  <Field
-                    component="input"
-                    name="url[1]"
-                    placeholder="Share your best work"
-                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete"
-                  />
-                  <Field
-                    component="input"
-                    name="url[2]"
-                    placeholder="Share your best work"
-                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete"
-                  />
+                  <Field name="url[0]" validate={composeValidators(required, mustBeUrl)}>
+                    {({ input, meta }) => (
+                      <div>
+                        <input
+                          {...input}
+                          type="text"
+                          placeholder="Share your best work"
+                          className="w-full border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete mb-2 mt-2"
+                        />
+                        {meta.error && meta.touched && (
+                          <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
+                        )}
+                      </div>
+                    )}
+                  </Field>
+                  <Field name="url[1]" validate={mustBeUrl}>
+                    {({ input, meta }) => (
+                      <div>
+                        <input
+                          {...input}
+                          type="text"
+                          placeholder="How about another link?"
+                          className="w-full border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete mb-2"
+                        />
+                        {meta.error && meta.touched && (
+                          <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
+                        )}
+                      </div>
+                    )}
+                  </Field>
+                  <Field name="url[2]" validate={mustBeUrl}>
+                    {({ input, meta }) => (
+                      <div>
+                        <input
+                          {...input}
+                          type="text"
+                          placeholder="More more!"
+                          className="w-full border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete"
+                        />
+                        {meta.error && meta.touched && (
+                          <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
+                        )}
+                      </div>
+                    )}
+                  </Field>
                 </div>
                 <div className="flex flex-col col-span-2 mt-4">
                   <label htmlFor="entryDescription" className="text-marble-white">
@@ -136,12 +163,20 @@ const ApplicationModal = ({
                       }`}
                     *
                   </label>
-                  <Field
-                    component="textarea"
-                    name="entryDescription"
-                    placeholder="Highlight your unique value in 3-5 sentences"
-                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete"
-                  />
+                  <Field name="entryDescription" validate={required}>
+                    {({ input, meta }) => (
+                      <div>
+                        <textarea
+                          {...input}
+                          placeholder="Highlight your unique value in 3-5 sentences"
+                          className="w-full mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete"
+                        />
+                        {meta.error && meta.touched && (
+                          <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
+                        )}
+                      </div>
+                    )}
+                  </Field>
                 </div>
               </div>
               <button
