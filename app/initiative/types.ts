@@ -29,3 +29,9 @@ export type Initiative = {
   contributors?: []
   applicationCount?: number
 }
+
+export enum StatusOptions {
+  OPEN_FOR_SUBMISSIONS,
+  ACTIVE,
+  INACTIVE,
+}

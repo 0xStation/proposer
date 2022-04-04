@@ -1,8 +1,6 @@
 import { Editor, Transforms, Element as SlateElement } from "slate"
 import { useSlate } from "slate-react"
 
-import LooksOneIcon from "@mui/icons-material/LooksOne"
-import LooksTwoIcon from "@mui/icons-material/LooksTwo"
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered"
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted"
 import FormatItalicIcon from "@mui/icons-material/FormatItalic"
@@ -30,12 +28,6 @@ const RichTextToolbar = () => {
         </li>
         <li>
           <MarkButton format="code" icon={<CodeIcon />} />
-        </li>
-        <li>
-          <BlockButton format="heading-one" icon={<LooksOneIcon />} />
-        </li>
-        <li>
-          <BlockButton format="heading-two" icon={<LooksTwoIcon />} />
         </li>
         <li>
           <BlockButton format="block-quote" icon={<FormatQuoteIcon />} />

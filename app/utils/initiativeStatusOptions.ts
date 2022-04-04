@@ -1,11 +1,9 @@
-export const OPEN_FOR_SUBMISSIONS = "Open to submissions"
-export const ACTIVE = "Active"
-export const INACTIVE = "Inactive"
+import { StatusOptions } from "app/initiative/types"
 
 const InitiativeStatusOptions = [
-  { value: OPEN_FOR_SUBMISSIONS, label: OPEN_FOR_SUBMISSIONS },
-  { value: ACTIVE, label: ACTIVE },
-  { value: INACTIVE, label: INACTIVE },
+  { value: StatusOptions.OPEN_FOR_SUBMISSIONS, label: "Open for submissions" },
+  { value: StatusOptions.ACTIVE, label: "Active" },
+  { value: StatusOptions.INACTIVE, label: "Inactive" },
 ]
 
 const getInitiativeStatusOptionFromValue = (value) => {
@@ -14,13 +12,13 @@ const getInitiativeStatusOptionFromValue = (value) => {
 
 const getInitiativeStatusColor = (status) => {
   switch (status) {
-    case OPEN_FOR_SUBMISSIONS:
+    case StatusOptions.OPEN_FOR_SUBMISSIONS:
       return `neon-blue`
 
-    case ACTIVE:
+    case StatusOptions.ACTIVE:
       return `magic-mint`
 
-    case INACTIVE:
+    case StatusOptions.INACTIVE:
       return "concrete"
 
     default:

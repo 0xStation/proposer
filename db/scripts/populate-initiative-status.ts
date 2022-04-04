@@ -1,6 +1,6 @@
 import db from "../index"
 import { Initiative } from "app/initiative/types"
-import { OPEN_FOR_SUBMISSIONS, ACTIVE } from "app/utils/initiativeStatusOptions"
+import { StatusOptions } from "app/initiative/types"
 
 // blitz db seed -f db/scripts/populate-initiative-status.ts
 const seed = async () => {
@@ -25,7 +25,10 @@ const seed = async () => {
       data: {
         data: {
           ...initiative.data,
-          status: !initiative.data.status && openToSubmissions ? OPEN_FOR_SUBMISSIONS : ACTIVE,
+          status:
+            !initiative.data.status && openToSubmissions
+              ? StatusOptions.OPEN_FOR_SUBMISSIONS
+              : StatusOptions.ACTIVE,
         },
       },
     })
