@@ -35,9 +35,7 @@ const InitiativeCard = ({
           <div className="absolute h-full w-full bg-tunnel-black opacity-80 top-0 left-0 hidden group-hover:block"></div>
           <div className="absolute h-full w-full top-0 left-0 flex-col items-center justify-center space-y-2 hidden group-hover:flex">
             <Link href={viewLink}>
-              <button className="bg-tunnel-black text-marble-white border border-marble-white hover:bg-wet-concrete rounded w-36 p-1">
-                View
-              </button>
+              <button className={buttonStyles}>View</button>
             </Link>
             <button
               className={buttonStyles}
