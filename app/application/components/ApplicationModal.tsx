@@ -93,9 +93,9 @@ const ApplicationModal = ({
             })
             // send message to terminal's #station-notifications discord channel if applicable
             await sendNewApplicationNotification(
-              terminalHandle,
               initiative.data.name,
               activeUser.data.name,
+              activeUser.address,
               discordWebhookUrl
             )
           } catch (error) {
