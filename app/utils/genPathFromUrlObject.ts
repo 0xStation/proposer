@@ -1,8 +1,8 @@
 import { RouteUrlObject } from "blitz"
+import { genBaseUrl } from "./genBaseUrl"
 
 export const genPathFromUrlObject = (route: RouteUrlObject) => {
-  const baseUrl =
-    process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://app.station.express"
+  const baseUrl = genBaseUrl()
 
   if (route.query) {
     let newPath = Object.keys(route.query).reduce((path, queryArg) => {

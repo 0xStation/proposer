@@ -1,3 +1,5 @@
+import { genBaseUrl } from "./genBaseUrl"
+
 export async function sendNewApplicationNotification(
   initiativeName: string,
   userName: string,
@@ -8,7 +10,7 @@ export async function sendNewApplicationNotification(
     await fetch(discordWebhookUrl, {
       method: "POST",
       body: JSON.stringify({
-        content: `New interest submission for **${initiativeName}** from ${userName}\nView profile: https://app.station.express/profile/${userAddress}`,
+        content: `New interest submission for **${initiativeName}** from ${userName}\nView profile: ${genBaseUrl()}/profile/${userAddress}`,
       }),
       headers: {
         "Content-Type": "application/json",
