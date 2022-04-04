@@ -16,7 +16,7 @@ export const InviteModal = ({
   isInviteModalOpen,
   setIsInviteModalOpen,
   applicantTicket,
-  setRefreshApplications,
+  refetchApplications,
 }) => {
   const [roleNotSelectedError, setRoleNotSelectedError] = useState<boolean>(false)
   const [inviteSuccessful, setInviteSuccessful] = useState<boolean>(false)
@@ -52,10 +52,8 @@ export const InviteModal = ({
         initiativeId: currentInitiative.id,
       })
       setInviteSuccessful(true)
-
-      // Remove application from waiting room when applicant is invited.
-      // TODO: make it so that applications automatically refreshes via dependency hook
-      setRefreshApplications(true)
+      // refresh applications in waiting room to show correct data
+      refetchApplications()
     }
   }
 
@@ -139,7 +137,6 @@ export const InviteModal = ({
         setRoleNotSelectedError(false)
         setIsInviteModalOpen(close)
         setInviteSuccessful(false)
-        setRefreshApplications(false)
         setChosenRole(undefined)
       }}
       error={roleNotSelectedError}
