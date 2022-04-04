@@ -5,6 +5,7 @@ import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
 import useStore from "../../core/hooks/useStore"
 import { Initiative } from "../../initiative/types"
+import { sendNewApplicationNotification } from "app/utils/sendDiscordNotification"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
 import Button from "app/core/components/Button"
 
@@ -36,10 +37,12 @@ const ApplicationModal = ({
   isOpen,
   setIsOpen,
   initiative,
+  discordWebhookUrl,
 }: {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   initiative: Initiative
+  discordWebhookUrl?: string
 }) => {
   const [urlField, setUrlField] = useState<string[]>([])
   const [entryDescriptionField, setEntryDescriptionField] = useState<string>("")
@@ -88,6 +91,13 @@ const ApplicationModal = ({
               initiativeId: initiative.id,
               accountId: activeUser.id,
             })
+            // send message to terminal's #station-notifications discord channel if applicable
+            await sendNewApplicationNotification(
+              initiative.data.name,
+              activeUser.data.name,
+              activeUser.address,
+              discordWebhookUrl
+            )
           } catch (error) {
             alert("Error applying.")
           }

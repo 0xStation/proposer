@@ -28,6 +28,7 @@ export type TerminalMetadata = {
     }
   }
   hide?: boolean
+  discordWebhookUrl?: string
   visualizeNftMethod?: string
 }
 
