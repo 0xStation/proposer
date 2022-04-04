@@ -26,16 +26,15 @@ const Project: BlitzPage = () => {
   const [{ data: accountData }] = useAccount()
   const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
-  const toggleAccountModal = useStore((state) => state.toggleAccountModal)
-  let [applicationModalOpen, setApplicationModalOpen] = useState(false)
+  const [applicationModalOpen, setApplicationModalOpen] = useState(false)
   const [page, setPage] = useState(0)
   const [userTriggered, setUserTrigged] = useState(false)
   const address = useMemo(() => accountData?.address, [accountData?.address])
   const [contributorDirectoryModalIsOpen, setContributorDirectoryModalOpen] = useState(false)
   const [selectedContributorToView, setSelectedContributorToView] = useState<Account | null>(null)
-  const { DIRECTED_FROM } = QUERY_PARAMETERS
+  const { DIRECTED_FROM, SET_TAB } = QUERY_PARAMETERS
   const router = useRouter()
-  const { directedFrom } = useRouterQuery()
+  const { directedFrom, address: addressParam } = useRouterQuery()
 
   const handleSubmitInterestClick = () => {
     if (address) {
@@ -155,7 +154,7 @@ const Project: BlitzPage = () => {
           <button
             onClick={() => {
               if (directedFrom === DIRECTED_FROM.PROFILE) {
-                router.push("/profile?setTab=initiatives")
+                router.push(`/profile/${addressParam}?setTab=${SET_TAB.INITIATIVES}`)
               } else {
                 router.push(`/terminal/${terminalHandle}/initiative-board`)
               }
@@ -249,10 +248,10 @@ const Project: BlitzPage = () => {
                   </div>
                   <div className="flex flex-wrap">
                     {initiative &&
-                      initiative.data.skills?.map?.((skill, index) => {
+                      initiative.skills?.map?.((skill, index) => {
                         return (
                           <Tag key={index} type={"skill"}>
-                            {skill}
+                            {skill.name}
                           </Tag>
                         )
                       })}

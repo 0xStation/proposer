@@ -19,13 +19,14 @@ model Account {
   tickets     AccountTerminal[]
   initiatives AccountInitiative[]
   data        Json?
+  endorsed    Endorsement[]       @relation("Endorsed")
 }
 
 // Each DAO is represented by a terminal.
 // roleNameOverrides overrides default role names
 model Terminal {
   id            Int               @id @default(autoincrement())
-  ticketAddress String            @unique
+  ticketAddress String?           @unique
   handle        String            @unique
   initiatives   Initiative[]
   roles         Role[]
@@ -65,6 +66,7 @@ model Initiative {
   terminalId Int
   localId    Int                 @default(autoincrement())
   accounts   AccountInitiative[]
+  skills     InitiativeSkill[]
   data       Json?
 
   @@unique([terminalId, localId])
@@ -84,9 +86,10 @@ model AccountInitiative {
 }
 
 model Skill {
-  id       Int            @id @default(autoincrement())
-  name     String         @unique
-  accounts AccountSkill[]
+  id          Int               @id @default(autoincrement())
+  name        String            @unique
+  accounts    AccountSkill[]
+  initiatives InitiativeSkill[]
 }
 
 model AccountSkill {
@@ -96,6 +99,28 @@ model AccountSkill {
   skillId   Int
 
   @@id([accountId, skillId])
+}
+
+model InitiativeSkill {
+  initiative   Initiative @relation(fields: [initiativeId], references: [id])
+  initiativeId Int
+  skill        Skill      @relation(fields: [skillId], references: [id])
+  skillId      Int
+
+  @@id([initiativeId, skillId])
+}
+
+// Off-chain transaction to signal a user's support for another user.
+// We trigger signatures to write this endorsement model on-chain.
+model Endorsement {
+  id               Int      @id @default(autoincrement())
+  initiativeId     Int
+  endorser         Account  @relation(name: "Endorsed", fields: [endorserId], references: [id])
+  endorserId       Int
+  endorseeId       Int
+  timestamp        DateTime @default(now())
+  endorsementValue Int
+  data             Json?
 }
 
 enum AccountInitiativeStatus {

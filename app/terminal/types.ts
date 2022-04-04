@@ -1,3 +1,4 @@
+import { Initiative } from "app/initiative/types"
 import { Role } from "app/role/types"
 
 export enum MethodToVisualizeContributorsNft {
@@ -11,7 +12,8 @@ export type TerminalMetadata = {
   pfpURL: string
   coverURL?: string
   permissions: {
-    invite: any
+    invite: Record<string, number[]>
+    edit: Record<string, number[]>
   }
   contracts: {
     addresses: {
@@ -36,4 +38,5 @@ export type Terminal = {
   handle: string
   data: TerminalMetadata
   roles: Role[]
+  initiatives?: Initiative[]
 }

@@ -88,6 +88,7 @@ export default async function getSubgraphApplicationData(
       where: { address: { in: Object.keys(referrers), mode: "insensitive" } },
       // addresses come from the subgraph lowered, but database may or may not lower so insensitive filtering used
       select: {
+        id: true,
         address: true,
         data: true,
         tickets: {
@@ -102,6 +103,7 @@ export default async function getSubgraphApplicationData(
     })
     // update per-referrer store with account metadata
     accounts.forEach((a) => {
+      referrers[a.address.toLowerCase()].id = a.id
       referrers[a.address.toLowerCase()].address = a.address
       referrers[a.address.toLowerCase()].role = (a.tickets[0]?.role as Role)?.data.value || "N/A"
       referrers[a.address.toLowerCase()].data = a.data

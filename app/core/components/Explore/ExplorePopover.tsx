@@ -5,7 +5,7 @@ import ExploreView from "./ExploreView"
 
 const ExplorePopover = () => {
   return (
-    <div className="px-4">
+    <div className="px-4 hover:bg-wet-concrete h-full flex items-center">
       <Popover className="sm:relative">
         {({ open }) => (
           <>

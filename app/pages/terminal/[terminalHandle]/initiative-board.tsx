@@ -3,16 +3,23 @@ import { BlitzPage, useQuery, useParam, Routes, Link } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/Navigation"
 import InitiativeCard from "app/initiative/components/InitiativeCard"
+import useStore from "app/core/hooks/useStore"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getInitiativesByTerminal from "app/initiative/queries/getInitiativesByTerminal"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
+import { canEdit } from "app/core/utils/permissions"
+import { EditPermissionTypes } from "app/core/utils/constants"
 
 const TerminalInitiativePage: BlitzPage = () => {
   const { DIRECTED_FROM } = QUERY_PARAMETERS
   const [sortedInitiatives, setSortedInitiatives] = useState<any[]>()
   const terminalHandle = useParam("terminalHandle", "string") as string
 
+  const activeUser = useStore((state) => state.activeUser)
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+  const userCanEdit = activeUser
+    ? canEdit(activeUser, terminal?.id, EditPermissionTypes.INITIATIVE)
+    : false
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
@@ -35,25 +42,28 @@ const TerminalInitiativePage: BlitzPage = () => {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {sortedInitiatives?.map?.(
-              ({ localId, contributors, data: { name, oneLiner, isAcceptingApplications } }) => {
+              (
+                { localId, contributors, data: { name, oneLiner, isAcceptingApplications } },
+                idx
+              ) => {
                 return (
-                  <Link
-                    key={localId}
-                    href={Routes.Project({
+                  <InitiativeCard
+                    key={idx}
+                    viewLink={Routes.Project({
                       terminalHandle,
                       initiativeId: localId,
                       directedFrom: DIRECTED_FROM.INITIATIVE_BOARD,
                     })}
-                  >
-                    <a>
-                      <InitiativeCard
-                        title={name || "Title"}
-                        oneLiner={oneLiner || "One Liner"}
-                        contributors={contributors}
-                        isAcceptingApplications={isAcceptingApplications}
-                      />
-                    </a>
-                  </Link>
+                    editLink={Routes.TerminalInitiativeEditPage({
+                      terminalHandle,
+                      initiativeId: localId,
+                    })}
+                    editable={userCanEdit}
+                    title={name || "Title"}
+                    oneLiner={oneLiner || "One Liner"}
+                    contributors={contributors}
+                    isAcceptingApplications={isAcceptingApplications}
+                  />
                 )
               }
             )}

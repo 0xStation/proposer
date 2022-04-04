@@ -11,6 +11,7 @@ import MultiSelect from "app/core/components/form/MultiSelect"
 import { TimezoneOptions, getTimezoneOptionFromValue } from "app/utils/timezoneOptions"
 import UploadIcon from "app/core/icons/UploadIcon"
 import { Account } from "app/account/types"
+import { toTitleCase } from "app/core/utils/titleCase"
 
 interface ApplicationParams {
   name: string
@@ -162,20 +163,9 @@ const AccountForm = ({
     }
   }, [account])
 
-  function capitalizeWord(word: string) {
-    return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase()
-  }
-
-  function capitalizeSkill(skill: string) {
-    return skill
-      .split(" ")
-      .map((w) => capitalizeWord(w))
-      .join(" ")
-  }
-
   const [skills] = useQuery(getSkills, {}, { suspense: false })
   const skillOptions = skills?.map((skill) => {
-    return { value: skill.name, label: capitalizeSkill(skill.name) }
+    return { value: skill.name, label: toTitleCase(skill.name) }
   })
 
   const existingSkills =
@@ -225,7 +215,7 @@ const AccountForm = ({
             </div>
             <div className="flex flex-col col-span-2 mt-10">
               <label htmlFor="name" className="text-marble-white text-base font-bold">
-                Name
+                Name*
               </label>
               <Field
                 component="input"
@@ -236,7 +226,7 @@ const AccountForm = ({
             </div>
             <div className="flex flex-col col-span-2">
               <label htmlFor="bio" className="text-marble-white font-bold">
-                Bio
+                Bio*
               </label>
               <Field
                 component="textarea"
@@ -247,7 +237,7 @@ const AccountForm = ({
             </div>
             <div className="flex flex-col col-span-2">
               <label htmlFor="contactURL" className="text-marble-white text-base font-bold">
-                Contact
+                Contact*
               </label>
               <p className="text-concrete text-sm mb-2">What&apos;s the best way to contact you?</p>
               <div className="flex flex-row mt-1">
@@ -261,7 +251,7 @@ const AccountForm = ({
             </div>
             <div className="flex flex-col col-span-2">
               <label htmlFor="skills" className="text-marble-white text-base font-bold">
-                Skills
+                Skills*
               </label>
               <p className="text-concrete text-sm mb-2">(Type to add or search skills)</p>
               <div>
@@ -275,7 +265,7 @@ const AccountForm = ({
             </div>
             <div className="flex flex-col col-span-2">
               <label htmlFor="timezone" className="text-marble-white mb-2 text-base font-bold">
-                Timezone
+                Timezone*
               </label>
               <Select
                 name="timezone"
@@ -287,7 +277,7 @@ const AccountForm = ({
           </div>
           <button
             type="submit"
-            className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-14 mx-auto block p-2"
+            className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-14 mx-auto block p-2 hover:opacity-70"
           >
             {isEdit ? "Save" : "Submit"}
           </button>

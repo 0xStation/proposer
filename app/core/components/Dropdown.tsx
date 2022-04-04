@@ -38,16 +38,14 @@ const Dropdown = ({ button, items, side, className }: DropdownProps) => {
           >
             <Menu.Items
               className={`${
-                side === "left" ? `left-[-5px]` : `right-[-5px]`
-              } uppercase text-marble-white text-lg absolute mt-[9px] origin-top-right bg-tunnel-black border border-[#646464] focus:outline-none whitespace-nowrap z-10`}
+                side === "left" ? `left-[10px]` : `right-[2px]`
+              } uppercase text-marble-white text-lg origin-top mt-[10px] absolute bg-tunnel-black border border-[#646464] whitespace-nowrap z-10`}
             >
               {items.map((item) => (
                 <Menu.Item key={item.name}>
-                  {({ active }) => (
+                  {() => (
                     <a
-                      className={`${
-                        active && "text-neon-blue"
-                      } group flex rounded-md items-center w-full px-4 py-2 cursor-pointer`}
+                      className={`hover:bg-wet-concrete group flex items-center w-full px-4 py-2 cursor-pointer`}
                       href={item.href}
                       onClick={item.onClick}
                     >

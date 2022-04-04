@@ -19,6 +19,8 @@ import { InviteModal } from "app/application/components/InviteModal"
 import getTicket from "app/ticket/queries/getTicket"
 import { Ticket } from "app/ticket/types"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
+import { Initiative } from "app/initiative/types"
+import hasInvitePermissions from "app/application/queries/hasInvitePermissions"
 
 const skeletonLoadingScreen = (
   <div className="flex flex-col space-y-10">
@@ -93,6 +95,15 @@ const TerminalWaitingPage: BlitzPage = () => {
     [selectedInitiativeLocalId]
   )
 
+  const [canInvite, { refetch: refetchInviteDetails }] = useQuery(
+    hasInvitePermissions,
+    { inviterId: activeUser?.id, terminalId: currentInitiative?.terminalId },
+    {
+      enabled: !!(activeUser?.id && currentInitiative?.terminalId && currentInitiative),
+      suspense: false,
+    }
+  )
+
   const [applications, { isLoading: applicationsLoading }] = useQuery(
     getApplicationsByInitiative,
     {
@@ -140,16 +151,16 @@ const TerminalWaitingPage: BlitzPage = () => {
   }, [activeUser?.id])
 
   const applicationCards = applications?.map((application, idx) => {
-    const onApplicantCardClick = () => {
-      setSelectedApplication(application)
-      setIsApplicantOpen(true)
-    }
-
     const applicationCardProps = {
       terminal,
       application,
-      onApplicantCardClick,
       roleOfActiveUser,
+      initiative: currentInitiative as Initiative,
+      setIsApplicantOpen: setIsApplicantOpen,
+      setIsInviteModalOpen: setIsInviteModalOpen,
+      setIsEndorseModalOpen: setIsEndorseModalOpen,
+      setSelectedApplication: setSelectedApplication,
+      canInvite,
     }
 
     return <ApplicantCard key={idx} {...applicationCardProps} />
@@ -193,6 +204,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           roleOfActiveUser={roleOfActiveUser?.data?.value}
           setIsInviteModalOpen={setIsInviteModalOpen}
           terminalData={terminal?.data}
+          canInvite={canInvite}
         />
       )}
       {selectedInitiativeLocalId && selectedInitiativeLocalId && selectedApplication?.account && (
@@ -201,7 +213,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           setIsEndorseModalOpen={setIsEndorseModalOpen}
           setIsSuccessModalOpen={setIsEndorseSuccessModalOpen}
           selectedUserToEndorse={selectedApplication?.account}
-          initiativeLocalId={selectedInitiativeLocalId}
+          initiativeId={currentInitiative?.id}
           terminal={terminal}
         />
       )}
@@ -230,7 +242,10 @@ const TerminalWaitingPage: BlitzPage = () => {
                     <Pill
                       key={idx}
                       active={initiative.localId === selectedInitiativeLocalId}
-                      onClick={() => setSelectedInitiativeLocalId(initiative.localId)}
+                      onClick={() => {
+                        setSelectedInitiativeLocalId(initiative.localId)
+                        refetchInviteDetails()
+                      }}
                     >
                       {`${initiative.data?.name?.toUpperCase()} (${initiative.applicationCount})`}
                     </Pill>

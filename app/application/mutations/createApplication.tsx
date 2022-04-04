@@ -2,7 +2,7 @@ import db from "db"
 import * as z from "zod"
 
 const CreateApplication = z.object({
-  url: z.string(),
+  urls: z.string().array(),
   entryDescription: z.string(),
   accountId: z.number(),
   initiativeId: z.number(),
@@ -14,7 +14,7 @@ export default async function createApplication(input: z.infer<typeof CreateAppl
   const payload = {
     data: {
       approved: false,
-      url: params.url,
+      urls: params.urls,
       entryDescription: params.entryDescription,
     },
     account: { connect: { id: params.accountId } },

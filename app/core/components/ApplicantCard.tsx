@@ -1,45 +1,63 @@
-import { Account } from "app/account/types"
+import { Dispatch, SetStateAction } from "react"
 import { Application } from "app/application/types"
-import Button from "../components/Button"
-import Card from "../components/Card"
 import ProfileMetadata from "../ProfileMetadata"
 import Tag from "../components/Tag"
 import { formatDate } from "../utils/formatDate"
 import useStore from "app/core/hooks/useStore"
-import { DEFAULT_NUMBER_OF_DECIMALS } from "app/core/utils/constants"
-import { useDecimals } from "app/core/contracts/contracts"
-import { useBalance } from "wagmi"
 import { Terminal } from "app/terminal/types"
+import { useQuery } from "blitz"
+import { Initiative } from "app/initiative/types"
+import getReferralsByApplication from "app/endorsements/queries/getReferralsByApplication"
+import hasUserEndorsedApplicant from "app/endorsements/queries/hasUserEndorsedApplicant"
 
 type ApplicantCardProps = {
   application: Application
   points?: number
-  onApplicantCardClick?: (user) => void
   roleOfActiveUser?: any
   terminal?: Terminal | null
+  initiative: Initiative
+  setIsApplicantOpen: Dispatch<SetStateAction<boolean>>
+  setIsInviteModalOpen: Dispatch<SetStateAction<boolean>>
+  setIsEndorseModalOpen: Dispatch<SetStateAction<boolean>>
+  setSelectedApplication: Dispatch<SetStateAction<Application>>
+  canInvite?: boolean
 }
 
 export const ApplicantCard = (props: ApplicantCardProps) => {
-  const { application, onApplicantCardClick, roleOfActiveUser, terminal } = props
-  const { account: applicant, createdAt, points, referrals } = application
-  const pointsSymbol = terminal?.data.contracts.symbols.points
+  const hoverButtonStyling =
+    "bg-tunnel-black text-magic-mint rounded w-40 border border-magic-mint hover:bg-wet-concrete p-1"
+  const {
+    application,
+    roleOfActiveUser,
+    initiative,
+    setIsInviteModalOpen,
+    setIsEndorseModalOpen,
+    setIsApplicantOpen,
+    setSelectedApplication,
+    canInvite = false,
+  } = props
+  const { account: applicant, createdAt } = application
+  const [referrals] = useQuery(getReferralsByApplication, {
+    initiativeId: initiative?.id,
+    endorseeId: applicant?.id,
+  })
 
   const activeUser = useStore((state) => state.activeUser)
-  const { decimals = DEFAULT_NUMBER_OF_DECIMALS } = useDecimals(
-    terminal?.data.contracts.addresses.endorsements
+
+  const [hasUserAlreadyEndorsedApplicant] = useQuery(
+    hasUserEndorsedApplicant,
+    {
+      initiativeId: initiative?.id,
+      endorseeId: applicant?.id,
+      endorserId: activeUser?.id as number,
+    },
+    { suspense: false, enabled: !!(initiative?.id && applicant?.id && activeUser?.id) }
   )
-  const [{ data: balanceData }] = useBalance({
-    addressOrName: activeUser?.address,
-    token: terminal?.data?.contracts?.addresses?.endorsements,
-    watch: false,
-    formatUnits: decimals,
-  })
-  const endorsementPoints = points * Math.pow(10, 0 - decimals)
+
   const canActiveUserEndorse =
     // if active user has a role or they have an endorsement balance (ex: friends of Station)
     // AND they're not endorsing themself, then they are allowed to endorse the applicant.
-    (!!roleOfActiveUser?.data?.value || !!parseFloat(balanceData?.formatted || "0")) &&
-    applicant?.address !== activeUser?.address
+    !!roleOfActiveUser?.data?.value && applicant?.address !== activeUser?.address
 
   const {
     address,
@@ -55,40 +73,31 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
       <div className="flex flex-1 align-right place-content-end content-right text-base">
         <div className="flex flex-row">
           {referrals?.length
-            ? referrals.slice(0, 4).map(
-                (
-                  {
-                    from: {
-                      data: { pfpURL },
-                    },
-                  },
-                  idx
-                ) => {
-                  const pfpStyling = "h-6 w-6 rounded-full border block border-marble-white"
-                  const nestedStyling = idx ? "ml-[-5px]" : ""
-                  if (idx === 3) {
-                    const additionalReferrals = referrals.length - 3
-                    return (
-                      <span
-                        key={idx}
-                        className={`bg-neon-blue text-[10px] text-center items-center ${pfpStyling} ${nestedStyling}`}
-                      >
-                        {additionalReferrals}+
-                      </span>
-                    )
-                  }
-                  let pfpBubble = pfpURL ? (
+            ? referrals.slice(0, 4).map(({ endorser }, idx) => {
+                const pfpStyling = "h-6 w-6 rounded-full border block border-marble-white"
+                const nestedStyling = idx ? "ml-[-5px]" : ""
+                if (idx === 3) {
+                  const additionalReferrals = referrals.length - 3
+                  return (
                     <span
                       key={idx}
-                      className={`bg-contain bg-clip-padding ${pfpStyling} ${nestedStyling}`}
-                      style={{ backgroundImage: `url(${pfpURL})` }}
-                    ></span>
-                  ) : (
-                    <span key={idx} className={`bg-concrete ${pfpStyling} ${nestedStyling}`}></span>
+                      className={`bg-neon-blue text-[10px] text-center items-center ${pfpStyling} ${nestedStyling}`}
+                    >
+                      {additionalReferrals}+
+                    </span>
                   )
-                  return pfpBubble
                 }
-              )
+                let pfpBubble = endorser?.data?.pfpURL ? (
+                  <span
+                    key={idx}
+                    className={`bg-contain bg-clip-padding ${pfpStyling} ${nestedStyling}`}
+                    style={{ backgroundImage: `url(${endorser?.data?.pfpURL})` }}
+                  ></span>
+                ) : (
+                  <span key={idx} className={`bg-concrete ${pfpStyling} ${nestedStyling}`}></span>
+                )
+                return pfpBubble
+              })
             : "N/A"}
         </div>
       </div>
@@ -96,7 +105,55 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
   )
 
   return (
-    <Card onClick={onApplicantCardClick}>
+    <div
+      className="border border-concrete p-1 pb-3 flex flex-col cursor-pointer h-full hover:border-marble-white relative group"
+      onClick={() => {
+        setSelectedApplication(application)
+        setIsApplicantOpen(true)
+      }}
+    >
+      <>
+        <div className="absolute h-full w-full bg-tunnel-black opacity-80 top-0 left-0 hidden group-hover:block"></div>
+        <div className="absolute h-full w-full top-0 left-0 flex-col items-center justify-center space-y-2 hidden group-hover:flex">
+          {activeUser && canActiveUserEndorse && !hasUserAlreadyEndorsedApplicant && (
+            <button
+              className={hoverButtonStyling}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setSelectedApplication(application)
+                setIsEndorseModalOpen(true)
+              }}
+            >
+              Endorse
+            </button>
+          )}
+          {canInvite && (
+            <button
+              className={hoverButtonStyling}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setSelectedApplication(application)
+                setIsInviteModalOpen(true)
+              }}
+            >
+              Add to Terminal
+            </button>
+          )}
+          <button
+            className={hoverButtonStyling}
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              setSelectedApplication(application)
+              setIsApplicantOpen(true)
+            }}
+          >
+            View
+          </button>
+        </div>
+      </>
       <ProfileMetadata
         {...{ pfpURL, name, ens, pronouns, role, address, verified, className: "mx-3 my-3" }}
       />
@@ -113,29 +170,12 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
         </div>
       </div>
       {referralPfps}
-      <div className="flex flex-row flex-1 mx-3">
-        <div className="flex-1 items-center justify-center text-base">
-          <div className="place-self-center mt-1 font-bold">Points</div>
-        </div>
-        {pointsSymbol && (
-          <div className="flex flex-1 align-right place-content-end content-right text-base">
-            {endorsementPoints ? `${endorsementPoints} ${pointsSymbol}` : `0 ${pointsSymbol}`}
-          </div>
-        )}
-      </div>
-      {activeUser && canActiveUserEndorse && onApplicantCardClick && (
-        <div className="flex flex-row flex-1 mx-2.5">
-          <Button secondary={true} onClick={onApplicantCardClick} className="w-full mt-3">
-            Endorse
-          </Button>
-        </div>
-      )}
       <div className="flex flex-row flex-1 mx-3 mt-3.5">
         <div className="flex-1 items-center justify-center text-xs text-concrete">
           {`SUBMITTED ON ${formatDate(createdAt)}`}
         </div>
       </div>
-    </Card>
+    </div>
   )
 }
 

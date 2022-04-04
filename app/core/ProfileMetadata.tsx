@@ -21,7 +21,7 @@ export const ProfileMetadata = ({
   address,
   pronouns,
   verified = false,
-  className,
+  className = "",
   large = false,
 }: ProfileMetadataProps) => {
   const pfpSize = large ? "h-[52px] w-[52px]" : "h-[40px] w-[40px]"
@@ -41,10 +41,10 @@ export const ProfileMetadata = ({
   )
 
   return (
-    <div className={`flex flex-row flex-auto content-center space-x-1 ${className}`}>
+    <div className={`flex content-center space-x-1 ${className}`}>
       <div className="flex-2/5 content-center align-middle mr-1">{profileImage}</div>
-      <div className="flex flex-col flex-1 content-center">
-        <div className="flex flex-row items-center flex-1 space-x-1">
+      <div className="flex flex-col content-center">
+        <div className="flex flex-row items-center space-x-1">
           <div className={`${large && "font-bold"} text-lg text-marble-white`}>{name}</div>
           {verified && (
             <div className="m-auto">
@@ -52,7 +52,7 @@ export const ProfileMetadata = ({
             </div>
           )}
         </div>
-        <div className="flex flex-row flex-1 text-sm text-concrete space-x-1 overflow-hidden">
+        <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
           <div className="w-max truncate">@{truncateString(ens || address)}</div>
         </div>
       </div>

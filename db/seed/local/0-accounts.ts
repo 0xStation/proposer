@@ -30,10 +30,22 @@ const kristen: CreateAccountParams = {
   discordId: "rie#9502",
 }
 
+const hardhat: CreateAccountParams = {
+  address: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  name: "hardhat",
+  bio: "local dev!",
+  skills: [],
+  timezone: "EST",
+  contactURL: "twitter.com",
+  coverURL: "",
+  pfpURL:
+    "https://user-images.githubusercontent.com/38736612/152036018-25f65c4d-a968-4c6c-b328-15958acdb649.png",
+}
+
 const chiyoko: CreateAccountParams = {
   address: "0x1E8f3C0286b4949e8eB1F5d705b49016dc84D288",
   name: "chiyoko",
-  bio: "a great movie star",
+  bio: "local dev!",
   skills: [],
   timezone: "EST",
   contactURL: "twitter.com",
@@ -56,7 +68,7 @@ const setsuko: CreateAccountParams = {
 
 const seed = async () => {
   console.log("Seeding Accounts")
-  const users = [kristen, chiyoko, setsuko]
+  const users = [kristen, chiyoko, setsuko, hardhat]
   for (const name in users) {
     const contributorData = users[name] as CreateAccountParams
     const account = await db.account.findUnique({

@@ -58,16 +58,25 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   return (
     <Modal
       title="Enter Station"
-      subtitle="Connect your wallet to enter Station and explore initiatives."
       open={isWalletOpen}
       toggle={setIsWalletOpen}
       banner={Banner}
       showTitle={true}
     >
+      <p className="text-lg text-center mt-4">
+        Connect your wallet to enter Station and explore initiatives.
+      </p>
+      <p className="text-lg text-center">
+        New to web3? Learn how to create a wallet{" "}
+        <a className="text-magic-mint" href="https://www.youtube.com/watch?v=OsRIHlr0_Iw">
+          here
+        </a>
+        .
+      </p>
       <div className="mt-8">
         <div className="flex flex-row space-x-3 mx-5 text-marble-white">
           <button
-            className="flex-1 border border-marble-white  rounded-md content-center"
+            className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete"
             onClick={async () => {
               // @ts-ignore
               await appConnect(metamaskWallet, "metamask")
@@ -83,7 +92,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
             </div>
           </button>
           <button
-            className="flex-1  border border-marble-white rounded-md content-center"
+            className="flex-1  border border-marble-white rounded-md content-center hover:bg-wet-concrete"
             onClick={async () => {
               // @ts-ignore
               await connect(walletConnect)
@@ -99,7 +108,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
             </div>
           </button>
           <button
-            className="flex-1 border border-marble-white rounded-md content-center"
+            className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete"
             onClick={async () => {
               // @ts-ignore
               await appConnect(coinbaseWallet, "coinbase")
