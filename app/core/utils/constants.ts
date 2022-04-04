@@ -19,15 +19,15 @@ export const LOCAL_STORAGE = {
 }
 
 export const APPLICATION_STATUS_MAP = {
-  APPLIED: {
-    status: "INTERESTED",
-    color: "bg-neon-carrot",
+  PREVIOUS_CONTRIBUTOR: {
+    status: "PREVIOUS CONTRIBUTOR",
+    color: "bg-torch-red",
   },
-  INVITED: {
-    status: "INVITED",
+  INTERESTED: {
+    status: "INTERESTED",
     color: "bg-neon-blue",
   },
-  CONTRIBUTOR: {
+  CONTRIBUTING: {
     status: "CONTRIBUTING",
     color: "bg-magic-mint",
   },
@@ -38,10 +38,9 @@ export enum EditPermissionTypes {
 }
 
 export enum AccountInitiativeStatus {
-  APPLIED = "APPLIED",
-  INVITED = "INVITED",
-  CONTRIBUTOR = "CONTRIBUTOR",
-  INACTIVE = "INACTIVE",
+  INTERESTED = "INTERESTED",
+  CONTRIBUTING = "CONTRIBUTING",
+  PREVIOUS_CONTRIBUTOR = "PREVIOUS_CONTRIBUTOR",
 }
 
 export const defaultTicketImageUrl: string =

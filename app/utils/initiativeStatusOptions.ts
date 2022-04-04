@@ -1,9 +1,9 @@
-export const OPEN_TO_SUBMISSIONS = "Open to submissions"
+export const OPEN_FOR_SUBMISSIONS = "Open to submissions"
 export const ACTIVE = "Active"
 export const INACTIVE = "Inactive"
 
 const InitiativeStatusOptions = [
-  { value: OPEN_TO_SUBMISSIONS, label: OPEN_TO_SUBMISSIONS },
+  { value: OPEN_FOR_SUBMISSIONS, label: OPEN_FOR_SUBMISSIONS },
   { value: ACTIVE, label: ACTIVE },
   { value: INACTIVE, label: INACTIVE },
 ]
@@ -14,7 +14,7 @@ const getInitiativeStatusOptionFromValue = (value) => {
 
 const getInitiativeStatusColor = (status) => {
   switch (status) {
-    case OPEN_TO_SUBMISSIONS:
+    case OPEN_FOR_SUBMISSIONS:
       return `neon-blue`
 
     case ACTIVE:

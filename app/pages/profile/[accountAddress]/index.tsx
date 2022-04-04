@@ -175,10 +175,10 @@ const ProfileHome: BlitzPage = () => {
                             key={index}
                             application={application}
                             onClick={() => {
-                              if (application.status === "APPLIED") {
+                              if (application.status === "INTERESTED") {
                                 setActiveApplication(application)
                                 setSliderOpen(true)
-                              } else if (application.status === "CONTRIBUTOR") {
+                              } else if (application.status === "CONTRIBUTING") {
                                 router.push(
                                   `/terminal/${application.initiative.terminal.handle}/initiative/${application.initiative.localId}?directedFrom=${DIRECTED_FROM.PROFILE}&address=${account.address}`
                                 )

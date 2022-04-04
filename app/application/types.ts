@@ -18,7 +18,7 @@ export type Application = {
   referrals: ApplicationReferral[]
 }
 
-export type ApplicationStatus = "APPLIED" | "INVITED" | "CONTRIBUTOR" | "INACTIVE"
+export type ApplicationStatus = "INTERESTED" | "CONTRIBUTING" | "PREVIOUS_CONTRIBUTOR"
 
 export type ApplicationSubgraphData = {
   points: number

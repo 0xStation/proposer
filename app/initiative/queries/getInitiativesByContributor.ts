@@ -13,7 +13,7 @@ export default async function getInitiativesByContributor(
   const data = GetInitiativesByContributor.parse(input)
 
   const accountInitiatives = await db.accountInitiative.findMany({
-    where: { accountId: data.accountId, status: "CONTRIBUTOR" },
+    where: { accountId: data.accountId, status: "CONTRIBUTING" },
     include: {
       initiative: true,
     },

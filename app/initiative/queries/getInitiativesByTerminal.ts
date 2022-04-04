@@ -29,9 +29,9 @@ export default async function getInitiativesByTerminal(
   return initiatives.map((i) => {
     return {
       ...i,
-      applicationCount: i.accounts.filter((a) => a.status == "APPLIED").length,
+      applicationCount: i.accounts.filter((a) => a.status == "INTERESTED").length,
       contributors: i.accounts
-        .filter((a) => a.status == "CONTRIBUTOR")
+        .filter((a) => a.status == "CONTRIBUTING")
         .map((a) => {
           return {
             ...a.account,
