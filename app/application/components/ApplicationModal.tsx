@@ -7,7 +7,7 @@ import useStore from "../../core/hooks/useStore"
 import { Initiative } from "../../initiative/types"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
 import Button from "app/core/components/Button"
-import { required, mustBeUrl, composeValidators } from "app/utils/validators"
+import { requiredField, mustBeUrl, composeValidators } from "app/utils/validators"
 
 export const ApplicationConfirmationModal = ({
   confirmationOpen,
@@ -109,15 +109,16 @@ const ApplicationModal = ({
                   <label htmlFor="url" className="text-marble-white">
                     Share a link to a proposal or a project you&apos;re proud of*
                   </label>
-                  <Field name="url[0]" validate={composeValidators(required, mustBeUrl)}>
+                  <Field name="url[0]" validate={composeValidators(requiredField, mustBeUrl)}>
                     {({ input, meta }) => (
                       <div>
                         <input
                           {...input}
                           type="text"
-                          placeholder="Share your best work"
+                          placeholder="e.g. github, mirror, notion, discord, discourse"
                           className="w-full border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete mb-2 mt-2"
                         />
+                        {/* this error shows up when the user focuses the field (meta.touched) */}
                         {meta.error && meta.touched && (
                           <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
                         )}
@@ -130,9 +131,10 @@ const ApplicationModal = ({
                         <input
                           {...input}
                           type="text"
-                          placeholder="How about another link?"
+                          placeholder="e.g. github, mirror, notion, discord, discourse"
                           className="w-full border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete mb-2"
                         />
+                        {/* this error shows up when the user focuses the field (meta.touched) */}
                         {meta.error && meta.touched && (
                           <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
                         )}
@@ -145,9 +147,10 @@ const ApplicationModal = ({
                         <input
                           {...input}
                           type="text"
-                          placeholder="More more!"
+                          placeholder="e.g. github, mirror, notion, discord, discourse"
                           className="w-full border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete"
                         />
+                        {/* this error shows up when the user focuses the field (meta.touched) */}
                         {meta.error && meta.touched && (
                           <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
                         )}
@@ -163,7 +166,7 @@ const ApplicationModal = ({
                       }`}
                     *
                   </label>
-                  <Field name="entryDescription" validate={required}>
+                  <Field name="entryDescription" validate={requiredField}>
                     {({ input, meta }) => (
                       <div>
                         <textarea
@@ -171,6 +174,7 @@ const ApplicationModal = ({
                           placeholder="Highlight your unique value in 3-5 sentences"
                           className="w-full mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete"
                         />
+                        {/* this error shows up when the user focuses the field (meta.touched) */}
                         {meta.error && meta.touched && (
                           <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
                         )}

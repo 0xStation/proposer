@@ -1,17 +1,21 @@
 import isURL from "validator/lib/isURL"
 
+// reducer that takes in an array of validators (functions) and returns the appropriate error
+// useful if you have a form field that has a few different validations (required field, must be number, etc)
+// example use case would look like
+// <Field name="name" validate={composeValidators(required, mustBeUrl)}>
 export const composeValidators =
   (...validators) =>
   (value) =>
     validators.reduce((error, validator) => error || validator(value), undefined)
 
-export const required = (value) => (value ? undefined : "This field is required.")
+export const requiredField = (value) => (value ? undefined : "This field is required.")
 export const mustBeUrl = (value) => {
   if (!value) {
     return undefined
   }
   let options = {
-    protocols: ["http", "https", "ftp"],
+    protocols: ["https"],
     require_tld: true,
     require_protocol: true,
     require_host: true,
@@ -25,6 +29,5 @@ export const mustBeUrl = (value) => {
   }
 
   const valid = isURL(value, options)
-  console.log(valid)
-  return valid ? undefined : "Not a valid url. Could you be missing www. or https://?"
+  return valid ? undefined : "Not a valid url. Example url: https://www.twitter.com"
 }
