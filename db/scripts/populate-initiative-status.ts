@@ -25,10 +25,7 @@ const seed = async () => {
       data: {
         data: {
           ...initiative.data,
-          status:
-            !initiative.data.status && openToSubmissions
-              ? StatusOptions.OPEN_FOR_SUBMISSIONS
-              : StatusOptions.ACTIVE,
+          status: openToSubmissions ? StatusOptions.OPEN_FOR_SUBMISSIONS : StatusOptions.ACTIVE,
         },
       },
     })
