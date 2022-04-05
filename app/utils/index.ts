@@ -1,5 +1,12 @@
 import { RouteUrlObject } from "blitz"
 
+export const genBaseUrl = () => {
+  if (window.location.hostname === "localhost") {
+    return "http://localhost:3000"
+  }
+  return `https://${window.location.hostname}`
+}
+
 export const genPathFromUrlObject = (route: RouteUrlObject) => {
   if (route.query) {
     let newPath = Object.keys(route.query).reduce((path, queryArg) => {
@@ -13,8 +20,8 @@ export const genPathFromUrlObject = (route: RouteUrlObject) => {
       return path.replace(`[${queryArg}]`, queries[queryArg])
     }, route.pathname)
 
-    return `${window.location.hostname}${newPath}`
+    return `${genBaseUrl()}${newPath}`
   }
 
-  return `${window.location.hostname}${route.pathname}`
+  return `${genBaseUrl()}${route.pathname}`
 }
