@@ -1,6 +1,6 @@
 import { Account } from "app/account/types"
 import { Link, RouteUrlObject, useRouter } from "blitz"
-import { genPathFromUrlObject } from "app/utils/genPathFromUrlObject"
+import { genPathFromUrlObject } from "app/utils"
 import { getInitiativeStatusColor } from "app/utils/initiativeStatusOptions"
 
 type InitiatveCardProps = {
