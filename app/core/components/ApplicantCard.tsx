@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, useEffect } from "react"
 import { Application } from "app/application/types"
 import ProfileMetadata from "../ProfileMetadata"
 import Tag from "../components/Tag"
@@ -21,6 +21,7 @@ type ApplicantCardProps = {
   setIsEndorseModalOpen: Dispatch<SetStateAction<boolean>>
   setSelectedApplication: Dispatch<SetStateAction<Application>>
   canInvite?: boolean
+  isEndorseSuccessModalOpen?: boolean
 }
 
 export const ApplicantCard = (props: ApplicantCardProps) => {
@@ -35,6 +36,7 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
     setIsApplicantOpen,
     setSelectedApplication,
     canInvite = false,
+    isEndorseSuccessModalOpen,
   } = props
   const { account: applicant, createdAt } = application
   const [referrals] = useQuery(getReferralsByApplication, {
@@ -44,15 +46,25 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
 
   const activeUser = useStore((state) => state.activeUser)
 
-  const [hasUserAlreadyEndorsedApplicant] = useQuery(
+  const [hasUserAlreadyEndorsedApplicant, { refetch: refetchHasUserAlreadyEndorsed }] = useQuery(
     hasUserEndorsedApplicant,
     {
       initiativeId: initiative?.id,
       endorseeId: applicant?.id,
       endorserId: activeUser?.id as number,
     },
-    { suspense: false, enabled: !!(initiative?.id && applicant?.id && activeUser?.id) }
+    {
+      suspense: false,
+      enabled: !!(initiative?.id && applicant?.id && activeUser?.id),
+    }
   )
+
+  useEffect(() => {
+    // If the endorse success modal is open, that means the user has already
+    // endorsed the applicant. Therefore, we want to use this state to refetch
+    // the correct endorsement permissions and hide the endorse button on hover.
+    refetchHasUserAlreadyEndorsed()
+  }, [isEndorseSuccessModalOpen])
 
   const canActiveUserEndorse =
     // if active user has a role or they have an endorsement balance (ex: friends of Station)

@@ -12,6 +12,7 @@ const EndorseModal = ({
   selectedUserToEndorse: contributor,
   initiativeId,
   terminal,
+  refetchApplications,
 }) => {
   const activeUser = useStore((state) => state.activeUser)
   const setShouldRefetchEndorsementPoints = useStore(
@@ -36,6 +37,7 @@ const EndorseModal = ({
     setEndorsementMessage("")
     setIsEndorseModalOpen(false)
     setShouldRefetchEndorsementPoints(true)
+    refetchApplications()
     // allow time for applicant modal to clean up
     // before opening the next modal and causing
     // a memory leak + scroll lock

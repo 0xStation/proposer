@@ -60,7 +60,6 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [selectedApplicantTicket, setSelectedApplicantTicket] = useState<Ticket | null>()
   const activeUser = useStore((state) => state.activeUser)
   const [roleOfActiveUser, setRoleOfActiveUser] = useState<Role | null>()
-  const [refreshApplications, setRefreshApplications] = useState<boolean>(false)
   const [initialPageLoading, setInitialPageLoading] = useState<boolean>(true)
   const [isApplicantOpen, setIsApplicantOpen] = useState(false)
   const { DIRECTED_FROM } = QUERY_PARAMETERS
@@ -104,7 +103,7 @@ const TerminalWaitingPage: BlitzPage = () => {
     }
   )
 
-  const [applications, { isLoading: applicationsLoading }] = useQuery(
+  const [applications, { isLoading: applicationsLoading, refetch: refetchApplications }] = useQuery(
     getApplicationsByInitiative,
     {
       referralGraphAddress: terminal?.data.contracts.addresses.referrals as string,
@@ -115,11 +114,10 @@ const TerminalWaitingPage: BlitzPage = () => {
     {
       suspense: false,
       enabled:
-        (!!terminal?.data.contracts.addresses.referrals &&
-          !!selectedInitiativeLocalId &&
-          !!currentInitiative?.id &&
-          !!terminal?.id) ||
-        refreshApplications,
+        !!terminal?.data.contracts.addresses.referrals &&
+        !!selectedInitiativeLocalId &&
+        !!currentInitiative?.id &&
+        !!terminal?.id,
       onSuccess: () => {
         setInitialPageLoading(false)
       },
@@ -161,6 +159,7 @@ const TerminalWaitingPage: BlitzPage = () => {
       setIsEndorseModalOpen: setIsEndorseModalOpen,
       setSelectedApplication: setSelectedApplication,
       canInvite,
+      isEndorseSuccessModalOpen,
     }
 
     return <ApplicantCard key={idx} {...applicationCardProps} />
@@ -215,6 +214,7 @@ const TerminalWaitingPage: BlitzPage = () => {
           selectedUserToEndorse={selectedApplication?.account}
           initiativeId={currentInitiative?.id}
           terminal={terminal}
+          refetchApplications={refetchApplications}
         />
       )}
       <EndorseSuccessModal
@@ -228,7 +228,7 @@ const TerminalWaitingPage: BlitzPage = () => {
         isInviteModalOpen={isInviteModalOpen}
         setIsInviteModalOpen={setIsInviteModalOpen}
         applicantTicket={selectedApplicantTicket}
-        setRefreshApplications={setRefreshApplications}
+        refetchApplications={refetchApplications}
       />
       <div className="flex flex-col space-y-10">
         {initiatives && initiatives?.filter((initiative) => initiative?.applicationCount).length ? (
