@@ -78,7 +78,8 @@ const TerminalWaitingPage: BlitzPage = () => {
       onSuccess: (initiatives) => {
         if (
           Array.isArray(initiatives) &&
-          initiatives?.filter((initiative) => initiative?.applicationCount).length
+          initiatives?.filter((initiative) => initiative?.applicationCount).length &&
+          !selectedInitiativeLocalId
         ) {
           const firstInitiative = initiatives.find((init) => init.applicationCount !== 0)
           setSelectedInitiativeLocalId(firstInitiative?.localId)
