@@ -10,7 +10,7 @@ const getInitiativeStatusOptionFromValue = (value) => {
   return InitiativeStatusOptions.find((is) => is.value === value)
 }
 
-const getInitiativeStatusColor = (status) => {
+const getInitiativeStatusColor = (status: string) => {
   switch (status) {
     case StatusOptions.OPEN_FOR_SUBMISSIONS:
       return `neon-blue`

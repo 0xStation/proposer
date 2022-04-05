@@ -31,7 +31,7 @@ export type Initiative = {
 }
 
 export enum StatusOptions {
-  OPEN_FOR_SUBMISSIONS = "OPEN_FOR_SUBMISSIONS",
+  OPEN_FOR_SUBMISSIONS = "OPEN FOR SUBMISSIONS",
   ACTIVE = "ACTIVE",
   INACTIVE = "INACTIVE",
 }
