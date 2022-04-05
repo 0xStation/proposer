@@ -328,7 +328,7 @@ const Project: BlitzPage = () => {
                       handleSubmitInterestClick()
                     }}
                   >
-                    Submit Interest
+                    Submit a Proposal
                   </Button>
                 )}
               </div>
