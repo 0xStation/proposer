@@ -42,6 +42,7 @@
     "formidable-serverless": "1.1.1",
     "graphql": "16.2.0",
     "graphql-request": "3.7.0",
+    "immer": "9.0.12",
     "jmespath": "0.16.0",
     "keccak": "3.0.2",
     "react": "17.0.2",
