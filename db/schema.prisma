@@ -79,7 +79,7 @@ model AccountInitiative {
   initiative   Initiative              @relation(fields: [initiativeId], references: [id])
   initiativeId Int
   createdAt    DateTime                @default(now())
-  status       AccountInitiativeStatus @default(INTERESTED)
+  status       AccountInitiativeStatus @default(APPLIED)
   data         Json?
 
   @@id([accountId, initiativeId])
@@ -124,6 +124,10 @@ model Endorsement {
 }
 
 enum AccountInitiativeStatus {
+  APPLIED
+  INVITED
+  CONTRIBUTOR
+  INACTIVE
   INTERESTED
   CONTRIBUTING
   PREVIOUSLY_CONTRIBUTED
