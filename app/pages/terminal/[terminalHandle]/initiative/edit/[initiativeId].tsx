@@ -14,7 +14,7 @@ const TerminalInitiativeEditPage: BlitzPage = () => {
   const initiativeLocalId = useParam("initiativeId", "number") as number
   const activeUser = useStore((state) => state.activeUser)
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
-  const [initiative] = useQuery(
+  const [initiative, { refetch }] = useQuery(
     getInitiativeByLocalId,
     {
       terminalId: terminal?.id,
@@ -45,18 +45,21 @@ const TerminalInitiativeEditPage: BlitzPage = () => {
           </div>
           <h1 className="text-marble-white text-4xl text-center pt-12">Edit Initiative</h1>
           <div className="mx-auto max-w-2xl pb-12 mt-9">
-            <InitiativeForm
-              initiative={initiative}
-              isEdit={true}
-              onSuccess={() => {
-                router.push(
-                  Routes.Project({
-                    terminalHandle,
-                    initiativeId: initiativeLocalId,
-                  })
-                )
-              }}
-            />
+            {initiative && (
+              <InitiativeForm
+                initiative={initiative}
+                isEdit={true}
+                onSuccess={() => {
+                  refetch()
+                  router.push(
+                    Routes.Project({
+                      terminalHandle,
+                      initiativeId: initiativeLocalId,
+                    })
+                  )
+                }}
+              />
+            )}
           </div>
         </div>
       )}

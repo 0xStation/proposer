@@ -15,9 +15,9 @@ const formatErrorMessage = (formattedError) => {
 }
 
 const UpdateInitiative = z.object({
+  about: z.any(),
   bannerURL: z.string(),
   commitment: z.string(),
-  contributeText: z.union([z.string(), z.string().array()]).optional(),
   existingSkills: z
     .object({
       value: z.string(),
@@ -34,6 +34,7 @@ const UpdateInitiative = z.object({
     })
     .array()
     .optional(),
+  link: z.string().optional(),
   name: z.string(),
   oneLiner: z.string(),
   rewardText: z.union([z.string(), z.string().array()]),
@@ -43,6 +44,10 @@ const UpdateInitiative = z.object({
       label: z.string(),
     })
     .array(),
+  status: z.object({
+    value: z.string(),
+    label: z.string(),
+  }),
 })
 
 export default async function updateInitiative(input: z.infer<typeof UpdateInitiative>) {
@@ -73,14 +78,16 @@ export default async function updateInitiative(input: z.infer<typeof UpdateIniti
 
   const payload = {
     data: {
+      about: params.about,
       bannerURL: params.bannerURL,
       commitment: params.commitment,
-      contributeText: params.contributeText,
       isAcceptingApplications: params.isAcceptingApplications,
       links: params.links,
+      link: params.link,
       name: params.name,
       oneLiner: params.oneLiner,
       rewardText: params.rewardText,
+      status: params.status.value,
     },
     skills: {
       delete: removedSkills.map((skill) => {

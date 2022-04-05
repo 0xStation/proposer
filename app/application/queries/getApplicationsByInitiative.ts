@@ -107,7 +107,7 @@ export default async function getApplicationsByInitiative(
 
   // get all applications for the initiative
   const applications = await db.accountInitiative.findMany({
-    where: { initiativeId: initiativeId, status: "APPLIED" },
+    where: { initiativeId: initiativeId, status: "INTERESTED" },
     include: {
       account: {
         include: {

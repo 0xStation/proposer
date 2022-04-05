@@ -43,7 +43,11 @@ const TerminalInitiativePage: BlitzPage = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {sortedInitiatives?.map?.(
               (
-                { localId, contributors, data: { name, oneLiner, isAcceptingApplications } },
+                {
+                  localId,
+                  contributors,
+                  data: { name, oneLiner, isAcceptingApplications, status },
+                },
                 idx
               ) => {
                 return (
@@ -59,6 +63,7 @@ const TerminalInitiativePage: BlitzPage = () => {
                       initiativeId: localId,
                     })}
                     editable={userCanEdit}
+                    status={status}
                     title={name || "Title"}
                     oneLiner={oneLiner || "One Liner"}
                     contributors={contributors}

@@ -61,7 +61,7 @@ export default async function getInitiativeByLocalId(
     data: initiative.data as InitiativeMetadata,
     skills: initiative.skills.map((s) => s.skill),
     contributors: initiative.accounts
-      .filter((a) => a.status == "CONTRIBUTOR")
+      .filter((a) => a.status == "CONTRIBUTING")
       .map((a) => {
         return {
           ...a.account,

@@ -30,7 +30,7 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
       },
     },
     data: {
-      status: "CONTRIBUTOR",
+      status: "CONTRIBUTING",
     },
   })
 
