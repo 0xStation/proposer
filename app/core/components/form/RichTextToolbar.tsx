@@ -43,6 +43,7 @@ const RichTextToolbar = () => {
   )
 }
 
+// creates a block node in the editor
 const toggleBlock = (editor, format) => {
   const isActive = isBlockActive(editor, format)
   const isList = LIST_TYPES.includes(format)
@@ -70,6 +71,7 @@ const isMarkActive = (editor, format) => {
   return marks ? marks[format] === true : false
 }
 
+// creates a markdown node in the editor
 const toggleMark = (editor, format) => {
   const isActive = isMarkActive(editor, format)
 
@@ -108,6 +110,7 @@ const Button = ({ isActive, className = "", children, ...props }) => {
   )
 }
 
+// markdown button
 const MarkButton = ({ format, icon }) => {
   const editor = useSlate()
   return (
@@ -123,6 +126,7 @@ const MarkButton = ({ format, icon }) => {
   )
 }
 
+// block button
 const BlockButton = ({ format, icon }) => {
   const editor = useSlate()
   return (

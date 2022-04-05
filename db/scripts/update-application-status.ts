@@ -20,7 +20,7 @@ const seed = async () => {
         : //@ts-ignore
         status === "APPLIED"
         ? "INTERESTED"
-        : "PREVIOUS_CONTRIBUTOR"
+        : "PREVIOUSLY_CONTRIBUTED"
 
     await db.accountInitiative.update({
       where: {

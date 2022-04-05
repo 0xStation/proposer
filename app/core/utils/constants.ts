@@ -19,8 +19,8 @@ export const LOCAL_STORAGE = {
 }
 
 export const APPLICATION_STATUS_MAP = {
-  PREVIOUS_CONTRIBUTOR: {
-    status: "PREVIOUS CONTRIBUTOR",
+  PREVIOUSLY_CONTRIBUTED: {
+    status: "PREVIOUSLY CONTRIBUTED",
     color: "bg-torch-red",
   },
   INTERESTED: {
@@ -40,7 +40,7 @@ export enum EditPermissionTypes {
 export enum AccountInitiativeStatus {
   INTERESTED = "INTERESTED",
   CONTRIBUTING = "CONTRIBUTING",
-  PREVIOUS_CONTRIBUTOR = "PREVIOUS_CONTRIBUTOR",
+  PREVIOUSLY_CONTRIBUTED = "PREVIOUSLY_CONTRIBUTED",
 }
 
 export const defaultTicketImageUrl: string =

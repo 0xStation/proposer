@@ -140,7 +140,7 @@ const InitiativeForm = ({
                 </div>
               </div>
               <div className="flex flex-col col-span-2">
-                <label htmlFor="demo" className="text-marble-white text-base font-bold mb-1">
+                <label htmlFor="description" className="text-marble-white text-base font-bold mb-1">
                   Description
                 </label>
                 <div>

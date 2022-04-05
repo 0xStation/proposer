@@ -126,5 +126,5 @@ model Endorsement {
 enum AccountInitiativeStatus {
   INTERESTED
   CONTRIBUTING
-  PREVIOUS_CONTRIBUTOR
+  PREVIOUSLY_CONTRIBUTED
 }

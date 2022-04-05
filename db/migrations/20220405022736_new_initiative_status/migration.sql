@@ -6,7 +6,7 @@
 */
 -- AlterEnum
 BEGIN;
-CREATE TYPE "AccountInitiativeStatus_new" AS ENUM ('INTERESTED', 'CONTRIBUTING', 'PREVIOUS_CONTRIBUTOR');
+CREATE TYPE "AccountInitiativeStatus_new" AS ENUM ('INTERESTED', 'CONTRIBUTING', 'PREVIOUSLY_CONTRIBUTED');
 ALTER TABLE "AccountInitiative" ALTER COLUMN "status" DROP DEFAULT;
 ALTER TABLE "AccountInitiative" ALTER COLUMN "status" TYPE "AccountInitiativeStatus_new" USING ("status"::text::"AccountInitiativeStatus_new");
 ALTER TYPE "AccountInitiativeStatus" RENAME TO "AccountInitiativeStatus_old";
