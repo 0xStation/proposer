@@ -80,8 +80,12 @@ const TerminalWaitingPage: BlitzPage = () => {
           Array.isArray(initiatives) &&
           initiatives?.filter((initiative) => initiative?.applicationCount).length
         ) {
-          const firstInitiative = initiatives.find((init) => init.applicationCount !== 0)
-          setSelectedInitiativeLocalId(firstInitiative?.localId)
+          if (selectedInitiativeLocalId) {
+            setSelectedInitiativeLocalId(selectedInitiativeLocalId)
+          } else {
+            const firstInitiative = initiatives.find((init) => init.applicationCount !== 0)
+            setSelectedInitiativeLocalId(firstInitiative?.localId)
+          }
         } else {
           setInitialPageLoading(false)
         }
