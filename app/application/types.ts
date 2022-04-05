@@ -3,6 +3,7 @@ import { Account } from "app/account/types"
 export type ApplicationMetadata = {
   entryDescription?: string
   url?: string
+  urls?: string[]
 }
 
 export type ApplicationReferral = {
@@ -18,7 +19,7 @@ export type Application = {
   referrals: ApplicationReferral[]
 }
 
-export type ApplicationStatus = "APPLIED" | "INVITED" | "CONTRIBUTOR" | "INACTIVE"
+export type ApplicationStatus = "INTERESTED" | "CONTRIBUTING" | "PREVIOUSLY_CONTRIBUTED"
 
 export type ApplicationSubgraphData = {
   points: number

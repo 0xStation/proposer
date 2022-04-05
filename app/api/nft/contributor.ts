@@ -70,7 +70,7 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
       initiatives: {
         include: {
           accounts: {
-            where: { accountId: account.id, status: AccountInitiativeStatus.CONTRIBUTOR },
+            where: { accountId: account.id, status: AccountInitiativeStatus.CONTRIBUTING },
           },
         },
       },

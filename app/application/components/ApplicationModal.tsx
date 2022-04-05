@@ -5,8 +5,10 @@ import Modal from "../../core/components/Modal"
 import createApplication from "../mutations/createApplication"
 import useStore from "../../core/hooks/useStore"
 import { Initiative } from "../../initiative/types"
+import { sendNewApplicationNotification } from "app/utils/sendDiscordNotification"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
 import Button from "app/core/components/Button"
+import { requiredField, mustBeUrl, composeValidators } from "app/utils/validators"
 
 export const ApplicationConfirmationModal = ({
   confirmationOpen,
@@ -25,7 +27,7 @@ export const ApplicationConfirmationModal = ({
         You won&apos;t be able to edit your submission until the first day of next month. Would you
         like to send in your submission now?
       </p>
-      <Button className="px-5" onClick={() => onClick({ url: urlField, entryDescription })}>
+      <Button className="px-5" onClick={() => onClick({ urls: urlField, entryDescription })}>
         Confirm
       </Button>
     </Modal>
@@ -36,12 +38,14 @@ const ApplicationModal = ({
   isOpen,
   setIsOpen,
   initiative,
+  discordWebhookUrl,
 }: {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
   initiative: Initiative
+  discordWebhookUrl?: string
 }) => {
-  const [urlField, setUrlField] = useState<string>("")
+  const [urlField, setUrlField] = useState<string[]>([])
   const [entryDescriptionField, setEntryDescriptionField] = useState<string>("")
   const [confirmationOpen, setIsConfirmationOpen] = useState<boolean>(false)
   const { DIRECTED_FROM } = QUERY_PARAMETERS
@@ -88,6 +92,13 @@ const ApplicationModal = ({
               initiativeId: initiative.id,
               accountId: activeUser.id,
             })
+            // send message to terminal's #station-notifications discord channel if applicable
+            await sendNewApplicationNotification(
+              initiative.data.name,
+              activeUser.data.name,
+              activeUser.address,
+              discordWebhookUrl
+            )
           } catch (error) {
             alert("Error applying.")
           }
@@ -95,7 +106,7 @@ const ApplicationModal = ({
       />
       <div className="mt-8 mx-2">
         <Form
-          onSubmit={async (values: { url: string; entryDescription: string }) => {
+          onSubmit={async (values: { url: string[]; entryDescription: string }) => {
             const { url, entryDescription } = values
             setUrlField(url)
             setEntryDescriptionField(entryDescription)
@@ -108,12 +119,54 @@ const ApplicationModal = ({
                   <label htmlFor="url" className="text-marble-white">
                     Share a link to a proposal or a project you&apos;re proud of*
                   </label>
-                  <Field
-                    component="input"
-                    name="url"
-                    placeholder="Share your best work"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
-                  />
+                  <Field name="url[0]" validate={composeValidators(requiredField, mustBeUrl)}>
+                    {({ input, meta }) => (
+                      <div>
+                        <input
+                          {...input}
+                          type="text"
+                          placeholder="e.g. github, mirror, notion, discord, discourse"
+                          className="w-full border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete mb-2 mt-2"
+                        />
+                        {/* this error shows up when the user focuses the field (meta.touched) */}
+                        {meta.error && meta.touched && (
+                          <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
+                        )}
+                      </div>
+                    )}
+                  </Field>
+                  <Field name="url[1]" validate={mustBeUrl}>
+                    {({ input, meta }) => (
+                      <div>
+                        <input
+                          {...input}
+                          type="text"
+                          placeholder="e.g. github, mirror, notion, discord, discourse"
+                          className="w-full border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete mb-2"
+                        />
+                        {/* this error shows up when the user focuses the field (meta.touched) */}
+                        {meta.error && meta.touched && (
+                          <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
+                        )}
+                      </div>
+                    )}
+                  </Field>
+                  <Field name="url[2]" validate={mustBeUrl}>
+                    {({ input, meta }) => (
+                      <div>
+                        <input
+                          {...input}
+                          type="text"
+                          placeholder="e.g. github, mirror, notion, discord, discourse"
+                          className="w-full border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete"
+                        />
+                        {/* this error shows up when the user focuses the field (meta.touched) */}
+                        {meta.error && meta.touched && (
+                          <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
+                        )}
+                      </div>
+                    )}
+                  </Field>
                 </div>
                 <div className="flex flex-col col-span-2 mt-4">
                   <label htmlFor="entryDescription" className="text-marble-white">
@@ -123,12 +176,21 @@ const ApplicationModal = ({
                       }`}
                     *
                   </label>
-                  <Field
-                    component="textarea"
-                    name="entryDescription"
-                    placeholder="Highlight your unique value in 3-5 sentences"
-                    className="mt-1 border border-concrete bg-tunnel-black text-marble-white p-2"
-                  />
+                  <Field name="entryDescription" validate={requiredField}>
+                    {({ input, meta }) => (
+                      <div>
+                        <textarea
+                          {...input}
+                          placeholder="Highlight your unique value in 3-5 sentences"
+                          className="w-full mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 placeholder:text-concrete"
+                        />
+                        {/* this error shows up when the user focuses the field (meta.touched) */}
+                        {meta.error && meta.touched && (
+                          <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
+                        )}
+                      </div>
+                    )}
+                  </Field>
                 </div>
               </div>
               <button

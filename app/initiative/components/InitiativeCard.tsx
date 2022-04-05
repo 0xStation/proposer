@@ -1,6 +1,7 @@
 import { Account } from "app/account/types"
 import { Link, RouteUrlObject, useRouter } from "blitz"
 import { genPathFromUrlObject } from "app/utils/genPathFromUrlObject"
+import { getInitiativeStatusColor } from "app/utils/initiativeStatusOptions"
 
 type InitiatveCardProps = {
   title: string
@@ -8,6 +9,7 @@ type InitiatveCardProps = {
   contributors: Account[] | undefined
   isAcceptingApplications: boolean
   editable: boolean
+  status: string
   viewLink: RouteUrlObject
   editLink: RouteUrlObject
 }
@@ -16,7 +18,7 @@ const InitiativeCard = ({
   title,
   oneLiner,
   contributors,
-  isAcceptingApplications,
+  status,
   editable,
   viewLink,
   editLink,
@@ -35,9 +37,7 @@ const InitiativeCard = ({
           <div className="absolute h-full w-full bg-tunnel-black opacity-80 top-0 left-0 hidden group-hover:block"></div>
           <div className="absolute h-full w-full top-0 left-0 flex-col items-center justify-center space-y-2 hidden group-hover:flex">
             <Link href={viewLink}>
-              <button className="bg-tunnel-black text-marble-white border border-marble-white hover:bg-wet-concrete rounded w-36 p-1">
-                View
-              </button>
+              <button className={buttonStyles}>View</button>
             </Link>
             <button
               className={buttonStyles}
@@ -65,7 +65,15 @@ const InitiativeCard = ({
           </div>
         </>
       )}
-      <h3 className="text-marble-white text-2xl">{title}</h3>
+      <div className="flex flex-row items-center">
+        <span
+          className={`h-2 w-2 block rounded-full mr-2 bg-${getInitiativeStatusColor(status)}`}
+        />
+        <span className="text-center text-marble-white uppercase text-xs tracking-wide">
+          {status}
+        </span>
+      </div>
+      <h3 className="text-marble-white text-2xl mt-2">{title}</h3>
       <p className="text-marble-white text-base mt-2 grow">{oneLiner}</p>
       <div className="flex flex-row space-x-3">
         <div className="mt-8 flex flex-row flex-auto">
@@ -100,11 +108,6 @@ const InitiativeCard = ({
               })
             : ""}
         </div>
-        {isAcceptingApplications && (
-          <div className="flex-auto grid place-content-end">
-            <span className="text-neon-blue text-xs">OPEN FOR SUBMISSIONS</span>
-          </div>
-        )}
       </div>
     </div>
   )

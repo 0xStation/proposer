@@ -7,6 +7,7 @@ const seed = async () => {
   await db.accountSkill.deleteMany({})
   await db.accountTerminal.deleteMany({})
   await db.role.deleteMany({})
+  await db.endorsement.deleteMany({})
   await db.skill.deleteMany({})
   await db.initiative.deleteMany({})
   await db.terminal.deleteMany({})

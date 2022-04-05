@@ -114,23 +114,29 @@ const ApplicationDrawer = ({ isOpen, setIsOpen, application }) => {
                             {application?.data?.entryDescription}
                           </span>
                         </div>
-                        <div className="flex flex-col border-b border-concrete pb-8 mt-8">
-                          <span className="text-base font-bold text-marble-white">Submission</span>
-                          <a
-                            className="mt-2 text-base text-magic-mint cursor-pointer hover:underline"
-                            href={application?.data?.url}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            {application?.data?.url}
-                          </a>
-                        </div>
+                        {application.data.urls && (
+                          <div className="flex flex-col border-b border-concrete pb-8 mt-8">
+                            <span className="text-base font-bold text-marble-white">
+                              Submission
+                            </span>
+                            {application.data.urls.map((url, idx) => {
+                              return (
+                                <a
+                                  key={idx}
+                                  className="mt-2 text-base text-magic-mint cursor-pointer hover:underline"
+                                  href={url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  {url}
+                                </a>
+                              )
+                            })}
+                          </div>
+                        )}
                         <div className="flex flew-row pt-6 pb-3 space-x-64">
                           <span className="flex-col text-base font-bold text-marble-white">
                             Endorsers ({referrals?.length ? referrals.length : 0})
-                          </span>
-                          <span className="flex-col text-base font-bold text-marble-white">
-                            Points ({totalEndorsementPoints || 0})
                           </span>
                         </div>
                         {referrals?.map?.(({ endorser: account, endorsementsGiven }, index) => (

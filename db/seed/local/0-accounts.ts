@@ -26,7 +26,7 @@ const kristen: CreateAccountParams = {
   timezone: "PST",
   contactURL: "twitter.com",
   coverURL: "",
-  pfpURL: "https://pbs.twimg.com/profile_images/1480639057914855424/LiE4wCe2_400x400.jpg",
+  pfpURL: "https://pbs.twimg.com/profile_images/1504696320509964292/ERRqUjIa_400x400.jpg",
   discordId: "rie#9502",
 }
 

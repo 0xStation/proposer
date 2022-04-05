@@ -19,8 +19,8 @@ export const InviteModal = ({
   isInviteModalOpen,
   setIsInviteModalOpen,
   applicantTicket,
-  refreshApplications,
   selectedApplicationHasNft,
+  refetchApplications,
 }) => {
   const [explorerLink, setExplorerLink] = useState<string>()
   const [mintMessage, setMintMessage] = useState<string>("")
@@ -82,7 +82,7 @@ export const InviteModal = ({
     setInviteSuccessful(true)
 
     // Remove application from waiting room when applicant is invited.
-    refreshApplications()
+    refetchApplications()
   }
 
   const handleNewMemberInviteClick = async () => {
@@ -150,7 +150,7 @@ export const InviteModal = ({
       setInviteSuccessful(true)
 
       // Refetches applications from waiting room when applicant is invited.
-      refreshApplications()
+      refetchApplications()
     }
   }
 

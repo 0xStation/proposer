@@ -61,7 +61,7 @@ const seed = async () => {
         continue
       }
 
-      let status = applicants[name] ? "APPLIED" : "CONTRIBUTOR"
+      let status = applicants[name] ? "INTERESTED" : "CONTRIBUTING"
       await db.accountInitiative.create({
         data: {
           accountId: account.id,
