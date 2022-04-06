@@ -4,7 +4,7 @@ import { useMutation } from "blitz"
 import updateInitiative from "../mutations/updateInitiative"
 import MultiSelect from "app/core/components/form/MultiSelect"
 import Select from "app/core/components/form/Select"
-import RichTextarea from "app/core/components/form/RichTextarea"
+import Editor from "app/core/components/form/Editor"
 import {
   InitiativeStatusOptions,
   getInitiativeStatusOptionFromValue,
@@ -144,9 +144,10 @@ const InitiativeForm = ({
                   Description
                 </label>
                 <div>
-                  <RichTextarea onChange={setAbout} initialValue={initiative?.data.about} />
+                  <Editor onChange={setAbout} initialValue={initiative?.data.about} />
                 </div>
               </div>
+
               <div className="flex flex-col col-span-2">
                 <label htmlFor="skills" className="text-marble-white text-base font-bold">
                   Skills*
