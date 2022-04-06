@@ -45,7 +45,6 @@
     "immer": "9.0.12",
     "jmespath": "0.16.0",
     "keccak": "3.0.2",
-    "next-remove-imports": "1.0.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-dropzone": "11.5.1",
