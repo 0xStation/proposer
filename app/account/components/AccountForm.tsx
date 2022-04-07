@@ -12,7 +12,6 @@ import { TimezoneOptions, getTimezoneOptionFromValue } from "app/utils/timezoneO
 import UploadIcon from "app/core/icons/UploadIcon"
 import { Account } from "app/account/types"
 import { toTitleCase } from "app/core/utils/titleCase"
-import { configOptions } from "final-form"
 
 interface ApplicationParams {
   name: string
@@ -130,9 +129,6 @@ const AccountForm = ({
   const [pfpURL, setPfpURL] = useState("")
   const activeUser = useStore((state) => state.activeUser)
   const setActiveUser = useStore((state) => state.setActiveUser)
-
-  console.log("coverURL", coverURL)
-  console.log("pfpURL", pfpURL)
 
   let existingActiveUserParams = {
     ens: activeUser?.data?.ens,
