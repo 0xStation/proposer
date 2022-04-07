@@ -279,7 +279,7 @@ const Project: BlitzPage = () => {
                 </div>
               )}
               <div className="text-marble-white flex flex-col space-y-8">
-                {initiative && initiative.data.rewardText && (
+                {initiative && initiative.data.rewardText && initiative.data.rewardText.length > 0 && (
                   <div className="space-y-2">
                     <span className="text-2xl">Rewards</span>
                     <div className="flex flex-col">
