@@ -18,6 +18,7 @@ import { formatDate } from "app/core/utils/formatDate"
 import Button from "app/core/components/Button"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
 import { getInitiativeStatusColor } from "app/utils/initiativeStatusOptions"
+import ReadOnlyTextArea from "app/core/components/form/ReadonlyTextarea"
 
 const Project: BlitzPage = () => {
   const [hasApplied, setHasApplied] = useState(false)
@@ -193,7 +194,7 @@ const Project: BlitzPage = () => {
                 )}
               </div>
               {initiative?.data.about ? (
-                <ReadonlyTextarea value={initiative.data.about} />
+                <ReadOnlyTextArea value={initiative.data.about} />
               ) : (
                 <div className="flex flex-col space-y-3">
                   {initiative?.data.contributeText?.map?.((item, index) => {
