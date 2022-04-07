@@ -17,7 +17,7 @@ const formatErrorMessage = (formattedError) => {
 const UpdateInitiative = z.object({
   about: z.any(),
   bannerURL: z.string(),
-  commitment: z.string(),
+  commitment: z.string().optional(),
   existingSkills: z
     .object({
       value: z.string(),
@@ -60,9 +60,9 @@ export default async function updateInitiative(input: z.infer<typeof UpdateIniti
   }
 
   const params = response.data
-  const existingInitiative = await db.initiative.findUnique({
+  const existingInitiative = (await db.initiative.findUnique({
     where: { id: params.id },
-  })
+  })) as Initiative
 
   if (!existingInitiative) {
     throw new Error("cannot update an initiative that does not exist")
@@ -78,6 +78,7 @@ export default async function updateInitiative(input: z.infer<typeof UpdateIniti
 
   const payload = {
     data: {
+      ...existingInitiative.data,
       about: params.about,
       bannerURL: params.bannerURL,
       commitment: params.commitment,

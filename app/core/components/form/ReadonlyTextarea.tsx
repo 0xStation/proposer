@@ -52,7 +52,7 @@ const ReadonlyTextarea = ({ value }: { value: CustomElement[] }) => {
         readOnly
         renderElement={renderElement}
         renderLeaf={renderLeaf}
-        className="prose text-marble-white prose-headings:text-marble-white  prose-strong:text-marble-white prose-code:text-marble-white prose-blockquote:text-marble-white prose-headings:m-0 prose-p:m-0 prose-blockquote:m-0 prose-a:text-magic-mint prose-a:text-underline"
+        className="prose text-marble-white prose-headings:text-marble-white  prose-strong:text-marble-white prose-code:text-marble-white prose-blockquote:text-marble-white prose-headings:m-0 prose-p:m-0 prose-blockquote:m-0 max-w-none prose-a:text-magic-mint prose-a:text-underline"
       />
     </Slate>
   )
