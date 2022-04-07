@@ -1,4 +1,4 @@
-import db from "../index"
+import db from "../../index"
 import { Initiative } from "app/initiative/types"
 
 // blitz db seed -f db/scripts/populate-initiative-link.ts
