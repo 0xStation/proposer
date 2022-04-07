@@ -1,5 +1,5 @@
 import generateTicketVisual from "app/ticket/mutations/generateTicketVisual"
-import db from "../index"
+import db from "../../index"
 import { Terminal } from "app/terminal/types"
 import { Account } from "app/account/types"
 import { Role } from "app/role/types"

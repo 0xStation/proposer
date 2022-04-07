@@ -192,8 +192,8 @@ const Project: BlitzPage = () => {
                   <img src={initiative.data.bannerURL} alt="Project banner image." />
                 )}
               </div>
-              {/* {initiative?.data.about && <ReadonlyTextarea value={initiative.data.about} />} */}
-              <div className="flex flex-col space-y-3">
+              {initiative?.data.about && <ReadonlyTextarea value={initiative.data.about} />}
+              {/* <div className="flex flex-col space-y-3">
                 {initiative &&
                   initiative.data.contributeText?.map?.((item, index) => {
                     return (
@@ -202,7 +202,7 @@ const Project: BlitzPage = () => {
                       </span>
                     )
                   })}
-              </div>
+              </div> */}
               {results.length > 0 && (
                 <div className="space-y-4">
                   <div className="flex flex-row">

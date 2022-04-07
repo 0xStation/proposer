@@ -1,4 +1,4 @@
-import db, { AccountInitiativeStatus } from "../index"
+import db, { AccountInitiativeStatus } from "../../index"
 
 // blitz db seed -f db/scripts/update-application-status.ts
 const seed = async () => {
