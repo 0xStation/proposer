@@ -66,7 +66,26 @@ const TerminalContributorsPage: BlitzPage = () => {
     }
 
     return (
-      <Card onClick={onClick} key={idx}>
+      <div
+        className="border border-concrete p-1 pb-3 flex flex-col cursor-pointer h-full hover:border-marble-white relative group"
+        onClick={onClick}
+        key={idx}
+      >
+        <>
+          <div className="absolute h-full w-full bg-tunnel-black opacity-80 top-0 left-0 hidden group-hover:block"></div>
+          <div className="absolute h-full w-full top-0 left-0 flex-col items-center justify-center space-y-2 hidden group-hover:flex">
+            <button
+              className="bg-tunnel-black text-magic-mint rounded w-40 border border-magic-mint hover:bg-wet-concrete p-1"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                onClick()
+              }}
+            >
+              View
+            </button>
+          </div>
+        </>
         <ProfileMetadata
           {...{ pfpURL, name, ens, pronouns, role, address, verified, className: "mx-3 my-3" }}
         />
@@ -84,7 +103,7 @@ const TerminalContributorsPage: BlitzPage = () => {
             {`JOINED SINCE ${formatDate(joinedAt)}`}
           </div>
         </div>
-      </Card>
+      </div>
     )
   })
 

@@ -17,7 +17,6 @@ import Card from "app/core/components/Card"
 import { formatDate } from "app/core/utils/formatDate"
 import Button from "app/core/components/Button"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
-import ReadonlyTextarea from "app/core/components/form/ReadonlyTextarea"
 import { getInitiativeStatusColor } from "app/utils/initiativeStatusOptions"
 
 const Project: BlitzPage = () => {
