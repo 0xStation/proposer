@@ -158,6 +158,7 @@ const ContributorDirectoryModal: React.FC<ContributorDirectoryModalProps> = ({
                   return (
                     <InitiativeCard
                       key={idx}
+                      toggleContributorDirectoryModal={setIsOpen}
                       editable={false}
                       editLink={Routes.Project({
                         terminalHandle,

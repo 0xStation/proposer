@@ -16,7 +16,6 @@ export type Application = {
   data: ApplicationMetadata
   account: Account
   points: number
-  referrals: ApplicationReferral[]
 }
 
 export type ApplicationStatus = "INTERESTED" | "CONTRIBUTING" | "PREVIOUSLY_CONTRIBUTED"

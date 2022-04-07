@@ -157,11 +157,10 @@ const AccountForm = ({
   })
 
   useEffect(() => {
-    if (account) {
-      setPfpURL(account.data.pfpURL || "")
-      setCoverURL(account.data.coverURL || "")
-    }
-  }, [account])
+    // initialize pfpInput and coverInput with user's pre-existing images
+    setPfpURL(account?.data?.pfpURL || "")
+    setCoverURL(account?.data?.coverURL || "")
+  }, [account?.data?.pfpURL, account?.data?.coverURL])
 
   const [skills] = useQuery(getSkills, {}, { suspense: false })
   const skillOptions = skills?.map((skill) => {
