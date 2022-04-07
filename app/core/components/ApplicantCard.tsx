@@ -140,7 +140,7 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
               Endorse
             </button>
           )}
-          {canInvite && (
+          {canInvite && activeUser?.address !== address && (
             <button
               className={hoverButtonStyling}
               onClick={(e) => {
