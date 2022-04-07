@@ -12,6 +12,7 @@ import { TimezoneOptions, getTimezoneOptionFromValue } from "app/utils/timezoneO
 import UploadIcon from "app/core/icons/UploadIcon"
 import { Account } from "app/account/types"
 import { toTitleCase } from "app/core/utils/titleCase"
+import { configOptions } from "final-form"
 
 interface ApplicationParams {
   name: string
@@ -130,6 +131,9 @@ const AccountForm = ({
   const activeUser = useStore((state) => state.activeUser)
   const setActiveUser = useStore((state) => state.setActiveUser)
 
+  console.log("coverURL", coverURL)
+  console.log("pfpURL", pfpURL)
+
   let existingActiveUserParams = {
     ens: activeUser?.data?.ens,
     discordId: activeUser?.data?.discordId,
@@ -157,11 +161,10 @@ const AccountForm = ({
   })
 
   useEffect(() => {
-    if (account) {
-      setPfpURL(account.data.pfpURL || "")
-      setCoverURL(account.data.coverURL || "")
-    }
-  }, [account])
+    // initialize pfpInput and coverInput with user's pre-existing images
+    setPfpURL(account?.data?.pfpURL || "")
+    setCoverURL(account?.data?.coverURL || "")
+  }, [account?.data?.pfpURL, account?.data?.coverURL])
 
   const [skills] = useQuery(getSkills, {}, { suspense: false })
   const skillOptions = skills?.map((skill) => {
