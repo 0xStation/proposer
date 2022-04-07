@@ -39,10 +39,17 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
     isEndorseSuccessModalOpen,
   } = props
   const { account: applicant, createdAt } = application
-  const [referrals] = useQuery(getReferralsByApplication, {
-    initiativeId: initiative?.id,
-    endorseeId: applicant?.id,
-  })
+  const [referrals] = useQuery(
+    getReferralsByApplication,
+    {
+      initiativeId: initiative?.id,
+      endorseeId: applicant?.id,
+    },
+    {
+      suspense: false,
+      enabled: !!(initiative?.id && applicant?.id),
+    }
+  )
 
   const activeUser = useStore((state) => state.activeUser)
 
