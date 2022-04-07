@@ -6,19 +6,10 @@ import { XIcon } from "@heroicons/react/outline"
 import { formatDate } from "app/core/utils/formatDate"
 import { APPLICATION_STATUS_MAP } from "app/core/utils/constants"
 import getReferralsByApplication from "app/endorsements/queries/getReferralsByApplication"
-import getEndorsementValueSumByApplication from "app/endorsements/queries/getEndorsementValueSumByApplication"
 
 const ApplicationDrawer = ({ isOpen, setIsOpen, application }) => {
   const [referrals] = useQuery(
     getReferralsByApplication,
-    {
-      initiativeId: application?.initiative?.id,
-      endorseeId: application?.accountId,
-    },
-    { suspense: false, enabled: !!(application?.initiative?.id && application?.accountId) }
-  )
-  const [totalEndorsementPoints] = useQuery(
-    getEndorsementValueSumByApplication,
     {
       initiativeId: application?.initiative?.id,
       endorseeId: application?.accountId,
@@ -114,12 +105,12 @@ const ApplicationDrawer = ({ isOpen, setIsOpen, application }) => {
                             {application?.data?.entryDescription}
                           </span>
                         </div>
-                        {application.data.urls && (
+                        {application.data?.urls && (
                           <div className="flex flex-col border-b border-concrete pb-8 mt-8">
                             <span className="text-base font-bold text-marble-white">
                               Submission
                             </span>
-                            {application.data.urls.map((url, idx) => {
+                            {application.data?.urls.map((url, idx) => {
                               return (
                                 <a
                                   key={idx}

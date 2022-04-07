@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { BlitzPage, useQuery, useParam, useRouter, Image, Routes, useMutation } from "blitz"
+import { useState, useEffect } from "react"
+import { BlitzPage, useQuery, useParam, useRouter, Image, Routes, useMutation, Link } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
@@ -33,7 +33,7 @@ export const ApplicationConfirmationModal = ({
         </p>
         <p>Would you like to send in your submission now?</p>
       </div>
-      <Button className="px-10 my-5" onClick={() => onClick({ urls: urlField, entryDescription })}>
+      <Button className="px-10 my-2" onClick={() => onClick({ urls: urlField, entryDescription })}>
         Confirm
       </Button>
     </Modal>
@@ -42,6 +42,7 @@ export const ApplicationConfirmationModal = ({
 
 const TerminalInitiativeContributePage: BlitzPage = () => {
   const router = useRouter()
+  const [hasApplied, setHasApplied] = useState<boolean>(false)
   const terminalHandle = useParam("terminalHandle", "string") as string
   const initiativeLocalId = useParam("initiativeId", "number") as number
   const activeUser = useStore((state) => state.activeUser)
@@ -67,15 +68,23 @@ const TerminalInitiativeContributePage: BlitzPage = () => {
     },
   })
 
+  useEffect(() => {
+    if (terminal && activeUser && initiativeLocalId) {
+      let currentInit = activeUser.initiatives?.find(
+        (init) =>
+          init.initiative.localId === initiativeLocalId && init.initiative.terminalId == terminal.id
+      )
+      if (currentInit) {
+        setHasApplied(true)
+      }
+    }
+  }, [activeUser, initiativeLocalId])
+
   // TODO: check for activeUser - right now we're relying on being redirected to the account creation page
   // if the user doesn't have an account
 
-  return (
-    <Layout
-      title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Join ${
-        initiative?.data?.name || "Initiative"
-      }`}
-    >
+  const applicationForm = (
+    <>
       <ApplicationConfirmationModal
         confirmationOpen={confirmationOpen}
         setIsConfirmationOpen={setIsConfirmationOpen}
@@ -231,6 +240,32 @@ const TerminalInitiativeContributePage: BlitzPage = () => {
           />
         </div>
       </div>
+    </>
+  )
+
+  return (
+    <Layout
+      title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Join ${
+        initiative?.data?.name || "Initiative"
+      }`}
+    >
+      {" "}
+      {hasApplied ? (
+        <div className="mx-auto max-w-2xl py-12">
+          <h1 className="text-marble-white text-3xl text-center">
+            You&apos;ve already applied! Check out your application from your{" "}
+            <a
+              href={`/profile/${activeUser?.address}?setTab=initiatives`}
+              className="text-magic-mint"
+            >
+              profile
+            </a>
+            .
+          </h1>
+        </div>
+      ) : (
+        applicationForm
+      )}
     </Layout>
   )
 }
