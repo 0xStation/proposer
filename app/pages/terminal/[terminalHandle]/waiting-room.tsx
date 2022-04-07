@@ -107,18 +107,12 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [applications, { isLoading: applicationsLoading, refetch: refetchApplications }] = useQuery(
     getApplicationsByInitiative,
     {
-      referralGraphAddress: terminal?.data.contracts.addresses.referrals as string,
-      initiativeLocalId: selectedInitiativeLocalId as number,
       initiativeId: currentInitiative?.id as number,
       terminalId: terminal?.id as number,
     },
     {
       suspense: false,
-      enabled:
-        !!terminal?.data.contracts.addresses.referrals &&
-        !!selectedInitiativeLocalId &&
-        !!currentInitiative?.id &&
-        !!terminal?.id,
+      enabled: !!currentInitiative?.id && !!terminal?.id,
       onSuccess: () => {
         setInitialPageLoading(false)
       },
