@@ -1,14 +1,13 @@
 import { useState, useEffect, useMemo } from "react"
 import { useAccount } from "wagmi"
-import { Image, useQuery, BlitzPage, useParam, useRouter, useRouterQuery } from "blitz"
+import { Image, useQuery, BlitzPage, useParam, useRouter, useRouterQuery, Routes } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import ImageLink from "../../../../core/components/ImageLink"
+import ImageLink from "app/core/components/ImageLink"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
 import ContributorDirectoryModal from "app/contributors/components/ContributorDirectoryModal"
 import Back from "/public/back-icon.svg"
 import { Account } from "app/account/types"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import ApplicationModal from "app/application/components/ApplicationModal"
 import useStore from "app/core/hooks/useStore"
 import usePagination from "app/core/hooks/usePagination"
 import Tag from "app/core/components/Tag"
@@ -21,11 +20,12 @@ import { getInitiativeStatusColor } from "app/utils/initiativeStatusOptions"
 import ReadOnlyTextArea from "app/core/components/form/ReadonlyTextarea"
 
 const Project: BlitzPage = () => {
+  const terminalHandle = useParam("terminalHandle") as string
+  const initiativeLocalId = useParam("initiativeId", "number") as number
   const [hasApplied, setHasApplied] = useState(false)
   const [{ data: accountData }] = useAccount()
   const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
-  const [applicationModalOpen, setApplicationModalOpen] = useState(false)
   const [page, setPage] = useState(0)
   const [userTriggered, setUserTrigged] = useState(false)
   const address = useMemo(() => accountData?.address, [accountData?.address])
@@ -39,7 +39,12 @@ const Project: BlitzPage = () => {
     if (address) {
       if (activeUser) {
         // user already has an account, redirect to application creation
-        setApplicationModalOpen(true)
+        router.push(
+          Routes.TerminalInitiativeContributePage({
+            terminalHandle,
+            initiativeId: initiativeLocalId,
+          })
+        )
       } else {
         // user is connected but doesn't have an account
         router.push("/profile/create")
@@ -51,7 +56,6 @@ const Project: BlitzPage = () => {
   }
 
   useEffect(() => {
-    setApplicationModalOpen(false)
     toggleWalletModal(false)
     let handler
     if (userTriggered) {
@@ -61,9 +65,6 @@ const Project: BlitzPage = () => {
       clearTimeout(handler)
     }
   }, [address, activeUser])
-
-  const terminalHandle = useParam("terminalHandle") as string
-  const initiativeLocalId = useParam("initiativeId", "number") as number
 
   useEffect(() => {
     if (terminal) {
@@ -132,14 +133,6 @@ const Project: BlitzPage = () => {
 
   return (
     <Layout title={`${initiative?.data.name || "Initiative"}`}>
-      {initiative && (
-        <ApplicationModal
-          isOpen={applicationModalOpen}
-          setIsOpen={setApplicationModalOpen}
-          initiative={initiative}
-          discordWebhookUrl={terminal?.data.discordWebhookUrl}
-        />
-      )}
       {selectedContributorToView && (
         <ContributorDirectoryModal
           contributor={selectedContributorToView}
