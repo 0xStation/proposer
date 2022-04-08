@@ -142,7 +142,7 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
                       {skills?.map?.((skill, index) => {
                         return (
                           <Tag key={index} type="skill">
-                            {skill}
+                            {skill?.skill?.name}
                           </Tag>
                         )
                       })}

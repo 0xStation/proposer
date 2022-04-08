@@ -43,7 +43,7 @@ export const InviteModal = ({
       setRoleNotSelectedError(true)
     } else {
       await inviteContributor({
-        inviterId: activeUser.id,
+        inviterId: activeUser.id as number,
         accountId: selectedApplication.account.id,
         terminalId: currentInitiative.terminalId,
         // if applicant already holds a ticket we return the same roleLocalId on their ticket
