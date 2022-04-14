@@ -132,6 +132,8 @@ const ApplicationDrawer = ({ isOpen, setIsOpen, application }) => {
                           <span className="flex-col text-base font-bold text-marble-white">
                             Endorsers ({referrals?.length ? referrals.length : 0})
                           </span>
+                        </div>
+                        <div className="flex-col overflow-y-auto max-h-[32.5rem] mb-5">
                           {referrals?.map?.(({ endorser: account, endorsementsGiven }, index) => (
                             <ApplicantEndorsements
                               key={index}
