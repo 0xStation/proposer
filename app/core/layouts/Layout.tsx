@@ -1,5 +1,4 @@
 import { Head, BlitzLayout } from "blitz"
-import Ticker from "../components/Ticker"
 import Navigation from "../components/Navigation"
 import ModalContainer from "../components/ModalContainer"
 import { useNetwork } from "wagmi"
