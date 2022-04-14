@@ -85,7 +85,6 @@ const TerminalWaitingPage: BlitzPage = () => {
         })
         setSelectedApplication(application as Application)
         setIsApplicantOpen(true)
-        setSelectedInitiativeLocalId(initiativeLocalId)
       })()
     }
   }, [initiativeLocalIdParam, applicantAddressParam, terminal?.id])
@@ -102,8 +101,12 @@ const TerminalWaitingPage: BlitzPage = () => {
           initiatives?.filter((initiative) => initiative?.applicationCount).length &&
           !selectedInitiativeLocalId
         ) {
-          const firstInitiative = initiatives.find((init) => init.applicationCount !== 0)
-          setSelectedInitiativeLocalId(firstInitiative?.localId)
+          // set the initiative filter if it's specified in the query param,
+          // otherwise default to the first initiative that has applications
+          let initiativeLocalId = initiativeLocalIdParam
+            ? parseInt(initiativeLocalIdParam as string)
+            : initiatives.find((init) => init.applicationCount !== 0)?.localId
+          setSelectedInitiativeLocalId(initiativeLocalId)
         } else {
           setInitialPageLoading(false)
         }

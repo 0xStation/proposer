@@ -55,6 +55,14 @@ const Navigation = () => {
 
   return (
     <>
+      {/* beta banner */}
+      <div className="bg-wet-concrete w-full h-8 text-center align-center pt-1">
+        We&apos;re still in beta. Have feedback?{" "}
+        <a className="text-magic-mint" href="https://twitter.com/0xstation">
+          Let us know
+        </a>
+        .
+      </div>
       <div className="h-12 w-full bg-tunnel-black flex flex-row justify-between border-b border-b-concrete">
         <Dropdown
           side="left"

@@ -102,12 +102,22 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
     <p className="text-xs text-concrete font-normal">SUBMITTED ON ...</p>
   )
 
+  const handleCloseApplicantModelClick = (close) => {
+    router.push(`${window.location.pathname}`, undefined, { shallow: true })
+    setIsApplicantOpen(close)
+  }
+
   return (
-    <Modal subtitle="" open={isApplicantOpen} toggle={setIsApplicantOpen} showTitle={false}>
+    <Modal
+      subtitle=""
+      open={isApplicantOpen}
+      toggle={handleCloseApplicantModelClick}
+      showTitle={false}
+    >
       <div className="flex flex-col space-y-6">
         <div className="flex flex- auto flex-col space-y-6 overflow-y-scroll overflow-x-hidden h-[585px]">
           <div id="close and meta data" className="flex-auto flex flex-row">
-            <CloseButton onClick={() => setIsApplicantOpen(false)} />
+            <CloseButton onClick={() => handleCloseApplicantModelClick(false)} />
             <div className="flex flex-1 justify-end absolute top-2 right-2 z-50">
               {DateMetadata}
             </div>
