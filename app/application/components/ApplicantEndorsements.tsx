@@ -1,6 +1,6 @@
 import { Account } from "app/account/types"
-import { Tag } from "app/core/components/Tag"
 import ProfileMetadata from "app/core/ProfileMetadata"
+import { useRouter } from "blitz"
 
 type ApplicantEndorsementsProps = {
   endorser: Account
@@ -9,9 +9,9 @@ type ApplicantEndorsementsProps = {
 }
 
 const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({ endorser, amount }) => {
+  const router = useRouter()
   const {
     address,
-    role,
     data: { pfpURL, name, ens, pronouns, verified },
   } = endorser
 
@@ -24,11 +24,13 @@ const ApplicantEndorsements: React.FC<ApplicantEndorsementsProps> = ({ endorser,
     verified,
   }
   return (
-    <div>
-      <div className="flex flex-row border border-concrete space-x-52 p-3">
-        <div className="flex flex-col">
-          <ProfileMetadata {...profileMetdataProps} />
-        </div>
+    <div
+      tabIndex={0}
+      className="flex flex-row border border-concrete space-x-52 p-3 hover:border-marble-white"
+      onClick={() => router.push(`/profile/${address}`)}
+    >
+      <div className="flex flex-col">
+        <ProfileMetadata {...profileMetdataProps} />
       </div>
     </div>
   )

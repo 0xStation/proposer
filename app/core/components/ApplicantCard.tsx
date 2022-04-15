@@ -5,7 +5,7 @@ import Tag from "../components/Tag"
 import { formatDate } from "../utils/formatDate"
 import useStore from "app/core/hooks/useStore"
 import { Terminal } from "app/terminal/types"
-import { useQuery } from "blitz"
+import { useQuery, useRouter } from "blitz"
 import { Initiative } from "app/initiative/types"
 import getReferralsByApplication from "app/endorsements/queries/getReferralsByApplication"
 import hasUserEndorsedApplicant from "app/endorsements/queries/hasUserEndorsedApplicant"
@@ -39,6 +39,7 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
     isEndorseSuccessModalOpen,
   } = props
   const { account: applicant, createdAt } = application
+  const router = useRouter()
   const [referrals] = useQuery(
     getReferralsByApplication,
     {
@@ -123,13 +124,25 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
     </div>
   )
 
+  const handleViewApplicationClick = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setSelectedApplication(application)
+    // replace query params with applicant details
+    // `shallow` will update the route without refetching data for the page.
+    // https://nextjs.org/docs/routing/shallow-routing
+    router.push(
+      `${window.location.pathname}/?applicant=${applicant.address}&initiative=${initiative.localId}`,
+      undefined,
+      { shallow: true }
+    )
+    setIsApplicantOpen(true)
+  }
+
   return (
     <div
       className="border border-concrete p-1 pb-3 flex flex-col cursor-pointer h-full hover:border-marble-white relative group"
-      onClick={() => {
-        setSelectedApplication(application)
-        setIsApplicantOpen(true)
-      }}
+      onClick={handleViewApplicationClick}
     >
       <>
         <div className="absolute h-full w-full bg-tunnel-black opacity-80 top-0 left-0 hidden group-hover:block"></div>
@@ -160,15 +173,7 @@ export const ApplicantCard = (props: ApplicantCardProps) => {
               Add to Terminal
             </button>
           )}
-          <button
-            className={hoverButtonStyling}
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              setSelectedApplication(application)
-              setIsApplicantOpen(true)
-            }}
-          >
+          <button className={hoverButtonStyling} onClick={handleViewApplicationClick}>
             View
           </button>
         </div>

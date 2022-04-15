@@ -21,6 +21,7 @@ import { Ticket } from "app/ticket/types"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
 import { Initiative } from "app/initiative/types"
 import hasInvitePermissions from "app/application/queries/hasInvitePermissions"
+import getApplicationByAddress from "app/application/queries/getApplicationByAddress"
 
 const skeletonLoadingScreen = (
   <div className="flex flex-col space-y-10">
@@ -50,7 +51,11 @@ const skeletonLoadingScreen = (
 
 const TerminalWaitingPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
-  const { directedFrom } = useRouterQuery()
+  const {
+    directedFrom,
+    initiative: initiativeLocalIdParam,
+    applicant: applicantAddressParam,
+  } = useRouterQuery()
   const [selectedInitiativeLocalId, setSelectedInitiativeLocalId] = useState<number | null>()
   const [isRedirectModalOpen, setIsRedirectModalOpen] = useState(false)
   const [isEndorseModalOpen, setIsEndorseModalOpen] = useState(false)
@@ -63,11 +68,26 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [initialPageLoading, setInitialPageLoading] = useState<boolean>(true)
   const [isApplicantOpen, setIsApplicantOpen] = useState(false)
   const { DIRECTED_FROM } = QUERY_PARAMETERS
+  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
   useEffect(() => {
     setIsRedirectModalOpen(directedFrom === DIRECTED_FROM.SUBMITTED_APPLICATION)
   }, [directedFrom])
-  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+
+  useEffect(() => {
+    if (applicantAddressParam && initiativeLocalIdParam && terminal?.id) {
+      const initiativeLocalId = parseInt(initiativeLocalIdParam as string)
+      ;(async () => {
+        const application = await invoke(getApplicationByAddress, {
+          terminalId: terminal?.id,
+          initiativeLocalId: initiativeLocalId,
+          address: applicantAddressParam,
+        })
+        setSelectedApplication(application as Application)
+        setIsApplicantOpen(true)
+      })()
+    }
+  }, [initiativeLocalIdParam, applicantAddressParam, terminal?.id])
 
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
@@ -81,8 +101,12 @@ const TerminalWaitingPage: BlitzPage = () => {
           initiatives?.filter((initiative) => initiative?.applicationCount).length &&
           !selectedInitiativeLocalId
         ) {
-          const firstInitiative = initiatives.find((init) => init.applicationCount !== 0)
-          setSelectedInitiativeLocalId(firstInitiative?.localId)
+          // set the initiative filter if it's specified in the query param,
+          // otherwise default to the first initiative that has applications
+          let initiativeLocalId = initiativeLocalIdParam
+            ? parseInt(initiativeLocalIdParam as string)
+            : initiatives.find((init) => init.applicationCount !== 0)?.localId
+          setSelectedInitiativeLocalId(initiativeLocalId)
         } else {
           setInitialPageLoading(false)
         }
