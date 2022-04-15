@@ -61,5 +61,12 @@ export default async function getApplicationByAddress(
     },
   })
 
+  if (!application) {
+    console.error(
+      `Could not find application with address: ${address}, terminal id: ${terminalId}, and initiativeLocalId: ${initiativeLocalId}.`
+    )
+    return null
+  }
+
   return application as unknown as Application
 }

@@ -103,6 +103,8 @@ const ApplicantDetailsModal: React.FC<ApplicantDetailsModalProps> = ({
   )
 
   const handleCloseApplicantModelClick = (close) => {
+    // `shallow` will update the route without refetching data for the page.
+    // https://nextjs.org/docs/routing/shallow-routing
     router.push(`${window.location.pathname}`, undefined, { shallow: true })
     setIsApplicantOpen(close)
   }
