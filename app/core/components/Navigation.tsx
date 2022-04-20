@@ -23,6 +23,7 @@ const Navigation = () => {
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const setSiweAddress = useStore((state) => state.setSiweAddress)
   const siweAddress = useStore((state) => state.siweAddress)
+  const authorized = useStore((state) => state.authorized)
 
   const getUserAccount = async (address) => {
     // closing the wallet modal
@@ -60,7 +61,7 @@ const Navigation = () => {
     // 2. window is focused (in case user logs out of another window)
     window.addEventListener("focus", handler)
     return () => window.removeEventListener("focus", handler)
-  }, [])
+  }, [authorized])
 
   const appDisconnect = async () => {
     // we're reading from localStorage at the app level

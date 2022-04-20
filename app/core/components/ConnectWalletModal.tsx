@@ -8,6 +8,7 @@ import Banner from "/public/walletconnect-banner.svg"
 import { useConnect, useAccount, useNetwork, useSignMessage } from "wagmi"
 import { LOCAL_STORAGE } from "../utils/constants"
 import { SiweMessage } from "siwe"
+import useStore from "app/core/hooks/useStore"
 
 const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   const [{ data: connectData }, connect] = useConnect()
@@ -15,6 +16,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   const [{ data: networkData }] = useNetwork()
   const [, signMessage] = useSignMessage()
   const [metamaskWallet, walletConnect, coinbaseWallet] = connectData?.connectors
+  const setAuthorized = useStore((state) => state.setAuthorized)
 
   // https://github.com/NoahZinsmeister/web3-react/issues/300
   // If a user is connecting their wallet for the first time and has both coinbase and metamask extensions,
@@ -90,6 +92,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         body: JSON.stringify({ message, signature: signRes.data }),
       })
       if (!verifyRes.ok) throw new Error("Error verifying message")
+      setAuthorized(true)
     } catch (error) {
       // error state
     }
@@ -98,7 +101,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   const siweView = (
     <div>
       <p className="text-lg text-center mt-4">
-        Connect your wallet to enter Station and explore initiatives.
+        Authorize your account so that we can remember your preferences.
       </p>
       <div className="mt-4 text-center">
         <button
