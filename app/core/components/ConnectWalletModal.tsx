@@ -16,7 +16,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   const [{ data: networkData }] = useNetwork()
   const [, signMessage] = useSignMessage()
   const [metamaskWallet, walletConnect, coinbaseWallet] = connectData?.connectors
-  const setAuthorized = useStore((state) => state.setAuthorized)
+  const setSiweAddress = useStore((state) => state.setSiweAddress)
 
   // https://github.com/NoahZinsmeister/web3-react/issues/300
   // If a user is connecting their wallet for the first time and has both coinbase and metamask extensions,
@@ -66,7 +66,6 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
     try {
       const address = accountData?.address
       const chainId = networkData?.chain?.id
-      console.log("address in sign in function", address)
       if (!address || !chainId) return
 
       // Fetch random nonce, create SIWE message, and sign with wallet
@@ -92,7 +91,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         body: JSON.stringify({ message, signature: signRes.data }),
       })
       if (!verifyRes.ok) throw new Error("Error verifying message")
-      setAuthorized(true)
+      setSiweAddress(address as string)
     } catch (error) {
       // error state
     }

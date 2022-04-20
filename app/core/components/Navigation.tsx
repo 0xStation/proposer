@@ -23,9 +23,8 @@ const Navigation = () => {
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const setSiweAddress = useStore((state) => state.setSiweAddress)
   const siweAddress = useStore((state) => state.siweAddress)
-  const authorized = useStore((state) => state.authorized)
 
-  const getUserAccount = async (address) => {
+  const getUserAccount = async (address: string) => {
     // closing the wallet modal
     // we have the address (since this is called from the useEffect hook)
     toggleWalletModal(false)
@@ -39,7 +38,7 @@ const Navigation = () => {
 
   useEffect(() => {
     const handler = async () => {
-      if (siweAddress && activeUser) {
+      if (!siweAddress || activeUser) {
         // if user is already defined, return
         return
       }
@@ -48,11 +47,11 @@ const Navigation = () => {
         const res = await fetch("/api/me")
         const json = await res.json()
         setSiweAddress(json.address)
-        if (json.address) {
-          await getUserAccount(json.address)
+        if (siweAddress) {
+          await getUserAccount(siweAddress)
         }
       } catch (err) {
-        console.error("could not fetch user")
+        console.error("could not fetch user", err)
       }
     }
     // 1. page loads
@@ -61,7 +60,7 @@ const Navigation = () => {
     // 2. window is focused (in case user logs out of another window)
     window.addEventListener("focus", handler)
     return () => window.removeEventListener("focus", handler)
-  }, [authorized])
+  }, [siweAddress])
 
   const appDisconnect = async () => {
     // we're reading from localStorage at the app level
