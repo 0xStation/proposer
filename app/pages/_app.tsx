@@ -42,18 +42,18 @@ export default function App({ Component, pageProps }: AppProps) {
   // completely, we're reading from localStorage to read when the user
   // connects and disconnects from the app. We set the localStorage key
   // when the user connects their wallet and remove it on disconnect.
-  let autoConnect
-  if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
-    const connection = localStorage.getItem(LOCAL_STORAGE.CONNECTION)
-    autoConnect = !!connection
-  }
+  // let autoConnect
+  // if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+  //   const connection = localStorage.getItem(LOCAL_STORAGE.CONNECTION)
+  //   autoConnect = !!connection
+  // }
 
   return (
     <Provider
       connectorStorageKey={LOCAL_STORAGE.WAGMI_WALLET}
       connectors={connectors}
       provider={provider}
-      autoConnect={autoConnect}
+      // autoConnect={autoConnect}
     >
       {getLayout(<Component {...pageProps} />)}
     </Provider>

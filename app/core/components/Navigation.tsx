@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Image, invoke, useRouter } from "blitz"
 import Dropdown from "../components/Dropdown"
 import logo from "../../../public/station-logo.svg"
@@ -18,11 +18,11 @@ const Navigation = () => {
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
   })
-
-  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const setActiveUser = useStore((state) => state.setActiveUser)
   const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  const setSiweAddress = useStore((state) => state.setSiweAddress)
+  const siweAddress = useStore((state) => state.siweAddress)
 
   const getUserAccount = async (address) => {
     // closing the wallet modal
@@ -37,20 +37,41 @@ const Navigation = () => {
   }
 
   useEffect(() => {
-    if (address) {
-      getUserAccount(address)
-    } else if (!localStorage.getItem(LOCAL_STORAGE.CONNECTION)) {
-      setActiveUser(null)
-    }
-  }, [address])
+    const handler = async () => {
+      if (siweAddress && activeUser) {
+        // if user is already defined, return
+        return
+      }
 
-  const appDisconnect = () => {
+      try {
+        const res = await fetch("/api/me")
+        const json = await res.json()
+        setSiweAddress(json.address)
+        if (json.address) {
+          await getUserAccount(json.address)
+        }
+      } catch (err) {
+        console.error("could not fetch user")
+      }
+    }
+    // 1. page loads
+    ;(async () => await handler())()
+
+    // 2. window is focused (in case user logs out of another window)
+    window.addEventListener("focus", handler)
+    return () => window.removeEventListener("focus", handler)
+  }, [])
+
+  const appDisconnect = async () => {
     // we're reading from localStorage at the app level
     // to see if we need to maintain a wallet connection
     if (localStorage.getItem(LOCAL_STORAGE.CONNECTION)) {
       localStorage.removeItem(LOCAL_STORAGE.CONNECTION)
     }
     disconnect()
+    setActiveUser(null)
+    setSiweAddress(undefined)
+    await fetch("/api/logout")
   }
 
   return (
@@ -111,25 +132,25 @@ const Navigation = () => {
                 },
                 {
                   name: "Disconnect",
-                  onClick: appDisconnect,
+                  onClick: async () => await appDisconnect(),
                 },
               ]}
             />
-          ) : address ? (
+          ) : siweAddress ? (
             <Dropdown
               side="right"
               className="h-full p-2 border-l border-l-concrete hover:bg-wet-concrete w-full"
               button={
                 <div className="flex items-center">
                   <span className="w-7 h-7 rounded-full bg-gradient-to-b from-electric-violet to-magic-mint border border-marble-white mr-2"></span>
-                  <span>{truncateString(address)}</span>
+                  <span>{truncateString(siweAddress)}</span>
                 </div>
               }
               items={[
                 { name: "Create Account", onClick: () => router.push("/profile/create") },
                 {
                   name: "disconnect",
-                  onClick: appDisconnect,
+                  onClick: async () => await appDisconnect(),
                 },
               ]}
             />
