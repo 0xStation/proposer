@@ -20,11 +20,5 @@
     "tsBuildInfoFile": ".tsbuildinfo"
   },
   "exclude": ["node_modules", "**/*.e2e.ts", "cypress"],
-  "include": [
-    "blitz-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "app/core/hooks/useStore.js",
-    "types/**/*.d.ts"
-  ]
+  "include": ["blitz-env.d.ts", "**/*.ts", "**/*.tsx", "app/core/hooks/useStore.js"]
 }
