@@ -123,7 +123,7 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
     name: acctName,
     description: `Contributor NFT for the ${
       (terminal.data as TerminalMetadata)?.name
-    } Terminal.\nView ${acctName}'s full profile at https://staging.station.express/profile/${owner}`,
+    } Terminal. [View ${acctName}'s full profile](https://staging.station.express/profile/${owner}).`,
     // TODO: add link to contributor's public profile page to description once complete
     external_url: "https://station.express/",
     image,
