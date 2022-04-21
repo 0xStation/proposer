@@ -49,6 +49,8 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
         invitedBy: inviterId,
       },
     },
-    update: {},
+    update: {
+      roleLocalId: roleLocalId,
+    },
   })
 }

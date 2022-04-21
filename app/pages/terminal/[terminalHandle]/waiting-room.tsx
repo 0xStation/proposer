@@ -20,6 +20,8 @@ import getTicket from "app/ticket/queries/getTicket"
 import { Ticket } from "app/ticket/types"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
 import { Initiative } from "app/initiative/types"
+import { useContributorsRead } from "app/core/contracts/contracts"
+import { BigNumberish, utils } from "ethers"
 import hasInvitePermissions from "app/application/queries/hasInvitePermissions"
 import getApplicationByAddress from "app/application/queries/getApplicationByAddress"
 
@@ -62,6 +64,7 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [isEndorseSuccessModalOpen, setIsEndorseSuccessModalOpen] = useState(false)
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
+  const [selectedApplicationHasNft, setSelectedApplicationHasNft] = useState<boolean>(false)
   const [selectedApplicantTicket, setSelectedApplicantTicket] = useState<Ticket | null>()
   const activeUser = useStore((state) => state.activeUser)
   const [roleOfActiveUser, setRoleOfActiveUser] = useState<Role | null>()
@@ -73,6 +76,11 @@ const TerminalWaitingPage: BlitzPage = () => {
   useEffect(() => {
     setIsRedirectModalOpen(directedFrom === DIRECTED_FROM.SUBMITTED_APPLICATION)
   }, [directedFrom])
+
+  const { read: readTokenOf } = useContributorsRead({
+    contract: terminal?.ticketAddress || "0x4A2De54eee273fb95bC861f71C90E5ee6705f01e",
+    methodName: "tokenOf",
+  })
 
   useEffect(() => {
     if (applicantAddressParam && initiativeLocalIdParam && terminal?.id) {
@@ -142,6 +150,21 @@ const TerminalWaitingPage: BlitzPage = () => {
       },
     }
   )
+
+  useEffect(() => {
+    if (terminal?.id && selectedApplication?.account?.id) {
+      ;(async () => {
+        const tokenData = await readTokenOf({
+          args: [selectedApplication.account.address],
+        })
+        if (tokenData.data) {
+          setSelectedApplicationHasNft(
+            parseFloat(utils.formatUnits(tokenData.data as BigNumberish, 0)) > 0
+          )
+        }
+      })()
+    }
+  }, [selectedApplication])
 
   useEffect(() => {
     if (terminal?.id && selectedApplication?.account?.id) {
@@ -247,6 +270,7 @@ const TerminalWaitingPage: BlitzPage = () => {
         isInviteModalOpen={isInviteModalOpen}
         setIsInviteModalOpen={setIsInviteModalOpen}
         applicantTicket={selectedApplicantTicket}
+        selectedApplicationHasNft={selectedApplicationHasNft}
         refetchApplications={refetchApplications}
       />
       <div className="flex flex-col space-y-10">

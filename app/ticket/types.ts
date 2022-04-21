@@ -1,3 +1,4 @@
+import { Role } from "../types"
 export type Ticket = {
   accountId: number
   terminalId: number
@@ -5,6 +6,7 @@ export type Ticket = {
   joinedAt: Date
   active: boolean
   data?: TicketMetadata
+  role?: Role
 }
 
 export type TicketMetadata = {

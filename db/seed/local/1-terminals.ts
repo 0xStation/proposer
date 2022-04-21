@@ -53,7 +53,7 @@ const ccs: CreateTerminalParams = {
 
 const station: CreateTerminalParams = {
   handle: "stationlabs",
-  ticketAddress: "0xbe26ee78ba287e5c6a862258db9c5e7fe7538f56",
+  ticketAddress: "0x4A2De54eee273fb95bC861f71C90E5ee6705f01e",
   data: {
     name: "Station Labs",
     description: "Creating on-chain infrastructure for a new genre of work.",
