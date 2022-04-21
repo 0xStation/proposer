@@ -3,17 +3,11 @@ import { TERMINAL, CONTRACTS } from "../utils/constants"
 import endorsementTokenAbi from "../abi/EndorsementToken.json"
 import endorsementGraphAbi from "../abi/EndorsementGraph.json"
 import waitingRoomAbi from "../abi/WaitingRoom.json"
-import identityAdminAbi from "../abi/IdentityTokenAdmin.json"
-import contributorsAbi from "../abi/Contributors.json"
-import stationIdAbi from "../abi/StationId.json"
-import { useContractRead, useContractWrite } from "wagmi"
+import { useContractRead, useContractWrite, useToken } from "wagmi"
 
 const endorseContractInterface = new utils.Interface(endorsementGraphAbi)
 const endorsementTokenInterface = new utils.Interface(endorsementTokenAbi)
 const waitingRoomInterface = new utils.Interface(waitingRoomAbi)
-const identityAdminInterface = new utils.Interface(identityAdminAbi)
-const contributorsInterface = new utils.Interface(contributorsAbi)
-const stationIdInterface = new utils.Interface(stationIdAbi)
 
 // call write functions from the endorsment graph
 export const useEndorsementGraphRead = ({ methodName, contract }) => {
@@ -45,39 +39,6 @@ export const useWaitingRoomWrite = ({ methodName }) => {
     {
       addressOrName: CONTRACTS.WAITING_ROOM,
       contractInterface: waitingRoomInterface,
-    },
-    methodName
-  )
-  return { data, error, loading, write }
-}
-
-export const useContributorsRead = ({ methodName, contract }) => {
-  const [{ data, error, loading }, read] = useContractRead(
-    {
-      addressOrName: contract,
-      contractInterface: contributorsInterface,
-    },
-    methodName
-  )
-  return { data, error, loading, read }
-}
-
-export const useIdentityAdminWrite = ({ methodName }) => {
-  const [{ data, error, loading }, write] = useContractWrite(
-    {
-      addressOrName: CONTRACTS.IDENTITY_ADMIN,
-      contractInterface: identityAdminInterface,
-    },
-    methodName
-  )
-  return { data, error, loading, write }
-}
-
-export const useStationIdWrite = ({ methodName, contract }) => {
-  const [{ data, error, loading }, write] = useContractWrite(
-    {
-      addressOrName: contract || "0x33e3a9610D7D0847A68109bA1B2D00089a784D21", // station's contract
-      contractInterface: stationIdInterface,
     },
     methodName
   )
