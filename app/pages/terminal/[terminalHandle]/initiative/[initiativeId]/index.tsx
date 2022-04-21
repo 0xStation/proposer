@@ -1,14 +1,13 @@
 import { useState, useEffect, useMemo } from "react"
 import { useAccount } from "wagmi"
-import { Image, useQuery, BlitzPage, useParam, useRouter, useRouterQuery } from "blitz"
+import { Image, useQuery, BlitzPage, useParam, useRouter, useRouterQuery, Routes } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import ImageLink from "../../../../core/components/ImageLink"
+import ImageLink from "app/core/components/ImageLink"
 import getInitiativeByLocalId from "app/initiative/queries/getInitiativeByLocalId"
 import ContributorDirectoryModal from "app/contributors/components/ContributorDirectoryModal"
 import Back from "/public/back-icon.svg"
 import { Account } from "app/account/types"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import ApplicationModal from "app/application/components/ApplicationModal"
 import useStore from "app/core/hooks/useStore"
 import usePagination from "app/core/hooks/usePagination"
 import Tag from "app/core/components/Tag"
@@ -17,15 +16,16 @@ import Card from "app/core/components/Card"
 import { formatDate } from "app/core/utils/formatDate"
 import Button from "app/core/components/Button"
 import { QUERY_PARAMETERS } from "app/core/utils/constants"
-import ReadonlyTextarea from "app/core/components/form/ReadonlyTextarea"
 import { getInitiativeStatusColor } from "app/utils/initiativeStatusOptions"
+import ReadOnlyTextArea from "app/core/components/form/ReadonlyTextarea"
 
 const Project: BlitzPage = () => {
+  const terminalHandle = useParam("terminalHandle") as string
+  const initiativeLocalId = useParam("initiativeId", "number") as number
   const [hasApplied, setHasApplied] = useState(false)
   const [{ data: accountData }] = useAccount()
   const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
-  const [applicationModalOpen, setApplicationModalOpen] = useState(false)
   const [page, setPage] = useState(0)
   const [userTriggered, setUserTrigged] = useState(false)
   const address = useMemo(() => accountData?.address, [accountData?.address])
@@ -39,7 +39,12 @@ const Project: BlitzPage = () => {
     if (address) {
       if (activeUser) {
         // user already has an account, redirect to application creation
-        setApplicationModalOpen(true)
+        router.push(
+          Routes.TerminalInitiativeContributePage({
+            terminalHandle,
+            initiativeId: initiativeLocalId,
+          })
+        )
       } else {
         // user is connected but doesn't have an account
         router.push("/profile/create")
@@ -51,7 +56,6 @@ const Project: BlitzPage = () => {
   }
 
   useEffect(() => {
-    setApplicationModalOpen(false)
     toggleWalletModal(false)
     let handler
     if (userTriggered) {
@@ -61,9 +65,6 @@ const Project: BlitzPage = () => {
       clearTimeout(handler)
     }
   }, [address, activeUser])
-
-  const terminalHandle = useParam("terminalHandle") as string
-  const initiativeLocalId = useParam("initiativeId", "number") as number
 
   useEffect(() => {
     if (terminal) {
@@ -132,14 +133,6 @@ const Project: BlitzPage = () => {
 
   return (
     <Layout title={`${initiative?.data.name || "Initiative"}`}>
-      {initiative && (
-        <ApplicationModal
-          isOpen={applicationModalOpen}
-          setIsOpen={setApplicationModalOpen}
-          initiative={initiative}
-          discordWebhookUrl={terminal?.data.discordWebhookUrl}
-        />
-      )}
       {selectedContributorToView && (
         <ContributorDirectoryModal
           contributor={selectedContributorToView}
@@ -193,17 +186,19 @@ const Project: BlitzPage = () => {
                   <img src={initiative.data.bannerURL} alt="Project banner image." />
                 )}
               </div>
-              {/* {initiative?.data.about && <ReadonlyTextarea value={initiative.data.about} />} */}
-              <div className="flex flex-col space-y-3">
-                {initiative &&
-                  initiative.data.contributeText?.map?.((item, index) => {
+              {initiative?.data.about ? (
+                <ReadOnlyTextArea value={initiative.data.about} />
+              ) : (
+                <div className="flex flex-col space-y-3">
+                  {initiative?.data.contributeText?.map?.((item, index) => {
                     return (
                       <span className="flex flex-col text-base" key={index}>
                         <p dangerouslySetInnerHTML={{ __html: item }} />
                       </span>
                     )
                   })}
-              </div>
+                </div>
+              )}
               {results.length > 0 && (
                 <div className="space-y-4">
                   <div className="flex flex-row">
@@ -279,7 +274,7 @@ const Project: BlitzPage = () => {
                 </div>
               )}
               <div className="text-marble-white flex flex-col space-y-8">
-                {initiative && initiative.data.rewardText && (
+                {initiative && initiative.data.rewardText && initiative.data.rewardText.length > 0 && (
                   <div className="space-y-2">
                     <span className="text-2xl">Rewards</span>
                     <div className="flex flex-col">
@@ -328,7 +323,7 @@ const Project: BlitzPage = () => {
                       handleSubmitInterestClick()
                     }}
                   >
-                    Submit Interest
+                    Submit a Proposal
                   </Button>
                 )}
               </div>

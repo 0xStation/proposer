@@ -1,6 +1,7 @@
+import { Dispatch, SetStateAction } from "react"
 import { Account } from "app/account/types"
 import { Link, RouteUrlObject, useRouter } from "blitz"
-import { genPathFromUrlObject } from "app/utils/genPathFromUrlObject"
+import { genPathFromUrlObject } from "app/utils"
 import { getInitiativeStatusColor } from "app/utils/initiativeStatusOptions"
 
 type InitiatveCardProps = {
@@ -12,6 +13,7 @@ type InitiatveCardProps = {
   status: string
   viewLink: RouteUrlObject
   editLink: RouteUrlObject
+  toggleContributorDirectoryModal?: Dispatch<SetStateAction<boolean>>
 }
 
 const InitiativeCard = ({
@@ -22,6 +24,7 @@ const InitiativeCard = ({
   editable,
   viewLink,
   editLink,
+  toggleContributorDirectoryModal,
 }: InitiatveCardProps) => {
   const router = useRouter()
   const buttonStyles =
@@ -29,7 +32,12 @@ const InitiativeCard = ({
 
   const cardJSX = (
     <div
-      onClick={() => router.push(genPathFromUrlObject(viewLink))}
+      onClick={() => {
+        if (toggleContributorDirectoryModal) {
+          toggleContributorDirectoryModal(false)
+        }
+        router.push(genPathFromUrlObject(viewLink))
+      }}
       className="border border-concrete p-4 flex flex-col cursor-pointer h-full hover:border-marble-white relative group"
     >
       {editable && (

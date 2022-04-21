@@ -23,6 +23,7 @@ import { Initiative } from "app/initiative/types"
 import { useContributorsRead } from "app/core/contracts/contracts"
 import { BigNumberish, utils } from "ethers"
 import hasInvitePermissions from "app/application/queries/hasInvitePermissions"
+import getApplicationByAddress from "app/application/queries/getApplicationByAddress"
 
 const skeletonLoadingScreen = (
   <div className="flex flex-col space-y-10">
@@ -52,7 +53,11 @@ const skeletonLoadingScreen = (
 
 const TerminalWaitingPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
-  const { directedFrom } = useRouterQuery()
+  const {
+    directedFrom,
+    initiative: initiativeLocalIdParam,
+    applicant: applicantAddressParam,
+  } = useRouterQuery()
   const [selectedInitiativeLocalId, setSelectedInitiativeLocalId] = useState<number | null>()
   const [isRedirectModalOpen, setIsRedirectModalOpen] = useState(false)
   const [isEndorseModalOpen, setIsEndorseModalOpen] = useState(false)
@@ -77,6 +82,21 @@ const TerminalWaitingPage: BlitzPage = () => {
     methodName: "tokenOf",
   })
 
+  useEffect(() => {
+    if (applicantAddressParam && initiativeLocalIdParam && terminal?.id) {
+      const initiativeLocalId = parseInt(initiativeLocalIdParam as string)
+      ;(async () => {
+        const application = await invoke(getApplicationByAddress, {
+          terminalId: terminal?.id,
+          initiativeLocalId: initiativeLocalId,
+          address: applicantAddressParam,
+        })
+        setSelectedApplication(application as Application)
+        setIsApplicantOpen(true)
+      })()
+    }
+  }, [initiativeLocalIdParam, applicantAddressParam, terminal?.id])
+
   const [initiatives] = useQuery(
     getInitiativesByTerminal,
     { terminalId: terminal?.id as number },
@@ -86,10 +106,15 @@ const TerminalWaitingPage: BlitzPage = () => {
       onSuccess: (initiatives) => {
         if (
           Array.isArray(initiatives) &&
-          initiatives?.filter((initiative) => initiative?.applicationCount).length
+          initiatives?.filter((initiative) => initiative?.applicationCount).length &&
+          !selectedInitiativeLocalId
         ) {
-          const firstInitiative = initiatives.find((init) => init.applicationCount !== 0)
-          setSelectedInitiativeLocalId(firstInitiative?.localId)
+          // set the initiative filter if it's specified in the query param,
+          // otherwise default to the first initiative that has applications
+          let initiativeLocalId = initiativeLocalIdParam
+            ? parseInt(initiativeLocalIdParam as string)
+            : initiatives.find((init) => init.applicationCount !== 0)?.localId
+          setSelectedInitiativeLocalId(initiativeLocalId)
         } else {
           setInitialPageLoading(false)
         }
@@ -114,18 +139,12 @@ const TerminalWaitingPage: BlitzPage = () => {
   const [applications, { isLoading: applicationsLoading, refetch: refetchApplications }] = useQuery(
     getApplicationsByInitiative,
     {
-      referralGraphAddress: terminal?.data.contracts.addresses.referrals as string,
-      initiativeLocalId: selectedInitiativeLocalId as number,
       initiativeId: currentInitiative?.id as number,
       terminalId: terminal?.id as number,
     },
     {
       suspense: false,
-      enabled:
-        !!terminal?.data.contracts.addresses.referrals &&
-        !!selectedInitiativeLocalId &&
-        !!currentInitiative?.id &&
-        !!terminal?.id,
+      enabled: !!currentInitiative?.id && !!terminal?.id,
       onSuccess: () => {
         setInitialPageLoading(false)
       },

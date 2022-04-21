@@ -139,7 +139,7 @@ export const InviteModal = ({
 
       // upsert new role if user already has an applicant ticket
       await inviteContributor({
-        inviterId: activeUser.id,
+        inviterId: activeUser.id as number,
         accountId: selectedApplication.account.id,
         terminalId: currentInitiative.terminalId,
         roleLocalId: chosenRole?.localId || applicantTicket?.roleLocalId,

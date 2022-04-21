@@ -10,13 +10,9 @@ import { Terminal, TerminalMetadata } from "app/terminal/types"
 import { getNftImageUrl } from "app/utils/getNftImageUrl"
 import { TraitTypes, DisplayTypes, Ticket } from "app/ticket/types"
 
-/*
-    KEEPING FILE FOR BACKWARDS COMPATABILITY WITH OLD DEMOS
-    WILL REMOVE ONCE DEMOS ARE REPLACED FOR TERMINALS
-*/
-
 type TicketQuery = {
-  ticket: string
+  address: string
+  tokenId: string
   owner: string
 }
 
@@ -51,7 +47,7 @@ const errorMessage = (message: string) => {
 // Station-minted Contributor NFTs will point to this route by default, allowing our
 // metadata to render in Opensea's trait-based system and all products built on top of their API.
 export default async function handler(req: BlitzApiRequest, res: BlitzApiResponse) {
-  const { ticket, owner } = req.query as TicketQuery
+  const { address, tokenId, owner } = req.query as TicketQuery
 
   const account = await db.account.findUnique({
     where: { address: toChecksumAddress(owner) },
@@ -64,7 +60,7 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
   }
 
   const terminal = await db.terminal.findUnique({
-    where: { ticketAddress: toChecksumAddress(ticket) },
+    where: { ticketAddress: toChecksumAddress(address) },
     include: {
       roles: true,
       tickets: {
@@ -121,9 +117,13 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
       .map((i) => makeAttribute(TraitTypes.INITIATIVE, (i.data as InitiativeMetadata)?.name)),
   ]
 
+  const acctName = (account.data as AccountMetadata)?.name
+
   let payload = {
-    name: (account.data as AccountMetadata)?.name,
-    description: `Contributor NFT for the ${(terminal.data as TerminalMetadata)?.name} Terminal.`,
+    name: acctName,
+    description: `Contributor NFT for the ${
+      (terminal.data as TerminalMetadata)?.name
+    } Terminal. [View ${acctName}'s full profile](https://staging.station.express/profile/${owner}).`,
     // TODO: add link to contributor's public profile page to description once complete
     external_url: "https://station.express/",
     image,

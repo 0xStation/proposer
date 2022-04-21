@@ -1,24 +1,18 @@
 import { Fragment } from "react"
-import { useQuery } from "blitz"
+import { Routes, useParam, useQuery, useRouter } from "blitz"
 import ApplicantEndorsements from "./ApplicantEndorsements"
 import { Dialog, Transition } from "@headlessui/react"
 import { XIcon } from "@heroicons/react/outline"
 import { formatDate } from "app/core/utils/formatDate"
 import { APPLICATION_STATUS_MAP } from "app/core/utils/constants"
 import getReferralsByApplication from "app/endorsements/queries/getReferralsByApplication"
-import getEndorsementValueSumByApplication from "app/endorsements/queries/getEndorsementValueSumByApplication"
+import { Button } from "app/core/components/Button"
 
 const ApplicationDrawer = ({ isOpen, setIsOpen, application }) => {
+  const router = useRouter()
+  const applicantAddress = useParam("accountAddress", "string") as string
   const [referrals] = useQuery(
     getReferralsByApplication,
-    {
-      initiativeId: application?.initiative?.id,
-      endorseeId: application?.accountId,
-    },
-    { suspense: false, enabled: !!(application?.initiative?.id && application?.accountId) }
-  )
-  const [totalEndorsementPoints] = useQuery(
-    getEndorsementValueSumByApplication,
     {
       initiativeId: application?.initiative?.id,
       endorseeId: application?.accountId,
@@ -114,12 +108,12 @@ const ApplicationDrawer = ({ isOpen, setIsOpen, application }) => {
                             {application?.data?.entryDescription}
                           </span>
                         </div>
-                        {application.data.urls && (
+                        {application.data?.urls && (
                           <div className="flex flex-col border-b border-concrete pb-8 mt-8">
                             <span className="text-base font-bold text-marble-white">
                               Submission
                             </span>
-                            {application.data.urls.map((url, idx) => {
+                            {application.data?.urls.map((url, idx) => {
                               return (
                                 <a
                                   key={idx}
@@ -134,21 +128,37 @@ const ApplicationDrawer = ({ isOpen, setIsOpen, application }) => {
                             })}
                           </div>
                         )}
-                        <div className="flex flew-row pt-6 pb-3 space-x-64">
+                        <div className="flex flew-row pt-6 pb-3 space-x-64 mb-auto">
                           <span className="flex-col text-base font-bold text-marble-white">
                             Endorsers ({referrals?.length ? referrals.length : 0})
                           </span>
                         </div>
-                        {referrals?.map?.(({ endorser: account, endorsementsGiven }, index) => (
-                          <ApplicantEndorsements
-                            key={index}
-                            endorser={account}
-                            amount={endorsementsGiven || 0}
-                          />
-                        ))}
+                        <div className="flex-col overflow-y-auto max-h-[32.5rem] mb-5">
+                          {referrals?.map?.(({ endorser: account, endorsementsGiven }, index) => (
+                            <ApplicantEndorsements
+                              key={index}
+                              endorser={account}
+                              amount={endorsementsGiven || 0}
+                            />
+                          ))}
+                        </div>
                       </>
                     )}
                   </div>
+                  <Button
+                    className="w-80 mt-auto mb-10"
+                    onClick={() => {
+                      router.push(
+                        Routes.TerminalWaitingPage({
+                          terminalHandle: application?.initiative.terminal.handle,
+                          applicant: applicantAddress,
+                          initiative: application?.initiative.localId,
+                        })
+                      )
+                    }}
+                  >
+                    View Submission in Waiting Room
+                  </Button>
                 </div>
               </div>
             </Transition.Child>

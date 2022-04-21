@@ -1,4 +1,4 @@
-import db from "../index"
+import db from "../../index"
 import { Initiative } from "app/initiative/types"
 import { StatusOptions } from "app/initiative/types"
 
