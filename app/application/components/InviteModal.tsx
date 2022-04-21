@@ -9,7 +9,7 @@ import { Account } from "app/account/types"
 import { Role } from "app/role/types"
 import { toTitleCase } from "app/core/utils/titleCase"
 import getInvitePermissions from "../queries/getInvitePermissions"
-import { useIdentityAdminWrite } from "app/core/contracts/contracts"
+import { useIdentityAdminWrite, useStationIdWrite } from "app/core/contracts/contracts"
 import { useWaitForTransaction } from "wagmi"
 import { BigNumber } from "ethers"
 
@@ -50,8 +50,9 @@ export const InviteModal = ({
     { enabled: !!currentInitiative?.terminalId, suspense: false }
   )
 
-  const { loading: mintLoading, write: mint } = useIdentityAdminWrite({
+  const { loading: mintLoading, write: mint } = useStationIdWrite({
     methodName: "mint",
+    contract: terminal?.ticketAddress,
   })
 
   const [, wait] = useWaitForTransaction({
@@ -96,9 +97,8 @@ export const InviteModal = ({
     } else {
       // Applicant doesn't already have an nft, we need to mint one
       if (!selectedApplicationHasNft) {
-        const tags = BigNumber.from(Math.pow(2, chosenRole?.localId || 0)) // convert roleLocalId into on-chain representation
         const { data: mintData, error: mintError } = await mint({
-          args: [terminal?.ticketAddress, selectedApplication?.account.address, tags],
+          args: [selectedApplication?.account.address],
         })
 
         // Poll for on-chain endorse data until we have an error or the results data
