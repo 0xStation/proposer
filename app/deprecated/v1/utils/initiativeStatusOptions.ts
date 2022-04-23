@@ -1,4 +1,4 @@
-import { StatusOptions } from "app/v1/initiative/types"
+import { StatusOptions } from "app/deprecated/v1/initiative/types"
 
 const InitiativeStatusOptions = [
   { value: StatusOptions.OPEN_FOR_SUBMISSIONS, label: "Open for submissions" },

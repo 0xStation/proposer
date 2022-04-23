@@ -1,4 +1,4 @@
-import { genBaseUrl } from "../../utils"
+import { genBaseUrl } from "../../../utils"
 
 export async function sendNewApplicationNotification(
   initiativeName: string,

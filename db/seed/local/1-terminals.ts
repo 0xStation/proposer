@@ -1,5 +1,5 @@
 import db from "../../index"
-import { Terminal, TerminalMetadata } from "app/v1/terminal/types"
+import { Terminal, TerminalMetadata } from "app/deprecated/v1/terminal/types"
 
 interface CreateTerminalParams {
   ticketAddress: string

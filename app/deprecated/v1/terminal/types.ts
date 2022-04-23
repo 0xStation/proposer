@@ -1,4 +1,4 @@
-import { Initiative } from "app/v1/initiative/types"
+import { Initiative } from "app/deprecated/v1/initiative/types"
 import { Role } from "app/role/types"
 
 export enum MethodToVisualizeContributorsNft {

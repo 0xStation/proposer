@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { Initiative } from "app/v1/initiative/types"
+import { Initiative } from "app/deprecated/v1/initiative/types"
 
 const GetInitiativesByLocalIds = z.object({
   terminalId: z.number(),

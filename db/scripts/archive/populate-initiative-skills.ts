@@ -1,5 +1,5 @@
 import db from "../../index"
-import { Initiative } from "app/v1/initiative/types"
+import { Initiative } from "app/deprecated/v1/initiative/types"
 
 // blitz db seed -f db/scripts/populate-initiative-skills.ts
 const seed = async () => {
