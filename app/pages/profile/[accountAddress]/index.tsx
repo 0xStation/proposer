@@ -1,32 +1,26 @@
 import { useState, useEffect } from "react"
 import { BlitzPage, useRouter, useRouterQuery, useParam, useQuery } from "blitz"
 import { Tag } from "app/core/components/Tag"
-import TerminalCard from "app/terminal/components/TerminalCard"
-import ApplicationCard from "app/application/components/ApplicationCard"
-import ApplicationDrawer from "app/application/components/ApplicationDrawer"
+import TerminalCard from "app/terminal/TerminalCard"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import { getWalletString } from "app/utils/getWalletString"
 import Button from "app/core/components/Button"
-import ExploreModal from "app/core/components/Explore/ExploreModal"
 import { QUERY_PARAMETERS, PROFILE_TABS } from "app/core/utils/constants"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
-type ProfileTabs = "TERMINALS" | "INITIATIVES"
+type ProfileTabs = "TERMINALS"
 
 // the profile homepage
-// can see a users initiatives + termials + profile info at a glance
+// can see a users terminals + profile info at a glance
 const ProfileHome: BlitzPage = () => {
   const accountAddress = useParam("accountAddress", "string") as string
   const { setTab } = useRouterQuery()
-  const [isExploreModalOpen, setIsExploreModalOpen] = useState<boolean>(false)
-  const [sliderOpen, setSliderOpen] = useState(false)
-  const [activeApplication, setActiveApplication] = useState()
   const [subpage, setSubpage] = useState<ProfileTabs>(PROFILE_TABS.TERMINALS as ProfileTabs)
   const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
-  const { DIRECTED_FROM, SET_TAB } = QUERY_PARAMETERS
+  const { SET_TAB } = QUERY_PARAMETERS
 
   const [account] = useQuery(
     getAccountByAddress,
@@ -35,9 +29,7 @@ const ProfileHome: BlitzPage = () => {
   )
 
   useEffect(() => {
-    if (setTab === SET_TAB.INITIATIVES) {
-      setSubpage(PROFILE_TABS.INITIATIVES as ProfileTabs)
-    } else if (setTab === SET_TAB.TERMINALS) {
+    if (setTab === SET_TAB.TERMINALS) {
       setSubpage(PROFILE_TABS.TERMINALS as ProfileTabs)
     }
   }, [setTab])
@@ -56,17 +48,7 @@ const ProfileHome: BlitzPage = () => {
 
   return (
     <Layout title={`${account ? `${account?.data?.name} | ` : ""}Profile`}>
-      <ExploreModal
-        isExploreModalOpen={isExploreModalOpen}
-        setIsExploreModalOpen={setIsExploreModalOpen}
-      />
       <div className="w-full grid grid-cols-1 xl:grid-cols-4 min-h-[calc(100vh-88px)] h-[1px]">
-        <ApplicationDrawer
-          isOpen={sliderOpen}
-          setIsOpen={setSliderOpen}
-          application={activeApplication}
-        />
-
         <div className="col-span-1 text-2xl md:border-r border-concrete h-full">
           <div className="h-[185px] relative mb-[116px]">
             {account?.data.coverURL ? (
@@ -134,8 +116,7 @@ const ProfileHome: BlitzPage = () => {
         </div>
         <div className="col-span-2 xl:col-span-3 px-12 relative">
           <div className="mt-12">
-            {((account?.tickets && account?.tickets.length > 0) ||
-              (account?.initiatives && account?.initiatives.length > 0)) && (
+            {account?.tickets && account?.tickets.length > 0 && (
               <>
                 <div className="flex flex-row z-10">
                   <button
@@ -147,15 +128,6 @@ const ProfileHome: BlitzPage = () => {
                   >
                     Terminals
                   </button>
-                  <button
-                    tabIndex={0}
-                    onClick={() => setSubpage(PROFILE_TABS.INITIATIVES as ProfileTabs)}
-                    className={`${
-                      subpage === "INITIATIVES" ? activeLinkStyles : inactiveLinkStyles
-                    } cursor-pointer text-2xl mr-12`}
-                  >
-                    Initiatives
-                  </button>
                 </div>
                 {subpage === PROFILE_TABS.TERMINALS && (
                   <div className="flex mt-12 flex-wrap">
@@ -165,60 +137,29 @@ const ProfileHome: BlitzPage = () => {
                       })}
                   </div>
                 )}
-                {subpage === PROFILE_TABS.INITIATIVES && (
-                  <div className="flex mt-12 flex-wrap">
-                    {account?.initiatives &&
-                      account?.initiatives.map((application, index) => {
-                        return (
-                          <ApplicationCard
-                            address={account.address}
-                            key={index}
-                            application={application}
-                            onClick={() => {
-                              if (application.status === "INTERESTED") {
-                                setActiveApplication(application)
-                                setSliderOpen(true)
-                              } else if (application.status === "CONTRIBUTING") {
-                                router.push(
-                                  `/terminal/${application.initiative.terminal.handle}/initiative/${application.initiative.localId}?directedFrom=${DIRECTED_FROM.PROFILE}&address=${account.address}`
-                                )
-                              }
-                            }}
-                          />
-                        )
-                      })}
-                  </div>
-                )}
               </>
             )}
-            {/* Show if user is active in terminal but has no initiatives, or if the user is not in any terminals or initiatives */}
-            {(!account?.initiatives?.length && subpage === PROFILE_TABS.INITIATIVES) ||
-              (!account?.tickets?.length && subpage === PROFILE_TABS.TERMINALS && (
-                <div className="w-full h-full flex items-center flex-col justify-center mt-[23%]">
-                  {activeUser?.address === account?.address ? (
-                    <>
-                      <p className="text-marble-white text-2xl font-bold">Explore Terminals</p>
-                      <p className="mt-2 text-marble-white text-base w-[400px] text-center">
-                        Discover DAOs and communities, submit interests to initiatives, and start
-                        contributing.
-                      </p>
-                      <Button
-                        className="cursor-pointer mt-4 w-[300px] py-1"
-                        onClick={() => setIsExploreModalOpen(true)}
-                      >
-                        Start exploring
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <p className="font-bold text-2xl text-center">
-                        {`${account?.data?.name}`} is still exploring
-                      </p>
-                      <p className="font-bold text-2xl text-center w-[290px]">in Station</p>
-                    </>
-                  )}
-                </div>
-              ))}
+            {/* Show if the user is not in any terminals */}
+            {!account?.tickets?.length && subpage === PROFILE_TABS.TERMINALS && (
+              <div className="w-full h-full flex items-center flex-col justify-center mt-[23%]">
+                {activeUser?.address === account?.address ? (
+                  <>
+                    <p className="text-marble-white text-2xl font-bold">Explore Terminals</p>
+                    <p className="mt-2 text-marble-white text-base w-[400px] text-center">
+                      Discover DAOs and communities and start contributing.
+                    </p>
+                    <Button className="cursor-pointer mt-4 w-[300px] py-1">Start exploring</Button>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-bold text-2xl text-center">
+                      {`${account?.data?.name}`} is still exploring
+                    </p>
+                    <p className="font-bold text-2xl text-center w-[290px]">in Station</p>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

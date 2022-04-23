@@ -1,24 +1,10 @@
-import { useState } from "react"
-import { Router } from "blitz"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import { useAccount } from "wagmi"
 import Button from "app/core/components/Button"
-import ExploreModal from "app/core/components/Explore/ExploreModal"
 
 const Home: BlitzPage = () => {
-  const [isExploreModalOpen, setIsExploreModalOpen] = useState<boolean>(false)
-
-  const [{ data: accountData }] = useAccount({
-    fetchEns: true,
-  })
-
   const ConnectView = (
     <>
-      <ExploreModal
-        isExploreModalOpen={isExploreModalOpen}
-        setIsExploreModalOpen={setIsExploreModalOpen}
-      />
       <div className="flex items-center h-full px-4 sm:px-0 sm:ml-40">
         <div className="bg-tunnel-black border border-marble-white pt-10 px-5 pb-5 w-full sm:w-128">
           <h3 className="text-marble-white text-3xl">Welcome to Station</h3>
@@ -27,12 +13,7 @@ const Home: BlitzPage = () => {
             places in Web3.
           </p>
           <p className="text-marble-white text-base mt-4">Join the ride.</p>
-          <Button
-            className="mt-4 w-full py-2 text-center text-base"
-            onClick={() => setIsExploreModalOpen(true)}
-          >
-            {accountData?.address ? "Start Exploring" : "Enter Station"}
-          </Button>
+          <Button className="mt-4 w-full py-2 text-center text-base">Enter Station</Button>
         </div>
       </div>
     </>

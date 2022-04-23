@@ -2,7 +2,7 @@ import { useMemo } from "react"
 import { createEditor } from "slate"
 import { Slate, Editable, withReact } from "slate-react"
 import withLinks from "./Editor/plugins/withLinks"
-import { CustomElement } from "app/initiative/types"
+import { CustomElement } from "app/v1/initiative/types"
 
 import Paragraph from "./Editor/elements/Paragraph"
 import Link from "./Editor/elements/Link"

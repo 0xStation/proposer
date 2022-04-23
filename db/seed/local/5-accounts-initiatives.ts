@@ -1,4 +1,4 @@
-import { ApplicationStatus } from "app/application/types"
+import { ApplicationStatus } from "app/v1/application/types"
 import db from "../../index"
 import { initiativeIds } from "./4-initiatives"
 

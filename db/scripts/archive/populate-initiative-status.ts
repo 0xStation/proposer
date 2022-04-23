@@ -1,6 +1,6 @@
 import db from "../../index"
-import { Initiative } from "app/initiative/types"
-import { StatusOptions } from "app/initiative/types"
+import { Initiative } from "app/v1/initiative/types"
+import { StatusOptions } from "app/v1/initiative/types"
 
 // blitz db seed -f db/scripts/populate-initiative-status.ts
 const seed = async () => {

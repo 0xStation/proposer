@@ -7,7 +7,6 @@ import useStore from "../hooks/useStore"
 import { useAccount } from "wagmi"
 import truncateString from "../utils/truncateString"
 import { LOCAL_STORAGE } from "../utils/constants"
-import ExplorePopover from "./Explore/ExplorePopover"
 
 /**
  * Navigation Component
@@ -85,7 +84,6 @@ const Navigation = () => {
           ]}
         />
         <div className="flex items-center border-l border-l-concrete">
-          <ExplorePopover />
           {activeUser ? (
             <Dropdown
               side="right"

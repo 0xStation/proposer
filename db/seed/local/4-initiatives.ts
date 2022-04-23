@@ -1,7 +1,7 @@
 import db from "../../index"
-import { InitiativeMetadata } from "app/initiative/types"
+import { InitiativeMetadata } from "app/v1/initiative/types"
 import { Symbol } from "app/types"
-import { CustomElement } from "app/initiative/types"
+import { CustomElement } from "app/v1/initiative/types"
 
 type InitiativeSeed = {
   localId: number

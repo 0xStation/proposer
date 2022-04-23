@@ -1,5 +1,5 @@
 import { defaultTicketImageUrl } from "app/core/utils/constants"
-import { Terminal, MethodToVisualizeContributorsNft, TerminalMetadata } from "app/terminal/types"
+import { Terminal } from "app/v1/terminal/types"
 import { Ticket } from "app/ticket/types"
 
 // algorithm for finding the appropriate data source to retrieve a Contributor NFT's image
