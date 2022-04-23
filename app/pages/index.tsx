@@ -42,7 +42,7 @@ const Home: BlitzPage = () => {
     <Layout title="Station">
       <main
         className="w-full h-[calc(100vh-6rem)] bg-cover bg-no-repeat"
-        style={{ backgroundImage: "url('/station-cover.png')" }}
+        style={{ backgroundImage: "url('/station-cover.webp')" }}
       >
         {ConnectView}
       </main>
