@@ -5,11 +5,10 @@ import Coinbase from "/public/coinbase-logo.svg"
 import WalletConnect from "/public/wallet-logo.svg"
 import Banner from "/public/walletconnect-banner.svg"
 import { useConnect } from "wagmi"
-import { LOCAL_STORAGE } from "../utils/constants"
 
 const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
-  const [{ data: connectData }, connect] = useConnect()
-  const [metamaskWallet, walletConnect, coinbaseWallet] = connectData?.connectors
+  const { connectors, connect } = useConnect()
+  const [metamaskWallet, walletConnect, coinbaseWallet] = connectors
 
   // https://github.com/NoahZinsmeister/web3-react/issues/300
   // If a user is connecting their wallet for the first time and has both coinbase and metamask extensions,
@@ -50,9 +49,6 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
       activateInjectedProvider(wallet)
     }
     await connect(connector)
-    // we're reading from localStorage at the app level
-    // to see if we need to maintain a wallet connection
-    localStorage.setItem(LOCAL_STORAGE.CONNECTION, "true")
   }
 
   return (
