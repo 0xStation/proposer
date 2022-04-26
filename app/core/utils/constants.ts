@@ -13,11 +13,6 @@ export const DEFAULT_NUMBER_OF_DECIMALS = 6
 
 export const MAX_ALLOWANCE = 100000000000000
 
-export const LOCAL_STORAGE = {
-  WAGMI_WALLET: "station.wallet",
-  CONNECTION: "station.connection",
-}
-
 export const APPLICATION_STATUS_MAP = {
   PREVIOUSLY_CONTRIBUTED: {
     status: "PREVIOUSLY CONTRIBUTED",

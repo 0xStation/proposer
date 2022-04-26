@@ -6,7 +6,7 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import useStore from "../hooks/useStore"
 import { useAccount } from "wagmi"
 import truncateString from "../utils/truncateString"
-import { LOCAL_STORAGE } from "../utils/constants"
+import { useDisconnect } from "wagmi"
 
 /**
  * Navigation Component
@@ -14,9 +14,8 @@ import { LOCAL_STORAGE } from "../utils/constants"
 const Navigation = () => {
   const router = useRouter()
   // a list of the modals that are active on the screen
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  })
+  const { data: accountData } = useAccount()
+  const { disconnect } = useDisconnect()
 
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const setActiveUser = useStore((state) => state.setActiveUser)
@@ -38,19 +37,10 @@ const Navigation = () => {
   useEffect(() => {
     if (address) {
       getUserAccount(address)
-    } else if (!localStorage.getItem(LOCAL_STORAGE.CONNECTION)) {
+    } else {
       setActiveUser(null)
     }
   }, [address])
-
-  const appDisconnect = () => {
-    // we're reading from localStorage at the app level
-    // to see if we need to maintain a wallet connection
-    if (localStorage.getItem(LOCAL_STORAGE.CONNECTION)) {
-      localStorage.removeItem(LOCAL_STORAGE.CONNECTION)
-    }
-    disconnect()
-  }
 
   return (
     <>
@@ -99,7 +89,7 @@ const Navigation = () => {
                   ) : (
                     <span className="w-7 h-7 rounded-full bg-gradient-to-b object-cover from-electric-violet to-magic-mint border border-marble-white mr-2"></span>
                   )}
-                  <span>{accountData?.ens?.name || activeUser?.data?.name || "Handle"}</span>
+                  <span>{activeUser?.data?.name || "Handle"}</span>
                 </div>
               }
               items={[
@@ -109,7 +99,7 @@ const Navigation = () => {
                 },
                 {
                   name: "Disconnect",
-                  onClick: appDisconnect,
+                  onClick: disconnect,
                 },
               ]}
             />
@@ -127,7 +117,7 @@ const Navigation = () => {
                 { name: "Create Account", onClick: () => router.push("/profile/create") },
                 {
                   name: "disconnect",
-                  onClick: appDisconnect,
+                  onClick: disconnect,
                 },
               ]}
             />
