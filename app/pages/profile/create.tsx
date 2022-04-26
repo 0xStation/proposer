@@ -7,9 +7,7 @@ import useStore from "app/core/hooks/useStore"
 
 const CreateProfile: BlitzPage = () => {
   const router = useRouter()
-  const [{ data: accountData }] = useAccount({
-    fetchEns: true,
-  })
+  const { data: accountData } = useAccount()
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const activeUser = useStore((state) => state.activeUser)
   const [accountCreationLoading, setAccountCreationLoading] = useState<boolean>(false)

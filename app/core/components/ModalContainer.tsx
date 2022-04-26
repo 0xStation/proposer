@@ -1,7 +1,6 @@
 import { Fragment } from "react"
 import ConnectWalletModal from "app/core/components/ConnectWalletModal"
 import useStore from "../hooks/useStore"
-import { useAccount } from "wagmi"
 
 const ModalContainer = () => {
   const walletModalOpen = useStore((state) => state.walletModalOpen)

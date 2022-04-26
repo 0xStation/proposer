@@ -1,11 +1,10 @@
 import { AppProps } from "blitz"
 import "app/core/styles/index.css"
 import { providers } from "ethers"
-import { Provider, defaultChains } from "wagmi"
+import { Provider, defaultChains, createClient } from "wagmi"
 import { InjectedConnector } from "wagmi/connectors/injected"
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect"
-import { WalletLinkConnector } from "wagmi/connectors/walletLink"
-import { LOCAL_STORAGE } from "app/core/utils/constants"
+import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet"
 
 // Chains for connectors to support
 const chains = defaultChains
@@ -24,38 +23,22 @@ const connectors = ({ chainId }) => {
       },
     }),
     // Coinbase
-    new WalletLinkConnector({
+    new CoinbaseWalletConnector({
       options: {
         appName: "Station",
       },
     }),
   ]
 }
+
+const client = createClient({
+  autoConnect: false,
+  connectors,
+  provider,
+})
+
 export default function App({ Component, pageProps }: AppProps) {
   const getLayout = Component.getLayout || ((page) => page)
 
-  // https://wagmi-xyz.vercel.app/docs/provider#autoconnect-optional
-  // The `wagmi` library provides an autoconnect option that connects
-  // a user to whatever their last-used connector was. This maintains
-  // the connection throughout the app, but if the user tries to disconnect,
-  // wagmi will immediately reinstate the connection. To disconnect the user
-  // completely, we're reading from localStorage to read when the user
-  // connects and disconnects from the app. We set the localStorage key
-  // when the user connects their wallet and remove it on disconnect.
-  let autoConnect
-  if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
-    const connection = localStorage.getItem(LOCAL_STORAGE.CONNECTION)
-    autoConnect = !!connection
-  }
-
-  return (
-    <Provider
-      connectorStorageKey={LOCAL_STORAGE.WAGMI_WALLET}
-      connectors={connectors}
-      provider={provider}
-      autoConnect={autoConnect}
-    >
-      {getLayout(<Component {...pageProps} />)}
-    </Provider>
-  )
+  return <Provider client={client}>{getLayout(<Component {...pageProps} />)}</Provider>
 }
