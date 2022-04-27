@@ -1,4 +1,4 @@
-import { Membership } from "@prisma/client"
+import { AccountTerminal } from "@prisma/client"
 
 export type RoleMetadata = {
   name: string
@@ -11,5 +11,5 @@ export type Role = {
   localId: number
   data: RoleMetadata
   ticketCount?: number
-  tickets?: Membership
+  tickets?: AccountTerminal
 }

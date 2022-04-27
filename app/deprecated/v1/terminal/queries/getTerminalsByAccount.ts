@@ -8,7 +8,7 @@ const GetTerminalsByAccount = z.object({
 
 export default async function getTerminalsByAccount(input: z.infer<typeof GetTerminalsByAccount>) {
   const params = GetTerminalsByAccount.parse(input)
-  const tickets = await db.membership.findMany({
+  const tickets = await db.accountTerminal.findMany({
     include: {
       terminal: true,
     },

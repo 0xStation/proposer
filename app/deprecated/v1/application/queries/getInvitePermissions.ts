@@ -13,7 +13,7 @@ const GetInvitePermissions = z.object({
 export const getInvitePermissions = async (input) => {
   const data = GetInvitePermissions.parse(input)
 
-  const inviterTerminal = await db.membership.findUnique({
+  const inviterTerminal = await db.accountTerminal.findUnique({
     where: {
       accountId_terminalId: {
         accountId: data?.inviterId,

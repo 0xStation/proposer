@@ -14,7 +14,7 @@ export default async function getTicket(input: z.infer<typeof GetTicket>) {
     return null
   }
 
-  const ticket = await db.membership.findUnique({
+  const ticket = await db.accountTerminal.findUnique({
     where: {
       accountId_terminalId: {
         accountId: data.accountId,
