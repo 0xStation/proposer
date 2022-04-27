@@ -13,7 +13,7 @@ export default async function getAccountsByTerminalRole(
 ) {
   const data = GetAccountsByTerminalRole.parse(input)
 
-  const tickets = await db.membership.findMany({
+  const tickets = await db.accountTerminal.findMany({
     where: { terminalId: data.terminalId, roleLocalId: data.roleLocalId },
     include: {
       account: {

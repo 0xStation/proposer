@@ -34,7 +34,7 @@ export default async function inviteContributor(input: z.infer<typeof InviteCont
     },
   })
 
-  await db.membership.upsert({
+  await db.accountTerminal.upsert({
     where: {
       accountId_terminalId: {
         accountId: accountId,

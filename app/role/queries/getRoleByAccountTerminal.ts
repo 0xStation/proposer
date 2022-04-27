@@ -13,7 +13,7 @@ export default async function getRoleByAccountTerminal(
   const data = GetRoleByAccountTerminal.parse(input)
   const { terminalId, accountId } = data
 
-  const ticket = await db.membership.findUnique({
+  const ticket = await db.accountTerminal.findUnique({
     where: {
       accountId_terminalId: {
         terminalId,

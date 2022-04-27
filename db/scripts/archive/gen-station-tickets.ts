@@ -17,7 +17,7 @@ const seed = async () => {
     return
   }
 
-  let stationTickets = await db.membership.findMany({
+  let stationTickets = await db.accountTerminal.findMany({
     where: {
       terminalId: stationTerminal.id,
     },
@@ -54,7 +54,7 @@ const seed = async () => {
     }
 
     const dataCopy = JSON.parse(JSON.stringify(st.data))
-    await db.membership.update({
+    await db.accountTerminal.update({
       where: {
         accountId_terminalId: {
           accountId: account.id,
