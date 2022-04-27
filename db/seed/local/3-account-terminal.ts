@@ -37,7 +37,7 @@ const seed = async () => {
       continue
     }
 
-    await db.accountTerminal.create({
+    await db.membership.create({
       data: {
         accountId: account.id,
         terminalId: terminal.id,
@@ -71,7 +71,7 @@ const seed = async () => {
     }
     console.log("ccs terminal id", ccsTerminal.id)
 
-    await db.accountTerminal.create({
+    await db.membership.create({
       data: {
         accountId: account.id,
         terminalId: ccsTerminal.id,

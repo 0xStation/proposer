@@ -5,7 +5,7 @@ const seed = async () => {
   console.log("Wiping all database rows...")
   await db.accountInitiative.deleteMany({})
   await db.accountSkill.deleteMany({})
-  await db.accountTerminal.deleteMany({})
+  await db.membership.deleteMany({})
   await db.role.deleteMany({})
   await db.endorsement.deleteMany({})
   await db.skill.deleteMany({})
