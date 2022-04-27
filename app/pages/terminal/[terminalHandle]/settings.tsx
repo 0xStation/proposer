@@ -1,12 +1,6 @@
 import { useState, useEffect } from "react"
-import { BlitzPage, useParam, useRouterQuery, useQuery } from "blitz"
+import { BlitzPage, useParam, useQuery } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-
-type GuildOption = {
-  img: string
-  label: string
-  value: string
-}
 
 type Guild = {
   roles: Role[]
@@ -16,15 +10,18 @@ type Role = {
   name: string
 }
 
+const STATION_ID = "872269102092263465"
+const SA_ID = "882488248591593553"
+
 const SettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
-  const [activeGuild, setActiveGuild] = useState<Guild>()
+  const [connectedGuild, setConnectedGuild] = useState<Guild | undefined>(undefined)
 
   useEffect(() => {
     const fetchAsync = async () => {
       // maybe add this in the data field of the terminals we support
-      let selectedGuildId = "882488248591593553"
+      let selectedGuildId = SA_ID
       const response = await fetch("/api/discord/get-guild", {
         method: "POST",
         headers: {
@@ -33,34 +30,37 @@ const SettingsPage: BlitzPage = () => {
         body: JSON.stringify({ guild_id: selectedGuildId }),
       })
 
+      if (response.status !== 200) {
+        return
+      }
       const guild = await response.json()
-      setActiveGuild(guild)
+      setConnectedGuild(guild)
     }
     fetchAsync()
   }, [])
 
-  console.log(activeGuild)
-
   return (
-    <main className="text-marble-white h-screen flex flex-row">
-      <nav className="w-[70px] h-full border-r border-concrete"></nav>
-      <section className="w-[300px] h-full border-r border-concrete p-6">
-        <label className="font-bold text-sm text-marble-white uppercase tracking-wider">
-          {terminalHandle}
-        </label>
-        <ul className="mt-6">
-          <li className="text-concrete text-lg cursor-pointer">General Information</li>
-        </ul>
+    <main className="text-marble-white min-h-screen flex flex-row">
+      <nav className="w-[70px]"></nav>
+      <section className="w-[300px] border-r border-concrete p-6">
+        <div className="fixed">
+          <label className="font-bold text-sm text-marble-white uppercase tracking-wider">
+            {terminalHandle}
+          </label>
+          <ul className="mt-6">
+            <li className="text-concrete text-lg cursor-pointer">General Information</li>
+          </ul>
 
-        <label className="font-bold text-sm text-marble-white uppercase tracking-wider mt-8 block">
-          Integrations
-        </label>
-        <ul className="mt-6">
-          <li className="text-marble-white text-lg cursor-pointer">Discord</li>
-        </ul>
+          <label className="font-bold text-sm text-marble-white uppercase tracking-wider mt-8 block">
+            Integrations
+          </label>
+          <ul className="mt-6">
+            <li className="text-marble-white text-lg cursor-pointer">Discord</li>
+          </ul>
+        </div>
       </section>
-      <section className="flex-1 h-full">
-        {false && (
+      <section className="flex-1">
+        {!connectedGuild && (
           <div className="w-full h-full flex items-center flex-col justify-center">
             <p className="text-marble-white text-2xl font-bold">Connect with Discord</p>
             <p className="mt-2 text-marble-white text-base w-[400px] text-center">
@@ -79,36 +79,47 @@ const SettingsPage: BlitzPage = () => {
             </a>
           </div>
         )}
-        <div className="flex flex-col">
-          <div className="p-6 border-b border-concrete">
-            <h2 className="text-marble-white text-2xl">Discord</h2>
-            <p className="text-marble-white mt-4">Connect with discord to sync roles.</p>
-          </div>
-          <div className="p-6">
-            <div className="grid grid-cols-2 border-b border-concrete pb-2">
-              <header className="text-bold text-sm uppercase tracking-wider">Role</header>
-              <header className="text-bold text-sm uppercase tracking-wider">Category</header>
+        {connectedGuild && (
+          <div className="flex flex-col">
+            <div className="p-6 border-b border-concrete flex justify-between">
+              <div>
+                <h2 className="text-marble-white text-2xl">Discord</h2>
+                <p className="text-marble-white mt-4">Connect with discord to sync roles.</p>
+              </div>
+              <button className="rounded border border-marble-white text-marble-white px-4 self-start">
+                Connected
+              </button>
             </div>
-            <div className="grid grid-cols-2 mt-6 gap-y-2">
-              {activeGuild?.roles.map((role) => {
-                return (
-                  <>
-                    <div>
-                      <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline">
-                        {role.name}
-                      </p>
-                    </div>
-                    <div>
-                      <select className="bg-tunnel-black w-[200px]">
-                        <option>Select One</option>
-                      </select>
-                    </div>
-                  </>
-                )
-              })}
+
+            <div className="p-6">
+              <div className="grid grid-cols-2 border-b border-concrete pb-2">
+                <header className="text-bold text-sm uppercase tracking-wider">Role</header>
+                <header className="text-bold text-sm uppercase tracking-wider">Category</header>
+              </div>
+              <div className="grid grid-cols-2 mt-6 gap-y-2">
+                {connectedGuild?.roles.map((role) => {
+                  return (
+                    <>
+                      <div>
+                        <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline">
+                          {role.name}
+                        </p>
+                      </div>
+                      <div>
+                        <select className="bg-tunnel-black w-[200px]">
+                          <option>Select One</option>
+                          <option>Role</option>
+                          <option>Initiative</option>
+                          <option>Status</option>
+                        </select>
+                      </div>
+                    </>
+                  )
+                })}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </section>
     </main>
   )
