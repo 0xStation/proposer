@@ -22,7 +22,7 @@ const Home: BlitzPage = () => {
   return (
     <Layout title="Station">
       <main
-        className="w-full h-[calc(100vh-6rem)] bg-cover bg-no-repeat"
+        className="h-full relative bg-cover bg-no-repeat"
         style={{ backgroundImage: "url('/station-cover.webp')" }}
       >
         {ConnectView}
