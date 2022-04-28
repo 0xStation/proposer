@@ -18,6 +18,7 @@ const ccs: CreateTerminalParams = {
   handle: "ccs",
   ticketAddress: "0x",
   data: {
+    guildId: "882488248591593553",
     name: "Crypto, Culture and Society",
     description:
       "A learning DAO building the liberal arts for crypto and exploring web3’s broader societal impact.",
@@ -55,6 +56,7 @@ const station: CreateTerminalParams = {
   handle: "stationlabs",
   ticketAddress: "0xbe26ee78ba287e5c6a862258db9c5e7fe7538f56",
   data: {
+    guildId: "882488248591593553",
     name: "Station Labs",
     description: "Creating on-chain infrastructure for a new genre of work.",
     coverURL: "https://station-images.nyc3.digitaloceanspaces.com/station-cover.png",

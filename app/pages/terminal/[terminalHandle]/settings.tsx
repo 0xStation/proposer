@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react"
 import { BlitzPage, useParam, useQuery } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
+import Checkbox from "app/core/components/form/Checkbox"
+import { Field, Form } from "react-final-form"
 
 type Guild = {
   roles: Role[]
@@ -10,9 +12,6 @@ type Role = {
   name: string
 }
 
-const STATION_ID = "872269102092263465"
-const SA_ID = "882488248591593553"
-
 const SettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
@@ -20,8 +19,8 @@ const SettingsPage: BlitzPage = () => {
 
   useEffect(() => {
     const fetchAsync = async () => {
-      // maybe add this in the data field of the terminals we support
-      let selectedGuildId = SA_ID
+      if (!terminal) return
+      let selectedGuildId = terminal.data.guildId
       const response = await fetch("/api/discord/get-guild", {
         method: "POST",
         headers: {
@@ -36,8 +35,10 @@ const SettingsPage: BlitzPage = () => {
       const guild = await response.json()
       setConnectedGuild(guild)
     }
-    fetchAsync()
-  }, [])
+    if (terminal) {
+      fetchAsync()
+    }
+  }, [terminal])
 
   return (
     <main className="text-marble-white min-h-screen flex flex-row">
@@ -80,45 +81,76 @@ const SettingsPage: BlitzPage = () => {
           </div>
         )}
         {connectedGuild && (
-          <div className="flex flex-col">
-            <div className="p-6 border-b border-concrete flex justify-between">
-              <div>
-                <h2 className="text-marble-white text-2xl">Discord</h2>
-                <p className="text-marble-white mt-4">Connect with discord to sync roles.</p>
-              </div>
-              <button className="rounded border border-marble-white text-marble-white px-4 self-start">
-                Connected
-              </button>
-            </div>
-
-            <div className="p-6">
-              <div className="grid grid-cols-2 border-b border-concrete pb-2">
-                <header className="text-bold text-sm uppercase tracking-wider">Role</header>
-                <header className="text-bold text-sm uppercase tracking-wider">Category</header>
-              </div>
-              <div className="grid grid-cols-2 mt-6 gap-y-2">
-                {connectedGuild?.roles.map((role) => {
-                  return (
-                    <>
+          <Form
+            initialValues={{}}
+            onSubmit={async (values) => console.log(values)}
+            render={({ form, handleSubmit }) => {
+              let cbState = form.getFieldState("@everyone.active")
+              console.log(cbState)
+              return (
+                <form onSubmit={handleSubmit}>
+                  <div className="flex flex-col">
+                    <div className="p-6 border-b border-concrete flex justify-between">
                       <div>
-                        <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline">
-                          {role.name}
+                        <h2 className="text-marble-white text-2xl">Discord</h2>
+                        <p className="text-marble-white mt-4">
+                          Connect with discord to sync roles.
                         </p>
                       </div>
-                      <div>
-                        <select className="bg-tunnel-black w-[200px]">
-                          <option>Select One</option>
-                          <option>Role</option>
-                          <option>Initiative</option>
-                          <option>Status</option>
-                        </select>
+                      <button
+                        className="rounded text-tunnel-black bg-magic-mint px-4 self-start"
+                        type="submit"
+                      >
+                        Save
+                      </button>
+                    </div>
+
+                    <div className="p-6">
+                      <div className="grid grid-cols-2 border-b border-concrete pb-2">
+                        <header className="text-bold text-sm uppercase tracking-wider">Role</header>
+                        <header className="text-bold text-sm uppercase tracking-wider">
+                          Category
+                        </header>
                       </div>
-                    </>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
+                      <div className="grid grid-cols-2 mt-6 gap-y-2">
+                        {connectedGuild.roles.map((role, idx) => {
+                          let cbState = form.getFieldState(role.name + ".active")
+                          return (
+                            <>
+                              <div key={idx} className="flex flex-row items-center">
+                                <Checkbox name={`${role.name}.active`} value={true} />
+                                <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline ml-2">
+                                  {role.name}
+                                </p>
+                              </div>
+                              <div>
+                                <Field
+                                  name={`${role.name}.type`}
+                                  component="select"
+                                  className={`bg-tunnel-black w-[200px] ${
+                                    !cbState?.value ? "text-wet-concrete" : "text-marble-white"
+                                  }`}
+                                >
+                                  <option>Choose option</option>
+                                  {cbState?.value && (
+                                    <>
+                                      <option value="role">Role</option>
+                                      <option value="initiative">Initiative</option>
+                                      <option value="status">Status</option>
+                                    </>
+                                  )}
+                                </Field>
+                              </div>
+                            </>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              )
+            }}
+          />
         )}
       </section>
     </main>

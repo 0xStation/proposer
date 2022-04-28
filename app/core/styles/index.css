@@ -46,3 +46,7 @@ body {
 ::-webkit-scrollbar {
   display: none;
 }
+
+.custom-checkbox:checked ~ .custom-checkbox-placeholder {
+  background-color: white;
+}

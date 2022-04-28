@@ -30,6 +30,7 @@ export type TerminalMetadata = {
   hide?: boolean
   discordWebhookUrl?: string
   visualizeNftMethod?: string
+  guildId?: string
 }
 
 export type Terminal = {
