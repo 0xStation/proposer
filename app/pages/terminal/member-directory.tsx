@@ -39,10 +39,10 @@ const MemberDirectoryPage: BlitzPage = () => {
                   </div>
                   <div className="flex flex-col content-center">
                     <div className="flex flex-row items-center space-x-1">
-                      <div className={`text-lg text-marble-white`}>contributor name</div>
+                      <div className="text-lg text-marble-white font-bold">contributor name</div>
                     </div>
                     <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-                      <div className="w-max truncate">@address</div>
+                      <div className="w-max truncate leading-4">@address</div>
                     </div>
                   </div>
                 </div>
@@ -57,7 +57,7 @@ const MemberDirectoryPage: BlitzPage = () => {
                 </div>
                 <div className="flex flex-col content-center">
                   <div className="flex flex-row items-center space-x-1">
-                    <div className={`text-lg text-marble-white`}>contributor name</div>
+                    <div className="text-lg text-marble-white font-bold">contributor name</div>
                   </div>
                   <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
                     <div className="w-max truncate">@address</div>
@@ -67,7 +67,9 @@ const MemberDirectoryPage: BlitzPage = () => {
               <div className="mt-9 text-xs">
                 <div>
                   <p className="uppercase mb-3">status</p>
-                  <span className="rounded-full py-1 px-3 bg-wet-concrete uppercase">active</span>
+                  <span className="rounded-full py-1 px-3 bg-wet-concrete uppercase font-bold">
+                    active
+                  </span>
                 </div>
                 <div className="mt-7">
                   <p className="uppercase mb-3">joined since</p>
@@ -76,10 +78,10 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <div className="mt-7">
                   <p className="uppercase mb-3">roles</p>
                   <div className="flex-row space-x-2">
-                    <span className="rounded-full py-1 px-3 bg-wet-concrete uppercase">
+                    <span className="rounded-full py-1 px-3 bg-wet-concrete uppercase font-bold">
                       contributor
                     </span>
-                    <span className="rounded-full py-1 px-3 bg-wet-concrete uppercase">
+                    <span className="rounded-full py-1 px-3 bg-wet-concrete uppercase font-bold">
                       founding member
                     </span>
                   </div>
@@ -87,10 +89,10 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <div className="mt-7">
                   <p className="uppercase mb-3">workstreams</p>
                   <div className="flex-row space-x-2">
-                    <span className="rounded-full py-1 px-3 bg-wet-concrete uppercase">
+                    <span className="rounded-full py-1 px-3 bg-wet-concrete uppercase font-bold">
                       finance & tokenomics
                     </span>
-                    <span className="rounded-full py-1 px-3 bg-wet-concrete uppercase">
+                    <span className="rounded-full py-1 px-3 bg-wet-concrete uppercase font-bold">
                       property & interiors
                     </span>
                   </div>

@@ -16,11 +16,11 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
             <Image src={StationLogo} alt="Station logo" height={34} width={34} />
           </div>
           <div className="flex flex-col content-center mr-[86px]">
-            <div className="flex flex-row items-center space-x-1">
-              <div className={`text-xl text-marble-white`}>Station Labs</div>
+            <div className="flex flex-row items-center">
+              <div className="text-xl text-marble-white font-bold">Station Labs</div>
             </div>
-            <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-              <div className="w-max truncate">@stationlabs</div>
+            <div className="flex flex-row text-sm text-concrete overflow-hidden leading-4">
+              @stationlabs
             </div>
           </div>
           <div className="flex flex-col mt-3">
@@ -30,7 +30,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
         {/* Terminal navigation */}
         <div>
           <ul className="mt-9 ml-8 text-lg space-y-2">
-            <li className={`cursor-pointer hover:text-marble-white`}>
+            <li className="cursor-pointer hover:text-marble-white font-bold">
               {/* <Link href={Routes.TerminalInitiativePage({ terminalHandle })}> */}
               <div className="inline mr-5">
                 <Image src={MemberDirectoryIcon} alt="Member directory icon" />
