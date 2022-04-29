@@ -19,6 +19,9 @@ CREATE TABLE "AccountTerminalTag" (
     CONSTRAINT "AccountTerminalTag_pkey" PRIMARY KEY ("tagId","ticketAccountId","ticketTerminalId")
 );
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Tag_value_terminalId_key" ON "Tag"("value", "terminalId");
+
 -- AddForeignKey
 ALTER TABLE "Tag" ADD CONSTRAINT "Tag_terminalId_fkey" FOREIGN KEY ("terminalId") REFERENCES "Terminal"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 

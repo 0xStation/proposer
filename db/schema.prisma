@@ -134,6 +134,8 @@ model Tag {
   terminalId Int
   data       Json?
   tickets    AccountTerminalTag[]
+
+  @@unique([value, terminalId])
 }
 
 model AccountTerminalTag {
