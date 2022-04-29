@@ -47,15 +47,15 @@ model Role {
 }
 
 model AccountTerminal {
-  account     Account  @relation(fields: [accountId], references: [id])
+  account     Account              @relation(fields: [accountId], references: [id])
   accountId   Int
-  terminal    Terminal @relation(fields: [terminalId], references: [id])
+  terminal    Terminal             @relation(fields: [terminalId], references: [id])
   terminalId  Int
-  role        Role?    @relation(fields: [terminalId, roleLocalId], references: [terminalId, localId])
+  role        Role?                @relation(fields: [terminalId, roleLocalId], references: [terminalId, localId])
   roleLocalId Int?
-  joinedAt    DateTime @default(now())
-  active      Boolean  @default(true)
-  tags        Tag[]
+  joinedAt    DateTime             @default(now())
+  active      Boolean              @default(true)
+  tags        AccountTerminalTag[]
   data        Json?
 
   @@id([accountId, terminalId])
@@ -70,7 +70,6 @@ model Initiative {
   accounts   AccountInitiative[]
   skills     InitiativeSkill[]
   data       Json?
-
 
   @@unique([terminalId, localId])
 }
@@ -127,16 +126,24 @@ model Endorsement {
 }
 
 model Tag {
-  id                        Int              @id @default(autoincrement())
-  type                      String
-  value                     String
-  public                    Boolean          @default(true)
-  terminal                  Terminal         @relation(fields: [terminalId], references: [id])
-  terminalId                Int
-  data                      Json?
-  AccountTerminal           AccountTerminal? @relation(fields: [accountTerminalAccountId, accountTerminalTerminalId], references: [accountId, terminalId])
-  accountTerminalAccountId  Int?
-  accountTerminalTerminalId Int?
+  id         Int                  @id @default(autoincrement())
+  type       String
+  value      String
+  public     Boolean              @default(true)
+  terminal   Terminal             @relation(fields: [terminalId], references: [id])
+  terminalId Int
+  data       Json?
+  tickets    AccountTerminalTag[]
+}
+
+model AccountTerminalTag {
+  tag              Tag             @relation(fields: [tagId], references: [id])
+  tagId            Int
+  ticket           AccountTerminal @relation(fields: [ticketAccountId, ticketTerminalId], references: [accountId, terminalId])
+  ticketAccountId  Int
+  ticketTerminalId Int
+
+  @@id([tagId, ticketAccountId, ticketTerminalId])
 }
 
 enum AccountInitiativeStatus {
