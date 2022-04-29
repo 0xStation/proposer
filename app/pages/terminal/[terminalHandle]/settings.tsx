@@ -83,7 +83,17 @@ const SettingsPage: BlitzPage = () => {
         {connectedGuild && (
           <Form
             initialValues={{}}
-            onSubmit={async (values) => console.log(values)}
+            onSubmit={async (values) => {
+              let names = Object.keys(values)
+              let tags = names.map((name) => {
+                return {
+                  value: name,
+                  type: values[name].type,
+                }
+              })
+
+              console.log(tags)
+            }}
             render={({ form, handleSubmit }) => {
               let cbState = form.getFieldState("@everyone.active")
               console.log(cbState)
