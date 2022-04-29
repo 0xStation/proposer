@@ -47,7 +47,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
           </ul>
         </div>
       </div>
-      <div className="h-screen left-[380px] w-[calc(100%-380px)] fixed">{children}</div>
+      <div className="h-screen left-[370px] w-[calc(100%-370px)] fixed">{children}</div>
     </>
   )
 }

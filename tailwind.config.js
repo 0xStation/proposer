@@ -12,6 +12,7 @@ module.exports = {
       "wet-concrete": "#2E2E2E",
       "torch-red": "#FF5650",
       "marble-white": "#F2EFEF",
+      "light-concrete": "#858585",
     },
     fontFamily: {
       vt323: ["VT323", "Monospace"],

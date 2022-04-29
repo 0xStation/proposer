@@ -1,8 +1,40 @@
-import { BlitzPage } from "blitz"
+import { BlitzPage, invoke, useRouter } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import Button from "app/core/components/Button"
+import useStore from "app/core/hooks/useStore"
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import { useAccount } from "wagmi"
+import { useEffect, useMemo } from "react"
 
 const Home: BlitzPage = () => {
+  const router = useRouter()
+  const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  const setActiveUser = useStore((state) => state.setActiveUser)
+  const { data: accountData } = useAccount()
+
+  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
+
+  const getUserAccount = async (address) => {
+    // closing the wallet modal
+    // we have the address (since this is called from the useEffect hook)
+    toggleWalletModal(false)
+    let user = await invoke(getAccountByAddress, { address })
+    if (user) {
+      setActiveUser(user)
+      router.push("/terminal/member-directory")
+    } else {
+      router.push("/profile/create")
+    }
+  }
+
+  useEffect(() => {
+    if (address) {
+      getUserAccount(address)
+    } else {
+      setActiveUser(null)
+    }
+  }, [address])
+
   const ConnectView = (
     <>
       <div className="flex items-center h-full px-4 sm:px-0 sm:ml-40">
@@ -13,7 +45,12 @@ const Home: BlitzPage = () => {
             places in Web3.
           </p>
           <p className="text-marble-white text-base mt-4">Join the ride.</p>
-          <Button className="mt-4 w-full py-2 text-center text-base">Enter Station</Button>
+          <Button
+            className="mt-4 w-full py-2 text-center text-base"
+            onClick={() => toggleWalletModal(true)}
+          >
+            Connect you wallet
+          </Button>
         </div>
       </div>
     </>
