@@ -1,13 +1,19 @@
-import { Image } from "blitz"
+import { Image, invoke } from "blitz"
 import Modal from "./Modal"
 import Metamask from "/public/metamask-logo.svg"
 import Coinbase from "/public/coinbase-logo.svg"
 import WalletConnect from "/public/wallet-logo.svg"
 import Banner from "/public/walletconnect-banner.svg"
-import { useConnect } from "wagmi"
+import { useConnect, useAccount, useNetwork, useSignMessage } from "wagmi"
+import generateNonce from "app/session/queries/generateNonce"
+import { SiweMessage } from "siwe"
+import verify from "app/session/mutations/verify"
 
 const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
-  const { connectors, connect } = useConnect()
+  const { data: chain } = useNetwork()
+  const { data: accountData } = useAccount()
+  const { connectors, connect, connectAsync } = useConnect()
+  const { signMessage } = useSignMessage()
   const [metamaskWallet, walletConnect, coinbaseWallet] = connectors
 
   // https://github.com/NoahZinsmeister/web3-react/issues/300
@@ -74,8 +80,27 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           <button
             className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete"
             onClick={async () => {
-              // @ts-ignore
-              await appConnect(metamaskWallet, "metamask")
+              // // @ts-ignore
+              //await appConnect(metamaskWallet, "metamask")
+              const connectData = await connectAsync(metamaskWallet) // connect from useConnect
+
+              // const nonceRes = await invoke(generateNonce, {})
+              // const message = new SiweMessage({
+              //   domain: window.location.host,
+              //   address: connectData.account,
+              //   statement: "Sign in with Ethereum to the app.",
+              //   uri: window.location.origin,
+              //   version: "1",
+              //   chainId: connectData.chain?.id,
+              //   nonce: nonceRes,
+              // })
+
+              // const signer = await metamaskWallet?.getSigner()
+              // const signature = await signer?.signMessage(message.prepareMessage())
+              // const verificationSuccessful = await invoke(verify, {
+              //   message: JSON.stringify(message),
+              //   signature,
+              // })
             }}
           >
             <div className="flex flex-row flex-1 justify-center items-center space-x-2 my-1">

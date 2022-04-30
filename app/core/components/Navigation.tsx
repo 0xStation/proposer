@@ -15,6 +15,10 @@ const Navigation = () => {
   const router = useRouter()
   // a list of the modals that are active on the screen
   const { data: accountData } = useAccount()
+  // NOTE: metamask doesn't support programmatically disconnecting from your wallet.
+  // See issue here: https://github.com/MetaMask/metamask-extension/issues/10353
+  // Wagmi stores the connection in storage and will disconnect from the app, but
+  // a user's wallet will still show them as connected.
   const { disconnect } = useDisconnect()
 
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])

@@ -49,7 +49,7 @@ const Home: BlitzPage = () => {
             className="mt-4 w-full py-2 text-center text-base"
             onClick={() => toggleWalletModal(true)}
           >
-            Connect you wallet
+            Connect your wallet
           </Button>
         </div>
       </div>
