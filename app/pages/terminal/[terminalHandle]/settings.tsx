@@ -117,14 +117,9 @@ const SettingsPage: BlitzPage = () => {
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-col">
                     <div className="p-6 border-b border-concrete flex justify-between">
-                      <div>
-                        <h2 className="text-marble-white text-2xl">Discord</h2>
-                        <p className="text-marble-white mt-4">
-                          Connect with discord to sync roles.
-                        </p>
-                      </div>
+                      <h2 className="text-marble-white text-2xl">Discord</h2>
                       <button
-                        className="rounded text-tunnel-black bg-magic-mint px-4 self-start"
+                        className="rounded text-tunnel-black bg-magic-mint px-8"
                         type="submit"
                       >
                         Save
@@ -132,11 +127,11 @@ const SettingsPage: BlitzPage = () => {
                     </div>
 
                     <div className="p-6">
-                      <div className="grid grid-cols-2 border-b border-concrete pb-2">
-                        <header className="text-bold text-sm uppercase tracking-wider">Role</header>
-                        <header className="text-bold text-sm uppercase tracking-wider">
-                          Category
-                        </header>
+                      <div className="flex flex-col pb-2">
+                        <h3>Manage Roles*</h3>
+                        <span className="text-concrete text-xs mt-1">
+                          Sort roles into categories
+                        </span>
                       </div>
                       <div className="grid grid-cols-2 mt-6 gap-y-2">
                         {connectedGuild.roles.map((role, idx) => {
