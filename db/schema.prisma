@@ -132,7 +132,7 @@ model Tag {
   active     Boolean              @default(true)
   terminal   Terminal             @relation(fields: [terminalId], references: [id])
   terminalId Int
-  discordId  Int
+  discordId  Int?
   data       Json?
   tickets    AccountTerminalTag[]
 
