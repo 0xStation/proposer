@@ -7,6 +7,7 @@ const UpsertTags = z.object({
     .object({
       value: z.string(),
       type: z.string(),
+      active: z.boolean(),
     })
     .array(),
 })
@@ -29,9 +30,11 @@ export default async function upsertTags(input: z.infer<typeof UpsertTags>) {
       },
       update: {
         type: t.type.toLowerCase(),
+        active: t.active,
       },
       create: {
         value: t.value,
+        active: t.active,
         type: t.type.toLowerCase(),
         terminalId: params.terminalId,
       },

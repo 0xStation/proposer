@@ -15,9 +15,13 @@ type Role = {
 
 const SettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
-  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+  const [terminal, { refetch }] = useQuery(
+    getTerminalByHandle,
+    { handle: terminalHandle },
+    { suspense: false }
+  )
   const [connectedGuild, setConnectedGuild] = useState<Guild | undefined>(undefined)
-  const [upsertTags] = useMutation(UpsertTags)
+  const [upsertTags, { isLoading }] = useMutation(UpsertTags)
 
   useEffect(() => {
     const fetchAsync = async () => {
@@ -89,7 +93,7 @@ const SettingsPage: BlitzPage = () => {
                 ? terminal?.tags.reduce((acc, tag) => {
                     acc[tag.value] = {
                       type: tag.type,
-                      active: true,
+                      active: tag.active,
                     }
                     return acc
                   }, {})
@@ -100,6 +104,7 @@ const SettingsPage: BlitzPage = () => {
               let tags = names.map((name) => {
                 return {
                   value: name,
+                  active: values[name].active,
                   type: values[name].type,
                 }
               })
@@ -109,10 +114,10 @@ const SettingsPage: BlitzPage = () => {
                   tags,
                   terminalId: terminal.id,
                 })
+                refetch()
               }
             }}
             render={({ form, handleSubmit }) => {
-              let cbState = form.getFieldState("@everyone.active")
               return (
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-col">
@@ -139,7 +144,7 @@ const SettingsPage: BlitzPage = () => {
                           return (
                             <>
                               <div key={idx} className="flex flex-row items-center">
-                                <Checkbox name={`${role.name}.active`} value={true} />
+                                <Checkbox name={`${role.name}.active`} checked={cbState?.value} />
                                 <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline ml-2">
                                   {role.name}
                                 </p>
