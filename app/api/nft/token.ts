@@ -63,7 +63,7 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
     where: { ticketAddress: toChecksumAddress(address) },
     include: {
       roles: true,
-      tickets: {
+      members: {
         where: {
           accountId: account.id,
         },
@@ -84,7 +84,7 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
     return
   }
 
-  const accountTerminal = terminal.tickets[0] // from join query, should be 1 object list if ticket exists for account or empty list if not
+  const accountTerminal = terminal.members[0] // from join query, should be 1 object list if ticket exists for account or empty list if not
 
   if (!accountTerminal) {
     res.statusCode = 404
