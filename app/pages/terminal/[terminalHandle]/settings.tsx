@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { BlitzPage, useParam, useQuery, useMutation } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import UpdateTerminalTags from "app/tag/mutations/updateTerminalTags"
+import UpsertTags from "app/tag/mutations/upsertTags"
 import Checkbox from "app/core/components/form/Checkbox"
 import { Field, Form } from "react-final-form"
 
@@ -17,7 +17,7 @@ const SettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
   const [connectedGuild, setConnectedGuild] = useState<Guild | undefined>(undefined)
-  const [updateTerminalTags] = useMutation(UpdateTerminalTags)
+  const [upsertTags] = useMutation(UpsertTags)
 
   useEffect(() => {
     const fetchAsync = async () => {
@@ -94,9 +94,8 @@ const SettingsPage: BlitzPage = () => {
                 }
               })
 
-              console.log(tags)
               if (terminal) {
-                await updateTerminalTags({
+                await upsertTags({
                   tags,
                   terminalId: terminal.id,
                 })
@@ -104,7 +103,6 @@ const SettingsPage: BlitzPage = () => {
             }}
             render={({ form, handleSubmit }) => {
               let cbState = form.getFieldState("@everyone.active")
-              console.log(cbState)
               return (
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-col">
