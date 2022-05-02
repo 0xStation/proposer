@@ -3,6 +3,7 @@ import { BlitzPage, useParam, useQuery, useMutation } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import UpsertTags from "app/tag/mutations/upsertTags"
 import Checkbox from "app/core/components/form/Checkbox"
+import Toast from "app/core/components/Toast"
 import { Field, Form } from "react-final-form"
 
 type Guild = {
@@ -20,8 +21,16 @@ const SettingsPage: BlitzPage = () => {
     { handle: terminalHandle },
     { suspense: false }
   )
+  const [successToastOpen, setSuccessToastOpen] = useState(false)
   const [connectedGuild, setConnectedGuild] = useState<Guild | undefined>(undefined)
-  const [upsertTags, { isLoading }] = useMutation(UpsertTags)
+  const [upsertTags] = useMutation(UpsertTags, {
+    onSuccess: () => {
+      setSuccessToastOpen(true)
+      setTimeout(() => {
+        setSuccessToastOpen(false)
+      }, 3000)
+    },
+  })
 
   useEffect(() => {
     const fetchAsync = async () => {
@@ -132,44 +141,50 @@ const SettingsPage: BlitzPage = () => {
                     </div>
 
                     <div className="p-6">
-                      <div className="flex flex-col pb-2">
-                        <h3>Manage Roles*</h3>
-                        <span className="text-concrete text-xs mt-1">
-                          Sort roles into categories
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 mt-6 gap-y-2">
-                        {connectedGuild.roles.map((role, idx) => {
-                          let cbState = form.getFieldState(role.name + ".active")
-                          return (
-                            <>
-                              <div key={idx} className="flex flex-row items-center">
-                                <Checkbox name={`${role.name}.active`} checked={cbState?.value} />
-                                <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline ml-2">
-                                  {role.name}
-                                </p>
-                              </div>
-                              <div>
-                                <Field
-                                  name={`${role.name}.type`}
-                                  component="select"
-                                  className={`bg-tunnel-black w-[200px] ${
-                                    !cbState?.value ? "text-wet-concrete" : "text-marble-white"
-                                  }`}
-                                >
-                                  <option>Choose option</option>
-                                  {cbState?.value && (
-                                    <>
-                                      <option value="role">Role</option>
-                                      <option value="initiative">Initiative</option>
-                                      <option value="status">Status</option>
-                                    </>
-                                  )}
-                                </Field>
-                              </div>
-                            </>
-                          )
-                        })}
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="flex flex-col pb-2 col-span-2">
+                          <h3>Manage Roles*</h3>
+                          <span className="text-concrete text-xs mt-1">
+                            Sort roles into categories
+                          </span>
+                          <div className="grid grid-cols-2 mt-6 gap-y-2">
+                            {connectedGuild.roles.map((role, idx) => {
+                              let cbState = form.getFieldState(role.name + ".active")
+                              return (
+                                <>
+                                  <div key={idx} className="flex flex-row items-center">
+                                    <Checkbox
+                                      name={`${role.name}.active`}
+                                      checked={cbState?.value}
+                                    />
+                                    <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline ml-2">
+                                      {role.name}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <Field
+                                      name={`${role.name}.type`}
+                                      component="select"
+                                      className={`bg-tunnel-black w-[200px] ${
+                                        !cbState?.value ? "text-wet-concrete" : "text-marble-white"
+                                      }`}
+                                    >
+                                      <option>Choose option</option>
+                                      {cbState?.value && (
+                                        <>
+                                          <option value="role">Role</option>
+                                          <option value="initiative">Initiative</option>
+                                          <option value="status">Status</option>
+                                        </>
+                                      )}
+                                    </Field>
+                                  </div>
+                                </>
+                              )
+                            })}
+                          </div>
+                        </div>
+                        {successToastOpen && <Toast />}
                       </div>
                     </div>
                   </div>
