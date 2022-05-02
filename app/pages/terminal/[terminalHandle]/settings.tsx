@@ -84,7 +84,17 @@ const SettingsPage: BlitzPage = () => {
         )}
         {connectedGuild && (
           <Form
-            initialValues={{}}
+            initialValues={
+              terminal
+                ? terminal?.tags.reduce((acc, tag) => {
+                    acc[tag.value] = {
+                      type: tag.type,
+                      active: true,
+                    }
+                    return acc
+                  }, {})
+                : {}
+            }
             onSubmit={async (values) => {
               let names = Object.keys(values)
               let tags = names.map((name) => {

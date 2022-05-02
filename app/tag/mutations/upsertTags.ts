@@ -14,11 +14,16 @@ const UpsertTags = z.object({
 export default async function upsertTags(input: z.infer<typeof UpsertTags>) {
   const params = UpsertTags.parse(input)
 
+  // prisma does not natively support "upsertMany"
+  // so the idea here is to create a list of transaction requests, one per upsert
+  // then send it into prismas "$transaction" api which will atomically run the batch
+  // meaning they will either all succeed, or one or many will error and the whole batch will roll back.
+  // this way, we don't get partial writes if some fail.
   const requests = params.tags.map((t) =>
     db.tag.upsert({
       where: {
         value_terminalId: {
-          value: t.value.toLowerCase(),
+          value: t.value,
           terminalId: params.terminalId,
         },
       },
@@ -26,7 +31,7 @@ export default async function upsertTags(input: z.infer<typeof UpsertTags>) {
         type: t.type.toLowerCase(),
       },
       create: {
-        value: t.value.toLowerCase(),
+        value: t.value,
         type: t.type.toLowerCase(),
         terminalId: params.terminalId,
       },
