@@ -3,8 +3,9 @@ CREATE TABLE "Tag" (
     "id" SERIAL NOT NULL,
     "type" TEXT NOT NULL,
     "value" TEXT NOT NULL,
-    "public" BOOLEAN NOT NULL DEFAULT true,
+    "active" BOOLEAN NOT NULL DEFAULT true,
     "terminalId" INTEGER NOT NULL,
+    "discordId" INTEGER NOT NULL,
     "data" JSONB,
 
     CONSTRAINT "Tag_pkey" PRIMARY KEY ("id")
