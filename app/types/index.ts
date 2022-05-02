@@ -16,3 +16,17 @@ export enum Role {
   WEEKEND_COMMUTER = "WEEKEND COMMUTER",
   VISITOR = "VISITOR",
 }
+
+export type TypedDataSignatureDomain = {
+  name: string
+  version: string
+  chainId: 1
+  verifyingContract: string
+}
+
+export type TypedDataField = {
+  name: string
+  type: string // solidity type e.g. "address", "uint256", etc.
+}
+
+export type TypedDataTypeDefinition = Record<string, TypedDataField[]>
