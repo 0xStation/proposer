@@ -129,9 +129,10 @@ model Tag {
   id         Int                  @id @default(autoincrement())
   type       String
   value      String
-  public     Boolean              @default(true)
+  active     Boolean              @default(true)
   terminal   Terminal             @relation(fields: [terminalId], references: [id])
   terminalId Int
+  discordId  Int
   data       Json?
   tickets    AccountTerminalTag[]
 
