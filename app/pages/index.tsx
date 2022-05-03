@@ -21,7 +21,6 @@ const Home: BlitzPage = () => {
     let user = await invoke(getAccountByAddress, { address })
     if (user) {
       setActiveUser(user)
-      router.push("/terminal/member-directory")
     } else {
       router.push("/profile/create")
     }
@@ -35,35 +34,12 @@ const Home: BlitzPage = () => {
     }
   }, [address])
 
-  const ConnectView = (
-    <>
-      <div className="flex items-center h-full px-4 sm:px-0 sm:ml-40">
-        <div className="bg-tunnel-black border border-marble-white pt-10 px-5 pb-5 w-full sm:w-128">
-          <h3 className="text-marble-white text-3xl">Welcome to Station</h3>
-          <p className="text-marble-white text-base mt-4">
-            This is where contributors come together, discover, and participate in the most exciting
-            places in Web3.
-          </p>
-          <p className="text-marble-white text-base mt-4">Join the ride.</p>
-          <Button
-            className="mt-4 w-full py-2 text-center text-base"
-            onClick={() => toggleWalletModal(true)}
-          >
-            Connect your wallet
-          </Button>
-        </div>
-      </div>
-    </>
-  )
-
   return (
     <Layout title="Station">
       <main
-        className="h-full relative bg-cover bg-no-repeat"
+        className="h-full bg-cover bg-no-repeat"
         style={{ backgroundImage: "url('/station-cover.webp')" }}
-      >
-        {ConnectView}
-      </main>
+      ></main>
     </Layout>
   )
 }

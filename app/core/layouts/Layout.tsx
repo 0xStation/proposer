@@ -1,5 +1,5 @@
 import { Head, BlitzLayout } from "blitz"
-import Navigation from "../components/TerminalsNavigation"
+import Navigation from "../components/Navigation"
 import ModalContainer from "../components/ModalContainer"
 
 const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {

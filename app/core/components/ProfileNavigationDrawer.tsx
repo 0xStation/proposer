@@ -11,7 +11,14 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
   const { data: accountData } = useAccount()
   const { disconnect } = useDisconnect()
   const activeUser = useStore((state) => state.activeUser)
+  const setActiveUser = useStore((state) => state.setActiveUser)
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
+
+  const handleDisconnect = () => {
+    setIsOpen(false)
+    setActiveUser(null)
+    disconnect()
+  }
 
   const profilePfp =
     activeUser && activeUser.data?.pfpURL ? (
@@ -85,7 +92,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                       >
                         Open a Terminal
                       </a>
-                      <button className="block hover:opacity-70" onClick={() => disconnect()}>
+                      <button className="block hover:opacity-70" onClick={handleDisconnect}>
                         Disconnect
                       </button>
                       <button className="block hover:opacity-70 text-torch-red">

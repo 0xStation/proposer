@@ -1,140 +1,114 @@
-import { useEffect, useMemo } from "react"
-import { Image, invoke, useRouter } from "blitz"
-import Dropdown from "../components/Dropdown"
-import logo from "../../../public/station-logo.svg"
-import getAccountByAddress from "app/account/queries/getAccountByAddress"
-import useStore from "../hooks/useStore"
+import StationLogo from "public/station-letters.svg"
+import { Image, useQuery } from "blitz"
 import { useAccount } from "wagmi"
+import useStore from "../hooks/useStore"
 import truncateString from "../utils/truncateString"
-import { useDisconnect } from "wagmi"
+import { useMemo, useState } from "react"
+import ProfileNavigationDrawer from "./ProfileNavigationDrawer"
+import getTerminalsByAccount, { TerminalMetadata } from "app/terminal/queries/getTerminalsByAccount"
 
-/**
- * Navigation Component
- */
-const Navigation = () => {
-  const router = useRouter()
-  // a list of the modals that are active on the screen
+const Navigation = ({ children }: { children?: any }) => {
   const { data: accountData } = useAccount()
-  // NOTE: metamask doesn't support programmatically disconnecting from your wallet.
-  // See issue here: https://github.com/MetaMask/metamask-extension/issues/10353
-  // Wagmi stores the connection in storage and will disconnect from the app, but
-  // a user's wallet will still show them as connected.
-  const { disconnect } = useDisconnect()
-
-  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
-  const setActiveUser = useStore((state) => state.setActiveUser)
   const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
+  const [profileNavDrawerIsOpen, setProfileNavDrawerIsOpen] = useState<boolean>(false)
+  const isAccountConnected = activeUser && address
 
-  const getUserAccount = async (address) => {
-    // closing the wallet modal
-    // we have the address (since this is called from the useEffect hook)
-    toggleWalletModal(false)
-    let user = await invoke(getAccountByAddress, { address })
-    if (user) {
-      setActiveUser(user)
-    } else {
-      router.push("/profile/create")
+  const [usersTerminals] = useQuery(
+    getTerminalsByAccount,
+    { accountId: activeUser?.id as number },
+    { suspense: false, enabled: !!activeUser?.id }
+  )
+
+  const handlePfpClick = () => {
+    if (address || activeUser) {
+      setProfileNavDrawerIsOpen(true)
     }
   }
 
-  useEffect(() => {
-    if (address) {
-      getUserAccount(address)
-    } else {
-      setActiveUser(null)
-    }
-  }, [address])
+  // 1. if user has an active account w/Station + pfp url, render pfp url.
+  // 2. else if user has a connected address, render gradient pfp.
+  // 3. else don't render anything
+  const profilePfp =
+    isAccountConnected && activeUser.data?.pfpURL ? (
+      <>
+        {address && (
+          <div className="text-xs text-light-concrete flex mb-1">
+            <p>{truncateString(address, 3)}</p>
+            <div className="h-1 w-1 bg-magic-mint rounded-full align-middle ml-[0.1rem] mt-[.35rem]" />
+          </div>
+        )}
+        <div tabIndex={0} className="mx-auto">
+          <img
+            src={activeUser.data.pfpURL}
+            alt="PFP"
+            className={"w-[46px] h-[46px] border border-marble-white rounded-full cursor-pointer"}
+          />
+        </div>
+      </>
+    ) : address ? (
+      <>
+        <div className="text-xs text-light-concrete flex mb-1">
+          <p>{truncateString(address, 3)}</p>
+          <div className="h-1 w-1 bg-magic-mint rounded-full align-middle ml-[0.1rem] mt-[.35rem]" />
+        </div>
+        <div
+          tabIndex={0}
+          className="rounded-full w-[46px] h-[46px] bg-gradient-to-b from-electric-violet to-magic-mint border border-marble-white mx-auto cursor-pointer"
+        ></div>
+      </>
+    ) : null
+
+  const terminalsView =
+    isAccountConnected && Array.isArray(usersTerminals) && usersTerminals?.length > 0
+      ? usersTerminals?.map((terminal, idx) => (
+          <div className="cursor-pointer" key={`${terminal.handle}${idx}`}>
+            <img
+              key={`${terminal?.handle + idx}`}
+              src={(terminal?.data as TerminalMetadata)?.pfpURL}
+              className="w-[46px] h-[46px] bg-wet-concrete border border-concrete rounded-lg mx-auto mb-4"
+            />
+          </div>
+        ))
+      : null
 
   return (
     <>
-      {/* beta banner */}
-      <div className="bg-wet-concrete w-full h-8 text-center align-center pt-1">
-        We&apos;re still in beta. Have feedback?{" "}
-        <a className="text-magic-mint" href="https://twitter.com/0xstation">
-          Let us know
-        </a>
-        .
-      </div>
-      <div className="h-12 w-full bg-tunnel-black flex flex-row justify-between border-b border-b-concrete">
-        <Dropdown
-          side="left"
-          className="h-full pt-[.60rem] hover:bg-wet-concrete pl-4 pr-1"
-          button={
-            <div className="h-full flex items-center">
-              <Image src={logo} alt="Station logo, the letters station spelled out." />
+      <ProfileNavigationDrawer
+        isOpen={profileNavDrawerIsOpen}
+        setIsOpen={setProfileNavDrawerIsOpen}
+      />
+      {/* TODO: remove this parent div later. Need a parent element around the banner or else the dom rearranges for some reason */}
+      <div>
+        {!address ? (
+          <div className="w-full h-14 absolute z-10 bg-concrete bottom-0">
+            <div className="fixed right-0 mt-3">
+              <p className="inline-block mr-5 italic">Join the ride &#8594;</p>
+              <button
+                onClick={() => toggleWalletModal(true)}
+                className="inline mr-10  bg-magic-mint text-tunnel-black w-48 rounded align-middle p-1 hover:bg-opacity-70"
+              >
+                Connect Wallet
+              </button>
             </div>
-          }
-          items={[
-            { name: "home", href: "/" },
-            { name: "open terminal", href: "https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6" },
-            { name: "newstand", href: "https://station.mirror.xyz/" },
-            { name: "twitter", href: "https://twitter.com/0xstation" },
-            { name: "help desk", href: "https://6vdcjqzyfj3.typeform.com/to/kTlOjkdT" },
-            {
-              name: "legal & privacy",
-              href: "https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176",
-            },
-          ]}
-        />
-        <div className="flex items-center border-l border-l-concrete">
-          {activeUser ? (
-            <Dropdown
-              side="right"
-              className="h-full p-2 border-l border-l-concrete hover:bg-wet-concrete w-full"
-              button={
-                <div className="flex items-center">
-                  {activeUser?.data?.pfpURL ? (
-                    <img
-                      src={activeUser?.data.pfpURL}
-                      alt="PFP"
-                      className="w-7 h-7 border border-marble-white rounded-full mr-2"
-                    />
-                  ) : (
-                    <span className="w-7 h-7 rounded-full bg-gradient-to-b object-cover from-electric-violet to-magic-mint border border-marble-white mr-2"></span>
-                  )}
-                  <span>{activeUser?.data?.name || "Handle"}</span>
-                </div>
-              }
-              items={[
-                {
-                  name: "Profile",
-                  onClick: () => router.push(`/profile/${activeUser.address}`),
-                },
-                {
-                  name: "Disconnect",
-                  onClick: disconnect,
-                },
-              ]}
-            />
-          ) : address ? (
-            <Dropdown
-              side="right"
-              className="h-full p-2 border-l border-l-concrete hover:bg-wet-concrete w-full"
-              button={
-                <div className="flex items-center">
-                  <span className="w-7 h-7 rounded-full bg-gradient-to-b from-electric-violet to-magic-mint border border-marble-white mr-2"></span>
-                  <span>{truncateString(address)}</span>
-                </div>
-              }
-              items={[
-                { name: "Create Account", onClick: () => router.push("/profile/create") },
-                {
-                  name: "disconnect",
-                  onClick: disconnect,
-                },
-              ]}
-            />
-          ) : (
-            <span
-              className="h-full p-2 uppercase text-magic-mint text-sm sm:text-lg border-l border-l-concrete cursor-pointer hover:bg-wet-concrete"
-              onClick={() => toggleWalletModal(true)}
-            >
-              Connect Wallet
-            </span>
+          </div>
+        ) : null}
+      </div>
+      <div className="h-screen w-[70px] bg-tunnel-black border-r border-concrete fixed text-center">
+        <a className="mt-1 inline-block" href="https://www.station.express/">
+          <Image src={StationLogo} alt="Station logo" height={20} width={54} />
+        </a>
+        <div className="h-full mt-4">
+          {terminalsView}
+          {profilePfp && (
+            <div className="fixed bottom-[10px] left-[10px]" onClick={() => handlePfpClick()}>
+              {profilePfp}
+            </div>
           )}
         </div>
       </div>
+      <div className="h-screen left-[70px] relative">{children}</div>
     </>
   )
 }
