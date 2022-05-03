@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
   const guild = await response.json()
 
-  if (guild.code === 50001 || guild.code === 50035) {
+if (guild.code === 50001 || guild.code === 50035 || guild.code === 0) {
     res.status(401).json({ error: "Guild not authenticated." })
     return
   }
