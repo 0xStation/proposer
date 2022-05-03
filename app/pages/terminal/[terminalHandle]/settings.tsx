@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { BlitzPage, useParam, useQuery, useMutation } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import UpsertTags from "app/tag/mutations/upsertTags"
 import Checkbox from "app/core/components/form/Checkbox"
-import Toast from "app/core/components/Toast"
+// import Toast from "app/core/components/Toast"
+import useToast from "app/core/hooks/useToast"
 import { Field, Form } from "react-final-form"
 
 type Guild = {
@@ -21,14 +22,11 @@ const SettingsPage: BlitzPage = () => {
     { handle: terminalHandle },
     { suspense: false }
   )
-  const [successToastOpen, setSuccessToastOpen] = useState(false)
+  const [toast, Toast] = useToast()
   const [connectedGuild, setConnectedGuild] = useState<Guild | undefined>(undefined)
   const [upsertTags] = useMutation(UpsertTags, {
     onSuccess: () => {
-      setSuccessToastOpen(true)
-      setTimeout(() => {
-        setSuccessToastOpen(false)
-      }, 3000)
+      toast("Your roles have been updated.")
     },
   })
 
@@ -52,6 +50,31 @@ const SettingsPage: BlitzPage = () => {
     }
     if (terminal) {
       fetchAsync()
+    }
+  }, [terminal])
+
+  // kind of confusing to explain, you probably need to see it to understand so I recorded a loom
+  // https://www.loom.com/share/f5c67a2872854bb386330ddbb744a5d8
+  // When the form successfully saves, it calls the toast component to show the user a success notification.
+  // The toast is set on a 3 second timeout, so it automatically closes after 3 seconds.
+  // The problem though, is that once the toast closes, that triggers a change in state, which triggers another fetch
+  // of the terminal and the old tags. This means that if you were to change the form state in the time between saving
+  // and the three seconds before the toast closes, it would reset back to the state at the time of the save.
+  // This is likely a small edge case, but its bothering me.
+  // to get around it, we memoize the initial form state. This way, the form does not re-render its state when the
+  // toast closes. There is also no lag after the save. WOW! And people thought useMemo was over-engineering...
+  // not today!!
+  const initialFormValues = useMemo(() => {
+    if (terminal) {
+      return terminal?.tags.reduce((acc, tag) => {
+        acc[tag.value] = {
+          type: tag.type,
+          active: tag.active,
+        }
+        return acc
+      }, {})
+    } else {
+      return {}
     }
   }, [terminal])
 
@@ -97,17 +120,7 @@ const SettingsPage: BlitzPage = () => {
         )}
         {connectedGuild && (
           <Form
-            initialValues={
-              terminal
-                ? terminal?.tags.reduce((acc, tag) => {
-                    acc[tag.value] = {
-                      type: tag.type,
-                      active: tag.active,
-                    }
-                    return acc
-                  }, {})
-                : {}
-            }
+            initialValues={initialFormValues}
             onSubmit={async (values) => {
               let names = Object.keys(values)
               let tags = names.map((name) => {
@@ -150,6 +163,7 @@ const SettingsPage: BlitzPage = () => {
                           <div className="grid grid-cols-2 mt-6 gap-y-2">
                             {connectedGuild.roles.map((role, idx) => {
                               let cbState = form.getFieldState(role.name + ".active")
+                              const required = (value) => (value ? undefined : "Required")
                               return (
                                 <>
                                   <div key={idx} className="flex flex-row items-center">
@@ -162,20 +176,31 @@ const SettingsPage: BlitzPage = () => {
                                     </p>
                                   </div>
                                   <div>
-                                    <Field
-                                      name={`${role.name}.type`}
-                                      component="select"
-                                      className={`bg-tunnel-black w-[200px] ${
-                                        !cbState?.value ? "text-wet-concrete" : "text-marble-white"
-                                      }`}
-                                    >
-                                      <option>Choose option</option>
-                                      {cbState?.value && (
-                                        <>
-                                          <option value="role">Role</option>
-                                          <option value="initiative">Initiative</option>
-                                          <option value="status">Status</option>
-                                        </>
+                                    <Field name={`${role.name}.type`}>
+                                      {({ input, meta }) => (
+                                        <div>
+                                          <select
+                                            {...input}
+                                            className={`bg-tunnel-black w-[200px] ${
+                                              !cbState?.value
+                                                ? "text-wet-concrete"
+                                                : "text-marble-white"
+                                            }`}
+                                            required={cbState?.value}
+                                          >
+                                            <option value="">Choose option</option>
+                                            {cbState?.value && (
+                                              <>
+                                                <option value="role">Role</option>
+                                                <option value="initiative">Initiative</option>
+                                                <option value="status">Status</option>
+                                              </>
+                                            )}
+                                          </select>
+                                          {meta.error && meta.touched && (
+                                            <span className="text-torch-red">{meta.error}</span>
+                                          )}
+                                        </div>
                                       )}
                                     </Field>
                                   </div>
@@ -184,7 +209,7 @@ const SettingsPage: BlitzPage = () => {
                             })}
                           </div>
                         </div>
-                        {successToastOpen && <Toast />}
+                        <Toast />
                       </div>
                     </div>
                   </div>
