@@ -17,6 +17,21 @@ export default async function verify(input: z.infer<typeof Verify>, ctx: Ctx) {
       return false
     }
     await ctx.session.$setPublicData({ siwe: fields })
+
+    // `ctx.session.$create` allows us to create an authenticated session
+    // where `ctx.session` stores the user's user id and we can authenticate
+    // every page. Sadly, there is a bug that's thrown on create within the blitz
+    // app so we can't use $create until there's a minor update :'(
+    // const account = await invoke(getAccountByAddress, { address: fields.address })
+
+    // if (account && account.id) {
+    //   try {
+    //     await ctx.session.$create({ userId: account.id, siwe: fields })
+    //   } catch (err) {
+    //     console.error(err)
+    //   }
+    // }
+
     return true
   } catch (err) {
     // TODO: add error handling

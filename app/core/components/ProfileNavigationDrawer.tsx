@@ -1,10 +1,11 @@
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment, useMemo } from "react"
-import { Image, useRouter } from "blitz"
+import { Image, useRouter, invoke } from "blitz"
 import Exit from "public/exit-button.svg"
 import truncateString from "../utils/truncateString"
 import { useAccount, useDisconnect } from "wagmi"
 import useStore from "../hooks/useStore"
+import logout from "app/session/mutations/logout"
 
 export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
   const router = useRouter()
@@ -14,9 +15,10 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
   const setActiveUser = useStore((state) => state.setActiveUser)
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
 
-  const handleDisconnect = () => {
+  const handleDisconnect = async () => {
     setIsOpen(false)
     setActiveUser(null)
+    await invoke(logout, {})
     disconnect()
   }
 
@@ -66,7 +68,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-full"
             >
-              <div className="pointer-events-auto w-screen max-w-[298px]">
+              <div className="pointer-events-auto w-screen max-w-[165px]">
                 <div className="flex h-full flex-col overflow-y-scroll bg-tunnel-black border-r border-concrete">
                   <button className="mt-4 mr-4 text-right" onClick={() => setIsOpen(false)}>
                     <Image src={Exit} alt="Close button" width={12} height={12} />

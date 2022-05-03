@@ -1,67 +1,95 @@
+import { useState, useEffect } from "react"
 import { Image, invoke } from "blitz"
 import Modal from "./Modal"
 import Metamask from "/public/metamask-logo.svg"
 import Coinbase from "/public/coinbase-logo.svg"
 import WalletConnect from "/public/wallet-logo.svg"
 import Banner from "/public/walletconnect-banner.svg"
-import { useConnect, useAccount, useNetwork, useSignMessage } from "wagmi"
+import { useConnect, useAccount } from "wagmi"
 import generateNonce from "app/session/queries/generateNonce"
 import { SiweMessage } from "siwe"
 import verify from "app/session/mutations/verify"
 
 const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
-  const { data: chain } = useNetwork()
+  const [connectState, setConnectState] = useState<{
+    loading: boolean
+    success: boolean
+    error: boolean
+  }>({
+    loading: false,
+    success: false,
+    error: false,
+  })
+  const [errorMessage, setErrorMessage] = useState<string>("")
   const { data: accountData } = useAccount()
-  const { connectors, connect, connectAsync } = useConnect()
-  const { signMessage } = useSignMessage()
+  const { connectors, connectAsync, data: connectData } = useConnect()
   const [metamaskWallet, walletConnect, coinbaseWallet] = connectors
 
-  // https://github.com/NoahZinsmeister/web3-react/issues/300
-  // If a user is connecting their wallet for the first time and has both coinbase and metamask extensions,
-  // both wallets will be triggered at the same time when trying to connect either of the wallets.
-  // The multi-wallet triggering is attributed to the window.ethereum obj providing support
-  // for both metamask and coinbase at the same time via a multi-provider. The mult-provider contains a list of
-  // the different provdiers - whichever wallet is connected first will be the selected provider.
-  // Connecting to the second wallet will not update the selected provider.
-  // The reason for this design choice was so that dapps wouldn't have to worry about updating states when
-  // the user decides to connect the other wallet.
-  const activateInjectedProvider = (providerName: "metamask" | "coinbase") => {
-    const { ethereum } = window
-
-    // @ts-ignore
-    if (!ethereum?.providers) {
-      // user doesn't have multiple providers
-      return false
-    }
-    const providerLookupMap = {
-      // @ts-ignore
-      coinbase: ethereum.providers.find(({ isCoinbaseWallet }) => isCoinbaseWallet),
-      // @ts-ignore
-      metamask: ethereum.providers.find(({ isMetaMask }) => isMetaMask),
-    }
-
-    const provider = providerLookupMap[providerName]
-
-    if (provider) {
-      // @ts-ignore
-      ethereum.setSelectedProvider(provider)
-      return true
-    }
-    return false
+  const handleCloseConnectWalletModal = () => {
+    setConnectState({ error: false, success: false, loading: false })
+    setErrorMessage("")
+    setIsWalletOpen(false)
   }
 
-  const appConnect = async (connector, wallet) => {
-    if (wallet) {
-      activateInjectedProvider(wallet)
+  useEffect(() => {
+    if (connectState.success) {
+      handleCloseConnectWalletModal()
     }
-    await connect(connector)
+  }, [connectState.success])
+
+  const handleWalletConnection = async (connector) => {
+    setConnectState({ error: false, success: false, loading: true })
+    let address = accountData?.address
+    let chainId = connectData?.chain.id
+    if (!address) {
+      try {
+        const connectData = await connectAsync(connector)
+        address = connectData.account
+        chainId = connectData.chain.id
+      } catch (err) {
+        console.error("Wallet connection failed with: ", err)
+        if (err.code === 4001) {
+          setErrorMessage("User rejected transaction.")
+        }
+        setConnectState({ error: true, success: false, loading: false })
+      }
+    }
+
+    try {
+      const nonceRes = await invoke(generateNonce, {})
+      const message = new SiweMessage({
+        domain: window.location.host,
+        address,
+        statement: "Sign in with Ethereum to the app.",
+        uri: window.location.origin,
+        version: "1",
+        chainId, // chainId is optional
+        nonce: nonceRes,
+      })
+
+      const signer = await metamaskWallet?.getSigner()
+      const signature = await signer?.signMessage(message.prepareMessage())
+      const verificationSuccessful = await invoke(verify, {
+        message: JSON.stringify(message),
+        signature,
+      })
+      if (verificationSuccessful) {
+        setConnectState({ error: false, success: true, loading: false })
+      }
+    } catch (err) {
+      console.error("Sign in with ethereum failed with: ", err)
+      if (err.code === 4001) {
+        setErrorMessage("User rejected transaction.")
+      }
+      setConnectState({ error: true, success: false, loading: false })
+    }
   }
 
   return (
     <Modal
       title="Enter Station"
       open={isWalletOpen}
-      toggle={setIsWalletOpen}
+      toggle={handleCloseConnectWalletModal}
       banner={Banner}
       showTitle={true}
     >
@@ -75,32 +103,18 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         </a>
         .
       </p>
-      <div className="mt-8">
+      {connectState.error ? (
+        <div className="mt-2 text-center text-torch-red">
+          <p>{errorMessage || "Something went wrong"}</p>
+        </div>
+      ) : null}
+      <div className="mt-6">
         <div className="flex flex-row space-x-3 mx-5 text-marble-white">
           <button
             className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete"
+            disabled={connectState.loading}
             onClick={async () => {
-              // // @ts-ignore
-              //await appConnect(metamaskWallet, "metamask")
-              const connectData = await connectAsync(metamaskWallet) // connect from useConnect
-
-              // const nonceRes = await invoke(generateNonce, {})
-              // const message = new SiweMessage({
-              //   domain: window.location.host,
-              //   address: connectData.account,
-              //   statement: "Sign in with Ethereum to the app.",
-              //   uri: window.location.origin,
-              //   version: "1",
-              //   chainId: connectData.chain?.id,
-              //   nonce: nonceRes,
-              // })
-
-              // const signer = await metamaskWallet?.getSigner()
-              // const signature = await signer?.signMessage(message.prepareMessage())
-              // const verificationSuccessful = await invoke(verify, {
-              //   message: JSON.stringify(message),
-              //   signature,
-              // })
+              await handleWalletConnection(metamaskWallet)
             }}
           >
             <div className="flex flex-row flex-1 justify-center items-center space-x-2 my-1">
@@ -114,9 +128,9 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           </button>
           <button
             className="flex-1  border border-marble-white rounded-md content-center hover:bg-wet-concrete"
+            disabled={connectState.loading}
             onClick={async () => {
-              // @ts-ignore
-              await connect(walletConnect)
+              await handleWalletConnection(walletConnect)
             }}
           >
             <div className="flex flex-row flex-1 justify-center align-middle items-center space-x-2 my-1 mx-auto">
@@ -130,9 +144,9 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           </button>
           <button
             className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete"
+            disabled={connectState.loading}
             onClick={async () => {
-              // @ts-ignore
-              await appConnect(coinbaseWallet, "coinbase")
+              await handleWalletConnection(coinbaseWallet)
             }}
           >
             <div className="flex flex-row flex-1 justify-center items-center align-middle space-x-2 my-1">

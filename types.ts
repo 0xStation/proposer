@@ -1,3 +1,4 @@
+import { Account } from "app/account/types"
 import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
 import { SiweMessage } from "siwe"
 
@@ -13,6 +14,7 @@ declare module "blitz" {
       nonce?: string
       role?: Role
       siwe?: SiweMessage
+      activeUser?: Account | null
     }
   }
 }

@@ -1,19 +1,33 @@
 import StationLogo from "public/station-letters.svg"
-import { Image, useQuery } from "blitz"
+import { useEffect } from "react"
+import { Image, invoke, useQuery, useSession } from "blitz"
 import { useAccount } from "wagmi"
 import useStore from "../hooks/useStore"
 import truncateString from "../utils/truncateString"
 import { useMemo, useState } from "react"
 import ProfileNavigationDrawer from "./ProfileNavigationDrawer"
 import getTerminalsByAccount, { TerminalMetadata } from "app/terminal/queries/getTerminalsByAccount"
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
 const Navigation = ({ children }: { children?: any }) => {
+  const session = useSession({ suspense: false })
   const { data: accountData } = useAccount()
   const activeUser = useStore((state) => state.activeUser)
+  const setActiveUser = useStore((state) => state.setActiveUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [profileNavDrawerIsOpen, setProfileNavDrawerIsOpen] = useState<boolean>(false)
-  const isAccountConnected = activeUser && address
+  const isAccountConnected = activeUser && session?.siwe?.address
+
+  useEffect(() => {
+    if (session?.siwe?.address && !activeUser) {
+      const setActiveAccount = async () => {
+        const account = await invoke(getAccountByAddress, { address: session?.siwe?.address })
+        setActiveUser(account)
+      }
+      setActiveAccount()
+    }
+  }, [session?.siwe?.address])
 
   const [usersTerminals] = useQuery(
     getTerminalsByAccount,
@@ -22,7 +36,7 @@ const Navigation = ({ children }: { children?: any }) => {
   )
 
   const handlePfpClick = () => {
-    if (address || activeUser) {
+    if (session?.siwe?.address) {
       setProfileNavDrawerIsOpen(true)
     }
   }
@@ -33,9 +47,9 @@ const Navigation = ({ children }: { children?: any }) => {
   const profilePfp =
     isAccountConnected && activeUser.data?.pfpURL ? (
       <>
-        {address && (
+        {session?.siwe?.address && (
           <div className="text-xs text-light-concrete flex mb-1">
-            <p>{truncateString(address, 3)}</p>
+            <p>{truncateString(session?.siwe?.address, 3)}</p>
             <div className="h-1 w-1 bg-magic-mint rounded-full align-middle ml-[0.1rem] mt-[.35rem]" />
           </div>
         )}
@@ -47,10 +61,10 @@ const Navigation = ({ children }: { children?: any }) => {
           />
         </div>
       </>
-    ) : address ? (
+    ) : session?.siwe?.address ? (
       <>
         <div className="text-xs text-light-concrete flex mb-1">
-          <p>{truncateString(address, 3)}</p>
+          <p>{truncateString(session?.siwe?.address, 3)}</p>
           <div className="h-1 w-1 bg-magic-mint rounded-full align-middle ml-[0.1rem] mt-[.35rem]" />
         </div>
         <div
@@ -81,15 +95,18 @@ const Navigation = ({ children }: { children?: any }) => {
       />
       {/* TODO: remove this parent div later. Need a parent element around the banner or else the dom rearranges for some reason */}
       <div>
-        {!address ? (
+        {!address || !session?.siwe?.address ? (
           <div className="w-full h-14 absolute z-10 bg-concrete bottom-0">
             <div className="fixed right-0 mt-3">
-              <p className="inline-block mr-5 italic">Join the ride &#8594;</p>
+              <p className="inline-block mr-5 italic">
+                {!address ? "Join the ride →" : "Sign in with ethereum →"}
+              </p>
               <button
                 onClick={() => toggleWalletModal(true)}
+                // disable={}
                 className="inline mr-10  bg-magic-mint text-tunnel-black w-48 rounded align-middle p-1 hover:bg-opacity-70"
               >
-                Connect Wallet
+                {!address ? "Connect Wallet" : "Sign"}
               </button>
             </div>
           </div>
