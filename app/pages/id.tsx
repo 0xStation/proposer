@@ -4,7 +4,6 @@ import Button from "app/core/components/Button"
 import useStore from "app/core/hooks/useStore"
 import Layout from "app/core/layouts/Layout"
 import { TypedDataTypeDefinition, TypedDataSignatureDomain } from "app/types"
-import { BigNumber } from "ethers"
 
 const signatureToRSV = (signature: string) => {
   const r = "0x" + signature.substring(2).substring(0, 64)
@@ -22,7 +21,6 @@ const recoverTypes: TypedDataTypeDefinition = {
   Recover: [
     { name: "tokenId", type: "uint256" },
     { name: "to", type: "address" },
-    { name: "approver", type: "address" },
   ],
 }
 
@@ -32,18 +30,17 @@ const IdConsolePage: BlitzPage = () => {
   const domain: TypedDataSignatureDomain = {
     name: "Station Labs ID",
     version: "1",
-    chainId: 1,
-    verifyingContract: "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+    chainId: 4,
+    verifyingContract: "0xa6d043D37A0a28232998C2Ce09dE435B30297754",
   }
 
   const mintValue = {
-    to: activeUser?.address,
+    to: "0x016562aA41A8697720ce0943F003141f5dEAe006",
   }
 
   const recoverValue = {
-    tokenId: BigNumber.from("7969960975173386214804117530009790747280859142"),
-    to: activeUser?.address,
-    approver: activeUser?.address,
+    tokenId: "7969960975173386214804117530009790747280859142",
+    to: "0x4D75d85D37170A5f9D47275dAF250459D965dff1",
   }
 
   let {
@@ -72,20 +69,12 @@ const IdConsolePage: BlitzPage = () => {
 
   if (mintIsSuccess && mintData) {
     const { v, r, s } = signatureToRSV(mintData as string)
-    console.log(`Mint signature\nv: ${v}\nr: ${r}\ns: ${s}`)
-
-    // clear data
-    mintIsSuccess = false
-    mintData = ""
+    console.log(`signer: ${activeUser?.address}\nMint signature\nv: ${v}\nr: ${r}\ns: ${s}`)
   }
 
   if (recoverIsSuccess && recoverData) {
     const { v, r, s } = signatureToRSV(recoverData as string)
-    console.log(`Recover signature\nv: ${v}\nr: ${r}\ns: ${s}`)
-
-    // clear data
-    recoverIsSuccess = false
-    recoverData = ""
+    console.log(`signer: ${activeUser?.address}\nRecover signature\nv: ${v}\nr: ${r}\ns: ${s}`)
   }
 
   return (

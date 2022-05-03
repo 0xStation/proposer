@@ -20,7 +20,7 @@ export enum Role {
 export type TypedDataSignatureDomain = {
   name: string
   version: string
-  chainId: 1
+  chainId: number
   verifyingContract: string
 }
 
