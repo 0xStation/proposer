@@ -118,15 +118,12 @@ const SettingsPage: BlitzPage = () => {
             </p>
             {/* the route for connecting to user */}
             {/* <a href="https://discord.com/api/oauth2/authorize?client_id=963465926353752104&redirect_uri=http%3A%2F%2Flocalhost%3A3000/discord&response_type=code&scope=identify%20guilds%20guilds.join%20guilds.members.read"> */}
-            <a target="_blank" rel="noreferrer">
-              <button
-                onClick={() =>
-                  window.open(
-                    `href="https://discord.com/api/oauth2/authorize?guild_id=${terminal?.data?.guildId}&client_id=963465926353752104&permissions=268435456&scope=bot`
-                  )
-                }
-                className="cursor-pointer mt-8 w-[200px] py-1 bg-magic-mint text-tunnel-black rounded text-base"
-              >
+            <a
+              target="_blank"
+              href={`https://discord.com/api/oauth2/authorize?guild_id=${terminal?.data.guildId}&client_id=${process.env.DISCORD_CLIENT_ID}&permissions=268435456&scope=bot`}
+              rel="noreferrer"
+            >
+              <button className="cursor-pointer mt-8 w-[200px] py-1 bg-magic-mint text-tunnel-black rounded text-base">
                 Connect
               </button>
             </a>

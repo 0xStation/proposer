@@ -9,8 +9,6 @@ export default async function handler(req, res) {
 
   const guild = await response.json()
 
-  console.log(guild.code)
-
   if (!guild.code) {
     res.status(200).json(guild)
   }
