@@ -1,5 +1,6 @@
 import { Initiative } from "app/deprecated/v1/initiative/types"
 import { Role } from "app/role/types"
+import { Tag } from "app/tag/types"
 
 export enum MethodToVisualizeContributorsNft {
   ROLE = "ROLE", // images are created per role, e.g. CCS NFT
@@ -30,6 +31,7 @@ export type TerminalMetadata = {
   hide?: boolean
   discordWebhookUrl?: string
   visualizeNftMethod?: string
+  guildId?: string
 }
 
 export type Terminal = {
@@ -38,5 +40,6 @@ export type Terminal = {
   handle: string
   data: TerminalMetadata
   roles: Role[]
+  tags: Tag[]
   initiatives?: Initiative[]
 }
