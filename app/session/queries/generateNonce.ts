@@ -7,6 +7,7 @@ export default async function getNonce(_: any, ctx: Ctx) {
     await ctx.session.$setPublicData({ nonce })
     return ctx.session.nonce
   } catch (err) {
-    // TODO: add error handling
+    console.error("Failed to generate and retrieve nonce with error: ", err)
+    return ""
   }
 }

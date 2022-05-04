@@ -107,7 +107,7 @@ const Navigation = ({ children }: { children?: any }) => {
         isOpen={profileNavDrawerIsOpen}
         setIsOpen={setProfileNavDrawerIsOpen}
       />
-      {/* TODO: remove this parent div later. Need a parent element around the banner or else the dom rearranges for some reason */}
+      {/* Need a parent element around the banner or else there's a chance for a hydration issue and the dom rearranges */}
       <div>
         {!address || !session?.siwe?.address ? (
           <div className="w-full h-14 absolute z-10 bg-concrete bottom-0">
