@@ -8,6 +8,7 @@ const UpsertTags = z.object({
       value: z.string(),
       type: z.string(),
       active: z.boolean(),
+      discordId: z.string().optional(),
     })
     .array(),
 })
@@ -35,6 +36,7 @@ export default async function upsertTags(input: z.infer<typeof UpsertTags>) {
       create: {
         value: t.value,
         active: t.active,
+        discordId: t.discordId ? parseInt(t.discordId) : null,
         type: t.type.toLowerCase(),
         terminalId: params.terminalId,
       },

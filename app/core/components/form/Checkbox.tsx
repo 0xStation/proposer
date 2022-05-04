@@ -10,7 +10,7 @@ const Checkbox = ({ name, value, checked }: { name: string; value?: string; chec
       name={name}
       value={value}
       render={({ input, meta }) => (
-        <div className="relative block cursor-pointer border border-marble-white p-0.5">
+        <div className="custom-checkbox-container relative block cursor-pointer border border-marble-white p-0.5">
           <input
             {...input}
             type="checkbox"

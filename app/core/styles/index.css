@@ -47,6 +47,10 @@ body {
   display: none;
 }
 
+.custom-checkbox:focus ~ .custom-checkbox-placeholder {
+  border: 2px solid #5f6fff;
+}
+
 .custom-checkbox:checked ~ .custom-checkbox-placeholder {
   background-color: white;
 }

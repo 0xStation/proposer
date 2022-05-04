@@ -3,7 +3,6 @@ import { BlitzPage, useParam, useQuery, useMutation } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import UpsertTags from "app/tag/mutations/upsertTags"
 import Checkbox from "app/core/components/form/Checkbox"
-// import Toast from "app/core/components/Toast"
 import useToast from "app/core/hooks/useToast"
 import { Field, Form } from "react-final-form"
 
@@ -13,6 +12,7 @@ type Guild = {
 
 type Role = {
   name: string
+  id: string
 }
 
 const SettingsPage: BlitzPage = () => {
@@ -22,11 +22,11 @@ const SettingsPage: BlitzPage = () => {
     { handle: terminalHandle },
     { suspense: false }
   )
-  const [toast, Toast] = useToast()
+  const [addToast, Toast] = useToast()
   const [connectedGuild, setConnectedGuild] = useState<Guild | undefined>(undefined)
   const [upsertTags] = useMutation(UpsertTags, {
     onSuccess: () => {
-      toast("Your roles have been updated.")
+      addToast("Your roles have been updated.")
     },
   })
 
@@ -64,20 +64,31 @@ const SettingsPage: BlitzPage = () => {
   // to get around it, we memoize the initial form state. This way, the form does not re-render its state when the
   // toast closes. There is also no lag after the save. WOW! And people thought useMemo was over-engineering...
   // not today!!
-  const initialFormValues = useMemo(() => {
-    if (terminal) {
-      return terminal?.tags.reduce((acc, tag) => {
+  const _initialFormValues = useMemo(() => {
+    if (connectedGuild && terminal) {
+      let allRoles = connectedGuild.roles.reduce((acc, role) => {
+        acc[role.name] = {
+          active: true,
+          type: "inactive",
+        }
+        return acc
+      }, {})
+
+      let existingRoles = terminal?.tags.reduce((acc, tag) => {
         acc[tag.value] = {
           type: tag.type,
           active: tag.active,
         }
         return acc
       }, {})
+
+      return Object.assign(allRoles, existingRoles)
     } else {
       return {}
     }
-  }, [terminal])
+  }, [connectedGuild, terminal])
 
+  console.log(_initialFormValues)
   return (
     <main className="text-marble-white min-h-screen flex flex-row">
       <nav className="w-[70px]"></nav>
@@ -94,7 +105,7 @@ const SettingsPage: BlitzPage = () => {
             Integrations
           </label>
           <ul className="mt-6">
-            <li className="text-marble-white text-lg cursor-pointer">Discord</li>
+            <li className="text-marble-white text-lg font-bold cursor-pointer">Discord</li>
           </ul>
         </div>
       </section>
@@ -107,12 +118,15 @@ const SettingsPage: BlitzPage = () => {
             </p>
             {/* the route for connecting to user */}
             {/* <a href="https://discord.com/api/oauth2/authorize?client_id=963465926353752104&redirect_uri=http%3A%2F%2Flocalhost%3A3000/discord&response_type=code&scope=identify%20guilds%20guilds.join%20guilds.members.read"> */}
-            <a
-              target="_blank"
-              href="https://discord.com/api/oauth2/authorize?guild_id=${selectedGuild}&client_id=963465926353752104&permissions=268435456&scope=bot"
-              rel="noreferrer"
-            >
-              <button className="cursor-pointer mt-8 w-[200px] py-1 bg-magic-mint text-tunnel-black rounded text-base">
+            <a target="_blank" rel="noreferrer">
+              <button
+                onClick={() =>
+                  window.open(
+                    `href="https://discord.com/api/oauth2/authorize?guild_id=${terminal?.data?.guildId}&client_id=963465926353752104&permissions=268435456&scope=bot`
+                  )
+                }
+                className="cursor-pointer mt-8 w-[200px] py-1 bg-magic-mint text-tunnel-black rounded text-base"
+              >
                 Connect
               </button>
             </a>
@@ -120,14 +134,16 @@ const SettingsPage: BlitzPage = () => {
         )}
         {connectedGuild && (
           <Form
-            initialValues={initialFormValues}
+            initialValues={_initialFormValues}
             onSubmit={async (values) => {
+              console.log(values)
               let names = Object.keys(values)
               let tags = names.map((name) => {
                 return {
                   value: name,
                   active: values[name].active,
                   type: values[name].type,
+                  discordId: values[name].discordId,
                 }
               })
 
@@ -144,7 +160,7 @@ const SettingsPage: BlitzPage = () => {
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-col">
                     <div className="p-6 border-b border-concrete flex justify-between">
-                      <h2 className="text-marble-white text-2xl">Discord</h2>
+                      <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
                       <button
                         className="rounded text-tunnel-black bg-magic-mint px-8"
                         type="submit"
@@ -152,18 +168,16 @@ const SettingsPage: BlitzPage = () => {
                         Save
                       </button>
                     </div>
-
                     <div className="p-6">
                       <div className="grid grid-cols-3 gap-4">
                         <div className="flex flex-col pb-2 col-span-2">
-                          <h3>Manage Roles*</h3>
+                          <h3 className="font-bold">Manage Roles*</h3>
                           <span className="text-concrete text-xs mt-1">
                             Sort roles into categories
                           </span>
                           <div className="grid grid-cols-2 mt-6 gap-y-2">
                             {connectedGuild.roles.map((role, idx) => {
                               let cbState = form.getFieldState(role.name + ".active")
-                              const required = (value) => (value ? undefined : "Required")
                               return (
                                 <>
                                   <div key={idx} className="flex flex-row items-center">
@@ -177,7 +191,7 @@ const SettingsPage: BlitzPage = () => {
                                   </div>
                                   <div>
                                     <Field name={`${role.name}.type`}>
-                                      {({ input, meta }) => (
+                                      {({ input }) => (
                                         <div>
                                           <select
                                             {...input}
@@ -188,19 +202,24 @@ const SettingsPage: BlitzPage = () => {
                                             }`}
                                             required={cbState?.value}
                                           >
-                                            <option value="">Choose option</option>
-                                            {cbState?.value && (
+                                            {cbState?.value ? (
                                               <>
+                                                <option value="">Choose option</option>
                                                 <option value="role">Role</option>
                                                 <option value="initiative">Initiative</option>
                                                 <option value="status">Status</option>
+                                                <option value="guild">Guild</option>
                                               </>
+                                            ) : (
+                                              <option value="">inactive</option>
                                             )}
                                           </select>
-                                          {meta.error && meta.touched && (
-                                            <span className="text-torch-red">{meta.error}</span>
-                                          )}
                                         </div>
+                                      )}
+                                    </Field>
+                                    <Field name={`${role.name}.discordId`}>
+                                      {({ input }) => (
+                                        <input {...input} type="hidden" value={role.id} />
                                       )}
                                     </Field>
                                   </div>
