@@ -31,8 +31,8 @@ const EditProfile: BlitzPage = () => {
 
   return (
     <>
-      <div className="bg-tunnel-black min-h-[calc(100vh-15rem)] h-[1px] relative">
-        <div className="absolute top-3 left-5">
+      <div className="bg-tunnel-black relative">
+        <div className="absolute top-3 left-28">
           <div className="w-[24px] h-[24px]">
             <button
               className="text-marble-white"

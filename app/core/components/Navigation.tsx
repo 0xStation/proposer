@@ -1,15 +1,17 @@
 import StationLogo from "public/station-letters.svg"
 import { useEffect } from "react"
 import { Image, invoke, useQuery, useSession } from "blitz"
-import { useAccount } from "wagmi"
+import { useAccount, useConnect } from "wagmi"
 import useStore from "../hooks/useStore"
 import truncateString from "../utils/truncateString"
 import { useMemo, useState } from "react"
 import ProfileNavigationDrawer from "./ProfileNavigationDrawer"
 import getTerminalsByAccount, { TerminalMetadata } from "app/terminal/queries/getTerminalsByAccount"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import logout from "app/session/mutations/logout"
 
 const Navigation = ({ children }: { children?: any }) => {
+  const { isConnected } = useConnect()
   const session = useSession({ suspense: false })
   const { data: accountData } = useAccount()
   const activeUser = useStore((state) => state.activeUser)
@@ -17,7 +19,17 @@ const Navigation = ({ children }: { children?: any }) => {
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [profileNavDrawerIsOpen, setProfileNavDrawerIsOpen] = useState<boolean>(false)
-  const isAccountConnected = activeUser && session?.siwe?.address
+  const isAccountConnected = address && activeUser && session?.siwe?.address
+
+  useEffect(() => {
+    if (session?.siwe?.address && !isConnected) {
+      const revokeSession = async () => {
+        await invoke(logout, {})
+        setActiveUser(null)
+      }
+      revokeSession()
+    }
+  }, [isConnected, session?.siwe?.address])
 
   useEffect(() => {
     if (session?.siwe?.address && !activeUser) {
@@ -50,14 +62,14 @@ const Navigation = ({ children }: { children?: any }) => {
         {session?.siwe?.address && (
           <div className="text-xs text-light-concrete flex mb-1">
             <p>{truncateString(session?.siwe?.address, 3)}</p>
-            <div className="h-1 w-1 bg-magic-mint rounded-full align-middle ml-[0.1rem] mt-[.35rem]" />
           </div>
         )}
         <div tabIndex={0} className="mx-auto">
+          <div className="h-3 w-3 border border-tunnel-black bg-magic-mint rounded-full absolute right-0 mr-.5" />
           <img
             src={activeUser.data.pfpURL}
             alt="PFP"
-            className={"w-[46px] h-[46px] border border-marble-white rounded-full cursor-pointer"}
+            className={"w-[46px] h-[46px] rounded-full cursor-pointer"}
           />
         </div>
       </>
@@ -65,11 +77,11 @@ const Navigation = ({ children }: { children?: any }) => {
       <>
         <div className="text-xs text-light-concrete flex mb-1">
           <p>{truncateString(session?.siwe?.address, 3)}</p>
-          <div className="h-1 w-1 bg-magic-mint rounded-full align-middle ml-[0.1rem] mt-[.35rem]" />
         </div>
+        <div className="h-3 w-3 border border-tunnel-black bg-magic-mint rounded-full absolute right-0 mr-.5" />
         <div
           tabIndex={0}
-          className="rounded-full w-[46px] h-[46px] bg-gradient-to-b from-electric-violet to-magic-mint border border-marble-white mx-auto cursor-pointer"
+          className="rounded-full w-[46px] h-[46px] bg-gradient-to-b from-electric-violet to-magic-mint mx-auto cursor-pointer"
         ></div>
       </>
     ) : null
@@ -77,12 +89,14 @@ const Navigation = ({ children }: { children?: any }) => {
   const terminalsView =
     isAccountConnected && Array.isArray(usersTerminals) && usersTerminals?.length > 0
       ? usersTerminals?.map((terminal, idx) => (
-          <div className="cursor-pointer" key={`${terminal.handle}${idx}`}>
-            <img
-              key={`${terminal?.handle + idx}`}
-              src={(terminal?.data as TerminalMetadata)?.pfpURL}
-              className="w-[46px] h-[46px] bg-wet-concrete border border-concrete rounded-lg mx-auto mb-4"
-            />
+          <div className="block w-full group" key={`${terminal.handle}${idx}`}>
+            <div className="group-focus:visible invisible w-[3px] h-[46px] bg-marble-white rounded-r-lg inline-block mr-2"></div>
+            <button className="inline-block overflow-hidden bg-wet-concrete w-[46px] h-[46px] cursor-pointer border border-concrete focus:border-marble-white rounded-lg mb-4 mr-2">
+              <img
+                key={`${terminal?.handle + idx}`}
+                src={(terminal?.data as TerminalMetadata)?.pfpURL}
+              />
+            </button>
           </div>
         ))
       : null
@@ -125,7 +139,7 @@ const Navigation = ({ children }: { children?: any }) => {
           )}
         </div>
       </div>
-      <div className="h-screen left-[70px] relative">{children}</div>
+      <div className="h-screen ml-[70px] relative">{children}</div>
     </>
   )
 }
