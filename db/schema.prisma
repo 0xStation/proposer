@@ -30,8 +30,9 @@ model Terminal {
   handle        String            @unique
   initiatives   Initiative[]
   roles         Role[]
-  tickets       AccountTerminal[]
+  members       AccountTerminal[]
   data          Json?
+  tags          Tag[]
 }
 
 // A role within a terminal
@@ -46,14 +47,15 @@ model Role {
 }
 
 model AccountTerminal {
-  account     Account  @relation(fields: [accountId], references: [id])
+  account     Account              @relation(fields: [accountId], references: [id])
   accountId   Int
-  terminal    Terminal @relation(fields: [terminalId], references: [id])
+  terminal    Terminal             @relation(fields: [terminalId], references: [id])
   terminalId  Int
-  role        Role?    @relation(fields: [terminalId, roleLocalId], references: [terminalId, localId])
+  role        Role?                @relation(fields: [terminalId, roleLocalId], references: [terminalId, localId])
   roleLocalId Int?
-  joinedAt    DateTime @default(now())
-  active      Boolean  @default(true)
+  joinedAt    DateTime             @default(now())
+  active      Boolean              @default(true)
+  tags        AccountTerminalTag[]
   data        Json?
 
   @@id([accountId, terminalId])
@@ -121,6 +123,30 @@ model Endorsement {
   timestamp        DateTime @default(now())
   endorsementValue Int
   data             Json?
+}
+
+model Tag {
+  id         Int                  @id @default(autoincrement())
+  type       String
+  value      String
+  active     Boolean              @default(true)
+  terminal   Terminal             @relation(fields: [terminalId], references: [id])
+  terminalId Int
+  discordId  Int?
+  data       Json?
+  tickets    AccountTerminalTag[]
+
+  @@unique([value, terminalId])
+}
+
+model AccountTerminalTag {
+  tag              Tag             @relation(fields: [tagId], references: [id])
+  tagId            Int
+  ticket           AccountTerminal @relation(fields: [ticketAccountId, ticketTerminalId], references: [accountId, terminalId])
+  ticketAccountId  Int
+  ticketTerminalId Int
+
+  @@id([tagId, ticketAccountId, ticketTerminalId])
 }
 
 enum AccountInitiativeStatus {
