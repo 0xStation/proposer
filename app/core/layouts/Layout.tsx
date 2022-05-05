@@ -19,8 +19,7 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
         <link rel="apple-touch-icon" href="/station-logo-favicon.ico" />
       </Head>
       <ModalContainer />
-      <Navigation />
-      {children}
+      <Navigation>{children}</Navigation>
     </>
   )
 }

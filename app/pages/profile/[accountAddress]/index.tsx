@@ -48,7 +48,7 @@ const ProfileHome: BlitzPage = () => {
 
   return (
     <Layout title={`${account ? `${account?.data?.name} | ` : ""}Profile`}>
-      <div className="w-full grid grid-cols-1 xl:grid-cols-4 min-h-[calc(100vh-88px)] h-[1px]">
+      <div className="w-full grid grid-cols-1 xl:grid-cols-4 min-h-full">
         <div className="col-span-1 text-2xl md:border-r border-concrete h-full">
           <div className="h-[185px] relative mb-[116px]">
             {account?.data.coverURL ? (
