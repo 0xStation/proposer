@@ -41,7 +41,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
     activeUser && activeUser.data?.pfpURL ? (
       <>
         <div tabIndex={0} className="mx-auto">
-          <div className="h-3 w-3 border border-tunnel-black bg-magic-mint rounded-full absolute ml-8" />
+          <div className="h-3 w-3 border border-tunnel-black bg-magic-mint rounded-full absolute ml-[2.15rem]" />
           <img
             src={activeUser.data.pfpURL}
             alt="PFP"
@@ -51,7 +51,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
       </>
     ) : (
       <>
-        <div className="h-3 w-3 border border-tunnel-black bg-magic-mint rounded-full absolute ml-8" />
+        <div className="h-3 w-3 border border-tunnel-black bg-magic-mint rounded-full absolute ml-[2.15rem]" />
         <div
           tabIndex={0}
           className="rounded-full w-[46px] h-[46px] bg-gradient-to-b from-electric-violet to-magic-mint cursor-pointer"
@@ -85,7 +85,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-full"
             >
-              <div className="pointer-events-auto w-screen max-w-[165px]">
+              <div className="pointer-events-auto w-screen max-w-[298px]">
                 <div className="flex h-full flex-col overflow-y-scroll bg-tunnel-black border-r border-concrete">
                   <button className="mt-4 mr-4 text-right" onClick={() => setIsOpen(false)}>
                     <Image src={Exit} alt="Close button" width={12} height={12} />
@@ -102,15 +102,13 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                       <a
                         className="block hover:opacity-70"
                         href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
+                        target="_blank"
+                        rel="noreferrer"
                       >
                         Open a Terminal
                       </a>
                       <button className="block hover:opacity-70" onClick={handleDisconnect}>
                         Disconnect
-                      </button>
-                      <button className="block hover:opacity-70 text-torch-red">
-                        {/* TODO: Make mutation */}
-                        Delete account
                       </button>
                     </div>
                   </div>

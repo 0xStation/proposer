@@ -21,6 +21,9 @@ const Navigation = ({ children }: { children?: any }) => {
   const [profileNavDrawerIsOpen, setProfileNavDrawerIsOpen] = useState<boolean>(false)
   const isAccountConnected = address && activeUser && session?.siwe?.address
 
+  // If the user disconnects from their metamask wallet via the extension,
+  // we should revoke their sign-in with ethereum session
+  // and set the active user to `null`.
   useEffect(() => {
     if (session?.siwe?.address && !isConnected) {
       const revokeSession = async () => {
@@ -31,6 +34,9 @@ const Navigation = ({ children }: { children?: any }) => {
     }
   }, [isConnected, session?.siwe?.address])
 
+  // If the user connects + signs their wallet,
+  // set the active user. The active user will be
+  // set to `null` if there isn't an existing account.
   useEffect(() => {
     if (session?.siwe?.address && !activeUser) {
       const setActiveAccount = async () => {
@@ -55,34 +61,34 @@ const Navigation = ({ children }: { children?: any }) => {
 
   // 1. if user has an active account w/Station + pfp url, render pfp url.
   // 2. else if user has a connected address, render gradient pfp.
-  // 3. else don't render anything
+  // 3. else don't render anything when user isn't connected.
   const profilePfp =
     isAccountConnected && activeUser.data?.pfpURL ? (
       <>
-        {session?.siwe?.address && (
-          <div className="text-xs text-light-concrete flex mb-1">
-            <p>{truncateString(session?.siwe?.address, 3)}</p>
-          </div>
-        )}
         <div tabIndex={0} className="mx-auto">
-          <div className="h-3 w-3 border border-tunnel-black bg-magic-mint rounded-full absolute right-0 mr-.5" />
+          <div className="h-3 w-3 border border-tunnel-black bg-magic-mint rounded-full absolute right-0 mr-1" />
           <img
             src={activeUser.data.pfpURL}
             alt="PFP"
             className={"w-[46px] h-[46px] rounded-full cursor-pointer"}
           />
         </div>
+        {session?.siwe?.address && (
+          <div className="text-xs text-light-concrete flex mt-1">
+            <p>{truncateString(session?.siwe?.address, 3)}</p>
+          </div>
+        )}
       </>
     ) : session?.siwe?.address ? (
       <>
-        <div className="text-xs text-light-concrete flex mb-1">
-          <p>{truncateString(session?.siwe?.address, 3)}</p>
-        </div>
-        <div className="h-3 w-3 border border-tunnel-black bg-magic-mint rounded-full absolute right-0 mr-.5" />
+        <div className="h-3 w-3 border border-tunnel-black bg-magic-mint rounded-full absolute right-0 mr-1" />
         <div
           tabIndex={0}
           className="rounded-full w-[46px] h-[46px] bg-gradient-to-b from-electric-violet to-magic-mint mx-auto cursor-pointer"
         ></div>
+        <div className="text-xs text-light-concrete flex mt-1">
+          <p>{truncateString(session?.siwe?.address, 3)}</p>
+        </div>
       </>
     ) : null
 
@@ -90,8 +96,9 @@ const Navigation = ({ children }: { children?: any }) => {
     isAccountConnected && Array.isArray(usersTerminals) && usersTerminals?.length > 0
       ? usersTerminals?.map((terminal, idx) => (
           <div className="block w-full group" key={`${terminal.handle}${idx}`}>
+            {/* TODO: this focused div is not working - need to fix */}
             <div className="group-focus:visible invisible w-[3px] h-[46px] bg-marble-white rounded-r-lg inline-block mr-2"></div>
-            <button className="inline-block overflow-hidden bg-wet-concrete w-[46px] h-[46px] cursor-pointer border border-concrete focus:border-marble-white rounded-lg mb-4 mr-2">
+            <button className="inline-block overflow-hidden bg-wet-concrete w-[46px] h-[46px] cursor-pointer border border-wet-concrete focus:border-marble-white rounded-lg mb-4 mr-2">
               <img
                 key={`${terminal?.handle + idx}`}
                 src={(terminal?.data as TerminalMetadata)?.pfpURL}
@@ -109,7 +116,7 @@ const Navigation = ({ children }: { children?: any }) => {
       />
       {/* Need a parent element around the banner or else there's a chance for a hydration issue and the dom rearranges */}
       <div>
-        {!address || !session?.siwe?.address ? (
+        {(!address || !session?.siwe?.address) && (
           <div className="w-full h-14 absolute z-10 bg-concrete bottom-0">
             <div className="fixed right-0 mt-3">
               <p className="inline-block mr-5 italic">
@@ -117,17 +124,18 @@ const Navigation = ({ children }: { children?: any }) => {
               </p>
               <button
                 onClick={() => toggleWalletModal(true)}
-                // disable={}
                 className="inline mr-10  bg-magic-mint text-tunnel-black w-48 rounded align-middle p-1 hover:bg-opacity-70"
               >
                 {!address ? "Connect Wallet" : "Sign"}
               </button>
             </div>
           </div>
-        ) : null}
+        )}
       </div>
       <div className="h-screen w-[70px] bg-tunnel-black border-r border-concrete fixed text-center">
-        <a className="mt-1 inline-block" href="https://www.station.express/">
+        {/* hardcoding the link for now - we don't have access to the window object unless we pass it via 
+        serverside props through the `Layout` component on every page */}
+        <a className="mt-1 inline-block" href="https://app.station.express">
           <Image src={StationLogo} alt="Station logo" height={20} width={54} />
         </a>
         <div className="h-full mt-4">

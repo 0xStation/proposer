@@ -60,7 +60,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
       const message = new SiweMessage({
         domain: window.location.host,
         address,
-        statement: "Sign in with Ethereum to the app.",
+        statement: "Sign in with Ethereum to access your account on Station.",
         uri: window.location.origin,
         version: "1",
         chainId, // chainId is optional
@@ -79,7 +79,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
     } catch (err) {
       console.error("Sign in with ethereum failed with: ", err)
       if (err.code === 4001) {
-        setErrorMessage("User rejected transaction.")
+        setErrorMessage("Wallet connection declined.")
       }
       setConnectState({ error: true, success: false, loading: false })
     }
