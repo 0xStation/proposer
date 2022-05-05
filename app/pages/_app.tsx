@@ -1,7 +1,7 @@
 import { AppProps } from "blitz"
 import "app/core/styles/index.css"
 import { providers } from "ethers"
-import { Provider, defaultChains, createClient } from "wagmi"
+import { WagmiProvider, defaultChains, createClient } from "wagmi"
 import { InjectedConnector } from "wagmi/connectors/injected"
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect"
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet"
@@ -31,6 +31,7 @@ const connectors = ({ chainId }) => {
   ]
 }
 
+// Manages wallet connection and state for the wagmi provider
 const client = createClient({
   autoConnect: false,
   connectors,
@@ -40,5 +41,5 @@ const client = createClient({
 export default function App({ Component, pageProps }: AppProps) {
   const getLayout = Component.getLayout || ((page) => page)
 
-  return <Provider client={client}>{getLayout(<Component {...pageProps} />)}</Provider>
+  return <WagmiProvider client={client}>{getLayout(<Component {...pageProps} />)}</WagmiProvider>
 }
