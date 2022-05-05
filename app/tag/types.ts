@@ -3,4 +3,5 @@ export type Tag = {
   value: string
   type: string
   active: boolean
+  discordId?: string
 }

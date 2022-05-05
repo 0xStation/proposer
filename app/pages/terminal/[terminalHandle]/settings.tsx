@@ -70,6 +70,7 @@ const SettingsPage: BlitzPage = () => {
         acc[role.name] = {
           active: true,
           type: "inactive",
+          discordId: role.id,
         }
         return acc
       }, {})
@@ -78,6 +79,7 @@ const SettingsPage: BlitzPage = () => {
         acc[tag.value] = {
           type: tag.type,
           active: tag.active,
+          discordId: tag.discordId || null,
         }
         return acc
       }, {})
@@ -88,7 +90,6 @@ const SettingsPage: BlitzPage = () => {
     }
   }, [connectedGuild, terminal])
 
-  console.log(_initialFormValues)
   return (
     <main className="text-marble-white min-h-screen flex flex-row">
       <nav className="w-[70px]"></nav>
@@ -153,6 +154,7 @@ const SettingsPage: BlitzPage = () => {
               }
             }}
             render={({ form, handleSubmit }) => {
+              console.log(form.getFieldState("@everyone.discordId"))
               return (
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-col">
@@ -212,11 +214,6 @@ const SettingsPage: BlitzPage = () => {
                                             )}
                                           </select>
                                         </div>
-                                      )}
-                                    </Field>
-                                    <Field name={`${role.name}.discordId`}>
-                                      {({ input }) => (
-                                        <input {...input} type="hidden" value={role.id} />
                                       )}
                                     </Field>
                                   </div>
