@@ -47,9 +47,8 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         address = connectData.account
         chainId = connectData.chain.id
       } catch (err) {
-        console.error("Wallet connection failed with: ", err)
         if (err.code === 4001) {
-          setErrorMessage("User rejected transaction.")
+          setErrorMessage("Wallet signature declined.")
         }
         setConnectState({ error: true, success: false, loading: false })
       }
@@ -77,9 +76,8 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         setConnectState({ error: false, success: true, loading: false })
       }
     } catch (err) {
-      console.error("Sign in with ethereum failed with: ", err)
       if (err.code === 4001) {
-        setErrorMessage("Wallet connection declined.")
+        setErrorMessage("Wallet signature declined.")
       }
       setConnectState({ error: true, success: false, loading: false })
     }
