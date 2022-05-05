@@ -134,7 +134,6 @@ const SettingsPage: BlitzPage = () => {
           <Form
             initialValues={_initialFormValues}
             onSubmit={async (values) => {
-              console.log(values)
               let names = Object.keys(values)
               let tags = names.map((name) => {
                 return {
@@ -154,7 +153,6 @@ const SettingsPage: BlitzPage = () => {
               }
             }}
             render={({ form, handleSubmit }) => {
-              console.log(form.getFieldState("@everyone.discordId"))
               return (
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-col">
