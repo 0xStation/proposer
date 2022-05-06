@@ -6,7 +6,8 @@ import useStore from "../hooks/useStore"
 import truncateString from "../utils/truncateString"
 import { useMemo, useState } from "react"
 import ProfileNavigationDrawer from "./ProfileNavigationDrawer"
-import getTerminalsByAccount, { TerminalMetadata } from "app/terminal/queries/getTerminalsByAccount"
+import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
+import { TerminalMetadata } from "app/terminal/types"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import logout from "app/session/mutations/logout"
 
@@ -133,7 +134,7 @@ const Navigation = ({ children }: { children?: any }) => {
         )}
       </div>
       <div className="h-screen w-[70px] bg-tunnel-black border-r border-concrete fixed text-center">
-        {/* hardcoding the link for now - we don't have access to the window object unless we pass it via 
+        {/* hardcoding the link for now - we don't have access to the window object unless we pass it via
         serverside props through the `Layout` component on every page */}
         <a className="mt-1 inline-block" href="https://app.station.express">
           <Image src={StationLogo} alt="Station logo" height={20} width={54} />

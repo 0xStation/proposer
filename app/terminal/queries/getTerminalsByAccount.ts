@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { TerminalMetadata } from "../../../../terminal/types"
+import { TerminalMetadata } from "app/terminal/types"
 
 const GetTerminalsByAccount = z.object({
   accountId: z.number(),
