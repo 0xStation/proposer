@@ -36,8 +36,8 @@ export default async function upsertTags(input: z.infer<typeof UpsertTags>) {
       create: {
         value: t.value,
         active: t.active,
-        discordId: t.discordId ? parseInt(t.discordId) : null,
         type: t.type.toLowerCase(),
+        discordId: t.discordId ? t.discordId : null,
         terminalId: params.terminalId,
       },
     })
