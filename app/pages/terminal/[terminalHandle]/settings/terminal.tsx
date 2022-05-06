@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react"
-import { BlitzPage, useParam, useQuery, useMutation } from "blitz"
+import { BlitzPage, useParam, useQuery, useMutation, useRouter, Routes } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Navigation from "app/terminal/components/settings/navigation"
 import useToast from "app/core/hooks/useToast"
@@ -7,6 +7,9 @@ import updateTerminal from "app/terminal/mutations/updateTerminal"
 import { useDropzone } from "react-dropzone"
 import UploadIcon from "app/core/icons/UploadIcon"
 import { Field, Form } from "react-final-form"
+import useStore from "app/core/hooks/useStore"
+import { canEdit } from "app/core/utils/permissions"
+import { EditPermissionTypes } from "app/core/utils/constants"
 
 // maybe we can break this out into it's own component?
 const PfpInput = ({ pfpURL, onUpload }) => {
@@ -55,19 +58,27 @@ const PfpInput = ({ pfpURL, onUpload }) => {
 }
 
 const TerminalSettingsPage: BlitzPage = () => {
+  const router = useRouter()
+  const [addToast, Toast] = useToast()
+  const activeUser = useStore((state) => state.activeUser)
   const [pfpURL, setPfpURL] = useState<string>("")
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
-  const [addToast, Toast] = useToast()
+
+  console.log(activeUser)
+  const userCanEdit = activeUser
+    ? canEdit(activeUser, terminal?.id, EditPermissionTypes.TERMINAL)
+    : false
+
+  console.log(userCanEdit)
 
   const [updateTerminalMutation] = useMutation(updateTerminal, {
     onSuccess: (data) => {
       console.log(data)
       addToast("Successfully updated your terminal.")
 
-      // if terminal handle changes it is going to break the routes
-      // if the users refreshes for example, it is not going to work because their handle is different
-      // so we should auto refresh with the new handle possibly?
+      let route = `/terminal/${data?.handle || terminalHandle}/settings/terminal`
+      router.push(route, undefined, { shallow: true })
     },
     onError: (error) => {
       console.log(error)
@@ -89,7 +100,6 @@ const TerminalSettingsPage: BlitzPage = () => {
           <Form
             initialValues={{ name: terminal.data.name, handle: terminal.handle } || {}}
             onSubmit={async (values) => {
-              console.log(values)
               await updateTerminalMutation({
                 ...values,
                 pfpURL: pfpURL,
