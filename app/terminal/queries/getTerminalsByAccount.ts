@@ -1,31 +1,6 @@
 import db from "db"
 import * as z from "zod"
-
-export type TerminalMetadata = {
-  name: string
-  description: string
-  pfpURL: string
-  coverURL?: string
-  permissions: {
-    invite: Record<string, number[]>
-    edit: Record<string, number[]>
-  }
-  contracts: {
-    addresses: {
-      endorsements: string
-      points: string
-      referrals: string
-    }
-    symbols: {
-      endorsements: string
-      points: string
-      referrals: string
-    }
-  }
-  hide?: boolean
-  discordWebhookUrl?: string
-  visualizeNftMethod?: string
-}
+import { TerminalMetadata } from "../../../../terminal/types"
 
 const GetTerminalsByAccount = z.object({
   accountId: z.number(),
