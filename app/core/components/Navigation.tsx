@@ -1,17 +1,15 @@
 import StationLogo from "public/station-letters.svg"
 import { useEffect } from "react"
 import { Image, invoke, useQuery, useSession } from "blitz"
-import { useAccount, useConnect } from "wagmi"
+import { useAccount } from "wagmi"
 import useStore from "../hooks/useStore"
 import truncateString from "../utils/truncateString"
 import { useMemo, useState } from "react"
 import ProfileNavigationDrawer from "./ProfileNavigationDrawer"
 import getTerminalsByAccount, { TerminalMetadata } from "app/terminal/queries/getTerminalsByAccount"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
-import logout from "app/session/mutations/logout"
 
 const Navigation = ({ children }: { children?: any }) => {
-  const { isConnected } = useConnect()
   const session = useSession({ suspense: false })
   const { data: accountData } = useAccount()
   const activeUser = useStore((state) => state.activeUser)
@@ -19,20 +17,6 @@ const Navigation = ({ children }: { children?: any }) => {
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [profileNavDrawerIsOpen, setProfileNavDrawerIsOpen] = useState<boolean>(false)
-  const isAccountConnected = address && activeUser && session?.siwe?.address
-
-  // If the user disconnects from their metamask wallet via the extension,
-  // we should revoke their sign-in with ethereum session
-  // and set the active user to `null`.
-  useEffect(() => {
-    if (session?.siwe?.address && !isConnected) {
-      const revokeSession = async () => {
-        await invoke(logout, {})
-        setActiveUser(null)
-      }
-      revokeSession()
-    }
-  }, [isConnected, session?.siwe?.address])
 
   // If the user connects + signs their wallet,
   // set the active user. The active user will be
@@ -63,21 +47,19 @@ const Navigation = ({ children }: { children?: any }) => {
   // 2. else if user has a connected address, render gradient pfp.
   // 3. else don't render anything when user isn't connected.
   const profilePfp =
-    isAccountConnected && activeUser.data?.pfpURL ? (
+    session?.siwe?.address && activeUser?.data?.pfpURL ? (
       <>
         <div tabIndex={0} className="mx-auto">
           <div className="h-3 w-3 border border-tunnel-black bg-magic-mint rounded-full absolute right-0 mr-1" />
           <img
-            src={activeUser.data.pfpURL}
+            src={activeUser?.data.pfpURL}
             alt="PFP"
             className={"w-[46px] h-[46px] rounded-full cursor-pointer"}
           />
         </div>
-        {session?.siwe?.address && (
-          <div className="text-xs text-light-concrete flex mt-1">
-            <p>{truncateString(session?.siwe?.address, 3)}</p>
-          </div>
-        )}
+        <div className="text-xs text-light-concrete flex mt-1">
+          <p>{truncateString(session?.siwe?.address, 3)}</p>
+        </div>
       </>
     ) : session?.siwe?.address ? (
       <>
@@ -93,7 +75,7 @@ const Navigation = ({ children }: { children?: any }) => {
     ) : null
 
   const terminalsView =
-    isAccountConnected && Array.isArray(usersTerminals) && usersTerminals?.length > 0
+    usersTerminals && Array.isArray(usersTerminals) && usersTerminals?.length > 0
       ? usersTerminals?.map((terminal, idx) => (
           <div className="block w-full group" key={`${terminal.handle}${idx}`}>
             {/* TODO: this focused div is not working - need to fix */}
@@ -116,7 +98,7 @@ const Navigation = ({ children }: { children?: any }) => {
       />
       {/* Need a parent element around the banner or else there's a chance for a hydration issue and the dom rearranges */}
       <div>
-        {(!address || !session?.siwe?.address) && (
+        {!session?.siwe?.address && (
           <div className="w-full h-14 absolute z-10 bg-concrete bottom-0">
             <div className="fixed right-0 mt-3">
               <p className="inline-block mr-5 italic">

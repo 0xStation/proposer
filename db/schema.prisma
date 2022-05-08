@@ -20,6 +20,7 @@ model Account {
   initiatives AccountInitiative[]
   data        Json?
   endorsed    Endorsement[]       @relation("Endorsed")
+  Session     Session[]
 }
 
 // Each DAO is represented by a terminal.
@@ -153,4 +154,19 @@ enum AccountInitiativeStatus {
   INTERESTED
   CONTRIBUTING
   PREVIOUSLY_CONTRIBUTED
+}
+
+model Session {
+  id                 Int       @id @default(autoincrement())
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  expiresAt          DateTime?
+  handle             String    @unique
+  hashedSessionToken String?
+  antiCSRFToken      String?
+  publicData         String?
+  privateData        String?
+
+  user   Account? @relation(fields: [userId], references: [id])
+  userId Int?
 }
