@@ -31,6 +31,8 @@ const DiscordSettingsPage: BlitzPage = () => {
     },
   })
 
+  const [selectAllActive, setSelectAllActive] = useState(false)
+
   useEffect(() => {
     const fetchAsync = async () => {
       if (!terminal) return
@@ -97,8 +99,6 @@ const DiscordSettingsPage: BlitzPage = () => {
           <p className="mt-2 text-marble-white text-base w-[400px] text-center">
             Connect with Discord to synchronize roles and manage permissions & access on Station.
           </p>
-          {/* the route for connecting to user */}
-          {/* <a href="https://discord.com/api/oauth2/authorize?client_id=963465926353752104&redirect_uri=http%3A%2F%2Flocalhost%3A3000/discord&response_type=code&scope=identify%20guilds%20guilds.join%20guilds.members.read"> */}
           <a
             target="_blank"
             href={`https://discord.com/api/oauth2/authorize?guild_id=${terminal?.data.guildId}&client_id=${process.env.DISCORD_CLIENT_ID}&permissions=268435456&scope=bot`}
@@ -132,6 +132,13 @@ const DiscordSettingsPage: BlitzPage = () => {
               refetch()
             }
           }}
+          mutators={{
+            selectAll: (args, state, utils) => {
+              Object.keys(state.formState.values).forEach((key) => {
+                utils.changeValue(state, `${key}.active`, () => args[0])
+              })
+            },
+          }}
           render={({ form, handleSubmit }) => {
             return (
               <form onSubmit={handleSubmit}>
@@ -149,7 +156,18 @@ const DiscordSettingsPage: BlitzPage = () => {
                         <span className="text-concrete text-xs mt-1">
                           Sort roles into categories
                         </span>
-                        <div className="grid grid-cols-2 mt-6 gap-y-2">
+                        <div>
+                          <p
+                            className="mt-6 mb-2 underline cursor-pointer inline-block"
+                            onClick={() => {
+                              setSelectAllActive(!selectAllActive)
+                              form.mutators.selectAll?.(!selectAllActive)
+                            }}
+                          >
+                            {!selectAllActive ? "Select all" : "Deselect all"}
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-y-2">
                           {connectedGuild.roles.map((role, idx) => {
                             let cbState = form.getFieldState(role.name + ".active")
                             return (
