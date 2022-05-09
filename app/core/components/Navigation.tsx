@@ -77,16 +77,7 @@ const Navigation = ({ children }: { children?: any }) => {
   const terminalsView =
     usersTerminals && Array.isArray(usersTerminals) && usersTerminals?.length > 0
       ? usersTerminals?.map((terminal, idx) => (
-          <div className="block w-full group" key={`${terminal.handle}${idx}`}>
-            {/* TODO: this focused div is not working - need to fix */}
-            <div className="group-focus:visible invisible w-[3px] h-[46px] bg-marble-white rounded-r-lg inline-block mr-2"></div>
-            <button className="inline-block overflow-hidden bg-wet-concrete w-[46px] h-[46px] cursor-pointer border border-wet-concrete focus:border-marble-white rounded-lg mb-4 mr-2">
-              <img
-                key={`${terminal?.handle + idx}`}
-                src={(terminal?.data as TerminalMetadata)?.pfpURL}
-              />
-            </button>
-          </div>
+          <TerminalIcon terminal={terminal} key={`${terminal.handle}${idx}`} />
         ))
       : null
 
@@ -114,7 +105,7 @@ const Navigation = ({ children }: { children?: any }) => {
           </div>
         )}
       </div>
-      <div className="h-screen w-[70px] bg-tunnel-black border-r border-concrete fixed text-center">
+      <div className="h-screen w-[70px] bg-tunnel-black border-r border-concrete fixed top-0 left-0 text-center flex flex-col">
         {/* hardcoding the link for now - we don't have access to the window object unless we pass it via 
         serverside props through the `Layout` component on every page */}
         <a className="mt-1 inline-block" href="https://app.station.express">
@@ -123,7 +114,7 @@ const Navigation = ({ children }: { children?: any }) => {
         <div className="h-full mt-4">
           {terminalsView}
           {profilePfp && (
-            <div className="fixed bottom-[10px] left-[10px]" onClick={() => handlePfpClick()}>
+            <div className="fixed bottom-[10px] left-[12px]" onClick={() => handlePfpClick()}>
               {profilePfp}
             </div>
           )}
@@ -133,5 +124,18 @@ const Navigation = ({ children }: { children?: any }) => {
     </>
   )
 }
+
+const TerminalIcon = ({ terminal }) => (
+  <div className="relative flex items-center justify-center group">
+    <span
+      className="group-hover:scale-100 absolute w-[3px] h-[46px] min-w-max left-0 rounded-r-lg inline-block mr-2 mb-4
+    bg-marble-white
+    transition-all duration-200 scale-0 origin-left"
+    />
+    <button className="inline-block overflow-hidden bg-wet-concrete w-[46px] h-[46px] cursor-pointer border border-wet-concrete group-hover:border-marble-white focus:border-marble-white rounded-lg mb-4">
+      <img src={(terminal?.data as TerminalMetadata)?.pfpURL} />
+    </button>
+  </div>
+)
 
 export default Navigation

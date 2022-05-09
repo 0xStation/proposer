@@ -92,9 +92,9 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                   </button>
                   <div className="fixed bottom-6 left-6">
                     {profilePfp}
-                    {address && (
+                    {session?.siwe?.address && (
                       <div className="text-xs text-light-concrete flex mt-7 ml-1 mb-1">
-                        <p>{truncateString(address)}</p>
+                        <p>{truncateString(session?.siwe?.address)}</p>
                       </div>
                     )}
                     <div className="space-y-2 mt-4">
