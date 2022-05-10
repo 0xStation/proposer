@@ -16,7 +16,7 @@ export enum TraitTypes {
   ROLE = "ROLE",
   INITIATIVE = "INITIATIVE",
   GUILD = "GUILD",
-  JOINED_SINCE = "JOINED_SINCE",
+  JOINED_SINCE = "JOINED SINCE",
 }
 
 export enum DisplayTypes {
