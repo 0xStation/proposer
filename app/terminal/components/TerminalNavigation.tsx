@@ -2,9 +2,10 @@ import StationLogo from "public/station-logo.svg"
 import SettingsIcon from "app/core/icons/SettingsIcon"
 import MemberDirectoryIcon from "public/member-directory-icon.svg"
 import LockedIcon from "public/locked-icon.svg"
-import { Image, Link, Routes } from "blitz"
+import { Image, Link, Routes, useParam } from "blitz"
 
 const TerminalNavigation = ({ children }: { children?: any }) => {
+  const terminalHandle = useParam("terminalHandle", "string") as string
   return (
     <>
       <div className="h-screen w-[300px] bg-tunnel-black border-r border-concrete fixed">
@@ -22,7 +23,11 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
             </div>
           </div>
           <div className="flex flex-col mt-3">
-            <SettingsIcon className="hover:fill-concrete cursor-pointer" />
+            <Link href={Routes.SettingsPage({ terminalHandle })}>
+              <button>
+                <SettingsIcon className="hover:fill-concrete cursor-pointer" />
+              </button>
+            </Link>
           </div>
         </div>
         {/* Terminal navigation */}

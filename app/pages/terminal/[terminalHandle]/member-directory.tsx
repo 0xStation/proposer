@@ -1,5 +1,5 @@
 import { BlitzPage, useQuery, useParam } from "blitz"
-import { Fragment, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
@@ -20,9 +20,8 @@ const MemberDirectoryPage: BlitzPage = () => {
   )
   const [filteredAccountTerminals, setFilteredAccountTerminals] = useState<any[]>()
   // selected user for the contributor card
-  const [selectedAccountTerminal, setSelectedAccountTerminal] = useState()
+  const [selectedAccountTerminal, setSelectedAccountTerminal] = useState<any>()
   const [filters, setFilters] = useState<Set<string>>(new Set())
-
   /* 
   `groupedTags` returns in the format where the key
   is the type, and the value is an array of tags:
@@ -43,14 +42,18 @@ const MemberDirectoryPage: BlitzPage = () => {
     {
       suspense: false,
       enabled: !!terminal?.id,
+      retry: false,
       onSuccess: (accountTerminals) => {
-        if (filteredAccountTerminals === undefined) {
-          setFilteredAccountTerminals(accountTerminals)
-        }
+        setFilteredAccountTerminals(accountTerminals)
+        setSelectedAccountTerminal(accountTerminals[0])
       },
     }
   )
-  // console.log("accountTerminals", accountTerminals)
+
+  useEffect(() => {
+    // clear filters on page change
+    filters.clear()
+  }, [accountTerminals])
 
   return (
     <Layout>
@@ -59,7 +62,7 @@ const MemberDirectoryPage: BlitzPage = () => {
         <div className="h-[130px] border-b border-concrete">
           <h1 className="text-2xl font-bold ml-6 pt-7">Membership Directory</h1>
           <div className="flex ml-6 pt-4 space-x-2">
-            {groupedTags &&
+            {groupedTags && Object.entries(groupedTags).length ? (
               Object.entries(groupedTags).map(([tagType, tags], idx) => (
                 <FilterPill
                   tagType={tagType}
@@ -70,7 +73,10 @@ const MemberDirectoryPage: BlitzPage = () => {
                   filters={filters}
                   key={`${idx}${tagType}`}
                 />
-              ))}
+              ))
+            ) : (
+              <p className="text-marble-white">View other members in the terminal.</p>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-7 h-full w-full">
@@ -110,15 +116,19 @@ const FilterPill = ({
   setFilteredAccountTerminals,
   filters,
 }) => {
-  const [clearDefaultValue, setClearDefaultValue] = useState<string | undefined>()
+  const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
   const handleClearFilters = (e) => {
     e.preventDefault()
+
+    // remove the filters for the specific tag type
     tags.forEach((tag) => {
       if (filters.has(tag.value)) {
         filters.delete(tag.value)
       }
     })
-    setClearDefaultValue("cleared")
+
+    // clear filled checkboxes by removing the defaultChecked value
+    setClearDefaultValue(true)
     setFilteredAccountTerminals(accountTerminals)
 
     if (filters.size === 0) {
@@ -136,7 +146,7 @@ const FilterPill = ({
   return (
     <Menu as="div" className={`relative`}>
       {({ open }) => {
-        setClearDefaultValue(undefined)
+        setClearDefaultValue(false)
         return (
           <>
             <Menu.Button className="block h-[28px] text-marble-white">
@@ -163,8 +173,6 @@ const FilterPill = ({
               >
                 <Form
                   onSubmit={(fields) => {
-                    console.log("fields", fields)
-                    console.log("accountTerminals", filteredAccountTerminals)
                     Object.entries(fields).forEach(([tagName, value]) => {
                       if (filters.has(tagName) && !value) {
                         filters.delete(tagName)

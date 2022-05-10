@@ -1,6 +1,6 @@
 import StationLogo from "public/station-letters.svg"
 import { useEffect } from "react"
-import { Image, invoke, useQuery, useSession } from "blitz"
+import { Image, invoke, Routes, useParam, useQuery, useRouter, useSession } from "blitz"
 import { useAccount } from "wagmi"
 import useStore from "../hooks/useStore"
 import truncateString from "../utils/truncateString"
@@ -125,17 +125,29 @@ const Navigation = ({ children }: { children?: any }) => {
   )
 }
 
-const TerminalIcon = ({ terminal }) => (
-  <div className="relative flex items-center justify-center group">
-    <span
-      className="group-hover:scale-100 absolute w-[3px] h-[46px] min-w-max left-0 rounded-r-lg inline-block mr-2 mb-4
+const TerminalIcon = ({ terminal }) => {
+  const terminalHandle = useParam("terminalHandle", "string") as string
+  const isTerminalSelected = terminalHandle === terminal.handle
+  const router = useRouter()
+  return (
+    <div className="relative flex items-center justify-center group">
+      <span
+        className={`${
+          isTerminalSelected ? "scale-100" : "scale-0"
+        } group-hover:scale-100 absolute w-[3px] h-[46px] min-w-max left-0 rounded-r-lg inline-block mr-2 mb-4
     bg-marble-white
-    transition-all duration-200 scale-0 origin-left"
-    />
-    <button className="inline-block overflow-hidden bg-wet-concrete w-[46px] h-[46px] cursor-pointer border border-wet-concrete group-hover:border-marble-white focus:border-marble-white rounded-lg mb-4">
-      <img src={(terminal?.data as TerminalMetadata)?.pfpURL} />
-    </button>
-  </div>
-)
+    transition-all duration-200 origin-left`}
+      />
+      <button
+        className={`${
+          isTerminalSelected ? "border-marble-white" : "border-wet-concrete"
+        } inline-block overflow-hidden bg-wet-concrete w-[46px] h-[46px] cursor-pointer border group-hover:border-marble-white rounded-lg mb-4`}
+        onClick={() => router.push(Routes.MemberDirectoryPage({ terminalHandle: terminal.handle }))}
+      >
+        <img src={(terminal?.data as TerminalMetadata)?.pfpURL} />
+      </button>
+    </div>
+  )
+}
 
 export default Navigation
