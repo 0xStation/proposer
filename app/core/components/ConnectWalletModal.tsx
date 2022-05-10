@@ -49,6 +49,8 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
       } catch (err) {
         if (err.code === 4001) {
           setErrorMessage("Wallet signature declined.")
+        } else {
+          setErrorMessage("Something went wrong.")
         }
         setConnectState({ error: true, success: false, loading: false })
       }
@@ -72,12 +74,17 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         message: JSON.stringify(message),
         signature,
       })
+
       if (verificationSuccessful) {
         setConnectState({ error: false, success: true, loading: false })
+      } else {
+        throw Error("Unsuccessful signature.")
       }
     } catch (err) {
       if (err.code === 4001) {
         setErrorMessage("Wallet signature declined.")
+      } else {
+        setErrorMessage("Something went wrong.")
       }
       setConnectState({ error: true, success: false, loading: false })
     }
