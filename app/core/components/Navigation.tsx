@@ -6,7 +6,8 @@ import useStore from "../hooks/useStore"
 import truncateString from "../utils/truncateString"
 import { useMemo, useState } from "react"
 import ProfileNavigationDrawer from "./ProfileNavigationDrawer"
-import getTerminalsByAccount, { TerminalMetadata } from "app/terminal/queries/getTerminalsByAccount"
+import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
+import { TerminalMetadata } from "app/terminal/types"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
 const Navigation = ({ children }: { children?: any }) => {

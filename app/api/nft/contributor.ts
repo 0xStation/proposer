@@ -6,7 +6,7 @@ import { RoleMetadata } from "app/role/types"
 import { InitiativeMetadata } from "app/deprecated/v1/initiative/types"
 import { AccountMetadata } from "app/account/types"
 import { AccountInitiativeStatus } from "app/core/utils/constants"
-import { Terminal, TerminalMetadata } from "app/deprecated/v1/terminal/types"
+import { Terminal, TerminalMetadata } from "app/terminal/types"
 import { getNftImageUrl } from "app/utils/getNftImageUrl"
 import { TraitTypes, DisplayTypes, Ticket } from "app/ticket/types"
 

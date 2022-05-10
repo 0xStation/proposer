@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { Terminal } from "../types"
+import { Terminal } from "../../../../terminal/types"
 
 const GetTerminalById = z.object({
   id: z.number(),

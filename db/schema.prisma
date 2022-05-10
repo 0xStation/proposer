@@ -20,6 +20,7 @@ model Account {
   initiatives AccountInitiative[]
   data        Json?
   endorsed    Endorsement[]       @relation("Endorsed")
+  sessions    Session[]
 }
 
 // Each DAO is represented by a terminal.
@@ -166,5 +167,5 @@ model Session {
   publicData         String?
   privateData        String?
   userId             Int?
-  accountId          Int?
+  user               Account?  @relation(fields: [userId], references: [id])
 }

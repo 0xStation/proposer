@@ -23,7 +23,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
             </div>
           </div>
           <div className="flex flex-col mt-3">
-            <Link href={Routes.SettingsPage({ terminalHandle })}>
+            <Link href={Routes.TerminalSettingsPage({ terminalHandle })}>
               <button>
                 <SettingsIcon className="hover:fill-concrete cursor-pointer" />
               </button>
