@@ -14,8 +14,7 @@ export default async function verify(input: z.infer<typeof Verify>, ctx: Ctx) {
     const siweMessage = new SiweMessage(JSON.parse(message))
     const fields = await siweMessage.validate(signature)
     if (fields.nonce !== ctx.session.nonce) {
-      throw Error("nonce mismatch")
-      return false
+      throw Error("nonce mismatch.")
     }
 
     // `ctx.session.$create` allows us to create an authenticated session
@@ -28,7 +27,8 @@ export default async function verify(input: z.infer<typeof Verify>, ctx: Ctx) {
       try {
         await ctx.session.$create({ userId: account.id, siwe: fields })
       } catch (err) {
-        console.error(err)
+        console.error("Failed to create session with error: ", err)
+        return false
       }
     }
 
@@ -36,7 +36,7 @@ export default async function verify(input: z.infer<typeof Verify>, ctx: Ctx) {
 
     return true
   } catch (err) {
-    console.error("Error verifying wallet signature. Failed with error: ", err)
+    console.error("Failed to verify wallet signature with error: ", err)
     return false
   }
 }

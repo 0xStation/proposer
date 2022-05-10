@@ -78,7 +78,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
       if (verificationSuccessful) {
         setConnectState({ error: false, success: true, loading: false })
       } else {
-        throw Error("Unsuccessful signature")
+        throw Error("Unsuccessful signature.")
       }
     } catch (err) {
       if (err.code === 4001) {

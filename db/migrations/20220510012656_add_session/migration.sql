@@ -10,12 +10,10 @@ CREATE TABLE "Session" (
     "publicData" TEXT,
     "privateData" TEXT,
     "userId" INTEGER,
+    "accountId" INTEGER,
 
     CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Session_handle_key" ON "Session"("handle");
-
--- AddForeignKey
-ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Account"("id") ON DELETE SET NULL ON UPDATE CASCADE;
