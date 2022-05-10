@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react"
-import { BlitzPage, useParam, useQuery, useRouter } from "blitz"
-import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import CreateTerminalProgressBar from "app/terminal/components/createTerminalProgressBar"
+import { BlitzPage, useRouter } from "blitz"
 
 const CreateTerminalPropertiesPage: BlitzPage = () => {
   const router = useRouter()
@@ -60,12 +58,11 @@ const CreateTerminalPropertiesPage: BlitzPage = () => {
 
   return (
     <main className="text-marble-white min-h-screen max-w-screen-sm mx-auto">
-      <CreateTerminalProgressBar step={1} />
       <h2 className="text-2xl font-bold mt-12">Add member properties</h2>
       <h6 className="mt-2">Member properties help your community understand who each other are.</h6>
       {!guilds && (
         <a
-          className="border border-marble-white w-full rounded mt-12 py-1"
+          className="border border-marble-white w-full rounded mt-12 py-1 block text-center"
           href={`https://discord.com/api/oauth2/authorize?client_id=963465926353752104&redirect_uri=${encodeURIComponent(
             redirectUri
           )}&response_type=code&scope=identify%20guilds%20guilds.join%20guilds.members.read`}
