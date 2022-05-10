@@ -10,6 +10,7 @@ import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import { canEdit } from "app/core/utils/permissions"
 import { EditPermissionTypes } from "app/core/utils/constants"
+import { mustBeUnder50 } from "app/utils/validators"
 
 // maybe we can break this out into it's own component?
 const PfpInput = ({ pfpURL, onUpload }) => {
@@ -65,24 +66,20 @@ const TerminalSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
-  console.log(activeUser)
   const userCanEdit = activeUser
     ? canEdit(activeUser, terminal?.id, EditPermissionTypes.TERMINAL)
     : false
 
-  console.log(userCanEdit)
-
   const [updateTerminalMutation] = useMutation(updateTerminal, {
     onSuccess: (data) => {
-      console.log(data)
       addToast("Successfully updated your terminal.")
 
       let route = `/terminal/${data?.handle || terminalHandle}/settings/terminal`
       router.push(route, undefined, { shallow: true })
     },
-    onError: (error) => {
-      console.log(error)
-      // error toast
+    onError: (error: Error) => {
+      // could probably parse this better
+      addToast(error.toString())
     },
   })
 
@@ -107,13 +104,17 @@ const TerminalSettingsPage: BlitzPage = () => {
               })
             }}
             render={({ form, handleSubmit }) => {
+              let formState = form.getState()
+              let errors = formState.errors
               return (
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-col">
                     <div className="p-6 border-b border-concrete flex justify-between">
                       <h2 className="text-marble-white text-2xl font-bold">Terminal Overview</h2>
                       <button
-                        className="rounded text-tunnel-black bg-magic-mint px-8"
+                        className={`rounded text-tunnel-black px-8 ${
+                          formState.hasValidationErrors ? "bg-light-concrete" : "bg-magic-mint"
+                        }`}
                         type="submit"
                       >
                         Save
@@ -127,15 +128,19 @@ const TerminalSettingsPage: BlitzPage = () => {
                           <Field
                             name="name"
                             component="input"
+                            validate={mustBeUnder50}
                             className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
                           />
+                          <span className="text-torch-red text-xs">{errors?.name}</span>
                           <label className="font-bold mt-4">Terminal Handle*</label>
                           <span className="text-concrete text-xs mt-1">50 characters max.</span>
                           <Field
                             name="handle"
                             component="input"
+                            validate={mustBeUnder50}
                             className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-4"
                           />
+                          <span className="text-torch-red text-xs">{errors?.handle}</span>
                           <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
                         </div>
                         <Toast />

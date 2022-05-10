@@ -30,9 +30,14 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
     handle: params.handle,
   }
 
-  const terminal = await db.terminal.update({
-    where: { id: params.id },
-    data: payload,
-  })
-  return terminal
+  try {
+    const terminal = await db.terminal.update({
+      where: { id: params.id },
+      data: payload,
+    })
+
+    return terminal
+  } catch (err) {
+    throw err
+  }
 }
