@@ -1,5 +1,5 @@
 import db from "../../../../../db/index"
-import { Terminal } from "app/deprecated/v1/terminal/types"
+import { Terminal } from "app/terminal/types"
 import { z } from "zod"
 
 const HasInvitePermissions = z.object({

@@ -30,6 +30,7 @@ export const APPLICATION_STATUS_MAP = {
 
 export enum EditPermissionTypes {
   INITIATIVE = "initiative",
+  TERMINAL = "terminal",
 }
 
 export enum AccountInitiativeStatus {

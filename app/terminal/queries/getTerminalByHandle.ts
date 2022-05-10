@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { Terminal } from "app/deprecated/v1/terminal/types"
+import { Terminal } from "app/terminal/types"
 
 const GetTerminalByHandle = z.object({
   handle: z.string(),
