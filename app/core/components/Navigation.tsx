@@ -134,8 +134,8 @@ const TerminalIcon = ({ terminal }) => {
     <div className="relative flex items-center justify-center group">
       <span
         className={`${
-          isTerminalSelected ? "scale-100" : "scale-0"
-        } group-hover:scale-100 absolute w-[3px] h-[46px] min-w-max left-0 rounded-r-lg inline-block mr-2 mb-4
+          isTerminalSelected ? "scale-100" : "scale-0 group-hover:scale-75"
+        }  absolute w-[3px] h-[46px] min-w-max left-0 rounded-r-lg inline-block mr-2 mb-4
     bg-marble-white
     transition-all duration-200 origin-left`}
       />

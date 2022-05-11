@@ -41,11 +41,14 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
               Member Directory
               {/* </Link> */}
             </li>
-            <li className="text-concrete cursor-pointer">
+            <li className="text-concrete cursor-pointer group">
               <div className="inline mr-5">
                 <Image src={LockedIcon} alt="Locked icon" />
               </div>
               Proposals
+              <span className="group-hover:scale-100 text-xs rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0 origin-left">
+                Coming soon!
+              </span>
             </li>
           </ul>
         </div>

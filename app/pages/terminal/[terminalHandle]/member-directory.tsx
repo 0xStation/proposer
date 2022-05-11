@@ -18,10 +18,12 @@ const MemberDirectoryPage: BlitzPage = () => {
     { handle: terminalHandle as string },
     { suspense: false, enabled: !!terminalHandle }
   )
-  const [filteredAccountTerminals, setFilteredAccountTerminals] = useState<any[]>()
+  const [filteredAccountTerminals, setFilteredAccountTerminals] = useState<any[]>([])
   // selected user for the contributor card
   const [selectedAccountTerminal, setSelectedAccountTerminal] = useState<any>()
-  const [filters, setFilters] = useState<Set<string>>(new Set())
+
+  // filter is a hashmap where the key is the tag type and value are the filters as a Set
+  const [filters, setFilters] = useState<any>({})
   /* 
   `groupedTags` returns in the format where the key
   is the type, and the value is an array of tags:
@@ -33,8 +35,25 @@ const MemberDirectoryPage: BlitzPage = () => {
   const [groupedTags] = useQuery(
     getGroupedTagsByTerminalId,
     { terminalId: terminal?.id as number },
-    { suspense: false, enabled: !!terminal?.id }
+    {
+      suspense: false,
+      enabled: !!terminal?.id,
+      onSuccess: (groupedTags) => {
+        if (!groupedTags) return
+        let filterMap = {}
+        Object.keys(groupedTags).map((tagType) => {
+          if (!filterMap[tagType]) {
+            filterMap[tagType] = new Set<string>()
+          }
+        })
+        setFilters(filterMap)
+      },
+    }
   )
+
+  useEffect(() => {
+    setSelectedAccountTerminal(filteredAccountTerminals[0])
+  }, [filteredAccountTerminals])
 
   const [accountTerminals] = useQuery(
     getAccountTerminalsByTerminalId,
@@ -45,15 +64,9 @@ const MemberDirectoryPage: BlitzPage = () => {
       retry: false,
       onSuccess: (accountTerminals) => {
         setFilteredAccountTerminals(accountTerminals)
-        setSelectedAccountTerminal(accountTerminals[0])
       },
     }
   )
-
-  useEffect(() => {
-    // clear filters on page change
-    filters.clear()
-  }, [accountTerminals])
 
   return (
     <Layout>
@@ -68,7 +81,6 @@ const MemberDirectoryPage: BlitzPage = () => {
                   tagType={tagType}
                   tags={tags}
                   accountTerminals={accountTerminals}
-                  filteredAccountTerminals={filteredAccountTerminals}
                   setFilteredAccountTerminals={setFilteredAccountTerminals}
                   filters={filters}
                   key={`${idx}${tagType}`}
@@ -108,39 +120,47 @@ const PfpImage = ({ account }) =>
     <div className="h-[40px] min-w-[40px] place-self-center border border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
   )
 
-const FilterPill = ({
-  tagType,
-  tags,
-  accountTerminals,
-  filteredAccountTerminals,
-  setFilteredAccountTerminals,
-  filters,
-}) => {
+const FilterPill = ({ tagType, tags, accountTerminals, setFilteredAccountTerminals, filters }) => {
   const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
-  const handleClearFilters = (e) => {
-    e.preventDefault()
 
-    // remove the filters for the specific tag type
-    tags.forEach((tag) => {
-      if (filters.has(tag.value)) {
-        filters.delete(tag.value)
+  const applyFilters = () => {
+    let clearFilters = true
+    // reset directory to show all contributors if no filters are selected
+    Object.entries(filters).map(([tagType, tagFilter]: [string, Set<string>]) => {
+      if (tagFilter.size > 0) {
+        clearFilters = false
       }
     })
-
-    // clear filled checkboxes by removing the defaultChecked value
-    setClearDefaultValue(true)
-    setFilteredAccountTerminals(accountTerminals)
-
-    if (filters.size === 0) {
+    if (clearFilters) {
       setFilteredAccountTerminals(accountTerminals)
       return
     }
 
-    const newFilteredAccountTerminals = accountTerminals.filter((accountTerminal) =>
-      accountTerminal.tags.find((accountTerminalTag) => filters.has(accountTerminalTag.tag.value))
-    )
+    const newFilteredAccountTerminals = accountTerminals.filter((accountTerminal) => {
+      let meetsFilterRequirements = [] as any[]
+      Object.entries(filters).map(([tagType, tagFilter]: [string, Set<string>]) => {
+        const satisfiesFilter =
+          accountTerminal.tags.find((accountTerminalTag) =>
+            tagFilter.has(accountTerminalTag.tag.value)
+          ) || !tagFilter.size
+        meetsFilterRequirements.push(!!satisfiesFilter)
+      })
 
+      if (meetsFilterRequirements.find((val) => !!val === false) === undefined) {
+        return accountTerminal
+      }
+    })
     setFilteredAccountTerminals(newFilteredAccountTerminals)
+  }
+
+  const handleClearFilters = (e) => {
+    e.preventDefault()
+
+    filters[tagType].clear()
+
+    // clear filled checkboxes by removing the defaultChecked value
+    setClearDefaultValue(true)
+    applyFilters()
   }
 
   return (
@@ -172,27 +192,21 @@ const FilterPill = ({
                 className={`absolute origin-top-left mt-5 h-auto w-[22rem] bg-tunnel-black border border-concrete rounded-md`}
               >
                 <Form
-                  onSubmit={(fields) => {
-                    Object.entries(fields).forEach(([tagName, value]) => {
-                      if (filters.has(tagName) && !value) {
-                        filters.delete(tagName)
+                  onSubmit={(field) => {
+                    if (!field || !Object.keys(field).length || !Object.entries(field)[0]) {
+                      return
+                    }
+                    const [tagType, tagNames] = Object.entries(field)[0] as [string, any]
+                    const tagFilters = filters[tagType]
+                    Object.entries(tagNames).forEach(([tagName, value]) => {
+                      if (tagFilters.has(tagName) && !value) {
+                        tagFilters.delete(tagName)
                       } else if (value) {
-                        filters.add(tagName)
+                        tagFilters.add(tagName)
                       }
                     })
 
-                    if (filters.size === 0) {
-                      setFilteredAccountTerminals(accountTerminals)
-                      return
-                    }
-
-                    const newFilteredAccountTerminals = accountTerminals.filter((accountTerminal) =>
-                      accountTerminal.tags.find((accountTerminalTag) =>
-                        filters.has(accountTerminalTag.tag.value)
-                      )
-                    )
-
-                    setFilteredAccountTerminals(newFilteredAccountTerminals)
+                    applyFilters()
                   }}
                   render={({ form, handleSubmit }) => {
                     return (
@@ -202,8 +216,8 @@ const FilterPill = ({
                             return (
                               <div className="flex-row" key={`${clearDefaultValue}${tag.value}`}>
                                 <Checkbox
-                                  name={`${tag.value}`}
-                                  defaultChecked={filters.has(tag.value)}
+                                  name={`${tag.type}.${tag.value}`}
+                                  defaultChecked={filters[tag.type].has(tag.value)}
                                 />
                                 <p className="inline mx-4">{tag.value}</p>
                               </div>
