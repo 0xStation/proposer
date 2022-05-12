@@ -34,12 +34,10 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
         <div>
           <ul className="mt-9 ml-8 text-lg space-y-2">
             <li className="cursor-pointer hover:text-marble-white font-bold">
-              {/* <Link href={Routes.TerminalInitiativePage({ terminalHandle })}> */}
               <div className="inline mr-5">
                 <Image src={MemberDirectoryIcon} alt="Member directory icon" />
               </div>
-              Member Directory
-              {/* </Link> */}
+              <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>Members</Link>
             </li>
             <li className="text-concrete cursor-pointer group">
               <div className="inline mr-5">

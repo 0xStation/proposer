@@ -171,10 +171,18 @@ const FilterPill = ({ tagType, tags, accountTerminals, setFilteredAccountTermina
           <>
             <Menu.Button className="block h-[28px] text-marble-white">
               <div className="flex items-center">
-                <span className="capitalize group rounded-full border border-concrete h-[17px] w-max p-4 flex flex-center items-center cursor-pointer hover:bg-marble-white hover:text-tunnel-black">
+                <span
+                  className={`${
+                    open
+                      ? "bg-marble-white text-tunnel-black"
+                      : "hover:bg-marble-white hover:text-tunnel-black"
+                  } capitalize group rounded-full border border-concrete h-[17px] w-max p-4 flex flex-center items-center cursor-pointer `}
+                >
                   {`${tagType}`}
                   <div className="ml-3">
-                    <DropdownChevronIcon className="group-hover:fill-tunnel-black" />
+                    <DropdownChevronIcon
+                      className={`${open ? "fill-tunnel-black" : "group-hover:fill-tunnel-black"}`}
+                    />
                   </div>
                 </span>
               </div>
@@ -218,8 +226,11 @@ const FilterPill = ({ tagType, tags, accountTerminals, setFilteredAccountTermina
                                 <Checkbox
                                   name={`${tag.type}.${tag.value}`}
                                   defaultChecked={filters[tag.type].has(tag.value)}
+                                  className="align-middle"
                                 />
-                                <p className="inline mx-4">{tag.value}</p>
+                                <p className="p-0.5 align-middle mx-4 inline leading-none">
+                                  {tag.value}
+                                </p>
                               </div>
                             )
                           })}
@@ -259,7 +270,7 @@ const ContributorComponent = ({ accountTerminal, setSelectedAccountTerminal }) =
       onClick={() => setSelectedAccountTerminal(accountTerminal)}
     >
       <div className="flex space-x-2">
-        <div className="flex flex-colcontent-center align-middle mr-1">
+        <div className="flex flex-col content-center align-middle mr-1">
           <PfpImage account={account} />
         </div>
         <div className="flex flex-col content-center">
@@ -299,7 +310,7 @@ const SelectedContributorCard = ({ accountTerminal }) => {
     <div className="h-full border-l border-concrete col-span-3">
       <div className="m-5 flex-col">
         <div className="flex space-x-2">
-          <div className="flex flex-colcontent-center align-middle mr-1">
+          <div className="flex flex-col content-center align-middle mr-1">
             <PfpImage account={account} />
           </div>
           <div className="flex flex-col content-center">
@@ -309,7 +320,7 @@ const SelectedContributorCard = ({ accountTerminal }) => {
               </div>
             </div>
             <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-              <div className="w-max truncate">@{truncateString(account.address)}</div>
+              <div className="w-max truncate leading-4">@{truncateString(account.address)}</div>
             </div>
           </div>
         </div>
