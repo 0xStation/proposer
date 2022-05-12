@@ -1,10 +1,11 @@
 import { useState } from "react"
-import { BlitzPage, useMutation, useRouter } from "blitz"
+import { BlitzPage, useMutation, useRouter, Image, Router } from "blitz"
 import CreateTerminal from "app/terminal/mutations/createTerminal"
 import { Field, Form } from "react-final-form"
 import { useDropzone } from "react-dropzone"
 import UploadIcon from "app/core/icons/UploadIcon"
 import { mustBeUnder50 } from "app/utils/validators"
+import Exit from "/public/exit-button.svg"
 
 const PfpInput = ({ pfpURL, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
@@ -69,6 +70,14 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
 
   return (
     <main className="text-marble-white min-h-screen max-w-screen-sm mx-auto">
+      <div
+        className="absolute top-4 left-4 cursor-pointer"
+        onClick={() => {
+          Router.back()
+        }}
+      >
+        <Image src={Exit} alt="Close button" width={12} height={12} />
+      </div>
       <h2 className="text-2xl font-bold pt-16">Open a Terminal</h2>
       <h6 className="mt-2">
         Terminal is where members of your community collaborate and make decisions. Tell us about

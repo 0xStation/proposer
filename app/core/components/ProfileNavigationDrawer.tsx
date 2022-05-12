@@ -1,6 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment, useMemo } from "react"
-import { Image, useRouter, invoke, useSession } from "blitz"
+import { Image, useRouter, invoke, useSession, Link, Routes } from "blitz"
 import Exit from "public/exit-button.svg"
 import truncateString from "../utils/truncateString"
 import { useAccount, useDisconnect } from "wagmi"
@@ -99,14 +99,11 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                     )}
                     <div className="space-y-2 mt-4">
                       {profileLinkOption}
-                      <a
-                        className="block hover:opacity-70"
-                        href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Open a Terminal
-                      </a>
+                      <Link href={Routes.CreateTerminalDetailsPage()}>
+                        <span className="block hover:opacity-70 cursor-pointer">
+                          Open a Terminal
+                        </span>
+                      </Link>
                       <button className="block hover:opacity-70" onClick={handleDisconnect}>
                         Disconnect
                       </button>
