@@ -9,7 +9,12 @@ import { Menu, Transition } from "@headlessui/react"
 import Checkbox from "app/core/components/form/Checkbox"
 import { Form } from "react-final-form"
 import truncateString from "app/core/utils/truncateString"
-import getAccountTerminalsByTerminalId from "app/accountTerminal/queries/getAccountTerminalsByTerminalId"
+import getMembersByTerminalId from "app/accountTerminal/queries/getMembersByTerminalId"
+import { AccountTerminalWithTagsAndAccount } from "app/accountTerminal/types"
+
+interface Filters {
+  [tagType: string]: Set<string>
+}
 
 const MemberDirectoryPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle")
@@ -18,15 +23,18 @@ const MemberDirectoryPage: BlitzPage = () => {
     { handle: terminalHandle as string },
     { suspense: false, enabled: !!terminalHandle }
   )
-  const [filteredAccountTerminals, setFilteredAccountTerminals] = useState<any[]>([])
-  // selected user for the contributor card
-  const [selectedAccountTerminal, setSelectedAccountTerminal] = useState<any>()
+  const [filteredMembers, setFilteredMembers] = useState<AccountTerminalWithTagsAndAccount[]>([])
+  // selected user to display in the contributor card
+  const [selectedMember, setSelectedMember] = useState<AccountTerminalWithTagsAndAccount>()
 
-  // filter is a hashmap where the key is the tag type and value are the filters as a Set
-  const [filters, setFilters] = useState<any>({})
+  // filters is a hashmap where the key is the tag type and the value is a Set of strings
+  // where the strings are applied filters
+  const [filters, setFilters] = useState<Filters>({})
+
   /* 
-  `groupedTags` returns in the format where the key
-  is the type, and the value is an array of tags:
+  `groupedTags` returns an object where the key
+  is the tag type and the value is an array of tags
+  that fall under the category:
   {
     initative: [tag1, ...., tagn],
     role: [tag1, ...., tagn],
@@ -40,30 +48,29 @@ const MemberDirectoryPage: BlitzPage = () => {
       enabled: !!terminal?.id,
       onSuccess: (groupedTags) => {
         if (!groupedTags) return
-        let filterMap = {}
-        Object.keys(groupedTags).map((tagType) => {
-          if (!filterMap[tagType]) {
-            filterMap[tagType] = new Set<string>()
-          }
-        })
+        // create filters object where the tagType (filter category) maps to a set of applied filters
+        const filterMap = Object.keys(groupedTags).reduce((filterMap, tagType) => {
+          filterMap[tagType] = new Set<string>()
+          return filterMap
+        }, {})
         setFilters(filterMap)
       },
     }
   )
 
   useEffect(() => {
-    setSelectedAccountTerminal(filteredAccountTerminals[0])
-  }, [filteredAccountTerminals])
+    setSelectedMember(filteredMembers[0])
+  }, [filteredMembers])
 
-  const [accountTerminals] = useQuery(
-    getAccountTerminalsByTerminalId,
+  const [members] = useQuery(
+    getMembersByTerminalId,
     { terminalId: terminal?.id as number },
     {
       suspense: false,
       enabled: !!terminal?.id,
       retry: false,
-      onSuccess: (accountTerminals) => {
-        setFilteredAccountTerminals(accountTerminals)
+      onSuccess: (members: AccountTerminalWithTagsAndAccount[]) => {
+        setFilteredMembers(members)
       },
     }
   )
@@ -80,8 +87,8 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <FilterPill
                   tagType={tagType}
                   tags={tags}
-                  accountTerminals={accountTerminals}
-                  setFilteredAccountTerminals={setFilteredAccountTerminals}
+                  members={members}
+                  setFilteredMembers={setFilteredMembers}
                   filters={filters}
                   key={`${idx}${tagType}`}
                 />
@@ -93,16 +100,16 @@ const MemberDirectoryPage: BlitzPage = () => {
         </div>
         <div className="grid grid-cols-7 h-full w-full">
           <div className="overflow-y-auto h-full col-span-4">
-            {filteredAccountTerminals &&
-              filteredAccountTerminals.map((accountTerminal, idx) => (
+            {filteredMembers &&
+              filteredMembers.map((member, idx) => (
                 <ContributorComponent
-                  key={`${accountTerminal.joinedAt}${idx}`}
-                  accountTerminal={accountTerminal}
-                  setSelectedAccountTerminal={setSelectedAccountTerminal}
+                  key={`${member.joinedAt}${idx}`}
+                  member={member}
+                  setSelectedMember={setSelectedMember}
                 />
               ))}
           </div>
-          <SelectedContributorCard accountTerminal={selectedAccountTerminal} />
+          <SelectedContributorCard member={selectedMember} />
         </div>
       </TerminalNavigation>
     </Layout>
@@ -120,7 +127,7 @@ const PfpImage = ({ account }) =>
     <div className="h-[40px] min-w-[40px] place-self-center border border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
   )
 
-const FilterPill = ({ tagType, tags, accountTerminals, setFilteredAccountTerminals, filters }) => {
+const FilterPill = ({ tagType, tags, members, setFilteredMembers, filters }) => {
   const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
 
   const applyFilters = () => {
@@ -132,25 +139,28 @@ const FilterPill = ({ tagType, tags, accountTerminals, setFilteredAccountTermina
       }
     })
     if (clearFilters) {
-      setFilteredAccountTerminals(accountTerminals)
+      setFilteredMembers(members)
       return
     }
 
-    const newFilteredAccountTerminals = accountTerminals.filter((accountTerminal) => {
-      let meetsFilterRequirements = [] as any[]
+    const newFilteredMembers = members.filter((member) => {
+      let meetsFilterRequirements = [] as (boolean | undefined)[]
+
       Object.entries(filters).map(([tagType, tagFilter]: [string, Set<string>]) => {
+        // member meets the category's filter if:
+        // member has any of the tags in the category's applied filters
+        // or there are no applied filters.
         const satisfiesFilter =
-          accountTerminal.tags.find((accountTerminalTag) =>
-            tagFilter.has(accountTerminalTag.tag.value)
-          ) || !tagFilter.size
+          member.tags.find((accountTerminalTag) => tagFilter.has(accountTerminalTag.tag.value)) ||
+          !tagFilter.size
         meetsFilterRequirements.push(!!satisfiesFilter)
       })
-
+      // if user satisfies all category's filter requirements, show them in the member directory
       if (meetsFilterRequirements.find((val) => !!val === false) === undefined) {
-        return accountTerminal
+        return member
       }
     })
-    setFilteredAccountTerminals(newFilteredAccountTerminals)
+    setFilteredMembers(newFilteredMembers)
   }
 
   const handleClearFilters = (e) => {
@@ -178,7 +188,7 @@ const FilterPill = ({ tagType, tags, accountTerminals, setFilteredAccountTermina
                       : "hover:bg-marble-white hover:text-tunnel-black"
                   } capitalize group rounded-full border border-concrete h-[17px] w-max p-4 flex flex-center items-center cursor-pointer `}
                 >
-                  {`${tagType}`}
+                  {tagType}
                   <div className="ml-3">
                     <DropdownChevronIcon
                       className={`${open ? "fill-tunnel-black" : "group-hover:fill-tunnel-black"}`}
@@ -260,14 +270,14 @@ const FilterPill = ({ tagType, tags, accountTerminals, setFilteredAccountTermina
   )
 }
 
-const ContributorComponent = ({ accountTerminal, setSelectedAccountTerminal }) => {
-  const { account } = accountTerminal
+const ContributorComponent = ({ member, setSelectedMember }) => {
+  const { account } = member
 
   return (
     <div
       tabIndex={0}
       className="flex flex-row space-x-52 p-3 mx-3 mt-3 rounded-lg hover:bg-wet-concrete cursor-pointer"
-      onClick={() => setSelectedAccountTerminal(accountTerminal)}
+      onClick={() => setSelectedMember(member)}
     >
       <div className="flex space-x-2">
         <div className="flex flex-col content-center align-middle mr-1">
@@ -288,21 +298,21 @@ const ContributorComponent = ({ accountTerminal, setSelectedAccountTerminal }) =
   )
 }
 
-const SelectedContributorCard = ({ accountTerminal }) => {
-  if (!accountTerminal) return null
-  const { account } = accountTerminal
+const SelectedContributorCard = ({ member }) => {
+  if (!member) return null
+  const { account } = member
 
-  const statusTags = accountTerminal.tags?.filter(
+  const statusTags = member.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === "status"
   )
 
-  const roleTags = accountTerminal.tags?.filter(
+  const roleTags = member.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === "role"
   )
-  const initiativeTags = accountTerminal.tags?.filter(
+  const initiativeTags = member.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === "initiative"
   )
-  const guildTags = accountTerminal.tags?.filter(
+  const guildTags = member.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === "guild"
   )
 
@@ -326,10 +336,10 @@ const SelectedContributorCard = ({ accountTerminal }) => {
         </div>
         <div className="mt-9 text-xs">
           <TagDetails tagType="status" tags={statusTags} />
-          {accountTerminal.joinedAt && (
+          {member.joinedAt && (
             <div className="mt-7">
               <p className="uppercase mb-3">joined since</p>
-              <p className="text-base">{accountTerminal.joinedAt.toDateString()}</p>
+              <p className="text-base">{member.joinedAt.toDateString()}</p>
             </div>
           )}
           <TagDetails tagType="roles" tags={roleTags} />
