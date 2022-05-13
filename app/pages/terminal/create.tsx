@@ -1,10 +1,11 @@
 import { useState } from "react"
-import { BlitzPage, useMutation, useRouter, Image, Router } from "blitz"
-import CreateTerminal from "app/terminal/mutations/createTerminal"
+import { BlitzPage, useMutation, useRouter, Image, Router, useSession } from "blitz"
+import createTerminal from "app/terminal/mutations/createTerminal"
 import { Field, Form } from "react-final-form"
 import { useDropzone } from "react-dropzone"
+import useToast from "app/core/hooks/useToast"
 import UploadIcon from "app/core/icons/UploadIcon"
-import { mustBeUnder50 } from "app/utils/validators"
+import { composeValidators, requiredField, mustBeUnder50Chars } from "app/utils/validators"
 import Exit from "/public/exit-button.svg"
 
 const PfpInput = ({ pfpURL, onUpload }) => {
@@ -15,8 +16,13 @@ const PfpInput = ({ pfpURL, onUpload }) => {
       method: "POST",
       body: formData,
     })
-    const data = await res.json()
-    onUpload(data.url)
+
+    try {
+      const data = await res.json()
+      onUpload(data.url)
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -54,17 +60,19 @@ const PfpInput = ({ pfpURL, onUpload }) => {
 }
 
 const CreateTerminalDetailsPage: BlitzPage = () => {
+  const session = useSession({ suspense: false })
   const router = useRouter()
+  const [addToast, Toast] = useToast()
   const [pfpURL, setPfpURL] = useState<string>("")
-  const [createTerminalMutation] = useMutation(CreateTerminal, {
-    onSuccess: (data) => {
+  const [createTerminalMutation] = useMutation(createTerminal, {
+    onSuccess: (_data) => {
       // go to the terminal page? Do we even have one yet?
       let route = `/`
       router.push(route, undefined, { shallow: true })
     },
     onError: (error: Error) => {
-      // could probably parse this better
       console.error(error)
+      addToast(error.toString(), "error")
     },
   })
 
@@ -85,7 +93,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
       </h6>
       <Form
         initialValues={{}}
-        onSubmit={async (values: { name: string; handle: string; pfpUrl?: string }) => {
+        onSubmit={async (values: { name: string; handle: string; pfpURL?: string }) => {
           await createTerminalMutation({
             ...values,
             pfpURL,
@@ -103,8 +111,8 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                   <Field
                     name="name"
                     component="input"
-                    validate={mustBeUnder50}
-                    className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
+                    validate={composeValidators(mustBeUnder50Chars, requiredField)}
+                    className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-1"
                   />
                   <span className="text-torch-red text-xs">{errors?.name}</span>
                   <label className="font-bold mt-4">Terminal Handle*</label>
@@ -112,11 +120,13 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                   <Field
                     name="handle"
                     component="input"
-                    validate={mustBeUnder50}
-                    className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-4"
+                    validate={composeValidators(mustBeUnder50Chars, requiredField)}
+                    className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-1"
                   />
                   <span className="text-torch-red text-xs">{errors?.handle}</span>
-                  <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
+                  <div className="mt-4">
+                    <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
+                  </div>
                 </div>
                 <div className="mt-4">
                   <button
@@ -133,6 +143,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
           )
         }}
       />
+      <Toast />
     </main>
   )
 }

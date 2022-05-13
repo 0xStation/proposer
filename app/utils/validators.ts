@@ -11,7 +11,7 @@ export const composeValidators =
 
 export const requiredField = (value) => (value ? undefined : "This field is required.")
 
-export const mustBeUnder50 = (value) =>
+export const mustBeUnder50Chars = (value) =>
   value ? (value.length <= 50 ? undefined : "Must be less than 50 characters") : undefined
 
 export const mustBeUrl = (value) => {

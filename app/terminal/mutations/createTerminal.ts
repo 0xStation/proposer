@@ -6,6 +6,7 @@ const CreateTerminal = z.object({
   name: z.string(),
   handle: z.string(),
   pfpURL: z.string().optional(),
+  accountId: z.number().optional(),
 })
 
 export default async function createTerminal(input: z.infer<typeof CreateTerminal>) {
@@ -19,10 +20,31 @@ export default async function createTerminal(input: z.infer<typeof CreateTermina
     handle: params.handle,
   }
 
+  if (params.accountId) {
+    Object.assign(payload, {
+      members: {
+        create: [
+          {
+            account: {
+              connect: {
+                id: params.accountId,
+              },
+            },
+          },
+        ],
+      },
+    })
+  }
+
   try {
     const terminal = (await db.terminal.create({ data: payload })) as Terminal
     return terminal
   } catch (err) {
+    // prisma error code docs
+    // https://www.prisma.io/docs/reference/api-reference/error-reference#error-codes
+    if (err.code === "P2002") {
+      throw new Error(`${err.meta.target[0]} already exists.`)
+    }
     throw err
   }
 }

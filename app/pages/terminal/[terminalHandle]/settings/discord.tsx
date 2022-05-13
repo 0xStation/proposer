@@ -27,7 +27,7 @@ const DiscordSettingsPage: BlitzPage = () => {
   const [connectedGuild, setConnectedGuild] = useState<Guild | undefined>(undefined)
   const [upsertTags] = useMutation(UpsertTags, {
     onSuccess: () => {
-      addToast("Your roles have been updated.")
+      addToast("Your roles have been updated.", "success")
     },
   })
 
