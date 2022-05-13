@@ -87,7 +87,7 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <FilterPill
                   tagType={tagType}
                   tags={tags}
-                  members={members}
+                  allMembers={members}
                   setFilteredMembers={setFilteredMembers}
                   filters={filters}
                   key={`${idx}${tagType}`}
@@ -127,9 +127,10 @@ const PfpImage = ({ account }) =>
     <div className="h-[40px] min-w-[40px] place-self-center border border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
   )
 
-const FilterPill = ({ tagType, tags, members, setFilteredMembers, filters }) => {
+const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) => {
   const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
 
+  // apply filters on accounts
   const applyFilters = () => {
     let clearFilters = true
     // reset directory to show all contributors if no filters are selected
@@ -139,11 +140,11 @@ const FilterPill = ({ tagType, tags, members, setFilteredMembers, filters }) => 
       }
     })
     if (clearFilters) {
-      setFilteredMembers(members)
+      setFilteredMembers(allMembers)
       return
     }
 
-    const newFilteredMembers = members.filter((member) => {
+    const newFilteredMembers = allMembers.filter((member) => {
       let meetsFilterRequirements = [] as (boolean | undefined)[]
 
       Object.entries(filters).map(([tagType, tagFilter]: [string, Set<string>]) => {
@@ -169,6 +170,7 @@ const FilterPill = ({ tagType, tags, members, setFilteredMembers, filters }) => 
     filters[tagType].clear()
 
     // clear filled checkboxes by removing the defaultChecked value
+    // bumping the key will reset the uncontrolled component's internal state
     setClearDefaultValue(true)
     applyFilters()
   }
@@ -214,12 +216,15 @@ const FilterPill = ({ tagType, tags, members, setFilteredMembers, filters }) => 
                     if (!field || !Object.keys(field).length || !Object.entries(field)[0]) {
                       return
                     }
+                    // grab field selected
                     const [tagType, tagNames] = Object.entries(field)[0] as [string, any]
                     const tagFilters = filters[tagType]
                     Object.entries(tagNames).forEach(([tagName, value]) => {
+                      // remove tag if de-selected
                       if (tagFilters.has(tagName) && !value) {
                         tagFilters.delete(tagName)
                       } else if (value) {
+                        // add tag if selected
                         tagFilters.add(tagName)
                       }
                     })

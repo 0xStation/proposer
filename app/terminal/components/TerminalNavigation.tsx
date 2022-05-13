@@ -12,7 +12,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
     <>
       <div className="h-screen w-[300px] bg-tunnel-black border-r border-concrete fixed">
         {/* Terminal Profile metadata + Settings icon*/}
-        <div className="flex content-center ml-4 mt-6">
+        <div className="flex content-center ml-4 mt-7">
           <div className="align-middle text-center mr-2 rounded-lg border border-wet-concrete w-[41px] h-[41px] mt-1 overflow-hidden">
             <img src={terminal?.data?.pfpURL} alt="Station logo" height={41} width={41} />
           </div>
