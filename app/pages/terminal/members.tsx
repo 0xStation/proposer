@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react"
 import { BlitzPage, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
 import useGuild from "app/core/hooks/useGuild"
+import useGuildMembers from "app/core/hooks/useGuildMembers"
 import Checkbox from "app/core/components/form/Checkbox"
 
 const AddMembersPage: BlitzPage = () => {

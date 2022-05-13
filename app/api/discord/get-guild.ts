@@ -11,6 +11,7 @@ export default async function handler(req, res) {
 
   if (!guild.code) {
     res.status(200).json(guild)
+    return
   }
 
   // discord status codes
