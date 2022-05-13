@@ -76,6 +76,8 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
     },
   })
 
+  console.log(session)
+
   return (
     <main className="text-marble-white min-h-screen max-w-screen-sm mx-auto">
       <div
@@ -86,63 +88,72 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
       >
         <Image src={Exit} alt="Close button" width={12} height={12} />
       </div>
-      <h2 className="text-2xl font-bold pt-16">Open a Terminal</h2>
-      <h6 className="mt-2">
-        Terminal is where members of your community collaborate and make decisions. Tell us about
-        your Terminal.
-      </h6>
-      <Form
-        initialValues={{}}
-        onSubmit={async (values: { name: string; handle: string; pfpURL?: string }) => {
-          await createTerminalMutation({
-            ...values,
-            pfpURL,
-          })
-        }}
-        render={({ form, handleSubmit }) => {
-          let formState = form.getState()
-          let errors = formState.errors
-          return (
-            <form onSubmit={handleSubmit} className="mt-6">
-              <div className="flex flex-col">
-                <div className="flex flex-col pb-2 col-span-2">
-                  <label className="font-bold">Terminal Name*</label>
-                  <span className="text-concrete text-xs mt-1">50 characters max.</span>
-                  <Field
-                    name="name"
-                    component="input"
-                    validate={composeValidators(mustBeUnder50Chars, requiredField)}
-                    className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-1"
-                  />
-                  <span className="text-torch-red text-xs">{errors?.name}</span>
-                  <label className="font-bold mt-4">Terminal Handle*</label>
-                  <span className="text-concrete text-xs mt-1">50 characters max.</span>
-                  <Field
-                    name="handle"
-                    component="input"
-                    validate={composeValidators(mustBeUnder50Chars, requiredField)}
-                    className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-1"
-                  />
-                  <span className="text-torch-red text-xs">{errors?.handle}</span>
-                  <div className="mt-4">
-                    <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
+      {session.userId ? (
+        <>
+          <h2 className="text-2xl font-bold pt-16">Open a Terminal</h2>
+          <h6 className="mt-2">
+            Terminal is where members of your community collaborate and make decisions. Tell us
+            about your Terminal.
+          </h6>
+          <Form
+            initialValues={{}}
+            onSubmit={async (values: { name: string; handle: string; pfpURL?: string }) => {
+              if (session.userId !== null) {
+                await createTerminalMutation({
+                  ...values,
+                  pfpURL,
+                  accountId: session.userId,
+                })
+              }
+            }}
+            render={({ form, handleSubmit }) => {
+              let formState = form.getState()
+              let errors = formState.errors
+              return (
+                <form onSubmit={handleSubmit} className="mt-6">
+                  <div className="flex flex-col">
+                    <div className="flex flex-col pb-2 col-span-2">
+                      <label className="font-bold">Terminal Name*</label>
+                      <span className="text-concrete text-xs mt-1">50 characters max.</span>
+                      <Field
+                        name="name"
+                        component="input"
+                        validate={composeValidators(mustBeUnder50Chars, requiredField)}
+                        className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-1"
+                      />
+                      <span className="text-torch-red text-xs">{errors?.name}</span>
+                      <label className="font-bold mt-4">Terminal Handle*</label>
+                      <span className="text-concrete text-xs mt-1">50 characters max.</span>
+                      <Field
+                        name="handle"
+                        component="input"
+                        validate={composeValidators(mustBeUnder50Chars, requiredField)}
+                        className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-1"
+                      />
+                      <span className="text-torch-red text-xs">{errors?.handle}</span>
+                      <div className="mt-4">
+                        <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <button
+                        className={`rounded text-tunnel-black px-8 py-1 ${
+                          formState.hasValidationErrors ? "bg-light-concrete" : "bg-magic-mint"
+                        }`}
+                        type="submit"
+                      >
+                        Open
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div className="mt-4">
-                  <button
-                    className={`rounded text-tunnel-black px-8 py-1 ${
-                      formState.hasValidationErrors ? "bg-light-concrete" : "bg-magic-mint"
-                    }`}
-                    type="submit"
-                  >
-                    Open
-                  </button>
-                </div>
-              </div>
-            </form>
-          )
-        }}
-      />
+                </form>
+              )
+            }}
+          />
+        </>
+      ) : (
+        <div>you need to have an account to create a terminal.</div>
+      )}
       <Toast />
     </main>
   )
