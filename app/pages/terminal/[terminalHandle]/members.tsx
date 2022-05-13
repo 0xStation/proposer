@@ -1,8 +1,10 @@
 import { useEffect, useState, useMemo } from "react"
-import { BlitzPage, useRouter } from "blitz"
+import { BlitzPage, useRouter, useParam, useQuery, useMutation } from "blitz"
 import { Field, Form } from "react-final-form"
 import useGuild from "app/core/hooks/useGuild"
 import useGuildMembers from "app/core/hooks/useGuildMembers"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
+import UpsertTags from "app/tag/mutations/upsertTags"
 import Checkbox from "app/core/components/form/Checkbox"
 
 const AddMembersPage: BlitzPage = () => {
@@ -15,13 +17,31 @@ const AddMembersPage: BlitzPage = () => {
   // this is the guild we will likely be adding the bot to
   const [activeGuildId, setActiveGuildId] = useState<string>("")
 
-  const { status, guild } = useGuild(activeGuildId)
+  const terminalHandle = useParam("terminalHandle") as string
+  const [terminal, { refetch }] = useQuery(
+    getTerminalByHandle,
+    { handle: terminalHandle },
+    { suspense: false }
+  )
+
+  const [upsertTags] = useMutation(UpsertTags, {
+    onSuccess: () => {
+      console.log("success")
+    },
+  })
+
+  const { status: guildStatus, guild } = useGuild(activeGuildId)
+  const { status: memberStatus, guildMembers } = useGuildMembers(activeGuildId)
+
+  console.log(guild)
+  console.log(guildMembers)
 
   // need to make sure redirectURI matches
   // here (this variable)
   // on discord API console
   // in the .env
-  let redirectUri = `http://localhost:3000${router.pathname}`
+  // let redirectUri = `http://localhost:3000${router.pathname}`
+  let redirectUri = `http://localhost:3000/terminal/css/members`
 
   useEffect(() => {
     if (router.query.code && !accessToken) {
@@ -119,7 +139,7 @@ const AddMembersPage: BlitzPage = () => {
           </select>
         </>
       )}
-      {activeGuildId && status !== "ready" && (
+      {activeGuildId && guildStatus !== "ready" && (
         <div>
           <button
             className="border border-marble-white w-full rounded mt-4 py-2"
@@ -131,6 +151,14 @@ const AddMembersPage: BlitzPage = () => {
             }
           >
             Connect Station bot
+          </button>
+        </div>
+      )}
+
+      {activeGuildId && guildStatus === "ready" && (
+        <div>
+          <button className="border border-marble-white w-full rounded mt-4 py-2 cursor-default">
+            Connected
           </button>
         </div>
       )}
@@ -148,6 +176,14 @@ const AddMembersPage: BlitzPage = () => {
                 discordId: values[name].discordId,
               }
             })
+
+            if (terminal) {
+              await upsertTags({
+                tags,
+                terminalId: terminal.id,
+              })
+              refetch()
+            }
           }}
           render={({ form, handleSubmit }) => {
             return (

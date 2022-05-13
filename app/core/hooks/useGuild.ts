@@ -24,6 +24,7 @@ const useGuild = (guildId: string) => {
       })
 
       if (response.status !== 200) {
+        setGuild(undefined)
         setStatus("error")
         return
       }
