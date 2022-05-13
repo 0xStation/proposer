@@ -68,7 +68,7 @@ const MemberDirectoryPage: BlitzPage = () => {
     {
       suspense: false,
       enabled: !!terminal?.id,
-      retry: false,
+      refetchOnWindowFocus: false,
       onSuccess: (members: AccountTerminalWithTagsAndAccount[]) => {
         setFilteredMembers(members)
       },
@@ -124,7 +124,7 @@ const PfpImage = ({ account }) =>
       className="min-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
     />
   ) : (
-    <div className="h-[40px] min-w-[40px] place-self-center border border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
+    <div className="h-[46px] min-w-[46px] place-self-center border border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
   )
 
 const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) => {
@@ -152,12 +152,13 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
         // member has any of the tags in the category's applied filters
         // or there are no applied filters.
         const satisfiesFilter =
-          member.tags.find((accountTerminalTag) => tagFilter.has(accountTerminalTag.tag.value)) ||
-          !tagFilter.size
+          !tagFilter.size ||
+          member.tags.find((accountTerminalTag) => tagFilter.has(accountTerminalTag.tag.value))
+
         meetsFilterRequirements.push(!!satisfiesFilter)
       })
       // if user satisfies all category's filter requirements, show them in the member directory
-      if (meetsFilterRequirements.find((val) => !!val === false) === undefined) {
+      if (meetsFilterRequirements.every((val) => val)) {
         return member
       }
     })
