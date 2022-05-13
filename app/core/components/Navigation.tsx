@@ -1,6 +1,6 @@
 import StationLogo from "public/station-letters.svg"
 import { useEffect } from "react"
-import { Image, invoke, useQuery, useSession } from "blitz"
+import { Image, invoke, Routes, useParam, useQuery, useRouter, useSession } from "blitz"
 import { useAccount } from "wagmi"
 import useStore from "../hooks/useStore"
 import truncateString from "../utils/truncateString"
@@ -78,16 +78,7 @@ const Navigation = ({ children }: { children?: any }) => {
   const terminalsView =
     usersTerminals && Array.isArray(usersTerminals) && usersTerminals?.length > 0
       ? usersTerminals?.map((terminal, idx) => (
-          <div className="block w-full group" key={`${terminal.handle}${idx}`}>
-            {/* TODO: this focused div is not working - need to fix */}
-            <div className="group-focus:visible invisible w-[3px] h-[46px] bg-marble-white rounded-r-lg inline-block mr-2"></div>
-            <button className="inline-block overflow-hidden bg-wet-concrete w-[46px] h-[46px] cursor-pointer border border-wet-concrete focus:border-marble-white rounded-lg mb-4 mr-2">
-              <img
-                key={`${terminal?.handle + idx}`}
-                src={(terminal?.data as TerminalMetadata)?.pfpURL}
-              />
-            </button>
-          </div>
+          <TerminalIcon terminal={terminal} key={`${terminal.handle}${idx}`} />
         ))
       : null
 
@@ -115,8 +106,8 @@ const Navigation = ({ children }: { children?: any }) => {
           </div>
         )}
       </div>
-      <div className="h-screen w-[70px] bg-tunnel-black border-r border-concrete fixed text-center">
-        {/* hardcoding the link for now - we don't have access to the window object unless we pass it via
+      <div className="h-screen w-[70px] bg-tunnel-black border-r border-concrete fixed top-0 left-0 text-center flex flex-col">
+        {/* hardcoding the link for now - we don't have access to the window object unless we pass it via 
         serverside props through the `Layout` component on every page */}
         <a className="mt-1 inline-block" href="https://app.station.express">
           <Image src={StationLogo} alt="Station logo" height={20} width={54} />
@@ -124,7 +115,7 @@ const Navigation = ({ children }: { children?: any }) => {
         <div className="h-full mt-4">
           {terminalsView}
           {profilePfp && (
-            <div className="fixed bottom-[10px] left-[10px]" onClick={() => handlePfpClick()}>
+            <div className="fixed bottom-[10px] left-[12px]" onClick={() => handlePfpClick()}>
               {profilePfp}
             </div>
           )}
@@ -132,6 +123,31 @@ const Navigation = ({ children }: { children?: any }) => {
       </div>
       <div className="h-screen ml-[70px] relative">{children}</div>
     </>
+  )
+}
+
+const TerminalIcon = ({ terminal }) => {
+  const terminalHandle = useParam("terminalHandle", "string") as string
+  const isTerminalSelected = terminalHandle === terminal.handle
+  const router = useRouter()
+  return (
+    <div className="relative flex items-center justify-center group">
+      <span
+        className={`${
+          isTerminalSelected ? "scale-100" : "scale-0 group-hover:scale-75"
+        }  absolute w-[3px] h-[46px] min-w-max left-0 rounded-r-lg inline-block mr-2 mb-4
+    bg-marble-white
+    transition-all duration-200 origin-left`}
+      />
+      <button
+        className={`${
+          isTerminalSelected ? "border-marble-white" : "border-wet-concrete"
+        } inline-block overflow-hidden bg-wet-concrete w-[46px] h-[46px] cursor-pointer border group-hover:border-marble-white rounded-lg mb-4`}
+        onClick={() => router.push(Routes.MemberDirectoryPage({ terminalHandle: terminal.handle }))}
+      >
+        <img src={(terminal?.data as TerminalMetadata)?.pfpURL} />
+      </button>
+    </div>
   )
 }
 
