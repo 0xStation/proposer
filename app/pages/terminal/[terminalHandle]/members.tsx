@@ -6,6 +6,7 @@ import useGuildMembers from "app/core/hooks/useGuildMembers"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import UpsertTags from "app/tag/mutations/upsertTags"
 import Checkbox from "app/core/components/form/Checkbox"
+import useDCAuth from "app/core/hooks/useDCAuth"
 
 const AddMembersPage: BlitzPage = () => {
   const router = useRouter()
@@ -16,6 +17,7 @@ const AddMembersPage: BlitzPage = () => {
   // the selectedGuild from the dropdown of guilds
   // this is the guild we will likely be adding the bot to
   const [activeGuildId, setActiveGuildId] = useState<string>("")
+  const [windowInstance, setWindowInstance] = useState<Window | null>(null)
 
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal, { refetch }] = useQuery(
@@ -32,36 +34,7 @@ const AddMembersPage: BlitzPage = () => {
 
   const { status: guildStatus, guild } = useGuild(activeGuildId)
   const { status: memberStatus, guildMembers } = useGuildMembers(activeGuildId)
-
-  console.log(guild)
-  console.log(guildMembers)
-
-  // need to make sure redirectURI matches
-  // here (this variable)
-  // on discord API console
-  // in the .env
-  // let redirectUri = `http://localhost:3000${router.pathname}`
-  let redirectUri = `http://localhost:3000/terminal/css/members`
-
-  useEffect(() => {
-    if (router.query.code && !accessToken) {
-      fetch("/api/discord/exchange-code", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code: router.query.code }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.error) {
-            console.error(`${data.error}: ${data.error_description}`)
-          } else {
-            setAccessToken(data.access_token)
-          }
-        })
-    }
-  }, [router.query.code])
+  const { onOpen, authorization, error, isAuthenticating } = useDCAuth("guilds")
 
   useEffect(() => {
     const fetchGuilds = async (accessToken) => {
@@ -89,8 +62,8 @@ const AddMembersPage: BlitzPage = () => {
         }
       }
     }
-    fetchGuilds(accessToken)
-  }, [accessToken])
+    fetchGuilds(authorization)
+  }, [authorization])
 
   const initialFormValues = useMemo(() => {
     if (guild) {
@@ -112,14 +85,14 @@ const AddMembersPage: BlitzPage = () => {
       <h2 className="text-2xl font-bold mt-12">Add member properties</h2>
       <h6 className="mt-2">Member properties help your community understand who each other are.</h6>
       {!guilds && (
-        <a
+        <button
+          onClick={() => {
+            onOpen()
+          }}
           className="border border-marble-white w-full rounded mt-12 py-1 block text-center"
-          href={`https://discord.com/api/oauth2/authorize?client_id=963465926353752104&redirect_uri=${encodeURIComponent(
-            redirectUri
-          )}&response_type=code&scope=identify%20guilds%20guilds.join%20guilds.members.read`}
         >
           Connect with Discord
-        </a>
+        </button>
       )}
       {guilds && (
         <>
