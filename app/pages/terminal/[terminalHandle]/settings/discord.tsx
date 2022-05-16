@@ -1,21 +1,15 @@
-import { useState, useEffect, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { BlitzPage, useParam, useQuery, useMutation } from "blitz"
 import { Field, Form } from "react-final-form"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import UpsertTags from "app/tag/mutations/upsertTags"
+import updateTerminal from "app/terminal/mutations/updateTerminal"
 import Navigation from "app/terminal/components/settings/navigation"
 import Checkbox from "app/core/components/form/Checkbox"
 import useToast from "app/core/hooks/useToast"
 import useDCAuth from "app/core/hooks/useDCAuth"
-
-type Guild = {
-  roles: Role[]
-}
-
-type Role = {
-  name: string
-  id: string
-}
+import useGuild from "app/core/hooks/useGuild"
+import useActiveUserGuilds from "app/core/hooks/useActiveUserGuilds"
 
 const DiscordSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -25,38 +19,28 @@ const DiscordSettingsPage: BlitzPage = () => {
     { suspense: false }
   )
   const [addToast, Toast] = useToast()
-  const [connectedGuild, setConnectedGuild] = useState<Guild | undefined>(undefined)
+
   const [upsertTags] = useMutation(UpsertTags, {
     onSuccess: () => {
       addToast("Your roles have been updated.", "success")
     },
   })
 
+  const [updateTerminalMutation] = useMutation(updateTerminal, {
+    onSuccess: (data) => {
+      // maybe add a toast?
+      console.log("success")
+    },
+    onError: (error: Error) => {
+      // could probably parse this better
+      addToast(error.toString(), "error")
+    },
+  })
+
   const { onOpen, authorization, error, isAuthenticating } = useDCAuth("guilds")
+  const { status: guildStatus, guild: connectedGuild } = useGuild(terminal?.data?.guildId)
+  const { status: guildsStatus, guilds } = useActiveUserGuilds()
   const [selectAllActive, setSelectAllActive] = useState(false)
-
-  useEffect(() => {
-    const fetchAsync = async () => {
-      if (!terminal) return
-      let selectedGuildId = terminal.data.guildId
-      const response = await fetch("/api/discord/get-guild", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ guild_id: selectedGuildId }),
-      })
-
-      if (response.status !== 200) {
-        return
-      }
-      const guild = await response.json()
-      setConnectedGuild(guild)
-    }
-    if (terminal) {
-      fetchAsync()
-    }
-  }, [terminal])
 
   // kind of confusing to explain, you probably need to see it to understand so I recorded a loom
   // https://www.loom.com/share/f5c67a2872854bb386330ddbb744a5d8
@@ -72,7 +56,8 @@ const DiscordSettingsPage: BlitzPage = () => {
   const _initialFormValues = useMemo(() => {
     if (connectedGuild && terminal) {
       let allRoles = connectedGuild.roles.reduce((acc, role) => {
-        acc[role.name] = {
+        let roleName = role.name.replace(".", "")
+        acc[roleName] = {
           active: true,
           type: "inactive",
         }
@@ -111,7 +96,65 @@ const DiscordSettingsPage: BlitzPage = () => {
           </button>
         </div>
       )}
-      {connectedGuild && (
+
+      {terminal && !terminal?.data.guildId && (
+        <Form
+          initialValues={{}}
+          onSubmit={async (values) => {
+            await updateTerminalMutation({ id: terminal.id, ...values })
+            refetch()
+          }}
+          render={({ form, handleSubmit }) => {
+            const formState = form.getState()
+            return (
+              <form onSubmit={handleSubmit}>
+                <div className="flex flex-col">
+                  <div className="p-6 border-b border-concrete flex justify-between">
+                    <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
+                    <button
+                      className={`rounded text-tunnel-black px-8 ${
+                        formState.dirty ? "bg-magic-mint" : "bg-concrete"
+                      }`}
+                      type="submit"
+                    >
+                      Save
+                    </button>
+                  </div>
+                  <div className="p-6">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="flex flex-col pb-2 col-span-2">
+                        <h3 className="font-bold">Select a server*</h3>
+                        <span className="text-concrete text-xs mb-2 block">
+                          In order to integrate fully with discord, your terminal needs to connect
+                          the station bot to your discord server.
+                        </span>
+                        <div className="custom-select-wrapper">
+                          <Field
+                            name="guildId"
+                            component="select"
+                            className="w-full p-2 bg-wet-concrete border rounded"
+                          >
+                            <option>Select one</option>
+                            {guilds.map((guild, idx) => {
+                              return (
+                                <option value={guild.value} key={idx}>
+                                  {guild.label}
+                                </option>
+                              )
+                            })}
+                          </Field>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            )
+          }}
+        />
+      )}
+
+      {terminal?.data.guildId && (
         <Form
           initialValues={_initialFormValues}
           onSubmit={async (values) => {
@@ -141,12 +184,18 @@ const DiscordSettingsPage: BlitzPage = () => {
             },
           }}
           render={({ form, handleSubmit }) => {
+            const formState = form.getState()
             return (
               <form onSubmit={handleSubmit}>
                 <div className="flex flex-col">
                   <div className="p-6 border-b border-concrete flex justify-between">
                     <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
-                    <button className="rounded text-tunnel-black bg-magic-mint px-8" type="submit">
+                    <button
+                      className={`rounded text-tunnel-black px-8 ${
+                        formState.dirty ? "bg-magic-mint" : "bg-concrete"
+                      }`}
+                      type="submit"
+                    >
                       Save
                     </button>
                   </div>
@@ -169,18 +218,19 @@ const DiscordSettingsPage: BlitzPage = () => {
                           </p>
                         </div>
                         <div className="grid grid-cols-2 gap-y-2">
-                          {connectedGuild.roles.map((role, idx) => {
-                            let cbState = form.getFieldState(role.name + ".active")
+                          {connectedGuild?.roles.map((role, idx) => {
+                            let roleName = role.name.replace(".", "")
+                            let cbState = form.getFieldState(roleName + ".active")
                             return (
                               <>
                                 <div key={idx} className="flex flex-row items-center">
-                                  <Checkbox name={`${role.name}.active`} checked={cbState?.value} />
+                                  <Checkbox name={`${roleName}.active`} checked={cbState?.value} />
                                   <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline ml-2">
-                                    {role.name}
+                                    {roleName}
                                   </p>
                                 </div>
                                 <div>
-                                  <Field name={`${role.name}.type`}>
+                                  <Field name={`${roleName}.type`}>
                                     {({ input }) => (
                                       <div>
                                         <select
@@ -207,7 +257,7 @@ const DiscordSettingsPage: BlitzPage = () => {
                                       </div>
                                     )}
                                   </Field>
-                                  <Field name={`${role.name}.discordId`}>
+                                  <Field name={`${roleName}.discordId`}>
                                     {({ input }) => (
                                       <input {...input} type="hidden" value={role.id} />
                                     )}

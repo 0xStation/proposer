@@ -5,7 +5,7 @@ import useLocalStorage from "./useLocalStorage"
 import usePopupWindow from "./usePopupWindow"
 
 type Auth = {
-  accessToken: string
+  access_token: string
   tokenType: string
   expires: number
   authorization: string
@@ -56,7 +56,7 @@ const useDCAuth = (scope: string) => {
 
       return () => clearTimeout(timeout)
     }
-  }, [auth])
+  }, [auth, setAuth])
 
   /** On a window creation, we set a new listener */
   useEffect(() => {
@@ -101,7 +101,7 @@ const useDCAuth = (scope: string) => {
 
     window.addEventListener("message", popupMessageListener)
     return () => window.removeEventListener("message", popupMessageListener)
-  }, [windowInstance])
+  }, [windowInstance, setAuth])
 
   return {
     authorization: auth?.authorization,

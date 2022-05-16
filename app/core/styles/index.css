@@ -54,3 +54,20 @@ body {
 .custom-checkbox:checked ~ .custom-checkbox-placeholder {
   background-color: white;
 }
+
+select {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.custom-select-wrapper {
+  position: relative;
+}
+
+.custom-select-wrapper::after {
+  content: "▼";
+  font-size: 0.75rem;
+  top: 12px;
+  right: 10px;
+  position: absolute;
+}

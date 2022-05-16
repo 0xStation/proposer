@@ -9,7 +9,7 @@ type Role = {
   id: string
 }
 
-const useGuild = (guildId: string) => {
+const useGuild = (guildId: string | undefined) => {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading")
   const [guild, setGuild] = useState<Guild>()
 
@@ -36,6 +36,8 @@ const useGuild = (guildId: string) => {
       fetchAsync()
     }
   }, [guildId])
+
+  console.log(guild)
 
   return { status, guild }
 }

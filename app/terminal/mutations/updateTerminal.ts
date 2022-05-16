@@ -7,6 +7,7 @@ const UpdateTerminal = z.object({
   name: z.string().optional(),
   handle: z.string().optional(),
   pfpURL: z.string().optional(),
+  guildId: z.string().optional(),
 })
 
 export default async function updateTerminal(input: z.infer<typeof UpdateTerminal>) {
@@ -24,10 +25,11 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
   const payload = {
     data: {
       ...existingTerminal.data,
-      pfpURL: params.pfpURL,
-      name: params.name,
+      ...(params.pfpURL && { pfpURL: params.pfpURL }),
+      ...(params.name && { name: params.name }),
+      ...(params.guildId && { guildId: params.guildId }),
     },
-    handle: params.handle,
+    ...(params.handle && { handle: params.handle }),
   }
 
   try {

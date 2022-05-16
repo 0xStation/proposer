@@ -3,17 +3,13 @@ import { BlitzPage, useRouter, useParam, useQuery, useMutation } from "blitz"
 import { Field, Form } from "react-final-form"
 import useGuild from "app/core/hooks/useGuild"
 import useGuildMembers from "app/core/hooks/useGuildMembers"
+import useActiveUserGuilds from "app/core/hooks/useActiveUserGuilds"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import UpsertTags from "app/tag/mutations/upsertTags"
 import Checkbox from "app/core/components/form/Checkbox"
 import useDCAuth from "app/core/hooks/useDCAuth"
 
 const AddMembersPage: BlitzPage = () => {
-  const router = useRouter()
-  // access token returned after exchanging the code
-  const [accessToken, setAccessToken] = useState()
-  // list of guild objects as returned from the discord API
-  const [guilds, setGuilds] = useState<any[] | null>(null)
   // the selectedGuild from the dropdown of guilds
   // this is the guild we will likely be adding the bot to
   const [activeGuildId, setActiveGuildId] = useState<string>("")
@@ -34,36 +30,8 @@ const AddMembersPage: BlitzPage = () => {
 
   const { status: guildStatus, guild } = useGuild(activeGuildId)
   const { status: memberStatus, guildMembers } = useGuildMembers(activeGuildId)
+  const { status: guildsStatus, guilds } = useActiveUserGuilds()
   const { onOpen, authorization, error, isAuthenticating } = useDCAuth("guilds")
-
-  useEffect(() => {
-    const fetchGuilds = async (accessToken) => {
-      if (accessToken) {
-        let response = await fetch(`https://discord.com/api/v8/users/@me/guilds`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        })
-
-        let guilds = await response.json()
-        if (Array.isArray(guilds)) {
-          guilds = guilds
-            .filter(({ owner, permissions }) => owner || (permissions & (1 << 3)) === 1 << 3)
-            .map(({ id, icon, name }) => ({
-              img: icon
-                ? `https://cdn.discordapp.com/icons/${id}/${icon}.png`
-                : "./default_discord_icon.png",
-              label: name,
-              value: id,
-            }))
-          setGuilds(guilds)
-        }
-      }
-    }
-    fetchGuilds(authorization)
-  }, [authorization])
 
   const initialFormValues = useMemo(() => {
     if (guild) {
