@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from "react"
 import { BlitzPage, useParam, useQuery, useMutation } from "blitz"
+import { Field, Form } from "react-final-form"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import UpsertTags from "app/tag/mutations/upsertTags"
 import Navigation from "app/terminal/components/settings/navigation"
 import Checkbox from "app/core/components/form/Checkbox"
 import useToast from "app/core/hooks/useToast"
-import { Field, Form } from "react-final-form"
+import useDCAuth from "app/core/hooks/useDCAuth"
 
 type Guild = {
   roles: Role[]
@@ -31,6 +32,7 @@ const DiscordSettingsPage: BlitzPage = () => {
     },
   })
 
+  const { onOpen, authorization, error, isAuthenticating } = useDCAuth("guilds")
   const [selectAllActive, setSelectAllActive] = useState(false)
 
   useEffect(() => {
@@ -93,21 +95,20 @@ const DiscordSettingsPage: BlitzPage = () => {
 
   return (
     <Navigation>
-      {!connectedGuild && (
+      {!connectedGuild && !authorization && (
         <div className="w-full h-full flex items-center flex-col justify-center">
           <p className="text-marble-white text-2xl font-bold">Connect with Discord</p>
           <p className="mt-2 text-marble-white text-base w-[400px] text-center">
             Connect with Discord to synchronize roles and manage permissions & access on Station.
           </p>
-          <a
-            target="_blank"
-            href={`https://discord.com/api/oauth2/authorize?guild_id=${terminal?.data.guildId}&client_id=${process.env.DISCORD_CLIENT_ID}&permissions=268435456&scope=bot`}
-            rel="noreferrer"
+          <button
+            onClick={() => {
+              onOpen()
+            }}
+            className="cursor-pointer mt-8 w-[200px] py-1 bg-magic-mint text-tunnel-black rounded text-base"
           >
-            <button className="cursor-pointer mt-8 w-[200px] py-1 bg-magic-mint text-tunnel-black rounded text-base">
-              Connect
-            </button>
-          </a>
+            Connect
+          </button>
         </div>
       )}
       {connectedGuild && (
