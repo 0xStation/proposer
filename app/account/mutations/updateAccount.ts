@@ -18,8 +18,6 @@ const UpdateAccount = z.object({
 export default async function updateAccount(input: z.infer<typeof UpdateAccount>) {
   const params = UpdateAccount.parse(input)
 
-  console.log("this is params", params)
-
   const existingAccount = await db.account.findUnique({
     where: {
       address: params.address,
@@ -53,6 +51,5 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
     data: payload,
   })
 
-  console.log("this is account", account)
   return account as Account
 }
