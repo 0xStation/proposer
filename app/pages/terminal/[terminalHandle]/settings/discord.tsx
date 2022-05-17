@@ -8,6 +8,7 @@ import Navigation from "app/terminal/components/settings/navigation"
 import Checkbox from "app/core/components/form/Checkbox"
 import useToast from "app/core/hooks/useToast"
 import useDCAuth from "app/core/hooks/useDCAuth"
+import useDCBotAuth from "app/core/hooks/useDCBotAuth"
 import useGuild from "app/core/hooks/useGuild"
 import useActiveUserGuilds from "app/core/hooks/useActiveUserGuilds"
 
@@ -41,6 +42,7 @@ const DiscordSettingsPage: BlitzPage = () => {
   const [selectedGuildId, setSelectedGuildId] = useState<string>()
 
   const { onOpen, authorization, error, isAuthenticating } = useDCAuth("guilds")
+  const { onOpen: onBotOpen, connected } = useDCBotAuth(selectedGuildId || "")
   const { status: selectedGuildStatus, guild: selectedGuild } = useGuild(selectedGuildId)
   const { status: guildStatus, guild: connectedGuild } = useGuild(terminal?.data?.guildId)
   const { status: guildsStatus, guilds } = useActiveUserGuilds()
@@ -157,20 +159,19 @@ const DiscordSettingsPage: BlitzPage = () => {
                         {selectedGuildStatus !== "ready" ? (
                           <div>
                             <button
+                              type="button"
                               className="border border-marble-white w-full rounded mt-4 py-2"
-                              onClick={() =>
-                                // make this use client id from env and redirect uri from env
-                                window.open(
-                                  `https://discord.com/api/oauth2/authorize?guild_id=${selectedGuildId}&client_id=963465926353752104&permissions=268435456&scope=bot`
-                                )
-                              }
+                              onClick={() => onBotOpen()}
                             >
                               Connect Station bot
                             </button>
                           </div>
                         ) : (
                           <div>
-                            <button className="border border-marble-white w-full rounded mt-4 py-2 cursor-default">
+                            <button
+                              type="button"
+                              className="border border-marble-white w-full rounded mt-4 py-2 cursor-default"
+                            >
                               Connected
                             </button>
                           </div>
