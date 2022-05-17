@@ -36,17 +36,15 @@ const Navigation = ({ children }) => {
             </li>
           </ul>
           <ul className="mt-4">
-            {/* <li
-                className={`${
-                  router.pathname === Routes.EditProfile().pathname
-                    ? "text-marble-white font-bold"
-                    : "text-concrete"
-                } cursor-pointer hover:text-marble-white`}
-              > */}
-            <li className="text-concrete">
-              <Link href={Routes.EditProfile()}>Apps</Link>
+            <li
+              className={`${
+                router.pathname === Routes.EditProfileApps().pathname
+                  ? "text-marble-white font-bold"
+                  : "text-concrete"
+              } cursor-pointer hover:text-marble-white`}
+            >
+              <Link href={Routes.EditProfileApps()}>Apps</Link>
             </li>
-            {/* </li> */}
           </ul>
         </section>
         <section className="flex-1">{children}</section>
