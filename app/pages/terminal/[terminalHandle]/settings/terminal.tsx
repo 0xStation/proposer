@@ -10,7 +10,7 @@ import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import { canEdit } from "app/core/utils/permissions"
 import { EditPermissionTypes } from "app/core/utils/constants"
-import { mustBeUnder50 } from "app/utils/validators"
+import { mustBeUnderNumCharacters } from "app/utils/validators"
 
 // maybe we can break this out into it's own component?
 const PfpInput = ({ pfpURL, onUpload }) => {
@@ -128,7 +128,7 @@ const TerminalSettingsPage: BlitzPage = () => {
                           <Field
                             name="name"
                             component="input"
-                            validate={mustBeUnder50}
+                            validate={mustBeUnderNumCharacters(50)}
                             className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
                           />
                           <span className="text-torch-red text-xs">{errors?.name}</span>
@@ -137,7 +137,7 @@ const TerminalSettingsPage: BlitzPage = () => {
                           <Field
                             name="handle"
                             component="input"
-                            validate={mustBeUnder50}
+                            validate={mustBeUnderNumCharacters(50)}
                             className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-4"
                           />
                           <span className="text-torch-red text-xs">{errors?.handle}</span>

@@ -1,13 +1,14 @@
-import { BlitzPage, useQuery, useRouter, Image } from "blitz"
+import { BlitzPage, useQuery, useRouter, useSession } from "blitz"
 import AccountForm from "app/account/components/AccountForm"
-import Layout from "app/core/layouts/Layout"
+import EditNavigation from "app/profile/components/settings/Navigation"
+import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import useStore from "app/core/hooks/useStore"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
-import Exit from "public/exit-button.svg"
 
 const EditProfile: BlitzPage = () => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
+  const session = useSession({ suspense: false })
 
   const [account, { isLoading }] = useQuery(
     getAccountByAddress,
@@ -19,7 +20,7 @@ const EditProfile: BlitzPage = () => {
     // return loading
   }
 
-  if (!activeUser || !account) {
+  if (!session?.siwe?.address || !activeUser || !account) {
     return (
       <div className="mx-auto max-w-2xl py-12">
         <h1 className="text-marble-white text-3xl text-center">
@@ -30,20 +31,12 @@ const EditProfile: BlitzPage = () => {
   }
 
   return (
-    <>
+    <EditNavigation>
+      <div className="p-6 border-b border-concrete flex justify-between">
+        <h2 className="text-marble-white text-2xl font-bold">Overview</h2>
+      </div>
       <div className="bg-tunnel-black relative">
-        <div className="absolute top-3 left-28">
-          <div className="w-[24px] h-[24px]">
-            <button
-              className="text-marble-white"
-              onClick={() => router.push(`/profile/${activeUser.address}`)}
-            >
-              <Image src={Exit} alt="Close button" width={24} height={24} />
-            </button>
-          </div>
-        </div>
-        <h1 className="text-marble-white text-4xl text-center pt-12">Edit your profile</h1>
-        <div className="mx-auto max-w-2xl pb-12">
+        <div className="ml-6 max-w-lg pb-12 mt-6">
           <AccountForm
             onSuccess={() => router.push(`/profile/${activeUser.address}`)}
             address={activeUser.address}
@@ -52,11 +45,13 @@ const EditProfile: BlitzPage = () => {
           />
         </div>
       </div>
-    </>
+    </EditNavigation>
   )
 }
 
 EditProfile.suppressFirstRenderFlicker = true
-EditProfile.getLayout = (page) => <Layout title="Edit Profile">{page}</Layout>
+EditProfile.getLayout = (page) => (
+  <LayoutWithoutNavigation title="Edit Profile">{page}</LayoutWithoutNavigation>
+)
 
 export default EditProfile

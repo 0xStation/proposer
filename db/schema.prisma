@@ -36,6 +36,7 @@ model Terminal {
   tags          Tag[]
 }
 
+// deprecated
 // A role within a terminal
 model Role {
   terminal   Terminal          @relation(fields: [terminalId], references: [id])
@@ -62,6 +63,7 @@ model AccountTerminal {
   @@id([accountId, terminalId])
 }
 
+// deprecated
 // An initiative within a terminal
 model Initiative {
   id         Int                 @id @default(autoincrement())
@@ -75,6 +77,7 @@ model Initiative {
   @@unique([terminalId, localId])
 }
 
+// deprecated
 // Associates accounts with initiatives for applications and contributor membership
 model AccountInitiative {
   account      Account                 @relation(fields: [accountId], references: [id])
@@ -88,6 +91,7 @@ model AccountInitiative {
   @@id([accountId, initiativeId])
 }
 
+// deprecated
 model Skill {
   id          Int               @id @default(autoincrement())
   name        String            @unique
@@ -95,6 +99,7 @@ model Skill {
   initiatives InitiativeSkill[]
 }
 
+// deprecated
 model AccountSkill {
   account   Account @relation(fields: [accountId], references: [id])
   accountId Int
@@ -104,6 +109,7 @@ model AccountSkill {
   @@id([accountId, skillId])
 }
 
+// deprecated
 model InitiativeSkill {
   initiative   Initiative @relation(fields: [initiativeId], references: [id])
   initiativeId Int
@@ -113,6 +119,7 @@ model InitiativeSkill {
   @@id([initiativeId, skillId])
 }
 
+// deprecated
 // Off-chain transaction to signal a user's support for another user.
 // We trigger signatures to write this endorsement model on-chain.
 model Endorsement {

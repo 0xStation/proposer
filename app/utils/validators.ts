@@ -11,8 +11,14 @@ export const composeValidators =
 
 export const requiredField = (value) => (value ? undefined : "This field is required.")
 
-export const mustBeUnder50 = (value) =>
-  value ? (value.length <= 50 ? undefined : "Must be less than 50 characters") : undefined
+export const mustBeUnderNumCharacters =
+  (maxNumCharacters = 50) =>
+  (value) =>
+    value
+      ? value.length <= maxNumCharacters
+        ? undefined
+        : `Must be less than ${maxNumCharacters} characters`
+      : undefined
 
 export const mustBeUrl = (value) => {
   if (!value) {
@@ -33,5 +39,5 @@ export const mustBeUrl = (value) => {
   }
 
   const valid = isURL(value, options)
-  return valid ? undefined : "Not a valid url. Example url: https://www.twitter.com"
+  return valid ? undefined : "Not a valid url. Example format: https://www.twitter.com"
 }
