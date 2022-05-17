@@ -72,14 +72,14 @@ const TerminalSettingsPage: BlitzPage = () => {
 
   const [updateTerminalMutation] = useMutation(updateTerminal, {
     onSuccess: (data) => {
-      addToast("Successfully updated your terminal.")
+      addToast("Successfully updated your terminal.", "success")
 
       let route = `/terminal/${data?.handle || terminalHandle}/settings/terminal`
       router.push(route, undefined, { shallow: true })
     },
     onError: (error: Error) => {
       // could probably parse this better
-      addToast(error.toString())
+      addToast(error.toString(), "error")
     },
   })
 

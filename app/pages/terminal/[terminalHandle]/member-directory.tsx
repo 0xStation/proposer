@@ -98,8 +98,8 @@ const MemberDirectoryPage: BlitzPage = () => {
             )}
           </div>
         </div>
-        <div className="grid grid-cols-7 h-full w-full">
-          <div className="overflow-y-auto h-full col-span-4">
+        <div className="grid grid-cols-7 h-[calc(100vh-130px)] w-full box-border">
+          <div className="overflow-y-auto col-span-4">
             {filteredMembers &&
               filteredMembers.map((member, idx) => (
                 <ContributorComponent
@@ -124,7 +124,7 @@ const PfpImage = ({ account }) =>
       className="min-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
     />
   ) : (
-    <div className="h-[46px] min-w-[46px] place-self-center border border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
+    <div className="h-[46px] min-w-[46px] place-self-center border border-wet-concrete bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
   )
 
 const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) => {

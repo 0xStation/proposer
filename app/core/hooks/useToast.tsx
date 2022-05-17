@@ -1,23 +1,26 @@
 // single toast vs multi?
 import { Fragment, useState } from "react"
 import { Transition } from "@headlessui/react"
-import { CheckCircleIcon } from "@heroicons/react/outline"
+import { CheckCircleIcon, EmojiSadIcon } from "@heroicons/react/outline"
 import { Image } from "blitz"
+
 import Exit from "/public/exit-button.svg"
 
 type Toast = {
   message: string
+  type: "error" | "success"
 }
 
-const useToast: () => [(msg: any) => void, () => JSX.Element] = () => {
+const useToast: () => [(msg: string, type: string) => void, () => JSX.Element] = () => {
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>()
   const [toast, setToast] = useState<Toast>()
   const [showToast, setShowToast] = useState<boolean>(false)
 
   // used to set the toast message
-  const addToast = (msg) => {
+  const addToast = (msg, type) => {
     setToast({
       message: msg,
+      type,
     })
 
     setShowToast(true)
@@ -48,10 +51,16 @@ const useToast: () => [(msg: any) => void, () => JSX.Element] = () => {
             <div className="p-4">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
-                  <CheckCircleIcon className="h-6 w-6 text-green-400" aria-hidden="true" />
+                  {toast && toast.type === "success" ? (
+                    <CheckCircleIcon className="h-6 w-6 text-green-400" aria-hidden="true" />
+                  ) : (
+                    <EmojiSadIcon className="h-6 w-6 text-green-400" aria-hidden="true" />
+                  )}
                 </div>
                 <div className="ml-3 w-0 flex-1 pt-0.5">
-                  <p className="text-sm font-bold text-gray-900">Successfully saved!</p>
+                  <p className="text-sm font-bold text-gray-900">
+                    {toast && toast.type === "success" ? "Success" : "Error"}
+                  </p>
                   <p className="mt-1 text-sm">{toast && toast.message}</p>
                 </div>
                 <div className="ml-4 flex-shrink-0 flex">
