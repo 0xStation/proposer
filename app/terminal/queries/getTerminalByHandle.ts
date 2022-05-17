@@ -20,6 +20,7 @@ export default async function getTerminalByHandle(input: z.infer<typeof GetTermi
       tags: true,
     },
   })
+
   if (!terminal) {
     return null
   }
