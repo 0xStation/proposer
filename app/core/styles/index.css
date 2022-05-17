@@ -55,7 +55,7 @@ body {
   background-color: white;
 }
 
-select {
+.custom-select-wrapper select {
   -webkit-appearance: none;
   appearance: none;
 }

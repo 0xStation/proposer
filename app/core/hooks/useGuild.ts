@@ -37,8 +37,6 @@ const useGuild = (guildId: string | undefined) => {
     }
   }, [guildId])
 
-  console.log(guild)
-
   return { status, guild }
 }
 

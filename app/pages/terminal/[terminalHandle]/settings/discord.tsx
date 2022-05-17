@@ -37,10 +37,15 @@ const DiscordSettingsPage: BlitzPage = () => {
     },
   })
 
+  const [selectAllActive, setSelectAllActive] = useState(false)
+  const [selectedGuildId, setSelectedGuildId] = useState<string>()
+
   const { onOpen, authorization, error, isAuthenticating } = useDCAuth("guilds")
+  const { status: selectedGuildStatus, guild: selectedGuild } = useGuild(selectedGuildId)
   const { status: guildStatus, guild: connectedGuild } = useGuild(terminal?.data?.guildId)
   const { status: guildsStatus, guilds } = useActiveUserGuilds()
-  const [selectAllActive, setSelectAllActive] = useState(false)
+
+  console.log(selectedGuildStatus)
 
   // kind of confusing to explain, you probably need to see it to understand so I recorded a loom
   // https://www.loom.com/share/f5c67a2872854bb386330ddbb744a5d8
@@ -106,6 +111,7 @@ const DiscordSettingsPage: BlitzPage = () => {
           }}
           render={({ form, handleSubmit }) => {
             const formState = form.getState()
+            setSelectedGuildId(formState.values.guildId)
             return (
               <form onSubmit={handleSubmit}>
                 <div className="flex flex-col">
@@ -129,21 +135,46 @@ const DiscordSettingsPage: BlitzPage = () => {
                           the station bot to your discord server.
                         </span>
                         <div className="custom-select-wrapper">
-                          <Field
-                            name="guildId"
-                            component="select"
-                            className="w-full p-2 bg-wet-concrete border rounded"
-                          >
-                            <option>Select one</option>
-                            {guilds.map((guild, idx) => {
-                              return (
-                                <option value={guild.value} key={idx}>
-                                  {guild.label}
-                                </option>
-                              )
-                            })}
+                          <Field name="guildId">
+                            {({ input }) => (
+                              <select
+                                {...input}
+                                className="w-full p-2 bg-wet-concrete border rounded"
+                              >
+                                <option>Select one</option>
+                                {guilds.map((guild, idx) => {
+                                  return (
+                                    <option value={guild.value} key={idx}>
+                                      {guild.label}
+                                    </option>
+                                  )
+                                })}
+                              </select>
+                            )}
                           </Field>
                         </div>
+                        {/* likely means the auth didn't go through, the guild is not connected yet */}
+                        {selectedGuildStatus !== "ready" ? (
+                          <div>
+                            <button
+                              className="border border-marble-white w-full rounded mt-4 py-2"
+                              onClick={() =>
+                                // make this use client id from env and redirect uri from env
+                                window.open(
+                                  `https://discord.com/api/oauth2/authorize?guild_id=${selectedGuildId}&client_id=963465926353752104&permissions=268435456&scope=bot`
+                                )
+                              }
+                            >
+                              Connect Station bot
+                            </button>
+                          </div>
+                        ) : (
+                          <div>
+                            <button className="border border-marble-white w-full rounded mt-4 py-2 cursor-default">
+                              Connected
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -211,10 +242,10 @@ const DiscordSettingsPage: BlitzPage = () => {
                             className="mt-6 mb-2 underline cursor-pointer inline-block"
                             onClick={() => {
                               setSelectAllActive(!selectAllActive)
-                              form.mutators.selectAll?.(!selectAllActive)
+                              form.mutators.selectAll?.(selectAllActive)
                             }}
                           >
-                            {!selectAllActive ? "Select all" : "Deselect all"}
+                            {selectAllActive ? "Select all" : "Deselect all"}
                           </p>
                         </div>
                         <div className="grid grid-cols-2 gap-y-2">
