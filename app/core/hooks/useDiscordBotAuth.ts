@@ -6,7 +6,7 @@ type Auth = {
   connected: boolean
 }
 
-const useDCBotAuth = (guildId: string) => {
+const useDiscordBotAuth = (guildId: string) => {
   const redirectUri =
     typeof window !== "undefined" &&
     `${window.location.href.split("/").slice(0, 3).join("/")}/auth/discord`
@@ -36,4 +36,4 @@ const useDCBotAuth = (guildId: string) => {
   }
 }
 
-export default useDCBotAuth
+export default useDiscordBotAuth

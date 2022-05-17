@@ -5,7 +5,11 @@ const DiscordAuth = () => {
   const router = useRouter()
 
   useEffect(() => {
-    if (router.query.code) {
+    if (router.query.code && router.query.state) {
+      const state = router.query.state as string
+      const { url } = JSON.parse(state)
+      const target = `${window.location.origin}${url}`
+
       fetch("/api/discord/exchange-code", {
         method: "POST",
         headers: {
@@ -23,14 +27,14 @@ const DiscordAuth = () => {
                 type: "DC_AUTH_SUCCESS",
                 data: { access_token: data.access_token },
               },
-              `${window.location.origin}/terminal/css/members`
+              target
             )
           }
         })
     }
-  }, [router.query.code])
+  }, [router.query.code, router.query.state])
 
-  return <div>authorizing... closing window soon </div>
+  return <div>authorizing... closing window soon</div>
 }
 
 export default DiscordAuth

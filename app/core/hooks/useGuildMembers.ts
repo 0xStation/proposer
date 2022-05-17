@@ -15,6 +15,7 @@ const useGuildMembers = (guildId: string) => {
       })
 
       if (response.status !== 200) {
+        console.error(response)
         setStatus("error")
         return
       }

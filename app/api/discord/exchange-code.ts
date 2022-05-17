@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   params.append("grant_type", "authorization_code")
   params.append("code", req.body.code)
 
-  const response = await fetch(`${process.env.API_ENDPOINT}/oauth2/token`, {
+  const response = await fetch(`${process.env.BLITZ_PUBLIC_API_ENDPOINT}/oauth2/token`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",

@@ -8,16 +8,22 @@ type Auth = {
   authorization: string
 }
 
+type GuildObject = {
+  img: string
+  label: string
+  value: string
+}
+
 // used to fetch the guilds of the active user
-const useActiveUserGuilds = () => {
+const useActiveUserDiscordGuilds = () => {
   const [authorization] = useLocalStorage<Partial<Auth>>("dc_auth_guilds", {}, false)
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading")
-  const [guilds, setGuilds] = useState<{ img: string; label: string; value: string }[]>([])
+  const [guilds, setGuilds] = useState<GuildObject[]>([])
 
   useEffect(() => {
     const fetchGuilds = async (token) => {
       if (token) {
-        let response = await fetch(`https://discord.com/api/v8/users/@me/guilds`, {
+        let response = await fetch(`${process.env.BLITZ_PUBLIC_API_ENDPOINT}/users/@me/guilds`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -53,4 +59,4 @@ const useActiveUserGuilds = () => {
   return { status, guilds }
 }
 
-export default useActiveUserGuilds
+export default useActiveUserDiscordGuilds

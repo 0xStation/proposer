@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
   const guildMembers = await response.json()
 
-  if (!guildMembers.code) {
+  if (!guildMembers.code && guildMembers.code !== undefined) {
     res.status(200).json({ guildMembers })
     return
   }

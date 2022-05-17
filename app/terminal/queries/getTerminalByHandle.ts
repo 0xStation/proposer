@@ -8,7 +8,6 @@ const GetTerminalByHandle = z.object({
 
 export default async function getTerminalByHandle(input: z.infer<typeof GetTerminalByHandle>) {
   const data = GetTerminalByHandle.parse(input)
-  console.log(data.handle)
   const terminal = await db.terminal.findFirst({
     where: {
       handle: {

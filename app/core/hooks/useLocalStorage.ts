@@ -1,10 +1,8 @@
 import { useState } from "react"
 
 /**
- * forking this code from Guild.xyz, which is open source and does not have a license as far as I can tell.
- * It's great clean code, so might as well use it. No different than using an open source library in my opinion.
- * If anyone has objections, I'm fine with writing something up ourselves. -mg
- * https://github.com/agoraxyz/guild.xyz/blob/f590e6e550a6288076c048fbaa9928c4e64eaf9a/src/hooks/usePopupWindow.ts#L3
+ * forking this code from Guild.xyz, we have permission to use it.
+ * https://github.com/agoraxyz/guild.xyz/blob/f590e6e550a6288076c048fbaa9928c4e64eaf9a/src/hooks/useLocalStorage.ts
  */
 const getDataFromLocalstorage = <T>(key: string, initialValue: T, shouldSaveInitial = false) => {
   if (typeof window === "undefined") return initialValue
@@ -16,7 +14,7 @@ const getDataFromLocalstorage = <T>(key: string, initialValue: T, shouldSaveInit
     }
     return JSON.parse(item)
   } catch (error) {
-    console.log(error)
+    console.error(error)
     return initialValue
   }
 }
@@ -36,7 +34,7 @@ const useLocalStorage = <T>(key: string, initialValue: T, shouldSaveInitial = fa
         window.localStorage.setItem(key, JSON.stringify(valueToStore))
       }
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
   return [storedValue, setValue] as const

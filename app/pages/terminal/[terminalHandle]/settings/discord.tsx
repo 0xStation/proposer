@@ -7,10 +7,10 @@ import updateTerminal from "app/terminal/mutations/updateTerminal"
 import Navigation from "app/terminal/components/settings/navigation"
 import Checkbox from "app/core/components/form/Checkbox"
 import useToast from "app/core/hooks/useToast"
-import useDCAuth from "app/core/hooks/useDCAuth"
-import useDCBotAuth from "app/core/hooks/useDCBotAuth"
-import useGuild from "app/core/hooks/useGuild"
-import useActiveUserGuilds from "app/core/hooks/useActiveUserGuilds"
+import useDiscordAuth from "app/core/hooks/useDiscordAuth"
+import useDiscordBotAuth from "app/core/hooks/useDiscordBotAuth"
+import useDiscordGuild from "app/core/hooks/useDiscordGuild"
+import useActiveUserDiscordGuilds from "app/core/hooks/useActiveUserDiscordGuilds"
 
 const DiscordSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -28,12 +28,11 @@ const DiscordSettingsPage: BlitzPage = () => {
   })
 
   const [updateTerminalMutation] = useMutation(updateTerminal, {
-    onSuccess: (data) => {
-      // maybe add a toast?
+    onSuccess: (_data) => {
+      addToast("Guild added to your terminal", "success")
       console.log("success")
     },
     onError: (error: Error) => {
-      // could probably parse this better
       addToast(error.toString(), "error")
     },
   })
@@ -41,25 +40,14 @@ const DiscordSettingsPage: BlitzPage = () => {
   const [selectAllActive, setSelectAllActive] = useState(false)
   const [selectedGuildId, setSelectedGuildId] = useState<string>()
 
-  const { onOpen, authorization, error, isAuthenticating } = useDCAuth("guilds")
-  const { onOpen: onBotOpen, connected } = useDCBotAuth(selectedGuildId || "")
-  const { status: selectedGuildStatus, guild: selectedGuild } = useGuild(selectedGuildId)
-  const { status: guildStatus, guild: connectedGuild } = useGuild(terminal?.data?.guildId)
-  const { status: guildsStatus, guilds } = useActiveUserGuilds()
-
-  console.log(selectedGuildStatus)
+  const { onOpen, authorization, error, isAuthenticating } = useDiscordAuth("guilds")
+  const { onOpen: onBotOpen, connected } = useDiscordBotAuth(selectedGuildId || "")
+  const { status: selectedGuildStatus, guild: selectedGuild } = useDiscordGuild(selectedGuildId)
+  const { status: guildStatus, guild: connectedGuild } = useDiscordGuild(terminal?.data?.guildId)
+  const { status: guildsStatus, guilds } = useActiveUserDiscordGuilds()
 
   // kind of confusing to explain, you probably need to see it to understand so I recorded a loom
   // https://www.loom.com/share/f5c67a2872854bb386330ddbb744a5d8
-  // When the form successfully saves, it calls the toast component to show the user a success notification.
-  // The toast is set on a 3 second timeout, so it automatically closes after 3 seconds.
-  // The problem though, is that once the toast closes, that triggers a change in state, which triggers another fetch
-  // of the terminal and the old tags. This means that if you were to change the form state in the time between saving
-  // and the three seconds before the toast closes, it would reset back to the state at the time of the save.
-  // This is likely a small edge case, but its bothering me.
-  // to get around it, we memoize the initial form state. This way, the form does not re-render its state when the
-  // toast closes. There is also no lag after the save. WOW! And people thought useMemo was over-engineering...
-  // not today!!
   const _initialFormValues = useMemo(() => {
     if (connectedGuild && terminal) {
       let allRoles = connectedGuild.roles.reduce((acc, role) => {
@@ -133,8 +121,8 @@ const DiscordSettingsPage: BlitzPage = () => {
                       <div className="flex flex-col pb-2 col-span-2">
                         <h3 className="font-bold">Select a server*</h3>
                         <span className="text-concrete text-xs mb-2 block">
-                          In order to integrate fully with discord, your terminal needs to connect
-                          the station bot to your discord server.
+                          In order to integrate fully with Discord, your terminal needs to connect
+                          the Station bot to your Discord server.
                         </span>
                         <div className="custom-select-wrapper">
                           <Field name="guildId">

@@ -22,6 +22,11 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
     return null
   }
 
+  /**
+   * required so we can use this function and pass in any or all optional params without wiping out the old ones.
+   * The syntax ...(condition && { key: value })
+     will only create a key value pair in the object if the condition is truthy.
+   */
   const payload = {
     data: {
       ...existingTerminal.data,

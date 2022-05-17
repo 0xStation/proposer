@@ -9,7 +9,7 @@ type Role = {
   id: string
 }
 
-const useGuild = (guildId: string | undefined) => {
+const useDiscordGuild = (guildId: string | undefined) => {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading")
   const [guild, setGuild] = useState<Guild>()
 
@@ -24,6 +24,7 @@ const useGuild = (guildId: string | undefined) => {
       })
 
       if (response.status !== 200) {
+        console.error(response)
         setGuild(undefined)
         setStatus("error")
         return
@@ -40,4 +41,4 @@ const useGuild = (guildId: string | undefined) => {
   return { status, guild }
 }
 
-export default useGuild
+export default useDiscordGuild
