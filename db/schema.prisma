@@ -21,6 +21,7 @@ model Account {
   data        Json?
   endorsed    Endorsement[]       @relation("Endorsed")
   sessions    Session[]
+  proposals   AccountProposal[]
 }
 
 // Each DAO is represented by a terminal.
@@ -34,6 +35,7 @@ model Terminal {
   members       AccountTerminal[]
   data          Json?
   tags          Tag[]
+  proposals     Proposal[]
 }
 
 // A role within a terminal
@@ -168,4 +170,44 @@ model Session {
   privateData        String?
   userId             Int?
   user               Account?  @relation(fields: [userId], references: [id])
+}
+
+model Proposal {
+  id              Int                 @id @default(autoincrement())
+  terminalId      Int?
+  terminal        Terminal?           @relation(fields: [terminalId], references: [id])
+  authorAddress   String
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @default(now())
+  data            Json?
+  relatedAccounts AccountProposal[]
+  signatures      ProposalSignature[]
+}
+
+model AccountProposal {
+  id         Int                 @id @default(autoincrement())
+  accountId  Int
+  account    Account             @relation(fields: [accountId], references: [id])
+  proposalId Int
+  proposal   Proposal            @relation(fields: [proposalId], references: [id])
+  type       AccountProposalType
+}
+
+model ProposalSignature {
+  id                  Int      @id @default(autoincrement())
+  proposalId          Int
+  proposal            Proposal @relation(fields: [proposalId], references: [id])
+  signingAddress      String
+  representingAddress String? // used for tracking parent gnosis safe
+  createdAt           DateTime @default(now())
+  message             String
+  signature           String
+}
+
+enum AccountProposalType {
+  AUTHOR
+  COLLABORATOR
+  SIGNER
+  FUNDER
+  RECIPIENT
 }
