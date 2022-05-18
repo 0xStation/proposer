@@ -1,9 +1,20 @@
-import { BlitzPage, useRouter, Image } from "blitz"
+import {
+  BlitzPage,
+  useRouter,
+  Image,
+  getSession,
+  GetServerSideProps,
+  invoke,
+  Routes,
+  InferGetServerSidePropsType,
+} from "blitz"
+import { useEffect } from "react"
 import AccountForm from "app/account/components/AccountForm"
 import Layout from "app/core/layouts/LayoutWithoutNavigation"
 import Exit from "/public/exit-button.svg"
-import { getSession, GetServerSideProps, invoke, Routes, InferGetServerSidePropsType } from "blitz"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import { useConnect, useDisconnect } from "wagmi"
+import logout from "app/session/mutations/logout"
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session = await getSession(req, res)
@@ -41,13 +52,27 @@ const CreateProfile: BlitzPage = ({
   siweAddress,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
+  const { isConnected } = useConnect()
+  const { disconnect } = useDisconnect()
+
+  const handleDisconnect = async () => {
+    await invoke(logout, {})
+    disconnect()
+    router.push("/")
+  }
+
+  useEffect(() => {
+    if (!isConnected) {
+      ;(async () => await handleDisconnect())()
+    }
+  }, [isConnected])
 
   return (
     <div>
       <div className="absolute top-5 left-5">
-        <a href="https://station.express">
+        <button onClick={handleDisconnect}>
           <Image src={Exit} alt="Close button" width={16} height={16} />
-        </a>
+        </button>
       </div>
       <div className="bg-tunnel-black relative mx-auto w-[31rem]">
         <div className="flex flex-row mt-16">

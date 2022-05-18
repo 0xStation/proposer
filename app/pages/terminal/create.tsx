@@ -76,8 +76,6 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
     },
   })
 
-  console.log(session)
-
   return (
     <main className="text-marble-white min-h-screen max-w-screen-sm mx-auto">
       <div

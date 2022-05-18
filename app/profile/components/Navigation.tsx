@@ -1,12 +1,18 @@
 import useStore from "app/core/hooks/useStore"
 import { getWalletString } from "app/utils/getWalletString"
-import { useRouter, Image, Link, Routes } from "blitz"
+import { useRouter, Image } from "blitz"
 import TerminalIcon from "public/terminal-icon.svg"
 import LockedIcon from "public/locked-icon.svg"
+import GithubIcon from "public/github-icon.svg"
+import TwitterIcon from "public/twitter-icon.svg"
+import PersonalSiteIcon from "public/personal-site-icon.svg"
+import InstagramIcon from "public/instagram-icon.svg"
+import TikTokIcon from "public/tiktok-icon.svg"
 
 export const Navigation = ({ account, children }) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
+
   return (
     <>
       <div className="h-screen w-[300px] bg-tunnel-black border-r border-concrete fixed">
@@ -36,6 +42,33 @@ export const Navigation = ({ account, children }) => {
             <span className="text-base text-concrete">
               {`@${getWalletString(account?.address)}`}
             </span>
+          </div>
+          <div className="flex flex-row space-x-4 mt-3">
+            {account?.data?.contactURL && (
+              <a href={account?.data?.contactURL} className="hover:opacity-70 cursor-pointer">
+                <Image src={PersonalSiteIcon} alt="Personal Site Icon." width={15} height={15} />
+              </a>
+            )}
+            {account?.data?.twitterUrl && (
+              <a href={account?.data?.twitterUrl} className="hover:opacity-70 cursor-pointer">
+                <Image src={TwitterIcon} alt="Twitter Icon." width={15} height={15} />
+              </a>
+            )}
+            {account?.data?.githubUrl && (
+              <a href={account?.data?.githubUrl} className="hover:opacity-70 cursor-pointer">
+                <Image src={GithubIcon} alt="Github Icon." width={15} height={15} />
+              </a>
+            )}
+            {account?.data?.tiktokUrl && (
+              <a href={account?.data?.tiktokUrl} className="hover:opacity-70 cursor-pointer">
+                <Image src={TikTokIcon} alt="TikTok Icon." width={15} height={15} />
+              </a>
+            )}
+            {account?.data?.instagramUrl && (
+              <a href={account?.data?.instagramUrl} className="hover:opacity-70 cursor-pointer">
+                <Image src={InstagramIcon} alt="Instagram Icon." width={15} height={15} />
+              </a>
+            )}
           </div>
           <div className="h-24">
             <p className="text-marble-white text-base mt-4 font-normal">{account?.data.bio}</p>

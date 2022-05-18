@@ -17,7 +17,7 @@ const Home: BlitzPage = () => {
     } else {
       router.push(`/profile/create`)
     }
-  }, [activeUser])
+  }, [activeUser, session?.siwe?.address])
 
   return (
     <Layout title="Station">

@@ -1,20 +1,18 @@
-import { useState, useEffect } from "react"
-import { BlitzPage, useRouter, useParam, useQuery } from "blitz"
+import { useState } from "react"
+import { BlitzPage, useParam, useQuery, Routes, Link } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import useStore from "app/core/hooks/useStore"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
-import Modal from "app/core/components/Modal"
 import ProfileNavigation from "app/profile/components/Navigation"
 import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
 import { Terminal } from "app/terminal/types"
+import { formatDate } from "app/core/utils/formatDate"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
 const ProfileHome: BlitzPage = () => {
   const accountAddress = useParam("accountAddress", "string") as string
   const [selectedTerminal, setSelectedTerminal] = useState<Terminal | null>(null)
-  const activeUser = useStore((state) => state.activeUser)
 
   const [account] = useQuery(
     getAccountByAddress,
@@ -37,18 +35,9 @@ const ProfileHome: BlitzPage = () => {
     }
   )
 
-  if (!account) {
-    // TODO: replace with pulsating loading state
-    return (
-      <div className="mx-auto max-w-2xl py-12">
-        <h1 className="text-marble-white text-3xl text-center">Loading...</h1>
-      </div>
-    )
-  }
-
   return (
     <Layout title={`${account ? `${account?.data?.name} | ` : ""}Profile`}>
-      <ProfileNavigation account={activeUser}>
+      <ProfileNavigation account={account}>
         <div className="h-[108px] border-b border-concrete">
           <h1 className="text-2xl font-bold ml-6 pt-6">Terminals</h1>
           <p className="flex ml-6 pt-2">Communities you&apos;re a part of </p>
@@ -124,11 +113,13 @@ const SelectedTerminalCard = ({ account, terminal }) => {
       <div className="m-5 flex-col">
         <div className="flex space-x-2">
           <div className="flex flex-col content-center align-middle mr-1">
-            <img
-              src={terminal.data.pfpURL}
-              alt="Terminal PFP"
-              className="min-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
-            />
+            <Link href={Routes.MemberDirectoryPage({ terminalHandle: terminal.handle })}>
+              <img
+                src={terminal.data.pfpURL}
+                alt="Terminal PFP"
+                className="min-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete hover:border-marble-white"
+              />
+            </Link>
           </div>
           <div className="flex flex-col content-center">
             <div className="flex flex-row items-center space-x-1">
@@ -144,7 +135,7 @@ const SelectedTerminalCard = ({ account, terminal }) => {
           {membership.joinedAt && (
             <div className="mt-7">
               <p className="uppercase mb-3">joined since</p>
-              <p className="text-base">{membership.joinedAt.toDateString()}</p>
+              <p className="text-base">{formatDate(membership.joinedAt)}</p>
             </div>
           )}
           <TagDetails tagType="roles" tags={roleTags} />

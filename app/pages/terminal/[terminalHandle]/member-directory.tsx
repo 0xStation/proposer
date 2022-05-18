@@ -1,4 +1,4 @@
-import { BlitzPage, useQuery, useParam } from "blitz"
+import { BlitzPage, useQuery, useParam, Image, Link, Routes } from "blitz"
 import { Fragment, useEffect, useState } from "react"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import Layout from "app/core/layouts/Layout"
@@ -11,6 +11,12 @@ import { Form } from "react-final-form"
 import truncateString from "app/core/utils/truncateString"
 import getMembersByTerminalId from "app/accountTerminal/queries/getMembersByTerminalId"
 import { AccountTerminalWithTagsAndAccount } from "app/accountTerminal/types"
+import { formatDate } from "app/core/utils/formatDate"
+import GithubIcon from "public/github-icon.svg"
+import TwitterIcon from "public/twitter-icon.svg"
+import PersonalSiteIcon from "public/personal-site-icon.svg"
+import InstagramIcon from "public/instagram-icon.svg"
+import TikTokIcon from "public/tiktok-icon.svg"
 
 interface Filters {
   [tagType: string]: Set<string>
@@ -116,17 +122,6 @@ const MemberDirectoryPage: BlitzPage = () => {
   )
 }
 
-const PfpImage = ({ account }) =>
-  account.data.pfpURL ? (
-    <img
-      src={account.data.pfpURL}
-      alt="PFP"
-      className="min-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
-    />
-  ) : (
-    <div className="h-[46px] min-w-[46px] place-self-center border border-wet-concrete bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
-  )
-
 const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) => {
   const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
 
@@ -187,11 +182,12 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                 <span
                   className={`${
                     open
-                      ? "bg-marble-white text-tunnel-black"
-                      : "hover:bg-marble-white hover:text-tunnel-black"
-                  } capitalize group rounded-full border border-concrete h-[17px] w-max p-4 flex flex-center items-center cursor-pointer `}
+                      ? "bg-marble-white text-tunnel-black  border-marble-white"
+                      : "hover:bg-marble-white hover:text-tunnel-black border-concrete hover:border-marble-white"
+                  } capitalize group rounded-full border h-[17px] w-max p-4 flex flex-center items-center cursor-pointer `}
                 >
-                  {tagType}
+                  {tagType}{" "}
+                  {filters[tagType] && filters[tagType].size ? `(${filters[tagType].size})` : ""}
                   <div className="ml-3">
                     <DropdownChevronIcon
                       className={`${open ? "fill-tunnel-black" : "group-hover:fill-tunnel-black"}`}
@@ -253,7 +249,7 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                         </div>
                         <button
                           type="submit"
-                          className="bg-marble-white w-52 text-tunnel-black rounded mb-4 ml-4 mr-1 hover:opacity-70"
+                          className="bg-marble-white w-52 h-[35px] text-tunnel-black rounded mb-4 ml-4 mr-1 hover:opacity-70"
                         >
                           Apply
                         </button>
@@ -287,7 +283,15 @@ const ContributorComponent = ({ member, setSelectedMember }) => {
     >
       <div className="flex space-x-2">
         <div className="flex flex-col content-center align-middle mr-1">
-          <PfpImage account={account} />
+          {account.data.pfpURL ? (
+            <img
+              src={account.data.pfpURL}
+              alt="PFP"
+              className="min-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
+            />
+          ) : (
+            <div className="h-[46px] min-w-[46px] place-self-center border border-wet-concrete bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
+          )}
         </div>
         <div className="flex flex-col content-center">
           <div className="flex flex-row items-center space-x-1">
@@ -327,7 +331,17 @@ const SelectedContributorCard = ({ member }) => {
       <div className="m-5 flex-col">
         <div className="flex space-x-2">
           <div className="flex flex-col content-center align-middle mr-1">
-            <PfpImage account={account} />
+            <Link href={Routes.ProfileHome({ accountAddress: account.address })}>
+              {account.data.pfpURL ? (
+                <img
+                  src={account.data.pfpURL}
+                  alt="PFP"
+                  className="min-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete hover:border-marble-white"
+                />
+              ) : (
+                <div className="h-[46px] min-w-[46px] place-self-center border border-wet-concrete hover:border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
+              )}
+            </Link>
           </div>
           <div className="flex flex-col content-center">
             <div className="flex flex-row items-center space-x-1">
@@ -340,12 +354,39 @@ const SelectedContributorCard = ({ member }) => {
             </div>
           </div>
         </div>
-        <div className="mt-9 text-xs">
+        <div className="mt-5 space-x-4">
+          {account?.data?.contactURL && (
+            <a href={account?.data?.contactURL} className="hover:opacity-70 cursor-pointer">
+              <Image src={PersonalSiteIcon} alt="Personal Site Icon." width={15} height={15} />
+            </a>
+          )}
+          {account?.data?.twitterUrl && (
+            <a href={account?.data?.twitterUrl} className="hover:opacity-70 cursor-pointer">
+              <Image src={TwitterIcon} alt="Twitter Icon." width={15} height={15} />
+            </a>
+          )}
+          {account?.data?.githubUrl && (
+            <a href={account?.data?.githubUrl} className="hover:opacity-70 cursor-pointer">
+              <Image src={GithubIcon} alt="Github Icon." width={15} height={15} />
+            </a>
+          )}
+          {account?.data?.tiktokUrl && (
+            <a href={account?.data?.tiktokUrl} className="hover:opacity-70 cursor-pointer">
+              <Image src={TikTokIcon} alt="TikTok Icon." width={15} height={15} />
+            </a>
+          )}
+          {account?.data?.instagramUrl && (
+            <a href={account?.data?.instagramUrl} className="hover:opacity-70 cursor-pointer">
+              <Image src={InstagramIcon} alt="Instagram Icon." width={15} height={15} />
+            </a>
+          )}
+        </div>
+        <div className="mt-5 text-xs">
           <TagDetails tagType="status" tags={statusTags} />
           {member.joinedAt && (
             <div className="mt-7">
               <p className="uppercase mb-3">joined since</p>
-              <p className="text-base">{member.joinedAt.toDateString()}</p>
+              <p className="text-base">{formatDate(member.joinedAt)}</p>
             </div>
           )}
           <TagDetails tagType="roles" tags={roleTags} />

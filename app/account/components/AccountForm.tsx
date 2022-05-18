@@ -52,9 +52,9 @@ const CoverPhotoInput = ({ coverURL, onUpload }) => {
   return (
     <div className="flex-col">
       <label className="font-bold text-base">Cover</label>
-      <p className="text-concrete">.jpg or .png, 600 x 600px recommended</p>
+      <p className="text-concrete text-sm">.jpg or .png, 600 x 600px recommended</p>
       <div
-        className="w-[18rem] h-[9rem] bg-gradient-to-b object-cover from-electric-violet to-magic-mint border border-concrete cursor-pointer relative mt-4"
+        className="w-[18rem] h-[9rem] bg-gradient-to-b object-cover from-electric-violet to-magic-mint border border-concrete cursor-pointer relative mt-2"
         {...getRootProps()}
       >
         {coverURL && (
@@ -96,9 +96,9 @@ const PfpInput = ({ pfpURL, onUpload }) => {
   return (
     <div className="flex-col">
       <label className="font-bold text-base">PFP</label>
-      <p className="text-concrete">.jpg or .png, 600 x 600px recommended</p>
+      <p className="text-concrete text-sm">.jpg or .png, 600 x 600px recommended</p>
       <div
-        className="w-[5.66rem] h-[5.66rem] border border-wet-concrete rounded-full bg-gradient-to-b object-cover from-electric-violet to-magic-mint flex items-center justify-center cursor-pointer mt-4"
+        className="w-[5.66rem] h-[5.66rem] border border-wet-concrete rounded-full bg-gradient-to-b object-cover from-electric-violet to-magic-mint flex items-center justify-center cursor-pointer mt-2"
         {...getRootProps()}
       >
         <>
@@ -193,7 +193,7 @@ const AccountForm = ({
               <label htmlFor="name" className="text-marble-white text-base font-bold">
                 Name*
               </label>
-              <p className="text-concrete">50 characters max</p>
+              <p className="text-concrete text-sm">50 characters max</p>
               <Field
                 component="input"
                 name="name"
@@ -220,7 +220,7 @@ const AccountForm = ({
               <label htmlFor="bio" className="text-marble-white font-bold">
                 About
               </label>
-              <p className="text-concrete">150 characters max</p>
+              <p className="text-concrete text-sm">150 characters max</p>
               <Field component="textarea" name="bio" validate={mustBeUnderNumCharacters(150)}>
                 {({ input, meta }) => (
                   <div>
@@ -231,7 +231,7 @@ const AccountForm = ({
                     />
                     {/* this error shows up when the user focuses the field (meta.touched) */}
                     {meta.error && meta.touched && (
-                      <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
+                      <span className=" text-xs text-torch-red block">{meta.error}</span>
                     )}
                   </div>
                 )}
@@ -244,7 +244,7 @@ const AccountForm = ({
               <CoverPhotoInput coverURL={coverURL} onUpload={(url) => setCoverURL(url)} />
             </div>
             <div className="flex flex-col mt-6">
-              <label className="mb-5 font-bold text-base">Socials</label>
+              <label className="mb-2 font-bold text-base">Socials</label>
               <Field name="contactURL" validate={mustBeUrl}>
                 {({ input, meta }) => (
                   <div className="h-10 w-full border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
