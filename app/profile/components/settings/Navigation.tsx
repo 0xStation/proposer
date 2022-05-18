@@ -1,10 +1,8 @@
-import useStore from "app/core/hooks/useStore"
 import { useRouter, Routes, Link, Image } from "blitz"
 import Exit from "public/exit-button.svg"
 
-const Navigation = ({ children }) => {
+const Navigation = ({ children, activeUser }) => {
   const router = useRouter()
-  const activeUser = useStore((state) => state.activeUser)
 
   return (
     <div>

@@ -1,36 +1,54 @@
-import { BlitzPage, useQuery, useRouter, useSession } from "blitz"
+import {
+  BlitzPage,
+  useQuery,
+  useRouter,
+  useSession,
+  InferGetServerSidePropsType,
+  GetServerSideProps,
+  getSession,
+  invoke,
+  Routes,
+} from "blitz"
 import EditNavigation from "app/profile/components/settings/Navigation"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import useStore from "app/core/hooks/useStore"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
-const EditProfileApps: BlitzPage = () => {
-  const router = useRouter()
-  const activeUser = useStore((state) => state.activeUser)
-  const session = useSession({ suspense: false })
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const session = await getSession(req, res)
 
-  const [account, { isLoading }] = useQuery(
-    getAccountByAddress,
-    { address: activeUser?.address },
-    { suspense: false }
-  )
+  const user = await invoke(getAccountByAddress, { address: session?.siwe?.address })
 
-  if (isLoading) {
-    // return loading
+  if (!session?.siwe?.address) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
   }
 
-  //   if (!session?.siwe?.address || !activeUser || !account) {
-  //     return (
-  //       <div className="mx-auto max-w-2xl py-12">
-  //         <h1 className="text-marble-white text-3xl text-center">
-  //           Please connect your wallet to edit your account.
-  //         </h1>
-  //       </div>
-  //     )
-  //   }
+  if (!user) {
+    return {
+      redirect: {
+        destination: Routes.CreateProfile(),
+        permanent: false,
+      },
+    }
+  }
 
+  return {
+    props: {
+      activeUser: user,
+    }, // will be passed to the page component as props
+  }
+}
+
+const EditProfileApps: BlitzPage = ({
+  activeUser,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
-    <EditNavigation>
+    <EditNavigation activeUser={activeUser}>
       <div className="p-6 border-b border-concrete flex justify-between">
         <h2 className="text-marble-white text-2xl font-bold">Apps</h2>
       </div>
