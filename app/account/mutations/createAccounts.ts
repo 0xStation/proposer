@@ -18,19 +18,13 @@ export default async function createAccounts(input: z.infer<typeof CreateAccount
   params.users.forEach(async (user) => {
     const account = await db.account.create({
       data: {
+        discordId: user.discordId,
         data: {
           name: user.name,
-          discordId: user.discordId,
         },
       },
     })
 
-    // what if this user already exists
-    // in the case that we are importing from discord but they exist
-
-    // terminalId 19
-    // tagId 176
-    // accountId 9
     const ticket = await db.accountTerminal.create({
       data: {
         accountId: account.id,
@@ -43,7 +37,10 @@ export default async function createAccounts(input: z.infer<typeof CreateAccount
         },
       },
     })
+
+    return ticket
   })
 
+  // not sure what return value is useful here... maybe just a regular success / error cycle
   return
 }

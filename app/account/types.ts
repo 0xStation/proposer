@@ -4,11 +4,8 @@ export type AccountMetadata = {
   name: string
   handle?: string
   ens?: string
-  bio?: string
   ticketId?: number // TODO: remove this when subgraph is ready
   pfpURL?: string
-  coverURL?: string
-  contactURL?: string
   githubUrl?: string
   twitterUrL?: string
   tiktokUrl?: string
@@ -16,14 +13,18 @@ export type AccountMetadata = {
   ticketImage?: string
   pronouns?: string
   discordId?: string
+  contactURL?: string
+  coverURL?: string
   timezone?: string
   verified?: boolean
+  bio?: string
   initiatives?: number[]
 }
 
 export type Account = {
   id: number
-  address: string
+  address?: string
+  discordId?: string
   data: AccountMetadata
   role?: string
   points?: number
