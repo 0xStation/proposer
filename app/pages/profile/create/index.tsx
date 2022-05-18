@@ -1,15 +1,46 @@
-import { BlitzPage, useRouter, useSession, Image } from "blitz"
+import { BlitzPage, useRouter, Image } from "blitz"
 import AccountForm from "app/account/components/AccountForm"
 import Layout from "app/core/layouts/LayoutWithoutNavigation"
 import Exit from "/public/exit-button.svg"
+import { getSession, GetServerSideProps, invoke, Routes, InferGetServerSidePropsType } from "blitz"
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
-const CreateProfile: BlitzPage = () => {
-  const router = useRouter()
-  const session = useSession({ suspense: false })
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const session = await getSession(req, res)
+
+  const user = await invoke(getAccountByAddress, { address: session?.siwe?.address })
+
+  if (user) {
+    return {
+      redirect: {
+        destination: Routes.ProfileHome({ accountAddress: session?.siwe?.address as string }),
+        permanent: false,
+        // Permanent Redirect status response code indicates that the resource requested
+        // has been definitively moved to the URL given by the Location headers
+      },
+    }
+  }
 
   if (!session?.siwe?.address) {
-    return <div>You need to connect your wallet first!</div>
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
   }
+
+  return {
+    props: {
+      siweAddress: session?.siwe?.address,
+    }, // will be passed to the page component as props
+  }
+}
+
+const CreateProfile: BlitzPage = ({
+  siweAddress,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter()
 
   return (
     <div>
@@ -33,9 +64,9 @@ const CreateProfile: BlitzPage = () => {
         <div className="mx-auto max-w-2xl pb-10">
           <AccountForm
             onSuccess={() => {
-              router.push(`/profile/${session?.siwe?.address}`)
+              router.push(`/profile/${siweAddress}`)
             }}
-            address={session?.siwe?.address}
+            address={siweAddress}
             isEdit={false}
           />
         </div>
