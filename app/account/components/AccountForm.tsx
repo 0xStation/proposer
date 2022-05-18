@@ -351,7 +351,7 @@ const AccountForm = ({
             type="submit"
             className="bg-magic-mint text-tunnel-black w-48 rounded mt-14 mb-40 block p-2 hover:opacity-70"
           >
-            {isEdit ? "Save" : "Save and continue"}
+            {isEdit ? "Save" : "Next"}
           </button>
         </form>
       )}

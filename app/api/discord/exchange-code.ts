@@ -13,17 +13,16 @@ export default async function handler(req, res) {
   params.append("client_id", process.env.DISCORD_CLIENT_ID)
   params.append("client_secret", process.env.DISCORD_CLIENT_SECRET)
   params.append("grant_type", "authorization_code")
-  // code can only be used once
-  params.append("code", req.query.code.toString())
-  params.append("redirect_uri", process.env.REDIRECT_URL)
+  params.append("code", req.body.code)
 
   try {
-    const response = await fetch(`${process.env.API_ENDPOINT}/oauth2/token`, {
+    const response = await fetch(`${process.env.BLITZ_PUBLIC_API_ENDPOINT}/oauth2/token`, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
+        Accept: "application/json",
       },
-      body: params.toString(),
+      body: params,
     })
 
     const token = await response.json()

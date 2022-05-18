@@ -178,25 +178,6 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
   )
 }
 
-const DiscordModal = ({ isOpen, setIsOpen }) => (
-  <Modal open={isOpen} toggle={setIsOpen}>
-    <div className="text-center">
-      <h1 className="text-2xl m-7 text-center font-bold w-80 mx-auto">
-        Connect your Station profile with Discord
-      </h1>
-      <p className="text-base mx-14 m-7 text-center">
-        Connecting your Station profile with Discord to showcase your membership in communities on
-        Station.
-      </p>
-      <a href="https://discord.com/api/oauth2/authorize?client_id=963465926353752104&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fdiscord%2Fexchange-code&response_type=code&scope=identify%20email%20guilds%20guilds.join">
-        <button className="text-center border border-marble-white rounded w-96 mx-auto py-1 mb-3">
-          Connect with Discord
-        </button>
-      </a>
-    </div>
-  </Modal>
-)
-
 ProfileHome.suppressFirstRenderFlicker = true
 
 export default ProfileHome
