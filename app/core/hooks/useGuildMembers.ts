@@ -1,8 +1,19 @@
 import { useState, useEffect } from "react"
 
-const useGuildMembers = (guildId: string) => {
+interface GuildMember {
+  nick?: string
+  roles: string[]
+  user: {
+    id: string
+    username: string
+  }
+}
+
+const useGuildMembers = (
+  guildId: string | undefined
+): { status: "loading" | "ready" | "error"; guildMembers: GuildMember[] } => {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading")
-  const [guildMembers, setGuildMembers] = useState()
+  const [guildMembers, setGuildMembers] = useState<GuildMember[]>([])
 
   useEffect(() => {
     const fetchAsync = async () => {
@@ -19,7 +30,8 @@ const useGuildMembers = (guildId: string) => {
         setStatus("error")
         return
       }
-      const guildMembers = await response.json()
+      const res = await response.json()
+      const guildMembers = res.guildMembers as GuildMember[]
       setGuildMembers(guildMembers)
       setStatus("ready")
     }

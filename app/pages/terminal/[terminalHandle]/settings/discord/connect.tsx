@@ -22,11 +22,10 @@ const DiscordConnectPage: BlitzPage = () => {
 
   const [updateTerminalMutation] = useMutation(updateTerminal, {
     onSuccess: (_data) => {
-      // addToast("Guild added to your terminal", "success")
       router.push(Routes.DiscordImportPage({ terminalHandle: terminalHandle }))
     },
     onError: (error: Error) => {
-      // addToast(error.toString(), "error")
+      console.error(error)
     },
   })
 

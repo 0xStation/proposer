@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   const response = await fetch(
-    `${process.env.API_ENDPOINT}/guilds/${req.body.guild_id}/members?limit=${req.body.limit}`,
+    `${process.env.BLITZ_PUBLIC_API_ENDPOINT}/guilds/${req.body.guild_id}/members?limit=${req.body.limit}`,
     {
       method: "GET",
       headers: {
@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
   const guildMembers = await response.json()
 
-  if (!guildMembers.code && guildMembers.code !== undefined) {
+  if (!guildMembers.code || guildMembers.code !== undefined) {
     res.status(200).json({ guildMembers })
     return
   }

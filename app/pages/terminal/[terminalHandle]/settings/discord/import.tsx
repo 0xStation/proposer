@@ -2,8 +2,10 @@ import { useState, useMemo } from "react"
 import { BlitzPage, useMutation, useParam, useQuery, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
 import UpsertTags from "app/tag/mutations/upsertTags"
+import createAccounts from "app/account/mutations/createAccounts"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import useDiscordGuild from "app/core/hooks/useDiscordGuild"
+import useGuildMembers from "app/core/hooks/useGuildMembers"
 import Checkbox from "app/core/components/form/Checkbox"
 
 const DiscordImportPage: BlitzPage = () => {
@@ -17,12 +19,23 @@ const DiscordImportPage: BlitzPage = () => {
 
   const [upsertTags] = useMutation(UpsertTags, {
     onSuccess: () => {
-      router.push(Routes.DiscordSettingsPage({ terminalHandle: terminalHandle }))
+      console.log("nice tags")
+      // router.push(Routes.DiscordSettingsPage({ terminalHandle: terminalHandle }))
+    },
+    onError: (error: Error) => {
+      console.error(error)
+    },
+  })
+
+  const [createAccountsMutation] = useMutation(createAccounts, {
+    onSuccess: () => {
+      console.log("nice accounts")
     },
   })
 
   const [selectAllActive, setSelectAllActive] = useState(false)
-  const { status: guildStatus, guild: connectedGuild } = useDiscordGuild(terminal?.data?.guildId)
+  const { guild: connectedGuild } = useDiscordGuild(terminal?.data?.guildId)
+  const { guildMembers } = useGuildMembers(terminal?.data?.guildId)
 
   const initialFormValues = useMemo(() => {
     if (connectedGuild && terminal) {
@@ -31,6 +44,7 @@ const DiscordImportPage: BlitzPage = () => {
         acc[roleName] = {
           active: true,
           type: "inactive",
+          discordId: role.id,
         }
         return acc
       }, {})
@@ -76,11 +90,42 @@ const DiscordImportPage: BlitzPage = () => {
           })
 
           if (terminal) {
-            await upsertTags({
+            const createdTags = await upsertTags({
               tags,
               terminalId: terminal.id,
             })
-            refetch()
+
+            const activeCreatedTags = createdTags.filter((tag) => tag.active)
+            const activeCreatedTagDiscordIds = activeCreatedTags.map((tag) => tag.discordId || "")
+            const activeGuildMembers = guildMembers.filter((gm) => {
+              return gm.roles.some((r) => activeCreatedTagDiscordIds.includes(r))
+            })
+
+            // refetch()
+            await createAccountsMutation({
+              terminalId: terminal.id,
+              users: activeGuildMembers.map((gm) => {
+                const tagOverlap = activeCreatedTagDiscordIds.filter((tag) =>
+                  gm.roles.includes(tag)
+                )
+
+                const tagOverlapId = tagOverlap
+                  .map((discordId) => {
+                    const tag = activeCreatedTags.find((tag) => {
+                      return tag.discordId === discordId
+                    })
+
+                    return tag?.id
+                  })
+                  .filter((tag): tag is number => !!tag) // remove possible undefined from `find` in map above
+                console.log(tagOverlapId)
+                return {
+                  discordId: gm.user.id,
+                  name: gm.nick || gm.user.username,
+                  tags: tagOverlapId,
+                }
+              }),
+            })
           }
         }}
         mutators={{
