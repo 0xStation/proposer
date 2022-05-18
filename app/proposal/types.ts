@@ -77,16 +77,16 @@ export type ProposalMetadata = {
   startDate: number // unix timestamp
   endDate: number // unix timestamp
   deliverables: ProposalDeliverable[]
-  state: ProposalState
 }
 
 export type Proposal = {
   id: number
-  terminalId: number
+  terminalId?: number
   authorAddress: string
   createdAt: string
   updatedAt: string
   data: ProposalMetadata
+  state: ProposalState
   accounts: AccountProposal[]
   signatures: ProposalSignature[]
 }

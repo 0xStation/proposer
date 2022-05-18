@@ -182,6 +182,7 @@ model Proposal {
   data            Json?
   relatedAccounts AccountProposal[]
   signatures      ProposalSignature[]
+  state           ProposalState       @default(DRAFTING)
 }
 
 model AccountProposal {
@@ -210,4 +211,12 @@ enum AccountProposalType {
   SIGNER
   FUNDER
   RECIPIENT
+}
+
+enum ProposalState {
+  DRAFTING
+  APPROVING
+  EXECUTING
+  COMPLETE
+  CANCELED
 }
