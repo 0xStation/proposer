@@ -59,7 +59,7 @@ const Navigation = ({ children }: { children?: any }) => {
           />
         </div>
         <div className="text-xs text-light-concrete flex mt-1">
-          <p>{truncateString(session?.siwe?.address, 3)}</p>
+          <p>@{truncateString(session?.siwe?.address, 2)}</p>
         </div>
       </>
     ) : session?.siwe?.address ? (
@@ -70,7 +70,7 @@ const Navigation = ({ children }: { children?: any }) => {
           className="rounded-full w-[46px] h-[46px] bg-gradient-to-b from-electric-violet to-magic-mint mx-auto cursor-pointer"
         ></div>
         <div className="text-xs text-light-concrete flex mt-1">
-          <p>{truncateString(session?.siwe?.address, 3)}</p>
+          <p>@{truncateString(session?.siwe?.address, 2)}</p>
         </div>
       </>
     ) : null
