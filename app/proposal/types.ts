@@ -1,4 +1,4 @@
-import { Account } from "@prisma/client"
+import { Account, AccountProposalType, ProposalState } from "@prisma/client"
 
 export enum PaymentTerms {
   AFTER_COMPLETION = "After completion",
@@ -12,22 +12,6 @@ export enum FundingCurrency {
 
 export enum FundingType {
   DIRECT_TRANSFER = "Direct transfer", // send tokens/ETH directly between two addresses
-}
-
-export enum AccountProposalType {
-  AUTHOR = "Author",
-  COLLABORATOR = "Collaborator",
-  SIGNER = "Signer",
-  FUNDER = "Funder",
-  RECIPIENT = "Recipient",
-}
-
-export enum ProposalState {
-  DRAFTING = "Drafting",
-  APPROVING = "Approving",
-  EXECUTING = "Executing",
-  COMPLETE = "Complete",
-  CANCELED = "Canceled",
 }
 
 // mapping of chainId to gas token, add more over time

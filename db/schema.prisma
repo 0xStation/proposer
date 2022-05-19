@@ -206,11 +206,10 @@ model ProposalSignature {
 }
 
 enum AccountProposalType {
-  AUTHOR
-  COLLABORATOR
-  SIGNER
-  FUNDER
-  RECIPIENT
+  AUTHOR // I created the proposal
+  COLLABORATOR // I helped draft the proposal
+  SIGNER // I signed the proposal
+  PARITICPANT // I otherwise participated in this proposal
 }
 
 enum ProposalState {

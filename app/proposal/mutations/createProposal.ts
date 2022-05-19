@@ -1,4 +1,5 @@
-import db from "db"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import db, { AccountProposalType } from "db"
 import * as z from "zod"
 import { Proposal } from "../types"
 
@@ -19,6 +20,7 @@ const CreateProposalMetadata = z.object({
 })
 
 const CreateProposal = z.object({
+  accountId: z.number(),
   authorAddress: z.string(),
   terminalId: z.number().optional(),
   data: CreateProposalMetadata,
@@ -28,7 +30,7 @@ export default async function createTerminal(input: z.infer<typeof CreateProposa
   const params = CreateProposal.parse(input)
 
   const payload = {
-    authorAddress: params.authorAddress,
+    authorAddress: toChecksumAddress(params.authorAddress),
     terminalId: params.terminalId,
     data: {
       funding: {
@@ -50,10 +52,23 @@ export default async function createTerminal(input: z.infer<typeof CreateProposa
     },
   }
 
+  let proposal: Proposal
   try {
-    const proposal = (await db.proposal.create({ data: payload })) as unknown as Proposal
-    return proposal
+    proposal = (await db.proposal.create({ data: payload })) as unknown as Proposal
   } catch (err) {
     throw err
   }
+  try {
+    await db.accountProposal.create({
+      data: {
+        accountId: params.accountId,
+        proposalId: proposal.id,
+        type: AccountProposalType.AUTHOR,
+      },
+    })
+  } catch (err) {
+    throw err
+  }
+
+  return proposal
 }
