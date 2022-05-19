@@ -18,10 +18,6 @@ const DiscordImportPage: BlitzPage = () => {
   )
 
   const [upsertTags] = useMutation(UpsertTags, {
-    onSuccess: () => {
-      console.log("nice tags")
-      // router.push(Routes.DiscordSettingsPage({ terminalHandle: terminalHandle }))
-    },
     onError: (error: Error) => {
       console.error(error)
     },
@@ -29,7 +25,7 @@ const DiscordImportPage: BlitzPage = () => {
 
   const [createAccountsMutation] = useMutation(createAccounts, {
     onSuccess: () => {
-      console.log("nice accounts")
+      router.push(Routes.DiscordSettingsPage({ terminalHandle: terminalHandle }))
     },
   })
 
@@ -118,11 +114,12 @@ const DiscordImportPage: BlitzPage = () => {
                     return tag?.id
                   })
                   .filter((tag): tag is number => !!tag) // remove possible undefined from `find` in map above
-                console.log(tagOverlapId)
+
                 return {
                   discordId: gm.user.id,
                   name: gm.nick || gm.user.username,
                   tags: tagOverlapId,
+                  avatarHash: gm.user.avatar,
                 }
               }),
             })

@@ -6,6 +6,7 @@ interface GuildMember {
   user: {
     id: string
     username: string
+    avatar: string
   }
 }
 

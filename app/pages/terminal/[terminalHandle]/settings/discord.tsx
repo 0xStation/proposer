@@ -1,15 +1,17 @@
 import { useState, useMemo } from "react"
-import { BlitzPage, useParam, useQuery, useMutation, Routes, Link } from "blitz"
+import { BlitzPage, useParam, useQuery, useMutation, Routes, Link, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import UpsertTags from "app/tag/mutations/upsertTags"
 import Navigation from "app/terminal/components/settings/navigation"
 import Checkbox from "app/core/components/form/Checkbox"
 import useToast from "app/core/hooks/useToast"
-import useDiscordAuth from "app/core/hooks/useDiscordAuth"
+import useDiscordAuthWithCallback from "app/core/hooks/useDiscordAuthWithCallback"
 import useDiscordGuild from "app/core/hooks/useDiscordGuild"
+import NoSsr from "app/core/components/NoSsr"
 
 const DiscordSettingsPage: BlitzPage = () => {
+  const router = useRouter()
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal, { refetch }] = useQuery(
     getTerminalByHandle,
@@ -25,7 +27,9 @@ const DiscordSettingsPage: BlitzPage = () => {
   })
 
   const [selectAllActive, setSelectAllActive] = useState(false)
-  const { onOpen, authorization, error, isAuthenticating } = useDiscordAuth("guilds")
+  const { callbackWithDCAuth: onOpen, authorization } = useDiscordAuthWithCallback("guilds", () => {
+    router.push(Routes.DiscordConnectPage({ terminalHandle: terminalHandle }))
+  })
   const { status: guildStatus, guild: connectedGuild } = useDiscordGuild(terminal?.data?.guildId)
 
   // kind of confusing to explain, you probably need to see it to understand so I recorded a loom
@@ -57,36 +61,41 @@ const DiscordSettingsPage: BlitzPage = () => {
 
   return (
     <Navigation>
-      {!connectedGuild && !authorization && (
-        <div className="w-full h-full flex items-center flex-col justify-center">
-          <p className="text-marble-white text-2xl font-bold">Connect with Discord</p>
-          <p className="mt-2 text-marble-white text-base w-[400px] text-center">
-            Connect with Discord to synchronize roles and manage permissions & access on Station.
-          </p>
-          <button
-            onClick={() => {
-              onOpen()
-            }}
-            className="cursor-pointer mt-8 w-[200px] py-1 bg-magic-mint text-tunnel-black rounded text-base"
-          >
-            Connect
-          </button>
-        </div>
-      )}
-
-      {!connectedGuild && authorization && (
-        <div className="flex flex-col">
-          <div className="p-6 border-b border-concrete flex justify-between">
-            <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
-          </div>
-          <div className="p-6">
-            Finish the discord integration{" "}
-            <Link href={Routes.DiscordConnectPage({ terminalHandle })}>
-              <span className="underline text-magic-mint cursor-pointer">here.</span>
-            </Link>
-          </div>
-        </div>
-      )}
+      <NoSsr>
+        {!connectedGuild && (
+          <>
+            {authorization ? (
+              <div className="flex flex-col">
+                <div className="p-6 border-b border-concrete flex justify-between">
+                  <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
+                </div>
+                <div className="p-6">
+                  Finish the discord integration{" "}
+                  <Link href={Routes.DiscordConnectPage({ terminalHandle })}>
+                    <span className="underline text-magic-mint cursor-pointer">here.</span>
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-full flex items-center flex-col justify-center">
+                <p className="text-marble-white text-2xl font-bold">Connect with Discord</p>
+                <p className="mt-2 text-marble-white text-base w-[400px] text-center">
+                  Connect with Discord to synchronize roles and manage permissions & access on
+                  Station.
+                </p>
+                <button
+                  onClick={() => {
+                    onOpen()
+                  }}
+                  className="cursor-pointer mt-8 w-[200px] py-1 bg-magic-mint text-tunnel-black rounded text-base"
+                >
+                  Connect
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </NoSsr>
 
       {terminal?.data.guildId && (
         <Form
