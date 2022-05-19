@@ -1,0 +1,110 @@
+import useStore from "app/core/hooks/useStore"
+import { getWalletString } from "app/utils/getWalletString"
+import { useRouter, Image } from "blitz"
+import TerminalIcon from "public/terminal-icon.svg"
+import LockedIcon from "public/locked-icon.svg"
+import GithubIcon from "public/github-icon.svg"
+import TwitterIcon from "public/twitter-icon.svg"
+import PersonalSiteIcon from "public/personal-site-icon.svg"
+import InstagramIcon from "public/instagram-icon.svg"
+import TikTokIcon from "public/tiktok-icon.svg"
+
+export const Navigation = ({ account, children }) => {
+  const router = useRouter()
+  const activeUser = useStore((state) => state.activeUser)
+
+  return (
+    <>
+      <div className="h-screen w-[300px] bg-tunnel-black border-r border-concrete fixed">
+        <div className="h-[150px] relative mb-[116px]">
+          {account?.data.coverURL ? (
+            <img
+              alt="The user's cover photo."
+              src={account?.data.coverURL}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="bg-gradient-to-b object-cover from-electric-violet to-magic-mint h-full w-full"></div>
+          )}
+          {account?.data.pfpURL ? (
+            <img
+              src={account?.data.pfpURL}
+              alt="The user's profile picture."
+              className="bg-gradient-to-b from-electric-violet to-magic-mint w-[142px] h-[142px] border-4 border-tunnel-black rounded-full absolute bottom-[-100px] left-0 right-0 mx-auto"
+            />
+          ) : (
+            <div className="bg-gradient-to-b from-electric-violet to-magic-mint w-[142px] h-[142px] border-4 border-tunnel-black rounded-full absolute bottom-[-100px] left-0 right-0 mx-auto"></div>
+          )}
+        </div>
+        <div className="px-8 border-b border-concrete pb-6">
+          <div className="flex flex-col">
+            <h1 className="text-2xl text-marble-white">{account?.data.name}</h1>
+            <span className="text-base text-concrete">
+              {`@${getWalletString(account?.address)}`}
+            </span>
+          </div>
+          <div className="flex flex-row space-x-4 mt-3">
+            {account?.data?.contactURL && (
+              <a href={account?.data?.contactURL} className="hover:opacity-70 cursor-pointer">
+                <Image src={PersonalSiteIcon} alt="Personal Site Icon." width={15} height={15} />
+              </a>
+            )}
+            {account?.data?.twitterUrl && (
+              <a href={account?.data?.twitterUrl} className="hover:opacity-70 cursor-pointer">
+                <Image src={TwitterIcon} alt="Twitter Icon." width={15} height={15} />
+              </a>
+            )}
+            {account?.data?.githubUrl && (
+              <a href={account?.data?.githubUrl} className="hover:opacity-70 cursor-pointer">
+                <Image src={GithubIcon} alt="Github Icon." width={15} height={15} />
+              </a>
+            )}
+            {account?.data?.tiktokUrl && (
+              <a href={account?.data?.tiktokUrl} className="hover:opacity-70 cursor-pointer">
+                <Image src={TikTokIcon} alt="TikTok Icon." width={15} height={15} />
+              </a>
+            )}
+            {account?.data?.instagramUrl && (
+              <a href={account?.data?.instagramUrl} className="hover:opacity-70 cursor-pointer">
+                <Image src={InstagramIcon} alt="Instagram Icon." width={15} height={15} />
+              </a>
+            )}
+          </div>
+          <div className="h-24">
+            <p className="text-marble-white text-base mt-4 font-normal">{account?.data.bio}</p>
+          </div>
+          {activeUser?.address === account?.address && (
+            <button
+              onClick={() => router.push("/profile/edit")}
+              className="mt-4 p-[0.20rem] border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer"
+            >
+              Edit Profile
+            </button>
+          )}
+        </div>
+        <div>
+          <ul className="mt-6 ml-8 text-lg space-y-2">
+            <li className="cursor-pointer hover:text-marble-white font-bold">
+              <div className="inline mr-5 align-middle">
+                <Image src={TerminalIcon} alt="Member directory icon" />
+              </div>
+              <p className="inline">Terminals</p>
+            </li>
+            <li className="text-concrete cursor-pointer group">
+              <div className="inline mr-5 align-middle">
+                <Image src={LockedIcon} alt="Locked icon" />
+              </div>
+              <p className="inline">Proposals</p>
+              <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0 origin-left">
+                Coming soon
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div className="h-screen left-[370px] w-[calc(100%-370px)] fixed">{children}</div>
+    </>
+  )
+}
+
+export default Navigation

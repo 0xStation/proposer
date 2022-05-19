@@ -5,7 +5,7 @@ import { Field, Form } from "react-final-form"
 import { useDropzone } from "react-dropzone"
 import useToast from "app/core/hooks/useToast"
 import UploadIcon from "app/core/icons/UploadIcon"
-import { composeValidators, requiredField, mustBeUnder50Chars } from "app/utils/validators"
+import { composeValidators, requiredField, mustBeUnderNumCharacters } from "app/utils/validators"
 import Exit from "/public/exit-button.svg"
 
 const PfpInput = ({ pfpURL, onUpload }) => {
@@ -76,8 +76,6 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
     },
   })
 
-  console.log(session)
-
   return (
     <main className="text-marble-white min-h-screen max-w-screen-sm mx-auto">
       <div
@@ -118,7 +116,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                       <Field
                         name="name"
                         component="input"
-                        validate={composeValidators(mustBeUnder50Chars, requiredField)}
+                        validate={composeValidators(mustBeUnderNumCharacters(50), requiredField)}
                         className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-1"
                       />
                       <span className="text-torch-red text-xs">{errors?.name}</span>
@@ -127,7 +125,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                       <Field
                         name="handle"
                         component="input"
-                        validate={composeValidators(mustBeUnder50Chars, requiredField)}
+                        validate={composeValidators(mustBeUnderNumCharacters(50), requiredField)}
                         className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-1"
                       />
                       <span className="text-torch-red text-xs">{errors?.handle}</span>

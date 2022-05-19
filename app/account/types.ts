@@ -4,19 +4,20 @@ export type AccountMetadata = {
   name: string
   handle?: string
   ens?: string
+  bio?: string
   ticketId?: number // TODO: remove this when subgraph is ready
   pfpURL?: string
-  webURL?: string
-  githubURL?: string
-  twitterURL?: string
+  coverURL?: string
+  contactURL?: string
+  githubUrl?: string
+  twitterUrL?: string
+  tiktokUrl?: string
+  instagramUrl?: string
   ticketImage?: string
   pronouns?: string
-  discordId: string
-  contactURL?: string
-  coverURL?: string
-  timezone: string
-  verified: boolean
-  bio?: string
+  discordId?: string
+  timezone?: string
+  verified?: boolean
   initiatives?: number[]
 }
 
@@ -27,7 +28,7 @@ export type Account = {
   role?: string
   points?: number
   joinedAt?: Date
-  skills: any[]
+  skills?: any[]
   tickets?: any[]
   initiatives?: any[]
 }
