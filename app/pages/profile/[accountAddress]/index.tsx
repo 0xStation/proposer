@@ -57,7 +57,7 @@ const ProfileHome: BlitzPage = () => {
                   ))}
               </div>
               <SelectedTerminalCard account={account} terminal={selectedTerminal} />
-            </div>{" "}
+            </div>
           </>
         ) : (
           <div className="w-full h-full flex items-center flex-col justify-center">
