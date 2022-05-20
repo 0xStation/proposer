@@ -103,6 +103,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                         href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
                         target="_blank"
                         rel="noopener noreferrer"
+                        className="block"
                       >
                         <span className="block hover:opacity-70 cursor-pointer">
                           Open a Terminal
