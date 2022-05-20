@@ -404,7 +404,7 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
   return (
     <div className="mt-7">
       <p className="uppercase mb-3">{tagType}</p>
-      <div className="flex-row space-y-1 align-left mr-2">
+      <div className="flex-row space-y-2 align-left mr-2">
         {tags.map((accountTerminalTag) => {
           return (
             <span
