@@ -70,7 +70,7 @@ export const Navigation = ({ account, terminals, children }) => {
               </a>
             )}
           </div>
-          <div className="h-24">
+          <div>
             <p className="text-marble-white text-base mt-4 font-normal">{account?.data.bio}</p>
           </div>
           {activeUser?.address === account?.address && (
