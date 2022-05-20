@@ -352,8 +352,10 @@ const SelectedContributorCard = ({ member }) => {
               </div>
             </div>
             <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-              {account.address && (
+              {account.address ? (
                 <div className="w-max truncate leading-4">@{truncateString(account.address)}</div>
+              ) : (
+                <div className="w-max truncate leading-4">Imported from discord</div>
               )}
             </div>
           </div>

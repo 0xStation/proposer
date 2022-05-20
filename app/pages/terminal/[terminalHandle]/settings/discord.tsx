@@ -3,11 +3,13 @@ import { BlitzPage, useParam, useQuery, useMutation, Routes, Link, useRouter } f
 import { Field, Form } from "react-final-form"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import UpsertTags from "app/tag/mutations/upsertTags"
+import createAccounts from "app/account/mutations/createAccounts"
 import Navigation from "app/terminal/components/settings/navigation"
 import Checkbox from "app/core/components/form/Checkbox"
 import useToast from "app/core/hooks/useToast"
 import useDiscordAuthWithCallback from "app/core/hooks/useDiscordAuthWithCallback"
 import useDiscordGuild from "app/core/hooks/useDiscordGuild"
+import useGuildMembers from "app/core/hooks/useGuildMembers"
 import NoSsr from "app/core/components/NoSsr"
 
 const DiscordSettingsPage: BlitzPage = () => {
@@ -26,11 +28,18 @@ const DiscordSettingsPage: BlitzPage = () => {
     },
   })
 
+  const [createAccountsMutation] = useMutation(createAccounts, {
+    onSuccess: () => {
+      addToast("Your roles have been updated and members imported.", "success")
+    },
+  })
+
   const [selectAllActive, setSelectAllActive] = useState(false)
   const { callbackWithDCAuth: onOpen, authorization } = useDiscordAuthWithCallback("guilds", () => {
     router.push(Routes.DiscordConnectPage({ terminalHandle: terminalHandle }))
   })
   const { status: guildStatus, guild: connectedGuild } = useDiscordGuild(terminal?.data?.guildId)
+  const { guildMembers } = useGuildMembers(terminal?.data?.guildId)
 
   // kind of confusing to explain, you probably need to see it to understand so I recorded a loom
   // https://www.loom.com/share/f5c67a2872854bb386330ddbb744a5d8
@@ -41,6 +50,7 @@ const DiscordSettingsPage: BlitzPage = () => {
         acc[roleName] = {
           active: true,
           type: "inactive",
+          discordId: role.id,
         }
         return acc
       }, {})
@@ -49,6 +59,7 @@ const DiscordSettingsPage: BlitzPage = () => {
         acc[tag.value] = {
           type: tag.type,
           active: tag.active,
+          discordId: tag.discordId,
         }
         return acc
       }, {})
@@ -112,10 +123,42 @@ const DiscordSettingsPage: BlitzPage = () => {
             })
 
             if (terminal) {
-              await upsertTags({
+              const createdTags = await upsertTags({
                 tags,
                 terminalId: terminal.id,
               })
+              const activeCreatedTags = createdTags.filter((tag) => tag.active)
+              const activeCreatedTagDiscordIds = activeCreatedTags.map((tag) => tag.discordId || "")
+              const activeGuildMembers = guildMembers.filter((gm) => {
+                return gm.roles.some((r) => activeCreatedTagDiscordIds.includes(r))
+              })
+
+              await createAccountsMutation({
+                terminalId: terminal.id,
+                users: activeGuildMembers.map((gm) => {
+                  const tagOverlap = activeCreatedTagDiscordIds.filter((tag) =>
+                    gm.roles.includes(tag)
+                  )
+
+                  const tagOverlapId = tagOverlap
+                    .map((discordId) => {
+                      const tag = activeCreatedTags.find((tag) => {
+                        return tag.discordId === discordId
+                      })
+
+                      return tag?.id
+                    })
+                    .filter((tag): tag is number => !!tag) // remove possible undefined from `find` in map above
+
+                  return {
+                    discordId: gm.user.id,
+                    name: gm.nick || gm.user.username,
+                    tags: tagOverlapId,
+                    ...(gm.user.avatar && { avatarHash: gm.user.avatar }),
+                  }
+                }),
+              })
+
               refetch()
             }
           }}

@@ -4,8 +4,8 @@ import * as z from "zod"
 const accountObject = z.object({
   name: z.string(),
   discordId: z.string().optional(),
+  avatarHash: z.string().optional(),
   tags: z.number().array(),
-  avatarHash: z.string(),
 })
 
 const CreateAccounts = z.object({
@@ -24,13 +24,17 @@ export default async function createAccounts(input: z.infer<typeof CreateAccount
         discordId: user.discordId,
         data: {
           name: user.name,
-          pfpUrl: `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatarHash}.png`,
+          pfpUrl: user.avatarHash
+            ? `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatarHash}.png`
+            : undefined,
         },
       },
     })
 
-    const ticket = await db.accountTerminal.create({
-      data: {
+    const ticket = await db.accountTerminal.upsert({
+      where: { accountId_terminalId: { accountId: account.id, terminalId: params.terminalId } },
+      update: {},
+      create: {
         accountId: account.id,
         terminalId: params.terminalId,
         active: false,
