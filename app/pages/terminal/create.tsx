@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { BlitzPage, useMutation, useRouter, Image, Router, useSession } from "blitz"
+import { BlitzPage, useMutation, useRouter, Routes, Image, Router, useSession } from "blitz"
 import createTerminal from "app/terminal/mutations/createTerminal"
 import { Field, Form } from "react-final-form"
 import { useDropzone } from "react-dropzone"
@@ -65,10 +65,8 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
   const [addToast, Toast] = useToast()
   const [pfpURL, setPfpURL] = useState<string>("")
   const [createTerminalMutation] = useMutation(createTerminal, {
-    onSuccess: (_data) => {
-      // go to the terminal page? Do we even have one yet?
-      let route = `/`
-      router.push(route, undefined, { shallow: true })
+    onSuccess: (data) => {
+      router.push(Routes.MemberDirectoryPage({ terminalHandle: data.handle, tutorial: "true" }))
     },
     onError: (error: Error) => {
       console.error(error)

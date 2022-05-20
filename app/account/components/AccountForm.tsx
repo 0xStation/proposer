@@ -127,7 +127,7 @@ const AccountForm = ({
   isEdit,
 }: {
   onSuccess: () => void
-  address: string
+  address?: string
   account?: Account
   isEdit: boolean
 }) => {
