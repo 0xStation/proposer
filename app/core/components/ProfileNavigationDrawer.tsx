@@ -99,11 +99,15 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                     )}
                     <div className="space-y-2 mt-4">
                       {profileLinkOption}
-                      <Link href={Routes.CreateTerminalDetailsPage()}>
+                      <a
+                        href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <span className="block hover:opacity-70 cursor-pointer">
                           Open a Terminal
                         </span>
-                      </Link>
+                      </a>
                       <button className="block hover:opacity-70" onClick={handleDisconnect}>
                         Disconnect
                       </button>
