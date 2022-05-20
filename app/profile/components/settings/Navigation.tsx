@@ -17,8 +17,7 @@ const Navigation = ({ children, activeUser }) => {
         </div>
       </div>
       <main className="text-marble-white min-h-screen flex flex-row">
-        <nav className="w-[70px]"></nav>
-        <section className="w-[300px] border-r border-concrete p-6">
+        <section className="w-[300px] border-r border-concrete p-6 ml-[70px]">
           <label className="font-bold text-sm text-marble-white uppercase tracking-wider">
             Edit Profile
           </label>

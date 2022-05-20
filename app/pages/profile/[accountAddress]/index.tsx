@@ -37,25 +37,54 @@ const ProfileHome: BlitzPage = () => {
 
   return (
     <Layout title={`${account ? `${account?.data?.name} | ` : ""}Profile`}>
-      <ProfileNavigation account={account}>
-        <div className="h-[108px] border-b border-concrete">
-          <h1 className="text-2xl font-bold ml-6 pt-6">Terminals</h1>
-          <p className="flex ml-6 pt-2">Communities you&apos;re a part of </p>
-        </div>
-        <div className="grid grid-cols-7 h-full w-full">
-          <div className="overflow-y-auto h-full col-span-4">
-            {terminals &&
-              terminals.map((terminal, idx) => (
-                <TerminalComponent
-                  key={`${terminal.handle}${idx}`}
-                  account={account}
-                  terminal={terminal}
-                  setSelectedTerminal={setSelectedTerminal}
-                />
-              ))}
+      <ProfileNavigation account={account} terminals={terminals}>
+        {terminals && terminals.length ? (
+          <>
+            <div className="h-[108px] border-b border-concrete">
+              <h1 className="text-2xl font-bold ml-6 pt-6">Terminals</h1>
+              <p className="flex ml-6 pt-2">Communities you&apos;re a part of </p>
+            </div>
+            <div className="grid grid-cols-7 h-full w-full">
+              <div className="overflow-y-auto h-full col-span-4">
+                {terminals &&
+                  terminals.map((terminal, idx) => (
+                    <TerminalComponent
+                      key={`${terminal.handle}${idx}`}
+                      account={account}
+                      terminal={terminal}
+                      setSelectedTerminal={setSelectedTerminal}
+                    />
+                  ))}
+              </div>
+              <SelectedTerminalCard account={account} terminal={selectedTerminal} />
+            </div>
+          </>
+        ) : (
+          <div className="w-full h-full flex items-center flex-col justify-center">
+            <h1 className="text-2xl font-bold text-marble-white text-center">Coming Soon</h1>
+            <p className="my-2 w-[309px]">
+              Station is still in private beta. You can{" "}
+              <a
+                className="text-magic-mint"
+                href="https://twitter.com/messages/compose?recipient_id=1412594810985271296"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                DM us
+              </a>{" "}
+              to learn more or{" "}
+              <a
+                className="text-magic-mint"
+                href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                sign up on our waitlist
+              </a>
+              .
+            </p>
           </div>
-          <SelectedTerminalCard account={account} terminal={selectedTerminal} />
-        </div>
+        )}
       </ProfileNavigation>
     </Layout>
   )
