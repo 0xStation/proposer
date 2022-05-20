@@ -61,7 +61,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
-      <Dialog as="div" className="fixed inset-0 overflow-hidden" onClose={setIsOpen}>
+      <Dialog as="div" className="fixed inset-0 overflow-hidden z-50" onClose={setIsOpen}>
         <div className="absolute inset-0 overflow-hidden">
           <Transition.Child
             as={Fragment}

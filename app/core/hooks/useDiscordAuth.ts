@@ -92,7 +92,7 @@ const useDiscordAuth = (scope: string) => {
             })
         }
 
-        // windowInstance?.close()
+        windowInstance?.close()
       }
     }
 
