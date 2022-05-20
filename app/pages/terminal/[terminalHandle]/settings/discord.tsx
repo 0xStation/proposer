@@ -38,8 +38,28 @@ const DiscordSettingsPage: BlitzPage = () => {
   const { callbackWithDCAuth: onOpen, authorization } = useDiscordAuthWithCallback("guilds", () => {
     router.push(Routes.DiscordConnectPage({ terminalHandle: terminalHandle }))
   })
-  const { status: guildStatus, guild: connectedGuild } = useDiscordGuild(terminal?.data?.guildId)
+  const { guild: connectedGuild } = useDiscordGuild(terminal?.data?.guildId)
   const { guildMembers } = useGuildMembers(terminal?.data?.guildId)
+
+  const refreshRoles = async () => {
+    if (terminal) {
+      const response = await fetch("/api/discord/sync-roles", {
+        method: "POST",
+        body: JSON.stringify({
+          terminalId: terminal.id,
+        }),
+      })
+
+      console.log(await response.json())
+
+      if (response.status !== 200) {
+        addToast("Something went wrong!", "error")
+        return
+      }
+
+      addToast("Your roles are refreshed", "success")
+    }
+  }
 
   // kind of confusing to explain, you probably need to see it to understand so I recorded a loom
   // https://www.loom.com/share/f5c67a2872854bb386330ddbb744a5d8
@@ -176,14 +196,23 @@ const DiscordSettingsPage: BlitzPage = () => {
                 <div className="flex flex-col">
                   <div className="p-6 border-b border-concrete flex justify-between">
                     <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
-                    <button
-                      className={`rounded text-tunnel-black px-8 ${
-                        formState.dirty ? "bg-magic-mint" : "bg-concrete"
-                      }`}
-                      type="submit"
-                    >
-                      Save
-                    </button>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => refreshRoles()}
+                        className={`rounded text-tunnel-black px-8 bg-magic-mint mr-4 h-full`}
+                      >
+                        Refresh Roles
+                      </button>
+                      <button
+                        className={`rounded text-tunnel-black px-8 h-full ${
+                          formState.dirty ? "bg-magic-mint" : "bg-concrete"
+                        }`}
+                        type="submit"
+                      >
+                        Save
+                      </button>
+                    </div>
                   </div>
                   <div className="p-6">
                     <div className="grid grid-cols-3 gap-4">
