@@ -7,8 +7,8 @@ import { toTitleCase } from "app/core/utils/titleCase"
 // blitz db seed -f db/scripts/v2-members-launch.ts
 const seed = async () => {
   // fresh wipe on all tags
-  await db.tag.deleteMany()
   await db.accountTerminalTag.deleteMany()
+  await db.tag.deleteMany()
 
   // create Active/Inactive STATUS tags per terminal
   const terminals = await db.terminal.findMany()
@@ -119,28 +119,30 @@ const seed = async () => {
   // generate accountTerminal<->Tag associations from accountTerminals
   // responsible for both ROLE tags and STATUS tags
   const accountTerminals = await db.accountTerminal.findMany()
-  const accountTerminalTags = accountTerminals.reduce(
-    (acc, at) => [
-      ...acc,
-      {
-        tagId: roleToTag[at.terminalId][at.roleLocalId],
-        ticketAccountId: at.accountId,
-        ticketTerminalId: at.terminalId,
-      },
-      at.active
-        ? {
-            tagId: activeToTag[at.terminalId],
-            ticketAccountId: at.accountId,
-            ticketTerminalId: at.terminalId,
-          }
-        : {
-            tagId: inactiveToTag[at.terminalId],
-            ticketAccountId: at.accountId,
-            ticketTerminalId: at.terminalId,
-          },
-    ],
-    []
-  )
+  const accountTerminalTags = accountTerminals
+    .filter((at) => !!at.roleLocalId)
+    .reduce(
+      (acc, at) => [
+        ...acc,
+        {
+          tagId: roleToTag[at.terminalId][at.roleLocalId],
+          ticketAccountId: at.accountId,
+          ticketTerminalId: at.terminalId,
+        },
+        at.active
+          ? {
+              tagId: activeToTag[at.terminalId],
+              ticketAccountId: at.accountId,
+              ticketTerminalId: at.terminalId,
+            }
+          : {
+              tagId: inactiveToTag[at.terminalId],
+              ticketAccountId: at.accountId,
+              ticketTerminalId: at.terminalId,
+            },
+      ],
+      []
+    )
   // generate all accountTerminal<->Tag associations in one query
   await db.accountTerminalTag.createMany({
     data: [...accountInitiativeTags, ...accountTerminalTags],
