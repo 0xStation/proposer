@@ -1,18 +1,19 @@
 import { useState, useMemo } from "react"
-import { BlitzPage, useParam, useQuery, useMutation } from "blitz"
+import { BlitzPage, useParam, useQuery, useMutation, Routes, Link, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import UpsertTags from "app/tag/mutations/upsertTags"
-import updateTerminal from "app/terminal/mutations/updateTerminal"
+import createAccounts from "app/account/mutations/createAccounts"
 import Navigation from "app/terminal/components/settings/navigation"
 import Checkbox from "app/core/components/form/Checkbox"
 import useToast from "app/core/hooks/useToast"
-import useDiscordAuth from "app/core/hooks/useDiscordAuth"
-import useDiscordBotAuth from "app/core/hooks/useDiscordBotAuth"
+import useDiscordAuthWithCallback from "app/core/hooks/useDiscordAuthWithCallback"
 import useDiscordGuild from "app/core/hooks/useDiscordGuild"
-import useActiveUserDiscordGuilds from "app/core/hooks/useActiveUserDiscordGuilds"
+import useGuildMembers from "app/core/hooks/useGuildMembers"
+import NoSsr from "app/core/components/NoSsr"
 
 const DiscordSettingsPage: BlitzPage = () => {
+  const router = useRouter()
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal, { refetch }] = useQuery(
     getTerminalByHandle,
@@ -27,24 +28,38 @@ const DiscordSettingsPage: BlitzPage = () => {
     },
   })
 
-  const [updateTerminalMutation] = useMutation(updateTerminal, {
-    onSuccess: (_data) => {
-      addToast("Guild added to your terminal", "success")
-      console.log("success")
-    },
-    onError: (error: Error) => {
-      addToast(error.toString(), "error")
+  const [createAccountsMutation] = useMutation(createAccounts, {
+    onSuccess: () => {
+      addToast("Your roles have been updated and members imported.", "success")
     },
   })
 
   const [selectAllActive, setSelectAllActive] = useState(false)
-  const [selectedGuildId, setSelectedGuildId] = useState<string>()
+  const { callbackWithDCAuth: onOpen, authorization } = useDiscordAuthWithCallback("guilds", () => {
+    router.push(Routes.DiscordConnectPage({ terminalHandle: terminalHandle }))
+  })
+  const { guild: connectedGuild } = useDiscordGuild(terminal?.data?.guildId)
+  const { guildMembers } = useGuildMembers(terminal?.data?.guildId)
 
-  const { onOpen, authorization, error, isAuthenticating } = useDiscordAuth("guilds")
-  const { onOpen: onBotOpen, connected } = useDiscordBotAuth(selectedGuildId || "")
-  const { status: selectedGuildStatus, guild: selectedGuild } = useDiscordGuild(selectedGuildId)
-  const { status: guildStatus, guild: connectedGuild } = useDiscordGuild(terminal?.data?.guildId)
-  const { status: guildsStatus, guilds } = useActiveUserDiscordGuilds()
+  const refreshRoles = async () => {
+    if (terminal) {
+      const response = await fetch("/api/discord/sync-roles", {
+        method: "POST",
+        body: JSON.stringify({
+          terminalId: terminal.id,
+        }),
+      })
+
+      console.log(await response.json())
+
+      if (response.status !== 200) {
+        addToast("Something went wrong!", "error")
+        return
+      }
+
+      addToast("Your roles are refreshed", "success")
+    }
+  }
 
   // kind of confusing to explain, you probably need to see it to understand so I recorded a loom
   // https://www.loom.com/share/f5c67a2872854bb386330ddbb744a5d8
@@ -55,6 +70,7 @@ const DiscordSettingsPage: BlitzPage = () => {
         acc[roleName] = {
           active: true,
           type: "inactive",
+          discordId: role.id,
         }
         return acc
       }, {})
@@ -63,6 +79,7 @@ const DiscordSettingsPage: BlitzPage = () => {
         acc[tag.value] = {
           type: tag.type,
           active: tag.active,
+          discordId: tag.discordId,
         }
         return acc
       }, {})
@@ -75,104 +92,41 @@ const DiscordSettingsPage: BlitzPage = () => {
 
   return (
     <Navigation>
-      {!connectedGuild && !authorization && (
-        <div className="w-full h-full flex items-center flex-col justify-center">
-          <p className="text-marble-white text-2xl font-bold">Connect with Discord</p>
-          <p className="mt-2 text-marble-white text-base w-[400px] text-center">
-            Connect with Discord to synchronize roles and manage permissions & access on Station.
-          </p>
-          <button
-            onClick={() => {
-              onOpen()
-            }}
-            className="cursor-pointer mt-8 w-[200px] py-1 bg-magic-mint text-tunnel-black rounded text-base"
-          >
-            Connect
-          </button>
-        </div>
-      )}
-
-      {terminal && !terminal?.data.guildId && (
-        <Form
-          initialValues={{}}
-          onSubmit={async (values) => {
-            await updateTerminalMutation({ id: terminal.id, ...values })
-            refetch()
-          }}
-          render={({ form, handleSubmit }) => {
-            const formState = form.getState()
-            setSelectedGuildId(formState.values.guildId)
-            return (
-              <form onSubmit={handleSubmit}>
-                <div className="flex flex-col">
-                  <div className="p-6 border-b border-concrete flex justify-between">
-                    <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
-                    <button
-                      className={`rounded text-tunnel-black px-8 ${
-                        formState.dirty ? "bg-magic-mint" : "bg-concrete"
-                      }`}
-                      type="submit"
-                    >
-                      Save
-                    </button>
-                  </div>
-                  <div className="p-6">
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="flex flex-col pb-2 col-span-2">
-                        <h3 className="font-bold">Select a server*</h3>
-                        <span className="text-concrete text-xs mb-2 block">
-                          In order to integrate fully with Discord, your terminal needs to connect
-                          the Station bot to your Discord server.
-                        </span>
-                        <div className="custom-select-wrapper">
-                          <Field name="guildId">
-                            {({ input }) => (
-                              <select
-                                {...input}
-                                className="w-full p-2 bg-wet-concrete border rounded"
-                              >
-                                <option>Select one</option>
-                                {guilds.map((guild, idx) => {
-                                  return (
-                                    <option value={guild.value} key={idx}>
-                                      {guild.label}
-                                    </option>
-                                  )
-                                })}
-                              </select>
-                            )}
-                          </Field>
-                        </div>
-                        {/* likely means the auth didn't go through, the guild is not connected yet */}
-                        {selectedGuildStatus !== "ready" ? (
-                          <div>
-                            <button
-                              type="button"
-                              className="border border-marble-white w-full rounded mt-4 py-2"
-                              onClick={() => onBotOpen()}
-                            >
-                              Connect Station bot
-                            </button>
-                          </div>
-                        ) : (
-                          <div>
-                            <button
-                              type="button"
-                              className="border border-marble-white w-full rounded mt-4 py-2 cursor-default"
-                            >
-                              Connected
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+      <NoSsr>
+        {!connectedGuild && (
+          <>
+            {authorization ? (
+              <div className="flex flex-col">
+                <div className="p-6 border-b border-concrete flex justify-between">
+                  <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
                 </div>
-              </form>
-            )
-          }}
-        />
-      )}
+                <div className="p-6">
+                  Finish the discord integration{" "}
+                  <Link href={Routes.DiscordConnectPage({ terminalHandle })}>
+                    <span className="underline text-magic-mint cursor-pointer">here.</span>
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-full flex items-center flex-col justify-center">
+                <p className="text-marble-white text-2xl font-bold">Connect with Discord</p>
+                <p className="mt-2 text-marble-white text-base w-[400px] text-center">
+                  Connect with Discord to synchronize roles and manage permissions & access on
+                  Station.
+                </p>
+                <button
+                  onClick={() => {
+                    onOpen()
+                  }}
+                  className="cursor-pointer mt-8 w-[200px] py-1 bg-magic-mint text-tunnel-black rounded text-base"
+                >
+                  Connect
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </NoSsr>
 
       {terminal?.data.guildId && (
         <Form
@@ -189,10 +143,42 @@ const DiscordSettingsPage: BlitzPage = () => {
             })
 
             if (terminal) {
-              await upsertTags({
+              const createdTags = await upsertTags({
                 tags,
                 terminalId: terminal.id,
               })
+              const activeCreatedTags = createdTags.filter((tag) => tag.active)
+              const activeCreatedTagDiscordIds = activeCreatedTags.map((tag) => tag.discordId || "")
+              const activeGuildMembers = guildMembers.filter((gm) => {
+                return gm.roles.some((r) => activeCreatedTagDiscordIds.includes(r))
+              })
+
+              await createAccountsMutation({
+                terminalId: terminal.id,
+                users: activeGuildMembers.map((gm) => {
+                  const tagOverlap = activeCreatedTagDiscordIds.filter((tag) =>
+                    gm.roles.includes(tag)
+                  )
+
+                  const tagOverlapId = tagOverlap
+                    .map((discordId) => {
+                      const tag = activeCreatedTags.find((tag) => {
+                        return tag.discordId === discordId
+                      })
+
+                      return tag?.id
+                    })
+                    .filter((tag): tag is number => !!tag) // remove possible undefined from `find` in map above
+
+                  return {
+                    discordId: gm.user.id,
+                    name: gm.nick || gm.user.username,
+                    tags: tagOverlapId,
+                    ...(gm.user.avatar && { avatarHash: gm.user.avatar }),
+                  }
+                }),
+              })
+
               refetch()
             }
           }}
@@ -210,14 +196,23 @@ const DiscordSettingsPage: BlitzPage = () => {
                 <div className="flex flex-col">
                   <div className="p-6 border-b border-concrete flex justify-between">
                     <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
-                    <button
-                      className={`rounded text-tunnel-black px-8 ${
-                        formState.dirty ? "bg-magic-mint" : "bg-concrete"
-                      }`}
-                      type="submit"
-                    >
-                      Save
-                    </button>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => refreshRoles()}
+                        className={`rounded text-tunnel-black px-8 bg-magic-mint mr-4 h-full`}
+                      >
+                        Refresh Roles
+                      </button>
+                      <button
+                        className={`rounded text-tunnel-black px-8 h-full ${
+                          formState.dirty ? "bg-magic-mint" : "bg-concrete"
+                        }`}
+                        type="submit"
+                      >
+                        Save
+                      </button>
+                    </div>
                   </div>
                   <div className="p-6">
                     <div className="grid grid-cols-3 gap-4">

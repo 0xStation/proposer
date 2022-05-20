@@ -37,7 +37,7 @@ const MemberDirectoryPage: BlitzPage = () => {
   // where the strings are applied filters
   const [filters, setFilters] = useState<Filters>({})
 
-  /* 
+  /*
   `groupedTags` returns an object where the key
   is the tag type and the value is an array of tags
   that fall under the category:
@@ -300,7 +300,9 @@ const ContributorComponent = ({ member, setSelectedMember }) => {
             </p>
           </div>
           <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-            <p className="w-max truncate leading-4">@{truncateString(account.address)}</p>
+            {account.address && (
+              <p className="w-max truncate leading-4">@{truncateString(account.address)}</p>
+            )}
           </div>
         </div>
       </div>
@@ -350,7 +352,11 @@ const SelectedContributorCard = ({ member }) => {
               </div>
             </div>
             <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-              <div className="w-max truncate leading-4">@{truncateString(account.address)}</div>
+              {account.address ? (
+                <div className="w-max truncate leading-4">@{truncateString(account.address)}</div>
+              ) : (
+                <div className="w-max truncate leading-4">Imported from discord</div>
+              )}
             </div>
           </div>
         </div>

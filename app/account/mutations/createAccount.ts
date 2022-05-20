@@ -3,8 +3,8 @@ import * as z from "zod"
 import { Account } from "../types"
 
 const CreateAccount = z.object({
-  address: z.string(),
   name: z.string(),
+  address: z.string().optional(),
   bio: z.string().optional(),
   pfpURL: z.string().optional(),
   coverURL: z.string().optional(),

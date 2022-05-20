@@ -43,7 +43,7 @@ const seed = async () => {
     })) as Role
 
     let ticketImageUrl = await generateTicketVisual({
-      accountAddress: account.address,
+      accountAddress: account.address || "0x",
       accountName: account.data.name,
       terminalName: stationTerminal.data.name,
       roleName: role.data.value,

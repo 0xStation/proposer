@@ -9,13 +9,14 @@ const DiscordAuth = () => {
       const state = router.query.state as string
       const { url } = JSON.parse(state)
       const target = `${window.location.origin}${url}`
+      const redirect = `${window.location.origin}/auth/discord`
 
       fetch("/api/discord/exchange-code", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ code: router.query.code }),
+        body: JSON.stringify({ code: router.query.code, redirect }),
       })
         .then((res) => res.json())
         .then((data) => {
