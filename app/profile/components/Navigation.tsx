@@ -9,7 +9,7 @@ import PersonalSiteIcon from "public/personal-site-icon.svg"
 import InstagramIcon from "public/instagram-icon.svg"
 import TikTokIcon from "public/tiktok-icon.svg"
 
-export const Navigation = ({ account, children }) => {
+export const Navigation = ({ account, terminals, children }) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
 
@@ -84,11 +84,27 @@ export const Navigation = ({ account, children }) => {
         </div>
         <div>
           <ul className="mt-6 ml-8 text-lg space-y-2">
-            <li className="cursor-pointer hover:text-marble-white font-bold">
-              <div className="inline mr-5 align-middle">
-                <Image src={TerminalIcon} alt="Member directory icon" />
+            <li
+              className={`cursor-pointer group ${
+                terminals && terminals?.length
+                  ? "hover:text-marble-white font-bold"
+                  : "text-concrete"
+              }`}
+            >
+              <div className="inline mr-5 align-middle ">
+                {terminals && terminals?.length ? (
+                  <Image src={TerminalIcon} alt="Member directory icon" />
+                ) : (
+                  <Image src={LockedIcon} alt="Locked icon" />
+                )}
               </div>
               <p className="inline">Terminals</p>
+              {!terminals ||
+                (!terminals.length && (
+                  <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0 origin-left">
+                    Coming soon
+                  </span>
+                ))}
             </li>
             <li className="text-concrete cursor-pointer group">
               <div className="inline mr-5 align-middle">
