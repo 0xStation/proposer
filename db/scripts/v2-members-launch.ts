@@ -4,8 +4,9 @@ import { InitiativeMetadata } from "app/deprecated/v1/initiative/types"
 import { toTitleCase } from "app/core/utils/titleCase"
 
 // To run:
-// blitz db seed -f db/scripts/gen-station-tickets.ts
+// blitz db seed -f db/scripts/v2-members-launch.ts
 const seed = async () => {
+  // create Active/Inactive STATUS tags per terminal
   const terminals = await db.terminal.findMany()
   const statusTags = terminals.reduce(
     (acc, t) => [
@@ -30,6 +31,7 @@ const seed = async () => {
     []
   )
 
+  // create INITIATIVE tags per initiative
   const initiatives = await db.initiative.findMany()
   const initiativeTags = initiatives.map((i) => {
     return {
@@ -42,6 +44,7 @@ const seed = async () => {
     }
   })
 
+  // create ROLE tags per role
   const roles = await db.role.findMany({})
   const roleTags = roles.map((r) => {
     return {
@@ -54,12 +57,14 @@ const seed = async () => {
     }
   })
 
+  // generate all new tags in one query
   await db.tag.createMany({
     data: [...statusTags, ...initiativeTags, ...roleTags],
   })
 
   const newTags = (await db.tag.findMany()).filter((t) => !!t.data)
 
+  // prepare dictionaries to access tag objects by properties
   let activeToTag = {}
   let inactiveToTag = {}
   let initiativeToTag = {}
@@ -93,7 +98,9 @@ const seed = async () => {
     }
   })
 
+  // generate accountTerminal<->Tag associations from initiative contributorships
   const accountInitiatives = await db.accountInitiative.findMany({
+    where: { status: "CONTRIBUTING" },
     include: {
       initiative: true,
     },
@@ -105,6 +112,8 @@ const seed = async () => {
       ticketTerminalId: ai.initiative.terminalId,
     }
   })
+  // generate accountTerminal<->Tag associations from accountTerminals
+  // responsible for both ROLE tags and STATUS tags
   const accountTerminals = await db.accountTerminal.findMany()
   const accountTerminalTags = accountTerminals.reduce(
     (acc, at) => [
@@ -128,7 +137,7 @@ const seed = async () => {
     ],
     []
   )
-
+  // generate all accountTerminal<->Tag associations in one query
   await db.accountTerminalTag.createMany({
     data: [...accountInitiativeTags, ...accountTerminalTags],
   })
