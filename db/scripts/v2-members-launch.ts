@@ -6,6 +6,10 @@ import { toTitleCase } from "app/core/utils/titleCase"
 // To run:
 // blitz db seed -f db/scripts/v2-members-launch.ts
 const seed = async () => {
+  // fresh wipe on all tags
+  await db.tag.deleteMany()
+  await db.accountTerminalTag.deleteMany()
+
   // create Active/Inactive STATUS tags per terminal
   const terminals = await db.terminal.findMany()
   const statusTags = terminals.reduce(
@@ -84,16 +88,16 @@ const seed = async () => {
     }
     const initiativeId = data["initiativeId"]
     if (initiativeId) {
-      initiativeToTag[initiativeId] = t
+      initiativeToTag[initiativeId] = t.id
     }
     const roleLocalId = data["roleLocalId"]
     if (roleLocalId) {
       if (!roleToTag[t.terminalId]) {
         roleToTag[t.terminalId] = {
-          roleLocalId: t,
+          [roleLocalId]: t.id,
         }
       } else {
-        roleToTag[t.terminalId][roleLocalId] = t
+        roleToTag[t.terminalId][roleLocalId] = t.id
       }
     }
   })
