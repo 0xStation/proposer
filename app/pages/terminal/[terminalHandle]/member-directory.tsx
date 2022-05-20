@@ -404,12 +404,12 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
   return (
     <div className="mt-7">
       <p className="uppercase mb-3">{tagType}</p>
-      <div className="flex-row space-x-2">
+      <div className="flex-row space-y-2 align-left mr-2">
         {tags.map((accountTerminalTag) => {
           return (
             <span
               key={accountTerminalTag.tag.value}
-              className="rounded-full py-1 px-3 bg-wet-concrete uppercase font-bold"
+              className="rounded-full py-1 px-3 mr-2 bg-wet-concrete uppercase font-bold inline-block"
             >
               {accountTerminalTag.tag.value}
             </span>
