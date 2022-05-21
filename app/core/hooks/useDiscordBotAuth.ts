@@ -21,8 +21,6 @@ const useDiscordBotAuth = (guildId: string) => {
   /** On a window creation, we set a new listener */
   useEffect(() => {
     if (!windowInstance) return
-
-    console.log(windowInstance)
   }, [windowInstance, setAuth])
 
   return {
