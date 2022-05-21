@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo } from "react"
-import { BlitzPage, useParam, useQuery, useMutation, useRouter, Routes } from "blitz"
+import { BlitzPage, useParam, useQuery, useMutation, useRouter } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Navigation from "app/terminal/components/settings/navigation"
-import useToast from "app/core/hooks/useToast"
 import updateTerminal from "app/terminal/mutations/updateTerminal"
 import { useDropzone } from "react-dropzone"
 import UploadIcon from "app/core/icons/UploadIcon"
@@ -11,6 +10,7 @@ import useStore from "app/core/hooks/useStore"
 import { canEdit } from "app/core/utils/permissions"
 import { EditPermissionTypes } from "app/core/utils/constants"
 import { mustBeUnderNumCharacters } from "app/utils/validators"
+import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 
 // maybe we can break this out into it's own component?
 const PfpInput = ({ pfpURL, onUpload }) => {
@@ -60,7 +60,7 @@ const PfpInput = ({ pfpURL, onUpload }) => {
 
 const TerminalSettingsPage: BlitzPage = () => {
   const router = useRouter()
-  const [addToast, Toast] = useToast()
+  const setToastState = useStore((state) => state.setToastState)
   const activeUser = useStore((state) => state.activeUser)
   const [pfpURL, setPfpURL] = useState<string>("")
   const terminalHandle = useParam("terminalHandle") as string
@@ -72,14 +72,18 @@ const TerminalSettingsPage: BlitzPage = () => {
 
   const [updateTerminalMutation] = useMutation(updateTerminal, {
     onSuccess: (data) => {
-      addToast("Successfully updated your terminal.", "success")
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Successfully updated your terminal.",
+      })
 
       let route = `/terminal/${data?.handle || terminalHandle}/settings/terminal`
       router.push(route, undefined, { shallow: true })
     },
     onError: (error: Error) => {
-      // could probably parse this better
-      addToast(error.toString(), "error")
+      console.error("Failed to update terminal with error: ", error)
+      setToastState({ isToastShowing: true, type: "error", message: "Something went wrong!" })
     },
   })
 
@@ -89,71 +93,72 @@ const TerminalSettingsPage: BlitzPage = () => {
   }, [terminal?.data?.pfpURL])
 
   return (
-    <Navigation>
-      <section className="flex-1">
-        {!terminal ? (
-          <div>loading terminal...</div>
-        ) : (
-          <Form
-            initialValues={{ name: terminal.data.name, handle: terminal.handle } || {}}
-            onSubmit={async (values) => {
-              await updateTerminalMutation({
-                ...values,
-                pfpURL: pfpURL,
-                id: terminal.id,
-              })
-            }}
-            render={({ form, handleSubmit }) => {
-              let formState = form.getState()
-              let errors = formState.errors
-              return (
-                <form onSubmit={handleSubmit}>
-                  <div className="flex flex-col">
-                    <div className="p-6 border-b border-concrete flex justify-between">
-                      <h2 className="text-marble-white text-2xl font-bold">Terminal Overview</h2>
-                      <button
-                        className={`rounded text-tunnel-black px-8 ${
-                          formState.hasValidationErrors ? "bg-light-concrete" : "bg-magic-mint"
-                        }`}
-                        type="submit"
-                      >
-                        Save
-                      </button>
-                    </div>
-                    <div className="p-6">
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="flex flex-col pb-2 col-span-2">
-                          <label className="font-bold">Terminal Name*</label>
-                          <span className="text-concrete text-xs mt-1">50 characters max.</span>
-                          <Field
-                            name="name"
-                            component="input"
-                            validate={mustBeUnderNumCharacters(50)}
-                            className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
-                          />
-                          <span className="text-torch-red text-xs">{errors?.name}</span>
-                          <label className="font-bold mt-4">Terminal Handle*</label>
-                          <span className="text-concrete text-xs mt-1">50 characters max.</span>
-                          <Field
-                            name="handle"
-                            component="input"
-                            validate={mustBeUnderNumCharacters(50)}
-                            className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-4"
-                          />
-                          <span className="text-torch-red text-xs">{errors?.handle}</span>
-                          <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
+    <LayoutWithoutNavigation>
+      <Navigation>
+        <section className="flex-1">
+          {!terminal ? (
+            <div>loading terminal...</div>
+          ) : (
+            <Form
+              initialValues={{ name: terminal.data.name, handle: terminal.handle } || {}}
+              onSubmit={async (values) => {
+                await updateTerminalMutation({
+                  ...values,
+                  pfpURL: pfpURL,
+                  id: terminal.id,
+                })
+              }}
+              render={({ form, handleSubmit }) => {
+                let formState = form.getState()
+                let errors = formState.errors
+                return (
+                  <form onSubmit={handleSubmit}>
+                    <div className="flex flex-col">
+                      <div className="p-6 border-b border-concrete flex justify-between">
+                        <h2 className="text-marble-white text-2xl font-bold">Terminal Overview</h2>
+                        <button
+                          className={`rounded text-tunnel-black px-8 ${
+                            formState.hasValidationErrors ? "bg-light-concrete" : "bg-magic-mint"
+                          }`}
+                          type="submit"
+                        >
+                          Save
+                        </button>
+                      </div>
+                      <div className="p-6">
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="flex flex-col pb-2 col-span-2">
+                            <label className="font-bold">Terminal Name*</label>
+                            <span className="text-concrete text-xs mt-1">50 characters max.</span>
+                            <Field
+                              name="name"
+                              component="input"
+                              validate={mustBeUnderNumCharacters(50)}
+                              className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
+                            />
+                            <span className="text-torch-red text-xs">{errors?.name}</span>
+                            <label className="font-bold mt-4">Terminal Handle*</label>
+                            <span className="text-concrete text-xs mt-1">50 characters max.</span>
+                            <Field
+                              name="handle"
+                              component="input"
+                              validate={mustBeUnderNumCharacters(50)}
+                              className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-4"
+                            />
+                            <span className="text-torch-red text-xs">{errors?.handle}</span>
+                            <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
+                          </div>
                         </div>
-                        <Toast />
                       </div>
                     </div>
-                  </div>
-                </form>
-              )
-            }}
-          />
-        )}
-      </section>
-    </Navigation>
+                  </form>
+                )
+              }}
+            />
+          )}
+        </section>
+      </Navigation>
+    </LayoutWithoutNavigation>
   )
 }
 
