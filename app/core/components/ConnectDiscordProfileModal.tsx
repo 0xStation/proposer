@@ -5,13 +5,14 @@ import useDiscordAuthWithCallback from "../hooks/useDiscordAuthWithCallback"
 import useStore from "../hooks/useStore"
 import Modal from "./Modal"
 
-export const ConnectDiscordProfileModal = ({ isOpen, setIsOpen, activeUser }) => {
+export const ConnectDiscordProfileModal = ({ isOpen, setIsOpen, activeUser, setNewAuth }) => {
   const setToastState = useStore((state) => state.setToastState)
   // identify, email, guilds, guilds.join
   const { callbackWithDCAuth, isAuthenticating, authorization } = useDiscordAuthWithCallback(
     "identify guilds",
     async (authorization) => {
       if (authorization) {
+        setNewAuth(authorization)
         try {
           let response = await fetch(`${process.env.BLITZ_PUBLIC_API_ENDPOINT}/users/@me`, {
             method: "GET",
@@ -33,13 +34,13 @@ export const ConnectDiscordProfileModal = ({ isOpen, setIsOpen, activeUser }) =>
           })
 
           setIsOpen(false)
-          // make success toast call
-
           setToastState({
             isToastShowing: true,
             type: "success",
             message: "Your Station profile is now connected with your Discord Account.",
           })
+
+          invalidateQuery(getAccountByAddress)
 
           return data
         } catch (err) {

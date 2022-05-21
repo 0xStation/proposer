@@ -131,8 +131,8 @@ const AccountForm = ({
   account?: Account
   isEdit: boolean
 }) => {
-  const [coverURL, setCoverURL] = useState("")
-  const [pfpURL, setPfpURL] = useState("")
+  const [coverURL, setCoverURL] = useState<string | undefined>()
+  const [pfpURL, setPfpURL] = useState<string | undefined>()
   const setActiveUser = useStore((state) => state.setActiveUser)
 
   const [createAccountMutation] = useMutation(createAccount, {
@@ -157,8 +157,8 @@ const AccountForm = ({
 
   useEffect(() => {
     // initialize pfpInput and coverInput with user's pre-existing images
-    setPfpURL(account?.data?.pfpURL || "")
-    setCoverURL(account?.data?.coverURL || "")
+    setPfpURL(account?.data?.pfpURL)
+    setCoverURL(account?.data?.coverURL)
   }, [account?.data?.pfpURL, account?.data?.coverURL])
 
   return (
@@ -179,6 +179,7 @@ const AccountForm = ({
               address,
               pfpURL,
               coverURL,
+              createSession: true,
             })
           }
         } catch (error) {
