@@ -91,7 +91,7 @@ export default async function handler(req, res) {
         discordId: user.discordId,
         data: {
           name: user.name,
-          pfpUrl: user.avatarHash
+          pfpURL: user.avatarHash
             ? `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatarHash}.png`
             : undefined,
         },

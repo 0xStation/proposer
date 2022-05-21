@@ -1,23 +1,36 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { BlitzPage, useParam, useQuery, Routes, Link } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import ConnectDiscordProfileModal from "app/core/components/ConnectDiscordProfileModal"
 import ProfileNavigation from "app/profile/components/Navigation"
 import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
 import { Terminal } from "app/terminal/types"
 import { formatDate } from "app/core/utils/formatDate"
+import useLocalStorage from "app/core/hooks/useLocalStorage"
+import useStore from "app/core/hooks/useStore"
+import { Account } from "app/account/types"
+
+type Auth = { access_token: string; authorization: string }
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
 const ProfileHome: BlitzPage = () => {
   const accountAddress = useParam("accountAddress", "string") as string
   const [selectedTerminal, setSelectedTerminal] = useState<Terminal | null>(null)
+  const [isConnectDiscordModalOpen, setIsConnectDiscordModalOpen] = useState<boolean>(false)
+  const [discordAuthToken] = useLocalStorage<Auth | undefined>(
+    "dc_auth_identify guilds",
+    undefined,
+    false
+  )
+  const activeUser = useStore((state) => state.activeUser)
 
   const [account] = useQuery(
     getAccountByAddress,
     { address: toChecksumAddress(accountAddress) },
-    { enabled: !!accountAddress, suspense: false }
+    { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
   )
 
   const [terminals] = useQuery(
@@ -35,8 +48,21 @@ const ProfileHome: BlitzPage = () => {
     }
   )
 
+  useEffect(() => {
+    if (account && activeUser && account.id === activeUser.id) {
+      if (!activeUser?.discordId && !discordAuthToken?.authorization) {
+        setIsConnectDiscordModalOpen(true)
+      }
+    }
+  }, [account, activeUser, discordAuthToken?.authorization])
+
   return (
     <Layout title={`${account ? `${account?.data?.name} | ` : ""}Profile`}>
+      <ConnectDiscordProfileModal
+        isOpen={isConnectDiscordModalOpen}
+        setIsOpen={setIsConnectDiscordModalOpen}
+        activeUser={activeUser}
+      />
       <ProfileNavigation account={account} terminals={terminals}>
         {terminals && terminals.length ? (
           <>
@@ -50,7 +76,6 @@ const ProfileHome: BlitzPage = () => {
                   terminals.map((terminal, idx) => (
                     <TerminalComponent
                       key={`${terminal.handle}${idx}`}
-                      account={account}
                       terminal={terminal}
                       setSelectedTerminal={setSelectedTerminal}
                     />
@@ -90,7 +115,7 @@ const ProfileHome: BlitzPage = () => {
   )
 }
 
-const TerminalComponent = ({ account, terminal, setSelectedTerminal }) => {
+const TerminalComponent = ({ terminal, setSelectedTerminal }) => {
   return (
     <div
       tabIndex={0}
@@ -102,7 +127,7 @@ const TerminalComponent = ({ account, terminal, setSelectedTerminal }) => {
           <img
             src={terminal.data.pfpURL}
             alt="Terminal PFP"
-            className="min-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
+            className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
           />
         </div>
         <div className="flex flex-col content-center">
@@ -146,7 +171,7 @@ const SelectedTerminalCard = ({ account, terminal }) => {
               <img
                 src={terminal.data.pfpURL}
                 alt="Terminal PFP"
-                className="min-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete hover:border-marble-white"
+                className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete hover:border-marble-white"
               />
             </Link>
           </div>

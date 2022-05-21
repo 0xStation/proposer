@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
 import useDiscordAuth from "./useDiscordAuth"
 
-const useDiscordAuthWithCallback = (scope: string, callback: () => void) => {
+const useDiscordAuthWithCallback = (scope: string, callback: (authorization?: string) => void) => {
   const { authorization, onOpen, ...rest } = useDiscordAuth(scope)
   const [hasClickedAuth, setHasClickedAuth] = useState(false)
 
   const handleClick = () => {
-    if (authorization) callback()
+    if (authorization) callback(authorization)
     else {
       onOpen()
       setHasClickedAuth(true)
@@ -16,7 +16,8 @@ const useDiscordAuthWithCallback = (scope: string, callback: () => void) => {
   useEffect(() => {
     if (!authorization || !hasClickedAuth) return
 
-    callback()
+    callback(authorization)
+    setHasClickedAuth(false)
   }, [authorization, hasClickedAuth, callback])
 
   return {

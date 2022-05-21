@@ -7,7 +7,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 // The account of user of Station
@@ -50,7 +51,7 @@ model Role {
 }
 
 model AccountTerminal {
-  account     Account              @relation(fields: [accountId], references: [id])
+  account     Account              @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId   Int
   terminal    Terminal             @relation(fields: [terminalId], references: [id])
   terminalId  Int
@@ -81,7 +82,7 @@ model Initiative {
 // deprecated
 // Associates accounts with initiatives for applications and contributor membership
 model AccountInitiative {
-  account      Account                 @relation(fields: [accountId], references: [id])
+  account      Account                 @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId    Int
   initiative   Initiative              @relation(fields: [initiativeId], references: [id])
   initiativeId Int
@@ -102,7 +103,7 @@ model Skill {
 
 // deprecated
 model AccountSkill {
-  account   Account @relation(fields: [accountId], references: [id])
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId Int
   skill     Skill   @relation(fields: [skillId], references: [id])
   skillId   Int
@@ -126,7 +127,7 @@ model InitiativeSkill {
 model Endorsement {
   id               Int      @id @default(autoincrement())
   initiativeId     Int
-  endorser         Account  @relation(name: "Endorsed", fields: [endorserId], references: [id])
+  endorser         Account  @relation(name: "Endorsed", fields: [endorserId], references: [id], onDelete: Cascade)
   endorserId       Int
   endorseeId       Int
   timestamp        DateTime @default(now())
@@ -151,7 +152,7 @@ model Tag {
 model AccountTerminalTag {
   tag              Tag             @relation(fields: [tagId], references: [id])
   tagId            Int
-  ticket           AccountTerminal @relation(fields: [ticketAccountId, ticketTerminalId], references: [accountId, terminalId])
+  ticket           AccountTerminal @relation(fields: [ticketAccountId, ticketTerminalId], references: [accountId, terminalId], onDelete: Cascade)
   ticketAccountId  Int
   ticketTerminalId Int
 
@@ -175,5 +176,5 @@ model Session {
   publicData         String?
   privateData        String?
   userId             Int?
-  user               Account?  @relation(fields: [userId], references: [id])
+  user               Account?  @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
