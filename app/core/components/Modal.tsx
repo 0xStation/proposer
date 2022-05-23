@@ -43,7 +43,7 @@ const Modal = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0 bg-marble-white opacity-50" />
+            <Dialog.Overlay className="fixed inset-0 bg-tunnel-black opacity-50" />
           </Transition.Child>
 
           {/* This element is to trick the browser into centering the modal contents. */}
@@ -60,8 +60,8 @@ const Modal = ({
             leaveTo="opacity-0 scale-95"
           >
             <div
-              className={`inline-block w-full ${width} my-8 overflow-hidden text-left align-middle transition-all transform bg-tunnel-black border ${
-                error ? "border-torch-red" : "border-marble-white"
+              className={`inline-block w-full ${width} my-8 overflow-hidden rounded text-left align-middle transition-all transform bg-tunnel-black border ${
+                error ? "border-torch-red" : "border-concrete"
               }`}
             >
               {showTitle && (

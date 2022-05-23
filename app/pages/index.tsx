@@ -1,7 +1,8 @@
 import { BlitzPage, useRouter, useSession } from "blitz"
-import { useEffect } from "react"
-import Layout from "app/core/layouts/Layout"
+import { useEffect, useState } from "react"
+import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import useStore from "app/core/hooks/useStore"
+import { ConnectWalletComponent } from "app/core/components/ConnectWalletComponent"
 
 const Home: BlitzPage = () => {
   const router = useRouter()
@@ -20,12 +21,14 @@ const Home: BlitzPage = () => {
   }, [activeUser, session?.siwe?.address])
 
   return (
-    <Layout title="Station">
+    <LayoutWithoutNavigation title="Station">
       <main
-        className="h-full bg-cover bg-no-repeat"
-        style={{ backgroundImage: "url('/station-cover.webp')" }}
-      ></main>
-    </Layout>
+        className="h-screen bg-cover bg-no-repeat"
+        style={{ backgroundImage: "url('/station-cover-v2.webp')" }}
+      >
+        <ConnectWalletComponent />
+      </main>
+    </LayoutWithoutNavigation>
   )
 }
 
