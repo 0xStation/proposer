@@ -8,7 +8,7 @@ const UpsertTags = z.object({
       value: z.string(),
       type: z.string(),
       active: z.boolean(),
-      discordId: z.string(),
+      discordId: z.string().optional(),
     })
     .array(),
 })
