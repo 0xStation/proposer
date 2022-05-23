@@ -88,7 +88,7 @@ export default async function handler(req, res) {
       where: { discordId: user.discordId },
       update: {
         data: {
-          ...user.data,
+          name: user.name,
           pfpURL: user.avatarHash
             ? `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatarHash}.png`
             : undefined,

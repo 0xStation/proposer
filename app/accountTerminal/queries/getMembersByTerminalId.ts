@@ -22,6 +22,11 @@ export default async function getMembersByTerminalId(
         },
         account: true,
       },
+      orderBy: {
+        tags: {
+          _count: "desc",
+        },
+      },
     })
 
     return members as AccountTerminalWithTagsAndAccount[]
