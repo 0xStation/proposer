@@ -10,8 +10,7 @@ import { Terminal } from "app/terminal/types"
 import { formatDate } from "app/core/utils/formatDate"
 import useLocalStorage from "app/core/hooks/useLocalStorage"
 import useStore from "app/core/hooks/useStore"
-
-type Auth = { access_token: string; authorization: string }
+import { Auth } from "app/auth/types"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance

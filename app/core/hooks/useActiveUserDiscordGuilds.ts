@@ -1,12 +1,6 @@
+import { Auth } from "app/auth/types"
 import { useState, useEffect } from "react"
 import useLocalStorage from "./useLocalStorage"
-
-type Auth = {
-  access_token: string
-  tokenType: string
-  expires: number
-  authorization: string
-}
 
 type GuildObject = {
   img: string
