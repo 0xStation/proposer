@@ -146,7 +146,7 @@ const DiscordSettingsPage: BlitzPage = () => {
                   value: name,
                   active: values[name].active,
                   type: values[name].type,
-                  discordId: values[name].discordId,
+                  ...(values[name].discordId && { discordId: values[name].discordId }),
                 }
               })
 
