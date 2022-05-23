@@ -34,7 +34,24 @@ export default async function createAccounts(input: z.infer<typeof CreateAccount
 
     const ticket = await db.accountTerminal.upsert({
       where: { accountId_terminalId: { accountId: account.id, terminalId: params.terminalId } },
-      update: {},
+      update: {
+        tags: {
+          connectOrCreate: user.tags.map((tagId) => {
+            return {
+              where: {
+                tagId_ticketAccountId_ticketTerminalId: {
+                  tagId: tagId,
+                  ticketAccountId: account.id,
+                  ticketTerminalId: params.terminalId,
+                },
+              },
+              create: {
+                tagId: tagId,
+              },
+            }
+          }),
+        },
+      },
       create: {
         accountId: account.id,
         terminalId: params.terminalId,

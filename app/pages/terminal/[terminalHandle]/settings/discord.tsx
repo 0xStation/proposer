@@ -73,7 +73,7 @@ const DiscordSettingsPage: BlitzPage = () => {
   const _initialFormValues = useMemo(() => {
     if (connectedGuild && terminal) {
       let allRoles = connectedGuild.roles.reduce((acc, role) => {
-        let roleName = role.name.replace(".", "")
+        let roleName = role.name.replace(".", "").toLowerCase()
         acc[roleName] = {
           active: true,
           type: "inactive",
@@ -254,7 +254,7 @@ const DiscordSettingsPage: BlitzPage = () => {
                           </div>
                           <div className="grid grid-cols-2 gap-y-2">
                             {connectedGuild?.roles.map((role, idx) => {
-                              let roleName = role.name.replace(".", "")
+                              let roleName = role.name.replace(".", "").toLowerCase()
                               let cbState = form.getFieldState(roleName + ".active")
                               return (
                                 <>
@@ -283,9 +283,9 @@ const DiscordSettingsPage: BlitzPage = () => {
                                             {cbState?.value ? (
                                               <>
                                                 <option value="">Choose option</option>
-                                                <option value="role">Role</option>
-                                                <option value="initiative">Initiative</option>
                                                 <option value="status">Status</option>
+                                                <option value="role">Role</option>
+                                                <option value="project">Project</option>
                                                 <option value="guild">Guild</option>
                                               </>
                                             ) : (
