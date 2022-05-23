@@ -322,8 +322,8 @@ const SelectedContributorCard = ({ member }) => {
   const roleTags = member.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === "role"
   )
-  const initiativeTags = member.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "initiative"
+  const projectTags = member.tags?.filter(
+    (accountTerminalTag) => accountTerminalTag.tag.type === "project"
   )
   const guildTags = member.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === "guild"
@@ -397,7 +397,7 @@ const SelectedContributorCard = ({ member }) => {
             </div>
           )}
           <TagDetails tagType="roles" tags={roleTags} />
-          <TagDetails tagType="initiatives" tags={initiativeTags} />
+          <TagDetails tagType="projects" tags={projectTags} />
           <TagDetails tagType="guilds" tags={guildTags} />
         </div>
       </div>
