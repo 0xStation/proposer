@@ -32,6 +32,7 @@ const DiscordImportPage: BlitzPage = () => {
   const [selectAllActive, setSelectAllActive] = useState(false)
   const { guild: connectedGuild } = useDiscordGuild(terminal?.data?.guildId)
   const { guildMembers } = useGuildMembers(terminal?.data?.guildId)
+  console.log(guildMembers)
 
   const initialFormValues = useMemo(() => {
     if (connectedGuild && terminal) {
@@ -119,7 +120,7 @@ const DiscordImportPage: BlitzPage = () => {
                   discordId: gm.user.id,
                   name: gm.nick || gm.user.username,
                   tags: tagOverlapId,
-                  avatarHash: gm.user.avatar,
+                  ...(gm.user.avatar && { avatarHash: gm.user.avatar }),
                 }
               }),
             })

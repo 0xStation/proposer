@@ -13,11 +13,11 @@ const DiscordConnectPage: BlitzPage = () => {
   const [terminal, { refetch }] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle },
-    { suspense: false }
+    { suspense: false, enabled: !!terminalHandle }
   )
   const [selectedGuildId, setSelectedGuildId] = useState<string>()
   const { status: selectedGuildStatus, guild: selectedGuild } = useDiscordGuild(selectedGuildId)
-  const { status: usersGuildsStatus, guilds } = useActiveUserDiscordGuilds()
+  const { guilds } = useActiveUserDiscordGuilds()
   const { onOpen: onBotOpen, connected } = useDiscordBotAuth(selectedGuildId || "")
 
   const [updateTerminalMutation] = useMutation(updateTerminal, {

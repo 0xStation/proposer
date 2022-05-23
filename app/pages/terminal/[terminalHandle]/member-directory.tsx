@@ -37,6 +37,15 @@ const MemberDirectoryPage: BlitzPage = () => {
   // where the strings are applied filters
   const [filters, setFilters] = useState<Filters>({})
 
+  useEffect(() => {
+    const _ = async () => {
+      let l = await fetch("/api/discord/demo")
+      let j = await l.json()
+      console.log(j)
+    }
+    _()
+  }, [])
+
   /*
   `groupedTags` returns an object where the key
   is the tag type and the value is an array of tags
@@ -355,7 +364,7 @@ const SelectedContributorCard = ({ member }) => {
               {account.address ? (
                 <div className="w-max truncate leading-4">@{truncateString(account.address)}</div>
               ) : (
-                <div className="w-max truncate leading-4">Imported from discord</div>
+                <div className="w-max truncate leading-4">Imported from Discord</div>
               )}
             </div>
           </div>

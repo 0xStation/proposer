@@ -50,8 +50,6 @@ const DiscordSettingsPage: BlitzPage = () => {
         }),
       })
 
-      console.log(await response.json())
-
       if (response.status !== 200) {
         addToast("Something went wrong!", "error")
         return
