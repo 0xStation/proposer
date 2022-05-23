@@ -149,7 +149,6 @@ const DiscordSettingsPage: BlitzPage = () => {
                   ...(values[name].discordId && { discordId: values[name].discordId }),
                 }
               })
-              console.log(tags)
 
               if (terminal) {
                 const createdTags = await upsertTags({
