@@ -185,6 +185,7 @@ const DiscordSettingsPage: BlitzPage = () => {
                         discordId: gm.user.id,
                         name: gm.nick || gm.user.username,
                         tags: tagOverlapId,
+                        joinedAt: gm.joined_at,
                         ...(gm.user.avatar && { avatarHash: gm.user.avatar }),
                       }
                     }),

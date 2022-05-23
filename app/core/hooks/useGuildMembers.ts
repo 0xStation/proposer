@@ -8,6 +8,7 @@ interface GuildMember {
     username: string
     avatar: string
   }
+  joined_at: string
 }
 
 const useGuildMembers = (

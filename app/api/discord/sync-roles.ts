@@ -78,6 +78,7 @@ export default async function handler(req, res) {
       name: gm.nick || gm.user.username,
       incomingTagIds: tagOverlapId,
       avatarHash: gm.user.avatar,
+      joinedAt: gm.joined_at,
     }
   })
 
@@ -160,12 +161,14 @@ export default async function handler(req, res) {
     const ticket = await db.accountTerminal.upsert({
       where: { accountId_terminalId: { accountId: account.id, terminalId: params.terminalId } },
       update: {
+        joinedAt: new Date(user.joinedAt),
         tags: tagObject,
       },
       create: {
         accountId: account.id,
         terminalId: params.terminalId,
         active: false,
+        joinedAt: new Date(user.joinedAt),
         tags: {
           create: user.incomingTagIds.map((tag) => {
             return { tagId: tag }
