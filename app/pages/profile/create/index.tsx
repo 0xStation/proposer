@@ -89,7 +89,7 @@ const CreateProfile: BlitzPage = ({
         <div className="mx-auto max-w-2xl pb-10">
           <AccountForm
             onSuccess={() => {
-              router.push(`/profile/${siweAddress}`)
+              router.push(`/profile/create/discord`)
             }}
             address={siweAddress}
             isEdit={false}

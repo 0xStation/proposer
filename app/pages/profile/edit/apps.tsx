@@ -6,6 +6,7 @@ import {
   invoke,
   Routes,
   Image,
+  invalidateQuery,
 } from "blitz"
 import { useState } from "react"
 import EditNavigation from "app/profile/components/settings/Navigation"
@@ -13,6 +14,12 @@ import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import DiscordIcon from "public/discord-icon.svg"
 import CheckmarkIcon from "public/checkmark-icon.svg"
+import useDiscordAuthWithCallback from "app/core/hooks/useDiscordAuthWithCallback"
+import addDiscordIdAndMergeAccount from "app/account/mutations/addDiscordIdAndMergeAccount"
+import useStore from "app/core/hooks/useStore"
+import useLocalStorage from "app/core/hooks/useLocalStorage"
+import { Auth } from "app/auth/types"
+import NoSsr from "app/core/components/NoSsr"
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session = await getSession(req, res)
@@ -73,7 +80,7 @@ const EditProfileApps: BlitzPage = ({
                 />
               ))}
           </div>
-          <SelectedAppCard appName={selectedAppName} />
+          <SelectedAppCard appName={selectedAppName} activeUser={activeUser} />
         </div>
       </div>
     </EditNavigation>
@@ -103,55 +110,116 @@ const AppComponent = ({ app, setSelectedAppName }) => {
   )
 }
 
-const SelectedAppCard = ({ appName }) => {
+const SelectedAppCard = ({ appName, activeUser }) => {
   switch (appName) {
     case "Discord":
-      return <DiscordAppCard />
+      return <DiscordAppCard activeUser={activeUser} />
     default:
       return null
   }
 }
 
-export const DiscordAppCard = () => {
+export const DiscordAppCard = ({ activeUser }) => {
+  const setToastState = useStore((state) => state.setToastState)
+  const [discordAuthToken] = useLocalStorage<Auth | undefined>(
+    "dc_auth_identify guilds",
+    undefined,
+    false
+  )
+
+  const { callbackWithDCAuth, isAuthenticating, authorization } = useDiscordAuthWithCallback(
+    "identify guilds",
+    async (authorization) => {
+      if (authorization) {
+        try {
+          let response = await fetch(`${process.env.BLITZ_PUBLIC_API_ENDPOINT}/users/@me`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${authorization}`,
+              "Content-Type": "application/json",
+            },
+          })
+
+          if (response.status !== 200) {
+            throw Error(`Error: status not 200 - returned ${response.status}`)
+          }
+
+          const data = await response.json()
+
+          await invoke(addDiscordIdAndMergeAccount, {
+            accountId: activeUser?.id,
+            discordId: data?.id,
+          })
+
+          setToastState({
+            isToastShowing: true,
+            type: "success",
+            message: "Your Station profile is now connected with your Discord account.",
+          })
+
+          invalidateQuery(getAccountByAddress)
+
+          return data
+        } catch (err) {
+          console.error(err)
+          setToastState({
+            isToastShowing: true,
+            type: "error",
+            message: "Connection didn't go through. Please try again refreshing the page.",
+          })
+        }
+      }
+      return
+    }
+  )
+
   return (
-    <div className="h-screen border-l border-concrete col-span-3 flex flex-col">
-      <div className="mt-5 ml-5">
-        <div className="inline mr-2 align-middle">
-          <Image src={DiscordIcon} height={26} width={26} />
+    <NoSsr>
+      <div className="h-screen border-l border-concrete col-span-3 flex flex-col">
+        <div className="mt-5 ml-5">
+          <div className="inline mr-2 align-middle">
+            <Image src={DiscordIcon} height={26} width={26} />
+          </div>
+          <p className="inline font-bold text-xl">Discord</p>
         </div>
-        <p className="inline font-bold text-xl">Discord</p>
+        <div className="ml-5 mr-8">
+          <p className="uppercase tracking-wider text-xs mt-8">About the app</p>
+          <p className="mt-3 mr-8">
+            Discord is a VoIP, instant messaging and digital distribution platform. Users have the
+            ability to communicate with voice calls, video calls, text messaging, media and files in
+            private chats or as part of communities called &quot;servers.&quot;
+          </p>
+        </div>
+        <div className="ml-5 mt-6 mr-8">
+          <p className="uppercase tracking-wider text-xs">Permissions</p>
+          <ul>
+            <li className="mt-3">
+              <div className="inline align-middle mr-3">
+                <Image src={CheckmarkIcon} height={18} width={18} />
+              </div>
+              <p className="inline">Access your username and avatar</p>
+            </li>
+            <li className="mt-3">
+              <div className="inline align-middle mr-3">
+                <Image src={CheckmarkIcon} height={18} width={18} />
+              </div>
+              <p className="inline">Know what servers you’re in</p>
+            </li>
+          </ul>
+        </div>
+        <div className="text-center mt-auto mb-28">
+          <button
+            className={`h-[35px] border border-marble-white w-[198px] rounded cursor-pointer ${
+              authorization || discordAuthToken ? "opacity-70" : "hover:bg-concrete"
+            }`}
+            onClick={callbackWithDCAuth}
+            disabled={!!(authorization || discordAuthToken)}
+          >
+            {authorization || discordAuthToken ? "Connected" : "Connect"}
+          </button>
+        </div>
       </div>
-      <div className="ml-5 mr-8">
-        <p className="uppercase tracking-wider text-xs mt-8">About the app</p>
-        <p className="mt-3 mr-8">
-          Discord is a VoIP, instant messaging and digital distribution platform. Users have the
-          ability to communicate with voice calls, video calls, text messaging, media and files in
-          private chats or as part of communities called &quot;servers.&quot;
-        </p>
-      </div>
-      <div className="ml-5 mt-6 mr-8">
-        <p className="uppercase tracking-wider text-xs">Permissions</p>
-        <ul>
-          <li className="mt-3">
-            <div className="inline align-middle mr-3">
-              <Image src={CheckmarkIcon} height={18} width={18} />
-            </div>
-            <p className="inline">Access your username and avatar</p>
-          </li>
-          <li className="mt-3">
-            <div className="inline align-middle mr-3">
-              <Image src={CheckmarkIcon} height={18} width={18} />
-            </div>
-            <p className="inline">Know what servers you’re in</p>
-          </li>
-        </ul>
-      </div>
-      <div className="text-center mt-auto mb-28">
-        <button className="h-[35px] border border-marble-white w-[198px] rounded cursor-pointer hover:bg-concrete">
-          Connect
-        </button>
-      </div>
-    </div>
+    </NoSsr>
   )
 }
 

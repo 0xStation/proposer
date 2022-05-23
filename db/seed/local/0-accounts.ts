@@ -1,4 +1,5 @@
 import db from "../../index"
+import { invoke } from "blitz"
 import createAccount from "app/account/mutations/createAccount"
 
 interface Skill {
@@ -79,7 +80,7 @@ const seed = async () => {
       continue
     }
 
-    await createAccount(contributorData)
+    await invoke(createAccount, { ...contributorData })
   }
 }
 
