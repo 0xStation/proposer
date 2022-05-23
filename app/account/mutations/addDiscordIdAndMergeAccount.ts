@@ -50,8 +50,9 @@ export default async function addDiscordIdAndMergeAccount(
   // then we don't want to delete the Station account. Instead, the user should have
   // a way to disconnect their Station account from their Discord account.
   if (importedAccountId.address) {
-    console.warn("The Discord account is already connected to another Station account.")
-    throw Error("The Discord account is already connected to another Station account.")
+    const errorMessage = "The Discord account is already connected to another Station account."
+    console.warn(errorMessage)
+    throw Error(errorMessage)
   }
 
   // 2. If account doesn't exist, then the account hasn't been imported before.
