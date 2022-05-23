@@ -24,7 +24,7 @@ export default async function createAccounts(input: z.infer<typeof CreateAccount
         discordId: user.discordId,
         data: {
           name: user.name,
-          pfpUrl: user.avatarHash
+          pfpURL: user.avatarHash
             ? `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatarHash}.png`
             : undefined,
         },

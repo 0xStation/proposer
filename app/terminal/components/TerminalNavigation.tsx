@@ -15,7 +15,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
   return (
     <>
       <div className="h-screen w-[300px] bg-tunnel-black border-r border-concrete fixed z-50">
-        {!!tutorial && <div className="fixed inset-0 bg-tunnel-black opacity-50 z-10"></div>}
+        {!!tutorial && <div className="fixed inset-0 bg-tunnel-black opacity-70 z-10"></div>}
         {/* Terminal Profile metadata + Settings icon*/}
         <div className="flex content-center ml-4 mt-7">
           <div className="align-middle text-center mr-2 rounded-lg border border-wet-concrete w-[41px] h-[41px] mt-1 overflow-hidden">
