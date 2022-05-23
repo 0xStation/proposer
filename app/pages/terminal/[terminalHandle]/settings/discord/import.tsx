@@ -125,8 +125,8 @@ const DiscordImportPage: BlitzPage = () => {
                       discordId: gm.user.id,
                       name: gm.nick || gm.user.username,
                       tags: tagOverlapId,
-                      avatarHash: gm.user.avatar,
                       joinedAt: gm.joined_at,
+                      ...(gm.user.avatar && { avatarHash: gm.user.avatar }),
                     }
                   }),
                 })
