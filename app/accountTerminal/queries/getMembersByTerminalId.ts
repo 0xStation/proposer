@@ -26,7 +26,6 @@ export default async function getMembersByTerminalId(
         tags: {
           _count: "desc",
         },
-        joinedAt: "asc",
       },
     })
 
