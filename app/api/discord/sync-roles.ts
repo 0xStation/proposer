@@ -161,7 +161,7 @@ export default async function handler(req, res) {
     const ticket = await db.accountTerminal.upsert({
       where: { accountId_terminalId: { accountId: account.id, terminalId: params.terminalId } },
       update: {
-        joinedAt: new Date(user.joinedAt),
+        ...(!account.address && { joinedAt: new Date(user.joinedAt) }), // only update joinedAt if still a discord-only imported account
         tags: tagObject,
       },
       create: {
