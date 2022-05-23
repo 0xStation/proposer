@@ -7,26 +7,48 @@ const AddDiscordIdAndMergeAccount = z.object({
   discordId: z.string(),
 })
 
+// This mutation is called when a user connects to discord.
+// Connecting an account means adding a discord id to the user's `Account`.
+// The discordId column is a unique column, so only one account can exist with the id
+// at a time.
+
+// The mutation handles the following cases:
+// 1. If the user already has a discord id on their `Account`, it means
+// they are already connected, so we don't need to do anything.
+
+// 2. If an account doesn't exist with a discord id, that means the user hasn't
+// connected before and a terminal has never imported the user from discord before.
+// In this case, we update the user's account to include the discord id.
+
+// 3. The last handled case is if an account has been created with the user's discord id
+// when the terminal imported discord accounts and the user is connecting their account
+// for the first time. Here we need to merge the accounts and delete the imported account.
 export default async function addDiscordIdAndMergeAccount(
   input: z.infer<typeof AddDiscordIdAndMergeAccount>
 ) {
   const params = AddDiscordIdAndMergeAccount.parse(input)
 
-  const importedAccount = await db.account.findFirst({
-    where: { discordId: params.discordId },
-  })
+  let importedAccount
+  try {
+    importedAccount = await db.account.findFirst({
+      where: { discordId: params.discordId },
+    })
+  } catch (err) {
+    console.error("Could not retrieve account with Discord Id. Failed with error: ", err)
+    throw err
+  }
 
   const importedAccountId = importedAccount?.id
 
-  if (importedAccount?.id === params.accountId) {
-    // The account is already connected. Don't do anything
+  // 1. The account is already connected. Don't do anything and return
+  // the queried account.
+  if (importedAccountId === params.accountId) {
     return importedAccount
   }
 
+  // 2. If account doesn't exist, then the account hasn't been imported before.
+  // Add discord id to existing account.
   if (!importedAccount) {
-    // if account doesn't exist, then the account hasn't been imported before.
-    // Add discordId to existing account.
-
     try {
       const updatedAccount = await db.account.update({
         where: {
@@ -44,13 +66,14 @@ export default async function addDiscordIdAndMergeAccount(
     }
   }
 
-  // else we need to grab the id account and merge it with the discord account
+  // 3. Else, we need to grab the user-created account and merge it with the imported account.
   const userCreatedAccount = await db.account.findFirst({
     where: { id: params.accountId },
   })
 
-  // merge the two accounts where userCreatedAccount is the source
-  const mergedAccount = {
+  // Merge the two accounts where userCreatedAccount is the source.
+  // TODO: deepmerge this using lodash's `mergeWith`
+  const mergedAccountMetadata = {
     ...importedAccount,
     ...userCreatedAccount,
     discordId: params.discordId,
@@ -61,10 +84,13 @@ export default async function addDiscordIdAndMergeAccount(
   }
 
   try {
-    // rollback if any of these calls fail
+    // Prisma's `$transaction` api rollbacks if any of the calls fail within the callback.
     // https://www.prisma.io/docs/concepts/components/prisma-client/transactions#the-transaction-api
     await db.$transaction(async (db) => {
-      // erase the discordId since there is a unique constraint on discordId, but don't delete the account yet
+      // Remove the discordId from the imported account since there is a
+      // unique constraint on `discordId`, but don't delete the account yet
+      // because we need the imported account's `accountTerminal` and deleting
+      // the account will cascade delete the related tables.
       await db.account.update({
         where: {
           discordId: params.discordId,
@@ -74,12 +100,12 @@ export default async function addDiscordIdAndMergeAccount(
         },
       })
 
-      // update the user-created account with discord id + other info
-      const mAccount = await db.account.update({
+      // Update the user-created account with discord id + other info.
+      const mergedAccount = await db.account.update({
         where: {
           id: params.accountId,
         },
-        data: mergedAccount,
+        data: mergedAccountMetadata,
       })
 
       const accountTerminals = await db.accountTerminal.findMany({
@@ -87,11 +113,12 @@ export default async function addDiscordIdAndMergeAccount(
         include: { tags: true },
       })
 
+      // Create discord-related tags for user-created account.
       accountTerminals.forEach(async (membership) => {
         await db.accountTerminal.upsert({
           where: {
             accountId_terminalId: {
-              accountId: mAccount?.id as number,
+              accountId: mergedAccount?.id as number,
               terminalId: membership.terminalId,
             },
           },
@@ -102,7 +129,7 @@ export default async function addDiscordIdAndMergeAccount(
                   where: {
                     tagId_ticketAccountId_ticketTerminalId: {
                       tagId: membershipTag.tagId,
-                      ticketAccountId: mAccount?.id,
+                      ticketAccountId: mergedAccount?.id,
                       ticketTerminalId: membership.terminalId,
                     },
                   },
@@ -114,7 +141,7 @@ export default async function addDiscordIdAndMergeAccount(
             },
           },
           create: {
-            accountId: mAccount?.id,
+            accountId: mergedAccount?.id,
             terminalId: membership.terminalId,
             tags: {
               create: membership.tags.map((membershipTag) => {
@@ -127,19 +154,24 @@ export default async function addDiscordIdAndMergeAccount(
         })
       })
 
-      // all other records should be automatically deleted with the
-      // on `onDelete: Cascade` propoerty found in `schema.prisma`
-      // ref: https://www.prisma.io/docs/concepts/components/prisma-schema/relations/referential-actions
+      // Once the imported account is deleted, all other records
+      // should be automatically deleted with the `onDelete: Cascade`
+      // property found in `schema.prisma`.
+      // Ref: https://www.prisma.io/docs/concepts/components/prisma-schema/relations/referential-actions
       await db.account.delete({
         where: {
           id: importedAccountId,
         },
       })
 
-      return mAccount
+      return mergedAccount
     })
   } catch (err) {
-    console.error(err)
+    console.error(
+      "Error could not merge imported account with user's account. Failed with error: ",
+      err
+    )
+    throw err
   }
 
   return importedAccount as Account

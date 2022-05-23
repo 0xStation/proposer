@@ -37,7 +37,7 @@ export const ConnectDiscordProfileModal = ({ isOpen, setIsOpen, activeUser, setN
           setToastState({
             isToastShowing: true,
             type: "success",
-            message: "Your Station profile is now connected with your Discord Account.",
+            message: "Your Station profile is now connected with your Discord account.",
           })
 
           invalidateQuery(getAccountByAddress)

@@ -146,7 +146,7 @@ export const DiscordAppCard = ({ activeUser }) => {
 
           const data = await response.json()
 
-          const account = await invoke(addDiscordIdAndMergeAccount, {
+          await invoke(addDiscordIdAndMergeAccount, {
             accountId: activeUser?.id,
             discordId: data?.id,
           })
