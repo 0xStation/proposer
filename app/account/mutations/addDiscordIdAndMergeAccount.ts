@@ -160,7 +160,7 @@ export default async function addDiscordIdAndMergeAccount(
             accountId: mergedAccount?.id,
             terminalId: membership.terminalId,
             joinedAt: membership.joinedAt,
-            data: membership.data as AccountTerminalMetadata,
+            ...(membership.data && { data: membership.data as AccountTerminalMetadata }), // throws error if pass in `data: null`
             tags: {
               create: membership.tags.map((membershipTag) => {
                 return {
