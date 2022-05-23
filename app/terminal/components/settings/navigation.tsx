@@ -9,9 +9,11 @@ const Navigation = ({ children }) => {
       <nav className="w-[70px]"></nav>
       <section className="w-[300px] border-r border-concrete p-6">
         <div className="fixed">
-          <label className="font-bold text-sm text-marble-white uppercase tracking-wider">
-            {terminalHandle}
-          </label>
+          <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>
+            <label className="font-bold text-sm text-marble-white uppercase tracking-wider cursor-pointer">
+              {terminalHandle}
+            </label>
+          </Link>
           <ul className="mt-6">
             <li
               className={`${
