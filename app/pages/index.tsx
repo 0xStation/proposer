@@ -22,6 +22,16 @@ const Home: BlitzPage = () => {
 
   return (
     <LayoutWithoutNavigation title="Station">
+      <div className="bg-wet-concrete w-full h-8 text-center align-center pt-1">
+        We&apos;re still in beta. Have feedback?{" "}
+        <a
+          className="text-magic-mint"
+          href="https://twitter.com/messages/compose?recipient_id=1412594810985271296"
+        >
+          Let us know
+        </a>
+        .
+      </div>
       <main
         className="h-screen bg-cover bg-no-repeat"
         style={{ backgroundImage: "url('/station-cover-v2.webp')" }}
