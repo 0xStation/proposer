@@ -9,7 +9,6 @@ import useGuildMembers from "app/core/hooks/useGuildMembers"
 import Checkbox from "app/core/components/form/Checkbox"
 import useStore from "app/core/hooks/useStore"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
-import { toTitleCase } from "app/core/utils/titleCase"
 
 const DiscordImportPage: BlitzPage = () => {
   const router = useRouter()
@@ -172,7 +171,7 @@ const DiscordImportPage: BlitzPage = () => {
                           <div key={idx} className="flex flex-row items-center">
                             <Checkbox name={`${roleName}.active`} checked={cbState?.value} />
                             <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline ml-2">
-                              {toTitleCase(roleName)}
+                              {roleName}
                             </p>
                           </div>
                           <div>
@@ -189,9 +188,9 @@ const DiscordImportPage: BlitzPage = () => {
                                     {cbState?.value ? (
                                       <>
                                         <option value="">Choose option</option>
-                                        <option value="role">Role</option>
-                                        <option value="initiative">Initiative</option>
                                         <option value="status">Status</option>
+                                        <option value="role">Role</option>
+                                        <option value="project">Project</option>
                                         <option value="guild">Guild</option>
                                       </>
                                     ) : (

@@ -149,6 +149,7 @@ const DiscordSettingsPage: BlitzPage = () => {
                   ...(values[name].discordId && { discordId: values[name].discordId }),
                 }
               })
+              console.log(tags)
 
               if (terminal) {
                 const createdTags = await upsertTags({
@@ -283,9 +284,9 @@ const DiscordSettingsPage: BlitzPage = () => {
                                             {cbState?.value ? (
                                               <>
                                                 <option value="">Choose option</option>
-                                                <option value="role">Role</option>
-                                                <option value="initiative">Initiative</option>
                                                 <option value="status">Status</option>
+                                                <option value="role">Role</option>
+                                                <option value="project">Project</option>
                                                 <option value="guild">Guild</option>
                                               </>
                                             ) : (
