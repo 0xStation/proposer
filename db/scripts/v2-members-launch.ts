@@ -5,7 +5,18 @@ import { toTitleCase } from "app/core/utils/titleCase"
 
 // To run:
 // blitz db seed -f db/scripts/v2-members-launch.ts
+
+// DON'T RUN; THIS IS GOING TO CAUSE LOTS OF EXTRA WORK
+
+// Running this script will create tags to replicate the existing metadata of
+// contributors on initiatives and having roles in the Terminal. This creates a mismatch
+// between roles that are created within Discord and roles that are not, forcing us to
+// write a reconciliation/syncing script that merges tags of the same name and updates all
+// holders of that tag. I'd rather not write such a thing right now but we will need to
+// write this eventually.
 const seed = async () => {
+  throw Error("Don't run me yet.")
+
   // fresh wipe on all tags
   await db.accountTerminalTag.deleteMany()
   await db.tag.deleteMany()
