@@ -1,5 +1,6 @@
 import db from "db"
 import * as z from "zod"
+import { Ctx } from "blitz"
 import { Account } from "../types"
 
 const CreateAccount = z.object({
@@ -13,9 +14,10 @@ const CreateAccount = z.object({
   githubUrl: z.string().optional(),
   tiktokUrl: z.string().optional(),
   instagramUrl: z.string().optional(),
+  createSession: z.boolean().optional(),
 })
 
-export default async function createAccount(input: z.infer<typeof CreateAccount>) {
+export default async function createAccount(input: z.infer<typeof CreateAccount>, ctx: Ctx) {
   const params = CreateAccount.parse(input)
 
   const payload = {
@@ -36,6 +38,15 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
   const account = await db.account.create({
     data: payload,
   })
+
+  if (account && account.id && params.createSession) {
+    // create an authenticated session
+    try {
+      await ctx.session.$create({ userId: account.id })
+    } catch (err) {
+      console.error("Could not create an authenticated session. Failed with err: ", err)
+    }
+  }
 
   return account as Account
 }

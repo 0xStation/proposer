@@ -3,13 +3,7 @@ import { randomBytes } from "crypto"
 import { useRouter } from "blitz"
 import useLocalStorage from "./useLocalStorage"
 import usePopupWindow from "./usePopupWindow"
-
-type Auth = {
-  access_token: string
-  tokenType: string
-  expires: number
-  authorization: string
-}
+import { Auth } from "app/auth/types"
 
 /**
  * forking this code from Guild.xyz, we have permission to use it.
