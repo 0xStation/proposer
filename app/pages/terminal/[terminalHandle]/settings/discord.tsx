@@ -146,7 +146,7 @@ const DiscordSettingsPage: BlitzPage = () => {
                   value: name,
                   active: values[name].active,
                   type: values[name].type,
-                  discordId: values[name].discordId,
+                  ...(values[name].discordId && { discordId: values[name].discordId }),
                 }
               })
 
@@ -185,6 +185,7 @@ const DiscordSettingsPage: BlitzPage = () => {
                         discordId: gm.user.id,
                         name: gm.nick || gm.user.username,
                         tags: tagOverlapId,
+                        joinedAt: gm.joined_at,
                         ...(gm.user.avatar && { avatarHash: gm.user.avatar }),
                       }
                     }),

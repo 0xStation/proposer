@@ -17,6 +17,7 @@ import TwitterIcon from "public/twitter-icon.svg"
 import PersonalSiteIcon from "public/personal-site-icon.svg"
 import InstagramIcon from "public/instagram-icon.svg"
 import TikTokIcon from "public/tiktok-icon.svg"
+import { toTitleCase } from "app/core/utils/titleCase"
 
 interface Filters {
   [tagType: string]: Set<string>
@@ -241,7 +242,7 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                                   className="align-middle"
                                 />
                                 <p className="p-0.5 align-middle mx-4 inline leading-none">
-                                  {tag.value}
+                                  {toTitleCase(tag.value)}
                                 </p>
                               </div>
                             )
