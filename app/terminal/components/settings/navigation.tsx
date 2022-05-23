@@ -14,6 +14,7 @@ const Navigation = ({ children }) => {
               {terminalHandle}
             </label>
           </Link>
+
           <ul className="mt-6">
             <li
               className={`${

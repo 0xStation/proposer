@@ -91,7 +91,7 @@ const Navigation = ({ children }: { children?: any }) => {
       {/* Need a parent element around the banner or else there's a chance for a hydration issue and the dom rearranges */}
       <div>
         {!session?.siwe?.address && (
-          <div className="w-full h-14 absolute z-10 bg-concrete bottom-0">
+          <div className="w-full h-14 absolute z-[60] bg-concrete bottom-0">
             <div className="fixed right-0 mt-3">
               <p className="inline-block mr-5 italic">
                 {!address ? "Join the ride →" : "Sign in with ethereum →"}
@@ -107,7 +107,7 @@ const Navigation = ({ children }: { children?: any }) => {
         )}
       </div>
       <div className="h-screen w-[70px] bg-tunnel-black border-r border-concrete fixed top-0 left-0 text-center flex flex-col">
-        {/* hardcoding the link for now - we don't have access to the window object unless we pass it via 
+        {/* hardcoding the link for now - we don't have access to the window object unless we pass it via
         serverside props through the `Layout` component on every page */}
         <a className="mt-1 inline-block" href="https://app.station.express">
           <Image src={StationLogo} alt="Station logo" height={20} width={54} />
