@@ -6,6 +6,7 @@ const accountObject = z.object({
   discordId: z.string().optional(),
   avatarHash: z.string().optional(),
   tags: z.number().array(),
+  joinedAt: z.string(),
 })
 
 const CreateAccounts = z.object({
@@ -38,6 +39,7 @@ export default async function createAccounts(input: z.infer<typeof CreateAccount
         accountId: account.id,
         terminalId: params.terminalId,
         active: false,
+        joinedAt: new Date(user.joinedAt),
         tags: {
           create: user.tags.map((tag) => {
             return { tagId: tag }

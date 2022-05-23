@@ -8,7 +8,7 @@ const UpsertTags = z.object({
       value: z.string(),
       type: z.string(),
       active: z.boolean(),
-      discordId: z.string(),
+      discordId: z.string().optional(),
     })
     .array(),
 })
@@ -25,7 +25,7 @@ export default async function upsertTags(input: z.infer<typeof UpsertTags>) {
     db.tag.upsert({
       where: {
         value_terminalId: {
-          value: t.value,
+          value: t.value.toLowerCase(),
           terminalId: params.terminalId,
         },
       },
@@ -34,7 +34,7 @@ export default async function upsertTags(input: z.infer<typeof UpsertTags>) {
         active: t.active,
       },
       create: {
-        value: t.value,
+        value: t.value.toLowerCase(),
         active: t.active,
         type: t.type.toLowerCase(),
         discordId: t.discordId,
