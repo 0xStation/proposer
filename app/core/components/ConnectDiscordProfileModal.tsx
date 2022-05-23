@@ -7,7 +7,7 @@ import Modal from "./Modal"
 
 export const ConnectDiscordProfileModal = ({ isOpen, setIsOpen, activeUser, setNewAuth }) => {
   const setToastState = useStore((state) => state.setToastState)
-  // identify, email, guilds, guilds.join
+
   const { callbackWithDCAuth, isAuthenticating, authorization } = useDiscordAuthWithCallback(
     "identify guilds",
     async (authorization) => {

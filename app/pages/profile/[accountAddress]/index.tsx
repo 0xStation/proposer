@@ -58,10 +58,16 @@ const ProfileHome: BlitzPage = () => {
   }, [])
 
   useEffect(() => {
-    if (!firstRender && activeUser && account?.id === activeUser.id) {
-      if (!activeUser?.discordId && !discordAuthToken?.authorization && !newAuth) {
-        setIsConnectDiscordModalOpen(true)
-      }
+    // if it's not the first render, and the activeUser hasn't
+    // connected their account, show the connect discord modal.
+    if (
+      !firstRender &&
+      account?.id === activeUser?.id &&
+      !activeUser?.discordId &&
+      !discordAuthToken?.authorization &&
+      !newAuth
+    ) {
+      setIsConnectDiscordModalOpen(true)
     }
   }, [account, activeUser, discordAuthToken?.authorization, firstRender])
 

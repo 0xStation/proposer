@@ -1,3 +1,4 @@
+import { AccountTerminalMetadata } from "app/accountTerminal/types"
 import db from "db"
 import * as z from "zod"
 import { Account } from "../types"
@@ -15,6 +16,11 @@ const AddDiscordIdAndMergeAccount = z.object({
 // The mutation handles the following cases:
 // 1. If the user already has a discord id on their `Account`, it means
 // they are already connected, so we don't need to do anything.
+
+// 1.5 If the user doesn't have a discord id on their Account, but an account
+// already exists with the discord id AND the account has an address, that means
+// the discord info is already connected to a different user-created account.
+// The user needs to disconnect from the other user-created account first.
 
 // 2. If an account doesn't exist with a discord id, that means the user hasn't
 // connected before and a terminal has never imported the user from discord before.
@@ -49,6 +55,7 @@ export default async function addDiscordIdAndMergeAccount(
   // 1.5 If the discord account is already connected to a different Station account
   // then we don't want to delete the Station account. Instead, the user should have
   // a way to disconnect their Station account from their Discord account.
+  // The presence of an address indicates that it is a user-created account.
   if (importedAccountId.address) {
     const errorMessage = "The Discord account is already connected to another Station account."
     console.warn(errorMessage)
@@ -152,6 +159,8 @@ export default async function addDiscordIdAndMergeAccount(
           create: {
             accountId: mergedAccount?.id,
             terminalId: membership.terminalId,
+            joinedAt: membership.joinedAt,
+            data: membership.data as AccountTerminalMetadata,
             tags: {
               create: membership.tags.map((membershipTag) => {
                 return {
