@@ -363,27 +363,52 @@ const SelectedContributorCard = ({ member }) => {
         </div>
         <div className="mt-5 space-x-4">
           {account?.data?.contactURL && (
-            <a href={account?.data?.contactURL} className="hover:opacity-70 cursor-pointer">
+            <a
+              href={account?.data?.contactURL}
+              target="_blank"
+              className="hover:opacity-70 cursor-pointer"
+              rel="noreferrer"
+            >
               <Image src={PersonalSiteIcon} alt="Personal Site Icon." width={15} height={15} />
             </a>
           )}
           {account?.data?.twitterUrl && (
-            <a href={account?.data?.twitterUrl} className="hover:opacity-70 cursor-pointer">
+            <a
+              href={account?.data?.twitterUrl}
+              target="_blank"
+              className="hover:opacity-70 cursor-pointer"
+              rel="noreferrer"
+            >
               <Image src={TwitterIcon} alt="Twitter Icon." width={15} height={15} />
             </a>
           )}
           {account?.data?.githubUrl && (
-            <a href={account?.data?.githubUrl} className="hover:opacity-70 cursor-pointer">
+            <a
+              href={account?.data?.githubUrl}
+              target="_blank"
+              className="hover:opacity-70 cursor-pointer"
+              rel="noreferrer"
+            >
               <Image src={GithubIcon} alt="Github Icon." width={15} height={15} />
             </a>
           )}
           {account?.data?.tiktokUrl && (
-            <a href={account?.data?.tiktokUrl} className="hover:opacity-70 cursor-pointer">
+            <a
+              href={account?.data?.tiktokUrl}
+              target="_blank"
+              className="hover:opacity-70 cursor-pointer"
+              rel="noreferrer"
+            >
               <Image src={TikTokIcon} alt="TikTok Icon." width={15} height={15} />
             </a>
           )}
           {account?.data?.instagramUrl && (
-            <a href={account?.data?.instagramUrl} className="hover:opacity-70 cursor-pointer">
+            <a
+              href={account?.data?.instagramUrl}
+              target="_blank"
+              className="hover:opacity-70 cursor-pointer"
+              rel="noreferrer"
+            >
               <Image src={InstagramIcon} alt="Instagram Icon." width={15} height={15} />
             </a>
           )}
