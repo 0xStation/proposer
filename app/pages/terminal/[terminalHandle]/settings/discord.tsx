@@ -135,8 +135,7 @@ const DiscordSettingsPage: BlitzPage = () => {
                 <div className="w-full h-full flex items-center flex-col justify-center">
                   <p className="text-marble-white text-2xl font-bold">Connect with Discord</p>
                   <p className="mt-2 text-marble-white text-base w-[400px] text-center">
-                    Connect with Discord to synchronize roles and manage permissions & access on
-                    Station.
+                    Connect with Discord to import roles and members.
                   </p>
                   <button
                     onClick={() => {
