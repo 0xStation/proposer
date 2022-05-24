@@ -73,12 +73,18 @@ const ProfileHome: BlitzPage = () => {
 
   return (
     <Layout title={`${account ? `${account?.data?.name} | ` : ""}Profile`}>
-      <ConnectDiscordProfileModal
-        isOpen={isConnectDiscordModalOpen}
-        setIsOpen={setIsConnectDiscordModalOpen}
-        activeUser={activeUser}
-        setNewAuth={setNewAuth}
-      />
+      {
+        // only show discord popup if I don't have a discordId associated with my account
+        // first account check prevents flicker of modal while account is still loading
+        account && !account?.discordId && (
+          <ConnectDiscordProfileModal
+            isOpen={isConnectDiscordModalOpen}
+            setIsOpen={setIsConnectDiscordModalOpen}
+            activeUser={activeUser}
+            setNewAuth={setNewAuth}
+          />
+        )
+      }
       <ProfileNavigation account={account} terminals={terminals}>
         {terminals && terminals.length ? (
           <>
