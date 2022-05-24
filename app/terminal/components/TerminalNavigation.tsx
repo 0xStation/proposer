@@ -54,7 +54,13 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
           </div>
           {session?.siwe?.address && hasAdminPermissions && (
             <div className="flex flex-col mt-3 relative">
-              <Link href={Routes.TerminalSettingsPage({ terminalHandle })}>
+              <Link
+                href={
+                  !tutorial
+                    ? Routes.TerminalSettingsPage({ terminalHandle })
+                    : Routes.DiscordSettingsPage({ terminalHandle })
+                }
+              >
                 <button className={`${!!tutorial && "z-30"} group`}>
                   <SettingsIcon className="group-hover:fill-concrete cursor-pointer" />
                 </button>
