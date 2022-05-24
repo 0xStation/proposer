@@ -47,7 +47,7 @@ const DiscordConnectPage: BlitzPage = () => {
 
       <div className="mt-12">
         <h1 className="text-2xl font-bold">Connect with Discord</h1>
-        <p>Add the Station bot to your discord to proceed.</p>
+        <p>Connect with Discord to import and create your membership directory in a few clicks.</p>
       </div>
 
       <Form

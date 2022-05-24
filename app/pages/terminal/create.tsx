@@ -34,7 +34,7 @@ const PfpInput = ({ pfpURL, onUpload }) => {
   return (
     <div className="flex flex-col">
       <label className="font-bold text-base">Logo</label>
-      <span className="text-concrete text-xs mt-1">.jpg or .png</span>
+      <span className="text-concrete text-xs">.jpg or .png</span>
       <div
         className="w-24 h-24 border rounded-xl bg-gradient-to-b object-cover from-electric-violet to-magic-mint border-concrete flex items-center justify-center cursor-pointer mt-2"
         {...getRootProps()}
@@ -86,8 +86,8 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
           <>
             <h2 className="text-2xl font-bold pt-16">Open a Terminal</h2>
             <h6 className="mt-2">
-              Terminal is where members of your community collaborate and make decisions. Tell us
-              about your Terminal.
+              Terminal is where community members propose, coordinate, and fund ideas. Give it some
+              bling.
             </h6>
             <Form
               initialValues={{}}
@@ -106,37 +106,42 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
               }}
               render={({ form, handleSubmit }) => {
                 let formState = form.getState()
+                console.log(formState)
                 let errors = formState.errors
                 return (
-                  <form onSubmit={handleSubmit} className="mt-6">
+                  <form onSubmit={handleSubmit} className="mt-12">
                     <div className="flex flex-col">
                       <div className="flex flex-col pb-2 col-span-2">
-                        <label className="font-bold">Terminal Name*</label>
-                        <span className="text-concrete text-xs mt-1">50 characters max.</span>
+                        <label className="font-bold">Terminal name*</label>
+                        <span className="text-concrete text-xs mb-2">50 characters max.</span>
                         <Field
                           name="name"
                           component="input"
                           validate={composeValidators(mustBeUnderNumCharacters(50), requiredField)}
                           className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-1"
                         />
-                        <span className="text-torch-red text-xs">{errors?.name}</span>
-                        <label className="font-bold mt-4">Terminal Handle*</label>
-                        <span className="text-concrete text-xs mt-1">50 characters max.</span>
+                        <span className="text-torch-red text-xs">
+                          {formState.touched && formState?.touched["name"] && errors?.name}
+                        </span>
+                        <label className="font-bold mt-6">Terminal handle*</label>
+                        <span className="text-concrete text-xs mb-2">50 characters max.</span>
                         <Field
                           name="handle"
                           component="input"
                           validate={composeValidators(mustBeUnderNumCharacters(50), requiredField)}
                           className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-1"
                         />
-                        <span className="text-torch-red text-xs">{errors?.handle}</span>
-                        <div className="mt-4">
+                        <span className="text-torch-red text-xs">
+                          {formState.touched && formState?.touched["handle"] && errors?.handle}
+                        </span>
+                        <div className="mt-6">
                           <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
                         </div>
                       </div>
-                      <div className="mt-4">
+                      <div className="mt-14">
                         <button
-                          className={`rounded text-tunnel-black px-8 py-1 ${
-                            formState.hasValidationErrors ? "bg-light-concrete" : "bg-magic-mint"
+                          className={`rounded text-tunnel-black px-8 py-1 bg-magic-mint ${
+                            formState.hasValidationErrors && "opacity-50"
                           }`}
                           type="submit"
                         >

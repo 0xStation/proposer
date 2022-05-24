@@ -43,7 +43,7 @@ const PfpInput = ({ pfpURL, onUpload }) => {
     <div className="flex-col">
       <label className="font-bold text-base">PFP</label>
       <div
-        className="w-24 h-24 border rounded-xl bg-gradient-to-b object-cover from-electric-violet to-magic-mint border-concrete flex items-center justify-center cursor-pointer mt-4"
+        className="w-24 h-24 border rounded-xl bg-gradient-to-b object-cover from-electric-violet to-magic-mint border-concrete flex items-center justify-center cursor-pointer mt-2"
         {...getRootProps()}
       >
         <>
@@ -152,7 +152,7 @@ const TerminalSettingsPage: BlitzPage = () => {
                   <form onSubmit={handleSubmit}>
                     <div className="flex flex-col">
                       <div className="p-6 border-b border-concrete flex justify-between">
-                        <h2 className="text-marble-white text-2xl font-bold">Terminal Overview</h2>
+                        <h2 className="text-marble-white text-2xl font-bold">Terminal overview</h2>
                         <button
                           className={`rounded text-tunnel-black px-8 ${
                             formState.hasValidationErrors ? "bg-light-concrete" : "bg-magic-mint"
@@ -165,8 +165,8 @@ const TerminalSettingsPage: BlitzPage = () => {
                       <div className="p-6">
                         <div className="grid grid-cols-3 gap-4">
                           <div className="flex flex-col pb-2 col-span-2">
-                            <label className="font-bold">Terminal Name*</label>
-                            <span className="text-concrete text-xs mt-1">50 characters max.</span>
+                            <label className="font-bold">Terminal name*</label>
+                            <span className="text-concrete text-xs">50 characters max.</span>
                             <Field
                               name="name"
                               component="input"
@@ -174,13 +174,13 @@ const TerminalSettingsPage: BlitzPage = () => {
                               className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
                             />
                             <span className="text-torch-red text-xs">{errors?.name}</span>
-                            <label className="font-bold mt-4">Terminal Handle*</label>
-                            <span className="text-concrete text-xs mt-1">50 characters max.</span>
+                            <label className="font-bold mt-6">Terminal handle*</label>
+                            <span className="text-concrete text-xs">50 characters max.</span>
                             <Field
                               name="handle"
                               component="input"
                               validate={mustBeUnderNumCharacters(50)}
-                              className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-4"
+                              className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-6"
                             />
                             <span className="text-torch-red text-xs">{errors?.handle}</span>
                             <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
