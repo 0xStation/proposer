@@ -8,8 +8,20 @@ import TwitterIcon from "public/twitter-icon.svg"
 import PersonalSiteIcon from "public/personal-site-icon.svg"
 import InstagramIcon from "public/instagram-icon.svg"
 import TikTokIcon from "public/tiktok-icon.svg"
+import { Terminal } from "app/terminal/types"
+import { Account } from "app/account/types"
 
-export const Navigation = ({ account, terminals, children }) => {
+export const Navigation = ({
+  account,
+  terminals,
+  children,
+  setIsConnectDiscordModalOpen,
+}: {
+  account?: Account
+  terminals?: Terminal[]
+  children?: any
+  setIsConnectDiscordModalOpen?: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
 
@@ -98,14 +110,21 @@ export const Navigation = ({ account, terminals, children }) => {
           <div>
             <p className="text-marble-white text-base mt-4 font-normal">{account?.data.bio}</p>
           </div>
-          {activeUser?.address === account?.address && (
+          {activeUser?.address === account?.address ? (
             <button
               onClick={() => router.push("/profile/edit")}
               className="mt-4 p-[0.20rem] border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer"
             >
               Edit Profile
             </button>
-          )}
+          ) : !account?.address && !activeUser?.discordId && setIsConnectDiscordModalOpen ? (
+            <button
+              onClick={() => setIsConnectDiscordModalOpen(true)}
+              className="mt-4 p-[0.20rem] border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer"
+            >
+              Claim Account
+            </button>
+          ) : null}
         </div>
         <div>
           <ul className="mt-6 ml-8 text-lg space-y-2">

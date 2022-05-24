@@ -11,6 +11,7 @@ import { formatDate } from "app/core/utils/formatDate"
 import useLocalStorage from "app/core/hooks/useLocalStorage"
 import useStore from "app/core/hooks/useStore"
 import { Auth } from "app/auth/types"
+import { Account } from "app/account/types"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
@@ -79,7 +80,7 @@ const ProfileHome: BlitzPage = () => {
         activeUser={activeUser}
         setNewAuth={setNewAuth}
       />
-      <ProfileNavigation account={account} terminals={terminals}>
+      <ProfileNavigation account={account as Account} terminals={terminals}>
         {terminals && terminals.length ? (
           <>
             <div className="h-[108px] border-b border-concrete">

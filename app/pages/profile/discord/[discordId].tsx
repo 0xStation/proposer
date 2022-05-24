@@ -10,6 +10,7 @@ import { formatDate } from "app/core/utils/formatDate"
 import useLocalStorage from "app/core/hooks/useLocalStorage"
 import useStore from "app/core/hooks/useStore"
 import { Auth } from "app/auth/types"
+import { Account } from "app/account/types"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
@@ -23,7 +24,6 @@ const DiscordProfileHome: BlitzPage = () => {
     false
   )
   const activeUser = useStore((state) => state.activeUser)
-  const [firstRender, setFirstRender] = useState<boolean>(true)
 
   // TODO: useLocalStorage doesn't return us the updated authentication value
   // so just manually setting it for now, but we can prob change it to use a hook
@@ -51,25 +51,6 @@ const DiscordProfileHome: BlitzPage = () => {
     }
   )
 
-  useEffect(() => {
-    // suppress first render flicker of the connect discord modal
-    setFirstRender(false)
-  }, [])
-
-  useEffect(() => {
-    // if it's not the first render, and the activeUser hasn't
-    // connected their account, show the connect discord modal.
-    if (
-      !firstRender &&
-      account?.id === activeUser?.id &&
-      !activeUser?.discordId &&
-      !discordAuthToken?.authorization &&
-      !newAuth
-    ) {
-      setIsConnectDiscordModalOpen(true)
-    }
-  }, [account, activeUser, discordAuthToken?.authorization, firstRender])
-
   return (
     <Layout title={`${account ? `${account?.data?.name} | ` : ""}Profile`}>
       <ConnectDiscordProfileModal
@@ -78,7 +59,11 @@ const DiscordProfileHome: BlitzPage = () => {
         activeUser={activeUser}
         setNewAuth={setNewAuth}
       />
-      <ProfileNavigation account={account} terminals={terminals}>
+      <ProfileNavigation
+        account={account as Account}
+        terminals={terminals}
+        setIsConnectDiscordModalOpen={setIsConnectDiscordModalOpen}
+      >
         {terminals && terminals.length ? (
           <>
             <div className="h-[108px] border-b border-concrete">
