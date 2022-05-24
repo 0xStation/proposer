@@ -75,6 +75,7 @@ const EditProfileApps: BlitzPage = ({
               LIST_OF_SUPPORTED_APPS_METADATA.map((app, idx) => (
                 <AppComponent
                   app={app}
+                  selectedAppName={selectedAppName}
                   setSelectedAppName={setSelectedAppName}
                   key={app.name + idx}
                 />
@@ -87,11 +88,13 @@ const EditProfileApps: BlitzPage = ({
   )
 }
 
-const AppComponent = ({ app, setSelectedAppName }) => {
+const AppComponent = ({ app, selectedAppName, setSelectedAppName }) => {
   return (
     <div
       tabIndex={0}
-      className="flex flex-row space-x-52 p-3 mx-3 mt-3 rounded-lg hover:bg-wet-concrete cursor-pointer"
+      className={`flex flex-row space-x-52 p-3 mx-3 mt-3 rounded-lg hover:bg-wet-concrete cursor-pointer ${
+        app.name === selectedAppName ? "bg-wet-concrete" : ""
+      }`}
       onClick={() => {
         setSelectedAppName(app.name)
       }}

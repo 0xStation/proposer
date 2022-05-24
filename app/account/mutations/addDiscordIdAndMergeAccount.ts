@@ -17,16 +17,16 @@ const AddDiscordIdAndMergeAccount = z.object({
 // 1. If the user already has a discord id on their `Account`, it means
 // they are already connected, so we don't need to do anything.
 
-// 1.5 If the user doesn't have a discord id on their Account, but an account
-// already exists with the discord id AND the account has an address, that means
-// the discord info is already connected to a different user-created account.
-// The user needs to disconnect from the other user-created account first.
-
 // 2. If an account doesn't exist with a discord id, that means the user hasn't
 // connected before and a terminal has never imported the user from discord before.
 // In this case, we update the user's account to include the discord id.
 
-// 3. The last handled case is if an account has been created with the user's discord id
+// 3. If the user doesn't have a discord id on their Account, but an account
+// already exists with the discord id AND the account has an address, that means
+// the discord info is already connected to a different user-created account.
+// The user needs to disconnect from the other user-created account first.
+
+// 4. The last handled case is if an account has been created with the user's discord id
 // when the terminal imported discord accounts and the user is connecting their account
 // for the first time. Here we need to merge the accounts and delete the imported account.
 export default async function addDiscordIdAndMergeAccount(
@@ -52,16 +52,6 @@ export default async function addDiscordIdAndMergeAccount(
     return importedAccount
   }
 
-  // 1.5 If the discord account is already connected to a different Station account
-  // then we don't want to delete the Station account. Instead, the user should have
-  // a way to disconnect their Station account from their Discord account.
-  // The presence of an address indicates that it is a user-created account.
-  if (importedAccountId.address) {
-    const errorMessage = "The Discord account is already connected to another Station account."
-    console.warn(errorMessage)
-    throw Error(errorMessage)
-  }
-
   // 2. If account doesn't exist, then the account hasn't been imported before.
   // Add discord id to existing account.
   if (!importedAccount) {
@@ -82,7 +72,17 @@ export default async function addDiscordIdAndMergeAccount(
     }
   }
 
-  // 3. Else, we need to grab the user-created account and merge it with the imported account.
+  // 3. If the discord account is already connected to a different Station account
+  // then we don't want to delete the Station account. Instead, the user should have
+  // a way to disconnect their Station account from their Discord account.
+  // The presence of an address indicates that it is a user-created account.
+  if (importedAccount.address) {
+    const errorMessage = "The Discord account is already connected to another Station account."
+    console.warn(errorMessage)
+    throw Error(errorMessage)
+  }
+
+  // 4. Else, we need to grab the user-created account and merge it with the imported account.
   const userCreatedAccount = await db.account.findFirst({
     where: { id: params.accountId },
   })

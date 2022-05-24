@@ -112,6 +112,7 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <ContributorComponent
                   key={`${member.joinedAt}${idx}`}
                   member={member}
+                  selectedMember={selectedMember}
                   setSelectedMember={setSelectedMember}
                 />
               ))}
@@ -273,13 +274,15 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
   )
 }
 
-const ContributorComponent = ({ member, setSelectedMember }) => {
+const ContributorComponent = ({ member, selectedMember, setSelectedMember }) => {
   const { account } = member
 
   return (
     <div
       tabIndex={0}
-      className="flex flex-row space-x-52 p-3 mx-3 mt-3 rounded-lg hover:bg-wet-concrete cursor-pointer"
+      className={`flex flex-row space-x-52 p-3 mx-3 mt-3 rounded-lg hover:bg-wet-concrete cursor-pointer ${
+        account.id === selectedMember?.account?.id ? "bg-wet-concrete" : ""
+      }`}
       onClick={() => setSelectedMember(member)}
     >
       <div className="flex space-x-2">
