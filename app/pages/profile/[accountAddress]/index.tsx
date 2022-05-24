@@ -93,6 +93,7 @@ const ProfileHome: BlitzPage = () => {
                     <TerminalComponent
                       key={`${terminal.handle}${idx}`}
                       terminal={terminal}
+                      selectedTerminal={selectedTerminal}
                       setSelectedTerminal={setSelectedTerminal}
                     />
                   ))}
@@ -131,11 +132,13 @@ const ProfileHome: BlitzPage = () => {
   )
 }
 
-const TerminalComponent = ({ terminal, setSelectedTerminal }) => {
+const TerminalComponent = ({ terminal, selectedTerminal, setSelectedTerminal }) => {
   return (
     <div
       tabIndex={0}
-      className="flex flex-row space-x-52 p-3 mx-3 mt-3 rounded-lg hover:bg-wet-concrete cursor-pointer"
+      className={`flex flex-row space-x-52 p-3 mx-3 mt-3 rounded-lg hover:bg-wet-concrete cursor-pointer ${
+        selectedTerminal?.id === terminal?.id ? "bg-wet-concrete" : ""
+      }`}
       onClick={() => setSelectedTerminal(terminal)}
     >
       <div className="flex space-x-2">
