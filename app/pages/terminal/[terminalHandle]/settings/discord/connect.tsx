@@ -37,8 +37,8 @@ const DiscordConnectPage: BlitzPage = () => {
   return (
     <div className="max-w-screen-sm mx-auto pt-12 flex flex-col">
       <div className="grid grid-cols-2 gap-2">
-        <div className="border-t-4 border-neon-blue pt-2">
-          <span className="text-sm text-neon-blue">Connect with Discord</span>
+        <div className="border-t-4 border-electric-violet pt-2">
+          <span className="text-sm text-electric-violet">Connect with Discord</span>
         </div>
         <div className="border-t-4 border-light-concrete pt-2">
           <span className="text-sm text-light-concrete">Import roles and members</span>

@@ -39,11 +39,11 @@ const DiscordImportPage: BlitzPage = () => {
   const initialFormValues = useMemo(() => {
     if (connectedGuild && terminal) {
       let allRoles = connectedGuild.roles.reduce((acc, role) => {
-        let roleName = role.name.replace(".", "")
-        acc[roleName] = {
+        let roleId = "x" + String(role.id)
+        acc[roleId] = {
           active: true,
           type: "inactive",
-          discordId: role.id,
+          name: role.name,
         }
         return acc
       }, {})
@@ -63,11 +63,11 @@ const DiscordImportPage: BlitzPage = () => {
     <LayoutWithoutNavigation>
       <div className="max-w-screen-sm mx-auto pt-12 flex flex-col">
         <div className="grid grid-cols-2 gap-2">
-          <div className="border-t-4 border-neon-blue pt-2">
-            <span className="text-sm text-neon-blue">Import with Discord</span>
+          <div className="border-t-4 border-light-concrete pt-2">
+            <span className="text-sm text-light-concrete">Import with Discord</span>
           </div>
-          <div className="border-t-4 border-neon-blue pt-2">
-            <span className="text-sm text-neon-blue">Import roles and members</span>
+          <div className="border-t-4 border-electric-violet pt-2">
+            <span className="text-sm text-electric-violet">Import roles and members</span>
           </div>
         </div>
 
@@ -79,13 +79,13 @@ const DiscordImportPage: BlitzPage = () => {
         <Form
           initialValues={initialFormValues}
           onSubmit={async (values) => {
-            let names = Object.keys(values)
-            let tags = names.map((name) => {
+            let ids = Object.keys(values)
+            let tags = ids.map((id) => {
               return {
-                value: name,
-                active: values[name].active,
-                type: values[name].type,
-                discordId: values[name].discordId,
+                value: values[id].name,
+                active: values[id].active,
+                type: values[id].type,
+                discordId: id.slice(1),
               }
             })
 
@@ -164,18 +164,18 @@ const DiscordImportPage: BlitzPage = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-y-2">
                     {connectedGuild?.roles.map((role, idx) => {
-                      let roleName = role.name.replace(".", "")
-                      let cbState = form.getFieldState(roleName + ".active")
+                      let roleId = "x" + String(role.id)
+                      let cbState = form.getFieldState(roleId + ".active")
                       return (
                         <>
                           <div key={idx} className="flex flex-row items-center">
-                            <Checkbox name={`${roleName}.active`} checked={cbState?.value} />
+                            <Checkbox name={`${roleId}.active`} checked={cbState?.value} />
                             <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline ml-2">
-                              {roleName}
+                              {role.name}
                             </p>
                           </div>
                           <div>
-                            <Field name={`${roleName}.type`}>
+                            <Field name={`${roleId}.type`}>
                               {({ input }) => (
                                 <div>
                                   <select
@@ -200,8 +200,8 @@ const DiscordImportPage: BlitzPage = () => {
                                 </div>
                               )}
                             </Field>
-                            <Field name={`${roleName}.discordId`}>
-                              {({ input }) => <input {...input} type="hidden" value={role.id} />}
+                            <Field name={`${roleId}.name`}>
+                              {({ input }) => <input {...input} type="hidden" value={role.name} />}
                             </Field>
                           </div>
                         </>

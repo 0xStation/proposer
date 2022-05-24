@@ -2,11 +2,12 @@ import { useRouterQuery, useRouter } from "blitz"
 import SettingsIcon from "app/core/icons/SettingsIcon"
 import MemberDirectoryIcon from "public/member-directory-icon.svg"
 import LockedIcon from "public/locked-icon.svg"
-import { Image, Link, Routes, useParam, useQuery } from "blitz"
+import { Image, Link, Routes, useParam, useQuery, useSession } from "blitz"
 import Exit from "/public/exit-button.svg"
 import getTerminalByHandle from "../queries/getTerminalByHandle"
 
 const TerminalNavigation = ({ children }: { children?: any }) => {
+  const session = useSession({ suspense: false })
   const router = useRouter()
   const { tutorial } = useRouterQuery()
   const terminalHandle = useParam("terminalHandle", "string") as string
@@ -14,7 +15,11 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
 
   return (
     <>
-      <div className="h-screen w-[300px] bg-tunnel-black border-r border-concrete fixed z-50">
+      <div
+        className={`h-screen w-[300px] bg-tunnel-black border-r border-concrete fixed ${
+          !!tutorial && "z-50"
+        }`}
+      >
         {!!tutorial && <div className="fixed inset-0 bg-tunnel-black opacity-70 z-10"></div>}
         {/* Terminal Profile metadata + Settings icon*/}
         <div className="flex content-center ml-4 mt-7">
@@ -29,28 +34,35 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
               @{terminal?.handle}
             </p>
           </div>
-          <div className="flex flex-col mt-3 relative">
-            <Link href={Routes.TerminalSettingsPage({ terminalHandle })}>
-              <button className="z-30 group">
-                <SettingsIcon className="group-hover:fill-concrete cursor-pointer" />
-              </button>
-            </Link>
-            {!!tutorial && (
-              <div className="absolute  bg-wet-concrete w-[200px] top-6 rounded p-2 z-30 flex items-center justify-between">
-                <span className="text-xs mr-1">
-                  Next, connect with Discord to import roles and members.
-                </span>
-                <span
-                  className="text-torch-red cursor-pointer"
-                  onClick={() => {
-                    router.push(window.location.href.split("?")[0] || window.location.href)
-                  }}
+          {session?.siwe?.address && (
+            <div className="flex flex-col mt-3 relative">
+              <Link href={Routes.TerminalSettingsPage({ terminalHandle })}>
+                <button className={`${!!tutorial && "z-30"} group`}>
+                  <SettingsIcon className="group-hover:fill-concrete cursor-pointer" />
+                </button>
+              </Link>
+
+              {!!tutorial && (
+                <div
+                  className={`absolute bg-wet-concrete w-[200px] top-6 rounded p-2 flex items-center justify-between ${
+                    !!tutorial && "z-30"
+                  }`}
                 >
-                  <Image src={Exit} alt="Close button" width={16} height={16} />
-                </span>
-              </div>
-            )}
-          </div>
+                  <span className="text-xs mr-1">
+                    Next, connect with Discord to import roles and members.
+                  </span>
+                  <span
+                    className="text-torch-red cursor-pointer"
+                    onClick={() => {
+                      router.push(window.location.href.split("?")[0] || window.location.href)
+                    }}
+                  >
+                    <Image src={Exit} alt="Close button" width={16} height={16} />
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
         {/* Terminal navigation */}
         <div>
