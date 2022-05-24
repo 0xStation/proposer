@@ -42,32 +42,6 @@ const DiscordSettingsPage: BlitzPage = () => {
   const { guild: connectedGuild } = useDiscordGuild(terminal?.data?.guildId)
   const { guildMembers } = useGuildMembers(terminal?.data?.guildId)
 
-  const refreshRoles = async () => {
-    if (terminal) {
-      const response = await fetch("/api/discord/sync-roles", {
-        method: "POST",
-        body: JSON.stringify({
-          terminalId: terminal.id,
-        }),
-      })
-
-      if (response.status !== 200) {
-        setToastState({
-          isToastShowing: true,
-          type: "error",
-          message: "Something went wrong!",
-        })
-        return
-      }
-
-      setToastState({
-        isToastShowing: true,
-        type: "success",
-        message: "Your roles are refreshed",
-      })
-    }
-  }
-
   // kind of confusing to explain, you probably need to see it to understand so I recorded a loom
   // https://www.loom.com/share/f5c67a2872854bb386330ddbb744a5d8
   const _initialFormValues = useMemo(() => {
@@ -220,13 +194,6 @@ const DiscordSettingsPage: BlitzPage = () => {
                     <div className="p-6 border-b border-concrete flex justify-between">
                       <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
                       <div>
-                        <button
-                          type="button"
-                          onClick={() => refreshRoles()}
-                          className={`rounded text-tunnel-black px-8 bg-magic-mint mr-4 h-full`}
-                        >
-                          Refresh Roles
-                        </button>
                         <button
                           className={`rounded text-tunnel-black px-8 h-full ${
                             formState.dirty ? "bg-magic-mint" : "bg-concrete"

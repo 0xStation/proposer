@@ -18,6 +18,8 @@ import PersonalSiteIcon from "public/personal-site-icon.svg"
 import InstagramIcon from "public/instagram-icon.svg"
 import TikTokIcon from "public/tiktok-icon.svg"
 import { toTitleCase } from "app/core/utils/titleCase"
+import { RefreshIcon } from "@heroicons/react/outline"
+import useStore from "app/core/hooks/useStore"
 
 interface Filters {
   [tagType: string]: Set<string>
@@ -33,6 +35,8 @@ const MemberDirectoryPage: BlitzPage = () => {
   const [filteredMembers, setFilteredMembers] = useState<AccountTerminalWithTagsAndAccount[]>([])
   // selected user to display in the contributor card
   const [selectedMember, setSelectedMember] = useState<AccountTerminalWithTagsAndAccount>()
+
+  const setToastState = useStore((state) => state.setToastState)
 
   // filters is a hashmap where the key is the tag type and the value is a Set of strings
   // where the strings are applied filters
@@ -82,12 +86,45 @@ const MemberDirectoryPage: BlitzPage = () => {
     }
   )
 
+  const refreshRoles = async () => {
+    if (terminal) {
+      const response = await fetch("/api/discord/sync-roles", {
+        method: "POST",
+        body: JSON.stringify({
+          terminalId: terminal.id,
+        }),
+      })
+
+      if (response.status !== 200) {
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: "Something went wrong!",
+        })
+        return
+      }
+
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Your roles are refreshed",
+      })
+    }
+  }
+
   return (
     <Layout>
       <TerminalNavigation>
         {/* Filter View */}
         <div className="h-[130px] border-b border-concrete">
-          <h1 className="text-2xl font-bold ml-6 pt-7">Membership Directory</h1>
+          <div className="flex flex-row items-center ml-6 pt-7">
+            <h1 className="text-2xl font-bold">Membership Directory</h1>
+            <RefreshIcon
+              className="h-5 w-5 ml-2 mt-1 cursor-pointer"
+              aria-hidden="true"
+              onClick={() => refreshRoles()}
+            />
+          </div>
           <div className="flex ml-6 pt-4 space-x-2">
             {groupedTags && Object.entries(groupedTags).length ? (
               Object.entries(groupedTags).map(([tagType, tags], idx) => (
