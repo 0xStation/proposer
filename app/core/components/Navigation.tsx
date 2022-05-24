@@ -92,7 +92,7 @@ const Navigation = ({ children }: { children?: any }) => {
       <div>
         {!session?.siwe?.address && (
           <div className="w-full h-[70px] absolute z-[60] bg-wet-concrete bottom-0">
-            <div className="fixed mt-3 left-1/3 ml-[-213px]">
+            <div className="fixed mt-2 left-1/3 ml-[-213px]">
               <div className="inline-block mr-16">
                 <h2 className="inline-block mr-5 text-xl font-bold justify-center">
                   {!address ? "Be recognized in your community" : "Sign in with ethereum"}
