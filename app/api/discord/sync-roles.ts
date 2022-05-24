@@ -87,14 +87,7 @@ export default async function handler(req, res) {
     // if one does exist, an empty update map will just skip over this and return the account
     const account = await db.account.upsert({
       where: { discordId: user.discordId },
-      update: {
-        data: {
-          name: user.name,
-          pfpURL: user.avatarHash
-            ? `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatarHash}.png`
-            : undefined,
-        },
-      },
+      update: {},
       create: {
         discordId: user.discordId,
         data: {
