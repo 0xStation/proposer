@@ -4,6 +4,7 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import useDiscordAuthWithCallback from "../hooks/useDiscordAuthWithCallback"
 import useStore from "../hooks/useStore"
 import Modal from "./Modal"
+import getAccountByDiscordId from "app/account/queries/getAccountByDiscordId"
 
 export const ConnectDiscordProfileModal = ({ isOpen, setIsOpen, activeUser, setNewAuth }) => {
   const setToastState = useStore((state) => state.setToastState)
@@ -41,6 +42,7 @@ export const ConnectDiscordProfileModal = ({ isOpen, setIsOpen, activeUser, setN
           })
 
           invalidateQuery(getAccountByAddress)
+          invalidateQuery(getAccountByDiscordId)
 
           return data
         } catch (err) {
