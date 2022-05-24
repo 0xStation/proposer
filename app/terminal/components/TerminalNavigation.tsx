@@ -1,10 +1,20 @@
-import { useRouterQuery, useRouter } from "blitz"
+import {
+  useRouterQuery,
+  useRouter,
+  Image,
+  Link,
+  Routes,
+  useParam,
+  useQuery,
+  useSession,
+} from "blitz"
+import { useState, useEffect } from "react"
 import SettingsIcon from "app/core/icons/SettingsIcon"
 import MemberDirectoryIcon from "public/member-directory-icon.svg"
 import LockedIcon from "public/locked-icon.svg"
-import { Image, Link, Routes, useParam, useQuery, useSession } from "blitz"
 import Exit from "/public/exit-button.svg"
 import getTerminalByHandle from "../queries/getTerminalByHandle"
+import useStore from "app/core/hooks/useStore"
 
 const TerminalNavigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -12,6 +22,14 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
   const { tutorial } = useRouterQuery()
   const terminalHandle = useParam("terminalHandle", "string") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+  const activeUser = useStore((state) => state.activeUser)
+  const [hasAdminPermissions, setHasAdminPermissions] = useState<boolean>(false)
+
+  useEffect(() => {
+    setHasAdminPermissions(
+      !!terminal?.data?.permissions?.accountWhitelist?.includes(activeUser?.id as number)
+    )
+  }, [terminal])
 
   return (
     <>
@@ -34,7 +52,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
               @{terminal?.handle}
             </p>
           </div>
-          {session?.siwe?.address && (
+          {session?.siwe?.address && hasAdminPermissions && (
             <div className="flex flex-col mt-3 relative">
               <Link href={Routes.TerminalSettingsPage({ terminalHandle })}>
                 <button className={`${!!tutorial && "z-30"} group`}>

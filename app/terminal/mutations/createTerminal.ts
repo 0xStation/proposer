@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { Terminal } from "../types"
+import { Terminal, TerminalMetadata } from "../types"
 
 const CreateTerminal = z.object({
   name: z.string(),
@@ -16,7 +16,10 @@ export default async function createTerminal(input: z.infer<typeof CreateTermina
     data: {
       pfpURL: params.pfpURL,
       name: params.name,
-    },
+      permissions: {
+        accountWhitelist: [params.accountId],
+      },
+    } as TerminalMetadata,
     handle: params.handle,
   }
 

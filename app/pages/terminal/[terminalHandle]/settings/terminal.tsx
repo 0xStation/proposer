@@ -1,5 +1,14 @@
 import { useState, useEffect, useMemo } from "react"
-import { BlitzPage, useParam, useQuery, useMutation, useRouter } from "blitz"
+import {
+  BlitzPage,
+  useParam,
+  useQuery,
+  useMutation,
+  useRouter,
+  GetServerSideProps,
+  invoke,
+  getSession,
+} from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Navigation from "app/terminal/components/settings/navigation"
 import updateTerminal from "app/terminal/mutations/updateTerminal"
@@ -56,6 +65,34 @@ const PfpInput = ({ pfpURL, onUpload }) => {
       </div>
     </div>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
+  const session = await getSession(req, res)
+
+  if (!session?.userId) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
+
+  if (!terminal?.data?.permissions?.accountWhitelist?.includes(session?.userId as number)) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  }
 }
 
 const TerminalSettingsPage: BlitzPage = () => {

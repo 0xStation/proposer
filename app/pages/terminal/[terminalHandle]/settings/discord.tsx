@@ -1,5 +1,16 @@
 import { useState, useMemo } from "react"
-import { BlitzPage, useParam, useQuery, useMutation, Routes, Link, useRouter } from "blitz"
+import {
+  BlitzPage,
+  useParam,
+  useQuery,
+  useMutation,
+  Routes,
+  Link,
+  useRouter,
+  GetServerSideProps,
+  getSession,
+  invoke,
+} from "blitz"
 import { Field, Form } from "react-final-form"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import UpsertTags from "app/tag/mutations/upsertTags"
@@ -12,6 +23,34 @@ import useGuildMembers from "app/core/hooks/useGuildMembers"
 import NoSsr from "app/core/components/NoSsr"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import useStore from "app/core/hooks/useStore"
+
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
+  const session = await getSession(req, res)
+
+  if (!session?.userId) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
+
+  if (!terminal?.data?.permissions?.accountWhitelist?.includes(session?.userId as number)) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
 
 const DiscordSettingsPage: BlitzPage = () => {
   const router = useRouter()
