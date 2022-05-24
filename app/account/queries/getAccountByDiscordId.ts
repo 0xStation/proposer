@@ -3,15 +3,11 @@ import * as z from "zod"
 import { Account } from "../types"
 
 const GetAccountByDiscordId = z.object({
-  discordId: z.string().optional(),
+  discordId: z.string(),
 })
 
 export default async function getAccountByDiscordId(input: z.infer<typeof GetAccountByDiscordId>) {
   const data = GetAccountByDiscordId.parse(input)
-
-  if (!data.discordId) {
-    return null
-  }
 
   const account = await db.account.findFirst({
     where: { discordId: data.discordId },

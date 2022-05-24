@@ -25,7 +25,6 @@ const ProfileHome: BlitzPage = () => {
     false
   )
   const activeUser = useStore((state) => state.activeUser)
-  const [firstRender, setFirstRender] = useState<boolean>(true)
 
   // TODO: useLocalStorage doesn't return us the updated authentication value
   // so just manually setting it for now, but we can prob change it to use a hook
@@ -54,32 +53,33 @@ const ProfileHome: BlitzPage = () => {
   )
 
   useEffect(() => {
-    // suppress first render flicker of the connect discord modal
-    setFirstRender(false)
-  }, [])
-
-  useEffect(() => {
     // if it's not the first render, and the activeUser hasn't
     // connected their account, show the connect discord modal.
     if (
-      !firstRender &&
       account?.id === activeUser?.id &&
+      activeUser &&
       !activeUser?.discordId &&
       !discordAuthToken?.authorization &&
       !newAuth
     ) {
       setIsConnectDiscordModalOpen(true)
     }
-  }, [account, activeUser, discordAuthToken?.authorization, firstRender])
+  }, [account, activeUser, discordAuthToken?.authorization])
 
   return (
     <Layout title={`${account ? `${account?.data?.name} | ` : ""}Profile`}>
-      <ConnectDiscordProfileModal
-        isOpen={isConnectDiscordModalOpen}
-        setIsOpen={setIsConnectDiscordModalOpen}
-        activeUser={activeUser}
-        setNewAuth={setNewAuth}
-      />
+      {
+        // only show discord popup if I don't have a discordId associated with my account
+        // first account check prevents flicker of modal while account is still loading
+        activeUser && !activeUser?.discordId && (
+          <ConnectDiscordProfileModal
+            isOpen={isConnectDiscordModalOpen}
+            setIsOpen={setIsConnectDiscordModalOpen}
+            activeUser={activeUser}
+            setNewAuth={setNewAuth}
+          />
+        )
+      }
       <ProfileNavigation account={account as Account} terminals={terminals}>
         {terminals && terminals.length ? (
           <>
