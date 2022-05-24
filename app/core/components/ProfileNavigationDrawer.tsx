@@ -37,6 +37,22 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
       </button>
     ) : null
 
+  const openATerminalLink =
+    session?.siwe?.address && activeUser ? (
+      <Link href={Routes.CreateTerminalDetailsPage()}>
+        <span className="block hover:opacity-70 cursor-pointer">Open a Terminal</span>
+      </Link>
+    ) : (
+      <a
+        href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+      >
+        <span className="block hover:opacity-70 cursor-pointer">Open a Terminal</span>
+      </a>
+    )
+
   const profilePfp =
     activeUser && activeUser.data?.pfpURL ? (
       <>
@@ -99,16 +115,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                     )}
                     <div className="space-y-2 mt-4">
                       {profileLinkOption}
-                      <a
-                        href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block"
-                      >
-                        <span className="block hover:opacity-70 cursor-pointer">
-                          Open a Terminal
-                        </span>
-                      </a>
+                      {openATerminalLink}
                       <button className="block hover:opacity-70" onClick={handleDisconnect}>
                         Disconnect
                       </button>
