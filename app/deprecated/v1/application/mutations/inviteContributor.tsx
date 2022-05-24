@@ -11,44 +11,40 @@ const InviteContributor = z.object({
 })
 
 export default async function inviteContributor(input: z.infer<typeof InviteContributor>) {
-  const params = InviteContributor.parse(input)
-  const { inviterId, terminalId, accountId, initiativeId, roleLocalId } = params
-
-  const permissions = await getInvitePermissions({ inviterId, terminalId })
-
-  if (!permissions || !permissions.includes(roleLocalId)) {
-    console.log("Not a valid invite pair.")
-    return
-  }
-
-  // update the application to show that the status is accepted
-  await db.accountInitiative.update({
-    where: {
-      accountId_initiativeId: {
-        accountId: accountId,
-        initiativeId: initiativeId,
-      },
-    },
-    data: {
-      status: "CONTRIBUTING",
-    },
-  })
-
-  await db.accountTerminal.upsert({
-    where: {
-      accountId_terminalId: {
-        accountId: accountId,
-        terminalId: terminalId,
-      },
-    },
-    create: {
-      accountId: accountId,
-      terminalId: terminalId,
-      roleLocalId: roleLocalId,
-      data: {
-        invitedBy: inviterId,
-      },
-    },
-    update: {},
-  })
+  // const params = InviteContributor.parse(input)
+  // const { inviterId, terminalId, accountId, initiativeId, roleLocalId } = params
+  // const permissions = await getInvitePermissions({ inviterId, terminalId })
+  // if (!permissions || !permissions.includes(roleLocalId)) {
+  //   console.log("Not a valid invite pair.")
+  //   return
+  // }
+  // // update the application to show that the status is accepted
+  // await db.accountInitiative.update({
+  //   where: {
+  //     accountId_initiativeId: {
+  //       accountId: accountId,
+  //       initiativeId: initiativeId,
+  //     },
+  //   },
+  //   data: {
+  //     status: "CONTRIBUTING",
+  //   },
+  // })
+  // await db.accountTerminal.upsert({
+  //   where: {
+  //     accountId_terminalId: {
+  //       accountId: accountId,
+  //       terminalId: terminalId,
+  //     },
+  //   },
+  //   create: {
+  //     accountId: accountId,
+  //     terminalId: terminalId,
+  //     roleLocalId: roleLocalId,
+  //     data: {
+  //       invitedBy: inviterId,
+  //     },
+  //   },
+  //   update: {},
+  // })
 }

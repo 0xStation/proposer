@@ -150,7 +150,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
             />
           </>
         ) : (
-          <div>you need to have an account to create a terminal.</div>
+          <div>You need to have an account to create a terminal.</div>
         )}
       </main>
     </LayoutWithoutNavigation>
