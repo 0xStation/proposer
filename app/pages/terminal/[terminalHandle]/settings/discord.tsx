@@ -42,51 +42,28 @@ const DiscordSettingsPage: BlitzPage = () => {
   const { guild: connectedGuild } = useDiscordGuild(terminal?.data?.guildId)
   const { guildMembers } = useGuildMembers(terminal?.data?.guildId)
 
-  const refreshRoles = async () => {
-    if (terminal) {
-      const response = await fetch("/api/discord/sync-roles", {
-        method: "POST",
-        body: JSON.stringify({
-          terminalId: terminal.id,
-        }),
-      })
-
-      if (response.status !== 200) {
-        setToastState({
-          isToastShowing: true,
-          type: "error",
-          message: "Something went wrong!",
-        })
-        return
-      }
-
-      setToastState({
-        isToastShowing: true,
-        type: "success",
-        message: "Your roles are refreshed",
-      })
-    }
-  }
-
   // kind of confusing to explain, you probably need to see it to understand so I recorded a loom
   // https://www.loom.com/share/f5c67a2872854bb386330ddbb744a5d8
   const _initialFormValues = useMemo(() => {
     if (connectedGuild && terminal) {
       let allRoles = connectedGuild.roles.reduce((acc, role) => {
-        let roleName = role.name.replace(".", "").toLowerCase()
-        acc[roleName] = {
+        let roleId = "x" + String(role.id)
+        acc[roleId] = {
           active: true,
           type: "inactive",
-          discordId: role.id,
+          name: role.name,
         }
         return acc
       }, {})
 
-      let existingRoles = terminal?.tags.reduce((acc, tag) => {
-        acc[tag.value] = {
-          type: tag.type,
-          active: tag.active,
-          discordId: tag.discordId,
+      let existingDiscordRoles = terminal?.tags.filter((tag) => tag.discordId)
+      let existingRoles = existingDiscordRoles.reduce((acc, tag) => {
+        if (tag.discordId) {
+          acc["x" + tag.discordId] = {
+            type: tag.type,
+            active: tag.active,
+            name: tag.value,
+          }
         }
         return acc
       }, {})
@@ -140,13 +117,13 @@ const DiscordSettingsPage: BlitzPage = () => {
           <Form
             initialValues={_initialFormValues}
             onSubmit={async (values) => {
-              let names = Object.keys(values)
-              let tags = names.map((name) => {
+              let ids = Object.keys(values)
+              let tags = ids.map((id) => {
                 return {
-                  value: name,
-                  active: values[name].active,
-                  type: values[name].type,
-                  ...(values[name].discordId && { discordId: values[name].discordId }),
+                  discordId: id.slice(1),
+                  value: values[id].name,
+                  active: values[id].active,
+                  type: values[id].type,
                 }
               })
 
@@ -218,13 +195,6 @@ const DiscordSettingsPage: BlitzPage = () => {
                       <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
                       <div>
                         <button
-                          type="button"
-                          onClick={() => refreshRoles()}
-                          className={`rounded text-tunnel-black px-8 bg-magic-mint mr-4 h-full`}
-                        >
-                          Refresh Roles
-                        </button>
-                        <button
                           className={`rounded text-tunnel-black px-8 h-full ${
                             formState.dirty ? "bg-magic-mint" : "bg-concrete"
                           }`}
@@ -254,21 +224,18 @@ const DiscordSettingsPage: BlitzPage = () => {
                           </div>
                           <div className="grid grid-cols-2 gap-y-2">
                             {connectedGuild?.roles.map((role, idx) => {
-                              let roleName = role.name.replace(".", "").toLowerCase()
-                              let cbState = form.getFieldState(roleName + ".active")
+                              let roleId = "x" + String(role.id)
+                              let cbState = form.getFieldState(roleId + ".active")
                               return (
                                 <>
                                   <div key={idx} className="flex flex-row items-center">
-                                    <Checkbox
-                                      name={`${roleName}.active`}
-                                      checked={cbState?.value}
-                                    />
+                                    <Checkbox name={`${roleId}.active`} checked={cbState?.value} />
                                     <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline ml-2">
-                                      {roleName}
+                                      {role.name}
                                     </p>
                                   </div>
                                   <div>
-                                    <Field name={`${roleName}.type`}>
+                                    <Field name={`${roleId}.type`}>
                                       {({ input }) => (
                                         <div>
                                           <select
@@ -295,9 +262,9 @@ const DiscordSettingsPage: BlitzPage = () => {
                                         </div>
                                       )}
                                     </Field>
-                                    <Field name={`${roleName}.discordId`}>
+                                    <Field name={`${roleId}.name`}>
                                       {({ input }) => (
-                                        <input {...input} type="hidden" value={role.id} />
+                                        <input {...input} type="hidden" value={role.name} />
                                       )}
                                     </Field>
                                   </div>
