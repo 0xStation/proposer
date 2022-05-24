@@ -84,7 +84,7 @@ const ProfileHome: BlitzPage = () => {
           <>
             <div className="h-[108px] border-b border-concrete">
               <h1 className="text-2xl font-bold ml-6 pt-6">Terminals</h1>
-              <p className="flex ml-6 pt-2">Communities you&apos;re a part of </p>
+              <p className="flex ml-6 pt-2">{`${account?.data?.name}'s communities`} </p>
             </div>
             <div className="grid grid-cols-7 h-full w-full">
               <div className="overflow-y-auto h-full col-span-4">

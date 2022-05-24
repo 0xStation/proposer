@@ -395,7 +395,7 @@ const SelectedContributorCard = ({ member }) => {
           <TagDetails tagType="status" tags={statusTags} />
           {member.joinedAt && (
             <div className="mt-7">
-              <p className="uppercase mb-3">joined since</p>
+              <p className="uppercase mb-2">joined since</p>
               <p className="text-base">{formatDate(member.joinedAt)}</p>
             </div>
           )}
@@ -413,7 +413,7 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
 
   return (
     <div className="mt-7">
-      <p className="uppercase mb-3">
+      <p className="uppercase mb-2">
         {tags.length > 1 || tagType == "status" ? tagType : tagType.slice(0, -1)}
       </p>
       <div className="flex-row space-y-2 align-left mr-2">
