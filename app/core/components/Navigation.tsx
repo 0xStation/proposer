@@ -95,7 +95,7 @@ const Navigation = ({ children }: { children?: any }) => {
             <div className="fixed mt-2 left-1/3 ml-[-213px]">
               <div className="inline-block mr-16">
                 <h2 className="inline-block mr-5 text-xl font-bold justify-center">
-                  {!address ? "Be recognized in your community" : "Sign in with ethereum"}
+                  {!address ? "Be recognized in your community" : "Sign in with Ethereum"}
                 </h2>
                 <p>Connect your wallet and join the next class of emerging talent</p>
               </div>
