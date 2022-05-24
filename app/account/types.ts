@@ -7,7 +7,7 @@ export type AccountMetadata = {
   ticketId?: number // TODO: remove this when subgraph is ready
   pfpURL?: string
   githubUrl?: string
-  twitterUrL?: string
+  twitterUrl?: string
   tiktokUrl?: string
   instagramUrl?: string
   ticketImage?: string

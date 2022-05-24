@@ -371,12 +371,16 @@ const SelectedContributorCard = ({ member }) => {
     (accountTerminalTag) => accountTerminalTag.tag.type === "guild"
   )
 
+  const profileLink = account.address
+    ? Routes.ProfileHome({ accountAddress: account.address })
+    : Routes.DiscordProfileHome({ discordId: account.discordId })
+
   return (
     <div className="h-full border-l border-concrete col-span-3">
       <div className="m-5 flex-col">
         <div className="flex space-x-2">
           <div className="flex flex-col content-center align-middle mr-1">
-            <Link href={Routes.ProfileHome({ accountAddress: account.address })}>
+            <Link href={profileLink}>
               {account.data.pfpURL ? (
                 <img
                   src={account.data.pfpURL}

@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react"
 import { BlitzPage, useParam, useQuery, Routes, Link } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import getAccountByAddress from "app/account/queries/getAccountByAddress"
-import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import getAccountByDiscordId from "app/account/queries/getAccountByDiscordId"
 import ConnectDiscordProfileModal from "app/core/components/ConnectDiscordProfileModal"
 import ProfileNavigation from "app/profile/components/Navigation"
 import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
@@ -15,8 +14,8 @@ import { Account } from "app/account/types"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
-const ProfileHome: BlitzPage = () => {
-  const accountAddress = useParam("accountAddress", "string") as string
+const DiscordProfileHome: BlitzPage = () => {
+  const discordId = useParam("discordId", "string") as string
   const [selectedTerminal, setSelectedTerminal] = useState<Terminal | null>(null)
   const [isConnectDiscordModalOpen, setIsConnectDiscordModalOpen] = useState<boolean>(false)
   const [discordAuthToken] = useLocalStorage<Auth | undefined>(
@@ -32,9 +31,9 @@ const ProfileHome: BlitzPage = () => {
   const [newAuth, setNewAuth] = useState<string | undefined>()
 
   const [account] = useQuery(
-    getAccountByAddress,
-    { address: toChecksumAddress(accountAddress) },
-    { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
+    getAccountByDiscordId,
+    { discordId: discordId },
+    { enabled: !!discordId, suspense: false, refetchOnWindowFocus: false }
   )
 
   const [terminals] = useQuery(
@@ -52,35 +51,19 @@ const ProfileHome: BlitzPage = () => {
     }
   )
 
-  useEffect(() => {
-    // if it's not the first render, and the activeUser hasn't
-    // connected their account, show the connect discord modal.
-    if (
-      account?.id === activeUser?.id &&
-      activeUser &&
-      !activeUser?.discordId &&
-      !discordAuthToken?.authorization &&
-      !newAuth
-    ) {
-      setIsConnectDiscordModalOpen(true)
-    }
-  }, [account, activeUser, discordAuthToken?.authorization])
-
   return (
     <Layout title={`${account ? `${account?.data?.name} | ` : ""}Profile`}>
-      {
-        // only show discord popup if I don't have a discordId associated with my account
-        // first account check prevents flicker of modal while account is still loading
-        activeUser && !activeUser?.discordId && (
-          <ConnectDiscordProfileModal
-            isOpen={isConnectDiscordModalOpen}
-            setIsOpen={setIsConnectDiscordModalOpen}
-            activeUser={activeUser}
-            setNewAuth={setNewAuth}
-          />
-        )
-      }
-      <ProfileNavigation account={account as Account} terminals={terminals}>
+      <ConnectDiscordProfileModal
+        isOpen={isConnectDiscordModalOpen}
+        setIsOpen={setIsConnectDiscordModalOpen}
+        activeUser={activeUser}
+        setNewAuth={setNewAuth}
+      />
+      <ProfileNavigation
+        account={account as Account}
+        terminals={terminals}
+        setIsConnectDiscordModalOpen={setIsConnectDiscordModalOpen}
+      >
         {terminals && terminals.length ? (
           <>
             <div className="h-[108px] border-b border-concrete">
@@ -245,6 +228,6 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
   )
 }
 
-ProfileHome.suppressFirstRenderFlicker = true
+DiscordProfileHome.suppressFirstRenderFlicker = true
 
-export default ProfileHome
+export default DiscordProfileHome
