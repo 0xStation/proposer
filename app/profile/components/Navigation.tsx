@@ -40,7 +40,7 @@ export const Navigation = ({ account, terminals, children }) => {
           <div className="flex flex-col">
             <h1 className="text-2xl text-marble-white">{account?.data.name}</h1>
             <span className="text-base text-concrete">
-              {`@${getWalletString(account?.address)}`}
+              {account?.address ? `@${getWalletString(account?.address)}` : "Imported from Discord"}
             </span>
           </div>
           <div className="flex flex-row space-x-4 mt-3">
