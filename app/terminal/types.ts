@@ -15,7 +15,7 @@ export type TerminalMetadata = {
   permissions: {
     invite: Record<string, number[]>
     edit: Record<string, number[]>
-    accountWhitelist?: number[]
+    accountWhitelist?: string[]
   }
   contracts: {
     addresses: {

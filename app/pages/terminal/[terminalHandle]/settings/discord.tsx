@@ -38,7 +38,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
 
   const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
 
-  if (!terminal?.data?.permissions?.accountWhitelist?.includes(session?.userId as number)) {
+  if (!terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string)) {
     return {
       redirect: {
         destination: "/",

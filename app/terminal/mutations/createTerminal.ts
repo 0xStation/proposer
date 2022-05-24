@@ -1,3 +1,4 @@
+import { Ctx } from "blitz"
 import db from "db"
 import * as z from "zod"
 import { Terminal, TerminalMetadata } from "../types"
@@ -9,7 +10,7 @@ const CreateTerminal = z.object({
   accountId: z.number().optional(),
 })
 
-export default async function createTerminal(input: z.infer<typeof CreateTerminal>) {
+export default async function createTerminal(input: z.infer<typeof CreateTerminal>, ctx: Ctx) {
   const params = CreateTerminal.parse(input)
 
   const payload = {
@@ -17,7 +18,7 @@ export default async function createTerminal(input: z.infer<typeof CreateTermina
       pfpURL: params.pfpURL,
       name: params.name,
       permissions: {
-        accountWhitelist: [params.accountId],
+        accountWhitelist: [ctx.session.siwe?.address],
       },
     } as TerminalMetadata,
     handle: params.handle,

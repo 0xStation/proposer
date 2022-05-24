@@ -27,9 +27,9 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
 
   useEffect(() => {
     setHasAdminPermissions(
-      !!terminal?.data?.permissions?.accountWhitelist?.includes(activeUser?.id as number)
+      !!terminal?.data?.permissions?.accountWhitelist?.includes(activeUser?.address as string)
     )
-  }, [terminal])
+  }, [terminal, activeUser?.address])
 
   return (
     <>
