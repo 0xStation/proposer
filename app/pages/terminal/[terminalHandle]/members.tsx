@@ -118,12 +118,14 @@ const MemberDirectoryPage: BlitzPage = () => {
         {/* Filter View */}
         <div className="h-[130px] border-b border-concrete">
           <div className="flex flex-row items-center ml-6 pt-7">
-            <h1 className="text-2xl font-bold">Membership Directory</h1>
-            <RefreshIcon
-              className="h-5 w-5 ml-2 mt-1 cursor-pointer"
-              aria-hidden="true"
-              onClick={() => refreshRoles()}
-            />
+            <h1 className="text-2xl font-bold">Members</h1>
+            {groupedTags && Object.entries(groupedTags).length ? (
+              <RefreshIcon
+                className="h-5 w-5 ml-2 mt-1 cursor-pointer"
+                aria-hidden="true"
+                onClick={() => refreshRoles()}
+              />
+            ) : null}
           </div>
           <div className="flex ml-6 pt-4 space-x-2">
             {groupedTags && Object.entries(groupedTags).length ? (
