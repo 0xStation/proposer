@@ -85,6 +85,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         setErrorMessage("Wallet signature declined.")
       } else {
         setErrorMessage("Something went wrong.")
+        console.error(err)
       }
       setConnectState({ error: true, success: false, loading: false })
     }
