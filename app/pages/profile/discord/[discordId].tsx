@@ -51,8 +51,6 @@ const DiscordProfileHome: BlitzPage = () => {
     }
   )
 
-  console.log("this is account", account)
-
   useEffect(() => {
     // suppress first render flicker of the connect discord modal
     setFirstRender(false)
