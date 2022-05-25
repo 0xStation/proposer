@@ -104,7 +104,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                       values.name,
                       values.handle,
                       `https://${window.location.host}`,
-                      process.env.STATION_DISCORD_SERVER_WEBHOOK
+                      process.env.BLITZ_PUBLIC_STATION_DISCORD_SERVER_WEBHOOK
                     )
                   } catch (err) {
                     setToastState({ isToastShowing: true, type: "error", message: err.toString() })
