@@ -1,18 +1,25 @@
 import { Interface } from "@ethersproject/abi"
 import { Contract } from "@ethersproject/contracts"
+import { AlchemyProvider } from "@ethersproject/providers"
 // trimmed version from snapshot here: https://github.com/snapshot-labs/snapshot.js/blob/master/src/networks.json
 import networks from "./networks.json"
 
 // forked from snapshot here: https://github.com/snapshot-labs/snapshot.js/blob/master/src/utils.ts#L46-L86
-export async function multicall(network: string, provider, abi: any[], calls: any[], options?) {
+export async function multicall(abi: any[], calls: any[], options?) {
+  const mainnet = "1" // mainnet chainId
+  // abi for making multiple view calls in one RPC call
   const multicallAbi = [
     "function aggregate(tuple(address target, bytes callData)[] calls) view returns (uint256 blockNumber, bytes[] returnData)",
   ]
+  // node provider for making calls to smart contracts
+  const provider = new AlchemyProvider("homestead", process.env.ALCHEMY_API_KEY)
+  // multicall contract object
   const multi = new Contract(
-    networks[network].multicall, // address of multicall contract on network
-    multicallAbi, // abi for making multiple view calls in one RPC call
-    provider // node provider object e.g. Alchemy, Infura
+    networks[mainnet].multicall, // address of multicall contract on mainnet
+    multicallAbi,
+    provider
   )
+  // interface object for abi to multicall
   const itf = new Interface(abi)
   try {
     // split `calls` into multiple pages of `max` length each

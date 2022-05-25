@@ -1,28 +1,31 @@
 import db from "db"
-import { Terminal } from "app/terminal/types"
 import { TagTokenMetadata, TagType } from "app/tag/types"
 import { multicall } from "app/utils/rpcMulticall"
 
 /**
  * API endpoint for "refreshing" token ownership tags for members of a Station terminal.
  * When a terminal first adds a token, the members with that token are synced.
+ * 1. Get tokens of terminal
+ * 2. Get accounts with addresses and their token tags
+ * 3. Get token ownership per account via multicall
+ * 4. Look at set difference between token ownership and tags and update database
  *
  * @param req - { terminalId: number }
  * @param res - 200 or 401
  * @returns {response: "success"}
  */
 export default async function handler(req, res) {
-  const params = JSON.parse(req.body)
+  // 1. Get tokens of terminal
 
-  // get tokens of terminal
   const tokens = await db.tag.findMany({
-    where: { terminalId: params.terminalId, type: TagType.TOKEN },
+    where: { terminalId: req.body.terminalId, type: TagType.TOKEN },
   })
 
-  // get accounts with addresses and their token tags
+  // 2. Get accounts with addresses and their token tags
+
   const memberships = await db.accountTerminal.findMany({
     where: {
-      terminalId: params.terminalId,
+      terminalId: req.body.terminalId,
       account: {
         NOT: {
           address: null,
@@ -41,36 +44,63 @@ export default async function handler(req, res) {
     },
   })
 
-  // get token ownership per account via multicall
-  const network = "1" // eth mainnet
-  const provider = null
-  const abi = ["function balanceOf(address owner) view returns (uint256 balance)"] // works for both ERC20 & ERC721
-  let calls: any[] = []
+  // 3. Get token ownership per account via multicall
+
+  // balanceOf abi works for both ERC20 & ERC721
+  const abi = ["function balanceOf(address owner) view returns (uint256 balance)"]
+  // generate call list, one per membership per token
+  let calls: any[][3] = []
   memberships.forEach((m) => {
     tokens.forEach((t) => {
-      calls.push([(t.data as TagTokenMetadata).address, "balanceOf", m.account.address])
+      calls.push([(t.data as TagTokenMetadata).address, "balanceOf", [m.account.address]])
+    })
+  })
+  // make multicall request
+  const response = await multicall(abi, calls)
+
+  // 4. Look at set difference between token ownership and tags and update database
+
+  memberships.forEach(async (m, i) => {
+    const existingTags = m.tags.map((t) => t.tagId)
+    // take slice of response calls for this user (order preserved throughout whole process)
+    const subset = response.slice(i, tokens.length * (i + 1))
+    // sort balance values >0 or =0 into different buckets
+    // v.balance values are ethers.BigNumber objects
+    const owns = subset.filter((v) => v.balance.gt(0)).map((v, i) => tokens[i]?.id)
+    const doesNotOwn = subset.filter((v) => v.balance.eq(0)).map((v, i) => tokens[i]?.id)
+    // compare owned tags to owned tokens
+    const tagsToRemove = existingTags.filter((tagId) => doesNotOwn.includes(tagId))
+    const tagsToAdd = owns.filter((tagId) => !existingTags.includes(tagId))
+    // genrate prisma object to delete or create AccountTerminalTag objects
+    const updateTagsPrismaObj = {
+      deleteMany: tagsToRemove.map((tagId) => {
+        return {
+          tagId,
+        }
+      }),
+      connectOrCreate: tagsToAdd.map((tagId) => {
+        return {
+          where: {
+            tagId_ticketAccountId_ticketTerminalId: {
+              tagId,
+              ticketAccountId: m.accountId,
+              ticketTerminalId: m.terminalId,
+            },
+          },
+          create: {
+            tagId,
+          },
+        }
+      }),
+    }
+    // submit update query for membership's token tags
+    await db.accountTerminal.update({
+      where: { accountId_terminalId: { accountId: m.accountId, terminalId: m.terminalId } },
+      data: {
+        tags: updateTagsPrismaObj,
+      },
     })
   })
 
-  const response = await multicall(network, provider, abi, calls)
-
-  let membershipObj = {}
-
-  response.forEach((value, i) => {
-    const address = calls[i][2]
-    if (!membershipObj[address]) {
-      membershipObj[address] = {
-        [calls[i][0]]: value,
-      }
-    } else {
-      membershipObj[address][calls[i][0]] = value
-    }
-  })
-
-  // take set difference between on-chain data and current AccountTerminalTags
-
-  // remove tags for tokens no longer owned, add tags for new token ownership
-
-  // better error handling and success messages prob but im exhausted rn
   res.status(200).json({ response: "success" })
 }

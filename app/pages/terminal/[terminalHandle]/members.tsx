@@ -112,6 +112,32 @@ const MemberDirectoryPage: BlitzPage = () => {
     }
   }
 
+  const refreshTokens = async () => {
+    if (terminal) {
+      const response = await fetch("/api/sync-tokens", {
+        method: "POST",
+        body: JSON.stringify({
+          terminalId: terminal.id,
+        }),
+      })
+
+      if (response.status !== 200) {
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: "Something went wrong!",
+        })
+        return
+      }
+
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Your tokens are refreshed",
+      })
+    }
+  }
+
   return (
     <Layout>
       <TerminalNavigation>
@@ -123,7 +149,10 @@ const MemberDirectoryPage: BlitzPage = () => {
               <RefreshIcon
                 className="h-5 w-5 ml-2 mt-1 cursor-pointer"
                 aria-hidden="true"
-                onClick={() => refreshRoles()}
+                onClick={() => {
+                  refreshRoles()
+                  refreshTokens()
+                }}
               />
             ) : null}
           </div>
