@@ -29,6 +29,8 @@
   "dependencies": {
     "@emotion/react": "11.8.2",
     "@emotion/styled": "11.8.1",
+    "@ethersproject/abi": "5.6.3",
+    "@ethersproject/contracts": "5.6.2",
     "@headlessui/react": "1.4.2",
     "@heroicons/react": "1.0.5",
     "@mui/icons-material": "5.5.1",
