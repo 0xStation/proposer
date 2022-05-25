@@ -8,6 +8,7 @@ import { composeValidators, requiredField, mustBeUnderNumCharacters } from "app/
 import Exit from "/public/exit-button.svg"
 import useStore from "app/core/hooks/useStore"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
+import { sendTerminalCreationNotification } from "app/utils/sendTerminalCreatedNotification"
 
 const PfpInput = ({ pfpURL, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
@@ -99,6 +100,12 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                       pfpURL,
                       accountId: session.userId,
                     })
+                    sendTerminalCreationNotification(
+                      values.name,
+                      values.handle,
+                      `https://${window.location.host}`,
+                      process.env.STATION_DISCORD_SERVER_WEBHOOK
+                    )
                   } catch (err) {
                     setToastState({ isToastShowing: true, type: "error", message: err.toString() })
                   }
