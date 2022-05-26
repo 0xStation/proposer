@@ -21,6 +21,12 @@ export default async function handler(req, res) {
   let tokens = await db.tag.findMany({
     where: { terminalId: req.body.terminalId, type: TagType.TOKEN },
   })
+
+  if (tokens.length == 0) {
+    res.status(200).json({ response: "success" })
+    return
+  }
+
   // sort tokens by chainId so that multicalls can be shared by tokens on same chain
   tokens = tokens.sort(
     (a, b) => (b.data as TagTokenMetadata).chainId - (a.data as TagTokenMetadata).chainId
@@ -49,11 +55,17 @@ export default async function handler(req, res) {
     },
   })
 
+  if (memberships.length == 0) {
+    res.status(200).json({ response: "success" })
+    return
+  }
+
   // 3. Get token ownership per account via multicall
 
   // balanceOf abi works for both ERC20 & ERC721
   const abi = ["function balanceOf(address owner) view returns (uint256 balance)"]
-  // generate call list, one per membership per token
+  // split multicalls by chainId so that multiple tokesn on same chain can share one multicall
+  // per chain, generate a call list with one call per membership per token
   let promises: any[] = []
   let currentChainId = (tokens[0]?.data as TagTokenMetadata).chainId
   let currentChainCalls: AtomicCall[] = []
@@ -72,18 +84,13 @@ export default async function handler(req, res) {
       })
     })
   })
-  // add current call list to complete loop
+  // add current chain call list to complete loop
   promises.push(multicall(currentChainId.toString(), abi, currentChainCalls))
 
   // await all multicall requests separated by chainId
   let results = await Promise.all(promises)
   // concat all results together
   results = [].concat(...results)
-
-  if (results.length == 0) {
-    res.status(200).json({ response: "success" })
-    return
-  }
 
   // 4. Look at set difference between token ownership and tags and update database
 

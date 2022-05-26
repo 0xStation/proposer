@@ -1,4 +1,5 @@
 import { Auth } from "app/auth/types"
+import { requireEnv } from "app/utils/requireEnv"
 import { useState, useEffect } from "react"
 import useLocalStorage from "./useLocalStorage"
 
@@ -17,7 +18,7 @@ const useActiveUserDiscordGuilds = () => {
   useEffect(() => {
     const fetchGuilds = async (token) => {
       if (token) {
-        let response = await fetch(`${process.env.BLITZ_PUBLIC_API_ENDPOINT}/users/@me/guilds`, {
+        let response = await fetch(`${requireEnv("BLITZ_PUBLIC_API_ENDPOINT")}/users/@me/guilds`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

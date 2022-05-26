@@ -20,6 +20,7 @@ import useStore from "app/core/hooks/useStore"
 import useLocalStorage from "app/core/hooks/useLocalStorage"
 import { Auth } from "app/auth/types"
 import NoSsr from "app/core/components/NoSsr"
+import { requireEnv } from "app/utils/requireEnv"
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session = await getSession(req, res)
@@ -135,7 +136,7 @@ export const DiscordAppCard = ({ activeUser }) => {
     async (authorization) => {
       if (authorization) {
         try {
-          let response = await fetch(`${process.env.BLITZ_PUBLIC_API_ENDPOINT}/users/@me`, {
+          let response = await fetch(`${requireEnv("BLITZ_PUBLIC_API_ENDPOINT")}/users/@me`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${authorization}`,

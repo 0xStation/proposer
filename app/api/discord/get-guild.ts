@@ -1,10 +1,12 @@
+import { requireEnv } from "app/utils/requireEnv"
+
 export default async function handler(req, res) {
   const response = await fetch(
-    `${process.env.BLITZ_PUBLIC_API_ENDPOINT}/guilds/${req.body.guild_id}`,
+    `${requireEnv("BLITZ_PUBLIC_API_ENDPOINT")}/guilds/${req.body.guild_id}`,
     {
       method: "GET",
       headers: {
-        Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+        Authorization: `Bot ${requireEnv("DISCORD_BOT_TOKEN")}`,
         "Content-Type": "application/json",
       },
     }

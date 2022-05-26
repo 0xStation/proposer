@@ -16,6 +16,7 @@ import useStore from "app/core/hooks/useStore"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import useLocalStorage from "app/core/hooks/useLocalStorage"
 import { Auth } from "app/auth/types"
+import { requireEnv } from "app/utils/requireEnv"
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session = await getSession(req, res)
@@ -54,7 +55,7 @@ const CreateConnectDiscord: BlitzPage = ({
     async (authorization) => {
       if (authorization) {
         try {
-          let response = await fetch(`${process.env.BLITZ_PUBLIC_API_ENDPOINT}/users/@me`, {
+          let response = await fetch(`${requireEnv("BLITZ_PUBLIC_API_ENDPOINT")}/users/@me`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${authorization}`,

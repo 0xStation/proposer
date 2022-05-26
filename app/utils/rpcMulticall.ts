@@ -3,6 +3,7 @@ import { Contract } from "@ethersproject/contracts"
 import { AlchemyProvider } from "@ethersproject/providers"
 // trimmed version from snapshot here: https://github.com/snapshot-labs/snapshot.js/blob/master/src/networks.json
 import networks from "./networks.json"
+import { requireEnv } from "./requireEnv"
 
 export type AtomicCall = {
   targetAddress: string
@@ -11,13 +12,14 @@ export type AtomicCall = {
 }
 
 // forked from snapshot here: https://github.com/snapshot-labs/snapshot.js/blob/master/src/utils.ts#L46-L86
-export async function multicall(chainId: string, abi: any[], calls: AtomicCall[], options?) {
+export async function multicall(chainId: string, abi: string[], calls: AtomicCall[], options?) {
   // abi for making multiple view calls in one RPC call
   const multicallAbi = [
     "function aggregate(tuple(address target, bytes callData)[] calls) view returns (uint256 blockNumber, bytes[] returnData)",
   ]
+
   // node provider for making calls to smart contracts
-  const provider = new AlchemyProvider(networks[chainId].network, process.env.ALCHEMY_API_KEY)
+  const provider = new AlchemyProvider(networks[chainId].network, requireEnv("ALCHEMY_API_KEY"))
   // multicall contract object
   const multi = new Contract(
     networks[chainId].multicall, // address of multicall contract on specific chain
