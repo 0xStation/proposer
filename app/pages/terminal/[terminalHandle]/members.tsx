@@ -400,6 +400,10 @@ const SelectedContributorCard = ({ member }) => {
     (accountTerminalTag) => accountTerminalTag.tag.type === "guild"
   )
 
+  const tokenTags = member.tags?.filter(
+    (accountTerminalTag) => accountTerminalTag.tag.type === "token"
+  )
+
   const profileLink = account.address
     ? Routes.ProfileHome({ accountAddress: account.address })
     : Routes.DiscordProfileHome({ discordId: account.discordId })
@@ -499,6 +503,7 @@ const SelectedContributorCard = ({ member }) => {
           <TagDetails tagType="roles" tags={roleTags} />
           <TagDetails tagType="projects" tags={projectTags} />
           <TagDetails tagType="guilds" tags={guildTags} />
+          <TagDetails tagType="tokens" tags={tokenTags} />
         </div>
       </div>
     </div>
