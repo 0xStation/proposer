@@ -312,7 +312,10 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                                   className="align-middle"
                                 />
                                 <p className="p-0.5 align-middle mx-4 inline leading-none">
-                                  {toTitleCase(tag.value)}
+                                  {
+                                    // title case text except on ERC20 tokens
+                                    tag.value[0] == "$" ? tag.value : toTitleCase(tag.value)
+                                  }
                                 </p>
                               </div>
                             )
