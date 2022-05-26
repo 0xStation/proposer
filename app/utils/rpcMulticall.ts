@@ -5,8 +5,7 @@ import { AlchemyProvider } from "@ethersproject/providers"
 import networks from "./networks.json"
 
 // forked from snapshot here: https://github.com/snapshot-labs/snapshot.js/blob/master/src/utils.ts#L46-L86
-export async function multicall(abi: any[], calls: any[], options?) {
-  const mainnet = "1" // mainnet chainId
+export async function multicall(chainId: string, abi: any[], calls: any[], options?) {
   // abi for making multiple view calls in one RPC call
   const multicallAbi = [
     "function aggregate(tuple(address target, bytes callData)[] calls) view returns (uint256 blockNumber, bytes[] returnData)",
@@ -15,7 +14,7 @@ export async function multicall(abi: any[], calls: any[], options?) {
   const provider = new AlchemyProvider("homestead", process.env.ALCHEMY_API_KEY)
   // multicall contract object
   const multi = new Contract(
-    networks[mainnet].multicall, // address of multicall contract on mainnet
+    networks[chainId].multicall, // address of multicall contract on specific chain
     multicallAbi,
     provider
   )

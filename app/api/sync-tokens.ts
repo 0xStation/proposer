@@ -18,9 +18,12 @@ import { toChecksumAddress } from "app/core/utils/checksumAddress"
 export default async function handler(req, res) {
   // 1. Get tokens of terminal
 
-  const tokens = await db.tag.findMany({
+  let tokens = await db.tag.findMany({
     where: { terminalId: req.body.terminalId, type: TagType.TOKEN },
   })
+  tokens = tokens.sort(
+    (a, b) => (b.data as TagTokenMetadata).chainId - (a.data as TagTokenMetadata).chainId
+  )
 
   // 2. Get accounts with addresses and their token tags
 
@@ -50,28 +53,53 @@ export default async function handler(req, res) {
   // balanceOf abi works for both ERC20 & ERC721
   const abi = ["function balanceOf(address owner) view returns (uint256 balance)"]
   // generate call list, one per membership per token
-  let calls: any[][3] = []
-  memberships.forEach((m) => {
-    tokens.forEach((t) => {
-      calls.push([
+  let promises: any[] = []
+  let currentChainId = (tokens[0]?.data as TagTokenMetadata).chainId
+  let currentChainCalls: any[][3] = []
+  tokens.forEach((t) => {
+    const tokenChain = (t.data as TagTokenMetadata).chainId
+    if (tokenChain !== currentChainId) {
+      promises.push(multicall(currentChainId.toString(), abi, currentChainCalls))
+      currentChainId = tokenChain
+      currentChainCalls = []
+    }
+    memberships.forEach((m) => {
+      // console.log(m)
+      currentChainCalls.push([
         toChecksumAddress((t.data as TagTokenMetadata).address),
         "balanceOf",
         [toChecksumAddress(m.account.address as string)],
       ])
     })
   })
-  // make multicall request
-  const response = await multicall(abi, calls)
+  promises.push(multicall(currentChainId.toString(), abi, currentChainCalls))
+
+  // await all multicall requests separated by chainId
+  let results = await Promise.all(promises)
+  // concat all results together
+  results = [].concat(...results)
+
+  if (results.length == 0) {
+    res.status(200).json({ response: "success" })
+    return
+  }
 
   // 4. Look at set difference between token ownership and tags and update database
 
   memberships.forEach(async (m, i) => {
     const existingTags = m.tags.map((t) => t.tagId)
+
     // take slice of response calls for this user (order preserved throughout whole process)
-    const subset = response.slice(i, tokens.length * (i + 1))
+    // grab every i of a membership.length cycle repeating tokens.length times
+    const subset: any[] = []
+    for (let j = 0; j < tokens.length; j++) {
+      const arrIndex = i + j * memberships.length
+      subset.push(results[arrIndex])
+    }
+
     // sort balance values >0 or =0 into different buckets
     // v.balance values are ethers.BigNumber objects
-    const owns = subset.filter((v) => v.balance.gt(0)).map((v, i) => tokens[i]?.id)
+    const owns = subset.filter((v) => v.balance.gt(0)).map((v, i) => tokens[i]?.id as number)
     const doesNotOwn = subset.filter((v) => v.balance.eq(0)).map((v, i) => tokens[i]?.id)
     // compare owned tags to owned tokens
     const tagsToRemove = existingTags.filter((tagId) => doesNotOwn.includes(tagId))
