@@ -122,20 +122,25 @@ const MemberDirectoryPage: BlitzPage = () => {
         }),
       })
 
-      if (response.status !== 200) {
+      // timeout to not make toasts overlap with sync-roles
+      // TODO replace this with toast enabling stacking instead
+      // https://linear.app/station/issue/WEB-424/if-queuing-multiple-toasts-simultaneously-stack-them
+      await setTimeout(() => {
+        if (response.status !== 200) {
+          setToastState({
+            isToastShowing: true,
+            type: "error",
+            message: "Something went wrong!",
+          })
+          return
+        }
+
         setToastState({
           isToastShowing: true,
-          type: "error",
-          message: "Something went wrong!",
+          type: "success",
+          message: "Your tokens are refreshed",
         })
-        return
-      }
-
-      setToastState({
-        isToastShowing: true,
-        type: "success",
-        message: "Your tokens are refreshed",
-      })
+      }, 3500)
     }
   }
 
