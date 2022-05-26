@@ -113,7 +113,7 @@ const MemberDirectoryPage: BlitzPage = () => {
   }
 
   return (
-    <Layout>
+    <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Members`}>
       <TerminalNavigation>
         {/* Filter View */}
         <div className="h-[130px] border-b border-concrete">
