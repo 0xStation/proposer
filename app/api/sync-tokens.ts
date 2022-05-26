@@ -16,10 +16,17 @@ import { toChecksumAddress } from "app/core/utils/checksumAddress"
  * @returns {response: "success"}
  */
 export default async function handler(req, res) {
+  const terminalId = JSON.parse(req.body).terminalId
+
+  if (terminalId == null) {
+    res.status(500).json({ response: "Terminal ID must be not null" })
+    return
+  }
+
   // 1. Get tokens of terminal
 
   let tokens = await db.tag.findMany({
-    where: { terminalId: req.body.terminalId, type: TagType.TOKEN },
+    where: { terminalId, type: TagType.TOKEN },
   })
 
   if (tokens.length == 0) {
@@ -36,7 +43,7 @@ export default async function handler(req, res) {
 
   const memberships = await db.accountTerminal.findMany({
     where: {
-      terminalId: req.body.terminalId,
+      terminalId,
       account: {
         NOT: {
           address: null,

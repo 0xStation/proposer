@@ -20,6 +20,7 @@ import TikTokIcon from "public/tiktok-icon.svg"
 import { toTitleCase } from "app/core/utils/titleCase"
 import { RefreshIcon } from "@heroicons/react/outline"
 import useStore from "app/core/hooks/useStore"
+import { TagType } from "app/tag/types"
 
 interface Filters {
   [tagType: string]: Set<string>
@@ -396,21 +397,19 @@ const SelectedContributorCard = ({ member }) => {
   const { account } = member
 
   const statusTags = member.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "status"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.STATUS
   )
-
   const roleTags = member.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "role"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.ROLE
   )
   const projectTags = member.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "project"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.PROJECT
   )
   const guildTags = member.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "guild"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.GUILD
   )
-
   const tokenTags = member.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "token"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.TOKEN
   )
 
   const profileLink = account.address
