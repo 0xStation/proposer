@@ -104,7 +104,7 @@ const Navigation = ({ children }: { children?: any }) => {
             </div>
             <button
               onClick={() => toggleWalletModal(true)}
-              className="inline h-[35px] bg-magic-mint text-tunnel-black w-48 rounded align-middle p-1 hover:bg-opacity-70 ml-28 mt-4 mr-[-6rem] right-1/3 fixed"
+              className="inline h-[35px] bg-magic-mint text-tunnel-black w-48 rounded align-middle p-1 hover:bg-opacity-70 ml-28 mt-4 mr-[-6.65rem] right-1/3 fixed"
             >
               {!address ? "Connect Wallet" : "Sign in with Ethereum"}
             </button>

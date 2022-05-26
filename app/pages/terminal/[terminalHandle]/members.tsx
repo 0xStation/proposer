@@ -385,10 +385,10 @@ const SelectedContributorCard = ({ member }) => {
                 <img
                   src={account.data.pfpURL}
                   alt="PFP"
-                  className="min-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete hover:border-marble-white"
+                  className="min-w-[46px] max-h-[46px] rounded-full cursor-pointer border border-wet-concrete hover:border-marble-white"
                 />
               ) : (
-                <div className="h-[46px] min-w-[46px] place-self-center border border-wet-concrete hover:border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
+                <div className="max-h-[46px] min-w-[46px] place-self-center border border-wet-concrete hover:border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
               )}
             </Link>
           </div>
