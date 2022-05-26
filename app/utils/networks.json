@@ -1,0 +1,162 @@
+{
+  "1": {
+    "key": "1",
+    "name": "Ethereum Mainnet",
+    "chainId": 1,
+    "network": "homestead",
+    "multicall": "0xeefba1e63905ef1d7acba5a8513c70307c1ce441",
+    "ensResolver": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
+    "rpc": [
+      {
+        "url": "https://api-geth-archive.ankr.com",
+        "user": "balancer_user",
+        "password": "balancerAnkr20201015"
+      },
+      "https://rpc.ankr.com/eth",
+      "https://speedy-nodes-nyc.moralis.io/b9aed21e7bb7bdeb35972c9a/eth/mainnet/archive",
+      "https://apis.ankr.com/e62bc219f9c9462b8749defe472d2dc5/6106d4a3ec1d1bcc87ec72158f8fd089/eth/archive/main",
+      "https://eth-archival.gateway.pokt.network/v1/5f76124fb90218002e9ce985",
+      "https://eth-mainnet.alchemyapi.io/v2/4bdDVB5QAaorY2UE-GBUbM2yQB3QJqzv"
+    ],
+    "light": ["https://cloudflare-eth.com"],
+    "ws": ["wss://eth-mainnet.ws.alchemyapi.io/v2/4bdDVB5QAaorY2UE-GBUbM2yQB3QJqzv"],
+    "explorer": "https://etherscan.io",
+    "start": 7929876,
+    "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA"
+  },
+  "4": {
+    "key": "4",
+    "name": "Ethereum Testnet Rinkeby",
+    "shortName": "Rinkeby",
+    "chainId": 4,
+    "network": "rinkeby",
+    "testnet": true,
+    "multicall": "0x42ad527de7d4e9d9d011ac45b31d8551f8fe9821",
+    "ensResolver": "0xf6305c19e814d2a75429fd637d01f7ee0e77d615",
+    "rpc": [
+      "https://eth-rinkeby.alchemyapi.io/v2/ugiPEBqMebLQbjro42kalZ1h4StpW_fR",
+      "https://eth-rinkeby.gateway.pokt.network/v1/5f76124fb90218002e9ce985"
+    ],
+    "ws": ["wss://eth-rinkeby.ws.alchemyapi.io/v2/twReQE9Px03E-E_N_Fbb3OVF7YgHxoGq"],
+    "explorer": "https://rinkeby.etherscan.io",
+    "start": 4534725,
+    "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA"
+  },
+  "5": {
+    "key": "5",
+    "name": "Ethereum Testnet Görli",
+    "shortName": "Görli",
+    "chainId": 5,
+    "network": "goerli",
+    "testnet": true,
+    "multicall": "0x77dca2c955b15e9de4dbbcf1246b4b85b651e50e",
+    "rpc": ["https://eth-goerli.alchemyapi.io/v2/v4nqH_J-J3STit45Mm07TxuYexMHQsYZ"],
+    "explorer": "https://goerli.etherscan.io",
+    "start": 743550,
+    "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA"
+  },
+  "10": {
+    "key": "10",
+    "name": "Optimism Mainnet",
+    "chainId": 10,
+    "network": "Optimism mainnet",
+    "multicall": "0x35A6Cdb2C9AD4a45112df4a04147EB07dFA01aB7",
+    "rpc": ["https://opt-mainnet.g.alchemy.com/v2/JzmIL4Q3jBj7it2duxLFeuCa9Wobmm7D"],
+    "explorer": "https://optimistic.etherscan.io",
+    "start": 657806,
+    "logo": "ipfs://QmfF4kwhGL8QosUXvgq2KWCmavhKBvwD6kbhs7L4p5ZAWb"
+  },
+  "100": {
+    "key": "100",
+    "name": "Gnosis Chain",
+    "shortName": "xDAI",
+    "chainId": 100,
+    "network": "mainnet",
+    "multicall": "0xb5b692a88bdfc81ca69dcb1d924f59f0413a602a",
+    "rpc": [
+      "https://xdai-archive.blockscout.com",
+      "https://gno.getblock.io/mainnet/?api_key=6c1d1e6e-75d9-452f-a863-a694bff93d5c",
+      "https://poa-xdai.gateway.pokt.network/v1/5f76124fb90218002e9ce985",
+      "https://rpc.gnosischain.com"
+    ],
+    "light": ["https://rpc.gnosischain.com"],
+    "ws": ["wss://rpc.xdaichain.com/wss"],
+    "explorer": "https://blockscout.com/poa/xdai",
+    "start": 4108192,
+    "logo": "ipfs://QmZeiy8Ax4133wzxUQM9ky8z5XFVf6YLFjJMmTWbWVniZR"
+  },
+  "137": {
+    "key": "137",
+    "name": "Polygon Mainnet",
+    "shortName": "Polygon",
+    "chainId": 137,
+    "network": "mainnet",
+    "multicall": "0xCBca837161be50EfA5925bB9Cc77406468e76751",
+    "rpc": [
+      "https://speedy-nodes-nyc.moralis.io/f2963e29bec0de5787da3164/polygon/mainnet/archive",
+      "https://rpc-mainnet.maticvigil.com/v1/1cfd7598e5ba6dcf0b4db58e8be484badc6ea08e",
+      "https://speedy-nodes-nyc.moralis.io/b9aed21e7bb7bdeb35972c9a/polygon/mainnet/archive"
+    ],
+    "ws": ["wss://ws-mainnet.matic.network"],
+    "explorer": "https://polygonscan.com",
+    "start": 9834491,
+    "logo": "ipfs://QmaGokGqgjknfa4xnXKnnwC5ZyXzUjQ7p6KEe4D8G5uFFE"
+  },
+  "250": {
+    "key": "250",
+    "name": "Fantom Opera",
+    "shortName": "fantom",
+    "chainId": 250,
+    "network": "Mainnet",
+    "multicall": "0x7f6A10218264a22B4309F3896745687E712962a0",
+    "rpc": ["https://rpc.ftm.tools", "https://rpcapi.fantom.network"],
+    "explorer": "https://ftmscan.com",
+    "start": 2497732,
+    "logo": "ipfs://QmVEgNeQDKnXygeGxfY9FywZpNGQu98ktZtRJ9bToYF6g7"
+  },
+  "42161": {
+    "key": "42161",
+    "name": "Arbitrum One",
+    "chainId": 42161,
+    "network": "Arbitrum mainnet",
+    "multicall": "0x7A7443F8c577d537f1d8cD4a629d40a3148Dd7ee",
+    "rpc": [
+      "https://arb-mainnet.g.alchemy.com/v2/JDvtNGwnHhTltIwfnxQocKwKkCTKA1DL",
+      "https://rpc.ankr.com/arbitrum"
+    ],
+    "explorer": "https://arbiscan.io",
+    "start": 256508,
+    "logo": "ipfs://QmWZ5SMRfvcK8tycsDqojQaSiKedgtVkS7CkZdxPgeCVsZ"
+  },
+  "42220": {
+    "key": "42220",
+    "name": "Celo Mainnet",
+    "shortName": "Celo",
+    "chainId": 42220,
+    "network": "mainnet",
+    "multicall": "0xb8d0d2C1391eeB350d2Cd39EfABBaaEC297368D9",
+    "rpc": [
+      "https://celo.snapshot.org",
+      "https://forno.celo.org",
+      "https://celo-mainnet--rpc.datahub.figment.io/apikey/e892a66dc36e4d2d98a5d6406d609796/"
+    ],
+    "explorer": "https://explorer.celo.org",
+    "start": 6599803,
+    "logo": "ipfs://QmS2tVJ7rdJRe1NHXAi2L86yCbUwVVrmB2mHQeNdJxvQti"
+  },
+  "43114": {
+    "key": "43114",
+    "name": "Avalanche",
+    "chainId": 43114,
+    "network": "mainnet",
+    "multicall": "0x7E9985aE4C8248fdB07607648406a48C76e9e7eD",
+    "rpc": [
+      "https://nd-784-543-849.p2pify.com/aa7b29fc5fed65b34f0ee6b8de33f8c0/ext/bc/C/rpc",
+      "https://rpc.ankr.com/avalanche",
+      "https://api.avax.network/ext/bc/C/rpc"
+    ],
+    "explorer": "https://snowtrace.io",
+    "start": 536483,
+    "logo": "ipfs://QmeS75uS7XLR8o8uUzhLRVYPX9vMFf4DXgKxQeCzyy7vM2"
+  }
+}

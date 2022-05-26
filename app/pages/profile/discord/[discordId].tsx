@@ -210,7 +210,7 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
   return (
     <div className="mt-7">
       <p className="uppercase mb-3">
-        {tags.length > 1 || tagType == "status" ? tagType : tagType.slice(0, -1)}
+        {tags.length > 1 || tagType === "status" ? tagType : tagType.slice(0, -1)}
       </p>
       <div className="flex-row space-y-2 align-left mr-2">
         {tags.map((accountTerminalTag) => {
