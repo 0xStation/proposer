@@ -4,7 +4,6 @@ import { useRouter } from "blitz"
 import useLocalStorage from "./useLocalStorage"
 import usePopupWindow from "./usePopupWindow"
 import { Auth } from "app/auth/types"
-import { requireEnv } from "app/utils/requireEnv"
 
 /**
  * forking this code from Guild.xyz, we have permission to use it.
@@ -24,11 +23,11 @@ const useDiscordAuth = (scope: string) => {
     `${window.location.href.split("/").slice(0, 3).join("/")}/auth/discord`
 
   const { onOpen, windowInstance } = usePopupWindow(
-    `https://discord.com/api/oauth2/authorize?client_id=${requireEnv(
-      "BLITZ_PUBLIC_DISCORD_CLIENT_ID"
-    )}&response_type=code&redirect_uri=${encodeURIComponent(
-      redirectUri
-    )}&scope=${encodeURIComponent(scope)}&state=${encodeURIComponent(state)}`
+    `https://discord.com/api/oauth2/authorize?client_id=${
+      process.env.BLITZ_PUBLIC_DISCORD_CLIENT_ID
+    }&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(
+      scope
+    )}&state=${encodeURIComponent(state)}`
   )
   const [error, setError] = useState<any>(null)
   const [auth, setAuth] = useLocalStorage<Partial<Auth>>(`dc_auth_${scope}`, {})

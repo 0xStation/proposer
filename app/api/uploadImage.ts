@@ -3,7 +3,6 @@ import formidable from "formidable-serverless"
 import fs from "fs"
 import aws from "aws-sdk"
 import { v4 as uuidv4 } from "uuid"
-import { requireEnv } from "app/utils/requireEnv"
 
 // excuse my language here but WTF this is the dumbest thing ever lol
 // I spent like an hour trying to figure out what was going wrong
@@ -18,9 +17,9 @@ export const config = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const s3 = new aws.S3({
-    endpoint: requireEnv("SPACES_ENDPOINT"),
-    accessKeyId: requireEnv("SPACES_ACCESS_KEY_ID"),
-    secretAccessKey: requireEnv("SPACES_SECRET_KEY"),
+    endpoint: process.env.SPACES_ENDPOINT,
+    accessKeyId: process.env.SPACES_ACCESS_KEY_ID,
+    secretAccessKey: process.env.SPACES_SECRET_KEY,
   })
 
   const form = new formidable.IncomingForm()

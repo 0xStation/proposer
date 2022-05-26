@@ -1,6 +1,5 @@
 import db from "db"
 import { Terminal } from "app/terminal/types"
-import { requireEnv } from "app/utils/requireEnv"
 
 /**
  * API endpoint for "refreshing" roles between discord and station.
@@ -30,11 +29,11 @@ export default async function handler(req, res) {
   // TODO: this is going to only accept the first 1000, honestly
   // we need more tech time to figure out how to fetch > 1000 nicely
   const response = await fetch(
-    `${requireEnv("BLITZ_PUBLIC_API_ENDPOINT")}/guilds/${terminal.data.guildId}/members?limit=1000`,
+    `${process.env.BLITZ_PUBLIC_API_ENDPOINT}/guilds/${terminal.data.guildId}/members?limit=1000`,
     {
       method: "GET",
       headers: {
-        Authorization: `Bot ${requireEnv("DISCORD_BOT_TOKEN")}`,
+        Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
         "Content-Type": "application/json",
       },
     }

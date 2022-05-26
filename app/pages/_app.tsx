@@ -5,12 +5,11 @@ import { WagmiProvider, defaultChains, createClient } from "wagmi"
 import { InjectedConnector } from "wagmi/connectors/injected"
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect"
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet"
-import { requireEnv } from "app/utils/requireEnv"
 
 // Chains for connectors to support
 const chains = defaultChains
 
-const provider = ({ chainId }) => new providers.AlchemyProvider(4, requireEnv("RINKEBY_API_KEY"))
+const provider = ({ chainId }) => new providers.AlchemyProvider(4, process.env.RINKEBY_API_KEY)
 
 // Set up connectors
 const connectors = ({ chainId }) => {

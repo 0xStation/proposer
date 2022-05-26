@@ -1,5 +1,4 @@
 import aws from "aws-sdk"
-import { requireEnv } from "./requireEnv"
 
 type UploadResponse = {
   ETag?: string
@@ -26,9 +25,9 @@ const OPTION_DEFAULTS = {
 // are centered around AWS (S3 etc), so just keep that in mind. We are really on DO.
 function uploadToS3(content, path, options: UploadOptions = {}): Promise<UploadResponse> {
   const s3 = new aws.S3({
-    endpoint: requireEnv("SPACES_ENDPOINT"),
-    accessKeyId: requireEnv("SPACES_ACCESS_KEY_ID"),
-    secretAccessKey: requireEnv("SPACES_SECRET_KEY"),
+    endpoint: process.env.SPACES_ENDPOINT,
+    accessKeyId: process.env.SPACES_ACCESS_KEY_ID,
+    secretAccessKey: process.env.SPACES_SECRET_KEY,
   })
 
   return new Promise((resolve) => {

@@ -5,7 +5,6 @@ import useDiscordAuthWithCallback from "../hooks/useDiscordAuthWithCallback"
 import useStore from "../hooks/useStore"
 import Modal from "./Modal"
 import getAccountByDiscordId from "app/account/queries/getAccountByDiscordId"
-import { requireEnv } from "app/utils/requireEnv"
 
 export const ConnectDiscordProfileModal = ({ isOpen, setIsOpen, activeUser, setNewAuth }) => {
   const setToastState = useStore((state) => state.setToastState)
@@ -16,7 +15,7 @@ export const ConnectDiscordProfileModal = ({ isOpen, setIsOpen, activeUser, setN
       if (authorization) {
         setNewAuth(authorization)
         try {
-          let response = await fetch(`${requireEnv("BLITZ_PUBLIC_API_ENDPOINT")}/users/@me`, {
+          let response = await fetch(`${process.env.BLITZ_PUBLIC_API_ENDPOINT}/users/@me`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${authorization}`,
