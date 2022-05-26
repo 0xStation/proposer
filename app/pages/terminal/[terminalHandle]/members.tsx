@@ -112,6 +112,7 @@ const MemberDirectoryPage: BlitzPage = () => {
     }
   }
 
+  // TODO add automatic toast stacking for multiple simultaneous toast displays
   const refreshTokens = async () => {
     if (terminal) {
       const response = await fetch("/api/sync-tokens", {

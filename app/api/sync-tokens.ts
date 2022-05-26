@@ -1,6 +1,7 @@
 import db from "db"
 import { TagTokenMetadata, TagType } from "app/tag/types"
 import { multicall } from "app/utils/rpcMulticall"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 /**
  * API endpoint for "refreshing" token ownership tags for members of a Station terminal.
@@ -52,7 +53,11 @@ export default async function handler(req, res) {
   let calls: any[][3] = []
   memberships.forEach((m) => {
     tokens.forEach((t) => {
-      calls.push([(t.data as TagTokenMetadata).address, "balanceOf", [m.account.address]])
+      calls.push([
+        toChecksumAddress((t.data as TagTokenMetadata).address),
+        "balanceOf",
+        [toChecksumAddress(m.account.address as string)],
+      ])
     })
   })
   // make multicall request
@@ -71,26 +76,33 @@ export default async function handler(req, res) {
     // compare owned tags to owned tokens
     const tagsToRemove = existingTags.filter((tagId) => doesNotOwn.includes(tagId))
     const tagsToAdd = owns.filter((tagId) => !existingTags.includes(tagId))
+    if (tagsToRemove.length === 0 && tagsToAdd.length === 0) {
+      return
+    }
     // genrate prisma object to delete or create AccountTerminalTag objects
     const updateTagsPrismaObj = {
-      deleteMany: tagsToRemove.map((tagId) => {
-        return {
-          tagId,
-        }
-      }),
-      connectOrCreate: tagsToAdd.map((tagId) => {
-        return {
-          where: {
-            tagId_ticketAccountId_ticketTerminalId: {
-              tagId,
-              ticketAccountId: m.accountId,
-              ticketTerminalId: m.terminalId,
-            },
-          },
-          create: {
+      ...(tagsToRemove.length > 0 && {
+        deleteMany: tagsToRemove.map((tagId) => {
+          return {
             tagId,
-          },
-        }
+          }
+        }),
+      }),
+      ...(tagsToAdd.length > 0 && {
+        connectOrCreate: tagsToAdd.map((tagId) => {
+          return {
+            where: {
+              tagId_ticketAccountId_ticketTerminalId: {
+                tagId,
+                ticketAccountId: m.accountId,
+                ticketTerminalId: m.terminalId,
+              },
+            },
+            create: {
+              tagId,
+            },
+          }
+        }),
       }),
     }
     // submit update query for membership's token tags
