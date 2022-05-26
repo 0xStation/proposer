@@ -4,8 +4,14 @@ import { AlchemyProvider } from "@ethersproject/providers"
 // trimmed version from snapshot here: https://github.com/snapshot-labs/snapshot.js/blob/master/src/networks.json
 import networks from "./networks.json"
 
+export type AtomicCall = {
+  targetAddress: string
+  functionSignature: string
+  callParameters: any[]
+}
+
 // forked from snapshot here: https://github.com/snapshot-labs/snapshot.js/blob/master/src/utils.ts#L46-L86
-export async function multicall(chainId: string, abi: any[], calls: any[], options?) {
+export async function multicall(chainId: string, abi: any[], calls: AtomicCall[], options?) {
   // abi for making multiple view calls in one RPC call
   const multicallAbi = [
     "function aggregate(tuple(address target, bytes callData)[] calls) view returns (uint256 blockNumber, bytes[] returnData)",
@@ -33,9 +39,9 @@ export async function multicall(chainId: string, abi: any[], calls: any[], optio
         multi.aggregate(
           callsInPage.map((call) => [
             // grab the target address and lowercase it
-            call[0].toLowerCase(),
+            call.targetAddress.toLowerCase(),
             // encode the function signature with calldata e.g. ownerOf(uint256 tokenId) & 1234
-            itf.encodeFunctionData(call[1], call[2]),
+            itf.encodeFunctionData(call.functionSignature, call.callParameters),
           ]),
           options || {}
         )
@@ -46,7 +52,9 @@ export async function multicall(chainId: string, abi: any[], calls: any[], optio
     // reduce paginated results into one flat array
     results = results.reduce((prev: any, [, res]: any) => prev.concat(res), [])
     // tage each call's result, and parse the return value, preserving order
-    return results.map((call, i) => itf.decodeFunctionResult(calls[i][1], call))
+    return results.map((call, i) =>
+      itf.decodeFunctionResult(calls[i]?.functionSignature as string, call)
+    )
   } catch (e) {
     return Promise.reject(e)
   }

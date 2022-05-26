@@ -1,6 +1,6 @@
 import db from "db"
 import { TagTokenMetadata, TagType } from "app/tag/types"
-import { multicall } from "app/utils/rpcMulticall"
+import { AtomicCall, multicall } from "app/utils/rpcMulticall"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 /**
@@ -21,6 +21,7 @@ export default async function handler(req, res) {
   let tokens = await db.tag.findMany({
     where: { terminalId: req.body.terminalId, type: TagType.TOKEN },
   })
+  // sort tokens by chainId so that multicalls can be shared by tokens on same chain
   tokens = tokens.sort(
     (a, b) => (b.data as TagTokenMetadata).chainId - (a.data as TagTokenMetadata).chainId
   )
@@ -55,7 +56,7 @@ export default async function handler(req, res) {
   // generate call list, one per membership per token
   let promises: any[] = []
   let currentChainId = (tokens[0]?.data as TagTokenMetadata).chainId
-  let currentChainCalls: any[][3] = []
+  let currentChainCalls: AtomicCall[] = []
   tokens.forEach((t) => {
     const tokenChain = (t.data as TagTokenMetadata).chainId
     if (tokenChain !== currentChainId) {
@@ -64,13 +65,14 @@ export default async function handler(req, res) {
       currentChainCalls = []
     }
     memberships.forEach((m) => {
-      currentChainCalls.push([
-        toChecksumAddress((t.data as TagTokenMetadata).address),
-        "balanceOf",
-        [toChecksumAddress(m.account.address as string)],
-      ])
+      currentChainCalls.push({
+        targetAddress: (t.data as TagTokenMetadata).address,
+        functionSignature: "balanceOf",
+        callParameters: [toChecksumAddress(m.account.address as string)],
+      })
     })
   })
+  // add current call list to complete loop
   promises.push(multicall(currentChainId.toString(), abi, currentChainCalls))
 
   // await all multicall requests separated by chainId
@@ -86,7 +88,7 @@ export default async function handler(req, res) {
   // 4. Look at set difference between token ownership and tags and update database
 
   memberships.forEach(async (m, i) => {
-    const existingTags = m.tags.map((t) => t.tagId)
+    const existingTagIds = m.tags.map((t) => t.tagId)
 
     // take slice of response calls for this user (order preserved throughout whole process)
     // grab every i of a membership.length cycle repeating tokens.length times
@@ -104,8 +106,8 @@ export default async function handler(req, res) {
     const owns = subset.filter((v) => v.balance.gt(0)).map((v) => v.tagId)
     const doesNotOwn = subset.filter((v) => v.balance.eq(0)).map((v) => v.tagId)
     // compare owned tags to owned tokens
-    const tagsToRemove = existingTags.filter((tagId) => doesNotOwn.includes(tagId))
-    const tagsToAdd = owns.filter((tagId) => !existingTags.includes(tagId))
+    const tagsToRemove = existingTagIds.filter((tagId) => doesNotOwn.includes(tagId))
+    const tagsToAdd = owns.filter((tagId) => !existingTagIds.includes(tagId))
     if (tagsToRemove.length === 0 && tagsToAdd.length === 0) {
       return
     }
