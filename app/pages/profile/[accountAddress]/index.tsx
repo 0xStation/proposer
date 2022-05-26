@@ -105,28 +105,38 @@ const ProfileHome: BlitzPage = () => {
           </>
         ) : (
           <div className="w-full h-full flex items-center flex-col justify-center">
-            <h1 className="text-2xl font-bold text-marble-white text-center">Coming Soon</h1>
-            <p className="my-2 w-[309px]">
-              Station is still in private beta. You can{" "}
-              <a
-                className="text-magic-mint"
-                href="https://twitter.com/messages/compose?recipient_id=1412594810985271296"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                DM us
-              </a>{" "}
-              to learn more or{" "}
-              <a
-                className="text-magic-mint"
-                href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                sign up on our waitlist
-              </a>
-              .
-            </p>
+            <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
+              {account && account?.id === activeUser?.id
+                ? "You’re not yet a part of any Terminal on Station"
+                : `${account?.data?.name} is not yet a part of any Terminal on Station`}
+            </h1>
+            {account?.id === activeUser?.id ? (
+              <p className="my-2 w-[309px] text-center">
+                Station is still in private beta. You can{" "}
+                <a
+                  className="text-magic-mint"
+                  href="https://twitter.com/messages/compose?recipient_id=1412594810985271296"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  DM us
+                </a>{" "}
+                to learn more or{" "}
+                <a
+                  className="text-magic-mint"
+                  href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  sign up on our waitlist
+                </a>
+                .
+              </p>
+            ) : (
+              <p className="my-2 w-[309px] text-center">
+                Communities {account?.data.name} is a part of will display here.
+              </p>
+            )}
           </div>
         )}
       </ProfileNavigation>
