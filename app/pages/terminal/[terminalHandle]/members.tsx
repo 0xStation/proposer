@@ -22,7 +22,7 @@ import { RefreshIcon } from "@heroicons/react/outline"
 import useStore from "app/core/hooks/useStore"
 
 interface Filters {
-  [tagType: string]: Set<string>
+  [tagType: string]: Set<number>
 }
 
 const MemberDirectoryPage: BlitzPage = () => {
@@ -32,15 +32,15 @@ const MemberDirectoryPage: BlitzPage = () => {
     { handle: terminalHandle as string },
     { suspense: false, enabled: !!terminalHandle }
   )
-  const [filteredMembers, setFilteredMembers] = useState<AccountTerminalWithTagsAndAccount[]>([])
   // selected user to display in the contributor card
   const [selectedMember, setSelectedMember] = useState<AccountTerminalWithTagsAndAccount>()
-
+  const [page, setPage] = useState<number>(0)
   const setToastState = useStore((state) => state.setToastState)
 
   // filters is a hashmap where the key is the tag type and the value is a Set of strings
   // where the strings are applied filters
   const [filters, setFilters] = useState<Filters>({})
+  console.log(filters)
 
   /*
   `groupedTags` returns an object where the key
@@ -69,22 +69,27 @@ const MemberDirectoryPage: BlitzPage = () => {
     }
   )
 
-  useEffect(() => {
-    setSelectedMember(filteredMembers[0])
-  }, [filteredMembers])
-
   const [members] = useQuery(
     getMembersByTerminalId,
-    { terminalId: terminal?.id as number },
+    {
+      terminalId: terminal?.id as number,
+      tagGroups: Object.values(filters)
+        .map((set) => Array.from(set))
+        .filter((arr) => arr.length > 0),
+      page: page,
+    },
     {
       suspense: false,
       enabled: !!terminal?.id,
       refetchOnWindowFocus: false,
-      onSuccess: (members: AccountTerminalWithTagsAndAccount[]) => {
-        setFilteredMembers(members)
-      },
     }
   )
+
+  useEffect(() => {
+    if (members) {
+      setSelectedMember(members[0])
+    }
+  }, [members])
 
   const refreshRoles = async () => {
     if (terminal) {
@@ -127,34 +132,56 @@ const MemberDirectoryPage: BlitzPage = () => {
               />
             ) : null}
           </div>
-          <div className="flex ml-6 pt-4 space-x-2">
-            {groupedTags && Object.entries(groupedTags).length ? (
-              Object.entries(groupedTags).map(([tagType, tags], idx) => (
-                <FilterPill
-                  tagType={tagType}
-                  tags={tags}
-                  allMembers={members}
-                  setFilteredMembers={setFilteredMembers}
-                  filters={filters}
-                  key={`${idx}${tagType}`}
-                />
-              ))
-            ) : (
-              <p className="text-marble-white">View other members in the terminal.</p>
-            )}
+          <div className="flex flex-row justify-between items-center">
+            <div className="flex ml-6 pt-4 space-x-2">
+              {groupedTags && Object.entries(groupedTags).length ? (
+                Object.entries(groupedTags).map(([tagType, tags], idx) => (
+                  <FilterPill
+                    tagType={tagType}
+                    tags={tags}
+                    filters={filters}
+                    setFilters={setFilters}
+                    key={`${idx}${tagType}`}
+                  />
+                ))
+              ) : (
+                <p className="text-marble-white">View other members in the terminal.</p>
+              )}
+            </div>
+            <div className="mr-6 flex flex-row space-x-2 pt-4 items-center text-sm">
+              <span className="self-end">showing {members?.length} results</span>
+              {page > 0 && (
+                <span
+                  className="hover:bg-marble-white hover:text-tunnel-black text-sm capitalize group rounded-full border h-[17px] w-max p-4 flex flex-center items-center cursor-pointer"
+                  onClick={() => setPage(page - 1)}
+                >
+                  Prev
+                </span>
+              )}
+              {members?.length === 100 && (
+                <span
+                  className="hover:bg-marble-white hover:text-tunnel-black text-sm capitalize group rounded-full border h-[17px] w-max p-4 flex flex-center items-center cursor-pointer"
+                  onClick={() => setPage(page + 1)}
+                >
+                  Next
+                </span>
+              )}
+            </div>
           </div>
         </div>
         <div className="grid grid-cols-7 h-[calc(100vh-130px)] w-full box-border">
           <div className="overflow-y-auto col-span-4">
-            {filteredMembers &&
-              filteredMembers.map((member, idx) => (
-                <ContributorComponent
-                  key={`${member.joinedAt}${idx}`}
-                  member={member}
-                  selectedMember={selectedMember}
-                  setSelectedMember={setSelectedMember}
-                />
-              ))}
+            <div className="overflow-y-auto">
+              {members &&
+                members.map((member, idx) => (
+                  <ContributorComponent
+                    key={`${member.joinedAt}${idx}`}
+                    member={member}
+                    selectedMember={selectedMember}
+                    setSelectedMember={setSelectedMember}
+                  />
+                ))}
+            </div>
           </div>
           <SelectedContributorCard member={selectedMember} />
         </div>
@@ -163,53 +190,23 @@ const MemberDirectoryPage: BlitzPage = () => {
   )
 }
 
-const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) => {
+const FilterPill = ({ tagType, tags, filters, setFilters }) => {
   const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
-
-  // apply filters on accounts
-  const applyFilters = () => {
-    let clearFilters = true
-    // reset directory to show all contributors if no filters are selected
-    Object.entries(filters).map(([tagType, tagFilter]: [string, Set<string>]) => {
-      if (tagFilter.size > 0) {
-        clearFilters = false
-      }
-    })
-    if (clearFilters) {
-      setFilteredMembers(allMembers)
-      return
-    }
-
-    const newFilteredMembers = allMembers.filter((member) => {
-      let meetsFilterRequirements = [] as (boolean | undefined)[]
-
-      Object.entries(filters).map(([tagType, tagFilter]: [string, Set<string>]) => {
-        // member meets the category's filter if:
-        // member has any of the tags in the category's applied filters
-        // or there are no applied filters.
-        const satisfiesFilter =
-          !tagFilter.size ||
-          member.tags.find((accountTerminalTag) => tagFilter.has(accountTerminalTag.tag.value))
-
-        meetsFilterRequirements.push(!!satisfiesFilter)
-      })
-      // if user satisfies all category's filter requirements, show them in the member directory
-      if (meetsFilterRequirements.every((val) => val)) {
-        return member
-      }
-    })
-    setFilteredMembers(newFilteredMembers)
-  }
 
   const handleClearFilters = (e) => {
     e.preventDefault()
 
-    filters[tagType].clear()
+    const tagFilters = filters[tagType]
+    tagFilters.clear()
+
+    setFilters({
+      ...filters,
+      [tagType]: tagFilters,
+    })
 
     // clear filled checkboxes by removing the defaultChecked value
     // bumping the key will reset the uncontrolled component's internal state
     setClearDefaultValue(true)
-    applyFilters()
   }
 
   return (
@@ -255,7 +252,10 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                       return
                     }
                     // grab field selected
-                    const [tagType, tagNames] = Object.entries(field)[0] as [string, any]
+                    const [tagType, tagNames] = Object.entries(field)[0] as [
+                      string,
+                      Record<string, number[]>
+                    ]
                     const tagFilters = filters[tagType]
                     Object.entries(tagNames).forEach(([tagName, value]) => {
                       // remove tag if de-selected
@@ -263,11 +263,14 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                         tagFilters.delete(tagName)
                       } else if (value) {
                         // add tag if selected
-                        tagFilters.add(tagName)
+                        tagFilters.add(value[0])
                       }
                     })
 
-                    applyFilters()
+                    setFilters({
+                      ...filters,
+                      [tagType]: tagFilters,
+                    })
                   }}
                   render={({ form, handleSubmit }) => {
                     return (
@@ -277,8 +280,9 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                             return (
                               <div className="flex-row" key={`${clearDefaultValue}${tag.value}`}>
                                 <Checkbox
+                                  value={tag.id}
                                   name={`${tag.type}.${tag.value}`}
-                                  defaultChecked={filters[tag.type].has(tag.value)}
+                                  defaultChecked={filters[tag.type].has(tag.id)}
                                   className="align-middle"
                                 />
                                 <p className="p-0.5 align-middle mx-4 inline leading-none">

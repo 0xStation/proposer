@@ -166,45 +166,27 @@ const DiscordSettingsPage: BlitzPage = () => {
               })
 
               if (terminal) {
-                const createdTags = await upsertTags({
-                  tags,
-                  terminalId: terminal.id,
-                })
-                const activeCreatedTags = createdTags.filter((tag) => tag.active)
-                const activeCreatedTagDiscordIds = activeCreatedTags.map(
-                  (tag) => tag.discordId || ""
-                )
-                const activeGuildMembers = guildMembers.filter((gm) => {
-                  return gm.roles.some((r) => activeCreatedTagDiscordIds.includes(r))
-                })
+                // First, update the tags
+                await upsertTags({ tags, terminalId: terminal.id })
 
+                // next, sync discord server with station tags
                 try {
-                  await createAccountsMutation({
-                    terminalId: terminal.id,
-                    users: activeGuildMembers.map((gm) => {
-                      const tagOverlap = activeCreatedTagDiscordIds.filter((tag) =>
-                        gm.roles.includes(tag)
-                      )
-
-                      const tagOverlapId = tagOverlap
-                        .map((discordId) => {
-                          const tag = activeCreatedTags.find((tag) => {
-                            return tag.discordId === discordId
-                          })
-
-                          return tag?.id
-                        })
-                        .filter((tag): tag is number => !!tag) // remove possible undefined from `find` in map above
-
-                      return {
-                        discordId: gm.user.id,
-                        name: gm.nick || gm.user.username,
-                        tags: tagOverlapId,
-                        joinedAt: gm.joined_at,
-                        ...(gm.user.avatar && { avatarHash: gm.user.avatar }),
-                      }
-                    }),
-                  })
+                  let retry = true
+                  let afterId = null
+                  while (retry) {
+                    console.log(retry)
+                    console.log(afterId)
+                    const response = await fetch("/api/discord/sync-roles", {
+                      method: "POST",
+                      body: JSON.stringify({
+                        terminalId: terminal.id,
+                        afterId: afterId,
+                      }),
+                    })
+                    const responseJson = await response.json()
+                    retry = responseJson.retry
+                    afterId = responseJson.afterId
+                  }
                 } catch (err) {
                   console.error("Error creating accounts. Failed with ", err)
                   setToastState({

@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   const response = await fetch(
-    `${process.env.BLITZ_PUBLIC_API_ENDPOINT}/guilds/${req.body.guild_id}`,
+    `${process.env.BLITZ_PUBLIC_API_ENDPOINT}/guilds/${req.body.guildId}`,
     {
       method: "GET",
       headers: {
