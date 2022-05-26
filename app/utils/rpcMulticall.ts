@@ -11,7 +11,7 @@ export async function multicall(chainId: string, abi: any[], calls: any[], optio
     "function aggregate(tuple(address target, bytes callData)[] calls) view returns (uint256 blockNumber, bytes[] returnData)",
   ]
   // node provider for making calls to smart contracts
-  const provider = new AlchemyProvider("homestead", process.env.ALCHEMY_API_KEY)
+  const provider = new AlchemyProvider(networks[chainId].network, process.env.ALCHEMY_API_KEY)
   // multicall contract object
   const multi = new Contract(
     networks[chainId].multicall, // address of multicall contract on specific chain

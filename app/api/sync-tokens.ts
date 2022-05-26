@@ -64,7 +64,6 @@ export default async function handler(req, res) {
       currentChainCalls = []
     }
     memberships.forEach((m) => {
-      // console.log(m)
       currentChainCalls.push([
         toChecksumAddress((t.data as TagTokenMetadata).address),
         "balanceOf",
@@ -94,13 +93,16 @@ export default async function handler(req, res) {
     const subset: any[] = []
     for (let j = 0; j < tokens.length; j++) {
       const arrIndex = i + j * memberships.length
-      subset.push(results[arrIndex])
+      subset.push({
+        tagId: tokens[j]?.id,
+        balance: results[arrIndex].balance,
+      })
     }
 
     // sort balance values >0 or =0 into different buckets
     // v.balance values are ethers.BigNumber objects
-    const owns = subset.filter((v) => v.balance.gt(0)).map((v, i) => tokens[i]?.id as number)
-    const doesNotOwn = subset.filter((v) => v.balance.eq(0)).map((v, i) => tokens[i]?.id)
+    const owns = subset.filter((v) => v.balance.gt(0)).map((v) => v.tagId)
+    const doesNotOwn = subset.filter((v) => v.balance.eq(0)).map((v) => v.tagId)
     // compare owned tags to owned tokens
     const tagsToRemove = existingTags.filter((tagId) => doesNotOwn.includes(tagId))
     const tagsToAdd = owns.filter((tagId) => !existingTags.includes(tagId))
