@@ -115,7 +115,8 @@ const MemberDirectoryPage: BlitzPage = () => {
 
   // TODO add automatic toast stacking for multiple simultaneous toast displays
   const refreshTokens = async () => {
-    if (terminal) {
+    // only trigger refresh if terminal has tokens
+    if (terminal && terminal.tags.filter((t) => t.type === TagType.TOKEN).length > 0) {
       const response = await fetch("/api/sync-tokens", {
         method: "POST",
         body: JSON.stringify({
