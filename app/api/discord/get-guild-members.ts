@@ -1,25 +1,42 @@
 export default async function handler(req, res) {
-  const response = await fetch(
-    `${process.env.BLITZ_PUBLIC_API_ENDPOINT}/guilds/${req.body.guild_id}/members?limit=${req.body.limit}`,
-    {
+  const paginatedFetch = async (after, previousResults) => {
+    const limit = 1000
+    const baseURL = `${process.env.BLITZ_PUBLIC_API_ENDPOINT}/guilds/${req.body.guild_id}/members?limit=${limit}`
+    const url = after ? baseURL + `&after=${after}` : baseURL
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
         "Content-Type": "application/json",
       },
+    })
+    const newResults = await response.json()
+
+    if (newResults.code) {
+      throw newResults.message
     }
-  )
 
-  const guildMembers = await response.json()
+    const results = [...previousResults, ...newResults]
 
-  if (!guildMembers.code || guildMembers.code !== undefined) {
-    res.status(200).json({ guildMembers })
-    return
+    // limit is 1000
+    // 1. there are more results to fetch
+    // 2. we fetched the last 1000, but no way to know
+    // so we need to make another request to check
+    // to request the next page, get the id of the last user in current page to specify as "after"
+    if (newResults.length === 1000) {
+      return paginatedFetch(newResults[999].user.id, results)
+    }
+
+    // anything less than 1000 means this was final page, return results
+    return results
   }
 
-  // // discord status codes
-  // // https://discord.com/developers/docs/topics/opcodes-and-status-codes
-  // // could maybe respond better depending on the code
-  // // for now, the presense of the code implies something went wrong...
-  res.status(401).json({ error: "Guild not authenticated." })
+  try {
+    const guildMembers = await paginatedFetch(null, [])
+    res.status(200).json({ guildMembers })
+    return
+  } catch (err) {
+    console.log(err)
+    res.status(401).json({ error: err })
+  }
 }

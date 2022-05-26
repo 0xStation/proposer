@@ -28,7 +28,8 @@ const useGuildMembers = (
       })
 
       if (response.status !== 200) {
-        console.error(response)
+        const error = await response.json()
+        console.error(error)
         setStatus("error")
         return
       }
