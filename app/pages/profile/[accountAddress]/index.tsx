@@ -12,6 +12,7 @@ import useLocalStorage from "app/core/hooks/useLocalStorage"
 import useStore from "app/core/hooks/useStore"
 import { Auth } from "app/auth/types"
 import { Account } from "app/account/types"
+import { TagType } from "app/tag/types"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
@@ -169,17 +170,19 @@ const SelectedTerminalCard = ({ account, terminal }) => {
   const membership = account.tickets.find((ticket) => ticket.terminalId === terminal.id)
 
   const statusTags = membership.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "status"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.STATUS
   )
-
   const roleTags = membership.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "role"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.ROLE
   )
   const projectTags = membership.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "project"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.PROJECT
   )
   const guildTags = membership.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "guild"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.GUILD
+  )
+  const tokenTags = membership.tags?.filter(
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.TOKEN
   )
 
   return (
@@ -215,6 +218,7 @@ const SelectedTerminalCard = ({ account, terminal }) => {
           <TagDetails tagType="roles" tags={roleTags} />
           <TagDetails tagType="projects" tags={projectTags} />
           <TagDetails tagType="guilds" tags={guildTags} />
+          <TagDetails tagType="tokens" tags={tokenTags} />
         </div>
       </div>
     </div>
@@ -227,7 +231,7 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
   return (
     <div className="mt-7">
       <p className="uppercase mb-3">
-        {tags.length > 1 || tagType == "status" ? tagType : tagType.slice(0, -1)}
+        {tags.length > 1 || tagType === "status" ? tagType : tagType.slice(0, -1)}
       </p>
       <div className="flex-row space-y-2 align-left mr-2">
         {tags.map((accountTerminalTag) => {

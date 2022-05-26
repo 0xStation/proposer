@@ -20,6 +20,7 @@ import TikTokIcon from "public/tiktok-icon.svg"
 import { toTitleCase } from "app/core/utils/titleCase"
 import { RefreshIcon } from "@heroicons/react/outline"
 import useStore from "app/core/hooks/useStore"
+import { TagType } from "app/tag/types"
 
 interface Filters {
   [tagType: string]: Set<string>
@@ -112,6 +113,39 @@ const MemberDirectoryPage: BlitzPage = () => {
     }
   }
 
+  // TODO add automatic toast stacking for multiple simultaneous toast displays
+  const refreshTokens = async () => {
+    // only trigger refresh if terminal has tokens
+    if (terminal && terminal.tags.filter((t) => t.type === TagType.TOKEN).length > 0) {
+      const response = await fetch("/api/sync-tokens", {
+        method: "POST",
+        body: JSON.stringify({
+          terminalId: terminal.id,
+        }),
+      })
+
+      // timeout to not make toasts overlap with sync-roles
+      // TODO replace this with toast enabling stacking instead
+      // https://linear.app/station/issue/WEB-424/if-queuing-multiple-toasts-simultaneously-stack-them
+      await setTimeout(() => {
+        if (response.status !== 200) {
+          setToastState({
+            isToastShowing: true,
+            type: "error",
+            message: "Something went wrong!",
+          })
+          return
+        }
+
+        setToastState({
+          isToastShowing: true,
+          type: "success",
+          message: "Your tokens are refreshed",
+        })
+      }, 2000)
+    }
+  }
+
   return (
     <Layout>
       <TerminalNavigation>
@@ -123,7 +157,10 @@ const MemberDirectoryPage: BlitzPage = () => {
               <RefreshIcon
                 className="h-5 w-5 ml-2 mt-1 cursor-pointer"
                 aria-hidden="true"
-                onClick={() => refreshRoles()}
+                onClick={() => {
+                  refreshRoles()
+                  refreshTokens()
+                }}
               />
             ) : null}
           </div>
@@ -282,7 +319,10 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                                   className="align-middle"
                                 />
                                 <p className="p-0.5 align-middle mx-4 inline leading-none">
-                                  {toTitleCase(tag.value)}
+                                  {
+                                    // title case text except on ERC20 tokens
+                                    tag.value[0] === "$" ? tag.value : toTitleCase(tag.value)
+                                  }
                                 </p>
                               </div>
                             )
@@ -358,17 +398,19 @@ const SelectedContributorCard = ({ member }) => {
   const { account } = member
 
   const statusTags = member.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "status"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.STATUS
   )
-
   const roleTags = member.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "role"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.ROLE
   )
   const projectTags = member.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "project"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.PROJECT
   )
   const guildTags = member.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "guild"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.GUILD
+  )
+  const tokenTags = member.tags?.filter(
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.TOKEN
   )
 
   const profileLink = account.address
@@ -470,6 +512,7 @@ const SelectedContributorCard = ({ member }) => {
           <TagDetails tagType="roles" tags={roleTags} />
           <TagDetails tagType="projects" tags={projectTags} />
           <TagDetails tagType="guilds" tags={guildTags} />
+          <TagDetails tagType="tokens" tags={tokenTags} />
         </div>
       </div>
     </div>
@@ -482,7 +525,7 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
   return (
     <div className="mt-7">
       <p className="uppercase mb-2">
-        {tags.length > 1 || tagType == "status" ? tagType : tagType.slice(0, -1)}
+        {tags.length > 1 || tagType === "status" ? tagType : tagType.slice(0, -1)}
       </p>
       <div className="flex-row space-y-2 align-left mr-2">
         {tags.map((accountTerminalTag) => {
