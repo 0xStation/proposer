@@ -18,7 +18,7 @@ import { toChecksumAddress } from "app/core/utils/checksumAddress"
 export default async function handler(req, res) {
   const terminalId = JSON.parse(req.body).terminalId
 
-  if (terminalId == null) {
+  if (terminalId === null) {
     res.status(500).json({ response: "Terminal ID must be not null" })
     return
   }
@@ -29,13 +29,13 @@ export default async function handler(req, res) {
     where: { terminalId, type: TagType.TOKEN },
   })
 
-  if (tokens.length == 0) {
+  if (tokens.length === 0) {
     res.status(200).json({ response: "success" })
     return
   }
 
   // sort tokens by chainId so that multicalls can be shared by tokens on same chain
-  tokens = tokens.sort(
+  const sortedTokens = tokens.sort(
     (a, b) => (b.data as TagTokenMetadata).chainId - (a.data as TagTokenMetadata).chainId
   )
 
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
     },
   })
 
-  if (memberships.length == 0) {
+  if (memberships.length === 0) {
     res.status(200).json({ response: "success" })
     return
   }
@@ -71,15 +71,16 @@ export default async function handler(req, res) {
 
   // balanceOf abi works for both ERC20 & ERC721
   const abi = ["function balanceOf(address owner) view returns (uint256 balance)"]
-  // split multicalls by chainId so that multiple tokesn on same chain can share one multicall
+  // split multicalls by chainId so that multiple tokens on same chain can share one multicall
   // per chain, generate a call list with one call per membership per token
   let promises: any[] = []
-  let currentChainId = (tokens[0]?.data as TagTokenMetadata).chainId
+  let currentChainId = (sortedTokens[0]?.data as TagTokenMetadata).chainId
   let currentChainCalls: AtomicCall[] = []
-  tokens.forEach((t) => {
+  sortedTokens.forEach((t) => {
     const tokenChain = (t.data as TagTokenMetadata).chainId
     if (tokenChain !== currentChainId) {
-      promises.push(multicall(currentChainId.toString(), abi, currentChainCalls))
+      const calls = JSON.parse(JSON.stringify(currentChainCalls)) // hard copy to prevent side-effects risk
+      promises.push(multicall(currentChainId.toString(), abi, calls))
       currentChainId = tokenChain
       currentChainCalls = []
     }
@@ -95,9 +96,9 @@ export default async function handler(req, res) {
   promises.push(multicall(currentChainId.toString(), abi, currentChainCalls))
 
   // await all multicall requests separated by chainId
-  let results = await Promise.all(promises)
+  const completedPromises = await Promise.all(promises)
   // concat all results together
-  results = [].concat(...results)
+  const results: any[] = [].concat(...completedPromises)
 
   // 4. Look at set difference between token ownership and tags and update database
 
@@ -107,10 +108,10 @@ export default async function handler(req, res) {
     // take slice of response calls for this user (order preserved throughout whole process)
     // grab every i of a membership.length cycle repeating tokens.length times
     const subset: any[] = []
-    for (let j = 0; j < tokens.length; j++) {
+    for (let j = 0; j < sortedTokens.length; j++) {
       const arrIndex = i + j * memberships.length
       subset.push({
-        tagId: tokens[j]?.id,
+        tagId: sortedTokens[j]?.id,
         balance: results[arrIndex].balance,
       })
     }

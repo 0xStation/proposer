@@ -142,7 +142,7 @@ const MemberDirectoryPage: BlitzPage = () => {
           type: "success",
           message: "Your tokens are refreshed",
         })
-      }, 3500)
+      }, 2000)
     }
   }
 
@@ -321,7 +321,7 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                                 <p className="p-0.5 align-middle mx-4 inline leading-none">
                                   {
                                     // title case text except on ERC20 tokens
-                                    tag.value[0] == "$" ? tag.value : toTitleCase(tag.value)
+                                    tag.value[0] === "$" ? tag.value : toTitleCase(tag.value)
                                   }
                                 </p>
                               </div>
@@ -525,7 +525,7 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
   return (
     <div className="mt-7">
       <p className="uppercase mb-2">
-        {tags.length > 1 || tagType == "status" ? tagType : tagType.slice(0, -1)}
+        {tags.length > 1 || tagType === "status" ? tagType : tagType.slice(0, -1)}
       </p>
       <div className="flex-row space-y-2 align-left mr-2">
         {tags.map((accountTerminalTag) => {

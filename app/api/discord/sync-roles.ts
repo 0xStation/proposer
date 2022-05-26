@@ -102,7 +102,7 @@ export default async function handler(req, res) {
     // In order to get the difference between an existing station members tags and their new tags, we need to fetch
     // their existing tags. This lives on their ticket to the given terminal. Note, this is not a concern for newly
     // created accounts, since there will be no "difference" of roles - the incoming ones are correct.
-    // We filter out tags that do not have a discordId because they will not be inlcuded in the tag list for the
+    // We filter out tags that do not have a discordId because they will not be included in the tag list for the
     // member when fetching from discord and will accidentally be removed.
     const existingTicket = await db.accountTerminal.findUnique({
       where: {
