@@ -92,20 +92,22 @@ const Navigation = ({ children }: { children?: any }) => {
       <div>
         {!session?.siwe?.address && (
           <div className="w-full h-[70px] absolute z-[60] bg-wet-concrete bottom-0">
-            <div className="fixed mt-2 left-1/3 ml-[-213px]">
-              <div className="inline-block mr-16">
-                <h2 className="inline-block mr-5 text-xl font-bold justify-center">
-                  {!address ? "Be recognized in your community" : "Sign in with Ethereum"}
-                </h2>
-                <p>Connect your wallet and join the next class of emerging talent</p>
-              </div>
-              <button
-                onClick={() => toggleWalletModal(true)}
-                className="inline h-[35px] bg-magic-mint text-tunnel-black w-48 rounded align-middle p-1 hover:bg-opacity-70 ml-28 mb-7"
-              >
-                {!address ? "Connect Wallet" : "Sign"}
-              </button>
+            <div className="fixed mt-2 left-1/3 ml-[-6.65rem]">
+              <h2 className="inline-block mr-5 text-xl font-bold justify-center">
+                {!address ? "Be recognized in your community" : "Sign in with Ethereum"}
+              </h2>
+              <p>
+                {!address
+                  ? "Connect your wallet and join the next class of emerging talent"
+                  : "Verify that it's you"}
+              </p>
             </div>
+            <button
+              onClick={() => toggleWalletModal(true)}
+              className="inline h-[35px] bg-magic-mint text-tunnel-black w-48 rounded align-middle p-1 hover:bg-opacity-70 ml-28 mt-4 mr-[-6rem] right-1/3 fixed"
+            >
+              {!address ? "Connect Wallet" : "Sign in with Ethereum"}
+            </button>
           </div>
         )}
       </div>

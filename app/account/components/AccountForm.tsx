@@ -52,7 +52,7 @@ const CoverPhotoInput = ({ coverURL, onUpload }) => {
   return (
     <div className="flex-col">
       <label className="font-bold text-base">Cover</label>
-      <p className="text-concrete text-sm">.jpg or .png, 600 x 600px recommended</p>
+      <p className="text-concrete text-sm">.jpg or .png, 1200px x 600px recommended</p>
       <div
         className="w-[18rem] h-[9rem] bg-gradient-to-b object-cover from-electric-violet to-magic-mint border border-concrete cursor-pointer relative mt-2"
         {...getRootProps()}
