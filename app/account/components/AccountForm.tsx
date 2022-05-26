@@ -96,7 +96,7 @@ const PfpInput = ({ pfpURL, onUpload }) => {
   return (
     <div className="flex-col">
       <label className="font-bold text-base">PFP</label>
-      <p className="text-concrete text-sm">.jpg or .png, 600 x 600px recommended</p>
+      <p className="text-concrete text-sm">.jpg or .png, 600px x 600px recommended</p>
       <div
         className="w-[5.66rem] h-[5.66rem] border border-wet-concrete rounded-full bg-gradient-to-b object-cover from-electric-violet to-magic-mint flex items-center justify-center cursor-pointer mt-2"
         {...getRootProps()}
