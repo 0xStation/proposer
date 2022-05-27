@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     })
     const newResults = await response.json()
 
-    if (newResults.code) {
+    if (newResults.code !== undefined) {
       throw newResults.message
     }
 
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
     res.status(200).json({ guildMembers })
     return
   } catch (err) {
-    console.log(err)
+    console.error(err)
     res.status(401).json({ error: err })
   }
 }
