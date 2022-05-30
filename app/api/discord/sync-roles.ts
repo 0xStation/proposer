@@ -75,10 +75,10 @@ export default async function handler(req, res) {
     return gm.roles.some((r) => activeCreatedTagDiscordIds.includes(r))
   })
 
-  // now that we have the list, we need to shape the guild member object a bit
-  // activeGuildMembers just filtered by which members HAD an active tag
-  // now we need to map to actually get the tags that overlapped
-  const filteredActiveGuildMembers = activeGuildMembers.map((gm) => {
+  // we need to stash some information that is not saved on the account when it is created
+  // this is a handy lookup mapping discord user ids to metadata about that user.
+  // specifically, the incoming tags for that user, and the joinedAt data
+  const accountDiscordId_metadata = activeGuildMembers.reduce((acc, gm) => {
     const tagOverlap = activeCreatedTagDiscordIds.filter((tag) => gm.roles.includes(tag))
 
     const tagOverlapId = tagOverlap
@@ -91,55 +91,59 @@ export default async function handler(req, res) {
       })
       .filter((tag): tag is number => !!tag) // remove possible undefined from `find` in map above
 
-    return {
-      discordId: gm.user.id,
-      name: gm.nick || gm.user.username,
+    acc[gm.user.id] = {
       incomingTagIds: tagOverlapId,
-      avatarHash: gm.user.avatar,
       joinedAt: gm.joined_at,
     }
-  })
 
-  filteredActiveGuildMembers.forEach(async (user) => {
-    // creates an account for the active guild member if one does not exist
-    // if one does exist, an empty update map will just skip over this and return the account
-    const account = await db.account.upsert({
-      where: { discordId: user.discordId },
-      update: {},
-      create: {
-        discordId: user.discordId,
-        data: {
-          name: user.name,
-          pfpURL: user.avatarHash
-            ? `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatarHash}.png`
-            : undefined,
+    return acc
+  }, {})
+
+  // step 1.
+  // creates an account for the active guild member if one does not exist
+  // if one does exist, an empty update map will just skip over this and return the account
+  // includes the tickets and tags, which we will need to later when building up which tags to upsert alongside
+  // the ticket.
+  const accounts = await db.$transaction(
+    activeGuildMembers.map((guildMember) =>
+      db.account.upsert({
+        where: { discordId: guildMember.user.id },
+        update: {},
+        create: {
+          discordId: guildMember.user.id,
+          data: {
+            name: guildMember.nick || guildMember.user.username,
+            pfpURL: guildMember.user.avatar
+              ? `https://cdn.discordapp.com/avatars/${guildMember.user.id}/${guildMember.user.avatar}.png`
+              : undefined,
+          },
         },
-      },
-    })
-
-    // In order to get the difference between an existing station members tags and their new tags, we need to fetch
-    // their existing tags. This lives on their ticket to the given terminal. Note, this is not a concern for newly
-    // created accounts, since there will be no "difference" of roles - the incoming ones are correct.
-    const existingTicket = await db.accountTerminal.findUnique({
-      where: {
-        accountId_terminalId: {
-          accountId: account.id,
-          terminalId: params.terminalId,
+        include: {
+          tickets: {
+            include: {
+              tags: true,
+            },
+          },
         },
-      },
-      include: {
-        tags: true,
-      },
-    })
+      })
+    )
+  )
 
-    // building up the tag object
-    // easier to do it this way since only existing tickets may have the "deleteMany" key.
-    // not very "functional" but oh well...
+  // step 2. prepare the ticket data structure
+  // for tickets that exist, we need to compare existing tags to incoming tags to remove tags that may currently
+  // exist but are no longer active according to the new incoming tag list.
+  // for new tickets, we just need to add incoming tags... there is nothing to compare so everything is fresh
+  // ---
+  // this map builds up a list of account object with a new field called tagObject which is the tags to update or remove
+  // in the next step, we will create a transaction creating tickets using this tag data.
+  const accountsWithTagObject = accounts.map((account) => {
+    let existingTicket = account.tickets.find((ticket) => ticket.terminalId === params.terminalId)
     const tagObject = {}
-
     if (existingTicket) {
       const existingTags = existingTicket.tags
-      const tagsToRemove = existingTags.filter((tag) => !user.incomingTagIds.includes(tag.tagId))
+      const tagsToRemove = existingTags.filter(
+        (tag) => !accountDiscordId_metadata[account.discordId].incomingTagIds.includes(tag.tagId)
+      )
       const remove = {
         deleteMany: tagsToRemove.map((tag) => {
           return {
@@ -149,9 +153,8 @@ export default async function handler(req, res) {
       }
       Object.assign(tagObject, remove)
     }
-
     const connectOrCreate = {
-      connectOrCreate: user.incomingTagIds.map((tagId) => {
+      connectOrCreate: accountDiscordId_metadata[account.discordId].incomingTagIds.map((tagId) => {
         return {
           where: {
             tagId_ticketAccountId_ticketTerminalId: {
@@ -166,28 +169,44 @@ export default async function handler(req, res) {
         }
       }),
     }
-
     Object.assign(tagObject, connectOrCreate)
 
-    const ticket = await db.accountTerminal.upsert({
-      where: { accountId_terminalId: { accountId: account.id, terminalId: params.terminalId } },
-      update: {
-        ...(!account.address && { joinedAt: new Date(user.joinedAt) }), // only update joinedAt if still a discord-only imported account
-        tags: tagObject,
-      },
-      create: {
-        accountId: account.id,
-        terminalId: params.terminalId,
-        active: false,
-        joinedAt: new Date(user.joinedAt),
-        tags: {
-          create: user.incomingTagIds.map((tag) => {
-            return { tagId: tag }
-          }),
-        },
-      },
-    })
+    return {
+      ...account,
+      tagObject,
+    }
   })
+
+  // step 3. Create the tickets
+  // creates a new account terminal (ticket) relationship
+  // The existing (update) case uses the tagObject from the previous step
+  // the new (create) case loops over the incoming tags and creates a tag relationship for each.
+  const tickets = await db.$transaction(
+    accountsWithTagObject.map((account) =>
+      db.accountTerminal.upsert({
+        where: { accountId_terminalId: { accountId: account.id, terminalId: params.terminalId } },
+        update: {
+          ...(!account.address && {
+            joinedAt: new Date(accountDiscordId_metadata[account.discordId].joinedAt),
+          }), // only update joinedAt if still a discord-only imported account
+          // now that I'm looking at it, we only use the tagObject for the update case
+          // it's possible that in the map above, we can ignore the case in which ticket does not exist
+          tags: account.tagObject,
+        },
+        create: {
+          accountId: account.id,
+          terminalId: params.terminalId,
+          active: false,
+          joinedAt: new Date(accountDiscordId_metadata[account.discordId].joinedAt),
+          tags: {
+            create: accountDiscordId_metadata[account.discordId].incomingTagIds.map((tag) => {
+              return { tagId: tag }
+            }),
+          },
+        },
+      })
+    )
+  )
 
   // better error handling and success messages prob but im exhausted rn
   res.status(200).json({ response: "success" })
