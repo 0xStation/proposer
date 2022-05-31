@@ -46,7 +46,7 @@ const ProfileHome: BlitzPage = () => {
       suspense: false,
       refetchOnWindowFocus: false,
       onSuccess: (terminals: Terminal[]) => {
-        if (terminals && terminals.length > 0) {
+        if (terminals && terminals.length > 0 && !selectedTerminal) {
           setSelectedTerminal(terminals[0] || null)
         }
       },
