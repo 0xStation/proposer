@@ -1,8 +1,14 @@
-import { useParam, useRouter, Routes, Link, Image, Router } from "blitz"
+import { useParam, useQuery, useRouter, Routes, Link, Image, Router } from "blitz"
 import Exit from "/public/exit-button.svg"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 
 const Navigation = ({ children }) => {
   const terminalHandle = useParam("terminalHandle") as string
+  const [terminal] = useQuery(
+    getTerminalByHandle,
+    { handle: terminalHandle as string },
+    { suspense: false, enabled: !!terminalHandle }
+  )
   const router = useRouter()
 
   return (
@@ -17,7 +23,7 @@ const Navigation = ({ children }) => {
         <div className="fixed">
           <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>
             <label className="font-bold text-sm text-marble-white uppercase tracking-wider cursor-pointer">
-              {terminalHandle}
+              {terminal?.data.name || terminalHandle}
             </label>
           </Link>
 
