@@ -171,12 +171,22 @@ const DiscordSettingsPage: BlitzPage = () => {
 
                 // next, sync discord server with station tags
                 try {
-                  await fetch("/api/discord/sync-roles", {
-                    method: "POST",
-                    body: JSON.stringify({
-                      terminalId: terminal.id,
-                    }),
-                  })
+                  let retry = true
+                  let afterId = null
+                  while (retry) {
+                    console.log(retry)
+                    console.log(afterId)
+                    const response = await fetch("/api/discord/sync-roles", {
+                      method: "POST",
+                      body: JSON.stringify({
+                        terminalId: terminal.id,
+                        afterId: afterId,
+                      }),
+                    })
+                    const responseJson = await response.json()
+                    retry = responseJson.retry
+                    afterId = responseJson.afterId
+                  }
                 } catch (err) {
                   console.error("Error creating accounts. Failed with ", err)
                   setToastState({

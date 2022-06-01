@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     return
   }
 
-  const paginatedFetch = async (after, previousResults) => {
+  const fetchGuildMembers = async (after) => {
     const limit = 1000
     const baseURL = `${process.env.BLITZ_PUBLIC_API_ENDPOINT}/guilds/${terminal.data.guildId}/members?limit=${limit}`
     const url = after ? baseURL + `&after=${after}` : baseURL
@@ -36,21 +36,10 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
       },
     })
-    const newResults = await response.json()
+    const results = await response.json()
 
-    if (newResults.code !== undefined) {
-      throw newResults.message
-    }
-
-    const results = [...previousResults, ...newResults]
-
-    // limit is 1000
-    // 1. there are more results to fetch
-    // 2. we fetched the last 1000, but no way to know
-    // so we need to make another request to check
-    // to request the next page, get the id of the last user in current page to specify as "after"
-    if (newResults.length === 1000) {
-      return paginatedFetch(newResults[999].user.id, results)
+    if (results.code !== undefined) {
+      throw results.message
     }
 
     // anything less than 1000 means this was final page, return results
@@ -59,7 +48,7 @@ export default async function handler(req, res) {
 
   let guildMembers
   try {
-    guildMembers = await paginatedFetch(null, [])
+    guildMembers = await fetchGuildMembers(params.afterId)
   } catch (err) {
     console.error(err)
     res.status(401).json({ error: err })
@@ -208,6 +197,12 @@ export default async function handler(req, res) {
     )
   )
 
-  // better error handling and success messages prob but im exhausted rn
-  res.status(200).json({ response: "success" })
+  // returns the count (to know if we should refetch) and the last guildMember
+  let count = guildMembers.length
+  if (count === 1000) {
+    let afterId = guildMembers[count - 1].user.id
+    res.status(200).json({ retry: true, afterId: afterId })
+  } else {
+    res.status(200).json({ retry: false, afterId: null })
+  }
 }
