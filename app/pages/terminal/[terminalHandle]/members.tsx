@@ -22,7 +22,7 @@ import { RefreshIcon } from "@heroicons/react/outline"
 import useStore from "app/core/hooks/useStore"
 
 interface Filters {
-  [tagType: string]: Set<string>
+  [tagType: string]: Set<number>
 }
 
 const MemberDirectoryPage: BlitzPage = () => {
@@ -73,9 +73,20 @@ const MemberDirectoryPage: BlitzPage = () => {
     setSelectedMember(filteredMembers[0])
   }, [filteredMembers])
 
+  const m = Object.values(filters)
+    .map((set) => Array.from(set))
+    .filter((arr) => arr.length > 0)
+
+  console.log(m)
+
   const [members] = useQuery(
     getMembersByTerminalId,
-    { terminalId: terminal?.id as number },
+    {
+      terminalId: terminal?.id as number,
+      tagGroups: Object.values(filters)
+        .map((set) => Array.from(set))
+        .filter((arr) => arr.length > 0),
+    },
     {
       suspense: false,
       enabled: !!terminal?.id,
@@ -136,6 +147,7 @@ const MemberDirectoryPage: BlitzPage = () => {
                   allMembers={members}
                   setFilteredMembers={setFilteredMembers}
                   filters={filters}
+                  setFilters={setFilters}
                   key={`${idx}${tagType}`}
                 />
               ))
@@ -163,7 +175,7 @@ const MemberDirectoryPage: BlitzPage = () => {
   )
 }
 
-const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) => {
+const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters, setFilters }) => {
   const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
 
   // apply filters on accounts
@@ -255,7 +267,10 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                       return
                     }
                     // grab field selected
-                    const [tagType, tagNames] = Object.entries(field)[0] as [string, any]
+                    const [tagType, tagNames] = Object.entries(field)[0] as [
+                      string,
+                      Record<string, number[]>
+                    ]
                     const tagFilters = filters[tagType]
                     Object.entries(tagNames).forEach(([tagName, value]) => {
                       // remove tag if de-selected
@@ -263,11 +278,14 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                         tagFilters.delete(tagName)
                       } else if (value) {
                         // add tag if selected
-                        tagFilters.add(tagName)
+                        tagFilters.add(value[0])
                       }
                     })
 
-                    applyFilters()
+                    setFilters({
+                      ...filters,
+                      [filters[tagType]]: tagFilters,
+                    })
                   }}
                   render={({ form, handleSubmit }) => {
                     return (
@@ -277,8 +295,9 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                             return (
                               <div className="flex-row" key={`${clearDefaultValue}${tag.value}`}>
                                 <Checkbox
+                                  value={tag.id}
                                   name={`${tag.type}.${tag.value}`}
-                                  defaultChecked={filters[tag.type].has(tag.value)}
+                                  defaultChecked={filters[tag.type].has(tag.id)}
                                   className="align-middle"
                                 />
                                 <p className="p-0.5 align-middle mx-4 inline leading-none">
