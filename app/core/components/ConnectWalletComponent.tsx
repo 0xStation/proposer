@@ -68,10 +68,11 @@ export const ConnectWalletComponent = () => {
         throw Error("Unsuccessful signature.")
       }
     } catch (err) {
+      console.error(err)
       if (err.code === 4001) {
         setErrorMessage("Wallet signature declined.")
       } else {
-        setErrorMessage("Something went wrong.")
+        setErrorMessage(`Something went wrong. ${err.message}`)
       }
       setConnectState({ error: true, success: false, loading: false })
     }
@@ -102,7 +103,7 @@ export const ConnectWalletComponent = () => {
       <div className="m-6">
         <div className="flex flex-row space-x-3 mx-5 text-marble-white">
           <button
-            className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete"
+            className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer"
             disabled={connectState.loading}
             onClick={async () => {
               await handleWalletConnection(metamaskWallet)
@@ -118,7 +119,7 @@ export const ConnectWalletComponent = () => {
             </div>
           </button>
           <button
-            className="flex-1  border border-marble-white rounded-md content-center hover:bg-wet-concrete"
+            className="flex-1  border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer"
             disabled={connectState.loading}
             onClick={async () => {
               await handleWalletConnection(walletConnect)
@@ -134,7 +135,7 @@ export const ConnectWalletComponent = () => {
             </div>
           </button>
           <button
-            className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete"
+            className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor-pointer"
             disabled={connectState.loading}
             onClick={async () => {
               await handleWalletConnection(coinbaseWallet)

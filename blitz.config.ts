@@ -3,7 +3,7 @@ import { BlitzConfig, sessionMiddleware, simpleRolesIsAuthorized } from "blitz"
 const config: BlitzConfig = {
   middleware: [
     sessionMiddleware({
-      cookiePrefix: "station",
+      cookiePrefix: `${process.env.APP_ENV}_session`,
       isAuthorized: simpleRolesIsAuthorized,
     }),
   ],

@@ -81,11 +81,11 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         throw Error("Unsuccessful signature.")
       }
     } catch (err) {
+      console.error(err)
       if (err.code === 4001) {
         setErrorMessage("Wallet signature declined.")
       } else {
-        setErrorMessage("Something went wrong.")
-        console.error(err)
+        setErrorMessage(`Something went wrong. ${err.message}`)
       }
       setConnectState({ error: true, success: false, loading: false })
     }
@@ -115,7 +115,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
       <div className="mt-6">
         <div className="flex flex-row space-x-3 mx-5 text-marble-white">
           <button
-            className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete"
+            className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer"
             disabled={connectState.loading}
             onClick={async () => {
               await handleWalletConnection(metamaskWallet)
@@ -131,7 +131,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
             </div>
           </button>
           <button
-            className="flex-1  border border-marble-white rounded-md content-center hover:bg-wet-concrete"
+            className="flex-1  border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer"
             disabled={connectState.loading}
             onClick={async () => {
               await handleWalletConnection(walletConnect)
@@ -147,7 +147,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
             </div>
           </button>
           <button
-            className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete"
+            className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer"
             disabled={connectState.loading}
             onClick={async () => {
               await handleWalletConnection(coinbaseWallet)
