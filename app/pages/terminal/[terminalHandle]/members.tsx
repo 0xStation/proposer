@@ -32,7 +32,6 @@ const MemberDirectoryPage: BlitzPage = () => {
     { handle: terminalHandle as string },
     { suspense: false, enabled: !!terminalHandle }
   )
-  const [filteredMembers, setFilteredMembers] = useState<AccountTerminalWithTagsAndAccount[]>([])
   // selected user to display in the contributor card
   const [selectedMember, setSelectedMember] = useState<AccountTerminalWithTagsAndAccount>()
 
@@ -41,6 +40,7 @@ const MemberDirectoryPage: BlitzPage = () => {
   // filters is a hashmap where the key is the tag type and the value is a Set of strings
   // where the strings are applied filters
   const [filters, setFilters] = useState<Filters>({})
+  console.log(filters)
 
   /*
   `groupedTags` returns an object where the key
@@ -69,16 +69,6 @@ const MemberDirectoryPage: BlitzPage = () => {
     }
   )
 
-  useEffect(() => {
-    setSelectedMember(filteredMembers[0])
-  }, [filteredMembers])
-
-  const m = Object.values(filters)
-    .map((set) => Array.from(set))
-    .filter((arr) => arr.length > 0)
-
-  console.log(m)
-
   const [members] = useQuery(
     getMembersByTerminalId,
     {
@@ -91,11 +81,14 @@ const MemberDirectoryPage: BlitzPage = () => {
       suspense: false,
       enabled: !!terminal?.id,
       refetchOnWindowFocus: false,
-      onSuccess: (members: AccountTerminalWithTagsAndAccount[]) => {
-        setFilteredMembers(members)
-      },
     }
   )
+
+  useEffect(() => {
+    if (members) {
+      setSelectedMember(members[0])
+    }
+  }, [members])
 
   const refreshRoles = async () => {
     if (terminal) {
@@ -144,8 +137,6 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <FilterPill
                   tagType={tagType}
                   tags={tags}
-                  allMembers={members}
-                  setFilteredMembers={setFilteredMembers}
                   filters={filters}
                   setFilters={setFilters}
                   key={`${idx}${tagType}`}
@@ -158,8 +149,8 @@ const MemberDirectoryPage: BlitzPage = () => {
         </div>
         <div className="grid grid-cols-7 h-[calc(100vh-130px)] w-full box-border">
           <div className="overflow-y-auto col-span-4">
-            {filteredMembers &&
-              filteredMembers.map((member, idx) => (
+            {members &&
+              members.map((member, idx) => (
                 <ContributorComponent
                   key={`${member.joinedAt}${idx}`}
                   member={member}
@@ -175,53 +166,23 @@ const MemberDirectoryPage: BlitzPage = () => {
   )
 }
 
-const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters, setFilters }) => {
+const FilterPill = ({ tagType, tags, filters, setFilters }) => {
   const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
-
-  // apply filters on accounts
-  const applyFilters = () => {
-    let clearFilters = true
-    // reset directory to show all contributors if no filters are selected
-    Object.entries(filters).map(([tagType, tagFilter]: [string, Set<string>]) => {
-      if (tagFilter.size > 0) {
-        clearFilters = false
-      }
-    })
-    if (clearFilters) {
-      setFilteredMembers(allMembers)
-      return
-    }
-
-    const newFilteredMembers = allMembers.filter((member) => {
-      let meetsFilterRequirements = [] as (boolean | undefined)[]
-
-      Object.entries(filters).map(([tagType, tagFilter]: [string, Set<string>]) => {
-        // member meets the category's filter if:
-        // member has any of the tags in the category's applied filters
-        // or there are no applied filters.
-        const satisfiesFilter =
-          !tagFilter.size ||
-          member.tags.find((accountTerminalTag) => tagFilter.has(accountTerminalTag.tag.value))
-
-        meetsFilterRequirements.push(!!satisfiesFilter)
-      })
-      // if user satisfies all category's filter requirements, show them in the member directory
-      if (meetsFilterRequirements.every((val) => val)) {
-        return member
-      }
-    })
-    setFilteredMembers(newFilteredMembers)
-  }
 
   const handleClearFilters = (e) => {
     e.preventDefault()
 
-    filters[tagType].clear()
+    const tagFilters = filters[tagType]
+    tagFilters.clear()
+
+    setFilters({
+      ...filters,
+      [tagType]: tagFilters,
+    })
 
     // clear filled checkboxes by removing the defaultChecked value
     // bumping the key will reset the uncontrolled component's internal state
     setClearDefaultValue(true)
-    applyFilters()
   }
 
   return (
@@ -284,7 +245,7 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters, se
 
                     setFilters({
                       ...filters,
-                      [filters[tagType]]: tagFilters,
+                      [tagType]: tagFilters,
                     })
                   }}
                   render={({ form, handleSubmit }) => {
