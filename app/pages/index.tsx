@@ -1,5 +1,5 @@
 import { BlitzPage, useRouter, useSession } from "blitz"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import useStore from "app/core/hooks/useStore"
 import { ConnectWalletComponent } from "app/core/components/ConnectWalletComponent"
