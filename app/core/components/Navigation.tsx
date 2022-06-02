@@ -152,11 +152,7 @@ const TerminalIcon = ({ terminal }) => {
         } inline-block overflow-hidden object-cover bg-gradient-to-b  from-neon-blue to-torch-red w-[46px] h-[46px] cursor-pointer border group-hover:border-marble-white rounded-lg mb-4`}
         onClick={() => router.push(Routes.MemberDirectoryPage({ terminalHandle: terminal.handle }))}
       >
-        {(terminal?.data as TerminalMetadata)?.pfpURL ? (
-          <img src={(terminal?.data as TerminalMetadata)?.pfpURL} />
-        ) : (
-          <span></span>
-        )}
+        <img src={(terminal?.data as TerminalMetadata)?.pfpURL} />
       </button>
     </div>
   )
