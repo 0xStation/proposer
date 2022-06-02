@@ -127,11 +127,15 @@ const TerminalComponent = ({ terminal, selectedTerminal, setSelectedTerminal }) 
     >
       <div className="flex space-x-2">
         <div className="flex flex-col content-center align-middle mr-1">
-          <img
-            src={terminal.data.pfpURL}
-            alt="Terminal PFP"
-            className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
-          />
+          {terminal.data.pfpURL ? (
+            <img
+              src={terminal.data.pfpURL}
+              alt="Terminal PFP"
+              className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
+            />
+          ) : (
+            <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red" />
+          )}
         </div>
         <div className="flex flex-col content-center">
           <div className="flex flex-row items-center space-x-1">
@@ -171,11 +175,15 @@ const SelectedTerminalCard = ({ account, terminal }) => {
         <div className="flex space-x-2">
           <div className="flex flex-col content-center align-middle mr-1">
             <Link href={Routes.MemberDirectoryPage({ terminalHandle: terminal.handle })}>
-              <img
-                src={terminal.data.pfpURL}
-                alt="Terminal PFP"
-                className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete hover:border-marble-white"
-              />
+              {terminal.data.pfpURL ? (
+                <img
+                  src={terminal.data.pfpURL}
+                  alt="Terminal PFP"
+                  className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
+                />
+              ) : (
+                <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red" />
+              )}
             </Link>
           </div>
           <div className="flex flex-col content-center">
