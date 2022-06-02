@@ -501,6 +501,12 @@ const SelectedContributorCard = ({ member }) => {
             </a>
           )}
         </div>
+        {account?.data?.bio && (
+          <>
+            <p className="mt-4">{account?.data?.bio}</p>
+            <hr className="text-concrete mt-6" />
+          </>
+        )}
         <div className="mt-5 text-xs">
           <TagDetails tagType="status" tags={statusTags} />
           {member.joinedAt && (
