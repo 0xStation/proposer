@@ -43,7 +43,7 @@ const PfpInput = ({ pfpURL, onUpload }) => {
     <div className="flex-col">
       <label className="font-bold text-base">PFP</label>
       <div
-        className="w-24 h-24 border rounded-xl bg-gradient-to-b object-cover from-electric-violet to-magic-mint border-concrete flex items-center justify-center cursor-pointer mt-2"
+        className="w-24 h-24 border rounded-xl bg-gradient-to-b object-cover from-neon-blue to-torch-red border-concrete flex items-center justify-center cursor-pointer mt-2"
         {...getRootProps()}
       >
         <>

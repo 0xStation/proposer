@@ -149,7 +149,7 @@ const TerminalIcon = ({ terminal }) => {
       <button
         className={`${
           isTerminalSelected ? "border-marble-white" : "border-wet-concrete"
-        } inline-block overflow-hidden bg-wet-concrete w-[46px] h-[46px] cursor-pointer border group-hover:border-marble-white rounded-lg mb-4`}
+        } inline-block overflow-hidden object-cover bg-gradient-to-b  from-neon-blue to-torch-red w-[46px] h-[46px] cursor-pointer border group-hover:border-marble-white rounded-lg mb-4`}
         onClick={() => router.push(Routes.MemberDirectoryPage({ terminalHandle: terminal.handle }))}
       >
         <img src={(terminal?.data as TerminalMetadata)?.pfpURL} />
