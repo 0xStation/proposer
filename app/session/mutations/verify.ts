@@ -20,7 +20,8 @@ export default async function verify(input: z.infer<typeof Verify>, ctx: Ctx) {
     }
   } catch (err) {
     console.error("Failed to verify wallet signature with error: ", err)
-    throw Error("Failed to verify with Sign in with Ethereum.")
+    // @ts-ignore
+    throw Error("Failed to verify with Sign in with Ethereum.", { cause: err })
   }
 
   let account
@@ -31,7 +32,8 @@ export default async function verify(input: z.infer<typeof Verify>, ctx: Ctx) {
     account = await invoke(getAccountByAddress, { address: fields.address })
   } catch (err) {
     console.error("Failed to getAccountByAddress", err)
-    throw new Error("We had a problem retrieving your account.")
+    // @ts-ignore
+    throw new Error("We had a problem retrieving your account.", { cause: err })
   }
 
   if (account && account.id) {
@@ -39,7 +41,8 @@ export default async function verify(input: z.infer<typeof Verify>, ctx: Ctx) {
       await ctx.session.$create({ userId: account.id, siwe: fields })
     } catch (err) {
       console.error("Failed to create session with error: ", err)
-      throw new Error("Failed to create authenticated session.")
+      // @ts-ignore
+      throw new Error("Failed to create authenticated session.", { cause: err })
     }
   }
 
@@ -47,7 +50,8 @@ export default async function verify(input: z.infer<typeof Verify>, ctx: Ctx) {
     await ctx.session.$setPublicData({ siwe: fields })
   } catch (err) {
     console.error("Failed to setPublicData with error: ", err)
-    throw new Error("Failed to create session.")
+    // @ts-ignore
+    throw new Error("Failed to create session.", { cause: err })
   }
 
   return true

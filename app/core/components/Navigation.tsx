@@ -95,7 +95,7 @@ const Navigation = ({ children }: { children?: any }) => {
           <div className="w-full h-[70px] absolute z-[60] bg-wet-concrete bottom-0">
             <div className="fixed mt-2 left-1/3 ml-[-6.65rem]">
               <h2 className="inline-block mr-5 text-xl font-bold justify-center">
-                {!address ? "Be recognized in your community" : "Sign in with Ethereum"}
+                {!address ? "Be recognized in your community" : "Sign"}
               </h2>
               <p>
                 {!address
