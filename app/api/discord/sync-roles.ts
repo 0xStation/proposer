@@ -13,11 +13,18 @@ import { Terminal } from "app/terminal/types"
  */
 export default async function handler(req, res) {
   const params = JSON.parse(req.body)
+  console.log(params)
 
   // Find the terminal we are interested in syncing
   const terminal = (await db.terminal.findUnique({
     where: { id: params.terminalId },
-    include: { tags: true },
+    include: {
+      tags: {
+        where: {
+          active: true,
+        },
+      },
+    },
   })) as unknown as Terminal
 
   if (!terminal) {
@@ -46,23 +53,34 @@ export default async function handler(req, res) {
     return results
   }
 
-  let guildMembers
+  let guildMembers: any[] = []
+  let afterId
+  let retry = true
   try {
-    guildMembers = await fetchGuildMembers(params.afterId)
+    while (retry) {
+      const nextPage = await fetchGuildMembers(afterId)
+      if (nextPage.length < 1000) {
+        retry = false
+      }
+      guildMembers = guildMembers.concat(...nextPage)
+      const num = guildMembers.length - 1
+      afterId = guildMembers[num].user.id
+    }
   } catch (err) {
     console.error(err)
     res.status(401).json({ error: err })
     return
   }
 
-  // active tags are the tags in the terminal that are "active" and should be considered for use
-  const activeTags = terminal.tags.filter((tag) => tag.active)
   // filter to get the discordIds, which we need to compare to the tags from the discord guild member response
-  const activeCreatedTagDiscordIds = activeTags.map((tag) => tag.discordId || "")
+  const activeCreatedTagDiscordIds = terminal.tags.map((tag) => tag.discordId || "")
   // guild members who have one or more of the active tags
   const activeGuildMembers = guildMembers.filter((gm) => {
     return gm.roles.some((r) => activeCreatedTagDiscordIds.includes(r))
   })
+
+  console.log(guildMembers.length)
+  console.log(activeGuildMembers.length)
 
   // we need to stash some information that is not saved on the account when it is created
   // this is a handy lookup mapping discord user ids to metadata about that user.
@@ -72,7 +90,7 @@ export default async function handler(req, res) {
 
     const tagOverlapId = tagOverlap
       .map((discordId) => {
-        const tag = activeTags.find((tag) => {
+        const tag = terminal.tags.find((tag) => {
           return tag.discordId === discordId
         })
 
@@ -93,116 +111,157 @@ export default async function handler(req, res) {
   // if one does exist, an empty update map will just skip over this and return the account
   // includes the tickets and tags, which we will need to later when building up which tags to upsert alongside
   // the ticket.
-  const accounts = await db.$transaction(
-    activeGuildMembers.map((guildMember) =>
-      db.account.upsert({
-        where: { discordId: guildMember.user.id },
-        update: {},
-        create: {
-          discordId: guildMember.user.id,
-          data: {
-            name: guildMember.nick || guildMember.user.username,
-            pfpURL: guildMember.user.avatar
-              ? `https://cdn.discordapp.com/avatars/${guildMember.user.id}/${guildMember.user.avatar}.png`
-              : undefined,
-          },
-        },
-        include: {
-          tickets: {
-            include: {
-              tags: true,
-            },
-          },
-        },
-      })
-    )
-  )
 
-  // step 2. prepare the ticket data structure
-  // for tickets that exist, we need to compare existing tags to incoming tags to remove tags that may currently
-  // exist but are no longer active according to the new incoming tag list.
-  // for new tickets, we just need to add incoming tags... there is nothing to compare so everything is fresh
-  // ---
-  // this map builds up a list of account object with a new field called tagObject which is the tags to update or remove
-  // in the next step, we will create a transaction creating tickets using this tag data.
-  const accountsWithTagObject = accounts.map((account) => {
-    let existingTicket = account.tickets.find((ticket) => ticket.terminalId === params.terminalId)
-    const tagObject = {}
-    if (existingTicket) {
-      const existingTags = existingTicket.tags
-      const tagsToRemove = existingTags.filter(
-        (tag) => !accountDiscordId_metadata[account.discordId].incomingTagIds.includes(tag.tagId)
-      )
-      const remove = {
-        deleteMany: tagsToRemove.map((tag) => {
-          return {
-            tagId: tag.tagId,
-          }
-        }),
+  const newAccounts = await db.account.createMany({
+    skipDuplicates: true,
+    data: activeGuildMembers.map((guildMember) => {
+      return {
+        discordId: guildMember.user.id,
+        data: {
+          name: guildMember.nick || guildMember.user.username,
+          pfpURL: guildMember.user.avatar
+            ? `https://cdn.discordapp.com/avatars/${guildMember.user.id}/${guildMember.user.avatar}.png`
+            : undefined,
+        },
       }
-      Object.assign(tagObject, remove)
-    }
-    const connectOrCreate = {
-      connectOrCreate: accountDiscordId_metadata[account.discordId].incomingTagIds.map((tagId) => {
-        return {
-          where: {
-            tagId_ticketAccountId_ticketTerminalId: {
-              tagId: tagId,
-              ticketAccountId: account.id,
-              ticketTerminalId: params.terminalId,
+    }),
+  })
+
+  console.log(`${newAccounts.count} new accounts`)
+
+  // step 2.
+  // create AccountTerminals for accounts that do not yet have membership
+  const accounts = await db.account.findMany({
+    where: {
+      discordId: {
+        in: activeGuildMembers.map((gm) => gm.user.id),
+      },
+    },
+    // include tags proactively for step 3
+    include: {
+      tickets: {
+        include: {
+          tags: {
+            where: {
+              tag: { NOT: { discordId: null } },
             },
           },
-          create: {
-            tagId: tagId,
-          },
-        }
-      }),
-    }
-    Object.assign(tagObject, connectOrCreate)
+        },
+      },
+    },
+  })
 
-    return {
-      ...account,
-      tagObject,
+  const newTickets = await db.accountTerminal.createMany({
+    skipDuplicates: true,
+    data: accounts.map((a) => {
+      return {
+        accountId: a.id,
+        terminalId: params.terminalId,
+        active: false,
+        ...(a.discordId && { joinedAt: new Date(accountDiscordId_metadata[a.discordId].joinedAt) }),
+      }
+    }),
+  })
+
+  console.log(`${newTickets.count} new tickets`)
+
+  // step 3.
+  // organize tag diff between db and discord per account
+  type ATT = {
+    tagId: number
+    ticketAccountId: number
+    ticketTerminalId: number
+  }
+  let addAccountTerminalTags: ATT[] = []
+  let removeAccountTerminalTags: ATT[] = []
+
+  accounts.forEach((a) => {
+    let existingTicket = a.tickets.find((ticket) => ticket.terminalId === params.terminalId)
+    const incomingTagIds = accountDiscordId_metadata[a.discordId!].incomingTagIds
+
+    if (!existingTicket) {
+      addAccountTerminalTags.concat(
+        ...incomingTagIds.map((tagId) => {
+          return {
+            tagId,
+            ticketAccountId: a.id,
+            ticketTerminalId: params.terminalId,
+          }
+        })
+      )
+    } else {
+      const existingTagIds = existingTicket.tags.map((t) => t.tagId)
+
+      const toAdd = incomingTagIds.filter((tagId) => !existingTagIds.includes(tagId))
+      addAccountTerminalTags = addAccountTerminalTags.concat(
+        ...toAdd.map((tagId) => {
+          return {
+            tagId,
+            ticketAccountId: a.id,
+            ticketTerminalId: params.terminalId,
+          }
+        })
+      )
+
+      const toRemove = existingTagIds.filter((tagId) => !incomingTagIds.includes(tagId))
+      removeAccountTerminalTags = removeAccountTerminalTags.concat(
+        ...toRemove.map((tagId) => {
+          return {
+            tagId,
+            ticketAccountId: a.id,
+            ticketTerminalId: params.terminalId,
+          }
+        })
+      )
     }
   })
 
-  // step 3. Create the tickets
-  // creates a new account terminal (ticket) relationship
-  // The existing (update) case uses the tagObject from the previous step
-  // the new (create) case loops over the incoming tags and creates a tag relationship for each.
-  const tickets = await db.$transaction(
-    accountsWithTagObject.map((account) =>
-      db.accountTerminal.upsert({
-        where: { accountId_terminalId: { accountId: account.id, terminalId: params.terminalId } },
-        update: {
-          ...(!account.address && {
-            joinedAt: new Date(accountDiscordId_metadata[account.discordId].joinedAt),
-          }), // only update joinedAt if still a discord-only imported account
-          // now that I'm looking at it, we only use the tagObject for the update case
-          // it's possible that in the map above, we can ignore the case in which ticket does not exist
-          tags: account.tagObject,
-        },
-        create: {
-          accountId: account.id,
-          terminalId: params.terminalId,
-          active: false,
-          joinedAt: new Date(accountDiscordId_metadata[account.discordId].joinedAt),
-          tags: {
-            create: accountDiscordId_metadata[account.discordId].incomingTagIds.map((tag) => {
-              return { tagId: tag }
-            }),
+  // step 3a.
+  // create AccountTerminalTags for memberships that are missing tags
+  const addTicketTags = await db.accountTerminalTag.createMany({
+    skipDuplicates: true,
+    data: addAccountTerminalTags,
+  })
+
+  console.log(`${addTicketTags.count} tag associations created`)
+
+  // step 3b.
+  // delete AccountTerminalTags for memberships that have tags in our db that they no longer own in Discord
+  const removeTicketTags = await db.$transaction(
+    removeAccountTerminalTags.map((obj) => {
+      return db.accountTerminalTag.delete({
+        where: {
+          tagId_ticketAccountId_ticketTerminalId: {
+            ...obj,
           },
         },
       })
-    )
+    })
   )
+
+  console.log(`${removeTicketTags.length} tag associations removed`)
+
+  // other option using native `deleteMany`
+  // this takes less code, but for some reason feels weird when I imagine the generated SQL
+  // const removeTicketTags = db.accountTerminalTag.deleteMany({
+  //   where: {
+  //     OR: removeAccountTerminalTags,
+  //   },
+  // })
+
+  // step 3c.
+  // await both queries because they can run in parallel
+  // await addTicketTags
+  // await removeTicketTags
 
   // returns the count (to know if we should refetch) and the last guildMember
   let count = guildMembers.length
   if (count === 1000) {
     let afterId = guildMembers[count - 1].user.id
+    console.log("returning retry")
     res.status(200).json({ retry: true, afterId: afterId })
   } else {
+    console.log("returning NO retry")
     res.status(200).json({ retry: false, afterId: null })
   }
 }

@@ -39,7 +39,7 @@ export default async function getMembersByTerminalId(
           _count: "desc",
         },
       },
-      take: 10,
+      take: 100,
     })
 
     return members as AccountTerminalWithTagsAndAccount[]

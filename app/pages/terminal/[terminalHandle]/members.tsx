@@ -96,6 +96,7 @@ const MemberDirectoryPage: BlitzPage = () => {
         method: "POST",
         body: JSON.stringify({
           terminalId: terminal.id,
+          // afterId: "924971775484362782",
         }),
       })
 
