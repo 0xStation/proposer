@@ -25,6 +25,11 @@ const ProfileHome: BlitzPage = () => {
     undefined,
     false
   )
+  const [hasSeenDiscordConnectModal] = useLocalStorage<boolean>(
+    "has_dismissed_discord_connect_modal",
+    false,
+    true
+  )
   const activeUser = useStore((state) => state.activeUser)
 
   // TODO: useLocalStorage doesn't return us the updated authentication value
@@ -61,7 +66,8 @@ const ProfileHome: BlitzPage = () => {
       activeUser &&
       !activeUser?.discordId &&
       !discordAuthToken?.authorization &&
-      !newAuth
+      !newAuth &&
+      !hasSeenDiscordConnectModal
     ) {
       setIsConnectDiscordModalOpen(true)
     }
