@@ -258,7 +258,7 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
         {tags.length > 1 || tagType === "status" ? tagType : tagType.slice(0, -1)}
       </p>
       <div className="flex-row space-y-2 align-left mr-2">
-        {tags.map((accountTerminalTag) => {
+        {tags?.map((accountTerminalTag) => {
           return (
             <span
               key={accountTerminalTag.tag.value}

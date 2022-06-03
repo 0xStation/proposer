@@ -25,12 +25,15 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
     session?.siwe?.address && activeUser ? (
       <button
         className="block hover:opacity-70"
-        onClick={() => router.push(`/profile/${activeUser?.address}`)}
+        onClick={() => {
+          setIsOpen(false)
+          router.push(`/profile/${activeUser?.address}`)
+        }}
       >
         View Profile
       </button>
     ) : session?.siwe?.address ? (
-      <button className="block hover:opacity-70" onClick={() => router.push(`/profile/create`)}>
+      <button className="block hover:opacity-70" onClick={() => router.push(`/profile/complete`)}>
         Create Profile
       </button>
     ) : null
