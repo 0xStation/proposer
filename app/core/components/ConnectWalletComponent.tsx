@@ -98,71 +98,70 @@ export const ConnectWalletComponent = () => {
 
   return (
     <div
-      className={`w-[612px] rounded bg-tunnel-black border ${
+      className={`sm:w-[37rem] rounded bg-tunnel-black border ${
         connectState.error ? "border-torch-red" : "border-concrete"
-      } absolute top-1/2 left-1/2 ml-[-306px] mt-[-200px]`}
+      }`}
     >
       <div className="w-full h-full relative">
         <Image src={Banner} alt="Modal banner" layout="responsive" />
-      </div>
-      {showSignView && isConnected ? (
-        <>
-          <button
-            className="h-[20px] w-[20px] absolute mt-2 ml-2"
-            onClick={() => {
-              setConnectState({ error: false, loading: false })
-              setShowSignView(false)
-            }}
-          >
-            <Image src={BackIcon} alt="Back icon" />
-          </button>
-          <h1 className="text-2xl font-bold text-marble-white text-center mt-6 mb-2">
-            Sign in with Ethereum
-          </h1>
-          <p className="text-lg text-center">
-            Verify your address so we can securely authenticate you.
-          </p>
-          {connectState.error ? (
-            <div className="mt-2 text-center text-torch-red">
-              <p>{errorMessage || "Something went wrong"}</p>
-            </div>
-          ) : null}
-          <div className="m-6 text-center">
+
+        {showSignView && isConnected ? (
+          <>
             <button
-              className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-36 h-[35px]"
-              onClick={handleSignInWithEthereum}
-              disabled={connectState.loading}
+              className="h-[20px] w-[20px] absolute mt-2 ml-2"
+              onClick={() => {
+                setConnectState({ error: false, loading: false })
+                setShowSignView(false)
+              }}
             >
-              {connectState.loading ? (
-                <div className="flex justify-center items-center">
-                  <Spinner fill="white" />
-                </div>
-              ) : (
-                "Sign"
-              )}
+              <Image src={BackIcon} alt="Back icon" />
             </button>
-          </div>
-        </>
-      ) : (
-        <>
-          <h1 className="text-2xl font-bold text-marble-white text-center mt-6">Enter Station</h1>
-          <p className="text-lg text-center mt-4">Connect your wallet to enter Station.</p>
-          <p className="text-lg text-center">
-            New to web3? Learn how to create a wallet{" "}
-            <a className="text-magic-mint" href="https://www.youtube.com/watch?v=OsRIHlr0_Iw">
-              here
-            </a>
-            .
-          </p>
-          {connectState.error ? (
-            <div className="mt-2 text-center text-torch-red">
-              <p>{errorMessage || "Something went wrong"}</p>
-            </div>
-          ) : null}
-          <div className="m-6">
-            <div className="flex flex-row space-x-3 mx-5 text-marble-white">
+            <h1 className="text-2xl font-bold text-marble-white text-center mt-6 mb-2">
+              Sign in with Ethereum
+            </h1>
+            <p className="text-lg text-center">
+              Verify your address so we can securely authenticate you.
+            </p>
+            {connectState.error ? (
+              <div className="mt-2 text-center text-torch-red">
+                <p>{errorMessage || "Something went wrong"}</p>
+              </div>
+            ) : null}
+            <div className="m-6 text-center">
               <button
-                className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer"
+                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-36 h-[35px]"
+                onClick={handleSignInWithEthereum}
+                disabled={connectState.loading}
+              >
+                {connectState.loading ? (
+                  <div className="flex justify-center items-center">
+                    <Spinner fill="white" />
+                  </div>
+                ) : (
+                  "Sign"
+                )}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h1 className="text-2xl font-bold text-marble-white text-center mt-6">Enter Station</h1>
+            <p className="text-lg text-center mt-4">Connect your wallet to enter Station.</p>
+            <p className="text-lg text-center">
+              New to web3? Learn how to create a wallet{" "}
+              <a className="text-magic-mint" href="https://www.youtube.com/watch?v=OsRIHlr0_Iw">
+                here
+              </a>
+              .
+            </p>
+            {connectState.error ? (
+              <div className="mt-2 text-center text-torch-red">
+                <p>{errorMessage || "Something went wrong"}</p>
+              </div>
+            ) : null}
+            <div className="flex sm:flex-row flex-col mx-auto text-marble-white my-6 w-full justify-center place-items-center">
+              <button
+                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2"
                 disabled={connectState.loading}
                 onClick={async () => {
                   await handleWalletConnection(metamaskWallet)
@@ -174,9 +173,7 @@ export const ConnectWalletComponent = () => {
                   </div>
                 ) : (
                   <div className="flex flex-row flex-1 justify-center items-center space-x-2 my-1">
-                    <div className="flex-3/5">
-                      <span>Metamask</span>
-                    </div>
+                    <p>Metamask</p>
                     <div className="flex flex-2/5 justify-center items-center">
                       <Image src={Metamask} alt="Metamask logo." width={21} height={21} />
                     </div>
@@ -184,7 +181,7 @@ export const ConnectWalletComponent = () => {
                 )}
               </button>
               <button
-                className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer"
+                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2 sm:mt-0 mt-2"
                 disabled={connectState.loading}
                 onClick={async () => {
                   await handleWalletConnection(walletConnect)
@@ -196,22 +193,20 @@ export const ConnectWalletComponent = () => {
                   </div>
                 ) : (
                   <div className="flex flex-row flex-1 justify-center align-middle items-center space-x-2 my-1 mx-auto">
-                    <div className="flex-3/5">
-                      <span>Wallet Connect</span>
-                    </div>
-                    <div className="flex flex-2/5 justify-center items-center">
+                    <p>Wallet Connect</p>
+                    <div className="flex justify-center items-center">
                       <Image
                         src={WalletConnect}
                         alt="Wallet Connect logo."
-                        width={19}
-                        height={12}
+                        width={21}
+                        height={21}
                       />
                     </div>
                   </div>
                 )}
               </button>
               <button
-                className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor-pointer"
+                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor-pointer w-40 sm:mr-2 sm:mt-0 mt-2"
                 disabled={connectState.loading}
                 onClick={async () => {
                   await handleWalletConnection(coinbaseWallet)
@@ -223,19 +218,17 @@ export const ConnectWalletComponent = () => {
                   </div>
                 ) : (
                   <div className="flex flex-row flex-1 justify-center items-center align-middle space-x-2 my-1">
-                    <div className="flex-3/5">
-                      <span>Coinbase</span>
-                    </div>
-                    <div className="flex flex-2/5 justify-center items-center">
-                      <Image src={Coinbase} alt="Coinbase logo." width={16} height={16} />
+                    <p>Coinbase</p>
+                    <div className="flex justify-center items-center">
+                      <Image src={Coinbase} alt="Coinbase logo." width={21} height={21} />
                     </div>
                   </div>
                 )}
               </button>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
     </div>
   )
 }
