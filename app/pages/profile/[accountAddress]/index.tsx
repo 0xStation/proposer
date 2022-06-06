@@ -15,6 +15,7 @@ import { Auth } from "app/auth/types"
 import { Account } from "app/account/types"
 import { TagType } from "app/tag/types"
 import { Dialog, Transition } from "@headlessui/react"
+import truncateString from "app/core/utils/truncateString"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
@@ -77,7 +78,11 @@ const ProfileHome: BlitzPage = () => {
   }, [account, activeUser, discordAuthToken?.authorization])
 
   return (
-    <Layout title={`${account ? `${account?.data?.name} | ` : ""}Profile`}>
+    <Layout
+      title={`${
+        account?.data?.name ? account?.data?.name : truncateString(accountAddress, 3)
+      } | Profile`}
+    >
       {
         // only show discord popup if I don't have a discordId associated with my account
         // first account check prevents flicker of modal while account is still loading
@@ -340,7 +345,7 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
         {tags.length > 1 || tagType === "status" ? tagType : tagType.slice(0, -1)}
       </p>
       <div className="flex-row space-y-2 align-left mr-2">
-        {tags.map((accountTerminalTag) => {
+        {tags?.map((accountTerminalTag) => {
           return (
             <span
               key={accountTerminalTag.tag.value}

@@ -9,6 +9,7 @@ import ProfileNavigationDrawer from "./ProfileNavigationDrawer"
 import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
 import { TerminalMetadata } from "app/terminal/types"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import createAccount from "app/account/mutations/createAccount"
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -19,6 +20,7 @@ const Navigation = ({ children }: { children?: any }) => {
   const walletModalOpen = useStore((state) => state.walletModalOpen)
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [profileNavDrawerIsOpen, setProfileNavDrawerIsOpen] = useState<boolean>(false)
+  const router = useRouter()
 
   // If the user connects + signs their wallet,
   // set the active user. The active user will be
@@ -27,7 +29,13 @@ const Navigation = ({ children }: { children?: any }) => {
     if (session?.siwe?.address && !activeUser) {
       const setActiveAccount = async () => {
         const account = await invoke(getAccountByAddress, { address: session?.siwe?.address })
-        setActiveUser(account)
+        if (!account) {
+          const newUser = await invoke(createAccount, { address: session?.siwe?.address })
+          setActiveUser(newUser)
+          router.push(`/profile/complete`)
+        } else {
+          setActiveUser(account)
+        }
       }
       setActiveAccount()
     }
@@ -149,10 +157,17 @@ const TerminalIcon = ({ terminal }) => {
       <button
         className={`${
           isTerminalSelected ? "border-marble-white" : "border-wet-concrete"
-        } inline-block overflow-hidden object-cover bg-gradient-to-b  from-neon-blue to-torch-red w-[46px] h-[46px] cursor-pointer border group-hover:border-marble-white rounded-lg mb-4`}
+        } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg mb-4`}
         onClick={() => router.push(Routes.MemberDirectoryPage({ terminalHandle: terminal.handle }))}
       >
-        <img src={(terminal?.data as TerminalMetadata)?.pfpURL} />
+        {(terminal?.data as TerminalMetadata)?.pfpURL ? (
+          <img
+            className="object-fill w-[46px] h-[46px]"
+            src={(terminal?.data as TerminalMetadata)?.pfpURL}
+          />
+        ) : (
+          <span className="w-[46px] h-[46px] bg-gradient-to-b  from-neon-blue to-torch-red block" />
+        )}
       </button>
     </div>
   )

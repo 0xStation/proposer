@@ -44,11 +44,12 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
     },
   }
 
-  const account = await db.account.update({
+  const account = await db.account.upsert({
     where: {
       address: params.address,
     },
-    data: payload,
+    update: payload,
+    create: payload,
   })
 
   return account as Account
