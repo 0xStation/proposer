@@ -34,7 +34,7 @@ const MemberDirectoryPage: BlitzPage = () => {
   )
   // selected user to display in the contributor card
   const [selectedMember, setSelectedMember] = useState<AccountTerminalWithTagsAndAccount>()
-
+  const [page, setPage] = useState<number>(0)
   const setToastState = useStore((state) => state.setToastState)
 
   // filters is a hashmap where the key is the tag type and the value is a Set of strings
@@ -76,6 +76,7 @@ const MemberDirectoryPage: BlitzPage = () => {
       tagGroups: Object.values(filters)
         .map((set) => Array.from(set))
         .filter((arr) => arr.length > 0),
+      page: page,
     },
     {
       suspense: false,
@@ -132,33 +133,56 @@ const MemberDirectoryPage: BlitzPage = () => {
               />
             ) : null}
           </div>
-          <div className="flex ml-6 pt-4 space-x-2">
-            {groupedTags && Object.entries(groupedTags).length ? (
-              Object.entries(groupedTags).map(([tagType, tags], idx) => (
-                <FilterPill
-                  tagType={tagType}
-                  tags={tags}
-                  filters={filters}
-                  setFilters={setFilters}
-                  key={`${idx}${tagType}`}
-                />
-              ))
-            ) : (
-              <p className="text-marble-white">View other members in the terminal.</p>
-            )}
+          <div className="flex flex-row justify-between items-center">
+            <div className="flex ml-6 pt-4 space-x-2">
+              {groupedTags && Object.entries(groupedTags).length ? (
+                Object.entries(groupedTags).map(([tagType, tags], idx) => (
+                  <FilterPill
+                    tagType={tagType}
+                    tags={tags}
+                    filters={filters}
+                    setFilters={setFilters}
+                    key={`${idx}${tagType}`}
+                  />
+                ))
+              ) : (
+                <p className="text-marble-white">View other members in the terminal.</p>
+              )}
+            </div>
+            <div className="mr-6 flex flex-row space-x-2 pt-4 items-center text-sm">
+              <span className="self-end">showing {members?.length} results</span>
+              {page > 0 && (
+                <span
+                  className="hover:bg-marble-white hover:text-tunnel-black text-sm capitalize group rounded-full border h-[17px] w-max p-4 flex flex-center items-center cursor-pointer"
+                  onClick={() => setPage(page - 1)}
+                >
+                  Prev
+                </span>
+              )}
+              {members?.length === 100 && (
+                <span
+                  className="hover:bg-marble-white hover:text-tunnel-black text-sm capitalize group rounded-full border h-[17px] w-max p-4 flex flex-center items-center cursor-pointer"
+                  onClick={() => setPage(page + 1)}
+                >
+                  Next
+                </span>
+              )}
+            </div>
           </div>
         </div>
         <div className="grid grid-cols-7 h-[calc(100vh-130px)] w-full box-border">
           <div className="overflow-y-auto col-span-4">
-            {members &&
-              members.map((member, idx) => (
-                <ContributorComponent
-                  key={`${member.joinedAt}${idx}`}
-                  member={member}
-                  selectedMember={selectedMember}
-                  setSelectedMember={setSelectedMember}
-                />
-              ))}
+            <div className="overflow-y-auto">
+              {members &&
+                members.map((member, idx) => (
+                  <ContributorComponent
+                    key={`${member.joinedAt}${idx}`}
+                    member={member}
+                    selectedMember={selectedMember}
+                    setSelectedMember={setSelectedMember}
+                  />
+                ))}
+            </div>
           </div>
           <SelectedContributorCard member={selectedMember} />
         </div>
