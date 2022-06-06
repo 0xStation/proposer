@@ -302,7 +302,7 @@ const SelectedTerminalCard = ({
                 leaveFrom="translate-x-0"
                 leaveTo="translate-x-full"
               >
-                <div className="pointer-events-auto w-screen max-w-sm">
+                <div className="pointer-events-auto w-screen max-w-xs">
                   <div className="flex h-full flex-col overflow-y-scroll bg-tunnel-black border-l border-concrete">
                     <div className="px-4">
                       <>
