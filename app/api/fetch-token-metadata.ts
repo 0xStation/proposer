@@ -1,26 +1,32 @@
+import * as z from "zod"
 import { TokenType } from "app/tag/types"
 import { multicall } from "app/utils/rpcMulticall"
 
-export type TokenDetailsResponse = {
+export type TokenMetadataResponse = {
   name: string
   symbol: string
   type: TokenType
 }
 
-export type TokenDetailsRequest = {
-  chainId: number
-  address: string
-}
+const TokenMetadataRequest = z.object({
+  chainId: z.number(),
+  address: z.string(),
+})
 
 /**
  * Fetches token information provided a chain and address.
  *
  * @param req
  * @param res
- * @returns
+ * @returns token metadata object on success or failure message if no token exists
  */
 export default async function handler(req, res) {
-  const params: TokenDetailsRequest = req.body
+  let params
+  try {
+    params = TokenMetadataRequest.parse(req.body)
+  } catch {
+    res.status(500).json({ response: "error", message: "missing required parameter" })
+  }
 
   const nameAbi = "function name() view returns (string name)"
   const symbolAbi = "function symbol() view returns (string symbol)"
@@ -79,7 +85,7 @@ export default async function handler(req, res) {
     return
   }
 
-  let data: TokenDetailsResponse = {
+  let data: TokenMetadataResponse = {
     name,
     symbol,
     type,
