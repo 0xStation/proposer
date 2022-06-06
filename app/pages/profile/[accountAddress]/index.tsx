@@ -124,7 +124,7 @@ const ProfileHome: BlitzPage = () => {
             </div>
           </>
         ) : (
-          <div className="w-full h-full flex items-center flex-col justify-center">
+          <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
             <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
               {account && account?.id === activeUser?.id
                 ? "You’re not yet a part of any Terminal on Station"
