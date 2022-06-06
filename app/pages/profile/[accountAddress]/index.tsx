@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react"
-import { BlitzPage, useParam, useQuery, Routes, Link } from "blitz"
+import { useState, useEffect, Fragment } from "react"
+import { BlitzPage, useParam, useQuery, Routes, Link, Image } from "blitz"
 import Layout from "app/core/layouts/Layout"
+import Exit from "/public/exit-button.svg"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import ConnectDiscordProfileModal from "app/core/components/ConnectDiscordProfileModal"
@@ -13,6 +14,7 @@ import useStore from "app/core/hooks/useStore"
 import { Auth } from "app/auth/types"
 import { Account } from "app/account/types"
 import { TagType } from "app/tag/types"
+import { Dialog, Transition } from "@headlessui/react"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
@@ -30,6 +32,7 @@ const ProfileHome: BlitzPage = () => {
     false,
     true
   )
+  const [mobileTerminalDrawerIsOpen, setMobileTerminalDrawerIsOpen] = useState<boolean>(false)
   const activeUser = useStore((state) => state.activeUser)
 
   // TODO: useLocalStorage doesn't return us the updated authentication value
@@ -95,7 +98,7 @@ const ProfileHome: BlitzPage = () => {
               <p className="flex ml-6 pt-2">{`${account?.data?.name}'s communities`} </p>
             </div>
             <div className="grid grid-cols-7 h-full w-full">
-              <div className="overflow-y-auto h-full col-span-4">
+              <div className="overflow-y-auto h-full col-span-7 sm:col-span-4">
                 {terminals &&
                   terminals.map((terminal, idx) => (
                     <TerminalComponent
@@ -103,10 +106,16 @@ const ProfileHome: BlitzPage = () => {
                       terminal={terminal}
                       selectedTerminal={selectedTerminal}
                       setSelectedTerminal={setSelectedTerminal}
+                      setMobileTerminalDrawerIsOpen={setMobileTerminalDrawerIsOpen}
                     />
                   ))}
               </div>
-              <SelectedTerminalCard account={account} terminal={selectedTerminal} />
+              <SelectedTerminalCard
+                account={account}
+                terminal={selectedTerminal}
+                mobileTerminalDrawerIsOpen={mobileTerminalDrawerIsOpen}
+                setMobileTerminalDrawerIsOpen={setMobileTerminalDrawerIsOpen}
+              />
             </div>
           </>
         ) : (
@@ -150,14 +159,22 @@ const ProfileHome: BlitzPage = () => {
   )
 }
 
-const TerminalComponent = ({ terminal, selectedTerminal, setSelectedTerminal }) => {
+const TerminalComponent = ({
+  terminal,
+  selectedTerminal,
+  setSelectedTerminal,
+  setMobileTerminalDrawerIsOpen,
+}) => {
   return (
     <div
       tabIndex={0}
       className={`flex flex-row space-x-52 p-3 mx-3 mt-3 rounded-lg hover:bg-wet-concrete cursor-pointer ${
         selectedTerminal?.id === terminal?.id ? "bg-wet-concrete" : ""
       }`}
-      onClick={() => setSelectedTerminal(terminal)}
+      onClick={() => {
+        setSelectedTerminal(terminal)
+        setMobileTerminalDrawerIsOpen(true)
+      }}
     >
       <div className="flex space-x-2">
         <div className="flex flex-col content-center align-middle mr-1">
@@ -184,7 +201,12 @@ const TerminalComponent = ({ terminal, selectedTerminal, setSelectedTerminal }) 
   )
 }
 
-const SelectedTerminalCard = ({ account, terminal }) => {
+const SelectedTerminalCard = ({
+  account,
+  terminal,
+  setMobileTerminalDrawerIsOpen,
+  mobileTerminalDrawerIsOpen,
+}) => {
   if (!account || !terminal) return null
 
   const membership = account.tickets.find((ticket) => ticket.terminalId === terminal.id)
@@ -205,47 +227,107 @@ const SelectedTerminalCard = ({ account, terminal }) => {
     (accountTerminalTag) => accountTerminalTag.tag.type === TagType.TOKEN
   )
 
-  return (
-    <div className="h-full border-l border-concrete col-span-3">
-      <div className="m-5 flex-col">
-        <div className="flex space-x-2">
-          <div className="flex flex-col content-center align-middle mr-1">
-            <Link href={Routes.MemberDirectoryPage({ terminalHandle: terminal.handle })}>
-              {terminal.data.pfpURL ? (
-                <img
-                  src={terminal.data.pfpURL}
-                  alt="Terminal PFP"
-                  className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
-                />
-              ) : (
-                <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red" />
-              )}
-            </Link>
-          </div>
-          <div className="flex flex-col content-center">
-            <div className="flex flex-row items-center space-x-1">
-              <div className="text-lg text-marble-white font-bold">{terminal.data.name}</div>
-            </div>
-            <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-              <div className="w-max truncate leading-4">@{terminal.handle}</div>
-            </div>
-          </div>
+  const selectedTerminalCardContent = (
+    <div className="m-5 flex-col">
+      <div className="flex space-x-2">
+        <div className="flex flex-col content-center align-middle mr-1">
+          <Link href={Routes.MemberDirectoryPage({ terminalHandle: terminal.handle })}>
+            {terminal.data.pfpURL ? (
+              <img
+                src={terminal.data.pfpURL}
+                alt="Terminal PFP"
+                className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
+              />
+            ) : (
+              <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red" />
+            )}
+          </Link>
         </div>
-        <div className="mt-9 text-xs">
-          <TagDetails tagType="status" tags={statusTags} />
-          {membership.joinedAt && (
-            <div className="mt-7">
-              <p className="uppercase mb-3">joined since</p>
-              <p className="text-base">{formatDate(membership.joinedAt)}</p>
-            </div>
-          )}
-          <TagDetails tagType="roles" tags={roleTags} />
-          <TagDetails tagType="projects" tags={projectTags} />
-          <TagDetails tagType="guilds" tags={guildTags} />
-          <TagDetails tagType="tokens" tags={tokenTags} />
+        <div className="flex flex-col content-center">
+          <div className="flex flex-row items-center space-x-1">
+            <div className="text-lg text-marble-white font-bold">{terminal.data.name}</div>
+          </div>
+          <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
+            <div className="w-max truncate leading-4">@{terminal.handle}</div>
+          </div>
         </div>
       </div>
+      <div className="mt-9 text-xs">
+        <TagDetails tagType="status" tags={statusTags} />
+        {membership.joinedAt && (
+          <div className="mt-7">
+            <p className="uppercase mb-3">joined since</p>
+            <p className="text-base">{formatDate(membership.joinedAt)}</p>
+          </div>
+        )}
+        <TagDetails tagType="roles" tags={roleTags} />
+        <TagDetails tagType="projects" tags={projectTags} />
+        <TagDetails tagType="guilds" tags={guildTags} />
+        <TagDetails tagType="tokens" tags={tokenTags} />
+      </div>
     </div>
+  )
+
+  return (
+    <>
+      <div className="h-full border-l border-concrete hidden sm:col-span-3 sm:block">
+        {selectedTerminalCardContent}
+      </div>
+      <Transition.Root show={mobileTerminalDrawerIsOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="fixed inset-0 overflow-hidden block sm:hidden"
+          onClose={setMobileTerminalDrawerIsOpen}
+        >
+          <div className="absolute inset-0 overflow-hidden">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-in-out duration-500"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in-out duration-500"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <Dialog.Overlay className="absolute inset-0 bg-tunnel-black bg-opacity-75 transition-opacity" />
+            </Transition.Child>
+
+            <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+              <Transition.Child
+                as={Fragment}
+                enter="transform transition ease-in-out duration-500 sm:duration-700"
+                enterFrom="translate-x-full"
+                enterTo="translate-x-0"
+                leave="transform transition ease-in-out duration-500 sm:duration-700"
+                leaveFrom="translate-x-0"
+                leaveTo="translate-x-full"
+              >
+                <div className="pointer-events-auto w-screen max-w-sm">
+                  <div className="flex h-full flex-col overflow-y-scroll bg-tunnel-black border-l border-concrete">
+                    <div className="px-4">
+                      <>
+                        <div className="flex items-start justify-between w-full">
+                          <div className="flex justify-between h-7 items-center w-full">
+                            <button
+                              className="mt-4 mr-4 text-right"
+                              onClick={() => setMobileTerminalDrawerIsOpen(false)}
+                            >
+                              <Image src={Exit} alt="Close button" width={12} height={12} />
+                            </button>
+                          </div>
+                          <Dialog.Title className="text-lg font-medium text-marble-white"></Dialog.Title>
+                        </div>
+                      </>
+                    </div>
+                    {selectedTerminalCardContent}
+                  </div>
+                </div>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
+    </>
   )
 }
 

@@ -92,7 +92,7 @@ const Navigation = ({ children }: { children?: any }) => {
       {/* Need a parent element around the banner or else there's a chance for a hydration issue and the dom rearranges */}
       <div>
         {!session?.siwe?.address && (
-          <div className="w-full h-[70px] absolute z-[60] bg-wet-concrete bottom-0">
+          <div className="w-full h-36 lg:h-[70px] fixed z-[60] bg-wet-concrete bottom-0">
             <div className="fixed mt-2 left-1/3 ml-[-6.65rem]">
               <h2 className="inline-block mr-5 text-xl font-bold justify-center">
                 {!address ? "Be recognized in your community" : "Sign"}
@@ -105,7 +105,7 @@ const Navigation = ({ children }: { children?: any }) => {
             </div>
             <button
               onClick={() => toggleWalletModal(true)}
-              className="inline h-[35px] bg-magic-mint text-tunnel-black w-48 rounded align-middle p-1 hover:bg-opacity-70 ml-28 mt-4 mr-[-6.65rem] right-1/3 fixed"
+              className="h-[35px] bg-magic-mint text-tunnel-black w-48 rounded align-middle p-1 hover:bg-opacity-70 ml-28 mt-4 mr-[-2rem] mb-3 lg:mb-0 md:mr-[-6.65rem] right-1/3 fixed bottom-0 lg:bottom-auto"
               disabled={walletModalOpen}
             >
               {!address ? "Connect Wallet" : "Sign in with Ethereum"}

@@ -26,8 +26,8 @@ export const Navigation = ({
   const activeUser = useStore((state) => state.activeUser)
 
   return (
-    <>
-      <div className="h-screen w-[300px] bg-tunnel-black border-r border-concrete fixed">
+    <div className="grid md:grid-cols-5">
+      <div className="md:h-screen bg-tunnel-black border-r border-concrete md:col-span-1">
         <div className="h-[150px] relative mb-[116px]">
           {account?.data.coverURL ? (
             <img
@@ -127,9 +127,9 @@ export const Navigation = ({
           ) : null}
         </div>
         <div>
-          <ul className="mt-6 ml-8 text-lg space-y-2">
+          <ul className="mt-6 ml-8 text-lg md:space-y-2 md:space-x-0 space-x-8 overflow-x-scroll">
             <li
-              className={`cursor-pointer group ${
+              className={`cursor-pointer group inline md:block${
                 terminals && terminals?.length
                   ? "hover:text-marble-white font-bold"
                   : "text-concrete"
@@ -150,7 +150,7 @@ export const Navigation = ({
                   </span>
                 ))}
             </li>
-            <li className="text-concrete cursor-pointer group">
+            <li className="text-concrete cursor-pointer group inline md:block">
               <div className="inline mr-5 align-middle">
                 <Image src={LockedIcon} alt="Locked icon" />
               </div>
@@ -162,8 +162,8 @@ export const Navigation = ({
           </ul>
         </div>
       </div>
-      <div className="h-screen left-[370px] w-[calc(100%-370px)] fixed">{children}</div>
-    </>
+      <div className="h-screen md:col-span-4">{children}</div>
+    </div>
   )
 }
 
