@@ -10,8 +10,6 @@ import {
 import AccountForm from "app/account/components/AccountForm"
 import Layout from "app/core/layouts/LayoutWithoutNavigation"
 import Exit from "/public/exit-button.svg"
-import { useDisconnect } from "wagmi"
-import logout from "app/session/mutations/logout"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
@@ -41,18 +39,15 @@ const CreateProfile: BlitzPage = ({
   activeUser,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-  const { disconnect } = useDisconnect()
 
-  const handleDisconnect = async () => {
-    await invoke(logout, {})
-    disconnect()
-    router.push("/")
+  const handleCloseButtonClick = () => {
+    router.push(`/profile/${siweAddress}`)
   }
 
   return (
     <div>
       <div className="absolute top-5 left-5">
-        <button onClick={handleDisconnect}>
+        <button onClick={handleCloseButtonClick}>
           <Image src={Exit} alt="Close button" width={16} height={16} />
         </button>
       </div>
