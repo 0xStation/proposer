@@ -38,15 +38,17 @@ const DiscordImportPage: BlitzPage = () => {
 
   const initialFormValues = useMemo(() => {
     if (connectedGuild && terminal) {
-      let allRoles = connectedGuild.roles.reduce((acc, role) => {
-        let roleId = "x" + String(role.id)
-        acc[roleId] = {
-          active: true,
-          type: "inactive",
-          name: role.name,
-        }
-        return acc
-      }, {})
+      let allRoles = connectedGuild.roles
+        .filter((r) => !(r.managed || r.name === "@everyone"))
+        .reduce((acc, role) => {
+          let roleId = "x" + String(role.id)
+          acc[roleId] = {
+            active: true,
+            type: "inactive",
+            name: role.name,
+          }
+          return acc
+        }, {})
 
       return allRoles
     } else {
@@ -163,50 +165,54 @@ const DiscordImportPage: BlitzPage = () => {
                     </p>
                   </div>
                   <div className="grid grid-cols-2 gap-y-2">
-                    {connectedGuild?.roles.map((role, idx) => {
-                      let roleId = "x" + String(role.id)
-                      let cbState = form.getFieldState(roleId + ".active")
-                      return (
-                        <>
-                          <div key={idx} className="flex flex-row items-center">
-                            <Checkbox name={`${roleId}.active`} checked={cbState?.value} />
-                            <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline ml-2">
-                              {role.name}
-                            </p>
-                          </div>
-                          <div>
-                            <Field name={`${roleId}.type`}>
-                              {({ input }) => (
-                                <div>
-                                  <select
-                                    {...input}
-                                    className={`bg-tunnel-black w-[200px] ${
-                                      !cbState?.value ? "text-wet-concrete" : "text-marble-white"
-                                    }`}
-                                    required={cbState?.value}
-                                  >
-                                    {cbState?.value ? (
-                                      <>
-                                        <option value="">Choose option</option>
-                                        <option value="status">Status</option>
-                                        <option value="role">Role</option>
-                                        <option value="project">Project</option>
-                                        <option value="guild">Guild</option>
-                                      </>
-                                    ) : (
-                                      <option value="">inactive</option>
-                                    )}
-                                  </select>
-                                </div>
-                              )}
-                            </Field>
-                            <Field name={`${roleId}.name`}>
-                              {({ input }) => <input {...input} type="hidden" value={role.name} />}
-                            </Field>
-                          </div>
-                        </>
-                      )
-                    })}
+                    {connectedGuild?.roles
+                      .filter((r) => !(r.managed || r.name === "@everyone"))
+                      .map((role, idx) => {
+                        let roleId = "x" + String(role.id)
+                        let cbState = form.getFieldState(roleId + ".active")
+                        return (
+                          <>
+                            <div key={idx} className="flex flex-row items-center">
+                              <Checkbox name={`${roleId}.active`} checked={cbState?.value} />
+                              <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline ml-2">
+                                {role.name}
+                              </p>
+                            </div>
+                            <div>
+                              <Field name={`${roleId}.type`}>
+                                {({ input }) => (
+                                  <div>
+                                    <select
+                                      {...input}
+                                      className={`bg-tunnel-black w-[200px] ${
+                                        !cbState?.value ? "text-wet-concrete" : "text-marble-white"
+                                      }`}
+                                      required={cbState?.value}
+                                    >
+                                      {cbState?.value ? (
+                                        <>
+                                          <option value="">Choose option</option>
+                                          <option value="status">Status</option>
+                                          <option value="role">Role</option>
+                                          <option value="project">Project</option>
+                                          <option value="guild">Guild</option>
+                                        </>
+                                      ) : (
+                                        <option value="">inactive</option>
+                                      )}
+                                    </select>
+                                  </div>
+                                )}
+                              </Field>
+                              <Field name={`${roleId}.name`}>
+                                {({ input }) => (
+                                  <input {...input} type="hidden" value={role.name} />
+                                )}
+                              </Field>
+                            </div>
+                          </>
+                        )
+                      })}
                   </div>
                   <div>
                     <button

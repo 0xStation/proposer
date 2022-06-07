@@ -7,6 +7,7 @@ type Guild = {
 type Role = {
   name: string
   id: string
+  managed: boolean
 }
 
 const useDiscordGuild = (guildId: string | undefined) => {
