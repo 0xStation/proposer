@@ -4,12 +4,15 @@ import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import createTokenTag from "app/tag/mutations/createTokenTag"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Navigation from "app/terminal/components/settings/navigation"
+import useStore from "app/core/hooks/useStore"
 
 const NewTokenSettingsPage: BlitzPage = () => {
   const [createTokenTagMutation] = useMutation(createTokenTag)
 
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+
+  const setToastState = useStore((state) => state.setToastState)
 
   return (
     <LayoutWithoutNavigation>
@@ -19,15 +22,29 @@ const NewTokenSettingsPage: BlitzPage = () => {
           <Form
             initialValues={{}}
             onSubmit={async (values) => {
-              console.log(values)
               if (terminal) {
-                const tag = await createTokenTagMutation({
-                  terminalId: terminal.id,
-                  name: "M",
-                  type: "ERC20",
-                  symbol: "DD",
-                  address: "0x",
-                })
+                try {
+                  await createTokenTagMutation({
+                    terminalId: terminal.id,
+                    name: "M",
+                    type: "ERC20",
+                    symbol: "DD",
+                    address: "0x",
+                    chainId: 1,
+                  })
+
+                  setToastState({
+                    isToastShowing: true,
+                    type: "success",
+                    message: "Your tag has been created.",
+                  })
+                } catch (e) {
+                  setToastState({
+                    isToastShowing: true,
+                    type: "error",
+                    message: "Token already exists.",
+                  })
+                }
               }
             }}
             render={({ form, handleSubmit }) => {

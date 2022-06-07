@@ -7,6 +7,7 @@ const CreateTokenTag = z.object({
   symbol: z.string(),
   type: z.string(),
   address: z.string(),
+  chainId: z.number(),
 })
 
 export default async function createTokenTag(input: z.infer<typeof CreateTokenTag>) {
@@ -19,9 +20,10 @@ export default async function createTokenTag(input: z.infer<typeof CreateTokenTa
       active: true,
       type: "token",
       data: {
-        tokenAddress: params.address,
+        address: params.address,
         symbol: params.symbol,
-        ercType: params.type,
+        type: params.type,
+        chainId: params.chainId,
       },
     },
   })
