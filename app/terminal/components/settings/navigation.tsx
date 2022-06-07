@@ -17,7 +17,7 @@ const Navigation = ({ children }) => {
 
   const navigationContent = (
     <>
-      <div className="fixed">
+      <div className="fixed mt-5 sm:mt-0">
         <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>
           <label className="font-bold text-sm text-marble-white uppercase tracking-wider cursor-pointer">
             {terminal?.data.name || terminalHandle}
