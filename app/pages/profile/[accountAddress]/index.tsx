@@ -102,8 +102,8 @@ const ProfileHome: BlitzPage = () => {
               <h1 className="text-2xl font-bold ml-6 pt-6">Terminals</h1>
               <p className="flex ml-6 pt-2">{`${account?.data?.name}'s communities`} </p>
             </div>
-            <div className="grid grid-cols-7 h-full w-full">
-              <div className="overflow-y-auto h-full col-span-7 sm:col-span-4">
+            <div className="grid grid-cols-7 h-[calc(100vh-108px)] w-full">
+              <div className="overflow-y-auto col-span-7 sm:col-span-4">
                 {terminals &&
                   terminals.map((terminal, idx) => (
                     <TerminalComponent
