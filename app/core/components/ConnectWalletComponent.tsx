@@ -146,8 +146,10 @@ export const ConnectWalletComponent = () => {
         ) : (
           <>
             <h1 className="text-2xl font-bold text-marble-white text-center mt-6">Enter Station</h1>
-            <p className="text-lg text-center mt-4">Connect your wallet to enter Station.</p>
-            <p className="text-lg text-center">
+            <p className="text-lg text-center mt-4 px-4 sm:px-0">
+              Connect your wallet to enter Station.
+            </p>
+            <p className="text-lg text-center px-4 sm:px-0">
               New to web3? Learn how to create a wallet{" "}
               <a className="text-magic-mint" href="https://www.youtube.com/watch?v=OsRIHlr0_Iw">
                 here

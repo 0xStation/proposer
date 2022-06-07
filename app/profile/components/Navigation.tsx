@@ -145,7 +145,7 @@ export const Navigation = ({
               <p className="inline">Terminals</p>
               {!terminals ||
                 (!terminals.length && (
-                  <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0">
+                  <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0 hidden sm:inline">
                     Coming soon
                   </span>
                 ))}
@@ -155,7 +155,7 @@ export const Navigation = ({
                 <Image src={LockedIcon} alt="Locked icon" />
               </div>
               <p className="inline">Proposals</p>
-              <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0">
+              <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0 hidden sm:inline">
                 Coming soon
               </span>
             </li>

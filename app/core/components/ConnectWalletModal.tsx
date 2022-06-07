@@ -175,9 +175,9 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
             </div>
           ) : null}
           <div className="m-6">
-            <div className="flex flex-row space-x-3 mx-5 text-marble-white">
+            <div className="flex sm:flex-row flex-col mx-auto text-marble-white my-6 w-full justify-center place-items-center">
               <button
-                className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer"
+                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2 sm:mt-0 mt-2"
                 disabled={connectState.loading}
                 onClick={async () => {
                   await handleWalletConnection(metamaskWallet)
@@ -188,7 +188,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                     <Spinner fill="white" />
                   </div>
                 ) : (
-                  <div className="flex flex-row flex-1 justify-center items-center space-x-2 my-1">
+                  <div className="flex flex-row justify-center items-center space-x-2 my-1">
                     <div className="flex-3/5">
                       <span>Metamask</span>
                     </div>
@@ -199,7 +199,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                 )}
               </button>
               <button
-                className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer"
+                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2 sm:mt-0 mt-2"
                 disabled={connectState.loading}
                 onClick={async () => {
                   await handleWalletConnection(walletConnect)
@@ -226,7 +226,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                 )}
               </button>
               <button
-                className="flex-1 border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor-pointer"
+                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor-pointer w-40 sm:mr-2 sm:mt-0 mt-2"
                 disabled={connectState.loading}
                 onClick={async () => {
                   await handleWalletConnection(coinbaseWallet)
