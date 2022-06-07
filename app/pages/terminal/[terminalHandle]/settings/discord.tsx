@@ -14,7 +14,6 @@ import {
 import { Field, Form } from "react-final-form"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import UpsertTags from "app/tag/mutations/upsertTags"
-import createAccounts from "app/account/mutations/createAccounts"
 import Navigation from "app/terminal/components/settings/navigation"
 import Checkbox from "app/core/components/form/Checkbox"
 import useDiscordAuthWithCallback from "app/core/hooks/useDiscordAuthWithCallback"
@@ -71,8 +70,6 @@ const DiscordSettingsPage: BlitzPage = () => {
       })
     },
   })
-
-  const [createAccountsMutation] = useMutation(createAccounts)
 
   const [selectAllActive, setSelectAllActive] = useState(false)
   const { callbackWithDCAuth: onOpen, authorization } = useDiscordAuthWithCallback("guilds", () => {

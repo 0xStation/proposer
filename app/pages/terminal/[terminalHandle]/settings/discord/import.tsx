@@ -2,7 +2,6 @@ import { useState, useMemo } from "react"
 import { BlitzPage, useMutation, useParam, useQuery, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
 import UpsertTags from "app/tag/mutations/upsertTags"
-import createAccounts from "app/account/mutations/createAccounts"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import useDiscordGuild from "app/core/hooks/useDiscordGuild"
 import useGuildMembers from "app/core/hooks/useGuildMembers"
@@ -23,12 +22,6 @@ const DiscordImportPage: BlitzPage = () => {
   const [upsertTags] = useMutation(UpsertTags, {
     onError: (error: Error) => {
       console.error(error)
-    },
-  })
-
-  const [createAccountsMutation] = useMutation(createAccounts, {
-    onSuccess: () => {
-      router.push(Routes.DiscordSettingsPage({ terminalHandle: terminalHandle }))
     },
   })
 
@@ -105,32 +98,13 @@ const DiscordImportPage: BlitzPage = () => {
 
               // refetch()
               try {
-                await createAccountsMutation({
-                  terminalId: terminal.id,
-                  users: activeGuildMembers.map((gm) => {
-                    const tagOverlap = activeCreatedTagDiscordIds.filter((tag) =>
-                      gm.roles.includes(tag)
-                    )
-
-                    const tagOverlapId = tagOverlap
-                      .map((discordId) => {
-                        const tag = activeCreatedTags.find((tag) => {
-                          return tag.discordId === discordId
-                        })
-
-                        return tag?.id
-                      })
-                      .filter((tag): tag is number => !!tag) // remove possible undefined from `find` in map above
-
-                    return {
-                      discordId: gm.user.id,
-                      name: gm.nick || gm.user.username,
-                      tags: tagOverlapId,
-                      joinedAt: gm.joined_at,
-                      ...(gm.user.avatar && { avatarHash: gm.user.avatar }),
-                    }
+                await fetch("/api/discord/sync-roles", {
+                  method: "POST",
+                  body: JSON.stringify({
+                    terminalId: terminal.id,
                   }),
                 })
+                router.push(Routes.DiscordSettingsPage({ terminalHandle: terminalHandle }))
               } catch (err) {
                 console.error("Error creating accounts. Failed with ", err)
                 setToastState({
