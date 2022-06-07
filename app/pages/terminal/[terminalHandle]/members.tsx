@@ -153,7 +153,7 @@ const MemberDirectoryPage: BlitzPage = () => {
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Members`}>
       <TerminalNavigation>
         {/* Filter View */}
-        <div className="h-[130px] border-b border-concrete">
+        <div className="max-h-[250px] sm:h-[130px] border-b border-concrete">
           <div className="flex flex-row items-center ml-6 pt-7">
             <h1 className="text-2xl font-bold">Members</h1>
             {groupedTags && Object.entries(groupedTags).length ? (
@@ -167,7 +167,7 @@ const MemberDirectoryPage: BlitzPage = () => {
               />
             ) : null}
           </div>
-          <div className="flex ml-6 pt-4 space-x-2">
+          <div className="flex ml-6 py-4 space-x-2 flex-wrap">
             {groupedTags && Object.entries(groupedTags).length ? (
               Object.entries(groupedTags).map(([tagType, tags], idx) => (
                 <FilterPill
@@ -258,7 +258,7 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
   }
 
   return (
-    <Menu as="div" className={`relative`}>
+    <Menu as="div" className="relative mb-2 sm:mb-0">
       {({ open }) => {
         setClearDefaultValue(false)
         return (
