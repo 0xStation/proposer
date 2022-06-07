@@ -163,7 +163,7 @@ export const ConnectWalletComponent = () => {
             ) : null}
             <div className="flex sm:flex-row flex-col mx-auto text-marble-white my-6 w-full justify-center place-items-center">
               <button
-                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2"
+                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2 h-[35px]"
                 disabled={connectState.loading}
                 onClick={async () => {
                   await handleWalletConnection(metamaskWallet)
@@ -183,7 +183,7 @@ export const ConnectWalletComponent = () => {
                 )}
               </button>
               <button
-                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2 sm:mt-0 mt-2"
+                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2 sm:mt-0 mt-2 h-[35px]"
                 disabled={connectState.loading}
                 onClick={async () => {
                   await handleWalletConnection(walletConnect)
@@ -208,7 +208,7 @@ export const ConnectWalletComponent = () => {
                 )}
               </button>
               <button
-                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor-pointer w-40 sm:mr-2 sm:mt-0 mt-2"
+                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor-pointer w-40 sm:mr-2 sm:mt-0 mt-2 h-[35px]"
                 disabled={connectState.loading}
                 onClick={async () => {
                   await handleWalletConnection(coinbaseWallet)
