@@ -189,7 +189,7 @@ const AccountForm = ({
       }}
       render={({ handleSubmit }) => (
         <form onSubmit={handleSubmit}>
-          <div>
+          <div className="mr-5 sm:mr-0">
             <div className="flex flex-col">
               <label htmlFor="name" className="text-marble-white text-base font-bold">
                 Name*

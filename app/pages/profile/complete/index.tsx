@@ -45,7 +45,7 @@ const CreateProfile: BlitzPage = ({
   }
 
   return (
-    <div>
+    <div className="m-10 sm:m-0">
       <div className="absolute top-5 left-5">
         <button onClick={handleCloseButtonClick}>
           <Image src={Exit} alt="Close button" width={16} height={16} />
