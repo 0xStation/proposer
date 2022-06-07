@@ -1,11 +1,20 @@
 import db from "db"
 import { Terminal } from "app/terminal/types"
+import { getGuildMembers } from "app/utils/getGuildMembers"
 
 /**
  * API endpoint for "refreshing" roles between discord and station.
  * When a terminal first connects to station, the discord roles and members with those roles are synced.
  * However, it is possible for a discord to get more members, or for roles on discord to change (members lose role etc)
  * So, this function keeps discord and station in sync.
+ *
+ * Steps:
+ * 1. Get guild members for Terminal's connected Discord server
+ * 2. Create new accounts for guild members by Discord ID
+ * 3. Create new tickets for guild members by Discord ID in this Terminal
+ * 4. Take a diff on guild members' roles and accounts' discord-synced tags
+ * 5. Give tags to accounts that are not yet reflected in our db
+ * 6. Remove tags from accounts that are no longer reflected in Discord
  *
  * @param req - terminalId
  * @param res - 200 or 401
@@ -32,43 +41,17 @@ export default async function handler(req, res) {
     return
   }
 
-  const fetchGuildMembers = async (after) => {
-    const limit = 1000
-    const baseURL = `${process.env.BLITZ_PUBLIC_API_ENDPOINT}/guilds/${terminal.data.guildId}/members?limit=${limit}`
-    const url = after ? baseURL + `&after=${after}` : baseURL
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-    })
-    const results = await response.json()
-
-    if (results.code !== undefined) {
-      throw results.message
-    }
-
-    // anything less than 1000 means this was final page, return results
-    return results
+  if (!terminal.data.guildId) {
+    res.status(401).json({ error: "No Discord server for Terminal" })
+    return
   }
 
-  let guildMembers: any[] = []
-  let afterId
-  let retry = true
+  let guildMembers
   try {
-    while (retry) {
-      const nextPage = await fetchGuildMembers(afterId)
-      if (nextPage.length < 1000) {
-        retry = false
-      }
-      guildMembers = guildMembers.concat(...nextPage)
-      const num = guildMembers.length - 1
-      afterId = guildMembers[num].user.id
-    }
-  } catch (err) {
-    console.error(err)
-    res.status(401).json({ error: err })
+    guildMembers = await getGuildMembers(terminal.data.guildId)
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ response: "error", error: e })
     return
   }
 
@@ -78,9 +61,6 @@ export default async function handler(req, res) {
   const activeGuildMembers = guildMembers.filter((gm) => {
     return gm.roles.some((r) => activeCreatedTagDiscordIds.includes(r))
   })
-
-  console.log(guildMembers.length)
-  console.log(activeGuildMembers.length)
 
   // we need to stash some information that is not saved on the account when it is created
   // this is a handy lookup mapping discord user ids to metadata about that user.
@@ -112,22 +92,26 @@ export default async function handler(req, res) {
   // includes the tickets and tags, which we will need to later when building up which tags to upsert alongside
   // the ticket.
 
-  const newAccounts = await db.account.createMany({
-    skipDuplicates: true,
-    data: activeGuildMembers.map((guildMember) => {
-      return {
-        discordId: guildMember.user.id,
-        data: {
-          name: guildMember.nick || guildMember.user.username,
-          pfpURL: guildMember.user.avatar
-            ? `https://cdn.discordapp.com/avatars/${guildMember.user.id}/${guildMember.user.avatar}.png`
-            : undefined,
-        },
-      }
-    }),
-  })
-
-  console.log(`${newAccounts.count} new accounts`)
+  try {
+    await db.account.createMany({
+      skipDuplicates: true, // do not create entries that already exist
+      data: activeGuildMembers.map((guildMember) => {
+        return {
+          discordId: guildMember.user.id,
+          data: {
+            name: guildMember.nick || guildMember.user.username,
+            pfpURL: guildMember.user.avatar
+              ? `https://cdn.discordapp.com/avatars/${guildMember.user.id}/${guildMember.user.avatar}.png`
+              : undefined,
+          },
+        }
+      }),
+    })
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ response: "error", error: "failed creating new accounts" })
+    return
+  }
 
   // step 2.
   // create AccountTerminals for accounts that do not yet have membership
@@ -143,7 +127,7 @@ export default async function handler(req, res) {
         include: {
           tags: {
             where: {
-              tag: { NOT: { discordId: null } },
+              tag: { NOT: { discordId: null } }, // omit tags not meant to sync with Discord
             },
           },
         },
@@ -151,29 +135,30 @@ export default async function handler(req, res) {
     },
   })
 
-  const newTickets = await db.accountTerminal.createMany({
-    skipDuplicates: true,
-    data: accounts.map((a) => {
-      return {
-        accountId: a.id,
-        terminalId: params.terminalId,
-        active: false,
-        ...(a.discordId && { joinedAt: new Date(accountDiscordId_metadata[a.discordId].joinedAt) }),
-      }
-    }),
-  })
-
-  console.log(`${newTickets.count} new tickets`)
+  try {
+    await db.accountTerminal.createMany({
+      skipDuplicates: true, // do not create entries that already exist
+      data: accounts.map((a) => {
+        return {
+          accountId: a.id,
+          terminalId: params.terminalId,
+          active: false,
+          ...(a.discordId && {
+            joinedAt: new Date(accountDiscordId_metadata[a.discordId].joinedAt),
+          }),
+        }
+      }),
+    })
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ response: "error", error: "failed creating new memberships" })
+    return
+  }
 
   // step 3.
   // organize tag diff between db and discord per account
-  type ATT = {
-    tagId: number
-    ticketAccountId: number
-    ticketTerminalId: number
-  }
-  let addAccountTerminalTags: ATT[] = []
-  let removeAccountTerminalTags: ATT[] = []
+  let addAccountTerminalTags: any[] = []
+  let removeAccountTerminalTags: any[] = []
 
   accounts.forEach((a) => {
     let existingTicket = a.tickets.find((ticket) => ticket.terminalId === params.terminalId)
@@ -218,50 +203,47 @@ export default async function handler(req, res) {
 
   // step 3a.
   // create AccountTerminalTags for memberships that are missing tags
-  const addTicketTags = await db.accountTerminalTag.createMany({
-    skipDuplicates: true,
-    data: addAccountTerminalTags,
-  })
-
-  console.log(`${addTicketTags.count} tag associations created`)
+  try {
+    await db.accountTerminalTag.createMany({
+      skipDuplicates: true,
+      data: addAccountTerminalTags,
+    })
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ response: "error", error: "failed creating new tag associations" })
+    return
+  }
 
   // step 3b.
   // delete AccountTerminalTags for memberships that have tags in our db that they no longer own in Discord
-  const removeTicketTags = await db.$transaction(
-    removeAccountTerminalTags.map((obj) => {
-      return db.accountTerminalTag.delete({
-        where: {
-          tagId_ticketAccountId_ticketTerminalId: {
-            ...obj,
+  try {
+    await db.$transaction(
+      removeAccountTerminalTags.map((obj) => {
+        return db.accountTerminalTag.delete({
+          where: {
+            tagId_ticketAccountId_ticketTerminalId: {
+              ...obj,
+            },
           },
-        },
+        })
       })
-    })
-  )
-
-  console.log(`${removeTicketTags.length} tag associations removed`)
-
-  // other option using native `deleteMany`
-  // this takes less code, but for some reason feels weird when I imagine the generated SQL
-  // const removeTicketTags = db.accountTerminalTag.deleteMany({
-  //   where: {
-  //     OR: removeAccountTerminalTags,
-  //   },
-  // })
-
-  // step 3c.
-  // await both queries because they can run in parallel
-  // await addTicketTags
-  // await removeTicketTags
-
-  // returns the count (to know if we should refetch) and the last guildMember
-  let count = guildMembers.length
-  if (count === 1000) {
-    let afterId = guildMembers[count - 1].user.id
-    console.log("returning retry")
-    res.status(200).json({ retry: true, afterId: afterId })
-  } else {
-    console.log("returning NO retry")
-    res.status(200).json({ retry: false, afterId: null })
+    )
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ response: "error", error: "failed deleting stale tag associations" })
+    return
   }
+
+  /** Another option is to use the native `deleteMany`
+   *  This takes less code, but for some reason feels weird when I imagine the generated SQL
+   *  because all inputs identify a unique row and feels like double-looping versus packing
+   *  many unique-deletes into one transaction
+   *  const removeTicketTags = db.accountTerminalTag.deleteMany({
+   *    where: {
+   *      OR: removeAccountTerminalTags,
+   *    },
+   *  })
+   */
+
+  res.status(200).json({ response: "success" })
 }

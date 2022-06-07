@@ -24,7 +24,7 @@ const useGuildMembers = (
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ guild_id: guildId, limit: 1000 }),
+        body: JSON.stringify({ guildId }),
       })
 
       if (response.status !== 200) {
