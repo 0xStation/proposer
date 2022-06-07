@@ -23,8 +23,13 @@ const TokenMetadataRequest = z.object({
 export default async function handler(req, res) {
   let params
   try {
-    params = TokenMetadataRequest.parse(req.body)
-  } catch {
+    if (typeof req.body === "string" || req.body instanceof String) {
+      params = TokenMetadataRequest.parse(JSON.parse(req.body))
+    } else {
+      params = TokenMetadataRequest.parse(req.body)
+    }
+  } catch (e) {
+    console.log(e)
     res.status(500).json({ response: "error", message: "missing required parameter" })
   }
 

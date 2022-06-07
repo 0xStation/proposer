@@ -77,13 +77,14 @@ const TokenSettingsPage: BlitzPage = () => {
                   Add tokens that represent your community&apos;s membership and ownership.
                 </h5>
               </div>
-
-              <button
-                className="rounded text-tunnel-black px-16 py-2 h-full bg-magic-mint self-start"
-                type="submit"
-              >
-                Add
-              </button>
+              <Link href={Routes.NewTokenSettingsPage({ terminalHandle })}>
+                <button
+                  className="rounded text-tunnel-black px-16 py-2 h-full bg-magic-mint self-start"
+                  type="submit"
+                >
+                  Add
+                </button>
+              </Link>
             </div>
             <div className="grid grid-cols-7 h-[calc(100vh-115px)] w-full box-border">
               <div className="overflow-y-auto col-span-4">

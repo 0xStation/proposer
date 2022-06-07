@@ -1,10 +1,11 @@
-import { BlitzPage, useMutation, useParam, useQuery } from "blitz"
+import { BlitzPage, useMutation, useParam, useQuery, Link, Image, Routes } from "blitz"
 import { Field, Form } from "react-final-form"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import createTokenTag from "app/tag/mutations/createTokenTag"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Navigation from "app/terminal/components/settings/navigation"
 import useStore from "app/core/hooks/useStore"
+import Back from "/public/back-icon.svg"
 
 const NewTokenSettingsPage: BlitzPage = () => {
   const [createTokenTagMutation] = useMutation(createTokenTag)
@@ -18,32 +19,66 @@ const NewTokenSettingsPage: BlitzPage = () => {
     <LayoutWithoutNavigation>
       <Navigation>
         <div className="px-6 py-8">
-          <h1 className="text-xl">New Token</h1>
+          <div className="flex flex-row space-x-4">
+            <Link href={Routes.TokenSettingsPage({ terminalHandle })}>
+              <Image
+                src={Back}
+                alt="Close button"
+                width={16}
+                height={16}
+                className="cursor-pointer"
+              />
+            </Link>
+            <h1 className="text-xl">New Token</h1>
+          </div>
           <Form
             initialValues={{}}
             onSubmit={async (values) => {
               if (terminal) {
                 try {
-                  await createTokenTagMutation({
-                    terminalId: terminal.id,
-                    name: "M",
-                    type: "ERC20",
-                    symbol: "DD",
-                    address: "0x",
-                    chainId: 1,
+                  const metaDataResponse = await fetch("/api/fetch-token-metadata", {
+                    method: "POST",
+                    body: JSON.stringify({
+                      address: values.address,
+                      chainId: parseInt(values.chainId),
+                    }),
                   })
 
-                  setToastState({
-                    isToastShowing: true,
-                    type: "success",
-                    message: "Your tag has been created.",
-                  })
+                  const metadata = await metaDataResponse.json()
+
+                  if (metadata.response !== "success") {
+                    setToastState({
+                      isToastShowing: true,
+                      type: "error",
+                      message: metadata.message,
+                    })
+                  }
+
+                  try {
+                    await createTokenTagMutation({
+                      terminalId: terminal.id,
+                      name: metadata.data.name,
+                      type: metadata.data.type,
+                      symbol: metadata.data.symbol,
+                      address: values.address,
+                      chainId: parseInt(values.chainId),
+                    })
+
+                    setToastState({
+                      isToastShowing: true,
+                      type: "success",
+                      message: "Your tag has been created.",
+                    })
+                  } catch (e) {
+                    console.error(e)
+                    setToastState({
+                      isToastShowing: true,
+                      type: "error",
+                      message: "Token already exists.",
+                    })
+                  }
                 } catch (e) {
-                  setToastState({
-                    isToastShowing: true,
-                    type: "error",
-                    message: "Token already exists.",
-                  })
+                  console.error(e)
                 }
               }
             }}

@@ -16,7 +16,7 @@ export default async function createTokenTag(input: z.infer<typeof CreateTokenTa
   const tag = db.tag.create({
     data: {
       terminalId: params.terminalId,
-      value: params.name.toLowerCase(),
+      value: params.name,
       active: true,
       type: "token",
       data: {
