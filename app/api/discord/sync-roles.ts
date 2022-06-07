@@ -22,7 +22,6 @@ import { getGuildMembers } from "app/utils/getGuildMembers"
  */
 export default async function handler(req, res) {
   const params = JSON.parse(req.body)
-  console.log(params)
 
   // Find the terminal we are interested in syncing
   const terminal = (await db.terminal.findUnique({

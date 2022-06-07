@@ -44,7 +44,6 @@ const MemberDirectoryPage: BlitzPage = () => {
   // filters is a hashmap where the key is the tag type and the value is a Set of strings
   // where the strings are applied filters
   const [filters, setFilters] = useState<Filters>({})
-  console.log(filters)
 
   const paginationTake = 100
 
