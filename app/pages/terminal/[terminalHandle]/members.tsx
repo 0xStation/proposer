@@ -291,9 +291,7 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items
-                className={`absolute origin-top-left mt-5 h-auto w-[22rem] bg-tunnel-black border border-concrete rounded-md`}
-              >
+              <Menu.Items className="absolute origin-top-left mt-5 h-auto w-[11rem] sm:w-[22rem] bg-tunnel-black border border-concrete rounded-md z-10">
                 <Form
                   onSubmit={(field) => {
                     if (!field || !Object.keys(field).length || !Object.entries(field)[0]) {
@@ -338,12 +336,12 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                         </div>
                         <button
                           type="submit"
-                          className="bg-marble-white w-52 h-[35px] text-tunnel-black rounded mb-4 ml-4 mr-1 hover:opacity-70"
+                          className="bg-marble-white w-36 sm:w-52 h-[35px] text-tunnel-black rounded mb-4 ml-4 mr-1 hover:opacity-70"
                         >
                           Apply
                         </button>
                         <button
-                          className="w-[6.5rem] hover:text-concrete"
+                          className="w-[6.5rem] hover:text-concrete mb-2 sm:mb-0"
                           onClick={(e) => handleClearFilters(e)}
                         >
                           Clear all

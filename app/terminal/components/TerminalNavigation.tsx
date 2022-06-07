@@ -59,7 +59,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
             </p>
           </div>
           {session?.siwe?.address && hasAdminPermissions && (
-            <div className="flex flex-col mt-3 relative">
+            <div className="flex flex-col mt-3 relative mr-2">
               <Link
                 href={
                   !tutorial
