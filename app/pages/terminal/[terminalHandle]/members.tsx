@@ -1,6 +1,8 @@
 import { BlitzPage, useQuery, useParam, Image, Link, Routes } from "blitz"
 import { Fragment, useEffect, useState } from "react"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
+import BackArrow from "app/core/icons/BackArrow"
+import ForwardArrow from "app/core/icons/ForwardArrow"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
@@ -42,6 +44,8 @@ const MemberDirectoryPage: BlitzPage = () => {
   // where the strings are applied filters
   const [filters, setFilters] = useState<Filters>({})
   console.log(filters)
+
+  const paginationTake = 100
 
   /*
   `groupedTags` returns an object where the key
@@ -178,6 +182,7 @@ const MemberDirectoryPage: BlitzPage = () => {
                     tags={tags}
                     filters={filters}
                     setFilters={setFilters}
+                    setPage={setPage}
                     key={`${idx}${tagType}`}
                   />
                 ))
@@ -186,23 +191,31 @@ const MemberDirectoryPage: BlitzPage = () => {
               )}
             </div>
             <div className="mr-6 flex flex-row space-x-2 pt-4 items-center text-sm">
-              <span className="self-end">showing {members?.length} results</span>
-              {page > 0 && (
-                <span
-                  className="hover:bg-marble-white hover:text-tunnel-black text-sm capitalize group rounded-full border h-[17px] w-max p-4 flex flex-center items-center cursor-pointer"
-                  onClick={() => setPage(page - 1)}
-                >
-                  Prev
+              <div className="mr-6">
+                <span>Showing </span>
+                <span className="text-electric-violet font-bold">{page * paginationTake + 1}</span>
+                <span> to </span>
+                <span className="text-electric-violet font-bold">
+                  {/* less jarring than seeing NaN -> XXX */}
+                  {members?.length
+                    ? page * paginationTake + members?.length!
+                    : (page + 1) * paginationTake}
                 </span>
-              )}
-              {members?.length === 100 && (
-                <span
-                  className="hover:bg-marble-white hover:text-tunnel-black text-sm capitalize group rounded-full border h-[17px] w-max p-4 flex flex-center items-center cursor-pointer"
-                  onClick={() => setPage(page + 1)}
-                >
-                  Next
-                </span>
-              )}
+                <span> members</span>
+              </div>
+              <button className="w-6" disabled={page === 0} onClick={() => setPage(page - 1)}>
+                <BackArrow className={`fill-${page === 0 ? "concrete" : "marble-white"}`} />
+              </button>
+              <button
+                disabled={members?.length! < paginationTake}
+                onClick={() => setPage(page + 1)}
+              >
+                <ForwardArrow
+                  className={`fill-${
+                    members?.length! < paginationTake ? "concrete" : "marble-white"
+                  }`}
+                />
+              </button>
             </div>
           </div>
         </div>
@@ -227,7 +240,7 @@ const MemberDirectoryPage: BlitzPage = () => {
   )
 }
 
-const FilterPill = ({ tagType, tags, filters, setFilters }) => {
+const FilterPill = ({ tagType, tags, filters, setFilters, setPage }) => {
   const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
 
   const handleClearFilters = (e) => {
@@ -236,6 +249,7 @@ const FilterPill = ({ tagType, tags, filters, setFilters }) => {
     const tagFilters = filters[tagType]
     tagFilters.clear()
 
+    setPage(0)
     setFilters({
       ...filters,
       [tagType]: tagFilters,
@@ -304,6 +318,7 @@ const FilterPill = ({ tagType, tags, filters, setFilters }) => {
                       }
                     })
 
+                    setPage(0)
                     setFilters({
                       ...filters,
                       [tagType]: tagFilters,
