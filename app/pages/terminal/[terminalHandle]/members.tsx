@@ -12,6 +12,7 @@ import Checkbox from "app/core/components/form/Checkbox"
 import { Form } from "react-final-form"
 import truncateString from "app/core/utils/truncateString"
 import getMembersByTerminalId from "app/accountTerminal/queries/getMembersByTerminalId"
+import getMemberCountByTerminalId from "app/accountTerminal/queries/getMemberCountByTerminalId"
 import { AccountTerminalWithTagsAndAccount } from "app/accountTerminal/types"
 import { formatDate } from "app/core/utils/formatDate"
 import GithubIcon from "public/github-icon.svg"
@@ -82,6 +83,21 @@ const MemberDirectoryPage: BlitzPage = () => {
         .map((set) => Array.from(set))
         .filter((arr) => arr.length > 0),
       page: page,
+    },
+    {
+      suspense: false,
+      enabled: !!terminal?.id,
+      refetchOnWindowFocus: false,
+    }
+  )
+
+  const [memberCount] = useQuery(
+    getMemberCountByTerminalId,
+    {
+      terminalId: terminal?.id as number,
+      tagGroups: Object.values(filters)
+        .map((set) => Array.from(set))
+        .filter((arr) => arr.length > 0),
     },
     {
       suspense: false,
@@ -192,27 +208,32 @@ const MemberDirectoryPage: BlitzPage = () => {
             </div>
             <div className="mr-6 flex flex-row space-x-2 pt-4 items-center text-sm">
               <div className="mr-6">
-                <span>Showing </span>
-                <span className="text-electric-violet font-bold">{page * paginationTake + 1}</span>
-                <span> to </span>
+                Showing
                 <span className="text-electric-violet font-bold">
-                  {/* less jarring than seeing NaN -> XXX */}
-                  {members?.length
-                    ? page * paginationTake + members?.length!
-                    : (page + 1) * paginationTake}
+                  {" "}
+                  {page * paginationTake + 1}{" "}
                 </span>
-                <span> members</span>
+                to
+                <span className="text-electric-violet font-bold">
+                  {" "}
+                  {(page + 1) * paginationTake > memberCount!
+                    ? memberCount
+                    : (page + 1) * paginationTake}{" "}
+                </span>
+                of
+                <span className="font-bold"> {memberCount} </span>
+                members
               </div>
               <button className="w-6" disabled={page === 0} onClick={() => setPage(page - 1)}>
-                <BackArrow className={`fill-${page === 0 ? "concrete" : "marble-white"}`} />
+                <BackArrow className={`${page === 0 ? "fill-concrete" : "fill-marble-white"}`} />
               </button>
               <button
                 disabled={members?.length! < paginationTake}
                 onClick={() => setPage(page + 1)}
               >
                 <ForwardArrow
-                  className={`fill-${
-                    members?.length! < paginationTake ? "concrete" : "marble-white"
+                  className={`${
+                    members?.length! < paginationTake ? "fill-concrete" : "fill-marble-white"
                   }`}
                 />
               </button>
