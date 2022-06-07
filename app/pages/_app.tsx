@@ -41,5 +41,16 @@ const client = createClient({
 export default function App({ Component, pageProps }: AppProps) {
   const getLayout = Component.getLayout || ((page) => page)
 
-  return <WagmiConfig client={client}>{getLayout(<Component {...pageProps} />)}</WagmiConfig>
+  return (
+    <>
+      <div className="sm:hidden p-12 flex items-center justify-center w-full h-screen">
+        <div className="border p-6 rounded text-center">
+          We&apos;re working hard to bring station to mobile. etc etc etc
+        </div>
+      </div>
+      <div className="hidden sm:block">
+        <WagmiConfig client={client}>{getLayout(<Component {...pageProps} />)}</WagmiConfig>
+      </div>
+    </>
+  )
 }
