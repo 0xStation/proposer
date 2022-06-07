@@ -14,7 +14,6 @@ import {
 import { Field, Form } from "react-final-form"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import UpsertTags from "app/tag/mutations/upsertTags"
-import createAccounts from "app/account/mutations/createAccounts"
 import Navigation from "app/terminal/components/settings/navigation"
 import Checkbox from "app/core/components/form/Checkbox"
 import useDiscordAuthWithCallback from "app/core/hooks/useDiscordAuthWithCallback"
@@ -72,8 +71,6 @@ const DiscordSettingsPage: BlitzPage = () => {
     },
   })
 
-  const [createAccountsMutation] = useMutation(createAccounts)
-
   const [selectAllActive, setSelectAllActive] = useState(false)
   const { callbackWithDCAuth: onOpen, authorization } = useDiscordAuthWithCallback("guilds", () => {
     router.push(Routes.DiscordConnectPage({ terminalHandle: terminalHandle }))
@@ -85,15 +82,17 @@ const DiscordSettingsPage: BlitzPage = () => {
   // https://www.loom.com/share/f5c67a2872854bb386330ddbb744a5d8
   const _initialFormValues = useMemo(() => {
     if (connectedGuild && terminal) {
-      let allRoles = connectedGuild.roles.reduce((acc, role) => {
-        let roleId = "x" + String(role.id)
-        acc[roleId] = {
-          active: true,
-          type: "inactive",
-          name: role.name,
-        }
-        return acc
-      }, {})
+      let allRoles = connectedGuild.roles
+        .filter((r) => !(r.managed || r.name === "@everyone"))
+        .reduce((acc, role) => {
+          let roleId = "x" + String(role.id)
+          acc[roleId] = {
+            active: true,
+            type: "inactive",
+            name: role.name,
+          }
+          return acc
+        }, {})
 
       let existingDiscordRoles = terminal?.tags.filter((tag) => tag.discordId)
       let existingRoles = existingDiscordRoles.reduce((acc, tag) => {
@@ -166,43 +165,15 @@ const DiscordSettingsPage: BlitzPage = () => {
               })
 
               if (terminal) {
-                const createdTags = await upsertTags({
-                  tags,
-                  terminalId: terminal.id,
-                })
-                const activeCreatedTags = createdTags.filter((tag) => tag.active)
-                const activeCreatedTagDiscordIds = activeCreatedTags.map(
-                  (tag) => tag.discordId || ""
-                )
-                const activeGuildMembers = guildMembers.filter((gm) => {
-                  return gm.roles.some((r) => activeCreatedTagDiscordIds.includes(r))
-                })
+                // First, update the tags
+                await upsertTags({ tags, terminalId: terminal.id })
 
+                // next, sync discord server with station tags
                 try {
-                  await createAccountsMutation({
-                    terminalId: terminal.id,
-                    users: activeGuildMembers.map((gm) => {
-                      const tagOverlap = activeCreatedTagDiscordIds.filter((tag) =>
-                        gm.roles.includes(tag)
-                      )
-
-                      const tagOverlapId = tagOverlap
-                        .map((discordId) => {
-                          const tag = activeCreatedTags.find((tag) => {
-                            return tag.discordId === discordId
-                          })
-
-                          return tag?.id
-                        })
-                        .filter((tag): tag is number => !!tag) // remove possible undefined from `find` in map above
-
-                      return {
-                        discordId: gm.user.id,
-                        name: gm.nick || gm.user.username,
-                        tags: tagOverlapId,
-                        joinedAt: gm.joined_at,
-                        ...(gm.user.avatar && { avatarHash: gm.user.avatar }),
-                      }
+                  await fetch("/api/discord/sync-roles", {
+                    method: "POST",
+                    body: JSON.stringify({
+                      terminalId: terminal.id,
                     }),
                   })
                 } catch (err) {
@@ -261,54 +232,59 @@ const DiscordSettingsPage: BlitzPage = () => {
                             </p>
                           </div>
                           <div className="grid grid-cols-2 gap-y-2">
-                            {connectedGuild?.roles.map((role, idx) => {
-                              let roleId = "x" + String(role.id)
-                              let cbState = form.getFieldState(roleId + ".active")
-                              return (
-                                <>
-                                  <div key={idx} className="flex flex-row items-center">
-                                    <Checkbox name={`${roleId}.active`} checked={cbState?.value} />
-                                    <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline ml-2">
-                                      {role.name}
-                                    </p>
-                                  </div>
-                                  <div>
-                                    <Field name={`${roleId}.type`}>
-                                      {({ input }) => (
-                                        <div>
-                                          <select
-                                            {...input}
-                                            className={`bg-tunnel-black w-[200px] ${
-                                              !cbState?.value
-                                                ? "text-wet-concrete"
-                                                : "text-marble-white"
-                                            }`}
-                                            required={cbState?.value}
-                                          >
-                                            {cbState?.value ? (
-                                              <>
-                                                <option value="">Choose option</option>
-                                                <option value="status">Status</option>
-                                                <option value="role">Role</option>
-                                                <option value="project">Project</option>
-                                                <option value="guild">Guild</option>
-                                              </>
-                                            ) : (
-                                              <option value="">inactive</option>
-                                            )}
-                                          </select>
-                                        </div>
-                                      )}
-                                    </Field>
-                                    <Field name={`${roleId}.name`}>
-                                      {({ input }) => (
-                                        <input {...input} type="hidden" value={role.name} />
-                                      )}
-                                    </Field>
-                                  </div>
-                                </>
-                              )
-                            })}
+                            {connectedGuild?.roles
+                              .filter((r) => !(r.managed || r.name === "@everyone"))
+                              .map((role, idx) => {
+                                let roleId = "x" + String(role.id)
+                                let cbState = form.getFieldState(roleId + ".active")
+                                return (
+                                  <>
+                                    <div key={idx} className="flex flex-row items-center">
+                                      <Checkbox
+                                        name={`${roleId}.active`}
+                                        checked={cbState?.value}
+                                      />
+                                      <p className="text-bold text-xs uppercase tracking-wider rounded-full px-2 py-0.5 bg-wet-concrete inline ml-2">
+                                        {role.name}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <Field name={`${roleId}.type`}>
+                                        {({ input }) => (
+                                          <div>
+                                            <select
+                                              {...input}
+                                              className={`bg-tunnel-black w-[200px] ${
+                                                !cbState?.value
+                                                  ? "text-wet-concrete"
+                                                  : "text-marble-white"
+                                              }`}
+                                              required={cbState?.value}
+                                            >
+                                              {cbState?.value ? (
+                                                <>
+                                                  <option value="">Choose option</option>
+                                                  <option value="status">Status</option>
+                                                  <option value="role">Role</option>
+                                                  <option value="project">Project</option>
+                                                  <option value="guild">Guild</option>
+                                                </>
+                                              ) : (
+                                                <option value="">inactive</option>
+                                              )}
+                                            </select>
+                                          </div>
+                                        )}
+                                      </Field>
+                                      <Field name={`${roleId}.name`}>
+                                        {({ input }) => (
+                                          <input {...input} type="hidden" value={role.name} />
+                                        )}
+                                      </Field>
+                                    </div>
+                                  </>
+                                )
+                              })}
                           </div>
                         </div>
                       </div>

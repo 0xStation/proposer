@@ -7,6 +7,7 @@ type Guild = {
 type Role = {
   name: string
   id: string
+  managed: boolean
 }
 
 const useDiscordGuild = (guildId: string | undefined) => {
@@ -20,7 +21,7 @@ const useDiscordGuild = (guildId: string | undefined) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ guild_id: guildId }),
+        body: JSON.stringify({ guildId }),
       })
 
       if (response.status !== 200) {
