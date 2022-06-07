@@ -3,18 +3,16 @@ import { Fragment, useMemo } from "react"
 import { Image, useRouter, invoke, useSession, Link, Routes } from "blitz"
 import Exit from "public/exit-button.svg"
 import truncateString from "../utils/truncateString"
-import { useAccount, useDisconnect } from "wagmi"
+import { useDisconnect } from "wagmi"
 import useStore from "../hooks/useStore"
 import logout from "app/session/mutations/logout"
 
 export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
   const router = useRouter()
   const session = useSession({ suspense: false })
-  const { data: accountData } = useAccount()
   const { disconnect } = useDisconnect()
   const activeUser = useStore((state) => state.activeUser)
   const setActiveUser = useStore((state) => state.setActiveUser)
-  const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
 
   const handleDisconnect = async () => {
     setIsOpen(false)
@@ -27,12 +25,15 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
     session?.siwe?.address && activeUser ? (
       <button
         className="block hover:opacity-70"
-        onClick={() => router.push(`/profile/${activeUser?.address}`)}
+        onClick={() => {
+          setIsOpen(false)
+          router.push(`/profile/${activeUser?.address}`)
+        }}
       >
         View Profile
       </button>
     ) : session?.siwe?.address ? (
-      <button className="block hover:opacity-70" onClick={() => router.push(`/profile/create`)}>
+      <button className="block hover:opacity-70" onClick={() => router.push(`/profile/complete`)}>
         Create Profile
       </button>
     ) : null
@@ -54,7 +55,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
     )
 
   const profilePfp =
-    activeUser && activeUser.data?.pfpURL ? (
+    session?.siwe?.address && activeUser && activeUser.data?.pfpURL ? (
       <>
         <div tabIndex={0} className="mx-auto">
           <div className="h-3 w-3 border border-tunnel-black bg-magic-mint rounded-full absolute ml-[2.15rem]" />

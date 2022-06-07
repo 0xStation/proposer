@@ -1,8 +1,8 @@
 import { AppProps } from "blitz"
 import "app/core/styles/index.css"
 import { providers } from "ethers"
-import { WagmiProvider, defaultChains, createClient } from "wagmi"
-import { InjectedConnector } from "wagmi/connectors/injected"
+import { WagmiConfig, defaultChains, createClient } from "wagmi"
+import { MetaMaskConnector } from "wagmi/connectors/metaMask"
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect"
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet"
 
@@ -15,7 +15,7 @@ const provider = ({ chainId }) => new providers.AlchemyProvider(4, process.env.R
 const connectors = ({ chainId }) => {
   return [
     // MetaMask
-    new InjectedConnector({ chains }),
+    new MetaMaskConnector({ chains }),
     // Wallet Connect
     new WalletConnectConnector({
       options: {
@@ -41,5 +41,5 @@ const client = createClient({
 export default function App({ Component, pageProps }: AppProps) {
   const getLayout = Component.getLayout || ((page) => page)
 
-  return <WagmiProvider client={client}>{getLayout(<Component {...pageProps} />)}</WagmiProvider>
+  return <WagmiConfig client={client}>{getLayout(<Component {...pageProps} />)}</WagmiConfig>
 }

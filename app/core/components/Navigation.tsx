@@ -9,6 +9,7 @@ import ProfileNavigationDrawer from "./ProfileNavigationDrawer"
 import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
 import { TerminalMetadata } from "app/terminal/types"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import createAccount from "app/account/mutations/createAccount"
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -16,8 +17,10 @@ const Navigation = ({ children }: { children?: any }) => {
   const activeUser = useStore((state) => state.activeUser)
   const setActiveUser = useStore((state) => state.setActiveUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  const walletModalOpen = useStore((state) => state.walletModalOpen)
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [profileNavDrawerIsOpen, setProfileNavDrawerIsOpen] = useState<boolean>(false)
+  const router = useRouter()
 
   // If the user connects + signs their wallet,
   // set the active user. The active user will be
@@ -26,7 +29,13 @@ const Navigation = ({ children }: { children?: any }) => {
     if (session?.siwe?.address && !activeUser) {
       const setActiveAccount = async () => {
         const account = await invoke(getAccountByAddress, { address: session?.siwe?.address })
-        setActiveUser(account)
+        if (!account) {
+          const newUser = await invoke(createAccount, { address: session?.siwe?.address })
+          setActiveUser(newUser)
+          router.push(`/profile/complete`)
+        } else {
+          setActiveUser(account)
+        }
       }
       setActiveAccount()
     }
@@ -92,20 +101,23 @@ const Navigation = ({ children }: { children?: any }) => {
       <div>
         {!session?.siwe?.address && (
           <div className="w-full h-[70px] absolute z-[60] bg-wet-concrete bottom-0">
-            <div className="fixed mt-2 left-1/3 ml-[-213px]">
-              <div className="inline-block mr-16">
-                <h2 className="inline-block mr-5 text-xl font-bold justify-center">
-                  {!address ? "Be recognized in your community" : "Sign in with Ethereum"}
-                </h2>
-                <p>Connect your wallet and join the next class of emerging talent</p>
-              </div>
-              <button
-                onClick={() => toggleWalletModal(true)}
-                className="inline h-[35px] bg-magic-mint text-tunnel-black w-48 rounded align-middle p-1 hover:bg-opacity-70 ml-28 mb-7"
-              >
-                {!address ? "Connect Wallet" : "Sign"}
-              </button>
+            <div className="fixed mt-2 left-1/3 ml-[-6.65rem]">
+              <h2 className="inline-block mr-5 text-xl font-bold justify-center">
+                {!address ? "Be recognized in your community" : "Sign"}
+              </h2>
+              <p>
+                {!address
+                  ? "Connect your wallet and join the next class of emerging talent"
+                  : "Verify that it's you"}
+              </p>
             </div>
+            <button
+              onClick={() => toggleWalletModal(true)}
+              className="inline h-[35px] bg-magic-mint text-tunnel-black w-48 rounded align-middle p-1 hover:bg-opacity-70 ml-28 mt-4 mr-[-6.65rem] right-1/3 fixed"
+              disabled={walletModalOpen}
+            >
+              {!address ? "Connect Wallet" : "Sign in with Ethereum"}
+            </button>
           </div>
         )}
       </div>
@@ -145,10 +157,17 @@ const TerminalIcon = ({ terminal }) => {
       <button
         className={`${
           isTerminalSelected ? "border-marble-white" : "border-wet-concrete"
-        } inline-block overflow-hidden bg-wet-concrete w-[46px] h-[46px] cursor-pointer border group-hover:border-marble-white rounded-lg mb-4`}
+        } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg mb-4`}
         onClick={() => router.push(Routes.MemberDirectoryPage({ terminalHandle: terminal.handle }))}
       >
-        <img src={(terminal?.data as TerminalMetadata)?.pfpURL} />
+        {(terminal?.data as TerminalMetadata)?.pfpURL ? (
+          <img
+            className="object-fill w-[46px] h-[46px]"
+            src={(terminal?.data as TerminalMetadata)?.pfpURL}
+          />
+        ) : (
+          <span className="w-[46px] h-[46px] bg-gradient-to-b  from-neon-blue to-torch-red block" />
+        )}
       </button>
     </div>
   )

@@ -5,32 +5,15 @@ import {
   getSession,
   GetServerSideProps,
   invoke,
-  Routes,
   InferGetServerSidePropsType,
 } from "blitz"
-import { useEffect } from "react"
 import AccountForm from "app/account/components/AccountForm"
 import Layout from "app/core/layouts/LayoutWithoutNavigation"
 import Exit from "/public/exit-button.svg"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
-import { useConnect, useDisconnect } from "wagmi"
-import logout from "app/session/mutations/logout"
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session = await getSession(req, res)
-
-  const user = await invoke(getAccountByAddress, { address: session?.siwe?.address })
-
-  if (user) {
-    return {
-      redirect: {
-        destination: Routes.ProfileHome({ accountAddress: session?.siwe?.address as string }),
-        permanent: false,
-        // Permanent Redirect status response code indicates that the resource requested
-        // has been definitively moved to the URL given by the Location headers
-      },
-    }
-  }
 
   if (!session?.siwe?.address) {
     return {
@@ -41,36 +24,30 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     }
   }
 
+  const user = await invoke(getAccountByAddress, { address: session?.siwe?.address })
+
   return {
     props: {
       siweAddress: session?.siwe?.address,
+      activeUser: user,
     }, // will be passed to the page component as props
   }
 }
 
 const CreateProfile: BlitzPage = ({
   siweAddress,
+  activeUser,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-  const { isConnected } = useConnect()
-  const { disconnect } = useDisconnect()
 
-  const handleDisconnect = async () => {
-    await invoke(logout, {})
-    disconnect()
-    router.push("/")
+  const handleCloseButtonClick = () => {
+    router.push(`/profile/${siweAddress}`)
   }
-
-  useEffect(() => {
-    if (!isConnected) {
-      ;(async () => await handleDisconnect())()
-    }
-  }, [isConnected])
 
   return (
     <div>
       <div className="absolute top-5 left-5">
-        <button onClick={handleDisconnect}>
+        <button onClick={handleCloseButtonClick}>
           <Image src={Exit} alt="Close button" width={16} height={16} />
         </button>
       </div>
@@ -89,10 +66,11 @@ const CreateProfile: BlitzPage = ({
         <div className="mx-auto max-w-2xl pb-10">
           <AccountForm
             onSuccess={() => {
-              router.push(`/profile/create/discord`)
+              router.push(`/profile/complete/discord`)
             }}
             address={siweAddress}
-            isEdit={false}
+            isEdit={true}
+            account={activeUser}
           />
         </div>
       </div>

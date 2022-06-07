@@ -4,7 +4,7 @@ import { Ctx } from "blitz"
 import { Account } from "../types"
 
 const CreateAccount = z.object({
-  name: z.string(),
+  name: z.string().optional(),
   address: z.string().optional(),
   bio: z.string().optional(),
   pfpURL: z.string().optional(),

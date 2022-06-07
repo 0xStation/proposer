@@ -5,9 +5,14 @@ import useDiscordAuthWithCallback from "../hooks/useDiscordAuthWithCallback"
 import useStore from "../hooks/useStore"
 import Modal from "./Modal"
 import getAccountByDiscordId from "app/account/queries/getAccountByDiscordId"
+import useLocalStorage from "../hooks/useLocalStorage"
 
 export const ConnectDiscordProfileModal = ({ isOpen, setIsOpen, activeUser, setNewAuth }) => {
   const setToastState = useStore((state) => state.setToastState)
+  const [, setHasDismissedDiscordConnectModal] = useLocalStorage<boolean>(
+    "has_dismissed_discord_connect_modal",
+    false
+  )
 
   const { callbackWithDCAuth, isAuthenticating, authorization } = useDiscordAuthWithCallback(
     "identify guilds",
@@ -60,7 +65,12 @@ export const ConnectDiscordProfileModal = ({ isOpen, setIsOpen, activeUser, setN
   )
 
   return (
-    <Modal open={isOpen} toggle={setIsOpen}>
+    <Modal
+      open={isOpen}
+      toggle={() => {
+        setIsOpen(!isOpen)
+      }}
+    >
       <div className="text-center">
         <h1 className="text-2xl m-7 text-center font-bold w-80 mx-auto">
           Connect your Station profile with Discord
@@ -70,10 +80,19 @@ export const ConnectDiscordProfileModal = ({ isOpen, setIsOpen, activeUser, setN
           Station.
         </p>
         <button
-          className="text-center border border-marble-white rounded w-96 mx-auto py-1 mb-3 hover:bg-wet-concrete"
+          className="text-center bg-magic-mint text-tunnel-black rounded w-36 mx-auto py-1 mt-2 mb-3 hover:opacity-70"
           onClick={callbackWithDCAuth}
         >
-          Connect with Discord
+          Connect
+        </button>
+        <button
+          className="h-[33px] w-36 mx-auto ml-2 border border-magic-mint rounded-md text-magic-mint hover:bg-concrete"
+          onClick={() => {
+            setHasDismissedDiscordConnectModal(true)
+            setIsOpen(!isOpen)
+          }}
+        >
+          Dismiss
         </button>
       </div>
     </Modal>

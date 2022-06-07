@@ -41,9 +41,15 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
         {!!tutorial && <div className="fixed inset-0 bg-tunnel-black opacity-70 z-10"></div>}
         {/* Terminal Profile metadata + Settings icon*/}
         <div className="flex content-center ml-4 mt-7">
-          <div className="align-middle text-center mr-2 rounded-lg border border-wet-concrete w-[41px] h-[41px] mt-1 overflow-hidden">
-            <img src={terminal?.data?.pfpURL} alt="Station logo" height={41} width={41} />
-          </div>
+          {terminal?.data.pfpURL ? (
+            <img
+              src={terminal?.data.pfpURL}
+              alt="Terminal PFP"
+              className="min-w-[41px] max-w-[41px] h-[41px] rounded-md cursor-pointer border border-wet-concrete mr-2"
+            />
+          ) : (
+            <span className="w-[41px] h-[41px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red mr-2" />
+          )}
           <div className="flex flex-col content-center w-[200px] mr-[5px]">
             <div className="flex flex-row items-center">
               <p className="text-xl text-marble-white font-bold">{terminal?.data.name}</p>

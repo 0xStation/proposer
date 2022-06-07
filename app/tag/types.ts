@@ -3,6 +3,21 @@ export enum TagType {
   ROLE = "role",
   PROJECT = "project",
   GUILD = "guild",
+  TOKEN = "token",
+}
+
+export enum TokenType {
+  ERC20 = "ERC20",
+  ERC721 = "ERC721",
+  ERC1155 = "ERC1155",
+}
+
+export type TagTokenMetadata = {
+  chainId: number
+  address: string
+  type: TokenType
+  name: string
+  symbol: string
 }
 
 export type Tag = {
@@ -12,4 +27,5 @@ export type Tag = {
   type: TagType
   active: boolean
   discordId?: string
+  data?: TagTokenMetadata | any
 }

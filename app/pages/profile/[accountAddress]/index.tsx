@@ -12,6 +12,8 @@ import useLocalStorage from "app/core/hooks/useLocalStorage"
 import useStore from "app/core/hooks/useStore"
 import { Auth } from "app/auth/types"
 import { Account } from "app/account/types"
+import { TagType } from "app/tag/types"
+import truncateString from "app/core/utils/truncateString"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
@@ -23,6 +25,11 @@ const ProfileHome: BlitzPage = () => {
     "dc_auth_identify guilds",
     undefined,
     false
+  )
+  const [hasSeenDiscordConnectModal] = useLocalStorage<boolean>(
+    "has_dismissed_discord_connect_modal",
+    false,
+    true
   )
   const activeUser = useStore((state) => state.activeUser)
 
@@ -45,7 +52,7 @@ const ProfileHome: BlitzPage = () => {
       suspense: false,
       refetchOnWindowFocus: false,
       onSuccess: (terminals: Terminal[]) => {
-        if (terminals && terminals.length > 0) {
+        if (terminals && terminals.length > 0 && !selectedTerminal) {
           setSelectedTerminal(terminals[0] || null)
         }
       },
@@ -60,14 +67,19 @@ const ProfileHome: BlitzPage = () => {
       activeUser &&
       !activeUser?.discordId &&
       !discordAuthToken?.authorization &&
-      !newAuth
+      !newAuth &&
+      !hasSeenDiscordConnectModal
     ) {
       setIsConnectDiscordModalOpen(true)
     }
   }, [account, activeUser, discordAuthToken?.authorization])
 
   return (
-    <Layout title={`${account ? `${account?.data?.name} | ` : ""}Profile`}>
+    <Layout
+      title={`${
+        account?.data?.name ? account?.data?.name : truncateString(accountAddress, 3)
+      } | Profile`}
+    >
       {
         // only show discord popup if I don't have a discordId associated with my account
         // first account check prevents flicker of modal while account is still loading
@@ -104,28 +116,38 @@ const ProfileHome: BlitzPage = () => {
           </>
         ) : (
           <div className="w-full h-full flex items-center flex-col justify-center">
-            <h1 className="text-2xl font-bold text-marble-white text-center">Coming Soon</h1>
-            <p className="my-2 w-[309px]">
-              Station is still in private beta. You can{" "}
-              <a
-                className="text-magic-mint"
-                href="https://twitter.com/messages/compose?recipient_id=1412594810985271296"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                DM us
-              </a>{" "}
-              to learn more or{" "}
-              <a
-                className="text-magic-mint"
-                href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                sign up on our waitlist
-              </a>
-              .
-            </p>
+            <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
+              {account && account?.id === activeUser?.id
+                ? "You’re not yet a part of any Terminal on Station"
+                : `${account?.data?.name} is not yet a part of any Terminal on Station`}
+            </h1>
+            {account?.id === activeUser?.id ? (
+              <p className="my-2 w-[309px] text-center">
+                Station is still in private beta. You can{" "}
+                <a
+                  className="text-magic-mint"
+                  href="https://twitter.com/messages/compose?recipient_id=1412594810985271296"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  DM us
+                </a>{" "}
+                to learn more or{" "}
+                <a
+                  className="text-magic-mint"
+                  href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  sign up on our waitlist
+                </a>
+                .
+              </p>
+            ) : (
+              <p className="my-2 w-[309px] text-center">
+                Communities {account?.data.name} is a part of will display here.
+              </p>
+            )}
           </div>
         )}
       </ProfileNavigation>
@@ -144,11 +166,15 @@ const TerminalComponent = ({ terminal, selectedTerminal, setSelectedTerminal }) 
     >
       <div className="flex space-x-2">
         <div className="flex flex-col content-center align-middle mr-1">
-          <img
-            src={terminal.data.pfpURL}
-            alt="Terminal PFP"
-            className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
-          />
+          {terminal.data.pfpURL ? (
+            <img
+              src={terminal.data.pfpURL}
+              alt="Terminal PFP"
+              className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
+            />
+          ) : (
+            <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red" />
+          )}
         </div>
         <div className="flex flex-col content-center">
           <div className="flex flex-row items-center space-x-1">
@@ -169,17 +195,19 @@ const SelectedTerminalCard = ({ account, terminal }) => {
   const membership = account.tickets.find((ticket) => ticket.terminalId === terminal.id)
 
   const statusTags = membership.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "status"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.STATUS
   )
-
   const roleTags = membership.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "role"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.ROLE
   )
   const projectTags = membership.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "project"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.PROJECT
   )
   const guildTags = membership.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "guild"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.GUILD
+  )
+  const tokenTags = membership.tags?.filter(
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.TOKEN
   )
 
   return (
@@ -188,11 +216,15 @@ const SelectedTerminalCard = ({ account, terminal }) => {
         <div className="flex space-x-2">
           <div className="flex flex-col content-center align-middle mr-1">
             <Link href={Routes.MemberDirectoryPage({ terminalHandle: terminal.handle })}>
-              <img
-                src={terminal.data.pfpURL}
-                alt="Terminal PFP"
-                className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete hover:border-marble-white"
-              />
+              {terminal.data.pfpURL ? (
+                <img
+                  src={terminal.data.pfpURL}
+                  alt="Terminal PFP"
+                  className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
+                />
+              ) : (
+                <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red" />
+              )}
             </Link>
           </div>
           <div className="flex flex-col content-center">
@@ -215,6 +247,7 @@ const SelectedTerminalCard = ({ account, terminal }) => {
           <TagDetails tagType="roles" tags={roleTags} />
           <TagDetails tagType="projects" tags={projectTags} />
           <TagDetails tagType="guilds" tags={guildTags} />
+          <TagDetails tagType="tokens" tags={tokenTags} />
         </div>
       </div>
     </div>
@@ -227,10 +260,10 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
   return (
     <div className="mt-7">
       <p className="uppercase mb-3">
-        {tags.length > 1 || tagType == "status" ? tagType : tagType.slice(0, -1)}
+        {tags.length > 1 || tagType === "status" ? tagType : tagType.slice(0, -1)}
       </p>
       <div className="flex-row space-y-2 align-left mr-2">
-        {tags.map((accountTerminalTag) => {
+        {tags?.map((accountTerminalTag) => {
           return (
             <span
               key={accountTerminalTag.tag.value}

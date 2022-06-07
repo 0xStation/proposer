@@ -64,7 +64,7 @@ const Modal = ({
                 error ? "border-torch-red" : "border-concrete"
               }`}
             >
-              {showTitle && (
+              {(showTitle || banner) && (
                 <div className="w-full h-full relative">
                   <button
                     className="text-marble-white absolute z-50 left-2 top-2"
@@ -75,7 +75,7 @@ const Modal = ({
                   {checkBanner(banner)}
                 </div>
               )}
-              <div className="px-4 pt-[2rem] pb-4">
+              <div className="px-4 pb-4">
                 {showTitle && (
                   <Dialog.Title
                     as="h3"

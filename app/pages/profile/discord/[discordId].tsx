@@ -44,7 +44,7 @@ const DiscordProfileHome: BlitzPage = () => {
       suspense: false,
       refetchOnWindowFocus: false,
       onSuccess: (terminals: Terminal[]) => {
-        if (terminals && terminals.length > 0) {
+        if (terminals && terminals.length > 0 && !selectedTerminal) {
           setSelectedTerminal(terminals[0] || null)
         }
       },
@@ -127,11 +127,15 @@ const TerminalComponent = ({ terminal, selectedTerminal, setSelectedTerminal }) 
     >
       <div className="flex space-x-2">
         <div className="flex flex-col content-center align-middle mr-1">
-          <img
-            src={terminal.data.pfpURL}
-            alt="Terminal PFP"
-            className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
-          />
+          {terminal.data.pfpURL ? (
+            <img
+              src={terminal.data.pfpURL}
+              alt="Terminal PFP"
+              className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
+            />
+          ) : (
+            <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red" />
+          )}
         </div>
         <div className="flex flex-col content-center">
           <div className="flex flex-row items-center space-x-1">
@@ -171,11 +175,15 @@ const SelectedTerminalCard = ({ account, terminal }) => {
         <div className="flex space-x-2">
           <div className="flex flex-col content-center align-middle mr-1">
             <Link href={Routes.MemberDirectoryPage({ terminalHandle: terminal.handle })}>
-              <img
-                src={terminal.data.pfpURL}
-                alt="Terminal PFP"
-                className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete hover:border-marble-white"
-              />
+              {terminal.data.pfpURL ? (
+                <img
+                  src={terminal.data.pfpURL}
+                  alt="Terminal PFP"
+                  className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
+                />
+              ) : (
+                <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red" />
+              )}
             </Link>
           </div>
           <div className="flex flex-col content-center">
@@ -210,7 +218,7 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
   return (
     <div className="mt-7">
       <p className="uppercase mb-3">
-        {tags.length > 1 || tagType == "status" ? tagType : tagType.slice(0, -1)}
+        {tags.length > 1 || tagType === "status" ? tagType : tagType.slice(0, -1)}
       </p>
       <div className="flex-row space-y-2 align-left mr-2">
         {tags.map((accountTerminalTag) => {
