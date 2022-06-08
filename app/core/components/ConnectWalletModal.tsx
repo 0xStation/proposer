@@ -113,7 +113,6 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
 
   return (
     <Modal
-      title="Enter Station"
       open={isWalletOpen}
       toggle={handleCloseConnectWalletModal}
       banner={Banner}
@@ -132,7 +131,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
             <Image src={BackIcon} alt="Back icon" />
           </button>
           <h1 className="text-2xl font-bold text-marble-white text-center mt-6 mb-2">
-            Sign in with Ethereum
+            {connectState.loading ? "Check your wallet to continue " : "Sign in with Ethereum"}
           </h1>
           <p className="text-lg text-center">
             Verify your address so we can securely authenticate you.
@@ -144,13 +143,13 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           ) : null}
           <div className="m-6 text-center">
             <button
-              className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-36 h-[35px]"
+              className="border border-tunnel-black bg-magic-mint text-tunnel-black rounded-md content-center hover:opacity-70 cursor:pointer w-36 h-[35px]"
               onClick={handleSignInWithEthereum}
               disabled={connectState.loading}
             >
               {connectState.loading ? (
                 <div className="flex justify-center items-center">
-                  <Spinner fill="white" />
+                  <Spinner fill="black" />
                 </div>
               ) : (
                 "Sign"
@@ -160,7 +159,9 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         </>
       ) : (
         <>
-          <h1 className="text-2xl font-bold text-marble-white text-center mt-6">Enter Station</h1>
+          <h1 className="text-2xl font-bold text-marble-white text-center mt-6">
+            {connectState.loading ? "Check your wallet to continue " : "Enter Station"}
+          </h1>
           <p className="text-lg text-center mt-4">Connect your wallet to enter Station.</p>
           <p className="text-lg text-center">
             New to web3? Learn how to create a wallet{" "}

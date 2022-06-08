@@ -113,7 +113,11 @@ const Navigation = ({ children }: { children?: any }) => {
             </div>
             <button
               onClick={() => toggleWalletModal(true)}
-              className="h-[35px] bg-magic-mint text-tunnel-black w-48 rounded align-middle p-1 hover:bg-opacity-70 ml-28 mt-4 mr-[-2rem] mb-3 lg:mb-0 md:mr-[-6.65rem] right-1/3 fixed bottom-0 lg:bottom-auto"
+              className={`h-[35px] ${
+                !address
+                  ? "bg-magic-mint text-tunnel-black hover:opacity-70"
+                  : "border border-magic-mint text-magic-mint hover:bg-concrete"
+              }  w-48 rounded align-middle p-1 ml-28 mt-4 mr-[-2rem] mb-3 lg:mb-0 md:mr-[-6.65rem] right-1/3 fixed bottom-0 lg:bottom-auto`}
               disabled={walletModalOpen}
             >
               {!address ? "Connect Wallet" : "Sign in with Ethereum"}
