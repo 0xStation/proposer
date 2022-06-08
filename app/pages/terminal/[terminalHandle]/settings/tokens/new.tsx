@@ -1,4 +1,4 @@
-import { BlitzPage, useMutation, useParam, useQuery, Link, Image, Routes } from "blitz"
+import { BlitzPage, useMutation, useParam, useQuery, Link, Image, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import createTokenTag from "app/tag/mutations/createTokenTag"
@@ -6,8 +6,10 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Navigation from "app/terminal/components/settings/navigation"
 import useStore from "app/core/hooks/useStore"
 import Back from "/public/back-icon.svg"
+import networks from "app/utils/networks.json"
 
 const NewTokenSettingsPage: BlitzPage = () => {
+  const router = useRouter()
   const [createTokenTagMutation] = useMutation(createTokenTag)
 
   const terminalHandle = useParam("terminalHandle") as string
@@ -29,22 +31,26 @@ const NewTokenSettingsPage: BlitzPage = () => {
                 className="cursor-pointer"
               />
             </Link>
-            <h1 className="text-xl">New Token</h1>
+            <h1 className="text-2xl font-bold">New token</h1>
           </div>
           <Form
             initialValues={{}}
             onSubmit={async (values) => {
               if (terminal) {
                 try {
-                  const metaDataResponse = await fetch("/api/fetch-token-metadata", {
+                  const metadataResponse = await fetch("/api/fetch-token-metadata", {
                     method: "POST",
+                    headers: {
+                      Accept: "application/json, text/plain, */*",
+                      "Content-Type": "application/json",
+                    },
                     body: JSON.stringify({
                       address: values.address,
-                      chainId: parseInt(values.chainId),
+                      chainId: parseInt(values.chainId) || 1,
                     }),
                   })
 
-                  const metadata = await metaDataResponse.json()
+                  const metadata = await metadataResponse.json()
 
                   if (metadata.response !== "success") {
                     setToastState({
@@ -52,6 +58,8 @@ const NewTokenSettingsPage: BlitzPage = () => {
                       type: "error",
                       message: metadata.message,
                     })
+
+                    return
                   }
 
                   try {
@@ -61,14 +69,10 @@ const NewTokenSettingsPage: BlitzPage = () => {
                       type: metadata.data.type,
                       symbol: metadata.data.symbol,
                       address: values.address,
-                      chainId: parseInt(values.chainId),
+                      chainId: parseInt(values.chainId) || 1,
                     })
 
-                    setToastState({
-                      isToastShowing: true,
-                      type: "success",
-                      message: "Your tag has been created.",
-                    })
+                    router.push(Routes.TokenSettingsPage({ terminalHandle }))
                   } catch (e) {
                     console.error(e)
                     setToastState({
@@ -93,9 +97,13 @@ const NewTokenSettingsPage: BlitzPage = () => {
                       component="select"
                       className="bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
                     >
-                      <option />
-                      <option value="1">Ethereum</option>
-                      <option value="4">Rinkeby</option>
+                      {Object.keys(networks).map((chainId, idx) => {
+                        return (
+                          <option value={chainId} key={idx}>
+                            {networks[chainId].name}
+                          </option>
+                        )
+                      })}
                     </Field>
                     <h3 className="font-bold mt-4">Contract Address*</h3>
                     <Field

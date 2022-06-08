@@ -5,6 +5,7 @@ import Navigation from "app/terminal/components/settings/navigation"
 import getGroupedTagsByTerminalId from "app/tag/queries/getGroupedTagsByTerminalId"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { Tag } from "app/tag/types"
+import networks from "app/utils/networks.json"
 
 const TokenSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -22,7 +23,9 @@ const TokenSettingsPage: BlitzPage = () => {
           return
         }
         setTokenTags(groupedTags["token"])
-        setSelectedTag(groupedTags["token"][0])
+        if (!selectedTag) {
+          setSelectedTag(groupedTags["token"][0])
+        }
       },
     }
   )
@@ -37,9 +40,6 @@ const TokenSettingsPage: BlitzPage = () => {
         onClick={() => setSelectedTag(tag)}
       >
         <div className="flex space-x-2">
-          <div className="flex flex-col content-center align-middle mr-1">
-            <div className="h-[46px] min-w-[46px] place-self-center border border-wet-concrete bg-marble-white rounded-full place-items-center" />
-          </div>
           <div className="flex flex-col content-center">
             <div className="flex flex-row items-center space-x-1">
               <p className="text-lg text-marble-white font-bold">{tag.value}</p>
@@ -79,7 +79,7 @@ const TokenSettingsPage: BlitzPage = () => {
               </div>
               <Link href={Routes.NewTokenSettingsPage({ terminalHandle })}>
                 <button
-                  className="rounded text-tunnel-black px-16 py-2 h-full bg-magic-mint self-start"
+                  className="rounded text-tunnel-black px-8 h-full h-[32px] bg-magic-mint self-start"
                   type="submit"
                 >
                   Add
@@ -95,9 +95,6 @@ const TokenSettingsPage: BlitzPage = () => {
               <div className="h-full border-l border-concrete col-span-3">
                 <div className="m-5 flex-col">
                   <div className="flex space-x-2">
-                    <div className="flex flex-col content-center align-middle mr-1">
-                      <div className="h-[46px] w-[46px] place-self-center bg-marble-white rounded-full place-items-center" />
-                    </div>
                     <div className="flex flex-col content-center">
                       <div className="flex flex-row items-center space-x-1">
                         <div className="text-lg text-marble-white font-bold">
@@ -114,7 +111,7 @@ const TokenSettingsPage: BlitzPage = () => {
                   <div className="space-y-6 mt-12">
                     <div>
                       <h3 className="uppercase text-xs font-bold tracking-wider">Chain</h3>
-                      <p className="mt-2">Ethereum</p>
+                      <p className="mt-2">{networks[selectedTag?.data.chainId].name}</p>
                     </div>
                     <div>
                       <h3 className="uppercase text-xs font-bold tracking-wider">Token Type</h3>
