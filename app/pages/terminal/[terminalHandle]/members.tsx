@@ -7,7 +7,7 @@ import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getGroupedTagsByTerminalId from "app/tag/queries/getGroupedTagsByTerminalId"
-import { Menu, Transition } from "@headlessui/react"
+import { Dialog, Menu, Transition } from "@headlessui/react"
 import Checkbox from "app/core/components/form/Checkbox"
 import { Form } from "react-final-form"
 import truncateString from "app/core/utils/truncateString"
@@ -15,6 +15,7 @@ import getMembersByTerminalId from "app/accountTerminal/queries/getMembersByTerm
 import getMemberCountByTerminalId from "app/accountTerminal/queries/getMemberCountByTerminalId"
 import { AccountTerminalWithTagsAndAccount } from "app/accountTerminal/types"
 import { formatDate } from "app/core/utils/formatDate"
+import Exit from "public/exit-button.svg"
 import GithubIcon from "public/github-icon.svg"
 import TwitterIcon from "public/twitter-icon.svg"
 import PersonalSiteIcon from "public/personal-site-icon.svg"
@@ -38,6 +39,9 @@ const MemberDirectoryPage: BlitzPage = () => {
   )
   // selected user to display in the contributor card
   const [selectedMember, setSelectedMember] = useState<AccountTerminalWithTagsAndAccount>()
+  const [selectedMemberMobileDrawerIsOpen, setSelectedMemberMobileDrawerIsOpen] =
+    useState<boolean>(false)
+
   const [page, setPage] = useState<number>(0)
   const setToastState = useStore((state) => state.setToastState)
 
@@ -174,7 +178,7 @@ const MemberDirectoryPage: BlitzPage = () => {
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Members`}>
       <TerminalNavigation>
         {/* Filter View */}
-        <div className="h-[130px] border-b border-concrete">
+        <div className="max-h-[250px] sm:h-[130px] border-b border-concrete">
           <div className="flex flex-row items-center ml-6 pt-7">
             <h1 className="text-2xl font-bold">Members</h1>
             {groupedTags && Object.entries(groupedTags).length ? (
@@ -188,8 +192,8 @@ const MemberDirectoryPage: BlitzPage = () => {
               />
             ) : null}
           </div>
-          <div className="flex flex-row justify-between items-center">
-            <div className="flex ml-6 pt-4 space-x-2">
+          <div className="flex flex-col sm:flex-row justify-between">
+            <div className="flex ml-6 py-4 space-x-2 flex-wrap">
               {groupedTags && Object.entries(groupedTags).length ? (
                 Object.entries(groupedTags).map(([tagType, tags], idx) => (
                   <FilterPill
@@ -205,25 +209,20 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <p className="text-marble-white">View other members in the terminal.</p>
               )}
             </div>
-            <div className="mr-6 flex flex-row space-x-2 pt-4 items-center text-sm">
-              <div className="mr-6">
-                Showing
-                <span className="text-electric-violet font-bold">
-                  {" "}
-                  {page * paginationTake + 1}{" "}
-                </span>
-                to
-                <span className="text-electric-violet font-bold">
-                  {" "}
-                  {(page + 1) * paginationTake > memberCount!
-                    ? memberCount
-                    : (page + 1) * paginationTake}{" "}
-                </span>
-                of
-                <span className="font-bold"> {memberCount} </span>
-                members
-              </div>
-              <button className="w-6" disabled={page === 0} onClick={() => setPage(page - 1)}>
+            <div className="ml-6 sm:mr-6 py-4 text-sm">
+              Showing
+              <span className="text-electric-violet font-bold"> {page * paginationTake + 1} </span>
+              to
+              <span className="text-electric-violet font-bold">
+                {" "}
+                {(page + 1) * paginationTake > memberCount!
+                  ? memberCount
+                  : (page + 1) * paginationTake}{" "}
+              </span>
+              of
+              <span className="font-bold"> {memberCount} </span>
+              members
+              <button className="w-6 ml-2" disabled={page === 0} onClick={() => setPage(page - 1)}>
                 <BackArrow className={`${page === 0 ? "fill-concrete" : "fill-marble-white"}`} />
               </button>
               <button
@@ -240,20 +239,23 @@ const MemberDirectoryPage: BlitzPage = () => {
           </div>
         </div>
         <div className="grid grid-cols-7 h-[calc(100vh-130px)] w-full box-border">
-          <div className="overflow-y-auto col-span-4">
-            <div className="overflow-y-auto">
-              {members &&
-                members.map((member, idx) => (
-                  <ContributorComponent
-                    key={`${member.joinedAt}${idx}`}
-                    member={member}
-                    selectedMember={selectedMember}
-                    setSelectedMember={setSelectedMember}
-                  />
-                ))}
-            </div>
+          <div className="overflow-y-auto col-span-7 sm:col-span-4">
+            {members &&
+              members.map((member, idx) => (
+                <ContributorComponent
+                  key={`${member.joinedAt}${idx}`}
+                  member={member}
+                  selectedMember={selectedMember}
+                  setSelectedMember={setSelectedMember}
+                  setSelectedMemberMobileDrawerIsOpen={setSelectedMemberMobileDrawerIsOpen}
+                />
+              ))}
           </div>
-          <SelectedContributorCard member={selectedMember} />
+          <SelectedContributorCard
+            member={selectedMember}
+            selectedMemberMobileDrawerIsOpen={selectedMemberMobileDrawerIsOpen}
+            setSelectedMemberMobileDrawerIsOpen={setSelectedMemberMobileDrawerIsOpen}
+          />
         </div>
       </TerminalNavigation>
     </Layout>
@@ -281,7 +283,7 @@ const FilterPill = ({ tagType, tags, filters, setFilters, setPage }) => {
   }
 
   return (
-    <Menu as="div" className={`relative`}>
+    <Menu as="div" className="relative mb-2 sm:mb-0">
       {({ open }) => {
         setClearDefaultValue(false)
         return (
@@ -314,9 +316,7 @@ const FilterPill = ({ tagType, tags, filters, setFilters, setPage }) => {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items
-                className={`absolute origin-top-left mt-5 h-auto w-[22rem] bg-tunnel-black border border-concrete rounded-md`}
-              >
+              <Menu.Items className="absolute origin-top-left mt-5 h-auto w-[11rem] sm:w-[22rem] bg-tunnel-black border border-concrete rounded-md z-10">
                 <Form
                   onSubmit={(field) => {
                     if (!field || !Object.keys(field).length || !Object.entries(field)[0]) {
@@ -369,12 +369,12 @@ const FilterPill = ({ tagType, tags, filters, setFilters, setPage }) => {
                         </div>
                         <button
                           type="submit"
-                          className="bg-marble-white w-52 h-[35px] text-tunnel-black rounded mb-4 ml-4 mr-1 hover:opacity-70"
+                          className="bg-marble-white w-36 sm:w-52 h-[35px] text-tunnel-black rounded mb-4 ml-4 mr-1 hover:opacity-70"
                         >
                           Apply
                         </button>
                         <button
-                          className="w-[6.5rem] hover:text-concrete"
+                          className="w-[6.5rem] hover:text-concrete mb-2 sm:mb-0"
                           onClick={(e) => handleClearFilters(e)}
                         >
                           Clear all
@@ -392,7 +392,12 @@ const FilterPill = ({ tagType, tags, filters, setFilters, setPage }) => {
   )
 }
 
-const ContributorComponent = ({ member, selectedMember, setSelectedMember }) => {
+const ContributorComponent = ({
+  member,
+  selectedMember,
+  setSelectedMember,
+  setSelectedMemberMobileDrawerIsOpen,
+}) => {
   const { account } = member
 
   return (
@@ -401,7 +406,10 @@ const ContributorComponent = ({ member, selectedMember, setSelectedMember }) => 
       className={`flex flex-row space-x-52 p-3 mx-3 mt-3 rounded-lg hover:bg-wet-concrete cursor-pointer ${
         account.id === selectedMember?.account?.id ? "bg-wet-concrete" : ""
       }`}
-      onClick={() => setSelectedMember(member)}
+      onClick={() => {
+        setSelectedMember(member)
+        setSelectedMemberMobileDrawerIsOpen(true)
+      }}
     >
       <div className="flex space-x-2">
         <div className="flex flex-col content-center align-middle mr-1">
@@ -432,7 +440,11 @@ const ContributorComponent = ({ member, selectedMember, setSelectedMember }) => 
   )
 }
 
-const SelectedContributorCard = ({ member }) => {
+const SelectedContributorCard = ({
+  member,
+  selectedMemberMobileDrawerIsOpen,
+  setSelectedMemberMobileDrawerIsOpen,
+}) => {
   if (!member) return null
   const { account } = member
 
@@ -456,111 +468,171 @@ const SelectedContributorCard = ({ member }) => {
     ? Routes.ProfileHome({ accountAddress: account.address })
     : Routes.DiscordProfileHome({ discordId: account.discordId })
 
-  return (
-    <div className="h-full border-l border-concrete col-span-3">
-      <div className="m-5 flex-col">
-        <div className="flex space-x-2">
-          <div className="flex flex-col content-center align-middle mr-1">
-            <Link href={profileLink}>
-              {account.data.pfpURL ? (
-                <img
-                  src={account.data.pfpURL}
-                  alt="PFP"
-                  className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete hover:border-marble-white"
-                />
-              ) : (
-                <div className="h-[46px] w-[46px] place-self-center border border-wet-concrete hover:border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
-              )}
-            </Link>
-          </div>
-          <div className="flex flex-col content-center">
-            <div className="flex flex-row items-center space-x-1">
-              <div className="text-lg text-marble-white font-bold">
-                {account.data.name || account.data.discordId}
-              </div>
-            </div>
-            <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-              {account.address ? (
-                <div className="w-max truncate leading-4">@{truncateString(account.address)}</div>
-              ) : (
-                <div className="w-max truncate leading-4">Imported from discord</div>
-              )}
+  const selectedContributorCardContent = (
+    <div className="m-5 flex-col">
+      <div className="flex space-x-2">
+        <div className="flex flex-col content-center align-middle mr-1">
+          <Link href={profileLink}>
+            {account.data.pfpURL ? (
+              <img
+                src={account.data.pfpURL}
+                alt="PFP"
+                className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete hover:border-marble-white"
+              />
+            ) : (
+              <div className="h-[46px] w-[46px] place-self-center border border-wet-concrete hover:border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
+            )}
+          </Link>
+        </div>
+        <div className="flex flex-col content-center">
+          <div className="flex flex-row items-center space-x-1">
+            <div className="text-lg text-marble-white font-bold">
+              {account.data.name || account.data.discordId}
             </div>
           </div>
-        </div>
-        <div className="mt-5 space-x-4">
-          {account?.data?.contactURL && (
-            <a
-              href={account?.data?.contactURL}
-              target="_blank"
-              className="hover:opacity-70 cursor-pointer"
-              rel="noreferrer"
-            >
-              <Image src={PersonalSiteIcon} alt="Personal Site Icon." width={15} height={15} />
-            </a>
-          )}
-          {account?.data?.twitterUrl && (
-            <a
-              href={account?.data?.twitterUrl}
-              target="_blank"
-              className="hover:opacity-70 cursor-pointer"
-              rel="noreferrer"
-            >
-              <Image src={TwitterIcon} alt="Twitter Icon." width={15} height={15} />
-            </a>
-          )}
-          {account?.data?.githubUrl && (
-            <a
-              href={account?.data?.githubUrl}
-              target="_blank"
-              className="hover:opacity-70 cursor-pointer"
-              rel="noreferrer"
-            >
-              <Image src={GithubIcon} alt="Github Icon." width={15} height={15} />
-            </a>
-          )}
-          {account?.data?.tiktokUrl && (
-            <a
-              href={account?.data?.tiktokUrl}
-              target="_blank"
-              className="hover:opacity-70 cursor-pointer"
-              rel="noreferrer"
-            >
-              <Image src={TikTokIcon} alt="TikTok Icon." width={15} height={15} />
-            </a>
-          )}
-          {account?.data?.instagramUrl && (
-            <a
-              href={account?.data?.instagramUrl}
-              target="_blank"
-              className="hover:opacity-70 cursor-pointer"
-              rel="noreferrer"
-            >
-              <Image src={InstagramIcon} alt="Instagram Icon." width={15} height={15} />
-            </a>
-          )}
-        </div>
-        {account?.data?.bio && (
-          <>
-            <p className="mt-4">{account?.data?.bio}</p>
-            <hr className="text-concrete mt-6" />
-          </>
-        )}
-        <div className="mt-5 text-xs">
-          <TagDetails tagType="status" tags={statusTags} />
-          {member.joinedAt && (
-            <div className="mt-7">
-              <p className="uppercase mb-2">joined since</p>
-              <p className="text-base">{formatDate(member.joinedAt)}</p>
-            </div>
-          )}
-          <TagDetails tagType="roles" tags={roleTags} />
-          <TagDetails tagType="projects" tags={projectTags} />
-          <TagDetails tagType="guilds" tags={guildTags} />
-          <TagDetails tagType="tokens" tags={tokenTags} />
+          <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
+            {account.address ? (
+              <div className="w-max truncate leading-4">@{truncateString(account.address)}</div>
+            ) : (
+              <div className="w-max truncate leading-4">Imported from discord</div>
+            )}
+          </div>
         </div>
       </div>
+      <div className="mt-5 space-x-4">
+        {account?.data?.contactURL && (
+          <a
+            href={account?.data?.contactURL}
+            target="_blank"
+            className="hover:opacity-70 cursor-pointer"
+            rel="noreferrer"
+          >
+            <Image src={PersonalSiteIcon} alt="Personal Site Icon." width={15} height={15} />
+          </a>
+        )}
+        {account?.data?.twitterUrl && (
+          <a
+            href={account?.data?.twitterUrl}
+            target="_blank"
+            className="hover:opacity-70 cursor-pointer"
+            rel="noreferrer"
+          >
+            <Image src={TwitterIcon} alt="Twitter Icon." width={15} height={15} />
+          </a>
+        )}
+        {account?.data?.githubUrl && (
+          <a
+            href={account?.data?.githubUrl}
+            target="_blank"
+            className="hover:opacity-70 cursor-pointer"
+            rel="noreferrer"
+          >
+            <Image src={GithubIcon} alt="Github Icon." width={15} height={15} />
+          </a>
+        )}
+        {account?.data?.tiktokUrl && (
+          <a
+            href={account?.data?.tiktokUrl}
+            target="_blank"
+            className="hover:opacity-70 cursor-pointer"
+            rel="noreferrer"
+          >
+            <Image src={TikTokIcon} alt="TikTok Icon." width={15} height={15} />
+          </a>
+        )}
+        {account?.data?.instagramUrl && (
+          <a
+            href={account?.data?.instagramUrl}
+            target="_blank"
+            className="hover:opacity-70 cursor-pointer"
+            rel="noreferrer"
+          >
+            <Image src={InstagramIcon} alt="Instagram Icon." width={15} height={15} />
+          </a>
+        )}
+      </div>
+      {account?.data?.bio && (
+        <>
+          <p className="mt-4">{account?.data?.bio}</p>
+          <hr className="text-concrete mt-6" />
+        </>
+      )}
+      <div className="mt-5 text-xs">
+        <TagDetails tagType="status" tags={statusTags} />
+        {member.joinedAt && (
+          <div className="mt-7">
+            <p className="uppercase mb-2">joined since</p>
+            <p className="text-base">{formatDate(member.joinedAt)}</p>
+          </div>
+        )}
+        <TagDetails tagType="roles" tags={roleTags} />
+        <TagDetails tagType="projects" tags={projectTags} />
+        <TagDetails tagType="guilds" tags={guildTags} />
+        <TagDetails tagType="tokens" tags={tokenTags} />
+      </div>
     </div>
+  )
+
+  return (
+    <>
+      <div className="h-full border-l border-concrete hidden sm:col-span-3 sm:block">
+        {selectedContributorCardContent}
+      </div>
+      <Transition.Root show={selectedMemberMobileDrawerIsOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="fixed inset-0 overflow-hidden block sm:hidden"
+          onClose={setSelectedMemberMobileDrawerIsOpen}
+        >
+          <div className="absolute inset-0 overflow-hidden">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-in-out duration-500"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in-out duration-500"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <Dialog.Overlay className="absolute inset-0 bg-tunnel-black bg-opacity-75 transition-opacity" />
+            </Transition.Child>
+
+            <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+              <Transition.Child
+                as={Fragment}
+                enter="transform transition ease-in-out duration-500 sm:duration-700"
+                enterFrom="translate-x-full"
+                enterTo="translate-x-0"
+                leave="transform transition ease-in-out duration-500 sm:duration-700"
+                leaveFrom="translate-x-0"
+                leaveTo="translate-x-full"
+              >
+                <div className="pointer-events-auto w-screen max-w-xs">
+                  <div className="flex h-full flex-col overflow-y-scroll bg-tunnel-black border-l border-concrete">
+                    <div className="px-4">
+                      <>
+                        <div className="flex items-start justify-between w-full">
+                          <div className="flex justify-between h-7 items-center w-full">
+                            <button
+                              className="mt-4 mr-4 text-right"
+                              onClick={() => setSelectedMemberMobileDrawerIsOpen(false)}
+                            >
+                              <Image src={Exit} alt="Close button" width={12} height={12} />
+                            </button>
+                          </div>
+                          <Dialog.Title className="text-lg font-medium text-marble-white"></Dialog.Title>
+                        </div>
+                      </>
+                    </div>
+                    {selectedContributorCardContent}
+                  </div>
+                </div>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
+    </>
   )
 }
 

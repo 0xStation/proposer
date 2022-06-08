@@ -189,7 +189,7 @@ const AccountForm = ({
       }}
       render={({ handleSubmit }) => (
         <form onSubmit={handleSubmit}>
-          <div>
+          <div className="mr-5 sm:mr-0">
             <div className="flex flex-col">
               <label htmlFor="name" className="text-marble-white text-base font-bold">
                 Name*
@@ -261,7 +261,7 @@ const AccountForm = ({
                       {...input}
                       type="text"
                       placeholder="e.g. https://mirror.xyz/mima"
-                      className="h-full inline w-[90%] bg-wet-concrete text-marble-white"
+                      className="h-full inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white"
                     />
                     {/* this error shows up when the user focuses the field (meta.touched) */}
                     {meta.error && meta.touched && (
@@ -280,7 +280,7 @@ const AccountForm = ({
                       {...input}
                       type="text"
                       placeholder="e.g. https://twitter.com/mima"
-                      className="h-full inline w-[90%] bg-wet-concrete text-marble-white"
+                      className="h-full inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white"
                     />
                     {/* this error shows up when the user focuses the field (meta.touched) */}
                     {meta.error && meta.touched && (
@@ -299,7 +299,7 @@ const AccountForm = ({
                       {...input}
                       type="text"
                       placeholder="e.g. https://github.com/mima"
-                      className="h-full inline w-[90%] bg-wet-concrete text-marble-white"
+                      className="h-full inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white"
                     />
                     {/* this error shows up when the user focuses the field (meta.touched) */}
                     {meta.error && meta.touched && (
@@ -318,7 +318,7 @@ const AccountForm = ({
                       {...input}
                       type="text"
                       placeholder="e.g. https://tiktok.com/mima"
-                      className="h-full inline w-[90%] bg-wet-concrete text-marble-white"
+                      className="h-full inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white"
                     />
                     {/* this error shows up when the user focuses the field (meta.touched) */}
                     {meta.error && meta.touched && (
@@ -337,7 +337,7 @@ const AccountForm = ({
                       {...input}
                       type="text"
                       placeholder="e.g. https://instagram.com/mima"
-                      className="h-full inline w-[90%] bg-wet-concrete text-marble-white"
+                      className="h-full inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white"
                     />
                     {/* this error shows up when the user focuses the field (meta.touched) */}
                     {meta.error && meta.touched && (

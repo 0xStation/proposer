@@ -32,11 +32,11 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
   }, [terminal, activeUser?.address])
 
   return (
-    <>
+    <div className="grid md:grid-cols-5">
       <div
-        className={`h-screen w-[300px] bg-tunnel-black border-r border-concrete fixed ${
+        className={`md:h-screen bg-tunnel-black border-r border-concrete ${
           !!tutorial && "z-50"
-        }`}
+        } md:col-span-1`}
       >
         {!!tutorial && <div className="fixed inset-0 bg-tunnel-black opacity-70 z-10"></div>}
         {/* Terminal Profile metadata + Settings icon*/}
@@ -59,7 +59,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
             </p>
           </div>
           {session?.siwe?.address && hasAdminPermissions && (
-            <div className="flex flex-col mt-3 relative">
+            <div className="flex flex-col mt-3 relative mr-2">
               <Link
                 href={
                   !tutorial
@@ -117,8 +117,8 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
           </ul>
         </div>
       </div>
-      <div className="h-screen left-[370px] w-[calc(100%-370px)] fixed">{children}</div>
-    </>
+      <div className="h-screen md:col-span-4">{children}</div>
+    </div>
   )
 }
 

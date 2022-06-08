@@ -52,7 +52,7 @@ const Home: BlitzPage = () => {
         .
       </div>
       <main
-        className="h-screen bg-cover bg-no-repeat"
+        className="h-screen bg-cover bg-no-repeat flex items-center flex-col justify-center"
         style={{ backgroundImage: "url('/station-cover-v2.webp')" }}
       >
         <ConnectWalletComponent />

@@ -26,8 +26,8 @@ export const Navigation = ({
   const activeUser = useStore((state) => state.activeUser)
 
   return (
-    <>
-      <div className="h-screen w-[300px] bg-tunnel-black border-r border-concrete fixed">
+    <div className="grid md:grid-cols-5">
+      <div className="md:h-screen bg-tunnel-black border-r border-concrete md:col-span-1">
         <div className="h-[150px] relative mb-[116px]">
           {account?.data.coverURL ? (
             <img
@@ -145,7 +145,7 @@ export const Navigation = ({
               <p className="inline">Terminals</p>
               {!terminals ||
                 (!terminals.length && (
-                  <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0 origin-left">
+                  <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0">
                     Coming soon
                   </span>
                 ))}
@@ -155,15 +155,15 @@ export const Navigation = ({
                 <Image src={LockedIcon} alt="Locked icon" />
               </div>
               <p className="inline">Proposals</p>
-              <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0 origin-left">
+              <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0">
                 Coming soon
               </span>
             </li>
           </ul>
         </div>
       </div>
-      <div className="h-screen left-[370px] w-[calc(100%-370px)] fixed">{children}</div>
-    </>
+      <div className="h-screen md:col-span-4">{children}</div>
+    </div>
   )
 }
 

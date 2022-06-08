@@ -248,13 +248,13 @@ const DiscordSettingsPage: BlitzPage = () => {
                                         {role.name}
                                       </p>
                                     </div>
-                                    <div>
+                                    <div className="ml-16 sm:ml-0">
                                       <Field name={`${roleId}.type`}>
                                         {({ input }) => (
                                           <div>
                                             <select
                                               {...input}
-                                              className={`bg-tunnel-black w-[200px] ${
+                                              className={`bg-tunnel-black w-[100px] sm:w-[200px] ${
                                                 !cbState?.value
                                                   ? "text-wet-concrete"
                                                   : "text-marble-white"

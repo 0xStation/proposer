@@ -74,7 +74,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
 
   return (
     <LayoutWithoutNavigation>
-      <main className="text-marble-white min-h-screen max-w-screen-sm mx-auto">
+      <main className="text-marble-white min-h-screen max-w-screen-sm sm:mx-auto m-5">
         <div
           className="absolute top-4 left-4 cursor-pointer"
           onClick={() => {
