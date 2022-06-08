@@ -1,6 +1,8 @@
 import { BlitzPage, useQuery, useParam, Image, Link, Routes } from "blitz"
 import { Fragment, useEffect, useState } from "react"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
+import BackArrow from "app/core/icons/BackArrow"
+import ForwardArrow from "app/core/icons/ForwardArrow"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
@@ -10,6 +12,7 @@ import Checkbox from "app/core/components/form/Checkbox"
 import { Form } from "react-final-form"
 import truncateString from "app/core/utils/truncateString"
 import getMembersByTerminalId from "app/accountTerminal/queries/getMembersByTerminalId"
+import getMemberCountByTerminalId from "app/accountTerminal/queries/getMemberCountByTerminalId"
 import { AccountTerminalWithTagsAndAccount } from "app/accountTerminal/types"
 import { formatDate } from "app/core/utils/formatDate"
 import Exit from "public/exit-button.svg"
@@ -24,7 +27,7 @@ import useStore from "app/core/hooks/useStore"
 import { TagType } from "app/tag/types"
 
 interface Filters {
-  [tagType: string]: Set<string>
+  [tagType: string]: Set<number>
 }
 
 const MemberDirectoryPage: BlitzPage = () => {
@@ -34,17 +37,19 @@ const MemberDirectoryPage: BlitzPage = () => {
     { handle: terminalHandle as string },
     { suspense: false, enabled: !!terminalHandle }
   )
-  const [filteredMembers, setFilteredMembers] = useState<AccountTerminalWithTagsAndAccount[]>([])
   // selected user to display in the contributor card
   const [selectedMember, setSelectedMember] = useState<AccountTerminalWithTagsAndAccount>()
   const [selectedMemberMobileDrawerIsOpen, setSelectedMemberMobileDrawerIsOpen] =
     useState<boolean>(false)
 
+  const [page, setPage] = useState<number>(0)
   const setToastState = useStore((state) => state.setToastState)
 
   // filters is a hashmap where the key is the tag type and the value is a Set of strings
   // where the strings are applied filters
   const [filters, setFilters] = useState<Filters>({})
+
+  const paginationTake = 100
 
   /*
   `groupedTags` returns an object where the key
@@ -73,22 +78,42 @@ const MemberDirectoryPage: BlitzPage = () => {
     }
   )
 
-  useEffect(() => {
-    setSelectedMember(filteredMembers[0])
-  }, [filteredMembers])
-
   const [members] = useQuery(
     getMembersByTerminalId,
-    { terminalId: terminal?.id as number },
+    {
+      terminalId: terminal?.id as number,
+      tagGroups: Object.values(filters)
+        .map((set) => Array.from(set))
+        .filter((arr) => arr.length > 0),
+      page: page,
+    },
     {
       suspense: false,
       enabled: !!terminal?.id,
       refetchOnWindowFocus: false,
-      onSuccess: (members: AccountTerminalWithTagsAndAccount[]) => {
-        setFilteredMembers(members)
-      },
     }
   )
+
+  const [memberCount] = useQuery(
+    getMemberCountByTerminalId,
+    {
+      terminalId: terminal?.id as number,
+      tagGroups: Object.values(filters)
+        .map((set) => Array.from(set))
+        .filter((arr) => arr.length > 0),
+    },
+    {
+      suspense: false,
+      enabled: !!terminal?.id,
+      refetchOnWindowFocus: false,
+    }
+  )
+
+  useEffect(() => {
+    if (members) {
+      setSelectedMember(members[0])
+    }
+  }, [members])
 
   const refreshRoles = async () => {
     if (terminal) {
@@ -167,27 +192,56 @@ const MemberDirectoryPage: BlitzPage = () => {
               />
             ) : null}
           </div>
-          <div className="flex ml-6 py-4 space-x-2 flex-wrap">
-            {groupedTags && Object.entries(groupedTags).length ? (
-              Object.entries(groupedTags).map(([tagType, tags], idx) => (
-                <FilterPill
-                  tagType={tagType}
-                  tags={tags}
-                  allMembers={members}
-                  setFilteredMembers={setFilteredMembers}
-                  filters={filters}
-                  key={`${idx}${tagType}`}
+          <div className="flex flex-col sm:flex-row justify-between">
+            <div className="flex ml-6 py-4 space-x-2 flex-wrap">
+              {groupedTags && Object.entries(groupedTags).length ? (
+                Object.entries(groupedTags).map(([tagType, tags], idx) => (
+                  <FilterPill
+                    tagType={tagType}
+                    tags={tags}
+                    filters={filters}
+                    setFilters={setFilters}
+                    setPage={setPage}
+                    key={`${idx}${tagType}`}
+                  />
+                ))
+              ) : (
+                <p className="text-marble-white">View other members in the terminal.</p>
+              )}
+            </div>
+            <div className="ml-6 sm:mr-6 py-4">
+              Showing
+              <span className="text-electric-violet font-bold"> {page * paginationTake + 1} </span>
+              to
+              <span className="text-electric-violet font-bold">
+                {" "}
+                {(page + 1) * paginationTake > memberCount!
+                  ? memberCount
+                  : (page + 1) * paginationTake}{" "}
+              </span>
+              of
+              <span className="font-bold"> {memberCount} </span>
+              members
+              <button className="w-6 ml-2" disabled={page === 0} onClick={() => setPage(page - 1)}>
+                <BackArrow className={`${page === 0 ? "fill-concrete" : "fill-marble-white"}`} />
+              </button>
+              <button
+                disabled={members?.length! < paginationTake}
+                onClick={() => setPage(page + 1)}
+              >
+                <ForwardArrow
+                  className={`${
+                    members?.length! < paginationTake ? "fill-concrete" : "fill-marble-white"
+                  }`}
                 />
-              ))
-            ) : (
-              <p className="text-marble-white">View other members in the terminal.</p>
-            )}
+              </button>
+            </div>
           </div>
         </div>
         <div className="grid grid-cols-7 h-[calc(100vh-130px)] w-full box-border">
           <div className="overflow-y-auto col-span-7 sm:col-span-4">
-            {filteredMembers &&
-              filteredMembers.map((member, idx) => (
+            {members &&
+              members.map((member, idx) => (
                 <ContributorComponent
                   key={`${member.joinedAt}${idx}`}
                   member={member}
@@ -208,53 +262,24 @@ const MemberDirectoryPage: BlitzPage = () => {
   )
 }
 
-const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) => {
+const FilterPill = ({ tagType, tags, filters, setFilters, setPage }) => {
   const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
-
-  // apply filters on accounts
-  const applyFilters = () => {
-    let clearFilters = true
-    // reset directory to show all contributors if no filters are selected
-    Object.entries(filters).map(([tagType, tagFilter]: [string, Set<string>]) => {
-      if (tagFilter.size > 0) {
-        clearFilters = false
-      }
-    })
-    if (clearFilters) {
-      setFilteredMembers(allMembers)
-      return
-    }
-
-    const newFilteredMembers = allMembers.filter((member) => {
-      let meetsFilterRequirements = [] as (boolean | undefined)[]
-
-      Object.entries(filters).map(([tagType, tagFilter]: [string, Set<string>]) => {
-        // member meets the category's filter if:
-        // member has any of the tags in the category's applied filters
-        // or there are no applied filters.
-        const satisfiesFilter =
-          !tagFilter.size ||
-          member.tags.find((accountTerminalTag) => tagFilter.has(accountTerminalTag.tag.value))
-
-        meetsFilterRequirements.push(!!satisfiesFilter)
-      })
-      // if user satisfies all category's filter requirements, show them in the member directory
-      if (meetsFilterRequirements.every((val) => val)) {
-        return member
-      }
-    })
-    setFilteredMembers(newFilteredMembers)
-  }
 
   const handleClearFilters = (e) => {
     e.preventDefault()
 
-    filters[tagType].clear()
+    const tagFilters = filters[tagType]
+    tagFilters.clear()
+
+    setPage(0)
+    setFilters({
+      ...filters,
+      [tagType]: tagFilters,
+    })
 
     // clear filled checkboxes by removing the defaultChecked value
     // bumping the key will reset the uncontrolled component's internal state
     setClearDefaultValue(true)
-    applyFilters()
   }
 
   return (
@@ -298,7 +323,10 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                       return
                     }
                     // grab field selected
-                    const [tagType, tagNames] = Object.entries(field)[0] as [string, any]
+                    const [tagType, tagNames] = Object.entries(field)[0] as [
+                      string,
+                      Record<string, number[]>
+                    ]
                     const tagFilters = filters[tagType]
                     Object.entries(tagNames).forEach(([tagName, value]) => {
                       // remove tag if de-selected
@@ -306,11 +334,15 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                         tagFilters.delete(tagName)
                       } else if (value) {
                         // add tag if selected
-                        tagFilters.add(tagName)
+                        tagFilters.add(value[0])
                       }
                     })
 
-                    applyFilters()
+                    setPage(0)
+                    setFilters({
+                      ...filters,
+                      [tagType]: tagFilters,
+                    })
                   }}
                   render={({ form, handleSubmit }) => {
                     return (
@@ -320,8 +352,9 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                             return (
                               <div className="flex-row" key={`${clearDefaultValue}${tag.value}`}>
                                 <Checkbox
+                                  value={tag.id}
                                   name={`${tag.type}.${tag.value}`}
-                                  defaultChecked={filters[tag.type].has(tag.value)}
+                                  defaultChecked={filters[tag.type].has(tag.id)}
                                   className="align-middle"
                                 />
                                 <p className="p-0.5 align-middle mx-4 inline leading-none">

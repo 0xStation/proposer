@@ -127,9 +127,9 @@ export const Navigation = ({
           ) : null}
         </div>
         <div>
-          <ul className="mt-6 ml-8 text-lg md:space-y-2 md:space-x-0 space-x-8 overflow-x-scroll">
+          <ul className="mt-6 ml-8 text-lg space-y-2">
             <li
-              className={`cursor-pointer group inline md:block${
+              className={`cursor-pointer group ${
                 terminals && terminals?.length
                   ? "hover:text-marble-white font-bold"
                   : "text-concrete"
@@ -145,17 +145,17 @@ export const Navigation = ({
               <p className="inline">Terminals</p>
               {!terminals ||
                 (!terminals.length && (
-                  <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0 hidden sm:inline">
+                  <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0">
                     Coming soon
                   </span>
                 ))}
             </li>
-            <li className="text-concrete cursor-pointer group inline md:block">
+            <li className="text-concrete cursor-pointer group">
               <div className="inline mr-5 align-middle">
                 <Image src={LockedIcon} alt="Locked icon" />
               </div>
               <p className="inline">Proposals</p>
-              <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0 hidden sm:inline">
+              <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0">
                 Coming soon
               </span>
             </li>

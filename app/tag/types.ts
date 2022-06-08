@@ -9,13 +9,15 @@ export enum TagType {
 export enum TokenType {
   ERC20 = "ERC20",
   ERC721 = "ERC721",
-  // assume no ERC1155 type for now
+  ERC1155 = "ERC1155",
 }
 
 export type TagTokenMetadata = {
   chainId: number
   address: string
   type: TokenType
+  name: string
+  symbol: string
 }
 
 export type Tag = {
