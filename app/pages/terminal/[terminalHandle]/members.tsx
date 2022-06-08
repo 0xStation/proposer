@@ -209,7 +209,7 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <p className="text-marble-white">View other members in the terminal.</p>
               )}
             </div>
-            <div className="ml-6 sm:mr-6 py-4">
+            <div className="ml-6 sm:mr-6 py-4 text-sm">
               Showing
               <span className="text-electric-violet font-bold"> {page * paginationTake + 1} </span>
               to
