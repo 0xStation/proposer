@@ -1,5 +1,6 @@
 import { BlitzPage, useQuery, useParam, Image, Link, Routes } from "blitz"
 import { Fragment, useEffect, useState } from "react"
+import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import BackArrow from "app/core/icons/BackArrow"
 import ForwardArrow from "app/core/icons/ForwardArrow"
@@ -418,6 +419,9 @@ const ContributorComponent = ({
               src={account.data.pfpURL}
               alt="PFP"
               className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_PFP_URLS.USER
+              }}
             />
           ) : (
             <div className="h-[46px] min-w-[46px] place-self-center border border-wet-concrete bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
@@ -478,6 +482,9 @@ const SelectedContributorCard = ({
                 src={account.data.pfpURL}
                 alt="PFP"
                 className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete hover:border-marble-white"
+                onError={(e) => {
+                  e.currentTarget.src = DEFAULT_PFP_URLS.USER
+                }}
               />
             ) : (
               <div className="h-[46px] w-[46px] place-self-center border border-wet-concrete hover:border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />

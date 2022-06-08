@@ -13,6 +13,7 @@ import useLocalStorage from "app/core/hooks/useLocalStorage"
 import useStore from "app/core/hooks/useStore"
 import { Auth } from "app/auth/types"
 import { Account } from "app/account/types"
+import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
@@ -149,6 +150,9 @@ const TerminalComponent = ({
               src={terminal.data.pfpURL}
               alt="Terminal PFP"
               className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
+              }}
             />
           ) : (
             <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red" />
@@ -201,6 +205,9 @@ const SelectedTerminalCard = ({
                 src={terminal.data.pfpURL}
                 alt="Terminal PFP"
                 className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete hover:border-marble-white"
+                onError={(e) => {
+                  e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
+                }}
               />
             ) : (
               <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red hover:border-marble-white" />

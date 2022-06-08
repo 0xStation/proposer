@@ -15,6 +15,7 @@ import LockedIcon from "public/locked-icon.svg"
 import Exit from "/public/exit-button.svg"
 import getTerminalByHandle from "../queries/getTerminalByHandle"
 import useStore from "app/core/hooks/useStore"
+import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 
 const TerminalNavigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -46,6 +47,9 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
               src={terminal?.data.pfpURL}
               alt="Terminal PFP"
               className="min-w-[41px] max-w-[41px] h-[41px] rounded-md cursor-pointer border border-wet-concrete mr-2"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
+              }}
             />
           ) : (
             <span className="w-[41px] h-[41px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red mr-2" />

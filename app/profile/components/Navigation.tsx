@@ -10,6 +10,7 @@ import InstagramIcon from "public/instagram-icon.svg"
 import TikTokIcon from "public/tiktok-icon.svg"
 import { Terminal } from "app/terminal/types"
 import { Account } from "app/account/types"
+import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 
 export const Navigation = ({
   account,
@@ -34,6 +35,9 @@ export const Navigation = ({
               alt="The user's cover photo."
               src={account?.data.coverURL}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_PFP_URLS.USER
+              }}
             />
           ) : (
             <div className="bg-gradient-to-b object-cover from-electric-violet to-magic-mint h-full w-full"></div>
@@ -43,6 +47,9 @@ export const Navigation = ({
               src={account?.data.pfpURL}
               alt="The user's profile picture."
               className="bg-gradient-to-b from-electric-violet to-magic-mint w-[142px] h-[142px] border-4 border-tunnel-black rounded-full absolute bottom-[-100px] left-0 right-0 mx-auto"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_PFP_URLS.USER
+              }}
             />
           ) : (
             <div className="bg-gradient-to-b from-electric-violet to-magic-mint w-[142px] h-[142px] border-4 border-tunnel-black rounded-full absolute bottom-[-100px] left-0 right-0 mx-auto"></div>

@@ -10,6 +10,7 @@ import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
 import { TerminalMetadata } from "app/terminal/types"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import createAccount from "app/account/mutations/createAccount"
+import { DEFAULT_PFP_URLS } from "../utils/constants"
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -65,6 +66,9 @@ const Navigation = ({ children }: { children?: any }) => {
             src={activeUser?.data.pfpURL}
             alt="PFP"
             className={"w-[46px] h-[46px] rounded-full cursor-pointer"}
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_PFP_URLS.USER
+            }}
           />
         </div>
         <div className="text-xs text-light-concrete flex mt-1">
@@ -168,6 +172,9 @@ const TerminalIcon = ({ terminal }) => {
           <img
             className="object-fill w-[46px] h-[46px]"
             src={(terminal?.data as TerminalMetadata)?.pfpURL}
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
+            }}
           />
         ) : (
           <span className="w-[46px] h-[46px] bg-gradient-to-b  from-neon-blue to-torch-red block" />
