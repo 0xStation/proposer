@@ -35,7 +35,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
     <div className="grid md:grid-cols-5">
       <div
         className={`md:h-screen bg-tunnel-black border-r border-concrete ${
-          !!tutorial && "z-50"
+          !!tutorial && "z-40"
         } md:col-span-1`}
       >
         {!!tutorial && <div className="fixed inset-0 bg-tunnel-black opacity-70 z-10"></div>}

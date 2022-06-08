@@ -100,7 +100,7 @@ const Navigation = ({ children }: { children?: any }) => {
       {/* Need a parent element around the banner or else there's a chance for a hydration issue and the dom rearranges */}
       <div>
         {!session?.siwe?.address && (
-          <div className="w-full h-36 lg:h-[70px] fixed z-[60] bg-wet-concrete bottom-0">
+          <div className="w-full h-36 lg:h-[70px] fixed z-40 bg-wet-concrete bottom-0">
             <div className="fixed mt-2 left-1/3 ml-[-6.65rem]">
               <h2 className="inline-block mr-5 text-xl font-bold justify-center">
                 {!address ? "Be recognized in your community" : "Sign"}
