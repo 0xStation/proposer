@@ -18,7 +18,7 @@ import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import { canEdit } from "app/core/utils/permissions"
 import { EditPermissionTypes } from "app/core/utils/constants"
-import { mustBeUnderNumCharacters } from "app/utils/validators"
+import { composeValidators, mustBeUnderNumCharacters, requiredField } from "app/utils/validators"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 
 // maybe we can break this out into it's own component?
@@ -154,9 +154,12 @@ const TerminalSettingsPage: BlitzPage = () => {
                       <div className="p-6 border-b border-concrete flex justify-between">
                         <h2 className="text-marble-white text-2xl font-bold">Terminal overview</h2>
                         <button
-                          className={`rounded text-tunnel-black px-8 ${
-                            formState.hasValidationErrors ? "bg-light-concrete" : "bg-magic-mint"
+                          className={`rounded text-tunnel-black px-8 bg-magic-mint ${
+                            formState.hasValidationErrors || !formState.dirty
+                              ? "opacity-70 cursor-not-allowed"
+                              : ""
                           }`}
+                          disabled={formState.hasValidationErrors || !formState.dirty}
                           type="submit"
                         >
                           Save
@@ -170,7 +173,10 @@ const TerminalSettingsPage: BlitzPage = () => {
                             <Field
                               name="name"
                               component="input"
-                              validate={mustBeUnderNumCharacters(50)}
+                              validate={composeValidators(
+                                mustBeUnderNumCharacters(50),
+                                requiredField
+                              )}
                               className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
                             />
                             <span className="text-torch-red text-xs">{errors?.name}</span>
@@ -179,7 +185,10 @@ const TerminalSettingsPage: BlitzPage = () => {
                             <Field
                               name="handle"
                               component="input"
-                              validate={mustBeUnderNumCharacters(50)}
+                              validate={composeValidators(
+                                mustBeUnderNumCharacters(50),
+                                requiredField
+                              )}
                               className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-6"
                             />
                             <span className="text-torch-red text-xs">{errors?.handle}</span>

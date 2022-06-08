@@ -204,10 +204,11 @@ const DiscordSettingsPage: BlitzPage = () => {
                       <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
                       <div>
                         <button
-                          className={`rounded text-tunnel-black px-8 h-full ${
-                            formState.dirty ? "bg-magic-mint" : "bg-concrete"
+                          className={`rounded text-tunnel-black px-8 h-full bg-magic-mint ${
+                            formState.dirty ? "" : "opacity-70 cursor-not-allowed"
                           }`}
                           type="submit"
+                          disabled={!formState.dirty}
                         >
                           Save
                         </button>
