@@ -200,10 +200,10 @@ const SelectedTerminalCard = ({
               <img
                 src={terminal.data.pfpURL}
                 alt="Terminal PFP"
-                className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
+                className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete hover:border-marble-white"
               />
             ) : (
-              <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red" />
+              <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red hover:border-marble-white" />
             )}
           </Link>
         </div>
@@ -232,67 +232,65 @@ const SelectedTerminalCard = ({
   )
 
   return (
-    <div className="h-full border-l border-concrete col-span-3">
-      <>
-        <div className="h-full border-l border-concrete hidden sm:col-span-3 sm:block">
-          {selectedTerminalCardContent}
-        </div>
-        <Transition.Root show={mobileTerminalDrawerIsOpen} as={Fragment}>
-          <Dialog
-            as="div"
-            className="fixed inset-0 overflow-hidden block sm:hidden"
-            onClose={setMobileTerminalDrawerIsOpen}
-          >
-            <div className="absolute inset-0 overflow-hidden">
+    <>
+      <div className="h-full border-l border-concrete hidden sm:col-span-3 sm:block">
+        {selectedTerminalCardContent}
+      </div>
+      <Transition.Root show={mobileTerminalDrawerIsOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="fixed inset-0 overflow-hidden block sm:hidden"
+          onClose={setMobileTerminalDrawerIsOpen}
+        >
+          <div className="absolute inset-0 overflow-hidden">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-in-out duration-500"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in-out duration-500"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <Dialog.Overlay className="absolute inset-0 bg-tunnel-black bg-opacity-75 transition-opacity" />
+            </Transition.Child>
+
+            <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
               <Transition.Child
                 as={Fragment}
-                enter="ease-in-out duration-500"
-                enterFrom="opacity-0"
-                enterTo="opacity-100"
-                leave="ease-in-out duration-500"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
+                enter="transform transition ease-in-out duration-500 sm:duration-700"
+                enterFrom="translate-x-full"
+                enterTo="translate-x-0"
+                leave="transform transition ease-in-out duration-500 sm:duration-700"
+                leaveFrom="translate-x-0"
+                leaveTo="translate-x-full"
               >
-                <Dialog.Overlay className="absolute inset-0 bg-tunnel-black bg-opacity-75 transition-opacity" />
-              </Transition.Child>
-
-              <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
-                <Transition.Child
-                  as={Fragment}
-                  enter="transform transition ease-in-out duration-500 sm:duration-700"
-                  enterFrom="translate-x-full"
-                  enterTo="translate-x-0"
-                  leave="transform transition ease-in-out duration-500 sm:duration-700"
-                  leaveFrom="translate-x-0"
-                  leaveTo="translate-x-full"
-                >
-                  <div className="pointer-events-auto w-screen max-w-xs">
-                    <div className="flex h-full flex-col overflow-y-scroll bg-tunnel-black border-l border-concrete">
-                      <div className="px-4">
-                        <>
-                          <div className="flex items-start justify-between w-full">
-                            <div className="flex justify-between h-7 items-center w-full">
-                              <button
-                                className="mt-4 mr-4 text-right"
-                                onClick={() => setMobileTerminalDrawerIsOpen(false)}
-                              >
-                                <Image src={Exit} alt="Close button" width={12} height={12} />
-                              </button>
-                            </div>
-                            <Dialog.Title className="text-lg font-medium text-marble-white"></Dialog.Title>
+                <div className="pointer-events-auto w-screen max-w-xs">
+                  <div className="flex h-full flex-col overflow-y-scroll bg-tunnel-black border-l border-concrete">
+                    <div className="px-4">
+                      <>
+                        <div className="flex items-start justify-between w-full">
+                          <div className="flex justify-between h-7 items-center w-full">
+                            <button
+                              className="mt-4 mr-4 text-right"
+                              onClick={() => setMobileTerminalDrawerIsOpen(false)}
+                            >
+                              <Image src={Exit} alt="Close button" width={12} height={12} />
+                            </button>
                           </div>
-                        </>
-                      </div>
-                      {selectedTerminalCardContent}
+                          <Dialog.Title className="text-lg font-medium text-marble-white"></Dialog.Title>
+                        </div>
+                      </>
                     </div>
+                    {selectedTerminalCardContent}
                   </div>
-                </Transition.Child>
-              </div>
+                </div>
+              </Transition.Child>
             </div>
-          </Dialog>
-        </Transition.Root>
-      </>
-    </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
+    </>
   )
 }
 
