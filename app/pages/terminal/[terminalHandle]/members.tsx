@@ -199,16 +199,19 @@ const MemberDirectoryPage: BlitzPage = () => {
           <div className="flex flex-col sm:flex-row justify-between">
             <div className="flex ml-6 py-4 space-x-2 flex-wrap">
               {groupedTags && Object.entries(groupedTags).length ? (
-                Object.entries(groupedTags).map(([tagType, tags], idx) => (
-                  <FilterPill
-                    tagType={tagType}
-                    tags={tags}
-                    filters={filters}
-                    setFilters={setFilters}
-                    setPage={setPage}
-                    key={`${idx}${tagType}`}
-                  />
-                ))
+                [TagType.STATUS, TagType.ROLE, TagType.PROJECT, TagType.GUILD, TagType.TOKEN].map(
+                  (tagType, idx) =>
+                    groupedTags[tagType] && (
+                      <FilterPill
+                        tagType={tagType}
+                        tags={groupedTags[tagType]}
+                        filters={filters}
+                        setFilters={setFilters}
+                        setPage={setPage}
+                        key={`${idx}${tagType}`}
+                      />
+                    )
+                )
               ) : (
                 <p className="text-marble-white">View other members in the terminal.</p>
               )}
