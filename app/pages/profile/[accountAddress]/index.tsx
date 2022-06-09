@@ -17,6 +17,7 @@ import { TagType } from "app/tag/types"
 import { Dialog, Transition } from "@headlessui/react"
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
+import useKeyPress from "app/core/hooks/useKeyPress"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
@@ -78,6 +79,38 @@ const ProfileHome: BlitzPage = () => {
     }
   }, [account, activeUser, discordAuthToken?.authorization])
 
+  const downPress = useKeyPress("ArrowDown")
+  const upPress = useKeyPress("ArrowUp")
+  const enterPress = useKeyPress("Enter")
+  const [cursor, setCursor] = useState(0)
+  const [hovered, setHovered] = useState(undefined)
+
+  useEffect(() => {
+    if (terminals?.length && downPress) {
+      setCursor((prevState) => (prevState < terminals?.length - 1 ? prevState + 1 : prevState))
+      setSelectedTerminal(terminals[cursor] ?? null)
+    }
+  }, [downPress])
+
+  useEffect(() => {
+    if (terminals?.length && upPress) {
+      setCursor((prevState) => (prevState > 0 ? prevState - 1 : prevState))
+      setSelectedTerminal(terminals[cursor] ?? null)
+    }
+  }, [upPress])
+
+  useEffect(() => {
+    if (terminals?.length && enterPress) {
+      setSelectedTerminal(terminals[cursor] ?? null)
+    }
+  }, [cursor, enterPress])
+
+  useEffect(() => {
+    if (terminals?.length && hovered) {
+      setCursor(terminals?.indexOf(hovered))
+    }
+  }, [hovered])
+
   return (
     <Layout
       title={`${
@@ -113,6 +146,7 @@ const ProfileHome: BlitzPage = () => {
                       selectedTerminal={selectedTerminal}
                       setSelectedTerminal={setSelectedTerminal}
                       setMobileTerminalDrawerIsOpen={setMobileTerminalDrawerIsOpen}
+                      setHovered={setHovered}
                     />
                   ))}
               </div>
@@ -170,6 +204,7 @@ const TerminalComponent = ({
   selectedTerminal,
   setSelectedTerminal,
   setMobileTerminalDrawerIsOpen,
+  setHovered,
 }) => {
   return (
     <div
@@ -181,6 +216,8 @@ const TerminalComponent = ({
         setSelectedTerminal(terminal)
         setMobileTerminalDrawerIsOpen(true)
       }}
+      onMouseEnter={() => setHovered(terminal)}
+      onMouseLeave={() => setHovered(undefined)}
     >
       <div className="flex space-x-2">
         <div className="flex flex-col content-center align-middle mr-1">
