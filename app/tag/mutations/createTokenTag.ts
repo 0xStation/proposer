@@ -36,7 +36,7 @@ export default async function createTokenTag(input: z.infer<typeof CreateTokenTa
         ? "http://localhost:3000"
         : "https://app.station.express"
 
-    await fetch(`${baseUrl}/api/discord/sync-roles`, {
+    await fetch(`${baseUrl}/api/discord/sync-tokens`, {
       method: "POST",
       body: JSON.stringify({
         terminalId: params.terminalId,
