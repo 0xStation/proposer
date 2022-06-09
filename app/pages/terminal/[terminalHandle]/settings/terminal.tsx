@@ -17,7 +17,7 @@ import UploadIcon from "app/core/icons/UploadIcon"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import { canEdit } from "app/core/utils/permissions"
-import { EditPermissionTypes } from "app/core/utils/constants"
+import { DEFAULT_PFP_URLS, EditPermissionTypes } from "app/core/utils/constants"
 import { composeValidators, mustBeUnderNumCharacters, requiredField } from "app/utils/validators"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 
@@ -43,17 +43,18 @@ const PfpInput = ({ pfpURL, onUpload }) => {
     <div className="flex-col">
       <label className="font-bold text-base">PFP</label>
       <div
-        className="w-24 h-24 border rounded-xl bg-gradient-to-b object-cover from-neon-blue to-torch-red border-concrete flex items-center justify-center cursor-pointer mt-2"
+        className="w-24 h-24 border rounded-xl border-wet-concrete flex items-center justify-center cursor-pointer mt-2"
         {...getRootProps()}
       >
         <>
-          {pfpURL && (
-            <img
-              alt="Profile picture uploaded by the user."
-              src={pfpURL}
-              className="w-full h-full rounded-xl"
-            />
-          )}
+          <img
+            alt="Profile picture uploaded by the user."
+            src={pfpURL}
+            className="w-full h-full rounded-xl object-cover"
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
+            }}
+          />
           <span className="absolute z-10">
             <UploadIcon />
           </span>
