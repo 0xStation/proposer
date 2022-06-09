@@ -45,6 +45,7 @@ const MemberDirectoryPage: BlitzPage = () => {
 
   const [page, setPage] = useState<number>(0)
   const setToastState = useStore((state) => state.setToastState)
+  const [isContributorsLoading, setIsContributorsLoading] = useState<boolean>(false)
 
   // filters is a hashmap where the key is the tag type and the value is a Set of strings
   // where the strings are applied filters
@@ -123,6 +124,7 @@ const MemberDirectoryPage: BlitzPage = () => {
 
   const refreshRoles = async () => {
     if (terminal) {
+      setIsContributorsLoading(true)
       const response = await fetch("/api/discord/sync-roles", {
         method: "POST",
         body: JSON.stringify({
@@ -131,6 +133,7 @@ const MemberDirectoryPage: BlitzPage = () => {
       })
 
       if (response.status !== 200) {
+        setIsContributorsLoading(false)
         setToastState({
           isToastShowing: true,
           type: "error",
@@ -142,6 +145,7 @@ const MemberDirectoryPage: BlitzPage = () => {
       refetchMembers()
       refetchMemberCount()
 
+      setIsContributorsLoading(false)
       setToastState({
         isToastShowing: true,
         type: "success",
@@ -191,14 +195,20 @@ const MemberDirectoryPage: BlitzPage = () => {
           <div className="flex flex-row items-center ml-6 pt-7">
             <h1 className="text-2xl font-bold">Members</h1>
             {groupedTags && Object.entries(groupedTags).length ? (
-              <RefreshIcon
-                className="h-5 w-5 ml-2 mt-1 cursor-pointer"
-                aria-hidden="true"
+              <button
                 onClick={() => {
                   refreshRoles()
                   refreshTokens()
                 }}
-              />
+                disabled={isContributorsLoading}
+              >
+                <RefreshIcon
+                  className={`h-5 w-5 ml-2 mt-1 hover:stroke-concrete ${
+                    isContributorsLoading ? "cursor-not-allowed" : "cursor-pointer"
+                  }`}
+                  aria-hidden="true"
+                />
+              </button>
             ) : null}
           </div>
           <div className="flex flex-col sm:flex-row justify-between items-center">
@@ -252,16 +262,23 @@ const MemberDirectoryPage: BlitzPage = () => {
         </div>
         <div className="grid grid-cols-7 h-[calc(100vh-130px)] w-full box-border">
           <div className="overflow-y-auto col-span-7 sm:col-span-4">
-            {members &&
-              members.map((member, idx) => (
-                <ContributorComponent
-                  key={`${member.joinedAt}${idx}`}
-                  member={member}
-                  selectedMember={selectedMember}
-                  setSelectedMember={setSelectedMember}
-                  setSelectedMemberMobileDrawerIsOpen={setSelectedMemberMobileDrawerIsOpen}
-                />
-              ))}
+            {members && !isContributorsLoading
+              ? members.map((member, idx) => (
+                  <ContributorComponent
+                    key={`${member.joinedAt}${idx}`}
+                    member={member}
+                    selectedMember={selectedMember}
+                    setSelectedMember={setSelectedMember}
+                    setSelectedMemberMobileDrawerIsOpen={setSelectedMemberMobileDrawerIsOpen}
+                  />
+                ))
+              : Array.from(Array(15)).map((idx) => (
+                  <div
+                    key={idx}
+                    tabIndex={0}
+                    className={`flex flex-row space-x-52 p-3 mx-3 mt-3 rounded-lg bg-wet-concrete shadow border-solid h-[70px] motion-safe:animate-pulse`}
+                  />
+                ))}
           </div>
           <SelectedContributorCard
             member={selectedMember}
