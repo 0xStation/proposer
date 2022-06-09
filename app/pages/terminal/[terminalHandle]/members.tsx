@@ -61,7 +61,7 @@ const MemberDirectoryPage: BlitzPage = () => {
     role: [tag1, ...., tagn],
   }
   */
-  const [groupedTags] = useQuery(
+  const [groupedTags, { refetch: refetchGroupedTags }] = useQuery(
     getGroupedTagsByTerminalId,
     { terminalId: terminal?.id as number },
     {
@@ -79,7 +79,7 @@ const MemberDirectoryPage: BlitzPage = () => {
     }
   )
 
-  const [members] = useQuery(
+  const [members, { refetch: refetchMembers }] = useQuery(
     getMembersByTerminalId,
     {
       terminalId: terminal?.id as number,
@@ -95,7 +95,7 @@ const MemberDirectoryPage: BlitzPage = () => {
     }
   )
 
-  const [memberCount] = useQuery(
+  const [memberCount, { refetch: refetchMemberCount }] = useQuery(
     getMemberCountByTerminalId,
     {
       terminalId: terminal?.id as number,
@@ -133,6 +133,9 @@ const MemberDirectoryPage: BlitzPage = () => {
         })
         return
       }
+      refetchGroupedTags()
+      refetchMembers()
+      refetchMemberCount()
 
       setToastState({
         isToastShowing: true,

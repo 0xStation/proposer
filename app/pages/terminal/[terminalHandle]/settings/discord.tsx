@@ -205,7 +205,9 @@ const DiscordSettingsPage: BlitzPage = () => {
                       <div>
                         <button
                           className={`rounded text-tunnel-black px-8 h-full bg-magic-mint ${
-                            formState.dirty ? "" : "opacity-70 cursor-not-allowed"
+                            formState.dirty
+                              ? "hover:bg-opacity-70"
+                              : "opacity-50 cursor-not-allowed"
                           }`}
                           type="submit"
                           disabled={!formState.dirty}

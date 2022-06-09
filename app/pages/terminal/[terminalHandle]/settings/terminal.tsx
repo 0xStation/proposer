@@ -156,8 +156,8 @@ const TerminalSettingsPage: BlitzPage = () => {
                         <button
                           className={`rounded text-tunnel-black px-8 bg-magic-mint ${
                             formState.hasValidationErrors || !formState.dirty
-                              ? "opacity-70 cursor-not-allowed"
-                              : ""
+                              ? "opacity-50 cursor-not-allowed"
+                              : "hover:bg-opacity-70"
                           }`}
                           disabled={formState.hasValidationErrors || !formState.dirty}
                           type="submit"
