@@ -6,6 +6,7 @@ import truncateString from "../utils/truncateString"
 import { useDisconnect } from "wagmi"
 import useStore from "../hooks/useStore"
 import logout from "app/session/mutations/logout"
+import { DEFAULT_PFP_URLS } from "../utils/constants"
 
 export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
   const router = useRouter()
@@ -63,6 +64,9 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
             src={activeUser.data.pfpURL}
             alt="PFP"
             className={"w-[46px] h-[46px] rounded-full cursor-pointer"}
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_PFP_URLS.USER
+            }}
           />
         </div>
       </>

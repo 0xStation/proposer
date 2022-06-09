@@ -58,3 +58,8 @@ export const PROFILE_TABS = {
   INITIATIVES: "INITIATIVES",
   TERMINALS: "TERMINALS",
 }
+
+export const DEFAULT_PFP_URLS = {
+  USER: "https://station-images.nyc3.digitaloceanspaces.com/pfp-gradient.png",
+  TERMINAL: "https://station-images.nyc3.digitaloceanspaces.com/terminal-gradient.png",
+}

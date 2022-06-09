@@ -16,6 +16,8 @@ import { Account } from "app/account/types"
 import { TagType } from "app/tag/types"
 import { Dialog, Transition } from "@headlessui/react"
 import truncateString from "app/core/utils/truncateString"
+import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
+import useKeyPress from "app/core/hooks/useKeyPress"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
@@ -77,6 +79,38 @@ const ProfileHome: BlitzPage = () => {
     }
   }, [account, activeUser, discordAuthToken?.authorization])
 
+  const downPress = useKeyPress("ArrowDown")
+  const upPress = useKeyPress("ArrowUp")
+  const enterPress = useKeyPress("Enter")
+  const [cursor, setCursor] = useState(0)
+  const [hovered, setHovered] = useState(undefined)
+
+  useEffect(() => {
+    if (terminals?.length && downPress) {
+      setCursor((prevState) => (prevState < terminals?.length - 1 ? prevState + 1 : prevState))
+      setSelectedTerminal(terminals[cursor] ?? null)
+    }
+  }, [downPress])
+
+  useEffect(() => {
+    if (terminals?.length && upPress) {
+      setCursor((prevState) => (prevState > 0 ? prevState - 1 : prevState))
+      setSelectedTerminal(terminals[cursor] ?? null)
+    }
+  }, [upPress])
+
+  useEffect(() => {
+    if (terminals?.length && enterPress) {
+      setSelectedTerminal(terminals[cursor] ?? null)
+    }
+  }, [cursor, enterPress])
+
+  useEffect(() => {
+    if (terminals?.length && hovered) {
+      setCursor(terminals?.indexOf(hovered))
+    }
+  }, [hovered])
+
   return (
     <Layout
       title={`${
@@ -112,6 +146,7 @@ const ProfileHome: BlitzPage = () => {
                       selectedTerminal={selectedTerminal}
                       setSelectedTerminal={setSelectedTerminal}
                       setMobileTerminalDrawerIsOpen={setMobileTerminalDrawerIsOpen}
+                      setHovered={setHovered}
                     />
                   ))}
               </div>
@@ -169,6 +204,7 @@ const TerminalComponent = ({
   selectedTerminal,
   setSelectedTerminal,
   setMobileTerminalDrawerIsOpen,
+  setHovered,
 }) => {
   return (
     <div
@@ -180,6 +216,8 @@ const TerminalComponent = ({
         setSelectedTerminal(terminal)
         setMobileTerminalDrawerIsOpen(true)
       }}
+      onMouseEnter={() => setHovered(terminal)}
+      onMouseLeave={() => setHovered(undefined)}
     >
       <div className="flex space-x-2">
         <div className="flex flex-col content-center align-middle mr-1">
@@ -188,6 +226,9 @@ const TerminalComponent = ({
               src={terminal.data.pfpURL}
               alt="Terminal PFP"
               className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
+              }}
             />
           ) : (
             <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red" />
@@ -241,10 +282,13 @@ const SelectedTerminalCard = ({
               <img
                 src={terminal.data.pfpURL}
                 alt="Terminal PFP"
-                className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete"
+                className="min-w-[46px] max-w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete hover:border-marble-white"
+                onError={(e) => {
+                  e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
+                }}
               />
             ) : (
-              <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red" />
+              <span className="w-[46px] h-[46px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red hover:border-marble-white" />
             )}
           </Link>
         </div>
@@ -257,11 +301,11 @@ const SelectedTerminalCard = ({
           </div>
         </div>
       </div>
-      <div className="mt-9 text-xs">
+      <div className="mt-7 text-xs">
         <TagDetails tagType="status" tags={statusTags} />
         {membership.joinedAt && (
-          <div className="mt-7">
-            <p className="uppercase mb-3">joined since</p>
+          <div className="mt-5">
+            <p className="uppercase mb-2">joined since</p>
             <p className="text-base">{formatDate(membership.joinedAt)}</p>
           </div>
         )}
@@ -340,16 +384,16 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
   if (!tags.length) return null
 
   return (
-    <div className="mt-7">
-      <p className="uppercase mb-3">
+    <div className="mt-5">
+      <p className="uppercase">
         {tags.length > 1 || tagType === "status" ? tagType : tagType.slice(0, -1)}
       </p>
-      <div className="flex-row space-y-2 align-left mr-2">
+      <div className="flex-row mt-2 align-left mr-2">
         {tags?.map((accountTerminalTag) => {
           return (
             <span
               key={accountTerminalTag.tag.value}
-              className="rounded-full py-1 px-3 mr-2 bg-wet-concrete uppercase font-bold inline-block"
+              className="rounded-full py-1 px-3 mr-2 mb-2 bg-wet-concrete uppercase font-bold inline-block"
             >
               {accountTerminalTag.tag.value}
             </span>

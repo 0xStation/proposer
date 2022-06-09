@@ -98,7 +98,9 @@ export default async function handler(req, res) {
         return {
           discordId: guildMember.user.id,
           data: {
-            name: guildMember.nick || guildMember.user.username,
+            name:
+              `${guildMember.user.username}#${guildMember.user.discriminator}` ||
+              guildMember.user.nick,
             pfpURL: guildMember.user.avatar
               ? `https://cdn.discordapp.com/avatars/${guildMember.user.id}/${guildMember.user.avatar}.png`
               : undefined,

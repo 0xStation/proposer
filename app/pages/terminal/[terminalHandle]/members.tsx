@@ -1,5 +1,6 @@
 import { BlitzPage, useQuery, useParam, Image, Link, Routes } from "blitz"
 import { Fragment, useEffect, useState } from "react"
+import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import BackArrow from "app/core/icons/BackArrow"
 import ForwardArrow from "app/core/icons/ForwardArrow"
@@ -22,9 +23,10 @@ import PersonalSiteIcon from "public/personal-site-icon.svg"
 import InstagramIcon from "public/instagram-icon.svg"
 import TikTokIcon from "public/tiktok-icon.svg"
 import { toTitleCase } from "app/core/utils/titleCase"
-import { RefreshIcon } from "@heroicons/react/outline"
+import { RefreshIcon, ClipboardIcon, ClipboardCheckIcon } from "@heroicons/react/outline"
 import useStore from "app/core/hooks/useStore"
 import { TagType } from "app/tag/types"
+import useKeyPress from "app/core/hooks/useKeyPress"
 
 interface Filters {
   [tagType: string]: Set<number>
@@ -44,12 +46,13 @@ const MemberDirectoryPage: BlitzPage = () => {
 
   const [page, setPage] = useState<number>(0)
   const setToastState = useStore((state) => state.setToastState)
+  const [isContributorsLoading, setIsContributorsLoading] = useState<boolean>(false)
 
   // filters is a hashmap where the key is the tag type and the value is a Set of strings
   // where the strings are applied filters
   const [filters, setFilters] = useState<Filters>({})
 
-  const paginationTake = 100
+  const PAGINATION_TAKE = 50
 
   /*
   `groupedTags` returns an object where the key
@@ -60,7 +63,7 @@ const MemberDirectoryPage: BlitzPage = () => {
     role: [tag1, ...., tagn],
   }
   */
-  const [groupedTags] = useQuery(
+  const [groupedTags, { refetch: refetchGroupedTags }] = useQuery(
     getGroupedTagsByTerminalId,
     { terminalId: terminal?.id as number },
     {
@@ -78,7 +81,7 @@ const MemberDirectoryPage: BlitzPage = () => {
     }
   )
 
-  const [members] = useQuery(
+  const [members, { refetch: refetchMembers }] = useQuery(
     getMembersByTerminalId,
     {
       terminalId: terminal?.id as number,
@@ -86,6 +89,7 @@ const MemberDirectoryPage: BlitzPage = () => {
         .map((set) => Array.from(set))
         .filter((arr) => arr.length > 0),
       page: page,
+      paginationTake: PAGINATION_TAKE,
     },
     {
       suspense: false,
@@ -94,7 +98,7 @@ const MemberDirectoryPage: BlitzPage = () => {
     }
   )
 
-  const [memberCount] = useQuery(
+  const [memberCount, { refetch: refetchMemberCount }] = useQuery(
     getMemberCountByTerminalId,
     {
       terminalId: terminal?.id as number,
@@ -109,6 +113,42 @@ const MemberDirectoryPage: BlitzPage = () => {
     }
   )
 
+  const downPress = useKeyPress("ArrowDown")
+  const upPress = useKeyPress("ArrowUp")
+  const enterPress = useKeyPress("Enter")
+  const [cursor, setCursor] = useState(0)
+  const [hovered, setHovered] = useState(undefined)
+
+  useEffect(() => {
+    if (members?.length && downPress) {
+      setCursor((prevState) => (prevState < members?.length - 1 ? prevState + 1 : prevState))
+      setSelectedMember(members[cursor])
+    }
+  }, [downPress])
+
+  useEffect(() => {
+    if (members?.length && upPress) {
+      setCursor((prevState) => (prevState > 0 ? prevState - 1 : prevState))
+      setSelectedMember(members[cursor])
+    }
+  }, [upPress])
+
+  useEffect(() => {
+    if (members?.length && enterPress) {
+      setSelectedMember(members[cursor])
+    }
+  }, [cursor, enterPress])
+
+  useEffect(() => {
+    if (members?.length && hovered) {
+      setCursor(members?.indexOf(hovered))
+    }
+  }, [hovered])
+
+  useEffect(() => {
+    setPage(0)
+  }, [terminalHandle])
+
   useEffect(() => {
     if (members) {
       setSelectedMember(members[0])
@@ -117,6 +157,7 @@ const MemberDirectoryPage: BlitzPage = () => {
 
   const refreshRoles = async () => {
     if (terminal) {
+      setIsContributorsLoading(true)
       const response = await fetch("/api/discord/sync-roles", {
         method: "POST",
         body: JSON.stringify({
@@ -125,6 +166,7 @@ const MemberDirectoryPage: BlitzPage = () => {
       })
 
       if (response.status !== 200) {
+        setIsContributorsLoading(false)
         setToastState({
           isToastShowing: true,
           type: "error",
@@ -132,12 +174,16 @@ const MemberDirectoryPage: BlitzPage = () => {
         })
         return
       }
+      refetchGroupedTags()
+      refetchMembers()
+      refetchMemberCount()
 
       setToastState({
         isToastShowing: true,
         type: "success",
         message: "Your roles are refreshed",
       })
+      setIsContributorsLoading(false)
     }
   }
 
@@ -182,42 +228,51 @@ const MemberDirectoryPage: BlitzPage = () => {
           <div className="flex flex-row items-center ml-6 pt-7">
             <h1 className="text-2xl font-bold">Members</h1>
             {groupedTags && Object.entries(groupedTags).length ? (
-              <RefreshIcon
-                className="h-5 w-5 ml-2 mt-1 cursor-pointer"
-                aria-hidden="true"
+              <button
                 onClick={() => {
                   refreshRoles()
                   refreshTokens()
                 }}
-              />
+                disabled={isContributorsLoading}
+              >
+                <RefreshIcon
+                  className={`h-5 w-5 ml-2 mt-1 hover:stroke-concrete ${
+                    isContributorsLoading ? "cursor-not-allowed" : "cursor-pointer"
+                  }`}
+                  aria-hidden="true"
+                />
+              </button>
             ) : null}
           </div>
-          <div className="flex flex-col sm:flex-row justify-between">
-            <div className="flex ml-6 py-4 space-x-2 flex-wrap">
+          <div className="flex flex-col sm:flex-row justify-between items-center">
+            <div className="flex ml-6 py-4 space-x-2 flex-wrap self-start">
               {groupedTags && Object.entries(groupedTags).length ? (
-                Object.entries(groupedTags).map(([tagType, tags], idx) => (
-                  <FilterPill
-                    tagType={tagType}
-                    tags={tags}
-                    filters={filters}
-                    setFilters={setFilters}
-                    setPage={setPage}
-                    key={`${idx}${tagType}`}
-                  />
-                ))
+                [TagType.STATUS, TagType.ROLE, TagType.PROJECT, TagType.GUILD, TagType.TOKEN].map(
+                  (tagType, idx) =>
+                    groupedTags[tagType] && (
+                      <FilterPill
+                        tagType={tagType}
+                        tags={groupedTags[tagType]}
+                        filters={filters}
+                        setFilters={setFilters}
+                        setPage={setPage}
+                        key={`${idx}${tagType}`}
+                      />
+                    )
+                )
               ) : (
                 <p className="text-marble-white">View other members in the terminal.</p>
               )}
             </div>
-            <div className="ml-6 sm:mr-6 py-4 text-sm">
+            <div className="self-start ml-6 sm:mr-6 py-4 text-sm mt-1">
               Showing
-              <span className="text-electric-violet font-bold"> {page * paginationTake + 1} </span>
+              <span className="text-electric-violet font-bold"> {page * PAGINATION_TAKE + 1} </span>
               to
               <span className="text-electric-violet font-bold">
                 {" "}
-                {(page + 1) * paginationTake > memberCount!
+                {(page + 1) * PAGINATION_TAKE > memberCount!
                   ? memberCount
-                  : (page + 1) * paginationTake}{" "}
+                  : (page + 1) * PAGINATION_TAKE}{" "}
               </span>
               of
               <span className="font-bold"> {memberCount} </span>
@@ -226,12 +281,12 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <BackArrow className={`${page === 0 ? "fill-concrete" : "fill-marble-white"}`} />
               </button>
               <button
-                disabled={members?.length! < paginationTake}
+                disabled={members?.length! < PAGINATION_TAKE}
                 onClick={() => setPage(page + 1)}
               >
                 <ForwardArrow
                   className={`${
-                    members?.length! < paginationTake ? "fill-concrete" : "fill-marble-white"
+                    members?.length! < PAGINATION_TAKE ? "fill-concrete" : "fill-marble-white"
                   }`}
                 />
               </button>
@@ -240,16 +295,24 @@ const MemberDirectoryPage: BlitzPage = () => {
         </div>
         <div className="grid grid-cols-7 h-[calc(100vh-130px)] w-full box-border">
           <div className="overflow-y-auto col-span-7 sm:col-span-4">
-            {members &&
-              members.map((member, idx) => (
-                <ContributorComponent
-                  key={`${member.joinedAt}${idx}`}
-                  member={member}
-                  selectedMember={selectedMember}
-                  setSelectedMember={setSelectedMember}
-                  setSelectedMemberMobileDrawerIsOpen={setSelectedMemberMobileDrawerIsOpen}
-                />
-              ))}
+            {members && !isContributorsLoading
+              ? members.map((member, idx) => (
+                  <ContributorComponent
+                    key={`${member.joinedAt}${idx}`}
+                    member={member}
+                    selectedMember={selectedMember}
+                    setSelectedMember={setSelectedMember}
+                    setSelectedMemberMobileDrawerIsOpen={setSelectedMemberMobileDrawerIsOpen}
+                    setHovered={setHovered}
+                  />
+                ))
+              : Array.from(Array(15)).map((idx) => (
+                  <div
+                    key={idx}
+                    tabIndex={0}
+                    className={`flex flex-row space-x-52 p-3 mx-3 mt-3 rounded-lg bg-wet-concrete shadow border-solid h-[70px] motion-safe:animate-pulse`}
+                  />
+                ))}
           </div>
           <SelectedContributorCard
             member={selectedMember}
@@ -397,6 +460,7 @@ const ContributorComponent = ({
   selectedMember,
   setSelectedMember,
   setSelectedMemberMobileDrawerIsOpen,
+  setHovered,
 }) => {
   const { account } = member
 
@@ -410,6 +474,8 @@ const ContributorComponent = ({
         setSelectedMember(member)
         setSelectedMemberMobileDrawerIsOpen(true)
       }}
+      onMouseEnter={() => setHovered(member)}
+      onMouseLeave={() => setHovered(undefined)}
     >
       <div className="flex space-x-2">
         <div className="flex flex-col content-center align-middle mr-1">
@@ -418,6 +484,9 @@ const ContributorComponent = ({
               src={account.data.pfpURL}
               alt="PFP"
               className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_PFP_URLS.USER
+              }}
             />
           ) : (
             <div className="h-[46px] min-w-[46px] place-self-center border border-wet-concrete bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
@@ -445,6 +514,7 @@ const SelectedContributorCard = ({
   selectedMemberMobileDrawerIsOpen,
   setSelectedMemberMobileDrawerIsOpen,
 }) => {
+  const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
   if (!member) return null
   const { account } = member
 
@@ -478,6 +548,9 @@ const SelectedContributorCard = ({
                 src={account.data.pfpURL}
                 alt="PFP"
                 className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete hover:border-marble-white"
+                onError={(e) => {
+                  e.currentTarget.src = DEFAULT_PFP_URLS.USER
+                }}
               />
             ) : (
               <div className="h-[46px] w-[46px] place-self-center border border-wet-concrete hover:border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
@@ -492,7 +565,40 @@ const SelectedContributorCard = ({
           </div>
           <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
             {account.address ? (
-              <div className="w-max truncate leading-4">@{truncateString(account.address)}</div>
+              <>
+                <a
+                  className="w-max truncate leading-4 text-magic-mint"
+                  href={`https://etherscan.io/address/${account.address}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  @{truncateString(account.address)}
+                </a>
+                <div>
+                  <button
+                    className="pb-1 inline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(account.address).then(() => {
+                        setIsClipboardAddressCopied(true)
+                        setTimeout(() => setIsClipboardAddressCopied(false), 3000)
+                      })
+                    }}
+                  >
+                    {isClipboardAddressCopied ? (
+                      <>
+                        <ClipboardCheckIcon className="h-4 w-4 hover:stroke-concrete cursor-pointer" />
+                      </>
+                    ) : (
+                      <ClipboardIcon className="h-4 w-4 hover:stroke-concrete cursor-pointer" />
+                    )}
+                  </button>
+                  {isClipboardAddressCopied && (
+                    <span className="text-[.5rem] uppercase font-bold tracking-wider rounded px-1 absolute text-marble-white bg-wet-concrete">
+                      copied!
+                    </span>
+                  )}
+                </div>
+              </>
             ) : (
               <div className="w-max truncate leading-4">Imported from discord</div>
             )}
@@ -557,10 +663,10 @@ const SelectedContributorCard = ({
           <hr className="text-concrete mt-6" />
         </>
       )}
-      <div className="mt-5 text-xs">
+      <div className="mt-7 text-xs">
         <TagDetails tagType="status" tags={statusTags} />
         {member.joinedAt && (
-          <div className="mt-7">
+          <div className="mt-5">
             <p className="uppercase mb-2">joined since</p>
             <p className="text-base">{formatDate(member.joinedAt)}</p>
           </div>
@@ -640,16 +746,16 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
   if (!tags.length) return null
 
   return (
-    <div className="mt-7">
-      <p className="uppercase mb-2">
+    <div className="mt-5">
+      <p className="uppercase mb-3">
         {tags.length > 1 || tagType === "status" ? tagType : tagType.slice(0, -1)}
       </p>
-      <div className="flex-row space-y-2 align-left mr-2">
+      <div className="flex-row mt-2 align-left mr-2">
         {tags.map((accountTerminalTag) => {
           return (
             <span
               key={accountTerminalTag.tag.value}
-              className="rounded-full py-1 px-3 mr-2 bg-wet-concrete uppercase font-bold inline-block"
+              className="rounded-full py-1 px-3 mr-2 mb-2 bg-wet-concrete uppercase font-bold inline-block"
             >
               {accountTerminalTag.tag.value}
             </span>

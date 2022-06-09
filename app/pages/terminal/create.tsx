@@ -147,9 +147,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                       </div>
                       <div className="mt-14">
                         <button
-                          className={`rounded text-tunnel-black px-8 py-1 bg-magic-mint ${
-                            formState.hasValidationErrors && "opacity-50"
-                          }`}
+                          className="rounded text-tunnel-black px-8 py-1 bg-magic-mint hover:opacity-70"
                           type="submit"
                         >
                           Open

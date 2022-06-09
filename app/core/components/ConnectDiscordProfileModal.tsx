@@ -86,13 +86,13 @@ export const ConnectDiscordProfileModal = ({ isOpen, setIsOpen, activeUser, setN
           Connect
         </button>
         <button
-          className="h-[33px] w-36 mx-auto ml-2 border border-magic-mint rounded-md text-magic-mint hover:bg-concrete"
+          className="h-[32px] w-24 mx-auto ml-2 border border-magic-mint rounded-md text-magic-mint hover:bg-concrete"
           onClick={() => {
             setHasDismissedDiscordConnectModal(true)
             setIsOpen(!isOpen)
           }}
         >
-          Dismiss
+          Not now
         </button>
       </div>
     </Modal>

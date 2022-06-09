@@ -25,7 +25,7 @@ const ToastContainer = () => {
   return (
     <div
       aria-live="assertive"
-      className="fixed bottom-0 right-0 left-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 sm:items-start"
+      className="fixed bottom-0 right-0 left-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 sm:items-start z-[100]"
     >
       <div className="w-full flex flex-col items-center space-y-4 sm:items-end">
         <Transition
@@ -39,7 +39,7 @@ const ToastContainer = () => {
           as={Fragment}
           appear
         >
-          <div className="max-w-sm w-full pointer-events-auto overflow-hidden border border-concrete rounded">
+          <div className="max-w-sm w-full pointer-events-auto overflow-hidden border border-concrete rounded bg-tunnel-black">
             <div className="p-4">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
