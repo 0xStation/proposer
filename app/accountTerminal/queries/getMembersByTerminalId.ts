@@ -5,13 +5,14 @@ const GetMembersByTerminalId = z.object({
   terminalId: z.number(),
   tagGroups: z.number().array().array(),
   page: z.number().optional().default(0),
+  paginationTake: z.number().optional().default(50),
 })
 
 export default async function getMembersByTerminalId(
   input: z.infer<typeof GetMembersByTerminalId>
 ) {
   const data = GetMembersByTerminalId.parse(input)
-  const { page, terminalId, tagGroups } = data
+  const { page, terminalId, tagGroups, paginationTake } = data
 
   try {
     const members = await db.accountTerminal.findMany({
@@ -40,8 +41,8 @@ export default async function getMembersByTerminalId(
           _count: "desc",
         },
       },
-      take: 100,
-      skip: page * 100,
+      take: paginationTake,
+      skip: page * paginationTake,
     })
 
     return members as AccountTerminalWithTagsAndAccount[]

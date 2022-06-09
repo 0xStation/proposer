@@ -50,7 +50,7 @@ const MemberDirectoryPage: BlitzPage = () => {
   // where the strings are applied filters
   const [filters, setFilters] = useState<Filters>({})
 
-  const paginationTake = 100
+  const paginationTake = 50
 
   /*
   `groupedTags` returns an object where the key
@@ -87,6 +87,7 @@ const MemberDirectoryPage: BlitzPage = () => {
         .map((set) => Array.from(set))
         .filter((arr) => arr.length > 0),
       page: page,
+      paginationTake,
     },
     {
       suspense: false,
@@ -200,8 +201,8 @@ const MemberDirectoryPage: BlitzPage = () => {
               />
             ) : null}
           </div>
-          <div className="flex flex-col sm:flex-row justify-between">
-            <div className="flex ml-6 py-4 space-x-2 flex-wrap">
+          <div className="flex flex-col sm:flex-row justify-between items-center">
+            <div className="flex ml-6 py-4 space-x-2 flex-wrap self-start">
               {groupedTags && Object.entries(groupedTags).length ? (
                 [TagType.STATUS, TagType.ROLE, TagType.PROJECT, TagType.GUILD, TagType.TOKEN].map(
                   (tagType, idx) =>
@@ -220,7 +221,7 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <p className="text-marble-white">View other members in the terminal.</p>
               )}
             </div>
-            <div className="ml-6 sm:mr-6 py-4 text-sm">
+            <div className="self-start ml-6 sm:mr-6 py-4 text-sm">
               Showing
               <span className="text-electric-violet font-bold"> {page * paginationTake + 1} </span>
               to
