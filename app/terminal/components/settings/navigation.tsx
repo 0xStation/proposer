@@ -1,5 +1,5 @@
-import { useParam, useQuery, useRouter, Routes, Link, Image, Router } from "blitz"
 import { Fragment, useState } from "react"
+import { useParam, useQuery, useRouter, Routes, Link, Image } from "blitz"
 import Exit from "/public/exit-button.svg"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import SettingsIcon from "app/core/icons/SettingsIcon"
@@ -33,6 +33,16 @@ const Navigation = ({ children }) => {
             } cursor-pointer hover:text-marble-white`}
           >
             <Link href={Routes.TerminalSettingsPage({ terminalHandle })}>Overview</Link>
+          </li>
+          <li
+            className={`${
+              router.pathname === Routes.TokenSettingsPage({ terminalHandle }).pathname ||
+              router.pathname === Routes.NewTokenSettingsPage({ terminalHandle }).pathname
+                ? "text-marble-white font-bold"
+                : "text-concrete"
+            } cursor-pointer hover:text-marble-white mt-4`}
+          >
+            <Link href={Routes.TokenSettingsPage({ terminalHandle })}>Tokens</Link>
           </li>
         </ul>
 

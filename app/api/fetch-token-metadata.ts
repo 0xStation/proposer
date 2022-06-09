@@ -24,7 +24,8 @@ export default async function handler(req, res) {
   let params
   try {
     params = TokenMetadataRequest.parse(req.body)
-  } catch {
+  } catch (e) {
+    console.log(e)
     res.status(500).json({ response: "error", message: "missing required parameter" })
   }
 

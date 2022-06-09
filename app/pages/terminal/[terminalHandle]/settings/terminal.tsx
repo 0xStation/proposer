@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect } from "react"
 import {
   BlitzPage,
   useParam,
@@ -16,8 +16,7 @@ import { useDropzone } from "react-dropzone"
 import UploadIcon from "app/core/icons/UploadIcon"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
-import { canEdit } from "app/core/utils/permissions"
-import { DEFAULT_PFP_URLS, EditPermissionTypes } from "app/core/utils/constants"
+import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import { composeValidators, mustBeUnderNumCharacters, requiredField } from "app/utils/validators"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 
@@ -99,14 +98,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
 const TerminalSettingsPage: BlitzPage = () => {
   const router = useRouter()
   const setToastState = useStore((state) => state.setToastState)
-  const activeUser = useStore((state) => state.activeUser)
   const [pfpURL, setPfpURL] = useState<string>("")
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
-
-  const userCanEdit = activeUser
-    ? canEdit(activeUser, terminal?.id, EditPermissionTypes.TERMINAL)
-    : false
 
   const [updateTerminalMutation] = useMutation(updateTerminal, {
     onSuccess: (data) => {
