@@ -1,10 +1,27 @@
-import { BlitzPage, useRouter, useSession, invoke } from "blitz"
+import { BlitzPage, useRouter, useSession, invoke, getSession, GetServerSideProps } from "blitz"
 import { useEffect } from "react"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import useStore from "app/core/hooks/useStore"
 import { ConnectWalletComponent } from "app/core/components/ConnectWalletComponent"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import createAccount from "app/account/mutations/createAccount"
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const session = await getSession(req, res)
+
+  if (session?.siwe?.address) {
+    return {
+      redirect: {
+        destination: `/profile/${session?.siwe?.address}`,
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
 
 const Home: BlitzPage = () => {
   const router = useRouter()

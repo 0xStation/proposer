@@ -81,7 +81,7 @@ export const ConnectWalletComponent = () => {
       })
 
       if (verificationSuccessful) {
-        setConnectState({ error: false, loading: false })
+        setConnectState({ error: false, loading: true })
       } else {
         throw Error("Unsuccessful signature.")
       }
@@ -117,7 +117,7 @@ export const ConnectWalletComponent = () => {
               <Image src={BackIcon} alt="Back icon" />
             </button>
             <h1 className="text-2xl font-bold text-marble-white text-center mt-6 mb-2">
-              Sign in with Ethereum
+              {connectState.loading ? "Check your wallet to continue " : "Sign in with Ethereum"}
             </h1>
             <p className="text-lg text-center">
               Verify your address so we can securely authenticate you.
@@ -129,13 +129,15 @@ export const ConnectWalletComponent = () => {
             ) : null}
             <div className="m-6 text-center">
               <button
-                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-36 h-[35px]"
+                className={`bg-magic-mint text-tunnel-black rounded-md content-center hover:opacity-70 cursor:pointer w-36 h-[35px] ${
+                  connectState.loading && "cursor-not-allowed"
+                }`}
                 onClick={handleSignInWithEthereum}
                 disabled={connectState.loading}
               >
                 {connectState.loading ? (
                   <div className="flex justify-center items-center">
-                    <Spinner fill="white" />
+                    <Spinner fill="black" />
                   </div>
                 ) : (
                   "Sign"
@@ -145,7 +147,9 @@ export const ConnectWalletComponent = () => {
           </>
         ) : (
           <>
-            <h1 className="text-2xl font-bold text-marble-white text-center mt-6">Enter Station</h1>
+            <h1 className="text-2xl font-bold text-marble-white text-center mt-6">
+              {connectState.loading ? "Check your wallet to continue " : "Enter Station"}
+            </h1>
             <p className="text-lg text-center mt-4 px-4 sm:px-0">
               Connect your wallet to enter Station.
             </p>
@@ -163,7 +167,9 @@ export const ConnectWalletComponent = () => {
             ) : null}
             <div className="flex sm:flex-row flex-col mx-auto text-marble-white my-6 w-full justify-center place-items-center">
               <button
-                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2 h-[35px]"
+                className={`border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2 h-[35px] ${
+                  connectState.loading && "cursor-not-allowed"
+                }`}
                 disabled={connectState.loading}
                 onClick={async () => {
                   await handleWalletConnection(metamaskWallet)
@@ -183,7 +189,9 @@ export const ConnectWalletComponent = () => {
                 )}
               </button>
               <button
-                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2 sm:mt-0 mt-2 h-[35px]"
+                className={`border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2 sm:mt-0 mt-2 h-[35px] ${
+                  connectState.loading && "cursor-not-allowed"
+                }`}
                 disabled={connectState.loading}
                 onClick={async () => {
                   await handleWalletConnection(walletConnect)
@@ -208,7 +216,9 @@ export const ConnectWalletComponent = () => {
                 )}
               </button>
               <button
-                className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor-pointer w-40 sm:mr-2 sm:mt-0 mt-2 h-[35px]"
+                className={`border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor-pointer w-40 sm:mr-2 sm:mt-0 mt-2 h-[35px] ${
+                  connectState.loading && "cursor-not-allowed"
+                }`}
                 disabled={connectState.loading}
                 onClick={async () => {
                   await handleWalletConnection(coinbaseWallet)
