@@ -23,7 +23,12 @@ import PersonalSiteIcon from "public/personal-site-icon.svg"
 import InstagramIcon from "public/instagram-icon.svg"
 import TikTokIcon from "public/tiktok-icon.svg"
 import { toTitleCase } from "app/core/utils/titleCase"
-import { RefreshIcon, ClipboardIcon, ClipboardCheckIcon } from "@heroicons/react/outline"
+import {
+  RefreshIcon,
+  ClipboardIcon,
+  ClipboardCheckIcon,
+  ExternalLinkIcon,
+} from "@heroicons/react/outline"
 import useStore from "app/core/hooks/useStore"
 import { TagType } from "app/tag/types"
 import useKeyPress from "app/core/hooks/useKeyPress"
@@ -264,7 +269,7 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <p className="text-marble-white">View other members in the terminal.</p>
               )}
             </div>
-            <div className="self-start ml-6 sm:mr-6 py-4 text-sm mt-1">
+            <div className="ml-6 sm:mr-6 text-sm">
               Showing
               <span className="text-electric-violet font-bold"> {page * PAGINATION_TAKE + 1} </span>
               to
@@ -566,17 +571,18 @@ const SelectedContributorCard = ({
           <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
             {account.address ? (
               <>
+                <span className="w-max truncate leading-4 text-concrete">
+                  @{truncateString(account.address)}
+                </span>
                 <a
-                  className="w-max truncate leading-4 text-magic-mint"
                   href={`https://etherscan.io/address/${account.address}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  @{truncateString(account.address)}
+                  <ExternalLinkIcon className="h-4 w-4 hover:stroke-concrete cursor-pointer" />
                 </a>
                 <div>
                   <button
-                    className="pb-1 inline"
                     onClick={() => {
                       navigator.clipboard.writeText(account.address).then(() => {
                         setIsClipboardAddressCopied(true)

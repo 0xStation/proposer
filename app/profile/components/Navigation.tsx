@@ -12,7 +12,7 @@ import TikTokIcon from "public/tiktok-icon.svg"
 import { Terminal } from "app/terminal/types"
 import { Account } from "app/account/types"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
-import { ClipboardCheckIcon, ClipboardIcon } from "@heroicons/react/outline"
+import { ClipboardCheckIcon, ClipboardIcon, ExternalLinkIcon } from "@heroicons/react/outline"
 
 export const Navigation = ({
   account,
@@ -61,19 +61,26 @@ export const Navigation = ({
         <div className="px-8 border-b border-concrete pb-6">
           <div className="flex flex-col">
             <h1 className="text-2xl text-marble-white">{account?.data.name}</h1>
-            <div className="text-base text-concrete inline items-center">
-              {account?.address ? (
-                <>
-                  <a
-                    className="text-base text-magic-mint inline"
-                    href={`https://etherscan.io/address/${account?.address}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    @{getWalletString(account?.address)}
-                  </a>
+            {account?.address ? (
+              <div className="flex flex-row text-sm text-concrete items-center space-x-1">
+                <a
+                  className="text-base text-concrete inline"
+                  href={`https://etherscan.io/address/${account?.address}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  @{getWalletString(account?.address)}
+                </a>
+                <a
+                  href={`https://etherscan.io/address/${account.address}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLinkIcon className="h-4 w-4 hover:stroke-concrete cursor-pointer" />
+                </a>
+                <span className="self-start mt-[6px]">
                   <button
-                    className="ml-1"
+                    className=""
                     onClick={() => {
                       navigator.clipboard.writeText(account?.address || "").then(() => {
                         setIsClipboardAddressCopied(true)
@@ -94,11 +101,11 @@ export const Navigation = ({
                       copied!
                     </span>
                   )}
-                </>
-              ) : (
-                <p className="text-base text-concrete">Imported from Discord</p>
-              )}
-            </div>
+                </span>
+              </div>
+            ) : (
+              <p className="text-base text-concrete">Imported from Discord</p>
+            )}
           </div>
           <div className="flex flex-row space-x-4 mt-3">
             {account?.data?.contactURL && (
