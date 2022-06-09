@@ -111,6 +111,10 @@ const MemberDirectoryPage: BlitzPage = () => {
   )
 
   useEffect(() => {
+    setPage(0)
+  }, [terminalHandle])
+
+  useEffect(() => {
     if (members) {
       setSelectedMember(members[0])
     }
