@@ -301,11 +301,11 @@ const SelectedTerminalCard = ({
           </div>
         </div>
       </div>
-      <div className="mt-9 text-xs">
+      <div className="mt-7 text-xs">
         <TagDetails tagType="status" tags={statusTags} />
         {membership.joinedAt && (
-          <div className="mt-7">
-            <p className="uppercase mb-3">joined since</p>
+          <div className="mt-5">
+            <p className="uppercase mb-2">joined since</p>
             <p className="text-base">{formatDate(membership.joinedAt)}</p>
           </div>
         )}
@@ -384,16 +384,16 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
   if (!tags.length) return null
 
   return (
-    <div className="mt-7">
-      <p className="uppercase mb-3">
+    <div className="mt-5">
+      <p className="uppercase">
         {tags.length > 1 || tagType === "status" ? tagType : tagType.slice(0, -1)}
       </p>
-      <div className="flex-row space-y-2 align-left mr-2">
+      <div className="flex-row mt-2 align-left mr-2">
         {tags?.map((accountTerminalTag) => {
           return (
             <span
               key={accountTerminalTag.tag.value}
-              className="rounded-full py-1 px-3 mr-2 bg-wet-concrete uppercase font-bold inline-block"
+              className="rounded-full py-1 px-3 mr-2 mb-2 bg-wet-concrete uppercase font-bold inline-block"
             >
               {accountTerminalTag.tag.value}
             </span>

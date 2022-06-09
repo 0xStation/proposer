@@ -264,7 +264,7 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <p className="text-marble-white">View other members in the terminal.</p>
               )}
             </div>
-            <div className="self-start ml-6 sm:mr-6 py-4 text-sm">
+            <div className="self-start ml-6 sm:mr-6 py-4 text-sm mt-1">
               Showing
               <span className="text-electric-violet font-bold"> {page * PAGINATION_TAKE + 1} </span>
               to
@@ -629,10 +629,10 @@ const SelectedContributorCard = ({
           <hr className="text-concrete mt-6" />
         </>
       )}
-      <div className="mt-5 text-xs">
+      <div className="mt-7 text-xs">
         <TagDetails tagType="status" tags={statusTags} />
         {member.joinedAt && (
-          <div className="mt-7">
+          <div className="mt-5">
             <p className="uppercase mb-2">joined since</p>
             <p className="text-base">{formatDate(member.joinedAt)}</p>
           </div>
@@ -712,16 +712,16 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
   if (!tags.length) return null
 
   return (
-    <div className="mt-7">
-      <p className="uppercase mb-2">
+    <div className="mt-5">
+      <p className="uppercase mb-3">
         {tags.length > 1 || tagType === "status" ? tagType : tagType.slice(0, -1)}
       </p>
-      <div className="flex-row space-y-2 align-left mr-2">
+      <div className="flex-row mt-2 align-left mr-2">
         {tags.map((accountTerminalTag) => {
           return (
             <span
               key={accountTerminalTag.tag.value}
-              className="rounded-full py-1 px-3 mr-2 bg-wet-concrete uppercase font-bold inline-block"
+              className="rounded-full py-1 px-3 mr-2 mb-2 bg-wet-concrete uppercase font-bold inline-block"
             >
               {accountTerminalTag.tag.value}
             </span>
