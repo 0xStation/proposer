@@ -26,6 +26,7 @@ import { toTitleCase } from "app/core/utils/titleCase"
 import { RefreshIcon } from "@heroicons/react/outline"
 import useStore from "app/core/hooks/useStore"
 import { TagType } from "app/tag/types"
+import useKeyPress from "app/core/hooks/useKeyPress"
 
 interface Filters {
   [tagType: string]: Set<number>
@@ -111,6 +112,38 @@ const MemberDirectoryPage: BlitzPage = () => {
       refetchOnWindowFocus: false,
     }
   )
+
+  const downPress = useKeyPress("ArrowDown")
+  const upPress = useKeyPress("ArrowUp")
+  const enterPress = useKeyPress("Enter")
+  const [cursor, setCursor] = useState(0)
+  const [hovered, setHovered] = useState(undefined)
+
+  useEffect(() => {
+    if (members?.length && downPress) {
+      setCursor((prevState) => (prevState < members?.length - 1 ? prevState + 1 : prevState))
+      setSelectedMember(members[cursor])
+    }
+  }, [downPress])
+
+  useEffect(() => {
+    if (members?.length && upPress) {
+      setCursor((prevState) => (prevState > 0 ? prevState - 1 : prevState))
+      setSelectedMember(members[cursor])
+    }
+  }, [upPress])
+
+  useEffect(() => {
+    if (members?.length && enterPress) {
+      setSelectedMember(members[cursor])
+    }
+  }, [cursor, enterPress])
+
+  useEffect(() => {
+    if (members?.length && hovered) {
+      setCursor(members?.indexOf(hovered))
+    }
+  }, [hovered])
 
   useEffect(() => {
     setPage(0)
@@ -270,6 +303,7 @@ const MemberDirectoryPage: BlitzPage = () => {
                     selectedMember={selectedMember}
                     setSelectedMember={setSelectedMember}
                     setSelectedMemberMobileDrawerIsOpen={setSelectedMemberMobileDrawerIsOpen}
+                    setHovered={setHovered}
                   />
                 ))
               : Array.from(Array(15)).map((idx) => (
@@ -426,6 +460,7 @@ const ContributorComponent = ({
   selectedMember,
   setSelectedMember,
   setSelectedMemberMobileDrawerIsOpen,
+  setHovered,
 }) => {
   const { account } = member
 
@@ -439,6 +474,8 @@ const ContributorComponent = ({
         setSelectedMember(member)
         setSelectedMemberMobileDrawerIsOpen(true)
       }}
+      onMouseEnter={() => setHovered(member)}
+      onMouseLeave={() => setHovered(undefined)}
     >
       <div className="flex space-x-2">
         <div className="flex flex-col content-center align-middle mr-1">
