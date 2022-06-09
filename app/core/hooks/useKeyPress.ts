@@ -16,12 +16,10 @@ export const useKeyPress = (targetKey) => {
   }
 
   useEffect(() => {
-    console.log("hello!")
     window.addEventListener("keydown", downHandler)
     window.addEventListener("keyup", upHandler)
 
     return () => {
-      console.log("goodbye")
       window.removeEventListener("keydown", downHandler)
       window.removeEventListener("keyup", upHandler)
     }

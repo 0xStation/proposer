@@ -52,7 +52,7 @@ const MemberDirectoryPage: BlitzPage = () => {
   // where the strings are applied filters
   const [filters, setFilters] = useState<Filters>({})
 
-  const paginationTake = 50
+  const PAGINATION_TAKE = 50
 
   /*
   `groupedTags` returns an object where the key
@@ -89,7 +89,7 @@ const MemberDirectoryPage: BlitzPage = () => {
         .map((set) => Array.from(set))
         .filter((arr) => arr.length > 0),
       page: page,
-      paginationTake,
+      paginationTake: PAGINATION_TAKE,
     },
     {
       suspense: false,
@@ -266,13 +266,13 @@ const MemberDirectoryPage: BlitzPage = () => {
             </div>
             <div className="self-start ml-6 sm:mr-6 py-4 text-sm">
               Showing
-              <span className="text-electric-violet font-bold"> {page * paginationTake + 1} </span>
+              <span className="text-electric-violet font-bold"> {page * PAGINATION_TAKE + 1} </span>
               to
               <span className="text-electric-violet font-bold">
                 {" "}
-                {(page + 1) * paginationTake > memberCount!
+                {(page + 1) * PAGINATION_TAKE > memberCount!
                   ? memberCount
-                  : (page + 1) * paginationTake}{" "}
+                  : (page + 1) * PAGINATION_TAKE}{" "}
               </span>
               of
               <span className="font-bold"> {memberCount} </span>
@@ -281,12 +281,12 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <BackArrow className={`${page === 0 ? "fill-concrete" : "fill-marble-white"}`} />
               </button>
               <button
-                disabled={members?.length! < paginationTake}
+                disabled={members?.length! < PAGINATION_TAKE}
                 onClick={() => setPage(page + 1)}
               >
                 <ForwardArrow
                   className={`${
-                    members?.length! < paginationTake ? "fill-concrete" : "fill-marble-white"
+                    members?.length! < PAGINATION_TAKE ? "fill-concrete" : "fill-marble-white"
                   }`}
                 />
               </button>
