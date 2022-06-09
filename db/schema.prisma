@@ -22,6 +22,7 @@ model Account {
   endorsed    Endorsement[]       @relation("Endorsed")
   sessions    Session[]
   proposals   AccountProposal[]
+  rfps        RFP[]
 }
 
 // Each DAO is represented by a terminal.
@@ -36,6 +37,8 @@ model Terminal {
   data          Json?
   tags          Tag[]
   proposals     Proposal[]
+  checkbooks    Checkbook[]
+  proposers     AccountProposal[]
 }
 
 // A role within a terminal
@@ -172,50 +175,62 @@ model Session {
   user               Account?  @relation(fields: [userId], references: [id])
 }
 
+model Checkbook {
+  address    String   @id
+  terminalId Int
+  terminal   Terminal @relation(fields: [terminalId], references: [id])
+  data       Json
+  rfps       RFP[]
+}
+
+model RFP {
+  fundingAddress String
+  checkbook      Checkbook? @relation(fields: [fundingAddress], references: [address])
+  localId        Int
+  authorAddress  String
+  author         Account?   @relation(fields: [authorAddress], references: [address])
+  startDate      DateTime
+  endDate        DateTime?
+  status         RfpStatus  @default(DRAFT)
+  data           Json
+  proposals      Proposal[]
+
+  @@id([fundingAddress, localId])
+}
+
 model Proposal {
-  id              Int                 @id @default(autoincrement())
-  terminalId      Int?
-  terminal        Terminal?           @relation(fields: [terminalId], references: [id])
-  authorAddress   String
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @default(now())
-  data            Json?
-  relatedAccounts AccountProposal[]
-  signatures      ProposalSignature[]
-  state           ProposalState       @default(DRAFTING)
+  fundingAddress String
+  rfpLocalId     Int
+  rfp            RFP               @relation(fields: [fundingAddress, rfpLocalId], references: [fundingAddress, localId])
+  status         ProposalStatus    @default(IN_REVIEW)
+  data           Json
+  terminalId     Int
+  terminal       Terminal          @relation(fields: [terminalId], references: [id])
+  localId        Int
+  createdAt      DateTime          @default(now())
+  collaborators  AccountProposal[]
+
+  @@id([terminalId, localId])
+  @@unique([fundingAddress, localId])
 }
 
 model AccountProposal {
-  id         Int                 @id @default(autoincrement())
-  accountId  Int
-  account    Account             @relation(fields: [accountId], references: [id])
-  proposalId Int
-  proposal   Proposal            @relation(fields: [proposalId], references: [id])
-  type       AccountProposalType
+  id              Int      @id @default(autoincrement())
+  address         String
+  account         Account? @relation(fields: [address], references: [address])
+  terminalId      Int
+  proposalLocalId Int
+  proposal        Proposal @relation(fields: [terminalId, proposalLocalId], references: [terminalId, localId])
+  terminal        Terminal @relation(fields: [terminalId], references: [id])
 }
 
-model ProposalSignature {
-  id                  Int      @id @default(autoincrement())
-  proposalId          Int
-  proposal            Proposal @relation(fields: [proposalId], references: [id])
-  signingAddress      String
-  representingAddress String? // used for tracking parent gnosis safe
-  createdAt           DateTime @default(now())
-  message             String
-  signature           String
+enum RfpStatus {
+  DRAFT
+  PUBLISHED
 }
 
-enum AccountProposalType {
-  AUTHOR // I created the proposal
-  COLLABORATOR // I helped draft the proposal
-  SIGNER // I signed the proposal
-  PARITICPANT // I otherwise participated in this proposal
-}
-
-enum ProposalState {
-  DRAFTING
-  APPROVING
-  EXECUTING
-  COMPLETE
-  CANCELED
+enum ProposalStatus {
+  IN_REVIEW
+  APPROVED
+  PASSED
 }
