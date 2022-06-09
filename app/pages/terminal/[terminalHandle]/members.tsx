@@ -23,7 +23,7 @@ import PersonalSiteIcon from "public/personal-site-icon.svg"
 import InstagramIcon from "public/instagram-icon.svg"
 import TikTokIcon from "public/tiktok-icon.svg"
 import { toTitleCase } from "app/core/utils/titleCase"
-import { RefreshIcon } from "@heroicons/react/outline"
+import { RefreshIcon, ClipboardIcon, ClipboardCheckIcon } from "@heroicons/react/outline"
 import useStore from "app/core/hooks/useStore"
 import { TagType } from "app/tag/types"
 import useKeyPress from "app/core/hooks/useKeyPress"
@@ -178,12 +178,12 @@ const MemberDirectoryPage: BlitzPage = () => {
       refetchMembers()
       refetchMemberCount()
 
-      setIsContributorsLoading(false)
       setToastState({
         isToastShowing: true,
         type: "success",
         message: "Your roles are refreshed",
       })
+      setIsContributorsLoading(false)
     }
   }
 
@@ -514,6 +514,7 @@ const SelectedContributorCard = ({
   selectedMemberMobileDrawerIsOpen,
   setSelectedMemberMobileDrawerIsOpen,
 }) => {
+  const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
   if (!member) return null
   const { account } = member
 
@@ -564,7 +565,40 @@ const SelectedContributorCard = ({
           </div>
           <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
             {account.address ? (
-              <div className="w-max truncate leading-4">@{truncateString(account.address)}</div>
+              <>
+                <a
+                  className="w-max truncate leading-4 text-magic-mint"
+                  href={`https://etherscan.io/address/${account.address}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  @{truncateString(account.address)}
+                </a>
+                <div>
+                  <button
+                    className="pb-1 inline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(account.address).then(() => {
+                        setIsClipboardAddressCopied(true)
+                        setTimeout(() => setIsClipboardAddressCopied(false), 3000)
+                      })
+                    }}
+                  >
+                    {isClipboardAddressCopied ? (
+                      <>
+                        <ClipboardCheckIcon className="h-4 w-4 hover:stroke-concrete cursor-pointer" />
+                      </>
+                    ) : (
+                      <ClipboardIcon className="h-4 w-4 hover:stroke-concrete cursor-pointer" />
+                    )}
+                  </button>
+                  {isClipboardAddressCopied && (
+                    <span className="text-[.5rem] uppercase font-bold tracking-wider rounded px-1 absolute text-marble-white bg-wet-concrete">
+                      copied!
+                    </span>
+                  )}
+                </div>
+              </>
             ) : (
               <div className="w-max truncate leading-4">Imported from discord</div>
             )}
