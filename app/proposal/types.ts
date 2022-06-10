@@ -1,14 +1,14 @@
 import { Account, ProposalStatus } from "@prisma/client"
 
 export enum ReferralType {
-  TWITTER = "TWITTER",
-  NEWSLETTER_PODCAST = "NEWSLETTER_PODCAST",
-  MEMBER = "MEMBER",
+  TWITTER,
+  NEWSLETTER_PODCAST,
+  MEMBER,
 }
 
 export enum CheckStatus {
-  UNCLAIMED = "UNCLAIMED",
-  CASHED = "CASHED",
+  UNCLAIMED,
+  CASHED,
 }
 
 export type Signature = {
@@ -46,7 +46,8 @@ export type ProposalMetadata = {
 
 export type Proposal = {
   fundingAddress: string
-  data: ProposalMetadata
   status: ProposalStatus
-  // needs more work
+  data: ProposalMetadata
+  localId: number
+  createdAt: Date
 }

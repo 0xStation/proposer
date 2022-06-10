@@ -177,6 +177,8 @@ model Session {
 
 model Checkbook {
   address    String   @id
+  chainId    Int
+  name       String
   terminalId Int
   terminal   Terminal @relation(fields: [terminalId], references: [id])
   data       Json
@@ -195,6 +197,7 @@ model RFP {
   data           Json
   proposals      Proposal[]
 
+  // unique links by station.express/rfp/0xfundingAddress/localId
   @@id([fundingAddress, localId])
 }
 
@@ -211,7 +214,6 @@ model Proposal {
   collaborators  AccountProposal[]
 
   @@id([terminalId, localId])
-  @@unique([fundingAddress, localId])
 }
 
 model AccountProposal {
@@ -227,6 +229,7 @@ model AccountProposal {
 enum RfpStatus {
   DRAFT
   PUBLISHED
+  ARCHIVED
 }
 
 enum ProposalStatus {
