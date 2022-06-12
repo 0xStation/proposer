@@ -1,13 +1,15 @@
+import { useState } from "react"
 import { BlitzPage } from "blitz"
 import { LockClosedIcon } from "@heroicons/react/outline"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
-import MarkdownEditor from "app/core/components/MarkdownEditor"
-import MarkdownEditorTwo from "app/core/components/MarkdownEditorTwo"
+import Preview from "app/core/components/MarkdownPreview"
 
 const NewRFPPage: BlitzPage = () => {
+  const [markdown, setMarkdown] = useState("")
+  const [previewMode, setPreviewMode] = useState(false)
   const activeUser = useStore((state) => state.activeUser)
 
   return (
@@ -42,9 +44,25 @@ const NewRFPPage: BlitzPage = () => {
               </span>
             </div>
           </div>
-          <div className="mt-12">
-            {/* <MarkdownEditorTwo /> */}
-            <MarkdownEditor />
+          <div className="mt-12 h-full">
+            {!previewMode ? (
+              <textarea
+                value={markdown}
+                className="bg-tunnel-black w-full h-full outline-none resize-none"
+                onChange={(e) => setMarkdown(e.target.value.length > 0 ? e.target.value : "")}
+                placeholder="enter some text..."
+              />
+            ) : (
+              <Preview markdown={markdown} />
+            )}
+          </div>
+          <div className="absolute bottom-10 left-[450px]">
+            <button className="border rounded p-1 mr-2" onClick={() => setPreviewMode(false)}>
+              Draft
+            </button>
+            <button className="border rounded p-1" onClick={() => setPreviewMode(true)}>
+              Preview
+            </button>
           </div>
         </div>
         <div className="h-full border-l border-concrete col-span-1 flex flex-col">
