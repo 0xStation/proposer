@@ -1,21 +1,11 @@
-import { Account, ProposalStatus } from "@prisma/client"
-
-export enum ReferralType {
-  TWITTER,
-  NEWSLETTER_PODCAST,
-  MEMBER,
-}
+import { ProposalStatus } from "@prisma/client"
+import { FundingSignature } from "app/types"
 
 export enum CheckStatus {
-  UNCLAIMED,
-  CASHED,
-}
-
-export type Signature = {
-  address: string
-  message: string
-  signature: string
-  timestamp: Date
+  NOT_QUEUED, // for checks that represent future milestones that have yet to be kickstarted
+  PENDING_APPROVAL, // queued and currently in approval process
+  UNCLAIMED, // approved, but not cashed by recipient
+  CASHED, // cashed by recipient post-approval
 }
 
 export type ProposalMetadata = {
@@ -30,18 +20,13 @@ export type ProposalMetadata = {
   }
   startDate: Date
   endDate: Date
-  milestoneBreakdown: number[] // list of percentages, number of milestones implied by length
-  signatures: (Signature & { approval: boolean })[]
+  signatures: FundingSignature[] // copy of signatures used for approving first milestone
   milestones: {
-    amount: number
+    amount: number // compute percentage breakdown by diving this amount by total funding amount
     status: CheckStatus
-    fundingSignatures: Signature[]
+    fundingSignatures: FundingSignature[]
     transactionHash?: string // set once check is cashed showing proof of payment
   }[]
-  referral: {
-    type: ReferralType
-    value: string
-  }
 }
 
 export type Proposal = {

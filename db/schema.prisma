@@ -28,17 +28,19 @@ model Account {
 // Each DAO is represented by a terminal.
 // roleNameOverrides overrides default role names
 model Terminal {
-  id            Int               @id @default(autoincrement())
-  ticketAddress String?           @unique
-  handle        String            @unique
-  initiatives   Initiative[]
-  roles         Role[]
-  members       AccountTerminal[]
-  data          Json?
-  tags          Tag[]
-  proposals     Proposal[]
-  checkbooks    Checkbook[]
-  proposers     AccountProposal[]
+  id              Int               @id @default(autoincrement())
+  ticketAddress   String?           @unique
+  handle          String            @unique
+  multisigAddress String?           @unique
+  initiatives     Initiative[]
+  roles           Role[]
+  members         AccountTerminal[]
+  data            Json?
+  tags            Tag[]
+  proposals       Proposal[]
+  checkbooks      Checkbook[]
+  proposers       AccountProposal[]
+  RFP             RFP[]
 }
 
 // A role within a terminal
@@ -176,19 +178,21 @@ model Session {
 }
 
 model Checkbook {
-  address    String   @id
-  chainId    Int
-  name       String
-  terminalId Int
-  terminal   Terminal @relation(fields: [terminalId], references: [id])
-  data       Json
-  rfps       RFP[]
+  address        String    @id
+  chainId        Int
+  name           String
+  parentMultisig String
+  terminal       Terminal? @relation(fields: [parentMultisig], references: [multisigAddress])
+  data           Json
+  rfps           RFP[]
 }
 
 model RFP {
+  parentMultisig String
+  terminal       Terminal?  @relation(fields: [parentMultisig], references: [multisigAddress])
+  localId        Int
   fundingAddress String
   checkbook      Checkbook? @relation(fields: [fundingAddress], references: [address])
-  localId        Int
   authorAddress  String
   author         Account?   @relation(fields: [authorAddress], references: [address])
   startDate      DateTime
@@ -197,33 +201,34 @@ model RFP {
   data           Json
   proposals      Proposal[]
 
-  // unique links by station.express/rfp/0xfundingAddress/localId
-  @@id([fundingAddress, localId])
+  // unique links by /rfp/[0xparentMultisig]/[localId]
+  @@id([parentMultisig, localId])
 }
 
 model Proposal {
+  parentMultisig String
+  terminal       Terminal?         @relation(fields: [parentMultisig], references: [multisigAddress])
   fundingAddress String
   rfpLocalId     Int
-  rfp            RFP               @relation(fields: [fundingAddress, rfpLocalId], references: [fundingAddress, localId])
+  rfp            RFP               @relation(fields: [parentMultisig, rfpLocalId], references: [parentMultisig, localId])
   status         ProposalStatus    @default(IN_REVIEW)
   data           Json
-  terminalId     Int
-  terminal       Terminal          @relation(fields: [terminalId], references: [id])
   localId        Int
   createdAt      DateTime          @default(now())
   collaborators  AccountProposal[]
 
-  @@id([terminalId, localId])
+  // unique links by /proposal/[0xparentMultisig]/[localId]
+  @@id([parentMultisig, localId])
 }
 
 model AccountProposal {
-  id              Int      @id @default(autoincrement())
+  id              Int       @id @default(autoincrement())
   address         String
-  account         Account? @relation(fields: [address], references: [address])
-  terminalId      Int
+  account         Account?  @relation(fields: [address], references: [address])
+  parentMultisig  String
   proposalLocalId Int
-  proposal        Proposal @relation(fields: [terminalId, proposalLocalId], references: [terminalId, localId])
-  terminal        Terminal @relation(fields: [terminalId], references: [id])
+  proposal        Proposal  @relation(fields: [parentMultisig, proposalLocalId], references: [parentMultisig, localId])
+  terminal        Terminal? @relation(fields: [parentMultisig], references: [multisigAddress])
 }
 
 enum RfpStatus {
