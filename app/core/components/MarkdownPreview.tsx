@@ -1,35 +1,16 @@
-import React, { useMemo, useState } from "react"
+import React, { useMemo } from "react"
 import { Slate, Editable, withReact } from "slate-react"
 import { createEditor, Element as SlateElement, Descendant } from "slate"
 import { unified } from "unified"
 import markdown from "remark-parse"
-import { remarkToSlate, slateToRemark } from "remark-slate-transformer"
+import { remarkToSlate } from "remark-slate-transformer"
 
 const postprocessor = unified().use(markdown).use(remarkToSlate)
-
-const Wrapper = () => {
-  const [markdown, setMarkdown] = useState("")
-  return (
-    <>
-      <DemoEditor setMarkdown={setMarkdown} />
-      <PreviewEditor markdown={markdown} />
-    </>
-  )
-}
-
-const DemoEditor = ({ setMarkdown }) => {
-  return (
-    <textarea
-      className="bg-tunnel-black w-full p-6 focus:border-0"
-      onChange={(e) => setMarkdown(e.target.value.length > 0 ? e.target.value : initialValue)}
-    />
-  )
-}
 
 const PreviewEditor = ({ markdown }) => {
   console.log(markdown)
   const editor = useMemo(() => withReact(createEditor()), [])
-  const renderElement = ({ attributes, children, element }: RenderElementProps) => {
+  const renderElement = ({ attributes, children, element }) => {
     switch (element.type) {
       case "paragraph":
         return (
@@ -133,12 +114,13 @@ const PreviewEditor = ({ markdown }) => {
           />
         )
       case "code":
-        return
       case "yaml":
       case "toml":
         return (
           <pre>
-            <code {...attributes}>{children}</code>
+            <code className="font-mono bg-wet-concrete p-2 rounded" {...attributes}>
+              {children}
+            </code>
           </pre>
         )
       case "definition":
@@ -149,7 +131,14 @@ const PreviewEditor = ({ markdown }) => {
         return <br />
       case "link":
         return (
-          <a {...attributes} href={element.url as string} title={element.title as string}>
+          <a
+            className="text-magic-mint"
+            target="_blank"
+            rel="noreferrer"
+            {...attributes}
+            href={element.url as string}
+            title={element.title as string}
+          >
             {children}
           </a>
         )
@@ -195,41 +184,19 @@ const PreviewEditor = ({ markdown }) => {
     return <span {...attributes}>{children}</span>
   }
 
-  const slate = postprocessor.processSync(markdown).result
-  console.log(slate)
+  const slate = postprocessor.processSync(markdown).result as Descendant[]
   editor.children = slate
 
   return (
-    <Slate editor={editor} value={[]} onChange={() => {}}>
-      <Editable renderElement={renderElement} renderLeaf={renderLeaf} placeholder="preview?" />
+    <Slate editor={editor} value={slate} onChange={() => {}}>
+      <Editable
+        renderElement={renderElement}
+        renderLeaf={renderLeaf}
+        placeholder="preview?"
+        readOnly
+      />
     </Slate>
   )
 }
-
-const Leaf = ({ attributes, children, leaf }) => {
-  return (
-    <span
-      {...attributes}
-      className={`
-    ${leaf.bold ? "font-bold" : ""}
-    ${leaf.italic ? "italic" : ""}
-    ${leaf.title ? "text-2xl font-bold inline-block" : ""}
-    ${leaf.hr ? "border-b-2 border-concrete block text-center" : ""}
-    ${leaf.underlined ? "underline" : ""}
-    ${leaf.blockquote ? "pl-2 border-l-2 border-concrete inline-block tobias-italic" : ""}
-    ${leaf.code ? "font-mono bg-wet-concrete p-2 rounded" : ""}
-  `}
-    >
-      {children}
-    </span>
-  )
-}
-
-const initialValue: Descendant[] = [
-  {
-    type: "paragraph",
-    children: [{ text: "" }],
-  },
-]
 
 export default PreviewEditor
