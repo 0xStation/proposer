@@ -3,6 +3,7 @@ module.exports = {
   content: ["{pages,app}/**/*.{js,ts,jsx,tsx}"],
   theme: {
     colors: {
+      transparent: "transparent",
       "tunnel-black": "#000000",
       "neon-blue": "#5F6FFF",
       "neon-carrot": "#FF9956",
