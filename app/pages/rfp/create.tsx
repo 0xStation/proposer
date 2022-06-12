@@ -7,7 +7,7 @@ import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
 
-const NewRFPPage: BlitzPage = () => {
+const CreateRFPPage: BlitzPage = () => {
   const [markdown, setMarkdown] = useState("")
   const [previewMode, setPreviewMode] = useState(false)
   const activeUser = useStore((state) => state.activeUser)
@@ -129,4 +129,5 @@ const NewRFPPage: BlitzPage = () => {
   )
 }
 
-export default NewRFPPage
+CreateRFPPage.suppressFirstRenderFlicker = true
+export default CreateRFPPage
