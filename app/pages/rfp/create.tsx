@@ -5,7 +5,7 @@ import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
-// import Preview from "app/core/components/MarkdownPreview"
+import Preview from "app/core/components/MarkdownPreview"
 
 const CreateRFPPage: BlitzPage = () => {
   const [markdown, setMarkdown] = useState("")
@@ -53,8 +53,7 @@ const CreateRFPPage: BlitzPage = () => {
                 placeholder="enter some text..."
               />
             ) : (
-              <div></div>
-              // <Preview markdown={markdown} />
+              <Preview markdown={markdown} />
             )}
           </div>
           <div className="absolute bottom-10 left-[450px]">
