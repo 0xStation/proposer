@@ -10,38 +10,165 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// The account of user of Station
-// user's wallet address is primary key
+// unique links by /profile/[address]
 model Account {
-  id          Int                 @id @default(autoincrement())
-  address     String              @unique
+  id        Int               @id @default(autoincrement())
+  address   String            @unique
+  tickets   AccountTerminal[]
+  data      Json?
+  sessions  Session[]
+  proposals AccountProposal[]
+  rfps      RFP[]
+
+  // v1
   skills      AccountSkill[]
-  tickets     AccountTerminal[]
   initiatives AccountInitiative[]
-  data        Json?
   endorsed    Endorsement[]       @relation("Endorsed")
-  sessions    Session[]
-  proposals   AccountProposal[]
-  rfps        RFP[]
 }
 
-// Each DAO is represented by a terminal.
-// roleNameOverrides overrides default role names
+// unique links by /terminal/[handle]
 model Terminal {
   id              Int               @id @default(autoincrement())
-  ticketAddress   String?           @unique
   handle          String            @unique
   multisigAddress String?           @unique
-  initiatives     Initiative[]
-  roles           Role[]
-  members         AccountTerminal[]
   data            Json?
+  members         AccountTerminal[]
   tags            Tag[]
-  proposals       Proposal[]
   checkbooks      Checkbook[]
+  rfps            RFP[]
+  proposals       Proposal[]
   proposers       AccountProposal[]
-  RFP             RFP[]
+
+  // v1
+  ticketAddress String?      @unique
+  initiatives   Initiative[]
+  roles         Role[]
 }
+
+model AccountTerminal {
+  account    Account              @relation(fields: [accountId], references: [id])
+  accountId  Int
+  terminal   Terminal             @relation(fields: [terminalId], references: [id])
+  terminalId Int
+  joinedAt   DateTime             @default(now())
+  tags       AccountTerminalTag[]
+  data       Json?
+
+  // v1
+  active      Boolean @default(true)
+  roleLocalId Int?
+  role        Role?   @relation(fields: [terminalId, roleLocalId], references: [terminalId, localId])
+
+  @@id([accountId, terminalId])
+}
+
+model Tag {
+  id         Int                  @id @default(autoincrement())
+  type       String
+  value      String
+  active     Boolean              @default(true)
+  terminal   Terminal             @relation(fields: [terminalId], references: [id])
+  terminalId Int
+  discordId  String?
+  data       Json?
+  tickets    AccountTerminalTag[]
+
+  @@unique([value, terminalId])
+}
+
+model AccountTerminalTag {
+  tag              Tag             @relation(fields: [tagId], references: [id])
+  tagId            Int
+  ticket           AccountTerminal @relation(fields: [ticketAccountId, ticketTerminalId], references: [accountId, terminalId])
+  ticketAccountId  Int
+  ticketTerminalId Int
+
+  @@id([tagId, ticketAccountId, ticketTerminalId])
+}
+
+model Session {
+  id                 Int       @id @default(autoincrement())
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  expiresAt          DateTime?
+  handle             String    @unique
+  hashedSessionToken String?
+  antiCSRFToken      String?
+  publicData         String?
+  privateData        String?
+  userId             Int?
+  user               Account?  @relation(fields: [userId], references: [id])
+}
+
+model Checkbook {
+  address        String    @id
+  chainId        Int
+  name           String
+  parentMultisig String
+  terminal       Terminal? @relation(fields: [parentMultisig], references: [multisigAddress])
+  data           Json
+  rfps           RFP[]
+}
+
+// unique links by /rfp/[0xparentMultisig]/[localId]
+model RFP {
+  parentMultisig String
+  terminal       Terminal?  @relation(fields: [parentMultisig], references: [multisigAddress])
+  localId        Int
+  fundingAddress String
+  checkbook      Checkbook? @relation(fields: [fundingAddress], references: [address])
+  authorAddress  String
+  author         Account?   @relation(fields: [authorAddress], references: [address])
+  startDate      DateTime
+  endDate        DateTime?
+  status         RfpStatus  @default(DRAFT)
+  data           Json
+  proposals      Proposal[]
+
+  @@id([parentMultisig, localId])
+}
+
+// unique links by /proposal/[0xparentMultisig]/[localId]
+model Proposal {
+  parentMultisig String
+  terminal       Terminal?         @relation(fields: [parentMultisig], references: [multisigAddress])
+  fundingAddress String
+  rfpLocalId     Int
+  rfp            RFP               @relation(fields: [parentMultisig, rfpLocalId], references: [parentMultisig, localId])
+  status         ProposalStatus    @default(IN_REVIEW)
+  data           Json
+  localId        Int
+  createdAt      DateTime          @default(now())
+  collaborators  AccountProposal[]
+
+  @@id([parentMultisig, localId])
+}
+
+model AccountProposal {
+  id              Int       @id @default(autoincrement())
+  address         String
+  account         Account?  @relation(fields: [address], references: [address])
+  parentMultisig  String
+  proposalLocalId Int
+  proposal        Proposal  @relation(fields: [parentMultisig, proposalLocalId], references: [parentMultisig, localId])
+  terminal        Terminal? @relation(fields: [parentMultisig], references: [multisigAddress])
+}
+
+enum RfpStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ProposalStatus {
+  IN_REVIEW
+  APPROVED
+  PASSED
+}
+
+//
+//  V1 Models -- no longer used
+//
 
 // A role within a terminal
 model Role {
@@ -52,21 +179,6 @@ model Role {
   data       Json?
 
   @@id([terminalId, localId])
-}
-
-model AccountTerminal {
-  account     Account              @relation(fields: [accountId], references: [id])
-  accountId   Int
-  terminal    Terminal             @relation(fields: [terminalId], references: [id])
-  terminalId  Int
-  role        Role?                @relation(fields: [terminalId, roleLocalId], references: [terminalId, localId])
-  roleLocalId Int?
-  joinedAt    DateTime             @default(now())
-  active      Boolean              @default(true)
-  tags        AccountTerminalTag[]
-  data        Json?
-
-  @@id([accountId, terminalId])
 }
 
 // An initiative within a terminal
@@ -93,6 +205,12 @@ model AccountInitiative {
   data         Json?
 
   @@id([accountId, initiativeId])
+}
+
+enum AccountInitiativeStatus {
+  INTERESTED
+  CONTRIBUTING
+  PREVIOUSLY_CONTRIBUTED
 }
 
 model Skill {
@@ -131,114 +249,4 @@ model Endorsement {
   timestamp        DateTime @default(now())
   endorsementValue Int
   data             Json?
-}
-
-model Tag {
-  id         Int                  @id @default(autoincrement())
-  type       String
-  value      String
-  active     Boolean              @default(true)
-  terminal   Terminal             @relation(fields: [terminalId], references: [id])
-  terminalId Int
-  discordId  String?
-  data       Json?
-  tickets    AccountTerminalTag[]
-
-  @@unique([value, terminalId])
-}
-
-model AccountTerminalTag {
-  tag              Tag             @relation(fields: [tagId], references: [id])
-  tagId            Int
-  ticket           AccountTerminal @relation(fields: [ticketAccountId, ticketTerminalId], references: [accountId, terminalId])
-  ticketAccountId  Int
-  ticketTerminalId Int
-
-  @@id([tagId, ticketAccountId, ticketTerminalId])
-}
-
-enum AccountInitiativeStatus {
-  INTERESTED
-  CONTRIBUTING
-  PREVIOUSLY_CONTRIBUTED
-}
-
-model Session {
-  id                 Int       @id @default(autoincrement())
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  expiresAt          DateTime?
-  handle             String    @unique
-  hashedSessionToken String?
-  antiCSRFToken      String?
-  publicData         String?
-  privateData        String?
-  userId             Int?
-  user               Account?  @relation(fields: [userId], references: [id])
-}
-
-model Checkbook {
-  address        String    @id
-  chainId        Int
-  name           String
-  parentMultisig String
-  terminal       Terminal? @relation(fields: [parentMultisig], references: [multisigAddress])
-  data           Json
-  rfps           RFP[]
-}
-
-model RFP {
-  parentMultisig String
-  terminal       Terminal?  @relation(fields: [parentMultisig], references: [multisigAddress])
-  localId        Int
-  fundingAddress String
-  checkbook      Checkbook? @relation(fields: [fundingAddress], references: [address])
-  authorAddress  String
-  author         Account?   @relation(fields: [authorAddress], references: [address])
-  startDate      DateTime
-  endDate        DateTime?
-  status         RfpStatus  @default(DRAFT)
-  data           Json
-  proposals      Proposal[]
-
-  // unique links by /rfp/[0xparentMultisig]/[localId]
-  @@id([parentMultisig, localId])
-}
-
-model Proposal {
-  parentMultisig String
-  terminal       Terminal?         @relation(fields: [parentMultisig], references: [multisigAddress])
-  fundingAddress String
-  rfpLocalId     Int
-  rfp            RFP               @relation(fields: [parentMultisig, rfpLocalId], references: [parentMultisig, localId])
-  status         ProposalStatus    @default(IN_REVIEW)
-  data           Json
-  localId        Int
-  createdAt      DateTime          @default(now())
-  collaborators  AccountProposal[]
-
-  // unique links by /proposal/[0xparentMultisig]/[localId]
-  @@id([parentMultisig, localId])
-}
-
-model AccountProposal {
-  id              Int       @id @default(autoincrement())
-  address         String
-  account         Account?  @relation(fields: [address], references: [address])
-  parentMultisig  String
-  proposalLocalId Int
-  proposal        Proposal  @relation(fields: [parentMultisig, proposalLocalId], references: [parentMultisig, localId])
-  terminal        Terminal? @relation(fields: [parentMultisig], references: [multisigAddress])
-}
-
-enum RfpStatus {
-  DRAFT
-  PUBLISHED
-  ARCHIVED
-}
-
-enum ProposalStatus {
-  IN_REVIEW
-  APPROVED
-  PASSED
 }

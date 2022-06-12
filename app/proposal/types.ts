@@ -30,6 +30,7 @@ export type ProposalMetadata = {
 }
 
 export type Proposal = {
+  parentMultisig: string
   fundingAddress: string
   status: ProposalStatus
   data: ProposalMetadata

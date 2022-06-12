@@ -14,6 +14,7 @@ export type RfpMetadata = {
 }
 
 export type Rfp = {
+  parentMultisig: string
   fundingAddress: string
   localId: number
   authorAddress: string
