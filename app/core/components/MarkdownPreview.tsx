@@ -1,14 +1,11 @@
 import React, { useMemo } from "react"
 import { Slate, Editable, withReact } from "slate-react"
-import { createEditor, Element as SlateElement, Descendant } from "slate"
+import { createEditor, Descendant } from "slate"
 import { unified } from "unified"
-import markdown from "remark-parse"
 import { remarkToSlate } from "remark-slate-transformer"
 
-const postprocessor = unified().use(markdown).use(remarkToSlate)
-
 const PreviewEditor = ({ markdown }) => {
-  console.log(markdown)
+  const postprocessor = unified().use(markdown).use(remarkToSlate)
   const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = ({ attributes, children, element }) => {
     switch (element.type) {
