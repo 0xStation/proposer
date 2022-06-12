@@ -57,10 +57,20 @@ const NewRFPPage: BlitzPage = () => {
             )}
           </div>
           <div className="absolute bottom-10 left-[450px]">
-            <button className="border rounded p-1 mr-2" onClick={() => setPreviewMode(false)}>
-              Draft
+            <button
+              className={`border rounded p-1 mr-2 ${
+                !previewMode && "bg-marble-white text-tunnel-black"
+              }`}
+              onClick={() => setPreviewMode(false)}
+            >
+              Edit
             </button>
-            <button className="border rounded p-1" onClick={() => setPreviewMode(true)}>
+            <button
+              className={`border rounded p-1 mr-2 ${
+                previewMode && "bg-marble-white text-tunnel-black"
+              }`}
+              onClick={() => setPreviewMode(true)}
+            >
               Preview
             </button>
           </div>
