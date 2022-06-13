@@ -82,3 +82,19 @@ body {
   right: 10px;
   position: absolute;
 }
+
+.markdown-prose h1 {
+  @apply text-3xl font-bold;
+}
+
+.markdown-prose h2 {
+  @apply text-2xl font-bold;
+}
+
+.markdown-prose h3 {
+  @apply text-xl font-bold;
+}
+
+.markdown-prose h4 {
+  @apply text-base font-bold;
+}
