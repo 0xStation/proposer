@@ -2,15 +2,15 @@ import db from "db"
 import * as z from "zod"
 import { computeStatus } from "../utils"
 
-const GetRfpById = z.object({
-  multisigAddress: z.string(),
+const GetRfpByLocalId = z.object({
+  terminalId: z.number(),
   localId: z.number(),
 })
 
-export default async function getRfpsByMultisigAddress(input: z.infer<typeof GetRfpById>) {
+export default async function getRfpsByLocalId(input: z.infer<typeof GetRfpByLocalId>) {
   const rfps = await db.rfp.findMany({
     where: {
-      parentMultisig: input.multisigAddress,
+      terminalId: input.terminalId,
       localId: input.localId,
     },
     include: {

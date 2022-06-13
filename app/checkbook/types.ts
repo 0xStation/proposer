@@ -3,7 +3,6 @@ export type CheckbookMetadata = {
 }
 
 export type Checkbook = {
-  parentMultisig: string
   address: string
   chainId: number
   name: string

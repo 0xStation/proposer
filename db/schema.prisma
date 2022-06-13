@@ -14,8 +14,8 @@ generator client {
 // unique links by /profile/[address]
 model Account {
   id        Int               @id @default(autoincrement())
-  address   String?            @unique
-  discordId String?             @unique
+  address   String?           @unique
+  discordId String?           @unique
   tickets   AccountTerminal[]
   data      Json?
   sessions  Session[]
@@ -30,16 +30,15 @@ model Account {
 
 // unique links by /terminal/[handle]
 model Terminal {
-  id              Int               @id @default(autoincrement())
-  handle          String            @unique
-  multisigAddress String?           @unique
-  data            Json?
-  members         AccountTerminal[]
-  tags            Tag[]
-  checkbooks      Checkbook[]
-  rfps            Rfp[]
-  proposals       Proposal[]
-  proposers       AccountProposal[]
+  id         Int               @id @default(autoincrement())
+  handle     String            @unique
+  data       Json?
+  members    AccountTerminal[]
+  tags       Tag[]
+  checkbooks Checkbook[]
+  rfps       Rfp[]
+  proposals  Proposal[]
+  proposers  AccountProposal[]
 
   // v1
   ticketAddress String?      @unique
@@ -103,19 +102,19 @@ model Session {
 }
 
 model Checkbook {
-  address        String    @id
-  chainId        Int
-  name           String
-  parentMultisig String
-  terminal       Terminal? @relation(fields: [parentMultisig], references: [multisigAddress])
-  data           Json
-  rfps           Rfp[]
+  address    String   @id
+  chainId    Int
+  name       String
+  terminalId Int
+  terminal   Terminal @relation(fields: [terminalId], references: [id])
+  data       Json
+  rfps       Rfp[]
 }
 
-// unique links by /rfp/[0xparentMultisig]/[localId]
+// unique links by /terminal/[handle]/rfp/[localId]
 model Rfp {
-  parentMultisig String
-  terminal       Terminal?  @relation(fields: [parentMultisig], references: [multisigAddress])
+  terminalId     Int
+  terminal       Terminal   @relation(fields: [terminalId], references: [id])
   localId        Int
   fundingAddress String
   checkbook      Checkbook? @relation(fields: [fundingAddress], references: [address])
@@ -127,33 +126,33 @@ model Rfp {
   data           Json
   proposals      Proposal[]
 
-  @@id([parentMultisig, localId])
+  @@id([terminalId, localId])
 }
 
-// unique links by /proposal/[0xparentMultisig]/[localId]
+// unique links by /terminal/[handle]/proposal/[localId]
 model Proposal {
-  parentMultisig String
-  terminal       Terminal?         @relation(fields: [parentMultisig], references: [multisigAddress])
+  terminalId     Int
+  terminal       Terminal          @relation(fields: [terminalId], references: [id])
   fundingAddress String
   rfpLocalId     Int
-  rfp            Rfp               @relation(fields: [parentMultisig, rfpLocalId], references: [parentMultisig, localId])
+  rfp            Rfp               @relation(fields: [terminalId, rfpLocalId], references: [terminalId, localId])
   status         ProposalStatus    @default(IN_REVIEW)
   data           Json
   localId        Int
   createdAt      DateTime          @default(now())
   collaborators  AccountProposal[]
 
-  @@id([parentMultisig, localId])
+  @@id([terminalId, localId])
 }
 
 model AccountProposal {
-  id              Int       @id @default(autoincrement())
+  id              Int      @id @default(autoincrement())
   address         String
-  account         Account?  @relation(fields: [address], references: [address])
-  parentMultisig  String
+  account         Account? @relation(fields: [address], references: [address])
+  terminalId      Int
+  terminal        Terminal @relation(fields: [terminalId], references: [id])
   proposalLocalId Int
-  proposal        Proposal  @relation(fields: [parentMultisig, proposalLocalId], references: [parentMultisig, localId])
-  terminal        Terminal? @relation(fields: [parentMultisig], references: [multisigAddress])
+  proposal        Proposal @relation(fields: [terminalId, proposalLocalId], references: [terminalId, localId])
 }
 
 enum RfpStatus {
@@ -255,5 +254,5 @@ model Endorsement {
 //
 // Don't write new models below here!
 // This is the deprecated V1 models section
-// Write new models above :)
+// Write new models above this section :)
 //
