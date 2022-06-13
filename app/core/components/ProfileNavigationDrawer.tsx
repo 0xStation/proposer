@@ -37,6 +37,22 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
       </button>
     ) : null
 
+  const openATerminalLink =
+    session?.siwe?.address && activeUser ? (
+      <Link href={Routes.CreateTerminalDetailsPage()}>
+        <span className="block hover:opacity-70 cursor-pointer">Open a Terminal</span>
+      </Link>
+    ) : (
+      <a
+        href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+      >
+        <span className="block hover:opacity-70 cursor-pointer">Open a Terminal</span>
+      </a>
+    )
+
   const profilePfp =
     activeUser && activeUser.data?.pfpURL ? (
       <>
@@ -61,7 +77,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
-      <Dialog as="div" className="fixed inset-0 overflow-hidden" onClose={setIsOpen}>
+      <Dialog as="div" className="fixed inset-0 overflow-hidden z-50" onClose={setIsOpen}>
         <div className="absolute inset-0 overflow-hidden">
           <Transition.Child
             as={Fragment}
@@ -94,16 +110,12 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                     {profilePfp}
                     {session?.siwe?.address && (
                       <div className="text-xs text-light-concrete flex mt-7 ml-1 mb-1">
-                        <p>{truncateString(session?.siwe?.address)}</p>
+                        <p>@{truncateString(session?.siwe?.address)}</p>
                       </div>
                     )}
                     <div className="space-y-2 mt-4">
                       {profileLinkOption}
-                      <Link href={Routes.CreateTerminalDetailsPage()}>
-                        <span className="block hover:opacity-70 cursor-pointer">
-                          Open a Terminal
-                        </span>
-                      </Link>
+                      {openATerminalLink}
                       <button className="block hover:opacity-70" onClick={handleDisconnect}>
                         Disconnect
                       </button>

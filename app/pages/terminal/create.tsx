@@ -1,12 +1,13 @@
 import { useState } from "react"
-import { BlitzPage, useMutation, useRouter, Image, Router, useSession } from "blitz"
+import { BlitzPage, useMutation, useRouter, Routes, Image, Router, useSession } from "blitz"
 import createTerminal from "app/terminal/mutations/createTerminal"
 import { Field, Form } from "react-final-form"
 import { useDropzone } from "react-dropzone"
-import useToast from "app/core/hooks/useToast"
 import UploadIcon from "app/core/icons/UploadIcon"
-import { composeValidators, requiredField, mustBeUnder50Chars } from "app/utils/validators"
+import { composeValidators, requiredField, mustBeUnderNumCharacters } from "app/utils/validators"
 import Exit from "/public/exit-button.svg"
+import useStore from "app/core/hooks/useStore"
+import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 
 const PfpInput = ({ pfpURL, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
@@ -33,7 +34,7 @@ const PfpInput = ({ pfpURL, onUpload }) => {
   return (
     <div className="flex flex-col">
       <label className="font-bold text-base">Logo</label>
-      <span className="text-concrete text-xs mt-1">.jpg or .png</span>
+      <span className="text-concrete text-xs">.jpg or .png</span>
       <div
         className="w-24 h-24 border rounded-xl bg-gradient-to-b object-cover from-electric-violet to-magic-mint border-concrete flex items-center justify-center cursor-pointer mt-2"
         {...getRootProps()}
@@ -62,100 +63,102 @@ const PfpInput = ({ pfpURL, onUpload }) => {
 const CreateTerminalDetailsPage: BlitzPage = () => {
   const session = useSession({ suspense: false })
   const router = useRouter()
-  const [addToast, Toast] = useToast()
+  const setToastState = useStore((state) => state.setToastState)
   const [pfpURL, setPfpURL] = useState<string>("")
   const [createTerminalMutation] = useMutation(createTerminal, {
-    onSuccess: (_data) => {
-      // go to the terminal page? Do we even have one yet?
-      let route = `/`
-      router.push(route, undefined, { shallow: true })
-    },
-    onError: (error: Error) => {
-      console.error(error)
-      addToast(error.toString(), "error")
+    onSuccess: (data) => {
+      router.push(Routes.MemberDirectoryPage({ terminalHandle: data.handle, tutorial: "true" }))
     },
   })
 
-  console.log(session)
-
   return (
-    <main className="text-marble-white min-h-screen max-w-screen-sm mx-auto">
-      <div
-        className="absolute top-4 left-4 cursor-pointer"
-        onClick={() => {
-          Router.back()
-        }}
-      >
-        <Image src={Exit} alt="Close button" width={12} height={12} />
-      </div>
-      {session.userId ? (
-        <>
-          <h2 className="text-2xl font-bold pt-16">Open a Terminal</h2>
-          <h6 className="mt-2">
-            Terminal is where members of your community collaborate and make decisions. Tell us
-            about your Terminal.
-          </h6>
-          <Form
-            initialValues={{}}
-            onSubmit={async (values: { name: string; handle: string; pfpURL?: string }) => {
-              if (session.userId !== null) {
-                await createTerminalMutation({
-                  ...values,
-                  pfpURL,
-                  accountId: session.userId,
-                })
-              }
-            }}
-            render={({ form, handleSubmit }) => {
-              let formState = form.getState()
-              let errors = formState.errors
-              return (
-                <form onSubmit={handleSubmit} className="mt-6">
-                  <div className="flex flex-col">
-                    <div className="flex flex-col pb-2 col-span-2">
-                      <label className="font-bold">Terminal Name*</label>
-                      <span className="text-concrete text-xs mt-1">50 characters max.</span>
-                      <Field
-                        name="name"
-                        component="input"
-                        validate={composeValidators(mustBeUnder50Chars, requiredField)}
-                        className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-1"
-                      />
-                      <span className="text-torch-red text-xs">{errors?.name}</span>
-                      <label className="font-bold mt-4">Terminal Handle*</label>
-                      <span className="text-concrete text-xs mt-1">50 characters max.</span>
-                      <Field
-                        name="handle"
-                        component="input"
-                        validate={composeValidators(mustBeUnder50Chars, requiredField)}
-                        className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-1"
-                      />
-                      <span className="text-torch-red text-xs">{errors?.handle}</span>
-                      <div className="mt-4">
-                        <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
+    <LayoutWithoutNavigation>
+      <main className="text-marble-white min-h-screen max-w-screen-sm mx-auto">
+        <div
+          className="absolute top-4 left-4 cursor-pointer"
+          onClick={() => {
+            Router.back()
+          }}
+        >
+          <Image src={Exit} alt="Close button" width={12} height={12} />
+        </div>
+        {session.userId ? (
+          <>
+            <h2 className="text-2xl font-bold pt-16">Open a Terminal</h2>
+            <h6 className="mt-2">
+              Terminal is where community members propose, coordinate, and fund ideas. Give it some
+              bling.
+            </h6>
+            <Form
+              initialValues={{}}
+              onSubmit={async (values: { name: string; handle: string; pfpURL?: string }) => {
+                if (session.userId !== null) {
+                  try {
+                    await createTerminalMutation({
+                      ...values,
+                      pfpURL,
+                      accountId: session.userId,
+                    })
+                  } catch (err) {
+                    setToastState({ isToastShowing: true, type: "error", message: err.toString() })
+                  }
+                }
+              }}
+              render={({ form, handleSubmit }) => {
+                let formState = form.getState()
+                console.log(formState)
+                let errors = formState.errors
+                return (
+                  <form onSubmit={handleSubmit} className="mt-12">
+                    <div className="flex flex-col">
+                      <div className="flex flex-col pb-2 col-span-2">
+                        <label className="font-bold">Terminal name*</label>
+                        <span className="text-concrete text-xs mb-2">50 characters max.</span>
+                        <Field
+                          name="name"
+                          component="input"
+                          validate={composeValidators(mustBeUnderNumCharacters(50), requiredField)}
+                          className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-1"
+                        />
+                        <span className="text-torch-red text-xs">
+                          {formState.touched && formState?.touched["name"] && errors?.name}
+                        </span>
+                        <label className="font-bold mt-6">Terminal handle*</label>
+                        <span className="text-concrete text-xs mb-2">50 characters max.</span>
+                        <Field
+                          name="handle"
+                          component="input"
+                          validate={composeValidators(mustBeUnderNumCharacters(50), requiredField)}
+                          className="w-full rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-1"
+                        />
+                        <span className="text-torch-red text-xs">
+                          {formState.touched && formState?.touched["handle"] && errors?.handle}
+                        </span>
+                        <div className="mt-6">
+                          <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
+                        </div>
+                      </div>
+                      <div className="mt-14">
+                        <button
+                          className={`rounded text-tunnel-black px-8 py-1 bg-magic-mint ${
+                            formState.hasValidationErrors && "opacity-50"
+                          }`}
+                          type="submit"
+                        >
+                          Open
+                        </button>
                       </div>
                     </div>
-                    <div className="mt-4">
-                      <button
-                        className={`rounded text-tunnel-black px-8 py-1 ${
-                          formState.hasValidationErrors ? "bg-light-concrete" : "bg-magic-mint"
-                        }`}
-                        type="submit"
-                      >
-                        Open
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              )
-            }}
-          />
-        </>
-      ) : (
-        <div>you need to have an account to create a terminal.</div>
-      )}
-      <Toast />
-    </main>
+                  </form>
+                )
+              }}
+            />
+          </>
+        ) : (
+          <div>You need to have an account to create a terminal.</div>
+        )}
+      </main>
+    </LayoutWithoutNavigation>
   )
 }
 

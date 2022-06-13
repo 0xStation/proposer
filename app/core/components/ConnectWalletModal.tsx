@@ -85,6 +85,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         setErrorMessage("Wallet signature declined.")
       } else {
         setErrorMessage("Something went wrong.")
+        console.error(err)
       }
       setConnectState({ error: true, success: false, loading: false })
     }
@@ -98,9 +99,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
       banner={Banner}
       showTitle={true}
     >
-      <p className="text-lg text-center mt-4">
-        Connect your wallet to enter Station and explore initiatives.
-      </p>
+      <p className="text-lg text-center mt-4">Connect your wallet to enter Station.</p>
       <p className="text-lg text-center">
         New to web3? Learn how to create a wallet{" "}
         <a className="text-magic-mint" href="https://www.youtube.com/watch?v=OsRIHlr0_Iw">

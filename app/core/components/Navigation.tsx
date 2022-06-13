@@ -59,7 +59,7 @@ const Navigation = ({ children }: { children?: any }) => {
           />
         </div>
         <div className="text-xs text-light-concrete flex mt-1">
-          <p>{truncateString(session?.siwe?.address, 3)}</p>
+          <p>@{truncateString(session?.siwe?.address, 2)}</p>
         </div>
       </>
     ) : session?.siwe?.address ? (
@@ -70,7 +70,7 @@ const Navigation = ({ children }: { children?: any }) => {
           className="rounded-full w-[46px] h-[46px] bg-gradient-to-b from-electric-violet to-magic-mint mx-auto cursor-pointer"
         ></div>
         <div className="text-xs text-light-concrete flex mt-1">
-          <p>{truncateString(session?.siwe?.address, 3)}</p>
+          <p>@{truncateString(session?.siwe?.address, 2)}</p>
         </div>
       </>
     ) : null
@@ -91,14 +91,17 @@ const Navigation = ({ children }: { children?: any }) => {
       {/* Need a parent element around the banner or else there's a chance for a hydration issue and the dom rearranges */}
       <div>
         {!session?.siwe?.address && (
-          <div className="w-full h-14 absolute z-10 bg-concrete bottom-0">
-            <div className="fixed right-0 mt-3">
-              <p className="inline-block mr-5 italic">
-                {!address ? "Join the ride →" : "Sign in with ethereum →"}
-              </p>
+          <div className="w-full h-[70px] absolute z-[60] bg-wet-concrete bottom-0">
+            <div className="fixed mt-2 left-1/3 ml-[-213px]">
+              <div className="inline-block mr-16">
+                <h2 className="inline-block mr-5 text-xl font-bold justify-center">
+                  {!address ? "Be recognized in your community" : "Sign in with Ethereum"}
+                </h2>
+                <p>Connect your wallet and join the next class of emerging talent</p>
+              </div>
               <button
                 onClick={() => toggleWalletModal(true)}
-                className="inline mr-10  bg-magic-mint text-tunnel-black w-48 rounded align-middle p-1 hover:bg-opacity-70"
+                className="inline h-[35px] bg-magic-mint text-tunnel-black w-48 rounded align-middle p-1 hover:bg-opacity-70 ml-28 mb-7"
               >
                 {!address ? "Connect Wallet" : "Sign"}
               </button>
@@ -107,7 +110,7 @@ const Navigation = ({ children }: { children?: any }) => {
         )}
       </div>
       <div className="h-screen w-[70px] bg-tunnel-black border-r border-concrete fixed top-0 left-0 text-center flex flex-col">
-        {/* hardcoding the link for now - we don't have access to the window object unless we pass it via 
+        {/* hardcoding the link for now - we don't have access to the window object unless we pass it via
         serverside props through the `Layout` component on every page */}
         <a className="mt-1 inline-block" href="https://app.station.express">
           <Image src={StationLogo} alt="Station logo" height={20} width={54} />

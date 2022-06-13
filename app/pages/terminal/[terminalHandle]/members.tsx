@@ -1,4 +1,4 @@
-import { BlitzPage, useQuery, useParam } from "blitz"
+import { BlitzPage, useQuery, useParam, Image, Link, Routes } from "blitz"
 import { Fragment, useEffect, useState } from "react"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import Layout from "app/core/layouts/Layout"
@@ -11,6 +11,15 @@ import { Form } from "react-final-form"
 import truncateString from "app/core/utils/truncateString"
 import getMembersByTerminalId from "app/accountTerminal/queries/getMembersByTerminalId"
 import { AccountTerminalWithTagsAndAccount } from "app/accountTerminal/types"
+import { formatDate } from "app/core/utils/formatDate"
+import GithubIcon from "public/github-icon.svg"
+import TwitterIcon from "public/twitter-icon.svg"
+import PersonalSiteIcon from "public/personal-site-icon.svg"
+import InstagramIcon from "public/instagram-icon.svg"
+import TikTokIcon from "public/tiktok-icon.svg"
+import { toTitleCase } from "app/core/utils/titleCase"
+import { RefreshIcon } from "@heroicons/react/outline"
+import useStore from "app/core/hooks/useStore"
 
 interface Filters {
   [tagType: string]: Set<string>
@@ -27,11 +36,13 @@ const MemberDirectoryPage: BlitzPage = () => {
   // selected user to display in the contributor card
   const [selectedMember, setSelectedMember] = useState<AccountTerminalWithTagsAndAccount>()
 
+  const setToastState = useStore((state) => state.setToastState)
+
   // filters is a hashmap where the key is the tag type and the value is a Set of strings
   // where the strings are applied filters
   const [filters, setFilters] = useState<Filters>({})
 
-  /* 
+  /*
   `groupedTags` returns an object where the key
   is the tag type and the value is an array of tags
   that fall under the category:
@@ -75,12 +86,47 @@ const MemberDirectoryPage: BlitzPage = () => {
     }
   )
 
+  const refreshRoles = async () => {
+    if (terminal) {
+      const response = await fetch("/api/discord/sync-roles", {
+        method: "POST",
+        body: JSON.stringify({
+          terminalId: terminal.id,
+        }),
+      })
+
+      if (response.status !== 200) {
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: "Something went wrong!",
+        })
+        return
+      }
+
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Your roles are refreshed",
+      })
+    }
+  }
+
   return (
     <Layout>
       <TerminalNavigation>
         {/* Filter View */}
         <div className="h-[130px] border-b border-concrete">
-          <h1 className="text-2xl font-bold ml-6 pt-7">Membership Directory</h1>
+          <div className="flex flex-row items-center ml-6 pt-7">
+            <h1 className="text-2xl font-bold">Members</h1>
+            {groupedTags && Object.entries(groupedTags).length ? (
+              <RefreshIcon
+                className="h-5 w-5 ml-2 mt-1 cursor-pointer"
+                aria-hidden="true"
+                onClick={() => refreshRoles()}
+              />
+            ) : null}
+          </div>
           <div className="flex ml-6 pt-4 space-x-2">
             {groupedTags && Object.entries(groupedTags).length ? (
               Object.entries(groupedTags).map(([tagType, tags], idx) => (
@@ -105,6 +151,7 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <ContributorComponent
                   key={`${member.joinedAt}${idx}`}
                   member={member}
+                  selectedMember={selectedMember}
                   setSelectedMember={setSelectedMember}
                 />
               ))}
@@ -115,17 +162,6 @@ const MemberDirectoryPage: BlitzPage = () => {
     </Layout>
   )
 }
-
-const PfpImage = ({ account }) =>
-  account.data.pfpURL ? (
-    <img
-      src={account.data.pfpURL}
-      alt="PFP"
-      className="min-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
-    />
-  ) : (
-    <div className="h-[46px] min-w-[46px] place-self-center border border-wet-concrete bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
-  )
 
 const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) => {
   const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
@@ -187,11 +223,12 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                 <span
                   className={`${
                     open
-                      ? "bg-marble-white text-tunnel-black"
-                      : "hover:bg-marble-white hover:text-tunnel-black"
-                  } capitalize group rounded-full border border-concrete h-[17px] w-max p-4 flex flex-center items-center cursor-pointer `}
+                      ? "bg-marble-white text-tunnel-black  border-marble-white"
+                      : "hover:bg-marble-white hover:text-tunnel-black border-concrete hover:border-marble-white"
+                  } capitalize group rounded-full border h-[17px] w-max p-4 flex flex-center items-center cursor-pointer `}
                 >
-                  {tagType}
+                  {tagType}{" "}
+                  {filters[tagType] && filters[tagType].size ? `(${filters[tagType].size})` : ""}
                   <div className="ml-3">
                     <DropdownChevronIcon
                       className={`${open ? "fill-tunnel-black" : "group-hover:fill-tunnel-black"}`}
@@ -245,7 +282,7 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                                   className="align-middle"
                                 />
                                 <p className="p-0.5 align-middle mx-4 inline leading-none">
-                                  {tag.value}
+                                  {toTitleCase(tag.value)}
                                 </p>
                               </div>
                             )
@@ -253,7 +290,7 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
                         </div>
                         <button
                           type="submit"
-                          className="bg-marble-white w-52 text-tunnel-black rounded mb-4 ml-4 mr-1 hover:opacity-70"
+                          className="bg-marble-white w-52 h-[35px] text-tunnel-black rounded mb-4 ml-4 mr-1 hover:opacity-70"
                         >
                           Apply
                         </button>
@@ -276,18 +313,28 @@ const FilterPill = ({ tagType, tags, allMembers, setFilteredMembers, filters }) 
   )
 }
 
-const ContributorComponent = ({ member, setSelectedMember }) => {
+const ContributorComponent = ({ member, selectedMember, setSelectedMember }) => {
   const { account } = member
 
   return (
     <div
       tabIndex={0}
-      className="flex flex-row space-x-52 p-3 mx-3 mt-3 rounded-lg hover:bg-wet-concrete cursor-pointer"
+      className={`flex flex-row space-x-52 p-3 mx-3 mt-3 rounded-lg hover:bg-wet-concrete cursor-pointer ${
+        account.id === selectedMember?.account?.id ? "bg-wet-concrete" : ""
+      }`}
       onClick={() => setSelectedMember(member)}
     >
       <div className="flex space-x-2">
         <div className="flex flex-col content-center align-middle mr-1">
-          <PfpImage account={account} />
+          {account.data.pfpURL ? (
+            <img
+              src={account.data.pfpURL}
+              alt="PFP"
+              className="min-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
+            />
+          ) : (
+            <div className="h-[46px] min-w-[46px] place-self-center border border-wet-concrete bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
+          )}
         </div>
         <div className="flex flex-col content-center">
           <div className="flex flex-row items-center space-x-1">
@@ -296,7 +343,9 @@ const ContributorComponent = ({ member, setSelectedMember }) => {
             </p>
           </div>
           <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-            <p className="w-max truncate leading-4">@{truncateString(account.address)}</p>
+            {account.address && (
+              <p className="w-max truncate leading-4">@{truncateString(account.address)}</p>
+            )}
           </div>
         </div>
       </div>
@@ -315,19 +364,33 @@ const SelectedContributorCard = ({ member }) => {
   const roleTags = member.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === "role"
   )
-  const initiativeTags = member.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "initiative"
+  const projectTags = member.tags?.filter(
+    (accountTerminalTag) => accountTerminalTag.tag.type === "project"
   )
   const guildTags = member.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === "guild"
   )
+
+  const profileLink = account.address
+    ? Routes.ProfileHome({ accountAddress: account.address })
+    : Routes.DiscordProfileHome({ discordId: account.discordId })
 
   return (
     <div className="h-full border-l border-concrete col-span-3">
       <div className="m-5 flex-col">
         <div className="flex space-x-2">
           <div className="flex flex-col content-center align-middle mr-1">
-            <PfpImage account={account} />
+            <Link href={profileLink}>
+              {account.data.pfpURL ? (
+                <img
+                  src={account.data.pfpURL}
+                  alt="PFP"
+                  className="min-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete hover:border-marble-white"
+                />
+              ) : (
+                <div className="h-[46px] min-w-[46px] place-self-center border border-wet-concrete hover:border-marble-white bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
+              )}
+            </Link>
           </div>
           <div className="flex flex-col content-center">
             <div className="flex flex-row items-center space-x-1">
@@ -336,20 +399,76 @@ const SelectedContributorCard = ({ member }) => {
               </div>
             </div>
             <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-              <div className="w-max truncate leading-4">@{truncateString(account.address)}</div>
+              {account.address ? (
+                <div className="w-max truncate leading-4">@{truncateString(account.address)}</div>
+              ) : (
+                <div className="w-max truncate leading-4">Imported from discord</div>
+              )}
             </div>
           </div>
         </div>
-        <div className="mt-9 text-xs">
+        <div className="mt-5 space-x-4">
+          {account?.data?.contactURL && (
+            <a
+              href={account?.data?.contactURL}
+              target="_blank"
+              className="hover:opacity-70 cursor-pointer"
+              rel="noreferrer"
+            >
+              <Image src={PersonalSiteIcon} alt="Personal Site Icon." width={15} height={15} />
+            </a>
+          )}
+          {account?.data?.twitterUrl && (
+            <a
+              href={account?.data?.twitterUrl}
+              target="_blank"
+              className="hover:opacity-70 cursor-pointer"
+              rel="noreferrer"
+            >
+              <Image src={TwitterIcon} alt="Twitter Icon." width={15} height={15} />
+            </a>
+          )}
+          {account?.data?.githubUrl && (
+            <a
+              href={account?.data?.githubUrl}
+              target="_blank"
+              className="hover:opacity-70 cursor-pointer"
+              rel="noreferrer"
+            >
+              <Image src={GithubIcon} alt="Github Icon." width={15} height={15} />
+            </a>
+          )}
+          {account?.data?.tiktokUrl && (
+            <a
+              href={account?.data?.tiktokUrl}
+              target="_blank"
+              className="hover:opacity-70 cursor-pointer"
+              rel="noreferrer"
+            >
+              <Image src={TikTokIcon} alt="TikTok Icon." width={15} height={15} />
+            </a>
+          )}
+          {account?.data?.instagramUrl && (
+            <a
+              href={account?.data?.instagramUrl}
+              target="_blank"
+              className="hover:opacity-70 cursor-pointer"
+              rel="noreferrer"
+            >
+              <Image src={InstagramIcon} alt="Instagram Icon." width={15} height={15} />
+            </a>
+          )}
+        </div>
+        <div className="mt-5 text-xs">
           <TagDetails tagType="status" tags={statusTags} />
           {member.joinedAt && (
             <div className="mt-7">
-              <p className="uppercase mb-3">joined since</p>
-              <p className="text-base">{member.joinedAt.toDateString()}</p>
+              <p className="uppercase mb-2">joined since</p>
+              <p className="text-base">{formatDate(member.joinedAt)}</p>
             </div>
           )}
           <TagDetails tagType="roles" tags={roleTags} />
-          <TagDetails tagType="initiatives" tags={initiativeTags} />
+          <TagDetails tagType="projects" tags={projectTags} />
           <TagDetails tagType="guilds" tags={guildTags} />
         </div>
       </div>
@@ -362,13 +481,15 @@ const TagDetails = ({ tagType, tags }: { tagType: string; tags: any[] }) => {
 
   return (
     <div className="mt-7">
-      <p className="uppercase mb-3">{tagType}</p>
-      <div className="flex-row space-x-2">
+      <p className="uppercase mb-2">
+        {tags.length > 1 || tagType == "status" ? tagType : tagType.slice(0, -1)}
+      </p>
+      <div className="flex-row space-y-2 align-left mr-2">
         {tags.map((accountTerminalTag) => {
           return (
             <span
               key={accountTerminalTag.tag.value}
-              className="rounded-full py-1 px-3 bg-wet-concrete uppercase font-bold"
+              className="rounded-full py-1 px-3 mr-2 bg-wet-concrete uppercase font-bold inline-block"
             >
               {accountTerminalTag.tag.value}
             </span>

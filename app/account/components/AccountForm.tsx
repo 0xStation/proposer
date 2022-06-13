@@ -1,17 +1,23 @@
 import { useState, useEffect } from "react"
-import { useMutation, useQuery } from "blitz"
+import { useMutation, useQuery, Image } from "blitz"
 import { Field, Form } from "react-final-form"
 import updateAccount from "../mutations/updateAccount"
 import createAccount from "../mutations/createAccount"
 import useStore from "app/core/hooks/useStore"
-import getSkills from "app/skills/queries/getSkills"
 import { useDropzone } from "react-dropzone"
-import Select from "app/core/components/form/Select"
-import MultiSelect from "app/core/components/form/MultiSelect"
-import { TimezoneOptions, getTimezoneOptionFromValue } from "app/utils/timezoneOptions"
 import UploadIcon from "app/core/icons/UploadIcon"
 import { Account } from "app/account/types"
-import { toTitleCase } from "app/core/utils/titleCase"
+import PersonalSiteIcon from "public/personal-site-icon.svg"
+import TwitterIcon from "public/twitter-icon.svg"
+import GithubIcon from "public/github-icon.svg"
+import TikTokIcon from "public/tiktok-icon.svg"
+import InstagramIcon from "public/instagram-icon.svg"
+import {
+  mustBeUrl,
+  requiredField,
+  composeValidators,
+  mustBeUnderNumCharacters,
+} from "app/utils/validators"
 
 interface ApplicationParams {
   name: string
@@ -46,8 +52,9 @@ const CoverPhotoInput = ({ coverURL, onUpload }) => {
   return (
     <div className="flex-col">
       <label className="font-bold text-base">Cover</label>
+      <p className="text-concrete text-sm">.jpg or .png, 600 x 600px recommended</p>
       <div
-        className="w-96 h-52 bg-gradient-to-b object-cover from-electric-violet to-magic-mint border border-concrete cursor-pointer relative mt-4"
+        className="w-[18rem] h-[9rem] bg-gradient-to-b object-cover from-electric-violet to-magic-mint border border-concrete cursor-pointer relative mt-2"
         {...getRootProps()}
       >
         {coverURL && (
@@ -89,8 +96,9 @@ const PfpInput = ({ pfpURL, onUpload }) => {
   return (
     <div className="flex-col">
       <label className="font-bold text-base">PFP</label>
+      <p className="text-concrete text-sm">.jpg or .png, 600 x 600px recommended</p>
       <div
-        className="w-52 h-52 rounded-full bg-gradient-to-b object-cover from-electric-violet to-magic-mint border-concrete flex items-center justify-center cursor-pointer mt-4"
+        className="w-[5.66rem] h-[5.66rem] border border-wet-concrete rounded-full bg-gradient-to-b object-cover from-electric-violet to-magic-mint flex items-center justify-center cursor-pointer mt-2"
         {...getRootProps()}
       >
         <>
@@ -104,9 +112,7 @@ const PfpInput = ({ pfpURL, onUpload }) => {
           <span className="absolute z-10">
             <UploadIcon />
           </span>
-          <div className="rounded-full bg-tunnel-black opacity-50 h-5 w-5 absolute">
-            <span className=" h-full w-full"></span>
-          </div>
+          <div className="rounded-full bg-tunnel-black opacity-50 h-5 w-5 absolute" />
           <input {...getInputProps()} />
         </>
       </div>
@@ -121,20 +127,13 @@ const AccountForm = ({
   isEdit,
 }: {
   onSuccess: () => void
-  address: string
+  address?: string
   account?: Account
   isEdit: boolean
 }) => {
-  const [coverURL, setCoverURL] = useState("")
-  const [pfpURL, setPfpURL] = useState("")
-  const activeUser = useStore((state) => state.activeUser)
+  const [coverURL, setCoverURL] = useState<string | undefined>()
+  const [pfpURL, setPfpURL] = useState<string | undefined>()
   const setActiveUser = useStore((state) => state.setActiveUser)
-
-  let existingActiveUserParams = {
-    ens: activeUser?.data?.ens,
-    discordId: activeUser?.data?.discordId,
-    verified: activeUser?.data?.verified,
-  }
 
   const [createAccountMutation] = useMutation(createAccount, {
     onSuccess: (data) => {
@@ -142,7 +141,7 @@ const AccountForm = ({
       setActiveUser(data)
     },
     onError: (error) => {
-      console.log(error)
+      console.error(error)
     },
   })
 
@@ -152,27 +151,15 @@ const AccountForm = ({
       setActiveUser(data)
     },
     onError: (error) => {
-      console.log(error)
+      console.error(error)
     },
   })
 
   useEffect(() => {
     // initialize pfpInput and coverInput with user's pre-existing images
-    setPfpURL(account?.data?.pfpURL || "")
-    setCoverURL(account?.data?.coverURL || "")
+    setPfpURL(account?.data?.pfpURL)
+    setCoverURL(account?.data?.coverURL)
   }, [account?.data?.pfpURL, account?.data?.coverURL])
-
-  const [skills] = useQuery(getSkills, {}, { suspense: false })
-  const skillOptions = skills?.map((skill) => {
-    return { value: skill.name, label: toTitleCase(skill.name) }
-  })
-
-  const existingSkills =
-    account?.skills.map((skill) => {
-      return { value: skill.skill.name, label: skill.skill.name, id: skill.skill.id }
-    }) || []
-
-  const existingTimezone = getTimezoneOptionFromValue(account?.data.timezone)
 
   return (
     <Form
@@ -181,13 +168,10 @@ const AccountForm = ({
         try {
           if (isEdit) {
             await updateAccountMutation({
-              ...existingActiveUserParams,
               ...values,
               address,
               pfpURL,
               coverURL,
-              existingSkills,
-              timezone: values.timezone.value,
             })
           } else {
             await createAccountMutation({
@@ -195,7 +179,7 @@ const AccountForm = ({
               address,
               pfpURL,
               coverURL,
-              timezone: values.timezone.value,
+              createSession: true,
             })
           }
         } catch (error) {
@@ -205,80 +189,170 @@ const AccountForm = ({
       }}
       render={({ handleSubmit }) => (
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 gap-y-6 gap-x-2">
-            <div className="flex flex-col col-span-2">
-              <div className="w-full h-44 flex flex-row justify-between mb-8 mt-10">
-                <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
-                <CoverPhotoInput coverURL={coverURL} onUpload={(url) => setCoverURL(url)} />
-              </div>
-            </div>
-            <div className="flex flex-col col-span-2 mt-10">
+          <div>
+            <div className="flex flex-col">
               <label htmlFor="name" className="text-marble-white text-base font-bold">
                 Name*
               </label>
+              <p className="text-concrete text-sm">50 characters max</p>
               <Field
                 component="input"
                 name="name"
                 placeholder="Name"
-                className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
-              />
+                validate={composeValidators(requiredField, mustBeUnderNumCharacters(50))}
+              >
+                {({ input, meta }) => (
+                  <div>
+                    <input
+                      {...input}
+                      type="text"
+                      placeholder="Name"
+                      className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 rounded w-full"
+                    />
+                    {/* this error shows up when the user focuses the field (meta.touched) */}
+                    {meta.error && meta.touched && (
+                      <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
+                    )}
+                  </div>
+                )}
+              </Field>
             </div>
-            <div className="flex flex-col col-span-2">
+            <div className="flex flex-col mt-6">
               <label htmlFor="bio" className="text-marble-white font-bold">
-                Bio*
+                About
               </label>
-              <Field
-                component="textarea"
-                name="bio"
-                placeholder="Tell us about yourself"
-                className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
-              />
+              <p className="text-concrete text-sm">150 characters max</p>
+              <Field component="textarea" name="bio" validate={mustBeUnderNumCharacters(150)}>
+                {({ input, meta }) => (
+                  <div>
+                    <textarea
+                      {...input}
+                      placeholder="Tell us about yourself"
+                      className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 rounded min-h-[112px] w-full"
+                    />
+                    {/* this error shows up when the user focuses the field (meta.touched) */}
+                    {meta.error && meta.touched && (
+                      <span className=" text-xs text-torch-red block">{meta.error}</span>
+                    )}
+                  </div>
+                )}
+              </Field>
             </div>
-            <div className="flex flex-col col-span-2">
-              <label htmlFor="contactURL" className="text-marble-white text-base font-bold">
-                Contact*
-              </label>
-              <p className="text-concrete text-sm mb-2">What&apos;s the best way to contact you?</p>
-              <div className="flex flex-row mt-1">
-                <Field
-                  component="input"
-                  name="contactURL"
-                  placeholder="Contact URL (eg: Twitter, Calendly)"
-                  className="border border-concrete bg-wet-concrete text-marble-white p-2 flex-1"
-                />
-              </div>
+            <div className="flex flex-col mt-6">
+              <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
             </div>
-            <div className="flex flex-col col-span-2">
-              <label htmlFor="skills" className="text-marble-white text-base font-bold">
-                Skills*
-              </label>
-              <p className="text-concrete text-sm mb-2">(Type to add or search skills)</p>
-              <div>
-                <MultiSelect
-                  name="skills"
-                  placeholder="Type to add or search skills"
-                  options={skillOptions}
-                  initialValue={existingSkills}
-                />
-              </div>
+            <div className="flex flex-col mt-6">
+              <CoverPhotoInput coverURL={coverURL} onUpload={(url) => setCoverURL(url)} />
             </div>
-            <div className="flex flex-col col-span-2">
-              <label htmlFor="timezone" className="text-marble-white mb-2 text-base font-bold">
-                Timezone*
-              </label>
-              <Select
-                name="timezone"
-                placeholder="Select one"
-                options={TimezoneOptions}
-                initialValue={existingTimezone}
-              />
+            <div className="flex flex-col mt-6">
+              <label className="mb-2 font-bold text-base">Socials</label>
+              <Field name="contactURL" validate={mustBeUrl}>
+                {({ input, meta }) => (
+                  <div className="h-10 w-full border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
+                    <div className="py-2 px-3 mx-1 w-[2%] inline border-r border-concrete h-full">
+                      <Image
+                        src={PersonalSiteIcon}
+                        alt="Personal Site Icon."
+                        width={14}
+                        height={14}
+                      />
+                    </div>
+                    <input
+                      {...input}
+                      type="text"
+                      placeholder="e.g. https://mirror.xyz/mima"
+                      className="h-full inline w-[90%] bg-wet-concrete text-marble-white"
+                    />
+                    {/* this error shows up when the user focuses the field (meta.touched) */}
+                    {meta.error && meta.touched && (
+                      <span className="text-xs text-torch-red block">{meta.error}</span>
+                    )}
+                  </div>
+                )}
+              </Field>
+              <Field name="twitterUrl" validate={mustBeUrl}>
+                {({ input, meta }) => (
+                  <div className="h-10 w-full border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
+                    <div className="py-2 px-3 mx-1 w-[2%] inline border-r border-concrete h-full">
+                      <Image src={TwitterIcon} alt="Twitter Icon." width={14} height={14} />
+                    </div>
+                    <input
+                      {...input}
+                      type="text"
+                      placeholder="e.g. https://twitter.com/mima"
+                      className="h-full inline w-[90%] bg-wet-concrete text-marble-white"
+                    />
+                    {/* this error shows up when the user focuses the field (meta.touched) */}
+                    {meta.error && meta.touched && (
+                      <span className="text-xs text-torch-red mb-2 block">{meta.error}</span>
+                    )}
+                  </div>
+                )}
+              </Field>
+              <Field name="githubUrl" validate={mustBeUrl}>
+                {({ input, meta }) => (
+                  <div className="h-10 w-full border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
+                    <div className="py-2 px-3 mx-1 w-[2%] inline border-r border-concrete h-full">
+                      <Image src={GithubIcon} alt="Github Icon." width={14} height={14} />
+                    </div>
+                    <input
+                      {...input}
+                      type="text"
+                      placeholder="e.g. https://github.com/mima"
+                      className="h-full inline w-[90%] bg-wet-concrete text-marble-white"
+                    />
+                    {/* this error shows up when the user focuses the field (meta.touched) */}
+                    {meta.error && meta.touched && (
+                      <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
+                    )}
+                  </div>
+                )}
+              </Field>
+              <Field name="tiktokUrl" validate={mustBeUrl}>
+                {({ input, meta }) => (
+                  <div className="h-10 w-full border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
+                    <div className="py-2 px-3 mx-1 w-[2%] inline border-r border-concrete h-full">
+                      <Image src={TikTokIcon} alt="TikTok Icon." width={14} height={14} />
+                    </div>
+                    <input
+                      {...input}
+                      type="text"
+                      placeholder="e.g. https://tiktok.com/mima"
+                      className="h-full inline w-[90%] bg-wet-concrete text-marble-white"
+                    />
+                    {/* this error shows up when the user focuses the field (meta.touched) */}
+                    {meta.error && meta.touched && (
+                      <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
+                    )}
+                  </div>
+                )}
+              </Field>
+              <Field name="instagramUrl" validate={mustBeUrl}>
+                {({ input, meta }) => (
+                  <div className="h-10 w-full border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
+                    <div className="py-2 px-3 mx-1 w-[2%] inline border-r border-concrete h-full">
+                      <Image src={InstagramIcon} alt="Instagram Icon." width={14} height={14} />
+                    </div>
+                    <input
+                      {...input}
+                      type="text"
+                      placeholder="e.g. https://instagram.com/mima"
+                      className="h-full inline w-[90%] bg-wet-concrete text-marble-white"
+                    />
+                    {/* this error shows up when the user focuses the field (meta.touched) */}
+                    {meta.error && meta.touched && (
+                      <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
+                    )}
+                  </div>
+                )}
+              </Field>
             </div>
           </div>
           <button
             type="submit"
-            className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-14 mx-auto block p-2 hover:opacity-70"
+            className="bg-magic-mint text-tunnel-black w-48 rounded mt-14 mb-40 block p-2 hover:opacity-70"
           >
-            {isEdit ? "Save" : "Submit"}
+            {isEdit ? "Save" : "Next"}
           </button>
         </form>
       )}
