@@ -1,7 +1,7 @@
 import { RfpStatus } from "app/rfp/types"
 import { RfpStatus as PrismaRfpStatus } from "@prisma/client"
 
-export const statusToFilter = (status: string) => {
+export const computeRfpDbStatusFilter = (status: string) => {
   if (status === RfpStatus.DRAFT) {
     return {
       status: PrismaRfpStatus.DRAFT,
@@ -13,25 +13,25 @@ export const statusToFilter = (status: string) => {
   } else if (status === RfpStatus.STARTING_SOON) {
     return {
       status: PrismaRfpStatus.PUBLISHED,
-      startDate: { gt: new Date() },
+      startDate: { gt: new Date() }, // (start date > now) implies RFP is not open yet
     }
   } else if (status === RfpStatus.OPEN_FOR_SUBMISSIONS) {
     return {
       status: PrismaRfpStatus.PUBLISHED,
-      startDate: { lte: new Date() },
-      endDate: { gt: new Date() },
+      startDate: { lte: new Date() }, // (start date <= now) implies RFP has been open
+      endDate: { gt: new Date() }, // (end date > now) implies RFP is not closed yet
     }
   } else if (status === RfpStatus.CLOSED) {
     return {
       status: PrismaRfpStatus.PUBLISHED,
-      endDate: { lte: new Date() },
+      endDate: { lte: new Date() }, // (end date <= now) implies RFP is closed
     }
   } else {
     return {}
   }
 }
 
-export const computeStatus = (status: string, startDate: Date, endDate: Date | null) => {
+export const computeRfpProductStatus = (status: string, startDate: Date, endDate: Date | null) => {
   if (status === PrismaRfpStatus.DRAFT) {
     return RfpStatus.DRAFT
   } else if (status === PrismaRfpStatus.ARCHIVED) {

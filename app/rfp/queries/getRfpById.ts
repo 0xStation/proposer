@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { computeStatus } from "../utils"
+import { computeRfpProductStatus } from "../utils"
 
 const GetRfpByLocalId = z.object({
   terminalId: z.number(),
@@ -23,7 +23,7 @@ export default async function getRfpsByLocalId(input: z.infer<typeof GetRfpByLoc
   return rfps.map((rfp) => {
     return {
       ...rfp,
-      status: computeStatus(rfp.status, rfp.startDate, rfp.endDate),
+      status: computeRfpProductStatus(rfp.status, rfp.startDate, rfp.endDate),
       submissionCount: rfp._count.proposals,
     }
   })

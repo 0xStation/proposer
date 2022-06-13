@@ -1,5 +1,7 @@
 import { Signature } from "app/types"
 
+// note that these statuses are different than those in the database enum
+// our RFP queries/mutations translate between the two via functions in ./utils.ts
 export enum RfpStatus {
   DRAFT = "DRAFT",
   STARTING_SOON = "STARTING_SOON",

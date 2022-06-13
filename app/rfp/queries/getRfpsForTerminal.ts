@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { statusToFilter, computeStatus } from "../utils"
+import { computeRfpDbStatusFilter, computeRfpProductStatus } from "../utils"
 
 const GetRfpsByTerminalId = z.object({
   terminalId: z.number(),
@@ -11,7 +11,7 @@ export default async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsB
   const rfps = await db.rfp.findMany({
     where: {
       terminalId: input.terminalId,
-      ...(input.status && statusToFilter(input.status)),
+      ...(input.status && computeRfpDbStatusFilter(input.status)),
     },
     include: {
       _count: {
@@ -23,7 +23,7 @@ export default async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsB
   return rfps.map((rfp) => {
     return {
       ...rfp,
-      status: computeStatus(rfp.status, rfp.startDate, rfp.endDate),
+      status: computeRfpProductStatus(rfp.status, rfp.startDate, rfp.endDate),
       submissionCount: rfp._count.proposals,
     }
   })
