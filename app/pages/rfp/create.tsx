@@ -6,6 +6,7 @@ import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
+import Pencil from "public/pencil.svg"
 
 const CreateRFPPage: BlitzPage = () => {
   const [markdown, setMarkdown] = useState("")
@@ -15,7 +16,23 @@ const CreateRFPPage: BlitzPage = () => {
   return (
     <Layout title={`New RFP`}>
       <div className="grid grid-cols-3 h-screen w-full box-border">
-        <div className="overflow-y-auto col-span-2 p-20">
+        <div className="overflow-y-auto col-span-2 p-20 relative">
+          <div
+            className="absolute top-4 right-4 text-light-concrete flex flex-row items-center space-x-2 cursor-pointer"
+            onClick={() => setPreviewMode(!previewMode)}
+          >
+            {previewMode ? (
+              <>
+                <img src="/pencil.svg" />
+                <span>Back to editing</span>
+              </>
+            ) : (
+              <>
+                <img src="/eye.svg" />
+                <span>Preview</span>
+              </>
+            )}
+          </div>
           <div className="flex flex-row items-center space-x-2">
             <span className="h-2 w-2 rounded-full bg-concrete" />
             <span className="text-xs uppercase tracking-wider">Draft</span>
@@ -23,7 +40,7 @@ const CreateRFPPage: BlitzPage = () => {
           <div className="mt-6 flex flex-row">
             <span className="text-3xl font-bold">RFP:</span>
             <input
-              className="bg-tunnel-black text-3xl ml-2 w-full"
+              className="bg-tunnel-black text-3xl ml-2 w-full outline-none"
               placeholder="Give your request a title..."
             />
           </div>
@@ -53,26 +70,17 @@ const CreateRFPPage: BlitzPage = () => {
                 placeholder="enter some text..."
               />
             ) : (
+              // contentEditable does not respect new lines
+              // <div
+              //   contentEditable="true"
+              //   className="bg-tunnel-black w-full h-full outline-none resize-none"
+              //   onInput={(e) => setMarkdown(e.currentTarget.textContent || "")}
+              //   placeholder="enter some text..."
+              // >
+              //   {markdown}
+              // </div>
               <Preview markdown={markdown} />
             )}
-          </div>
-          <div className="absolute bottom-10 left-[450px]">
-            <button
-              className={`border rounded p-1 mr-2 ${
-                !previewMode && "bg-marble-white text-tunnel-black"
-              }`}
-              onClick={() => setPreviewMode(false)}
-            >
-              Edit
-            </button>
-            <button
-              className={`border rounded p-1 mr-2 ${
-                previewMode && "bg-marble-white text-tunnel-black"
-              }`}
-              onClick={() => setPreviewMode(true)}
-            >
-              Preview
-            </button>
           </div>
         </div>
         <div className="h-full border-l border-concrete col-span-1 flex flex-col">
