@@ -5,7 +5,7 @@ import { unified } from "unified"
 import { remarkToSlate } from "remark-slate-transformer"
 
 const PreviewEditor = ({ markdown }) => {
-  const postprocessor = unified().use(markdown).use(remarkToSlate)
+  // const postprocessor = unified().use(markdown).use(remarkToSlate)
   const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = ({ attributes, children, element }) => {
     switch (element.type) {
@@ -181,11 +181,11 @@ const PreviewEditor = ({ markdown }) => {
     return <span {...attributes}>{children}</span>
   }
 
-  const slate = postprocessor.processSync(markdown).result as Descendant[]
-  editor.children = slate
+  // const slate = postprocessor.processSync(markdown).result as Descendant[]
+  // editor.children = slate
 
   return (
-    <Slate editor={editor} value={slate} onChange={() => {}}>
+    <Slate editor={editor} value={[]} onChange={() => {}}>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
