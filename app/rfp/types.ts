@@ -1,5 +1,12 @@
-import { RfpStatus } from "@prisma/client"
 import { Signature } from "app/types"
+
+export enum RfpStatus {
+  DRAFT = "DRAFT",
+  STARTING_SOON = "STARTING_SOON",
+  OPEN_FOR_SUBMISSIONS = "OPEN_FOR_SUBMISSIONS",
+  CLOSED = "CLOSED",
+  ARCHIVED = "ARCHIVED",
+}
 
 export type RfpMetadata = {
   content: {

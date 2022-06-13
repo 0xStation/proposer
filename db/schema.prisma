@@ -18,7 +18,7 @@ model Account {
   data      Json?
   sessions  Session[]
   proposals AccountProposal[]
-  rfps      RFP[]
+  rfps      Rfp[]
 
   // v1
   skills      AccountSkill[]
@@ -35,7 +35,7 @@ model Terminal {
   members         AccountTerminal[]
   tags            Tag[]
   checkbooks      Checkbook[]
-  rfps            RFP[]
+  rfps            Rfp[]
   proposals       Proposal[]
   proposers       AccountProposal[]
 
@@ -107,11 +107,11 @@ model Checkbook {
   parentMultisig String
   terminal       Terminal? @relation(fields: [parentMultisig], references: [multisigAddress])
   data           Json
-  rfps           RFP[]
+  rfps           Rfp[]
 }
 
 // unique links by /rfp/[0xparentMultisig]/[localId]
-model RFP {
+model Rfp {
   parentMultisig String
   terminal       Terminal?  @relation(fields: [parentMultisig], references: [multisigAddress])
   localId        Int
@@ -134,7 +134,7 @@ model Proposal {
   terminal       Terminal?         @relation(fields: [parentMultisig], references: [multisigAddress])
   fundingAddress String
   rfpLocalId     Int
-  rfp            RFP               @relation(fields: [parentMultisig, rfpLocalId], references: [parentMultisig, localId])
+  rfp            Rfp               @relation(fields: [parentMultisig, rfpLocalId], references: [parentMultisig, localId])
   status         ProposalStatus    @default(IN_REVIEW)
   data           Json
   localId        Int
