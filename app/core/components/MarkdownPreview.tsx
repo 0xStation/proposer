@@ -5,7 +5,7 @@ import { unified } from "unified"
 import { remarkToSlate } from "remark-slate-transformer"
 
 const PreviewEditor = ({ markdown }) => {
-  // const postprocessor = unified().use(markdown).use(remarkToSlate)
+  const postprocessor = unified().use(markdown).use(remarkToSlate)
   const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = ({ attributes, children, element }) => {
     switch (element.type) {
