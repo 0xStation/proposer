@@ -1,11 +1,30 @@
-import React, { useMemo } from "react"
+import React, { useMemo, useEffect, useState } from "react"
 import { Slate, Editable, withReact } from "slate-react"
-import { createEditor } from "slate"
-import { markdownToSlate } from "app/utils/markdownToSlate"
+import { createEditor, Descendant } from "slate"
 
 const PreviewEditor = ({ markdown }) => {
+  const [slate, setSlate] = useState<Descendant[]>([])
   const editor = useMemo(() => withReact(createEditor()), [])
-  const slate = markdownToSlate(markdown)
+
+  useEffect(() => {
+    const api = async () => {
+      const res = await fetch("/api/markdown-to-slate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          markdownString: markdown,
+        }),
+      })
+
+      const data = await res.json()
+      setSlate(data.slate)
+    }
+    api()
+  }, [markdown])
+
+  editor.children = slate
 
   return (
     <Slate editor={editor} value={slate} onChange={() => {}}>
