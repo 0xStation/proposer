@@ -29,4 +29,5 @@ export type Rfp = {
   endDate?: Date
   status: RfpStatus
   data: RfpMetadata
+  submissionCount: number
 }
