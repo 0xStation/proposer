@@ -48,7 +48,7 @@ model Terminal {
 }
 
 model AccountTerminal {
-  account    Account              @relation(fields: [accountId], references: [id])
+  account    Account              @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId  Int
   terminal   Terminal             @relation(fields: [terminalId], references: [id])
   terminalId Int
@@ -81,7 +81,7 @@ model Tag {
 model AccountTerminalTag {
   tag              Tag             @relation(fields: [tagId], references: [id])
   tagId            Int
-  ticket           AccountTerminal @relation(fields: [ticketAccountId, ticketTerminalId], references: [accountId, terminalId])
+  ticket           AccountTerminal @relation(fields: [ticketAccountId, ticketTerminalId], references: [accountId, terminalId], onDelete: Cascade)
   ticketAccountId  Int
   ticketTerminalId Int
 
@@ -99,7 +99,7 @@ model Session {
   publicData         String?
   privateData        String?
   userId             Int?
-  user               Account?  @relation(fields: [userId], references: [id])
+  user               Account?  @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Checkbook {
@@ -167,7 +167,6 @@ enum RfpStatus {
 enum ProposalStatus {
   IN_REVIEW
   APPROVED
-  PASSED
 }
 
 //
