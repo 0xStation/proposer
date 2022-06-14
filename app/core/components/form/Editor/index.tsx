@@ -9,13 +9,13 @@ import withLinks from "./plugins/withLinks"
 import BulletedList from "./elements/BulletedList"
 import ListItem from "./elements/ListItem"
 
-// declare module "slate" {
-//   interface CustomTypes {
-//     Editor: BaseEditor & ReactEditor
-//     Element: CustomElement
-//     Text: CustomText
-//   }
-// }
+declare module "slate" {
+  interface CustomTypes {
+    Editor: BaseEditor & ReactEditor
+    Element: CustomElement
+    Text: CustomText
+  }
+}
 
 const renderElement = (props) => {
   switch (props.element.type) {
