@@ -36,6 +36,15 @@ const Navigation = ({ children }) => {
           </li>
           <li
             className={`${
+              router.pathname === Routes.SignatureTestingPage({ terminalHandle }).pathname
+                ? "text-marble-white font-bold"
+                : "text-concrete"
+            } cursor-pointer hover:text-marble-white mt-4`}
+          >
+            <Link href={Routes.SignatureTestingPage({ terminalHandle })}>Signature Testing</Link>
+          </li>
+          <li
+            className={`${
               router.pathname === Routes.TokenSettingsPage({ terminalHandle }).pathname ||
               router.pathname === Routes.NewTokenSettingsPage({ terminalHandle }).pathname
                 ? "text-marble-white font-bold"
