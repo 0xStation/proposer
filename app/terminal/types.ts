@@ -11,6 +11,9 @@ export type TerminalMetadata = {
   name: string
   description: string
   pfpURL: string
+  guildId?: string
+
+  // v1
   coverURL?: string
   permissions: {
     invite: Record<string, number[]>
@@ -32,15 +35,16 @@ export type TerminalMetadata = {
   hide?: boolean
   discordWebhookUrl?: string
   visualizeNftMethod?: string
-  guildId?: string
 }
 
 export type Terminal = {
   id: number
-  ticketAddress: string
   handle: string
   data: TerminalMetadata
-  roles: Role[]
   tags: Tag[]
+
+  // v1
+  ticketAddress: string
+  roles: Role[]
   initiatives?: Initiative[]
 }
