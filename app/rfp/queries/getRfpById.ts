@@ -2,16 +2,14 @@ import db from "db"
 import * as z from "zod"
 import { computeRfpProductStatus } from "../utils"
 
-const GetRfpByLocalId = z.object({
-  terminalId: z.number(),
-  localId: z.number(),
+const GetRfpById = z.object({
+  id: z.string(),
 })
 
-export default async function getRfpsByLocalId(input: z.infer<typeof GetRfpByLocalId>) {
-  const rfps = await db.rfp.findMany({
+export default async function getRfpById(input: z.infer<typeof GetRfpById>) {
+  const rfp = await db.rfp.findUnique({
     where: {
-      terminalId: input.terminalId,
-      localId: input.localId,
+      id: input.id,
     },
     include: {
       _count: {
@@ -20,11 +18,13 @@ export default async function getRfpsByLocalId(input: z.infer<typeof GetRfpByLoc
     },
   })
 
-  return rfps.map((rfp) => {
-    return {
-      ...rfp,
-      status: computeRfpProductStatus(rfp.status, rfp.startDate, rfp.endDate),
-      submissionCount: rfp._count.proposals,
-    }
-  })
+  if (!rfp) {
+    return null
+  }
+
+  return {
+    ...rfp,
+    status: computeRfpProductStatus(rfp.status, rfp.startDate, rfp.endDate),
+    submissionCount: rfp._count.proposals,
+  }
 }

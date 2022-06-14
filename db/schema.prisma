@@ -12,6 +12,7 @@ generator client {
 }
 
 // unique links by /profile/[address]
+// unique links by /profile/discord/[discordId]
 model Account {
   id        Int               @id @default(autoincrement())
   address   String?           @unique
@@ -113,6 +114,7 @@ model Checkbook {
 
 // unique links by /terminal/[handle]/rfp/[localId]
 model Rfp {
+  id             String     @id @default(uuid())
   terminalId     Int
   terminal       Terminal   @relation(fields: [terminalId], references: [id])
   localId        Int
@@ -126,33 +128,34 @@ model Rfp {
   data           Json
   proposals      Proposal[]
 
-  @@id([terminalId, localId])
+  @@unique([terminalId, localId])
 }
 
 // unique links by /terminal/[handle]/proposal/[localId]
 model Proposal {
+  id             String            @id @default(uuid())
   terminalId     Int
   terminal       Terminal          @relation(fields: [terminalId], references: [id])
   fundingAddress String
-  rfpLocalId     Int
-  rfp            Rfp               @relation(fields: [terminalId, rfpLocalId], references: [terminalId, localId])
+  rfpId          String
+  rfp            Rfp               @relation(fields: [rfpId], references: [id])
   status         ProposalStatus    @default(IN_REVIEW)
   data           Json
   localId        Int
   createdAt      DateTime          @default(now())
   collaborators  AccountProposal[]
 
-  @@id([terminalId, localId])
+  @@unique([terminalId, localId])
 }
 
 model AccountProposal {
-  id              Int      @id @default(autoincrement())
-  address         String
-  account         Account? @relation(fields: [address], references: [address])
-  terminalId      Int
-  terminal        Terminal @relation(fields: [terminalId], references: [id])
-  proposalLocalId Int
-  proposal        Proposal @relation(fields: [terminalId, proposalLocalId], references: [terminalId, localId])
+  id         Int      @id @default(autoincrement())
+  address    String
+  account    Account? @relation(fields: [address], references: [address])
+  terminalId Int
+  terminal   Terminal @relation(fields: [terminalId], references: [id])
+  proposalId String
+  proposal   Proposal @relation(fields: [proposalId], references: [id])
 }
 
 enum RfpStatus {
