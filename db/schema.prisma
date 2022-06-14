@@ -11,34 +11,167 @@ generator client {
   previewFeatures = ["interactiveTransactions"]
 }
 
-// The account of user of Station
-// user's wallet address is primary key
+// unique links by /profile/[address]
+// unique links by /profile/discord/[discordId]
 model Account {
-  id          Int                 @id @default(autoincrement())
-  address     String?             @unique
-  discordId   String?             @unique
+  id        Int               @id @default(autoincrement())
+  address   String?           @unique
+  discordId String?           @unique
+  tickets   AccountTerminal[]
+  data      Json?
+  sessions  Session[]
+  proposals AccountProposal[]
+  rfps      Rfp[]
+
+  // v1
   skills      AccountSkill[]
-  tickets     AccountTerminal[]
   initiatives AccountInitiative[]
-  data        Json?
   endorsed    Endorsement[]       @relation("Endorsed")
-  sessions    Session[]
 }
 
-// Each DAO is represented by a terminal.
-// roleNameOverrides overrides default role names
+// unique links by /terminal/[handle]
 model Terminal {
-  id            Int               @id @default(autoincrement())
-  ticketAddress String?           @unique
-  handle        String            @unique
+  id         Int               @id @default(autoincrement())
+  handle     String            @unique
+  data       Json?
+  members    AccountTerminal[]
+  tags       Tag[]
+  checkbooks Checkbook[]
+  rfps       Rfp[]
+  proposals  Proposal[]
+  proposers  AccountProposal[]
+
+  // v1
+  ticketAddress String?      @unique
   initiatives   Initiative[]
   roles         Role[]
-  members       AccountTerminal[]
-  data          Json?
-  tags          Tag[]
 }
 
-// deprecated
+model AccountTerminal {
+  account     Account              @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId   Int
+  terminal    Terminal             @relation(fields: [terminalId], references: [id])
+  terminalId  Int
+  joinedAt    DateTime             @default(now())
+  tags        AccountTerminalTag[]
+  data        Json?
+  // v1
+  active      Boolean              @default(true)
+  roleLocalId Int?
+  role        Role?                @relation(fields: [terminalId, roleLocalId], references: [terminalId, localId])
+
+  @@id([accountId, terminalId])
+}
+
+model Tag {
+  id         Int                  @id @default(autoincrement())
+  type       String
+  value      String
+  active     Boolean              @default(true)
+  terminal   Terminal             @relation(fields: [terminalId], references: [id])
+  terminalId Int
+  discordId  String?
+  data       Json?
+  tickets    AccountTerminalTag[]
+
+  @@unique([value, terminalId])
+}
+
+model AccountTerminalTag {
+  tag              Tag             @relation(fields: [tagId], references: [id])
+  tagId            Int
+  ticket           AccountTerminal @relation(fields: [ticketAccountId, ticketTerminalId], references: [accountId, terminalId], onDelete: Cascade)
+  ticketAccountId  Int
+  ticketTerminalId Int
+
+  @@id([tagId, ticketAccountId, ticketTerminalId])
+}
+
+model Session {
+  id                 Int       @id @default(autoincrement())
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  expiresAt          DateTime?
+  handle             String    @unique
+  hashedSessionToken String?
+  antiCSRFToken      String?
+  publicData         String?
+  privateData        String?
+  userId             Int?
+  user               Account?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Checkbook {
+  address    String   @id
+  chainId    Int
+  name       String
+  terminalId Int
+  terminal   Terminal @relation(fields: [terminalId], references: [id])
+  data       Json
+  rfps       Rfp[]
+}
+
+// unique links by /terminal/[handle]/rfp/[localId]
+model Rfp {
+  id             String     @id @default(uuid())
+  terminalId     Int
+  terminal       Terminal   @relation(fields: [terminalId], references: [id])
+  localId        Int
+  fundingAddress String
+  checkbook      Checkbook? @relation(fields: [fundingAddress], references: [address])
+  authorAddress  String
+  author         Account?   @relation(fields: [authorAddress], references: [address])
+  startDate      DateTime
+  endDate        DateTime?
+  status         RfpStatus  @default(DRAFT)
+  data           Json
+  proposals      Proposal[]
+
+  @@unique([terminalId, localId])
+}
+
+// unique links by /terminal/[handle]/proposal/[localId]
+model Proposal {
+  id             String            @id @default(uuid())
+  terminalId     Int
+  terminal       Terminal          @relation(fields: [terminalId], references: [id])
+  fundingAddress String
+  rfpId          String
+  rfp            Rfp               @relation(fields: [rfpId], references: [id])
+  status         ProposalStatus    @default(IN_REVIEW)
+  data           Json
+  localId        Int
+  createdAt      DateTime          @default(now())
+  collaborators  AccountProposal[]
+
+  @@unique([terminalId, localId])
+}
+
+model AccountProposal {
+  id         Int      @id @default(autoincrement())
+  address    String
+  account    Account? @relation(fields: [address], references: [address])
+  terminalId Int
+  terminal   Terminal @relation(fields: [terminalId], references: [id])
+  proposalId String
+  proposal   Proposal @relation(fields: [proposalId], references: [id])
+}
+
+enum RfpStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ProposalStatus {
+  IN_REVIEW
+  APPROVED
+}
+
+//
+//  V1 Models -- no longer used
+//
+
 // A role within a terminal
 model Role {
   terminal   Terminal          @relation(fields: [terminalId], references: [id])
@@ -50,22 +183,6 @@ model Role {
   @@id([terminalId, localId])
 }
 
-model AccountTerminal {
-  account     Account              @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  accountId   Int
-  terminal    Terminal             @relation(fields: [terminalId], references: [id])
-  terminalId  Int
-  role        Role?                @relation(fields: [terminalId, roleLocalId], references: [terminalId, localId])
-  roleLocalId Int?
-  joinedAt    DateTime             @default(now())
-  active      Boolean              @default(true)
-  tags        AccountTerminalTag[]
-  data        Json?
-
-  @@id([accountId, terminalId])
-}
-
-// deprecated
 // An initiative within a terminal
 model Initiative {
   id         Int                 @id @default(autoincrement())
@@ -93,7 +210,12 @@ model AccountInitiative {
   @@id([accountId, initiativeId])
 }
 
-// deprecated
+enum AccountInitiativeStatus {
+  INTERESTED
+  CONTRIBUTING
+  PREVIOUSLY_CONTRIBUTED
+}
+
 model Skill {
   id          Int               @id @default(autoincrement())
   name        String            @unique
@@ -101,7 +223,6 @@ model Skill {
   initiatives InitiativeSkill[]
 }
 
-// deprecated
 model AccountSkill {
   account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId Int
@@ -121,9 +242,6 @@ model InitiativeSkill {
   @@id([initiativeId, skillId])
 }
 
-// deprecated
-// Off-chain transaction to signal a user's support for another user.
-// We trigger signatures to write this endorsement model on-chain.
 model Endorsement {
   id               Int      @id @default(autoincrement())
   initiativeId     Int
@@ -135,46 +253,8 @@ model Endorsement {
   data             Json?
 }
 
-model Tag {
-  id         Int                  @id @default(autoincrement())
-  type       String
-  value      String
-  active     Boolean              @default(true)
-  terminal   Terminal             @relation(fields: [terminalId], references: [id])
-  terminalId Int
-  discordId  String?
-  data       Json?
-  tickets    AccountTerminalTag[]
-
-  @@unique([value, terminalId])
-}
-
-model AccountTerminalTag {
-  tag              Tag             @relation(fields: [tagId], references: [id])
-  tagId            Int
-  ticket           AccountTerminal @relation(fields: [ticketAccountId, ticketTerminalId], references: [accountId, terminalId], onDelete: Cascade)
-  ticketAccountId  Int
-  ticketTerminalId Int
-
-  @@id([tagId, ticketAccountId, ticketTerminalId])
-}
-
-enum AccountInitiativeStatus {
-  INTERESTED
-  CONTRIBUTING
-  PREVIOUSLY_CONTRIBUTED
-}
-
-model Session {
-  id                 Int       @id @default(autoincrement())
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  expiresAt          DateTime?
-  handle             String    @unique
-  hashedSessionToken String?
-  antiCSRFToken      String?
-  publicData         String?
-  privateData        String?
-  userId             Int?
-  user               Account?  @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
+//
+// Don't write new models below here!
+// This is the deprecated V1 models section
+// Write new models above this section :)
+//
