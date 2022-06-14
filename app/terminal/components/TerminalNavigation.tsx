@@ -11,11 +11,12 @@ import {
 import { useState, useEffect } from "react"
 import SettingsIcon from "app/core/icons/SettingsIcon"
 import MemberDirectoryIcon from "public/member-directory-icon.svg"
-import LockedIcon from "public/locked-icon.svg"
 import Exit from "/public/exit-button.svg"
 import getTerminalByHandle from "../queries/getTerminalByHandle"
 import useStore from "app/core/hooks/useStore"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
+import DirectoryIcon from "app/core/icons/DirectoryIcon"
+import BulletinIcon from "app/core/icons/BulletinIcon"
 
 const TerminalNavigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -102,21 +103,45 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
         <div>
           <ul className="mt-9 ml-8 text-lg space-y-2">
             <li className="cursor-pointer hover:text-marble-white font-bold">
-              <div className="inline mr-5 align-middle">
-                <Image src={MemberDirectoryIcon} alt="Member directory icon" />
-              </div>
-              <p className="inline">
-                <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>Members</Link>
+              <BulletinIcon
+                className={`inline mr-5 mb-1 ${
+                  router.pathname === Routes.BulletinPage({ terminalHandle }).pathname
+                    ? "fill-marble-white"
+                    : "fill-concrete"
+                }`}
+              />
+              <p
+                className={`inline  ${
+                  router.pathname === Routes.BulletinPage({ terminalHandle }).pathname
+                    ? "text-marble-white font-bold"
+                    : "text-concrete"
+                }`}
+              >
+                <Link href={Routes.BulletinPage({ terminalHandle })}>Bulletin</Link>
               </p>
             </li>
-            <li className="text-concrete cursor-pointer group">
-              <div className="inline mr-5 align-middle">
-                <Image src={LockedIcon} alt="Locked icon" />
-              </div>
-              <p className="inline">Proposals</p>
-              <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0 origin-left">
-                Coming soon
-              </span>
+            <li className="cursor-pointer hover:text-marble-white font-bold">
+              <DirectoryIcon
+                className={`inline mr-5 mb-1 ${
+                  router.pathname === Routes.MemberDirectoryPage({ terminalHandle }).pathname
+                    ? "fill-marble-white"
+                    : "fill-concrete"
+                }`}
+                fill={
+                  router.pathname === Routes.MemberDirectoryPage({ terminalHandle }).pathname
+                    ? "fill-marble-white"
+                    : "fill-concrete"
+                }
+              />
+              <p
+                className={`inline ${
+                  router.pathname === Routes.MemberDirectoryPage({ terminalHandle }).pathname
+                    ? "text-marble-white font-bold"
+                    : "text-concrete"
+                }`}
+              >
+                <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>Members</Link>
+              </p>
             </li>
           </ul>
         </div>
