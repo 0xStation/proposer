@@ -122,7 +122,13 @@ h1,
 h2,
 h3,
 hr {
-  @apply mb-4;
+  @apply mb-3;
+}
+
+.markdown-prose h1:not(:first-child),
+h2:not(:first-child),
+h3:not(:first-child) {
+  @apply mt-6;
 }
 
 ::-webkit-calendar-picker-indicator {
