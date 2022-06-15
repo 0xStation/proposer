@@ -76,7 +76,7 @@ body {
 }
 
 .custom-select-wrapper::after {
-  content: "▼";
+  content: "▾";
   font-size: 0.75rem;
   top: 12px;
   right: 10px;

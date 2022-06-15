@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { BlitzPage } from "blitz"
+import { BlitzPage, useMutation, useQuery, useParam } from "blitz"
 import { Field, Form } from "react-final-form"
 import { LockClosedIcon } from "@heroicons/react/solid"
 import Layout from "app/core/layouts/Layout"
@@ -7,11 +7,36 @@ import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
+import createRfp from "app/rfp/mutations/createRfp"
+import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 
 const CreateRFPPage: BlitzPage = () => {
   const [markdown, setMarkdown] = useState("")
   const [previewMode, setPreviewMode] = useState(false)
   const activeUser = useStore((state) => state.activeUser)
+
+  const terminalHandle = useParam("terminalHandle") as string
+  const [terminal] = useQuery(
+    getTerminalByHandle,
+    { handle: terminalHandle },
+    { suspense: false, enabled: !!terminalHandle }
+  )
+
+  const [checkbooks] = useQuery(
+    getCheckbooksByTerminal,
+    { terminalId: terminal?.id || 0 }, // does anyone know how to get rid of typescript errors here?
+    { suspense: false, enabled: !!terminal } // it wont run unless terminal exists, but TS doesnt pick up on that
+  )
+
+  const [createRfpMutation] = useMutation(createRfp)
+
+  console.log(checkbooks)
+
+  // redirect?
+  if (!terminal || !activeUser) {
+    return <Layout title={`New RFP`}></Layout>
+  }
 
   return (
     <Layout title={`New RFP`}>
@@ -92,8 +117,19 @@ const CreateRFPPage: BlitzPage = () => {
             </div>
           </div>
           <Form
-            onSubmit={async (values) => {
-              console.log(values)
+            onSubmit={async (values: {
+              startDate: Date
+              endDate: Date
+              checkbookAddress: string
+            }) => {
+              await createRfpMutation({
+                terminalId: terminal?.id,
+                startDate: new Date(values.startDate),
+                endDate: new Date(values.endDate),
+                authorAddress: activeUser.address || "NO ADDRESS", // should make activeUser required to have address
+                fundingAddress: values.checkbookAddress,
+                contentBody: markdown,
+              })
             }}
             render={({ handleSubmit }) => (
               <form onSubmit={handleSubmit} className="p-4 grow flex flex-col justify-between">
@@ -107,11 +143,31 @@ const CreateRFPPage: BlitzPage = () => {
                     </a>
                   </span>
 
+                  <Field name={`checkbookAddress`}>
+                    {({ input }) => (
+                      <div className="custom-select-wrapper">
+                        <select
+                          {...input}
+                          className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-1`}
+                        >
+                          <option value="">Choose option</option>
+                          {checkbooks?.map((cb, idx) => {
+                            return (
+                              <option key={`checkbook-${idx}`} value={cb.address}>
+                                {cb.name}
+                              </option>
+                            )
+                          })}
+                        </select>
+                      </div>
+                    )}
+                  </Field>
+
                   <div className="grid grid-cols-2 gap-4 mt-6">
                     <div className="flex flex-col">
                       <label className="font-bold">Start Date</label>
                       <span className="text-xs text-concrete block">Proposal submission open</span>
-                      <Field name="start_date">
+                      <Field name="startDate">
                         {({ input, meta }) => (
                           <div>
                             <input
@@ -128,7 +184,7 @@ const CreateRFPPage: BlitzPage = () => {
                       <span className="text-xs text-concrete block">
                         Proposal submission closed
                       </span>
-                      <Field name="end_date">
+                      <Field name="endDate">
                         {({ input, meta }) => (
                           <div>
                             <input
