@@ -1,5 +1,5 @@
 import { Remarkable } from "remarkable"
-var md = new Remarkable()
+const md = new Remarkable()
 
 const PreviewEditor = ({ markdown }) => {
   const html = { __html: md.render(markdown) }

@@ -95,10 +95,6 @@ body {
   @apply text-base font-bold;
 }
 
-.markdown-prose h4 {
-  @apply text-base font-bold;
-}
-
 .markdown-prose ul {
   @apply list-disc pl-6;
 }

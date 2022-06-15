@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { BlitzPage, useMutation, useQuery, useParam } from "blitz"
+import { BlitzPage, useMutation, useQuery, useParam, Link, Routes } from "blitz"
 import { Field, Form } from "react-final-form"
 import { LockClosedIcon } from "@heroicons/react/solid"
 import Layout from "app/core/layouts/Layout"
@@ -12,9 +12,11 @@ import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTermin
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 
 const CreateRFPPage: BlitzPage = () => {
+  const [title, setTitle] = useState("")
   const [markdown, setMarkdown] = useState("")
   const [previewMode, setPreviewMode] = useState(false)
   const activeUser = useStore((state) => state.activeUser)
+  const setToastState = useStore((state) => state.setToastState)
 
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(
@@ -40,10 +42,10 @@ const CreateRFPPage: BlitzPage = () => {
 
   return (
     <Layout title={`New RFP`}>
-      <div className="grid grid-cols-3 h-screen w-full box-border">
-        <div className="overflow-y-auto col-span-2 p-20 relative">
+      <div className="fixed grid grid-cols-4 w-[calc(100%-70px)] border-box z-50">
+        <div className="col-span-3 pt-4 pr-4">
           <div
-            className="absolute top-4 right-4 text-light-concrete flex flex-row items-center space-x-2 cursor-pointer"
+            className="text-light-concrete flex flex-row justify-end items-center space-x-2 cursor-pointer w-full"
             onClick={() => setPreviewMode(!previewMode)}
           >
             {previewMode ? (
@@ -58,6 +60,10 @@ const CreateRFPPage: BlitzPage = () => {
               </>
             )}
           </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-4 h-screen w-full box-border">
+        <div className="overflow-y-auto col-span-3 p-20 relative">
           <div className="flex flex-row items-center space-x-2">
             <span className="h-2 w-2 rounded-full bg-concrete" />
             <span className="text-xs uppercase tracking-wider">Draft</span>
@@ -65,12 +71,12 @@ const CreateRFPPage: BlitzPage = () => {
           <div className="mt-6 flex flex-row">
             <span className="text-3xl font-bold">RFP:</span>
             <input
+              onChange={(e) => setTitle(e.target.value)}
               className="bg-tunnel-black text-3xl ml-2 w-full outline-none"
               placeholder="Give your request a title..."
             />
           </div>
           <div className="mt-6 flex flex-row">
-            {/* are proposals just for logged in user, or connected users (with no account) okay too? */}
             <img
               src={activeUser?.data.pfpURL}
               alt="PFP"
@@ -95,15 +101,6 @@ const CreateRFPPage: BlitzPage = () => {
                 placeholder="enter some text..."
               />
             ) : (
-              // contentEditable does not respect new lines
-              // <div
-              //   contentEditable="true"
-              //   className="bg-tunnel-black w-full h-full outline-none resize-none"
-              //   onInput={(e) => setMarkdown(e.currentTarget.textContent || "")}
-              //   placeholder="enter some text..."
-              // >
-              //   {markdown}
-              // </div>
               <Preview markdown={markdown} />
             )}
           </div>
@@ -118,55 +115,71 @@ const CreateRFPPage: BlitzPage = () => {
           </div>
           <Form
             onSubmit={async (values: {
-              startDate: Date
-              endDate: Date
+              startDate: string
+              endDate: string
               checkbookAddress: string
             }) => {
-              await createRfpMutation({
-                terminalId: terminal?.id,
-                startDate: new Date(values.startDate),
-                endDate: new Date(values.endDate),
-                authorAddress: activeUser.address || "NO ADDRESS", // should make activeUser required to have address
-                fundingAddress: values.checkbookAddress,
-                contentBody: markdown,
-              })
+              if (!activeUser.address) {
+                setToastState({
+                  isToastShowing: true,
+                  type: "error",
+                  message: "You must connect your wallet in order to create RFPs",
+                })
+              } else {
+                await createRfpMutation({
+                  terminalId: terminal?.id,
+                  startDate: new Date(values.startDate),
+                  endDate: new Date(values.endDate),
+                  authorAddress: activeUser.address,
+                  fundingAddress: values.checkbookAddress,
+                  contentBody: markdown,
+                  contentTitle: title,
+                })
+              }
             }}
-            render={({ handleSubmit }) => (
-              <form onSubmit={handleSubmit} className="p-4 grow flex flex-col justify-between">
-                <div>
-                  <label className="font-bold block">Checkbook*</label>
-                  <span className="text-xs text-concrete block">
-                    Checkbook is where you deposit funds to create checks for proposers to claim
-                    once their projects have been approved.{" "}
-                    <a href="#" className="text-magic-mint">
-                      Learn more
-                    </a>
-                  </span>
+            render={({ form, handleSubmit }) => {
+              const formState = form.getState()
+              return (
+                <form onSubmit={handleSubmit} className="p-4 grow flex flex-col justify-between">
+                  <div>
+                    <label className="font-bold block">Checkbook*</label>
+                    <span className="text-xs text-concrete block">
+                      Checkbook is where you deposit funds to create checks for proposers to claim
+                      once their projects have been approved.
+                      <br />
+                      <a href="#" className="text-magic-mint">
+                        Learn more
+                      </a>
+                    </span>
 
-                  <Field name={`checkbookAddress`}>
-                    {({ input }) => (
-                      <div className="custom-select-wrapper">
-                        <select
-                          {...input}
-                          className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-1`}
-                        >
-                          <option value="">Choose option</option>
-                          {checkbooks?.map((cb, idx) => {
-                            return (
-                              <option key={`checkbook-${idx}`} value={cb.address}>
-                                {cb.name}
-                              </option>
-                            )
-                          })}
-                        </select>
-                      </div>
-                    )}
-                  </Field>
+                    <Field name={`checkbookAddress`}>
+                      {({ input }) => (
+                        <div className="custom-select-wrapper">
+                          <select
+                            {...input}
+                            className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-1`}
+                          >
+                            <option value="">Choose option</option>
+                            {checkbooks?.map((cb, idx) => {
+                              return (
+                                <option key={`checkbook-${idx}`} value={cb.address}>
+                                  {cb.name}
+                                </option>
+                              )
+                            })}
+                          </select>
+                        </div>
+                      )}
+                    </Field>
+                    <Link href={Routes.TerminalSettingsPage({ terminalHandle })}>
+                      <span className="text-magic-mint cursor-pointer mt-1 block">
+                        + Create new
+                      </span>
+                    </Link>
 
-                  <div className="grid grid-cols-2 gap-4 mt-6">
-                    <div className="flex flex-col">
+                    <div className="flex flex-col mt-6">
                       <label className="font-bold">Start Date</label>
-                      <span className="text-xs text-concrete block">Proposal submission open</span>
+                      <span className="text-xs text-concrete block">Proposal submission opens</span>
                       <Field name="startDate">
                         {({ input, meta }) => (
                           <div>
@@ -179,10 +192,10 @@ const CreateRFPPage: BlitzPage = () => {
                         )}
                       </Field>
                     </div>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col mt-6">
                       <label className="font-bold">End Date</label>
                       <span className="text-xs text-concrete block">
-                        Proposal submission closed
+                        Proposal submission closes
                       </span>
                       <Field name="endDate">
                         {({ input, meta }) => (
@@ -197,14 +210,18 @@ const CreateRFPPage: BlitzPage = () => {
                       </Field>
                     </div>
                   </div>
-                </div>
-                <div>
-                  <button className="bg-magic-mint text-tunnel-black px-6 py-1 rounded block mx-auto">
-                    Publish
-                  </button>
-                </div>
-              </form>
-            )}
+                  <div>
+                    <button
+                      className={`bg-magic-mint text-tunnel-black px-6 py-1 rounded block mx-auto ${
+                        formState.dirty ? "hover:bg-opacity-70" : "opacity-50 cursor-not-allowed"
+                      }`}
+                    >
+                      Publish
+                    </button>
+                  </div>
+                </form>
+              )
+            }}
           />
         </div>
       </div>

@@ -1,12 +1,12 @@
 import db from "db"
 import * as z from "zod"
 
-const GetCheckbookByTerminal = z.object({
+const GetCheckbooksByTerminal = z.object({
   terminalId: z.number(),
 })
 
-export default async function getCheckbookByTerminal(
-  input: z.infer<typeof GetCheckbookByTerminal>
+export default async function getCheckbooksByTerminal(
+  input: z.infer<typeof GetCheckbooksByTerminal>
 ) {
   const checkbooks = await db.checkbook.findMany({
     where: {
