@@ -1,12 +1,12 @@
 import { useState } from "react"
 import { BlitzPage } from "blitz"
-import { LockClosedIcon } from "@heroicons/react/outline"
+import { Field, Form } from "react-final-form"
+import { LockClosedIcon } from "@heroicons/react/solid"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
-import Pencil from "public/pencil.svg"
 
 const CreateRFPPage: BlitzPage = () => {
   const [markdown, setMarkdown] = useState("")
@@ -90,47 +90,66 @@ const CreateRFPPage: BlitzPage = () => {
               <LockClosedIcon className="h-4 w-4 hover:stroke-light-concrete text-concrete cursor-pointer" />
               <span className="text-concrete">Permission</span>
             </div>
-            <div className="flex flex-row space-x-1 items-center">
-              <LockClosedIcon className="h-4 w-4 hover:stroke-light-concrete text-concrete cursor-pointer" />
-              <span className="text-concrete">Custom Questions</span>
-            </div>
           </div>
-          <div className="p-4 grow flex flex-col justify-between">
-            <div>
-              <label className="font-bold block">Checkbook*</label>
-              <span className="text-xs text-concrete block">
-                Checkbook is where you deposit funds to create checks for proposers to claim once
-                their projects have been approved.{" "}
-                <a href="#" className="text-magic-mint">
-                  Learn more
-                </a>
-              </span>
+          <Form
+            onSubmit={async (values) => {
+              console.log(values)
+            }}
+            render={({ handleSubmit }) => (
+              <form onSubmit={handleSubmit} className="p-4 grow flex flex-col justify-between">
+                <div>
+                  <label className="font-bold block">Checkbook*</label>
+                  <span className="text-xs text-concrete block">
+                    Checkbook is where you deposit funds to create checks for proposers to claim
+                    once their projects have been approved.{" "}
+                    <a href="#" className="text-magic-mint">
+                      Learn more
+                    </a>
+                  </span>
 
-              <div className="grid grid-cols-2 gap-4 mt-6">
-                <div className="flex flex-col">
-                  <label className="font-bold">Start Date</label>
-                  <span className="text-xs text-concrete block">Proposal submission open</span>
-                  <input
-                    type="date"
-                    className="bg-wet-concrete border border-concrete rounded p-1 mt-1"
-                  />
+                  <div className="grid grid-cols-2 gap-4 mt-6">
+                    <div className="flex flex-col">
+                      <label className="font-bold">Start Date</label>
+                      <span className="text-xs text-concrete block">Proposal submission open</span>
+                      <Field name="start_date">
+                        {({ input, meta }) => (
+                          <div>
+                            <input
+                              {...input}
+                              type="date"
+                              className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
+                            />
+                          </div>
+                        )}
+                      </Field>
+                    </div>
+                    <div className="flex flex-col">
+                      <label className="font-bold">End Date</label>
+                      <span className="text-xs text-concrete block">
+                        Proposal submission closed
+                      </span>
+                      <Field name="end_date">
+                        {({ input, meta }) => (
+                          <div>
+                            <input
+                              {...input}
+                              type="date"
+                              className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
+                            />
+                          </div>
+                        )}
+                      </Field>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex flex-col">
-                  <label className="font-bold">End Date</label>
-                  <span className="text-xs text-concrete block">Proposal submission closed</span>
-                  <input
-                    type="date"
-                    className="bg-wet-concrete border border-concrete rounded p-1 mt-1"
-                  />
+                <div>
+                  <button className="bg-magic-mint text-tunnel-black px-6 py-1 rounded block mx-auto">
+                    Publish
+                  </button>
                 </div>
-              </div>
-            </div>
-            <div>
-              <button className="bg-magic-mint text-tunnel-black px-6 py-1 rounded block mx-auto">
-                Publish
-              </button>
-            </div>
-          </div>
+              </form>
+            )}
+          />
         </div>
       </div>
     </Layout>
