@@ -11,6 +11,8 @@ import { AccountTerminalWithTagsAndAccount } from "app/accountTerminal/types"
 import useStore from "app/core/hooks/useStore"
 import useKeyPress from "app/core/hooks/useKeyPress"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
+import getRfpsByTerminalId from "app/rfp/queries/getRfpsForTerminal"
+import { formatDate } from "app/core/utils/formatDate"
 
 interface Filters {
   [tagType: string]: Set<number>
@@ -22,6 +24,13 @@ const BulletinPage: BlitzPage = () => {
     getTerminalByHandle,
     { handle: terminalHandle as string },
     { suspense: false, enabled: !!terminalHandle }
+  )
+  const [rfps] = useQuery(
+    getRfpsByTerminalId,
+    {
+      terminalId: terminal?.id as number,
+    },
+    { suspense: false, enabled: !!terminal?.id }
   )
 
   // filters is a hashmap where the key is the tag type and the value is a Set of strings
@@ -39,8 +48,11 @@ const BulletinPage: BlitzPage = () => {
       <TerminalNavigation>
         {/* Filter View */}
         <div className="max-h-[250px] sm:h-[130px] border-b border-concrete">
-          <div className="flex flex-row items-center ml-6 pt-7">
+          <div className="flex flex-row items-center ml-6 pt-7 justify-between mr-4">
             <h1 className="text-2xl font-bold">Bulletin</h1>
+            <button className="h-[35px] bg-magic-mint px-9 rounded text-tunnel-black hover:bg-opacity-70">
+              Create RFP
+            </button>
           </div>
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <div className="flex ml-6 py-4 space-x-2 flex-wrap self-start">
@@ -57,38 +69,47 @@ const BulletinPage: BlitzPage = () => {
             <span className="basis-32 ml-2 mr-6 mb-2">Creator</span>
           </div>
           <div className="overflow-y-auto col-span-7 h-[calc(100vh-174px)] w-full">
-            <Link href={Routes.RequestForProposalBulletinInfoPage({ terminalHandle })}>
-              <div className="border-b border-concrete w-full flex flex-row cursor-pointer hover:bg-wet-concrete">
-                <div className="basis-[42rem] ml-6 mb-2">
-                  <div>
-                    <div className="bg-neon-carrot rounded-full min-h-1.5 max-h-1.5 min-w-1.5 max-w-1.5 inline-block align-middle mr-1">
-                      &nbsp;
-                    </div>
-                    <p className="uppercase text-xs inline-block mt-3">Starting Soon</p>
-                  </div>
-                  <h2 className="text-xl mt-2">
-                    RFP: Olympus Holiday Lorem Ipseum This is So Long Hello World
-                  </h2>
-                  <p className="text-sm mt-1 mb-3">Projects that educate about Olympus</p>
-                </div>
-                <div className="basis-32 ml-9 mb-2 self-center">
-                  <p>0</p>
-                </div>
-                <div className="basis-32 ml-6 mb-2 self-center">8-JUN-2022</div>
-                <div className="basis-32 ml-2 mb-2 self-center">9-JUL-2022</div>
-                <div className="basis-32 ml-2 mr-6 mb-2 self-center">
-                  <img
-                    src={DEFAULT_PFP_URLS.USER}
-                    className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
-                    alt="pfp"
-                  />
-                </div>
-              </div>
-            </Link>
+            {rfps?.map((rfp) => (
+              <RFPComponent rfp={rfp} terminalHandle={terminalHandle} key={rfp.id} />
+            ))}
           </div>
         </div>
       </TerminalNavigation>
     </Layout>
+  )
+}
+
+const RFPComponent = ({ rfp, terminalHandle }) => {
+  return (
+    <Link href={Routes.RequestForProposalInfoPage({ terminalHandle, rfpId: rfp.id })}>
+      <div className="border-b border-concrete w-full flex flex-row cursor-pointer hover:bg-wet-concrete">
+        <div className="basis-[42rem] ml-6 mb-2">
+          <div>
+            <div className="bg-neon-carrot rounded-full min-h-1.5 max-h-1.5 min-w-1.5 max-w-1.5 inline-block align-middle mr-1">
+              &nbsp;
+            </div>
+            <p className="uppercase text-xs inline-block mt-3">{rfp.status}</p>
+          </div>
+          <h2 className="text-xl mt-2">{`RFP: ${rfp.data?.content?.title}`}</h2>
+          <p className="text-sm mt-1 mb-3">{rfp.data?.content?.body}</p>
+        </div>
+        <div className="basis-32 ml-9 mb-2 self-center">
+          <p>{rfp?._count?.proposals}</p>
+        </div>
+        <div className="basis-32 ml-6 mb-2 self-center">{formatDate(rfp.startDate)}</div>
+        <div className="basis-32 ml-2 mb-2 self-center">{formatDate(rfp.endDate) || "N/A"}</div>
+        <div className="basis-32 ml-2 mr-6 mb-2 self-center">
+          <img
+            src={rfp.author.data.pfpURL || DEFAULT_PFP_URLS.USER}
+            className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
+            alt="pfp"
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_PFP_URLS.USER
+            }}
+          />
+        </div>
+      </div>
+    </Link>
   )
 }
 

@@ -1,5 +1,6 @@
 import db from "db"
 import * as z from "zod"
+import { Rfp } from "../types"
 import { computeRfpProductStatus } from "../utils"
 
 const GetRfpById = z.object({
@@ -12,6 +13,7 @@ export default async function getRfpById(input: z.infer<typeof GetRfpById>) {
       id: input.id,
     },
     include: {
+      author: true,
       _count: {
         select: { proposals: true },
       },
@@ -26,5 +28,5 @@ export default async function getRfpById(input: z.infer<typeof GetRfpById>) {
     ...rfp,
     status: computeRfpProductStatus(rfp.status, rfp.startDate, rfp.endDate),
     submissionCount: rfp._count.proposals,
-  }
+  } as unknown as Rfp
 }

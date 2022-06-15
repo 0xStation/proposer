@@ -105,14 +105,14 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
             <li className="cursor-pointer hover:text-marble-white font-bold">
               <BulletinIcon
                 className={`inline mr-5 mb-1 ${
-                  router.pathname === Routes.BulletinPage({ terminalHandle }).pathname
+                  router.pathname.includes(Routes.BulletinPage({ terminalHandle }).pathname)
                     ? "fill-marble-white"
                     : "fill-concrete"
                 }`}
               />
               <p
-                className={`inline  ${
-                  router.pathname === Routes.BulletinPage({ terminalHandle }).pathname
+                className={`inline ${
+                  router.pathname.includes(Routes.BulletinPage({ terminalHandle }).pathname)
                     ? "text-marble-white font-bold"
                     : "text-concrete"
                 }`}
