@@ -1,9 +1,11 @@
+import { useState } from "react"
 import { useRouter, Link, Routes, useParam, useQuery } from "blitz"
 import getRfpById from "../queries/getRfpById"
 import { XCircleIcon, PencilIcon, LinkIcon } from "@heroicons/react/solid"
 
 const RFPHeaderNavigation = ({ rfpId }) => {
   const terminalHandle = useParam("terminalHandle") as string
+  const [isRFPUrlCopied, setIsRfpUrlCopied] = useState<boolean>(false)
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
   const router = useRouter()
   return (
@@ -29,10 +31,29 @@ const RFPHeaderNavigation = ({ rfpId }) => {
             <div className="flex flex-col w-full">
               <div className="flex justify-between w-full">
                 <h1 className="text-2xl font-bold">RFP: {rfp?.data?.content?.title}</h1>
-                <div className="flex flex-row self-center mr-6 mb-6">
-                  <LinkIcon className="h-6 w-6 fill-concrete mr-3 hover:cursor-pointer hover:fill-light-concrete" />
-                  <PencilIcon className="h-6 w-6 fill-concrete mr-3 hover:cursor-pointer hover:fill-light-concrete" />
-                  <XCircleIcon className="h-6 w-6 fill-concrete hover:cursor-pointer hover:fill-light-concrete" />
+                <div className="inline self-center mr-6 mb-6">
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href).then(() => {
+                        setIsRfpUrlCopied(true)
+                        setTimeout(() => setIsRfpUrlCopied(false), 1500)
+                      })
+                      setIsRfpUrlCopied(true)
+                    }}
+                  >
+                    <LinkIcon className="inline h-6 w-6 fill-concrete mr-3 hover:cursor-pointer hover:fill-light-concrete active:fill-marble-white" />
+                  </button>
+                  {isRFPUrlCopied && (
+                    <span className="mt-2 text-[.5rem] ml-[-10px] uppercase font-bold tracking-wider rounded px-1 absolute text-marble-white bg-wet-concrete">
+                      copied!
+                    </span>
+                  )}
+                  <button>
+                    <PencilIcon className="inline h-6 w-6 fill-concrete mr-3 hover:cursor-pointer hover:fill-light-concrete active:fill-marble-white" />
+                  </button>
+                  <button>
+                    <XCircleIcon className="inline h-6 w-6 fill-concrete hover:cursor-pointer hover:fill-light-concrete active:fill-marble-white" />
+                  </button>
                 </div>
               </div>
             </div>

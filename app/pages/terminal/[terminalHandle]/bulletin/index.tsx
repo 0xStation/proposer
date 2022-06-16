@@ -1,4 +1,4 @@
-import { BlitzPage, useQuery, useParam, Image, Link, Routes } from "blitz"
+import { BlitzPage, useQuery, useParam, Routes, useRouter, Link } from "blitz"
 import { Fragment, useState } from "react"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import Layout from "app/core/layouts/Layout"
@@ -29,10 +29,7 @@ const BulletinPage: BlitzPage = () => {
     },
     { suspense: false, enabled: !!terminal?.id }
   )
-
-  // filters is a hashmap where the key is the tag type and the value is a Set of strings
-  // where the strings are applied filters
-  const [filters, setFilters] = useState<Filters>({})
+  const router = useRouter()
 
   const downPress = useKeyPress("ArrowDown")
   const upPress = useKeyPress("ArrowUp")
@@ -47,7 +44,11 @@ const BulletinPage: BlitzPage = () => {
         <div className="max-h-[250px] sm:h-[130px] border-b border-concrete">
           <div className="flex flex-row items-center ml-6 pt-7 justify-between mr-4">
             <h1 className="text-2xl font-bold">Bulletin</h1>
-            <button className="h-[35px] bg-magic-mint px-9 rounded text-tunnel-black hover:bg-opacity-70">
+            {/* TODO: add permissioning checks */}
+            <button
+              className="h-[35px] bg-magic-mint px-9 rounded text-tunnel-black hover:bg-opacity-70"
+              onClick={() => router.push(Routes.CreateRFPPage({ terminalHandle }))}
+            >
               Create RFP
             </button>
           </div>
