@@ -7,6 +7,7 @@ import Navigation from "app/terminal/components/settings/navigation"
 import useStore from "app/core/hooks/useStore"
 import Back from "/public/back-icon.svg"
 import { v4 as uuidv4 } from "uuid"
+import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
 
 const NewCheckbookSettingsPage: BlitzPage = () => {
   const router = useRouter()
@@ -16,6 +17,12 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
 
   const setToastState = useStore((state) => state.setToastState)
+
+  type FormValues = {
+    name: string
+    signers: string
+    quorum: number
+  }
 
   return (
     <LayoutWithoutNavigation>
@@ -35,19 +42,24 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
           </div>
           <Form
             initialValues={{}}
-            onSubmit={async (values) => {
+            onSubmit={async (values: FormValues) => {
               if (terminal) {
                 try {
-                  const regex = /\n| /g // remove new lines and spaces
-                  const signers = values.signers
-                    .replace(regex, "")
-                    .split(",")
-                    .filter((s) => !!s) // removes empty strings
-                  console.log(signers)
+                  // validation on checksum addresses, no duplicates
+                  const signers = parseUniqueAddresses(values.signers)
 
-                  // validation on checksum addresses, no duplicates, quorum <= signers.length
+                  // assert quorum <= number of signers
+                  if (values.quorum > signers.length) {
+                    setToastState({
+                      isToastShowing: true,
+                      type: "error",
+                      message: "Quorum cannot be greater than number of signers.",
+                    })
+                    return
+                  }
 
                   // trigger transaction, returns address of new Checkbook
+                  // TODO: real transaction that populates `checkbookAddress`
                   let checkbookAddress = "0x" + uuidv4().replace(/-/g, "") // placeholder, fake address
 
                   try {
@@ -117,7 +129,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                     <div>
                       <button
                         className={`rounded text-tunnel-black px-8 py-2 h-full mt-12 ${
-                          formState.dirty ? "bg-magic-mint" : "bg-concrete"
+                          formState.dirty ? "bg-magic-mint" : "bg-opacity-70"
                         }`}
                         type="submit"
                       >

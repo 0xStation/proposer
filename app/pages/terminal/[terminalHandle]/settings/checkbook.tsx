@@ -84,7 +84,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
                 return <CheckbookComponent checkbook={checkbook} key={checkbook.address} />
               })}
             </div>
-            {checkbooks.length > 0 ? (
+            {checkbooks.length > 0 && (
               <div className="h-full border-l border-concrete col-span-3">
                 <div className="m-5 flex-col">
                   <div className="flex space-x-2">
@@ -199,8 +199,6 @@ const CheckbookSettingsPage: BlitzPage = () => {
                   </div>
                 </div>
               </div>
-            ) : (
-              <></>
             )}
           </div>
         </div>
