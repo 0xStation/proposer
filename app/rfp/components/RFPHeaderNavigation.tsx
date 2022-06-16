@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useRouter, Link, Routes, useParam, useQuery } from "blitz"
+import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import getRfpById from "../queries/getRfpById"
 import { XCircleIcon, PencilIcon, LinkIcon } from "@heroicons/react/solid"
 
@@ -8,6 +9,7 @@ const RFPHeaderNavigation = ({ rfpId }) => {
   const [isRFPUrlCopied, setIsRfpUrlCopied] = useState<boolean>(false)
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
   const router = useRouter()
+
   return (
     <div className="max-h-[250px] sm:h-60 border-b border-concrete pl-6 pt-6 pr-4">
       <div className="flex flex-row justify-between">
@@ -24,8 +26,14 @@ const RFPHeaderNavigation = ({ rfpId }) => {
       <div className="flex flex-row mt-6">
         <div className="flex-col w-full">
           <div className="flex flex-row items-center space-x-2 mt-3">
-            <span className="h-2 w-2 rounded-full bg-concrete" />
-            <span className="text-xs uppercase tracking-wider">{rfp?.status}</span>
+            <span
+              className={`h-2 w-2 rounded-full ${
+                RFP_STATUS_DISPLAY_MAP[rfp?.status as string]?.color
+              }`}
+            />
+            <span className="text-xs uppercase tracking-wider">
+              {RFP_STATUS_DISPLAY_MAP[rfp?.status as string]?.copy}
+            </span>
           </div>
           <div className="flex flex-row w-full mt-3">
             <div className="flex flex-col w-full">

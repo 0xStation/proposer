@@ -10,6 +10,7 @@ import useKeyPress from "app/core/hooks/useKeyPress"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsForTerminal"
 import { formatDate } from "app/core/utils/formatDate"
+import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 
 interface Filters {
   [tagType: string]: Set<number>
@@ -82,8 +83,10 @@ const RFPComponent = ({ rfp, terminalHandle }) => {
     <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp.id })}>
       <div className="w-full border-b border-concrete cursor-pointer hover:bg-wet-concrete pt-5">
         <div className="flex flex-row items-center space-x-2 ml-6">
-          <span className="h-2 w-2 rounded-full bg-concrete" />
-          <span className="text-xs uppercase tracking-wider">{rfp.status}</span>
+          <span className={`h-2 w-2 rounded-full ${RFP_STATUS_DISPLAY_MAP[rfp.status]?.color}`} />
+          <span className="text-xs uppercase tracking-wider">
+            {RFP_STATUS_DISPLAY_MAP[rfp.status]?.copy}
+          </span>
         </div>
         <div className="w-full flex flex-row mb-5">
           <div className="basis-[42rem] ml-6 mb-2">
