@@ -272,6 +272,9 @@ const SelectedTerminalCard = ({
   const tokenTags = membership.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === TagType.TOKEN
   )
+  const checkbookTags = membership.tags?.filter(
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.CHECKBOOK_SIGNER
+  )
 
   const selectedTerminalCardContent = (
     <div className="m-5 flex-col">
@@ -313,6 +316,7 @@ const SelectedTerminalCard = ({
         <TagDetails tagType="projects" tags={projectTags} />
         <TagDetails tagType="guilds" tags={guildTags} />
         <TagDetails tagType="tokens" tags={tokenTags} />
+        <TagDetails tagType="checkbook signers" tags={tokenTags} />
       </div>
     </div>
   )

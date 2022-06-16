@@ -4,6 +4,7 @@ export enum TagType {
   PROJECT = "project",
   GUILD = "guild",
   TOKEN = "token",
+  CHECKBOOK_SIGNER = "checkbook signer",
 }
 
 export enum TokenType {

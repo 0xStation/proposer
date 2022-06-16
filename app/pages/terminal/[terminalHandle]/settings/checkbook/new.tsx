@@ -56,6 +56,8 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                       address: checkbookAddress,
                       chainId: 1,
                       name: values.name,
+                      quorum: values.quorum,
+                      signers,
                     })
 
                     router.push(Routes.CheckbookSettingsPage({ terminalHandle }))

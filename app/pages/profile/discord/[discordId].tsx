@@ -221,7 +221,6 @@ const SelectedTerminalCard = ({
   const statusTags = membership.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === "status"
   )
-
   const roleTags = membership.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === "role"
   )
