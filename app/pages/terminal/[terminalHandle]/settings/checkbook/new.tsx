@@ -6,7 +6,7 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Navigation from "app/terminal/components/settings/navigation"
 import useStore from "app/core/hooks/useStore"
 import Back from "/public/back-icon.svg"
-import networks from "app/utils/networks.json"
+import { v4 as uuidv4 } from "uuid"
 
 const NewCheckbookSettingsPage: BlitzPage = () => {
   const router = useRouter()
@@ -38,34 +38,22 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
             onSubmit={async (values) => {
               if (terminal) {
                 try {
-                  //   const metadataResponse = await fetch("/api/fetch-token-metadata", {
-                  //     method: "POST",
-                  //     headers: {
-                  //       Accept: "application/json, text/plain, */*",
-                  //       "Content-Type": "application/json",
-                  //     },
-                  //     body: JSON.stringify({
-                  //       address: values.address,
-                  //       chainId: parseInt(values.chainId) || 1,
-                  //     }),
-                  //   })
+                  const regex = /\n| /g // remove new lines and spaces
+                  const signers = values.signers
+                    .replace(regex, "")
+                    .split(",")
+                    .filter((s) => !!s) // removes empty strings
+                  console.log(signers)
 
-                  //   const metadata = await metadataResponse.json()
+                  // validation on checksum addresses, no duplicates, quorum <= signers.length
 
-                  //   if (metadata.response !== "success") {
-                  //     setToastState({
-                  //       isToastShowing: true,
-                  //       type: "error",
-                  //       message: metadata.message,
-                  //     })
-
-                  //     return
-                  //   }
+                  // trigger transaction, returns address of new Checkbook
+                  let checkbookAddress = "0x" + uuidv4().replace(/-/g, "") // placeholder, fake address
 
                   try {
                     await createCheckbookMutation({
                       terminalId: terminal.id,
-                      address: "0xcheckbook",
+                      address: checkbookAddress,
                       chainId: 1,
                       name: values.name,
                     })
@@ -103,7 +91,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                     </span>
                     <Field
                       name="signers"
-                      component="input"
+                      component="textarea"
                       type="text"
                       placeholder="Enter wallet addresses or ENS names"
                       className="bg-wet-concrete border border-light-concrete rounded p-2 mt-1"

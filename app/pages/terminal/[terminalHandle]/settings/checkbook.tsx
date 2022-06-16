@@ -56,41 +56,31 @@ const CheckbookSettingsPage: BlitzPage = () => {
   return (
     <LayoutWithoutNavigation>
       <Navigation>
-        {checkbooks.length === 0 ? (
-          <div className="w-full h-full flex items-center flex-col justify-center">
-            <p className="text-marble-white text-2xl font-bold">Create Checkbook</p>
-            <p className="mt-2 text-marble-white text-base w-[400px] text-center">Do it.</p>
+        <div className="flex flex-col">
+          <div className="p-6 border-b border-concrete flex justify-between">
+            <div className="flex flex-col">
+              <h2 className="text-marble-white text-2xl font-bold">Checkbook™</h2>
+              <h5 className="text-base mt-2">
+                A Checkbook is a contract that allows you to create checks for fund recipients to
+                cash out.
+              </h5>
+            </div>
             <Link href={Routes.NewCheckbookSettingsPage({ terminalHandle })}>
-              <button className="cursor-pointer mt-8 w-[200px] py-1 bg-magic-mint text-tunnel-black rounded text-base">
-                Create
+              <button
+                className="rounded text-tunnel-black px-8 h-full h-[32px] bg-magic-mint self-start"
+                type="submit"
+              >
+                Create Checkbook
               </button>
             </Link>
           </div>
-        ) : (
-          <div className="flex flex-col">
-            <div className="p-6 border-b border-concrete flex justify-between">
-              <div className="flex flex-col">
-                <h2 className="text-marble-white text-2xl font-bold">Checkbook™</h2>
-                <h5 className="text-base mt-2">
-                  A Checkbook is a contract that allows you to create checks for fund recipients to
-                  cash out.
-                </h5>
-              </div>
-              <Link href={Routes.NewCheckbookSettingsPage({ terminalHandle })}>
-                <button
-                  className="rounded text-tunnel-black px-8 h-full h-[32px] bg-magic-mint self-start"
-                  type="submit"
-                >
-                  Create Checkbook
-                </button>
-              </Link>
+          <div className="grid grid-cols-7 h-[calc(100vh-115px)] w-full box-border">
+            <div className="overflow-y-auto col-span-4">
+              {checkbooks.map((checkbook) => {
+                return <CheckbookComponent checkbook={checkbook} key={checkbook.address} />
+              })}
             </div>
-            <div className="grid grid-cols-7 h-[calc(100vh-115px)] w-full box-border">
-              <div className="overflow-y-auto col-span-4">
-                {checkbooks.map((checkbook) => {
-                  return <CheckbookComponent checkbook={checkbook} key={checkbook.address} />
-                })}
-              </div>
+            {checkbooks.length > 0 ? (
               <div className="h-full border-l border-concrete col-span-3">
                 <div className="m-5 flex-col">
                   <div className="flex space-x-2">
@@ -124,9 +114,11 @@ const CheckbookSettingsPage: BlitzPage = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <></>
+            )}
           </div>
-        )}
+        </div>
       </Navigation>
     </LayoutWithoutNavigation>
   )
