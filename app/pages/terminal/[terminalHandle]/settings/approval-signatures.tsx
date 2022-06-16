@@ -15,7 +15,13 @@ const signatureToRSV = (signature: string) => {
   return { r, s, v }
 }
 
-// type definitions
+/**
+ * Type Definitions
+ * these tell the wallet how to structure the signature UI and the cryptography encoding
+ * */
+
+// type definition of a single check, order matters
+// types per value are using Solidity types
 const singleCheckTypes: TypedDataTypeDefinition = {
   Check: [
     { name: "recipient", type: "address" },
@@ -25,6 +31,8 @@ const singleCheckTypes: TypedDataTypeDefinition = {
     { name: "nonce", type: "uint256" },
   ],
 }
+// type definition of multiple checks at once
+// uses nested type of previously defined `Check`
 const bulkCheckTypes: TypedDataTypeDefinition = {
   ...singleCheckTypes,
   BulkCheck: [{ name: "checks", type: "Check[]" }],
@@ -42,46 +50,51 @@ const ApprovalSignaturesPage: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
   const [checkQueue, setCheckQueue] = useState<Check[]>([])
 
+  // change this per Checkbook being used for the Proposal
+  const checkbookAddress = "0x016562aA41A8697720ce0943F003141f5dEAe006"
+
+  // top-level definition of where this signature will be used
+  // `name` is hardcoded to "Checkbook" in each contract
+  // `version` is also harcoded to "1" in each contract
+  // `chainId` should be the actual id for the contract, 4 is hardcoded for Rinkeby testing
+  // `verifyingContract` is the address of the contract that will be consuming this signature (the checkbook)
   const domain: TypedDataSignatureDomain = {
     name: "Checkbook",
     version: "1",
     chainId: 4,
-    verifyingContract: "0x016562aA41A8697720ce0943F003141f5dEAe006",
+    verifyingContract: checkbookAddress,
   }
 
-  let {
-    data: approveData,
-    isSuccess: approveIsSuccess,
-    signTypedData: signApprove,
-  } = useSignTypedData()
+  let { signTypedDataAsync: signApproval } = useSignTypedData()
 
-  if (approveIsSuccess && approveData) {
-    const { v, r, s } = signatureToRSV(approveData as string)
-    console.log(
-      `signer: ${activeUser?.address}\nApprove signature\nsignature:${
-        approveData as string
-      }\nv: ${v}\nr: ${r}\ns: ${s}`
-    )
-  }
-
-  const approveCheck = (check: Check) => {
-    console.log(check)
-    signApprove({
-      domain,
-      types: singleCheckTypes,
-      value: check,
-    })
-  }
-
-  const approveChecks = (checks: Check[]) => {
+  const approveChecks = async (checks: Check[]) => {
     console.log(checks)
-    signApprove({
-      domain,
-      types: bulkCheckTypes,
-      value: {
-        checks,
-      },
-    })
+    let types
+    let value
+    if (checks.length > 1) {
+      types = bulkCheckTypes
+      value = { checks }
+    } else {
+      types = singleCheckTypes
+      value = checks[0]!
+    }
+
+    try {
+      // prompt the Metamask signature modal
+      const signature = await signApproval({
+        domain,
+        types,
+        value,
+      })
+
+      // split signature to v,r,s components (probably not needed, just for show)
+      const { v, r, s } = signatureToRSV(signature)
+      console.log(
+        `signer: ${activeUser?.address}\nsignature:${signature}\nv: ${v}\nr: ${r}\ns: ${s}`
+      )
+    } catch {
+      console.log("signature denied by user")
+    }
   }
 
   return (
@@ -95,8 +108,11 @@ const ApprovalSignaturesPage: BlitzPage = () => {
             render={({ handleSubmit }) => (
               <form onSubmit={handleSubmit}>
                 <div className="w-1/3 flex flex-col col-span-2 mt-10">
+                  {/* 
+                    Funding recipient address
+                  */}
                   <label htmlFor="name" className="text-marble-white text-base mt-4">
-                    Recipient
+                    Recipient Address
                   </label>
                   <Field
                     component="input"
@@ -104,8 +120,11 @@ const ApprovalSignaturesPage: BlitzPage = () => {
                     placeholder="0x..."
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
+                  {/* 
+                    Funding token address, zero address (0x000...000) is used to represent ETH 
+                  */}
                   <label htmlFor="name" className="text-marble-white text-base mt-4">
-                    Token
+                    Token Address
                   </label>
                   <Field
                     component="input"
@@ -113,8 +132,12 @@ const ApprovalSignaturesPage: BlitzPage = () => {
                     placeholder="0x..."
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
+                  {/* 
+                    Amount of tokens for Check, should have full decimals of token, 
+                    make sure to use ethers.BigNumber or string type 
+                  */}
                   <label htmlFor="name" className="text-marble-white text-base mt-4">
-                    Amount
+                    Token Amount
                   </label>
                   <Field
                     component="input"
@@ -122,8 +145,12 @@ const ApprovalSignaturesPage: BlitzPage = () => {
                     placeholder="0"
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
+                  {/* 
+                    Deadline to cash this check, compute 1-month ahead of current timestamp when creating Check,
+                    represented as a Unix timestamp (string or number type okay)
+                  */}
                   <label htmlFor="name" className="text-marble-white text-base mt-4">
-                    Deadline
+                    Deadline to Cash (unix timestamp)
                   </label>
                   <Field
                     component="input"
@@ -131,6 +158,10 @@ const ApprovalSignaturesPage: BlitzPage = () => {
                     placeholder="0"
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
+                  {/* 
+                    One-use nonce for this specific check, verified by the contract,
+                    individual checks within a bulk approval should have unique nonces
+                  */}
                   <label htmlFor="name" className="text-marble-white text-base mt-4">
                     Nonce
                   </label>
@@ -162,14 +193,14 @@ const ApprovalSignaturesPage: BlitzPage = () => {
             disabled={checkQueue.length === 0}
             onClick={() => {
               try {
-                checkQueue.length > 1 ? approveChecks(checkQueue) : approveCheck(checkQueue[0]!)
+                approveChecks(checkQueue)
               } catch (error) {
                 console.error(`Error creating account: ${error}`)
                 alert("Error applying.")
               }
             }}
           >
-            Sign
+            Approve
           </button>
         </section>
       </Navigation>

@@ -62,7 +62,7 @@ const Navigation = ({ children }) => {
         </ul>
         {
           // show dev tools if on localhost
-          window.location.hostname === "localhost" && (
+          typeof window !== "undefined" && window.location.hostname === "localhost" && (
             <>
               <label className="font-bold text-sm text-marble-white uppercase tracking-wider mt-8 block">
                 Dev Tools
