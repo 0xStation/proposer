@@ -11,7 +11,7 @@ import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import { Fragment } from "react"
 import { Form } from "react-final-form"
 
-const ProposalsPage: BlitzPage = () => {
+const ProposalsTab: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const rfpId = useParam("rfpId") as string
   const [terminal] = useQuery(
@@ -20,7 +20,6 @@ const ProposalsPage: BlitzPage = () => {
     { suspense: false, enabled: !!terminalHandle }
   )
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
-  console.log("this is rfpId: ", rfp)
   const router = useRouter()
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
@@ -47,16 +46,12 @@ const ProposalsPage: BlitzPage = () => {
               >
                 <div className="basis-[38rem] ml-6 mb-2">
                   <div>
-                    <div className="bg-neon-carrot rounded-full min-h-1.5 max-h-1.5 min-w-1.5 max-w-1.5 inline-block align-middle mr-1">
-                      &nbsp;
+                    <div className="flex flex-row items-center space-x-2 mt-3">
+                      <span className="h-2 w-2 rounded-full bg-concrete" />
+                      <span className="text-xs uppercase tracking-wider">In review</span>
                     </div>
-                    <p className="uppercase text-xs inline-block mt-3">In review</p>
                   </div>
-                  <h2 className="text-xl mt-2">Olympus Early Tester Program</h2>
-                  <p className="text-sm mt-1 mb-3">
-                    <span className="text-concrete">OIP-6</span> · Projects that educate about
-                    Olympus
-                  </p>
+                  <h2 className="text-xl mt-2 mb-3">Olympus Early Tester Program</h2>
                 </div>
                 <div className="basis-32 ml-9 mb-2 self-center">
                   <p>0</p>
@@ -147,4 +142,4 @@ const FilterPill = ({ title, className = "" }) => {
     </Menu>
   )
 }
-export default ProposalsPage
+export default ProposalsTab

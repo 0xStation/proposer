@@ -102,42 +102,42 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
         {/* Terminal navigation */}
         <div>
           <ul className="mt-9 ml-8 text-lg space-y-2">
-            <li className="cursor-pointer hover:text-marble-white font-bold">
+            <li className="group cursor-pointer hover:text-marble-white font-bold">
               <BulletinIcon
                 className={`inline mr-5 mb-1 ${
                   router.pathname.includes(Routes.BulletinPage({ terminalHandle }).pathname)
                     ? "fill-marble-white"
-                    : "fill-concrete"
+                    : "fill-concrete group-hover:fill-light-concrete"
                 }`}
               />
               <p
                 className={`inline ${
                   router.pathname.includes(Routes.BulletinPage({ terminalHandle }).pathname)
                     ? "text-marble-white font-bold"
-                    : "text-concrete"
+                    : "text-concrete group-hover:text-light-concrete"
                 }`}
               >
                 <Link href={Routes.BulletinPage({ terminalHandle })}>Bulletin</Link>
               </p>
             </li>
-            <li className="cursor-pointer hover:text-marble-white font-bold">
+            <li className="group cursor-pointer hover:text-marble-white font-bold">
               <DirectoryIcon
                 className={`inline mr-5 mb-1 ${
                   router.pathname === Routes.MemberDirectoryPage({ terminalHandle }).pathname
                     ? "fill-marble-white"
-                    : "fill-concrete"
+                    : "fill-concrete group-hover:fill-light-concrete"
                 }`}
                 fill={
                   router.pathname === Routes.MemberDirectoryPage({ terminalHandle }).pathname
                     ? "fill-marble-white"
-                    : "fill-concrete"
+                    : "fill-concrete group-hover:text-light-concrete"
                 }
               />
               <p
                 className={`inline ${
                   router.pathname === Routes.MemberDirectoryPage({ terminalHandle }).pathname
                     ? "text-marble-white font-bold"
-                    : "text-concrete"
+                    : "text-concrete hover:text-light-concrete"
                 }`}
               >
                 <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>Members</Link>

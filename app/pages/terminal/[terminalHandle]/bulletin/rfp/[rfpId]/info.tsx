@@ -8,7 +8,7 @@ import RFPHeaderNavigation from "app/rfp/components/RFPHeaderNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { formatDate } from "app/core/utils/formatDate"
 
-const RequestForProposalInfoPage: BlitzPage = () => {
+const RFPInfoTab: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const rfpId = useParam("rfpId") as string
   const [terminal] = useQuery(
@@ -26,18 +26,15 @@ const RequestForProposalInfoPage: BlitzPage = () => {
         <div className="h-[calc(100vh-240px)] flex flex-row">
           <div className="w-full">{/* markdown */}</div>
           <div className="w-96 border-l border-concrete pl-6 pt-6 pr-16 flex-col">
-            <div>
-              <p className="text-concrete uppercase text-xs font-bold">RFP-ID</p>
-              <p className="mt-2">RFP-1</p>
-            </div>
-            <div className="mt-6">
+            <div className="mt-2">
               <p className="text-concrete uppercase text-xs font-bold">Start Date</p>
               <p className="mt-2">{formatDate(rfp?.startDate)}</p>
             </div>
             <div className="mt-6">
               <p className="text-concrete uppercase text-xs font-bold">End Date</p>
-              <p className="mt-2">{formatDate(rfp?.endDate)}</p>
+              <p className="mt-2">{(rfp?.endDate && formatDate(rfp?.endDate)) || "N/A"}</p>
             </div>
+            {/* TODO: make dynamic  */}
             <div className="mt-6">
               <p className="text-concrete uppercase text-xs font-bold">Total Funding</p>
               <p className="mt-2">100.00 ETH</p>
@@ -151,4 +148,4 @@ const PfpComponent = ({ user, className = "" }) => {
     </Link>
   )
 }
-export default RequestForProposalInfoPage
+export default RFPInfoTab

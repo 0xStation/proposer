@@ -1,14 +1,11 @@
 import { BlitzPage, useQuery, useParam, Image, Link, Routes } from "blitz"
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, useState } from "react"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import { Dialog, Menu, Transition } from "@headlessui/react"
-import Checkbox from "app/core/components/form/Checkbox"
+import { Menu, Transition } from "@headlessui/react"
 import { Form } from "react-final-form"
-import { AccountTerminalWithTagsAndAccount } from "app/accountTerminal/types"
-import useStore from "app/core/hooks/useStore"
 import useKeyPress from "app/core/hooks/useKeyPress"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsForTerminal"
@@ -60,13 +57,13 @@ const BulletinPage: BlitzPage = () => {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-7 h-[calc(100vh-130px)] w-full box-border">
-          <div className="col-span-7 border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
-            <span className="basis-[42rem] ml-6 mb-2">Information</span>
-            <span className="basis-32 ml-9 mb-2">Submissions</span>
-            <span className="basis-32 ml-6 mb-2">Start Date</span>
-            <span className="basis-32 ml-2 mb-2">Expiry Date</span>
-            <span className="basis-32 ml-2 mr-6 mb-2">Creator</span>
+        <div className="h-[calc(100vh-130px)] w-full">
+          <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
+            <span className="basis-[42rem] ml-6 mb-2 tracking-wider">Information</span>
+            <span className="basis-32 ml-9 mb-2 tracking-wider">Submissions</span>
+            <span className="basis-32 ml-6 mb-2 tracking-wider">Start Date</span>
+            <span className="basis-32 ml-2 mb-2 tracking-wider">End Date</span>
+            <span className="basis-32 ml-2 mr-6 mb-2 tracking-wider">Creator</span>
           </div>
           <div className="overflow-y-auto col-span-7 h-[calc(100vh-174px)] w-full">
             {rfps?.map((rfp) => (
@@ -81,20 +78,18 @@ const BulletinPage: BlitzPage = () => {
 
 const RFPComponent = ({ rfp, terminalHandle }) => {
   return (
-    <Link href={Routes.RequestForProposalInfoPage({ terminalHandle, rfpId: rfp.id })}>
+    <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp.id })}>
       <div className="border-b border-concrete w-full flex flex-row cursor-pointer hover:bg-wet-concrete">
         <div className="basis-[42rem] ml-6 mb-2">
-          <div>
-            <div className="bg-neon-carrot rounded-full min-h-1.5 max-h-1.5 min-w-1.5 max-w-1.5 inline-block align-middle mr-1">
-              &nbsp;
-            </div>
-            <p className="uppercase text-xs inline-block mt-3">{rfp.status}</p>
+          <div className="flex flex-row items-center space-x-2 mt-3">
+            <span className="h-2 w-2 rounded-full bg-concrete" />
+            <span className="text-xs uppercase tracking-wider">{rfp.status}</span>
           </div>
           <h2 className="text-xl mt-2">{`RFP: ${rfp.data?.content?.title}`}</h2>
           <p className="text-sm mt-1 mb-3">{rfp.data?.content?.body}</p>
         </div>
         <div className="basis-32 ml-9 mb-2 self-center">
-          <p>{rfp?._count?.proposals}</p>
+          <p>{rfp?.submissionCount}</p>
         </div>
         <div className="basis-32 ml-6 mb-2 self-center">{formatDate(rfp.startDate)}</div>
         <div className="basis-32 ml-2 mb-2 self-center">{formatDate(rfp.endDate) || "N/A"}</div>
