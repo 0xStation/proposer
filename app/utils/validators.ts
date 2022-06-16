@@ -1,3 +1,4 @@
+import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
 import isURL from "validator/lib/isURL"
 
 // reducer that takes in an array of validators (functions) and returns the appropriate error
@@ -40,4 +41,16 @@ export const mustBeUrl = (value) => {
 
   const valid = isURL(value, options)
   return valid ? undefined : "Not a valid url. Example format: https://www.twitter.com"
+}
+
+export const numUniqueAddresses = (value) => {
+  let numUniqueAddresses
+  const formatMessage = (n) => {
+    return `${n} unique addresses detected`
+  }
+
+  if (!value) {
+    return formatMessage(0)
+  }
+  return formatMessage(parseUniqueAddresses(value).length)
 }

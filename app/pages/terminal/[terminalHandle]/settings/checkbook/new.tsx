@@ -8,6 +8,7 @@ import useStore from "app/core/hooks/useStore"
 import Back from "/public/back-icon.svg"
 import { v4 as uuidv4 } from "uuid"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
+import { numUniqueAddresses } from "app/utils/validators"
 
 const NewCheckbookSettingsPage: BlitzPage = () => {
   const router = useRouter()
@@ -103,13 +104,24 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                       Insert wallet addresses whose signatures are required to create checks, deploy
                       funds, and edit this Checkbook’s information.
                     </span>
-                    <Field
-                      name="signers"
-                      component="textarea"
-                      type="text"
-                      placeholder="Enter wallet addresses or ENS names"
-                      className="bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
-                    />
+                    <Field name="signers" validate={numUniqueAddresses}>
+                      {({ input, meta }) => (
+                        <div>
+                          <textarea
+                            {...input}
+                            className="w-full bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
+                            rows={4}
+                            placeholder="Enter wallet addresses"
+                          />
+                          {/* user feedback on number of registered unique addresses, not actually an error */}
+                          {meta.error && (
+                            <span className=" text-xs text-marble-white ml-2 mb-2 block">
+                              {meta.error}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </Field>
                     <h3 className="font-bold mt-4">Approval quorum*</h3>
                     <span className="text-xs text-concrete block">
                       The number of signers required for a proposal to be approved and for a check
