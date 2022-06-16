@@ -30,7 +30,7 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
     data: {
       fundingAddress: input.fundingAddress,
       startDate: input.startDate,
-      ...(input.endDate && { endDate: input.endDate }),
+      endDate: input.endDate,
       data: {
         content: {
           title: input.contentTitle,
