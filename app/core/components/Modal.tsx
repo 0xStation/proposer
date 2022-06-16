@@ -43,7 +43,7 @@ const Modal = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0 bg-tunnel-black opacity-50" />
+            <div className="fixed inset-0 bg-tunnel-black bg-opacity-50" />
           </Transition.Child>
 
           {/* This element is to trick the browser into centering the modal contents. */}
@@ -67,10 +67,10 @@ const Modal = ({
               {(showTitle || banner) && (
                 <div className="w-full h-full relative">
                   <button
-                    className="text-marble-white absolute z-50 left-2 top-2"
+                    className="text-marble-white absolute z-50 right-2 top-2"
                     onClick={() => toggle(!open)}
                   >
-                    <Image src={Exit} alt="Close button" width={12} height={12} />
+                    <img src="/exit-button.svg" alt="Close button" />
                   </button>
                   {checkBanner(banner)}
                 </div>

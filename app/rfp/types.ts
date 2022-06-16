@@ -26,7 +26,6 @@ export type RfpMetadata = {
 export type Rfp = {
   id: number
   fundingAddress: string
-  localId: number
   authorAddress: string
   startDate: Date
   endDate?: Date
