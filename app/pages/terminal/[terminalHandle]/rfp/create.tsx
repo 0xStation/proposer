@@ -10,8 +10,10 @@ import Preview from "app/core/components/MarkdownPreview"
 import createRfp from "app/rfp/mutations/createRfp"
 import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
+import Modal from "app/core/components/Modal"
 
 const CreateRFPPage: BlitzPage = () => {
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
   const [title, setTitle] = useState("")
   const [markdown, setMarkdown] = useState("")
   const [previewMode, setPreviewMode] = useState(false)
@@ -32,8 +34,6 @@ const CreateRFPPage: BlitzPage = () => {
   )
 
   const [createRfpMutation] = useMutation(createRfp)
-
-  console.log(checkbooks)
 
   // redirect?
   if (!terminal || !activeUser) {
@@ -119,6 +119,7 @@ const CreateRFPPage: BlitzPage = () => {
               endDate: string
               checkbookAddress: string
             }) => {
+              console.log("trying to submit")
               if (!activeUser.address) {
                 setToastState({
                   isToastShowing: true,
@@ -140,7 +141,32 @@ const CreateRFPPage: BlitzPage = () => {
             render={({ form, handleSubmit }) => {
               const formState = form.getState()
               return (
-                <form onSubmit={handleSubmit} className="p-4 grow flex flex-col justify-between">
+                <form className="p-4 grow flex flex-col justify-between">
+                  <Modal open={confirmationModalOpen} toggle={setConfirmationModalOpen}>
+                    <div className="p-2">
+                      <h3 className="text-2xl font-bold pt-6">Publishing RFP?</h3>
+                      <p className="mt-2">
+                        Contributors will be able to submit proposals to this RFP after the defined
+                        start date. You can edit proposals anytime.
+                      </p>
+                      <div className="mt-8">
+                        <button
+                          type="button"
+                          className="text-magic-mint border border-magic-mint mr-2 py-1 px-4 rounded hover:opacity-75"
+                          onClick={() => setConfirmationModalOpen(false)}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="bg-magic-mint text-tunnel-black border border-magic-mint py-1 px-4 rounded hover:opacity-75"
+                          onClick={() => handleSubmit()}
+                        >
+                          Continue
+                        </button>
+                      </div>
+                    </div>
+                  </Modal>
                   <div>
                     <label className="font-bold block">Checkbook*</label>
                     <span className="text-xs text-concrete block">
@@ -212,6 +238,12 @@ const CreateRFPPage: BlitzPage = () => {
                   </div>
                   <div>
                     <button
+                      type="button"
+                      onClick={() => {
+                        if (formState.dirty) {
+                          setConfirmationModalOpen(true)
+                        }
+                      }}
                       className={`bg-magic-mint text-tunnel-black px-6 py-1 rounded block mx-auto ${
                         formState.dirty ? "hover:bg-opacity-70" : "opacity-50 cursor-not-allowed"
                       }`}

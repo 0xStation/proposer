@@ -83,47 +83,47 @@ body {
   position: absolute;
 }
 
-.markdown-prose h1 {
+.markdown-prose > h1 {
   @apply text-2xl font-bold;
 }
 
-.markdown-prose h2 {
+.markdown-prose > h2 {
   @apply text-xl font-bold;
 }
 
-.markdown-prose h3 {
+.markdown-prose > h3 {
   @apply text-base font-bold;
 }
 
-.markdown-prose ul {
+.markdown-prose > ul {
   @apply list-disc pl-6;
 }
 
-.markdown-prose blockquote {
+.markdown-prose > blockquote {
   @apply pl-2 border-l-2 border-light-concrete;
   font-family: "Tobias-Italic";
 }
 
-.markdown-prose code {
+.markdown-prose > code {
   @apply p-1 bg-wet-concrete rounded;
 }
 
-.markdown-prose a {
+.markdown-prose > a {
   @apply text-magic-mint;
 }
 
-.markdown-prose p,
-ul,
-h1,
-h2,
-h3,
-hr {
+.markdown-prose > p,
+.markdown-prose > ul,
+.markdown-prose > h1,
+.markdown-prose > h2,
+.markdown-prose > h3,
+.markdown-prose > hr {
   @apply mb-3;
 }
 
 .markdown-prose h1:not(:first-child),
-h2:not(:first-child),
-h3:not(:first-child) {
+.markdown-prose h2:not(:first-child),
+.markdown-prose h3:not(:first-child) {
   @apply mt-6;
 }
 
