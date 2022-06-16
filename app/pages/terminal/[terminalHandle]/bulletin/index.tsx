@@ -80,29 +80,30 @@ const BulletinPage: BlitzPage = () => {
 const RFPComponent = ({ rfp, terminalHandle }) => {
   return (
     <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp.id })}>
-      <div className="border-b border-concrete w-full flex flex-row cursor-pointer hover:bg-wet-concrete">
-        <div className="basis-[42rem] ml-6 mb-2">
-          <div className="flex flex-row items-center space-x-2 mt-3">
-            <span className="h-2 w-2 rounded-full bg-concrete" />
-            <span className="text-xs uppercase tracking-wider">{rfp.status}</span>
+      <div className="w-full border-b border-concrete cursor-pointer hover:bg-wet-concrete pt-5">
+        <div className="flex flex-row items-center space-x-2 ml-6">
+          <span className="h-2 w-2 rounded-full bg-concrete" />
+          <span className="text-xs uppercase tracking-wider">{rfp.status}</span>
+        </div>
+        <div className="w-full flex flex-row mb-5">
+          <div className="basis-[42rem] ml-6 mb-2">
+            <h2 className="text-xl mt-2">{`RFP: ${rfp.data?.content?.title}`}</h2>
           </div>
-          <h2 className="text-xl mt-2">{`RFP: ${rfp.data?.content?.title}`}</h2>
-          <p className="text-sm mt-1 mb-3">{rfp.data?.content?.body}</p>
-        </div>
-        <div className="basis-32 ml-9 mb-2 self-center">
-          <p>{rfp?.submissionCount}</p>
-        </div>
-        <div className="basis-32 ml-6 mb-2 self-center">{formatDate(rfp.startDate)}</div>
-        <div className="basis-32 ml-2 mb-2 self-center">{formatDate(rfp.endDate) || "N/A"}</div>
-        <div className="basis-32 ml-2 mr-6 mb-2 self-center">
-          <img
-            src={rfp.author.data.pfpURL || DEFAULT_PFP_URLS.USER}
-            className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
-            alt="pfp"
-            onError={(e) => {
-              e.currentTarget.src = DEFAULT_PFP_URLS.USER
-            }}
-          />
+          <div className="basis-32 ml-9 mb-2 self-center">
+            <p>{rfp?.submissionCount}</p>
+          </div>
+          <div className="basis-32 ml-6 mb-2 self-center">{formatDate(rfp.startDate)}</div>
+          <div className="basis-32 ml-2 mb-2 self-center">{formatDate(rfp.endDate) || "N/A"}</div>
+          <div className="basis-32 ml-2 mr-6 mb-2 self-center">
+            <img
+              src={rfp.author.data.pfpURL || DEFAULT_PFP_URLS.USER}
+              className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
+              alt="pfp"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_PFP_URLS.USER
+              }}
+            />
+          </div>
         </div>
       </div>
     </Link>

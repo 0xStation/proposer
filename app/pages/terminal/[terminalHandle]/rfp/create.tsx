@@ -1,7 +1,7 @@
 import { useState } from "react"
-import { BlitzPage, useMutation, useQuery, useParam, Link, Routes } from "blitz"
+import { BlitzPage, useMutation, useQuery, useParam, Link, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
-import { LockClosedIcon } from "@heroicons/react/solid"
+import { LockClosedIcon, XIcon } from "@heroicons/react/solid"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"
@@ -19,6 +19,7 @@ const CreateRFPPage: BlitzPage = () => {
   const [previewMode, setPreviewMode] = useState(false)
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
+  const router = useRouter()
 
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(
@@ -44,21 +45,26 @@ const CreateRFPPage: BlitzPage = () => {
     <Layout title={`New RFP`}>
       <div className="fixed grid grid-cols-4 w-[calc(100%-70px)] border-box z-50">
         <div className="col-span-3 pt-4 pr-4">
-          <div
-            className="text-light-concrete flex flex-row justify-end items-center space-x-2 cursor-pointer w-full"
-            onClick={() => setPreviewMode(!previewMode)}
-          >
-            {previewMode ? (
-              <>
-                <img src="/pencil.svg" />
-                <span>Back to editing</span>
-              </>
-            ) : (
-              <>
-                <img src="/eye.svg" />
-                <span>Preview</span>
-              </>
-            )}
+          <div className="text-light-concrete flex flex-row justify-between w-full">
+            <button onClick={() => router.push(Routes.BulletinPage({ terminalHandle }))}>
+              <XIcon className="h-6 w-6 ml-3 fill-marble-white" />
+            </button>
+            <div
+              className="space-x-1 items-center flex cursor-pointer"
+              onClick={() => setPreviewMode(!previewMode)}
+            >
+              {previewMode ? (
+                <>
+                  <img src="/pencil.svg" className="inline pr-2 self-center" />
+                  <span>Back to editing</span>
+                </>
+              ) : (
+                <>
+                  <img src="/eye.svg" className="inline pr-2 items-center" />
+                  <span>Preview</span>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
