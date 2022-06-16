@@ -16,12 +16,20 @@ const signatureToRSV = (signature: string) => {
 }
 
 /**
+ * THIS IS A DEV TOOL
+ * this is not production code
+ * this is not meant to have good UX or be what users see/touch
+ * this is meant to show a dev how check signatures need to be prepared to be valid for the Checkbook contracts
+ */
+
+/**
  * Type Definitions
  * these tell the wallet how to structure the signature UI and the cryptography encoding
  * */
 
 // type definition of a single check, order matters
 // types per value are using Solidity types
+// keys are capitalized because they mimic Solidity structs
 const singleCheckTypes: TypedDataTypeDefinition = {
   Check: [
     { name: "recipient", type: "address" },
@@ -68,6 +76,7 @@ const ApprovalSignaturesPage: BlitzPage = () => {
   let { signTypedDataAsync: signApproval } = useSignTypedData()
 
   const approveChecks = async (checks: Check[]) => {
+    // intentional log, for the developers benefit to see what's happening
     console.log(checks)
     let types
     let value
@@ -89,6 +98,7 @@ const ApprovalSignaturesPage: BlitzPage = () => {
 
       // split signature to v,r,s components (probably not needed, just for show)
       const { v, r, s } = signatureToRSV(signature)
+      // intentional log, for the developers benefit to see what's happening
       console.log(
         `signer: ${activeUser?.address}\nsignature:${signature}\nv: ${v}\nr: ${r}\ns: ${s}`
       )
