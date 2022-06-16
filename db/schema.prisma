@@ -116,7 +116,6 @@ model Rfp {
   id             String     @id @default(uuid())
   terminalId     Int
   terminal       Terminal   @relation(fields: [terminalId], references: [id])
-  localId        Int
   fundingAddress String
   checkbook      Checkbook? @relation(fields: [fundingAddress], references: [address])
   authorAddress  String
@@ -126,8 +125,6 @@ model Rfp {
   status         RfpStatus  @default(DRAFT)
   data           Json
   proposals      Proposal[]
-
-  @@unique([terminalId, localId])
 }
 
 // unique links by /terminal/[handle]/proposal/[localId]
@@ -140,11 +137,8 @@ model Proposal {
   rfp            Rfp               @relation(fields: [rfpId], references: [id])
   status         ProposalStatus    @default(IN_REVIEW)
   data           Json
-  localId        Int
   createdAt      DateTime          @default(now())
   collaborators  AccountProposal[]
-
-  @@unique([terminalId, localId])
 }
 
 model AccountProposal {
