@@ -12,34 +12,11 @@ const CreateCheckbook = z.object({
 })
 
 export default async function createCheckbook(input: z.infer<typeof CreateCheckbook>) {
-  // create tag for checkbook
-  // having a tag to represent a checkbook will let us associate accounts with it via AccounTerminalTag objects
-  // this will help us keep role management consistent and shared for things like member directory filtering and permissions
-  const checkbookTag = await db.tag.create({
-    data: {
-      terminalId: input.terminalId,
-      value: input.name,
-      active: true,
-      type: TagType.CHECKBOOK_SIGNER,
-      data: {
-        address: input.address,
-        chainId: input.chainId,
-      },
-    },
-  })
-
   // create checkbook
   const checkbook = await db.checkbook.create({
     data: {
-      terminalId: input.terminalId,
-      address: input.address,
-      chainId: input.chainId,
-      name: input.name,
-      data: {
-        quorum: input.quorum,
-        signers: input.signers,
-        tagId: checkbookTag.id,
-      },
+      ...input,
+      data: {},
     },
   })
 
@@ -72,18 +49,6 @@ export default async function createCheckbook(input: z.infer<typeof CreateCheckb
         accountId: a.id,
         terminalId: input.terminalId,
         active: true,
-      }
-    }),
-  })
-
-  // create tags for signers and checkbook
-  await db.accountTerminalTag.createMany({
-    skipDuplicates: true,
-    data: accounts.map((a) => {
-      return {
-        tagId: checkbookTag.id,
-        ticketAccountId: a.id,
-        ticketTerminalId: input.terminalId,
       }
     }),
   })

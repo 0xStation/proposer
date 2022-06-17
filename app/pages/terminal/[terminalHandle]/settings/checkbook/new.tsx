@@ -26,7 +26,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
   type FormValues = {
     name: string
     signers: string
-    quorum: number
+    quorum: string
   }
 
   return (
@@ -63,7 +63,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                       address: checkbookAddress,
                       chainId: 1, // ETH mainnet, change once checkbooks are multichain
                       name: values.name,
-                      quorum: values.quorum,
+                      quorum: parseInt(values.quorum),
                       signers,
                     })
 

@@ -107,6 +107,8 @@ model Checkbook {
   name       String
   terminalId Int
   terminal   Terminal @relation(fields: [terminalId], references: [id])
+  quorum     Int
+  signers    String[]
   data       Json
   rfps       Rfp[]
 }
