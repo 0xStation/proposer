@@ -272,9 +272,6 @@ const SelectedTerminalCard = ({
   const tokenTags = membership.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === TagType.TOKEN
   )
-  const checkbookTags = membership.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.CHECKBOOK_SIGNER
-  )
 
   const selectedTerminalCardContent = (
     <div className="m-5 flex-col">
