@@ -34,7 +34,14 @@ const CreateRFPPage: BlitzPage = () => {
     { suspense: false, enabled: !!terminal } // it wont run unless terminal exists, but TS doesnt pick up on that
   )
 
-  const [createRfpMutation] = useMutation(createRfp)
+  const [createRfpMutation] = useMutation(createRfp, {
+    onSuccess: (_data) => {
+      router.push(Routes.BulletinPage({ terminalHandle: terminalHandle }))
+    },
+    onError: (error: Error) => {
+      console.error(error)
+    },
+  })
 
   // redirect?
   if (!terminal || !activeUser) {
@@ -202,7 +209,7 @@ const CreateRFPPage: BlitzPage = () => {
                         </div>
                       )}
                     </Field>
-                    <Link href={Routes.TerminalSettingsPage({ terminalHandle })}>
+                    <Link href={Routes.NewCheckbookSettingsPage({ terminalHandle })}>
                       <span className="text-magic-mint cursor-pointer mt-1 block">
                         + Create new
                       </span>
@@ -250,8 +257,11 @@ const CreateRFPPage: BlitzPage = () => {
                         }
                       }}
                       className={`bg-magic-mint text-tunnel-black px-6 py-1 rounded block mx-auto ${
-                        formState.dirty ? "hover:bg-opacity-70" : "opacity-50 cursor-not-allowed"
+                        formState.values.checkbookAddress && formState.values.startDate
+                          ? "hover:bg-opacity-70"
+                          : "opacity-50 cursor-not-allowed"
                       }`}
+                      disabled={!formState.values.checkbookAddress || !formState.values.startDate}
                     >
                       Publish
                     </button>
