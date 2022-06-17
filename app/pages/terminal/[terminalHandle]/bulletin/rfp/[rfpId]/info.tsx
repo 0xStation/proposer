@@ -60,9 +60,9 @@ const RFPInfoTab: BlitzPage = () => {
   )
 }
 
-const PfpComponent = ({ account, className = "", key = 0 }) => {
+const PfpComponent = ({ account, className = "" }) => {
   return (
-    <Link key={key} href={Routes.ProfileHome({ accountAddress: account?.address })}>
+    <Link href={Routes.ProfileHome({ accountAddress: account?.address })}>
       <div className={`flex flex-row ${className}`}>
         <div className="flex flex-col content-center align-middle mr-3">
           {account?.data?.pfpURL ? (
