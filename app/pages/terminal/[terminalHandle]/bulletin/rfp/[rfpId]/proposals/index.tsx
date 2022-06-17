@@ -37,8 +37,6 @@ const ProposalsTab: BlitzPage = () => {
         <div className="h-[calc(100vh-240px)] flex flex-col">
           <div className="w-full h-20 flex flex-row">
             <FilterPill title="Status" className="mt-6 ml-6" />
-            <FilterPill title="Unread" className="mt-6 ml-2" />
-            <FilterPill title="My proposals" className="mt-6 ml-2" />
           </div>
           <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
             <span className="basis-[38rem] ml-6 mb-2">Proposal</span>
