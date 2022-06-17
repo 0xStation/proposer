@@ -1,5 +1,6 @@
 import db from "db"
 import * as z from "zod"
+import { RfpStatus as PrismaRfpStatus } from "@prisma/client"
 
 const CreateRfp = z.object({
   terminalId: z.number(),
@@ -19,6 +20,7 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
       terminalId: input.terminalId,
       startDate: input.startDate,
       ...(input.endDate && { endDate: input.endDate }),
+      status: PrismaRfpStatus.PUBLISHED,
       data: {
         content: {
           title: input.contentTitle,

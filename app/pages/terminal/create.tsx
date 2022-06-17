@@ -113,7 +113,6 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
               }}
               render={({ form, handleSubmit }) => {
                 let formState = form.getState()
-                console.log(formState)
                 let errors = formState.errors
                 return (
                   <form onSubmit={handleSubmit} className="mt-12">

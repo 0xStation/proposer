@@ -70,6 +70,29 @@ const Navigation = ({ children }) => {
             <Link href={Routes.DiscordSettingsPage({ terminalHandle })}>Discord</Link>
           </li>
         </ul>
+        {
+          // show dev tools if on localhost
+          typeof window !== "undefined" && window.location.hostname === "localhost" && (
+            <>
+              <label className="font-bold text-sm text-marble-white uppercase tracking-wider mt-8 block">
+                Dev Tools
+              </label>
+              <ul className="mt-6">
+                <li
+                  className={`${
+                    router.pathname === Routes.ApprovalSignaturesPage({ terminalHandle }).pathname
+                      ? "text-marble-white font-bold"
+                      : "text-concrete"
+                  } cursor-pointer hover:text-marble-white mt-4`}
+                >
+                  <Link href={Routes.ApprovalSignaturesPage({ terminalHandle })}>
+                    Approval Signatures
+                  </Link>
+                </li>
+              </ul>
+            </>
+          )
+        }
       </div>
     </>
   )
