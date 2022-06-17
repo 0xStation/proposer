@@ -25,8 +25,20 @@ export default async function getRfpById(input: z.infer<typeof GetRfpById>) {
     return null
   }
 
+  const signers = await db.account.findMany({
+    where: {
+      address: {
+        in: rfp.checkbook?.signers || [],
+      },
+    },
+  })
+
   return {
     ...rfp,
+    checkbook: {
+      ...rfp.checkbook,
+      signerAccounts: signers,
+    },
     status: computeRfpProductStatus(rfp.status, rfp.startDate, rfp.endDate),
     submissionCount: rfp._count.proposals,
   } as unknown as Rfp
