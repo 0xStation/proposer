@@ -45,78 +45,13 @@ const RFPInfoTab: BlitzPage = () => {
             </div>
             <div className="mt-6">
               <p className="text-concrete uppercase text-xs font-bold">Creator</p>
-              <PfpComponent user={rfp?.author} className="mt-2" />
+              <PfpComponent account={rfp?.author} className="mt-2" />
             </div>
             <div className="mt-9">
               <p className="text-xs text-concrete uppercase font-bold">Signers</p>
-              <div className="flex flex-row mt-4">
-                <div className="flex flex-col content-center align-middle mr-3">
-                  <img
-                    src={
-                      "https://cdn.discordapp.com/avatars/658010922043834400/77cb4d63757cc5cc70173e30b84ca867.png"
-                    }
-                    alt="PFP"
-                    className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
-                    onError={(e) => {
-                      e.currentTarget.src = DEFAULT_PFP_URLS.USER
-                    }}
-                  />
-                </div>
-                <div className="flex flex-col content-center">
-                  <div className="flex flex-row items-center space-x-1">
-                    <p className="text-base text-marble-white font-bold">Izzy</p>
-                  </div>
-                  <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-                    <p className="w-max truncate leading-4">
-                      @{truncateString("0xaE55f61f85935BBB68b8809d5c02142e4CbA9a13")}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex mt-4 flex-row">
-                <div className="flex flex-col content-center align-middle mr-3">
-                  <img
-                    src={""}
-                    alt="PFP"
-                    className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
-                    onError={(e) => {
-                      e.currentTarget.src = DEFAULT_PFP_URLS.USER
-                    }}
-                  />
-                </div>
-                <div className="flex flex-col content-center">
-                  <div className="flex flex-row items-center space-x-1">
-                    <p className="text-base text-marble-white font-bold">Pepe</p>
-                  </div>
-                  <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-                    <p className="w-max truncate leading-4">
-                      @{truncateString("0xaE55f61f85935BBB68b8809d5c02142e4CbA9a13")}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex mt-4 flex-row">
-                <div className="flex flex-col content-center align-middle mr-3">
-                  <img
-                    src={""}
-                    alt="PFP"
-                    className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
-                    onError={(e) => {
-                      e.currentTarget.src = DEFAULT_PFP_URLS.USER
-                    }}
-                  />
-                </div>
-                <div className="flex flex-col content-center">
-                  <div className="flex flex-row items-center space-x-1">
-                    <p className="text-base text-marble-white font-bold">Pepe</p>
-                  </div>
-                  <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-                    <p className="w-max truncate leading-4">
-                      @{truncateString("0xaE55f61f85935BBB68b8809d5c02142e4CbA9a13")}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              {(rfp?.checkbook?.signerAccounts || []).map((account, i) => (
+                <PfpComponent account={account} className="mt-4" key={i} />
+              ))}
             </div>
           </div>
         </div>
@@ -125,26 +60,30 @@ const RFPInfoTab: BlitzPage = () => {
   )
 }
 
-const PfpComponent = ({ user, className = "" }) => {
+const PfpComponent = ({ account, className = "" }) => {
   return (
-    <Link href={Routes.ProfileHome({ accountAddress: user?.address })}>
+    <Link href={Routes.ProfileHome({ accountAddress: account?.address })}>
       <div className={`flex flex-row ${className}`}>
         <div className="flex flex-col content-center align-middle mr-3">
-          <img
-            src={user?.data?.pfpURL}
-            alt="PFP"
-            className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
-            onError={(e) => {
-              e.currentTarget.src = DEFAULT_PFP_URLS.USER
-            }}
-          />
+          {account?.data?.pfpURL ? (
+            <img
+              src={account?.data?.pfpURL}
+              alt="PFP"
+              className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_PFP_URLS.USER
+              }}
+            />
+          ) : (
+            <div className="h-[46px] min-w-[46px] place-self-center border border-wet-concrete bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
+          )}
         </div>
         <div className="flex flex-col content-center">
           <div className="flex flex-row items-center space-x-1">
-            <p className="text-base text-marble-white font-bold">{user?.data?.name}</p>
+            <p className="text-base text-marble-white font-bold">{account?.data?.name}</p>
           </div>
           <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-            <p className="w-max truncate leading-4">@{truncateString(user?.address)}</p>
+            <p className="w-max truncate leading-4">@{truncateString(account?.address)}</p>
           </div>
         </div>
       </div>
