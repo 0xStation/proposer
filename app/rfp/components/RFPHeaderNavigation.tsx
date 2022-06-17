@@ -44,12 +44,16 @@ const RFPHeaderNavigation = ({ rfpId }) => {
                     onClick={() => {
                       navigator.clipboard.writeText(window.location.href).then(() => {
                         setIsRfpUrlCopied(true)
-                        setTimeout(() => setIsRfpUrlCopied(false), 1000)
+                        setTimeout(() => setIsRfpUrlCopied(false), 500)
                       })
                       setIsRfpUrlCopied(true)
                     }}
                   >
-                    <LinkIcon className="inline h-6 w-6 fill-concrete mr-3 hover:cursor-pointer hover:fill-light-concrete" />
+                    <LinkIcon
+                      className={`inline h-6 w-6 mr-3 hover:cursor-pointer hover:fill-marble-white ${
+                        isRFPUrlCopied ? "fill-marble-white" : "fill-concrete"
+                      }`}
+                    />
                   </button>
                   {isRFPUrlCopied && (
                     <span className="mt-2 text-[.5rem] ml-[-10px] uppercase font-bold tracking-wider rounded px-1 absolute text-marble-white bg-wet-concrete">
@@ -57,10 +61,10 @@ const RFPHeaderNavigation = ({ rfpId }) => {
                     </span>
                   )}
                   <button>
-                    <PencilIcon className="inline h-6 w-6 fill-concrete mr-3 hover:cursor-pointer hover:fill-light-concrete" />
+                    <PencilIcon className="inline h-6 w-6 fill-concrete mr-3 hover:cursor-pointer hover:fill-marble-white" />
                   </button>
                   <button>
-                    <XCircleIcon className="inline h-6 w-6 fill-concrete hover:cursor-pointer hover:fill-light-concrete" />
+                    <XCircleIcon className="inline h-6 w-6 fill-concrete hover:cursor-pointer hover:fill-marble-white" />
                   </button>
                 </div>
               </div>

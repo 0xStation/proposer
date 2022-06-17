@@ -1,4 +1,5 @@
 import { RfpStatus } from "app/rfp/types"
+import { ProposalStatus } from "app/proposal/types"
 export const TERMINAL = {
   TICKET_ADDRESS: "0xd9243de6be84EA0f592D20e3E6bd67949D96bfe9",
   TOKEN_ADDRESS: "0xABf03EDC17De11e80008C3e89919b82AbA34521A",
@@ -81,5 +82,16 @@ export const RFP_STATUS_DISPLAY_MAP = {
   [RfpStatus.CLOSED]: {
     copy: "open for submissions",
     color: "bg-torch-red",
+  },
+}
+
+export const PROPOSAL_STATUS_DISPLAY_MAP = {
+  [ProposalStatus.APPROVED]: {
+    copy: "approved",
+    color: "bg-magic-mint",
+  },
+  [ProposalStatus.IN_REVIEW]: {
+    copy: "in review",
+    color: "bg-neon-carrot",
   },
 }

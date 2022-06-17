@@ -14,6 +14,7 @@ export default async function getRfpById(input: z.infer<typeof GetRfpById>) {
     },
     include: {
       author: true,
+      checkbook: true,
       _count: {
         select: { proposals: true },
       },

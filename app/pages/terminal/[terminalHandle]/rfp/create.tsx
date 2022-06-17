@@ -125,7 +125,6 @@ const CreateRFPPage: BlitzPage = () => {
               endDate: string
               checkbookAddress: string
             }) => {
-              console.log("trying to submit")
               if (!activeUser.address) {
                 setToastState({
                   isToastShowing: true,

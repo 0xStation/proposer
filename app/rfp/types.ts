@@ -1,4 +1,5 @@
 import { Account } from "app/account/types"
+import { Checkbook } from "app/checkbook/types"
 import { Signature } from "app/types"
 
 // note that these statuses are different than those in the database enum
@@ -33,4 +34,5 @@ export type Rfp = {
   data: RfpMetadata
   submissionCount: number
   author?: Account
+  checkbook: Checkbook
 }

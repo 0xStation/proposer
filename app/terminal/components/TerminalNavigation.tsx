@@ -102,7 +102,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
         {/* Terminal navigation */}
         <div>
           <ul className="mt-9 ml-8 text-lg space-y-2">
-            <li className="group cursor-pointer hover:text-marble-white font-bold">
+            <li className="group cursor-pointer font-bold">
               <BulletinIcon
                 className={`inline mr-5 mb-1 ${
                   router.pathname.includes(Routes.BulletinPage({ terminalHandle }).pathname)
@@ -120,7 +120,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
                 <Link href={Routes.BulletinPage({ terminalHandle })}>Bulletin</Link>
               </p>
             </li>
-            <li className="group cursor-pointer hover:text-marble-white font-bold">
+            <li className="group cursor-pointer font-bold">
               <DirectoryIcon
                 className={`inline mr-5 mb-1 ${
                   router.pathname === Routes.MemberDirectoryPage({ terminalHandle }).pathname
@@ -137,7 +137,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
                 className={`inline ${
                   router.pathname === Routes.MemberDirectoryPage({ terminalHandle }).pathname
                     ? "text-marble-white font-bold"
-                    : "text-concrete hover:text-light-concrete"
+                    : "text-concrete group-hover:text-light-concrete"
                 }`}
               >
                 <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>Members</Link>

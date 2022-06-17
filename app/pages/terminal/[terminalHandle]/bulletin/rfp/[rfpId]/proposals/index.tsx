@@ -1,15 +1,17 @@
 import truncateString from "app/core/utils/truncateString"
 import { BlitzPage, Routes, useParam, useQuery, Link, useRouter } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
+import { DEFAULT_PFP_URLS, PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import RFPHeaderNavigation from "app/rfp/components/RFPHeaderNavigation"
-import getRfpById from "app/rfp/queries/getRfpById"
 import { Menu, Transition } from "@headlessui/react"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import { Fragment } from "react"
 import { Form } from "react-final-form"
+import getProposalsByRfpId from "app/proposal/queries/getProposalsByRfpId"
+import { formatDate } from "app/core/utils/formatDate"
+import getRfpById from "app/rfp/queries/getRfpById"
 
 const ProposalsTab: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -19,8 +21,15 @@ const ProposalsTab: BlitzPage = () => {
     { handle: terminalHandle as string },
     { suspense: false, enabled: !!terminalHandle }
   )
+
+  const [proposals] = useQuery(
+    getProposalsByRfpId,
+    { rfpId },
+    { suspense: false, enabled: !!rfpId }
+  )
+
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
-  const router = useRouter()
+
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
       <TerminalNavigation>
@@ -39,38 +48,90 @@ const ProposalsTab: BlitzPage = () => {
             <span className="basis-32 ml-6 mr-6 mb-2">Creator</span>
           </div>
           <div className="h-[calc(100vh-284px)] overflow-y-auto">
-            {Array.from(Array(5)).map((idx) => (
-              <div
-                className="border-b border-concrete w-full flex flex-row cursor-pointer hover:bg-wet-concrete"
-                key={idx}
-              >
-                <div className="basis-[38rem] ml-6 mb-2">
-                  <div>
-                    <div className="flex flex-row items-center space-x-2 mt-3">
-                      <span className="h-2 w-2 rounded-full bg-concrete" />
-                      <span className="text-xs uppercase tracking-wider">In review</span>
-                    </div>
-                  </div>
-                  <h2 className="text-xl mt-2 mb-3">Olympus Early Tester Program</h2>
-                </div>
-                <div className="basis-32 ml-9 mb-2 self-center">
-                  <p>0</p>
-                </div>
-                <div className="basis-32 ml-6 mb-2 self-center">8-JUN-2022</div>
-                <div className="basis-32 ml-2 mb-2 self-center">9-JUL-2022</div>
-                <div className="basis-32 ml-6 mr-6 mb-2 self-center">
-                  <img
-                    src={DEFAULT_PFP_URLS.USER}
-                    className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
-                    alt="pfp"
-                  />
-                </div>
-              </div>
-            ))}
+            {proposals &&
+              proposals.map((proposal, idx) => (
+                <ProposalComponent proposal={proposal} rfp={rfp} key={idx} />
+              ))}
           </div>
         </div>
       </TerminalNavigation>
     </Layout>
+  )
+}
+
+const ProposalComponent = ({ proposal, rfp }) => {
+  return (
+    <Link href={"#"}>
+      <div className="border-b border-concrete w-full cursor-pointer hover:bg-wet-concrete pt-5">
+        <div className="flex flex-row items-center space-x-2 ml-6">
+          <span
+            className={`h-2 w-2 rounded-full ${
+              PROPOSAL_STATUS_DISPLAY_MAP[proposal.status]?.color || "bg-concrete"
+            }`}
+          />
+          <span className="text-xs uppercase tracking-wider">
+            {PROPOSAL_STATUS_DISPLAY_MAP[proposal.status]?.copy}
+          </span>
+        </div>
+        <div className="w-full flex flex-row mb-5">
+          <div className="basis-[38rem] ml-6 mb-2">
+            <h2 className="text-xl mt-2 mb-3">{proposal?.data?.content?.title}</h2>
+          </div>
+          <div className="basis-32 ml-9 mb-2 self-center">
+            <p>
+              {/* TODO: Figure out how to show signers per milestone */}
+              {`${proposal.data?.signatures?.length || "0"} / ${
+                rfp?.checkbook?.data?.quorum || "N/A"
+              }`}
+            </p>
+          </div>
+          <div className="basis-32 ml-6 mb-2 self-center">
+            {proposal.data?.funding?.amount || "N/A"}
+          </div>
+          <div className="basis-32 ml-2 mb-2 self-center">
+            {formatDate(proposal.createdAt) || "N/A"}
+          </div>
+          <div className="basis-32 ml-6 mr-6 mb-2 self-center">
+            {/* TODO: create a flag to indicate the main author when creating an account proposal */}
+            <img
+              src={proposal?.collaborators[0]?.account?.data?.pfpURL}
+              alt="PFP"
+              className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_PFP_URLS.USER
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+const PfpComponent = ({ user, className = "" }) => {
+  return (
+    <Link href={Routes.ProfileHome({ accountAddress: user?.address })}>
+      <div className={`flex flex-row ${className}`}>
+        <div className="flex flex-col content-center align-middle mr-3">
+          <img
+            src={user?.data?.pfpURL}
+            alt="PFP"
+            className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_PFP_URLS.USER
+            }}
+          />
+        </div>
+        <div className="flex flex-col content-center">
+          <div className="flex flex-row items-center space-x-1">
+            <p className="text-base text-marble-white font-bold">{user?.data?.name}</p>
+          </div>
+          <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
+            <p className="w-max truncate leading-4">@{truncateString(user?.address)}</p>
+          </div>
+        </div>
+      </div>
+    </Link>
   )
 }
 
