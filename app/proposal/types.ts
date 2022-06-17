@@ -1,4 +1,4 @@
-import { ProposalStatus } from "@prisma/client"
+import { AccountProposal } from "@prisma/client"
 import { FundingSignature } from "app/types"
 
 export enum CheckStatus {
@@ -6,6 +6,11 @@ export enum CheckStatus {
   PENDING_APPROVAL, // queued and currently in approval process
   UNCLAIMED, // approved, but not cashed by recipient
   CASHED, // cashed by recipient post-approval
+}
+
+export enum ProposalStatus {
+  APPROVED = "APPROVED",
+  IN_REVIEW = "IN_REVIEW",
 }
 
 export type ProposalMetadata = {
@@ -34,4 +39,5 @@ export type Proposal = {
   status: ProposalStatus
   data: ProposalMetadata
   createdAt: Date
+  collaborators: AccountProposal[]
 }
