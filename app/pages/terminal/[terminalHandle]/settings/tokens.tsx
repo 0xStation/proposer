@@ -110,11 +110,15 @@ const TokenSettingsPage: BlitzPage = () => {
                   </div>
                   <div className="space-y-6 mt-12">
                     <div>
-                      <h3 className="uppercase text-xs font-bold tracking-wider">Chain</h3>
+                      <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
+                        Chain
+                      </h3>
                       <p className="mt-2">{networks[selectedTag?.data.chainId].name}</p>
                     </div>
                     <div>
-                      <h3 className="uppercase text-xs font-bold tracking-wider">Token Type</h3>
+                      <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
+                        Token Type
+                      </h3>
                       <p className="mt-2">{selectedTag?.data.type}</p>
                     </div>
                   </div>

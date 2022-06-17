@@ -313,6 +313,7 @@ const SelectedTerminalCard = ({
         <TagDetails tagType="projects" tags={projectTags} />
         <TagDetails tagType="guilds" tags={guildTags} />
         <TagDetails tagType="tokens" tags={tokenTags} />
+        <TagDetails tagType="checkbook signers" tags={tokenTags} />
       </div>
     </div>
   )

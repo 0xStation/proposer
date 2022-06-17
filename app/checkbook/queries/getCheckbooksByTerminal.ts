@@ -14,5 +14,20 @@ export default async function getCheckbooksByTerminal(
     },
   })
 
-  return checkbooks
+  const signers = {}
+  checkbooks.forEach((c) => c.signers.forEach((s) => (signers[s] = {})))
+
+  const accounts = await db.account.findMany({
+    where: {
+      address: {
+        in: Object.keys(signers),
+      },
+    },
+  })
+
+  accounts.forEach((a) => (signers[a.address!] = a))
+
+  return checkbooks.map((c) => {
+    return { ...c, signerAccounts: c.signers.map((s) => signers[s]) }
+  })
 }
