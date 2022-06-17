@@ -3,12 +3,12 @@ import * as z from "zod"
 
 // Change the end date to some later date to "reopen" it.
 // note: need to send notification
-const CloseRfp = z.object({
+const ReopenRfp = z.object({
   rfpId: z.string(),
   endDate: z.date(),
 })
 
-export default async function closeRfp(input: z.infer<typeof CloseRfp>) {
+export default async function reopenRfp(input: z.infer<typeof ReopenRfp>) {
   if (input.endDate < new Date()) {
     throw Error("End date cannot be in the past.")
   }
