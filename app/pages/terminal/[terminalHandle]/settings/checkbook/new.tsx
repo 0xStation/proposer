@@ -8,14 +8,18 @@ import useStore from "app/core/hooks/useStore"
 import Back from "/public/back-icon.svg"
 import { v4 as uuidv4 } from "uuid"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
-import { numUniqueAddresses } from "app/utils/validators"
+import { uniqueName, isValidQuorum } from "app/utils/validators"
 
 const NewCheckbookSettingsPage: BlitzPage = () => {
   const router = useRouter()
   const [createCheckbookMutation] = useMutation(createCheckbook)
 
   const terminalHandle = useParam("terminalHandle") as string
-  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+  const [terminal] = useQuery(
+    getTerminalByHandle,
+    { handle: terminalHandle, include: ["checkbooks"] },
+    { suspense: false }
+  )
 
   const setToastState = useStore((state) => state.setToastState)
 
@@ -47,17 +51,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
               if (terminal) {
                 try {
                   // validation on checksum addresses, no duplicates
-                  const signers = parseUniqueAddresses(values.signers)
-
-                  // assert quorum <= number of signers
-                  if (values.quorum > signers.length) {
-                    setToastState({
-                      isToastShowing: true,
-                      type: "error",
-                      message: "Quorum cannot be greater than number of signers.",
-                    })
-                    return
-                  }
+                  const signers = parseUniqueAddresses(values.signers || "")
 
                   // trigger transaction, returns address of new Checkbook
                   // TODO: real transaction that populates `checkbookAddress`
@@ -67,7 +61,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                     await createCheckbookMutation({
                       terminalId: terminal.id,
                       address: checkbookAddress,
-                      chainId: 1,
+                      chainId: 1, // ETH mainnet, change once checkbooks are multichain
                       name: values.name,
                       quorum: values.quorum,
                       signers,
@@ -95,17 +89,34 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                     <h3 className="font-bold">Checkbook name*</h3>
                     <Field
                       name="name"
-                      component="input"
-                      placeholder="e.g. 2022 Q3 Grants"
-                      className="bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
-                    />
+                      validate={uniqueName(terminal?.checkbooks?.map((c) => c.name) || [])}
+                    >
+                      {({ input, meta }) => (
+                        <div>
+                          <input
+                            {...input}
+                            type="text"
+                            placeholder="e.g. 2022 Q3 Grants"
+                            className="w-full bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
+                          />
+                          {/* this error shows up when the user focuses the field (meta.touched) */}
+                          {meta.error && meta.touched && (
+                            <span className=" text-xs text-torch-red p-2 block">{meta.error}</span>
+                          )}
+                        </div>
+                      )}
+                    </Field>
                     <h3 className="font-bold mt-4">Checkbook signers*</h3>
                     <span className="text-xs text-concrete block">
                       Insert wallet addresses whose signatures are required to create checks, deploy
                       funds, and edit this Checkbook’s information.
                     </span>
-                    <Field name="signers" validate={numUniqueAddresses}>
-                      {({ input, meta }) => (
+                    <Field
+                      name="signers"
+                      // automatically enter new lines for user
+                      format={(value) => value?.replace(/,\s*|\s+/g, ",\n")}
+                    >
+                      {({ input }) => (
                         <div>
                           <textarea
                             {...input}
@@ -113,10 +124,12 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                             rows={4}
                             placeholder="Enter wallet addresses"
                           />
-                          {/* user feedback on number of registered unique addresses, not actually an error */}
-                          {meta.error && (
+                          {/* user feedback on number of registered unique addresses, not an error */}
+                          {input && (
                             <span className=" text-xs text-marble-white ml-2 mb-2 block">
-                              {meta.error}
+                              {`${
+                                parseUniqueAddresses(input.value || "").length
+                              } unique addresses detected`}
                             </span>
                           )}
                         </div>
@@ -133,17 +146,42 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                     </span>
                     <Field
                       name="quorum"
-                      component="input"
-                      type="text"
-                      placeholder="0"
-                      className="bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
-                    />
+                      validate={isValidQuorum(
+                        parseUniqueAddresses(formState.values.signers || "").length
+                      )}
+                    >
+                      {({ input, meta }) => (
+                        <div>
+                          <input
+                            {...input}
+                            type="text"
+                            placeholder="1"
+                            className="w-full bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
+                          />
+                          {/* this error shows up when the user focuses the field (meta.touched) */}
+                          {meta.error && meta.touched && (
+                            <span className=" text-xs text-torch-red p-2 block">{meta.error}</span>
+                          )}
+                        </div>
+                      )}
+                    </Field>
                     <div>
                       <button
                         className={`rounded text-tunnel-black px-8 py-2 h-full mt-12 ${
-                          formState.dirty ? "bg-magic-mint" : "bg-opacity-70"
+                          formState.values.name &&
+                          formState.values.signers &&
+                          formState.values.quorum &&
+                          !formState.hasValidationErrors
+                            ? "bg-magic-mint"
+                            : "bg-concrete"
                         }`}
                         type="submit"
+                        disabled={
+                          !formState.values.name ||
+                          !formState.values.signers ||
+                          !formState.values.quorum ||
+                          formState.hasValidationErrors
+                        }
                       >
                         Create
                       </button>

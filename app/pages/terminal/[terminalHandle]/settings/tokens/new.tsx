@@ -116,7 +116,7 @@ const NewTokenSettingsPage: BlitzPage = () => {
                     <div>
                       <button
                         className={`rounded text-tunnel-black px-8 py-2 h-full mt-12 ${
-                          formState.dirty ? "bg-magic-mint" : "bg-opacity-70"
+                          formState.dirty ? "bg-magic-mint" : "bg-concrete"
                         }`}
                         type="submit"
                       >

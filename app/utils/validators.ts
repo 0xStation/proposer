@@ -43,14 +43,20 @@ export const mustBeUrl = (value) => {
   return valid ? undefined : "Not a valid url. Example format: https://www.twitter.com"
 }
 
-export const numUniqueAddresses = (value) => {
-  let numUniqueAddresses
-  const formatMessage = (n) => {
-    return `${n} unique addresses detected`
+export const isValidQuorum = (numSigners: number) => {
+  return (quorum: number) => {
+    return quorum == 0 // intentional == because form gives quorum as string
+      ? "Cannot have zero quorum"
+      : quorum > numSigners
+      ? "Not enough signers"
+      : undefined
   }
+}
 
-  if (!value) {
-    return formatMessage(0)
+export const uniqueName = (names: string[]) => {
+  return (v: string) => {
+    return names.map((n) => n.toLowerCase()).indexOf(v?.toLowerCase()) > -1
+      ? "Name already exists"
+      : undefined
   }
-  return formatMessage(parseUniqueAddresses(value).length)
 }
