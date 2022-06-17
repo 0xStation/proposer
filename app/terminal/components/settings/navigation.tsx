@@ -36,6 +36,16 @@ const Navigation = ({ children }) => {
           </li>
           <li
             className={`${
+              router.pathname === Routes.CheckbookSettingsPage({ terminalHandle }).pathname ||
+              router.pathname === Routes.NewCheckbookSettingsPage({ terminalHandle }).pathname
+                ? "text-marble-white font-bold"
+                : "text-concrete"
+            } cursor-pointer hover:text-marble-white mt-4`}
+          >
+            <Link href={Routes.CheckbookSettingsPage({ terminalHandle })}>Checkbook™</Link>
+          </li>
+          <li
+            className={`${
               router.pathname === Routes.TokenSettingsPage({ terminalHandle }).pathname ||
               router.pathname === Routes.NewTokenSettingsPage({ terminalHandle }).pathname
                 ? "text-marble-white font-bold"
