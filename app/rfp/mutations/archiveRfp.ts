@@ -9,23 +9,16 @@ const ArchiveRfp = z.object({
 })
 
 export default async function archiveRfp(input: z.infer<typeof ArchiveRfp>) {
-  const existingRfp = await db.rfp.findUnique({
-    where: {
-      id: input.rfpId,
-    },
-  })
+  try {
+    const rfp = await db.rfp.update({
+      where: { id: input.rfpId },
+      data: {
+        status: PrismaRfpStatus.ARCHIVED,
+      },
+    })
 
-  if (!existingRfp) {
-    console.error(`An RFP with localId ${input.rfpId} does not exist.`)
-    return null
+    return rfp
+  } catch (error) {
+    return error
   }
-
-  const rfp = await db.rfp.update({
-    where: { id: input.rfpId },
-    data: {
-      status: PrismaRfpStatus.ARCHIVED,
-    },
-  })
-
-  return rfp
 }

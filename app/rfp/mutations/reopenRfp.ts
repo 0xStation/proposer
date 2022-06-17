@@ -9,23 +9,20 @@ const CloseRfp = z.object({
 })
 
 export default async function closeRfp(input: z.infer<typeof CloseRfp>) {
-  const existingRfp = await db.rfp.findUnique({
-    where: {
-      id: input.rfpId,
-    },
-  })
-
-  if (!existingRfp) {
-    console.error(`An RFP with localId ${input.rfpId} does not exist.`)
-    return null
+  if (input.endDate < new Date()) {
+    throw Error("End date cannot be in the past.")
   }
 
-  const rfp = await db.rfp.update({
-    where: { id: input.rfpId },
-    data: {
-      endDate: input.endDate,
-    },
-  })
+  try {
+    const rfp = await db.rfp.update({
+      where: { id: input.rfpId },
+      data: {
+        endDate: input.endDate,
+      },
+    })
 
-  return rfp
+    return rfp
+  } catch (error) {
+    throw error
+  }
 }

@@ -14,31 +14,24 @@ const UpdateRfp = z.object({
 })
 
 export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
-  const existingRfp = await db.rfp.findUnique({
-    where: {
-      id: input.rfpId,
-    },
-  })
-
-  if (!existingRfp) {
-    console.error(`An RFP with localId ${input.rfpId} does not exist.`)
-    return null
-  }
-
-  const rfp = await db.rfp.update({
-    where: { id: input.rfpId },
-    data: {
-      fundingAddress: input.fundingAddress,
-      startDate: input.startDate,
-      endDate: input.endDate,
+  try {
+    const rfp = await db.rfp.update({
+      where: { id: input.rfpId },
       data: {
-        content: {
-          title: input.contentTitle,
-          body: input.contentBody,
+        fundingAddress: input.fundingAddress,
+        startDate: input.startDate,
+        endDate: input.endDate,
+        data: {
+          content: {
+            title: input.contentTitle,
+            body: input.contentBody,
+          },
         },
       },
-    },
-  })
+    })
 
-  return rfp
+    return rfp
+  } catch (error) {
+    throw error
+  }
 }
