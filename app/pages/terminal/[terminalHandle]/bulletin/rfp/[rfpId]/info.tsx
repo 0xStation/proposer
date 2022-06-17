@@ -65,9 +65,9 @@ const PfpComponent = ({ account, className = "", key = 0 }) => {
     <Link key={key} href={Routes.ProfileHome({ accountAddress: account?.address })}>
       <div className={`flex flex-row ${className}`}>
         <div className="flex flex-col content-center align-middle mr-3">
-          {account.data.pfpURL ? (
+          {account?.data?.pfpURL ? (
             <img
-              src={account.data.pfpURL}
+              src={account?.data?.pfpURL}
               alt="PFP"
               className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
               onError={(e) => {
@@ -80,10 +80,10 @@ const PfpComponent = ({ account, className = "", key = 0 }) => {
         </div>
         <div className="flex flex-col content-center">
           <div className="flex flex-row items-center space-x-1">
-            <p className="text-base text-marble-white font-bold">{account.data.name}</p>
+            <p className="text-base text-marble-white font-bold">{account?.data?.name}</p>
           </div>
           <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-            <p className="w-max truncate leading-4">@{truncateString(account.address)}</p>
+            <p className="w-max truncate leading-4">@{truncateString(account?.address)}</p>
           </div>
         </div>
       </div>
