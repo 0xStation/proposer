@@ -1,5 +1,6 @@
+import { BlitzPage, Routes, useParam, useQuery, Link } from "blitz"
 import truncateString from "app/core/utils/truncateString"
-import { BlitzPage, Routes, useParam, useQuery, Link, useRouter } from "blitz"
+import Preview from "app/core/components/MarkdownPreview"
 import Layout from "app/core/layouts/Layout"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
@@ -17,14 +18,16 @@ const RFPInfoTab: BlitzPage = () => {
     { suspense: false, enabled: !!terminalHandle }
   )
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
-  const router = useRouter()
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
       <TerminalNavigation>
         <RFPHeaderNavigation rfpId={rfpId} />
         <div className="h-[calc(100vh-240px)] flex flex-row">
-          <div className="w-full">{/* markdown */}</div>
+          <div className="w-full p-6 overflow-y-scroll">
+            <Preview markdown={rfp?.data?.content?.body} />
+          </div>
+
           <div className="w-96 border-l border-concrete pl-6 pt-6 pr-16 flex-col">
             <div className="mt-2">
               <p className="text-concrete uppercase text-xs font-bold">Start Date</p>
@@ -34,7 +37,7 @@ const RFPInfoTab: BlitzPage = () => {
               <p className="text-concrete uppercase text-xs font-bold">End Date</p>
               <p className="mt-2">{(rfp?.endDate && formatDate(rfp?.endDate)) || "N/A"}</p>
             </div>
-            {/* TODO: make dynamic  */}
+            {/* TODO: make funding + signers dynamic  */}
             <div className="mt-6">
               <p className="text-concrete uppercase text-xs font-bold">Total Funding</p>
               <p className="mt-2">100.00 ETH</p>

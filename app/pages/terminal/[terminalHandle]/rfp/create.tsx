@@ -44,7 +44,7 @@ const CreateRFPPage: BlitzPage = () => {
   return (
     <Layout title={`New RFP`}>
       <div className="fixed grid grid-cols-4 w-[calc(100%-70px)] border-box z-50">
-        <div className="col-span-3 pt-4 pr-4">
+        <div className="col-span-3 pt-4 pr-4 h-full bg-tunnel-black">
           <div className="text-light-concrete flex flex-row justify-between w-full">
             <button onClick={() => router.push(Routes.BulletinPage({ terminalHandle }))}>
               <XIcon className="h-6 w-6 ml-3 fill-marble-white" />
