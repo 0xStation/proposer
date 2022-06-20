@@ -11,17 +11,16 @@ const CreateProposal = z.object({
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
-  const proposal = await db.proposal.create({
-    data: {
-      rfpId: input.rfpId,
-      data: {
-        content: {
-          title: input.contentTitle,
-          body: input.contentBody,
-        },
-      },
-    },
-  })
-
-  return proposal
+  // const proposal = await db.proposal.create({
+  //   data: {
+  //     rfpId: input.rfpId,
+  //     data: {
+  //       content: {
+  //         title: input.contentTitle,
+  //         body: input.contentBody,
+  //       },
+  //     },
+  //   },
+  // })
+  // return proposal
 }

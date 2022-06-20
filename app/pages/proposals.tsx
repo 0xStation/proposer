@@ -1,22 +1,16 @@
 import { useState } from "react"
-import { BlitzPage, invoke } from "blitz"
+import { BlitzPage } from "blitz"
 import { Field, Form } from "react-final-form"
-import { PlusIcon } from "@heroicons/react/solid"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
 import Modal from "app/core/components/Modal"
-import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
-import { Account } from "app/account/types"
 
 const CreateProposalPage: BlitzPage = () => {
   const [previewMode, setPreviewMode] = useState<boolean>(false)
-  const [collaborationModalOpen, setCollaborationModalOpen] = useState<boolean>(false)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
-  const [contributorList, setContributorList] = useState<string>("")
-  const [contributorListAccounts, setContributorListAccounts] = useState<(Account | string)[]>([])
   const [markdown, setMarkdown] = useState<string>("")
   const [title, setTitle] = useState<string>("")
   const activeUser = useStore((state) => state.activeUser)
@@ -26,61 +20,8 @@ const CreateProposalPage: BlitzPage = () => {
   //   return <Layout title={`New RFP`}></Layout>
   // }
 
-  const addCollaborators = async () => {
-    const addresses = contributorList.split(",").map((e) => e.trimStart().trimEnd())
-    const accounts = await invoke(getAccountsByAddresses, {
-      addresses,
-    })
-
-    const foundAddresses = accounts.map((account) => {
-      if (account.address) {
-        return account.address
-      }
-    })
-
-    const missingAddresses: string[] = addresses.filter(
-      (address) => !foundAddresses.includes(address)
-    )
-    setContributorListAccounts([...accounts, ...missingAddresses])
-  }
-
-  console.log(contributorListAccounts)
-
   return (
     <Layout title={`New Proposal`}>
-      <Modal open={collaborationModalOpen} toggle={setCollaborationModalOpen}>
-        <div className="p-2">
-          <h3 className="text-2xl font-bold pt-6">Add collaborators</h3>
-          <p className="mt-2">
-            Add wallet or ENS addresses of your collaborators. Separate them with commas.
-          </p>
-          <textarea
-            className="mt-4 bg-wet-concrete rounded h-[150px] w-full border border-concrete resize-none p-2"
-            placeholder="Enter wallet or ENS address"
-            value={contributorList}
-            onChange={(e) => setContributorList(e.target.value)}
-          />
-          <div className="mt-8">
-            <button
-              type="button"
-              className="text-magic-mint border border-magic-mint mr-2 py-1 px-4 rounded hover:opacity-75"
-              onClick={() => setCollaborationModalOpen(false)}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="bg-magic-mint text-tunnel-black border border-magic-mint py-1 px-4 rounded hover:opacity-75"
-              onClick={() => {
-                addCollaborators()
-                setCollaborationModalOpen(false)
-              }}
-            >
-              Add
-            </button>
-          </div>
-        </div>
-      </Modal>
       <div className="fixed grid grid-cols-4 w-[calc(100%-70px)] border-box z-50">
         <div className="col-span-3 pt-4 pr-4">
           <div
@@ -129,51 +70,6 @@ const CreateProposalPage: BlitzPage = () => {
                 <span className="text-xs text-light-concrete flex">
                   @{truncateString(activeUser?.address, 4)}
                 </span>
-              </div>
-            </div>
-            {contributorListAccounts.map((account, idx) => {
-              if (account?.data) {
-                return (
-                  <div className="flex flex-row items-center" key={`account-${idx}`}>
-                    <img
-                      src={account?.data?.pfpURL}
-                      alt="PFP"
-                      className="w-[46px] h-[46px] rounded-full"
-                      onError={(e) => {
-                        e.currentTarget.src = DEFAULT_PFP_URLS.USER
-                      }}
-                    />
-                    <div className="ml-2">
-                      <span>{account?.data.name}</span>
-                      <span className="text-xs text-light-concrete flex">
-                        @{truncateString(account?.address, 4)}
-                      </span>
-                    </div>
-                  </div>
-                )
-              } else {
-                return (
-                  <div className="flex flex-row items-center" key={`account-${idx}`}>
-                    <img
-                      src={DEFAULT_PFP_URLS.USER}
-                      alt="PFP"
-                      className="w-[46px] h-[46px] rounded-full"
-                    />
-                    <div className="ml-2">{truncateString(account)}</div>
-                  </div>
-                )
-              }
-            })}
-            <div
-              className="flex flex-row items-center group cursor-pointer"
-              onClick={() => setCollaborationModalOpen(true)}
-            >
-              <span className="w-[46px] h-[46px] rounded-full bg-wet-concrete group-hover:bg-concrete flex justify-center items-center transition-colors">
-                <PlusIcon className="h-4 w-4 text-white cursor-pointer" />
-              </span>
-              <div className="ml-2">
-                <span>Add contributors</span>
-                <span className="text-xs text-light-concrete flex">Wallet or ENS addresses</span>
               </div>
             </div>
           </div>
