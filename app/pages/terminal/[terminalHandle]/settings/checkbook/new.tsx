@@ -50,7 +50,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
           signers: signers as string[],
         })
 
-        router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
+        router.push(Routes.CheckbookSettingsPage({ terminalHandle, creationSuccess: true }))
       } catch (e) {
         setWaitingCreation(false)
         console.error(e)

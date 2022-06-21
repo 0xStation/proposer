@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { BlitzPage, Link, Routes, useParam, useQuery } from "blitz"
+import { BlitzPage, Link, Routes, useParam, useQuery, useRouterQuery } from "blitz"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import Navigation from "app/terminal/components/settings/navigation"
 import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
@@ -8,13 +8,17 @@ import { Checkbook } from "app/checkbook/types"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import truncateString from "app/core/utils/truncateString"
 import { ClipboardIcon, ClipboardCheckIcon, ExternalLinkIcon } from "@heroicons/react/outline"
+import Modal from "app/core/components/Modal"
 
 const CheckbookSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
+  const { creationSuccess } = useRouterQuery()
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
   const [checkbooks, setCheckbooks] = useState<Checkbook[]>([])
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
+  const [isModalAddressCopied, setIsModalAddressCopied] = useState<boolean>(false)
+  const [successModalOpen, setSuccessModalOpen] = useState<boolean>(!!creationSuccess)
 
   useQuery(
     getCheckbooksByTerminal,
@@ -28,7 +32,8 @@ const CheckbookSettingsPage: BlitzPage = () => {
         }
         setCheckbooks(books as any[])
         if (!selectedCheckbook) {
-          setSelectedCheckbook((books as any[])[0])
+          // set defaulted checkbook as last so that newly created ones automatically shown on redirect
+          setSelectedCheckbook((books as any[])[books.length - 1])
         }
       },
     }
@@ -60,6 +65,27 @@ const CheckbookSettingsPage: BlitzPage = () => {
   return (
     <LayoutWithoutNavigation>
       <Navigation>
+        <Modal open={successModalOpen} toggle={setSuccessModalOpen}>
+          <div className="p-2">
+            <h3 className="text-2xl font-bold pt-6">Next, add funds to this Checkbook.</h3>
+            <p className="mt-2">
+              To activate your Checkbook, please transfer funds to the contract address.
+            </p>
+            <div className="mt-8">
+              <button
+                className="bg-magic-mint text-tunnel-black border border-magic-mint py-1 px-4 rounded hover:opacity-75"
+                onClick={() => {
+                  navigator.clipboard.writeText(selectedCheckbook?.address as string).then(() => {
+                    setIsModalAddressCopied(true)
+                    setTimeout(() => setSuccessModalOpen(false), 500) // slight delay before closing modal
+                  })
+                }}
+              >
+                {isModalAddressCopied ? "Copied!" : "Copy Address"}
+              </button>
+            </div>
+          </div>
+        </Modal>
         <div className="flex flex-col">
           <div className="p-6 border-b border-concrete flex justify-between">
             <div className="flex flex-col">
