@@ -13,10 +13,10 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Modal from "app/core/components/Modal"
 
 const CreateRFPPage: BlitzPage = () => {
-  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
-  const [title, setTitle] = useState("")
-  const [markdown, setMarkdown] = useState("")
-  const [previewMode, setPreviewMode] = useState(false)
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
+  const [title, setTitle] = useState<string>("")
+  const [markdown, setMarkdown] = useState<string>("")
+  const [previewMode, setPreviewMode] = useState<boolean>(false)
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
@@ -132,23 +132,35 @@ const CreateRFPPage: BlitzPage = () => {
               endDate: string
               checkbookAddress: string
             }) => {
+              if (!title || !markdown) {
+                const missing = !title ? (!markdown ? "title and details" : "title") : "details"
+                setConfirmationModalOpen(false)
+                setToastState({
+                  isToastShowing: true,
+                  type: "error",
+                  message: `Please fill in the ${missing} to to publish RFP.`,
+                })
+                return
+              }
+
               if (!activeUser.address) {
                 setToastState({
                   isToastShowing: true,
                   type: "error",
                   message: "You must connect your wallet in order to create RFPs",
                 })
-              } else {
-                await createRfpMutation({
-                  terminalId: terminal?.id,
-                  startDate: new Date(values.startDate),
-                  endDate: new Date(values.endDate),
-                  authorAddress: activeUser.address,
-                  fundingAddress: values.checkbookAddress,
-                  contentBody: markdown,
-                  contentTitle: title,
-                })
+                return
               }
+
+              await createRfpMutation({
+                terminalId: terminal?.id,
+                startDate: new Date(values.startDate),
+                endDate: new Date(values.endDate),
+                authorAddress: activeUser.address,
+                fundingAddress: values.checkbookAddress,
+                contentBody: markdown,
+                contentTitle: title,
+              })
             }}
             render={({ form, handleSubmit }) => {
               const formState = form.getState()
@@ -191,26 +203,33 @@ const CreateRFPPage: BlitzPage = () => {
                     </span>
 
                     <Field name={`checkbookAddress`}>
-                      {({ input }) => (
-                        <div className="custom-select-wrapper">
-                          <select
-                            {...input}
-                            className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-1`}
-                          >
-                            <option value="">Choose option</option>
-                            {checkbooks?.map((cb, idx) => {
-                              return (
-                                <option key={`checkbook-${idx}`} value={cb.address}>
-                                  {cb.name}
-                                </option>
-                              )
-                            })}
-                          </select>
-                        </div>
-                      )}
+                      {({ input, meta }) => {
+                        return (
+                          <div className="custom-select-wrapper">
+                            <select
+                              {...input}
+                              className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-1`}
+                            >
+                              <option value="">Choose option</option>
+                              {checkbooks?.map((cb, idx) => {
+                                return (
+                                  <option key={`checkbook-${idx}`} value={cb.address}>
+                                    {cb.name}
+                                  </option>
+                                )
+                              })}
+                            </select>
+                            {meta.touched && input.value === "" && (
+                              <span className="text-torch-red text-xs">
+                                You must select a checkbook.
+                              </span>
+                            )}
+                          </div>
+                        )
+                      }}
                     </Field>
                     <Link href={Routes.NewCheckbookSettingsPage({ terminalHandle })}>
-                      <span className="text-magic-mint cursor-pointer mt-1 block">
+                      <span className="text-magic-mint cursor-pointer mt-1 inline-block">
                         + Create new
                       </span>
                     </Link>
@@ -219,15 +238,23 @@ const CreateRFPPage: BlitzPage = () => {
                       <label className="font-bold">Start Date</label>
                       <span className="text-xs text-concrete block">Proposal submission opens</span>
                       <Field name="startDate">
-                        {({ input, meta }) => (
-                          <div>
-                            <input
-                              {...input}
-                              type="date"
-                              className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
-                            />
-                          </div>
-                        )}
+                        {({ input, meta }) => {
+                          return (
+                            <div>
+                              <input
+                                {...input}
+                                type="date"
+                                min={new Date().toISOString().split("T")[0]}
+                                className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
+                              />
+                              {meta.touched && input.value === "" && (
+                                <span className="text-torch-red text-xs">
+                                  You must select a start date.
+                                </span>
+                              )}
+                            </div>
+                          )
+                        }}
                       </Field>
                     </div>
                     <div className="flex flex-col mt-6">
@@ -252,7 +279,7 @@ const CreateRFPPage: BlitzPage = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        if (formState.dirty) {
+                        if (formState.values.checkbookAddress && formState.values.startDate) {
                           setConfirmationModalOpen(true)
                         }
                       }}
