@@ -7,12 +7,12 @@ export const useCreateCheckbook = (chainId: number) => {
     console.error("Invalid chain selected. Please select Rinkeby or Localhost")
   }
   const address = CONTRACTS[chainId]?.CHECKBOOK_FACTORY
-  const { writeAsync: create } = useContractWrite(
+  const { writeAsync: createCheckbook } = useContractWrite(
     {
       addressOrName: address,
       contractInterface: checkbookFactoryAbi,
     },
     "create(uint256,address[])" // have to specify arguments because two functions with name create but different arguments
   )
-  return { create }
+  return { createCheckbook }
 }

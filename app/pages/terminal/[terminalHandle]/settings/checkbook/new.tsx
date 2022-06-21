@@ -2,27 +2,29 @@ import { BlitzPage, useMutation, useParam, useQuery, Link, Image, Routes, useRou
 import { useState } from "react"
 import { Field, Form } from "react-final-form"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
-import createCheckbook from "app/checkbook/mutations/createCheckbook"
+import CreateCheckbook from "app/checkbook/mutations/createCheckbook"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Navigation from "app/terminal/components/settings/navigation"
 import useStore from "app/core/hooks/useStore"
+import useAllowedNetwork from "app/core/hooks/useAllowedNetwork"
 import Back from "/public/back-icon.svg"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
-import { sortAddresses } from "app/core/utils/sortAddresses"
+import { sortAddressesIncreasing } from "app/core/utils/sortAddressesIncreasing"
 import { uniqueName, isValidQuorum } from "app/utils/validators"
 import { useCreateCheckbook } from "app/contracts/contracts"
-import { useWaitForTransaction, useNetwork } from "wagmi"
+import { useWaitForTransaction } from "wagmi"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { Spinner } from "app/core/components/Spinner"
 
 const NewCheckbookSettingsPage: BlitzPage = () => {
   const router = useRouter()
-  const [createCheckbookMutation] = useMutation(createCheckbook)
+  const [createCheckbookMutation] = useMutation(CreateCheckbook)
   const [quorum, setQuorum] = useState<number>()
   const [signers, setSigners] = useState<string[]>()
   const [name, setName] = useState<string>()
   const [txnHash, setTxnHash] = useState<string>()
   const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
+  const setToastState = useStore((state) => state.setToastState)
 
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(
@@ -31,8 +33,9 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
     { suspense: false }
   )
 
-  const { activeChain } = useNetwork()
-  const { create } = useCreateCheckbook(activeChain?.id as number)
+  const { chainId, error: invalidSelectedNetwork } = useAllowedNetwork()
+
+  const { createCheckbook } = useCreateCheckbook(chainId)
 
   const data = useWaitForTransaction({
     confirmations: 1,
@@ -54,7 +57,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
         await createCheckbookMutation({
           terminalId: terminal?.id as number,
           address: checkbookAddress,
-          chainId: activeChain?.id as number,
+          chainId,
           name: name as string,
           quorum: quorum as number,
           signers: signers as string[],
@@ -72,8 +75,6 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
       }
     },
   })
-
-  const setToastState = useStore((state) => state.setToastState)
 
   type FormValues = {
     name: string
@@ -107,7 +108,9 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                   const quorum = parseInt(values.quorum)
                   // validation on checksummed addresses, no duplicates
                   // must be sorted for contract to validate no duplicates
-                  const signers = sortAddresses(parseUniqueAddresses(values.signers || ""))
+                  const signers = sortAddressesIncreasing(
+                    parseUniqueAddresses(values.signers || "")
+                  )
 
                   // trigger transaction
                   // after execution, will save transaction hash to state to trigger waiting process to create Checkbook entity
@@ -116,7 +119,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                     setSigners(signers)
                     setName(values.name)
 
-                    const transaction = await create({
+                    const transaction = await createCheckbook({
                       args: [quorum, signers],
                     })
 
@@ -125,11 +128,19 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                   } catch (e) {
                     setWaitingCreation(false)
                     console.error(e)
-                    setToastState({
-                      isToastShowing: true,
-                      type: "error",
-                      message: "Checkbook contract creation failed.",
-                    })
+                    if (e.name == "ConnectorNotFoundError") {
+                      setToastState({
+                        isToastShowing: true,
+                        type: "error",
+                        message: "Contract creation failed, please reset wallet connection.",
+                      })
+                    } else {
+                      setToastState({
+                        isToastShowing: true,
+                        type: "error",
+                        message: "Contract creation failed.",
+                      })
+                    }
                   }
                 } catch (e) {
                   setWaitingCreation(false)
@@ -139,6 +150,12 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
             }}
             render={({ form, handleSubmit }) => {
               const formState = form.getState()
+              const formButtonDisabled =
+                !formState.values.name ||
+                !formState.values.signers ||
+                !formState.values.quorum ||
+                formState.hasValidationErrors ||
+                !!invalidSelectedNetwork
               return (
                 <form onSubmit={handleSubmit} className="mt-12">
                   <div className="flex flex-col w-1/2">
@@ -223,22 +240,11 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                     </Field>
                     <div>
                       <button
-                        className={`rounded text-tunnel-black px-8 py-2 h-full mt-12 ${
-                          formState.values.name &&
-                          formState.values.signers &&
-                          formState.values.quorum &&
-                          !formState.hasValidationErrors
-                            ? "bg-electric-violet"
-                            : "bg-concrete"
+                        className={`rounded text-tunnel-black text-bold px-8 py-2 w-28 h-10 mt-12 ${
+                          formButtonDisabled ? "bg-concrete" : "bg-electric-violet"
                         }`}
                         type="submit"
-                        disabled={
-                          !formState.values.name ||
-                          !formState.values.signers ||
-                          !formState.values.quorum ||
-                          formState.hasValidationErrors ||
-                          waitingCreation
-                        }
+                        disabled={formButtonDisabled || waitingCreation}
                       >
                         {waitingCreation ? (
                           <div className="flex justify-center items-center">

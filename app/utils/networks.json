@@ -132,7 +132,8 @@
     "key": "1337",
     "name": "Localhost",
     "chainId": 1337,
-    "network": "Localhost"
+    "network": "Localhost",
+    "explorer": "https://app.station.express"
   },
   "42220": {
     "key": "42220",
