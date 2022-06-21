@@ -10,7 +10,11 @@ import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsForTerminal"
 import getRfpCountByTerminalId from "app/rfp/queries/getRfpCountByTerminalId"
 import { formatDate } from "app/core/utils/formatDate"
-import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
+import {
+  RFP_STATUS_DISPLAY_MAP,
+  PAGINATION_TAKE,
+  RFP_STATUSES_FILTER_ARRAY,
+} from "app/core/utils/constants"
 import { RfpStatus } from "app/rfp/types"
 import Checkbox from "app/core/components/form/Checkbox"
 import BackArrow from "app/core/icons/BackArrow"
@@ -26,15 +30,6 @@ const BulletinPage: BlitzPage = () => {
   const [filters, setFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
 
   const [page, setPage] = useState<number>(0)
-
-  const PAGINATION_TAKE = 50
-  const RFP_STATUSES_ARRAY = [
-    RfpStatus.DRAFT,
-    RfpStatus.STARTING_SOON,
-    RfpStatus.OPEN_FOR_SUBMISSIONS,
-    RfpStatus.CLOSED,
-    RfpStatus.ARCHIVED,
-  ]
 
   const [rfps] = useQuery(
     getRfpsByTerminalId,
@@ -83,7 +78,7 @@ const BulletinPage: BlitzPage = () => {
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <div className="flex ml-6 py-4 space-x-2 flex-wrap self-start">
               <FilterPill
-                filterValues={RFP_STATUSES_ARRAY}
+                filterValues={RFP_STATUSES_FILTER_ARRAY}
                 filters={filters}
                 setFilters={setFilters}
                 setPage={setPage}
@@ -200,7 +195,7 @@ const FilterPill = ({ filters, setFilters, filterValues, setPage }) => {
                       : "hover:bg-marble-white hover:text-tunnel-black border-concrete hover:border-marble-white"
                   } capitalize group rounded-full border h-[17px] w-max p-4 flex flex-center items-center cursor-pointer `}
                 >
-                  Request Status
+                  Status
                   <div className="ml-3">
                     <DropdownChevronIcon
                       className={`${open ? "fill-tunnel-black" : "group-hover:fill-tunnel-black"}`}
@@ -247,7 +242,7 @@ const FilterPill = ({ filters, setFilters, filterValues, setPage }) => {
                               <div className="flex-row" key={`${clearDefaultValue}${filterVal}`}>
                                 <Checkbox
                                   value={filterVal}
-                                  name={`${filterVal}.active`}
+                                  name={filterVal}
                                   defaultChecked={filters.has(filterVal)}
                                   className="align-middle"
                                 />

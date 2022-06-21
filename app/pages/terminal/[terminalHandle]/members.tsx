@@ -1,6 +1,6 @@
 import { BlitzPage, useQuery, useParam, Image, Link, Routes } from "blitz"
 import { Fragment, useEffect, useState } from "react"
-import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
+import { DEFAULT_PFP_URLS, PAGINATION_TAKE } from "app/core/utils/constants"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import BackArrow from "app/core/icons/BackArrow"
 import ForwardArrow from "app/core/icons/ForwardArrow"
@@ -56,8 +56,6 @@ const MemberDirectoryPage: BlitzPage = () => {
   // filters is a hashmap where the key is the tag type and the value is a Set of strings
   // where the strings are applied filters
   const [filters, setFilters] = useState<Filters>({})
-
-  const PAGINATION_TAKE = 50
 
   /*
   `groupedTags` returns an object where the key

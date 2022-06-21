@@ -1,7 +1,12 @@
 import { useState } from "react"
 import { BlitzPage, Routes, useParam, useQuery, Link, useRouter, invalidateQuery } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import { DEFAULT_PFP_URLS, PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
+import {
+  DEFAULT_PFP_URLS,
+  PROPOSAL_STATUS_DISPLAY_MAP,
+  PAGINATION_TAKE,
+  PROPOSAL_STATUSES_FILTER_ARRAY,
+} from "app/core/utils/constants"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import RFPHeaderNavigation from "app/rfp/components/RFPHeaderNavigation"
@@ -30,14 +35,6 @@ const ProposalsTab: BlitzPage = () => {
     { suspense: false, enabled: !!rfpId }
   )
 
-  const PAGINATION_TAKE = 50
-  const PROPOSAL_STATUSES_ARRAY = [
-    ProposalStatus.DRAFT,
-    ProposalStatus.SUBMITTED,
-    ProposalStatus.IN_REVIEW,
-    ProposalStatus.APPROVED,
-  ]
-
   const [filters, setFilters] = useState<Set<ProposalStatus>>(new Set<ProposalStatus>())
   const [page, setPage] = useState<number>(0)
 
@@ -52,7 +49,7 @@ const ProposalsTab: BlitzPage = () => {
             <FilterPill
               title="Status"
               className="mt-6 ml-6"
-              filterValues={PROPOSAL_STATUSES_ARRAY}
+              filterValues={PROPOSAL_STATUSES_FILTER_ARRAY}
               filters={filters}
               setFilters={setFilters}
               setPage={setPage}
