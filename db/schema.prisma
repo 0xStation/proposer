@@ -38,7 +38,6 @@ model Terminal {
   tags       Tag[]
   checkbooks Checkbook[]
   rfps       Rfp[]
-  proposals  Proposal[]
   proposers  AccountProposal[]
 
   // v1
@@ -131,16 +130,13 @@ model Rfp {
 
 // unique links by /terminal/[handle]/proposal/[localId]
 model Proposal {
-  id             String            @id @default(uuid())
-  terminalId     Int
-  terminal       Terminal          @relation(fields: [terminalId], references: [id])
-  fundingAddress String
-  rfpId          String
-  rfp            Rfp               @relation(fields: [rfpId], references: [id])
-  status         ProposalStatus    @default(DRAFT)
-  data           Json
-  createdAt      DateTime          @default(now())
-  collaborators  AccountProposal[]
+  id            String            @id @default(uuid())
+  rfpId         String
+  rfp           Rfp               @relation(fields: [rfpId], references: [id])
+  status        ProposalStatus    @default(DRAFT)
+  data          Json
+  createdAt     DateTime          @default(now())
+  collaborators AccountProposal[]
 }
 
 model AccountProposal {
