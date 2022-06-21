@@ -100,7 +100,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                       pfpURL,
                       accountId: session.userId,
                     })
-                    if (window !== undefined && window.location.hostname !== "localhost") {
+                    if (window !== undefined && window.location.host === "app.station.express") {
                       sendTerminalCreationNotification(
                         values.name,
                         values.handle,

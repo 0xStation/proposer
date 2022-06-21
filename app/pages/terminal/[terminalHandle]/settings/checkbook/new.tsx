@@ -37,8 +37,17 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
     confirmations: 1,
     hash: txnHash,
     onSuccess: async (data) => {
+      // transaction emits an event that contains the address of the new Checkbook
+      // events are contained in the TransactionReceipt's `.logs` field
+      // each log has a `topics` list object for event parameters that have an index
+      // the first topic is always the name of the event, the next is our Checkbook address
+      // the location of the Checkbook address in the topics array is dependent on ordering within the contract
+      // a topic string has 32 bytes, but an address is only 20 bytes so the topic is 0-padded in the front
+      // a topic string also adds "0x" to the front of its 32 bytes
+      // to get the address, we throw away the first 2 characters ("0x") + the next 2*12bytes characters (0-padding)
+      // which leads us to use `.substring(26)` and extract the address string
+      // this string is lowercased though, so we checksum it to give it proper casing before storing in database
       const checkbookAddress = toChecksumAddress("0x" + data.logs[0]?.topics[1]?.substring(26))
-      console.log(checkbookAddress)
 
       try {
         await createCheckbookMutation({
@@ -131,7 +140,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
               return (
                 <form onSubmit={handleSubmit} className="mt-12">
                   <div className="flex flex-col w-1/2">
-                    <h3 className="font-bold mt-4">Checkbook name*</h3>
+                    <h3 className="font-bold">Checkbook name*</h3>
                     <Field
                       name="name"
                       validate={uniqueName(terminal?.checkbooks?.map((c) => c.name) || [])}

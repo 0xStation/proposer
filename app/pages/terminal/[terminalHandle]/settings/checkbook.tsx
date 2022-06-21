@@ -211,7 +211,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
                     </div>
                     <div>
                       <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
-                        Amount
+                        Funds
                       </h3>
                       <p className="mt-2">
                         There are no funds available to deploy. Copy the contract address and

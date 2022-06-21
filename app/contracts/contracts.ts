@@ -1,11 +1,6 @@
-import { utils } from "ethers"
 import { useContractWrite } from "wagmi"
 import { CONTRACTS } from "app/core/utils/constants"
 import checkbookFactoryAbi from "./abi/CheckbookFactory.json"
-
-const checkbookFactoryInterface = new utils.Interface(checkbookFactoryAbi)
-
-// console.log(checkbookFactoryInterface)
 
 export const useCreateCheckbook = (chainId: number) => {
   if (!!chainId && chainId != 4 && chainId != 1337) {
