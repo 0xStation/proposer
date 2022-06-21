@@ -10,7 +10,7 @@ import Back from "/public/back-icon.svg"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
 import { uniqueName, isValidQuorum } from "app/utils/validators"
 import { useCreateCheckbook } from "app/contracts/contracts"
-import { useWaitForTransaction } from "wagmi"
+import { useWaitForTransaction, useNetwork } from "wagmi"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 const NewCheckbookSettingsPage: BlitzPage = () => {
@@ -28,7 +28,8 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
     { suspense: false }
   )
 
-  const { create } = useCreateCheckbook()
+  const { activeChain } = useNetwork()
+  const { create } = useCreateCheckbook(activeChain?.id as number)
 
   const data = useWaitForTransaction({
     confirmations: 1,
@@ -123,7 +124,9 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
               return (
                 <form onSubmit={handleSubmit} className="mt-12">
                   <div className="flex flex-col w-1/2">
-                    <h3 className="font-bold">Checkbook name*</h3>
+                    <h3 className="font-bold">Chain</h3>
+                    <span className=" text-m mt-2 block">{activeChain?.name}</span>
+                    <h3 className="font-bold mt-4">Checkbook name*</h3>
                     <Field
                       name="name"
                       validate={uniqueName(terminal?.checkbooks?.map((c) => c.name) || [])}
