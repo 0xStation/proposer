@@ -140,7 +140,7 @@ const CreateProposalPage: BlitzPage = () => {
                       recommended.
                     </span>
 
-                    <Field name={`fundRecipient`}>
+                    <Field name={`recipientAddress`}>
                       {({ input }) => (
                         <input
                           {...input}
@@ -169,7 +169,7 @@ const CreateProposalPage: BlitzPage = () => {
                       )}
                     </Field>
 
-                    <Field name={`totalAmount`}>
+                    <Field name={`amount`}>
                       {({ input }) => (
                         <>
                           <label className="font-bold block mt-6">Total Amount*</label>

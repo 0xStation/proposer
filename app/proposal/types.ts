@@ -35,7 +35,6 @@ export type ProposalMetadata = {
 }
 
 export type Proposal = {
-  fundingAddress: string
   status: ProposalStatus
   data: ProposalMetadata
   createdAt: Date
