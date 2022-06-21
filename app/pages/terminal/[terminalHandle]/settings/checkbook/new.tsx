@@ -1,4 +1,5 @@
 import { BlitzPage, useMutation, useParam, useQuery, Link, Image, Routes, useRouter } from "blitz"
+import { useState } from "react"
 import { Field, Form } from "react-final-form"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import createCheckbook from "app/checkbook/mutations/createCheckbook"
@@ -6,13 +7,19 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Navigation from "app/terminal/components/settings/navigation"
 import useStore from "app/core/hooks/useStore"
 import Back from "/public/back-icon.svg"
-import { v4 as uuidv4 } from "uuid"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
 import { uniqueName, isValidQuorum } from "app/utils/validators"
+import { useCreateCheckbook } from "app/contracts/contracts"
+import { useWaitForTransaction } from "wagmi"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 const NewCheckbookSettingsPage: BlitzPage = () => {
   const router = useRouter()
   const [createCheckbookMutation] = useMutation(createCheckbook)
+  const [quorum, setQuorum] = useState<number>()
+  const [signers, setSigners] = useState<string[]>()
+  const [name, setName] = useState<string>()
+  const [txnHash, setTxnHash] = useState<string>()
 
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(
@@ -20,6 +27,37 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
     { handle: terminalHandle, include: ["checkbooks"] },
     { suspense: false }
   )
+
+  const { create } = useCreateCheckbook()
+
+  const data = useWaitForTransaction({
+    confirmations: 1,
+    hash: txnHash,
+    onSuccess: async (data) => {
+      const checkbookAddress = toChecksumAddress("0x" + data.logs[0]?.topics[1]?.substring(26))
+      console.log(checkbookAddress)
+
+      try {
+        await createCheckbookMutation({
+          terminalId: terminal?.id as number,
+          address: checkbookAddress,
+          chainId: 1, // ETH mainnet, change once checkbooks are multichain
+          name: name as string,
+          quorum: quorum as number,
+          signers: signers as string[],
+        })
+
+        router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
+      } catch (e) {
+        console.error(e)
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: "Checkbook entity creation failed.",
+        })
+      }
+    },
+  })
 
   const setToastState = useStore((state) => state.setToastState)
 
@@ -50,30 +88,29 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
             onSubmit={async (values: FormValues) => {
               if (terminal) {
                 try {
+                  const quorum = parseInt(values.quorum)
                   // validation on checksum addresses, no duplicates
                   const signers = parseUniqueAddresses(values.signers || "")
 
-                  // trigger transaction, returns address of new Checkbook
-                  // TODO: real transaction that populates `checkbookAddress`
-                  let checkbookAddress = "0x" + uuidv4().replace(/-/g, "") // placeholder, fake address
-
+                  // trigger transaction
+                  // after execution, will save transaction hash to state to trigger waiting process to create Checkbook entity
                   try {
-                    await createCheckbookMutation({
-                      terminalId: terminal.id,
-                      address: checkbookAddress,
-                      chainId: 1, // ETH mainnet, change once checkbooks are multichain
-                      name: values.name,
-                      quorum: parseInt(values.quorum),
-                      signers,
+                    setQuorum(quorum)
+                    setSigners(signers)
+                    setName(values.name)
+
+                    const transaction = await create({
+                      args: [quorum, signers],
                     })
 
-                    router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
+                    // triggers hook for useWaitForTransaction which parses checkbook address makes prisma mutation
+                    setTxnHash(transaction.hash)
                   } catch (e) {
                     console.error(e)
                     setToastState({
                       isToastShowing: true,
                       type: "error",
-                      message: "Checkbook creation failed.",
+                      message: "Checkbook contract creation failed.",
                     })
                   }
                 } catch (e) {
