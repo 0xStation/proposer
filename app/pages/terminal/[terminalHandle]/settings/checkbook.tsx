@@ -9,6 +9,7 @@ import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import truncateString from "app/core/utils/truncateString"
 import { ClipboardIcon, ClipboardCheckIcon, ExternalLinkIcon } from "@heroicons/react/outline"
 import Modal from "app/core/components/Modal"
+import networks from "app/utils/networks.json"
 
 const CheckbookSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -73,7 +74,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
             </p>
             <div className="mt-8">
               <button
-                className="bg-magic-mint text-tunnel-black border border-magic-mint py-1 px-4 rounded hover:opacity-75"
+                className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
                 onClick={() => {
                   navigator.clipboard.writeText(selectedCheckbook?.address as string).then(() => {
                     setIsModalAddressCopied(true)
@@ -97,10 +98,10 @@ const CheckbookSettingsPage: BlitzPage = () => {
             </div>
             <Link href={Routes.NewCheckbookSettingsPage({ terminalHandle })}>
               <button
-                className="rounded text-tunnel-black px-8 h-full h-[32px] bg-magic-mint self-start"
+                className="rounded text-tunnel-black px-8 h-full h-[32px] bg-electric-violet self-start"
                 type="submit"
               >
-                Create Checkbook
+                Create
               </button>
             </Link>
           </div>
@@ -158,6 +159,12 @@ const CheckbookSettingsPage: BlitzPage = () => {
                     </div>
                   </div>
                   <div className="space-y-6 mt-12">
+                    <div>
+                      <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
+                        Chain
+                      </h3>
+                      <p className="mt-2">{networks[selectedCheckbook?.chainId!].name}</p>
+                    </div>
                     <div>
                       <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
                         Signers

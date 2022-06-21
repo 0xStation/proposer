@@ -44,7 +44,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
         await createCheckbookMutation({
           terminalId: terminal?.id as number,
           address: checkbookAddress,
-          chainId: 1, // ETH mainnet, change once checkbooks are multichain
+          chainId: activeChain?.id as number,
           name: name as string,
           quorum: quorum as number,
           signers: signers as string[],
@@ -131,8 +131,6 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
               return (
                 <form onSubmit={handleSubmit} className="mt-12">
                   <div className="flex flex-col w-1/2">
-                    <h3 className="font-bold">Chain</h3>
-                    <span className=" text-m mt-2 block">{activeChain?.name}</span>
                     <h3 className="font-bold mt-4">Checkbook name*</h3>
                     <Field
                       name="name"
@@ -187,7 +185,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                       The number of signers required for a proposal to be approved and for a check
                       to be generated.
                       <br />
-                      <a href="#" className="text-magic-mint">
+                      <a href="#" className="text-electric-violet">
                         Learn more
                       </a>
                     </span>
@@ -219,7 +217,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                           formState.values.signers &&
                           formState.values.quorum &&
                           !formState.hasValidationErrors
-                            ? "bg-magic-mint"
+                            ? "bg-electric-violet"
                             : "bg-concrete"
                         }`}
                         type="submit"
