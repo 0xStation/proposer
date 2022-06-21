@@ -9,7 +9,7 @@ import { alchemyProvider } from "wagmi/providers/alchemy"
 
 // Chains for connectors to support
 const { chains, provider } = configureChains(allChains, [
-  alchemyProvider({ alchemyId: process.env.ALCHEMY_API_KEY as string }),
+  alchemyProvider({ alchemyId: process.env.BLITZ_PUBLIC_ALCHEMY_API_KEY as string }),
   publicProvider(), // gives fallback provider for Localhost network
 ])
 
@@ -34,7 +34,7 @@ const connectors = () => {
 }
 
 const client = createClient({
-  autoConnect: true,
+  autoConnect: false,
   connectors,
   provider,
 })

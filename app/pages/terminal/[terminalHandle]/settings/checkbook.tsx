@@ -124,7 +124,9 @@ const CheckbookSettingsPage: BlitzPage = () => {
                       <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
                         <div className="w-max truncate leading-4">{selectedCheckbook?.address}</div>
                         <a
-                          href={`https://etherscan.io/address/${selectedCheckbook?.address}`}
+                          href={`https://${
+                            selectedCheckbook?.chainId === 4 ? "rinkeby." : ""
+                          }etherscan.io/address/${selectedCheckbook?.address}`}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
