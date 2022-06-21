@@ -8,6 +8,7 @@ import Navigation from "app/terminal/components/settings/navigation"
 import useStore from "app/core/hooks/useStore"
 import Back from "/public/back-icon.svg"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
+import { sortAddresses } from "app/core/utils/sortAddresses"
 import { uniqueName, isValidQuorum } from "app/utils/validators"
 import { useCreateCheckbook } from "app/contracts/contracts"
 import { useWaitForTransaction, useNetwork } from "wagmi"
@@ -104,8 +105,9 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                   setWaitingCreation(true)
 
                   const quorum = parseInt(values.quorum)
-                  // validation on checksum addresses, no duplicates
-                  const signers = parseUniqueAddresses(values.signers || "")
+                  // validation on checksummed addresses, no duplicates
+                  // must be sorted for contract to validate no duplicates
+                  const signers = sortAddresses(parseUniqueAddresses(values.signers || ""))
 
                   // trigger transaction
                   // after execution, will save transaction hash to state to trigger waiting process to create Checkbook entity

@@ -33,6 +33,7 @@ const connectors = () => {
   ]
 }
 
+// Manages wallet connection and state for the wagmi provider
 const client = createClient({
   autoConnect: false,
   connectors,

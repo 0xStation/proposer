@@ -1,6 +1,7 @@
 import db from "db"
 import * as z from "zod"
 import { TagType } from "app/tag/types"
+import { truncateString } from "app/core/utils/truncateString"
 
 const CreateCheckbook = z.object({
   terminalId: z.number(),
@@ -27,7 +28,7 @@ export default async function createCheckbook(input: z.infer<typeof CreateCheckb
       return {
         address,
         data: {
-          name: address,
+          name: truncateString(address),
         },
       }
     }),

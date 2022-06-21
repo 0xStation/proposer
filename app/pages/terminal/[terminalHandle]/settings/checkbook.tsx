@@ -78,7 +78,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
                 onClick={() => {
                   navigator.clipboard.writeText(selectedCheckbook?.address as string).then(() => {
                     setIsModalAddressCopied(true)
-                    setTimeout(() => setSuccessModalOpen(false), 500) // slight delay before closing modal
+                    setTimeout(() => setSuccessModalOpen(false), 450) // slight delay before closing modal
                   })
                 }}
               >
