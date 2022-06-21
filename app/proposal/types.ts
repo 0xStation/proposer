@@ -9,8 +9,10 @@ export enum CheckStatus {
 }
 
 export enum ProposalStatus {
-  APPROVED = "APPROVED",
+  DRAFT = "DRAFT",
+  SUBMITTED = "SUBMITTED",
   IN_REVIEW = "IN_REVIEW",
+  APPROVED = "APPROVED",
 }
 
 export type ProposalMetadata = {

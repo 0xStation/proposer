@@ -19,7 +19,18 @@ export const computeRfpDbStatusFilter = (status: string) => {
     return {
       status: PrismaRfpStatus.PUBLISHED,
       startDate: { lte: new Date() }, // (start date <= now) implies RFP has been open
-      endDate: { gt: new Date() }, // (end date > now) implies RFP is not closed yet
+      OR: [
+        {
+          endDate: {
+            gt: new Date(),
+          },
+        }, // (end date > now) implies RFP is not closed yet
+        {
+          endDate: {
+            equals: null,
+          },
+        },
+      ],
     }
   } else if (status === RfpStatus.CLOSED) {
     return {

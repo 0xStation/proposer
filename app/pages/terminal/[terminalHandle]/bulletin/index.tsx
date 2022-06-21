@@ -1,4 +1,4 @@
-import { BlitzPage, useQuery, useParam, Routes, useRouter, Link } from "blitz"
+import { BlitzPage, useQuery, useParam, Routes, useRouter, Link, invalidateQuery } from "blitz"
 import { Fragment, useState } from "react"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import Layout from "app/core/layouts/Layout"
@@ -6,15 +6,15 @@ import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { Menu, Transition } from "@headlessui/react"
 import { Form } from "react-final-form"
-import useKeyPress from "app/core/hooks/useKeyPress"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsForTerminal"
+import getRfpCountByTerminalId from "app/rfp/queries/getRfpCountByTerminalId"
 import { formatDate } from "app/core/utils/formatDate"
 import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
-
-interface Filters {
-  [tagType: string]: Set<number>
-}
+import { RfpStatus } from "app/rfp/types"
+import Checkbox from "app/core/components/form/Checkbox"
+import BackArrow from "app/core/icons/BackArrow"
+import ForwardArrow from "app/core/icons/ForwardArrow"
 
 const BulletinPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -23,20 +23,47 @@ const BulletinPage: BlitzPage = () => {
     { handle: terminalHandle as string },
     { suspense: false, enabled: !!terminalHandle }
   )
+  const [filters, setFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
+
+  const [page, setPage] = useState<number>(0)
+
+  const PAGINATION_TAKE = 50
+  const RFP_STATUSES_ARRAY = [
+    RfpStatus.DRAFT,
+    RfpStatus.STARTING_SOON,
+    RfpStatus.OPEN_FOR_SUBMISSIONS,
+    RfpStatus.CLOSED,
+    RfpStatus.ARCHIVED,
+  ]
+
   const [rfps] = useQuery(
     getRfpsByTerminalId,
     {
       terminalId: terminal?.id as number,
+      statuses: Array.from(filters),
+      page: page,
+      paginationTake: PAGINATION_TAKE,
     },
-    { suspense: false, enabled: !!terminal?.id }
+    {
+      suspense: false,
+      enabled: !!terminal?.id,
+      refetchOnWindowFocus: false,
+    }
   )
-  const router = useRouter()
 
-  const downPress = useKeyPress("ArrowDown")
-  const upPress = useKeyPress("ArrowUp")
-  const enterPress = useKeyPress("Enter")
-  const [cursor, setCursor] = useState(0)
-  const [hovered, setHovered] = useState(undefined)
+  const [rfpCount] = useQuery(
+    getRfpCountByTerminalId,
+    {
+      terminalId: terminal?.id as number,
+    },
+    {
+      suspense: false,
+      enabled: !!terminal?.id,
+      refetchOnWindowFocus: false,
+    }
+  )
+
+  const router = useRouter()
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
@@ -50,12 +77,41 @@ const BulletinPage: BlitzPage = () => {
               className="h-[35px] bg-magic-mint px-9 rounded text-tunnel-black hover:bg-opacity-70"
               onClick={() => router.push(Routes.CreateRFPPage({ terminalHandle }))}
             >
-              Create RFP
+              Create request for proposal
             </button>
           </div>
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <div className="flex ml-6 py-4 space-x-2 flex-wrap self-start">
-              <FilterPill />
+              <FilterPill
+                filterValues={RFP_STATUSES_ARRAY}
+                filters={filters}
+                setFilters={setFilters}
+                setPage={setPage}
+              />
+            </div>
+            <div className="ml-6 sm:mr-6 text-sm pt-2">
+              Showing
+              <span className="text-electric-violet font-bold"> {page * PAGINATION_TAKE + 1} </span>
+              to
+              <span className="text-electric-violet font-bold">
+                {" "}
+                {(page + 1) * PAGINATION_TAKE > rfpCount!
+                  ? rfps?.length
+                  : (page + 1) * PAGINATION_TAKE}{" "}
+              </span>
+              of
+              <span className="font-bold"> {rfpCount} </span>
+              members
+              <button className="w-6 ml-2" disabled={page === 0} onClick={() => setPage(page - 1)}>
+                <BackArrow className={`${page === 0 ? "fill-concrete" : "fill-marble-white"}`} />
+              </button>
+              <button disabled={rfps?.length! < PAGINATION_TAKE} onClick={() => setPage(page + 1)}>
+                <ForwardArrow
+                  className={`${
+                    rfps?.length! < PAGINATION_TAKE ? "fill-concrete" : "fill-marble-white"
+                  }`}
+                />
+              </button>
             </div>
           </div>
         </div>
@@ -113,10 +169,26 @@ const RFPComponent = ({ rfp, terminalHandle }) => {
   )
 }
 
-const FilterPill = ({}) => {
+const FilterPill = ({ filters, setFilters, filterValues, setPage }) => {
+  const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
+
+  const handleClearFilters = (e) => {
+    e.preventDefault()
+
+    filters.clear()
+
+    setPage(0)
+    setFilters(filters)
+    // clear filled checkboxes by removing the defaultChecked value
+    // bumping the key will reset the uncontrolled component's internal state
+    setClearDefaultValue(true)
+
+    invalidateQuery(getRfpsByTerminalId)
+  }
   return (
     <Menu as="div" className="relative mb-2 sm:mb-0">
       {({ open }) => {
+        setClearDefaultValue(false)
         return (
           <>
             <Menu.Button className="block h-[28px] text-marble-white">
@@ -148,15 +220,44 @@ const FilterPill = ({}) => {
             >
               <Menu.Items className="absolute origin-top-left mt-5 h-auto w-[11rem] sm:w-[22rem] bg-tunnel-black border border-concrete rounded-md z-10">
                 <Form
-                  onSubmit={(field) => {
-                    if (!field || !Object.keys(field).length || !Object.entries(field)[0]) {
+                  // name: ["value"]
+                  onSubmit={(fields) => {
+                    if (!fields || !Object.keys(fields).length || !Object.keys(fields)[0]) {
                       return
                     }
+                    Object.entries(fields).map(([key, value]) => {
+                      if (filters.has(key)) {
+                        if (!value.length) {
+                          filters.delete(key)
+                        }
+                      } else {
+                        filters.add(key)
+                      }
+                    })
+                    setPage(0)
+                    setFilters(filters)
+                    invalidateQuery(getRfpsByTerminalId)
                   }}
                   render={({ form, handleSubmit }) => {
                     return (
                       <form onSubmit={handleSubmit}>
-                        <div className="mt-[1.4rem] mx-[1.15rem] mb-5 space-y-3"></div>
+                        <div className="mt-[1.4rem] mx-[1.15rem] mb-5 space-y-3">
+                          {filterValues?.map((filterVal) => {
+                            return (
+                              <div className="flex-row" key={`${clearDefaultValue}${filterVal}`}>
+                                <Checkbox
+                                  value={filterVal}
+                                  name={`${filterVal}.active`}
+                                  defaultChecked={filters.has(filterVal)}
+                                  className="align-middle"
+                                />
+                                <p className="p-0.5 align-middle mx-4 inline leading-none uppercase">
+                                  {RFP_STATUS_DISPLAY_MAP[filterVal]?.copy}
+                                </p>
+                              </div>
+                            )
+                          })}
+                        </div>
                         <button
                           type="submit"
                           className="bg-marble-white w-36 sm:w-52 h-[35px] text-tunnel-black rounded mb-4 ml-4 mr-1 hover:opacity-70"
@@ -165,7 +266,10 @@ const FilterPill = ({}) => {
                         </button>
                         <button
                           className="w-[6.5rem] hover:text-concrete mb-2 sm:mb-0"
-                          onClick={(e) => {}}
+                          onClick={(e) => {
+                            handleClearFilters(e)
+                            form.reset()
+                          }}
                         >
                           Clear all
                         </button>

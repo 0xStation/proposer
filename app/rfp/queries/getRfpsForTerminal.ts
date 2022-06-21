@@ -5,14 +5,26 @@ import { computeRfpDbStatusFilter, computeRfpProductStatus } from "../utils"
 
 const GetRfpsByTerminalId = z.object({
   terminalId: z.number(),
-  status: z.string().optional(),
+  statuses: z.string().array().optional(),
+  page: z.number().optional().default(0),
+  paginationTake: z.number().optional().default(50),
 })
 
 export default async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsByTerminalId>) {
+  let statuses = []
+
+  if (input.statuses && Array.isArray(input.statuses) && input.statuses?.length) {
+    const rfpDbStatusFilters = input.statuses?.map((status) => {
+      return computeRfpDbStatusFilter(status)
+    })
+
+    statuses = { OR: rfpDbStatusFilters } as any
+  }
+
   const rfps = await db.rfp.findMany({
     where: {
       terminalId: input.terminalId,
-      ...(input.status && computeRfpDbStatusFilter(input.status)),
+      ...statuses,
     },
     include: {
       author: true,
@@ -20,6 +32,8 @@ export default async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsB
         select: { proposals: true },
       },
     },
+    take: input.paginationTake,
+    skip: input.page * input.paginationTake,
   })
 
   return rfps.map((rfp) => {

@@ -79,13 +79,25 @@ export const RFP_STATUS_DISPLAY_MAP = {
     copy: "open for submissions",
     color: "bg-magic-mint",
   },
+  [RfpStatus.ARCHIVED]: {
+    copy: "archived",
+    color: "bg-torch-red",
+  },
   [RfpStatus.CLOSED]: {
-    copy: "open for submissions",
+    copy: "closed",
     color: "bg-torch-red",
   },
 }
 
 export const PROPOSAL_STATUS_DISPLAY_MAP = {
+  [ProposalStatus.DRAFT]: {
+    copy: "draft",
+    color: "bg-concrete",
+  },
+  [ProposalStatus.SUBMITTED]: {
+    copy: "submitted",
+    color: "bg-marble-white",
+  },
   [ProposalStatus.APPROVED]: {
     copy: "approved",
     color: "bg-magic-mint",

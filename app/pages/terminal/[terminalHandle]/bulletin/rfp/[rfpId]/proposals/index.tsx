@@ -1,5 +1,5 @@
-import truncateString from "app/core/utils/truncateString"
-import { BlitzPage, Routes, useParam, useQuery, Link, useRouter } from "blitz"
+import { useState } from "react"
+import { BlitzPage, Routes, useParam, useQuery, Link, useRouter, invalidateQuery } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import { DEFAULT_PFP_URLS, PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
@@ -12,6 +12,8 @@ import { Form } from "react-final-form"
 import getProposalsByRfpId from "app/proposal/queries/getProposalsByRfpId"
 import { formatDate } from "app/core/utils/formatDate"
 import getRfpById from "app/rfp/queries/getRfpById"
+import { ProposalStatus } from "app/proposal/types"
+import Checkbox from "app/core/components/form/Checkbox"
 
 const ProposalsTab: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -28,6 +30,17 @@ const ProposalsTab: BlitzPage = () => {
     { suspense: false, enabled: !!rfpId }
   )
 
+  const PAGINATION_TAKE = 50
+  const PROPOSAL_STATUSES_ARRAY = [
+    ProposalStatus.DRAFT,
+    ProposalStatus.SUBMITTED,
+    ProposalStatus.IN_REVIEW,
+    ProposalStatus.APPROVED,
+  ]
+
+  const [filters, setFilters] = useState<Set<ProposalStatus>>(new Set<ProposalStatus>())
+  const [page, setPage] = useState<number>(0)
+
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
 
   return (
@@ -36,7 +49,14 @@ const ProposalsTab: BlitzPage = () => {
         <RFPHeaderNavigation rfpId={rfpId} />
         <div className="h-[calc(100vh-240px)] flex flex-col">
           <div className="w-full h-20 flex flex-row">
-            <FilterPill title="Status" className="mt-6 ml-6" />
+            <FilterPill
+              title="Status"
+              className="mt-6 ml-6"
+              filterValues={PROPOSAL_STATUSES_ARRAY}
+              filters={filters}
+              setFilters={setFilters}
+              setPage={setPage}
+            />
           </div>
           <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
             <span className="basis-[38rem] ml-6 mb-2">Proposal</span>
@@ -106,34 +126,23 @@ const ProposalComponent = ({ proposal, rfp }) => {
   )
 }
 
-const PfpComponent = ({ user, className = "" }) => {
-  return (
-    <Link href={Routes.ProfileHome({ accountAddress: user?.address })}>
-      <div className={`flex flex-row ${className}`}>
-        <div className="flex flex-col content-center align-middle mr-3">
-          <img
-            src={user?.data?.pfpURL}
-            alt="PFP"
-            className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
-            onError={(e) => {
-              e.currentTarget.src = DEFAULT_PFP_URLS.USER
-            }}
-          />
-        </div>
-        <div className="flex flex-col content-center">
-          <div className="flex flex-row items-center space-x-1">
-            <p className="text-base text-marble-white font-bold">{user?.data?.name}</p>
-          </div>
-          <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-            <p className="w-max truncate leading-4">@{truncateString(user?.address)}</p>
-          </div>
-        </div>
-      </div>
-    </Link>
-  )
-}
+const FilterPill = ({ title, className = "", filters, filterValues, setFilters, setPage }) => {
+  const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
 
-const FilterPill = ({ title, className = "" }) => {
+  const handleClearFilters = (e) => {
+    e.preventDefault()
+
+    filters.clear()
+
+    setPage(0)
+    setFilters(filters)
+    // clear filled checkboxes by removing the defaultChecked value
+    // bumping the key will reset the uncontrolled component's internal state
+    setClearDefaultValue(true)
+
+    invalidateQuery(getProposalsByRfpId)
+  }
+
   return (
     <Menu as="div" className={`relative ${className} mb-2 sm:mb-0`}>
       {({ open }) => {
@@ -168,15 +177,43 @@ const FilterPill = ({ title, className = "" }) => {
             >
               <Menu.Items className="absolute origin-top-left mt-5 h-auto w-[11rem] sm:w-[22rem] bg-tunnel-black border border-concrete rounded-md z-10">
                 <Form
-                  onSubmit={(field) => {
-                    if (!field || !Object.keys(field).length || !Object.entries(field)[0]) {
+                  onSubmit={(fields) => {
+                    if (!fields || !Object.keys(fields).length || !Object.keys(fields)[0]) {
                       return
                     }
+                    Object.entries(fields).map(([key, value]) => {
+                      if (filters.has(key)) {
+                        if (!value.length) {
+                          filters.delete(key)
+                        }
+                      } else {
+                        filters.add(key)
+                      }
+                    })
+                    setPage(0)
+                    setFilters(filters)
+                    invalidateQuery(getProposalsByRfpId)
                   }}
                   render={({ form, handleSubmit }) => {
                     return (
                       <form onSubmit={handleSubmit}>
-                        <div className="mt-[1.4rem] mx-[1.15rem] mb-5 space-y-3"></div>
+                        <div className="mt-[1.4rem] mx-[1.15rem] mb-5 space-y-3">
+                          {filterValues?.map((filterVal) => {
+                            return (
+                              <div className="flex-row" key={`${clearDefaultValue}${filterVal}`}>
+                                <Checkbox
+                                  value={filterVal}
+                                  name={`${filterVal}.active`}
+                                  defaultChecked={filters.has(filterVal)}
+                                  className="align-middle"
+                                />
+                                <p className="p-0.5 align-middle mx-4 inline leading-none uppercase">
+                                  {PROPOSAL_STATUS_DISPLAY_MAP[filterVal]?.copy}
+                                </p>
+                              </div>
+                            )
+                          })}
+                        </div>
                         <button
                           type="submit"
                           className="bg-marble-white w-36 sm:w-52 h-[35px] text-tunnel-black rounded mb-4 ml-4 mr-1 hover:opacity-70"
