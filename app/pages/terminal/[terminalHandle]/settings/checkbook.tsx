@@ -134,12 +134,6 @@ const CheckbookSettingsPage: BlitzPage = () => {
                   <div className="space-y-6 mt-12">
                     <div>
                       <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
-                        Quorum
-                      </h3>
-                      <p className="mt-2">{selectedCheckbook?.quorum || 1}</p>
-                    </div>
-                    <div>
-                      <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
                         Signers
                       </h3>
                       {
@@ -178,22 +172,17 @@ const CheckbookSettingsPage: BlitzPage = () => {
                     </div>
                     <div>
                       <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
+                        Approval Quorum
+                      </h3>
+                      <p className="mt-2">{selectedCheckbook?.quorum || 1}</p>
+                    </div>
+                    <div>
+                      <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
                         Amount
                       </h3>
                       <p className="mt-2">
-                        There are no funds available to deploy.
-                        <a
-                          href="#"
-                          className="text-magic-mint"
-                          onClick={() =>
-                            navigator.clipboard.writeText(selectedCheckbook?.address as string)
-                          }
-                        >
-                          {" "}
-                          Copy the contract address{" "}
-                        </a>
-                        and transfer funds to this Checkbook from Gnosis or other wallet
-                        applications.
+                        There are no funds available to deploy. Copy the contract address and
+                        transfer funds to this Checkbook from Gnosis or other wallet applications.
                       </p>
                     </div>
                   </div>

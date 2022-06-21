@@ -12,6 +12,7 @@ import { uniqueName, isValidQuorum } from "app/utils/validators"
 import { useCreateCheckbook } from "app/contracts/contracts"
 import { useWaitForTransaction, useNetwork } from "wagmi"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import { Spinner } from "app/core/components/Spinner"
 
 const NewCheckbookSettingsPage: BlitzPage = () => {
   const router = useRouter()
@@ -20,6 +21,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
   const [signers, setSigners] = useState<string[]>()
   const [name, setName] = useState<string>()
   const [txnHash, setTxnHash] = useState<string>()
+  const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
 
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(
@@ -50,6 +52,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
 
         router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
       } catch (e) {
+        setWaitingCreation(false)
         console.error(e)
         setToastState({
           isToastShowing: true,
@@ -89,6 +92,8 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
             onSubmit={async (values: FormValues) => {
               if (terminal) {
                 try {
+                  setWaitingCreation(true)
+
                   const quorum = parseInt(values.quorum)
                   // validation on checksum addresses, no duplicates
                   const signers = parseUniqueAddresses(values.signers || "")
@@ -107,6 +112,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                     // triggers hook for useWaitForTransaction which parses checkbook address makes prisma mutation
                     setTxnHash(transaction.hash)
                   } catch (e) {
+                    setWaitingCreation(false)
                     console.error(e)
                     setToastState({
                       isToastShowing: true,
@@ -115,6 +121,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                     })
                   }
                 } catch (e) {
+                  setWaitingCreation(false)
                   console.error(e)
                 }
               }
@@ -161,7 +168,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                           <textarea
                             {...input}
                             className="w-full bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
-                            rows={4}
+                            rows={6}
                             placeholder="Enter wallet addresses"
                           />
                           {/* user feedback on number of registered unique addresses, not an error */}
@@ -220,10 +227,17 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                           !formState.values.name ||
                           !formState.values.signers ||
                           !formState.values.quorum ||
-                          formState.hasValidationErrors
+                          formState.hasValidationErrors ||
+                          waitingCreation
                         }
                       >
-                        Create
+                        {waitingCreation ? (
+                          <div className="flex justify-center items-center">
+                            <Spinner fill="black" />
+                          </div>
+                        ) : (
+                          "Create"
+                        )}
                       </button>
                     </div>
                   </div>
