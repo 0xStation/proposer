@@ -4,6 +4,9 @@ import { Proposal } from "../types"
 
 const GetProposalsByRfpId = z.object({
   rfpId: z.string(),
+  statuses: z.string().array().optional(),
+  page: z.number().optional().default(0),
+  paginationTake: z.number().optional().default(50),
 })
 
 export default async function getProposalsByRfpId(params: z.infer<typeof GetProposalsByRfpId>) {
@@ -18,6 +21,8 @@ export default async function getProposalsByRfpId(params: z.infer<typeof GetProp
         },
       },
     },
+    take: params.paginationTake,
+    skip: params.page * params.paginationTake,
   })
 
   if (!proposals) {
