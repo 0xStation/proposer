@@ -8,9 +8,13 @@ const CreateProposal = z.object({
   recipientAddress: z.string(),
   contentTitle: z.string(),
   contentBody: z.string(),
+  startDate: z.date(),
+  endDate: z.date(),
+
   contributors: z.array(z.string()).optional(), // for now == moving this to p1+
 })
 
+// not making use of start date and end date for now...
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
   const proposal = await db.proposal.create({
     data: {

@@ -48,7 +48,12 @@ const ProposalsTab: BlitzPage = () => {
           <div className="h-[calc(100vh-284px)] overflow-y-auto">
             {proposals &&
               proposals.map((proposal, idx) => (
-                <ProposalComponent proposal={proposal} rfp={rfp} key={idx} />
+                <ProposalComponent
+                  terminalHandle={terminalHandle}
+                  proposal={proposal}
+                  rfp={rfp}
+                  key={idx}
+                />
               ))}
           </div>
         </div>
@@ -57,9 +62,9 @@ const ProposalsTab: BlitzPage = () => {
   )
 }
 
-const ProposalComponent = ({ proposal, rfp }) => {
+const ProposalComponent = ({ proposal, rfp, terminalHandle }) => {
   return (
-    <Link href={"#"}>
+    <Link href={Routes.ProposalPage({ terminalHandle, rfpId: rfp.id, proposalId: proposal.id })}>
       <div className="border-b border-concrete w-full cursor-pointer hover:bg-wet-concrete pt-5">
         <div className="flex flex-row items-center space-x-2 ml-6">
           <span

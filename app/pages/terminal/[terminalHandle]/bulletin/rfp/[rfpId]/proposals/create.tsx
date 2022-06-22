@@ -1,5 +1,12 @@
 import { useState } from "react"
-import { BlitzPage } from "blitz"
+import {
+  BlitzPage,
+  invoke,
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+  Routes,
+  useMutation,
+} from "blitz"
 import { Field, Form } from "react-final-form"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
@@ -7,18 +14,31 @@ import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
 import Modal from "app/core/components/Modal"
+import getRfpById from "app/rfp/queries/getRfpById"
+import createProposal from "app/proposal/mutations/createProposal"
+import { Rfp } from "app/rfp/types"
 
-const CreateProposalPage: BlitzPage = () => {
+type GetServerSidePropsData = {
+  rfp: Rfp
+}
+
+const CreateProposalPage: BlitzPage = ({
+  data,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [previewMode, setPreviewMode] = useState<boolean>(false)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
   const [markdown, setMarkdown] = useState<string>("")
   const [title, setTitle] = useState<string>("")
   const activeUser = useStore((state) => state.activeUser)
 
-  // // redirect?
-  // if (!terminal || !activeUser) {
-  //   return <Layout title={`New RFP`}></Layout>
-  // }
+  const [createProposalMutation] = useMutation(createProposal, {
+    onSuccess: (_data) => {
+      // router.push(Routes.BulletinPage({ terminalHandle: terminalHandle }))
+    },
+    onError: (error: Error) => {
+      console.error(error)
+    },
+  })
 
   return (
     <Layout title={`New Proposal`}>
@@ -89,11 +109,22 @@ const CreateProposalPage: BlitzPage = () => {
         <div className="h-full border-l border-concrete col-span-1 flex flex-col">
           <Form
             onSubmit={async (values: {
+              recipientAddress: string
               startDate: string
               endDate: string
-              checkbookAddress: string
+              token: string
+              amount: number
             }) => {
-              console.log("trying to submit")
+              await createProposalMutation({
+                rfpId: data.rfp.id,
+                startDate: new Date(values.startDate),
+                endDate: new Date(values.endDate),
+                token: values.token,
+                amount: values.amount,
+                recipientAddress: values.recipientAddress,
+                contentBody: markdown,
+                contentTitle: title,
+              })
             }}
             render={({ form, handleSubmit }) => {
               const formState = form.getState()
@@ -129,11 +160,11 @@ const CreateProposalPage: BlitzPage = () => {
                     <h4 className="text-xs font-bold text-concrete uppercase">
                       Proposal Recipient
                     </h4>
-                    <p className="mt-2">0xmcg.eth</p>
+                    <p className="mt-2">WHAT IS THIS FIELD</p>
                     <h4 className="text-xs font-bold text-concrete uppercase mt-4">
                       Request for Proposal
                     </h4>
-                    <p className="mt-2 text-electric-violet">Education</p>
+                    <p className="mt-2 text-electric-violet">{data.rfp.data.content.title}</p>
                     <label className="font-bold block mt-6">Fund Recipient*</label>
                     <span className="text-xs text-concrete block">
                       Primary destination of the funds. Project lead/creator’s wallet address is
@@ -176,7 +207,7 @@ const CreateProposalPage: BlitzPage = () => {
                           <input
                             {...input}
                             type="text"
-                            placeholder="Enter wallet or ENS address"
+                            placeholder="Enter token amount"
                             className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                           />
                         </>
@@ -238,6 +269,31 @@ const CreateProposalPage: BlitzPage = () => {
       </div>
     </Layout>
   )
+}
+
+// Fetch RFP on server side rather than fetching on client and requiring a loading state
+// either returns the RFP (no loading) or the RFP is not found and we redirect
+// right now redirecting to bulletin page, but we could do a 404 or something too
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { terminalHandle, rfpId } = context.query as { terminalHandle: string; rfpId: string }
+  const rfp = await invoke(getRfpById, { id: rfpId })
+
+  if (!rfp) {
+    return {
+      redirect: {
+        destination: Routes.BulletinPage({ terminalHandle }),
+        permanent: false,
+      },
+    }
+  }
+
+  const data: GetServerSidePropsData = {
+    rfp,
+  }
+
+  return {
+    props: { data },
+  }
 }
 
 CreateProposalPage.suppressFirstRenderFlicker = true
