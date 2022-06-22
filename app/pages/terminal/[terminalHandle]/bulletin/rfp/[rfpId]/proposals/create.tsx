@@ -110,15 +110,11 @@ const CreateProposalPage: BlitzPage = ({
           <Form
             onSubmit={async (values: {
               recipientAddress: string
-              startDate: string
-              endDate: string
               token: string
               amount: number
             }) => {
               await createProposalMutation({
                 rfpId: data.rfp.id,
-                startDate: new Date(values.startDate),
-                endDate: new Date(values.endDate),
                 token: values.token,
                 amount: values.amount,
                 recipientAddress: values.recipientAddress,
@@ -209,38 +205,6 @@ const CreateProposalPage: BlitzPage = ({
                             type="text"
                             placeholder="Enter token amount"
                             className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
-                          />
-                        </>
-                      )}
-                    </Field>
-
-                    <Field name="startDate">
-                      {({ input, meta }) => (
-                        <>
-                          <label className="font-bold block mt-6">Start Date</label>
-                          <span className="text-xs text-concrete block">
-                            Proposal submission opens
-                          </span>
-                          <input
-                            {...input}
-                            type="date"
-                            className="bg-wet-concrete border border-concrete rounded p-2 mt-1 w-full"
-                          />
-                        </>
-                      )}
-                    </Field>
-
-                    <Field name="endDate">
-                      {({ input, meta }) => (
-                        <>
-                          <label className="font-bold block mt-6">End Date</label>
-                          <span className="text-xs text-concrete block">
-                            Proposal submission closes
-                          </span>
-                          <input
-                            {...input}
-                            type="date"
-                            className="bg-wet-concrete border border-concrete rounded p-2 mt-1 w-full"
                           />
                         </>
                       )}

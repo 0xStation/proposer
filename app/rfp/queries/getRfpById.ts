@@ -13,6 +13,7 @@ export default async function getRfpById(input: z.infer<typeof GetRfpById>) {
       id: input.id,
     },
     include: {
+      terminal: true,
       author: true,
       checkbook: true,
       _count: {
