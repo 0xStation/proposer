@@ -1,6 +1,6 @@
 import { BlitzPage, useQuery, useParam, Routes, useRouter, Link, useRouterQuery } from "blitz"
 import { Menu, Transition } from "@headlessui/react"
-import { Fragment, useState } from "react"
+import { Fragment, useState, useEffect } from "react"
 import { Form } from "react-final-form"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import Layout from "app/core/layouts/Layout"
@@ -21,7 +21,7 @@ interface Filters {
 
 const BulletinPage: BlitzPage = () => {
   const { rfpId } = useRouterQuery() as { rfpId: string }
-  const [rfpModal, setRfpModal] = useState<boolean>(true)
+  const [rfpModal, setRfpModal] = useState<boolean>(false)
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(
     getTerminalByHandle,
@@ -44,15 +44,21 @@ const BulletinPage: BlitzPage = () => {
   const [cursor, setCursor] = useState(0)
   const [hovered, setHovered] = useState(undefined)
 
+  useEffect(() => {
+    if (rfpId) {
+      setRfpModal(true)
+    }
+  }, [rfpId])
+
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
-      {rfpId && (
+      {terminal && (
         <Modal open={rfpModal} toggle={setRfpModal}>
           <div className="p-2">
             <h3 className="text-2xl font-bold pt-6">Request successfully published!</h3>
             <p className="mt-2">
               Copy the link to share with your community and let the waves of ideas carry you to the
-              exciting future of Olympus.
+              exciting future of {terminal.data.name}.
             </p>
             <div className="mt-8">
               <button
