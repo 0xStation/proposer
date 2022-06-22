@@ -8,7 +8,7 @@ import { Menu, Transition } from "@headlessui/react"
 import { Form } from "react-final-form"
 import useKeyPress from "app/core/hooks/useKeyPress"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
-import getRfpsByTerminalId from "app/rfp/queries/getRfpsForTerminal"
+import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import { formatDate } from "app/core/utils/formatDate"
 import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 

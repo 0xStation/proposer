@@ -23,12 +23,12 @@ const CheckbookSettingsPage: BlitzPage = () => {
       suspense: false,
       enabled: !!terminal?.id,
       onSuccess: (books) => {
-        if (!books || books.length === 0) {
+        if (!books || (Array.isArray(books) && books.length === 0)) {
           return
         }
-        setCheckbooks(books as any[])
+        setCheckbooks(books as unknown as Checkbook[])
         if (!selectedCheckbook) {
-          setSelectedCheckbook((books as any[])[0])
+          setSelectedCheckbook((books as unknown as Checkbook[])[0])
         }
       },
     }

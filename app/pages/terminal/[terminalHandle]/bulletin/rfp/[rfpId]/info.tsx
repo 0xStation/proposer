@@ -5,7 +5,7 @@ import Layout from "app/core/layouts/Layout"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import RFPHeaderNavigation from "app/rfp/components/RFPHeaderNavigation"
+import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { formatDate } from "app/core/utils/formatDate"
 
@@ -22,7 +22,7 @@ const RFPInfoTab: BlitzPage = () => {
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
       <TerminalNavigation>
-        <RFPHeaderNavigation rfpId={rfpId} />
+        <RfpHeaderNavigation rfpId={rfpId} />
         <div className="h-[calc(100vh-240px)] flex flex-row">
           <div className="w-full p-6 overflow-y-scroll">
             <Preview markdown={rfp?.data?.content?.body} />
@@ -31,7 +31,7 @@ const RFPInfoTab: BlitzPage = () => {
           <div className="w-96 border-l border-concrete pl-6 pt-6 pr-16 flex-col">
             <div className="mt-2">
               <p className="text-concrete uppercase text-xs font-bold">Start Date</p>
-              <p className="mt-2">{formatDate(rfp?.startDate)}</p>
+              <p className="mt-2">{(rfp?.startDate && formatDate(rfp?.startDate)) || "N/A"}</p>
             </div>
             <div className="mt-6">
               <p className="text-concrete uppercase text-xs font-bold">End Date</p>

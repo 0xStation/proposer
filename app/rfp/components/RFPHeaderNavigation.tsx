@@ -4,7 +4,7 @@ import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import getRfpById from "../queries/getRfpById"
 import { XCircleIcon, PencilIcon, LinkIcon } from "@heroicons/react/solid"
 
-const RFPHeaderNavigation = ({ rfpId }) => {
+const RfpHeaderNavigation = ({ rfpId }) => {
   const terminalHandle = useParam("terminalHandle") as string
   const [isRFPUrlCopied, setIsRfpUrlCopied] = useState<boolean>(false)
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
@@ -60,9 +60,9 @@ const RFPHeaderNavigation = ({ rfpId }) => {
                       copied!
                     </span>
                   )}
-                  <button>
+                  <Link href={Routes.EditRfpPage({ terminalHandle, rfpId })}>
                     <PencilIcon className="inline h-6 w-6 fill-concrete mr-3 hover:cursor-pointer hover:fill-marble-white" />
-                  </button>
+                  </Link>
                   <button>
                     <XCircleIcon className="inline h-6 w-6 fill-concrete hover:cursor-pointer hover:fill-marble-white" />
                   </button>
@@ -96,4 +96,4 @@ const RFPHeaderNavigation = ({ rfpId }) => {
   )
 }
 
-export default RFPHeaderNavigation
+export default RfpHeaderNavigation

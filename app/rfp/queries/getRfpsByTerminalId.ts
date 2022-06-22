@@ -8,7 +8,7 @@ const GetRfpsByTerminalId = z.object({
   status: z.string().optional(),
 })
 
-export default async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsByTerminalId>) {
+export async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsByTerminalId>) {
   const rfps = await db.rfp.findMany({
     where: {
       terminalId: input.terminalId,
@@ -30,3 +30,5 @@ export default async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsB
     } as unknown as Rfp
   })
 }
+
+export default getRfpsByTerminalId

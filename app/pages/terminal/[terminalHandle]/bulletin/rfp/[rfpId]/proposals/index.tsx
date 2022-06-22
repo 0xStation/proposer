@@ -4,7 +4,7 @@ import Layout from "app/core/layouts/Layout"
 import { DEFAULT_PFP_URLS, PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import RFPHeaderNavigation from "app/rfp/components/RFPHeaderNavigation"
+import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
 import { Menu, Transition } from "@headlessui/react"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import { Fragment } from "react"
@@ -33,7 +33,7 @@ const ProposalsTab: BlitzPage = () => {
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
       <TerminalNavigation>
-        <RFPHeaderNavigation rfpId={rfpId} />
+        <RfpHeaderNavigation rfpId={rfpId} />
         <div className="h-[calc(100vh-240px)] flex flex-col">
           <div className="w-full h-20 flex flex-row">
             <FilterPill title="Status" className="mt-6 ml-6" />
