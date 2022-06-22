@@ -10,6 +10,8 @@ import truncateString from "app/core/utils/truncateString"
 import { ClipboardIcon, ClipboardCheckIcon, ExternalLinkIcon } from "@heroicons/react/outline"
 import Modal from "app/core/components/Modal"
 import networks from "app/utils/networks.json"
+import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
+import { formatUnits } from "ethers/lib/utils"
 
 const CheckbookSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -21,6 +23,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
   const [isModalAddressCopied, setIsModalAddressCopied] = useState<boolean>(false)
   const [isButtonAddressCopied, setIsButtonAddressCopied] = useState<boolean>(false)
   const [successModalOpen, setSuccessModalOpen] = useState<boolean>(!!creationSuccess)
+  const [selectedFundsToken, setSelectedFundsToken] = useState<string>()
 
   useQuery(
     getCheckbooksByTerminal,
@@ -39,6 +42,17 @@ const CheckbookSettingsPage: BlitzPage = () => {
         }
       },
     }
+  )
+
+  const tokenOptions = [
+    { symbol: "ETH", address: "" },
+    { symbol: "WETH", address: "0xc778417e063141139fce010982780140aa0cd5ab" },
+  ]
+
+  const selectedFunds = useCheckbookFunds(
+    selectedCheckbook?.chainId as number,
+    selectedCheckbook?.address as string,
+    selectedFundsToken
   )
 
   const CheckbookComponent = ({ checkbook }) => {
@@ -216,7 +230,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
                       <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
                         Funds
                       </h3>
-                      <p className="mt-2">
+                      {/* <p className="mt-2">
                         There are no funds available to deploy. Copy the contract address and
                         transfer funds to this Checkbook from Gnosis or other wallet applications.
                       </p>
@@ -233,7 +247,37 @@ const CheckbookSettingsPage: BlitzPage = () => {
                         }
                       >
                         {isButtonAddressCopied ? "Copied!" : "Copy Address"}
-                      </button>
+                      </button> */}
+                      <select
+                        className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-3`}
+                        onChange={({ target: { options, selectedIndex } }) => {
+                          setSelectedFundsToken(options[selectedIndex]?.value)
+                        }}
+                      >
+                        {tokenOptions.map((token, i) => {
+                          return (
+                            <option key={i} value={token.address}>
+                              {token.symbol}
+                            </option>
+                          )
+                        })}
+                      </select>
+                      <p className="mt-4">{`Total: ${formatUnits(
+                        selectedFunds?.total,
+                        selectedFunds?.decimals
+                      )}`}</p>
+                      <p className="mt-2">{`Available: ${formatUnits(
+                        selectedFunds?.available,
+                        selectedFunds?.decimals
+                      )}`}</p>
+                      <p className="mt-2">{`Pending: ${formatUnits(
+                        selectedFunds?.pending,
+                        selectedFunds?.decimals
+                      )}`}</p>
+                      <p className="mt-2">{`Cashed: ${formatUnits(
+                        selectedFunds?.cashed,
+                        selectedFunds?.decimals
+                      )}`}</p>
                     </div>
                   </div>
                 </div>
