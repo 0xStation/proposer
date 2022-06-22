@@ -82,7 +82,10 @@ const BulletinPage: BlitzPage = () => {
                   Help contributors write higher quality proposals by defining your DAOs’ needs and
                   priorities.
                 </p>
-                <button className="bg-electric-violet rounded text-tunnel-black px-6 h-[35px] mt-6">
+                <button
+                  className="bg-electric-violet rounded text-tunnel-black px-6 h-[35px] mt-6 hover:opacity-70"
+                  onClick={() => router.push(Routes.CreateRFPPage({ terminalHandle }))}
+                >
                   Create RFP
                 </button>
               </div>
