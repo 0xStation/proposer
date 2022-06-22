@@ -176,7 +176,7 @@
 //             </div>
 //             <button
 //               type="submit"
-//               className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-14 mx-auto block p-2"
+//               className="bg-electric-violet text-tunnel-black w-1/2 rounded mt-14 mx-auto block p-2"
 //             >
 //               {isEdit ? "Save" : "Submit"}
 //             </button>

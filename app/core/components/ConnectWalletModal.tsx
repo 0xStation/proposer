@@ -143,7 +143,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           ) : null}
           <div className="m-6 text-center">
             <button
-              className="border border-tunnel-black bg-magic-mint text-tunnel-black rounded-md content-center hover:opacity-70 cursor:pointer w-36 h-[35px]"
+              className="border border-tunnel-black bg-electric-violet text-tunnel-black rounded-md content-center hover:opacity-70 cursor:pointer w-36 h-[35px]"
               onClick={handleSignInWithEthereum}
               disabled={connectState.loading}
             >

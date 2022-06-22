@@ -350,7 +350,7 @@ const AccountForm = ({
           </div>
           <button
             type="submit"
-            className="bg-magic-mint text-tunnel-black w-48 rounded mt-14 mb-40 block p-2 hover:opacity-70"
+            className="bg-electric-violet text-tunnel-black w-48 rounded mt-14 mb-40 block p-2 hover:opacity-70"
           >
             {isEdit ? "Save" : "Next"}
           </button>
