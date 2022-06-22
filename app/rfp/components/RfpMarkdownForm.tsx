@@ -218,7 +218,7 @@ const RfpMarkdownForm = ({
                         </button>
                         <button
                           type="submit"
-                          className="bg-magic-mint text-tunnel-black border border-magic-mint py-1 px-4 rounded hover:opacity-75"
+                          className="bg-electric-violet text-tunnel-black border border-magic-mint py-1 px-4 rounded hover:opacity-75"
                           onClick={() => handleSubmit()}
                         >
                           Continue
@@ -232,7 +232,7 @@ const RfpMarkdownForm = ({
                       Checkbook is where you deposit funds to create checks for proposers to claim
                       once their projects have been approved.
                       <br />
-                      <a href="#" className="text-magic-mint">
+                      <a href="#" className="text-electric-violet">
                         Learn more
                       </a>
                     </span>
@@ -261,7 +261,7 @@ const RfpMarkdownForm = ({
                       passHref
                     >
                       <a target="_blank" rel="noopener noreferrer">
-                        <span className="text-magic-mint cursor-pointer mt-1 block">
+                        <span className="text-electric-violet cursor-pointer mt-1 block">
                           + Create new
                         </span>
                       </a>
@@ -308,7 +308,7 @@ const RfpMarkdownForm = ({
                           setConfirmationModalOpen(true)
                         }
                       }}
-                      className={`bg-magic-mint text-tunnel-black px-6 py-1 rounded block mx-auto ${
+                      className={`bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto ${
                         formState.values.checkbookAddress &&
                         formState.values.startDate &&
                         formState.dirty

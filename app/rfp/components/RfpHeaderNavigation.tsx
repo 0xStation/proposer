@@ -19,7 +19,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
           </span>
           RFP: {rfp?.data?.content?.title}
         </p>
-        <button className="bg-magic-mint text-tunnel-black rounded h-[35px] px-9 hover:bg-opacity-70">
+        <button className="bg-electric-violet text-tunnel-black rounded h-[35px] px-9 hover:bg-opacity-70">
           Create proposal
         </button>
       </div>
