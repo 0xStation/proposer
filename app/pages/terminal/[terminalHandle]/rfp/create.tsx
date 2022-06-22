@@ -18,8 +18,8 @@ const CreateRFPPage: BlitzPage = () => {
 
   const [checkbooks] = useQuery(
     getCheckbooksByTerminal,
-    { terminalId: terminal?.id || 0 }, // does anyone know how to get rid of typescript errors here?
-    { suspense: false, enabled: !!terminal } // it wont run unless terminal exists, but TS doesnt pick up on that
+    { terminalId: terminal?.id || 0 },
+    { suspense: false, enabled: !!terminal }
   )
 
   // redirect?

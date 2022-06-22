@@ -13,16 +13,7 @@ import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
 import { Rfp } from "../types"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
-
-const getShortDate = (date = new Date(), isLocalTime = false) => {
-  if (!date) return
-  const dd = String(isLocalTime ? date.getDate() : date.getUTCDate()).padStart(2, "0")
-  const mm = String((isLocalTime ? date.getMonth() : date.getUTCMonth()) + 1).padStart(2, "0") // January is 0
-  const yyyy = isLocalTime ? date.getFullYear() : date.getUTCFullYear()
-
-  console.log("shortDate", yyyy + "-" + mm + "-" + dd)
-  return yyyy + "-" + mm + "-" + dd
-}
+import { getShortDate } from "app/core/utils/getShortDate"
 
 const RfpMarkdownForm = ({
   terminal,
@@ -62,9 +53,6 @@ const RfpMarkdownForm = ({
       console.error(error)
     },
   })
-
-  console.log("start date!!!", rfp?.startDate)
-  console.log("end date!!!", rfp?.endDate)
 
   return (
     <>
@@ -175,8 +163,6 @@ const RfpMarkdownForm = ({
                   message: "You must connect your wallet in order to create RFPs",
                 })
               } else if (isEdit) {
-                console.log("startDate", new Date(`${values.startDate} 00:00:00 UTC`))
-                console.log("endDate", new Date(`${values.endDate} 23:59:59 UTC`))
                 await updateRfpMutation({
                   rfpId: rfp?.id as string,
                   startDate: new Date(`${values.startDate} 00:00:00 UTC`),

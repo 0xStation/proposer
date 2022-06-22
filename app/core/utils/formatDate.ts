@@ -13,6 +13,7 @@ const monthMapper = {
   11: "DEC",
 }
 
+// formateDate to dd-MM-yyyy, ex:) 01-JAN-2022
 export const formatDate = (date: Date, isLocalTime = false) => {
   if (!date) return null
 

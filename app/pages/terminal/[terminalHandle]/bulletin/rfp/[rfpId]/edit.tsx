@@ -19,15 +19,11 @@ const EditRfpPage: BlitzPage = () => {
 
   const [checkbooks] = useQuery(
     getCheckbooksByTerminal,
-    { terminalId: terminal?.id || 0 }, // does anyone know how to get rid of typescript errors here?
-    { suspense: false, enabled: !!terminal } // it wont run unless terminal exists, but TS doesnt pick up on that
+    { terminalId: terminal?.id as number },
+    { suspense: false, enabled: !!terminal }
   )
 
-  const [rfp] = useQuery(
-    getRfpById,
-    { id: rfpId }, // does anyone know how to get rid of typescript errors here?
-    { suspense: false, enabled: !!rfpId } // it wont run unless terminal exists, but TS doesnt pick up on that
-  )
+  const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
 
   return (
     <Layout title={`New RFP`}>
