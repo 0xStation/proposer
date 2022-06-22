@@ -2,12 +2,13 @@ import db from "db"
 import * as z from "zod"
 import { Rfp } from "../types"
 import { computeRfpDbStatusFilter, computeRfpProductStatus } from "../utils"
+import { PAGINATION_TAKE } from "../../core/utils/constants"
 
 const GetRfpsByTerminalId = z.object({
   terminalId: z.number(),
   statuses: z.string().array().optional(),
   page: z.number().optional().default(0),
-  paginationTake: z.number().optional().default(50),
+  paginationTake: z.number().optional().default(PAGINATION_TAKE),
 })
 
 export default async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsByTerminalId>) {

@@ -19,10 +19,14 @@ import { formatDate } from "app/core/utils/formatDate"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { ProposalStatus } from "app/proposal/types"
 import Checkbox from "app/core/components/form/Checkbox"
+import BackArrow from "app/core/icons/BackArrow"
+import ForwardArrow from "app/core/icons/ForwardArrow"
 
 const ProposalsTab: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const rfpId = useParam("rfpId") as string
+  const [filters, setFilters] = useState<Set<ProposalStatus>>(new Set<ProposalStatus>())
+  const [page, setPage] = useState<number>(0)
   const [terminal] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle as string },
@@ -31,12 +35,9 @@ const ProposalsTab: BlitzPage = () => {
 
   const [proposals] = useQuery(
     getProposalsByRfpId,
-    { rfpId },
+    { rfpId: rfpId, page: 1, paginationTake: PAGINATION_TAKE },
     { suspense: false, enabled: !!rfpId }
   )
-
-  const [filters, setFilters] = useState<Set<ProposalStatus>>(new Set<ProposalStatus>())
-  const [page, setPage] = useState<number>(0)
 
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
 
@@ -45,16 +46,46 @@ const ProposalsTab: BlitzPage = () => {
       <TerminalNavigation>
         <RFPHeaderNavigation rfpId={rfpId} />
         <div className="h-[calc(100vh-240px)] flex flex-col">
-          <div className="w-full h-20 flex flex-row">
-            <FilterPill
-              title="Status"
-              className="mt-6 ml-6"
-              filterValues={PROPOSAL_STATUSES_FILTER_ARRAY}
-              filters={filters}
-              setFilters={setFilters}
-              setPage={setPage}
-            />
+          <div className="w-full h-20 flex sm:flex-row justify-between items-center">
+            <div className="flex self-start">
+              <FilterPill
+                title="Status"
+                className="mt-6 ml-6"
+                filterValues={PROPOSAL_STATUSES_FILTER_ARRAY}
+                filters={filters}
+                setFilters={setFilters}
+                setPage={setPage}
+              />
+            </div>
+            <div className="ml-6 sm:mr-6 text-sm pt-1">
+              Showing
+              <span className="text-electric-violet font-bold"> {page * PAGINATION_TAKE + 1} </span>
+              to
+              <span className="text-electric-violet font-bold">
+                {" "}
+                {(page + 1) * PAGINATION_TAKE > proposals?.length!
+                  ? proposals?.length
+                  : (page + 1) * PAGINATION_TAKE}{" "}
+              </span>
+              of
+              <span className="font-bold"> {proposals?.length} </span>
+              members
+              <button className="w-6 ml-2" disabled={page === 0} onClick={() => setPage(page - 1)}>
+                <BackArrow className={`${page === 0 ? "fill-concrete" : "fill-marble-white"}`} />
+              </button>
+              <button
+                disabled={proposals?.length! < PAGINATION_TAKE}
+                onClick={() => setPage(page + 1)}
+              >
+                <ForwardArrow
+                  className={`${
+                    proposals?.length! < PAGINATION_TAKE ? "fill-concrete" : "fill-marble-white"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
+
           <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
             <span className="basis-[38rem] ml-6 mb-2">Proposal</span>
             <span className="basis-32 ml-9 mb-2">Approval</span>
