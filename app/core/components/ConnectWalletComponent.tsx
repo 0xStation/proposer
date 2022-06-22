@@ -129,7 +129,7 @@ export const ConnectWalletComponent = () => {
             ) : null}
             <div className="m-6 text-center">
               <button
-                className={`bg-magic-mint text-tunnel-black rounded-md content-center hover:opacity-70 cursor:pointer w-36 h-[35px] ${
+                className={`bg-electric-violet text-tunnel-black rounded-md content-center hover:opacity-70 cursor:pointer w-36 h-[35px] ${
                   connectState.loading && "cursor-not-allowed"
                 }`}
                 onClick={handleSignInWithEthereum}

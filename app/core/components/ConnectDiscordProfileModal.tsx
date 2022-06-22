@@ -80,13 +80,13 @@ export const ConnectDiscordProfileModal = ({ isOpen, setIsOpen, activeUser, setN
           Station.
         </p>
         <button
-          className="text-center bg-magic-mint text-tunnel-black rounded w-36 mx-auto py-1 mt-2 mb-3 hover:opacity-70"
+          className="text-center bg-electric-violet text-tunnel-black rounded w-36 mx-auto py-1 mt-2 mb-3 hover:opacity-70"
           onClick={callbackWithDCAuth}
         >
           Connect
         </button>
         <button
-          className="h-[32px] w-24 mx-auto ml-2 border border-magic-mint rounded-md text-magic-mint hover:bg-concrete"
+          className="h-[32px] w-24 mx-auto ml-2 border border-electric-violet rounded-md text-electric-violet hover:bg-concrete"
           onClick={() => {
             setHasDismissedDiscordConnectModal(true)
             setIsOpen(!isOpen)

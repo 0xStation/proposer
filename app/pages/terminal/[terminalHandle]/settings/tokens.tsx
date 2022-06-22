@@ -79,7 +79,7 @@ const TokenSettingsPage: BlitzPage = () => {
               </div>
               <Link href={Routes.NewTokenSettingsPage({ terminalHandle })}>
                 <button
-                  className="rounded text-tunnel-black px-8 h-full h-[32px] bg-magic-mint self-start"
+                  className="rounded text-tunnel-black px-8 h-[32px] bg-magic-mint self-start"
                   type="submit"
                 >
                   Add

@@ -47,7 +47,7 @@ const BulletinPage: BlitzPage = () => {
             <h1 className="text-2xl font-bold">Bulletin</h1>
             {/* TODO: add permissioning checks */}
             <button
-              className="h-[35px] bg-magic-mint px-9 rounded text-tunnel-black hover:bg-opacity-70"
+              className="h-[35px] bg-electric-violet px-9 rounded text-tunnel-black hover:bg-opacity-70"
               onClick={() => router.push(Routes.CreateRFPPage({ terminalHandle }))}
             >
               Create RFP
