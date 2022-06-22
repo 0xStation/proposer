@@ -172,7 +172,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                           formState.values.signers &&
                           formState.values.quorum &&
                           !formState.hasValidationErrors
-                            ? "bg-magic-mint"
+                            ? "bg-electric-violet"
                             : "bg-concrete"
                         }`}
                         type="submit"

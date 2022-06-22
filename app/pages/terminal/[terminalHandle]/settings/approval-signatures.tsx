@@ -118,7 +118,7 @@ const ApprovalSignaturesPage: BlitzPage = () => {
             render={({ handleSubmit }) => (
               <form onSubmit={handleSubmit}>
                 <div className="w-1/3 flex flex-col col-span-2 mt-10">
-                  {/* 
+                  {/*
                     Funding recipient address
                   */}
                   <label htmlFor="name" className="text-marble-white text-base mt-4">
@@ -130,8 +130,8 @@ const ApprovalSignaturesPage: BlitzPage = () => {
                     placeholder="0x..."
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
-                  {/* 
-                    Funding token address, zero address (0x000...000) is used to represent ETH 
+                  {/*
+                    Funding token address, zero address (0x000...000) is used to represent ETH
                   */}
                   <label htmlFor="name" className="text-marble-white text-base mt-4">
                     Token Address
@@ -142,9 +142,9 @@ const ApprovalSignaturesPage: BlitzPage = () => {
                     placeholder="0x..."
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
-                  {/* 
-                    Amount of tokens for Check, should have full decimals of token, 
-                    make sure to use ethers.BigNumber or string type 
+                  {/*
+                    Amount of tokens for Check, should have full decimals of token,
+                    make sure to use ethers.BigNumber or string type
                   */}
                   <label htmlFor="name" className="text-marble-white text-base mt-4">
                     Token Amount
@@ -155,7 +155,7 @@ const ApprovalSignaturesPage: BlitzPage = () => {
                     placeholder="0"
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
-                  {/* 
+                  {/*
                     Deadline to cash this check, compute 1-month ahead of current timestamp when creating Check,
                     represented as a Unix timestamp (string or number type okay)
                   */}
@@ -168,7 +168,7 @@ const ApprovalSignaturesPage: BlitzPage = () => {
                     placeholder="0"
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
-                  {/* 
+                  {/*
                     One-use nonce for this specific check, verified by the contract,
                     individual checks within a bulk approval should have unique nonces
                   */}
@@ -183,7 +183,7 @@ const ApprovalSignaturesPage: BlitzPage = () => {
                   />
                   <button
                     type="submit"
-                    className="bg-magic-mint text-tunnel-black w-1/2 rounded mt-12 block p-2 hover:opacity-70"
+                    className="bg-electric-violet text-tunnel-black w-1/2 rounded mt-12 block p-2 hover:opacity-70"
                   >
                     Add to Queue
                   </button>
@@ -199,7 +199,7 @@ const ApprovalSignaturesPage: BlitzPage = () => {
             ))}
           </div>
           <button
-            className="bg-magic-mint text-tunnel-black rounded mt-12 block p-2 hover:opacity-70"
+            className="bg-electric-violet text-tunnel-black rounded mt-12 block p-2 hover:opacity-70"
             disabled={checkQueue.length === 0}
             onClick={() => {
               try {

@@ -140,7 +140,7 @@ const DiscordSettingsPage: BlitzPage = () => {
                     onClick={() => {
                       onOpen()
                     }}
-                    className="cursor-pointer mt-8 w-[200px] py-1 bg-magic-mint text-tunnel-black rounded text-base"
+                    className="cursor-pointer mt-8 w-[200px] py-1 bg-electric-violet text-tunnel-black rounded text-base"
                   >
                     Connect
                   </button>
@@ -204,7 +204,7 @@ const DiscordSettingsPage: BlitzPage = () => {
                       <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
                       <div>
                         <button
-                          className={`rounded text-tunnel-black px-8 h-full bg-magic-mint ${
+                          className={`rounded text-tunnel-black px-8 h-full bg-electric-violet ${
                             formState.dirty
                               ? "hover:bg-opacity-70"
                               : "opacity-50 cursor-not-allowed"
