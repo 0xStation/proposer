@@ -14,6 +14,7 @@ import { Checkbook } from "app/checkbook/types"
 import { Rfp } from "../types"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import { getShortDate } from "app/core/utils/getShortDate"
+import ConfirmationRfpModal from "./ConfirmationRfpModal"
 
 const RfpMarkdownForm = ({
   terminal,
@@ -37,7 +38,10 @@ const RfpMarkdownForm = ({
   const [createRfpMutation] = useMutation(createRfp, {
     onSuccess: (_data) => {
       invalidateQuery(getRfpsByTerminalId)
-      router.push(Routes.BulletinPage({ terminalHandle: terminal?.handle }))
+      router.push({
+        pathname: `/terminal/${terminal?.handle}/bulletin`,
+        query: { rfpPublished: _data?.id },
+      })
     },
     onError: (error: Error) => {
       console.error(error)
@@ -47,7 +51,10 @@ const RfpMarkdownForm = ({
   const [updateRfpMutation] = useMutation(updateRfp, {
     onSuccess: (_data) => {
       invalidateQuery(getRfpsByTerminalId)
-      router.push(Routes.BulletinPage({ terminalHandle: terminal?.handle }))
+      router.push({
+        pathname: `/terminal/${terminal?.handle}/bulletin`,
+        query: { rfpPublished: rfp?.id },
+      })
     },
     onError: (error: Error) => {
       console.error(error)
@@ -187,31 +194,11 @@ const RfpMarkdownForm = ({
               const formState = form.getState()
               return (
                 <form className="p-4 grow flex flex-col justify-between">
-                  <Modal open={confirmationModalOpen} toggle={setConfirmationModalOpen}>
-                    <div className="p-2">
-                      <h3 className="text-2xl font-bold pt-6">Publishing RFP?</h3>
-                      <p className="mt-2">
-                        Contributors will be able to submit proposals to this RFP after the defined
-                        start date. You can edit proposals anytime.
-                      </p>
-                      <div className="mt-8">
-                        <button
-                          type="button"
-                          className="text-magic-mint border border-magic-mint mr-2 py-1 px-4 rounded hover:opacity-75"
-                          onClick={() => setConfirmationModalOpen(false)}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          className="bg-electric-violet text-tunnel-black border border-magic-mint py-1 px-4 rounded hover:opacity-75"
-                          onClick={() => handleSubmit()}
-                        >
-                          Continue
-                        </button>
-                      </div>
-                    </div>
-                  </Modal>
+                  <ConfirmationRfpModal
+                    isOpen={confirmationModalOpen}
+                    setIsOpen={setConfirmationModalOpen}
+                    handleSubmit={handleSubmit}
+                  />
                   <div>
                     <label className="font-bold block">Checkbook*</label>
                     <span className="text-xs text-concrete block">

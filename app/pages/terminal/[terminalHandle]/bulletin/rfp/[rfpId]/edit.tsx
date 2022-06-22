@@ -26,7 +26,7 @@ const EditRfpPage: BlitzPage = () => {
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
 
   return (
-    <Layout title={`New RFP`}>
+    <Layout title="Edit RFP">
       <RfpMarkdownForm
         checkbooks={checkbooks as unknown as Checkbook[]}
         terminal={terminal as Terminal}

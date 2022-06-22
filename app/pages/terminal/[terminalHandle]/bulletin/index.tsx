@@ -1,5 +1,5 @@
-import { BlitzPage, useQuery, useParam, Routes, useRouter, Link } from "blitz"
-import { Fragment, useState } from "react"
+import { BlitzPage, useQuery, useParam, Routes, useRouter, Link, useRouterQuery } from "blitz"
+import { Fragment, useState, useEffect } from "react"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
@@ -11,13 +11,12 @@ import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import { formatDate } from "app/core/utils/formatDate"
 import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
-
-interface Filters {
-  [tagType: string]: Set<number>
-}
+import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
 
 const BulletinPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
+  const query = useRouterQuery()
+  const [showRfpSuccessModal, setShowRfpSuccessModal] = useState<boolean>(false)
   const [terminal] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle as string },
@@ -32,6 +31,12 @@ const BulletinPage: BlitzPage = () => {
   )
   const router = useRouter()
 
+  useEffect(() => {
+    if (query.rfpPublished) {
+      setShowRfpSuccessModal(true)
+    }
+  }, [query?.rfpPublished])
+
   const downPress = useKeyPress("ArrowDown")
   const upPress = useKeyPress("ArrowUp")
   const enterPress = useKeyPress("Enter")
@@ -40,6 +45,12 @@ const BulletinPage: BlitzPage = () => {
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
+      <SuccessRfpModal
+        terminalHandle={terminalHandle}
+        setIsOpen={setShowRfpSuccessModal}
+        isOpen={showRfpSuccessModal}
+        rfpId={query?.rfpPublished}
+      />
       <TerminalNavigation>
         {/* Filter View */}
         <div className="max-h-[250px] sm:h-[130px] border-b border-concrete">
