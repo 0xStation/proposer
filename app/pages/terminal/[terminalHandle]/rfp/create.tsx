@@ -35,8 +35,8 @@ const CreateRFPPage: BlitzPage = () => {
   )
 
   const [createRfpMutation] = useMutation(createRfp, {
-    onSuccess: (_data) => {
-      router.push(Routes.BulletinPage({ terminalHandle: terminalHandle }))
+    onSuccess: (data) => {
+      router.push(Routes.BulletinPage({ terminalHandle: terminalHandle, rfpId: data.id }))
     },
     onError: (error: Error) => {
       console.error(error)
@@ -121,9 +121,14 @@ const CreateRFPPage: BlitzPage = () => {
         <div className="h-full border-l border-concrete col-span-1 flex flex-col">
           <div className="border-b border-concrete p-4 flex flex-row space-x-8">
             <span className="font-bold">General</span>
-            <div className="flex flex-row space-x-1 items-center">
-              <LockClosedIcon className="h-4 w-4 hover:stroke-light-concrete text-concrete cursor-pointer" />
-              <span className="text-concrete">Permission</span>
+            <div className="relative group">
+              <div className="flex flex-row space-x-1 items-center group relative cursor-pointer z-50">
+                <LockClosedIcon className="h-4 w-4 hover:stroke-light-concrete text-concrete cursor-pointer" />
+                <span className="text-concrete">Permission</span>
+              </div>
+              <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0 w-[115px]">
+                Coming soon
+              </span>
             </div>
           </div>
           <Form
@@ -268,6 +273,7 @@ const CreateRFPPage: BlitzPage = () => {
                             <input
                               {...input}
                               type="date"
+                              min={new Date().toISOString().split("T")[0]}
                               className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
                             />
                           </div>

@@ -1,22 +1,27 @@
-import { BlitzPage, useQuery, useParam, Routes, useRouter, Link } from "blitz"
+import { BlitzPage, useQuery, useParam, Routes, useRouter, Link, useRouterQuery } from "blitz"
+import { Menu, Transition } from "@headlessui/react"
 import { Fragment, useState } from "react"
+import { Form } from "react-final-form"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import Layout from "app/core/layouts/Layout"
+import Modal from "app/core/components/Modal"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import { Menu, Transition } from "@headlessui/react"
-import { Form } from "react-final-form"
-import useKeyPress from "app/core/hooks/useKeyPress"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsForTerminal"
 import { formatDate } from "app/core/utils/formatDate"
 import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
+import { genPathFromUrlObject } from "app/utils"
+import useStore from "app/core/hooks/useStore"
+import useKeyPress from "app/core/hooks/useKeyPress"
 
 interface Filters {
   [tagType: string]: Set<number>
 }
 
 const BulletinPage: BlitzPage = () => {
+  const { rfpId } = useRouterQuery() as { rfpId: string }
+  const [rfpModal, setRfpModal] = useState<boolean>(true)
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(
     getTerminalByHandle,
@@ -31,6 +36,7 @@ const BulletinPage: BlitzPage = () => {
     { suspense: false, enabled: !!terminal?.id }
   )
   const router = useRouter()
+  const setToastState = useStore((state) => state.setToastState)
 
   const downPress = useKeyPress("ArrowDown")
   const upPress = useKeyPress("ArrowUp")
@@ -40,6 +46,39 @@ const BulletinPage: BlitzPage = () => {
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
+      {rfpId && (
+        <Modal open={rfpModal} toggle={setRfpModal}>
+          <div className="p-2">
+            <h3 className="text-2xl font-bold pt-6">Request successfully published!</h3>
+            <p className="mt-2">
+              Copy the link to share with your community and let the waves of ideas carry you to the
+              exciting future of Olympus.
+            </p>
+            <div className="mt-8">
+              <button
+                type="submit"
+                className="bg-magic-mint text-tunnel-black border border-magic-mint py-1 px-4 rounded hover:opacity-75"
+                onClick={() => {
+                  navigator.clipboard
+                    .writeText(
+                      genPathFromUrlObject(Routes.RFPInfoTab({ terminalHandle, rfpId: rfpId }))
+                    )
+                    .then(() => {
+                      setRfpModal(false)
+                      setToastState({
+                        isToastShowing: true,
+                        type: "success",
+                        message: `Link copied!`,
+                      })
+                    })
+                }}
+              >
+                Copy link
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
       <TerminalNavigation>
         {/* Filter View */}
         <div className="max-h-[250px] sm:h-[130px] border-b border-concrete">
