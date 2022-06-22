@@ -285,16 +285,9 @@ const CreateRFPPage: BlitzPage = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        if (formState.values.checkbookAddress && formState.values.startDate) {
-                          setConfirmationModalOpen(true)
-                        }
+                        setConfirmationModalOpen(true)
                       }}
-                      className={`bg-magic-mint text-tunnel-black px-6 py-1 rounded block mx-auto ${
-                        formState.values.checkbookAddress && formState.values.startDate
-                          ? "hover:bg-opacity-70"
-                          : "opacity-50 cursor-not-allowed"
-                      }`}
-                      disabled={!formState.values.checkbookAddress || !formState.values.startDate}
+                      className={`bg-magic-mint text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70`}
                     >
                       Publish
                     </button>
