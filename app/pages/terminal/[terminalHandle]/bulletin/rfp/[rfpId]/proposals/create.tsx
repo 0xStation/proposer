@@ -109,14 +109,14 @@ const CreateProposalPage: BlitzPage = () => {
                       <div className="mt-8">
                         <button
                           type="button"
-                          className="text-magic-mint border border-magic-mint mr-2 py-1 px-4 rounded hover:opacity-75"
+                          className="text-electric-violet border border-electric-violet mr-2 py-1 px-4 rounded hover:opacity-75"
                           onClick={() => setConfirmationModalOpen(false)}
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
-                          className="bg-magic-mint text-tunnel-black border border-magic-mint py-1 px-4 rounded hover:opacity-75"
+                          className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
                           onClick={() => handleSubmit()}
                         >
                           Continue
@@ -133,7 +133,7 @@ const CreateProposalPage: BlitzPage = () => {
                     <h4 className="text-xs font-bold text-concrete uppercase mt-4">
                       Request for Proposal
                     </h4>
-                    <p className="mt-2 text-magic-mint">Education</p>
+                    <p className="mt-2 text-electric-violet">Education</p>
                     <label className="font-bold block mt-6">Fund Recipient*</label>
                     <span className="text-xs text-concrete block">
                       Primary destination of the funds. Project lead/creator’s wallet address is
@@ -223,7 +223,7 @@ const CreateProposalPage: BlitzPage = () => {
                           setConfirmationModalOpen(true)
                         }
                       }}
-                      className={`mt-4 bg-magic-mint text-tunnel-black px-6 py-1 rounded block mx-auto ${
+                      className={`mt-4 bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto ${
                         formState.dirty ? "hover:bg-opacity-70" : "opacity-50 cursor-not-allowed"
                       }`}
                     >
