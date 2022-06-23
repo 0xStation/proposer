@@ -1,8 +1,15 @@
 import { useBalance } from "wagmi"
 import { BigNumber } from "ethers"
-import { formatUnits } from "ethers/lib/utils"
+import { useQuery } from "blitz"
+import getCheckGroupsForCheckbook from "app/check/queries/getCheckGroupsForCheckbook"
 
 const useCheckbookFunds = (chainId: number, address: string, tokenAddress?: string) => {
+  const [checkGroups] = useQuery(
+    getCheckGroupsForCheckbook,
+    { address },
+    { suspense: false, enabled: !!address }
+  )
+
   const { data } = useBalance({
     addressOrName: address,
     chainId,
