@@ -36,7 +36,8 @@ export const computeRfpProductStatus = (status: string, startDate: Date, endDate
     return RfpStatus.DRAFT
   } else if (status === PrismaRfpStatus.DELETED) {
     return RfpStatus.DELETED
-  } else if (new Date() < startDate) {
+  } else if (new Date() < startDate && ((!!endDate && new Date() < endDate) || !endDate)) {
+    // new Date() < endDate: check if RFP is closed.
     return RfpStatus.STARTING_SOON
   } else if (!!endDate && new Date() > endDate) {
     return RfpStatus.CLOSED
