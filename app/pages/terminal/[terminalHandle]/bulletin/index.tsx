@@ -12,7 +12,6 @@ import getRfpsByTerminalId from "app/rfp/queries/getRfpsForTerminal"
 import { formatDate } from "app/core/utils/formatDate"
 import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import { genPathFromUrlObject } from "app/utils"
-import useStore from "app/core/hooks/useStore"
 import useKeyPress from "app/core/hooks/useKeyPress"
 
 interface Filters {
@@ -21,7 +20,8 @@ interface Filters {
 
 const BulletinPage: BlitzPage = () => {
   const { rfpId } = useRouterQuery() as { rfpId: string }
-  const [rfpModal, setRfpModal] = useState<boolean>(false)
+  const [linkCopied, setLinkCopied] = useState<boolean>(false)
+  const [rfpCreatedConfirmationModal, setRfpCreatedConfirmationModal] = useState<boolean>(false)
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(
     getTerminalByHandle,
@@ -36,7 +36,6 @@ const BulletinPage: BlitzPage = () => {
     { suspense: false, enabled: !!terminal?.id }
   )
   const router = useRouter()
-  const setToastState = useStore((state) => state.setToastState)
 
   const downPress = useKeyPress("ArrowDown")
   const upPress = useKeyPress("ArrowUp")
@@ -46,14 +45,14 @@ const BulletinPage: BlitzPage = () => {
 
   useEffect(() => {
     if (rfpId) {
-      setRfpModal(true)
+      setRfpCreatedConfirmationModal(true)
     }
   }, [rfpId])
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
       {terminal && (
-        <Modal open={rfpModal} toggle={setRfpModal}>
+        <Modal open={rfpCreatedConfirmationModal} toggle={setRfpCreatedConfirmationModal}>
           <div className="p-2">
             <h3 className="text-2xl font-bold pt-6">Request successfully published!</h3>
             <p className="mt-2">
@@ -62,24 +61,16 @@ const BulletinPage: BlitzPage = () => {
             </p>
             <div className="mt-8">
               <button
-                type="submit"
+                type="button"
                 className="bg-magic-mint text-tunnel-black border border-magic-mint py-1 px-4 rounded hover:opacity-75"
                 onClick={() => {
-                  navigator.clipboard
-                    .writeText(
-                      genPathFromUrlObject(Routes.RFPInfoTab({ terminalHandle, rfpId: rfpId }))
-                    )
-                    .then(() => {
-                      setRfpModal(false)
-                      setToastState({
-                        isToastShowing: true,
-                        type: "success",
-                        message: `Link copied!`,
-                      })
-                    })
+                  setLinkCopied(true)
+                  navigator.clipboard.writeText(
+                    genPathFromUrlObject(Routes.RFPInfoTab({ terminalHandle, rfpId: rfpId }))
+                  )
                 }}
               >
-                Copy link
+                {linkCopied ? "Copied!" : "Copy link"}
               </button>
             </div>
           </div>
