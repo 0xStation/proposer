@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useMutation, invalidateQuery, Link, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
 import { LockClosedIcon, XIcon } from "@heroicons/react/solid"
@@ -8,7 +8,6 @@ import { DEFAULT_PFP_URLS, RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constan
 import Preview from "app/core/components/MarkdownPreview"
 import createRfp from "app/rfp/mutations/createRfp"
 import updateRfp from "app/rfp/mutations/updateRfp"
-import Modal from "app/core/components/Modal"
 import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
 import { Rfp } from "../types"
@@ -31,9 +30,22 @@ const RfpMarkdownForm = ({
   const [title, setTitle] = useState(rfp?.data?.content?.title || "")
   const [markdown, setMarkdown] = useState(rfp?.data?.content?.body || "")
   const [previewMode, setPreviewMode] = useState(false)
+  const [isRfpEditorDirty, setRfpEditorDirty] = useState(false)
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
+
+  useEffect(() => {
+    if (rfp?.data?.content?.title) {
+      setTitle(rfp?.data?.content?.title)
+    }
+  }, [rfp?.data?.content?.title])
+
+  useEffect(() => {
+    if (rfp?.data?.content?.body) {
+      setMarkdown(rfp?.data?.content?.body)
+    }
+  }, [rfp?.data?.content?.body])
 
   const [createRfpMutation] = useMutation(createRfp, {
     onSuccess: (_data) => {
@@ -67,7 +79,18 @@ const RfpMarkdownForm = ({
         <div className="col-span-3 pt-4 pr-4 h-full bg-tunnel-black">
           <div className="text-light-concrete flex flex-row justify-between w-full">
             <button
-              onClick={() => router.push(Routes.BulletinPage({ terminalHandle: terminal?.handle }))}
+              onClick={() => {
+                if (isEdit) {
+                  router.push(
+                    Routes.RFPInfoTab({
+                      terminalHandle: terminal?.handle,
+                      rfpId: rfp?.id as string,
+                    })
+                  )
+                } else {
+                  router.push(Routes.BulletinPage({ terminalHandle: terminal?.handle }))
+                }
+              }}
             >
               <XIcon className="h-6 w-6 ml-3 fill-marble-white" />
             </button>
@@ -105,7 +128,19 @@ const RfpMarkdownForm = ({
           <div className="mt-6 flex flex-row">
             <span className="text-3xl font-bold">RFP:</span>
             <input
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                setTitle(e.target.value)
+                if (!isRfpEditorDirty) {
+                  setRfpEditorDirty(true)
+                } else if (
+                  e.target.value &&
+                  e.target.value === rfp?.data?.content?.title &&
+                  markdown &&
+                  markdown === rfp?.data?.content?.body
+                ) {
+                  setRfpEditorDirty(false)
+                }
+              }}
               className="bg-tunnel-black text-3xl ml-2 w-full outline-none"
               placeholder="Give your request a title..."
               value={title}
@@ -132,7 +167,19 @@ const RfpMarkdownForm = ({
               <textarea
                 value={markdown}
                 className="bg-tunnel-black w-full h-full outline-none resize-none"
-                onChange={(e) => setMarkdown(e.target.value.length > 0 ? e.target.value : "")}
+                onChange={(e) => {
+                  setMarkdown(e.target.value.length > 0 ? e.target.value : "")
+                  if (!isRfpEditorDirty) {
+                    setRfpEditorDirty(true)
+                  } else if (
+                    title &&
+                    title === rfp?.data?.content?.title &&
+                    e.target.value &&
+                    e.target.value === rfp?.data?.content?.body
+                  ) {
+                    setRfpEditorDirty(false)
+                  }
+                }}
                 placeholder="Enter some text..."
               />
             ) : (
@@ -284,14 +331,15 @@ const RfpMarkdownForm = ({
                       className={`bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto ${
                         formState.values.checkbookAddress &&
                         formState.values.startDate &&
-                        formState.dirty
-                          ? "hover:bg-opacity-70"
+                        (formState.dirty || isRfpEditorDirty)
+                          ? "hover:bg-opacity-70 cursor-pointer"
                           : "opacity-50 cursor-not-allowed"
                       }`}
                       disabled={
                         !formState.values.checkbookAddress ||
                         !formState.values.startDate ||
-                        (isEdit && !formState.dirty)
+                        (isEdit && !formState.dirty) ||
+                        !isRfpEditorDirty
                       }
                     >
                       Publish
