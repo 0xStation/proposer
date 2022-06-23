@@ -191,7 +191,7 @@ const DiscordImportPage: BlitzPage = () => {
                   <div>
                     <button
                       className={`rounded text-tunnel-black px-8 mt-12 py-2 ${
-                        formState.dirty ? "bg-magic-mint" : "bg-concrete"
+                        formState.dirty ? "bg-electric-violet" : "bg-concrete"
                       }`}
                       type="submit"
                     >
