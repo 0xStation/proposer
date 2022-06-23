@@ -70,24 +70,22 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                     )}
                     <button
                       onClick={() => {
+                        router.push(`/terminal/${terminalHandle}/bulletin/rfp/${rfpId}/edit`)
+                      }}
+                    >
+                      <PencilIcon className="inline h-6 w-6 fill-concrete mr-3 hover:cursor-pointer hover:fill-marble-white" />
+                    </button>
+                    <button
+                      onClick={() => {
                         if (rfp?.status !== RfpStatus.CLOSED) {
-                          router.push(`/terminal/${terminalHandle}/bulletin/rfp/${rfpId}/edit`)
+                          setIsClosedRfpModalOpen(true)
                         } else {
                           setIsReopenRfpModalOpen(true)
                         }
                       }}
                     >
-                      <PencilIcon className="inline h-6 w-6 fill-concrete mr-3 hover:cursor-pointer hover:fill-marble-white" />
+                      <XCircleIcon className="inline h-6 w-6 fill-concrete hover:cursor-pointer hover:fill-marble-white" />
                     </button>
-                    {rfp?.status !== RfpStatus.CLOSED && (
-                      <button
-                        onClick={() => {
-                          setIsClosedRfpModalOpen(true)
-                        }}
-                      >
-                        <XCircleIcon className="inline h-6 w-6 fill-concrete hover:cursor-pointer hover:fill-marble-white" />
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>
