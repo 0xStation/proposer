@@ -5,11 +5,11 @@ import * as z from "zod"
 // note: need to send notification
 const ReopenRfp = z.object({
   rfpId: z.string(),
-  endDate: z.date(),
+  endDate: z.date().optional(),
 })
 
 export default async function reopenRfp(input: z.infer<typeof ReopenRfp>) {
-  if (input.endDate < new Date()) {
+  if (input.endDate && input.endDate < new Date()) {
     throw Error("End date cannot be in the past.")
   }
 
