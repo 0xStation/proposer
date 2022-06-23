@@ -281,7 +281,7 @@ const RfpMarkdownForm = ({
                         </a>
                       </span>
 
-                      <Field name={`checkbookAddress`}>
+                      <Field name={`checkbookAddress`} validate={requiredField}>
                         {({ input, meta }) => {
                           return (
                             <div className="custom-select-wrapper">
