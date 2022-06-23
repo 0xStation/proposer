@@ -4,10 +4,10 @@ import { useQuery } from "blitz"
 import getCheckGroupsForCheckbook from "app/check/queries/getCheckGroupsForCheckbook"
 
 const useCheckbookFunds = (chainId: number, address: string, tokenAddress?: string) => {
-  const [checkGroups] = useQuery(
+  const [checks] = useQuery(
     getCheckGroupsForCheckbook,
-    { address },
-    { suspense: false, enabled: !!address }
+    { checkbookAddress: address, tokenAddress: tokenAddress as string },
+    { suspense: false, enabled: !!tokenAddress }
   )
 
   const { data } = useBalance({
@@ -18,8 +18,8 @@ const useCheckbookFunds = (chainId: number, address: string, tokenAddress?: stri
   })
 
   // query db for pending and cashed funds
-  const pendingFunds = BigNumber.from(0)
-  const cashedFunds = BigNumber.from(0)
+  const pendingFunds = BigNumber.from(checks?.pending || 0)
+  const cashedFunds = BigNumber.from(checks?.cashed || 0)
 
   return {
     pending: pendingFunds,

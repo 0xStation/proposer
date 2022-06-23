@@ -1,25 +1,44 @@
+import { Decimal } from "@prisma/client/runtime"
 import db from "db"
 import * as z from "zod"
 
 const GetCheckGroupsForCheckbook = z.object({
-  address: z.string(),
+  checkbookAddress: z.string(),
+  tokenAddress: z.string(),
 })
 
 export default async function getCheckGroupsForCheckbook(
   input: z.infer<typeof GetCheckGroupsForCheckbook>
 ) {
-  console.log("get check groups")
-
-  const checks = await db.check.groupBy({
+  const pending = await db.check.aggregate({
     where: {
-      fundingAddress: input.address,
+      fundingAddress: input.checkbookAddress,
+      tokenAddress: input.tokenAddress,
+      txnHash: {
+        equals: null,
+      },
+      // add approval count > quorum here
     },
-    by: ["txnHash"],
     _sum: {
       tokenAmount: true,
     },
   })
 
-  console.log(checks)
-  return checks
+  const cashed = await db.check.aggregate({
+    where: {
+      fundingAddress: input.checkbookAddress,
+      tokenAddress: input.tokenAddress,
+      txnHash: {
+        not: null,
+      },
+    },
+    _sum: {
+      tokenAmount: true,
+    },
+  })
+
+  return {
+    pending: pending._sum.tokenAmount || "0",
+    cashed: cashed._sum.tokenAmount || "0",
+  } as { pending: Decimal; cashed: Decimal }
 }
