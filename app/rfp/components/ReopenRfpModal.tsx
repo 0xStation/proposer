@@ -59,7 +59,6 @@ export const ReopenRfpModal = ({ isOpen, setIsOpen, rfp }) => {
           className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-52"
           placeholder="Select date"
           onChange={(e) => {
-            console.log("hey", new Date(`${e.target.value} 23:59:59 UTC`))
             setNewEndDate(e.target.value)
           }}
         />

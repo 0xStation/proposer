@@ -137,7 +137,7 @@ model Proposal {
   fundingAddress String
   rfpId          String
   rfp            Rfp               @relation(fields: [rfpId], references: [id])
-  status         ProposalStatus    @default(IN_REVIEW)
+  status         ProposalStatus    @default(DRAFT)
   data           Json
   createdAt      DateTime          @default(now())
   collaborators  AccountProposal[]
@@ -160,8 +160,8 @@ enum RfpStatus {
 }
 
 enum ProposalStatus {
-  IN_REVIEW
-  APPROVED
+  DRAFT
+  PUBLISHED
 }
 
 //

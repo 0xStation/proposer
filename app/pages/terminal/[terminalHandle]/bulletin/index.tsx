@@ -1,11 +1,11 @@
 import { BlitzPage, useQuery, useParam, Routes, useRouter, Link, useRouterQuery } from "blitz"
 import { Fragment, useState, useEffect } from "react"
+import { Menu, Transition } from "@headlessui/react"
+import { Form } from "react-final-form"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import { Menu, Transition } from "@headlessui/react"
-import { Form } from "react-final-form"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import { formatDate } from "app/core/utils/formatDate"
@@ -14,6 +14,7 @@ import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
 import useStore from "app/core/hooks/useStore"
 
 const BulletinPage: BlitzPage = () => {
+  const { rfpId } = useRouterQuery() as { rfpId: string }
   const terminalHandle = useParam("terminalHandle") as string
   const setToastState = useStore((state) => state.setToastState)
   const query = useRouterQuery()
