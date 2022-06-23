@@ -14,6 +14,8 @@ import { Rfp } from "../types"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import { getShortDate } from "app/core/utils/getShortDate"
 import ConfirmationRfpModal from "./ConfirmationRfpModal"
+import deleteRfp from "../mutations/deleteRfp"
+import DeleteRfpModal from "./DeleteRfpModal"
 
 const RfpMarkdownForm = ({
   terminal,
@@ -26,11 +28,12 @@ const RfpMarkdownForm = ({
   isEdit?: boolean
   rfp?: Rfp
 }) => {
-  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
-  const [title, setTitle] = useState(rfp?.data?.content?.title || "")
-  const [markdown, setMarkdown] = useState(rfp?.data?.content?.body || "")
-  const [previewMode, setPreviewMode] = useState(false)
-  const [isRfpEditorDirty, setRfpEditorDirty] = useState(false)
+  const [deleteRfpModalOpen, setDeleteRfpModalOpen] = useState<boolean>(false)
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
+  const [title, setTitle] = useState<string>(rfp?.data?.content?.title || "")
+  const [markdown, setMarkdown] = useState<string>(rfp?.data?.content?.body || "")
+  const [previewMode, setPreviewMode] = useState<boolean>(false)
+  const [isRfpEditorDirty, setRfpEditorDirty] = useState<boolean>(false)
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
@@ -64,8 +67,21 @@ const RfpMarkdownForm = ({
     onSuccess: (_data) => {
       invalidateQuery(getRfpsByTerminalId)
       router.push({
+        pathname: `/terminal/${terminal?.handle}/bulletin/rfp/${rfp?.id}/info`,
+        query: { rfpEdited: rfp?.id },
+      })
+    },
+    onError: (error: Error) => {
+      console.error(error)
+    },
+  })
+
+  const [deleteRfpMutation] = useMutation(deleteRfp, {
+    onSuccess: (_data) => {
+      invalidateQuery(getRfpsByTerminalId)
+      router.push({
         pathname: `/terminal/${terminal?.handle}/bulletin`,
-        query: { rfpPublished: rfp?.id },
+        query: { rfpDeleted: true },
       })
     },
     onError: (error: Error) => {
@@ -75,6 +91,22 @@ const RfpMarkdownForm = ({
 
   return (
     <>
+      <DeleteRfpModal
+        isOpen={deleteRfpModalOpen}
+        setIsOpen={setDeleteRfpModalOpen}
+        handleSubmit={async () => {
+          try {
+            await deleteRfpMutation({ rfpId: rfp?.id as string })
+          } catch (error) {
+            console.error("Error deleting RFP", error)
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "Error deleting RFPs",
+            })
+          }
+        }}
+      />
       <div className="fixed grid grid-cols-4 w-[calc(100%-70px)] border-box z-50">
         <div className="col-span-3 pt-4 pr-4 h-full bg-tunnel-black">
           <div className="text-light-concrete flex flex-row justify-between w-full">
@@ -319,12 +351,24 @@ const RfpMarkdownForm = ({
                         )}
                       </Field>
                     </div>
+                    {isEdit && (
+                      <div className="flex flex-col mt-7">
+                        <span
+                          className="text-torch-red cursor-pointer"
+                          onClick={() => {
+                            setDeleteRfpModalOpen(true)
+                          }}
+                        >
+                          Delete RFP
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <button
                       type="button"
                       onClick={() => {
-                        if (formState.dirty) {
+                        if (formState.dirty || isRfpEditorDirty) {
                           setConfirmationModalOpen(true)
                         }
                       }}
@@ -338,8 +382,7 @@ const RfpMarkdownForm = ({
                       disabled={
                         !formState.values.checkbookAddress ||
                         !formState.values.startDate ||
-                        (isEdit && !formState.dirty) ||
-                        !isRfpEditorDirty
+                        (!formState.dirty && !isRfpEditorDirty)
                       }
                     >
                       Publish

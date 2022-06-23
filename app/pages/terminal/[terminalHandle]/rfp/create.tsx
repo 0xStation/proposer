@@ -13,13 +13,13 @@ const CreateRFPPage: BlitzPage = () => {
   const [terminal] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle },
-    { suspense: false, enabled: !!terminalHandle }
+    { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
   )
 
   const [checkbooks] = useQuery(
     getCheckbooksByTerminal,
     { terminalId: terminal?.id || 0 },
-    { suspense: false, enabled: !!terminal }
+    { suspense: false, enabled: !!terminal, refetchOnWindowFocus: false }
   )
 
   // redirect?

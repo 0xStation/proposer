@@ -12,22 +12,25 @@ import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import { formatDate } from "app/core/utils/formatDate"
 import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
+import useStore from "app/core/hooks/useStore"
 
 const BulletinPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
+  const setToastState = useStore((state) => state.setToastState)
   const query = useRouterQuery()
   const [showRfpSuccessModal, setShowRfpSuccessModal] = useState<boolean>(false)
   const [terminal] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle as string },
-    { suspense: false, enabled: !!terminalHandle }
+    { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
   )
   const [rfps] = useQuery(
     getRfpsByTerminalId,
     {
       terminalId: terminal?.id as number,
+      includeDeletedRfps: false,
     },
-    { suspense: false, enabled: !!terminal?.id }
+    { suspense: false, enabled: !!terminal?.id, refetchOnWindowFocus: false }
   )
   const router = useRouter()
 
@@ -37,19 +40,24 @@ const BulletinPage: BlitzPage = () => {
     }
   }, [query?.rfpPublished])
 
-  const downPress = useKeyPress("ArrowDown")
-  const upPress = useKeyPress("ArrowUp")
-  const enterPress = useKeyPress("Enter")
-  const [cursor, setCursor] = useState(0)
-  const [hovered, setHovered] = useState(undefined)
+  useEffect(() => {
+    if (query.rfpDeleted) {
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Your request for proposal has been deleted.",
+      })
+    }
+  })
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
       <SuccessRfpModal
-        terminalHandle={terminalHandle}
+        terminal={terminal}
         setIsOpen={setShowRfpSuccessModal}
         isOpen={showRfpSuccessModal}
         rfpId={query?.rfpPublished}
+        isEdit={false}
       />
       <TerminalNavigation>
         {/* Filter View */}

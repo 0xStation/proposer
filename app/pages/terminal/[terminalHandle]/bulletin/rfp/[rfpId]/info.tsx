@@ -1,4 +1,5 @@
-import { BlitzPage, Routes, useParam, useQuery, Link } from "blitz"
+import { useState, useEffect } from "react"
+import { BlitzPage, Routes, useParam, useQuery, Link, useRouterQuery } from "blitz"
 import truncateString from "app/core/utils/truncateString"
 import Preview from "app/core/components/MarkdownPreview"
 import Layout from "app/core/layouts/Layout"
@@ -8,9 +9,12 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { formatDate } from "app/core/utils/formatDate"
+import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
 
 const RFPInfoTab: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
+  const [showRfpSuccessModal, setShowRfpSuccessModal] = useState<boolean>(false)
+  const query = useRouterQuery()
   const rfpId = useParam("rfpId") as string
   const [terminal] = useQuery(
     getTerminalByHandle,
@@ -19,9 +23,22 @@ const RFPInfoTab: BlitzPage = () => {
   )
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
 
+  useEffect(() => {
+    if (query.rfpEdited) {
+      setShowRfpSuccessModal(true)
+    }
+  }, [query?.rfpEdited])
+
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
       <TerminalNavigation>
+        <SuccessRfpModal
+          terminal={terminal}
+          setIsOpen={setShowRfpSuccessModal}
+          isOpen={showRfpSuccessModal}
+          rfpId={query?.rfpEdited}
+          isEdit={true}
+        />
         <RfpHeaderNavigation rfpId={rfpId} />
         <div className="h-[calc(100vh-240px)] flex flex-row">
           <div className="w-full p-6 overflow-y-scroll">

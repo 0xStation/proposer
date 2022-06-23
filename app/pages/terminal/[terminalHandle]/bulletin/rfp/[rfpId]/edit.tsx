@@ -14,13 +14,13 @@ const EditRfpPage: BlitzPage = () => {
   const [terminal] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle },
-    { suspense: false, enabled: !!terminalHandle }
+    { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
   )
 
   const [checkbooks] = useQuery(
     getCheckbooksByTerminal,
     { terminalId: terminal?.id as number },
-    { suspense: false, enabled: !!terminal }
+    { suspense: false, enabled: !!terminal, refetchOnWindowFocus: false }
   )
 
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
