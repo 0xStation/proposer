@@ -5,6 +5,8 @@ import {
   GetServerSideProps,
   InferGetServerSidePropsType,
   Routes,
+  useRouter,
+  useParam,
   useMutation,
 } from "blitz"
 import { Field, Form } from "react-final-form"
@@ -29,10 +31,13 @@ const CreateProposalPage: BlitzPage = ({
   const [previewMode, setPreviewMode] = useState<boolean>(false)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
   const activeUser = useStore((state) => state.activeUser)
+  const setToastState = useStore((state) => state.setToastState)
+  const router = useRouter()
 
+  const terminalHandle = useParam("terminalHandle") as string
   const [createProposalMutation] = useMutation(createProposal, {
     onSuccess: (_data) => {
-      // router.push(Routes.BulletinPage({ terminalHandle: terminalHandle }))
+      router.push(Routes.ProposalsTab({ terminalHandle: terminalHandle, rfpId: data.rfp.id }))
     },
     onError: (error: Error) => {
       console.error(error)
@@ -70,14 +75,14 @@ const CreateProposalPage: BlitzPage = ({
           markdown: string
           title: string
         }) => {
-          // await createProposalMutation({
-          //   rfpId: data.rfp.id,
-          //   token: values.token,
-          //   amount: values.amount,
-          //   recipientAddress: values.recipientAddress,
-          //   contentBody: markdown,
-          //   contentTitle: title,
-          // })
+          await createProposalMutation({
+            rfpId: data.rfp.id,
+            token: values.token,
+            amount: values.amount,
+            recipientAddress: values.recipientAddress,
+            contentBody: values.markdown,
+            contentTitle: values.title,
+          })
         }}
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
@@ -138,11 +143,8 @@ const CreateProposalPage: BlitzPage = ({
                 <form className="p-4 grow flex flex-col justify-between">
                   <Modal open={confirmationModalOpen} toggle={setConfirmationModalOpen}>
                     <div className="p-2">
-                      <h3 className="text-2xl font-bold pt-6">Publishing RFP?</h3>
-                      <p className="mt-2">
-                        Contributors will be able to submit proposals to this RFP after the defined
-                        start date. You can edit proposals anytime.
-                      </p>
+                      <h3 className="text-2xl font-bold pt-6">Publishing proposal?</h3>
+                      <p className="mt-2">You won’t be able to edit the proposal.</p>
                       <div className="mt-8">
                         <button
                           type="button"
@@ -184,7 +186,7 @@ const CreateProposalPage: BlitzPage = ({
                       Request for Proposal
                     </h4>
                     <p className="mt-2 text-electric-violet">{data.rfp.data.content.title}</p>
-                    <label className="font-bold block mt-6">Fund Recipient*</label>
+                    <label className="font-bold block mt-6">Fund recipient*</label>
                     <span className="text-xs text-concrete block">
                       Primary destination of the funds. Project lead/creator’s wallet address is
                       recommended.
@@ -232,7 +234,7 @@ const CreateProposalPage: BlitzPage = ({
                     <Field name={`amount`} validate={requiredField}>
                       {({ meta, input }) => (
                         <>
-                          <label className="font-bold block mt-6">Total Amount*</label>
+                          <label className="font-bold block mt-6">Total amount*</label>
                           <input
                             {...input}
                             type="text"
@@ -252,13 +254,20 @@ const CreateProposalPage: BlitzPage = ({
                     <button
                       type="button"
                       onClick={() => {
-                        if (formState.dirty) {
-                          setConfirmationModalOpen(true)
+                        if (formState.invalid) {
+                          const fieldsWithErrors = Object.keys(formState.errors as Object)
+                          setToastState({
+                            isToastShowing: true,
+                            type: "error",
+                            message: `Please fill in ${fieldsWithErrors.join(
+                              ", "
+                            )} to publish RFP.`,
+                          })
+                          return
                         }
+                        setConfirmationModalOpen(true)
                       }}
-                      className={`mt-4 bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto ${
-                        formState.dirty ? "hover:bg-opacity-70" : "opacity-50 cursor-not-allowed"
-                      }`}
+                      className={`bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70`}
                     >
                       Publish
                     </button>

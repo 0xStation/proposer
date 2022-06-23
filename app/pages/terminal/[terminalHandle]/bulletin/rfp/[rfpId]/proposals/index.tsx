@@ -12,6 +12,8 @@ import { Form } from "react-final-form"
 import getProposalsByRfpId from "app/proposal/queries/getProposalsByRfpId"
 import { formatDate } from "app/core/utils/formatDate"
 import getRfpById from "app/rfp/queries/getRfpById"
+import { Rfp } from "app/rfp/types"
+import { Proposal } from "app/proposal/types"
 
 const ProposalsTab: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -47,6 +49,7 @@ const ProposalsTab: BlitzPage = () => {
           </div>
           <div className="h-[calc(100vh-284px)] overflow-y-auto">
             {proposals &&
+              rfp &&
               proposals.map((proposal, idx) => (
                 <ProposalComponent
                   terminalHandle={terminalHandle}
@@ -62,7 +65,15 @@ const ProposalsTab: BlitzPage = () => {
   )
 }
 
-const ProposalComponent = ({ proposal, rfp, terminalHandle }) => {
+const ProposalComponent = ({
+  proposal,
+  rfp,
+  terminalHandle,
+}: {
+  proposal: Proposal
+  rfp: Rfp
+  terminalHandle: string
+}) => {
   return (
     <Link href={Routes.ProposalPage({ terminalHandle, rfpId: rfp.id, proposalId: proposal.id })}>
       <div className="border-b border-concrete w-full cursor-pointer hover:bg-wet-concrete pt-5">
