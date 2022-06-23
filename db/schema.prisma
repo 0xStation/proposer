@@ -158,7 +158,7 @@ model AccountProposal {
 
 model Check {
   id               String          @id @default(uuid())
-  proposalId       Int
+  proposalId       String
   fundingAddress   String
   chainId          Int
   checkbook        Checkbook       @relation(fields: [fundingAddress], references: [address])

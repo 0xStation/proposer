@@ -7,6 +7,8 @@ import useStore from "app/core/hooks/useStore"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import { TypedDataTypeDefinition, TypedDataSignatureDomain } from "app/types"
 import { truncateString } from "app/core/utils/truncateString"
+import { useMutation } from "blitz"
+import createCheck from "app/check/mutations/createCheck"
 
 const signatureToRSV = (signature: string) => {
   const r = "0x" + signature.substring(2).substring(0, 64)
@@ -58,8 +60,18 @@ const ApprovalSignaturesPage: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
   const [checkQueue, setCheckQueue] = useState<Check[]>([])
 
+  const [createCheckMutation] = useMutation(createCheck, {
+    onSuccess: (_data) => {
+      console.log("success", _data)
+    },
+    onError: (error: Error) => {
+      console.error(error)
+    },
+  })
+
   // change this per Checkbook being used for the Proposal
-  const checkbookAddress = "0x016562aA41A8697720ce0943F003141f5dEAe006"
+  const checkbookAddress = "0x0FF725b0e0DAFD6D29d4794892651d382a3E5bE8"
+  const checkbookChainId = 4
 
   // top-level definition of where this signature will be used
   // `name` is hardcoded to "Checkbook" in each contract
@@ -69,7 +81,7 @@ const ApprovalSignaturesPage: BlitzPage = () => {
   const domain: TypedDataSignatureDomain = {
     name: "Checkbook",
     version: "1",
-    chainId: 4,
+    chainId: checkbookChainId,
     verifyingContract: checkbookAddress,
   }
 
@@ -83,9 +95,30 @@ const ApprovalSignaturesPage: BlitzPage = () => {
     if (checks.length > 1) {
       types = bulkCheckTypes
       value = { checks }
-    } else {
-      types = singleCheckTypes
-      value = checks[0]!
+      console.log("not ready")
+      return
+    }
+
+    const check = checks[0]!
+
+    const deadline = new Date(check.deadline)
+
+    // generate check
+    const c = await createCheckMutation({
+      proposalId: "", // dummy for now
+      fundingAddress: checkbookAddress, // dummy
+      chainId: checkbookChainId, // dummy
+      recipientAddress: check.recipient,
+      tokenAddress: check.token,
+      tokenAmount: parseInt(check.amount),
+      deadline,
+    })
+
+    types = singleCheckTypes
+    value = {
+      ...check,
+      deadline: deadline.valueOf(),
+      nonce: c.nonce,
     }
 
     try {
@@ -160,19 +193,24 @@ const ApprovalSignaturesPage: BlitzPage = () => {
                     represented as a Unix timestamp (string or number type okay)
                   */}
                   <label htmlFor="name" className="text-marble-white text-base mt-4">
-                    Deadline to Cash (unix timestamp)
+                    Deadline to Cash
                   </label>
-                  <Field
-                    component="input"
-                    name="deadline"
-                    placeholder="0"
-                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
-                  />
-                  {/*
+                  <Field name="deadline">
+                    {({ input, meta }) => (
+                      <div>
+                        <input
+                          {...input}
+                          type="date"
+                          className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
+                        />
+                      </div>
+                    )}
+                  </Field>
+                  {/* 
                     One-use nonce for this specific check, verified by the contract,
                     individual checks within a bulk approval should have unique nonces
                   */}
-                  <label htmlFor="name" className="text-marble-white text-base mt-4">
+                  {/* <label htmlFor="name" className="text-marble-white text-base mt-4">
                     Nonce
                   </label>
                   <Field
@@ -180,7 +218,7 @@ const ApprovalSignaturesPage: BlitzPage = () => {
                     name="nonce"
                     placeholder="0"
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
-                  />
+                  /> */}
                   <button
                     type="submit"
                     className="bg-electric-violet text-tunnel-black w-1/2 rounded mt-12 block p-2 hover:opacity-70"
