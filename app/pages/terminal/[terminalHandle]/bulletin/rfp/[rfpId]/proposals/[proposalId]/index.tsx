@@ -99,7 +99,7 @@ const ProposalPage: BlitzPage = ({
               <Preview markdown={data.proposal.data.content.body} />
             </div>
           </div>
-          <div className="col-span-1 h-full border-l border-concrete">
+          <div className="col-span-1 h-full border-l border-concrete flex flex-col">
             <div className="border-b border-concrete p-6">
               <h4 className="text-xs font-bold text-concrete uppercase">Terminal</h4>
               <div className="flex flex-row items-center mt-2">
@@ -127,13 +127,23 @@ const ProposalPage: BlitzPage = ({
               <h4 className="text-xs font-bold text-concrete uppercase mt-6">Fund Recipient</h4>
               <p className="mt-2">{data.proposal.data.funding.recipientAddress}</p>
             </div>
-            <div className="p-6">
-              {/* will implement alongside approve action */}
-              <h4 className="text-xs font-bold text-concrete uppercase mt-4">Approval</h4>
-              <div className="flex flex-row space-x-2 items-center mt-2">
-                <ProgressIndicator percent={0} twsize={6} cutoff={0} />
-                <p className="">0/3</p>
+            <div className="p-6 grow flex flex-col justify-between">
+              <div>
+                <h4 className="text-xs font-bold text-concrete uppercase mt-4">Approval</h4>
+                <div className="flex flex-row space-x-2 items-center mt-2">
+                  <ProgressIndicator percent={0} twsize={6} cutoff={0} />
+                  <p className="">0/3</p>
+                </div>
               </div>
+              <button
+                type="button"
+                onClick={() => {
+                  //
+                }}
+                className={`bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70`}
+              >
+                Approve
+              </button>
             </div>
           </div>
         </div>
