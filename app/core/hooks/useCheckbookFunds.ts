@@ -3,15 +3,20 @@ import { BigNumber } from "ethers"
 import { useQuery } from "blitz"
 import getCheckGroupsForCheckbook from "app/check/queries/getCheckGroupsForCheckbook"
 
-const useCheckbookFunds = (chainId: number, address: string, tokenAddress?: string) => {
+const useCheckbookFunds = (
+  chainId: number,
+  checkbookAddress: string,
+  quorum: number,
+  tokenAddress?: string
+) => {
   const [checks] = useQuery(
     getCheckGroupsForCheckbook,
-    { checkbookAddress: address, tokenAddress: tokenAddress as string },
+    { checkbookAddress, quorum: quorum, tokenAddress: tokenAddress as string },
     { suspense: false, enabled: !!tokenAddress }
   )
 
   const { data } = useBalance({
-    addressOrName: address,
+    addressOrName: checkbookAddress,
     chainId,
     cacheTime: 10_000, // 10 seconds
     ...(!!tokenAddress && { token: tokenAddress }),

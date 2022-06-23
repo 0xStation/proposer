@@ -9,13 +9,8 @@ import { TypedDataTypeDefinition, TypedDataSignatureDomain } from "app/types"
 import { truncateString } from "app/core/utils/truncateString"
 import { useMutation } from "blitz"
 import createCheck from "app/check/mutations/createCheck"
-
-const signatureToRSV = (signature: string) => {
-  const r = "0x" + signature.substring(2).substring(0, 64)
-  const s = "0x" + signature.substring(2).substring(64, 128)
-  const v = parseInt(signature.substring(2).substring(128, 130), 16)
-  return { r, s, v }
-}
+import createCheckApproval from "app/checkApproval/mutations/createCheckApproval"
+import { signatureToVRS } from "app/core/utils/signatureToVRS"
 
 /**
  * THIS IS A DEV TOOL
@@ -52,8 +47,6 @@ type Check = {
   recipient: string
   token: string
   amount: string
-  deadline: string
-  nonce: string
 }
 
 const ApprovalSignaturesPage: BlitzPage = () => {
@@ -61,6 +54,14 @@ const ApprovalSignaturesPage: BlitzPage = () => {
   const [checkQueue, setCheckQueue] = useState<Check[]>([])
 
   const [createCheckMutation] = useMutation(createCheck, {
+    onSuccess: (_data) => {
+      console.log("success", _data)
+    },
+    onError: (error: Error) => {
+      console.error(error)
+    },
+  })
+  const [createCheckApprovalMutation] = useMutation(createCheckApproval, {
     onSuccess: (_data) => {
       console.log("success", _data)
     },
@@ -88,6 +89,10 @@ const ApprovalSignaturesPage: BlitzPage = () => {
   let { signTypedDataAsync: signApproval } = useSignTypedData()
 
   const approveChecks = async (checks: Check[]) => {
+    if (!activeUser?.address) {
+      throw Error("Missing wallet connection")
+    }
+
     // intentional log, for the developers benefit to see what's happening
     console.log(checks)
     let types
@@ -101,10 +106,17 @@ const ApprovalSignaturesPage: BlitzPage = () => {
 
     const check = checks[0]!
 
-    const deadline = new Date(check.deadline)
+    const deadline = new Date()
+    // missing edge cases for days in a month, but good enough for now
+    if (deadline.getMonth() < 12) {
+      deadline.setMonth(deadline.getMonth() + 1)
+    } else {
+      deadline.setMonth(1)
+      deadline.setFullYear(deadline.getFullYear() + 1)
+    }
 
     // generate check
-    const c = await createCheckMutation({
+    const newCheck = await createCheckMutation({
       proposalId: "", // dummy for now
       fundingAddress: checkbookAddress, // dummy
       chainId: checkbookChainId, // dummy
@@ -118,10 +130,11 @@ const ApprovalSignaturesPage: BlitzPage = () => {
     value = {
       ...check,
       deadline: deadline.valueOf(),
-      nonce: c.nonce,
+      nonce: newCheck.nonce,
     }
 
     try {
+      console.log("try sign")
       // prompt the Metamask signature modal
       const signature = await signApproval({
         domain,
@@ -130,13 +143,19 @@ const ApprovalSignaturesPage: BlitzPage = () => {
       })
 
       // split signature to v,r,s components (probably not needed, just for show)
-      const { v, r, s } = signatureToRSV(signature)
+      const { v, r, s } = signatureToVRS(signature)
       // intentional log, for the developers benefit to see what's happening
       console.log(
         `signer: ${activeUser?.address}\nsignature:${signature}\nv: ${v}\nr: ${r}\ns: ${s}`
       )
-    } catch {
-      console.log("signature denied by user")
+
+      await createCheckApprovalMutation({
+        checkId: newCheck.id,
+        signerAddress: activeUser?.address as string,
+        signature,
+      })
+    } catch (e) {
+      console.error(e)
     }
   }
 
@@ -188,37 +207,6 @@ const ApprovalSignaturesPage: BlitzPage = () => {
                     placeholder="0"
                     className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
                   />
-                  {/*
-                    Deadline to cash this check, compute 1-month ahead of current timestamp when creating Check,
-                    represented as a Unix timestamp (string or number type okay)
-                  */}
-                  <label htmlFor="name" className="text-marble-white text-base mt-4">
-                    Deadline to Cash
-                  </label>
-                  <Field name="deadline">
-                    {({ input, meta }) => (
-                      <div>
-                        <input
-                          {...input}
-                          type="date"
-                          className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
-                        />
-                      </div>
-                    )}
-                  </Field>
-                  {/* 
-                    One-use nonce for this specific check, verified by the contract,
-                    individual checks within a bulk approval should have unique nonces
-                  */}
-                  {/* <label htmlFor="name" className="text-marble-white text-base mt-4">
-                    Nonce
-                  </label>
-                  <Field
-                    component="input"
-                    name="nonce"
-                    placeholder="0"
-                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
-                  /> */}
                   <button
                     type="submit"
                     className="bg-electric-violet text-tunnel-black w-1/2 rounded mt-12 block p-2 hover:opacity-70"
@@ -233,7 +221,7 @@ const ApprovalSignaturesPage: BlitzPage = () => {
             {checkQueue.map((c, i) => (
               <span key={i} className="flex flex-row space-x-24 p-2">{`send ${truncateString(
                 c.recipient
-              )} ${c.amount} tokens (${truncateString(c.token)}), nonce: ${c.nonce}`}</span>
+              )} ${c.amount} tokens (${truncateString(c.token)})`}</span>
             ))}
           </div>
           <button

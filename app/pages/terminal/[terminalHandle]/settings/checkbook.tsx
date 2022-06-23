@@ -69,6 +69,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
   const selectedFunds = useCheckbookFunds(
     selectedCheckbook?.chainId as number,
     selectedCheckbook?.address as string,
+    selectedCheckbook?.quorum as number,
     selectedFundsToken
   )
 
