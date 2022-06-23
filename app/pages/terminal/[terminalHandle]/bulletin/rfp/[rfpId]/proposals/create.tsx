@@ -36,8 +36,14 @@ const CreateProposalPage: BlitzPage = ({
 
   const terminalHandle = useParam("terminalHandle") as string
   const [createProposalMutation] = useMutation(createProposal, {
-    onSuccess: (_data) => {
-      router.push(Routes.ProposalsTab({ terminalHandle: terminalHandle, rfpId: data.rfp.id }))
+    onSuccess: (response) => {
+      router.push(
+        Routes.ProposalsTab({
+          terminalHandle: terminalHandle,
+          rfpId: data.rfp.id,
+          proposalId: response.id,
+        })
+      )
     },
     onError: (error: Error) => {
       console.error(error)
