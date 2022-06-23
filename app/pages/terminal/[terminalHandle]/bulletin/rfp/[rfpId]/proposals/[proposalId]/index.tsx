@@ -114,7 +114,7 @@ const ProposalPage: BlitzPage = ({
                 <div className="ml-2">
                   <span>{data.rfp.terminal.data.name}</span>
                   <span className="text-xs text-light-concrete flex">
-                    {data.rfp.terminal.handle}
+                    @{data.rfp.terminal.handle}
                   </span>
                 </div>
               </div>

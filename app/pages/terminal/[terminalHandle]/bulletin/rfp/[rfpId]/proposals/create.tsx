@@ -17,6 +17,7 @@ import Modal from "app/core/components/Modal"
 import getRfpById from "app/rfp/queries/getRfpById"
 import createProposal from "app/proposal/mutations/createProposal"
 import { Rfp } from "app/rfp/types"
+import { requiredField } from "app/utils/validators"
 
 type GetServerSidePropsData = {
   rfp: Rfp
@@ -27,8 +28,6 @@ const CreateProposalPage: BlitzPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [previewMode, setPreviewMode] = useState<boolean>(false)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
-  const [markdown, setMarkdown] = useState<string>("")
-  const [title, setTitle] = useState<string>("")
   const activeUser = useStore((state) => state.activeUser)
 
   const [createProposalMutation] = useMutation(createProposal, {
@@ -62,69 +61,80 @@ const CreateProposalPage: BlitzPage = ({
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-4 h-screen w-full box-border">
-        <div className="overflow-y-auto col-span-3 p-20 relative">
-          <div className="flex flex-row items-center space-x-2">
-            <span className="h-2 w-2 rounded-full bg-concrete" />
-            <span className="text-xs uppercase tracking-wider">Draft</span>
-          </div>
-          <div className="mt-6 flex flex-row">
-            <input
-              onChange={(e) => setTitle(e.target.value)}
-              className="bg-tunnel-black text-3xl ml-2 w-full outline-none"
-              placeholder="Give your idea a title..."
-            />
-          </div>
-          <div className="mt-6 grid grid-cols-5 gap-4">
-            <div className="flex flex-row items-center">
-              <img
-                src={activeUser?.data.pfpURL}
-                alt="PFP"
-                className="w-[46px] h-[46px] rounded-full"
-                onError={(e) => {
-                  e.currentTarget.src = DEFAULT_PFP_URLS.USER
-                }}
-              />
-              <div className="ml-2">
-                <span>{activeUser?.data.name}</span>
-                <span className="text-xs text-light-concrete flex">
-                  @{truncateString(activeUser?.address, 4)}
-                </span>
+
+      <Form
+        onSubmit={async (values: {
+          recipientAddress: string
+          token: string
+          amount: number
+          markdown: string
+          title: string
+        }) => {
+          // await createProposalMutation({
+          //   rfpId: data.rfp.id,
+          //   token: values.token,
+          //   amount: values.amount,
+          //   recipientAddress: values.recipientAddress,
+          //   contentBody: markdown,
+          //   contentTitle: title,
+          // })
+        }}
+        render={({ form, handleSubmit }) => {
+          const formState = form.getState()
+          return (
+            <div className="grid grid-cols-4 h-screen w-full box-border">
+              <div className="overflow-y-auto col-span-3 p-20 relative">
+                <div className="flex flex-row items-center space-x-2">
+                  <span className="h-2 w-2 rounded-full bg-concrete" />
+                  <span className="text-xs uppercase tracking-wider">Draft</span>
+                </div>
+                <div className="mt-6 flex flex-row">
+                  <Field name={`title`} validate={requiredField}>
+                    {({ input }) => (
+                      <input
+                        {...input}
+                        type="text"
+                        placeholder="Give your idea a title..."
+                        className="bg-tunnel-black text-3xl ml-2 w-full outline-none"
+                      />
+                    )}
+                  </Field>
+                </div>
+                <div className="mt-6 grid grid-cols-5 gap-4">
+                  <div className="flex flex-row items-center">
+                    <img
+                      src={activeUser?.data.pfpURL}
+                      alt="PFP"
+                      className="w-[46px] h-[46px] rounded-full"
+                      onError={(e) => {
+                        e.currentTarget.src = DEFAULT_PFP_URLS.USER
+                      }}
+                    />
+                    <div className="ml-2">
+                      <span>{activeUser?.data.name}</span>
+                      <span className="text-xs text-light-concrete flex">
+                        @{truncateString(activeUser?.address, 4)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-12 h-full">
+                  {!previewMode ? (
+                    <Field name={`markdown`} validate={requiredField}>
+                      {({ input }) => (
+                        <textarea
+                          {...input}
+                          placeholder="enter some text..."
+                          className="bg-tunnel-black w-full h-full outline-none resize-none"
+                        />
+                      )}
+                    </Field>
+                  ) : (
+                    <Preview markdown={formState.values.markdown} />
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
-          <div className="mt-12 h-full">
-            {!previewMode ? (
-              <textarea
-                value={markdown}
-                className="bg-tunnel-black w-full h-full outline-none resize-none"
-                onChange={(e) => setMarkdown(e.target.value.length > 0 ? e.target.value : "")}
-                placeholder="enter some text..."
-              />
-            ) : (
-              <Preview markdown={markdown} />
-            )}
-          </div>
-        </div>
-        <div className="h-full border-l border-concrete col-span-1 flex flex-col">
-          <Form
-            onSubmit={async (values: {
-              recipientAddress: string
-              token: string
-              amount: number
-            }) => {
-              await createProposalMutation({
-                rfpId: data.rfp.id,
-                token: values.token,
-                amount: values.amount,
-                recipientAddress: values.recipientAddress,
-                contentBody: markdown,
-                contentTitle: title,
-              })
-            }}
-            render={({ form, handleSubmit }) => {
-              const formState = form.getState()
-              return (
+              <div className="h-full border-l border-concrete col-span-1 flex flex-col">
                 <form className="p-4 grow flex flex-col justify-between">
                   <Modal open={confirmationModalOpen} toggle={setConfirmationModalOpen}>
                     <div className="p-2">
@@ -153,11 +163,24 @@ const CreateProposalPage: BlitzPage = ({
                   </Modal>
 
                   <div>
-                    <h4 className="text-xs font-bold text-concrete uppercase">
-                      Proposal Recipient
-                    </h4>
-                    <p className="mt-2">WHAT IS THIS FIELD</p>
-                    <h4 className="text-xs font-bold text-concrete uppercase mt-4">
+                    <h4 className="text-xs font-bold text-concrete uppercase">Terminal</h4>
+                    <div className="flex flex-row items-center mt-2">
+                      <img
+                        src={data.rfp.terminal.data.pfpURL}
+                        alt="PFP"
+                        className="w-[46px] h-[46px] rounded-lg"
+                        onError={(e) => {
+                          e.currentTarget.src = DEFAULT_PFP_URLS.USER
+                        }}
+                      />
+                      <div className="ml-2">
+                        <span>{data.rfp.terminal.data.name}</span>
+                        <span className="text-xs text-light-concrete flex">
+                          @{data.rfp.terminal.handle}
+                        </span>
+                      </div>
+                    </div>
+                    <h4 className="text-xs font-bold text-concrete uppercase mt-6">
                       Request for Proposal
                     </h4>
                     <p className="mt-2 text-electric-violet">{data.rfp.data.content.title}</p>
@@ -167,19 +190,26 @@ const CreateProposalPage: BlitzPage = ({
                       recommended.
                     </span>
 
-                    <Field name={`recipientAddress`}>
-                      {({ input }) => (
-                        <input
-                          {...input}
-                          type="text"
-                          placeholder="Enter wallet or ENS address"
-                          className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
-                        />
+                    <Field name={`recipientAddress`} validate={requiredField}>
+                      {({ meta, input }) => (
+                        <>
+                          <input
+                            {...input}
+                            type="text"
+                            placeholder="Enter wallet or ENS address"
+                            className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
+                          />
+                          {meta.touched && input.value === "" && (
+                            <span className="text-torch-red text-xs">
+                              You must provide an address.
+                            </span>
+                          )}
+                        </>
                       )}
                     </Field>
 
-                    <Field name={`token`}>
-                      {({ input }) => (
+                    <Field name={`token`} validate={requiredField}>
+                      {({ meta, input }) => (
                         <>
                           <label className="font-bold block mt-6">Token*</label>
                           <div className="custom-select-wrapper">
@@ -192,12 +222,15 @@ const CreateProposalPage: BlitzPage = ({
                               <option value="ETH">ETH</option>
                             </select>
                           </div>
+                          {meta.touched && input.value === "" && (
+                            <span className="text-torch-red text-xs">You must select a token.</span>
+                          )}
                         </>
                       )}
                     </Field>
 
-                    <Field name={`amount`}>
-                      {({ input }) => (
+                    <Field name={`amount`} validate={requiredField}>
+                      {({ meta, input }) => (
                         <>
                           <label className="font-bold block mt-6">Total Amount*</label>
                           <input
@@ -206,6 +239,11 @@ const CreateProposalPage: BlitzPage = ({
                             placeholder="Enter token amount"
                             className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                           />
+                          {meta.touched && input.value === "" && (
+                            <span className="text-torch-red text-xs">
+                              You must provide an amount.
+                            </span>
+                          )}
                         </>
                       )}
                     </Field>
@@ -226,11 +264,11 @@ const CreateProposalPage: BlitzPage = ({
                     </button>
                   </div>
                 </form>
-              )
-            }}
-          />
-        </div>
-      </div>
+              </div>
+            </div>
+          )
+        }}
+      />
     </Layout>
   )
 }
