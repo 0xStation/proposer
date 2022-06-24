@@ -14,21 +14,21 @@ generator client {
 // unique links by /profile/[address]
 // unique links by /profile/discord/[discordId]
 model Account {
-  id        Int               @id @default(autoincrement())
-  address   String?           @unique
-  discordId String?           @unique
-  tickets   AccountTerminal[]
-  data      Json?
-  sessions  Session[]
-  proposals AccountProposal[]
-  rfps      Rfp[]
+  id             Int               @id @default(autoincrement())
+  address        String?           @unique
+  discordId      String?           @unique
+  tickets        AccountTerminal[]
+  data           Json?
+  sessions       Session[]
+  proposals      AccountProposal[]
+  rfps           Rfp[]
+  checks         Check[]
+  checkApprovals CheckApproval[]
 
   // v1
-  skills        AccountSkill[]
-  initiatives   AccountInitiative[]
-  endorsed      Endorsement[]       @relation("Endorsed")
-  Check         Check[]
-  CheckApproval CheckApproval[]
+  skills      AccountSkill[]
+  initiatives AccountInitiative[]
+  endorsed    Endorsement[]       @relation("Endorsed")
 }
 
 // unique links by /terminal/[handle]
@@ -113,7 +113,7 @@ model Checkbook {
   signers    String[]
   data       Json
   rfps       Rfp[]
-  Check      Check[]
+  checks     Check[]
 }
 
 // unique links by /terminal/[handle]/rfp/[localId]

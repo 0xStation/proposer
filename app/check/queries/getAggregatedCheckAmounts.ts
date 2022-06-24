@@ -2,14 +2,14 @@ import { Decimal } from "@prisma/client/runtime"
 import db from "db"
 import * as z from "zod"
 
-const GetCheckGroupsForCheckbook = z.object({
+const GetAggregatedCheckAmounts = z.object({
   checkbookAddress: z.string(),
   tokenAddress: z.string(),
   quorum: z.number(),
 })
 
-export default async function getCheckGroupsForCheckbook(
-  input: z.infer<typeof GetCheckGroupsForCheckbook>
+export default async function getAggregatedCheckAmounts(
+  input: z.infer<typeof GetAggregatedCheckAmounts>
 ) {
   // get checks that have >= quorum approvals
   // only way to make a query of this nature is with groupBy
