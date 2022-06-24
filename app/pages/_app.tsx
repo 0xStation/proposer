@@ -1,22 +1,15 @@
 import { AppProps } from "blitz"
 import "app/core/styles/index.css"
-import { WagmiConfig, createClient, configureChains } from "wagmi"
+import { providers } from "ethers"
+import { WagmiConfig, defaultChains, createClient } from "wagmi"
 import { MetaMaskConnector } from "wagmi/connectors/metaMask"
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect"
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet"
-import { publicProvider } from "wagmi/providers/public"
-import { alchemyProvider } from "wagmi/providers/alchemy"
-import { mainnet, rinkeby, localhost } from "wagmi/chains"
 
 // Chains for connectors to support
-const { chains, provider } = configureChains(
-  [mainnet, rinkeby, localhost], // add more chains here as we deploy to new networks
-  [
-    alchemyProvider({ alchemyId: process.env.BLITZ_PUBLIC_ALCHEMY_API_KEY as string }),
-    publicProvider(), // gives fallback provider for Localhost network
-  ]
-)
+const chains = defaultChains
 
+const provider = () => new providers.AlchemyProvider(4, process.env.RINKEBY_API_KEY)
 // Set up connectors
 const connectors = () => {
   return [

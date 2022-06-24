@@ -132,7 +132,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                       setToastState({
                         isToastShowing: true,
                         type: "error",
-                        message: "Contract creation failed, please reset wallet connection.",
+                        message: "Please reset wallet connection.\n(ConnectorNotFoundError)",
                       })
                     } else {
                       setToastState({

@@ -19,6 +19,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
   const [isModalAddressCopied, setIsModalAddressCopied] = useState<boolean>(false)
+  const [isButtonAddressCopied, setIsButtonAddressCopied] = useState<boolean>(false)
   const [successModalOpen, setSuccessModalOpen] = useState<boolean>(!!creationSuccess)
 
   useQuery(
@@ -219,6 +220,20 @@ const CheckbookSettingsPage: BlitzPage = () => {
                         There are no funds available to deploy. Copy the contract address and
                         transfer funds to this Checkbook from Gnosis or other wallet applications.
                       </p>
+                      <button
+                        type="button"
+                        className="text-electric-violet border border-electric-violet w-40 mt-3 py-1 px-4 rounded hover:opacity-75"
+                        onClick={() =>
+                          navigator.clipboard
+                            .writeText(selectedCheckbook?.address as string)
+                            .then(() => {
+                              setIsButtonAddressCopied(true)
+                              setTimeout(() => setIsButtonAddressCopied(false), 3000)
+                            })
+                        }
+                      >
+                        {isButtonAddressCopied ? "Copied!" : "Copy Address"}
+                      </button>
                     </div>
                   </div>
                 </div>
