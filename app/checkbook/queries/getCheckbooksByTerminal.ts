@@ -1,5 +1,6 @@
 import db from "db"
 import * as z from "zod"
+import { Checkbook } from "../types"
 
 const GetCheckbooksByTerminal = z.object({
   terminalId: z.number(),
@@ -29,5 +30,5 @@ export default async function getCheckbooksByTerminal(
 
   return checkbooks.map((c) => {
     return { ...c, signerAccounts: c.signers.map((s) => signers[s]) }
-  })
+  }) as Checkbook[]
 }

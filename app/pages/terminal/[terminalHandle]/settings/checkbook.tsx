@@ -11,9 +11,8 @@ import { ClipboardIcon, ClipboardCheckIcon, ExternalLinkIcon } from "@heroicons/
 import Modal from "app/core/components/Modal"
 import networks from "app/utils/networks.json"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
+import getFundingTokens from "app/core/utils/getFundingTokens"
 import { formatUnits } from "ethers/lib/utils"
-import { TagType, TokenType } from "app/tag/types"
-import networks from "app/utils/networks.json"
 
 const CheckbookSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -46,25 +45,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
     }
   )
 
-  const tokenOptions = [
-    // ETH gas coin if on mainnet or testnet
-    ...([1, 4, 5].includes(selectedCheckbook?.chainId || 0)
-      ? [{ symbol: "ETH", address: "" }]
-      : []),
-    // preferred stablecoins for network
-    ...(networks[selectedCheckbook?.chainId as number]?.stablecoins || []),
-    // ERC20 tokens imported to organization on same chain as checkbook
-    ...(terminal?.tags
-      .filter(
-        (t) =>
-          t.type === TagType.TOKEN &&
-          t.data.type === TokenType.ERC20 &&
-          t.data.chainId === selectedCheckbook?.chainId
-      )
-      .map((t) => {
-        return { symbol: t.data.symbol, address: t.data.address }
-      }) || []),
-  ]
+  const tokenOptions = getFundingTokens(selectedCheckbook, terminal)
 
   const selectedFunds = useCheckbookFunds(
     selectedCheckbook?.chainId as number,

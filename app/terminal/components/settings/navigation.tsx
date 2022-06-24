@@ -86,7 +86,7 @@ const Navigation = ({ children }) => {
                   } cursor-pointer hover:text-marble-white mt-4`}
                 >
                   <Link href={Routes.ApprovalSignaturesPage({ terminalHandle })}>
-                    Approval Signatures
+                    Generate Check
                   </Link>
                 </li>
               </ul>
