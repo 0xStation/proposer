@@ -70,7 +70,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                     )}
                     <button
                       onClick={() => {
-                        router.push(`/terminal/${terminalHandle}/bulletin/rfp/${rfpId}/edit`)
+                        router.push(Routes.EditRfpPage({ terminalHandle, rfpId }))
                       }}
                     >
                       <PencilIcon className="inline h-6 w-6 fill-concrete mr-3 hover:cursor-pointer hover:fill-marble-white" />

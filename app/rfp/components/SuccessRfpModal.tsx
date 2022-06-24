@@ -1,5 +1,6 @@
 import { useState } from "react"
 import Modal from "app/core/components/Modal"
+import { genBaseUrl } from "app/utils"
 
 export const SuccessRfpModal = ({ terminal, isOpen, setIsOpen, rfpId, isEdit = true }) => {
   const [isUrlCopied, setIsUrlCopied] = useState<boolean>(false)
@@ -20,7 +21,7 @@ export const SuccessRfpModal = ({ terminal, isOpen, setIsOpen, rfpId, isEdit = t
             onClick={() => {
               navigator.clipboard
                 .writeText(
-                  `https://${window.location.host}/terminal/${terminal?.handle}/bulletin/rfp/${rfpId}/info`
+                  `${genBaseUrl()}/terminal/${terminal?.handle}/bulletin/rfp/${rfpId}/info`
                 )
                 .then(() => {
                   setIsUrlCopied(true)
