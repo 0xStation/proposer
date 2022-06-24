@@ -1,18 +1,30 @@
 import { BlitzPage, useMutation, useParam, useQuery, Link, Image, Routes, useRouter } from "blitz"
+import { useState } from "react"
 import { Field, Form } from "react-final-form"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
-import createCheckbook from "app/checkbook/mutations/createCheckbook"
+import CreateCheckbook from "app/checkbook/mutations/createCheckbook"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Navigation from "app/terminal/components/settings/navigation"
 import useStore from "app/core/hooks/useStore"
+import useAllowedNetwork from "app/core/hooks/useAllowedNetwork"
 import Back from "/public/back-icon.svg"
-import { v4 as uuidv4 } from "uuid"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
+import { sortAddressesIncreasing } from "app/core/utils/sortAddressesIncreasing"
 import { uniqueName, isValidQuorum } from "app/utils/validators"
+import { useCreateCheckbook } from "app/contracts/contracts"
+import { useWaitForTransaction } from "wagmi"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import { Spinner } from "app/core/components/Spinner"
 
 const NewCheckbookSettingsPage: BlitzPage = () => {
   const router = useRouter()
-  const [createCheckbookMutation] = useMutation(createCheckbook)
+  const [createCheckbookMutation] = useMutation(CreateCheckbook)
+  const [quorum, setQuorum] = useState<number>()
+  const [signers, setSigners] = useState<string[]>()
+  const [name, setName] = useState<string>()
+  const [txnHash, setTxnHash] = useState<string>()
+  const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
+  const setToastState = useStore((state) => state.setToastState)
 
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(
@@ -21,7 +33,48 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
     { suspense: false }
   )
 
-  const setToastState = useStore((state) => state.setToastState)
+  const { chainId, error: invalidSelectedNetwork } = useAllowedNetwork()
+
+  const { createCheckbook } = useCreateCheckbook(chainId)
+
+  const data = useWaitForTransaction({
+    confirmations: 1,
+    hash: txnHash,
+    onSuccess: async (data) => {
+      // transaction emits an event that contains the address of the new Checkbook
+      // events are contained in the TransactionReceipt's `.logs` field
+      // each log has a `topics` list object for event parameters that have an index
+      // the first topic is always the name of the event, the next is our Checkbook address
+      // the location of the Checkbook address in the topics array is dependent on ordering within the contract
+      // a topic string has 32 bytes, but an address is only 20 bytes so the topic is 0-padded in the front
+      // a topic string also adds "0x" to the front of its 32 bytes
+      // to get the address, we throw away the first 2 characters ("0x") + the next 2*12bytes characters (0-padding)
+      // which leads us to use `.substring(26)` and extract the address string
+      // this string is lowercased though, so we checksum it to give it proper casing before storing in database
+      const checkbookAddress = toChecksumAddress("0x" + data.logs[0]?.topics[1]?.substring(26))
+
+      try {
+        await createCheckbookMutation({
+          terminalId: terminal?.id as number,
+          address: checkbookAddress,
+          chainId,
+          name: name as string,
+          quorum: quorum as number,
+          signers: signers as string[],
+        })
+
+        router.push(Routes.CheckbookSettingsPage({ terminalHandle, creationSuccess: true }))
+      } catch (e) {
+        setWaitingCreation(false)
+        console.error(e)
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: "Checkbook entity creation failed.",
+        })
+      }
+    },
+  })
 
   type FormValues = {
     name: string
@@ -50,39 +103,59 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
             onSubmit={async (values: FormValues) => {
               if (terminal) {
                 try {
-                  // validation on checksum addresses, no duplicates
-                  const signers = parseUniqueAddresses(values.signers || "")
+                  setWaitingCreation(true)
 
-                  // trigger transaction, returns address of new Checkbook
-                  // TODO: real transaction that populates `checkbookAddress`
-                  let checkbookAddress = "0x" + uuidv4().replace(/-/g, "") // placeholder, fake address
+                  const quorum = parseInt(values.quorum)
+                  // validation on checksummed addresses, no duplicates
+                  // must be sorted for contract to validate no duplicates
+                  const signers = sortAddressesIncreasing(
+                    parseUniqueAddresses(values.signers || "")
+                  )
 
+                  // trigger transaction
+                  // after execution, will save transaction hash to state to trigger waiting process to create Checkbook entity
                   try {
-                    await createCheckbookMutation({
-                      terminalId: terminal.id,
-                      address: checkbookAddress,
-                      chainId: 1, // ETH mainnet, change once checkbooks are multichain
-                      name: values.name,
-                      quorum: parseInt(values.quorum),
-                      signers,
+                    setQuorum(quorum)
+                    setSigners(signers)
+                    setName(values.name)
+
+                    const transaction = await createCheckbook({
+                      args: [quorum, signers],
                     })
 
-                    router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
+                    // triggers hook for useWaitForTransaction which parses checkbook address makes prisma mutation
+                    setTxnHash(transaction.hash)
                   } catch (e) {
+                    setWaitingCreation(false)
                     console.error(e)
-                    setToastState({
-                      isToastShowing: true,
-                      type: "error",
-                      message: "Checkbook creation failed.",
-                    })
+                    if (e.name == "ConnectorNotFoundError") {
+                      setToastState({
+                        isToastShowing: true,
+                        type: "error",
+                        message: "Please reset wallet connection.\n(ConnectorNotFoundError)",
+                      })
+                    } else {
+                      setToastState({
+                        isToastShowing: true,
+                        type: "error",
+                        message: "Contract creation failed.",
+                      })
+                    }
                   }
                 } catch (e) {
+                  setWaitingCreation(false)
                   console.error(e)
                 }
               }
             }}
             render={({ form, handleSubmit }) => {
               const formState = form.getState()
+              const formButtonDisabled =
+                !formState.values.name ||
+                !formState.values.signers ||
+                !formState.values.quorum ||
+                formState.hasValidationErrors ||
+                !!invalidSelectedNetwork
               return (
                 <form onSubmit={handleSubmit} className="mt-12">
                   <div className="flex flex-col w-1/2">
@@ -121,7 +194,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                           <textarea
                             {...input}
                             className="w-full bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
-                            rows={4}
+                            rows={6}
                             placeholder="Enter wallet addresses"
                           />
                           {/* user feedback on number of registered unique addresses, not an error */}
@@ -140,7 +213,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                       The number of signers required for a proposal to be approved and for a check
                       to be generated.
                       <br />
-                      <a href="#" className="text-magic-mint">
+                      <a href="#" className="text-electric-violet">
                         Learn more
                       </a>
                     </span>
@@ -167,23 +240,19 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                     </Field>
                     <div>
                       <button
-                        className={`rounded text-tunnel-black px-8 py-2 h-full mt-12 ${
-                          formState.values.name &&
-                          formState.values.signers &&
-                          formState.values.quorum &&
-                          !formState.hasValidationErrors
-                            ? "bg-electric-violet"
-                            : "bg-concrete"
+                        className={`rounded text-tunnel-black px-8 py-2 w-28 h-10 mt-12 ${
+                          formButtonDisabled ? "bg-concrete" : "bg-electric-violet"
                         }`}
                         type="submit"
-                        disabled={
-                          !formState.values.name ||
-                          !formState.values.signers ||
-                          !formState.values.quorum ||
-                          formState.hasValidationErrors
-                        }
+                        disabled={formButtonDisabled || waitingCreation}
                       >
-                        Create
+                        {waitingCreation ? (
+                          <div className="flex justify-center items-center">
+                            <Spinner fill="black" />
+                          </div>
+                        ) : (
+                          "Create"
+                        )}
                       </button>
                     </div>
                   </div>
