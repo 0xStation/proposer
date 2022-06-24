@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { BlitzPage, Link, Routes, useParam, useQuery } from "blitz"
+import { BlitzPage, Link, Routes, useParam, useQuery, useRouterQuery } from "blitz"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import Navigation from "app/terminal/components/settings/navigation"
 import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
@@ -8,13 +8,19 @@ import { Checkbook } from "app/checkbook/types"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import truncateString from "app/core/utils/truncateString"
 import { ClipboardIcon, ClipboardCheckIcon, ExternalLinkIcon } from "@heroicons/react/outline"
+import Modal from "app/core/components/Modal"
+import networks from "app/utils/networks.json"
 
 const CheckbookSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
+  const { creationSuccess } = useRouterQuery()
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
   const [checkbooks, setCheckbooks] = useState<Checkbook[]>([])
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
+  const [isModalAddressCopied, setIsModalAddressCopied] = useState<boolean>(false)
+  const [isButtonAddressCopied, setIsButtonAddressCopied] = useState<boolean>(false)
+  const [successModalOpen, setSuccessModalOpen] = useState<boolean>(!!creationSuccess)
 
   useQuery(
     getCheckbooksByTerminal,
@@ -28,7 +34,8 @@ const CheckbookSettingsPage: BlitzPage = () => {
         }
         setCheckbooks(books as unknown as Checkbook[])
         if (!selectedCheckbook) {
-          setSelectedCheckbook((books as unknown as Checkbook[])[0])
+          // set defaulted checkbook as last so that newly created ones automatically shown on redirect
+          setSelectedCheckbook(books[(books as unknown as Checkbook[])?.length - 1])
         }
       },
     }
@@ -60,6 +67,27 @@ const CheckbookSettingsPage: BlitzPage = () => {
   return (
     <LayoutWithoutNavigation>
       <Navigation>
+        <Modal open={successModalOpen} toggle={setSuccessModalOpen}>
+          <div className="p-2">
+            <h3 className="text-2xl font-bold pt-6">Next, add funds to this Checkbook.</h3>
+            <p className="mt-2">
+              To activate your Checkbook, please transfer funds to the contract address.
+            </p>
+            <div className="mt-8">
+              <button
+                className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
+                onClick={() => {
+                  navigator.clipboard.writeText(selectedCheckbook?.address as string).then(() => {
+                    setIsModalAddressCopied(true)
+                    setTimeout(() => setSuccessModalOpen(false), 450) // slight delay before closing modal
+                  })
+                }}
+              >
+                {isModalAddressCopied ? "Copied!" : "Copy Address"}
+              </button>
+            </div>
+          </div>
+        </Modal>
         <div className="flex flex-col">
           <div className="p-6 border-b border-concrete flex justify-between">
             <div className="flex flex-col">
@@ -74,7 +102,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
                 className="rounded text-tunnel-black px-8 h-[32px] bg-electric-violet self-start"
                 type="submit"
               >
-                Create Checkbook
+                Create
               </button>
             </Link>
           </div>
@@ -97,7 +125,9 @@ const CheckbookSettingsPage: BlitzPage = () => {
                       <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
                         <div className="w-max truncate leading-4">{selectedCheckbook?.address}</div>
                         <a
-                          href={`https://etherscan.io/address/${selectedCheckbook?.address}`}
+                          href={`${
+                            networks[selectedCheckbook?.chainId as number].explorer
+                          }/address/${selectedCheckbook?.address as string}`}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -134,9 +164,9 @@ const CheckbookSettingsPage: BlitzPage = () => {
                   <div className="space-y-6 mt-12">
                     <div>
                       <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
-                        Quorum
+                        Chain
                       </h3>
-                      <p className="mt-2">{selectedCheckbook?.quorum || 1}</p>
+                      <p className="mt-2">{networks[selectedCheckbook?.chainId!].name}</p>
                     </div>
                     <div>
                       <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
@@ -178,23 +208,32 @@ const CheckbookSettingsPage: BlitzPage = () => {
                     </div>
                     <div>
                       <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
-                        Amount
+                        Approval Quorum
+                      </h3>
+                      <p className="mt-2">{selectedCheckbook?.quorum || 1}</p>
+                    </div>
+                    <div>
+                      <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
+                        Funds
                       </h3>
                       <p className="mt-2">
-                        There are no funds available to deploy.
-                        <a
-                          href="#"
-                          className="text-magic-mint"
-                          onClick={() =>
-                            navigator.clipboard.writeText(selectedCheckbook?.address as string)
-                          }
-                        >
-                          {" "}
-                          Copy the contract address{" "}
-                        </a>
-                        and transfer funds to this Checkbook from Gnosis or other wallet
-                        applications.
+                        There are no funds available to deploy. Copy the contract address and
+                        transfer funds to this Checkbook from Gnosis or other wallet applications.
                       </p>
+                      <button
+                        type="button"
+                        className="text-electric-violet border border-electric-violet w-40 mt-3 py-1 px-4 rounded hover:opacity-75"
+                        onClick={() =>
+                          navigator.clipboard
+                            .writeText(selectedCheckbook?.address as string)
+                            .then(() => {
+                              setIsButtonAddressCopied(true)
+                              setTimeout(() => setIsButtonAddressCopied(false), 3000)
+                            })
+                        }
+                      >
+                        {isButtonAddressCopied ? "Copied!" : "Copy Address"}
+                      </button>
                     </div>
                   </div>
                 </div>

@@ -100,12 +100,14 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                       pfpURL,
                       accountId: session.userId,
                     })
-                    sendTerminalCreationNotification(
-                      values.name,
-                      values.handle,
-                      `https://${window.location.host}`,
-                      process.env.BLITZ_PUBLIC_STATION_DISCORD_SERVER_WEBHOOK
-                    )
+                    if (window !== undefined && window.location.host === "app.station.express") {
+                      sendTerminalCreationNotification(
+                        values.name,
+                        values.handle,
+                        `https://${window.location.host}`,
+                        process.env.BLITZ_PUBLIC_STATION_DISCORD_SERVER_WEBHOOK
+                      )
+                    }
                   } catch (err) {
                     setToastState({ isToastShowing: true, type: "error", message: err.toString() })
                   }
