@@ -99,7 +99,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
             </div>
             <Link href={Routes.NewCheckbookSettingsPage({ terminalHandle })}>
               <button
-                className="rounded text-tunnel-black px-8 h-full h-[32px] bg-electric-violet self-start"
+                className="rounded text-tunnel-black px-8 h-[32px] bg-electric-violet self-start"
                 type="submit"
               >
                 Create

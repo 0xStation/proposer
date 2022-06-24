@@ -240,7 +240,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                     </Field>
                     <div>
                       <button
-                        className={`rounded text-tunnel-black text-bold px-8 py-2 w-28 h-10 mt-12 ${
+                        className={`rounded text-tunnel-black px-8 py-2 w-28 h-10 mt-12 ${
                           formButtonDisabled ? "bg-concrete" : "bg-electric-violet"
                         }`}
                         type="submit"

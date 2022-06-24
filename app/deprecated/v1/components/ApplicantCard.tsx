@@ -26,7 +26,7 @@
 
 // export const ApplicantCard = (props: ApplicantCardProps) => {
 //   const hoverButtonStyling =
-//     "bg-tunnel-black text-magic-mint rounded w-40 border border-magic-mint hover:bg-wet-concrete p-1"
+//     "bg-tunnel-black text-electric-violet rounded w-40 border border-electric-violet hover:bg-wet-concrete p-1"
 //   const {
 //     application,
 //     roleOfActiveUser,

@@ -124,7 +124,7 @@ const CreateConnectDiscord: BlitzPage = ({
         </button>
         {(discordAuthToken || authorization) && (
           <button
-            className="bg-magic-mint h-[35px] text-tunnel-black rounded px-10 mt-12"
+            className="bg-electric-violet h-[35px] text-tunnel-black rounded px-10 mt-12"
             onClick={() => router.push(`/profile/${activeUser?.address}`)}
           >
             Finish

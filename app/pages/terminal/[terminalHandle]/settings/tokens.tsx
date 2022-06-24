@@ -65,7 +65,7 @@ const TokenSettingsPage: BlitzPage = () => {
               Add tokens that represent your community&apos;s membership and ownership.
             </p>
             <Link href={Routes.NewTokenSettingsPage({ terminalHandle })}>
-              <button className="cursor-pointer mt-8 w-[200px] py-1 bg-magic-mint text-tunnel-black rounded text-base">
+              <button className="cursor-pointer mt-8 w-[200px] py-1 bg-electric-violet text-tunnel-black rounded text-base">
                 Add
               </button>
             </Link>
@@ -81,7 +81,7 @@ const TokenSettingsPage: BlitzPage = () => {
               </div>
               <Link href={Routes.NewTokenSettingsPage({ terminalHandle })}>
                 <button
-                  className="rounded text-tunnel-black px-8 h-full h-[32px] bg-magic-mint self-start"
+                  className="rounded text-tunnel-black px-8 h-[32px] bg-electric-violet self-start"
                   type="submit"
                 >
                   Add
