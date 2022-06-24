@@ -1,7 +1,7 @@
 {
   "1": {
     "key": "1",
-    "name": "Ethereum Mainnet",
+    "name": "Ethereum",
     "chainId": 1,
     "network": "homestead",
     "multicall": "0xeefba1e63905ef1d7acba5a8513c70307c1ce441",
@@ -26,7 +26,7 @@
   },
   "4": {
     "key": "4",
-    "name": "Ethereum Testnet Rinkeby",
+    "name": "Rinkeby (testnet)",
     "shortName": "Rinkeby",
     "chainId": 4,
     "network": "rinkeby",
@@ -44,7 +44,7 @@
   },
   "5": {
     "key": "5",
-    "name": "Ethereum Testnet Görli",
+    "name": "Görli (testnet)",
     "shortName": "Görli",
     "chainId": 5,
     "network": "goerli",
@@ -57,7 +57,7 @@
   },
   "10": {
     "key": "10",
-    "name": "Optimism Mainnet",
+    "name": "Optimism",
     "chainId": 10,
     "network": "Optimism mainnet",
     "multicall": "0x35A6Cdb2C9AD4a45112df4a04147EB07dFA01aB7",
@@ -104,7 +104,7 @@
   },
   "250": {
     "key": "250",
-    "name": "Fantom Opera",
+    "name": "Fantom",
     "shortName": "fantom",
     "chainId": 250,
     "network": "Mainnet",
@@ -116,7 +116,7 @@
   },
   "42161": {
     "key": "42161",
-    "name": "Arbitrum One",
+    "name": "Arbitrum",
     "chainId": 42161,
     "network": "Arbitrum mainnet",
     "multicall": "0x7A7443F8c577d537f1d8cD4a629d40a3148Dd7ee",
@@ -128,9 +128,16 @@
     "start": 256508,
     "logo": "ipfs://QmWZ5SMRfvcK8tycsDqojQaSiKedgtVkS7CkZdxPgeCVsZ"
   },
+  "1337": {
+    "key": "1337",
+    "name": "Localhost",
+    "chainId": 1337,
+    "network": "Localhost",
+    "explorer": "https://app.station.express"
+  },
   "42220": {
     "key": "42220",
-    "name": "Celo Mainnet",
+    "name": "Celo",
     "shortName": "Celo",
     "chainId": 42220,
     "network": "mainnet",
