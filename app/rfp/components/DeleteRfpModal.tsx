@@ -1,6 +1,40 @@
+import { invalidateQuery, useMutation, useRouter } from "blitz"
 import Modal from "app/core/components/Modal"
+import getRfpsByTerminalId from "../queries/getRfpsByTerminalId"
+import getRfpById from "../queries/getRfpById"
+import useStore from "app/core/hooks/useStore"
+import deleteRfp from "../mutations/deleteRfp"
 
-export const DeleteRfpModal = ({ isOpen, setIsOpen, handleSubmit }) => {
+export const DeleteRfpModal = ({ isOpen, setIsOpen, rfp, terminalHandle }) => {
+  const setToastState = useStore((state) => state.setToastState)
+  const router = useRouter()
+  const [deleteRfpMutation] = useMutation(deleteRfp, {
+    onSuccess: (_data) => {
+      invalidateQuery(getRfpsByTerminalId)
+      invalidateQuery(getRfpById)
+      setIsOpen(false)
+      router.push({
+        pathname: `/terminal/${terminalHandle}/bulletin`,
+        query: { rfpDeleted: true },
+      })
+    },
+    onError: (error: Error) => {
+      console.error(error)
+    },
+  })
+
+  const handleSubmit = async () => {
+    try {
+      await deleteRfpMutation({ rfpId: rfp?.id as string })
+    } catch (error) {
+      console.error("Error deleting RFP", error)
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: "Error deleting RFPs",
+      })
+    }
+  }
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">

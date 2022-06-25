@@ -3,20 +3,37 @@ import { useRouter, Link, Routes, useParam, useQuery } from "blitz"
 import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import getRfpById from "../queries/getRfpById"
 import { RfpStatus } from "../types"
-import { XCircleIcon, PencilIcon, LinkIcon } from "@heroicons/react/solid"
+import {
+  TrashIcon,
+  XCircleIcon,
+  PencilIcon,
+  InboxInIcon,
+  DotsHorizontalIcon,
+  ClipboardCheckIcon,
+  ClipboardIcon,
+} from "@heroicons/react/solid"
 import CloseRfpModal from "./CloseRfpModal"
 import ReopenRfpModal from "./ReopenRfpModal"
+import Dropdown from "app/core/components/Dropdown"
+import { DeleteRfpModal } from "./DeleteRfpModal"
 
 const RfpHeaderNavigation = ({ rfpId }) => {
   const terminalHandle = useParam("terminalHandle") as string
   const [isRFPUrlCopied, setIsRfpUrlCopied] = useState<boolean>(false)
   const [isClosedRfpModalOpen, setIsClosedRfpModalOpen] = useState<boolean>(false)
   const [isReopenRfpModalOpen, setIsReopenRfpModalOpen] = useState<boolean>(false)
+  const [deleteRfpModalOpen, setDeleteRfpModalOpen] = useState<boolean>(false)
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
   const router = useRouter()
 
   return (
     <>
+      <DeleteRfpModal
+        isOpen={deleteRfpModalOpen}
+        setIsOpen={setDeleteRfpModalOpen}
+        rfp={rfp}
+        terminalHandle={terminalHandle}
+      />
       <ReopenRfpModal isOpen={isReopenRfpModalOpen} setIsOpen={setIsReopenRfpModalOpen} rfp={rfp} />
       <CloseRfpModal isOpen={isClosedRfpModalOpen} setIsOpen={setIsClosedRfpModalOpen} rfp={rfp} />
       <div className="max-h-[250px] sm:h-60 border-b border-concrete pl-6 pt-6 pr-4">
@@ -50,42 +67,79 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                   <div className="inline self-center mr-6 mb-6">
                     <button
                       onClick={() => {
-                        navigator.clipboard.writeText(window.location.href).then(() => {
-                          setIsRfpUrlCopied(true)
-                          setTimeout(() => setIsRfpUrlCopied(false), 500)
-                        })
-                        setIsRfpUrlCopied(true)
-                      }}
-                    >
-                      <LinkIcon
-                        className={`inline h-6 w-6 mr-3 hover:cursor-pointer hover:fill-marble-white ${
-                          isRFPUrlCopied ? "fill-marble-white" : "fill-concrete"
-                        }`}
-                      />
-                    </button>
-                    {isRFPUrlCopied && (
-                      <span className="mt-2 text-[.5rem] ml-[-10px] uppercase font-bold tracking-wider rounded px-1 absolute text-marble-white bg-wet-concrete">
-                        copied!
-                      </span>
-                    )}
-                    <button
-                      onClick={() => {
                         router.push(Routes.EditRfpPage({ terminalHandle, rfpId }))
                       }}
                     >
-                      <PencilIcon className="inline h-6 w-6 fill-concrete mr-3 hover:cursor-pointer hover:fill-marble-white" />
+                      <PencilIcon className="inline h-6 w-6 fill-marble-white mr-3 hover:cursor-pointer hover:fill-concrete" />
                     </button>
-                    <button
-                      onClick={() => {
-                        if (rfp?.status !== RfpStatus.CLOSED) {
-                          setIsClosedRfpModalOpen(true)
-                        } else {
-                          setIsReopenRfpModalOpen(true)
-                        }
-                      }}
-                    >
-                      <XCircleIcon className="inline h-6 w-6 fill-concrete hover:cursor-pointer hover:fill-marble-white" />
-                    </button>
+                    <Dropdown
+                      className="inline"
+                      side="right"
+                      button={
+                        <DotsHorizontalIcon className="inline-block h-6 w-6 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
+                      }
+                      items={[
+                        {
+                          name: (
+                            <>
+                              {isRFPUrlCopied ? (
+                                <>
+                                  <ClipboardCheckIcon className="h-4 w-4 mr-2 inline" />
+                                  <p className="inline">Copied!</p>
+                                </>
+                              ) : (
+                                <>
+                                  <ClipboardIcon className="h-4 w-4 mr-2 inline" />
+                                  <p className="inline">Copy link</p>
+                                </>
+                              )}
+                            </>
+                          ),
+                          onClick: () => {
+                            navigator.clipboard.writeText(window.location.href).then(() => {
+                              setIsRfpUrlCopied(true)
+                              setTimeout(() => setIsRfpUrlCopied(false), 500)
+                            })
+                            setIsRfpUrlCopied(true)
+                          },
+                        },
+                        {
+                          name: (
+                            <div>
+                              {rfp && rfp?.status !== RfpStatus.CLOSED ? (
+                                <>
+                                  <XCircleIcon className="h-4 w-4 mr-2 inline" />
+                                  <p className="inline">Close for submissions</p>
+                                </>
+                              ) : (
+                                <>
+                                  <InboxInIcon className="h-4 w-4 mr-2 inline" />
+                                  <p className="inline">Open for submissions</p>
+                                </>
+                              )}
+                            </div>
+                          ),
+                          onClick: () => {
+                            if (rfp?.status !== RfpStatus.CLOSED) {
+                              setIsClosedRfpModalOpen(true)
+                            } else {
+                              setIsReopenRfpModalOpen(true)
+                            }
+                          },
+                        },
+                        {
+                          name: (
+                            <>
+                              <TrashIcon className="h-4 w-4 mr-2 fill-torch-red" />
+                              <p className="text-torch-red">Delete</p>
+                            </>
+                          ),
+                          onClick: () => {
+                            setDeleteRfpModalOpen(true)
+                          },
+                        },
+                      ]}
+                    />
                   </div>
                 </div>
               </div>

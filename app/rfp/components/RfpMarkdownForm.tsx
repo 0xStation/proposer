@@ -14,8 +14,6 @@ import { Rfp } from "../types"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import { getShortDate } from "app/core/utils/getShortDate"
 import ConfirmationRfpModal from "./ConfirmationRfpModal"
-import deleteRfp from "../mutations/deleteRfp"
-import DeleteRfpModal from "./DeleteRfpModal"
 import { requiredField } from "app/utils/validators"
 
 const RfpMarkdownForm = ({
@@ -29,7 +27,6 @@ const RfpMarkdownForm = ({
   isEdit?: boolean
   rfp?: Rfp
 }) => {
-  const [deleteRfpModalOpen, setDeleteRfpModalOpen] = useState<boolean>(false)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
   const [title, setTitle] = useState<string>(rfp?.data?.content?.title || "")
   const [markdown, setMarkdown] = useState<string>(rfp?.data?.content?.body || "")
@@ -76,37 +73,8 @@ const RfpMarkdownForm = ({
     },
   })
 
-  const [deleteRfpMutation] = useMutation(deleteRfp, {
-    onSuccess: (_data) => {
-      invalidateQuery(getRfpsByTerminalId)
-      router.push({
-        pathname: `/terminal/${terminal?.handle}/bulletin`,
-        query: { rfpDeleted: true },
-      })
-    },
-    onError: (error: Error) => {
-      console.error(error)
-    },
-  })
-
   return (
     <>
-      <DeleteRfpModal
-        isOpen={deleteRfpModalOpen}
-        setIsOpen={setDeleteRfpModalOpen}
-        handleSubmit={async () => {
-          try {
-            await deleteRfpMutation({ rfpId: rfp?.id as string })
-          } catch (error) {
-            console.error("Error deleting RFP", error)
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: "Error deleting RFPs",
-            })
-          }
-        }}
-      />
       <div className="fixed grid grid-cols-4 w-[calc(100%-70px)] border-box z-50">
         <div className="col-span-3 pt-4 pr-4 h-full bg-tunnel-black">
           <div className="text-light-concrete flex flex-row justify-between w-full">
@@ -270,55 +238,7 @@ const RfpMarkdownForm = ({
                   </div>
                   <form className="p-4 grow flex flex-col justify-between">
                     <div>
-                      <label className="font-bold block">Checkbook*</label>
-                      <span className="text-xs text-concrete block">
-                        Checkbook is where you deposit funds to create checks for proposers to claim
-                        once their projects have been approved.
-                        <br />
-                        {/* TODO: add a link here  */}
-                        <a href="#" className="text-electric-violet">
-                          Learn more
-                        </a>
-                      </span>
-
-                      <Field name={`checkbookAddress`} validate={requiredField}>
-                        {({ input, meta }) => {
-                          return (
-                            <div className="custom-select-wrapper">
-                              <select
-                                {...input}
-                                className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-1`}
-                              >
-                                <option value="">Choose option</option>
-                                {checkbooks?.map((cb, idx) => {
-                                  return (
-                                    <option key={`checkbook-${idx}`} value={cb.address}>
-                                      {cb.name}
-                                    </option>
-                                  )
-                                })}
-                              </select>
-                              {meta.touched && input.value === "" && (
-                                <span className="text-torch-red text-xs">
-                                  You must select a checkbook.
-                                </span>
-                              )}
-                            </div>
-                          )
-                        }}
-                      </Field>
-                      <Link
-                        href={Routes.NewCheckbookSettingsPage({ terminalHandle: terminal?.handle })}
-                        passHref
-                      >
-                        <a target="_blank" rel="noopener noreferrer">
-                          <span className="text-electric-violet cursor-pointer mt-1 block">
-                            + Create new
-                          </span>
-                        </a>
-                      </Link>
-
-                      <div className="flex flex-col mt-6">
+                      <div className="flex flex-col mt-2">
                         <label className="font-bold">Start Date</label>
                         <span className="text-xs text-concrete block">
                           Proposal submission opens
@@ -361,18 +281,58 @@ const RfpMarkdownForm = ({
                           )}
                         </Field>
                       </div>
-                      {isEdit && (
-                        <div className="flex flex-col mt-7">
-                          <span
-                            className="text-torch-red cursor-pointer"
-                            onClick={() => {
-                              setDeleteRfpModalOpen(true)
-                            }}
-                          >
-                            Delete RFP
-                          </span>
-                        </div>
-                      )}
+                      <div className="flex flex-col mt-6">
+                        <label className="font-bold block">Checkbook*</label>
+                        <span className="text-xs text-concrete block">
+                          Checkbook is where you deposit funds to create checks for proposers to
+                          claim once their projects have been approved. You can connect RFP to
+                          Checkbook later.
+                          <br />
+                          {/* TODO: add a link here  */}
+                          <a href="#" className="text-electric-violet">
+                            Learn more
+                          </a>
+                        </span>
+
+                        <Field name={`checkbookAddress`} validate={requiredField}>
+                          {({ input, meta }) => {
+                            return (
+                              <div className="custom-select-wrapper">
+                                <select
+                                  {...input}
+                                  className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-1`}
+                                >
+                                  <option value="">Choose option</option>
+                                  {checkbooks?.map((cb, idx) => {
+                                    return (
+                                      <option key={`checkbook-${idx}`} value={cb.address}>
+                                        {cb.name}
+                                      </option>
+                                    )
+                                  })}
+                                </select>
+                                {meta.touched && input.value === "" && (
+                                  <span className="text-torch-red text-xs">
+                                    You must select a checkbook.
+                                  </span>
+                                )}
+                              </div>
+                            )
+                          }}
+                        </Field>
+                        <Link
+                          href={Routes.NewCheckbookSettingsPage({
+                            terminalHandle: terminal?.handle,
+                          })}
+                          passHref
+                        >
+                          <a target="_blank" rel="noopener noreferrer">
+                            <span className="text-electric-violet cursor-pointer mt-1 block">
+                              + Create new
+                            </span>
+                          </a>
+                        </Link>
+                      </div>
                     </div>
                     <div>
                       <button
