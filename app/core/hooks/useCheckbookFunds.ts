@@ -1,7 +1,9 @@
 import { useBalance } from "wagmi"
-import { BigNumber } from "ethers"
+import { BigNumber, utils } from "ethers"
 import { useQuery } from "blitz"
 import getAggregatedCheckAmounts from "app/check/queries/getAggregatedCheckAmounts"
+import { zeroAddress } from "../utils/constants"
+import decimalToBigNumber from "../utils/decimalToBigNumber"
 
 const useCheckbookFunds = (
   chainId: number,
@@ -19,12 +21,12 @@ const useCheckbookFunds = (
     addressOrName: checkbookAddress,
     chainId,
     cacheTime: 10_000, // 10 seconds
-    ...(!!tokenAddress && { token: tokenAddress }), // if tokenAddress is empty string, use gas token (e.g. ETH)
+    ...(!!tokenAddress && tokenAddress !== zeroAddress && { token: tokenAddress }), // if tokenAddress is zero address, use gas token (e.g. ETH)
   })
 
-  // query db for pending and cashed funds
-  const pending = BigNumber.from(aggregatedCheckTotals?.pending || 0)
-  const cashed = BigNumber.from(aggregatedCheckTotals?.cashed || 0)
+  // db stores check amounts as decimal so need to remultiply by token's number of decimals
+  const pending = decimalToBigNumber(aggregatedCheckTotals?.pending || 0, data?.decimals || 0)
+  const cashed = decimalToBigNumber(aggregatedCheckTotals?.cashed || 0, data?.decimals || 0)
 
   return {
     pending,

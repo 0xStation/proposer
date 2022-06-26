@@ -1,17 +1,21 @@
 import { BlitzPage } from "blitz"
-import { useSignTypedData } from "wagmi"
+import { useState } from "react"
+import { useSignTypedData, useToken } from "wagmi"
+import { utils } from "ethers"
 import Navigation from "app/terminal/components/settings/navigation"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import getFundingTokens from "app/core/utils/getFundingTokens"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
-import { TypedDataTypeDefinition, TypedDataSignatureDomain } from "app/types"
+import { TypedDataTypeDefinition } from "app/types"
 import { useQuery, useMutation, useParam } from "blitz"
 import createCheck from "app/check/mutations/createCheck"
 import createCheckApproval from "app/checkApproval/mutations/createCheckApproval"
 import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getAllAccounts from "app/account/queries/getAllAccounts"
+import { zeroAddress } from "app/core/utils/constants"
+import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 
 /**
  * THIS IS A DEV TOOL
@@ -49,6 +53,9 @@ const ApprovalSignaturesPage: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
   // queue used for demoing split checks, not needed for right now
   // const [checkQueue, setCheckQueue] = useState<Check[]>([])
+  const setToastState = useStore((state) => state.setToastState)
+
+  const [tokenAddress, setTokenAddress] = useState<string>()
 
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(
@@ -84,20 +91,16 @@ const ApprovalSignaturesPage: BlitzPage = () => {
 
   let { signTypedDataAsync: signApproval } = useSignTypedData()
 
+  const { data: tokenData } = useToken({
+    ...(!!tokenAddress && tokenAddress !== zeroAddress && { address: tokenAddress }),
+  })
+
   const generateCheck = async (check) => {
-    console.log(check)
-
-    const deadline = new Date()
-    // missing edge cases for days in a month, but good enough for now
-    if (deadline.getMonth() < 12) {
-      deadline.setMonth(deadline.getMonth() + 1)
-    } else {
-      deadline.setMonth(1)
-      deadline.setFullYear(deadline.getFullYear() + 1)
-    }
-
+    // need this for my jank frontend setup, advice would be helpful!
+    setTokenAddress(check.token)
     const checkbookChainId =
       checkbooks?.find((c) => c.address === check.checkbookAddress)?.chainId || 0
+    const decimals = tokenAddress === zeroAddress ? 18 : tokenData?.decimals || 0
 
     // generate check
     const newCheck = await createCheckMutation({
@@ -106,8 +109,8 @@ const ApprovalSignaturesPage: BlitzPage = () => {
       chainId: checkbookChainId,
       recipientAddress: check.recipient,
       tokenAddress: check.token,
-      tokenAmount: parseInt(check.amount),
-      deadline,
+      tokenAmount: check.amount, // store value with decimals
+      tokenDecimals: decimals,
     })
 
     // generate signature and create CheckApproval
@@ -124,8 +127,8 @@ const ApprovalSignaturesPage: BlitzPage = () => {
       // `chainId` should be the actual id for the contract, 4 is hardcoded for Rinkeby testing
       // `verifyingContract` is the address of the contract that will be consuming this signature (the checkbook)
       const domain = {
-        name: "Checkbook",
-        version: "1",
+        name: "Checkbook", // keep hardcoded
+        version: "1", // keep hardcoded
         chainId: checkbookChainId,
         verifyingContract: check.checkbookAddress,
       }
@@ -133,10 +136,10 @@ const ApprovalSignaturesPage: BlitzPage = () => {
       const types = singleCheckTypes
 
       const value = {
-        recipient: check.recipient,
-        token: check.token,
-        amount: check.amount,
-        deadline: deadline.valueOf(),
+        recipient: newCheck.recipientAddress,
+        token: newCheck.tokenAddress,
+        amount: decimalToBigNumber(newCheck.tokenAmount, decimals),
+        deadline: newCheck.deadline.valueOf(),
         nonce: newCheck.nonce,
       }
 
@@ -152,8 +155,11 @@ const ApprovalSignaturesPage: BlitzPage = () => {
         signerAddress: activeUser?.address as string,
         signature,
       })
+
+      return true
     } catch (e) {
       console.error(e)
+      return false
     }
   }
 
@@ -163,12 +169,25 @@ const ApprovalSignaturesPage: BlitzPage = () => {
         <section className="flex-1 ml-10">
           <h2 className="text-marble-white text-2xl font-bold mt-10">Generate Check</h2>
           <Form
-            onSubmit={async (values: any) => {
+            onSubmit={async (values: any, form) => {
               // setCheckQueue([...checkQueue, values])
               try {
-                generateCheck(values)
+                const success = await generateCheck(values)
+                if (success) {
+                  setToastState({
+                    isToastShowing: true,
+                    type: "success",
+                    message: "New check approval created.",
+                  })
+                  form.reset()
+                }
               } catch (error) {
                 console.error(`Error generating check: ${error}`)
+                setToastState({
+                  isToastShowing: true,
+                  type: "error",
+                  message: "Error with check generation",
+                })
                 alert("Error generating check.")
               }
             }}
@@ -250,10 +269,6 @@ const ApprovalSignaturesPage: BlitzPage = () => {
                       )}
                     </Field>
 
-                    {/* 
-                      Amount of tokens for Check, should have full decimals of token, 
-                      make sure to use ethers.BigNumber or string type 
-                    */}
                     <label htmlFor="name" className="text-marble-white text-base mt-4">
                       Amount*
                     </label>

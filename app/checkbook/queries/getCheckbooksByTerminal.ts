@@ -30,5 +30,5 @@ export default async function getCheckbooksByTerminal(
 
   return checkbooks.map((c) => {
     return { ...c, signerAccounts: c.signers.map((s) => signers[s]) }
-  }) as Checkbook[]
+  }) as unknown as Checkbook[]
 }

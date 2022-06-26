@@ -14,6 +14,8 @@ export const CONTRACTS = {
   },
 }
 
+export const zeroAddress = "0x0000000000000000000000000000000000000000"
+
 export const DEFAULT_PFP_URLS = {
   USER: "https://station-images.nyc3.digitaloceanspaces.com/pfp-gradient.png",
   TERMINAL: "https://station-images.nyc3.digitaloceanspaces.com/terminal-gradient.png",
