@@ -5,6 +5,7 @@ import {
   GetServerSideProps,
   InferGetServerSidePropsType,
   Routes,
+  Link,
   useRouter,
   useParam,
   useMutation,
@@ -17,13 +18,16 @@ import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
 import Modal from "app/core/components/Modal"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getRfpById from "app/rfp/queries/getRfpById"
 import createProposal from "app/proposal/mutations/createProposal"
 import { Rfp } from "app/rfp/types"
+import { Terminal } from "app/terminal/types"
 import { requiredField } from "app/utils/validators"
 
 type GetServerSidePropsData = {
   rfp: Rfp
+  terminal: Terminal
 }
 
 const CreateProposalPage: BlitzPage = ({
@@ -99,14 +103,33 @@ const CreateProposalPage: BlitzPage = ({
           markdown: string
           title: string
         }) => {
-          await createProposalMutation({
-            rfpId: data.rfp.id,
-            token: values.token,
-            amount: values.amount,
-            recipientAddress: values.recipientAddress,
-            contentBody: values.markdown,
-            contentTitle: values.title,
-          })
+          if (!activeUser?.address) {
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "You must connect your wallet in order to create a proposal",
+            })
+          } else {
+            try {
+              await createProposalMutation({
+                rfpId: data.rfp.id,
+                terminalId: data.terminal.id,
+                token: values.token,
+                amount: values.amount,
+                recipientAddress: values.recipientAddress,
+                contentBody: values.markdown,
+                contentTitle: values.title,
+                collaborators: [activeUser.address],
+              })
+            } catch (e) {
+              console.error(e)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Something went wrong.",
+              })
+            }
+          }
         }}
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
@@ -196,7 +219,7 @@ const CreateProposalPage: BlitzPage = ({
                         alt="PFP"
                         className="w-[46px] h-[46px] rounded-lg"
                         onError={(e) => {
-                          e.currentTarget.src = DEFAULT_PFP_URLS.USER
+                          e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
                         }}
                       />
                       <div className="ml-2">
@@ -209,23 +232,29 @@ const CreateProposalPage: BlitzPage = ({
                     <h4 className="text-xs font-bold text-concrete uppercase mt-6">
                       Request for Proposal
                     </h4>
-                    <p className="mt-2 text-electric-violet">{data.rfp.data.content.title}</p>
+                    <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: data.rfp.id })}>
+                      <p className="mt-2 text-electric-violet cursor-pointer">
+                        {data.rfp.data.content.title}
+                      </p>
+                    </Link>
                     <label className="font-bold block mt-6">Fund recipient*</label>
                     <span className="text-xs text-concrete block">
                       Primary destination of the funds. Project lead/creator’s wallet address is
                       recommended.
                     </span>
 
-                    <Field name={`recipientAddress`} validate={requiredField}>
+                    <Field name="recipientAddress" validate={requiredField}>
                       {({ meta, input }) => (
                         <>
                           <input
                             {...input}
                             type="text"
+                            required
                             placeholder="Enter wallet or ENS address"
                             className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                           />
-                          {meta.touched && input.value === "" && (
+
+                          {((meta.touched && input.value === "") || meta.error) && (
                             <span className="text-torch-red text-xs">
                               You must provide an address.
                             </span>
@@ -248,7 +277,7 @@ const CreateProposalPage: BlitzPage = ({
                               <option value="ETH">ETH</option>
                             </select>
                           </div>
-                          {meta.touched && input.value === "" && (
+                          {((meta.touched && input.value === "") || meta.error) && (
                             <span className="text-torch-red text-xs">You must select a token.</span>
                           )}
                         </>
@@ -265,7 +294,7 @@ const CreateProposalPage: BlitzPage = ({
                             placeholder="Enter token amount"
                             className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                           />
-                          {meta.touched && input.value === "" && (
+                          {((meta.touched && input.value === "") || meta.error) && (
                             <span className="text-torch-red text-xs">
                               You must provide an amount.
                             </span>
@@ -306,24 +335,20 @@ const CreateProposalPage: BlitzPage = ({
   )
 }
 
-// Fetch RFP on server side rather than fetching on client and requiring a loading state
-// either returns the RFP (no loading) or the RFP is not found and we redirect
-// right now redirecting to bulletin page, but we could do a 404 or something too
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { terminalHandle, rfpId } = context.query as { terminalHandle: string; rfpId: string }
   const rfp = await invoke(getRfpById, { id: rfpId })
+  const terminal = await invoke(getTerminalByHandle, { handle: terminalHandle })
 
-  if (!rfp) {
+  if (!rfp || !terminal) {
     return {
-      redirect: {
-        destination: Routes.BulletinPage({ terminalHandle }),
-        permanent: false,
-      },
+      notFound: true,
     }
   }
 
   const data: GetServerSidePropsData = {
     rfp,
+    terminal,
   }
 
   return {

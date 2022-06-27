@@ -2,13 +2,14 @@ import db from "db"
 import * as z from "zod"
 
 const CreateProposal = z.object({
+  terminalId: z.number(),
   rfpId: z.string(),
   token: z.string(),
   amount: z.number(),
   recipientAddress: z.string(),
   contentTitle: z.string(),
   contentBody: z.string(),
-  collaborators: z.array(z.string()).optional(), // optional for now - we are moving this to p1+
+  collaborators: z.array(z.string()),
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
@@ -24,6 +25,16 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
           recipientAddress: input.recipientAddress,
           token: input.token,
           amount: input.amount,
+        },
+      },
+      collaborators: {
+        createMany: {
+          data: input.collaborators.map((collaborator) => {
+            return {
+              address: collaborator,
+              terminalId: input.terminalId,
+            }
+          }),
         },
       },
     },

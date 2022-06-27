@@ -98,15 +98,16 @@ const ProposalPage: BlitzPage = ({
                 <h4 className="text-xs font-bold text-concrete uppercase mt-4">Approval</h4>
                 <div className="flex flex-row space-x-2 items-center mt-2">
                   <ProgressIndicator percent={0} twsize={6} cutoff={0} />
-                  <p className="">0/3</p>
+                  {/* todo -- approvals */}
+                  <p>0/3</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => {
-                  //
+                  // todo -- aprove
                 }}
-                className={`bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70`}
+                className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70"
               >
                 Approve
               </button>
