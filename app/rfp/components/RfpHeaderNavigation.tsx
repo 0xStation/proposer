@@ -44,9 +44,11 @@ const RfpHeaderNavigation = ({ rfpId }) => {
             </span>
             RFP: {rfp?.data?.content?.title}
           </p>
-          <button className="bg-electric-violet text-tunnel-black rounded h-[35px] px-9 hover:bg-opacity-70">
-            Create proposal
-          </button>
+          <Link href={Routes.CreateProposalPage({ terminalHandle, rfpId })}>
+            <button className="bg-electric-violet text-tunnel-black rounded h-[35px] px-9 hover:bg-opacity-70">
+              Create proposal
+            </button>
+          </Link>
         </div>
         <div className="flex flex-row mt-6">
           <div className="flex-col w-full">
