@@ -4,7 +4,7 @@ import { BlitzPage, Routes, useParam, useQuery, Link, useRouterQuery } from "bli
 import { Menu, Transition } from "@headlessui/react"
 import Layout from "app/core/layouts/Layout"
 import Modal from "app/core/components/Modal"
-import SuccessProposalModal from "app/proposal/components/successProposalModal"
+import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
