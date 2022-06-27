@@ -15,6 +15,7 @@ import { Auth } from "app/auth/types"
 import { Account } from "app/account/types"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import useKeyPress from "app/core/hooks/useKeyPress"
+import { TagType } from "app/tag/types"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
@@ -219,17 +220,19 @@ const SelectedTerminalCard = ({
   const membership = account.tickets.find((ticket) => ticket.terminalId === terminal.id)
 
   const statusTags = membership.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "status"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.STATUS
   )
-
+  const seasonTags = membership.tags?.filter(
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.SEASON
+  )
   const roleTags = membership.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "role"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.ROLE
   )
   const projectTags = membership.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "project"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.PROJECT
   )
   const guildTags = membership.tags?.filter(
-    (accountTerminalTag) => accountTerminalTag.tag.type === "guild"
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.GUILD
   )
 
   const selectedTerminalCardContent = (
@@ -268,6 +271,7 @@ const SelectedTerminalCard = ({
             <p className="text-base">{formatDate(membership.joinedAt)}</p>
           </div>
         )}
+        <TagDetails tagType="seasons" tags={seasonTags} />
         <TagDetails tagType="roles" tags={roleTags} />
         <TagDetails tagType="projects" tags={projectTags} />
         <TagDetails tagType="guilds" tags={guildTags} />

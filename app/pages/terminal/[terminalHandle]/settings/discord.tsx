@@ -268,6 +268,7 @@ const DiscordSettingsPage: BlitzPage = () => {
                                                 <>
                                                   <option value="">Choose option</option>
                                                   <option value="status">Status</option>
+                                                  <option value="season">Season</option>
                                                   <option value="role">Role</option>
                                                   <option value="project">Project</option>
                                                   <option value="guild">Guild</option>
