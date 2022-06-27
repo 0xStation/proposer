@@ -24,7 +24,7 @@ import { Check } from "@prisma/client"
  * this is meant to show a dev how check signatures need to be prepared to be valid for the Checkbook contracts
  */
 
-const ApprovalSignaturesPage: BlitzPage = () => {
+const GenerateCheckPage: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
 
@@ -296,6 +296,6 @@ const ApprovalSignaturesPage: BlitzPage = () => {
   )
 }
 
-ApprovalSignaturesPage.suppressFirstRenderFlicker = true
+GenerateCheckPage.suppressFirstRenderFlicker = true
 
-export default ApprovalSignaturesPage
+export default GenerateCheckPage
