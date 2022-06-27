@@ -2,7 +2,7 @@ import { Checkbook } from "app/checkbook/types"
 import { Terminal } from "app/terminal/types"
 import networks from "app/utils/networks.json"
 import { TagType, TokenType } from "app/tag/types"
-import { zeroAddress } from "./constants"
+import { zeroAddress, chainIds } from "./constants"
 
 const getFundingTokens = (
   checkbook: Checkbook | undefined,
@@ -10,7 +10,7 @@ const getFundingTokens = (
 ) => {
   return [
     // ETH gas coin if on mainnet or testnet
-    ...([1, 4, 5].includes(checkbook?.chainId || 0)
+    ...([chainIds.ETHEREUM, chainIds.RINKEBY, chainIds.GOERLI].includes(checkbook?.chainId || 0)
       ? [{ symbol: "ETH", address: zeroAddress }]
       : []),
     // preferred stablecoins for network

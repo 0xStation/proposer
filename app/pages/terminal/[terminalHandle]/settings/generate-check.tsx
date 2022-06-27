@@ -1,7 +1,6 @@
 import { BlitzPage } from "blitz"
 import { useState } from "react"
 import { useSignTypedData, useToken } from "wagmi"
-import { utils } from "ethers"
 import Navigation from "app/terminal/components/settings/navigation"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
@@ -16,6 +15,7 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getAllAccounts from "app/account/queries/getAllAccounts"
 import { zeroAddress } from "app/core/utils/constants"
 import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
+import { Check } from "@prisma/client"
 
 /**
  * THIS IS A DEV TOOL
@@ -24,35 +24,8 @@ import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
  * this is meant to show a dev how check signatures need to be prepared to be valid for the Checkbook contracts
  */
 
-/**
- * Type Definitions
- * these tell the wallet how to structure the signature UI and the cryptography encoding
- * */
-
-// type definition of a single check, order matters
-// types per value are using Solidity types
-// keys are capitalized because they mimic Solidity structs
-const singleCheckTypes: TypedDataTypeDefinition = {
-  Check: [
-    { name: "recipient", type: "address" },
-    { name: "token", type: "address" },
-    { name: "amount", type: "uint256" },
-    { name: "deadline", type: "uint256" },
-    { name: "nonce", type: "uint256" },
-  ],
-}
-// only needed for Split Checks, but keeping for now
-// type definition of multiple checks at once
-// uses nested type of previously defined `Check`
-// const bulkCheckTypes: TypedDataTypeDefinition = {
-//   ...singleCheckTypes,
-//   BulkCheck: [{ name: "checks", type: "Check[]" }],
-// }
-
 const ApprovalSignaturesPage: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
-  // queue used for demoing split checks, not needed for right now
-  // const [checkQueue, setCheckQueue] = useState<Check[]>([])
   const setToastState = useStore((state) => state.setToastState)
 
   const [tokenAddress, setTokenAddress] = useState<string>()
@@ -95,52 +68,60 @@ const ApprovalSignaturesPage: BlitzPage = () => {
     ...(!!tokenAddress && tokenAddress !== zeroAddress && { address: tokenAddress }),
   })
 
-  const generateCheck = async (check) => {
-    // need this for my jank frontend setup, advice would be helpful!
-    setTokenAddress(check.token)
-    const checkbookChainId =
-      checkbooks?.find((c) => c.address === check.checkbookAddress)?.chainId || 0
-    const decimals = tokenAddress === zeroAddress ? 18 : tokenData?.decimals || 0
-
-    // generate check
-    const newCheck = await createCheckMutation({
-      proposalId: "", // dummy for now
-      fundingAddress: check.checkbookAddress,
-      chainId: checkbookChainId,
-      recipientAddress: check.recipient,
-      tokenAddress: check.token,
-      tokenAmount: check.amount, // store value with decimals
-      tokenDecimals: decimals,
-    })
-
-    // generate signature and create CheckApproval
+  const approveCheck = async (check: Check, decimals: number) => {
+    // 3 parts to a typed-data signature:
+    //   1. domain: metadata about the contract and where it is located
+    //   2. types: definition of the typed object being signed at once
+    //   3. value: values that fit into the types definition
     try {
-      // 3 parts to a typed-data signature:
-      //   1. domain
-      //   2. types
-      //   3. value
-
-      // DOMAIN
-      // top-level definition of where this signature will be used
-      // `name` is hardcoded to "Checkbook" in each contract
-      // `version` is also harcoded to "1" in each contract
-      // `chainId` should be the actual id for the contract, 4 is hardcoded for Rinkeby testing
-      // `verifyingContract` is the address of the contract that will be consuming this signature (the checkbook)
+      /**
+       * DOMAIN
+       * top-level definition of where this signature will be used
+       * `name` is hardcoded to "Checkbook" in each contract
+       * `version` is also harcoded to "1" in each contract
+       * `chainId` should be the actual id for the contract, 4 is hardcoded for Rinkeby testing
+       * `verifyingContract` is the address of the contract that will be consuming this signature (the checkbook)
+       */
       const domain = {
         name: "Checkbook", // keep hardcoded
         version: "1", // keep hardcoded
-        chainId: checkbookChainId,
-        verifyingContract: check.checkbookAddress,
+        chainId: check.chainId,
+        verifyingContract: check.fundingAddress,
       }
 
-      const types = singleCheckTypes
+      /**
+       * TYPES
+       * definition of the object representing a single check, order and types matter
+       * types per value are using Solidity types
+       * `Check` is capitalized to mimic Solidity structs
+       * `recipient` is the address of the check recipient
+       * `token` is the address of the currency token where the zero address represents ETH
+       * `amount` is the uint representation of amount of tokens to move (requires BigNumber package in js/ts)
+       * `deadline` is the expiry date of this check represented as a unix timestamp
+       * `nonce` is the unique identifier for this check to prevent double spending
+       */
+      const types: TypedDataTypeDefinition = {
+        Check: [
+          { name: "recipient", type: "address" },
+          { name: "token", type: "address" },
+          { name: "amount", type: "uint256" },
+          { name: "deadline", type: "uint256" },
+          { name: "nonce", type: "uint256" },
+        ],
+      }
 
+      /**
+       * VALUE
+       * instantiation of a typed object reflecting `types`
+       * all required data comes from the `Check` entity to guarantee consistent values across all of its approvals
+       * notice that `decimalToBigNumber` is needed to convert db values into contract-readable values
+       */
       const value = {
-        recipient: newCheck.recipientAddress,
-        token: newCheck.tokenAddress,
-        amount: decimalToBigNumber(newCheck.tokenAmount, decimals),
-        deadline: newCheck.deadline.valueOf(),
-        nonce: newCheck.nonce,
+        recipient: check.recipientAddress,
+        token: check.tokenAddress,
+        amount: decimalToBigNumber(check.tokenAmount, decimals),
+        deadline: check.deadline.valueOf(),
+        nonce: check.nonce,
       }
 
       // prompt the Metamask signature modal
@@ -151,7 +132,7 @@ const ApprovalSignaturesPage: BlitzPage = () => {
       })
 
       await createCheckApprovalMutation({
-        checkId: newCheck.id,
+        checkId: check.id,
         signerAddress: activeUser?.address as string,
         signature,
       })
@@ -170,9 +151,26 @@ const ApprovalSignaturesPage: BlitzPage = () => {
           <h2 className="text-marble-white text-2xl font-bold mt-10">Generate Check</h2>
           <Form
             onSubmit={async (values: any, form) => {
-              // setCheckQueue([...checkQueue, values])
               try {
-                const success = await generateCheck(values)
+                // need this for my jank frontend setup, advice would be helpful!
+                setTokenAddress(values.token)
+                const checkbookChainId =
+                  checkbooks?.find((c) => c.address === values.checkbookAddress)?.chainId || 0
+                const decimals = tokenAddress === zeroAddress ? 18 : tokenData?.decimals || 0
+
+                // only call the mutation if you need a new check!
+                const newCheck = await createCheckMutation({
+                  proposalId: "", // dummy for now
+                  fundingAddress: values.checkbookAddress,
+                  chainId: checkbookChainId,
+                  recipientAddress: values.recipient,
+                  tokenAddress: values.token,
+                  tokenAmount: values.amount, // store as decimal value instead of BigNumber
+                  tokenDecimals: decimals,
+                })
+
+                const success = await approveCheck(newCheck, decimals)
+
                 if (success) {
                   setToastState({
                     isToastShowing: true,
@@ -292,28 +290,6 @@ const ApprovalSignaturesPage: BlitzPage = () => {
               )
             }}
           />
-          {/* below is code for multi-check systems, saving for later */}
-          {/* <div className="overflow-y-auto col-span-7 sm:col-span-4 mt-4">
-            {checkQueue.map((c, i) => (
-              <span key={i} className="flex flex-row space-x-24 p-2">{`send ${truncateString(
-                c.recipient
-              )} ${c.amount} tokens (${truncateString(c.token)})`}</span>
-            ))}
-          </div>
-          <button
-            className="bg-magic-mint text-tunnel-black rounded mt-12 block p-2 hover:opacity-70"
-            disabled={checkQueue.length === 0}
-            onClick={() => {
-              try {
-                approveChecks(checkQueue)
-              } catch (error) {
-                console.error(`Error creating account: ${error}`)
-                alert("Error applying.")
-              }
-            }}
-          >
-            Approve
-          </button> */}
         </section>
       </Navigation>
     </LayoutWithoutNavigation>
