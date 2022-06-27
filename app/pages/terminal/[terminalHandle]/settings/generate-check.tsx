@@ -140,6 +140,19 @@ const GenerateCheckPage: BlitzPage = () => {
       return true
     } catch (e) {
       console.error(e)
+      if (e.name == "ConnectorNotFoundError") {
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: "Please reset wallet connection.\n(ConnectorNotFoundError)",
+        })
+      } else {
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: "Contract creation failed.",
+        })
+      }
       return false
     }
   }
@@ -166,7 +179,6 @@ const GenerateCheckPage: BlitzPage = () => {
                   recipientAddress: values.recipient,
                   tokenAddress: values.token,
                   tokenAmount: values.amount, // store as decimal value instead of BigNumber
-                  tokenDecimals: decimals,
                 })
 
                 const success = await approveCheck(newCheck, decimals)
