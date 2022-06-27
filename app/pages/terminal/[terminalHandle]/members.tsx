@@ -252,7 +252,14 @@ const MemberDirectoryPage: BlitzPage = () => {
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <div className="flex ml-6 py-4 space-x-2 flex-wrap self-start">
               {groupedTags && Object.entries(groupedTags).length ? (
-                [TagType.STATUS, TagType.ROLE, TagType.PROJECT, TagType.GUILD, TagType.TOKEN].map(
+                [
+                  TagType.STATUS,
+                  TagType.SEASON,
+                  TagType.ROLE,
+                  TagType.PROJECT,
+                  TagType.GUILD,
+                  TagType.TOKEN,
+                ].map(
                   (tagType, idx) =>
                     groupedTags[tagType] && (
                       <FilterPill
@@ -526,6 +533,9 @@ const SelectedContributorCard = ({
   const statusTags = member.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === TagType.STATUS
   )
+  const seasonTags = member.tags?.filter(
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.SEASON
+  )
   const roleTags = member.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === TagType.ROLE
   )
@@ -677,6 +687,7 @@ const SelectedContributorCard = ({
             <p className="text-base">{formatDate(member.joinedAt)}</p>
           </div>
         )}
+        <TagDetails tagType="seasons" tags={seasonTags} />
         <TagDetails tagType="roles" tags={roleTags} />
         <TagDetails tagType="projects" tags={projectTags} />
         <TagDetails tagType="guilds" tags={guildTags} />

@@ -3,6 +3,7 @@ export enum TagType {
   ROLE = "role",
   PROJECT = "project",
   GUILD = "guild",
+  SEASON = "season",
   TOKEN = "token",
 }
 

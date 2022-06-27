@@ -260,6 +260,9 @@ const SelectedTerminalCard = ({
   const statusTags = membership.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === TagType.STATUS
   )
+  const seasonTags = membership.tags?.filter(
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.SEASON
+  )
   const roleTags = membership.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === TagType.ROLE
   )
@@ -309,6 +312,7 @@ const SelectedTerminalCard = ({
             <p className="text-base">{formatDate(membership.joinedAt)}</p>
           </div>
         )}
+        <TagDetails tagType="seasons" tags={seasonTags} />
         <TagDetails tagType="roles" tags={roleTags} />
         <TagDetails tagType="projects" tags={projectTags} />
         <TagDetails tagType="guilds" tags={guildTags} />
