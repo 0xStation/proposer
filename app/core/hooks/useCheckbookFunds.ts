@@ -23,17 +23,19 @@ const useCheckbookFunds = (
     cacheTime: 10_000, // 10 seconds
     ...(!!tokenAddress && tokenAddress !== zeroAddress && { token: tokenAddress }), // if tokenAddress is zero address, use gas token (e.g. ETH)
   })
+  const balance = data?.value || BigNumber.from(0)
+  const decimals = data?.decimals || 0
 
   // db stores check amounts as decimal so need to remultiply by token's number of decimals
-  const pending = decimalToBigNumber(aggregatedCheckTotals?.pending || 0, data?.decimals || 0)
-  const cashed = decimalToBigNumber(aggregatedCheckTotals?.cashed || 0, data?.decimals || 0)
+  const pending = decimalToBigNumber(aggregatedCheckTotals?.pending || 0, decimals)
+  const cashed = decimalToBigNumber(aggregatedCheckTotals?.cashed || 0, decimals)
 
   return {
     pending,
     cashed,
-    available: (data?.value || BigNumber.from(0)).sub(pending),
-    total: (data?.value || BigNumber.from(0)).add(cashed),
-    decimals: data?.decimals || 0,
+    available: balance.sub(pending),
+    total: balance.add(cashed),
+    decimals: decimals,
   }
 }
 

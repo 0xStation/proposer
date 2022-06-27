@@ -8,7 +8,7 @@ export async function fetchTokenDecimals(chainId: number, address: string) {
   // node provider for making calls to smart contracts
   const provider = new AlchemyProvider(
     networks[chainId.toString()].network,
-    requireEnv("BLITZ_PUBLIC_ALCHEMY_API_KEY")
+    requireEnv("ALCHEMY_API_KEY")
   )
   // abi for a token's decimals
   const abi = ["function decimals() view returns (uint8)"]

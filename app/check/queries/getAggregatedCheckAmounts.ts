@@ -65,7 +65,7 @@ export default async function getAggregatedCheckAmounts(
   })
 
   return {
-    pending: pending._sum.tokenAmount || "0",
-    cashed: cashed._sum.tokenAmount || "0",
+    pending: pending._sum.tokenAmount || new Decimal(0),
+    cashed: cashed._sum.tokenAmount || new Decimal(0),
   } as { pending: Decimal; cashed: Decimal }
 }
