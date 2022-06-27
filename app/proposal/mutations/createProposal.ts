@@ -8,7 +8,7 @@ const CreateProposal = z.object({
   recipientAddress: z.string(),
   contentTitle: z.string(),
   contentBody: z.string(),
-  contributors: z.array(z.string()).optional(), // optional for now - we are moving this to p1+
+  collaborators: z.array(z.string()).optional(), // optional for now - we are moving this to p1+
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {

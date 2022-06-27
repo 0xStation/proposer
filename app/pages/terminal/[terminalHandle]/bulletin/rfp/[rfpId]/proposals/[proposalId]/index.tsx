@@ -108,7 +108,7 @@ const ProposalPage: BlitzPage = ({
                   alt="PFP"
                   className="w-[46px] h-[46px] rounded-lg"
                   onError={(e) => {
-                    e.currentTarget.src = DEFAULT_PFP_URLS.USER
+                    e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
                   }}
                 />
                 <div className="ml-2">
