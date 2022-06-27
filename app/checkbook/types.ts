@@ -1,6 +1,8 @@
 import { Account } from "app/account/types"
 
-export type CheckbookMetadata = {}
+export type CheckbookMetadata = {
+  quorum: number
+}
 
 export type Checkbook = {
   address: string
