@@ -239,7 +239,7 @@ const RfpMarkdownForm = ({
                   <form className="p-4 grow flex flex-col justify-between">
                     <div>
                       <div className="flex flex-col mt-2">
-                        <label className="font-bold">Start Date</label>
+                        <label className="font-bold">Start Date*</label>
                         <span className="text-xs text-concrete block">
                           Proposal submission opens
                         </span>
@@ -253,7 +253,7 @@ const RfpMarkdownForm = ({
                                   min={getShortDate()}
                                   className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
                                 />
-                                {meta.touched && input.value === "" && (
+                                {((meta.touched && input.value === "") || meta.error) && (
                                   <span className="text-torch-red text-xs">
                                     You must select a start date.
                                   </span>
@@ -293,7 +293,6 @@ const RfpMarkdownForm = ({
                             Learn more
                           </a>
                         </span>
-
                         <Field name={`checkbookAddress`} validate={requiredField}>
                           {({ input, meta }) => {
                             return (
@@ -311,7 +310,7 @@ const RfpMarkdownForm = ({
                                     )
                                   })}
                                 </select>
-                                {meta.touched && input.value === "" && (
+                                {((meta.touched && input.value === "") || meta.error) && (
                                   <span className="text-torch-red text-xs">
                                     You must select a checkbook.
                                   </span>
