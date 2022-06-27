@@ -18,8 +18,9 @@ export const Button = ({
   disabled = false,
   type,
 }: ButtonProps) => {
-  const primaryStyling = "bg-magic-mint text-tunnel-black hover:opacity-70"
-  const secondaryStyling = "border-solid border border-magic-mint text-magic-mint hover:bg-concrete"
+  const primaryStyling = "bg-electric-violet text-tunnel-black hover:opacity-70"
+  const secondaryStyling =
+    "border-solid border border-electric-violet text-electric-violet hover:bg-concrete"
   const buttonStyling = secondary ? secondaryStyling : primaryStyling
 
   return (

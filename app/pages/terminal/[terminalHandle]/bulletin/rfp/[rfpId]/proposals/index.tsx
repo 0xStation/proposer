@@ -1,28 +1,32 @@
-import { useState } from "react"
-import { BlitzPage, Routes, useParam, useQuery, Link, useRouter, invalidateQuery } from "blitz"
+import { Fragment, useState, useEffect } from "react"
+import { Form } from "react-final-form"
+import { BlitzPage, Routes, useParam, useQuery, Link, useRouterQuery, invalidateQuery } from "blitz"
+import { Menu, Transition } from "@headlessui/react"
 import Layout from "app/core/layouts/Layout"
+import Modal from "app/core/components/Modal"
+import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
+import TerminalNavigation from "app/terminal/components/TerminalNavigation"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
+import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
+import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
+import getProposalsByRfpId from "app/proposal/queries/getProposalsByRfpId"
+import getRfpById from "app/rfp/queries/getRfpById"
+import Checkbox from "app/core/components/form/Checkbox"
+import BackArrow from "app/core/icons/BackArrow"
+import ForwardArrow from "app/core/icons/ForwardArrow"
 import {
   DEFAULT_PFP_URLS,
   PROPOSAL_STATUS_DISPLAY_MAP,
   PAGINATION_TAKE,
-  PROPOSAL_STATUSES_FILTER_ARRAY,
 } from "app/core/utils/constants"
-import TerminalNavigation from "app/terminal/components/TerminalNavigation"
-import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import RFPHeaderNavigation from "app/rfp/components/RFPHeaderNavigation"
-import { Menu, Transition } from "@headlessui/react"
-import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
-import { Fragment } from "react"
-import { Form } from "react-final-form"
-import getProposalsByRfpId from "app/proposal/queries/getProposalsByRfpId"
+import truncateString from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
-import getRfpById from "app/rfp/queries/getRfpById"
-import { ProposalStatus } from "app/proposal/types"
-import Checkbox from "app/core/components/form/Checkbox"
-import BackArrow from "app/core/icons/BackArrow"
-import ForwardArrow from "app/core/icons/ForwardArrow"
+import { genPathFromUrlObject } from "app/utils"
+import { Rfp } from "app/rfp/types"
+import { Proposal, ProposalStatus } from "app/proposal/types"
 
 const ProposalsTab: BlitzPage = () => {
+  const { proposalId } = useRouterQuery() as { proposalId: string }
   const terminalHandle = useParam("terminalHandle") as string
   const rfpId = useParam("rfpId") as string
   const [filters, setFilters] = useState<Set<ProposalStatus>>(new Set<ProposalStatus>())
@@ -41,21 +45,67 @@ const ProposalsTab: BlitzPage = () => {
 
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
 
+  const [proposalCreatedConfirmationModal, setProposalCreatedConfirmationModal] =
+    useState<boolean>(false)
+  const [linkCopied, setLinkCopied] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (proposalId) {
+      setProposalCreatedConfirmationModal(true)
+    }
+  }, [proposalId])
+
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
+      {terminal && (
+        <SuccessProposalModal
+          terminal={terminal}
+          rfpId={rfpId}
+          proposalId={proposalId}
+          isOpen={proposalCreatedConfirmationModal}
+          setIsOpen={setProposalCreatedConfirmationModal}
+        />
+      )}
+      {terminal && (
+        <Modal open={proposalCreatedConfirmationModal} toggle={setProposalCreatedConfirmationModal}>
+          <div className="p-2">
+            <h3 className="text-2xl font-bold pt-6">Request successfully published!</h3>
+            <p className="mt-2">
+              Copy the link to share with your community and let the waves of ideas carry you to the
+              exciting future of {terminal.data.name}.
+            </p>
+            <div className="mt-8">
+              <button
+                type="button"
+                className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
+                onClick={() => {
+                  setLinkCopied(true)
+                  navigator.clipboard.writeText(
+                    genPathFromUrlObject(
+                      Routes.ProposalPage({ terminalHandle, rfpId: rfpId, proposalId: proposalId })
+                    )
+                  )
+                }}
+              >
+                {linkCopied ? "Copied!" : "Copy link"}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
       <TerminalNavigation>
-        <RFPHeaderNavigation rfpId={rfpId} />
+        <RfpHeaderNavigation rfpId={rfpId} />
         <div className="h-[calc(100vh-240px)] flex flex-col">
           <div className="w-full h-20 flex sm:flex-row justify-between items-center">
             <div className="flex self-start">
-              <FilterPill
+              {/* <FilterPill
                 title="Status"
                 className="mt-6 ml-6"
                 filterValues={PROPOSAL_STATUSES_FILTER_ARRAY}
                 filters={filters}
                 setFilters={setFilters}
                 setPage={setPage}
-              />
+              /> */}
             </div>
             <div className="ml-6 sm:mr-6 text-sm pt-1">
               Showing
@@ -95,8 +145,14 @@ const ProposalsTab: BlitzPage = () => {
           </div>
           <div className="h-[calc(100vh-284px)] overflow-y-auto">
             {proposals &&
+              rfp &&
               proposals.map((proposal, idx) => (
-                <ProposalComponent proposal={proposal} rfp={rfp} key={idx} />
+                <ProposalComponent
+                  terminalHandle={terminalHandle}
+                  proposal={proposal}
+                  rfp={rfp}
+                  key={idx}
+                />
               ))}
           </div>
         </div>
@@ -105,9 +161,17 @@ const ProposalsTab: BlitzPage = () => {
   )
 }
 
-const ProposalComponent = ({ proposal, rfp }) => {
+const ProposalComponent = ({
+  proposal,
+  rfp,
+  terminalHandle,
+}: {
+  proposal: Proposal
+  rfp: Rfp
+  terminalHandle: string
+}) => {
   return (
-    <Link href={"#"}>
+    <Link href={Routes.ProposalPage({ terminalHandle, rfpId: rfp.id, proposalId: proposal.id })}>
       <div className="border-b border-concrete w-full cursor-pointer hover:bg-wet-concrete pt-5">
         <div className="flex flex-row items-center space-x-2 ml-6">
           <span

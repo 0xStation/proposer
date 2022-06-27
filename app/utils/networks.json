@@ -1,7 +1,7 @@
 {
   "1": {
     "key": "1",
-    "name": "Ethereum Mainnet",
+    "name": "Ethereum",
     "chainId": 1,
     "network": "homestead",
     "multicall": "0xeefba1e63905ef1d7acba5a8513c70307c1ce441",
@@ -22,11 +22,17 @@
     "ws": ["wss://eth-mainnet.ws.alchemyapi.io/v2/4bdDVB5QAaorY2UE-GBUbM2yQB3QJqzv"],
     "explorer": "https://etherscan.io",
     "start": 7929876,
-    "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA"
+    "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
+    "stablecoins": [
+      {
+        "symbol": "USDC",
+        "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+      }
+    ]
   },
   "4": {
     "key": "4",
-    "name": "Ethereum Testnet Rinkeby",
+    "name": "Rinkeby (testnet)",
     "shortName": "Rinkeby",
     "chainId": 4,
     "network": "rinkeby",
@@ -40,11 +46,17 @@
     "ws": ["wss://eth-rinkeby.ws.alchemyapi.io/v2/twReQE9Px03E-E_N_Fbb3OVF7YgHxoGq"],
     "explorer": "https://rinkeby.etherscan.io",
     "start": 4534725,
-    "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA"
+    "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
+    "stablecoins": [
+      {
+        "symbol": "USDC",
+        "address": "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926"
+      }
+    ]
   },
   "5": {
     "key": "5",
-    "name": "Ethereum Testnet Görli",
+    "name": "Görli (testnet)",
     "shortName": "Görli",
     "chainId": 5,
     "network": "goerli",
@@ -53,18 +65,30 @@
     "rpc": ["https://eth-goerli.alchemyapi.io/v2/v4nqH_J-J3STit45Mm07TxuYexMHQsYZ"],
     "explorer": "https://goerli.etherscan.io",
     "start": 743550,
-    "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA"
+    "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
+    "stablecoins": [
+      {
+        "symbol": "USDC",
+        "address": "0x2f3A40A3db8a7e3D09B0adfEfbCe4f6F81927557"
+      }
+    ]
   },
   "10": {
     "key": "10",
-    "name": "Optimism Mainnet",
+    "name": "Optimism",
     "chainId": 10,
     "network": "Optimism mainnet",
     "multicall": "0x35A6Cdb2C9AD4a45112df4a04147EB07dFA01aB7",
     "rpc": ["https://opt-mainnet.g.alchemy.com/v2/JzmIL4Q3jBj7it2duxLFeuCa9Wobmm7D"],
     "explorer": "https://optimistic.etherscan.io",
     "start": 657806,
-    "logo": "ipfs://QmfF4kwhGL8QosUXvgq2KWCmavhKBvwD6kbhs7L4p5ZAWb"
+    "logo": "ipfs://QmfF4kwhGL8QosUXvgq2KWCmavhKBvwD6kbhs7L4p5ZAWb",
+    "stablecoins": [
+      {
+        "symbol": "USDC",
+        "address": "0x7f5c764cbc14f9669b88837ca1490cca17c31607"
+      }
+    ]
   },
   "100": {
     "key": "100",
@@ -83,7 +107,13 @@
     "ws": ["wss://rpc.xdaichain.com/wss"],
     "explorer": "https://blockscout.com/poa/xdai",
     "start": 4108192,
-    "logo": "ipfs://QmZeiy8Ax4133wzxUQM9ky8z5XFVf6YLFjJMmTWbWVniZR"
+    "logo": "ipfs://QmZeiy8Ax4133wzxUQM9ky8z5XFVf6YLFjJMmTWbWVniZR",
+    "stablecoins": [
+      {
+        "symbol": "USDC",
+        "address": "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83"
+      }
+    ]
   },
   "137": {
     "key": "137",
@@ -100,11 +130,17 @@
     "ws": ["wss://ws-mainnet.matic.network"],
     "explorer": "https://polygonscan.com",
     "start": 9834491,
-    "logo": "ipfs://QmaGokGqgjknfa4xnXKnnwC5ZyXzUjQ7p6KEe4D8G5uFFE"
+    "logo": "ipfs://QmaGokGqgjknfa4xnXKnnwC5ZyXzUjQ7p6KEe4D8G5uFFE",
+    "stablecoins": [
+      {
+        "symbol": "USDC",
+        "address": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+      }
+    ]
   },
   "250": {
     "key": "250",
-    "name": "Fantom Opera",
+    "name": "Fantom",
     "shortName": "fantom",
     "chainId": 250,
     "network": "Mainnet",
@@ -112,11 +148,17 @@
     "rpc": ["https://rpc.ftm.tools", "https://rpcapi.fantom.network"],
     "explorer": "https://ftmscan.com",
     "start": 2497732,
-    "logo": "ipfs://QmVEgNeQDKnXygeGxfY9FywZpNGQu98ktZtRJ9bToYF6g7"
+    "logo": "ipfs://QmVEgNeQDKnXygeGxfY9FywZpNGQu98ktZtRJ9bToYF6g7",
+    "stablecoins": [
+      {
+        "symbol": "USDC",
+        "address": "0x04068da6c83afcfa0e13ba15a6696662335d5b75"
+      }
+    ]
   },
   "42161": {
     "key": "42161",
-    "name": "Arbitrum One",
+    "name": "Arbitrum",
     "chainId": 42161,
     "network": "Arbitrum mainnet",
     "multicall": "0x7A7443F8c577d537f1d8cD4a629d40a3148Dd7ee",
@@ -126,11 +168,24 @@
     ],
     "explorer": "https://arbiscan.io",
     "start": 256508,
-    "logo": "ipfs://QmWZ5SMRfvcK8tycsDqojQaSiKedgtVkS7CkZdxPgeCVsZ"
+    "logo": "ipfs://QmWZ5SMRfvcK8tycsDqojQaSiKedgtVkS7CkZdxPgeCVsZ",
+    "stablecoins": [
+      {
+        "symbol": "USDC",
+        "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"
+      }
+    ]
+  },
+  "1337": {
+    "key": "1337",
+    "name": "Localhost",
+    "chainId": 1337,
+    "network": "Localhost",
+    "explorer": "https://app.station.express"
   },
   "42220": {
     "key": "42220",
-    "name": "Celo Mainnet",
+    "name": "Celo",
     "shortName": "Celo",
     "chainId": 42220,
     "network": "mainnet",
@@ -157,6 +212,12 @@
     ],
     "explorer": "https://snowtrace.io",
     "start": 536483,
-    "logo": "ipfs://QmeS75uS7XLR8o8uUzhLRVYPX9vMFf4DXgKxQeCzyy7vM2"
+    "logo": "ipfs://QmeS75uS7XLR8o8uUzhLRVYPX9vMFf4DXgKxQeCzyy7vM2",
+    "stablecoins": [
+      {
+        "symbol": "USDC",
+        "address": "0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
+      }
+    ]
   }
 }

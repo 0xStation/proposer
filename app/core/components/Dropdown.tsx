@@ -1,15 +1,14 @@
 import { Menu, Transition } from "@headlessui/react"
 import { Fragment } from "react"
-import ChevronIcon from "../icons/ChevronIcon"
 
 interface DropdownProps {
   button: string | JSX.Element
   items: Link[]
-  side: "right" | "left"
+  side?: "right" | "left"
   className?: string
 }
 interface Link {
-  name: string
+  name: JSX.Element
   href?: string
   onClick?: () => void
 }
@@ -19,14 +18,10 @@ interface Link {
  */
 const Dropdown = ({ button, items, side, className }: DropdownProps) => {
   return (
-    <Menu as="div" className={`relative ${className}`}>
+    <Menu as="div" className={`${className}`}>
       {({ open }) => (
         <>
-          <Menu.Button className="block h-[28px] text-marble-white">
-            <div className="flex items-center">
-              {button} <ChevronIcon isUp={open} className="ml-2" />
-            </div>
-          </Menu.Button>
+          <Menu.Button className="relative text-marble-white">{button}</Menu.Button>
           <Transition
             as={Fragment}
             enter="transition ease-out duration-100"
@@ -38,11 +33,11 @@ const Dropdown = ({ button, items, side, className }: DropdownProps) => {
           >
             <Menu.Items
               className={`${
-                side === "left" ? `left-[10px]` : `right-[2px]`
-              } uppercase text-marble-white text-lg origin-top mt-[10px] absolute bg-tunnel-black border border-[#646464] whitespace-nowrap z-10`}
+                side && side === "left" ? `left-[10px]` : `right-[40px]`
+              } text-marble-white origin-top absolute mt-1 bg-tunnel-black border border-wet-concrete rounded whitespace-nowrap z-10 drop-shadow-lg`}
             >
-              {items.map((item) => (
-                <Menu.Item key={item.name}>
+              {items.map((item, idx) => (
+                <Menu.Item key={idx}>
                   {() => (
                     <a
                       className={`hover:bg-wet-concrete group flex items-center w-full px-4 py-2 cursor-pointer`}

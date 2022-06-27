@@ -12,6 +12,9 @@ const CreateRfp = z.object({
   endDate: z.date().optional(),
 })
 
+const defaultProposalPrefill =
+  "# Proposal summary \n\n # Goals \n\n # Roadmap and deliverable details \n\n # Challenges \n\n # Team background and previous contributions \n\n # Support request"
+
 export default async function createRfp(input: z.infer<typeof CreateRfp>) {
   const rfp = await db.rfp.create({
     data: {
@@ -26,6 +29,7 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
           title: input.contentTitle,
           body: input.contentBody,
         },
+        proposalPrefill: defaultProposalPrefill,
       },
     },
   })

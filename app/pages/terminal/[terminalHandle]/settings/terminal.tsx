@@ -149,7 +149,7 @@ const TerminalSettingsPage: BlitzPage = () => {
                       <div className="p-6 border-b border-concrete flex justify-between">
                         <h2 className="text-marble-white text-2xl font-bold">Terminal overview</h2>
                         <button
-                          className={`rounded text-tunnel-black px-8 bg-magic-mint ${
+                          className={`rounded text-tunnel-black px-8 bg-electric-violet ${
                             formState.hasValidationErrors || !formState.dirty
                               ? "opacity-50 cursor-not-allowed"
                               : "hover:bg-opacity-70"

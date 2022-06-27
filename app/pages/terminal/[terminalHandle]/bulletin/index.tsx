@@ -1,13 +1,22 @@
-import { BlitzPage, useQuery, useParam, Routes, useRouter, Link, invalidateQuery } from "blitz"
-import { Fragment, useState } from "react"
+import {
+  BlitzPage,
+  useQuery,
+  useParam,
+  Routes,
+  useRouter,
+  Link,
+  useRouterQuery,
+  invalidateQuery,
+} from "blitz"
+import { Fragment, useState, useEffect } from "react"
+import { Menu, Transition } from "@headlessui/react"
+import { Form } from "react-final-form"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import { Menu, Transition } from "@headlessui/react"
-import { Form } from "react-final-form"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
-import getRfpsByTerminalId from "app/rfp/queries/getRfpsForTerminal"
+import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import getRfpCountByTerminalId from "app/rfp/queries/getRfpCountByTerminalId"
 import { formatDate } from "app/core/utils/formatDate"
 import {
@@ -19,13 +28,19 @@ import { RfpStatus } from "app/rfp/types"
 import Checkbox from "app/core/components/form/Checkbox"
 import BackArrow from "app/core/icons/BackArrow"
 import ForwardArrow from "app/core/icons/ForwardArrow"
+import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
+import useStore from "app/core/hooks/useStore"
 
 const BulletinPage: BlitzPage = () => {
+  const { rfpId } = useRouterQuery() as { rfpId: string }
   const terminalHandle = useParam("terminalHandle") as string
+  const setToastState = useStore((state) => state.setToastState)
+  const query = useRouterQuery()
+  const [showRfpSuccessModal, setShowRfpSuccessModal] = useState<boolean>(false)
   const [terminal] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle as string },
-    { suspense: false, enabled: !!terminalHandle }
+    { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
   )
   const [filters, setFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
 
@@ -38,6 +53,7 @@ const BulletinPage: BlitzPage = () => {
       statuses: Array.from(filters),
       page: page,
       paginationTake: PAGINATION_TAKE,
+      includeDeletedRfps: false,
     },
     {
       suspense: false,
@@ -59,9 +75,31 @@ const BulletinPage: BlitzPage = () => {
   )
 
   const router = useRouter()
+  useEffect(() => {
+    if (query.rfpPublished) {
+      setShowRfpSuccessModal(true)
+    }
+  }, [query?.rfpPublished])
+
+  useEffect(() => {
+    if (query.rfpDeleted) {
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Your request for proposal has been deleted.",
+      })
+    }
+  })
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
+      <SuccessRfpModal
+        terminal={terminal}
+        setIsOpen={setShowRfpSuccessModal}
+        isOpen={showRfpSuccessModal}
+        rfpId={query?.rfpPublished}
+        isEdit={false}
+      />
       <TerminalNavigation>
         {/* Filter View */}
         <div className="max-h-[250px] sm:h-[130px] border-b border-concrete">
@@ -69,7 +107,7 @@ const BulletinPage: BlitzPage = () => {
             <h1 className="text-2xl font-bold">Bulletin</h1>
             {/* TODO: add permissioning checks */}
             <button
-              className="h-[35px] bg-magic-mint px-9 rounded text-tunnel-black hover:bg-opacity-70"
+              className="h-[35px] bg-electric-violet px-9 rounded text-tunnel-black hover:bg-opacity-70"
               onClick={() => router.push(Routes.CreateRFPPage({ terminalHandle }))}
             >
               Create request for proposal
@@ -119,9 +157,36 @@ const BulletinPage: BlitzPage = () => {
             <span className="basis-32 ml-2 mr-6 mb-2 tracking-wider">Creator</span>
           </div>
           <div className="overflow-y-auto col-span-7 h-[calc(100vh-174px)] w-full">
-            {rfps?.map((rfp) => (
-              <RFPComponent rfp={rfp} terminalHandle={terminalHandle} key={rfp.id} />
-            ))}
+            {rfps && rfps.length ? (
+              rfps?.map((rfp) => (
+                <RFPComponent rfp={rfp} terminalHandle={terminalHandle} key={rfp.id} />
+              ))
+            ) : rfps ? (
+              // TODO: hide this view from non-admins and show different copy once we have checkbook signer tags
+              <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
+                <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
+                  Create a request for proposals (RFPs)
+                </h1>
+                <p className="my-2 w-[325px] text-center">
+                  Help contributors write higher quality proposals by defining your DAOs’ needs and
+                  priorities.
+                </p>
+                <button
+                  className="bg-electric-violet rounded text-tunnel-black px-6 h-[35px] mt-6 hover:opacity-70"
+                  onClick={() => router.push(Routes.CreateRFPPage({ terminalHandle }))}
+                >
+                  Create RFP
+                </button>
+              </div>
+            ) : (
+              Array.from(Array(15)).map((idx) => (
+                <div
+                  key={idx}
+                  tabIndex={0}
+                  className={`flex flex-row space-x-52 my-3 mx-3 rounded-lg bg-wet-concrete shadow border-solid h-[113px] motion-safe:animate-pulse`}
+                />
+              ))
+            )}
           </div>
         </div>
       </TerminalNavigation>

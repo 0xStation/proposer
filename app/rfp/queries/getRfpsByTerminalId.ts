@@ -2,6 +2,7 @@ import db from "db"
 import * as z from "zod"
 import { Rfp } from "../types"
 import { computeRfpDbStatusFilter, computeRfpProductStatus } from "../utils"
+import { RfpStatus as PrismaRfpStatus } from "@prisma/client"
 import { PAGINATION_TAKE } from "../../core/utils/constants"
 
 const GetRfpsByTerminalId = z.object({
@@ -9,9 +10,10 @@ const GetRfpsByTerminalId = z.object({
   statuses: z.string().array().optional(),
   page: z.number().optional().default(0),
   paginationTake: z.number().optional().default(PAGINATION_TAKE),
+  includeDeletedRfps: z.boolean().optional().default(false),
 })
 
-export default async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsByTerminalId>) {
+export async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsByTerminalId>) {
   let statuses = []
 
   if (input.statuses && Array.isArray(input.statuses) && input.statuses?.length) {
@@ -22,10 +24,21 @@ export default async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsB
     statuses = { OR: rfpDbStatusFilters } as any
   }
 
+  const removeDeletedStatusFilter = input.includeDeletedRfps
+    ? {}
+    : {
+        NOT: [
+          {
+            status: PrismaRfpStatus.DELETED,
+          },
+        ],
+      }
+
   const rfps = await db.rfp.findMany({
     where: {
       terminalId: input.terminalId,
       ...statuses,
+      ...removeDeletedStatusFilter,
     },
     include: {
       author: true,
@@ -45,3 +58,5 @@ export default async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsB
     } as unknown as Rfp
   })
 }
+
+export default getRfpsByTerminalId

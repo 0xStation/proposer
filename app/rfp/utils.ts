@@ -6,9 +6,9 @@ export const computeRfpDbStatusFilter = (status: string) => {
     return {
       status: PrismaRfpStatus.DRAFT,
     }
-  } else if (status === RfpStatus.ARCHIVED) {
+  } else if (status === RfpStatus.DELETED) {
     return {
-      status: PrismaRfpStatus.ARCHIVED,
+      status: PrismaRfpStatus.DELETED,
     }
   } else if (status === RfpStatus.STARTING_SOON) {
     return {
@@ -45,9 +45,10 @@ export const computeRfpDbStatusFilter = (status: string) => {
 export const computeRfpProductStatus = (status: string, startDate: Date, endDate: Date | null) => {
   if (status === PrismaRfpStatus.DRAFT) {
     return RfpStatus.DRAFT
-  } else if (status === PrismaRfpStatus.ARCHIVED) {
-    return RfpStatus.ARCHIVED
-  } else if (new Date() < startDate) {
+  } else if (status === PrismaRfpStatus.DELETED) {
+    return RfpStatus.DELETED
+  } else if (new Date() < startDate && ((!!endDate && new Date() < endDate) || !endDate)) {
+    // new Date() < endDate: check if RFP is closed.
     return RfpStatus.STARTING_SOON
   } else if (!!endDate && new Date() > endDate) {
     return RfpStatus.CLOSED

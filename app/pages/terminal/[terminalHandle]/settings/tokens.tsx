@@ -6,12 +6,14 @@ import getGroupedTagsByTerminalId from "app/tag/queries/getGroupedTagsByTerminal
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { Tag } from "app/tag/types"
 import networks from "app/utils/networks.json"
+import { ClipboardIcon, ClipboardCheckIcon, ExternalLinkIcon } from "@heroicons/react/outline"
 
 const TokenSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
   const [tokenTags, setTokenTags] = useState<Tag[]>([])
   const [selectedTag, setSelectedTag] = useState<Tag>()
+  const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
 
   useQuery(
     getGroupedTagsByTerminalId,
@@ -63,7 +65,7 @@ const TokenSettingsPage: BlitzPage = () => {
               Add tokens that represent your community&apos;s membership and ownership.
             </p>
             <Link href={Routes.NewTokenSettingsPage({ terminalHandle })}>
-              <button className="cursor-pointer mt-8 w-[200px] py-1 bg-magic-mint text-tunnel-black rounded text-base">
+              <button className="cursor-pointer mt-8 w-[200px] py-1 bg-electric-violet text-tunnel-black rounded text-base">
                 Add
               </button>
             </Link>
@@ -79,7 +81,7 @@ const TokenSettingsPage: BlitzPage = () => {
               </div>
               <Link href={Routes.NewTokenSettingsPage({ terminalHandle })}>
                 <button
-                  className="rounded text-tunnel-black px-8 h-full h-[32px] bg-magic-mint self-start"
+                  className="rounded text-tunnel-black px-8 h-[32px] bg-electric-violet self-start"
                   type="submit"
                 >
                   Add
@@ -102,9 +104,45 @@ const TokenSettingsPage: BlitzPage = () => {
                         </div>
                       </div>
                       <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-                        {selectedTag?.data.address && (
-                          <div className="w-max truncate leading-4">{selectedTag.data.address}</div>
-                        )}
+                        <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
+                          <div className="w-max truncate leading-4">
+                            {selectedTag?.data.address}
+                          </div>
+                        </div>
+                        <a
+                          href={`${
+                            networks[selectedTag?.data.chainId as number].explorer
+                          }/address/${selectedTag?.data.address as string}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <ExternalLinkIcon className="h-4 w-4 hover:stroke-concrete cursor-pointer" />
+                        </a>
+                        <div>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard
+                                .writeText(selectedTag?.data.address as string)
+                                .then(() => {
+                                  setIsClipboardAddressCopied(true)
+                                  setTimeout(() => setIsClipboardAddressCopied(false), 3000)
+                                })
+                            }}
+                          >
+                            {isClipboardAddressCopied ? (
+                              <>
+                                <ClipboardCheckIcon className="h-4 w-4 hover:stroke-concrete cursor-pointer" />
+                              </>
+                            ) : (
+                              <ClipboardIcon className="h-4 w-4 hover:stroke-concrete cursor-pointer" />
+                            )}
+                          </button>
+                          {isClipboardAddressCopied && (
+                            <span className="text-[.5rem] uppercase font-bold tracking-wider rounded px-1 absolute text-marble-white bg-wet-concrete">
+                              copied!
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
