@@ -14,14 +14,16 @@ generator client {
 // unique links by /profile/[address]
 // unique links by /profile/discord/[discordId]
 model Account {
-  id        Int               @id @default(autoincrement())
-  address   String?           @unique
-  discordId String?           @unique
-  tickets   AccountTerminal[]
-  data      Json?
-  sessions  Session[]
-  proposals AccountProposal[]
-  rfps      Rfp[]
+  id             Int               @id @default(autoincrement())
+  address        String?           @unique
+  discordId      String?           @unique
+  tickets        AccountTerminal[]
+  data           Json?
+  sessions       Session[]
+  proposals      AccountProposal[]
+  rfps           Rfp[]
+  checks         Check[]
+  checkApprovals CheckApproval[]
 
   // v1
   skills      AccountSkill[]
@@ -111,6 +113,7 @@ model Checkbook {
   signers    String[]
   data       Json
   rfps       Rfp[]
+  checks     Check[]
 }
 
 // unique links by /terminal/[handle]/rfp/[localId]
@@ -141,6 +144,7 @@ model Proposal {
   data           Json
   createdAt      DateTime          @default(now())
   collaborators  AccountProposal[]
+  checks         Check[]
 }
 
 model AccountProposal {
@@ -151,6 +155,42 @@ model AccountProposal {
   terminal   Terminal @relation(fields: [terminalId], references: [id])
   proposalId String
   proposal   Proposal @relation(fields: [proposalId], references: [id])
+}
+
+model Check {
+  id               String          @id @default(uuid())
+  proposalId       String
+  proposal         Proposal        @relation(fields: [proposalId], references: [id])
+  fundingAddress   String
+  chainId          Int
+  checkbook        Checkbook       @relation(fields: [fundingAddress], references: [address])
+  recipientAddress String
+  recipientAccount Account         @relation(fields: [recipientAddress], references: [address])
+  tokenAddress     String
+  // refer to note in db/README.md
+  tokenAmount      Decimal
+  // timestamp needs to be converted to a unix representation in approval signatures
+  deadline         DateTime
+  nonce            Int
+  // transaction hash of cashed check, marks status as "CASHED" if not null
+  txnHash          String?
+  approvals        CheckApproval[]
+
+  // nonces are unique per checkbook to prevent re-cashing of the same check
+  @@unique([fundingAddress, nonce])
+}
+
+model CheckApproval {
+  id            String   @id @default(uuid())
+  checkId       String
+  Check         Check    @relation(fields: [checkId], references: [id])
+  signerAddress String
+  signerAccount Account  @relation(fields: [signerAddress], references: [address])
+  createdAt     DateTime @default(now())
+  data          Json
+
+  // prevent duplicate approvals for the same check
+  @@unique([checkId, signerAddress])
 }
 
 enum RfpStatus {
