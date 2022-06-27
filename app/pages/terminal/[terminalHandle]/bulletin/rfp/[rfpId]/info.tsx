@@ -1,16 +1,20 @@
-import { BlitzPage, Routes, useParam, useQuery, Link } from "blitz"
+import { useState, useEffect } from "react"
+import { BlitzPage, Routes, useParam, useQuery, Link, useRouterQuery } from "blitz"
 import truncateString from "app/core/utils/truncateString"
 import Preview from "app/core/components/MarkdownPreview"
 import Layout from "app/core/layouts/Layout"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import RFPHeaderNavigation from "app/rfp/components/RFPHeaderNavigation"
+import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { formatDate } from "app/core/utils/formatDate"
+import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
 
 const RFPInfoTab: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
+  const [showRfpSuccessModal, setShowRfpSuccessModal] = useState<boolean>(false)
+  const query = useRouterQuery()
   const rfpId = useParam("rfpId") as string
   const [terminal] = useQuery(
     getTerminalByHandle,
@@ -19,10 +23,23 @@ const RFPInfoTab: BlitzPage = () => {
   )
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
 
+  useEffect(() => {
+    if (query.rfpEdited) {
+      setShowRfpSuccessModal(true)
+    }
+  }, [query?.rfpEdited])
+
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
       <TerminalNavigation>
-        <RFPHeaderNavigation rfpId={rfpId} />
+        <SuccessRfpModal
+          terminal={terminal}
+          setIsOpen={setShowRfpSuccessModal}
+          isOpen={showRfpSuccessModal}
+          rfpId={query?.rfpEdited}
+          isEdit={true}
+        />
+        <RfpHeaderNavigation rfpId={rfpId} />
         <div className="h-[calc(100vh-240px)] flex flex-row">
           <div className="w-full p-6 overflow-y-scroll">
             <Preview markdown={rfp?.data?.content?.body} />
@@ -31,7 +48,7 @@ const RFPInfoTab: BlitzPage = () => {
           <div className="w-96 border-l border-concrete pl-6 pt-6 pr-16 flex-col">
             <div className="mt-2">
               <p className="text-concrete uppercase text-xs font-bold">Start Date</p>
-              <p className="mt-2">{formatDate(rfp?.startDate)}</p>
+              <p className="mt-2">{(rfp?.startDate && formatDate(rfp?.startDate)) || "N/A"}</p>
             </div>
             <div className="mt-6">
               <p className="text-concrete uppercase text-xs font-bold">End Date</p>

@@ -1,81 +1,64 @@
 import { BlitzPage, useQuery, useParam, Routes, useRouter, Link, useRouterQuery } from "blitz"
-import { Menu, Transition } from "@headlessui/react"
 import { Fragment, useState, useEffect } from "react"
+import { Menu, Transition } from "@headlessui/react"
 import { Form } from "react-final-form"
 import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
 import Layout from "app/core/layouts/Layout"
-import Modal from "app/core/components/Modal"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
-import getRfpsByTerminalId from "app/rfp/queries/getRfpsForTerminal"
+import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import { formatDate } from "app/core/utils/formatDate"
 import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
-import { genPathFromUrlObject } from "app/utils"
-import useKeyPress from "app/core/hooks/useKeyPress"
-
-interface Filters {
-  [tagType: string]: Set<number>
-}
+import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
+import useStore from "app/core/hooks/useStore"
 
 const BulletinPage: BlitzPage = () => {
   const { rfpId } = useRouterQuery() as { rfpId: string }
-  const [linkCopied, setLinkCopied] = useState<boolean>(false)
-  const [rfpCreatedConfirmationModal, setRfpCreatedConfirmationModal] = useState<boolean>(false)
   const terminalHandle = useParam("terminalHandle") as string
+  const setToastState = useStore((state) => state.setToastState)
+  const query = useRouterQuery()
+  const [showRfpSuccessModal, setShowRfpSuccessModal] = useState<boolean>(false)
   const [terminal] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle as string },
-    { suspense: false, enabled: !!terminalHandle }
+    { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
   )
   const [rfps] = useQuery(
     getRfpsByTerminalId,
     {
       terminalId: terminal?.id as number,
+      includeDeletedRfps: false,
     },
-    { suspense: false, enabled: !!terminal?.id }
+    { suspense: false, enabled: !!terminal?.id, refetchOnWindowFocus: false }
   )
   const router = useRouter()
 
-  const downPress = useKeyPress("ArrowDown")
-  const upPress = useKeyPress("ArrowUp")
-  const enterPress = useKeyPress("Enter")
-  const [cursor, setCursor] = useState(0)
-  const [hovered, setHovered] = useState(undefined)
+  useEffect(() => {
+    if (query.rfpPublished) {
+      setShowRfpSuccessModal(true)
+    }
+  }, [query?.rfpPublished])
 
   useEffect(() => {
-    if (rfpId) {
-      setRfpCreatedConfirmationModal(true)
+    if (query.rfpDeleted) {
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Your request for proposal has been deleted.",
+      })
     }
-  }, [rfpId])
+  })
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
-      {terminal && (
-        <Modal open={rfpCreatedConfirmationModal} toggle={setRfpCreatedConfirmationModal}>
-          <div className="p-2">
-            <h3 className="text-2xl font-bold pt-6">Request successfully published!</h3>
-            <p className="mt-2">
-              Copy the link to share with your community and let the waves of ideas carry you to the
-              exciting future of {terminal.data.name}.
-            </p>
-            <div className="mt-8">
-              <button
-                type="button"
-                className="bg-magic-mint text-tunnel-black border border-magic-mint py-1 px-4 rounded hover:opacity-75"
-                onClick={() => {
-                  setLinkCopied(true)
-                  navigator.clipboard.writeText(
-                    genPathFromUrlObject(Routes.RFPInfoTab({ terminalHandle, rfpId: rfpId }))
-                  )
-                }}
-              >
-                {linkCopied ? "Copied!" : "Copy link"}
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
+      <SuccessRfpModal
+        terminal={terminal}
+        setIsOpen={setShowRfpSuccessModal}
+        isOpen={showRfpSuccessModal}
+        rfpId={query?.rfpPublished}
+        isEdit={false}
+      />
       <TerminalNavigation>
         {/* Filter View */}
         <div className="max-h-[250px] sm:h-[130px] border-b border-concrete">

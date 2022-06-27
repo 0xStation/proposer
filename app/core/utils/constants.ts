@@ -33,7 +33,7 @@ export const RFP_STATUS_DISPLAY_MAP = {
     color: "bg-magic-mint",
   },
   [RfpStatus.CLOSED]: {
-    copy: "open for submissions",
+    copy: "closed",
     color: "bg-torch-red",
   },
 }

@@ -9,7 +9,7 @@ export enum RfpStatus {
   STARTING_SOON = "STARTING_SOON",
   OPEN_FOR_SUBMISSIONS = "OPEN_FOR_SUBMISSIONS",
   CLOSED = "CLOSED",
-  ARCHIVED = "ARCHIVED",
+  DELETED = "DELETED",
 }
 
 export type RfpMetadata = {
