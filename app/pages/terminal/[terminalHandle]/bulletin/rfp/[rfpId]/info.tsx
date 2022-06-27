@@ -10,6 +10,7 @@ import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { formatDate } from "app/core/utils/formatDate"
 import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
+import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 
 const RFPInfoTab: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -45,30 +46,32 @@ const RFPInfoTab: BlitzPage = () => {
             <Preview markdown={rfp?.data?.content?.body} />
           </div>
 
-          <div className="w-96 border-l border-concrete pl-6 pt-6 pr-16 flex-col">
-            <div className="mt-2">
-              <p className="text-concrete uppercase text-xs font-bold">Start Date</p>
-              <p className="mt-2">{(rfp?.startDate && formatDate(rfp?.startDate)) || "N/A"}</p>
+          <div className="w-96 border-l border-concrete flex-col overflow-y-scroll">
+            <div className="border-b border-concrete p-6 ">
+              <div className="mt-2">
+                <p className="text-concrete uppercase text-xs font-bold">Start Date</p>
+                <p className="mt-2">{(rfp?.startDate && formatDate(rfp?.startDate)) || "N/A"}</p>
+              </div>
+              <div className="mt-6">
+                <p className="text-concrete uppercase text-xs font-bold">End Date</p>
+                <p className="mt-2">{(rfp?.endDate && formatDate(rfp?.endDate)) || "N/A"}</p>
+              </div>
+              <div className="mt-6">
+                <p className="text-concrete uppercase text-xs font-bold">Creator</p>
+                <PfpComponent account={rfp?.author} className="mt-2" />
+              </div>
             </div>
-            <div className="mt-6">
-              <p className="text-concrete uppercase text-xs font-bold">End Date</p>
-              <p className="mt-2">{(rfp?.endDate && formatDate(rfp?.endDate)) || "N/A"}</p>
-            </div>
-            {/* TODO: make funding + signers dynamic  */}
-            <div className="mt-6">
-              <p className="text-concrete uppercase text-xs font-bold">Total Funding</p>
-              <p className="mt-2">100.00 ETH</p>
-              <p>1,500,000.00 USDC</p>
-            </div>
-            <div className="mt-6">
-              <p className="text-concrete uppercase text-xs font-bold">Creator</p>
-              <PfpComponent account={rfp?.author} className="mt-2" />
-            </div>
-            <div className="mt-9">
-              <p className="text-xs text-concrete uppercase font-bold">Signers</p>
-              {(rfp?.checkbook?.signerAccounts || []).map((account, i) => (
-                <PfpComponent account={account} className="mt-4" key={i} />
-              ))}
+            <div className="p-6">
+              <p className="text-concrete uppercase text-xs font-bold">Checkbook</p>
+              <p className="mt-2 font-bold">{rfp?.checkbook.name}</p>
+              <CheckbookIndicator checkbook={rfp?.checkbook} terminal={terminal} />
+
+              <div className="mt-9">
+                <p className="text-xs text-concrete uppercase font-bold">Signers</p>
+                {(rfp?.checkbook?.signerAccounts || []).map((account, i) => (
+                  <PfpComponent account={account} className="mt-4" key={i} />
+                ))}
+              </div>
             </div>
           </div>
         </div>
