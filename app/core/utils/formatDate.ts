@@ -13,11 +13,13 @@ const monthMapper = {
   11: "DEC",
 }
 
-export const formatDate = (date) => {
+// formateDate to dd-MM-yyyy, ex:) 01-JAN-2022
+export const formatDate = (date: Date, isLocalTime = false) => {
   if (!date) return null
-  const day = date.getDate()
-  const month = date.getMonth()
-  const year = date.getFullYear()
+
+  const day = isLocalTime ? date.getDate() : date.getUTCDate()
+  const month = isLocalTime ? date.getMonth() : date.getUTCMonth()
+  const year = isLocalTime ? date.getFullYear() : date.getUTCFullYear()
 
   return `${day}-${monthMapper[month]}-${year}`
 }
