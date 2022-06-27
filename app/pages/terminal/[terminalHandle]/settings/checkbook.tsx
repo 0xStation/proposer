@@ -33,13 +33,13 @@ const CheckbookSettingsPage: BlitzPage = () => {
       suspense: false,
       enabled: !!terminal?.id,
       onSuccess: (books) => {
-        if (!books || books.length === 0) {
+        if (!books || (Array.isArray(books) && books.length === 0)) {
           return
         }
-        setCheckbooks(books as any[])
+        setCheckbooks(books as unknown as Checkbook[])
         if (!selectedCheckbook) {
           // set defaulted checkbook as last so that newly created ones automatically shown on redirect
-          setSelectedCheckbook((books as any[])[books.length - 1])
+          setSelectedCheckbook(books[(books as unknown as Checkbook[])?.length - 1])
         }
       },
     }

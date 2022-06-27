@@ -196,7 +196,7 @@ model CheckApproval {
 enum RfpStatus {
   DRAFT
   PUBLISHED
-  ARCHIVED
+  DELETED
 }
 
 enum ProposalStatus {
