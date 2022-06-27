@@ -16,49 +16,11 @@ import { Rfp } from "app/rfp/types"
 import { Proposal } from "app/proposal/types"
 import { PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
+import ProgressIndicator from "app/core/components/ProgressIndicator"
 
 type GetServerSidePropsData = {
   rfp: Rfp
   proposal: Proposal
-}
-
-const ProgressIndicator = ({ percent, twsize, cutoff }) => {
-  const size = twsize * 4
-  const MAX_CIRCUMFRANCE = 2 * (size / 2 - size / 10) * Math.PI * ((360 - cutoff) / 360)
-  const strokeDashoffset = MAX_CIRCUMFRANCE - MAX_CIRCUMFRANCE * percent
-
-  return (
-    <div className={`w-${twsize} h-${twsize} relative`}>
-      {/* base layer */}
-      <svg width={`${size}px`} height={`${size}px`} className="absolute top-0 left-0">
-        <circle
-          cx={`${size / 2}`}
-          cy={`${size / 2}`}
-          r={`${size / 2 - size / 10}`}
-          stroke="#646464"
-          strokeWidth={`${size / 10}`}
-          strokeDasharray={MAX_CIRCUMFRANCE}
-          strokeDashoffset="0"
-          transform={`rotate(${90 + cutoff / 2}, ${size / 2}, ${size / 2})`}
-        />
-      </svg>
-
-      <svg width={`${size}px`} height={`${size}px`} className="absolute top-0 left-0">
-        <circle
-          cx={`${size / 2}`}
-          cy={`${size / 2}`}
-          r={`${size / 2 - size / 10}`}
-          // strokeLinecap="round"
-          stroke="#63EBAF"
-          fill="none"
-          strokeWidth={`${size / 10}`}
-          strokeDasharray={MAX_CIRCUMFRANCE}
-          strokeDashoffset={!isNaN(strokeDashoffset) ? strokeDashoffset : 0}
-          transform={`rotate(${90 + cutoff / 2}, ${size / 2}, ${size / 2})`}
-        />
-      </svg>
-    </div>
-  )
 }
 
 const ProposalPage: BlitzPage = ({
@@ -77,7 +39,7 @@ const ProposalPage: BlitzPage = ({
               <span className="text-concrete hover:text-light-concrete">
                 <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: data.rfp.id })}>
                   {`RFP: ${data.rfp?.data?.content?.title}`}
-                </Link>
+                </Link>{" "}
                 /&nbsp;
               </span>
               {data.proposal.data.content.title}
@@ -121,7 +83,11 @@ const ProposalPage: BlitzPage = ({
               <h4 className="text-xs font-bold text-concrete uppercase mt-6">
                 Request for Proposal
               </h4>
-              <p className="mt-2 text-electric-violet">{data.rfp.data.content.title}</p>
+              <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: data.rfp.id })}>
+                <p className="mt-2 text-electric-violet cursor-pointer">
+                  {data.rfp.data.content.title}
+                </p>
+              </Link>
               <h4 className="text-xs font-bold text-concrete uppercase mt-6">Total Amount</h4>
               <p className="mt-2 font-normal">{`${data.proposal.data.funding.amount} ${data.proposal.data.funding.token}`}</p>
               <h4 className="text-xs font-bold text-concrete uppercase mt-6">Fund Recipient</h4>

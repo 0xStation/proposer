@@ -4,6 +4,7 @@ import { BlitzPage, Routes, useParam, useQuery, Link, useRouterQuery } from "bli
 import { Menu, Transition } from "@headlessui/react"
 import Layout from "app/core/layouts/Layout"
 import Modal from "app/core/components/Modal"
+import SuccessProposalModal from "app/proposal/components/successProposalModal"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
@@ -36,7 +37,7 @@ const ProposalsTab: BlitzPage = () => {
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
 
   const [proposalCreatedConfirmationModal, setProposalCreatedConfirmationModal] =
-    useState<boolean>(true)
+    useState<boolean>(false)
   const [linkCopied, setLinkCopied] = useState<boolean>(false)
 
   useEffect(() => {
@@ -47,6 +48,15 @@ const ProposalsTab: BlitzPage = () => {
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
+      {terminal && (
+        <SuccessProposalModal
+          terminal={terminal}
+          rfpId={rfpId}
+          proposalId={proposalId}
+          isOpen={proposalCreatedConfirmationModal}
+          setIsOpen={setProposalCreatedConfirmationModal}
+        />
+      )}
       {terminal && (
         <Modal open={proposalCreatedConfirmationModal} toggle={setProposalCreatedConfirmationModal}>
           <div className="p-2">
