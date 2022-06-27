@@ -144,6 +144,7 @@ model Proposal {
   data           Json
   createdAt      DateTime          @default(now())
   collaborators  AccountProposal[]
+  checks         Check[]
 }
 
 model AccountProposal {
@@ -159,6 +160,7 @@ model AccountProposal {
 model Check {
   id               String          @id @default(uuid())
   proposalId       String
+  proposal         Proposal        @relation(fields: [proposalId], references: [id])
   fundingAddress   String
   chainId          Int
   checkbook        Checkbook       @relation(fields: [fundingAddress], references: [address])
