@@ -14,6 +14,7 @@ import {
   DEFAULT_PFP_URLS,
   PROPOSAL_STATUS_DISPLAY_MAP,
   PAGINATION_TAKE,
+  PROPOSAL_STATUSES_FILTER_ARRAY,
 } from "app/core/utils/constants"
 import { formatDate } from "app/core/utils/formatDate"
 import { genPathFromUrlObject } from "app/utils"
@@ -35,18 +36,22 @@ const ProposalsTab: BlitzPage = () => {
     { suspense: false, enabled: !!terminalHandle }
   )
 
-  const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
+  const [rfp] = useQuery(
+    getRfpById,
+    { id: rfpId },
+    { suspense: false, enabled: !!rfpId, refetchOnWindowFocus: false }
+  )
 
   const [proposals] = useQuery(
     getProposalsByRfpId,
     {
       rfpId,
       quorum: rfp?.checkbook.quorum as number,
-      statuses: [],
-      page: 1,
+      statuses: Array.from(proposalStatusFilters),
+      page: page,
       paginationTake: PAGINATION_TAKE,
     },
-    { suspense: false, enabled: !!rfpId && !!rfp?.checkbook }
+    { suspense: false, enabled: !!rfpId && !!rfp?.checkbook, refetchOnWindowFocus: false }
   )
 
   const [proposalCreatedConfirmationModal, setProposalCreatedConfirmationModal] =
@@ -103,11 +108,15 @@ const ProposalsTab: BlitzPage = () => {
           <div className="w-full h-20 flex sm:flex-row justify-between items-center">
             <div className="flex ml-5">
               <FilterPill
-                label="Status"
-                filterValues={[{ name: "", value: "" }]}
+                label="status"
+                filterValues={PROPOSAL_STATUSES_FILTER_ARRAY.map((proposalStatus) => ({
+                  name: PROPOSAL_STATUS_DISPLAY_MAP[proposalStatus]?.copy?.toUpperCase(),
+                  value: proposalStatus,
+                }))}
                 appliedFilters={proposalStatusFilters}
                 setAppliedFilters={setProposalStatusFilters}
                 setPage={setPage}
+                refetchCallback={() => invalidateQuery(getProposalsByRfpId)}
               />
             </div>
             <div className="ml-6 sm:mr-6 text-sm pt-1">
@@ -122,7 +131,7 @@ const ProposalsTab: BlitzPage = () => {
               </span>
               of
               <span className="font-bold"> {proposals?.length} </span>
-              members
+              proposals
               <button className="w-6 ml-2" disabled={page === 0} onClick={() => setPage(page - 1)}>
                 <BackArrow className={`${page === 0 ? "fill-concrete" : "fill-marble-white"}`} />
               </button>
@@ -147,16 +156,22 @@ const ProposalsTab: BlitzPage = () => {
             <span className="basis-32 ml-6 mr-6 mb-2">Creator</span>
           </div>
           <div className="h-[calc(100vh-284px)] overflow-y-auto">
-            {proposals &&
-              rfp &&
-              proposals.map((proposal, idx) => (
-                <ProposalComponent
-                  terminalHandle={terminalHandle}
-                  proposal={proposal}
-                  rfp={rfp}
-                  key={idx}
-                />
-              ))}
+            {proposals && rfp
+              ? proposals.map((proposal, idx) => (
+                  <ProposalComponent
+                    terminalHandle={terminalHandle}
+                    proposal={proposal}
+                    rfp={rfp}
+                    key={idx}
+                  />
+                ))
+              : Array.from(Array(15)).map((idx) => (
+                  <div
+                    key={idx}
+                    tabIndex={0}
+                    className={`flex flex-row space-x-52 my-3 mx-3 rounded-lg bg-wet-concrete shadow border-solid h-[113px] motion-safe:animate-pulse`}
+                  />
+                ))}
           </div>
         </div>
       </TerminalNavigation>

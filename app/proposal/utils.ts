@@ -7,11 +7,9 @@ import { ProposalStatus as ProductProposalStatus } from "./types"
  * Approved: db status = PUBLISHED && approval count = quorum
  */
 export const computeApprovalCountFilter = (statuses: string[], quorum: number) => {
-  if (statuses === [ProductProposalStatus.SUBMITTED]) {
-    return { equals: 0 }
-  } else if (statuses === [ProductProposalStatus.IN_REVIEW]) {
+  if (statuses.includes(ProductProposalStatus.IN_REVIEW) && statuses.length === 1) {
     return { gt: 0, lt: quorum }
-  } else if (statuses === [ProductProposalStatus.APPROVED]) {
+  } else if (statuses.includes(ProductProposalStatus.APPROVED) && statuses.length === 1) {
     return { equals: quorum }
   } else if (
     statuses.includes(ProductProposalStatus.SUBMITTED) &&

@@ -69,6 +69,12 @@ export const RFP_STATUSES_FILTER_ARRAY = [
   RfpStatus.CLOSED,
 ]
 
+export const PROPOSAL_STATUSES_FILTER_ARRAY = [
+  ProposalStatus.SUBMITTED,
+  ProposalStatus.IN_REVIEW,
+  ProposalStatus.APPROVED,
+]
+
 // LEGACY BELOW
 
 // LEGACY
