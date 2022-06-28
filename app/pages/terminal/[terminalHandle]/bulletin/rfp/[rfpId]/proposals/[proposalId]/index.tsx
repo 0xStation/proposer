@@ -11,6 +11,7 @@ import {
 } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
+import SignApprovalProposalModal from "app/proposal/components/SignApprovalProposalModal"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import useStore from "app/core/hooks/useStore"
 import getRfpById from "app/rfp/queries/getRfpById"
@@ -34,32 +35,33 @@ const ProposalPage: BlitzPage = ({
   const terminalHandle = useParam("terminalHandle") as string
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
-  const [tokenName, setTokenName] = useState("")
+  const [tokenName, setTokenName] = useState<string>("")
+  const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
   const [approveProposalMutation] = useMutation(approveProposal)
 
   // not really a fan of this but we need to get the token symbol
   // should we just store that alongside proposal so we don't have to call this function anytime we need the symbol?
-  useEffect(() => {
-    const getTokenData = async () => {
-      const a = await fetch("/api/fetch-token-metadata", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          address: data.proposal.data.funding.token,
-          chainId: 4,
-        }),
-      })
-      const r = await a.json()
-      setTokenName(r.data.symbol)
-    }
-    if (data.proposal.data.funding.token === zeroAddress) {
-      setTokenName("ETH")
-    } else {
-      getTokenData()
-    }
-  }, [])
+  // useEffect(() => {
+  //   const getTokenData = async () => {
+  //     const a = await fetch("/api/fetch-token-metadata", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         address: data.proposal.data.funding.token,
+  //         chainId: 4,
+  //       }),
+  //     })
+  //     const r = await a.json()
+  //     setTokenName(r.data.symbol)
+  //   }
+  //   if (data.proposal.data.funding.token === zeroAddress) {
+  //     setTokenName("ETH")
+  //   } else {
+  //     getTokenData()
+  //   }
+  // }, [])
 
   const executeApproval = async () => {
     if (!activeUser?.address) {
@@ -84,6 +86,12 @@ const ProposalPage: BlitzPage = ({
 
   return (
     <Layout title={`Proposals`}>
+      <SignApprovalProposalModal
+        isOpen={signModalOpen}
+        setIsOpen={setSignModalOpen}
+        rfp={data.rfp}
+        proposal={data.proposal}
+      />
       <TerminalNavigation>
         <div className="grid grid-cols-3 h-screen w-full box-border">
           <div className="col-span-2 p-6">
@@ -154,13 +162,14 @@ const ProposalPage: BlitzPage = ({
                 <div className="flex flex-row space-x-2 items-center mt-2">
                   <ProgressIndicator percent={0} twsize={6} cutoff={0} />
                   {/* todo -- approvals */}
-                  <p>0/3</p>
+                  <p>0/{data.rfp.checkbook.quorum}</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => {
-                  executeApproval()
+                  setSignModalOpen(true)
+                  // executeApproval()
                 }}
                 className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70"
               >

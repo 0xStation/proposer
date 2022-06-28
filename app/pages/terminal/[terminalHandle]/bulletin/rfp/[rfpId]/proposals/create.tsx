@@ -12,18 +12,24 @@ import {
 } from "blitz"
 import { Field, Form } from "react-final-form"
 import { XIcon } from "@heroicons/react/solid"
+// components
 import Layout from "app/core/layouts/Layout"
-import useStore from "app/core/hooks/useStore"
-import truncateString from "app/core/utils/truncateString"
-import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
 import Modal from "app/core/components/Modal"
-import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
+import CheckbookSelect from "app/core/components/CheckbookSelect"
+// hooks
+import useStore from "app/core/hooks/useStore"
+// queries + mutations
 import getRfpById from "app/rfp/queries/getRfpById"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import createProposal from "app/proposal/mutations/createProposal"
+// utils
+import truncateString from "app/core/utils/truncateString"
+import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
+import { requiredField } from "app/utils/validators"
+//types
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
-import { requiredField } from "app/utils/validators"
 
 type GetServerSidePropsData = {
   rfp: Rfp
@@ -268,14 +274,11 @@ const CreateProposalPage: BlitzPage = ({
                         <>
                           <label className="font-bold block mt-6">Token*</label>
                           <div className="custom-select-wrapper">
-                            <select
-                              {...input}
-                              className={`w-full bg-wet-concrete border border-concrete rounded p-2 mt-1`}
-                            >
-                              <option value="">Choose option</option>
-                              <option value="USDC">USDC</option>
-                              <option value="ETH">ETH</option>
-                            </select>
+                            <CheckbookSelect
+                              terminal={data.terminal}
+                              checkbook={data.rfp.checkbook}
+                              options={input}
+                            />
                           </div>
                           {((meta.touched && input.value === "") || meta.error) && (
                             <span className="text-torch-red text-xs">You must select a token.</span>

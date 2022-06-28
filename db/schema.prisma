@@ -141,7 +141,7 @@ model Proposal {
   id            String             @id @default(uuid())
   rfpId         String
   rfp           Rfp                @relation(fields: [rfpId], references: [id])
-  status        ProposalStatus     @default(PUBLISHED)
+  status        ProposalStatus     @default(SUBMITTED)
   data          Json
   createdAt     DateTime           @default(now())
   collaborators AccountProposal[]
@@ -215,8 +215,9 @@ enum RfpStatus {
 }
 
 enum ProposalStatus {
-  DRAFT
-  PUBLISHED
+  SUBMITTED
+  IN_REVIEW
+  APPROVED
 }
 
 //

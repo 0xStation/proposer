@@ -17,7 +17,6 @@ const ApproveProposal = z.object({
 // todo -
 // - error handling
 export default async function approveProposal(input: z.infer<typeof ApproveProposal>) {
-  console.log("the start of approving")
   // assuming we would want to approve all of the checks for a proposal?
   // we are not handling splits right now, so it doesnt reallly matter
   // but assuming we are handling splits and there are many checks for a proposal
@@ -41,21 +40,30 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
     checksToApprove.push(check)
   }
 
-  // create all of the check approvals
-  const approvals = await db.checkApproval.createMany({
-    data: checksToApprove.map((check) => {
-      return {
+  const checkApprovalQueries = checksToApprove.map((check) => {
+    return db.checkApproval.create({
+      data: {
         checkId: check.id,
         signerAddress: input.signerAddress,
         data: {
           signature: input.signature,
         },
-      }
-    }),
+      },
+    })
   })
 
-  // this is a number of the approvals, not sure it easily supports returning a list of the approvals since
-  // createMany returns a count for some reason...
-  // not sure that matters though
-  return approvals
+  const results = await db.$transaction([
+    db.proposalApproval.create({
+      data: {
+        proposalId: input.proposalId,
+        signerAddress: input.signerAddress,
+        data: {
+          signature: input.signature,
+        },
+      },
+    }),
+    ...checkApprovalQueries,
+  ])
+
+  return results
 }
