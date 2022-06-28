@@ -56,7 +56,7 @@ export const PROPOSAL_STATUS_DISPLAY_MAP = {
     color: "bg-neon-carrot",
   },
   [ProposalStatus.APPROVED]: {
-    copy: "in review",
+    copy: "approved",
     color: "bg-magic-mint",
   },
 }
