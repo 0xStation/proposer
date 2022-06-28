@@ -35,13 +35,19 @@ const ProposalsTab: BlitzPage = () => {
     { suspense: false, enabled: !!terminalHandle }
   )
 
+  const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
+
   const [proposals] = useQuery(
     getProposalsByRfpId,
-    { rfpId: rfpId, page: 1, paginationTake: PAGINATION_TAKE },
-    { suspense: false, enabled: !!rfpId }
+    {
+      rfpId,
+      quorum: rfp?.checkbook.quorum as number,
+      statuses: [],
+      page: 1,
+      paginationTake: PAGINATION_TAKE,
+    },
+    { suspense: false, enabled: !!rfpId && !!rfp?.checkbook }
   )
-
-  const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
 
   const [proposalCreatedConfirmationModal, setProposalCreatedConfirmationModal] =
     useState<boolean>(false)
@@ -187,9 +193,7 @@ const ProposalComponent = ({
           <div className="basis-32 ml-9 mb-2 self-center">
             <p>
               {/* TODO: Figure out how to show signers per milestone */}
-              {`${proposal.data?.signatures?.length || "0"} / ${
-                rfp?.checkbook?.data?.quorum || "N/A"
-              }`}
+              {`${proposal.approvals?.length || "0"} / ${rfp?.checkbook?.quorum || "N/A"}`}
             </p>
           </div>
           <div className="basis-32 ml-6 mb-2 self-center">

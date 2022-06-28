@@ -47,13 +47,17 @@ export const RFP_STATUS_DISPLAY_MAP = {
 }
 
 export const PROPOSAL_STATUS_DISPLAY_MAP = {
-  [ProposalStatus.PUBLISHED]: {
-    copy: "published",
-    color: "bg-magic-mint",
+  [ProposalStatus.SUBMITTED]: {
+    copy: "submitted",
+    color: "bg-marble-white",
   },
-  [ProposalStatus.DRAFT]: {
-    copy: "draft",
+  [ProposalStatus.IN_REVIEW]: {
+    copy: "in review",
     color: "bg-neon-carrot",
+  },
+  [ProposalStatus.APPROVED]: {
+    copy: "approved",
+    color: "bg-magic-mint",
   },
 }
 
