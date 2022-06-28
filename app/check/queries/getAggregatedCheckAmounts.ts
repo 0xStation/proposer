@@ -15,7 +15,7 @@ export default async function getAggregatedCheckAmounts(
   // only way to make a query of this nature is with groupBy
   const approvedUncashedChecksGroup = await db.checkApproval.groupBy({
     where: {
-      Check: {
+      check: {
         fundingAddress: {
           equals: input.checkbookAddress,
         },
