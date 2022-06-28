@@ -1,7 +1,8 @@
 import db from "db"
 import * as z from "zod"
 import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
-import { ProposalStatus as ProductProposalStatus, Proposal } from "../types"
+import { Proposal } from "../types"
+import { computeApprovalCountFilter, computeProposalStatus } from "../utils"
 
 const GetProposalsByRfpId = z.object({
   rfpId: z.string(),
@@ -10,51 +11,13 @@ const GetProposalsByRfpId = z.object({
 })
 
 export default async function getProposalsByRfpId(input: z.infer<typeof GetProposalsByRfpId>) {
-  /**
-   * Submitted: db status = PUBLISHED && approval count = 0
-   * In review: db status = PUBLISHED && approval count > 0, < quorum
-   * Approved: db status = PUBLISHED && approval count = quorum
-   */
-  let approvalCountFilter = {}
-  const s = input.statuses
-  if (s === [ProductProposalStatus.SUBMITTED]) {
-    approvalCountFilter = { equals: 0 }
-  } else if (s === [ProductProposalStatus.IN_REVIEW]) {
-    approvalCountFilter = { gt: 0, lt: input.quorum }
-  } else if (s === [ProductProposalStatus.APPROVED]) {
-    approvalCountFilter = { equals: input.quorum }
-  } else if (
-    s.includes(ProductProposalStatus.SUBMITTED) &&
-    s.includes(ProductProposalStatus.IN_REVIEW) &&
-    s.length === 2
-  ) {
-    approvalCountFilter = { lt: input.quorum }
-  } else if (
-    s.includes(ProductProposalStatus.SUBMITTED) &&
-    s.includes(ProductProposalStatus.APPROVED) &&
-    s.length === 2
-  ) {
-    approvalCountFilter = { in: [0, input.quorum] }
-  } else if (
-    s.includes(ProductProposalStatus.IN_REVIEW) &&
-    s.includes(ProductProposalStatus.APPROVED) &&
-    s.length === 2
-  ) {
-    approvalCountFilter = { gt: 0 }
-  } else if (
-    s.includes(ProductProposalStatus.SUBMITTED) &&
-    s.includes(ProductProposalStatus.IN_REVIEW) &&
-    s.includes(ProductProposalStatus.APPROVED) &&
-    s.length === 3
-  ) {
-    // keep filters as empty object
-  } else {
-    // no status filters applied
-    // keep filters as empty object
-  }
+  let approvalCountFilter = computeApprovalCountFilter(input.statuses, input.quorum)
 
   let proposalsWhere = {}
-  if (approvalCountFilter !== {}) {
+  if (!approvalCountFilter) {
+    // all or no filters applied, just get proposals by rfpId and published
+    proposalsWhere = { rfpId: input.rfpId, status: PrismaProposalStatus.PUBLISHED }
+  } else {
     const proposalStatusGroup = await db.proposalApproval.groupBy({
       where: {
         proposal: {
@@ -74,14 +37,8 @@ export default async function getProposalsByRfpId(input: z.infer<typeof GetPropo
       },
     })
 
-    console.log(proposalStatusGroup)
-
     const proposalIds = proposalStatusGroup.map((g) => g.proposalId)
-
     proposalsWhere = { id: { in: proposalIds } }
-  } else {
-    // all or no filters applied, just get proposals by rfpId
-    proposalsWhere = { rfpId: input.rfpId, status: PrismaProposalStatus.PUBLISHED }
   }
 
   const proposals = await db.proposal.findMany({
@@ -109,5 +66,10 @@ export default async function getProposalsByRfpId(input: z.infer<typeof GetPropo
     return null
   }
 
-  return proposals as unknown as Proposal[]
+  return proposals.map((p) => {
+    return {
+      ...p,
+      status: computeProposalStatus(p.approvals.length, input.quorum),
+    }
+  }) as unknown as Proposal[]
 }
