@@ -163,6 +163,11 @@ const BulletinPage: BlitzPage = () => {
               rfps?.map((rfp) => (
                 <RFPComponent rfp={rfp} terminalHandle={terminalHandle} key={rfp.id} />
               ))
+            ) : rfps && rfpStatusFilters?.size ? (
+              <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
+                <p>No RFPs came up</p>
+                <p>...</p>
+              </div>
             ) : rfps ? (
               // TODO: hide this view from non-admins and show different copy once we have checkbook signer tags
               <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">

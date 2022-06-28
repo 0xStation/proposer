@@ -156,22 +156,29 @@ const ProposalsTab: BlitzPage = () => {
             <span className="basis-32 ml-6 mr-6 mb-2">Creator</span>
           </div>
           <div className="h-[calc(100vh-284px)] overflow-y-auto">
-            {proposals && rfp
-              ? proposals.map((proposal, idx) => (
-                  <ProposalComponent
-                    terminalHandle={terminalHandle}
-                    proposal={proposal}
-                    rfp={rfp}
-                    key={idx}
-                  />
-                ))
-              : Array.from(Array(15)).map((idx) => (
-                  <div
-                    key={idx}
-                    tabIndex={0}
-                    className={`flex flex-row space-x-52 my-3 mx-3 rounded-lg bg-wet-concrete shadow border-solid h-[113px] motion-safe:animate-pulse`}
-                  />
-                ))}
+            {proposals && rfp && proposals.length ? (
+              proposals.map((proposal, idx) => (
+                <ProposalComponent
+                  terminalHandle={terminalHandle}
+                  proposal={proposal}
+                  rfp={rfp}
+                  key={idx}
+                />
+              ))
+            ) : rfp ? (
+              <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
+                <p>No proposals came up</p>
+                <p>...</p>
+              </div>
+            ) : (
+              Array.from(Array(15)).map((idx) => (
+                <div
+                  key={idx}
+                  tabIndex={0}
+                  className={`flex flex-row space-x-52 my-3 mx-3 rounded-lg bg-wet-concrete shadow border-solid h-[113px] motion-safe:animate-pulse`}
+                />
+              ))
+            )}
           </div>
         </div>
       </TerminalNavigation>
