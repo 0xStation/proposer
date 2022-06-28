@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react"
-import { BlitzPage, Routes, useParam, useQuery, Link, useRouterQuery } from "blitz"
-import truncateString from "app/core/utils/truncateString"
+import { BlitzPage, useParam, useQuery, useRouterQuery } from "blitz"
 import Preview from "app/core/components/MarkdownPreview"
 import Layout from "app/core/layouts/Layout"
-import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { formatDate } from "app/core/utils/formatDate"
 import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
+import AccountPfp from "app/core/components/AccountPfp"
 import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 
 const RFPInfoTab: BlitzPage = () => {
@@ -58,7 +57,7 @@ const RFPInfoTab: BlitzPage = () => {
               </div>
               <div className="mt-6">
                 <p className="text-concrete uppercase text-xs font-bold">Creator</p>
-                <PfpComponent account={rfp?.author} className="mt-2" />
+                <AccountPfp account={rfp?.author} className="mt-2" />
               </div>
             </div>
             <div className="p-6">
@@ -69,7 +68,7 @@ const RFPInfoTab: BlitzPage = () => {
               <div className="mt-9">
                 <p className="text-xs text-concrete uppercase font-bold">Signers</p>
                 {(rfp?.checkbook?.signerAccounts || []).map((account, i) => (
-                  <PfpComponent account={account} className="mt-4" key={i} />
+                  <AccountPfp account={account} className="mt-4" key={i} />
                 ))}
               </div>
             </div>
@@ -80,34 +79,4 @@ const RFPInfoTab: BlitzPage = () => {
   )
 }
 
-const PfpComponent = ({ account, className = "" }) => {
-  return (
-    <Link href={Routes.ProfileHome({ accountAddress: account?.address })}>
-      <div className={`flex flex-row ${className}`}>
-        <div className="flex flex-col content-center align-middle mr-3">
-          {account?.data?.pfpURL ? (
-            <img
-              src={account?.data?.pfpURL}
-              alt="PFP"
-              className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
-              onError={(e) => {
-                e.currentTarget.src = DEFAULT_PFP_URLS.USER
-              }}
-            />
-          ) : (
-            <div className="h-[46px] min-w-[46px] place-self-center border border-wet-concrete bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
-          )}
-        </div>
-        <div className="flex flex-col content-center">
-          <div className="flex flex-row items-center space-x-1">
-            <p className="text-base text-marble-white font-bold">{account?.data?.name}</p>
-          </div>
-          <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-            <p className="w-max truncate leading-4">@{truncateString(account?.address)}</p>
-          </div>
-        </div>
-      </div>
-    </Link>
-  )
-}
 export default RFPInfoTab

@@ -18,16 +18,26 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp }) 
   })
 
   const executeApprovals = async (rfp, proposal, signature, address) => {
-    const approvals = await approveProposalMutation({
-      proposalId: proposal.id,
-      chainId: rfp.checkbook.chainId,
-      signerAddress: address,
-      signature: signature,
-      fundingAddress: rfp.checkbook.address,
-      recipientAddress: proposal.data.funding.recipientAddress,
-      tokenAddress: proposal.data.funding.token,
-      tokenAmount: proposal.data.funding.amount,
-    })
+    try {
+      await approveProposalMutation({
+        proposalId: proposal.id,
+        chainId: rfp.checkbook.chainId,
+        signerAddress: address,
+        signature: signature,
+        fundingAddress: rfp.checkbook.address,
+        recipientAddress: proposal.data.funding.recipientAddress,
+        tokenAddress: proposal.data.funding.token,
+        tokenAmount: proposal.data.funding.amount,
+      })
+      setIsOpen(false)
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Your approval moves this proposal a step closer to reality.",
+      })
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   return (
