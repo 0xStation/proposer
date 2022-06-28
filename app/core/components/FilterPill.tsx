@@ -15,14 +15,14 @@ const FilterPill = ({
   appliedFilters,
   setAppliedFilters,
   setPage,
-  refetchCallback,
+  refetchCallback, // callback if any queries need to be re-run when filters are applied
 }: {
   label: string
   filterValues: FilterValue[]
   appliedFilters: Set<any>
   setAppliedFilters: React.Dispatch<React.SetStateAction<Set<any>>>
   setPage?: React.Dispatch<React.SetStateAction<number>>
-  refetchCallback: () => void
+  refetchCallback?: () => void
 }) => {
   const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
 
@@ -36,7 +36,9 @@ const FilterPill = ({
     }
 
     setAppliedFilters(appliedFilters)
-    refetchCallback()
+    if (refetchCallback) {
+      refetchCallback()
+    }
 
     // clear filled checkboxes by removing the defaultChecked value
     // bumping the key will reset the uncontrolled component's internal state
@@ -91,11 +93,16 @@ const FilterPill = ({
                         appliedFilters.delete(filterValue)
                       }
                     })
+
                     if (setPage) {
                       setPage(0)
                     }
+
                     setAppliedFilters(appliedFilters)
-                    refetchCallback()
+
+                    if (refetchCallback) {
+                      refetchCallback()
+                    }
                   }}
                   render={({ form, handleSubmit }) => {
                     return (

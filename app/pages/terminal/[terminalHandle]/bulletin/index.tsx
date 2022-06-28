@@ -107,7 +107,7 @@ const BulletinPage: BlitzPage = () => {
               className="h-[35px] bg-electric-violet px-9 rounded text-tunnel-black hover:bg-opacity-70"
               onClick={() => router.push(Routes.CreateRFPPage({ terminalHandle }))}
             >
-              Create request for proposal
+              Create RFP
             </button>
           </div>
           <div className="flex flex-col sm:flex-row justify-between items-center">
