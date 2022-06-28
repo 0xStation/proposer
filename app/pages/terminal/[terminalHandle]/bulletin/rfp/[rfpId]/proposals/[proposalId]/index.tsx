@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import {
   BlitzPage,
   Routes,
@@ -6,10 +7,12 @@ import {
   invoke,
   GetServerSideProps,
   InferGetServerSidePropsType,
+  useMutation,
 } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
+import useStore from "app/core/hooks/useStore"
 import getRfpById from "app/rfp/queries/getRfpById"
 import getProposalById from "app/proposal/queries/getProposalById"
 import { Rfp } from "app/rfp/types"
@@ -17,6 +20,8 @@ import { Proposal } from "app/proposal/types"
 import { PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import ProgressIndicator from "app/core/components/ProgressIndicator"
+import approveProposal from "app/proposal/mutations/approveProposal"
+import { zeroAddress } from "app/core/utils/constants"
 
 type GetServerSidePropsData = {
   rfp: Rfp
@@ -27,6 +32,56 @@ const ProposalPage: BlitzPage = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const terminalHandle = useParam("terminalHandle") as string
+  const activeUser = useStore((state) => state.activeUser)
+  const setToastState = useStore((state) => state.setToastState)
+  const [tokenName, setTokenName] = useState("")
+  const [approveProposalMutation] = useMutation(approveProposal)
+
+  // not really a fan of this but we need to get the token symbol
+  // should we just store that alongside proposal so we don't have to call this function anytime we need the symbol?
+  useEffect(() => {
+    const getTokenData = async () => {
+      const a = await fetch("/api/fetch-token-metadata", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address: data.proposal.data.funding.token,
+          chainId: 4,
+        }),
+      })
+      const r = await a.json()
+      setTokenName(r.data.symbol)
+    }
+    if (data.proposal.data.funding.token === zeroAddress) {
+      setTokenName("ETH")
+    } else {
+      getTokenData()
+    }
+  }, [])
+
+  const executeApproval = async () => {
+    if (!activeUser?.address) {
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: "You must connect your wallet in order to approve a proposal",
+      })
+    } else {
+      const approvals = await approveProposalMutation({
+        proposalId: data.proposal.id,
+        chainId: data.rfp.checkbook.chainId,
+        signerAddress: activeUser.address,
+        signature: "0x0000000000000000000000000000000000000000", // todo --- gen signature
+        fundingAddress: data.rfp.checkbook.address,
+        recipientAddress: data.proposal.data.funding.recipientAddress,
+        tokenAddress: data.proposal.data.funding.token,
+        tokenAmount: data.proposal.data.funding.amount,
+      })
+    }
+  }
+
   return (
     <Layout title={`Proposals`}>
       <TerminalNavigation>
@@ -89,7 +144,7 @@ const ProposalPage: BlitzPage = ({
                 </p>
               </Link>
               <h4 className="text-xs font-bold text-concrete uppercase mt-6">Total Amount</h4>
-              <p className="mt-2 font-normal">{`${data.proposal.data.funding.amount} ${data.proposal.data.funding.token}`}</p>
+              <p className="mt-2 font-normal">{`${data.proposal.data.funding.amount} ${tokenName}`}</p>
               <h4 className="text-xs font-bold text-concrete uppercase mt-6">Fund Recipient</h4>
               <p className="mt-2">{data.proposal.data.funding.recipientAddress}</p>
             </div>
@@ -105,7 +160,7 @@ const ProposalPage: BlitzPage = ({
               <button
                 type="button"
                 onClick={() => {
-                  // todo -- aprove
+                  executeApproval()
                 }}
                 className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70"
               >
