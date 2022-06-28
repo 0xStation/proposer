@@ -16,7 +16,6 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
   const proposal = await db.proposal.create({
     data: {
       rfpId: input.rfpId,
-      terminalId: input.terminalId,
       data: {
         content: {
           title: input.contentTitle,

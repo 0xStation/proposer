@@ -1,3 +1,4 @@
+import { computeProposalStatus } from "app/proposal/utils"
 import db from "db"
 import * as z from "zod"
 import { Account } from "../types"
@@ -24,6 +25,7 @@ export default async function getAccountProposalsByAddress(
                   checkbook: true,
                 },
               },
+              approvals: true,
             },
           },
         },
@@ -35,5 +37,21 @@ export default async function getAccountProposalsByAddress(
     return null
   }
 
-  return account as unknown as Account
+  const accountProposals = account.proposals.map((accountProposal) => {
+    return {
+      ...accountProposal,
+      proposal: {
+        ...accountProposal.proposal,
+        status: computeProposalStatus(
+          accountProposal.proposal.approvals.length,
+          accountProposal.proposal.rfp.checkbook?.quorum as number
+        ),
+      },
+    }
+  })
+
+  return {
+    ...account,
+    proposals: accountProposals,
+  } as unknown as Account
 }
