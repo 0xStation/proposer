@@ -17,6 +17,7 @@ import { formatDate } from "app/core/utils/formatDate"
 import { genPathFromUrlObject } from "app/utils"
 import { Rfp } from "app/rfp/types"
 import { Proposal } from "app/proposal/types"
+import ProgressIndicator from "app/core/components/ProgressIndicator"
 
 const ProposalsTab: BlitzPage = () => {
   const { proposalId } = useRouterQuery() as { proposalId: string }
@@ -142,12 +143,13 @@ const ProposalComponent = ({
             <h2 className="text-xl mt-2 mb-3">{proposal?.data?.content?.title}</h2>
           </div>
           <div className="basis-32 ml-9 mb-2 self-center">
-            <p>
-              {/* TODO: Figure out how to show signers per milestone */}
-              {`${proposal.data?.signatures?.length || "0"} / ${
-                rfp?.checkbook?.data?.quorum || "N/A"
-              }`}
-            </p>
+            <div className="flex flex-row">
+              <ProgressIndicator percent={0} twsize={6} cutoff={0} />
+              <p className="ml-2">
+                {/* TODO: Add ProposalApprovals */}
+                {`${proposal.data?.signatures?.length || "0"} / ${rfp?.checkbook?.quorum || "N/A"}`}
+              </p>
+            </div>
           </div>
           <div className="basis-32 ml-6 mb-2 self-center">
             {proposal.data?.funding?.amount || "N/A"}
