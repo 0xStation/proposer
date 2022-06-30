@@ -1,5 +1,6 @@
 import db from "db"
 import * as z from "zod"
+import { Check } from "../types"
 
 const GetPendingChecksByTerminal = z.object({
   terminalId: z.number(),
@@ -53,7 +54,10 @@ export default async function getPendingChecksByTerminal(
         in: pendingCheckIds,
       },
     },
+    include: {
+      approvals: true,
+    },
   })
 
-  return pendingChecks
+  return pendingChecks as Check[]
 }

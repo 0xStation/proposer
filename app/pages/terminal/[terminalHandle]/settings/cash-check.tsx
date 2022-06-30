@@ -6,12 +6,16 @@ import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import { useQuery, useMutation, useParam } from "blitz"
-import cashCheck from "app/check/mutations/cashCheck"
+import CashCheck from "app/check/mutations/cashCheck"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getPendingChecksByTerminal from "app/check/queries/getPendingChecksByTerminal"
 import { zeroAddress } from "app/core/utils/constants"
 import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
-import { Check } from "@prisma/client"
+import { Check } from "app/check/types"
+import { CheckApprovalMetadata } from "app/checkApproval/types"
+import { useCashCheck } from "app/contracts/contracts"
+import { checkToContractTypes } from "app/core/utils/checkToContractTypes"
+import { Spinner } from "app/core/components/Spinner"
 
 /**
  * THIS IS A DEV TOOL
@@ -23,6 +27,9 @@ import { Check } from "@prisma/client"
 const CashCheckPage: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
+  const [selectedCheck, setSelectedCheck] = useState<Check>()
+  const [txnHash, setTxnHash] = useState<string>()
+  const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
 
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(
@@ -37,7 +44,7 @@ const CashCheckPage: BlitzPage = () => {
     { suspense: false, enabled: !!terminal }
   )
 
-  const [cashCheckMutation] = useMutation(cashCheck, {
+  const [cashCheckMutation] = useMutation(CashCheck, {
     onSuccess: (_data) => {
       console.log("success", _data)
     },
@@ -46,18 +53,36 @@ const CashCheckPage: BlitzPage = () => {
     },
   })
 
+  const { cashCheck } = useCashCheck(selectedCheck?.fundingAddress as string)
+
   return (
     <LayoutWithoutNavigation>
       <Navigation>
         <section className="flex-1 ml-10">
-          <h2 className="text-marble-white text-2xl font-bold mt-10">Generate Check</h2>
+          <h2 className="text-marble-white text-2xl font-bold mt-10">Cash Check</h2>
           <Form
             onSubmit={async (values: any, form) => {
               try {
-                console.log(values)
+                setWaitingCreation(true)
+                setSelectedCheck(pendingChecks?.find((c) => c.id === values.checkId))
+                const check = checkToContractTypes(selectedCheck)
+
+                console.log(selectedCheck?.id)
+
+                const transaction = await cashCheck({
+                  args: [
+                    check.recipient,
+                    check.token,
+                    check.amount,
+                    check.deadline,
+                    check.nonce,
+                    check.signatures,
+                  ],
+                })
+
                 await cashCheckMutation({
                   checkId: values.checkId,
-                  txnHash: "",
+                  txnHash: transaction.hash,
                 })
 
                 setToastState({
@@ -65,13 +90,21 @@ const CashCheckPage: BlitzPage = () => {
                   type: "success",
                   message: "Check cashed.",
                 })
+                setWaitingCreation(false)
               } catch (e) {
+                setWaitingCreation(false)
                 console.error(e)
                 if (e.name == "ConnectorNotFoundError") {
                   setToastState({
                     isToastShowing: true,
                     type: "error",
                     message: "Please reset wallet connection.\n(ConnectorNotFoundError)",
+                  })
+                } else if (e.message.includes("execution reverted: nonce used")) {
+                  setToastState({
+                    isToastShowing: true,
+                    type: "error",
+                    message: "This check has already been cashed.",
                   })
                 } else {
                   setToastState({
@@ -111,12 +144,18 @@ const CashCheckPage: BlitzPage = () => {
                     </Field>
                     <button
                       type="submit"
-                      className={`rounded text-tunnel-black text-bold px-8 py-2 w-full mt-12 ${
+                      className={`rounded text-tunnel-black text-bold px-8 py-2 w-full h-10 mt-12 ${
                         disableSubmit ? "bg-concrete" : "bg-electric-violet"
                       }`}
-                      disabled={disableSubmit}
+                      disabled={disableSubmit || waitingCreation}
                     >
-                      Cash Check
+                      {waitingCreation ? (
+                        <div className="flex justify-center items-center">
+                          <Spinner fill="black" />
+                        </div>
+                      ) : (
+                        "Create"
+                      )}
                     </button>
                   </div>
                 </form>
