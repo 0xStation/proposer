@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "blitz"
+import { useMutation, useQuery, useRouter } from "blitz"
 import { useSignTypedData, useToken } from "wagmi"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
@@ -11,6 +11,7 @@ import { TypedDataTypeDefinition } from "app/types"
 import { Check } from "@prisma/client"
 
 export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp }) => {
+  const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const [approveProposalMutation] = useMutation(approveProposal)
@@ -143,6 +144,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp }) 
           signerAddress: activeUser.address,
           signature: signature,
         })
+        router.replace(router.asPath)
         setIsOpen(false)
         setToastState({
           isToastShowing: true,
