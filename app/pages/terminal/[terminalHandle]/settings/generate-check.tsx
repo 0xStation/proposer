@@ -173,7 +173,7 @@ const GenerateCheckPage: BlitzPage = () => {
 
                 // only call the mutation if you need a new check!
                 const newCheck = await createCheckMutation({
-                  proposalId: "", // dummy for now
+                  proposalId: "9cb97cb0-ba84-4fb5-8686-cf5868e747df", // dummy for now
                   fundingAddress: values.checkbookAddress,
                   chainId: checkbookChainId,
                   recipientAddress: values.recipient,
