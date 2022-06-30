@@ -33,7 +33,6 @@ const ProposalPage: BlitzPage = ({
   const terminalHandle = useParam("terminalHandle") as string
   const [tokenName, setTokenName] = useState<string>("ETH")
   const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
-  console.log(data.proposal)
 
   // not really a fan of this but we need to get the token symbol
   // should we just store that alongside proposal so we don't have to call this function anytime we need the symbol?
