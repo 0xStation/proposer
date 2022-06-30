@@ -14,13 +14,14 @@ import SignApprovalProposalModal from "app/proposal/components/SignApprovalPropo
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
 import getProposalById from "app/proposal/queries/getProposalById"
-import { Rfp } from "app/rfp/types"
-import { Proposal } from "app/proposal/types"
 import { PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import ProgressIndicator from "app/core/components/ProgressIndicator"
 import { zeroAddress } from "app/core/utils/constants"
 import AccountPfp from "app/core/components/AccountPfp"
+import useStore from "app/core/hooks/useStore"
+import { Rfp } from "app/rfp/types"
+import { Proposal } from "app/proposal/types"
 
 type GetServerSidePropsData = {
   rfp: Rfp
@@ -33,30 +34,31 @@ const ProposalPage: BlitzPage = ({
   const terminalHandle = useParam("terminalHandle") as string
   const [tokenName, setTokenName] = useState<string>("ETH")
   const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
+  const activeUser = useStore((state) => state.activeUser)
 
   // not really a fan of this but we need to get the token symbol
   // should we just store that alongside proposal so we don't have to call this function anytime we need the symbol?
-  // useEffect(() => {
-  //   const getTokenData = async () => {
-  //     const a = await fetch("/api/fetch-token-metadata", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         address: data.proposal.data.funding.token,
-  //         chainId: 4,
-  //       }),
-  //     })
-  //     const r = await a.json()
-  //     setTokenName(r.data.symbol)
-  //   }
-  //   if (data.proposal.data.funding.token === zeroAddress) {
-  //     setTokenName("ETH")
-  //   } else {
-  //     getTokenData()
-  //   }
-  // }, [])
+  useEffect(() => {
+    const getTokenData = async () => {
+      const a = await fetch("/api/fetch-token-metadata", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address: data.proposal.data.funding.token,
+          chainId: data.rfp.checkbook.chainId,
+        }),
+      })
+      const r = await a.json()
+      setTokenName(r.data.symbol)
+    }
+    if (data.proposal.data.funding.token === zeroAddress) {
+      setTokenName("ETH")
+    } else {
+      getTokenData()
+    }
+  }, [])
 
   return (
     <Layout title={`Proposals`}>
@@ -151,15 +153,20 @@ const ProposalPage: BlitzPage = ({
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setSignModalOpen(true)
-                }}
-                className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70"
-              >
-                Approve
-              </button>
+              {!data.proposal.approvals.some(
+                (approval) => approval.signerAddress === activeUser?.address
+              ) &&
+                activeUser && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSignModalOpen(true)
+                    }}
+                    className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70"
+                  >
+                    Approve
+                  </button>
+                )}
             </div>
           </div>
         </div>
