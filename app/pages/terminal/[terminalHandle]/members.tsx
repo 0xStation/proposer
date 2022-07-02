@@ -1,16 +1,13 @@
-import { BlitzPage, useQuery, useParam, Image, Link, Routes } from "blitz"
+import { BlitzPage, useQuery, useParam, Image, Link, Routes, invalidateQuery } from "blitz"
 import { Fragment, useEffect, useState } from "react"
-import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
-import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
+import { DEFAULT_PFP_URLS, PAGINATION_TAKE } from "app/core/utils/constants"
 import BackArrow from "app/core/icons/BackArrow"
 import ForwardArrow from "app/core/icons/ForwardArrow"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getGroupedTagsByTerminalId from "app/tag/queries/getGroupedTagsByTerminalId"
-import { Dialog, Menu, Transition } from "@headlessui/react"
-import Checkbox from "app/core/components/form/Checkbox"
-import { Form } from "react-final-form"
+import { Dialog, Transition } from "@headlessui/react"
 import truncateString from "app/core/utils/truncateString"
 import getMembersByTerminalId from "app/accountTerminal/queries/getMembersByTerminalId"
 import getMemberCountByTerminalId from "app/accountTerminal/queries/getMemberCountByTerminalId"
@@ -32,10 +29,8 @@ import {
 import useStore from "app/core/hooks/useStore"
 import { TagType } from "app/tag/types"
 import useKeyPress from "app/core/hooks/useKeyPress"
-
-interface Filters {
-  [tagType: string]: Set<number>
-}
+import FilterPill from "app/core/components/FilterPill"
+import Pagination from "app/core/components/Pagination"
 
 const MemberDirectoryPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle")
@@ -53,11 +48,11 @@ const MemberDirectoryPage: BlitzPage = () => {
   const setToastState = useStore((state) => state.setToastState)
   const [isContributorsLoading, setIsContributorsLoading] = useState<boolean>(false)
 
-  // filters is a hashmap where the key is the tag type and the value is a Set of strings
-  // where the strings are applied filters
-  const [filters, setFilters] = useState<Filters>({})
-
-  const PAGINATION_TAKE = 50
+  const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set<string>())
+  const [roleFilters, setRoleFilters] = useState<Set<string>>(new Set<string>())
+  const [projectFilters, setProjectFilters] = useState<Set<string>>(new Set<string>())
+  const [guildFilters, setGuildFilters] = useState<Set<string>>(new Set<string>())
+  const [tokenFilters, setTokenFilters] = useState<Set<string>>(new Set<string>())
 
   /*
   `groupedTags` returns an object where the key
@@ -74,15 +69,6 @@ const MemberDirectoryPage: BlitzPage = () => {
     {
       suspense: false,
       enabled: !!terminal?.id,
-      onSuccess: (groupedTags) => {
-        if (!groupedTags) return
-        // create filters object where the tagType (filter category) maps to a set of applied filters
-        const filterMap = Object.keys(groupedTags).reduce((filterMap, tagType) => {
-          filterMap[tagType] = new Set<string>()
-          return filterMap
-        }, {})
-        setFilters(filterMap)
-      },
     }
   )
 
@@ -90,8 +76,8 @@ const MemberDirectoryPage: BlitzPage = () => {
     getMembersByTerminalId,
     {
       terminalId: terminal?.id as number,
-      tagGroups: Object.values(filters)
-        .map((set) => Array.from(set))
+      tagGroups: [statusFilters, roleFilters, projectFilters, guildFilters, tokenFilters]
+        .map((set) => Array.from(set).map((val) => parseInt(val)))
         .filter((arr) => arr.length > 0),
       page: page,
       paginationTake: PAGINATION_TAKE,
@@ -107,8 +93,8 @@ const MemberDirectoryPage: BlitzPage = () => {
     getMemberCountByTerminalId,
     {
       terminalId: terminal?.id as number,
-      tagGroups: Object.values(filters)
-        .map((set) => Array.from(set))
+      tagGroups: [statusFilters, roleFilters, projectFilters, guildFilters, tokenFilters]
+        .map((set) => Array.from(set).map((val) => parseInt(val)))
         .filter((arr) => arr.length > 0),
     },
     {
@@ -225,6 +211,12 @@ const MemberDirectoryPage: BlitzPage = () => {
     }
   }
 
+  const filtersRefetchCallback = () => {
+    invalidateQuery(getMembersByTerminalId)
+    invalidateQuery(getMemberCountByTerminalId)
+    setPage(0)
+  }
+
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Members`}>
       <TerminalNavigation>
@@ -252,57 +244,78 @@ const MemberDirectoryPage: BlitzPage = () => {
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <div className="flex ml-6 py-4 space-x-2 flex-wrap self-start">
               {groupedTags && Object.entries(groupedTags).length ? (
-                [
-                  TagType.STATUS,
-                  TagType.SEASON,
-                  TagType.ROLE,
-                  TagType.PROJECT,
-                  TagType.GUILD,
-                  TagType.TOKEN,
-                ].map(
-                  (tagType, idx) =>
-                    groupedTags[tagType] && (
-                      <FilterPill
-                        tagType={tagType}
-                        tags={groupedTags[tagType]}
-                        filters={filters}
-                        setFilters={setFilters}
-                        setPage={setPage}
-                        key={`${idx}${tagType}`}
-                      />
-                    )
-                )
+                <>
+                  {groupedTags && groupedTags[TagType.STATUS] && (
+                    <FilterPill
+                      label={TagType.STATUS}
+                      filterOptions={groupedTags[TagType.STATUS].map((tag) => {
+                        return { name: toTitleCase(tag.value), value: tag?.id?.toString() }
+                      })}
+                      appliedFilters={statusFilters}
+                      setAppliedFilters={setStatusFilters}
+                      refetchCallback={filtersRefetchCallback}
+                    />
+                  )}
+                  {groupedTags && groupedTags[TagType.ROLE] && (
+                    <FilterPill
+                      label={TagType.ROLE}
+                      filterOptions={groupedTags[TagType.ROLE].map((tag) => {
+                        return { name: toTitleCase(tag.value), value: tag?.id?.toString() }
+                      })}
+                      appliedFilters={roleFilters}
+                      setAppliedFilters={setRoleFilters}
+                      refetchCallback={filtersRefetchCallback}
+                    />
+                  )}
+                  {groupedTags && groupedTags[TagType.PROJECT] && (
+                    <FilterPill
+                      label={TagType.PROJECT}
+                      filterOptions={groupedTags[TagType.PROJECT].map((tag) => {
+                        return { name: toTitleCase(tag.value), value: tag?.id?.toString() }
+                      })}
+                      appliedFilters={projectFilters}
+                      setAppliedFilters={setProjectFilters}
+                      refetchCallback={filtersRefetchCallback}
+                    />
+                  )}
+                  {groupedTags && groupedTags[TagType.GUILD] && (
+                    <FilterPill
+                      label={TagType.GUILD}
+                      filterOptions={groupedTags[TagType.GUILD].map((tag) => {
+                        return {
+                          name: toTitleCase(tag.value),
+                          value: tag?.id?.toString() as string,
+                        }
+                      })}
+                      appliedFilters={guildFilters}
+                      setAppliedFilters={setGuildFilters}
+                      refetchCallback={filtersRefetchCallback}
+                    />
+                  )}
+                  {groupedTags && groupedTags[TagType.TOKEN] && (
+                    <FilterPill
+                      label={TagType.TOKEN}
+                      filterOptions={groupedTags[TagType.TOKEN].map((tag) => {
+                        return { name: tag.value, value: tag?.id?.toString() }
+                      })}
+                      appliedFilters={tokenFilters}
+                      setAppliedFilters={setTokenFilters}
+                      refetchCallback={filtersRefetchCallback}
+                    />
+                  )}
+                </>
               ) : (
                 <p className="text-marble-white">View other members in the terminal.</p>
               )}
             </div>
-            <div className="ml-6 sm:mr-6 text-sm">
-              Showing
-              <span className="text-electric-violet font-bold"> {page * PAGINATION_TAKE + 1} </span>
-              to
-              <span className="text-electric-violet font-bold">
-                {" "}
-                {(page + 1) * PAGINATION_TAKE > memberCount!
-                  ? memberCount
-                  : (page + 1) * PAGINATION_TAKE}{" "}
-              </span>
-              of
-              <span className="font-bold"> {memberCount} </span>
-              members
-              <button className="w-6 ml-2" disabled={page === 0} onClick={() => setPage(page - 1)}>
-                <BackArrow className={`${page === 0 ? "fill-concrete" : "fill-marble-white"}`} />
-              </button>
-              <button
-                disabled={members?.length! < PAGINATION_TAKE}
-                onClick={() => setPage(page + 1)}
-              >
-                <ForwardArrow
-                  className={`${
-                    members?.length! < PAGINATION_TAKE ? "fill-concrete" : "fill-marble-white"
-                  }`}
-                />
-              </button>
-            </div>
+            <Pagination
+              page={page}
+              setPage={setPage}
+              results={members as any[]}
+              resultsCount={memberCount as number}
+              resultsLabel="members"
+              className="ml-6 sm:mr-6 text-sm"
+            />
           </div>
         </div>
         <div className="grid grid-cols-7 h-[calc(100vh-130px)] w-full box-border">
@@ -334,136 +347,6 @@ const MemberDirectoryPage: BlitzPage = () => {
         </div>
       </TerminalNavigation>
     </Layout>
-  )
-}
-
-const FilterPill = ({ tagType, tags, filters, setFilters, setPage }) => {
-  const [clearDefaultValue, setClearDefaultValue] = useState<boolean>(false)
-
-  const handleClearFilters = (e) => {
-    e.preventDefault()
-
-    const tagFilters = filters[tagType]
-    tagFilters.clear()
-
-    setPage(0)
-    setFilters({
-      ...filters,
-      [tagType]: tagFilters,
-    })
-
-    // clear filled checkboxes by removing the defaultChecked value
-    // bumping the key will reset the uncontrolled component's internal state
-    setClearDefaultValue(true)
-  }
-
-  return (
-    <Menu as="div" className="relative mb-2 sm:mb-0">
-      {({ open }) => {
-        setClearDefaultValue(false)
-        return (
-          <>
-            <Menu.Button className="block h-[28px] text-marble-white">
-              <div className="flex items-center">
-                <span
-                  className={`${
-                    open
-                      ? "bg-marble-white text-tunnel-black  border-marble-white"
-                      : "hover:bg-marble-white hover:text-tunnel-black border-concrete hover:border-marble-white"
-                  } capitalize group rounded-full border h-[17px] w-max p-4 flex flex-center items-center cursor-pointer `}
-                >
-                  {tagType}{" "}
-                  {filters[tagType] && filters[tagType].size ? `(${filters[tagType].size})` : ""}
-                  <div className="ml-3">
-                    <DropdownChevronIcon
-                      className={`${open ? "fill-tunnel-black" : "group-hover:fill-tunnel-black"}`}
-                    />
-                  </div>
-                </span>
-              </div>
-            </Menu.Button>
-            <Transition
-              as={Fragment}
-              enter="transition ease-out duration-100"
-              enterFrom="transform opacity-0 scale-95"
-              enterTo="transform opacity-100 scale-100"
-              leave="transition ease-in duration-75"
-              leaveFrom="transform opacity-100 scale-100"
-              leaveTo="transform opacity-0 scale-95"
-            >
-              <Menu.Items className="absolute origin-top-left mt-5 h-auto w-[11rem] sm:w-[22rem] bg-tunnel-black border border-concrete rounded-md z-10">
-                <Form
-                  onSubmit={(field) => {
-                    if (!field || !Object.keys(field).length || !Object.entries(field)[0]) {
-                      return
-                    }
-                    // grab field selected
-                    const [tagType, tagNames] = Object.entries(field)[0] as [
-                      string,
-                      Record<string, number[]>
-                    ]
-                    const tagFilters = filters[tagType]
-                    Object.entries(tagNames).forEach(([tagName, value]) => {
-                      // remove tag if de-selected
-                      if (tagFilters.has(tagName) && !value) {
-                        tagFilters.delete(tagName)
-                      } else if (value) {
-                        // add tag if selected
-                        tagFilters.add(value[0])
-                      }
-                    })
-
-                    setPage(0)
-                    setFilters({
-                      ...filters,
-                      [tagType]: tagFilters,
-                    })
-                  }}
-                  render={({ form, handleSubmit }) => {
-                    return (
-                      <form onSubmit={handleSubmit}>
-                        <div className="mt-[1.4rem] mx-[1.15rem] mb-5 space-y-3">
-                          {tags.map((tag) => {
-                            return (
-                              <div className="flex-row" key={`${clearDefaultValue}${tag.value}`}>
-                                <Checkbox
-                                  value={tag.id}
-                                  name={`${tag.type}.${tag.value}`}
-                                  defaultChecked={filters[tag.type].has(tag.id)}
-                                  className="align-middle"
-                                />
-                                <p className="p-0.5 align-middle mx-4 inline leading-none">
-                                  {
-                                    // title case text except on ERC20 tokens
-                                    tag.value[0] === "$" ? tag.value : toTitleCase(tag.value)
-                                  }
-                                </p>
-                              </div>
-                            )
-                          })}
-                        </div>
-                        <button
-                          type="submit"
-                          className="bg-marble-white w-36 sm:w-52 h-[35px] text-tunnel-black rounded mb-4 ml-4 mr-1 hover:opacity-70"
-                        >
-                          Apply
-                        </button>
-                        <button
-                          className="w-[6.5rem] hover:text-concrete mb-2 sm:mb-0"
-                          onClick={(e) => handleClearFilters(e)}
-                        >
-                          Clear all
-                        </button>
-                      </form>
-                    )
-                  }}
-                ></Form>
-              </Menu.Items>
-            </Transition>
-          </>
-        )
-      }}
-    </Menu>
   )
 }
 

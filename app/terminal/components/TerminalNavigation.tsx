@@ -114,7 +114,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
                 className={`inline ${
                   router.pathname.includes(Routes.BulletinPage({ terminalHandle }).pathname)
                     ? "text-marble-white font-bold"
-                    : "text-concrete group-hover:text-light-concrete"
+                    : "text-concrete font-normal group-hover:text-light-concrete"
                 }`}
               >
                 <Link href={Routes.BulletinPage({ terminalHandle })}>Bulletin</Link>
@@ -137,7 +137,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
                 className={`inline ${
                   router.pathname === Routes.MemberDirectoryPage({ terminalHandle }).pathname
                     ? "text-marble-white font-bold"
-                    : "text-concrete group-hover:text-light-concrete"
+                    : "text-concrete font-normal group-hover:text-light-concrete"
                 }`}
               >
                 <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>Members</Link>

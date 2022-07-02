@@ -257,7 +257,7 @@ const SelectedTerminalCard = ({
 
   const membership = account.tickets.find((ticket) => ticket.terminalId === terminal.id)
 
-  const statusTags = membership.tags?.filter(
+  const statusTags = membership?.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === TagType.STATUS
   )
   const seasonTags = membership.tags?.filter(
@@ -266,13 +266,13 @@ const SelectedTerminalCard = ({
   const roleTags = membership.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === TagType.ROLE
   )
-  const projectTags = membership.tags?.filter(
+  const projectTags = membership?.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === TagType.PROJECT
   )
-  const guildTags = membership.tags?.filter(
+  const guildTags = membership?.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === TagType.GUILD
   )
-  const tokenTags = membership.tags?.filter(
+  const tokenTags = membership?.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === TagType.TOKEN
   )
 
