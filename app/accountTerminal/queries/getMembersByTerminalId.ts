@@ -1,11 +1,13 @@
 import db from "db"
 import * as z from "zod"
 import { AccountTerminalWithTagsAndAccount } from "../types"
+import { PAGINATION_TAKE } from "app/core/utils/constants"
+
 const GetMembersByTerminalId = z.object({
   terminalId: z.number(),
   tagGroups: z.number().array().array(),
   page: z.number().optional().default(0),
-  paginationTake: z.number().optional().default(50),
+  paginationTake: z.number().optional().default(PAGINATION_TAKE),
 })
 
 export default async function getMembersByTerminalId(
