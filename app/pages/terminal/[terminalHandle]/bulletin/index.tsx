@@ -19,7 +19,7 @@ import { formatDate } from "app/core/utils/formatDate"
 import {
   RFP_STATUS_DISPLAY_MAP,
   PAGINATION_TAKE,
-  RFP_STATUSES_FILTER_ARRAY,
+  RFP_STATUSES_FILTER_OPTIONS,
 } from "app/core/utils/constants"
 import { RfpStatus } from "app/rfp/types"
 import BackArrow from "app/core/icons/BackArrow"
@@ -27,6 +27,7 @@ import ForwardArrow from "app/core/icons/ForwardArrow"
 import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
 import useStore from "app/core/hooks/useStore"
 import FilterPill from "app/core/components/FilterPill"
+import Pagination from "app/core/components/Pagination"
 
 const BulletinPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -114,40 +115,26 @@ const BulletinPage: BlitzPage = () => {
             <div className="flex ml-6 py-4 space-x-2 flex-wrap self-start">
               <FilterPill
                 label="status"
-                filterValues={RFP_STATUSES_FILTER_ARRAY.map((rfpStatus) => ({
+                filterOptions={RFP_STATUSES_FILTER_OPTIONS.map((rfpStatus) => ({
                   name: RFP_STATUS_DISPLAY_MAP[rfpStatus]?.copy?.toUpperCase(),
                   value: rfpStatus,
                 }))}
                 appliedFilters={rfpStatusFilters}
                 setAppliedFilters={setRfpStatusFilters}
-                setPage={setPage}
-                refetchCallback={() => invalidateQuery(getRfpsByTerminalId)}
+                refetchCallback={() => {
+                  setPage(0)
+                  invalidateQuery(getRfpsByTerminalId)
+                }}
               />
             </div>
-            <div className="ml-6 sm:mr-6 text-sm pt-2">
-              Showing
-              <span className="text-electric-violet font-bold"> {page * PAGINATION_TAKE + 1} </span>
-              to
-              <span className="text-electric-violet font-bold">
-                {" "}
-                {(page + 1) * PAGINATION_TAKE > rfpCount!
-                  ? rfps?.length
-                  : (page + 1) * PAGINATION_TAKE}{" "}
-              </span>
-              of
-              <span className="font-bold"> {rfpCount} </span>
-              rfps
-              <button className="w-6 ml-2" disabled={page === 0} onClick={() => setPage(page - 1)}>
-                <BackArrow className={`${page === 0 ? "fill-concrete" : "fill-marble-white"}`} />
-              </button>
-              <button disabled={rfps?.length! < PAGINATION_TAKE} onClick={() => setPage(page + 1)}>
-                <ForwardArrow
-                  className={`${
-                    rfps?.length! < PAGINATION_TAKE ? "fill-concrete" : "fill-marble-white"
-                  }`}
-                />
-              </button>
-            </div>
+            <Pagination
+              results={rfps as any[]}
+              resultsCount={rfpCount as number}
+              page={page}
+              setPage={setPage}
+              resultsLabel="rfps"
+              className="ml-6 sm:mr-6 text-sm pt-2"
+            />
           </div>
         </div>
         <div className="h-[calc(100vh-130px)] w-full">
@@ -165,7 +152,7 @@ const BulletinPage: BlitzPage = () => {
               ))
             ) : rfps && rfpStatusFilters?.size ? (
               <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
-                <p>No RFPs came up</p>
+                <p>No RFPs found</p>
                 <p>...</p>
               </div>
             ) : rfps ? (

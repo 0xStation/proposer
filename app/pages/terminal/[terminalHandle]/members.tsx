@@ -30,10 +30,7 @@ import useStore from "app/core/hooks/useStore"
 import { TagType } from "app/tag/types"
 import useKeyPress from "app/core/hooks/useKeyPress"
 import FilterPill from "app/core/components/FilterPill"
-
-interface Filters {
-  [tagType: string]: Set<number>
-}
+import Pagination from "app/core/components/Pagination"
 
 const MemberDirectoryPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle")
@@ -217,6 +214,7 @@ const MemberDirectoryPage: BlitzPage = () => {
   const filtersRefetchCallback = () => {
     invalidateQuery(getMembersByTerminalId)
     invalidateQuery(getMemberCountByTerminalId)
+    setPage(0)
   }
 
   return (
@@ -250,43 +248,40 @@ const MemberDirectoryPage: BlitzPage = () => {
                   {groupedTags && groupedTags[TagType.STATUS] && (
                     <FilterPill
                       label={TagType.STATUS}
-                      filterValues={groupedTags[TagType.STATUS].map((tag) => {
+                      filterOptions={groupedTags[TagType.STATUS].map((tag) => {
                         return { name: toTitleCase(tag.value), value: tag?.id?.toString() }
                       })}
                       appliedFilters={statusFilters}
                       setAppliedFilters={setStatusFilters}
-                      setPage={setPage}
                       refetchCallback={filtersRefetchCallback}
                     />
                   )}
                   {groupedTags && groupedTags[TagType.ROLE] && (
                     <FilterPill
                       label={TagType.ROLE}
-                      filterValues={groupedTags[TagType.ROLE].map((tag) => {
+                      filterOptions={groupedTags[TagType.ROLE].map((tag) => {
                         return { name: toTitleCase(tag.value), value: tag?.id?.toString() }
                       })}
                       appliedFilters={roleFilters}
                       setAppliedFilters={setRoleFilters}
-                      setPage={setPage}
                       refetchCallback={filtersRefetchCallback}
                     />
                   )}
                   {groupedTags && groupedTags[TagType.PROJECT] && (
                     <FilterPill
                       label={TagType.PROJECT}
-                      filterValues={groupedTags[TagType.PROJECT].map((tag) => {
+                      filterOptions={groupedTags[TagType.PROJECT].map((tag) => {
                         return { name: toTitleCase(tag.value), value: tag?.id?.toString() }
                       })}
                       appliedFilters={projectFilters}
                       setAppliedFilters={setProjectFilters}
-                      setPage={setPage}
                       refetchCallback={filtersRefetchCallback}
                     />
                   )}
                   {groupedTags && groupedTags[TagType.GUILD] && (
                     <FilterPill
                       label={TagType.GUILD}
-                      filterValues={groupedTags[TagType.GUILD].map((tag) => {
+                      filterOptions={groupedTags[TagType.GUILD].map((tag) => {
                         return {
                           name: toTitleCase(tag.value),
                           value: tag?.id?.toString() as string,
@@ -294,19 +289,17 @@ const MemberDirectoryPage: BlitzPage = () => {
                       })}
                       appliedFilters={guildFilters}
                       setAppliedFilters={setGuildFilters}
-                      setPage={setPage}
                       refetchCallback={filtersRefetchCallback}
                     />
                   )}
                   {groupedTags && groupedTags[TagType.TOKEN] && (
                     <FilterPill
                       label={TagType.TOKEN}
-                      filterValues={groupedTags[TagType.TOKEN].map((tag) => {
+                      filterOptions={groupedTags[TagType.TOKEN].map((tag) => {
                         return { name: tag.value, value: tag?.id?.toString() }
                       })}
                       appliedFilters={tokenFilters}
                       setAppliedFilters={setTokenFilters}
-                      setPage={setPage}
                       refetchCallback={filtersRefetchCallback}
                     />
                   )}
@@ -315,33 +308,14 @@ const MemberDirectoryPage: BlitzPage = () => {
                 <p className="text-marble-white">View other members in the terminal.</p>
               )}
             </div>
-            <div className="ml-6 sm:mr-6 text-sm">
-              Showing
-              <span className="text-electric-violet font-bold"> {page * PAGINATION_TAKE + 1} </span>
-              to
-              <span className="text-electric-violet font-bold">
-                {" "}
-                {(page + 1) * PAGINATION_TAKE > memberCount!
-                  ? memberCount
-                  : (page + 1) * PAGINATION_TAKE}{" "}
-              </span>
-              of
-              <span className="font-bold"> {memberCount} </span>
-              members
-              <button className="w-6 ml-2" disabled={page === 0} onClick={() => setPage(page - 1)}>
-                <BackArrow className={`${page === 0 ? "fill-concrete" : "fill-marble-white"}`} />
-              </button>
-              <button
-                disabled={members?.length! < PAGINATION_TAKE}
-                onClick={() => setPage(page + 1)}
-              >
-                <ForwardArrow
-                  className={`${
-                    members?.length! < PAGINATION_TAKE ? "fill-concrete" : "fill-marble-white"
-                  }`}
-                />
-              </button>
-            </div>
+            <Pagination
+              page={page}
+              setPage={setPage}
+              results={members as any[]}
+              resultsCount={memberCount as number}
+              resultsLabel="members"
+              className="ml-6 sm:mr-6 text-sm"
+            />
           </div>
         </div>
         <div className="grid grid-cols-7 h-[calc(100vh-130px)] w-full box-border">

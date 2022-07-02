@@ -63,13 +63,13 @@ export const PROPOSAL_STATUS_DISPLAY_MAP = {
 
 export const PAGINATION_TAKE = 50
 
-export const RFP_STATUSES_FILTER_ARRAY = [
+export const RFP_STATUSES_FILTER_OPTIONS = [
   RfpStatus.STARTING_SOON,
   RfpStatus.OPEN_FOR_SUBMISSIONS,
   RfpStatus.CLOSED,
 ]
 
-export const PROPOSAL_STATUSES_FILTER_ARRAY = [
+export const PROPOSAL_STATUSES_FILTER_OPTIONS = [
   ProposalStatus.SUBMITTED,
   ProposalStatus.IN_REVIEW,
   ProposalStatus.APPROVED,

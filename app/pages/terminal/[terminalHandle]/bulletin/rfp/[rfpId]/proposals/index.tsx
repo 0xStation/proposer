@@ -14,13 +14,14 @@ import {
   DEFAULT_PFP_URLS,
   PROPOSAL_STATUS_DISPLAY_MAP,
   PAGINATION_TAKE,
-  PROPOSAL_STATUSES_FILTER_ARRAY,
+  PROPOSAL_STATUSES_FILTER_OPTIONS,
 } from "app/core/utils/constants"
 import { formatDate } from "app/core/utils/formatDate"
 import { genPathFromUrlObject } from "app/utils"
 import { Rfp } from "app/rfp/types"
 import { Proposal, ProposalStatus } from "app/proposal/types"
 import FilterPill from "app/core/components/FilterPill"
+import Pagination from "app/core/components/Pagination"
 
 const ProposalsTab: BlitzPage = () => {
   const { proposalId } = useRouterQuery() as { proposalId: string }
@@ -109,43 +110,26 @@ const ProposalsTab: BlitzPage = () => {
             <div className="flex ml-5">
               <FilterPill
                 label="status"
-                filterValues={PROPOSAL_STATUSES_FILTER_ARRAY.map((proposalStatus) => ({
+                filterOptions={PROPOSAL_STATUSES_FILTER_OPTIONS.map((proposalStatus) => ({
                   name: PROPOSAL_STATUS_DISPLAY_MAP[proposalStatus]?.copy?.toUpperCase(),
                   value: proposalStatus,
                 }))}
                 appliedFilters={proposalStatusFilters}
                 setAppliedFilters={setProposalStatusFilters}
-                setPage={setPage}
-                refetchCallback={() => invalidateQuery(getProposalsByRfpId)}
+                refetchCallback={() => {
+                  setPage(0)
+                  invalidateQuery(getProposalsByRfpId)
+                }}
               />
             </div>
-            <div className="ml-6 sm:mr-6 text-sm pt-1">
-              Showing
-              <span className="text-electric-violet font-bold"> {page * PAGINATION_TAKE + 1} </span>
-              to
-              <span className="text-electric-violet font-bold">
-                {" "}
-                {(page + 1) * PAGINATION_TAKE > proposals?.length!
-                  ? proposals?.length
-                  : (page + 1) * PAGINATION_TAKE}{" "}
-              </span>
-              of
-              <span className="font-bold"> {proposals?.length} </span>
-              proposals
-              <button className="w-6 ml-2" disabled={page === 0} onClick={() => setPage(page - 1)}>
-                <BackArrow className={`${page === 0 ? "fill-concrete" : "fill-marble-white"}`} />
-              </button>
-              <button
-                disabled={proposals?.length! < PAGINATION_TAKE}
-                onClick={() => setPage(page + 1)}
-              >
-                <ForwardArrow
-                  className={`${
-                    proposals?.length! < PAGINATION_TAKE ? "fill-concrete" : "fill-marble-white"
-                  }`}
-                />
-              </button>
-            </div>
+            <Pagination
+              results={proposals as any[]}
+              resultsCount={proposals?.length as number}
+              page={page}
+              setPage={setPage}
+              resultsLabel={"proposals"}
+              className="ml-6 sm:mr-6 text-sm pt-1"
+            />
           </div>
 
           <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
@@ -167,7 +151,7 @@ const ProposalsTab: BlitzPage = () => {
               ))
             ) : rfp ? (
               <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
-                <p>No proposals came up</p>
+                <p>No proposals found</p>
                 <p>...</p>
               </div>
             ) : (
