@@ -1,8 +1,11 @@
 import db from "db"
 import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 import { ProposalStatus as ProductProposalStatus } from "./types"
-
-//
+/**
+ * "SUBMITTED": db status = PUBLISHED && approval count = 0
+ * "IN REVIEW": db status = PUBLISHED && approval count > 0, < quorum
+ * "APPROVED": db status = PUBLISHED && approval count = quorum
+ */
 export const computeApprovalCountFilter = (statuses: string[], quorum: number) => {
   if (
     statuses.includes(ProductProposalStatus.IN_REVIEW) &&
@@ -34,7 +37,7 @@ export const computeApprovalCountFilter = (statuses: string[], quorum: number) =
 export const computeProposalDbFilterFromProposalApprovals = async ({ statuses, rfpId, quorum }) => {
   // To filter for proposals where the status should be SUBMITTED (aka db status = PUBLISHED && approval count = 0)
   // we need to check whether the proposalApprovals relation count is 0. Since `proposalApproval`s don't exist when
-  // the relation count is 0, we need a separate query than the other statuses.
+  // the relation count is 0, we need a separate query than the other statuses to check if they exist at all.
   const submittedFilter =
     statuses && statuses?.length && statuses.includes(ProductProposalStatus.SUBMITTED)
       ? { approvals: { none: {} } }
@@ -45,6 +48,7 @@ export const computeProposalDbFilterFromProposalApprovals = async ({ statuses, r
 
   let proposalStatusGroupFilter = {}
   if (approvalCountFilter) {
+    // grab the proposal ids where the proposalApprovals have the relevant status(es) count
     const proposalStatusGroup = await db.proposalApproval.groupBy({
       where: {
         proposal: {
@@ -54,7 +58,6 @@ export const computeProposalDbFilterFromProposalApprovals = async ({ statuses, r
       },
       by: ["proposalId"],
       having: {
-        // grab the proposal ids where the proposalApprovals have the relevant status(es) count
         proposalId: {
           _count: approvalCountFilter,
         },
