@@ -42,6 +42,33 @@ export const computeRfpDbStatusFilter = (status: string) => {
   }
 }
 
+export const computeRfpDbAndDeletedStatusFilter = ({ statuses, includeDeletedRfps }) => {
+  let filteredStatuses = []
+
+  if (statuses && Array.isArray(statuses) && statuses?.length) {
+    const rfpDbStatusFilters = statuses?.map((status) => {
+      return computeRfpDbStatusFilter(status)
+    })
+
+    filteredStatuses = { OR: rfpDbStatusFilters } as any
+  }
+
+  const removeDeletedStatusFilter = includeDeletedRfps
+    ? {}
+    : {
+        NOT: [
+          {
+            status: PrismaRfpStatus.DELETED,
+          },
+        ],
+      }
+
+  return {
+    ...filteredStatuses,
+    ...removeDeletedStatusFilter,
+  }
+}
+
 export const computeRfpProductStatus = (status: string, startDate: Date, endDate: Date | null) => {
   if (status === PrismaRfpStatus.DRAFT) {
     return RfpStatus.DRAFT

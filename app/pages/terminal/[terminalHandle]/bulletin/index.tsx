@@ -64,6 +64,7 @@ const BulletinPage: BlitzPage = () => {
     {
       terminalId: terminal?.id as number,
       includeDeletedRfps: false,
+      statuses: Array.from(rfpStatusFilters),
     },
     {
       suspense: false,

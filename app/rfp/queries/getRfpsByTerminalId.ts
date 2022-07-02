@@ -1,8 +1,7 @@
 import db from "db"
 import * as z from "zod"
 import { Rfp } from "../types"
-import { computeRfpDbStatusFilter, computeRfpProductStatus } from "../utils"
-import { RfpStatus as PrismaRfpStatus } from "@prisma/client"
+import { computeRfpDbAndDeletedStatusFilter, computeRfpProductStatus } from "../utils"
 import { PAGINATION_TAKE } from "../../core/utils/constants"
 
 const GetRfpsByTerminalId = z.object({
@@ -14,31 +13,15 @@ const GetRfpsByTerminalId = z.object({
 })
 
 export async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsByTerminalId>) {
-  let statuses = []
-
-  if (input.statuses && Array.isArray(input.statuses) && input.statuses?.length) {
-    const rfpDbStatusFilters = input.statuses?.map((status) => {
-      return computeRfpDbStatusFilter(status)
-    })
-
-    statuses = { OR: rfpDbStatusFilters } as any
-  }
-
-  const removeDeletedStatusFilter = input.includeDeletedRfps
-    ? {}
-    : {
-        NOT: [
-          {
-            status: PrismaRfpStatus.DELETED,
-          },
-        ],
-      }
+  const rfpsWhere = computeRfpDbAndDeletedStatusFilter({
+    statuses: input.statuses,
+    includeDeletedRfps: input.includeDeletedRfps,
+  })
 
   const rfps = await db.rfp.findMany({
     where: {
       terminalId: input.terminalId,
-      ...statuses,
-      ...removeDeletedStatusFilter,
+      ...rfpsWhere,
     },
     include: {
       author: true,

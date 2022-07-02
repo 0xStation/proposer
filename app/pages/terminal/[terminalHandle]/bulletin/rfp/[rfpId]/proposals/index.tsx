@@ -8,8 +8,6 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
 import getProposalsByRfpId from "app/proposal/queries/getProposalsByRfpId"
 import getRfpById from "app/rfp/queries/getRfpById"
-import BackArrow from "app/core/icons/BackArrow"
-import ForwardArrow from "app/core/icons/ForwardArrow"
 import {
   DEFAULT_PFP_URLS,
   PROPOSAL_STATUS_DISPLAY_MAP,
@@ -22,6 +20,7 @@ import { Rfp } from "app/rfp/types"
 import { Proposal, ProposalStatus } from "app/proposal/types"
 import FilterPill from "app/core/components/FilterPill"
 import Pagination from "app/core/components/Pagination"
+import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpId"
 
 const ProposalsTab: BlitzPage = () => {
   const { proposalId } = useRouterQuery() as { proposalId: string }
@@ -51,6 +50,16 @@ const ProposalsTab: BlitzPage = () => {
       statuses: Array.from(proposalStatusFilters),
       page: page,
       paginationTake: PAGINATION_TAKE,
+    },
+    { suspense: false, enabled: !!rfpId && !!rfp?.checkbook, refetchOnWindowFocus: false }
+  )
+
+  const [proposalCount] = useQuery(
+    getProposalCountByRfpId,
+    {
+      rfpId,
+      quorum: rfp?.checkbook.quorum as number,
+      statuses: Array.from(proposalStatusFilters),
     },
     { suspense: false, enabled: !!rfpId && !!rfp?.checkbook, refetchOnWindowFocus: false }
   )
@@ -124,7 +133,7 @@ const ProposalsTab: BlitzPage = () => {
             </div>
             <Pagination
               results={proposals as any[]}
-              resultsCount={proposals?.length as number}
+              resultsCount={proposalCount as number}
               page={page}
               setPage={setPage}
               resultsLabel={"proposals"}
@@ -149,7 +158,7 @@ const ProposalsTab: BlitzPage = () => {
                   key={idx}
                 />
               ))
-            ) : rfp ? (
+            ) : proposals && rfp && !proposals.length ? (
               <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
                 <p>No proposals found</p>
                 <p>...</p>

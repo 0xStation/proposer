@@ -1,27 +1,24 @@
 import db from "db"
 import * as z from "zod"
-import { RfpStatus as PrismaRfpStatus } from "@prisma/client"
+import { computeRfpDbAndDeletedStatusFilter } from "../utils"
 
 const GetRfpCountByTerminalId = z.object({
   terminalId: z.number(),
   includeDeletedRfps: z.boolean().optional().default(false),
+  statuses: z.string().array().optional(),
 })
 
 export async function getRfpCountByTerminalId(input: z.infer<typeof GetRfpCountByTerminalId>) {
-  const removeDeletedStatusFilter = input.includeDeletedRfps
-    ? {}
-    : {
-        NOT: [
-          {
-            status: PrismaRfpStatus.DELETED,
-          },
-        ],
-      }
+  const rfpsWhere = computeRfpDbAndDeletedStatusFilter({
+    statuses: input.statuses,
+    includeDeletedRfps: input.includeDeletedRfps,
+  })
+
   try {
     const rfpCount = await db.rfp.count({
       where: {
         terminalId: input.terminalId,
-        ...removeDeletedStatusFilter,
+        ...rfpsWhere,
       },
     })
 
