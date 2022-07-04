@@ -41,15 +41,29 @@ const ProposalPage: BlitzPage = ({
   const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
   const [txnHash, setTxnHash] = useState<string>()
   // useful for P0 while we only expect one check
-  const [primaryCheck, setPrimaryCheck] = useState<Check>(data.proposal.checks[0])
+  const [primaryCheck, setPrimaryCheck] = useState<Check>()
 
-  const buttonText = !primaryCheck
-    ? "Approve"
-    : primaryCheck.approvals.length < (primaryCheck.checkbook?.quorum || 0)
-    ? "Approve"
+  if (!primaryCheck) {
+    const tmp = data.proposal.checks[0]
+    if (!!tmp && (!!tmp.txnHash || tmp.approvals.length >= tmp.checkbook?.quorum)) {
+      // if the check has a transaction or quorum approvals, then set it in state to render
+      setPrimaryCheck(tmp)
+    }
+  }
+
+  enum ButtonOption {
+    APPROVE = "Approve",
+    CASH = "Cash Check",
+    HIDDEN = "",
+  }
+
+  const buttonOption = !primaryCheck
+    ? ButtonOption.APPROVE
+    : !primaryCheck.txnHash && primaryCheck.approvals.length < (primaryCheck.checkbook?.quorum || 0)
+    ? ButtonOption.APPROVE
     : !primaryCheck.txnHash
-    ? "Cash"
-    : null
+    ? ButtonOption.CASH
+    : ButtonOption.HIDDEN
 
   const txn = useWaitForTransaction({
     confirmations: 1, // low confirmation count gives us a feel of faster UX
@@ -60,7 +74,7 @@ const ProposalPage: BlitzPage = ({
         setWaitingCreation(false)
         setCashCheckModalOpen(false)
         // update UI for check status and link
-        setPrimaryCheck({ ...primaryCheck, txnHash })
+        setPrimaryCheck(primaryCheck && { ...primaryCheck, txnHash })
         // clean up
         setTxnHash(undefined)
 
@@ -206,11 +220,19 @@ const ProposalPage: BlitzPage = ({
                 </div>
               </div>
             )}
-            {!!buttonText && (
+            {buttonOption != ButtonOption.HIDDEN && (
               <button
                 type="button"
                 onClick={() => {
-                  setCashCheckModalOpen(true)
+                  buttonOption == ButtonOption.CASH
+                    ? setCashCheckModalOpen(true)
+                    : buttonOption == ButtonOption.APPROVE
+                    ? () => {
+                        console.log("approve proposal")
+                      }
+                    : () => {
+                        console.log("nani")
+                      }
                 }}
                 className="bg-electric-violet text-tunnel-black px-6 mb-6 h-10 w-48 rounded block mx-auto hover:bg-opacity-70"
                 disabled={waitingCreation}
@@ -220,7 +242,7 @@ const ProposalPage: BlitzPage = ({
                     <Spinner fill="black" />
                   </div>
                 ) : (
-                  buttonText
+                  buttonOption
                 )}
               </button>
             )}
