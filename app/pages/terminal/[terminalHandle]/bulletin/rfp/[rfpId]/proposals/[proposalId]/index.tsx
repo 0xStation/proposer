@@ -8,6 +8,7 @@ import {
   InferGetServerSidePropsType,
 } from "blitz"
 import { useState } from "react"
+import useStore from "app/core/hooks/useStore"
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
@@ -24,6 +25,8 @@ import getChecksByProposalId from "app/check/queries/getChecksByProposalId"
 import AccountPfp from "app/core/components/AccountPfp"
 import networks from "app/utils/networks.json"
 import LinkArrow from "app/core/icons/LinkArrow"
+import { Spinner } from "app/core/components/Spinner"
+import { useWaitForTransaction } from "wagmi"
 
 type GetServerSidePropsData = {
   rfp: Rfp
@@ -35,7 +38,10 @@ const ProposalPage: BlitzPage = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const terminalHandle = useParam("terminalHandle") as string
+  const setToastState = useStore((state) => state.setToastState)
   const [cashCheckModalOpen, setCashCheckModalOpen] = useState<boolean>(false)
+  const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
+  const [txnHash, setTxnHash] = useState<string>()
 
   // useful for P0 while we only expect one check
   const primaryCheck = data.checks[0]
@@ -48,12 +54,50 @@ const ProposalPage: BlitzPage = ({
     ? "Cash"
     : null
 
+  const txn = useWaitForTransaction({
+    confirmations: 1,
+    hash: txnHash,
+    enabled: !!txnHash,
+    onSettled: () => {
+      console.log("settled")
+    },
+    onSuccess: () => {
+      try {
+        setWaitingCreation(false)
+        setCashCheckModalOpen(false)
+        setTxnHash(undefined)
+
+        setToastState({
+          isToastShowing: true,
+          type: "success",
+          message:
+            "Congratulations, the funds have been transferred. Time to execute and deliver! ",
+        })
+
+        // jank I know, can someone help me update check state
+        setTimeout(() => window.location.reload(), 750)
+      } catch (e) {
+        setWaitingCreation(false)
+        console.error(e)
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: "Cashing check failed.",
+        })
+      }
+    },
+  })
+
   return (
     <Layout title={`Proposals`}>
       {!!primaryCheck && (
         <CashCheckModal
           isOpen={cashCheckModalOpen}
           setIsOpen={setCashCheckModalOpen}
+          waitingCreation={waitingCreation}
+          setWaitingCreation={setWaitingCreation}
+          setTxnHash={setTxnHash}
+          setToastState={setToastState}
           check={primaryCheck}
         />
       )}
@@ -173,16 +217,24 @@ const ProposalPage: BlitzPage = ({
                 </div>
               </div>
             )}
-            <button
-              type="button"
-              onClick={() => {
-                setCashCheckModalOpen(true)
-              }}
-              className="bg-electric-violet text-tunnel-black px-6 mb-6 rounded block mx-auto hover:bg-opacity-70"
-              disabled={!buttonText}
-            >
-              {buttonText}
-            </button>
+            {!!buttonText && (
+              <button
+                type="button"
+                onClick={() => {
+                  setCashCheckModalOpen(true)
+                }}
+                className="bg-electric-violet text-tunnel-black px-6 mb-6 h-10 w-48 rounded block mx-auto hover:bg-opacity-70"
+                disabled={waitingCreation}
+              >
+                {waitingCreation ? (
+                  <div className="flex justify-center items-center">
+                    <Spinner fill="black" />
+                  </div>
+                ) : (
+                  buttonText
+                )}
+              </button>
+            )}
           </div>
         </div>
       </TerminalNavigation>

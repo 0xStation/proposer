@@ -2,7 +2,6 @@ import { useMutation, useRouter } from "blitz"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import { useCashCheck } from "app/contracts/contracts"
-import { useState } from "react"
 import CashCheck from "app/check/mutations/cashCheck"
 import { checkToContractTypes } from "app/core/utils/checkToContractTypes"
 import { Spinner } from "app/core/components/Spinner"
@@ -10,46 +9,21 @@ import truncateString from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 import { useWaitForTransaction } from "wagmi"
 
-export const CashCheckModal = ({ isOpen, setIsOpen, check }) => {
-  const activeUser = useStore((state) => state.activeUser)
-  const setToastState = useStore((state) => state.setToastState)
-  const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
-  const [txnHash, setTxnHash] = useState<string>()
-
+export const CashCheckModal = ({
+  isOpen,
+  setIsOpen,
+  waitingCreation,
+  setWaitingCreation,
+  setTxnHash,
+  setToastState,
+  check,
+}) => {
   const [cashCheckMutation] = useMutation(CashCheck, {
     onSuccess: (_data) => {
       console.log("success", _data)
     },
     onError: (error: Error) => {
       console.error(error)
-    },
-  })
-
-  const data = useWaitForTransaction({
-    confirmations: 1,
-    hash: txnHash,
-    enabled: !!txnHash,
-    onSuccess: async (data) => {
-      try {
-        setWaitingCreation(false)
-        setIsOpen(false)
-        setTxnHash(undefined)
-
-        setToastState({
-          isToastShowing: true,
-          type: "success",
-          message:
-            "Congratulations, the funds have been transferred. Time to execute and deliver! ",
-        })
-      } catch (e) {
-        setWaitingCreation(false)
-        console.error(e)
-        setToastState({
-          isToastShowing: true,
-          type: "error",
-          message: "Cashing check failed.",
-        })
-      }
     },
   })
 
