@@ -21,7 +21,6 @@ import { PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import ProgressIndicator from "app/core/components/ProgressIndicator"
 import CashCheckModal from "app/check/components/CashCheckModal"
-import getChecksByProposalId from "app/check/queries/getChecksByProposalId"
 import AccountPfp from "app/core/components/AccountPfp"
 import networks from "app/utils/networks.json"
 import LinkArrow from "app/core/icons/LinkArrow"
@@ -31,7 +30,6 @@ import { useWaitForTransaction } from "wagmi"
 type GetServerSidePropsData = {
   rfp: Rfp
   proposal: Proposal
-  checks: Check[]
 }
 
 const ProposalPage: BlitzPage = ({
@@ -42,29 +40,28 @@ const ProposalPage: BlitzPage = ({
   const [cashCheckModalOpen, setCashCheckModalOpen] = useState<boolean>(false)
   const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
   const [txnHash, setTxnHash] = useState<string>()
-
   // useful for P0 while we only expect one check
-  const primaryCheck = data.checks[0]
+  const [primaryCheck, setPrimaryCheck] = useState<Check>(data.proposal.checks[0])
 
   const buttonText = !primaryCheck
     ? "Approve"
-    : primaryCheck.approvals.length < primaryCheck.checkbook.quorum
+    : primaryCheck.approvals.length < (primaryCheck.checkbook?.quorum || 0)
     ? "Approve"
     : !primaryCheck.txnHash
     ? "Cash"
     : null
 
   const txn = useWaitForTransaction({
-    confirmations: 1,
+    confirmations: 1, // low confirmation count gives us a feel of faster UX
     hash: txnHash,
     enabled: !!txnHash,
-    onSettled: () => {
-      console.log("settled")
-    },
     onSuccess: () => {
       try {
         setWaitingCreation(false)
         setCashCheckModalOpen(false)
+        // update UI for check status and link
+        setPrimaryCheck({ ...primaryCheck, txnHash })
+        // clean up
         setTxnHash(undefined)
 
         setToastState({
@@ -73,9 +70,6 @@ const ProposalPage: BlitzPage = ({
           message:
             "Congratulations, the funds have been transferred. Time to execute and deliver! ",
         })
-
-        // jank I know, can someone help me update check state
-        setTimeout(() => window.location.reload(), 750)
       } catch (e) {
         setWaitingCreation(false)
         console.error(e)
@@ -245,7 +239,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
   const rfp = await invoke(getRfpById, { id: rfpId })
   const proposal = await invoke(getProposalById, { id: proposalId })
-  const checks = await invoke(getChecksByProposalId, { proposalId: proposal?.id as string })
 
   if (!rfp || !proposal) {
     return {
@@ -259,7 +252,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const data: GetServerSidePropsData = {
     rfp,
     proposal,
-    checks,
   }
 
   return {

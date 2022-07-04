@@ -60,6 +60,9 @@ export default async function getProposalsByRfpId(input: z.infer<typeof GetPropo
         },
       },
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   })
 
   if (!proposals) {

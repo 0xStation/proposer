@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client"
+import { Account, Checkbook, Prisma } from "@prisma/client"
 import { CheckApproval } from "@prisma/client"
 import { Proposal } from "app/proposal/types"
 
@@ -22,4 +22,6 @@ export type Check = {
   approvals: CheckApproval[]
   txnHash?: string
   proposal?: Proposal
+  checkbook?: Checkbook
+  recipientAccount?: Account
 }
