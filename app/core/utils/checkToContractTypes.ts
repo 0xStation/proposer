@@ -2,6 +2,7 @@ import { Check } from "app/check/types"
 import { CheckApprovalMetadata } from "app/checkApproval/types"
 import decimalToBigNumber from "./decimalToBigNumber"
 import { zeroAddress } from "./constants"
+import { BigNumber } from "ethers"
 
 // prepare check object from database to types ready for ethers for signatures or transactions
 export const checkToContractTypes = (check?: Check) => {
@@ -21,6 +22,11 @@ export const checkToContractTypes = (check?: Check) => {
     amount: decimalToBigNumber(check.tokenAmount, 18),
     deadline: check.deadline.valueOf(),
     nonce: check.nonce,
-    signatures: check.approvals.map((a) => (a.data as CheckApprovalMetadata)?.signature),
+    // sort signatures in order of increasing signer address
+    signatures: check.approvals
+      .sort((a, b) =>
+        BigNumber.from(a.signerAddress).gt(BigNumber.from(b.signerAddress)) ? 1 : -1
+      ) // sort addresses in increasing order
+      .map((a) => (a.data as CheckApprovalMetadata)?.signature),
   }
 }

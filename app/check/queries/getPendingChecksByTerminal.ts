@@ -56,8 +56,9 @@ export default async function getPendingChecksByTerminal(
     },
     include: {
       approvals: true,
+      proposal: true,
     },
   })
 
-  return pendingChecks as Check[]
+  return pendingChecks as unknown as Check[]
 }

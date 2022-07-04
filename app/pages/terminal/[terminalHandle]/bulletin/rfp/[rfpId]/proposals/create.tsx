@@ -24,6 +24,7 @@ import createProposal from "app/proposal/mutations/createProposal"
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
 import { requiredField } from "app/utils/validators"
+import { zeroAddress } from "app/core/utils/constants"
 
 type GetServerSidePropsData = {
   rfp: Rfp
@@ -114,9 +115,9 @@ const CreateProposalPage: BlitzPage = ({
               await createProposalMutation({
                 rfpId: data.rfp.id,
                 terminalId: data.terminal.id,
+                recipientAddress: values.recipientAddress,
                 token: values.token,
                 amount: values.amount,
-                recipientAddress: values.recipientAddress,
                 contentBody: values.markdown,
                 contentTitle: values.title,
                 collaborators: [activeUser.address],
@@ -274,7 +275,7 @@ const CreateProposalPage: BlitzPage = ({
                             >
                               <option value="">Choose option</option>
                               <option value="USDC">USDC</option>
-                              <option value="ETH">ETH</option>
+                              <option value={zeroAddress}>ETH</option>
                             </select>
                           </div>
                           {((meta.touched && input.value === "") || meta.error) && (

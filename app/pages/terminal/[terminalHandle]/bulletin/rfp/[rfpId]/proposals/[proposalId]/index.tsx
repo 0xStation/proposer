@@ -40,6 +40,14 @@ const ProposalPage: BlitzPage = ({
   // useful for P0 while we only expect one check
   const primaryCheck = data.checks[0]
 
+  const buttonText = !primaryCheck
+    ? "Approve"
+    : primaryCheck.approvals.length < primaryCheck.checkbook.quorum
+    ? "Approve"
+    : !primaryCheck.txnHash
+    ? "Cash"
+    : null
+
   return (
     <Layout title={`Proposals`}>
       {!!primaryCheck && (
@@ -171,9 +179,9 @@ const ProposalPage: BlitzPage = ({
                 setCashCheckModalOpen(true)
               }}
               className="bg-electric-violet text-tunnel-black px-6 mb-6 rounded block mx-auto hover:bg-opacity-70"
-              disabled={!primaryCheck || !!primaryCheck.txnHash}
+              disabled={!buttonText}
             >
-              {!primaryCheck ? "Approve" : "Cash"}
+              {buttonText}
             </button>
           </div>
         </div>

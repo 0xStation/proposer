@@ -4,15 +4,13 @@ import { useSignTypedData, useToken } from "wagmi"
 import Navigation from "app/terminal/components/settings/navigation"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
-import getFundingTokens from "app/core/utils/getFundingTokens"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import { TypedDataTypeDefinition } from "app/types"
 import { useQuery, useMutation, useParam } from "blitz"
 import createCheck from "app/check/mutations/createCheck"
 import createCheckApproval from "app/checkApproval/mutations/createCheckApproval"
-import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
-import getAllAccounts from "app/account/queries/getAllAccounts"
+import getProposalsByTerminal from "app/proposal/queries/getProposalsByTerminal"
 import { zeroAddress } from "app/core/utils/constants"
 import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 import { Check } from "@prisma/client"
@@ -37,13 +35,11 @@ const GenerateCheckPage: BlitzPage = () => {
     { suspense: false, enabled: !!terminalHandle }
   )
 
-  const [checkbooks] = useQuery(
-    getCheckbooksByTerminal,
+  const [proposals] = useQuery(
+    getProposalsByTerminal,
     { terminalId: terminal?.id || 0 }, // does anyone know how to get rid of typescript errors here?
     { suspense: false, enabled: !!terminal } // it wont run unless terminal exists, but TS doesnt pick up on that
   )
-
-  const [allAccounts] = useQuery(getAllAccounts, {}, { suspense: false })
 
   const [createCheckMutation] = useMutation(createCheck, {
     onSuccess: (_data) => {
@@ -165,23 +161,29 @@ const GenerateCheckPage: BlitzPage = () => {
           <Form
             onSubmit={async (values: any, form) => {
               try {
+                const proposal = proposals?.find((p) => p.id === values.proposal)
                 // need this for my jank frontend setup, advice would be helpful!
-                setTokenAddress(values.token)
-                const checkbookChainId =
-                  checkbooks?.find((c) => c.address === values.checkbookAddress)?.chainId || 0
-                const decimals = tokenAddress === zeroAddress ? 18 : tokenData?.decimals || 0
+                setTokenAddress(proposal?.data.funding.token)
+                const decimals =
+                  proposal?.data.funding.token === zeroAddress ? 18 : tokenData?.decimals || 0
 
-                // only call the mutation if you need a new check!
-                const newCheck = await createCheckMutation({
-                  proposalId: "9cb97cb0-ba84-4fb5-8686-cf5868e747df", // dummy for now
-                  fundingAddress: values.checkbookAddress,
-                  chainId: checkbookChainId,
-                  recipientAddress: values.recipient,
-                  tokenAddress: values.token,
-                  tokenAmount: values.amount, // store as decimal value instead of BigNumber
-                })
+                let check
+                if (proposal?.checks.length === 0) {
+                  // only call the mutation if you need a new check!
+                  const newCheck = await createCheckMutation({
+                    proposalId: values.proposal, // dummy for now
+                    fundingAddress: proposal?.rfp?.checkbook.address || "",
+                    chainId: proposal?.rfp?.checkbook.chainId || 0,
+                    recipientAddress: proposal?.data.funding.recipientAddress || "",
+                    tokenAddress: proposal?.data.funding.token || "",
+                    tokenAmount: proposal?.data.funding.amount.toString() || "", // store as decimal value instead of BigNumber
+                  })
+                  check = newCheck
+                } else {
+                  check = proposal?.checks[0]
+                }
 
-                const success = await approveCheck(newCheck, decimals)
+                const success = await approveCheck(check, decimals)
 
                 if (success) {
                   setToastState({
@@ -203,16 +205,12 @@ const GenerateCheckPage: BlitzPage = () => {
             }}
             render={({ form, handleSubmit }) => {
               const formState = form.getState()
-              const disableSubmit =
-                !formState.values.checkbookAddress ||
-                !formState.values.recipient ||
-                !formState.values.token ||
-                !formState.values.amount
+              const disableSubmit = !formState.values.proposal
               return (
                 <form onSubmit={handleSubmit}>
                   <div className="w-1/3 flex flex-col col-span-2 mt-6">
-                    <label className="font-bold block">Checkbook*</label>
-                    <Field name={`checkbookAddress`}>
+                    <label className="font-bold block">Proposal*</label>
+                    <Field name={`proposal`}>
                       {({ input }) => (
                         <div className="custom-select-wrapper">
                           <select
@@ -220,10 +218,10 @@ const GenerateCheckPage: BlitzPage = () => {
                             className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-1`}
                           >
                             <option value="">Choose option</option>
-                            {checkbooks?.map((cb, idx) => {
+                            {proposals?.map((p, idx) => {
                               return (
-                                <option key={`checkbook-${idx}`} value={cb.address}>
-                                  {cb.name}
+                                <option key={`checkbook-${idx}`} value={p.id}>
+                                  {p.data?.content.title}
                                 </option>
                               )
                             })}
@@ -231,63 +229,6 @@ const GenerateCheckPage: BlitzPage = () => {
                         </div>
                       )}
                     </Field>
-
-                    <label className="font-bold block mt-4">Recipient*</label>
-                    <Field name={`recipient`}>
-                      {({ input }) => (
-                        <div className="custom-select-wrapper">
-                          <select
-                            {...input}
-                            className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-1`}
-                          >
-                            <option value="">Choose option</option>
-                            {allAccounts?.map((a, id) => {
-                              return (
-                                <option key={`account-${id}`} value={a.address}>
-                                  {a.data?.name}
-                                </option>
-                              )
-                            })}
-                          </select>
-                        </div>
-                      )}
-                    </Field>
-
-                    <label className="font-bold block mt-4">Token*</label>
-                    <Field name={`token`}>
-                      {({ input }) => (
-                        <div className="custom-select-wrapper">
-                          <select
-                            {...input}
-                            className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-1`}
-                          >
-                            <option value="">Choose option</option>
-                            {getFundingTokens(
-                              checkbooks?.find(
-                                (c) => c.address === formState.values.checkbookAddress
-                              ),
-                              terminal
-                            )?.map((a, id) => {
-                              return (
-                                <option key={`account-${id}`} value={a.address}>
-                                  {a.symbol}
-                                </option>
-                              )
-                            })}
-                          </select>
-                        </div>
-                      )}
-                    </Field>
-
-                    <label htmlFor="name" className="text-marble-white text-base mt-4">
-                      Amount*
-                    </label>
-                    <Field
-                      component="input"
-                      name="amount"
-                      placeholder="0"
-                      className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2"
-                    />
                     <button
                       type="submit"
                       className={`rounded text-tunnel-black text-bold px-8 py-2 w-full mt-12 ${
@@ -295,7 +236,7 @@ const GenerateCheckPage: BlitzPage = () => {
                       }`}
                       disabled={disableSubmit}
                     >
-                      Generate Check & Sign
+                      Approve & Generate Check
                     </button>
                   </div>
                 </form>

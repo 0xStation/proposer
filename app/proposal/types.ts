@@ -2,6 +2,7 @@ import { AccountProposal } from "@prisma/client"
 import { Account } from "app/account/types"
 import { ProposalApproval } from "app/proposalApproval/types"
 import { Check } from "@prisma/client"
+import { Rfp } from "app/rfp/types"
 
 export enum ProposalStatus {
   SUBMITTED = "SUBMITTED",
@@ -38,4 +39,5 @@ export type Proposal = {
   collaborators: AccountProposalExtended[]
   approvals: ProposalApproval[]
   checks: Check[]
+  rfp?: Rfp
 }

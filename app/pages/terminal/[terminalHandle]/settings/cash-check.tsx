@@ -9,10 +9,7 @@ import { useQuery, useMutation, useParam } from "blitz"
 import CashCheck from "app/check/mutations/cashCheck"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getPendingChecksByTerminal from "app/check/queries/getPendingChecksByTerminal"
-import { zeroAddress } from "app/core/utils/constants"
-import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 import { Check } from "app/check/types"
-import { CheckApprovalMetadata } from "app/checkApproval/types"
 import { useCashCheck } from "app/contracts/contracts"
 import { checkToContractTypes } from "app/core/utils/checkToContractTypes"
 import { Spinner } from "app/core/components/Spinner"
@@ -134,7 +131,7 @@ const CashCheckPage: BlitzPage = () => {
                             {pendingChecks?.map((check, idx) => {
                               return (
                                 <option key={`checkbook-${idx}`} value={check.id}>
-                                  {`${check.tokenAmount} ___ to ${check.recipientAddress}`}
+                                  {check.proposal?.data?.content.title}
                                 </option>
                               )
                             })}

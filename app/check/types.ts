@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client"
 import { CheckApproval } from "@prisma/client"
+import { Proposal } from "app/proposal/types"
 
 export enum CheckStatus {
   NOT_QUEUED = "NOT QUEUED", // for checks that represent future milestones that have yet to be kickstarted
@@ -20,4 +21,5 @@ export type Check = {
   nonce: number
   approvals: CheckApproval[]
   txnHash?: string
+  proposal?: Proposal
 }
