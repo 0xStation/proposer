@@ -6,6 +6,7 @@ const GetProposalsByTerminal = z.object({
   terminalId: z.number(),
 })
 
+// temporary use for dev tools
 export default async function getProposalsByTerminal(
   input: z.infer<typeof GetProposalsByTerminal>
 ) {

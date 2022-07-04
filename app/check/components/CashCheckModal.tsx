@@ -50,7 +50,7 @@ export const CashCheckModal = ({
         txnHash: transaction.hash,
       })
 
-      // triggers hook for useWaitForTransaction which parses checkbook address makes prisma mutation
+      // triggers hook for useWaitForTransaction which waits to show toast and update check status on UI
       setTxnHash(transaction.hash)
     } catch (e) {
       setWaitingCreation(false)

@@ -88,17 +88,6 @@ const Navigation = ({ children }) => {
                   <Link href={Routes.GenerateCheckPage({ terminalHandle })}>Generate Check</Link>
                 </li>
               </ul>
-              <ul className="mt-6">
-                <li
-                  className={`${
-                    router.pathname === Routes.CashCheckPage({ terminalHandle }).pathname
-                      ? "text-marble-white font-bold"
-                      : "text-concrete"
-                  } cursor-pointer hover:text-marble-white mt-4`}
-                >
-                  <Link href={Routes.CashCheckPage({ terminalHandle })}>Cash Check</Link>
-                </li>
-              </ul>
             </>
           )
         }

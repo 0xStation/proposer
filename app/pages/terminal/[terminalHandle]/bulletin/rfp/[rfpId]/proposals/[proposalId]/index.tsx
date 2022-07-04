@@ -185,8 +185,6 @@ const ProposalPage: BlitzPage = ({
               <div className="p-6 grow flex flex-col justify-between">
                 <div className="mt-6">
                   <p className="text-xs text-concrete uppercase font-bold">Checks</p>
-                  {/* {data.checks.map((c) => (
-                    <> */}
                   <div className="flex justify-between items-center">
                     <AccountPfp account={primaryCheck.recipientAccount} className="mt-4" />
                     <div className="flex flex-row items-center space-x-1">
@@ -206,14 +204,11 @@ const ProposalPage: BlitzPage = ({
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          {/* <ExternalLinkIcon className="h-4 w-4 hover:stroke-concrete cursor-pointer" /> */}
                           <LinkArrow className="fill-marble-white" />
                         </a>
                       )}
                     </div>
                   </div>
-                  {/* </>
-                  ))} */}
                 </div>
               </div>
             )}

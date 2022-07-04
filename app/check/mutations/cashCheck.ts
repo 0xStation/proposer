@@ -8,7 +8,6 @@ const CashCheck = z.object({
 
 export default async function cashCheck(input: z.infer<typeof CashCheck>) {
   try {
-    // batch nonce generation and check creation in transaction for ACID guarantees to solve nonce race conditions
     const check = await db.check.update({
       where: { id: input.checkId },
       data: {
