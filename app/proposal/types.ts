@@ -1,5 +1,6 @@
 import { AccountProposal } from "@prisma/client"
 import { Account } from "app/account/types"
+import { Rfp } from "app/rfp/types"
 import { ProposalApproval } from "app/proposalApproval/types"
 import { Check } from "@prisma/client"
 
@@ -38,4 +39,5 @@ export type Proposal = {
   collaborators: AccountProposalExtended[]
   approvals: ProposalApproval[]
   checks: Check[]
+  rfp?: Rfp
 }
