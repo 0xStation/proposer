@@ -80,6 +80,7 @@ const ProposalPage: BlitzPage = ({
     { suspense: false }
   )
 
+  // show check if it has reached quorum and is ready to be cashed
   if (!primaryCheck) {
     const tmp = data.proposal.checks[0]
     if (!!tmp && (!!tmp.txnHash || tmp.approvals.length >= tmp.checkbook?.quorum)) {
@@ -95,14 +96,18 @@ const ProposalPage: BlitzPage = ({
   }
 
   let buttonOption: ButtonOption
-  if (
-    !primaryCheck ||
-    (!primaryCheck.txnHash &&
-      !data.proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address))
-  ) {
+  const hasQuorum = primaryCheck?.approvals === data.rfp.checkbook.quorum
+  const userCanApprove =
+    data.rfp.checkbook.signers.includes(activeUser?.address) &&
+    !data.proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address)
+  if (!primaryCheck || (!hasQuorum && userCanApprove)) {
     // no check created or the check has not been cashed and is not yet approved
     buttonOption = ButtonOption.APPROVE
-  } else if (!primaryCheck.txnHash && primaryCheck.recipientAddress === activeUser?.address) {
+  } else if (
+    hasQuorum &&
+    !primaryCheck.txnHash &&
+    primaryCheck.recipientAddress === activeUser?.address
+  ) {
     // check created, but not cashed and the current user is the recipient
     buttonOption = ButtonOption.CASH
   } else {
