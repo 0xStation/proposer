@@ -96,7 +96,7 @@ const ProposalPage: BlitzPage = ({
   }
 
   let buttonOption: ButtonOption
-  const hasQuorum = primaryCheck?.approvals === data.rfp.checkbook.quorum
+  const hasQuorum = primaryCheck?.approvals.length === data.rfp.checkbook.quorum
   const userCanApprove =
     data.rfp.checkbook.signers.includes(activeUser?.address) &&
     !data.proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address)
