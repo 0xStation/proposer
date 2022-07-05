@@ -35,6 +35,7 @@ type GetServerSidePropsData = {
 const ProposalPage: BlitzPage = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const activeUser = useStore((state) => state.activeUser)
   const terminalHandle = useParam("terminalHandle") as string
   const setToastState = useStore((state) => state.setToastState)
   const [cashCheckModalOpen, setCashCheckModalOpen] = useState<boolean>(false)
@@ -61,7 +62,7 @@ const ProposalPage: BlitzPage = ({
     ? ButtonOption.APPROVE
     : !primaryCheck.txnHash && primaryCheck.approvals.length < (primaryCheck.checkbook?.quorum || 0)
     ? ButtonOption.APPROVE
-    : !primaryCheck.txnHash
+    : !primaryCheck.txnHash && primaryCheck.recipientAddress === activeUser?.address
     ? ButtonOption.CASH
     : ButtonOption.HIDDEN
 

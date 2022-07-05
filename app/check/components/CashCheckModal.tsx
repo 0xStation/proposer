@@ -101,8 +101,8 @@ export const CashCheckModal = ({
             <span className="text-small">{check.tokenAmount}</span>
           </div>
           <div className="flex justify-between items-center mt-2">
-            <span className="text-small font-bold">Expires On</span>
-            <span className="text-small">{formatDate(check.deadline)}</span>
+            <span className="text-small font-bold">Cashing date</span>
+            <span className="text-small">{formatDate(new Date())}</span>
           </div>
         </div>
         <button
