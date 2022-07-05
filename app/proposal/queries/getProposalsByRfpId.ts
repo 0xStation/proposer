@@ -15,14 +15,14 @@ export default async function getProposalsByRfpId(input: z.infer<typeof GetPropo
 
   let proposalsWhere = {}
   if (!approvalCountFilter) {
-    // all or no filters applied, just get proposals by rfpId and submitted
-    proposalsWhere = { rfpId: input.rfpId, status: PrismaProposalStatus.SUBMITTED }
+    // all or no filters applied, just get proposals by rfpId and published
+    proposalsWhere = { rfpId: input.rfpId, status: PrismaProposalStatus.PUBLISHED }
   } else {
     const proposalStatusGroup = await db.proposalApproval.groupBy({
       where: {
         proposal: {
           rfpId: input.rfpId,
-          status: PrismaProposalStatus.SUBMITTED,
+          status: PrismaProposalStatus.PUBLISHED,
         },
       },
       by: ["proposalId"],

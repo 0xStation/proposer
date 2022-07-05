@@ -39,5 +39,5 @@ export type Proposal = {
   collaborators: AccountProposalExtended[]
   approvals: ProposalApproval[]
   checks: Check[]
-  rfp: Rfp
+  rfp?: Rfp
 }

@@ -1,7 +1,7 @@
 import { useState } from "react"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
-import getFundingTokens from "app/core/utils/getFundingTokens"
 import LinearProgressIndicator from "./LinearProgressIndicator"
+import CheckbookSelect from "./CheckbookSelect"
 import { formatUnits } from "ethers/lib/utils"
 
 // A component that shows a dropdown of the tokens in a given checkbook
@@ -9,7 +9,6 @@ import { formatUnits } from "ethers/lib/utils"
 const CheckbookIndicator = ({ terminal, checkbook }) => {
   const [selectedFundsToken, setSelectedFundsToken] = useState<string>()
 
-  const tokenOptions = getFundingTokens(checkbook, terminal)
   const selectedFunds = useCheckbookFunds(
     checkbook?.chainId as number,
     checkbook?.address as string,
@@ -24,20 +23,13 @@ const CheckbookIndicator = ({ terminal, checkbook }) => {
 
   return (
     <div>
-      <select
-        className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-3`}
+      <CheckbookSelect
+        terminal={terminal}
+        checkbook={checkbook}
         onChange={({ target: { options, selectedIndex } }) => {
           setSelectedFundsToken(options[selectedIndex]?.value)
         }}
-      >
-        {tokenOptions.map((token, i) => {
-          return (
-            <option key={i} value={token.address}>
-              {token.symbol}
-            </option>
-          )
-        })}
-      </select>
+      />
       <span className="text-xs text-concrete mt-2 block">
         {available}/{total} available to deploy
       </span>

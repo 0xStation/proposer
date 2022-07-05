@@ -1,8 +1,7 @@
-import { useMutation, useQuery, useRouter } from "blitz"
+import { useMutation, useRouter } from "blitz"
 import { useSignTypedData, useToken } from "wagmi"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
-import getChecksByProposalId from "app/check/queries/getChecksByProposalId"
 import createCheck from "app/check/mutations/createCheck"
 import approveProposal from "app/proposal/mutations/approveProposal"
 import { zeroAddress } from "app/core/utils/constants"
@@ -10,23 +9,13 @@ import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 import { TypedDataTypeDefinition } from "app/types"
 import { Check } from "@prisma/client"
 
-export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp }) => {
+export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, checks }) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const [approveProposalMutation] = useMutation(approveProposal)
 
-  const [checks] = useQuery(
-    getChecksByProposalId,
-    { proposalId: proposal.id as string },
-    { suspense: false }
-  )
-
   const [createCheckMutation] = useMutation(createCheck, {
-    onSuccess: async (data) => {
-      const signature = await approveCheck(data, decimals)
-      executeApprovals(proposal, data, signature)
-    },
     onError: (error: Error) => {
       console.error(error)
     },
@@ -40,23 +29,50 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp }) 
   const decimals = proposal.data.funding.token === zeroAddress ? 18 : tokenData?.decimals || 0
 
   const createOrFindCheckAndFetchSignature = async () => {
-    // need to create a check if it does not exist
-    if (checks) {
-      if (checks.length === 0) {
-        const newCheck = await createCheckMutation({
+    let check = checks[0]
+    if (!check) {
+      // need to create a check if it does not exist
+      check = await createCheckMutation({
+        proposalId: proposal.id,
+        fundingAddress: rfp.checkbook.address,
+        chainId: rfp.checkbook.chainId,
+        recipientAddress: proposal.data.funding.recipientAddress,
+        tokenAddress: proposal.data.funding.token,
+        tokenAmount: proposal.data.funding.amount, // store as decimal value instead of BigNumber
+      })
+    }
+
+    const signature = await approveCheck(check, decimals)
+
+    // user must have denied signature
+    if (!signature) {
+      return
+    }
+
+    if (!activeUser?.address) {
+      setIsOpen(false)
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: "You must connect your wallet in order to approve proposals.",
+      })
+    } else {
+      try {
+        await approveProposalMutation({
           proposalId: proposal.id,
-          fundingAddress: rfp.checkbook.address,
-          chainId: rfp.checkbook.chainId,
-          recipientAddress: proposal.data.funding.recipientAddress,
-          tokenAddress: proposal.data.funding.token,
-          tokenAmount: proposal.data.funding.amount, // store as decimal value instead of BigNumber
+          checkId: check.id,
+          signerAddress: activeUser.address,
+          signature: signature,
         })
-      } else {
-        const firstCheck = checks[0]
-        if (firstCheck) {
-          const signature = await approveCheck(firstCheck, decimals)
-          executeApprovals(proposal, firstCheck, signature)
-        }
+        router.replace(router.asPath)
+        setIsOpen(false)
+        setToastState({
+          isToastShowing: true,
+          type: "success",
+          message: "Your approval moves this proposal a step closer to reality.",
+        })
+      } catch (e) {
+        console.error(e)
       }
     }
   }
@@ -119,41 +135,19 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp }) 
     }
 
     // prompt the Metamask signature modal
-    const signature = await signApproval({
-      domain,
-      types,
-      value,
-    })
-
-    return signature
-  }
-
-  const executeApprovals = async (proposal, check, signature) => {
-    if (!activeUser?.address) {
-      setIsOpen(false)
+    try {
+      const signature = await signApproval({
+        domain,
+        types,
+        value,
+      })
+      return signature
+    } catch (e) {
       setToastState({
         isToastShowing: true,
         type: "error",
-        message: "You must connect your wallet in order to approve proposals.",
+        message: "Signature denied",
       })
-    } else {
-      try {
-        await approveProposalMutation({
-          proposalId: proposal.id,
-          checkId: check.id,
-          signerAddress: activeUser.address,
-          signature: signature,
-        })
-        router.replace(router.asPath)
-        setIsOpen(false)
-        setToastState({
-          isToastShowing: true,
-          type: "success",
-          message: "Your approval moves this proposal a step closer to reality.",
-        })
-      } catch (e) {
-        console.error(e)
-      }
     }
   }
 

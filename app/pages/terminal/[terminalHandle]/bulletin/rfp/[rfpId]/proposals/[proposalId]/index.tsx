@@ -3,6 +3,7 @@ import {
   BlitzPage,
   Routes,
   useParam,
+  useQuery,
   Link,
   invoke,
   GetServerSideProps,
@@ -13,6 +14,7 @@ import Preview from "app/core/components/MarkdownPreview"
 import SignApprovalProposalModal from "app/proposal/components/SignApprovalProposalModal"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
+import getChecksByProposalId from "app/check/queries/getChecksByProposalId"
 import getProposalById from "app/proposal/queries/getProposalById"
 import { PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
@@ -60,6 +62,12 @@ const ProposalPage: BlitzPage = ({
     }
   }, [])
 
+  const [checks] = useQuery(
+    getChecksByProposalId,
+    { proposalId: data.proposal.id as string },
+    { suspense: false }
+  )
+
   return (
     <Layout title={`Proposals`}>
       <SignApprovalProposalModal
@@ -67,6 +75,7 @@ const ProposalPage: BlitzPage = ({
         setIsOpen={setSignModalOpen}
         rfp={data.rfp}
         proposal={data.proposal}
+        checks={checks}
       />
       <TerminalNavigation>
         <div className="grid grid-cols-3 h-screen w-full box-border">

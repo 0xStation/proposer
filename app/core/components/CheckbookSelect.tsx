@@ -1,7 +1,18 @@
 import getFundingTokens from "app/core/utils/getFundingTokens"
+import { Terminal } from "app/terminal/types"
+import { Checkbook } from "app/checkbook/types"
 
 // A component that shows a dropdown of the tokens in a given checkbook
-const CheckbookSelect = ({ terminal, checkbook, options }) => {
+const CheckbookSelect = ({
+  terminal,
+  checkbook,
+  options,
+}: {
+  terminal: Terminal
+  checkbook: Checkbook
+  options?: any
+  onChange?: (any) => void
+}) => {
   const tokenOptions = getFundingTokens(checkbook, terminal)
 
   return (

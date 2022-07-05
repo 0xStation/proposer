@@ -5,7 +5,9 @@ import truncateString from "app/core/utils/truncateString"
 const AccountPfp = ({ account, className = "" }) => {
   return (
     <Link href={Routes.ProfileHome({ accountAddress: account?.address })}>
-      <div className={`flex flex-row ${className}`}>
+      <div
+        className={`flex flex-row rounded p-4 transition-colors hover:bg-wet-concrete ${className}`}
+      >
         <div className="flex flex-col content-center align-middle mr-3">
           {account?.data?.pfpURL ? (
             <img
