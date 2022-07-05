@@ -1,8 +1,8 @@
 import { useState } from "react"
 import * as Progress from "@radix-ui/react-progress"
 
-const LinearProgressIndicator = ({ incomingValue, max, color, title }) => {
-  const [value, setValue] = useState(incomingValue)
+const LinearProgressIndicator = ({ value, max, color, title }) => {
+  const [updatedValue, setValue] = useState(value)
 
   // no matter what value is, if max is 0, value should be 0 as well
   // cannot have x/0
@@ -18,17 +18,19 @@ const LinearProgressIndicator = ({ incomingValue, max, color, title }) => {
           <div className="font-bold text-xs uppercase tracking-wider">{title}</div>
         </div>
         <div className="text-xs">
-          <span className="text-lg font-bold">{value}</span> / {max}
+          <span className="text-lg font-bold">{updatedValue}</span> / {max}
         </div>
       </div>
       <Progress.Root
-        value={value}
+        value={updatedValue}
         max={max}
         className="h-2 w-full bg-concrete relative overflow-hidden"
       >
         <Progress.Indicator
           className={`w-full h-full bg-${color} transition-transform duration-500`}
-          style={{ transform: `translateX(-${max === 0 ? 0 : ((max - value) / max) * 100}%)` }}
+          style={{
+            transform: `translateX(-${max === 0 ? 0 : ((max - updatedValue) / max) * 100}%)`,
+          }}
         />
       </Progress.Root>
     </div>
