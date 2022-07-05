@@ -15,6 +15,7 @@ import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS, PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import getAccountProposalsByAddress from "app/account/queries/getAccountProposalsByAddress"
 import ProgressIndicator from "app/core/components/ProgressIndicator"
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
@@ -40,6 +41,12 @@ const ProfileHome: BlitzPage = () => {
   const [newAuth, setNewAuth] = useState<string | undefined>()
 
   const [account] = useQuery(
+    getAccountByAddress,
+    { address: toChecksumAddress(accountAddress) },
+    { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
+  )
+
+  const [accountProposals] = useQuery(
     getAccountProposalsByAddress,
     { address: toChecksumAddress(accountAddress) },
     { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
@@ -109,8 +116,8 @@ const ProfileHome: BlitzPage = () => {
                   <span className="basis-32 ml-2 mb-2 tracking-wider">Submission Date</span>
                   <span className="basis-32 ml-3 mr-2 mb-2 tracking-wider">Recipient</span>
                 </div>
-                {account?.proposals &&
-                  account?.proposals.map((accountProposal, idx) => (
+                {accountProposals &&
+                  accountProposals.map((accountProposal, idx) => (
                     <ProposalComponent
                       key={`${accountProposal.address}${idx}`}
                       accountProposal={accountProposal}

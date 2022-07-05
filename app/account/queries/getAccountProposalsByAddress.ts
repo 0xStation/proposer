@@ -4,7 +4,7 @@ import * as z from "zod"
 import { Account } from "../types"
 
 const GetAccountProposalsByAddress = z.object({
-  address: z.string().optional(),
+  address: z.string(),
 })
 
 export default async function getAccountProposalsByAddress(
@@ -12,32 +12,24 @@ export default async function getAccountProposalsByAddress(
 ) {
   const data = GetAccountProposalsByAddress.parse(input)
 
-  const account = await db.account.findFirst({
+  const accountProposals = await db.accountProposal.findMany({
     where: { address: data.address },
     include: {
-      proposals: {
+      terminal: true,
+      proposal: {
         include: {
-          terminal: true,
-          proposal: {
+          rfp: {
             include: {
-              rfp: {
-                include: {
-                  checkbook: true,
-                },
-              },
-              approvals: true,
+              checkbook: true,
             },
           },
+          approvals: true,
         },
       },
     },
   })
 
-  if (!account) {
-    return null
-  }
-
-  const accountProposals = account.proposals.map((accountProposal) => {
+  const accountProposalsWithProductStatus = accountProposals.map((accountProposal) => {
     return {
       ...accountProposal,
       proposal: {
@@ -50,8 +42,5 @@ export default async function getAccountProposalsByAddress(
     }
   })
 
-  return {
-    ...account,
-    proposals: accountProposals,
-  } as unknown as Account
+  return accountProposalsWithProductStatus
 }
