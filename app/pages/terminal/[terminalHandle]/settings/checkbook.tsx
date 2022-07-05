@@ -12,7 +12,7 @@ import Modal from "app/core/components/Modal"
 import networks from "app/utils/networks.json"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import getFundingTokens from "app/core/utils/getFundingTokens"
-import { formatUnits } from "ethers/lib/utils"
+import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 
 const CheckbookSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -247,36 +247,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
                       >
                         {isButtonAddressCopied ? "Copied!" : "Copy Address"}
                       </button> */}
-                      <select
-                        className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-3`}
-                        onChange={({ target: { options, selectedIndex } }) => {
-                          setSelectedFundsToken(options[selectedIndex]?.value)
-                        }}
-                      >
-                        {tokenOptions.map((token, i) => {
-                          return (
-                            <option key={i} value={token.address}>
-                              {token.symbol}
-                            </option>
-                          )
-                        })}
-                      </select>
-                      <p className="mt-4">{`Total: ${formatUnits(
-                        selectedFunds?.total,
-                        selectedFunds?.decimals
-                      )}`}</p>
-                      <p className="mt-2">{`Available: ${formatUnits(
-                        selectedFunds?.available,
-                        selectedFunds?.decimals
-                      )}`}</p>
-                      <p className="mt-2">{`Pending: ${formatUnits(
-                        selectedFunds?.pending,
-                        selectedFunds?.decimals
-                      )}`}</p>
-                      <p className="mt-2">{`Cashed: ${formatUnits(
-                        selectedFunds?.cashed,
-                        selectedFunds?.decimals
-                      )}`}</p>
+                      <CheckbookIndicator checkbook={selectedCheckbook} terminal={terminal} />
                     </div>
                   </div>
                 </div>

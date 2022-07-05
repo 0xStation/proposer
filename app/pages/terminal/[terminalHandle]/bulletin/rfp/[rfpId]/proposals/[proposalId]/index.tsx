@@ -9,7 +9,6 @@ import {
   GetServerSideProps,
   InferGetServerSidePropsType,
 } from "blitz"
-import { useState } from "react"
 import useStore from "app/core/hooks/useStore"
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
@@ -50,7 +49,7 @@ const ProposalPage: BlitzPage = ({
   const [primaryCheck, setPrimaryCheck] = useState<Check>()
   const [tokenName, setTokenName] = useState<string>("ETH")
   const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
-  
+
   // not really a fan of this but we need to get the token symbol
   // should we just store that alongside proposal so we don't have to call this function anytime we need the symbol?
   useEffect(() => {
@@ -98,7 +97,8 @@ const ProposalPage: BlitzPage = ({
   let buttonOption: ButtonOption
   if (
     !primaryCheck ||
-    (!primaryCheck.txnHash && !data.proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address))
+    (!primaryCheck.txnHash &&
+      !data.proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address))
   ) {
     // no check created or the check has not been cashed and is not yet approved
     buttonOption = ButtonOption.APPROVE
@@ -197,9 +197,9 @@ const ProposalPage: BlitzPage = ({
               <h4 className="text-xs font-bold text-concrete uppercase">Terminal</h4>
               <div className="flex flex-row items-center mt-2">
                 <img
-                  src={data.rfp.terminal.data.pfpURL}
+                  src={data.rfp.terminal.data.pfpURL || DEFAULT_PFP_URLS.TERMINAL}
                   alt="PFP"
-                  className="w-[46px] h-[46px] rounded-lg"
+                  className="w-[40px] h-[40px] rounded-lg"
                   onError={(e) => {
                     e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
                   }}
@@ -258,7 +258,7 @@ const ProposalPage: BlitzPage = ({
                 <div className="mt-6">
                   <p className="text-xs text-concrete uppercase font-bold">Checks</p>
                   <div className="flex justify-between items-center">
-                    <AccountPfp account={primaryCheck.recipientAccount} className="mt-4" />
+                    <AccountMediaObject account={primaryCheck.recipientAccount} className="mt-4" />
                     <div className="flex flex-row items-center space-x-1">
                       <span
                         className={`h-2 w-2 rounded-full bg-${

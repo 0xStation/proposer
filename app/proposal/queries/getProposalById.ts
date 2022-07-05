@@ -22,6 +22,8 @@ export default async function getProposalById(params: z.infer<typeof GetProposal
           recipientAccount: true,
           approvals: true,
           checkbook: true,
+        },
+      },
       approvals: {
         include: {
           signerAccount: true,

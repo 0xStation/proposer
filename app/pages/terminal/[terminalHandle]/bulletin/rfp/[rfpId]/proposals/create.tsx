@@ -30,8 +30,6 @@ import { requiredField } from "app/utils/validators"
 //types
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
-import { requiredField } from "app/utils/validators"
-import { zeroAddress } from "app/core/utils/constants"
 
 type GetServerSidePropsData = {
   rfp: Rfp

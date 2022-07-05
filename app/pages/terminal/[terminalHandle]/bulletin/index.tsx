@@ -22,8 +22,6 @@ import {
   RFP_STATUSES_FILTER_OPTIONS,
 } from "app/core/utils/constants"
 import { RfpStatus } from "app/rfp/types"
-import BackArrow from "app/core/icons/BackArrow"
-import ForwardArrow from "app/core/icons/ForwardArrow"
 import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
 import useStore from "app/core/hooks/useStore"
 import FilterPill from "app/core/components/FilterPill"
