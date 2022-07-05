@@ -8,24 +8,34 @@ const getFundingTokens = (
   checkbook: Checkbook | undefined,
   terminal: Terminal | null | undefined
 ) => {
-  return [
-    // ETH gas coin if on mainnet or testnet
-    ...([chainIds.ETHEREUM, chainIds.RINKEBY, chainIds.GOERLI].includes(checkbook?.chainId || 0)
-      ? [{ symbol: "ETH", address: zeroAddress }]
-      : []),
-    // preferred stablecoins for network
-    ...(networks[checkbook?.chainId as number]?.stablecoins || []),
-    // ERC20 tokens imported to organization on same chain as checkbook
-    ...(terminal?.tags
+  const eth = [chainIds.ETHEREUM, chainIds.RINKEBY, chainIds.GOERLI].includes(
+    checkbook?.chainId || 0
+  )
+    ? [{ symbol: "ETH", address: zeroAddress }]
+    : []
+
+  const stablecoins = networks[checkbook?.chainId as number]?.stablecoins || []
+
+  const tokenTags =
+    terminal?.tags
       .filter(
         (t) =>
           t.type === TagType.TOKEN &&
           t.data.type === TokenType.ERC20 &&
-          t.data.chainId === checkbook?.chainId
+          t.data.chainId === checkbook?.chainId &&
+          !stablecoins.map((s) => s.address).includes(t.data.address)
       )
       .map((t) => {
         return { symbol: t.data.symbol, address: t.data.address }
-      }) || []),
+      }) || []
+
+  return [
+    // ETH gas coin if on mainnet or testnet
+    ...eth,
+    // preferred stablecoins for network
+    ...stablecoins,
+    // ERC20 tokens imported to organization on same chain as checkbook
+    ...tokenTags,
   ]
 }
 

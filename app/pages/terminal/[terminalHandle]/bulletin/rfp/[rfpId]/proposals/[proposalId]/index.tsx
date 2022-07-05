@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react"
 import {
   BlitzPage,
   Routes,
   useParam,
+  useQuery,
   Link,
   invoke,
   GetServerSideProps,
@@ -9,14 +11,19 @@ import {
 } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
+import SignApprovalProposalModal from "app/proposal/components/SignApprovalProposalModal"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
+import getChecksByProposalId from "app/check/queries/getChecksByProposalId"
 import getProposalById from "app/proposal/queries/getProposalById"
-import { Rfp } from "app/rfp/types"
-import { Proposal } from "app/proposal/types"
 import { PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import ProgressIndicator from "app/core/components/ProgressIndicator"
+import { zeroAddress } from "app/core/utils/constants"
+import AccountMediaObject from "app/core/components/AccountMediaObject"
+import useStore from "app/core/hooks/useStore"
+import { Rfp } from "app/rfp/types"
+import { Proposal } from "app/proposal/types"
 
 type GetServerSidePropsData = {
   rfp: Rfp
@@ -27,8 +34,49 @@ const ProposalPage: BlitzPage = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const terminalHandle = useParam("terminalHandle") as string
+  const [tokenName, setTokenName] = useState<string>("ETH")
+  const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
+  const activeUser = useStore((state) => state.activeUser)
+
+  // not really a fan of this but we need to get the token symbol
+  // should we just store that alongside proposal so we don't have to call this function anytime we need the symbol?
+  useEffect(() => {
+    const getTokenData = async () => {
+      const a = await fetch("/api/fetch-token-metadata", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address: data.proposal.data.funding.token,
+          chainId: data.rfp.checkbook.chainId,
+        }),
+      })
+      const r = await a.json()
+      setTokenName(r.data.symbol)
+    }
+    if (data.proposal.data.funding.token === zeroAddress) {
+      setTokenName("ETH")
+    } else {
+      getTokenData()
+    }
+  }, [])
+
+  const [checks] = useQuery(
+    getChecksByProposalId,
+    { proposalId: data.proposal.id as string },
+    { suspense: false }
+  )
+
   return (
     <Layout title={`Proposals`}>
+      <SignApprovalProposalModal
+        isOpen={signModalOpen}
+        setIsOpen={setSignModalOpen}
+        rfp={data.rfp}
+        proposal={data.proposal}
+        checks={checks}
+      />
       <TerminalNavigation>
         <div className="grid grid-cols-3 h-screen w-full box-border">
           <div className="col-span-2 p-6">
@@ -89,7 +137,7 @@ const ProposalPage: BlitzPage = ({
                 </p>
               </Link>
               <h4 className="text-xs font-bold text-concrete uppercase mt-6">Total Amount</h4>
-              <p className="mt-2 font-normal">{`${data.proposal.data.funding.amount} ${data.proposal.data.funding.token}`}</p>
+              <p className="mt-2 font-normal">{`${data.proposal.data.funding.amount} ${tokenName}`}</p>
               <h4 className="text-xs font-bold text-concrete uppercase mt-6">Fund Recipient</h4>
               <p className="mt-2">{data.proposal.data.funding.recipientAddress}</p>
             </div>
@@ -97,20 +145,39 @@ const ProposalPage: BlitzPage = ({
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase mt-4">Approval</h4>
                 <div className="flex flex-row space-x-2 items-center mt-2">
-                  <ProgressIndicator percent={0} twsize={6} cutoff={0} />
-                  {/* todo -- approvals */}
-                  <p>0/3</p>
+                  <ProgressIndicator
+                    percent={data.proposal.approvals.length / data.rfp.checkbook.quorum}
+                    twsize={6}
+                    cutoff={0}
+                  />
+                  <p>
+                    {data.proposal.approvals.length}/{data.rfp.checkbook.quorum}
+                  </p>
+                </div>
+                <div className="mt-6">
+                  {data.proposal.approvals.length > 0 && (
+                    <p className="text-xs text-concrete uppercase font-bold">Signers</p>
+                  )}
+                  {(data.proposal.approvals || []).map((approval, i) => (
+                    <AccountMediaObject account={approval.signerAccount} className="mt-4" key={i} />
+                  ))}
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  // todo -- aprove
-                }}
-                className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70"
-              >
-                Approve
-              </button>
+
+              {!data.proposal.approvals.some(
+                (approval) => approval.signerAddress === activeUser?.address
+              ) &&
+                activeUser && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSignModalOpen(true)
+                    }}
+                    className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70"
+                  >
+                    Approve
+                  </button>
+                )}
             </div>
           </div>
         </div>
