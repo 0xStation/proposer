@@ -3,7 +3,7 @@ import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
 
 // A component that shows a dropdown of the tokens in a given checkbook
-const CheckbookSelect = ({
+const CheckbookSelectToken = ({
   terminal,
   checkbook,
   options,
@@ -11,7 +11,6 @@ const CheckbookSelect = ({
   terminal: Terminal
   checkbook: Checkbook
   options?: any
-  onChange?: (any) => void
 }) => {
   const tokenOptions = getFundingTokens(checkbook, terminal)
 
@@ -21,6 +20,7 @@ const CheckbookSelect = ({
         {...options}
         className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-3`}
       >
+        <option>Select token</option>
         {tokenOptions.map((token, i) => {
           return (
             <option key={i} value={token.address}>
@@ -33,4 +33,4 @@ const CheckbookSelect = ({
   )
 }
 
-export default CheckbookSelect
+export default CheckbookSelectToken

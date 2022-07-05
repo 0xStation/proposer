@@ -8,7 +8,7 @@ import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { formatDate } from "app/core/utils/formatDate"
 import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
-import AccountPfp from "app/core/components/AccountPfp"
+import AccountMediaObject from "app/core/components/AccountMediaObject"
 import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 
 const RFPInfoTab: BlitzPage = () => {
@@ -57,7 +57,7 @@ const RFPInfoTab: BlitzPage = () => {
               </div>
               <div className="mt-6">
                 <p className="text-concrete uppercase text-xs font-bold">Creator</p>
-                <AccountPfp account={rfp?.author} className="mt-2" />
+                <AccountMediaObject account={rfp?.author} className="mt-2" />
               </div>
             </div>
             <div className="p-6">
@@ -68,7 +68,7 @@ const RFPInfoTab: BlitzPage = () => {
               <div className="mt-9">
                 <p className="text-xs text-concrete uppercase font-bold">Signers</p>
                 {(rfp?.checkbook?.signerAccounts || []).map((account, i) => (
-                  <AccountPfp account={account} className="mt-4" key={i} />
+                  <AccountMediaObject account={account} className="mt-4" key={i} />
                 ))}
               </div>
             </div>

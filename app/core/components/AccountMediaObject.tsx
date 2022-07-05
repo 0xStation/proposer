@@ -2,24 +2,22 @@ import { Routes, Link } from "blitz"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import truncateString from "app/core/utils/truncateString"
 
-const AccountPfp = ({ account, className = "" }) => {
+const AccountMediaObject = ({ account, className = "" }) => {
   return (
     <Link href={Routes.ProfileHome({ accountAddress: account?.address })}>
-      <div
-        className={`flex flex-row rounded p-4 transition-colors hover:bg-wet-concrete ${className}`}
-      >
+      <div className={`flex flex-row rounded ${className}`}>
         <div className="flex flex-col content-center align-middle mr-3">
           {account?.data?.pfpURL ? (
             <img
               src={account?.data?.pfpURL}
               alt="PFP"
-              className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
+              className="min-w-[40px] max-w-[40px] h-[40px] rounded-full cursor-pointer border border-wet-concrete"
               onError={(e) => {
                 e.currentTarget.src = DEFAULT_PFP_URLS.USER
               }}
             />
           ) : (
-            <div className="h-[46px] min-w-[46px] place-self-center border border-wet-concrete bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
+            <div className="h-[40px] min-w-[40px] place-self-center border border-wet-concrete bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
           )}
         </div>
         <div className="flex flex-col content-center">
@@ -35,4 +33,4 @@ const AccountPfp = ({ account, className = "" }) => {
   )
 }
 
-export default AccountPfp
+export default AccountMediaObject

@@ -16,7 +16,7 @@ import { XIcon } from "@heroicons/react/solid"
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
 import Modal from "app/core/components/Modal"
-import CheckbookSelect from "app/core/components/CheckbookSelect"
+import CheckbookSelectToken from "app/core/components/CheckbookSelectToken"
 // hooks
 import useStore from "app/core/hooks/useStore"
 // queries + mutations
@@ -274,7 +274,7 @@ const CreateProposalPage: BlitzPage = ({
                         <>
                           <label className="font-bold block mt-6">Token*</label>
                           <div className="custom-select-wrapper">
-                            <CheckbookSelect
+                            <CheckbookSelectToken
                               terminal={data.terminal}
                               checkbook={data.rfp.checkbook}
                               options={input}

@@ -1,14 +1,17 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import * as Progress from "@radix-ui/react-progress"
 
 const LinearProgressIndicator = ({ value, max, color, title }) => {
   const [updatedValue, setValue] = useState(value)
 
-  // no matter what value is, if max is 0, value should be 0 as well
-  // cannot have x/0
-  if (max === 0) {
-    setValue(0)
-  }
+  useEffect(() => {
+    if (value) {
+      setValue(value)
+      if (max === 0) {
+        setValue(0)
+      }
+    }
+  }, [value])
 
   return (
     <div className="flex flex-col space-y-1">
@@ -29,7 +32,8 @@ const LinearProgressIndicator = ({ value, max, color, title }) => {
         <Progress.Indicator
           className={`w-full h-full bg-${color} transition-transform duration-500`}
           style={{
-            transform: `translateX(-${max === 0 ? 0 : ((max - updatedValue) / max) * 100}%)`,
+            // needs to be == because type misalignment? parseInt + `===` does not work?
+            transform: `translateX(-${max == 0 ? 100 : ((max - updatedValue) / max) * 100}%)`,
           }}
         />
       </Progress.Root>

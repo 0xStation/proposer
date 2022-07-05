@@ -20,7 +20,7 @@ import { PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import ProgressIndicator from "app/core/components/ProgressIndicator"
 import { zeroAddress } from "app/core/utils/constants"
-import AccountPfp from "app/core/components/AccountPfp"
+import AccountMediaObject from "app/core/components/AccountMediaObject"
 import useStore from "app/core/hooks/useStore"
 import { Rfp } from "app/rfp/types"
 import { Proposal } from "app/proposal/types"
@@ -155,9 +155,11 @@ const ProposalPage: BlitzPage = ({
                   </p>
                 </div>
                 <div className="mt-6">
-                  <p className="text-xs text-concrete uppercase font-bold">Signers</p>
+                  {data.proposal.approvals.length > 0 && (
+                    <p className="text-xs text-concrete uppercase font-bold">Signers</p>
+                  )}
                   {(data.proposal.approvals || []).map((approval, i) => (
-                    <AccountPfp account={approval.signerAccount} className="mt-4" key={i} />
+                    <AccountMediaObject account={approval.signerAccount} className="mt-4" key={i} />
                   ))}
                 </div>
               </div>

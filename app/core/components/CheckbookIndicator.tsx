@@ -1,13 +1,21 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import LinearProgressIndicator from "./LinearProgressIndicator"
-import CheckbookSelect from "./CheckbookSelect"
 import { formatUnits } from "ethers/lib/utils"
+import getFundingTokens from "app/core/utils/getFundingTokens"
 
 // A component that shows a dropdown of the tokens in a given checkbook
 // and indicators for the levels of those tokens that are used / pending / available
 const CheckbookIndicator = ({ terminal, checkbook }) => {
+  const tokenOptions = getFundingTokens(checkbook, terminal)
   const [selectedFundsToken, setSelectedFundsToken] = useState<string>()
+
+  // needed to fetch data for first page load
+  useEffect(() => {
+    if (tokenOptions.length > 0 && !selectedFundsToken) {
+      setSelectedFundsToken(tokenOptions[0].address)
+    }
+  }, [tokenOptions])
 
   const selectedFunds = useCheckbookFunds(
     checkbook?.chainId as number,
@@ -23,13 +31,22 @@ const CheckbookIndicator = ({ terminal, checkbook }) => {
 
   return (
     <div>
-      <CheckbookSelect
-        terminal={terminal}
-        checkbook={checkbook}
-        onChange={({ target: { options, selectedIndex } }) => {
-          setSelectedFundsToken(options[selectedIndex]?.value)
-        }}
-      />
+      <div>
+        <select
+          className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-3`}
+          onChange={({ target: { options, selectedIndex } }) => {
+            setSelectedFundsToken(options[selectedIndex]?.value || "")
+          }}
+        >
+          {tokenOptions.map((token, i) => {
+            return (
+              <option key={i} value={token.address}>
+                {token.symbol}
+              </option>
+            )
+          })}
+        </select>
+      </div>
       <span className="text-xs text-concrete mt-2 block">
         {available}/{total} available to deploy
       </span>
