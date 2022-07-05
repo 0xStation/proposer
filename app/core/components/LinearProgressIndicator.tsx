@@ -1,6 +1,15 @@
+import { useState } from "react"
 import * as Progress from "@radix-ui/react-progress"
 
-const LinearProgressIndicator = ({ value, max, color, title }) => {
+const LinearProgressIndicator = ({ incomingValue, max, color, title }) => {
+  const [value, setValue] = useState(incomingValue)
+
+  // no matter what value is, if max is 0, value should be 0 as well
+  // cannot have x/0
+  if (max === 0) {
+    setValue(0)
+  }
+
   return (
     <div className="flex flex-col space-y-1">
       <div className="flex justify-between items-center">
@@ -19,7 +28,7 @@ const LinearProgressIndicator = ({ value, max, color, title }) => {
       >
         <Progress.Indicator
           className={`w-full h-full bg-${color} transition-transform duration-500`}
-          style={{ transform: `translateX(-${((max - value) / max) * 100}%)` }}
+          style={{ transform: `translateX(-${max === 0 ? 0 : ((max - value) / max) * 100}%)` }}
         />
       </Progress.Root>
     </div>
