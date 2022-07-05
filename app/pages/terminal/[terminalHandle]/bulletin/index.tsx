@@ -1,20 +1,35 @@
-import { BlitzPage, useQuery, useParam, Routes, useRouter, Link, useRouterQuery } from "blitz"
-import { Fragment, useState, useEffect } from "react"
-import { Menu, Transition } from "@headlessui/react"
-import { Form } from "react-final-form"
-import DropdownChevronIcon from "app/core/icons/DropdownChevronIcon"
+import {
+  BlitzPage,
+  useQuery,
+  useParam,
+  Routes,
+  useRouter,
+  Link,
+  useRouterQuery,
+  invalidateQuery,
+} from "blitz"
+import { useState, useEffect } from "react"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
+import getRfpCountByTerminalId from "app/rfp/queries/getRfpCountByTerminalId"
 import { formatDate } from "app/core/utils/formatDate"
-import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
+import {
+  RFP_STATUS_DISPLAY_MAP,
+  PAGINATION_TAKE,
+  RFP_STATUSES_FILTER_OPTIONS,
+} from "app/core/utils/constants"
+import { RfpStatus } from "app/rfp/types"
+import BackArrow from "app/core/icons/BackArrow"
+import ForwardArrow from "app/core/icons/ForwardArrow"
 import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
 import useStore from "app/core/hooks/useStore"
+import FilterPill from "app/core/components/FilterPill"
+import Pagination from "app/core/components/Pagination"
 
 const BulletinPage: BlitzPage = () => {
-  const { rfpId } = useRouterQuery() as { rfpId: string }
   const terminalHandle = useParam("terminalHandle") as string
   const setToastState = useStore((state) => state.setToastState)
   const query = useRouterQuery()
@@ -24,16 +39,41 @@ const BulletinPage: BlitzPage = () => {
     { handle: terminalHandle as string },
     { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
   )
+  const [rfpStatusFilters, setRfpStatusFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
+
+  const [page, setPage] = useState<number>(0)
+
   const [rfps] = useQuery(
     getRfpsByTerminalId,
     {
       terminalId: terminal?.id as number,
+      statuses: Array.from(rfpStatusFilters),
+      page: page,
+      paginationTake: PAGINATION_TAKE,
       includeDeletedRfps: false,
     },
-    { suspense: false, enabled: !!terminal?.id, refetchOnWindowFocus: false }
+    {
+      suspense: false,
+      enabled: !!terminal?.id,
+      refetchOnWindowFocus: false,
+    }
   )
-  const router = useRouter()
 
+  const [rfpCount] = useQuery(
+    getRfpCountByTerminalId,
+    {
+      terminalId: terminal?.id as number,
+      includeDeletedRfps: false,
+      statuses: Array.from(rfpStatusFilters),
+    },
+    {
+      suspense: false,
+      enabled: !!terminal?.id,
+      refetchOnWindowFocus: false,
+    }
+  )
+
+  const router = useRouter()
   useEffect(() => {
     if (query.rfpPublished) {
       setShowRfpSuccessModal(true)
@@ -74,8 +114,28 @@ const BulletinPage: BlitzPage = () => {
           </div>
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <div className="flex ml-6 py-4 space-x-2 flex-wrap self-start">
-              <FilterPill />
+              <FilterPill
+                label="status"
+                filterOptions={RFP_STATUSES_FILTER_OPTIONS.map((rfpStatus) => ({
+                  name: RFP_STATUS_DISPLAY_MAP[rfpStatus]?.copy?.toUpperCase(),
+                  value: rfpStatus,
+                }))}
+                appliedFilters={rfpStatusFilters}
+                setAppliedFilters={setRfpStatusFilters}
+                refetchCallback={() => {
+                  setPage(0)
+                  invalidateQuery(getRfpsByTerminalId)
+                }}
+              />
             </div>
+            <Pagination
+              results={rfps as any[]}
+              resultsCount={rfpCount as number}
+              page={page}
+              setPage={setPage}
+              resultsLabel="rfps"
+              className="ml-6 sm:mr-6 text-sm pt-2"
+            />
           </div>
         </div>
         <div className="h-[calc(100vh-130px)] w-full">
@@ -91,6 +151,11 @@ const BulletinPage: BlitzPage = () => {
               rfps?.map((rfp) => (
                 <RFPComponent rfp={rfp} terminalHandle={terminalHandle} key={rfp.id} />
               ))
+            ) : rfps && rfpStatusFilters?.size ? (
+              <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
+                <p>No RFPs found</p>
+                <p>...</p>
+              </div>
             ) : rfps ? (
               // TODO: hide this view from non-admins and show different copy once we have checkbook signer tags
               <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
@@ -156,75 +221,6 @@ const RFPComponent = ({ rfp, terminalHandle }) => {
         </div>
       </div>
     </Link>
-  )
-}
-
-const FilterPill = ({}) => {
-  return (
-    <Menu as="div" className="relative mb-2 sm:mb-0">
-      {({ open }) => {
-        return (
-          <>
-            <Menu.Button className="block h-[28px] text-marble-white">
-              <div className="flex items-center">
-                <span
-                  className={`${
-                    open
-                      ? "bg-marble-white text-tunnel-black  border-marble-white"
-                      : "hover:bg-marble-white hover:text-tunnel-black border-concrete hover:border-marble-white"
-                  } capitalize group rounded-full border h-[17px] w-max p-4 flex flex-center items-center cursor-pointer `}
-                >
-                  Request Status
-                  <div className="ml-3">
-                    <DropdownChevronIcon
-                      className={`${open ? "fill-tunnel-black" : "group-hover:fill-tunnel-black"}`}
-                    />
-                  </div>
-                </span>
-              </div>
-            </Menu.Button>
-            <Transition
-              as={Fragment}
-              enter="transition ease-out duration-100"
-              enterFrom="transform opacity-0 scale-95"
-              enterTo="transform opacity-100 scale-100"
-              leave="transition ease-in duration-75"
-              leaveFrom="transform opacity-100 scale-100"
-              leaveTo="transform opacity-0 scale-95"
-            >
-              <Menu.Items className="absolute origin-top-left mt-5 h-auto w-[11rem] sm:w-[22rem] bg-tunnel-black border border-concrete rounded-md z-10">
-                <Form
-                  onSubmit={(field) => {
-                    if (!field || !Object.keys(field).length || !Object.entries(field)[0]) {
-                      return
-                    }
-                  }}
-                  render={({ form, handleSubmit }) => {
-                    return (
-                      <form onSubmit={handleSubmit}>
-                        <div className="mt-[1.4rem] mx-[1.15rem] mb-5 space-y-3"></div>
-                        <button
-                          type="submit"
-                          className="bg-marble-white w-36 sm:w-52 h-[35px] text-tunnel-black rounded mb-4 ml-4 mr-1 hover:opacity-70"
-                        >
-                          Apply
-                        </button>
-                        <button
-                          className="w-[6.5rem] hover:text-concrete mb-2 sm:mb-0"
-                          onClick={(e) => {}}
-                        >
-                          Clear all
-                        </button>
-                      </form>
-                    )
-                  }}
-                ></Form>
-              </Menu.Items>
-            </Transition>
-          </>
-        )
-      }}
-    </Menu>
   )
 }
 
