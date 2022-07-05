@@ -20,6 +20,7 @@ import getProposalById from "app/proposal/queries/getProposalById"
 import { Check } from "app/check/types"
 import { PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
+import truncateString from "app/core/utils/truncateString"
 import ProgressIndicator from "app/core/components/ProgressIndicator"
 import CashCheckModal from "app/check/components/CashCheckModal"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
@@ -169,8 +170,41 @@ const ProposalPage: BlitzPage = ({
                 {PROPOSAL_STATUS_DISPLAY_MAP[proposal?.status]?.copy}
               </span>
             </div>
-            <h1 className="mt-6 text-2xl font-bold">{proposal?.data.content.title}</h1>
-            {/* collaborators would go here, but we have not created collaborators yet */}
+            <h1 className="mt-6 text-2xl font-bold mb-2">{proposal.data.content.title}</h1>
+            {proposal.collaborators.map((collaborator, idx) => {
+              if (collaborator.account?.data) {
+                return (
+                  <div className="flex flex-row items-center" key={`account-${idx}`}>
+                    <img
+                      src={collaborator.account?.data?.pfpURL}
+                      alt="PFP"
+                      className="w-[32px] h-[32px] rounded-full"
+                      onError={(e) => {
+                        e.currentTarget.src = DEFAULT_PFP_URLS.USER
+                      }}
+                    />
+                    <div className="ml-2">
+                      <span>{collaborator.account?.data.name}</span>
+                      <span className="text-xs text-light-concrete flex">
+                        @{truncateString(collaborator.account?.address, 4)}
+                      </span>
+                    </div>
+                  </div>
+                )
+              } else {
+                return (
+                  <div className="flex flex-row items-center" key={`account-${idx}`}>
+                    <img
+                      src={DEFAULT_PFP_URLS.USER}
+                      alt="PFP"
+                      className="w-[32px] h-[32px] rounded-full"
+                    />
+                    <div className="ml-2">{truncateString(collaborator.account)}</div>
+                  </div>
+                )
+              }
+            })}
+
             <div className="w-full overflow-y-scroll mt-6">
               <Preview markdown={proposal?.data.content.body} />
             </div>

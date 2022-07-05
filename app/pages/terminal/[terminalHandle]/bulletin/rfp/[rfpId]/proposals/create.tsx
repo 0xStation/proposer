@@ -16,6 +16,7 @@ import { XIcon } from "@heroicons/react/solid"
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
 import Modal from "app/core/components/Modal"
+import ConnectWalletModal from "app/core/components/ConnectWalletModal"
 import CheckbookSelectToken from "app/core/components/CheckbookSelectToken"
 // hooks
 import useStore from "app/core/hooks/useStore"
@@ -40,6 +41,7 @@ const CreateProposalPage: BlitzPage = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [previewMode, setPreviewMode] = useState<boolean>(false)
+  const [connectWalletModalOpen, setConnectWalletModalOpen] = useState<boolean>(false)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
@@ -63,6 +65,10 @@ const CreateProposalPage: BlitzPage = ({
 
   return (
     <Layout title={`New Proposal`}>
+      <ConnectWalletModal
+        isWalletOpen={connectWalletModalOpen}
+        setIsWalletOpen={setConnectWalletModalOpen}
+      />
       <div className="fixed grid grid-cols-4 w-[calc(100%-70px)] border-box z-50">
         <div className="col-span-3 pt-4 pr-4">
           <div className="text-light-concrete flex flex-row justify-between w-full">
@@ -110,11 +116,12 @@ const CreateProposalPage: BlitzPage = ({
           title: string
         }) => {
           if (!activeUser?.address) {
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: "You must connect your wallet in order to create a proposal",
-            })
+            setConnectWalletModalOpen(true)
+            // setToastState({
+            //   isToastShowing: true,
+            //   type: "error",
+            //   message: "You must connect your wallet in order to create a proposal",
+            // })
           } else {
             try {
               await createProposalMutation({
