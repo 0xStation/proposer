@@ -17,7 +17,7 @@ export const useCreateCheckbook = (chainId: number) => {
 export const useCashCheck = (address: string) => {
   const { writeAsync: cashCheck } = useContractWrite(
     {
-      addressOrName: address || CONTRACTS[4]?.CHECKBOOK_TEMPLATE,
+      addressOrName: address,
       contractInterface: checkbookAbi,
     },
     "withdraw(address,address,uint256,uint256,uint256,bytes[])" // have to specify arguments because two functions with name create but different arguments

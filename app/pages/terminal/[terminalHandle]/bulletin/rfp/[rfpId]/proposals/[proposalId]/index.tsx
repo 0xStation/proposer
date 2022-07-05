@@ -58,13 +58,20 @@ const ProposalPage: BlitzPage = ({
     HIDDEN = "",
   }
 
-  const buttonOption = !primaryCheck
-    ? ButtonOption.APPROVE
-    : !primaryCheck.txnHash && primaryCheck.approvals.length < (primaryCheck.checkbook?.quorum || 0)
-    ? ButtonOption.APPROVE
-    : !primaryCheck.txnHash && primaryCheck.recipientAddress === activeUser?.address
-    ? ButtonOption.CASH
-    : ButtonOption.HIDDEN
+  let buttonOption: ButtonOption
+  if (
+    !primaryCheck ||
+    (!primaryCheck.txnHash && primaryCheck.approvals.length < (primaryCheck.checkbook?.quorum || 0))
+  ) {
+    // no check created or the check has not been cashed and is not yet approved
+    buttonOption = ButtonOption.APPROVE
+  } else if (!primaryCheck.txnHash && primaryCheck.recipientAddress === activeUser?.address) {
+    // check created, but not cashed and the current user is the recipient
+    buttonOption = ButtonOption.CASH
+  } else {
+    // check created and cashed OR user is not recipient
+    buttonOption = ButtonOption.HIDDEN
+  }
 
   const txn = useWaitForTransaction({
     confirmations: 1, // low confirmation count gives us a feel of faster UX
@@ -106,7 +113,6 @@ const ProposalPage: BlitzPage = ({
           waitingCreation={waitingCreation}
           setWaitingCreation={setWaitingCreation}
           setTxnHash={setTxnHash}
-          setToastState={setToastState}
           check={primaryCheck}
         />
       )}

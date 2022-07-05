@@ -1,13 +1,12 @@
-import { useMutation, useRouter } from "blitz"
+import { useMutation } from "blitz"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
-import { useCashCheck } from "app/contracts/contracts"
+import { useCashCheck } from "app/contracts/checkbook"
 import CashCheck from "app/check/mutations/cashCheck"
 import { checkToContractTypes } from "app/core/utils/checkToContractTypes"
 import { Spinner } from "app/core/components/Spinner"
 import truncateString from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
-import { useWaitForTransaction } from "wagmi"
 
 export const CashCheckModal = ({
   isOpen,
@@ -15,9 +14,9 @@ export const CashCheckModal = ({
   waitingCreation,
   setWaitingCreation,
   setTxnHash,
-  setToastState,
   check,
 }) => {
+  const setToastState = useStore((state) => state.setToastState)
   const [cashCheckMutation] = useMutation(CashCheck, {
     onSuccess: (_data) => {
       console.log("success", _data)
@@ -86,10 +85,6 @@ export const CashCheckModal = ({
           <div className="flex justify-between items-center mt-2">
             <span className="text-small font-bold">Fund recipient</span>
             <span className="text-small">{truncateString(check.recipientAddress)}</span>
-          </div>
-          <div className="flex justify-between items-center mt-2">
-            <span className="text-small font-bold">Proposal ID</span>
-            <span className="text-small">{truncateString(check.proposalId)}</span>
           </div>
           <div className="flex justify-between items-center mt-2">
             <span className="text-small font-bold">Token</span>

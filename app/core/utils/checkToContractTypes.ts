@@ -5,17 +5,7 @@ import { zeroAddress } from "./constants"
 import { BigNumber } from "ethers"
 
 // prepare check object from database to types ready for ethers for signatures or transactions
-export const checkToContractTypes = (check?: Check) => {
-  if (!check) {
-    return {
-      recipient: zeroAddress,
-      token: zeroAddress,
-      amount: 0,
-      deadline: 0,
-      nonce: 0,
-      signatures: [],
-    }
-  }
+export const checkToContractTypes = (check: Check) => {
   return {
     recipient: check.recipientAddress,
     token: check.tokenAddress,

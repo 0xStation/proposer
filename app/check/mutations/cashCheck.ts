@@ -16,7 +16,7 @@ export default async function cashCheck(input: z.infer<typeof CashCheck>) {
     })
     return check
   } catch (e) {
-    console.error("Check cashing failed", e)
+    console.error("Check updating failed", e)
     throw e
   }
 }
