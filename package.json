@@ -37,6 +37,7 @@
     "@mui/icons-material": "5.5.1",
     "@mui/material": "5.5.3",
     "@prisma/client": "3.6.0",
+    "@radix-ui/react-progress": "0.1.4",
     "@types/remarkable": "2.0.3",
     "autoprefixer": "10.4.0",
     "aws-sdk": "2.1060.0",
