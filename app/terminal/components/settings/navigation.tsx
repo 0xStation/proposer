@@ -80,12 +80,12 @@ const Navigation = ({ children }) => {
               <ul className="mt-6">
                 <li
                   className={`${
-                    router.pathname === Routes.GenerateCheckPage({ terminalHandle }).pathname
+                    router.pathname === Routes.PlaygroundPage({ terminalHandle }).pathname
                       ? "text-marble-white font-bold"
                       : "text-concrete"
                   } cursor-pointer hover:text-marble-white mt-4`}
                 >
-                  <Link href={Routes.GenerateCheckPage({ terminalHandle })}>Generate Check</Link>
+                  <Link href={Routes.PlaygroundPage({ terminalHandle })}>Playground</Link>
                 </li>
               </ul>
             </>

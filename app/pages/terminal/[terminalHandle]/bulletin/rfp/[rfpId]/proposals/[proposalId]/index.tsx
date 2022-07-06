@@ -47,7 +47,7 @@ const ProposalPage: BlitzPage = ({
   const [txnHash, setTxnHash] = useState<string>()
   // useful for P0 while we only expect one check
   const [primaryCheck, setPrimaryCheck] = useState<Check>()
-  const [tokenName, setTokenName] = useState<string>("ETH")
+  const [tokenSymbol, setTokenSymbol] = useState<string>("ETH")
   const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
 
   // not really a fan of this but we need to get the token symbol
@@ -65,10 +65,10 @@ const ProposalPage: BlitzPage = ({
         }),
       })
       const r = await a.json()
-      setTokenName(r.data.symbol)
+      setTokenSymbol(r.data.symbol)
     }
     if (data.proposal.data.funding.token === zeroAddress) {
-      setTokenName("ETH")
+      setTokenSymbol("ETH")
     } else {
       getTokenData()
     }
@@ -161,6 +161,7 @@ const ProposalPage: BlitzPage = ({
           setIsOpen={setCashCheckModalOpen}
           waitingCreation={waitingCreation}
           setWaitingCreation={setWaitingCreation}
+          tokenSymbol={tokenSymbol}
           setTxnHash={setTxnHash}
           check={primaryCheck}
         />
@@ -225,7 +226,7 @@ const ProposalPage: BlitzPage = ({
                 </p>
               </Link>
               <h4 className="text-xs font-bold text-concrete uppercase mt-6">Total Amount</h4>
-              <p className="mt-2 font-normal">{`${data.proposal.data.funding.amount} ${tokenName}`}</p>
+              <p className="mt-2 font-normal">{`${data.proposal.data.funding.amount} ${tokenSymbol}`}</p>
               <h4 className="text-xs font-bold text-concrete uppercase mt-6">Fund Recipient</h4>
               <p className="mt-2">{data.proposal.data.funding.recipientAddress}</p>
             </div>

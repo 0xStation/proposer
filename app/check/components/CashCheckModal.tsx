@@ -13,6 +13,7 @@ export const CashCheckModal = ({
   setIsOpen,
   waitingCreation,
   setWaitingCreation,
+  tokenSymbol,
   setTxnHash,
   check,
 }) => {
@@ -49,7 +50,9 @@ export const CashCheckModal = ({
         txnHash: transaction.hash,
       })
 
-      // triggers hook for useWaitForTransaction which waits to show toast and update check status on UI
+      // the `txnHash` state is required to enable the useWaitForTransaction hook in the parent page
+      // useWaitForTransaction is a wagmi hook that waits for a given transaction to confirm on the blockchain
+      // on successful processing of our transaction, we show a toast and update the check's status on UI
       setTxnHash(transaction.hash)
     } catch (e) {
       setWaitingCreation(false)
@@ -88,8 +91,7 @@ export const CashCheckModal = ({
           </div>
           <div className="flex justify-between items-center mt-2">
             <span className="text-small font-bold">Token</span>
-            {/* TODO: change to token symbol once we copy that data through models */}
-            <span className="text-small">{truncateString(check.tokenAddress)}</span>
+            <span className="text-small">{tokenSymbol}</span>
           </div>
           <div className="flex justify-between items-center mt-2">
             <span className="text-small font-bold">Amount</span>
