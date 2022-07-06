@@ -18,7 +18,7 @@ export type AccountMetadata = {
   timezone?: string
   verified?: boolean
   bio?: string
-  initiatives?: number[]
+  email?: string
 }
 
 export type Account = {
