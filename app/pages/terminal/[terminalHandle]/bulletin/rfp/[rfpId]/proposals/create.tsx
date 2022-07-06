@@ -47,7 +47,18 @@ const CreateProposalPage: BlitzPage = ({
 
   const terminalHandle = useParam("terminalHandle") as string
   const [createProposalMutation] = useMutation(createProposal, {
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
+      // send new proposal notification
+      fetch("/api/notify/proposal/new", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          proposalId: response.id,
+        }),
+      })
+
       router.push(
         Routes.ProposalsTab({
           terminalHandle: terminalHandle,
