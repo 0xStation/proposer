@@ -4,7 +4,7 @@ import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import { useMutation } from "blitz"
 import addEmailToAccount from "app/account/mutations/addEmailToAccount"
-import { requiredField } from "app/utils/validators"
+import { composeValidators, requiredField, isValidEmail } from "app/utils/validators"
 
 const GetNotifiedModal = ({ isOpen, setIsOpen }) => {
   const activeUser = useStore((state) => state.activeUser)
@@ -50,7 +50,7 @@ const GetNotifiedModal = ({ isOpen, setIsOpen }) => {
           render={({ form, handleSubmit }) => {
             return (
               <form onSubmit={handleSubmit}>
-                <Field name="email" validate={requiredField}>
+                <Field name="email" validate={composeValidators(requiredField, isValidEmail)}>
                   {({ meta, input }) => (
                     <>
                       <label className="font-bold block mt-6">Email</label>

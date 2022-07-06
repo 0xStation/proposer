@@ -38,7 +38,6 @@
     "@mui/material": "5.5.3",
     "@prisma/client": "3.6.0",
     "@radix-ui/react-progress": "0.1.4",
-    "@privy-io/privy-node": "0.0.1",
     "@sendgrid/mail": "7.7.0",
     "@types/remarkable": "2.0.3",
     "autoprefixer": "10.4.0",
