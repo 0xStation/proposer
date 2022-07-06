@@ -224,7 +224,7 @@ const RfpMarkdownForm = ({
                         }}
                       </Field>
                     ) : (
-                      <Preview markdown={markdown} />
+                      <Preview markdown={formState.values.markdown} />
                     )}
                   </div>
                 </div>
