@@ -6,6 +6,7 @@ const UpdateAccount = z.object({
   name: z.string(),
   address: z.string().optional(),
   bio: z.string().optional(),
+  email: z.string().optional(),
   pfpURL: z.string().optional(),
   coverURL: z.string().optional(),
   contactURL: z.string().optional(),
@@ -34,6 +35,7 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
     data: {
       name: params.name,
       bio: params.bio,
+      email: params.email,
       pfpURL: params.pfpURL,
       coverURL: params.coverURL,
       contactURL: params.contactURL,

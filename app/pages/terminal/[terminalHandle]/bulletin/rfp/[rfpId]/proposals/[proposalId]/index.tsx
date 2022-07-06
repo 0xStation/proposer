@@ -73,7 +73,9 @@ const ProposalPage: BlitzPage = ({
     {
       suspense: false,
       onSuccess: (checks) => {
-        setCheck(checks[0])
+        if (checks[0]?.approvals.length === rfp.checkbook.quorum) {
+          setCheck(checks[0])
+        }
       },
     }
   )

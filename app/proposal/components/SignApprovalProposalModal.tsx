@@ -73,6 +73,22 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
           type: "success",
           message: "Your approval moves this proposal a step closer to reality.",
         })
+        try {
+          // if this approval makes proposal reach quorum, send notification to collaborators
+          if (proposal.approvals.length + 1 === rfp.checkbook.quorum) {
+            await fetch("/api/notify/proposal/approved", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                proposalId: proposal.id,
+              }),
+            })
+          }
+        } catch (e) {
+          console.error(e)
+        }
       } catch (e) {
         console.error(e)
       }
