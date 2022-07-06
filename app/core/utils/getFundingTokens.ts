@@ -2,16 +2,16 @@ import { Checkbook } from "app/checkbook/types"
 import { Terminal } from "app/terminal/types"
 import networks from "app/utils/networks.json"
 import { TagType, TokenType } from "app/tag/types"
-import { zeroAddress, chainIds } from "./constants"
+import { ZERO_ADDRESS, CHAIN_IDS } from "./constants"
 
 const getFundingTokens = (
   checkbook: Checkbook | undefined,
   terminal: Terminal | null | undefined
 ) => {
-  const eth = [chainIds.ETHEREUM, chainIds.RINKEBY, chainIds.GOERLI].includes(
+  const eth = [CHAIN_IDS.ETHEREUM, CHAIN_IDS.RINKEBY, CHAIN_IDS.GOERLI].includes(
     checkbook?.chainId || 0
   )
-    ? [{ symbol: "ETH", address: zeroAddress }]
+    ? [{ symbol: "ETH", address: ZERO_ADDRESS }]
     : []
 
   const stablecoins = networks[checkbook?.chainId as number]?.stablecoins || []

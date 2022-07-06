@@ -120,9 +120,9 @@ const CreateProposalPage: BlitzPage = ({
               await createProposalMutation({
                 rfpId: data.rfp.id,
                 terminalId: data.terminal.id,
+                recipientAddress: values.recipientAddress,
                 token: values.token,
                 amount: values.amount,
-                recipientAddress: values.recipientAddress,
                 contentBody: values.markdown,
                 contentTitle: values.title,
                 collaborators: [activeUser.address],
