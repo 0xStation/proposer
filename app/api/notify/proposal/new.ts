@@ -5,6 +5,7 @@ import { Account } from "app/account/types"
 import { Proposal } from "app/proposal/types"
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
+import { Checkbook } from "app/checkbook/types"
 
 const EmailRequest = z.object({
   proposalId: z.string(),
@@ -30,30 +31,33 @@ export default async function handler(req, res) {
           rfp: {
             include: {
               terminal: true,
+              checkbook: true,
             },
           },
         },
       },
     },
-  })) as unknown as { account: Account; proposal: Proposal & { rfp: Rfp & { terminal: Terminal } } }
-
-  console.log(data)
+  })) as unknown as {
+    account: Account
+    proposal: Proposal & { rfp: Rfp & { terminal: Terminal; checkbook: Checkbook } }
+  }
 
   if (!data) {
     res.status(404)
     return
   }
 
-  email.send(
-    "0xBa767D65a7164E151783e42994Bd475509F256Dd",
-    "You've received a new proposal!",
-    email.newProposalBody(
-      data.account,
-      data.proposal,
-      data.proposal.rfp,
-      data.proposal.rfp.terminal
-    )
-  )
+  const subject = email.templates.newProposal.subject
+  const body = email.templates.newProposal.body({
+    account: data.account,
+    proposal: data.proposal,
+    rfp: data.proposal.rfp,
+    terminal: data.proposal.rfp.terminal,
+  })
+
+  data.proposal.rfp.checkbook.signers.forEach((address) => {
+    email.send(address, subject, body)
+  })
 
   res.status(200).json({ response: "success" })
 }

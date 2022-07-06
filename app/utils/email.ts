@@ -10,36 +10,29 @@ const client = new PrivyClient(requireEnv("PRIVY_API_KEY"), requireEnv("PRIVY_AP
 
 const set = async (address: string, email: string) => {
   const [res] = await client.put(address, [{ field: "email", value: email }])
-
-  console.log("email", res)
   return res?.text()
 }
 
 const get = async (address: string) => {
   const [email] = await client.get(address, ["email"])
-  console.log(email?.text())
   return email?.text()
 }
 
 const send = async (address: string, subject: string, body: string) => {
-  await client.sendEmail(address, subject, body)
+  try {
+    await client.sendEmail(address, subject, body)
+  } catch (e) {
+    console.error(e)
+  }
 }
 
-const newProposalBody = (account: Account, proposal: Proposal, rfp: Rfp, terminal: Terminal) => {
-  const proposerProfileUrl = `https://app.station.express/profile/${account.address}`
-  const proposerName = account.data?.name
-  const proposalUrl = `https://app.station.express/terminal/${terminal.handle}/bulletin/rfp/${rfp.id}/proposals/${proposal.id}`
-  const proposalTitle = proposal.data?.content.title
-  const rfpTitle = rfp.data?.content.title
+const generalBody = (message: string) => {
   return `
     <p>
       Hello,
     </p>
     <p>
-      <a href="${proposerProfileUrl}">${proposerName}</a>
-      has submitted 
-      <a href="${proposalUrl}">"${proposalTitle}"</a> to ${rfpTitle}. 
-      Find out how they want to contribute to your ecosystem, and help bring their ideas to reality.
+      ${message}
     </p>
     <p>
       Station Staff
@@ -65,4 +58,47 @@ const newProposalBody = (account: Account, proposal: Proposal, rfp: Rfp, termina
   `
 }
 
-export { set, get, send, newProposalBody }
+type EmailArgs = {
+  account?: Account
+  proposal?: Proposal
+  rfp?: Rfp
+  terminal?: Terminal
+}
+
+const newProposalBody = ({ account, proposal, rfp, terminal }: EmailArgs) => {
+  const proposerProfileUrl = `https://app.station.express/profile/${account?.address}`
+  const proposerName = account?.data?.name
+  const proposalUrl = `https://app.station.express/terminal/${terminal?.handle}/bulletin/rfp/${rfp?.id}/proposals/${proposal?.id}`
+  const proposalTitle = proposal?.data?.content.title
+  const rfpTitle = rfp?.data?.content.title
+  const message = `
+      <a href="${proposerProfileUrl}">${proposerName}</a>
+      has submitted 
+      <a href="${proposalUrl}">"${proposalTitle}"</a> to ${rfpTitle}. 
+      Find out how they want to contribute to your ecosystem, and help bring their ideas to reality.
+  `
+  return generalBody(message)
+}
+
+const approvedProposalBody = ({ proposal, rfp, terminal }: EmailArgs) => {
+  const proposalUrl = `https://app.station.express/terminal/${terminal?.handle}/bulletin/rfp/${rfp?.id}/proposals/${proposal?.id}`
+  const message = `
+      Congratulations! Your proposal has been approved. Next, 
+      <a href="${proposalUrl}">cash your check</a>
+      to complete the process and bring your ideas to reality.
+    `
+  return generalBody(message)
+}
+
+const templates = {
+  newProposal: {
+    subject: "You've received a new proposal!",
+    body: newProposalBody,
+  },
+  approvedProposal: {
+    subject: "Congratulations! Your proposal has been approved.",
+    body: approvedProposalBody,
+  },
+}
+
+export { set, get, send, templates }
