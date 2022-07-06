@@ -1,5 +1,17 @@
 import { useState, useEffect } from "react"
-import { BlitzPage, Routes, useParam, useQuery, Link, useRouterQuery, invalidateQuery } from "blitz"
+import {
+  BlitzPage,
+  Routes,
+  useParam,
+  useQuery,
+  useRouter,
+  Link,
+  useRouterQuery,
+  invalidateQuery,
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+  invoke,
+} from "blitz"
 import Layout from "app/core/layouts/Layout"
 import Modal from "app/core/components/Modal"
 import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
@@ -22,8 +34,12 @@ import { Proposal, ProposalStatus } from "app/proposal/types"
 import FilterPill from "app/core/components/FilterPill"
 import Pagination from "app/core/components/Pagination"
 import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpId"
+import useCheckbookBalance from "app/core/hooks/useCheckbookBalance"
 
-const ProposalsTab: BlitzPage = () => {
+const ProposalsTab: BlitzPage = ({
+  rfp,
+  terminal,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { proposalId } = useRouterQuery() as { proposalId: string }
   const terminalHandle = useParam("terminalHandle") as string
   const rfpId = useParam("rfpId") as string
@@ -31,17 +47,6 @@ const ProposalsTab: BlitzPage = () => {
     new Set<ProposalStatus>()
   )
   const [page, setPage] = useState<number>(0)
-  const [terminal] = useQuery(
-    getTerminalByHandle,
-    { handle: terminalHandle as string },
-    { suspense: false, enabled: !!terminalHandle }
-  )
-
-  const [rfp] = useQuery(
-    getRfpById,
-    { id: rfpId },
-    { suspense: false, enabled: !!rfpId, refetchOnWindowFocus: false }
-  )
 
   const [proposals] = useQuery(
     getProposalsByRfpId,
@@ -74,6 +79,8 @@ const ProposalsTab: BlitzPage = () => {
       setProposalCreatedConfirmationModal(true)
     }
   }, [proposalId])
+
+  const balances = useCheckbookBalance(rfp, terminal)
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
@@ -157,6 +164,7 @@ const ProposalsTab: BlitzPage = () => {
                   proposal={proposal}
                   rfp={rfp}
                   key={idx}
+                  balances={balances}
                 />
               ))
             ) : proposals && rfp && !proposals.length ? (
@@ -184,11 +192,15 @@ const ProposalComponent = ({
   proposal,
   rfp,
   terminalHandle,
+  balances,
 }: {
   proposal: Proposal
   rfp: Rfp
   terminalHandle: string
+  balances: any
 }) => {
+  const router = useRouter()
+
   return (
     <Link href={Routes.ProposalPage({ terminalHandle, rfpId: rfp.id, proposalId: proposal.id })}>
       <div className="border-b border-concrete w-full cursor-pointer hover:bg-wet-concrete pt-5">
@@ -213,14 +225,34 @@ const ProposalComponent = ({
                 twsize={6}
                 cutoff={0}
               />
-              <p>
+              <p className="ml-2">
                 {/* TODO: Figure out how to show signers per milestone */}
                 {`${proposal.approvals?.length || "0"} / ${rfp?.checkbook?.quorum || "N/A"}`}
               </p>
             </div>
           </div>
-          <div className="basis-32 ml-6 mb-2 self-center">
+          <div
+            className={`basis-32 ml-6 mb-2 self-center relative group ${
+              balances[proposal.data?.funding.token].available < proposal.data.funding?.amount &&
+              "text-torch-red"
+            }`}
+          >
             {proposal.data?.funding?.amount || "N/A"}
+            <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[100%] left-0 group hidden group-hover:block shadow-lg z-50">
+              Insufficient funds.{" "}
+              <span
+                className="text-electric-violet"
+                onClick={(e) => {
+                  // overriding the parent click handler
+                  e.preventDefault()
+                  // todo: only want to show this to people who have permission to see the checkbook.
+                  router.push(Routes.NewCheckbookSettingsPage({ terminalHandle }))
+                }}
+              >
+                Go to checkbook
+              </span>{" "}
+              to refill.
+            </span>
           </div>
           <div className="basis-32 ml-2 mb-2 self-center">
             {formatDate(proposal.createdAt) || "N/A"}
@@ -240,6 +272,29 @@ const ProposalComponent = ({
       </div>
     </Link>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { terminalHandle, rfpId, proposalId } = context.query as {
+    terminalHandle: string
+    rfpId: string
+    proposalId: string
+  }
+  const terminal = await invoke(getTerminalByHandle, { handle: terminalHandle })
+  const rfp = await invoke(getRfpById, { id: rfpId })
+
+  if (!rfp || !terminal) {
+    return {
+      redirect: {
+        destination: Routes.BulletinPage({ terminalHandle }),
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: { rfp, terminal },
+  }
 }
 
 export default ProposalsTab
