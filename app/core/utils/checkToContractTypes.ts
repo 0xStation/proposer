@@ -1,7 +1,7 @@
 import { Check } from "app/check/types"
 import { CheckApprovalMetadata } from "app/checkApproval/types"
 import decimalToBigNumber from "./decimalToBigNumber"
-import { zeroAddress } from "./constants"
+import { ZERO_ADDRESS } from "./constants"
 import { BigNumber } from "ethers"
 
 // prepare check object from database to types ready for ethers for signatures or transactions

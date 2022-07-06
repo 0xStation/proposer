@@ -14,9 +14,9 @@ export const CONTRACTS = {
   },
 }
 
-export const zeroAddress = "0x0000000000000000000000000000000000000000"
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
-export const chainIds = {
+export const CHAIN_IDS = {
   ETHEREUM: 1,
   RINKEBY: 4,
   GOERLI: 5,

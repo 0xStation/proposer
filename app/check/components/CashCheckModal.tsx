@@ -1,7 +1,7 @@
 import { useMutation } from "blitz"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
-import { useCashCheck } from "app/contracts/checkbook"
+import { useCashCheckOnChain } from "app/contracts/checkbook"
 import CashCheck from "app/check/mutations/cashCheck"
 import { checkToContractTypes } from "app/core/utils/checkToContractTypes"
 import { Spinner } from "app/core/components/Spinner"
@@ -27,7 +27,7 @@ export const CashCheckModal = ({
     },
   })
 
-  const { cashCheck } = useCashCheck(check.fundingAddress as string)
+  const { cashCheck } = useCashCheckOnChain(check.fundingAddress as string)
 
   const executeCashCheck = async () => {
     try {

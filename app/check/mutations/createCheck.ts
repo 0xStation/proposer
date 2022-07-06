@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { zeroAddress } from "app/core/utils/constants"
+import { ZERO_ADDRESS } from "app/core/utils/constants"
 import { Prisma } from "@prisma/client"
 import { fetchTokenDecimals } from "app/utils/fetchTokenDecimals"
 
@@ -17,7 +17,7 @@ export default async function createCheck(input: z.infer<typeof CreateCheck>) {
   // 1. clean token amount's decimal value
   // remove decimals after token's decimal precision, cleaner data saves ethers error risk later on frontend
   const tokenDecimals =
-    input.tokenAddress === zeroAddress
+    input.tokenAddress === ZERO_ADDRESS
       ? 18 // ETH decimals
       : await fetchTokenDecimals(input.chainId, input.tokenAddress) // fetch from ERC20 contract
   const tokenAmountDecimal = new Prisma.Decimal(input.tokenAmount)

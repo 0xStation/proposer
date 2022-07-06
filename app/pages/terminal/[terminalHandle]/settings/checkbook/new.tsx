@@ -11,7 +11,7 @@ import Back from "/public/back-icon.svg"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
 import { sortAddressesIncreasing } from "app/core/utils/sortAddressesIncreasing"
 import { uniqueName, isValidQuorum } from "app/utils/validators"
-import { useCreateCheckbook } from "app/contracts/checkbook"
+import { useCreateCheckbookOnChain } from "app/contracts/checkbook"
 import { useWaitForTransaction } from "wagmi"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { Spinner } from "app/core/components/Spinner"
@@ -35,7 +35,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
 
   const { chainId, error: invalidSelectedNetwork } = useAllowedNetwork()
 
-  const { createCheckbook } = useCreateCheckbook(chainId)
+  const { createCheckbook } = useCreateCheckbookOnChain(chainId)
 
   const data = useWaitForTransaction({
     confirmations: 1,
