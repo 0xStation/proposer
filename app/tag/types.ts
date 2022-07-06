@@ -4,6 +4,7 @@ export enum TagType {
   PROJECT = "project",
   GUILD = "guild",
   TOKEN = "token",
+  CHECKBOOK_SIGNER = "checkbook signer",
 }
 
 export enum TokenType {
@@ -23,6 +24,7 @@ export type TagTokenMetadata = {
 export type Tag = {
   id: number
   terminalId: number
+  // usually label of tag
   value: string
   type: TagType
   active: boolean

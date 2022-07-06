@@ -10,7 +10,6 @@ import {
 } from "blitz"
 import { useState, useEffect } from "react"
 import SettingsIcon from "app/core/icons/SettingsIcon"
-import MemberDirectoryIcon from "public/member-directory-icon.svg"
 import Exit from "/public/exit-button.svg"
 import getTerminalByHandle from "../queries/getTerminalByHandle"
 import useStore from "app/core/hooks/useStore"
