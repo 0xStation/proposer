@@ -10,6 +10,7 @@ const EmailRequest = z.object({
   proposalId: z.string(),
 })
 
+// TODO: currently unprotected, need to only allow requests from frontend
 export default async function handler(req, res) {
   let params
   try {

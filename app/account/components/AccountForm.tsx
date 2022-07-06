@@ -17,6 +17,7 @@ import {
   requiredField,
   composeValidators,
   mustBeUnderNumCharacters,
+  isValidEmail,
 } from "app/utils/validators"
 
 interface ApplicationParams {
@@ -253,7 +254,7 @@ const AccountForm = ({
                 component="input"
                 name="email"
                 placeholder=""
-                // validate={composeValidators(requiredField, mustBeUnderNumCharacters(50))}
+                validate={composeValidators(requiredField, isValidEmail)}
               >
                 {({ input, meta }) => (
                   <div>

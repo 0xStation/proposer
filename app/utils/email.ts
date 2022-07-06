@@ -5,6 +5,7 @@ import { Terminal } from "app/terminal/types"
 import { requireEnv } from "./requireEnv"
 import { MailService as SendGrid } from "@sendgrid/mail"
 import { SENDGRID_TEMPLATES } from "app/core/utils/constants"
+import truncateString from "app/core/utils/truncateString"
 
 const sendgrid = new SendGrid()
 sendgrid.setApiKey(requireEnv("SENDGRID_API_KEY"))
@@ -47,7 +48,7 @@ const email = async (recipients: string[], templateId: string, dynamicTemplateDa
 const newProposal = async ({ recipients, account, proposal, rfp, terminal }: EmailArgs) => {
   const dynamicTemplateData = {
     proposerProfileUrl: `${urlDomain}/profile/${account?.address}`,
-    proposerName: account?.data?.name,
+    proposerName: account?.data?.name || truncateString(account?.address),
     proposalUrl: `${urlDomain}/terminal/${terminal?.handle}/bulletin/rfp/${rfp?.id}/proposals/${proposal?.id}`,
     proposalTitle: proposal?.data?.content.title,
     rfpTitle: rfp?.data?.content.title,
