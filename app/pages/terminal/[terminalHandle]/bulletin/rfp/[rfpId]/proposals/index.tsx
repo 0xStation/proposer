@@ -70,22 +70,23 @@ const ProposalsTab: BlitzPage = () => {
 
   const [proposalCreatedConfirmationModal, setProposalCreatedConfirmationModal] =
     useState<boolean>(false)
-  const [linkCopied, setLinkCopied] = useState<boolean>(false)
 
-  const [getNotifiedModal, setGetNotifiedModal] = useState<boolean>(false)
+  const [isGetNotifiedModalOpen, setIsGetNotifiedModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
-    if (!activeUser?.data.email) {
-      setGetNotifiedModal(true)
-    } else if (proposalId) {
-      setProposalCreatedConfirmationModal(true)
+    if (proposalId) {
+      if (!activeUser?.data.email) {
+        setIsGetNotifiedModalOpen(true)
+      } else {
+        setProposalCreatedConfirmationModal(true)
+      }
     }
-  }, [proposalId])
+  }, [proposalId, activeUser])
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
       {terminal && activeUser && (
-        <GetNotifiedModal isOpen={getNotifiedModal} setIsOpen={setGetNotifiedModal} />
+        <GetNotifiedModal isOpen={isGetNotifiedModalOpen} setIsOpen={setIsGetNotifiedModalOpen} />
       )}
       {terminal && (
         <SuccessProposalModal

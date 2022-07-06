@@ -246,6 +246,7 @@ const AccountForm = ({
               <p className="text-concrete text-sm">
                 Only reviewers of your proposal can contact you via email. Your email won&apos;t be
                 displayed or shared with anyone.
+                {/* TODO: temporary link, will redirect to documentation */}
                 <a href="https://station.express">
                   <span className="text-electric-violet font-bold"> Learn more</span>
                 </a>
@@ -253,7 +254,6 @@ const AccountForm = ({
               <Field
                 component="input"
                 name="email"
-                placeholder=""
                 validate={composeValidators(requiredField, isValidEmail)}
               >
                 {({ input, meta }) => (

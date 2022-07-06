@@ -21,49 +21,60 @@ export default async function handler(req, res) {
     res.status(500).json({ response: "error", message: "missing required parameter" })
   }
 
-  const data = (await db.accountProposal.findFirst({
-    where: {
-      proposalId: params.proposalId,
-    },
-    include: {
-      account: true,
-      proposal: {
-        include: {
-          rfp: {
-            include: {
-              terminal: true,
-              checkbook: true,
+  try {
+    const data = (await db.accountProposal.findFirst({
+      where: {
+        proposalId: params.proposalId,
+      },
+      include: {
+        account: true,
+        proposal: {
+          include: {
+            rfp: {
+              include: {
+                terminal: true,
+                checkbook: true,
+              },
             },
           },
         },
       },
-    },
-  })) as unknown as {
-    account: Account
-    proposal: Proposal & { rfp: Rfp & { terminal: Terminal; checkbook: Checkbook } }
-  }
+    })) as unknown as {
+      account: Account
+      proposal: Proposal & { rfp: Rfp & { terminal: Terminal; checkbook: Checkbook } }
+    }
 
-  const recipientAccounts = await db.account.findMany({
-    where: {
-      address: {
-        in: data.proposal.rfp.checkbook.signers,
+    const recipientAccounts = await db.account.findMany({
+      where: {
+        address: {
+          in: data.proposal.rfp.checkbook.signers,
+        },
       },
-    },
-  })
+    })
 
-  if (!data) {
-    res.status(404)
-    return
+    if (!data) {
+      res.status(404)
+      return
+    }
+
+    try {
+      await email.sendNewProposalEmail({
+        recipients: recipientAccounts
+          .map((account) => (account.data as AccountMetadata)?.email || "")
+          .filter((s) => !!s),
+        account: data.account,
+        proposal: data.proposal,
+        rfp: data.proposal.rfp,
+        terminal: data.proposal.rfp.terminal,
+      })
+    } catch (e) {
+      console.error(e)
+      res.status(500).json({ response: "error", message: "error encountered in email emission" })
+    }
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ response: "error", message: "error encountered in data parsing" })
   }
 
-  await email.newProposal({
-    recipients: recipientAccounts
-      .map((account) => (account.data as AccountMetadata)?.email || "")
-      .filter((s) => !!s),
-    account: data.account,
-    proposal: data.proposal,
-    rfp: data.proposal.rfp,
-    terminal: data.proposal.rfp.terminal,
-  })
   res.status(200).json({ response: "success" })
 }

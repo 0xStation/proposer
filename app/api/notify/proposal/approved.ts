@@ -20,40 +20,50 @@ export default async function handler(req, res) {
     res.status(500).json({ response: "error", message: "missing required parameter" })
   }
 
-  const data = (await db.proposal.findUnique({
-    where: {
-      id: params.proposalId,
-    },
-    include: {
-      collaborators: {
-        include: {
-          account: true,
+  try {
+    const proposal = (await db.proposal.findUnique({
+      where: {
+        id: params.proposalId,
+      },
+      include: {
+        collaborators: {
+          include: {
+            account: true,
+          },
+        },
+        rfp: {
+          include: {
+            terminal: true,
+          },
         },
       },
-      rfp: {
-        include: {
-          terminal: true,
-        },
-      },
-    },
-  })) as unknown as Proposal & {
-    collaborators: { account: Account }[]
-    rfp: Rfp & { terminal: Terminal }
-  }
+    })) as unknown as Proposal & {
+      collaborators: { account: Account }[]
+      rfp: Rfp & { terminal: Terminal }
+    }
 
-  if (!data) {
-    res.status(404)
-    return
-  }
+    if (!proposal) {
+      res.status(404)
+      return
+    }
 
-  await email.approvedProposal({
-    recipients: data.collaborators
-      .map((ap) => (ap.account?.data as AccountMetadata)?.email || "")
-      .filter((s) => !!s),
-    proposal: data,
-    rfp: data.rfp,
-    terminal: data.rfp.terminal,
-  })
+    try {
+      await email.sendApprovedProposalEmail({
+        recipients: proposal.collaborators
+          .map((accountProposal) => (accountProposal.account?.data as AccountMetadata)?.email || "")
+          .filter((email) => !!email), // get rid of nonexistent emails
+        proposal: proposal,
+        rfp: proposal.rfp,
+        terminal: proposal.rfp.terminal,
+      })
+    } catch (e) {
+      console.error(e)
+      res.status(500).json({ response: "error", message: "error encountered in email emission" })
+    }
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ response: "error", message: "error encountered in data parsing" })
+  }
 
   res.status(200).json({ response: "success" })
 }
