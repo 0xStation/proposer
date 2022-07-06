@@ -1,12 +1,13 @@
-import { useMutation, useRouter } from "blitz"
+import { useMutation, useRouter, invalidateQuery } from "blitz"
 import { useSignTypedData, useToken } from "wagmi"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import createCheck from "app/check/mutations/createCheck"
 import approveProposal from "app/proposal/mutations/approveProposal"
-import { zeroAddress } from "app/core/utils/constants"
+import { ZERO_ADDRESS } from "app/core/utils/constants"
 import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 import { TypedDataTypeDefinition } from "app/types"
+import getChecksByProposalId from "../../check/queries/getChecksByProposalId"
 import { Check } from "@prisma/client"
 
 export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, checks }) => {
@@ -23,23 +24,24 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
 
   let { signTypedDataAsync: signApproval } = useSignTypedData()
   const { data: tokenData } = useToken({
-    ...(!!proposal.data.funding.token &&
-      proposal.data.funding.token !== zeroAddress && { address: proposal.data.funding.token }),
+    ...(!!proposal?.data.funding.token &&
+      proposal?.data.funding.token !== ZERO_ADDRESS && { address: proposal?.data.funding.token }),
   })
-  const decimals = proposal.data.funding.token === zeroAddress ? 18 : tokenData?.decimals || 0
+  const decimals = proposal?.data.funding.token === ZERO_ADDRESS ? 18 : tokenData?.decimals || 0
 
   const createOrFindCheckAndFetchSignature = async () => {
     let check = checks[0]
     if (!check) {
       // need to create a check if it does not exist
       check = await createCheckMutation({
-        proposalId: proposal.id,
+        proposalId: proposal?.id,
         fundingAddress: rfp.checkbook.address,
         chainId: rfp.checkbook.chainId,
-        recipientAddress: proposal.data.funding.recipientAddress,
-        tokenAddress: proposal.data.funding.token,
-        tokenAmount: proposal.data.funding.amount, // store as decimal value instead of BigNumber
+        recipientAddress: proposal?.data.funding.recipientAddress,
+        tokenAddress: proposal?.data.funding.token,
+        tokenAmount: proposal?.data.funding.amount, // store as decimal value instead of BigNumber
       })
+      invalidateQuery(getChecksByProposalId)
     }
 
     const signature = await approveCheck(check, decimals)
@@ -59,7 +61,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
     } else {
       try {
         await approveProposalMutation({
-          proposalId: proposal.id,
+          proposalId: proposal?.id,
           checkId: check.id,
           signerAddress: activeUser.address,
           signature: signature,

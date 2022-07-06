@@ -146,7 +146,7 @@ const ProposalsTab: BlitzPage = () => {
             <span className="basis-[38rem] ml-6 mb-2">Proposal</span>
             <span className="basis-32 ml-9 mb-2">Approval</span>
             <span className="basis-32 ml-6 mb-2">Amount</span>
-            <span className="basis-32 ml-2 mb-2">Submitted Date</span>
+            <span className="basis-32 ml-2 mb-2">Submission Date</span>
             <span className="basis-32 ml-6 mr-6 mb-2">Creator</span>
           </div>
           <div className="h-[calc(100vh-284px)] overflow-y-auto">
@@ -208,7 +208,11 @@ const ProposalComponent = ({
           </div>
           <div className="basis-32 ml-9 mb-2 self-center">
             <div className="flex flex-row">
-              <ProgressIndicator percent={0} twsize={6} cutoff={0} />
+              <ProgressIndicator
+                percent={proposal.approvals?.length / rfp?.checkbook?.quorum}
+                twsize={6}
+                cutoff={0}
+              />
               <p>
                 {/* TODO: Figure out how to show signers per milestone */}
                 {`${proposal.approvals?.length || "0"} / ${rfp?.checkbook?.quorum || "N/A"}`}
@@ -224,7 +228,7 @@ const ProposalComponent = ({
           <div className="basis-32 ml-6 mr-6 mb-2 self-center">
             {/* TODO: create a flag to indicate the main author when creating an account proposal */}
             <img
-              src={proposal?.collaborators[0]?.account?.data?.pfpURL}
+              src={proposal?.collaborators[0]?.account?.data?.pfpURL || DEFAULT_PFP_URLS.USER}
               alt="PFP"
               className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
               onError={(e) => {

@@ -151,15 +151,14 @@ const ProfileHome: BlitzPage = () => {
 }
 
 const ProposalComponent = ({ accountProposal }) => {
-  const { proposal } = accountProposal
-  const rfp = proposal?.rfp
-  const terminal = accountProposal?.terminal
+  const { terminal, proposal } = accountProposal
+  const rfp = proposal.rfp
   const checkbook = rfp.checkbook
 
   return (
     <Link
       href={Routes.ProposalPage({
-        terminalHandle: terminal?.handle,
+        terminalHandle: terminal.handle,
         rfpId: proposal.rfpId,
         proposalId: proposal.id,
       })}
@@ -181,10 +180,13 @@ const ProposalComponent = ({ accountProposal }) => {
           </div>
           <div className="basis-32 ml-9 mb-2 self-center">
             <div className="flex flex-row">
-              <ProgressIndicator percent={0} twsize={6} cutoff={0} />
+              <ProgressIndicator
+                percent={proposal.approvals.length / checkbook?.quorum}
+                twsize={6}
+                cutoff={0}
+              />
               <p className="ml-2">
-                {/* TODO: add proposalApproval */}
-                {`${proposal.data?.signatures?.length || "0"} / ${checkbook?.quorum || "N/A"}`}
+                {`${proposal.approvals.length || "0"} / ${checkbook?.quorum || "N/A"}`}
               </p>
             </div>
           </div>
@@ -196,7 +198,7 @@ const ProposalComponent = ({ accountProposal }) => {
           </div>
           <div className="basis-32 ml-3 mr-2 mb-2 self-center">
             <img
-              src={terminal?.data?.pfpURL}
+              src={terminal?.data?.pfpURL || DEFAULT_PFP_URLS.TERMINAL}
               alt="PFP"
               className="min-w-[46px] max-w-[46px] h-[46px] rounded cursor-pointer border border-wet-concrete"
               onError={(e) => {
