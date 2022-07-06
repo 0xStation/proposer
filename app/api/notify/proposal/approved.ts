@@ -1,7 +1,7 @@
 import db from "db"
 import * as z from "zod"
 import * as email from "app/utils/email"
-import { Account } from "app/account/types"
+import { Account, AccountMetadata } from "app/account/types"
 import { Proposal } from "app/proposal/types"
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
@@ -24,7 +24,11 @@ export default async function handler(req, res) {
       id: params.proposalId,
     },
     include: {
-      collaborators: true,
+      collaborators: {
+        include: {
+          account: true,
+        },
+      },
       rfp: {
         include: {
           terminal: true,
@@ -32,7 +36,7 @@ export default async function handler(req, res) {
       },
     },
   })) as unknown as Proposal & {
-    collaborators: Account[]
+    collaborators: { account: Account }[]
     rfp: Rfp & { terminal: Terminal }
   }
 
@@ -41,15 +45,13 @@ export default async function handler(req, res) {
     return
   }
 
-  const subject = email.templates.approvedProposal.subject
-  const body = email.templates.approvedProposal.body({
+  await email.approvedProposal({
+    recipients: data.collaborators
+      .map((ap) => (ap.account?.data as AccountMetadata)?.email || "")
+      .filter((s) => !!s),
     proposal: data,
     rfp: data.rfp,
     terminal: data.rfp.terminal,
-  })
-
-  data.collaborators.forEach((account) => {
-    email.send(account.address, subject, body)
   })
 
   res.status(200).json({ response: "success" })

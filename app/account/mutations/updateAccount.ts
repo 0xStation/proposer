@@ -1,7 +1,6 @@
 import db from "db"
 import * as z from "zod"
 import { Account } from "../types"
-import { set as setEmail, get as getEmail } from "app/utils/email"
 
 const UpdateAccount = z.object({
   name: z.string(),
@@ -31,16 +30,12 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
     return null
   }
 
-  if (input.email) {
-    setEmail(existingAccount.address || "", input.email)
-    console.log(getEmail(existingAccount.address || ""))
-  }
-
   const payload = {
     address: params.address,
     data: {
       name: params.name,
       bio: params.bio,
+      email: params.email,
       pfpURL: params.pfpURL,
       coverURL: params.coverURL,
       contactURL: params.contactURL,
