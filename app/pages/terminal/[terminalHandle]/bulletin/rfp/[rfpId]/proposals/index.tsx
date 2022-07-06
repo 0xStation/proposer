@@ -34,7 +34,8 @@ import { Proposal, ProposalStatus } from "app/proposal/types"
 import FilterPill from "app/core/components/FilterPill"
 import Pagination from "app/core/components/Pagination"
 import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpId"
-import useCheckbookBalance from "app/core/hooks/useCheckbookBalance"
+import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
+import { formatUnits } from "ethers/lib/utils"
 
 const ProposalsTab: BlitzPage = ({
   rfp,
@@ -79,8 +80,6 @@ const ProposalsTab: BlitzPage = ({
       setProposalCreatedConfirmationModal(true)
     }
   }, [proposalId])
-
-  const balances = useCheckbookBalance(rfp, terminal)
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
@@ -164,7 +163,6 @@ const ProposalsTab: BlitzPage = ({
                   proposal={proposal}
                   rfp={rfp}
                   key={idx}
-                  balances={balances}
                 />
               ))
             ) : proposals && rfp && !proposals.length ? (
@@ -192,14 +190,20 @@ const ProposalComponent = ({
   proposal,
   rfp,
   terminalHandle,
-  balances,
 }: {
   proposal: Proposal
   rfp: Rfp
   terminalHandle: string
-  balances: any
 }) => {
   const router = useRouter()
+
+  const funds = useCheckbookFunds(
+    rfp.checkbook?.chainId as number,
+    rfp.checkbook?.address as string,
+    rfp.checkbook?.quorum as number,
+    proposal.data?.funding.token
+  )
+  const available = formatUnits(funds?.available, funds?.decimals)
 
   return (
     <Link href={Routes.ProposalPage({ terminalHandle, rfpId: rfp.id, proposalId: proposal.id })}>
@@ -233,8 +237,7 @@ const ProposalComponent = ({
           </div>
           <div
             className={`basis-32 ml-6 mb-2 self-center relative group ${
-              balances[proposal.data?.funding.token].available < proposal.data.funding?.amount &&
-              "text-torch-red"
+              parseFloat(available) < proposal.data.funding?.amount && "text-torch-red"
             }`}
           >
             {proposal.data?.funding?.amount || "N/A"}
