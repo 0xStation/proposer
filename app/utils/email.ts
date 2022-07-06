@@ -9,13 +9,21 @@ import { Routes } from "blitz"
 const client = new PrivyClient(requireEnv("PRIVY_API_KEY"), requireEnv("PRIVY_API_SECRET"))
 
 const set = async (address: string, email: string) => {
-  const [res] = await client.put(address, [{ field: "email", value: email }])
-  return res?.text()
+  try {
+    const [res] = await client.put(address, [{ field: "email", value: email }])
+    return res?.text()
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 const get = async (address: string) => {
-  const [email] = await client.get(address, ["email"])
-  return email?.text()
+  try {
+    const [email] = await client.get(address, ["email"])
+    return email?.text()
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 const send = async (address: string, subject: string, body: string) => {

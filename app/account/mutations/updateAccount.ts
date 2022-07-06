@@ -1,11 +1,13 @@
 import db from "db"
 import * as z from "zod"
 import { Account } from "../types"
+import { set as setEmail, get as getEmail } from "app/utils/email"
 
 const UpdateAccount = z.object({
   name: z.string(),
   address: z.string().optional(),
   bio: z.string().optional(),
+  email: z.string().optional(),
   pfpURL: z.string().optional(),
   coverURL: z.string().optional(),
   contactURL: z.string().optional(),
@@ -27,6 +29,11 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
   if (!existingAccount) {
     console.error("cannot update an account that does not exist")
     return null
+  }
+
+  if (input.email) {
+    setEmail(existingAccount.address || "", input.email)
+    console.log(getEmail(existingAccount.address || ""))
   }
 
   const payload = {
