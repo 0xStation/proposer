@@ -40,7 +40,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
       hasAdminPermissionsFromTags ||
         !!terminal?.data?.permissions?.accountWhitelist?.includes(activeUser?.address as string)
     )
-  }, [terminal, activeUser?.address])
+  }, [terminal, activeUser?.address, hasAdminPermissionsFromTags])
 
   return (
     <div className="grid md:grid-cols-5">

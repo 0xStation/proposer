@@ -22,8 +22,8 @@ import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import arrayMutators from "final-form-arrays"
 import { FieldArray } from "react-final-form-arrays"
 import { TrashIcon } from "@heroicons/react/solid"
+import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 
-// maybe we can break this out into it's own component?
 const PfpInput = ({ pfpURL, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
     const formData = new FormData()
@@ -84,7 +84,15 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
 
   const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
 
-  if (!terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string)) {
+  const hasTagAdminPermissions = await invoke(hasAdminPermissionsBasedOnTags, {
+    terminalId: terminal?.id as number,
+    accountId: session?.userId as number,
+  })
+
+  if (
+    !terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string) &&
+    !hasTagAdminPermissions
+  ) {
     return {
       redirect: {
         destination: "/",
@@ -205,17 +213,18 @@ const TerminalSettingsPage: BlitzPage = () => {
                               {({ fields }) => (
                                 <div>
                                   {fields.map((name, index) => (
-                                    <Field
-                                      key={index}
-                                      name={`${name}`}
-                                      placeholder="Wallet address"
-                                      component="input"
-                                      validate={composeValidators(
-                                        mustBeUnderNumCharacters(50),
-                                        requiredField
-                                      )}
-                                      className="w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
-                                    />
+                                    <div key={index}>
+                                      <Field
+                                        name={`${name}`}
+                                        placeholder="Wallet address"
+                                        component="input"
+                                        validate={composeValidators(
+                                          mustBeUnderNumCharacters(50),
+                                          requiredField
+                                        )}
+                                        className="w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
+                                      />
+                                    </div>
                                   ))}
                                   <button
                                     type="button"
