@@ -1,8 +1,10 @@
+import set from "lodash.set"
 import truncateString from "app/core/utils/truncateString"
 import { TagType } from "app/tag/types"
 import db from "db"
 import * as z from "zod"
 import { Terminal } from "../types"
+import getAdminAccountsForTerminal from "app/permissions/queries/getAdminAccountsForTerminal"
 
 const UpdateTerminal = z.object({
   id: z.number(),
@@ -10,7 +12,7 @@ const UpdateTerminal = z.object({
   handle: z.string().optional(),
   pfpURL: z.string().optional(),
   guildId: z.string().optional(),
-  adminAddresses: z.string().array().optional(),
+  adminAddresses: z.string().array().optional().default([]),
 })
 
 export default async function updateTerminal(input: z.infer<typeof UpdateTerminal>) {
@@ -25,6 +27,7 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
     return null
   }
 
+  // create new admins or delete removed admins
   let updatedTerminalMetadata = JSON.parse(JSON.stringify(existingTerminal.data))
   if (input.adminAddresses) {
     const stationAdminTag = await db.tag.upsert({
@@ -43,6 +46,25 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
       },
     })
 
+    const terminalAdminAccounts = await getAdminAccountsForTerminal({
+      terminalId: input.id,
+    })
+
+    terminalAdminAccounts.forEach(async (terminalAdminAccount) => {
+      if (!input?.adminAddresses.includes(terminalAdminAccount?.address || "")) {
+        await db.accountTerminalTag.delete({
+          where: {
+            tagId_ticketAccountId_ticketTerminalId: {
+              tagId: stationAdminTag.id,
+              ticketAccountId: terminalAdminAccount.id,
+              ticketTerminalId: input.id,
+            },
+          },
+        })
+      }
+    })
+
+    // create accounts if the inputted address doesn't exist
     await db.account.createMany({
       skipDuplicates: true,
       data: input.adminAddresses.map((address) => {
@@ -63,6 +85,7 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
       },
     })
 
+    // give newly created accounts membership to the terminal
     await db.accountTerminal.createMany({
       skipDuplicates: true,
       data: adminAccounts.map((adminAccount) => {
@@ -84,10 +107,16 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
         }
       }),
     })
-
-    updatedTerminalMetadata.permissions.adminTagIdWhitelist = [stationAdminTag.id].concat(
-      existingTerminal.data.permissions.adminTagIdWhitelist || []
-    )
+    if (
+      updatedTerminalMetadata?.permissions?.adminTagIdWhitelist &&
+      !updatedTerminalMetadata?.permissions?.adminTagIdWhitelist.includes(stationAdminTag.id)
+    ) {
+      set(
+        updatedTerminalMetadata,
+        "permissions.adminTagIdWhitelist",
+        [stationAdminTag.id].concat(existingTerminal.data?.permissions?.adminTagIdWhitelist || [])
+      )
+    }
   }
   // Get tag if not create one for the terminal where they are a station admin -> make it a role
 

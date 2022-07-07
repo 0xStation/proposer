@@ -8,6 +8,7 @@ import {
   GetServerSideProps,
   invoke,
   getSession,
+  InferGetServerSidePropsType,
 } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Navigation from "app/terminal/components/settings/navigation"
@@ -25,9 +26,9 @@ import {
 } from "app/utils/validators"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import arrayMutators from "final-form-arrays"
-import { FieldArray } from "react-final-form-arrays"
-import { TrashIcon } from "@heroicons/react/solid"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
+import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
+import getAdminAccountsForTerminal from "app/permissions/queries/getAdminAccountsForTerminal"
 
 const PfpInput = ({ pfpURL, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
@@ -117,6 +118,11 @@ const TerminalSettingsPage: BlitzPage = () => {
   const [pfpURL, setPfpURL] = useState<string>("")
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+  const [adminAccounts] = useQuery(
+    getAdminAccountsForTerminal,
+    { terminalId: terminal?.id as number },
+    { suspense: false }
+  )
 
   const [updateTerminalMutation] = useMutation(updateTerminal, {
     onSuccess: (data) => {
@@ -148,7 +154,15 @@ const TerminalSettingsPage: BlitzPage = () => {
             <div>loading terminal...</div>
           ) : (
             <Form
-              initialValues={{ name: terminal.data.name, handle: terminal.handle } || {}}
+              initialValues={
+                {
+                  name: terminal.data.name,
+                  handle: terminal.handle,
+                  adminAddresses: adminAccounts
+                    ?.map((adminAccount) => adminAccount?.address)
+                    ?.join(",\n"),
+                } || {}
+              }
               mutators={{
                 ...arrayMutators,
               }}
@@ -156,6 +170,7 @@ const TerminalSettingsPage: BlitzPage = () => {
                 try {
                   await updateTerminalMutation({
                     ...values,
+                    adminAddresses: parseUniqueAddresses(values.adminAddresses || ""),
                     pfpURL: pfpURL,
                     id: terminal.id,
                   })
@@ -221,56 +236,34 @@ const TerminalSettingsPage: BlitzPage = () => {
                               Insert wallet addresses that are allowed to manage Terminal settings
                               and information. Addresses should be comma-separated.
                             </span>
-                            <FieldArray name="adminAddresses">
-                              {({ fields }) => (
+                            <Field
+                              name="adminAddresses"
+                              // automatically enter new lines for user
+                              format={(value = "") => {
+                                if (value && typeof value === "string") {
+                                  value?.replace(/,\s*|\s+/g, ",\n")
+                                }
+                              }}
+                            >
+                              {({ input }) => (
                                 <div>
-                                  {fields.map((name, index) => (
-                                    <div key={index}>
-                                      <Field name={`${name}`} validate={isAddress}>
-                                        {({ input, meta }) => (
-                                          <>
-                                            <input
-                                              {...input}
-                                              type="text"
-                                              placeholder="Wallet address"
-                                              className="w-3/4 sm:w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 text-marble-white"
-                                            />
-                                            {meta.error && meta.touched && (
-                                              <span className="text-xs text-torch-red mt-1 mb-1 block">
-                                                {meta.error}
-                                              </span>
-                                            )}
-                                          </>
-                                        )}
-                                      </Field>
-                                    </div>
-                                  ))}
-                                  <button
-                                    type="button"
-                                    className="pt-2 text-electric-violet"
-                                    onClick={(e) => {
-                                      e.preventDefault()
-                                      fields.push("")
-                                    }}
-                                  >
-                                    + Add admin
-                                  </button>
-                                  {fields && fields.length ? (
-                                    <button
-                                      type="button"
-                                      className="pl-8 text-torch-red"
-                                      onClick={(e) => {
-                                        e.preventDefault()
-                                        fields.pop()
-                                      }}
-                                    >
-                                      <TrashIcon className="w-4 h-4 fill-torch-red inline mr-1 mb-1" />
-                                      Remove
-                                    </button>
-                                  ) : null}
+                                  <textarea
+                                    {...input}
+                                    className="w-3/4 sm:w-[474px] bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
+                                    rows={6}
+                                    placeholder="Enter wallet addresses"
+                                  />
+                                  {/* user feedback on number of registered unique addresses, not an error */}
+                                  {input && (
+                                    <span className=" text-xs text-marble-white ml-2 mb-2 block">
+                                      {`${
+                                        parseUniqueAddresses(input.value || "").length
+                                      } unique addresses detected`}
+                                    </span>
+                                  )}
                                 </div>
                               )}
-                            </FieldArray>
+                            </Field>
                           </div>
                         </div>
                       </div>

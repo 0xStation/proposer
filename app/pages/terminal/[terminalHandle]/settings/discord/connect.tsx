@@ -100,7 +100,11 @@ const DiscordConnectPage: BlitzPage = () => {
       <Form
         initialValues={{}}
         onSubmit={async (values) => {
-          await updateTerminalMutation({ id: terminal.id, ...values })
+          //@ts-ignore
+          await updateTerminalMutation({
+            id: terminal.id,
+            ...values,
+          })
           refetch()
         }}
         render={({ form, handleSubmit }) => {
