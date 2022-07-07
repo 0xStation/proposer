@@ -33,6 +33,10 @@ export async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsByTermina
     skip: input.page * input.paginationTake,
   })
 
+  if (!rfps) {
+    return null
+  }
+
   return rfps.map((rfp) => {
     return {
       ...rfp,
