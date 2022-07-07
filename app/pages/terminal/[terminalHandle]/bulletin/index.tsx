@@ -33,7 +33,6 @@ const BulletinPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const setToastState = useStore((state) => state.setToastState)
   const session = useSession({ suspense: false })
-  const activeUser = useStore((state) => state.activeUser)
   const query = useRouterQuery()
   const [showRfpSuccessModal, setShowRfpSuccessModal] = useState<boolean>(false)
   const [terminal] = useQuery(
@@ -43,12 +42,14 @@ const BulletinPage: BlitzPage = () => {
   )
   const [hasTagAdminPermissions] = useQuery(
     hasAdminPermissionsBasedOnTags,
-    { terminalId: terminal?.id as number, accountId: activeUser?.id as number },
+    { terminalId: terminal?.id as number, accountId: session.userId as number },
     {
       suspense: false,
     }
   )
-  const isLoggedInAndIsAdmin = session.siwe?.address && hasTagAdminPermissions
+  const isLoggedInAndIsAdmin =
+    (session.siwe?.address && hasTagAdminPermissions) ||
+    terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string)
   const [rfpStatusFilters, setRfpStatusFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
 
   const [page, setPage] = useState<number>(0)
@@ -163,7 +164,7 @@ const BulletinPage: BlitzPage = () => {
               rfps?.map((rfp) => (
                 <RFPComponent rfp={rfp} terminalHandle={terminalHandle} key={rfp.id} />
               ))
-            ) : rfps && rfpStatusFilters?.size ? (
+            ) : (rfps && rfpStatusFilters?.size) || rfps?.length === 0 ? (
               <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
                 <p>No RFPs found</p>
                 <p>...</p>
