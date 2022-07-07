@@ -6,6 +6,10 @@
 
 <!--- Why is this change required? What problem does it solve? -->
 
+## Steps to test
+
+<!--- How can the reviewer reproduce your changes? -->
+
 ## Screenshots and/or [loom](https://www.loom.com/looms/videos) video
 
 ## Outstanding issues
