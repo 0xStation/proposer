@@ -19,6 +19,9 @@ import useStore from "app/core/hooks/useStore"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import { composeValidators, mustBeUnderNumCharacters, requiredField } from "app/utils/validators"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
+import arrayMutators from "final-form-arrays"
+import { FieldArray } from "react-final-form-arrays"
+import { TrashIcon } from "@heroicons/react/solid"
 
 // maybe we can break this out into it's own component?
 const PfpInput = ({ pfpURL, onUpload }) => {
@@ -133,7 +136,12 @@ const TerminalSettingsPage: BlitzPage = () => {
           ) : (
             <Form
               initialValues={{ name: terminal.data.name, handle: terminal.handle } || {}}
+              mutators={{
+                // potentially other mutators could be merged here
+                ...arrayMutators,
+              }}
               onSubmit={async (values) => {
+                console.log("values", values)
                 await updateTerminalMutation({
                   ...values,
                   pfpURL: pfpURL,
@@ -172,7 +180,7 @@ const TerminalSettingsPage: BlitzPage = () => {
                                 mustBeUnderNumCharacters(50),
                                 requiredField
                               )}
-                              className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
+                              className="w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
                             />
                             <span className="text-torch-red text-xs">{errors?.name}</span>
                             <label className="font-bold mt-6">Terminal handle*</label>
@@ -184,10 +192,57 @@ const TerminalSettingsPage: BlitzPage = () => {
                                 mustBeUnderNumCharacters(50),
                                 requiredField
                               )}
-                              className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-6"
+                              className="w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-6"
                             />
                             <span className="text-torch-red text-xs">{errors?.handle}</span>
                             <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
+                            <h3 className="font-bold mt-4">Admin addresses</h3>
+                            <span className="text-xs text-concrete block w-[474px]">
+                              Insert wallet addresses that are allowed to manage Terminal settings
+                              and information. Addresses should be comma-separated.
+                            </span>
+                            <FieldArray name="adminAddresses">
+                              {({ fields }) => (
+                                <div>
+                                  {fields.map((name, index) => (
+                                    <Field
+                                      key={index}
+                                      name={`${name}`}
+                                      placeholder="Wallet address"
+                                      component="input"
+                                      validate={composeValidators(
+                                        mustBeUnderNumCharacters(50),
+                                        requiredField
+                                      )}
+                                      className="w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
+                                    />
+                                  ))}
+                                  <button
+                                    type="button"
+                                    className="pt-2 text-electric-violet"
+                                    onClick={(e) => {
+                                      e.preventDefault()
+                                      fields.push("")
+                                    }}
+                                  >
+                                    + Add admin
+                                  </button>
+                                  {fields && fields.length ? (
+                                    <button
+                                      type="button"
+                                      className="pl-8 text-torch-red"
+                                      onClick={(e) => {
+                                        e.preventDefault()
+                                        fields.pop()
+                                      }}
+                                    >
+                                      <TrashIcon className="w-4 h-4 fill-torch-red inline mr-1 mb-1" />
+                                      Remove
+                                    </button>
+                                  ) : null}
+                                </div>
+                              )}
+                            </FieldArray>
                           </div>
                         </div>
                       </div>
