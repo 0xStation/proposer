@@ -87,7 +87,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                   RFP_STATUS_DISPLAY_MAP[rfp?.status as string]?.color
                 }`}
               />
-              <span className="text-xs uppercase tracking-wider">
+              <span className="text-xs uppercase tracking-wider font-bold">
                 {RFP_STATUS_DISPLAY_MAP[rfp?.status as string]?.copy}
               </span>
             </div>

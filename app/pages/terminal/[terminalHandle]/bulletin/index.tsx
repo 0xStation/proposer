@@ -193,7 +193,7 @@ const RFPComponent = ({ rfp, terminalHandle }) => {
       <div className="w-full border-b border-concrete cursor-pointer hover:bg-wet-concrete pt-5">
         <div className="flex flex-row items-center space-x-2 ml-6">
           <span className={`h-2 w-2 rounded-full ${RFP_STATUS_DISPLAY_MAP[rfp.status]?.color}`} />
-          <span className="text-xs uppercase tracking-wider">
+          <span className="text-xs uppercase tracking-wider font-bold">
             {RFP_STATUS_DISPLAY_MAP[rfp.status]?.copy}
           </span>
         </div>

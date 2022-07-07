@@ -176,7 +176,7 @@ const RfpMarkdownForm = ({
                         RFP_STATUS_DISPLAY_MAP[rfp?.status || "DRAFT"]?.color
                       }`}
                     />
-                    <span className="text-xs uppercase tracking-wider">
+                    <span className="text-xs uppercase tracking-wider font-bold">
                       {RFP_STATUS_DISPLAY_MAP[rfp?.status || "DRAFT"]?.copy}
                     </span>
                   </div>
