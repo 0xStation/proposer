@@ -1,5 +1,6 @@
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
 import isURL from "validator/lib/isURL"
+import isEmail from "validator/lib/isEmail"
 
 // reducer that takes in an array of validators (functions) and returns the appropriate error
 // useful if you have a form field that has a few different validations (required field, must be number, etc)
@@ -59,4 +60,8 @@ export const uniqueName = (names: string[]) => {
       ? "Name already exists"
       : undefined
   }
+}
+
+export const isValidEmail = (email: string) => {
+  return isEmail(email) ? undefined : "Invalid email"
 }

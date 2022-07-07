@@ -17,6 +17,7 @@ import {
   requiredField,
   composeValidators,
   mustBeUnderNumCharacters,
+  isValidEmail,
 } from "app/utils/validators"
 
 interface ApplicationParams {
@@ -219,7 +220,7 @@ const AccountForm = ({
             </div>
             <div className="flex flex-col mt-6">
               <label htmlFor="bio" className="text-marble-white font-bold">
-                About
+                Description
               </label>
               <p className="text-concrete text-sm">150 characters max</p>
               <Field component="textarea" name="bio" validate={mustBeUnderNumCharacters(150)}>
@@ -233,6 +234,39 @@ const AccountForm = ({
                     {/* this error shows up when the user focuses the field (meta.touched) */}
                     {meta.error && meta.touched && (
                       <span className=" text-xs text-torch-red block">{meta.error}</span>
+                    )}
+                  </div>
+                )}
+              </Field>
+            </div>
+            <div className="flex flex-col mt-6">
+              <label htmlFor="name" className="text-marble-white text-base font-bold">
+                Email
+              </label>
+              <p className="text-concrete text-sm">
+                Only reviewers of your proposal can contact you via email. Your email won&apos;t be
+                displayed or shared with anyone.
+                {/* TODO: temporary link, will redirect to documentation */}
+                <a href="https://station.express">
+                  <span className="text-electric-violet font-bold"> Learn more</span>
+                </a>
+              </p>
+              <Field
+                component="input"
+                name="email"
+                validate={composeValidators(requiredField, isValidEmail)}
+              >
+                {({ input, meta }) => (
+                  <div>
+                    <input
+                      {...input}
+                      type="text"
+                      placeholder="e.g. member@dao.xyz"
+                      className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 rounded w-full"
+                    />
+                    {/* this error shows up when the user focuses the field (meta.touched) */}
+                    {meta.error && meta.touched && (
+                      <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
                     )}
                   </div>
                 )}

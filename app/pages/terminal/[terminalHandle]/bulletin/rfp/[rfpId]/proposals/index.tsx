@@ -12,9 +12,11 @@ import {
   InferGetServerSidePropsType,
   invoke,
 } from "blitz"
+import useStore from "app/core/hooks/useStore"
 import Layout from "app/core/layouts/Layout"
 import Modal from "app/core/components/Modal"
 import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
+import GetNotifiedModal from "app/proposal/components/GetNotifiedModal"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
@@ -41,6 +43,7 @@ const ProposalsTab: BlitzPage = ({
   rfp,
   terminal,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const activeUser = useStore((state) => state.activeUser)
   const { proposalId } = useRouterQuery() as { proposalId: string }
   const terminalHandle = useParam("terminalHandle") as string
   const rfpId = useParam("rfpId") as string
@@ -73,16 +76,24 @@ const ProposalsTab: BlitzPage = ({
 
   const [proposalCreatedConfirmationModal, setProposalCreatedConfirmationModal] =
     useState<boolean>(false)
-  const [linkCopied, setLinkCopied] = useState<boolean>(false)
+
+  const [isGetNotifiedModalOpen, setIsGetNotifiedModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
     if (proposalId) {
-      setProposalCreatedConfirmationModal(true)
+      if (!activeUser?.data.email) {
+        setIsGetNotifiedModalOpen(true)
+      } else {
+        setProposalCreatedConfirmationModal(true)
+      }
     }
-  }, [proposalId])
+  }, [proposalId, activeUser])
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
+      {terminal && activeUser && (
+        <GetNotifiedModal isOpen={isGetNotifiedModalOpen} setIsOpen={setIsGetNotifiedModalOpen} />
+      )}
       {terminal && (
         <SuccessProposalModal
           terminal={terminal}
@@ -91,33 +102,6 @@ const ProposalsTab: BlitzPage = ({
           isOpen={proposalCreatedConfirmationModal}
           setIsOpen={setProposalCreatedConfirmationModal}
         />
-      )}
-      {terminal && (
-        <Modal open={proposalCreatedConfirmationModal} toggle={setProposalCreatedConfirmationModal}>
-          <div className="p-2">
-            <h3 className="text-2xl font-bold pt-6">Request successfully published!</h3>
-            <p className="mt-2">
-              Copy the link to share with your community and let the waves of ideas carry you to the
-              exciting future of {terminal.data.name}.
-            </p>
-            <div className="mt-8">
-              <button
-                type="button"
-                className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
-                onClick={() => {
-                  setLinkCopied(true)
-                  navigator.clipboard.writeText(
-                    genPathFromUrlObject(
-                      Routes.ProposalPage({ terminalHandle, rfpId: rfpId, proposalId: proposalId })
-                    )
-                  )
-                }}
-              >
-                {linkCopied ? "Copied!" : "Copy link"}
-              </button>
-            </div>
-          </div>
-        </Modal>
       )}
       <TerminalNavigation>
         <RfpHeaderNavigation rfpId={rfpId} />
