@@ -229,10 +229,12 @@ const ProposalPage: BlitzPage = ({
               <h4 className="text-xs font-bold text-concrete uppercase mt-6">
                 Request for Proposal
               </h4>
-              <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })}>
-                <p className="mt-2 text-electric-violet cursor-pointer">
-                  {rfp?.data.content.title}
-                </p>
+              <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })} passHref>
+                <a target="_blank" rel="noopener noreferrer">
+                  <p className="mt-2 text-electric-violet cursor-pointer">
+                    {rfp?.data.content.title}
+                  </p>
+                </a>
               </Link>
               <h4 className="text-xs font-bold text-concrete uppercase mt-6">Total Amount</h4>
               <p className="mt-2 font-normal">{`${proposal?.data.funding.amount} ${tokenSymbol}`}</p>

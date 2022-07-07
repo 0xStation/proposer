@@ -160,7 +160,7 @@ const CreateProposalPage: BlitzPage = ({
                         {...input}
                         type="text"
                         placeholder="Give your idea a title..."
-                        className="bg-tunnel-black text-3xl ml-2 w-full outline-none"
+                        className="bg-tunnel-black text-3xl font-bold w-full outline-none"
                       />
                     )}
                   </Field>
@@ -245,10 +245,12 @@ const CreateProposalPage: BlitzPage = ({
                     <h4 className="text-xs font-bold text-concrete uppercase mt-6">
                       Request for Proposal
                     </h4>
-                    <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: data.rfp.id })}>
-                      <p className="mt-2 text-electric-violet cursor-pointer">
-                        {data.rfp.data.content.title}
-                      </p>
+                    <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: data.rfp.id })} passHref>
+                      <a target="_blank" rel="noopener noreferrer">
+                        <p className="mt-2 text-electric-violet cursor-pointer">
+                          {data.rfp.data.content.title}
+                        </p>
+                      </a>
                     </Link>
                     <label className="font-bold block mt-6">Fund recipient*</label>
                     <span className="text-xs text-concrete block">
