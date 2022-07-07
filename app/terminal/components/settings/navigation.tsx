@@ -18,7 +18,7 @@ const Navigation = ({ children }) => {
   const navigationContent = (
     <>
       <div className="fixed mt-5 sm:mt-0">
-        <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>
+        <Link href={Routes.BulletinPage({ terminalHandle })}>
           <label className="font-bold text-sm text-marble-white uppercase tracking-wider cursor-pointer">
             {terminal?.data.name || terminalHandle}
           </label>
@@ -135,9 +135,7 @@ const Navigation = ({ children }) => {
                   </button>
                   {navigationContent}
                   <div className="fixed bottom-6 left-6">
-                    <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>
-                      Back to Members
-                    </Link>
+                    <Link href={Routes.BulletinPage({ terminalHandle })}>Back to Bulletin</Link>
                   </div>
                 </div>
               </div>
@@ -157,7 +155,7 @@ const Navigation = ({ children }) => {
         <SettingsIcon width={25} height={25} />
       </div>
       <div className="absolute top-4 left-4 cursor-pointer hidden sm:block">
-        <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>
+        <Link href={Routes.BulletinPage({ terminalHandle })}>
           <Image src={Exit} alt="Close button" width={12} height={12} />
         </Link>
       </div>

@@ -8,7 +8,7 @@ const HasAdminPermissionsBasedOnTags = z.object({
 })
 
 // returns true/false whether user has admin permissions
-// ( can access to all of the terminal settings subpages)
+// (user can access all of the terminal settings subpages and create rfps)
 // based on whether they have the right tags associated with
 // their account.
 export default async function hasAdminPermissionsBasedOnTags(

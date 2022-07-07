@@ -1,4 +1,16 @@
-import { BlitzPage, useMutation, useParam, useQuery, Link, Image, Routes, useRouter } from "blitz"
+import {
+  BlitzPage,
+  useMutation,
+  useParam,
+  useQuery,
+  Link,
+  Image,
+  Routes,
+  useRouter,
+  GetServerSideProps,
+  getSession,
+  invoke,
+} from "blitz"
 import { useState } from "react"
 import { Field, Form } from "react-final-form"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
@@ -15,6 +27,43 @@ import { useCreateCheckbookOnChain } from "app/contracts/checkbook"
 import { useWaitForTransaction } from "wagmi"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { Spinner } from "app/core/components/Spinner"
+import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
+
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
+  const session = await getSession(req, res)
+
+  if (!session?.userId) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
+
+  const hasTagAdminPermissions = await invoke(hasAdminPermissionsBasedOnTags, {
+    terminalId: terminal?.id as number,
+    accountId: session?.userId as number,
+  })
+
+  if (
+    !terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string) &&
+    !hasTagAdminPermissions
+  ) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
 
 const NewCheckbookSettingsPage: BlitzPage = () => {
   const router = useRouter()

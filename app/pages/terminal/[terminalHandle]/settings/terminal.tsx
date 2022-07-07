@@ -150,7 +150,6 @@ const TerminalSettingsPage: BlitzPage = () => {
             <Form
               initialValues={{ name: terminal.data.name, handle: terminal.handle } || {}}
               mutators={{
-                // potentially other mutators could be merged here
                 ...arrayMutators,
               }}
               onSubmit={async (values) => {
@@ -192,7 +191,7 @@ const TerminalSettingsPage: BlitzPage = () => {
                                 mustBeUnderNumCharacters(50),
                                 requiredField
                               )}
-                              className="w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
+                              className="w-3/4 sm:w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
                             />
                             <span className="text-torch-red text-xs">{errors?.name}</span>
                             <label className="font-bold mt-6">Terminal handle*</label>
@@ -204,12 +203,12 @@ const TerminalSettingsPage: BlitzPage = () => {
                                 mustBeUnderNumCharacters(50),
                                 requiredField
                               )}
-                              className="w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-6"
+                              className="w-3/4 sm:w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-6"
                             />
                             <span className="text-torch-red text-xs">{errors?.handle}</span>
                             <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
                             <h3 className="font-bold mt-4">Admin addresses</h3>
-                            <span className="text-xs text-concrete block w-[474px]">
+                            <span className="text-xs text-concrete block w-3/4 sm:w-[474px]">
                               Insert wallet addresses that are allowed to manage Terminal settings
                               and information. Addresses should be comma-separated.
                             </span>
@@ -225,7 +224,7 @@ const TerminalSettingsPage: BlitzPage = () => {
                                               {...input}
                                               type="text"
                                               placeholder="Wallet address"
-                                              className="w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 text-marble-white"
+                                              className="w-3/4 sm:w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 text-marble-white"
                                             />
                                             {meta.error && meta.touched && (
                                               <span className="text-xs text-torch-red mt-1 mb-1 block">
