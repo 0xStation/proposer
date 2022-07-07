@@ -115,7 +115,6 @@ const BulletinPage: BlitzPage = () => {
         <div className="max-h-[250px] sm:h-[130px] border-b border-concrete">
           <div className="flex flex-row items-center ml-6 pt-7 justify-between mr-4">
             <h1 className="text-2xl font-bold">Bulletin</h1>
-            {/* TODO: add permissioning checks */}
             {isLoggedInAndIsAdmin && (
               <button
                 className="h-[35px] bg-electric-violet px-9 rounded text-tunnel-black hover:bg-opacity-70"
