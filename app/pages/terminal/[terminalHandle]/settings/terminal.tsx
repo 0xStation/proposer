@@ -17,7 +17,12 @@ import UploadIcon from "app/core/icons/UploadIcon"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
-import { composeValidators, mustBeUnderNumCharacters, requiredField } from "app/utils/validators"
+import {
+  composeValidators,
+  mustBeUnderNumCharacters,
+  requiredField,
+  isAddress,
+} from "app/utils/validators"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import arrayMutators from "final-form-arrays"
 import { FieldArray } from "react-final-form-arrays"
@@ -149,7 +154,6 @@ const TerminalSettingsPage: BlitzPage = () => {
                 ...arrayMutators,
               }}
               onSubmit={async (values) => {
-                console.log("values", values)
                 await updateTerminalMutation({
                   ...values,
                   pfpURL: pfpURL,
@@ -214,16 +218,23 @@ const TerminalSettingsPage: BlitzPage = () => {
                                 <div>
                                   {fields.map((name, index) => (
                                     <div key={index}>
-                                      <Field
-                                        name={`${name}`}
-                                        placeholder="Wallet address"
-                                        component="input"
-                                        validate={composeValidators(
-                                          mustBeUnderNumCharacters(50),
-                                          requiredField
+                                      <Field name={`${name}`} validate={isAddress}>
+                                        {({ input, meta }) => (
+                                          <>
+                                            <input
+                                              {...input}
+                                              type="text"
+                                              placeholder="Wallet address"
+                                              className="w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 text-marble-white"
+                                            />
+                                            {meta.error && meta.touched && (
+                                              <span className="text-xs text-torch-red mt-1 mb-1 block">
+                                                {meta.error}
+                                              </span>
+                                            )}
+                                          </>
                                         )}
-                                        className="w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
-                                      />
+                                      </Field>
                                     </div>
                                   ))}
                                   <button

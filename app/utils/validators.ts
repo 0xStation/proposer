@@ -1,4 +1,4 @@
-import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
+import { utils } from "ethers"
 import isURL from "validator/lib/isURL"
 
 // reducer that takes in an array of validators (functions) and returns the appropriate error
@@ -59,4 +59,8 @@ export const uniqueName = (names: string[]) => {
       ? "Name already exists"
       : undefined
   }
+}
+
+export const isAddress = (address: string) => {
+  return utils.isAddress(address) ? undefined : "Not a valid address"
 }
