@@ -8,7 +8,6 @@ import {
   GetServerSideProps,
   invoke,
   getSession,
-  InferGetServerSidePropsType,
 } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Navigation from "app/terminal/components/settings/navigation"
@@ -18,14 +17,8 @@ import UploadIcon from "app/core/icons/UploadIcon"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
-import {
-  composeValidators,
-  mustBeUnderNumCharacters,
-  requiredField,
-  isAddress,
-} from "app/utils/validators"
+import { composeValidators, mustBeUnderNumCharacters, requiredField } from "app/utils/validators"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
-import arrayMutators from "final-form-arrays"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
 import getAdminAccountsForTerminal from "app/permissions/queries/getAdminAccountsForTerminal"
@@ -163,9 +156,6 @@ const TerminalSettingsPage: BlitzPage = () => {
                     ?.join(",\n"),
                 } || {}
               }
-              mutators={{
-                ...arrayMutators,
-              }}
               onSubmit={async (values) => {
                 try {
                   await updateTerminalMutation({
@@ -236,11 +226,8 @@ const TerminalSettingsPage: BlitzPage = () => {
                               Insert wallet addresses that are allowed to manage Terminal settings
                               and information. Addresses should be comma-separated.
                             </span>
-                            <Field
-                              name="adminAddresses"
-                              // automatically enter new lines for user
-                            >
-                              {({ input }) => (
+                            <Field name="adminAddresses" component="textarea">
+                              {({ input, meta }) => (
                                 <div>
                                   <textarea
                                     {...input}
@@ -254,6 +241,11 @@ const TerminalSettingsPage: BlitzPage = () => {
                                       {`${
                                         parseUniqueAddresses(input.value || "").length
                                       } unique addresses detected`}
+                                    </span>
+                                  )}
+                                  {errors?.adminAddresses && (
+                                    <span className=" text-xs text-torch-red mb-2 block">
+                                      {errors?.adminAddresses}
                                     </span>
                                   )}
                                 </div>
