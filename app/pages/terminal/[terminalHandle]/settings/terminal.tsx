@@ -239,11 +239,6 @@ const TerminalSettingsPage: BlitzPage = () => {
                             <Field
                               name="adminAddresses"
                               // automatically enter new lines for user
-                              format={(value = "") => {
-                                if (value && typeof value === "string") {
-                                  value?.replace(/,\s*|\s+/g, ",\n")
-                                }
-                              }}
                             >
                               {({ input }) => (
                                 <div>
