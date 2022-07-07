@@ -14,25 +14,30 @@ const HasAdminPermissionsBasedOnTags = z.object({
 export default async function hasAdminPermissionsBasedOnTags(
   input: z.infer<typeof HasAdminPermissionsBasedOnTags>
 ) {
-  const terminal = await db.terminal.findFirst({
-    where: { id: input.terminalId },
-  })
+  try {
+    const terminal = await db.terminal.findFirst({
+      where: { id: input.terminalId },
+    })
 
-  if (!terminal) {
+    if (!terminal) {
+      return false
+    }
+
+    const adminTagIdWhitelist = (terminal?.data as TerminalMetadata)?.permissions
+      ?.adminTagIdWhitelist
+
+    const containsTag = await db.accountTerminalTag.findFirst({
+      where: {
+        ticketAccountId: input.accountId,
+        ticketTerminalId: input.terminalId,
+        AND: {
+          tagId: { in: adminTagIdWhitelist },
+        },
+      },
+    })
+    return !!containsTag
+  } catch (err) {
+    console.error("Failed check if user has admin permissions based on tags with error", err)
     return false
   }
-
-  const adminTagIdWhitelist = (terminal?.data as TerminalMetadata)?.permissions?.adminTagIdWhitelist
-
-  const containsTag = await db.accountTerminalTag.findFirst({
-    where: {
-      ticketAccountId: input.accountId,
-      ticketTerminalId: input.terminalId,
-      AND: {
-        tagId: { in: adminTagIdWhitelist },
-      },
-    },
-  })
-
-  return !!containsTag
 }

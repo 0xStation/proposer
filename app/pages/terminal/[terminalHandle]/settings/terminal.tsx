@@ -153,11 +153,20 @@ const TerminalSettingsPage: BlitzPage = () => {
                 ...arrayMutators,
               }}
               onSubmit={async (values) => {
-                await updateTerminalMutation({
-                  ...values,
-                  pfpURL: pfpURL,
-                  id: terminal.id,
-                })
+                try {
+                  await updateTerminalMutation({
+                    ...values,
+                    pfpURL: pfpURL,
+                    id: terminal.id,
+                  })
+                } catch (err) {
+                  console.error("Failed to update terminal with error: ", err)
+                  setToastState({
+                    isToastShowing: true,
+                    type: "error",
+                    message: "Something went wrong!",
+                  })
+                }
               }}
               render={({ form, handleSubmit }) => {
                 let formState = form.getState()
