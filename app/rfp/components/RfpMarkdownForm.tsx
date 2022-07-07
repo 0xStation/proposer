@@ -233,7 +233,7 @@ const RfpMarkdownForm = ({
                     <span className="font-bold cursor-pointer">General</span>
                     <div className="flex flex-row space-x-1 items-center cursor-not-allowed">
                       <LockClosedIcon className="h-4 w-4 hover:stroke-light-concrete text-concrete" />
-                      <span className="text-concrete">Permission</span>
+                      <span className="text-concrete">Custom questions</span>
                     </div>
                   </div>
                   <form className="p-4 grow flex flex-col justify-between">

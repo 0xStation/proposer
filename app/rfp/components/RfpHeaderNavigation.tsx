@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter, Link, Routes, useParam, useQuery } from "blitz"
 import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import getRfpById from "../queries/getRfpById"
@@ -24,9 +24,19 @@ const RfpHeaderNavigation = ({ rfpId }) => {
   const [isClosedRfpModalOpen, setIsClosedRfpModalOpen] = useState<boolean>(false)
   const [isReopenRfpModalOpen, setIsReopenRfpModalOpen] = useState<boolean>(false)
   const [deleteRfpModalOpen, setDeleteRfpModalOpen] = useState<boolean>(false)
+  const [rfpOpen, setRfpOpen] = useState<boolean>(false)
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
   const router = useRouter()
   const setToastState = useStore((state) => state.setToastState)
+
+  useEffect(() => {
+    if (rfp) {
+      const today = new Date()
+      if (today > rfp.startDate || (rfp.endDate && today < rfp.endDate)) {
+        setRfpOpen(true)
+      }
+    }
+  }, [rfp])
 
   if (!rfp) {
     return <></>
@@ -51,10 +61,11 @@ const RfpHeaderNavigation = ({ rfpId }) => {
             RFP: {rfp?.data?.content?.title}
           </p>
           <button
-            className="bg-electric-violet text-tunnel-black rounded h-[35px] px-9 hover:bg-opacity-70"
+            className={`${
+              rfpOpen ? "bg-electric-violet" : "bg-concrete cursor-not-allowed"
+            } text-tunnel-black rounded h-[35px] px-9 hover:bg-opacity-70`}
             onClick={() => {
-              const today = new Date()
-              if (today > rfp?.startDate) {
+              if (rfpOpen) {
                 router.push(Routes.CreateProposalPage({ terminalHandle, rfpId }))
               } else {
                 setToastState({

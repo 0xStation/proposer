@@ -53,8 +53,11 @@ const CheckbookIndicator = ({ terminal, checkbook }) => {
       <div className="mt-4">
         <LinearProgressIndicator value={cashed} max={total} color="magic-mint" title="Cashed" />
       </div>
-      <div className="mt-4">
+      <div className="mt-4 relative group">
         <LinearProgressIndicator value={pending} max={total} color="neon-carrot" title="Pending" />
+        <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[120%] left-[10%] w-[80%] group hidden group-hover:block shadow-lg z-50">
+          Overallocated. You will not be able to approve all proposals.
+        </span>
       </div>
     </div>
   )

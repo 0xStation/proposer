@@ -266,7 +266,7 @@ const ProposalPage: BlitzPage = ({
                 </div>
               </div>
             </div>
-            {checks?.length && check && (
+            {check && (
               <div className="p-6 grow flex flex-col justify-between">
                 <div className="mt-6">
                   <p className="text-xs text-concrete uppercase font-bold">Check</p>

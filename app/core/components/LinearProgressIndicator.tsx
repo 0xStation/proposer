@@ -1,18 +1,6 @@
-import { useEffect, useState } from "react"
 import * as Progress from "@radix-ui/react-progress"
 
 const LinearProgressIndicator = ({ value, max, color, title }) => {
-  const [updatedValue, setValue] = useState(value)
-
-  useEffect(() => {
-    if (value) {
-      setValue(value)
-      if (max === 0) {
-        setValue(0)
-      }
-    }
-  }, [value])
-
   return (
     <div className="flex flex-col space-y-1">
       <div className="flex justify-between items-center">
@@ -21,21 +9,27 @@ const LinearProgressIndicator = ({ value, max, color, title }) => {
           <div className="font-bold text-xs uppercase tracking-wider">{title}</div>
         </div>
         <div className="text-xs">
-          <span className="text-lg font-bold">{updatedValue}</span> / {max}
+          <span className="text-lg font-bold">{value}</span> / {max}
         </div>
       </div>
       <Progress.Root
-        value={updatedValue}
+        value={value}
         max={max}
         className="h-2 w-full bg-concrete relative overflow-hidden"
       >
-        <Progress.Indicator
-          className={`w-full h-full bg-${color} transition-transform duration-500`}
-          style={{
-            // needs to be == because type misalignment? parseInt + `===` does not work?
-            transform: `translateX(-${max == 0 ? 100 : ((max - updatedValue) / max) * 100}%)`,
-          }}
-        />
+        {value > max ? (
+          <Progress.Indicator
+            className={`w-full h-full bg-torch-red transition-transform duration-500`}
+          />
+        ) : (
+          <Progress.Indicator
+            className={`w-full h-full bg-${color} transition-transform duration-500`}
+            style={{
+              // needs to be == because type misalignment? parseInt + `===` does not work?
+              transform: `translateX(-${max == 0 ? 100 : ((max - value) / max) * 100}%)`,
+            }}
+          />
+        )}
       </Progress.Root>
     </div>
   )
