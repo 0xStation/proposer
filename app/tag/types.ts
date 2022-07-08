@@ -1,3 +1,7 @@
+export enum StationPlatformTagValues {
+  STATION_ADMIN = "station admin",
+}
+
 export enum TagType {
   STATUS = "status",
   ROLE = "role",

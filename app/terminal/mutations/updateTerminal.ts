@@ -1,6 +1,6 @@
 import set from "lodash.set"
 import truncateString from "app/core/utils/truncateString"
-import { TagType } from "app/tag/types"
+import { StationPlatformTagValues, TagType } from "app/tag/types"
 import db from "db"
 import * as z from "zod"
 import { Terminal } from "../types"
@@ -33,14 +33,14 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
     const stationAdminTag = await db.tag.upsert({
       where: {
         value_terminalId: {
-          value: "station admin",
+          value: StationPlatformTagValues.STATION_ADMIN,
           terminalId: input.id,
         },
       },
       update: {},
       create: {
         terminalId: input.id,
-        value: "station admin",
+        value: StationPlatformTagValues.STATION_ADMIN,
         active: true,
         type: TagType.ROLE,
       },
@@ -50,19 +50,26 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
       terminalId: input.id,
     })
 
-    terminalAdminAccounts.forEach(async (terminalAdminAccount) => {
-      if (!input?.adminAddresses.includes(terminalAdminAccount?.address || "")) {
-        await db.accountTerminalTag.delete({
-          where: {
-            tagId_ticketAccountId_ticketTerminalId: {
-              tagId: stationAdminTag.id,
-              ticketAccountId: terminalAdminAccount.id,
-              ticketTerminalId: input.id,
+    // remove station admin account tag association from users who aren't
+    // included in the adminAddresses input array but are currently admins
+    await db.$transaction(
+      terminalAdminAccounts
+        .filter(
+          (terminalAdminAccount) =>
+            !input?.adminAddresses.includes(terminalAdminAccount?.address || "")
+        )
+        .map((terminalAdminAccount) => {
+          return db.accountTerminalTag.delete({
+            where: {
+              tagId_ticketAccountId_ticketTerminalId: {
+                tagId: stationAdminTag.id,
+                ticketAccountId: terminalAdminAccount.id,
+                ticketTerminalId: input.id,
+              },
             },
-          },
+          })
         })
-      }
-    })
+    )
 
     // create accounts if the inputted address doesn't exist
     await db.account.createMany({
@@ -97,6 +104,7 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
       }),
     })
 
+    // create account tag association for station admin tag and inputted admin accounts
     await db.accountTerminalTag.createMany({
       skipDuplicates: true,
       data: adminAccounts.map((account) => {
@@ -107,10 +115,14 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
         }
       }),
     })
+
+    // If the station admin tag isn't already added to the admin permission whitelist, add it
     if (
       updatedTerminalMetadata?.permissions?.adminTagIdWhitelist &&
       !updatedTerminalMetadata?.permissions?.adminTagIdWhitelist.includes(stationAdminTag.id)
     ) {
+      // https://lodash.com/docs/4.17.15#set
+      // > Sets the value at path of object. If a portion of path doesn't exist, it's created.
       set(
         updatedTerminalMetadata,
         "permissions.adminTagIdWhitelist",
@@ -118,7 +130,6 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
       )
     }
   }
-  // Get tag if not create one for the terminal where they are a station admin -> make it a role
 
   /**
    * required so we can use this function and pass in any or all optional params without wiping out the old ones.

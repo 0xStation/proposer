@@ -61,6 +61,10 @@ export default async function createCheckbook(input: z.infer<typeof CreateCheckb
       value: input.name,
       active: true,
       type: TagType.CHECKBOOK_SIGNER,
+      data: {
+        chainId: input.chainId,
+        address: input.address,
+      },
     },
   })
 

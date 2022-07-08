@@ -42,9 +42,13 @@ export const getAdminAccountsForTerminal = async (
       },
     })
 
-    return adminAccountTerminalTags.map(
+    const adminAccounts = adminAccountTerminalTags.map(
       (adminAccountTerminalTag) => adminAccountTerminalTag.ticket.account
     ) as Account[]
+
+    const uniqueAdminAccounts = new Set(adminAccounts)
+
+    return Array.from(uniqueAdminAccounts)
   } catch (err) {
     console.error("Failed query getAdminAccountsForTerminal", err)
     return []
