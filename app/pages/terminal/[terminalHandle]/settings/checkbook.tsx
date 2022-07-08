@@ -1,5 +1,15 @@
 import { useState } from "react"
-import { BlitzPage, Link, Routes, useParam, useQuery, useRouterQuery } from "blitz"
+import {
+  BlitzPage,
+  GetServerSideProps,
+  getSession,
+  invoke,
+  Link,
+  Routes,
+  useParam,
+  useQuery,
+  useRouterQuery,
+} from "blitz"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import Navigation from "app/terminal/components/settings/navigation"
 import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
@@ -13,6 +23,43 @@ import networks from "app/utils/networks.json"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import getFundingTokens from "app/core/utils/getFundingTokens"
 import CheckbookIndicator from "app/core/components/CheckbookIndicator"
+import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
+
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
+  const session = await getSession(req, res)
+
+  if (!session?.userId) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
+
+  const hasTagAdminPermissions = await invoke(hasAdminPermissionsBasedOnTags, {
+    terminalId: terminal?.id as number,
+    accountId: session?.userId as number,
+  })
+
+  if (
+    !terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string) &&
+    !hasTagAdminPermissions
+  ) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
 
 const CheckbookSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string

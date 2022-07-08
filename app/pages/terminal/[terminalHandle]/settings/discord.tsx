@@ -22,6 +22,7 @@ import useGuildMembers from "app/core/hooks/useGuildMembers"
 import NoSsr from "app/core/components/NoSsr"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import useStore from "app/core/hooks/useStore"
+import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   const session = await getSession(req, res)
@@ -37,7 +38,15 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
 
   const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
 
-  if (!terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string)) {
+  const hasTagAdminPermissions = await invoke(hasAdminPermissionsBasedOnTags, {
+    terminalId: terminal?.id as number,
+    accountId: session?.userId as number,
+  })
+
+  if (
+    !terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string) &&
+    !hasTagAdminPermissions
+  ) {
     return {
       redirect: {
         destination: "/",

@@ -1,12 +1,58 @@
 import { useState } from "react"
-import { BlitzPage, Link, Routes, useParam, useQuery } from "blitz"
+import {
+  BlitzPage,
+  GetServerSideProps,
+  Link,
+  Routes,
+  useParam,
+  useQuery,
+  getSession,
+  invoke,
+} from "blitz"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import Navigation from "app/terminal/components/settings/navigation"
 import getGroupedTagsByTerminalId from "app/tag/queries/getGroupedTagsByTerminalId"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { Tag } from "app/tag/types"
 import networks from "app/utils/networks.json"
+import hasAdminPermissionsBasedOnTags from "../../../../permissions/queries/hasAdminPermissionsBasedOnTags"
 import { ClipboardIcon, ClipboardCheckIcon, ExternalLinkIcon } from "@heroicons/react/outline"
+
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
+  const session = await getSession(req, res)
+
+  if (!session?.userId) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
+
+  const hasTagAdminPermissions = await invoke(hasAdminPermissionsBasedOnTags, {
+    terminalId: terminal?.id as number,
+    accountId: session?.userId as number,
+  })
+
+  if (
+    !terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string) &&
+    !hasTagAdminPermissions
+  ) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
 
 const TokenSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string

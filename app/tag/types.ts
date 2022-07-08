@@ -1,3 +1,7 @@
+export enum StationPlatformTagValues {
+  STATION_ADMIN = "station admin",
+}
+
 export enum TagType {
   STATUS = "status",
   ROLE = "role",
@@ -5,6 +9,7 @@ export enum TagType {
   GUILD = "guild",
   SEASON = "season",
   TOKEN = "token",
+  CHECKBOOK_SIGNER = "checkbook signer",
 }
 
 export enum TokenType {
@@ -24,6 +29,7 @@ export type TagTokenMetadata = {
 export type Tag = {
   id: number
   terminalId: number
+  // usually label of tag
   value: string
   type: TagType
   active: boolean

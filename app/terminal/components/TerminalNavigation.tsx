@@ -10,13 +10,13 @@ import {
 } from "blitz"
 import { useState, useEffect } from "react"
 import SettingsIcon from "app/core/icons/SettingsIcon"
-import MemberDirectoryIcon from "public/member-directory-icon.svg"
 import Exit from "/public/exit-button.svg"
 import getTerminalByHandle from "../queries/getTerminalByHandle"
 import useStore from "app/core/hooks/useStore"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import DirectoryIcon from "app/core/icons/DirectoryIcon"
 import BulletinIcon from "app/core/icons/BulletinIcon"
+import hasAdminPermissionsBasedOnTags from "../../permissions/queries/hasAdminPermissionsBasedOnTags"
 
 const TerminalNavigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -27,11 +27,20 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
   const activeUser = useStore((state) => state.activeUser)
   const [hasAdminPermissions, setHasAdminPermissions] = useState<boolean>(false)
 
+  const [hasAdminPermissionsFromTags] = useQuery(
+    hasAdminPermissionsBasedOnTags,
+    { terminalId: terminal?.id as number, accountId: activeUser?.id as number },
+    {
+      suspense: false,
+    }
+  )
+
   useEffect(() => {
     setHasAdminPermissions(
-      !!terminal?.data?.permissions?.accountWhitelist?.includes(activeUser?.address as string)
+      hasAdminPermissionsFromTags ||
+        !!terminal?.data?.permissions?.accountWhitelist?.includes(activeUser?.address as string)
     )
-  }, [terminal, activeUser?.address])
+  }, [terminal, activeUser?.address, hasAdminPermissionsFromTags])
 
   return (
     <div className="grid md:grid-cols-5">
