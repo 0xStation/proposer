@@ -5,6 +5,7 @@ import { Account, AccountMetadata } from "app/account/types"
 import { Proposal } from "app/proposal/types"
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
+import { getEmail } from "app/utils/privy"
 
 const EmailRequest = z.object({
   proposalId: z.string(),
@@ -47,11 +48,15 @@ export default async function handler(req, res) {
       return
     }
 
+    const emailRequests = proposal.collaborators
+      .filter((account) => !!account.address)
+      .map((account) => getEmail(account.address as string))
+
+    const emails = (await Promise.all(emailRequests)).map((email) => email as string)
+
     try {
       await email.sendApprovedProposalEmail({
-        recipients: proposal.collaborators
-          .map((accountProposal) => (accountProposal.account?.data as AccountMetadata)?.email || "")
-          .filter((email) => !!email), // get rid of nonexistent emails
+        recipients: emails,
         proposal: proposal,
         rfp: proposal.rfp,
         terminal: proposal.rfp.terminal,

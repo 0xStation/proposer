@@ -6,6 +6,7 @@ import { Proposal } from "app/proposal/types"
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
+import { getEmail } from "app/utils/privy"
 
 const EmailRequest = z.object({
   proposalId: z.string(),
@@ -57,11 +58,15 @@ export default async function handler(req, res) {
       return
     }
 
+    const emailRequests = recipientAccounts
+      .filter((account) => !!account.address)
+      .map((account) => getEmail(account.address as string))
+
+    const emails = (await Promise.all(emailRequests)).map((email) => email as string)
+
     try {
       await email.sendNewProposalEmail({
-        recipients: recipientAccounts
-          .map((account) => (account.data as AccountMetadata)?.email || "")
-          .filter((s) => !!s),
+        recipients: emails,
         account: data.account,
         proposal: data.proposal,
         rfp: data.proposal.rfp,
