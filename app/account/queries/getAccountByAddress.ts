@@ -1,20 +1,26 @@
 import db from "db"
 import * as z from "zod"
-import { Account } from "../types"
+import { Account, AccountMetadata } from "../types"
+import { getEmail } from "app/utils/privy"
 
 const GetAccountByAddress = z.object({
   address: z.string().optional(),
+  includeEmail: z.boolean().optional(),
 })
 
 export default async function getAccountByAddress(input: z.infer<typeof GetAccountByAddress>) {
-  const data = GetAccountByAddress.parse(input)
-
-  if (!data.address) {
+  if (!input.address) {
     return null
   }
 
+  // storing email with Privy, not our database, so we need to fetch it directly
+  let email
+  if (!!input.includeEmail) {
+    email = await getEmail(input.address)
+  }
+
   const account = await db.account.findFirst({
-    where: { address: data.address },
+    where: { address: input.address },
     include: {
       tickets: {
         include: {
@@ -33,5 +39,9 @@ export default async function getAccountByAddress(input: z.infer<typeof GetAccou
     return null
   }
 
-  return account as Account
+  // merge database model with Privy-stored data
+  return {
+    ...account,
+    data: { ...(account.data as AccountMetadata), ...(!!email && { email }) },
+  } as Account
 }

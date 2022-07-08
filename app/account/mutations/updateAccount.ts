@@ -1,6 +1,7 @@
 import db from "db"
 import * as z from "zod"
 import { Account } from "../types"
+import { saveEmail } from "app/utils/privy"
 
 const UpdateAccount = z.object({
   name: z.string(),
@@ -30,12 +31,16 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
     return null
   }
 
+  // store email with Privy so it does not live in our database to reduce leakage risk
+  if (!!params.email) {
+    await saveEmail(params.address as string, params.email)
+  }
+
   const payload = {
     address: params.address,
     data: {
       name: params.name,
       bio: params.bio,
-      email: params.email,
       pfpURL: params.pfpURL,
       coverURL: params.coverURL,
       contactURL: params.contactURL,
