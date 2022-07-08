@@ -13,14 +13,17 @@ export type TerminalMetadata = {
   description: string
   pfpURL: string
   guildId?: string
+  permissions: {
+    accountWhitelist?: string[] // provides `isAdmin` access based on specific addresses
+    adminTagIdWhitelist?: number[] // `isAdmin` provides access to all subpages within Station settings
+
+    // v1
+    invite: Record<string, number[]>
+    edit: Record<string, number[]>
+  }
 
   // v1
   coverURL?: string
-  permissions: {
-    invite: Record<string, number[]>
-    edit: Record<string, number[]>
-    accountWhitelist?: string[]
-  }
   contracts: {
     addresses: {
       endorsements: string

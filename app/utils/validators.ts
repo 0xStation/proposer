@@ -1,4 +1,4 @@
-import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
+import { utils } from "ethers"
 import isURL from "validator/lib/isURL"
 import isEmail from "validator/lib/isEmail"
 
@@ -60,6 +60,10 @@ export const uniqueName = (names: string[]) => {
       ? "Name already exists"
       : undefined
   }
+}
+
+export const isAddress = (address: string) => {
+  return utils.isAddress(address) ? undefined : "Not a valid address"
 }
 
 export const isValidEmail = (email: string) => {

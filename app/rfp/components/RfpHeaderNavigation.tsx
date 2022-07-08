@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useRouter, Link, Routes, useParam, useQuery } from "blitz"
+import { useRouter, Link, Routes, useParam, useQuery, useSession } from "blitz"
 import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import getRfpById from "../queries/getRfpById"
 import { RfpStatus } from "../types"
@@ -17,15 +17,33 @@ import ReopenRfpModal from "./ReopenRfpModal"
 import Dropdown from "app/core/components/Dropdown"
 import { DeleteRfpModal } from "./DeleteRfpModal"
 import useStore from "app/core/hooks/useStore"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
+import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 
 const RfpHeaderNavigation = ({ rfpId }) => {
   const terminalHandle = useParam("terminalHandle") as string
+  const session = useSession({ suspense: false })
   const [isRFPUrlCopied, setIsRfpUrlCopied] = useState<boolean>(false)
   const [isClosedRfpModalOpen, setIsClosedRfpModalOpen] = useState<boolean>(false)
   const [isReopenRfpModalOpen, setIsReopenRfpModalOpen] = useState<boolean>(false)
   const [deleteRfpModalOpen, setDeleteRfpModalOpen] = useState<boolean>(false)
   const [rfpOpen, setRfpOpen] = useState<boolean>(false)
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
+  const [terminal] = useQuery(
+    getTerminalByHandle,
+    { handle: terminalHandle as string },
+    { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
+  )
+  const [hasTagAdminPermissions] = useQuery(
+    hasAdminPermissionsBasedOnTags,
+    { terminalId: terminal?.id as number, accountId: session?.userId as number },
+    {
+      suspense: false,
+    }
+  )
+  const isLoggedInAndIsAdmin =
+    (session.siwe?.address && hasTagAdminPermissions) ||
+    terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string)
   const router = useRouter()
   const setToastState = useStore((state) => state.setToastState)
 
@@ -92,81 +110,119 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                 <div className="flex justify-between w-full">
                   <h1 className="text-2xl font-bold">RFP: {rfp?.data?.content?.title}</h1>
                   <div className="inline self-center mr-6 mb-6">
-                    <button
-                      onClick={() => {
-                        router.push(Routes.EditRfpPage({ terminalHandle, rfpId }))
-                      }}
-                    >
-                      <PencilIcon className="inline h-6 w-6 fill-marble-white mr-3 hover:cursor-pointer hover:fill-concrete" />
-                    </button>
-                    <Dropdown
-                      className="inline"
-                      side="right"
-                      button={
-                        <DotsHorizontalIcon className="inline-block h-6 w-6 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
-                      }
-                      items={[
-                        {
-                          name: (
-                            <>
-                              {isRFPUrlCopied ? (
+                    {isLoggedInAndIsAdmin ? (
+                      <>
+                        <button
+                          onClick={() => {
+                            router.push(Routes.EditRfpPage({ terminalHandle, rfpId }))
+                          }}
+                        >
+                          <PencilIcon className="inline h-6 w-6 fill-marble-white mr-3 hover:cursor-pointer hover:fill-concrete" />
+                        </button>
+                        <Dropdown
+                          className="inline"
+                          side="right"
+                          button={
+                            <DotsHorizontalIcon className="inline-block h-6 w-6 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
+                          }
+                          items={[
+                            {
+                              name: (
                                 <>
-                                  <ClipboardCheckIcon className="h-4 w-4 mr-2 inline" />
-                                  <p className="inline">Copied!</p>
+                                  {isRFPUrlCopied ? (
+                                    <>
+                                      <ClipboardCheckIcon className="h-4 w-4 mr-2 inline" />
+                                      <p className="inline">Copied!</p>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <ClipboardIcon className="h-4 w-4 mr-2 inline" />
+                                      <p className="inline">Copy link</p>
+                                    </>
+                                  )}
                                 </>
-                              ) : (
+                              ),
+                              onClick: () => {
+                                navigator.clipboard.writeText(window.location.href).then(() => {
+                                  setIsRfpUrlCopied(true)
+                                  setTimeout(() => setIsRfpUrlCopied(false), 500)
+                                })
+                                setIsRfpUrlCopied(true)
+                              },
+                            },
+                            {
+                              name: (
+                                <div>
+                                  {rfp && rfp?.status !== RfpStatus.CLOSED ? (
+                                    <>
+                                      <XCircleIcon className="h-4 w-4 mr-2 inline" />
+                                      <p className="inline">Close for submissions</p>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <InboxInIcon className="h-4 w-4 mr-2 inline" />
+                                      <p className="inline">Open for submissions</p>
+                                    </>
+                                  )}
+                                </div>
+                              ),
+                              onClick: () => {
+                                if (rfp?.status !== RfpStatus.CLOSED) {
+                                  setIsClosedRfpModalOpen(true)
+                                } else {
+                                  setIsReopenRfpModalOpen(true)
+                                }
+                              },
+                            },
+                            {
+                              name: (
                                 <>
-                                  <ClipboardIcon className="h-4 w-4 mr-2 inline" />
-                                  <p className="inline">Copy link</p>
+                                  <TrashIcon className="h-4 w-4 mr-2 fill-torch-red" />
+                                  <p className="text-torch-red">Delete</p>
                                 </>
-                              )}
-                            </>
-                          ),
-                          onClick: () => {
-                            navigator.clipboard.writeText(window.location.href).then(() => {
+                              ),
+                              onClick: () => {
+                                setDeleteRfpModalOpen(true)
+                              },
+                            },
+                          ]}
+                        />
+                      </>
+                    ) : (
+                      <Dropdown
+                        className="inline"
+                        side="right"
+                        button={
+                          <DotsHorizontalIcon className="inline-block h-6 w-6 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
+                        }
+                        items={[
+                          {
+                            name: (
+                              <>
+                                {isRFPUrlCopied ? (
+                                  <>
+                                    <ClipboardCheckIcon className="h-4 w-4 mr-2 inline" />
+                                    <p className="inline">Copied!</p>
+                                  </>
+                                ) : (
+                                  <>
+                                    <ClipboardIcon className="h-4 w-4 mr-2 inline" />
+                                    <p className="inline">Copy link</p>
+                                  </>
+                                )}
+                              </>
+                            ),
+                            onClick: () => {
+                              navigator.clipboard.writeText(window.location.href).then(() => {
+                                setIsRfpUrlCopied(true)
+                                setTimeout(() => setIsRfpUrlCopied(false), 500)
+                              })
                               setIsRfpUrlCopied(true)
-                              setTimeout(() => setIsRfpUrlCopied(false), 500)
-                            })
-                            setIsRfpUrlCopied(true)
+                            },
                           },
-                        },
-                        {
-                          name: (
-                            <div>
-                              {rfp && rfp?.status !== RfpStatus.CLOSED ? (
-                                <>
-                                  <XCircleIcon className="h-4 w-4 mr-2 inline" />
-                                  <p className="inline">Close for submissions</p>
-                                </>
-                              ) : (
-                                <>
-                                  <InboxInIcon className="h-4 w-4 mr-2 inline" />
-                                  <p className="inline">Open for submissions</p>
-                                </>
-                              )}
-                            </div>
-                          ),
-                          onClick: () => {
-                            if (rfp?.status !== RfpStatus.CLOSED) {
-                              setIsClosedRfpModalOpen(true)
-                            } else {
-                              setIsReopenRfpModalOpen(true)
-                            }
-                          },
-                        },
-                        {
-                          name: (
-                            <>
-                              <TrashIcon className="h-4 w-4 mr-2 fill-torch-red" />
-                              <p className="text-torch-red">Delete</p>
-                            </>
-                          ),
-                          onClick: () => {
-                            setDeleteRfpModalOpen(true)
-                          },
-                        },
-                      ]}
-                    />
+                        ]}
+                      />
+                    )}
                   </div>
                 </div>
               </div>

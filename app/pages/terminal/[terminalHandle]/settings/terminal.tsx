@@ -19,8 +19,10 @@ import useStore from "app/core/hooks/useStore"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import { composeValidators, mustBeUnderNumCharacters, requiredField } from "app/utils/validators"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
+import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
+import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
+import getAdminAccountsForTerminal from "app/permissions/queries/getAdminAccountsForTerminal"
 
-// maybe we can break this out into it's own component?
 const PfpInput = ({ pfpURL, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
     const formData = new FormData()
@@ -81,7 +83,15 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
 
   const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
 
-  if (!terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string)) {
+  const hasTagAdminPermissions = await invoke(hasAdminPermissionsBasedOnTags, {
+    terminalId: terminal?.id as number,
+    accountId: session?.userId as number,
+  })
+
+  if (
+    !terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string) &&
+    !hasTagAdminPermissions
+  ) {
     return {
       redirect: {
         destination: "/",
@@ -101,6 +111,11 @@ const TerminalSettingsPage: BlitzPage = () => {
   const [pfpURL, setPfpURL] = useState<string>("")
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+  const [adminAccounts] = useQuery(
+    getAdminAccountsForTerminal,
+    { terminalId: terminal?.id as number },
+    { suspense: false }
+  )
 
   const [updateTerminalMutation] = useMutation(updateTerminal, {
     onSuccess: (data) => {
@@ -132,13 +147,31 @@ const TerminalSettingsPage: BlitzPage = () => {
             <div>loading terminal...</div>
           ) : (
             <Form
-              initialValues={{ name: terminal.data.name, handle: terminal.handle } || {}}
+              initialValues={
+                {
+                  name: terminal.data.name,
+                  handle: terminal.handle,
+                  adminAddresses: adminAccounts
+                    ?.map((adminAccount) => adminAccount?.address)
+                    ?.join(",\n"),
+                } || {}
+              }
               onSubmit={async (values) => {
-                await updateTerminalMutation({
-                  ...values,
-                  pfpURL: pfpURL,
-                  id: terminal.id,
-                })
+                try {
+                  await updateTerminalMutation({
+                    ...values,
+                    adminAddresses: parseUniqueAddresses(values.adminAddresses || ""),
+                    pfpURL: pfpURL,
+                    id: terminal.id,
+                  })
+                } catch (err) {
+                  console.error("Failed to update terminal with error: ", err)
+                  setToastState({
+                    isToastShowing: true,
+                    type: "error",
+                    message: "Something went wrong!",
+                  })
+                }
               }}
               render={({ form, handleSubmit }) => {
                 let formState = form.getState()
@@ -172,7 +205,7 @@ const TerminalSettingsPage: BlitzPage = () => {
                                 mustBeUnderNumCharacters(50),
                                 requiredField
                               )}
-                              className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
+                              className="w-3/4 sm:w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
                             />
                             <span className="text-torch-red text-xs">{errors?.name}</span>
                             <label className="font-bold mt-6">Terminal handle*</label>
@@ -184,10 +217,40 @@ const TerminalSettingsPage: BlitzPage = () => {
                                 mustBeUnderNumCharacters(50),
                                 requiredField
                               )}
-                              className="w-1/2 rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-6"
+                              className="w-3/4 sm:w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2 mb-6"
                             />
                             <span className="text-torch-red text-xs">{errors?.handle}</span>
                             <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
+                            <h3 className="font-bold mt-4">Admin addresses</h3>
+                            <span className="text-xs text-concrete block w-3/4 sm:w-[474px]">
+                              Insert wallet addresses that are allowed to manage Terminal settings
+                              and information. Addresses should be comma-separated.
+                            </span>
+                            <Field name="adminAddresses" component="textarea">
+                              {({ input, meta }) => (
+                                <div>
+                                  <textarea
+                                    {...input}
+                                    className="w-3/4 sm:w-[474px] bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
+                                    rows={6}
+                                    placeholder="Enter wallet addresses"
+                                  />
+                                  {/* user feedback on number of registered unique addresses, not an error */}
+                                  {input && (
+                                    <span className=" text-xs text-marble-white ml-2 mb-2 block">
+                                      {`${
+                                        parseUniqueAddresses(input.value || "").length
+                                      } unique addresses detected`}
+                                    </span>
+                                  )}
+                                  {errors?.adminAddresses && (
+                                    <span className=" text-xs text-torch-red mb-2 block">
+                                      {errors?.adminAddresses}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </Field>
                           </div>
                         </div>
                       </div>
