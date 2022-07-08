@@ -29,6 +29,8 @@ import LinkArrow from "app/core/icons/LinkArrow"
 import { Spinner } from "app/core/components/Spinner"
 import { useWaitForTransaction } from "wagmi"
 import { ZERO_ADDRESS } from "app/core/utils/constants"
+import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
+import { formatUnits } from "ethers/lib/utils"
 
 const ProposalPage: BlitzPage = ({
   rfp,
@@ -81,6 +83,14 @@ const ProposalPage: BlitzPage = ({
     }
   )
 
+  const funds = useCheckbookFunds(
+    rfp.checkbook?.chainId as number,
+    rfp.checkbook?.address as string,
+    rfp.checkbook?.quorum as number,
+    proposal.data?.funding.token
+  )
+  const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
+
   const hasQuorum = check?.approvals?.length === rfp?.checkbook.quorum
 
   // user can approve if they are a signer and they haven't approved before
@@ -89,7 +99,8 @@ const ProposalPage: BlitzPage = ({
     !proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address)
 
   // show approve button, if there the proposal hasn't reached quorum, user can approve, user hasn't already approved
-  const showApproveButton = !hasQuorum && userCanApprove
+  const showApproveButton =
+    !hasQuorum && userCanApprove && parseFloat(fundsAvailable) < proposal.data.funding?.amount
 
   // proposer has reached quorum and check has not been cashed and user is the proposer
   const showCashButton =
@@ -175,24 +186,7 @@ const ProposalPage: BlitzPage = ({
             <h1 className="mt-6 text-2xl font-bold mb-2">{proposal.data.content.title}</h1>
             {proposal.collaborators.map((collaborator, idx) => {
               if (collaborator.account?.data) {
-                return (
-                  <div className="flex flex-row items-center" key={`account-${idx}`}>
-                    <img
-                      src={collaborator.account?.data?.pfpURL}
-                      alt="PFP"
-                      className="w-[32px] h-[32px] rounded-full"
-                      onError={(e) => {
-                        e.currentTarget.src = DEFAULT_PFP_URLS.USER
-                      }}
-                    />
-                    <div className="ml-2">
-                      <span>{collaborator.account?.data.name}</span>
-                      <span className="text-xs text-light-concrete flex">
-                        @{truncateString(collaborator.account?.address, 4)}
-                      </span>
-                    </div>
-                  </div>
-                )
+                return <AccountMediaObject account={collaborator.account} />
               } else {
                 return (
                   <div className="flex flex-row items-center" key={`account-${idx}`}>

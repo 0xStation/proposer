@@ -45,6 +45,7 @@ export default async function getProposalById(params: z.infer<typeof GetProposal
       ...proposal,
       status: computeProposalStatus(proposal.approvals.length, quorum),
     } as unknown as Proposal
+    // if first check does not exist, it means there can be no approvals. It must be in the sumbitted state
   } else {
     return {
       ...proposal,

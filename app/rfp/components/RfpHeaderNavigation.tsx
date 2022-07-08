@@ -32,7 +32,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
   useEffect(() => {
     if (rfp) {
       const today = new Date()
-      if (today > rfp.startDate || (rfp.endDate && today < rfp.endDate)) {
+      if (today > rfp.startDate && (!rfp.endDate || today < rfp.endDate)) {
         setRfpOpen(true)
       }
     }
@@ -67,7 +67,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                 setToastState({
                   isToastShowing: true,
                   type: "error",
-                  message: `You cannot create a proposal until the start date.`,
+                  message: `You cannot create a proposal while RFP is closed.`,
                 })
               }
             }}
