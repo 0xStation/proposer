@@ -1,4 +1,4 @@
-import { BlitzPage } from "blitz"
+import { BlitzPage, GetServerSideProps, getSession, invoke } from "blitz"
 import { useState } from "react"
 import Navigation from "app/terminal/components/settings/navigation"
 import { Field, Form } from "react-final-form"
@@ -6,6 +6,43 @@ import useStore from "app/core/hooks/useStore"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import { useQuery, useMutation, useParam } from "blitz"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
+import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
+
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
+  const session = await getSession(req, res)
+
+  if (!session?.userId) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
+
+  const hasTagAdminPermissions = await invoke(hasAdminPermissionsBasedOnTags, {
+    terminalId: terminal?.id as number,
+    accountId: session?.userId as number,
+  })
+
+  if (
+    !terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string) &&
+    !hasTagAdminPermissions
+  ) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
 
 /**
  * THIS IS A DEV TOOL

@@ -7,6 +7,7 @@ import {
   Link,
   useRouterQuery,
   invalidateQuery,
+  useSession,
 } from "blitz"
 import { useState, useEffect } from "react"
 import Layout from "app/core/layouts/Layout"
@@ -26,10 +27,12 @@ import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
 import useStore from "app/core/hooks/useStore"
 import FilterPill from "app/core/components/FilterPill"
 import Pagination from "app/core/components/Pagination"
+import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 
 const BulletinPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const setToastState = useStore((state) => state.setToastState)
+  const session = useSession({ suspense: false })
   const query = useRouterQuery()
   const [showRfpSuccessModal, setShowRfpSuccessModal] = useState<boolean>(false)
   const [terminal] = useQuery(
@@ -37,6 +40,16 @@ const BulletinPage: BlitzPage = () => {
     { handle: terminalHandle as string },
     { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
   )
+  const [hasTagAdminPermissions] = useQuery(
+    hasAdminPermissionsBasedOnTags,
+    { terminalId: terminal?.id as number, accountId: session.userId as number },
+    {
+      suspense: false,
+    }
+  )
+  const isLoggedInAndIsAdmin =
+    (session.siwe?.address && hasTagAdminPermissions) ||
+    terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string)
   const [rfpStatusFilters, setRfpStatusFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
 
   const [page, setPage] = useState<number>(0)
@@ -102,13 +115,14 @@ const BulletinPage: BlitzPage = () => {
         <div className="max-h-[250px] sm:h-[130px] border-b border-concrete">
           <div className="flex flex-row items-center ml-6 pt-7 justify-between mr-4">
             <h1 className="text-2xl font-bold">Bulletin</h1>
-            {/* TODO: add permissioning checks */}
-            <button
-              className="h-[35px] bg-electric-violet px-9 rounded text-tunnel-black hover:bg-opacity-70"
-              onClick={() => router.push(Routes.CreateRFPPage({ terminalHandle }))}
-            >
-              Create RFP
-            </button>
+            {isLoggedInAndIsAdmin && (
+              <button
+                className="h-[35px] bg-electric-violet px-9 rounded text-tunnel-black hover:bg-opacity-70"
+                onClick={() => router.push(Routes.CreateRFPPage({ terminalHandle }))}
+              >
+                Create RFP
+              </button>
+            )}
           </div>
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <div className="flex ml-6 py-4 space-x-2 flex-wrap self-start">
@@ -149,12 +163,12 @@ const BulletinPage: BlitzPage = () => {
               rfps?.map((rfp) => (
                 <RFPComponent rfp={rfp} terminalHandle={terminalHandle} key={rfp.id} />
               ))
-            ) : rfps && rfpStatusFilters?.size ? (
+            ) : (rfps && rfpStatusFilters?.size) || rfps?.length === 0 ? (
               <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
                 <p>No RFPs found</p>
                 <p>...</p>
               </div>
-            ) : rfps ? (
+            ) : rfps && isLoggedInAndIsAdmin ? (
               // TODO: hide this view from non-admins and show different copy once we have checkbook signer tags
               <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
                 <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">

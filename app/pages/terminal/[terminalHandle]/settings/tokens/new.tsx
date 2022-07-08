@@ -1,4 +1,16 @@
-import { BlitzPage, useMutation, useParam, useQuery, Link, Image, Routes, useRouter } from "blitz"
+import {
+  BlitzPage,
+  useMutation,
+  useParam,
+  useQuery,
+  Link,
+  Image,
+  Routes,
+  useRouter,
+  GetServerSideProps,
+  getSession,
+  invoke,
+} from "blitz"
 import { Field, Form } from "react-final-form"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import createTokenTag from "app/tag/mutations/createTokenTag"
@@ -7,6 +19,43 @@ import Navigation from "app/terminal/components/settings/navigation"
 import useStore from "app/core/hooks/useStore"
 import Back from "/public/back-icon.svg"
 import networks from "app/utils/networks.json"
+import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
+
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
+  const session = await getSession(req, res)
+
+  if (!session?.userId) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
+
+  const hasTagAdminPermissions = await invoke(hasAdminPermissionsBasedOnTags, {
+    terminalId: terminal?.id as number,
+    accountId: session?.userId as number,
+  })
+
+  if (
+    !terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string) &&
+    !hasTagAdminPermissions
+  ) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
 
 const NewTokenSettingsPage: BlitzPage = () => {
   const router = useRouter()

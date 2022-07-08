@@ -1,11 +1,58 @@
 import { useState } from "react"
-import { BlitzPage, useMutation, useParam, useQuery, Routes, useRouter } from "blitz"
+import {
+  BlitzPage,
+  useMutation,
+  useParam,
+  useQuery,
+  Routes,
+  useRouter,
+  GetServerSideProps,
+  getSession,
+  invoke,
+} from "blitz"
 import { Field, Form } from "react-final-form"
 import useDiscordGuild from "app/core/hooks/useDiscordGuild"
 import useDiscordBotAuth from "app/core/hooks/useDiscordBotAuth"
 import useActiveUserDiscordGuilds from "app/core/hooks/useActiveUserDiscordGuilds"
 import updateTerminal from "app/terminal/mutations/updateTerminal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
+import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
+
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
+  const session = await getSession(req, res)
+
+  if (!session?.userId) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
+
+  const hasTagAdminPermissions = await invoke(hasAdminPermissionsBasedOnTags, {
+    terminalId: terminal?.id as number,
+    accountId: session?.userId as number,
+  })
+
+  if (
+    !terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string) &&
+    !hasTagAdminPermissions
+  ) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
 
 const DiscordConnectPage: BlitzPage = () => {
   const router = useRouter()
@@ -53,7 +100,11 @@ const DiscordConnectPage: BlitzPage = () => {
       <Form
         initialValues={{}}
         onSubmit={async (values) => {
-          await updateTerminalMutation({ id: terminal.id, ...values })
+          //@ts-ignore
+          await updateTerminalMutation({
+            id: terminal.id,
+            ...values,
+          })
           refetch()
         }}
         render={({ form, handleSubmit }) => {

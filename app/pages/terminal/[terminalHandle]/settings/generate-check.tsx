@@ -1,4 +1,4 @@
-import { BlitzPage } from "blitz"
+import { BlitzPage, GetServerSideProps, getSession, invoke } from "blitz"
 import { useState } from "react"
 import { useSignTypedData, useToken } from "wagmi"
 import Navigation from "app/terminal/components/settings/navigation"
@@ -14,7 +14,43 @@ import getProposalsByTerminal from "app/proposal/queries/getProposalsByTerminal"
 import { ZERO_ADDRESS } from "app/core/utils/constants"
 import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 import { Check } from "@prisma/client"
+import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
+  const session = await getSession(req, res)
+
+  if (!session?.userId) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
+
+  const hasTagAdminPermissions = await invoke(hasAdminPermissionsBasedOnTags, {
+    terminalId: terminal?.id as number,
+    accountId: session?.userId as number,
+  })
+
+  if (
+    !terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string) &&
+    !hasTagAdminPermissions
+  ) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
 /**
  * THIS IS A DEV TOOL
  * this is not production code
