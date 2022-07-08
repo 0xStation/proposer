@@ -14,7 +14,6 @@ import {
 } from "blitz"
 import useStore from "app/core/hooks/useStore"
 import Layout from "app/core/layouts/Layout"
-import Modal from "app/core/components/Modal"
 import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
 import GetNotifiedModal from "app/proposal/components/GetNotifiedModal"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
@@ -187,7 +186,7 @@ const ProposalComponent = ({
     rfp.checkbook?.quorum as number,
     proposal.data?.funding.token
   )
-  const available = formatUnits(funds?.available, funds?.decimals)
+  const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
 
   return (
     <Link href={Routes.ProposalPage({ terminalHandle, rfpId: rfp.id, proposalId: proposal.id })}>
@@ -199,7 +198,7 @@ const ProposalComponent = ({
             }`}
           />
           <span className="text-xs uppercase tracking-wider font-bold">
-            {PROPOSAL_STATUS_DISPLAY_MAP[proposal.status]?.copy}
+            {PROPOSAL_STATUS_DISPLAY_MAP[proposal?.status]?.copy || proposal?.status}
           </span>
         </div>
         <div className="w-full flex flex-row mb-5">
@@ -221,7 +220,7 @@ const ProposalComponent = ({
           </div>
           <div
             className={`basis-32 ml-6 mb-2 self-center relative group ${
-              parseFloat(available) < proposal.data.funding?.amount && "text-torch-red"
+              parseFloat(fundsAvailable) < proposal.data.funding?.amount && "text-torch-red"
             }`}
           >
             {proposal.data?.funding?.amount || "N/A"}

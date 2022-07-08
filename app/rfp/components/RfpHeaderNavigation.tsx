@@ -38,10 +38,6 @@ const RfpHeaderNavigation = ({ rfpId }) => {
     }
   }, [rfp])
 
-  if (!rfp) {
-    return <></>
-  }
-
   return (
     <>
       <DeleteRfpModal
