@@ -18,7 +18,8 @@ export type AccountMetadata = {
   timezone?: string
   verified?: boolean
   bio?: string
-  email?: string
+  hasSavedEmail?: boolean
+  // TODO: add hasVerifiedEmail: boolean
 }
 
 export type Account = {

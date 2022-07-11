@@ -75,7 +75,8 @@ const ProposalsTab: BlitzPage = () => {
 
   useEffect(() => {
     if (proposalId) {
-      if (!activeUser?.data.email) {
+      // request user saves email to receive notifications if they do not have saved email
+      if (!activeUser?.data.hasSavedEmail) {
         setIsGetNotifiedModalOpen(true)
       } else {
         setProposalCreatedConfirmationModal(true)

@@ -23,5 +23,16 @@ export default async function addEmailToAccount(input: z.infer<typeof EmailAccou
   // store email with Privy so it does not live in our database to reduce leakage risk
   await saveEmail(existingAccount.address as string, input.email)
 
-  return true
+  // mark email as saved for this account to not show email input modals
+  const account = await db.account.update({
+    where: { id: input.accountId },
+    data: {
+      data: {
+        ...existingAccount.data,
+        hasSavedEmail: true,
+      },
+    },
+  })
+
+  return account as unknown as Account
 }

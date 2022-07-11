@@ -48,6 +48,8 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
       githubUrl: params.githubUrl,
       tiktokUrl: params.tiktokUrl,
       instagramUrl: params.instagramUrl,
+      // mark email as saved for this account to not show email input modals
+      hasSavedEmail: !!params.email,
     },
   }
 

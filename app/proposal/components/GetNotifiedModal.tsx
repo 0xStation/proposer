@@ -25,7 +25,8 @@ const GetNotifiedModal = ({ isOpen, setIsOpen }) => {
   })
 
   useEffect(() => {
-    if (!!activeUser?.data.email) {
+    // close modal if user has already saved an email
+    if (!!activeUser?.data.hasSavedEmail) {
       setIsOpen(false)
     }
   }, [activeUser])
