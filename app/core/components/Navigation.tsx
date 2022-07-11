@@ -31,7 +31,10 @@ const Navigation = ({ children }: { children?: any }) => {
       const setActiveAccount = async () => {
         const account = await invoke(getAccountByAddress, { address: session?.siwe?.address })
         if (!account) {
-          const newUser = await invoke(createAccount, { address: session?.siwe?.address })
+          const newUser = await invoke(createAccount, {
+            address: session?.siwe?.address,
+            createSession: true,
+          })
           setActiveUser(newUser)
           router.push(`/profile/complete`)
         } else {
