@@ -45,7 +45,7 @@ const Home: BlitzPage = () => {
             setActiveUser(user)
             router.push(`/profile/${session?.siwe?.address}`)
           } else {
-            await invoke(createAccount, { address: session?.siwe?.address })
+            await invoke(createAccount, { address: session?.siwe?.address, createSession: true })
             router.push(`/profile/complete`)
           }
         } catch (err) {
