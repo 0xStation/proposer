@@ -60,7 +60,7 @@ export default async function handler(req, res) {
 
     try {
       const emailRequests = recipientAccounts
-        .filter((account) => !!account.address)
+        .filter((account) => !!(account.data as AccountMetadata).hasSavedEmail) // TODO: replace with hasVerifiedEmail
         .map((account) => getEmail(account.address as string))
 
       const emails = (await Promise.all(emailRequests)).map((email) => email as string)

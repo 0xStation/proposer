@@ -50,8 +50,8 @@ export default async function handler(req, res) {
 
     try {
       const emailRequests = proposal.collaborators
-        .filter((account) => !!account.address)
-        .map((account) => getEmail(account.address as string))
+        .filter((collaborator) => !!(collaborator.account?.data as AccountMetadata).hasSavedEmail) // TODO: replace with hasVerifiedEmail
+        .map((collaborator) => getEmail(collaborator.account?.address as string))
 
       const emails = (await Promise.all(emailRequests)).map((email) => email as string)
 
