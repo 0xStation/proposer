@@ -45,7 +45,7 @@ const RFPInfoTab: BlitzPage = () => {
             <Preview markdown={rfp?.data?.content?.body} />
           </div>
 
-          <div className="w-96 border-l border-concrete flex-col overflow-y-scroll">
+          <div className="w-[36rem] border-l border-concrete flex-col overflow-y-scroll">
             <div className="border-b border-concrete p-6 ">
               <div className="mt-2">
                 <p className="text-concrete uppercase text-xs font-bold">Start Date</p>
