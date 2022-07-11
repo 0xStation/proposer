@@ -51,7 +51,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
       >
         {!!tutorial && <div className="fixed inset-0 bg-tunnel-black opacity-70 z-10"></div>}
         {/* Terminal Profile metadata + Settings icon*/}
-        <div className="flex content-center ml-4 mt-7">
+        <div className="flex mx-4 mt-7">
           {terminal?.data.pfpURL ? (
             <img
               src={terminal?.data.pfpURL}
@@ -73,7 +73,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
             </p>
           </div>
           {session?.siwe?.address && hasAdminPermissions && (
-            <div className="flex flex-col mt-3 relative mr-2">
+            <div className="mt-3 mr-2 ml-auto">
               <Link
                 href={
                   !tutorial

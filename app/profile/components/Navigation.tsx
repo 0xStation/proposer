@@ -228,7 +228,7 @@ export const Navigation = ({
                 <Link
                   href={Routes.TerminalsOnProfile({ accountAddress: account?.address as string })}
                 >
-                  Terminal
+                  Terminals
                 </Link>
               </p>
             </li>

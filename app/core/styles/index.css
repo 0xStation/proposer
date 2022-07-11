@@ -92,7 +92,7 @@ body {
 }
 
 .markdown-prose > h3 {
-  @apply text-base font-bold;
+  @apply text-base;
 }
 
 .markdown-prose > ul {
@@ -122,8 +122,7 @@ body {
 }
 
 .markdown-prose h1:not(:first-child),
-.markdown-prose h2:not(:first-child),
-.markdown-prose h3:not(:first-child) {
+.markdown-prose h2:not(:first-child) {
   @apply mt-6;
 }
 

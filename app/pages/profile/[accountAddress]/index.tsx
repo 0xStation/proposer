@@ -170,7 +170,7 @@ const ProposalComponent = ({ accountProposal }) => {
               PROPOSAL_STATUS_DISPLAY_MAP[proposal.status]?.color || "bg-concrete"
             }`}
           />
-          <span className="text-xs uppercase tracking-wider">
+          <span className="text-xs uppercase tracking-wider font-bold">
             {PROPOSAL_STATUS_DISPLAY_MAP[proposal.status]?.copy}
           </span>
         </div>
