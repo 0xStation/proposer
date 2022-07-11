@@ -67,5 +67,6 @@ export const isAddress = (address: string) => {
 }
 
 export const isValidEmail = (email: string) => {
+  if (!email) return undefined
   return isEmail(email) ? undefined : "Invalid email"
 }

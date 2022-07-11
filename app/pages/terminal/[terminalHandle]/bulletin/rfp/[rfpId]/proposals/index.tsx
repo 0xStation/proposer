@@ -76,6 +76,7 @@ const ProposalsTab: BlitzPage = () => {
   useEffect(() => {
     if (proposalId) {
       // request user saves email to receive notifications if they do not have saved email
+      // TODO: if user has saved email, but unverified, should we retrigger another verification email and present a modal that asks them to verify by checking their email?
       if (!activeUser?.data.hasSavedEmail) {
         setIsGetNotifiedModalOpen(true)
       } else {

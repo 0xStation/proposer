@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { Account } from "../types"
+import { Account, AccountMetadata } from "../types"
 import { saveEmail } from "app/utils/privy"
 
 const UpdateAccount = z.object({
@@ -32,8 +32,17 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
   }
 
   // store email with Privy so it does not live in our database to reduce leakage risk
-  if (!!params.email) {
-    await saveEmail(params.address as string, params.email)
+  if (
+    (existingAccount.data as AccountMetadata).hasSavedEmail ||
+    // if no saved email yet, only save if email was provided
+    (!(existingAccount.data as AccountMetadata).hasSavedEmail && !!params.email)
+  ) {
+    try {
+      await saveEmail(params.address as string, params.email || "")
+    } catch (e) {
+      console.error("updateAccount: ", e)
+      throw e
+    }
   }
 
   const payload = {
@@ -50,6 +59,7 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
       instagramUrl: params.instagramUrl,
       // mark email as saved for this account to not show email input modals
       hasSavedEmail: !!params.email,
+      // TODO: if email was saved with a new value, set hasVerifiedEmail to false
     },
   }
 

@@ -48,22 +48,29 @@ export default async function handler(req, res) {
       return
     }
 
-    const emailRequests = proposal.collaborators
-      .filter((account) => !!account.address)
-      .map((account) => getEmail(account.address as string))
-
-    const emails = (await Promise.all(emailRequests)).map((email) => email as string)
-
     try {
-      await email.sendApprovedProposalEmail({
-        recipients: emails,
-        proposal: proposal,
-        rfp: proposal.rfp,
-        terminal: proposal.rfp.terminal,
-      })
+      const emailRequests = proposal.collaborators
+        .filter((account) => !!account.address)
+        .map((account) => getEmail(account.address as string))
+
+      const emails = (await Promise.all(emailRequests)).map((email) => email as string)
+
+      try {
+        await email.sendApprovedProposalEmail({
+          recipients: emails,
+          proposal: proposal,
+          rfp: proposal.rfp,
+          terminal: proposal.rfp.terminal,
+        })
+      } catch (e) {
+        console.error(e)
+        res.status(500).json({ response: "error", message: "error encountered in email emission" })
+      }
     } catch (e) {
       console.error(e)
-      res.status(500).json({ response: "error", message: "error encountered in email emission" })
+      res
+        .status(500)
+        .json({ response: "error", message: "error encountered in email fetching for accounts" })
     }
   } catch (e) {
     console.error(e)

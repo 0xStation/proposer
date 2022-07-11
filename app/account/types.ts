@@ -19,7 +19,7 @@ export type AccountMetadata = {
   verified?: boolean
   bio?: string
   hasSavedEmail?: boolean
-  // TODO: add hasVerifiedEmail: boolean
+  // TODO: add hasVerifiedEmail?: boolean
 }
 
 export type Account = {
