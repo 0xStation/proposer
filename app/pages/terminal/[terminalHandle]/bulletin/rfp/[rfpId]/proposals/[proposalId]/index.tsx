@@ -32,23 +32,13 @@ import { useWaitForTransaction } from "wagmi"
 import { ZERO_ADDRESS } from "app/core/utils/constants"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import { formatUnits } from "ethers/lib/utils"
-import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
-import {
-  TrashIcon,
-  XCircleIcon,
-  PencilIcon,
-  InboxInIcon,
-  DotsHorizontalIcon,
-  ClipboardCheckIcon,
-  ClipboardIcon,
-} from "@heroicons/react/solid"
+import { DotsHorizontalIcon, ClipboardCheckIcon, ClipboardIcon } from "@heroicons/react/solid"
 import Dropdown from "app/core/components/Dropdown"
 
 const ProposalPage: BlitzPage = ({
   rfp,
   proposal,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const terminalHandle = useParam("terminalHandle") as string
   const setToastState = useStore((state) => state.setToastState)
@@ -210,13 +200,6 @@ const ProposalPage: BlitzPage = ({
                     <div className="flex flex-col">
                       <h1 className="text-2xl font-bold">{proposal.data.content.title}</h1>
                       <div className="relative mr-6 mt-2 mb-8">
-                        <button
-                          onClick={() => {
-                            router.push(Routes.EditRfpPage({ terminalHandle, rfpId: rfp.id }))
-                          }}
-                        >
-                          <PencilIcon className="inline h-4 w-4 fill-marble-white mr-3 hover:cursor-pointer hover:fill-concrete" />
-                        </button>
                         <Dropdown
                           className="inline"
                           side="left"
