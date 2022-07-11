@@ -135,6 +135,7 @@ const AccountForm = ({
   const [coverURL, setCoverURL] = useState<string | undefined>()
   const [pfpURL, setPfpURL] = useState<string | undefined>()
   const setActiveUser = useStore((state) => state.setActiveUser)
+  const setToastState = useStore((state) => state.setToastState)
 
   const [createAccountMutation] = useMutation(createAccount, {
     onSuccess: (data) => {
@@ -160,6 +161,14 @@ const AccountForm = ({
     // initialize pfpInput and coverInput with user's pre-existing images
     setPfpURL(account?.data?.pfpURL)
     setCoverURL(account?.data?.coverURL)
+    // if email fetch fails, notify user
+    if (account?.emailFetchError) {
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: account.emailFetchError,
+      })
+    }
   }, [account?.data?.pfpURL, account?.data?.coverURL])
 
   return (

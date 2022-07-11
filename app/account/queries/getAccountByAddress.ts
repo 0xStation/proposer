@@ -15,8 +15,15 @@ export default async function getAccountByAddress(input: z.infer<typeof GetAccou
 
   // storing email with Privy, not our database, so we need to fetch it directly
   let email
+  let emailFetchError
   if (!!input.includeEmail) {
-    email = await getEmail(input.address)
+    try {
+      email = await getEmail(input.address)
+    } catch (e) {
+      console.error(e)
+      emailFetchError = "Failed to fetch email"
+      // error to be used in toasts for user feedback
+    }
   }
 
   const account = await db.account.findFirst({
@@ -43,5 +50,6 @@ export default async function getAccountByAddress(input: z.infer<typeof GetAccou
   return {
     ...account,
     data: { ...(account.data as AccountMetadata), ...(!!email && { email }) },
+    ...(!!emailFetchError && { emailFetchError }),
   } as Account
 }

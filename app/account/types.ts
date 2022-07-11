@@ -34,4 +34,5 @@ export type Account = {
   tickets?: any[]
   initiatives?: any[]
   proposals?: AccountProposal[]
+  emailFetchError?: string
 }
