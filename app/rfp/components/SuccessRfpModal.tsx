@@ -16,7 +16,7 @@ export const SuccessRfpModal = ({ terminal, isOpen, setIsOpen, rfpId, isEdit = t
         </p>
         <div className="mt-8">
           <button
-            type="submit"
+            type="button"
             className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75 w-32"
             onClick={() => {
               navigator.clipboard

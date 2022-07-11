@@ -176,7 +176,7 @@ const RfpMarkdownForm = ({
                         RFP_STATUS_DISPLAY_MAP[rfp?.status || "DRAFT"]?.color
                       }`}
                     />
-                    <span className="text-xs uppercase tracking-wider">
+                    <span className="text-xs uppercase tracking-wider font-bold">
                       {RFP_STATUS_DISPLAY_MAP[rfp?.status || "DRAFT"]?.copy}
                     </span>
                   </div>
@@ -224,7 +224,7 @@ const RfpMarkdownForm = ({
                         }}
                       </Field>
                     ) : (
-                      <Preview markdown={markdown} />
+                      <Preview markdown={formState.values.markdown} />
                     )}
                   </div>
                 </div>
@@ -233,7 +233,7 @@ const RfpMarkdownForm = ({
                     <span className="font-bold cursor-pointer">General</span>
                     <div className="flex flex-row space-x-1 items-center cursor-not-allowed">
                       <LockClosedIcon className="h-4 w-4 hover:stroke-light-concrete text-concrete" />
-                      <span className="text-concrete">Permission</span>
+                      <span className="text-concrete">Custom questions</span>
                     </div>
                   </div>
                   <form className="p-4 grow flex flex-col justify-between">

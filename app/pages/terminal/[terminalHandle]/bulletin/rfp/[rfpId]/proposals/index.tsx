@@ -1,8 +1,19 @@
 import { useState, useEffect } from "react"
-import { BlitzPage, Routes, useParam, useQuery, Link, useRouterQuery, invalidateQuery } from "blitz"
+import {
+  BlitzPage,
+  Routes,
+  useParam,
+  useQuery,
+  useRouter,
+  Link,
+  useRouterQuery,
+  invalidateQuery,
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+  invoke,
+} from "blitz"
 import useStore from "app/core/hooks/useStore"
 import Layout from "app/core/layouts/Layout"
-import Modal from "app/core/components/Modal"
 import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
 import GetNotifiedModal from "app/proposal/components/GetNotifiedModal"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
@@ -24,8 +35,13 @@ import { Proposal, ProposalStatus } from "app/proposal/types"
 import FilterPill from "app/core/components/FilterPill"
 import Pagination from "app/core/components/Pagination"
 import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpId"
+import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
+import { formatUnits } from "ethers/lib/utils"
 
-const ProposalsTab: BlitzPage = () => {
+const ProposalsTab: BlitzPage = ({
+  rfp,
+  terminal,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const activeUser = useStore((state) => state.activeUser)
   const { proposalId } = useRouterQuery() as { proposalId: string }
   const terminalHandle = useParam("terminalHandle") as string
@@ -34,17 +50,6 @@ const ProposalsTab: BlitzPage = () => {
     new Set<ProposalStatus>()
   )
   const [page, setPage] = useState<number>(0)
-  const [terminal] = useQuery(
-    getTerminalByHandle,
-    { handle: terminalHandle as string },
-    { suspense: false, enabled: !!terminalHandle }
-  )
-
-  const [rfp] = useQuery(
-    getRfpById,
-    { id: rfpId },
-    { suspense: false, enabled: !!rfpId, refetchOnWindowFocus: false }
-  )
 
   const [proposals] = useQuery(
     getProposalsByRfpId,
@@ -173,6 +178,16 @@ const ProposalComponent = ({
   rfp: Rfp
   terminalHandle: string
 }) => {
+  const router = useRouter()
+
+  const funds = useCheckbookFunds(
+    rfp.checkbook?.chainId as number,
+    rfp.checkbook?.address as string,
+    rfp.checkbook?.quorum as number,
+    proposal.data?.funding.token
+  )
+  const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
+
   return (
     <Link href={Routes.ProposalPage({ terminalHandle, rfpId: rfp.id, proposalId: proposal.id })}>
       <div className="border-b border-concrete w-full cursor-pointer hover:bg-wet-concrete pt-5">
@@ -182,8 +197,8 @@ const ProposalComponent = ({
               PROPOSAL_STATUS_DISPLAY_MAP[proposal.status]?.color || "bg-concrete"
             }`}
           />
-          <span className="text-xs uppercase tracking-wider">
-            {PROPOSAL_STATUS_DISPLAY_MAP[proposal.status]?.copy}
+          <span className="text-xs uppercase tracking-wider font-bold">
+            {PROPOSAL_STATUS_DISPLAY_MAP[proposal?.status]?.copy || proposal?.status}
           </span>
         </div>
         <div className="w-full flex flex-row mb-5">
@@ -197,14 +212,39 @@ const ProposalComponent = ({
                 twsize={6}
                 cutoff={0}
               />
-              <p>
+              <p className="ml-2">
                 {/* TODO: Figure out how to show signers per milestone */}
                 {`${proposal.approvals?.length || "0"} / ${rfp?.checkbook?.quorum || "N/A"}`}
               </p>
             </div>
           </div>
-          <div className="basis-32 ml-6 mb-2 self-center">
+          <div
+            className={`basis-32 ml-6 mb-2 self-center relative group ${
+              parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
+              proposal.checks.length === 0 &&
+              "text-torch-red"
+            }`}
+          >
             {proposal.data?.funding?.amount || "N/A"}
+            {/* if there are no checks, it means the value of this prop is not pending, and can be overallocated */}
+            {parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
+              proposal.checks.length === 0 && (
+                <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[100%] left-0 group hidden group-hover:block shadow-lg z-50">
+                  Insufficient funds.{" "}
+                  <span
+                    className="text-electric-violet"
+                    onClick={(e) => {
+                      // overriding the parent click handler
+                      e.preventDefault()
+                      // todo: only want to show this to people who have permission to see the checkbook.
+                      router.push(Routes.NewCheckbookSettingsPage({ terminalHandle }))
+                    }}
+                  >
+                    Go to checkbook
+                  </span>{" "}
+                  to refill.
+                </span>
+              )}
           </div>
           <div className="basis-32 ml-2 mb-2 self-center">
             {formatDate(proposal.createdAt) || "N/A"}
@@ -224,6 +264,29 @@ const ProposalComponent = ({
       </div>
     </Link>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { terminalHandle, rfpId, proposalId } = context.query as {
+    terminalHandle: string
+    rfpId: string
+    proposalId: string
+  }
+  const terminal = await invoke(getTerminalByHandle, { handle: terminalHandle })
+  const rfp = await invoke(getRfpById, { id: rfpId })
+
+  if (!rfp || !terminal) {
+    return {
+      redirect: {
+        destination: Routes.BulletinPage({ terminalHandle }),
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: { rfp, terminal },
+  }
 }
 
 export default ProposalsTab

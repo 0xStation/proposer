@@ -20,6 +20,7 @@ import getProposalById from "app/proposal/queries/getProposalById"
 import { Check } from "app/check/types"
 import { PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
+import truncateString from "app/core/utils/truncateString"
 import ProgressIndicator from "app/core/components/ProgressIndicator"
 import CashCheckModal from "app/check/components/CashCheckModal"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
@@ -28,6 +29,8 @@ import LinkArrow from "app/core/icons/LinkArrow"
 import { Spinner } from "app/core/components/Spinner"
 import { useWaitForTransaction } from "wagmi"
 import { ZERO_ADDRESS } from "app/core/utils/constants"
+import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
+import { formatUnits } from "ethers/lib/utils"
 
 const ProposalPage: BlitzPage = ({
   rfp,
@@ -80,6 +83,14 @@ const ProposalPage: BlitzPage = ({
     }
   )
 
+  const funds = useCheckbookFunds(
+    rfp.checkbook?.chainId as number,
+    rfp.checkbook?.address as string,
+    rfp.checkbook?.quorum as number,
+    proposal.data?.funding.token
+  )
+  const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
+
   const hasQuorum = check?.approvals?.length === rfp?.checkbook.quorum
 
   // user can approve if they are a signer and they haven't approved before
@@ -88,7 +99,8 @@ const ProposalPage: BlitzPage = ({
     !proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address)
 
   // show approve button, if there the proposal hasn't reached quorum, user can approve, user hasn't already approved
-  const showApproveButton = !hasQuorum && userCanApprove
+  const showApproveButton =
+    !hasQuorum && userCanApprove && parseFloat(fundsAvailable) < proposal.data.funding?.amount
 
   // proposer has reached quorum and check has not been cashed and user is the proposer
   const showCashButton =
@@ -167,12 +179,28 @@ const ProposalPage: BlitzPage = ({
                   PROPOSAL_STATUS_DISPLAY_MAP[proposal?.status]?.color || "bg-concrete"
                 }`}
               />
-              <span className="text-xs uppercase tracking-wider">
+              <span className="text-xs uppercase tracking-wider font-bold">
                 {PROPOSAL_STATUS_DISPLAY_MAP[proposal?.status]?.copy}
               </span>
             </div>
-            <h1 className="mt-6 text-2xl font-bold">{proposal?.data.content.title}</h1>
-            {/* collaborators would go here, but we have not created collaborators yet */}
+            <h1 className="mt-6 text-2xl font-bold mb-2">{proposal.data.content.title}</h1>
+            {proposal.collaborators.map((collaborator, idx) => {
+              if (collaborator.account?.data) {
+                return <AccountMediaObject account={collaborator.account} />
+              } else {
+                return (
+                  <div className="flex flex-row items-center" key={`account-${idx}`}>
+                    <img
+                      src={DEFAULT_PFP_URLS.USER}
+                      alt="PFP"
+                      className="w-[32px] h-[32px] rounded-full"
+                    />
+                    <div className="ml-2">{truncateString(collaborator.account)}</div>
+                  </div>
+                )
+              }
+            })}
+
             <div className="w-full overflow-y-scroll mt-6">
               <Preview markdown={proposal?.data.content.body} />
             </div>
@@ -197,10 +225,12 @@ const ProposalPage: BlitzPage = ({
               <h4 className="text-xs font-bold text-concrete uppercase mt-6">
                 Request for Proposal
               </h4>
-              <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })}>
-                <p className="mt-2 text-electric-violet cursor-pointer">
-                  {rfp?.data.content.title}
-                </p>
+              <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })} passHref>
+                <a target="_blank" rel="noopener noreferrer">
+                  <p className="mt-2 text-electric-violet cursor-pointer">
+                    {rfp?.data.content.title}
+                  </p>
+                </a>
               </Link>
               <h4 className="text-xs font-bold text-concrete uppercase mt-6">Total Amount</h4>
               <p className="mt-2 font-normal">{`${proposal?.data.funding.amount} ${tokenSymbol}`}</p>
@@ -234,7 +264,7 @@ const ProposalPage: BlitzPage = ({
                 </div>
               </div>
             </div>
-            {checks?.length && check && (
+            {check && (
               <div className="p-6 grow flex flex-col justify-between">
                 <div className="mt-6">
                   <p className="text-xs text-concrete uppercase font-bold">Check</p>

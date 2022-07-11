@@ -192,7 +192,7 @@ const TokenSettingsPage: BlitzPage = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-6 mt-12">
+                  <div className="space-y-6 mt-9">
                     <div>
                       <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
                         Chain

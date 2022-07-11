@@ -1,5 +1,6 @@
 import { RfpStatus } from "app/rfp/types"
-import { ProposalStatus } from "app/proposal/types"
+import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
+import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 
 export const CONTRACTS = {
   // Localhost, change to whatever the forge script outputs when running local anvil
@@ -47,15 +48,15 @@ export const RFP_STATUS_DISPLAY_MAP = {
 }
 
 export const PROPOSAL_STATUS_DISPLAY_MAP = {
-  [ProposalStatus.SUBMITTED]: {
+  [ProductProposalStatus.SUBMITTED]: {
     copy: "submitted",
-    color: "bg-marble-white",
+    color: "bg-concrete",
   },
-  [ProposalStatus.IN_REVIEW]: {
+  [ProductProposalStatus.IN_REVIEW]: {
     copy: "in review",
     color: "bg-neon-carrot",
   },
-  [ProposalStatus.APPROVED]: {
+  [ProductProposalStatus.APPROVED]: {
     copy: "approved",
     color: "bg-magic-mint",
   },
@@ -70,9 +71,9 @@ export const RFP_STATUSES_FILTER_OPTIONS = [
 ]
 
 export const PROPOSAL_STATUSES_FILTER_OPTIONS = [
-  ProposalStatus.SUBMITTED,
-  ProposalStatus.IN_REVIEW,
-  ProposalStatus.APPROVED,
+  ProductProposalStatus.SUBMITTED,
+  ProductProposalStatus.IN_REVIEW,
+  ProductProposalStatus.APPROVED,
 ]
 
 export const SENDGRID_TEMPLATES = {
