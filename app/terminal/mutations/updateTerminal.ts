@@ -10,9 +10,15 @@ const UpdateTerminal = z.object({
   id: z.number(),
   name: z.string().optional(),
   handle: z.string().optional(),
+  description: z.string().optional(),
   pfpURL: z.string().optional(),
   guildId: z.string().optional(),
   adminAddresses: z.string().array().optional().default([]),
+  contactUrl: z.string().optional(),
+  twitterUrl: z.string().optional(),
+  githubUrl: z.string().optional(),
+  instagramUrl: z.string().optional(),
+  tiktokUrl: z.string().optional(),
 })
 
 export default async function updateTerminal(input: z.infer<typeof UpdateTerminal>) {
@@ -138,6 +144,12 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
    */
   const payload = {
     data: {
+      contactUrl: params.contactUrl,
+      twitterUrl: params.twitterUrl,
+      githubUrl: params.githubUrl,
+      instagramUrl: params.instagramUrl,
+      tiktokUrl: params.tiktokUrl,
+      description: params.description,
       ...updatedTerminalMetadata,
       ...(params.pfpURL && { pfpURL: params.pfpURL }),
       ...(params.name && { name: params.name }),

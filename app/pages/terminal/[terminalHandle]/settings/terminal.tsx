@@ -8,7 +8,13 @@ import {
   GetServerSideProps,
   invoke,
   getSession,
+  Image,
 } from "blitz"
+import PersonalSiteIcon from "public/personal-site-icon.svg"
+import TwitterIcon from "public/twitter-icon.svg"
+import GithubIcon from "public/github-icon.svg"
+import TikTokIcon from "public/tiktok-icon.svg"
+import InstagramIcon from "public/instagram-icon.svg"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Navigation from "app/terminal/components/settings/navigation"
 import updateTerminal from "app/terminal/mutations/updateTerminal"
@@ -17,7 +23,12 @@ import UploadIcon from "app/core/icons/UploadIcon"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
-import { composeValidators, mustBeUnderNumCharacters, requiredField } from "app/utils/validators"
+import {
+  composeValidators,
+  mustBeUnderNumCharacters,
+  mustBeUrl,
+  requiredField,
+} from "app/utils/validators"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
@@ -149,11 +160,11 @@ const TerminalSettingsPage: BlitzPage = () => {
             <Form
               initialValues={
                 {
-                  name: terminal.data.name,
                   handle: terminal.handle,
                   adminAddresses: adminAccounts
                     ?.map((adminAccount) => adminAccount?.address)
                     ?.join(",\n"),
+                  ...terminal.data,
                 } || {}
               }
               onSubmit={async (values) => {
@@ -251,6 +262,139 @@ const TerminalSettingsPage: BlitzPage = () => {
                                 </div>
                               )}
                             </Field>
+                            <div className="flex flex-col mt-6">
+                              <label className="mb-2 font-bold text-base">Socials</label>
+                              <Field name="contactUrl" validate={mustBeUrl}>
+                                {({ input, meta }) => (
+                                  <div className="h-10 w-8/12 border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
+                                    <div className="py-2 px-3 mx-1 w-[2%] inline border-r border-concrete h-full">
+                                      <Image
+                                        src={PersonalSiteIcon}
+                                        alt="Personal Site Icon."
+                                        width={14}
+                                        height={14}
+                                      />
+                                    </div>
+                                    <input
+                                      {...input}
+                                      type="text"
+                                      placeholder="e.g. https://mirror.xyz/sushiDAO"
+                                      className="h-full inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white"
+                                    />
+                                    {/* this error shows up when the user focuses the field (meta.touched) */}
+                                    {meta.error && meta.touched && (
+                                      <span className="text-xs text-torch-red block">
+                                        {meta.error}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </Field>
+                              <Field name="twitterUrl" validate={mustBeUrl}>
+                                {({ input, meta }) => (
+                                  <div className="h-10 w-8/12 border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
+                                    <div className="py-2 px-3 mx-1 w-[2%] inline border-r border-concrete h-full">
+                                      <Image
+                                        src={TwitterIcon}
+                                        alt="Twitter Icon."
+                                        width={14}
+                                        height={14}
+                                      />
+                                    </div>
+                                    <input
+                                      {...input}
+                                      type="text"
+                                      placeholder="e.g. https://twitter.com/sushiDAO"
+                                      className="h-full inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white"
+                                    />
+                                    {/* this error shows up when the user focuses the field (meta.touched) */}
+                                    {meta.error && meta.touched && (
+                                      <span className="text-xs text-torch-red mb-2 block">
+                                        {meta.error}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </Field>
+                              <Field name="githubUrl" validate={mustBeUrl}>
+                                {({ input, meta }) => (
+                                  <div className="h-10 w-8/12 border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
+                                    <div className="py-2 px-3 mx-1 w-[2%] inline border-r border-concrete h-full">
+                                      <Image
+                                        src={GithubIcon}
+                                        alt="Github Icon."
+                                        width={14}
+                                        height={14}
+                                      />
+                                    </div>
+                                    <input
+                                      {...input}
+                                      type="text"
+                                      placeholder="e.g. https://github.com/sushiDAO"
+                                      className="h-full inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white"
+                                    />
+                                    {/* this error shows up when the user focuses the field (meta.touched) */}
+                                    {meta.error && meta.touched && (
+                                      <span className=" text-xs text-torch-red mb-2 block">
+                                        {meta.error && meta.touched && meta.error}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </Field>
+                              <Field name="tiktokUrl" validate={mustBeUrl}>
+                                {({ input, meta }) => (
+                                  <div className="h-10 w-8/12 border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
+                                    <div className="py-2 px-3 mx-1 w-[2%] inline border-r border-concrete h-full">
+                                      <Image
+                                        src={TikTokIcon}
+                                        alt="TikTok Icon."
+                                        width={14}
+                                        height={14}
+                                      />
+                                    </div>
+                                    <input
+                                      {...input}
+                                      type="text"
+                                      placeholder="e.g. https://tiktok.com/sushiDAO"
+                                      className="h-full inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white"
+                                    />
+                                    {/* this error shows up when the user focuses the field (meta.touched) */}
+                                    {meta.error && meta.touched && (
+                                      <span className=" text-xs text-torch-red mb-2 block">
+                                        {meta.error}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </Field>
+                              <Field name="instagramUrl" validate={mustBeUrl}>
+                                {({ input, meta }) => (
+                                  <div className="h-10 w-8/12 border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
+                                    <div className="py-2 px-3 mx-1 w-[2%] inline border-r border-concrete h-full">
+                                      <Image
+                                        src={InstagramIcon}
+                                        alt="Instagram Icon."
+                                        width={14}
+                                        height={14}
+                                      />
+                                    </div>
+                                    <input
+                                      {...input}
+                                      type="text"
+                                      placeholder="e.g. https://instagram.com/sushiDAO"
+                                      className="h-full inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white"
+                                    />
+                                    {/* this error shows up when the user focuses the field (meta.touched) */}
+                                    {meta.error && meta.touched && (
+                                      <span className=" text-xs text-torch-red mb-2 block">
+                                        {meta.error}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </Field>
+                            </div>
                           </div>
                         </div>
                       </div>

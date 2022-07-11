@@ -10,8 +10,13 @@ export enum MethodToVisualizeContributorsNft {
 
 export type TerminalMetadata = {
   name: string
-  description: string
-  pfpURL: string
+  description?: string
+  pfpURL?: string
+  contactUrl?: string
+  twitterUrl?: string
+  githubUrl?: string
+  tiktokUrl?: string
+  instagramUrl?: string
   guildId?: string
   permissions: {
     accountWhitelist?: string[] // provides `isAdmin` access based on specific addresses

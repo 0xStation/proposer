@@ -6,8 +6,13 @@ import { Terminal, TerminalMetadata } from "../types"
 const CreateTerminal = z.object({
   name: z.string(),
   handle: z.string(),
+  description: z.string().optional(),
   pfpURL: z.string().optional(),
   accountId: z.number().optional(),
+  contactUrl: z.string().optional(),
+  twitterUrl: z.string().optional(),
+  githubUrl: z.string().optional(),
+  instagramUrl: z.string().optional(),
 })
 
 export default async function createTerminal(input: z.infer<typeof CreateTerminal>, ctx: Ctx) {
@@ -17,6 +22,11 @@ export default async function createTerminal(input: z.infer<typeof CreateTermina
     data: {
       pfpURL: params.pfpURL,
       name: params.name,
+      description: params.description,
+      contactUrl: params.contactUrl,
+      twitterUrl: params.twitterUrl,
+      githubUrl: params.githubUrl,
+      instagramUrl: params.instagramUrl,
       permissions: {
         accountWhitelist: [ctx.session.siwe?.address],
       },
