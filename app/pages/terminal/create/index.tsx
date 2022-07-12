@@ -17,7 +17,7 @@ import {
 } from "app/utils/validators"
 import Exit from "/public/exit-button.svg"
 import useStore from "app/core/hooks/useStore"
-import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
+import Layout from "app/core/layouts/Layout"
 import { sendTerminalCreationNotification } from "app/utils/sendTerminalCreatedNotification"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
 
@@ -77,23 +77,19 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
   const router = useRouter()
   const setToastState = useStore((state) => state.setToastState)
   const [pfpURL, setPfpURL] = useState<string>("")
-  const [createTerminalMutation] = useMutation(createTerminal, {
-    onSuccess: (data) => {
-      router.push(Routes.MemberDirectoryPage({ terminalHandle: data.handle, tutorial: "true" }))
-    },
-  })
+  const [createTerminalMutation] = useMutation(createTerminal)
 
   return (
-    <LayoutWithoutNavigation>
-      <main className="text-marble-white min-h-screen max-w-screen-sm sm:mx-auto m-5">
-        <div
-          className="absolute top-4 left-4 cursor-pointer"
-          onClick={() => {
-            Router.back()
-          }}
-        >
-          <Image src={Exit} alt="Close button" width={12} height={12} />
-        </div>
+    <Layout>
+      <div
+        className="absolute top-0 left-2 cursor-pointer"
+        onClick={() => {
+          Router.back()
+        }}
+      >
+        <Image src={Exit} alt="Close button" width={12} height={12} />
+      </div>
+      <main className="text-marble-white min-h-screen max-w-screen-sm sm:mx-auto mb-5">
         {session.userId ? (
           <div className="w-[31rem]">
             <div className="flex flex-row mt-16">
@@ -122,9 +118,10 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                 },
                 form
               ) => {
-                if (session.userId !== null && !form.getState().errors) {
+                console.log("session.userId", form.getState().errors)
+                if (session.userId !== null && !Object.keys(form.getState().errors || {}).length) {
                   try {
-                    await createTerminalMutation({
+                    const terminal = await createTerminalMutation({
                       ...values,
                       adminAddresses: parseUniqueAddresses(values.adminAddresses || ""),
                       pfpURL,
@@ -138,6 +135,9 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                         process.env.BLITZ_PUBLIC_STATION_DISCORD_SERVER_WEBHOOK
                       )
                     }
+                    router.push(
+                      Routes.NewCheckbookTerminalCreationPage({ terminalHandle: terminal.handle })
+                    )
                   } catch (err) {
                     setToastState({ isToastShowing: true, type: "error", message: err.toString() })
                   }
@@ -355,7 +355,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                           className="rounded text-tunnel-black px-8 py-1 bg-electric-violet hover:opacity-70"
                           type="submit"
                         >
-                          Open
+                          Save & continue
                         </button>
                       </div>
                     </div>
@@ -368,7 +368,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
           <div>You need to have an account to create a terminal.</div>
         )}
       </main>
-    </LayoutWithoutNavigation>
+    </Layout>
   )
 }
 

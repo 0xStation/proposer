@@ -38,9 +38,9 @@ export default async function createTerminal(input: z.infer<typeof CreateTermina
     handle: params.handle,
   }
 
-  let adminAccounts
+  let allAdminAccountIds = [] as number[]
+  let inputtedAdminAccountIds = [] as number[]
   if (params.accountId || params.adminAddresses) {
-    let adminAccountIds = [] as number[]
     if (params.adminAddresses) {
       // create accounts if the inputted adminAddresses don't exist
       await db.account.createMany({
@@ -55,7 +55,7 @@ export default async function createTerminal(input: z.infer<typeof CreateTermina
         }),
       })
 
-      adminAccounts = await db.account.findMany({
+      const inputtedAdminAccounts = await db.account.findMany({
         where: {
           address: {
             in: input.adminAddresses,
@@ -63,17 +63,18 @@ export default async function createTerminal(input: z.infer<typeof CreateTermina
         },
       })
 
-      adminAccountIds = adminAccounts.map((account) => account.id)
+      // convert admin accounts array to array of account ids,
+      // filtering to remove the user's id since we will append
+      // to an array that already includes the user's id
+      inputtedAdminAccountIds = inputtedAdminAccounts
+        .map((account) => account.id)
+        .filter((accountId) => accountId !== params.accountId)
     }
-
-    const accountIdsToCreateAccountTerminals =
-      params.accountId && !adminAccountIds.includes(params.accountId)
-        ? [params.accountId].concat(adminAccountIds)
-        : adminAccountIds
+    allAdminAccountIds = [params.accountId as number].concat(inputtedAdminAccountIds)
 
     Object.assign(payload, {
       members: {
-        create: accountIdsToCreateAccountTerminals.map((id) => {
+        create: allAdminAccountIds.map((id) => {
           return {
             account: {
               connect: { id },
@@ -105,6 +106,7 @@ export default async function createTerminal(input: z.infer<typeof CreateTermina
       where: { id: terminal.id },
       data: {
         data: {
+          ...terminal.data,
           permissions: {
             adminTagIdWhitelist: [stationAdminTag.id as number],
             ...(terminal.data.permissions && terminal.data.permissions),
@@ -117,10 +119,10 @@ export default async function createTerminal(input: z.infer<typeof CreateTermina
       // create account tag association for station admin tag and inputted admin accounts
       await db.accountTerminalTag.createMany({
         skipDuplicates: true,
-        data: adminAccounts.map((account) => {
+        data: allAdminAccountIds.map((accountId) => {
           return {
             tagId: stationAdminTag.id as number,
-            ticketAccountId: account.id,
+            ticketAccountId: accountId,
             ticketTerminalId: terminal.id,
           }
         }),
