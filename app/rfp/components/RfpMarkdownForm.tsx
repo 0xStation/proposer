@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useMutation, invalidateQuery, Link, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
-import { LockClosedIcon, XIcon } from "@heroicons/react/solid"
+import { LockClosedIcon, XIcon, RefreshIcon } from "@heroicons/react/solid"
 import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS, RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
@@ -19,10 +19,12 @@ import { requiredField } from "app/utils/validators"
 const RfpMarkdownForm = ({
   terminal,
   checkbooks,
+  refetchCheckbooks,
   isEdit = false,
   rfp = undefined,
 }: {
   terminal: Terminal
+  refetchCheckbooks: any
   checkbooks: Checkbook[]
   isEdit?: boolean
   rfp?: Rfp
@@ -309,18 +311,31 @@ const RfpMarkdownForm = ({
                             )
                           }}
                         </Field>
-                        <Link
-                          href={Routes.NewCheckbookSettingsPage({
-                            terminalHandle: terminal?.handle,
-                          })}
-                          passHref
-                        >
-                          <a target="_blank" rel="noopener noreferrer">
-                            <span className="text-electric-violet cursor-pointer mt-1 block font-bold">
-                              + Create new
-                            </span>
-                          </a>
-                        </Link>
+                        <div className="flex items-center justify-between">
+                          <Link
+                            href={Routes.NewCheckbookSettingsPage({
+                              terminalHandle: terminal?.handle,
+                            })}
+                            passHref
+                          >
+                            <a target="_blank" rel="noopener noreferrer">
+                              <span className="text-electric-violet cursor-pointer mt-1 block">
+                                + Create new
+                              </span>
+                            </a>
+                          </Link>
+                          <RefreshIcon
+                            className="h-4 w-4 text-white cursor-pointer"
+                            onClick={() => {
+                              refetchCheckbooks()
+                              setToastState({
+                                isToastShowing: true,
+                                type: "success",
+                                message: "Refetched checkbooks.",
+                              })
+                            }}
+                          />
+                        </div>
                       </div>
                       <button
                         type="button"
