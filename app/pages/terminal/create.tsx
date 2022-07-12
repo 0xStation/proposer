@@ -19,6 +19,7 @@ import Exit from "/public/exit-button.svg"
 import useStore from "app/core/hooks/useStore"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import { sendTerminalCreationNotification } from "app/utils/sendTerminalCreatedNotification"
+import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
 
 const PfpInput = ({ pfpURL, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
@@ -112,13 +113,22 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
             </h6>
             <Form
               initialValues={{}}
-              onSubmit={async (values: { name: string; handle: string; pfpURL?: string }) => {
-                if (session.userId !== null) {
+              onSubmit={async (
+                values: {
+                  name: string
+                  handle: string
+                  pfpURL?: string
+                  adminAddresses: string
+                },
+                form
+              ) => {
+                if (session.userId !== null && !form.getState().errors) {
                   try {
                     await createTerminalMutation({
                       ...values,
+                      adminAddresses: parseUniqueAddresses(values.adminAddresses || ""),
                       pfpURL,
-                      accountId: session.userId,
+                      accountId: session.userId as number,
                     })
                     if (window !== undefined && window.location.host === "app.station.express") {
                       sendTerminalCreationNotification(
@@ -304,6 +314,36 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                               {meta.error && meta.touched && (
                                 <span className=" text-xs text-torch-red mb-2 block">
                                   {meta.error}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </Field>
+                        <label className="font-bold mt-6">Admin addresses</label>
+                        <span className="text-xs text-concrete block w-3/4 sm:w-[474px]">
+                          Insert wallet addresses that are allowed to manage Terminal settings and
+                          information. Addresses should be comma-separated.
+                        </span>
+                        <Field name="adminAddresses" component="textarea">
+                          {({ input, meta }) => (
+                            <div>
+                              <textarea
+                                {...input}
+                                className="w-3/4 sm:w-[474px] bg-wet-concrete border border-light-concrete rounded p-2 mt-2"
+                                rows={6}
+                                placeholder="Enter wallet addresses"
+                              />
+                              {/* user feedback on number of registered unique addresses, not an error */}
+                              {input && (
+                                <span className=" text-xs text-marble-white ml-2 mb-2 block">
+                                  {`${
+                                    parseUniqueAddresses(input.value || "").length
+                                  } unique addresses detected`}
+                                </span>
+                              )}
+                              {errors?.adminAddresses && (
+                                <span className=" text-xs text-torch-red mb-2 block">
+                                  {errors?.adminAddresses}
                                 </span>
                               )}
                             </div>

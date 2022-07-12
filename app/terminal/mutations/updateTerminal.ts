@@ -34,7 +34,11 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
   }
 
   // create new admins or delete removed admins
-  let updatedTerminalMetadata = JSON.parse(JSON.stringify(existingTerminal.data))
+  let adminTagIdWhitelist = [
+    ...((existingTerminal.data?.permissions?.adminTagIdWhitelist &&
+      existingTerminal.data?.permissions?.adminTagIdWhitelist) ||
+      []),
+  ]
   if (input.adminAddresses) {
     const stationAdminTag = await db.tag.upsert({
       where: {
@@ -123,16 +127,11 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
     })
 
     // If the station admin tag isn't already added to the admin permission whitelist, add it
-    if (
-      updatedTerminalMetadata?.permissions?.adminTagIdWhitelist &&
-      !updatedTerminalMetadata?.permissions?.adminTagIdWhitelist.includes(stationAdminTag.id)
-    ) {
+    if (!adminTagIdWhitelist?.includes(stationAdminTag.id)) {
       // https://lodash.com/docs/4.17.15#set
       // > Sets the value at path of object. If a portion of path doesn't exist, it's created.
-      set(
-        updatedTerminalMetadata,
-        "permissions.adminTagIdWhitelist",
-        [stationAdminTag.id].concat(existingTerminal.data?.permissions?.adminTagIdWhitelist || [])
+      adminTagIdWhitelist = [stationAdminTag.id].concat(
+        existingTerminal.data?.permissions?.adminTagIdWhitelist || []
       )
     }
   }
@@ -150,7 +149,10 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
       instagramUrl: params.instagramUrl,
       tiktokUrl: params.tiktokUrl,
       description: params.description,
-      ...updatedTerminalMetadata,
+      permissions: {
+        adminTagIdWhitelist,
+        accountWhitelist: existingTerminal?.data?.permissions?.accountWhitelist || [],
+      },
       ...(params.pfpURL && { pfpURL: params.pfpURL }),
       ...(params.name && { name: params.name }),
       ...(params.guildId && { guildId: params.guildId }),
