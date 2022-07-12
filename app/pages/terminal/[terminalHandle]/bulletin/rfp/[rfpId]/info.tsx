@@ -48,22 +48,26 @@ const RFPInfoTab: BlitzPage = () => {
           <div className="w-[36rem] border-l border-concrete flex-col overflow-y-scroll">
             <div className="border-b border-concrete p-6 ">
               <div className="mt-2">
-                <p className="text-concrete uppercase text-xs font-bold">Start Date</p>
+                <p className="text-concrete uppercase text-xs font-bold">Open date</p>
                 <p className="mt-2">{(rfp?.startDate && formatDate(rfp?.startDate)) || "N/A"}</p>
               </div>
               <div className="mt-6">
-                <p className="text-concrete uppercase text-xs font-bold">End Date</p>
+                <p className="text-concrete uppercase text-xs font-bold">Close date</p>
                 <p className="mt-2">{(rfp?.endDate && formatDate(rfp?.endDate)) || "N/A"}</p>
               </div>
               <div className="mt-6">
-                <p className="text-concrete uppercase text-xs font-bold">Creator</p>
+                <p className="text-concrete uppercase text-xs font-bold">Author</p>
                 <AccountMediaObject account={rfp?.author} className="mt-2" />
               </div>
             </div>
             <div className="p-6">
-              <p className="text-concrete uppercase text-xs font-bold">Checkbook</p>
-              <p className="mt-2 font-bold">{rfp?.checkbook.name}</p>
               <CheckbookIndicator checkbook={rfp?.checkbook} terminal={terminal} />
+              {/* this is a link, but where does it go? Settings? */}
+              <p className="mt-4 text-sm">Checkbook: {rfp?.checkbook.name}</p>
+              {/* not sure where add funds is supposed to go do since we don't have any UI for adding funds */}
+              <button className="border border-electric-violet rounded text-electric-violet px-6 h-[35px] mt-2">
+                Add funds
+              </button>
 
               <div className="mt-9">
                 <p className="text-xs text-concrete uppercase font-bold">Signers</p>
