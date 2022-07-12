@@ -27,19 +27,15 @@ export default async function getProposalsByRfpId(input: z.infer<typeof GetPropo
       ...proposalsWhere,
     },
     include: {
-      collaborators: {
-        include: {
-          account: true,
-        },
-      },
+      checks: true,
       approvals: {
         include: {
           signerAccount: true,
         },
       },
-      checks: {
+      collaborators: {
         include: {
-          recipientAccount: true,
+          account: true,
         },
       },
     },
