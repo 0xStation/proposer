@@ -1,4 +1,3 @@
-import set from "lodash.set"
 import truncateString from "app/core/utils/truncateString"
 import { StationPlatformTagValues, TagType } from "app/tag/types"
 import db from "db"
@@ -128,8 +127,6 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
 
     // If the station admin tag isn't already added to the admin permission whitelist, add it
     if (!adminTagIdWhitelist?.includes(stationAdminTag.id)) {
-      // https://lodash.com/docs/4.17.15#set
-      // > Sets the value at path of object. If a portion of path doesn't exist, it's created.
       adminTagIdWhitelist = [stationAdminTag.id].concat(
         existingTerminal.data?.permissions?.adminTagIdWhitelist || []
       )
