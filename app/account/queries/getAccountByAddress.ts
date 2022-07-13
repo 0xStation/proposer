@@ -9,25 +9,20 @@ const GetAccountByAddress = z.object({
 })
 
 export default async function getAccountByAddress(input: z.infer<typeof GetAccountByAddress>) {
-  if (!input.address) {
+  const params = GetAccountByAddress.parse(input)
+
+  if (!params.address) {
     return null
   }
 
   // storing email with Privy, not our database, so we need to fetch it directly
   let email
-  let emailFetchError
-  if (!!input.includeEmail) {
-    try {
-      email = await getEmail(input.address)
-    } catch (e) {
-      console.error(e)
-      emailFetchError = "Failed to fetch email"
-      // error to be used in toasts for user feedback
-    }
+  if (!!params.includeEmail) {
+    email = await getEmail(params.address)
   }
 
   const account = await db.account.findFirst({
-    where: { address: input.address },
+    where: { address: params.address },
     include: {
       tickets: {
         include: {
@@ -50,6 +45,5 @@ export default async function getAccountByAddress(input: z.infer<typeof GetAccou
   return {
     ...account,
     data: { ...(account.data as AccountMetadata), ...(!!email && { email }) },
-    ...(!!emailFetchError && { emailFetchError }),
   } as Account
 }

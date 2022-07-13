@@ -6,7 +6,7 @@ import { Proposal } from "app/proposal/types"
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
-import { getEmail } from "app/utils/privy"
+import { getEmails } from "app/utils/privy"
 
 const EmailRequest = z.object({
   proposalId: z.string(),
@@ -45,7 +45,12 @@ export default async function handler(req, res) {
       proposal: Proposal & { rfp: Rfp & { terminal: Terminal; checkbook: Checkbook } }
     }
 
-    const recipientAccounts = await db.account.findMany({
+    if (!data) {
+      res.status(404)
+      return
+    }
+
+    const checkbookSigners = await db.account.findMany({
       where: {
         address: {
           in: data.proposal.rfp.checkbook.signers,
@@ -53,17 +58,12 @@ export default async function handler(req, res) {
       },
     })
 
-    if (!data) {
-      res.status(404)
-      return
-    }
+    const addresses = checkbookSigners
+      .filter((account) => !!(account.data as AccountMetadata).hasSavedEmail) // TODO: replace with hasVerifiedEmail
+      .map((account) => account.address as string)
 
     try {
-      const emailRequests = recipientAccounts
-        .filter((account) => !!(account.data as AccountMetadata).hasSavedEmail) // TODO: replace with hasVerifiedEmail
-        .map((account) => getEmail(account.address as string))
-
-      const emails = (await Promise.all(emailRequests)).map((email) => email as string)
+      const emails = await getEmails(addresses)
 
       try {
         await email.sendNewProposalEmail({

@@ -26,3 +26,14 @@ export const getEmail = async (address: string) => {
     throw e
   }
 }
+
+export const getEmails = async (addresses: string[]) => {
+  const promises = addresses.map((address) => getEmail(address))
+  try {
+    const emails = await Promise.all(promises)
+    return emails.filter((email) => !!email) as string[] // remove empty strings
+  } catch (e) {
+    console.error(e)
+    throw e
+  }
+}

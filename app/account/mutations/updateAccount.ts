@@ -37,12 +37,7 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
     // if no saved email yet, only save if email was provided
     (!(existingAccount.data as AccountMetadata).hasSavedEmail && !!params.email)
   ) {
-    try {
-      await saveEmail(params.address as string, params.email || "")
-    } catch (e) {
-      console.error("updateAccount: ", e)
-      throw e
-    }
+    await saveEmail(params.address as string, params.email || "")
   }
 
   const payload = {

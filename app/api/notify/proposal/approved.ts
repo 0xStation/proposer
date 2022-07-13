@@ -5,7 +5,7 @@ import { Account, AccountMetadata } from "app/account/types"
 import { Proposal } from "app/proposal/types"
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
-import { getEmail } from "app/utils/privy"
+import { getEmails } from "app/utils/privy"
 
 const EmailRequest = z.object({
   proposalId: z.string(),
@@ -48,12 +48,13 @@ export default async function handler(req, res) {
       return
     }
 
-    try {
-      const emailRequests = proposal.collaborators
-        .filter((collaborator) => !!(collaborator.account?.data as AccountMetadata).hasSavedEmail) // TODO: replace with hasVerifiedEmail
-        .map((collaborator) => getEmail(collaborator.account?.address as string))
+    const addresses = proposal.collaborators
+      .filter((collaborator) => !!(collaborator.account?.data as AccountMetadata).hasSavedEmail) // TODO: replace with hasVerifiedEmail
+      .map((collaborator) => collaborator.account?.address as string)
 
-      const emails = (await Promise.all(emailRequests)).map((email) => email as string)
+    try {
+      // fetch emails from Privy to notify
+      const emails = await getEmails(addresses)
 
       try {
         await email.sendApprovedProposalEmail({

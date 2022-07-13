@@ -2,6 +2,7 @@ import db from "db"
 import * as z from "zod"
 import { Ctx } from "blitz"
 import { Account } from "../types"
+import { saveEmail } from "app/utils/privy"
 
 const CreateAccount = z.object({
   name: z.string().optional(),
@@ -21,12 +22,16 @@ const CreateAccount = z.object({
 export default async function createAccount(input: z.infer<typeof CreateAccount>, ctx: Ctx) {
   const params = CreateAccount.parse(input)
 
+  // store email with Privy so it does not live in our database to reduce leakage risk
+  if (!!params.email) {
+    await saveEmail(params.address as string, params.email)
+  }
+
   const payload = {
     address: params.address,
     data: {
       name: params.name,
       bio: params.bio,
-      email: params.email,
       pfpURL: params.pfpURL,
       coverURL: params.coverURL,
       contactURL: params.contactURL,
@@ -34,6 +39,8 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
       githubUrl: params.githubUrl,
       tiktokUrl: params.tiktokUrl,
       instagramUrl: params.instagramUrl,
+      // mark email as saved for this account to not show email input modals
+      hasSavedEmail: !!params.email,
     },
   }
 

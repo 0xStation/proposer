@@ -67,6 +67,6 @@ export const isAddress = (address: string) => {
 }
 
 export const isValidEmail = (email: string) => {
-  if (!email) return undefined
+  if (!email) return undefined // prevent empty strings from triggering validator for optional form inputs
   return isEmail(email) ? undefined : "Invalid email"
 }
