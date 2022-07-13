@@ -237,7 +237,7 @@ const ProposalComponent = ({
                       // overriding the parent click handler
                       e.preventDefault()
                       // todo: only want to show this to people who have permission to see the checkbook.
-                      router.push(Routes.NewCheckbookSettingsPage({ terminalHandle }))
+                      router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
                     }}
                   >
                     Go to checkbook
