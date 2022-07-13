@@ -74,17 +74,18 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
           </div>
           {session?.siwe?.address && hasAdminPermissions && (
             <div className="mt-3 mr-2 ml-auto">
-              <Link
-                href={
-                  !tutorial
-                    ? Routes.TerminalSettingsPage({ terminalHandle })
-                    : Routes.DiscordSettingsPage({ terminalHandle })
-                }
+              <button
+                className={`${!!tutorial && "z-30"} group`}
+                onClick={() => {
+                  if (!tutorial) {
+                    router.push(Routes.TerminalSettingsPage({ terminalHandle }))
+                  } else {
+                    router.push(Routes.DiscordSettingsPage({ terminalHandle }))
+                  }
+                }}
               >
-                <button className={`${!!tutorial && "z-30"} group`}>
-                  <SettingsIcon className="group-hover:fill-concrete cursor-pointer" />
-                </button>
-              </Link>
+                <SettingsIcon className="group-hover:fill-concrete cursor-pointer" />
+              </button>
 
               {!!tutorial && (
                 <div

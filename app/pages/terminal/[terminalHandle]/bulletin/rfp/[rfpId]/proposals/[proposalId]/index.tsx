@@ -373,32 +373,29 @@ const ProposalPage: BlitzPage = ({
                     <div className="flex flex-row items-center">
                       <div>{truncateString(check.recipientAddress)}</div>
                     </div>
-                      <div className="flex flex-row items-center space-x-1">
-                        <span
-                          className={`h-2 w-2 rounded-full bg-${
-                            !!check.txnHash ? "magic-mint" : "neon-carrot"
-                          }`}
-                        />
-                        <div className="font-bold text-xs uppercase tracking-wider">
-                          {!!check.txnHash ? "cashed" : "pending"}
-                        </div>
-                        {!!check.txnHash && (
-                          <a
-                            href={`${networks[check.chainId as number].explorer}/tx/${
-                              check.txnHash
-                            }`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <LinkArrow className="fill-marble-white" />
-                          </a>
-                        )}
+                    <div className="flex flex-row items-center space-x-1">
+                      <span
+                        className={`h-2 w-2 rounded-full bg-${
+                          !!check.txnHash ? "magic-mint" : "neon-carrot"
+                        }`}
+                      />
+                      <div className="font-bold text-xs uppercase tracking-wider">
+                        {!!check.txnHash ? "cashed" : "pending"}
                       </div>
+                      {!!check.txnHash && (
+                        <a
+                          href={`${networks[check.chainId as number].explorer}/tx/${check.txnHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <LinkArrow className="fill-marble-white" />
+                        </a>
+                      )}
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </TerminalNavigation>
