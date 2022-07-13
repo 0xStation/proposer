@@ -200,7 +200,6 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
               <span className="text-xs text-concrete block">
                 The number of signers required for a proposal to be approved and for a check to be
                 generated.
-                <br />
                 <a href="#" className="text-electric-violet">
                   Learn more
                 </a>
@@ -216,7 +215,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
                     <input
                       {...input}
                       type="text"
-                      placeholder="1"
+                      placeholder="e.g. 1"
                       className="w-full bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
                     />
                     {/* this error shows up when the user focuses the field (meta.touched) */}

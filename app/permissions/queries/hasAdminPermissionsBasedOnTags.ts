@@ -4,6 +4,8 @@ import { TerminalMetadata } from "app/terminal/types"
 
 const HasAdminPermissionsBasedOnTags = z.object({
   terminalId: z.number(),
+  // when a user logs out, accountId becomes null and we want this query
+  // to return false rather than throw a zod error
   accountId: z.number().optional(),
 })
 

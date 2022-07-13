@@ -60,10 +60,7 @@ const NewCheckbookTerminalCreationPage: BlitzPage = () => {
       <div
         className="absolute top-4 left-4 cursor-pointer"
         onClick={() => {
-          router.push({
-            pathname: `/terminal/${terminalHandle}/bulletin`,
-            query: { terminalCreated: true },
-          })
+          router.push(Routes.BulletinPage({ terminalHandle, terminalCreated: true }))
         }}
       >
         <Image src={Exit} alt="Close button" width={16} height={16} />
@@ -94,10 +91,7 @@ const NewCheckbookTerminalCreationPage: BlitzPage = () => {
           <CheckbookForm
             isEdit={false}
             callback={() =>
-              router.push({
-                pathname: `/terminal/${terminalHandle}/bulletin`,
-                query: { terminalCreated: true },
-              })
+              router.push(Routes.BulletinPage({ terminalHandle, terminalCreated: true }))
             }
           />
         </div>
