@@ -60,7 +60,7 @@ const CheckbookIndicator = ({ terminal, checkbook }) => {
           </a>
         </div>
       </span>
-      <span className="text-2xl">{available}</span>
+      <span className="text-2xl">{parseFloat(available) < 0 ? 0 : available}</span>
       <div className="mt-4">
         <LinearProgressIndicator value={cashed} max={total} color="magic-mint" title="Cashed" />
       </div>

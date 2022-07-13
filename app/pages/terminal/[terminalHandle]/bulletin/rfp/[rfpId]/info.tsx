@@ -109,12 +109,14 @@ const RFPInfoTab: BlitzPage = () => {
                   <span className="text-marble-white">{rfp?.checkbook.name}</span>
                 )}
               </p>
-              <button
-                className="border border-electric-violet rounded text-electric-violet px-6 h-[35px] mt-2"
-                onClick={() => setShowAddFundsModal(true)}
-              >
-                Add funds
-              </button>
+              {isAdmin && (
+                <button
+                  className="border border-electric-violet rounded text-electric-violet px-6 h-[35px] mt-2"
+                  onClick={() => setShowAddFundsModal(true)}
+                >
+                  Add funds
+                </button>
+              )}
 
               <div className="mt-9">
                 <p className="text-xs text-concrete uppercase font-bold">Signers</p>
