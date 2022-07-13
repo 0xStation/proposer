@@ -199,7 +199,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
               <h3 className="font-bold mt-4">Approval quorum*</h3>
               <span className="text-xs text-concrete block">
                 The number of signers required for a proposal to be approved and for a check to be
-                generated.
+                generated.{" "}
                 <a href="#" className="text-electric-violet">
                   Learn more
                 </a>
@@ -234,11 +234,11 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
               <div className="mt-12">
                 {waitingCreation ? (
                   isDeployingCheckbook ? (
-                    <p className="text-electric-violet mb-2">
+                    <p className="text-marble-white mb-2">
                       Sit tight. Contract is deploying. This might take a minute.
                     </p>
                   ) : (
-                    <p className="text-electric-violet mb-2">Check your wallet for next steps.</p>
+                    <p className="text-marble-white mb-2">Check your wallet for next steps.</p>
                   )
                 ) : null}
                 {!isEdit && (

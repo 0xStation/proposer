@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import LinearProgressIndicator from "./LinearProgressIndicator"
 import { formatUnits } from "ethers/lib/utils"
+import { InformationCircleIcon } from "@heroicons/react/solid"
 import getFundingTokens from "app/core/utils/getFundingTokens"
 
 // A component that shows a dropdown of the tokens in a given checkbook
@@ -47,9 +48,19 @@ const CheckbookIndicator = ({ terminal, checkbook }) => {
           })}
         </select>
       </div>
-      <span className="text-xs text-concrete mt-2 block">
-        {available}/{total} available to deploy
+      <span className="mt-4 flex flex-row items-center group relative">
+        <span className="text-xs font-bold uppercase tracking-wider text-concrete">
+          available to deploy
+        </span>
+        <InformationCircleIcon className="h-4 w-4 ml-1 fill-light-concrete" />
+        <div className="hidden group-hover:block absolute top-[100%] bg-wet-concrete p-2 rounded text-xs w-1/2">
+          Token amount available minus pending network fee.{" "}
+          <a className="text-electric-violet" href="#">
+            Learn more.
+          </a>
+        </div>
       </span>
+      <span className="text-2xl">{parseFloat(available) < 0 ? 0 : available}</span>
       <div className="mt-4">
         <LinearProgressIndicator value={cashed} max={total} color="magic-mint" title="Cashed" />
       </div>

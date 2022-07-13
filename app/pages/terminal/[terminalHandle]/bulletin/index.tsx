@@ -27,7 +27,7 @@ import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
 import useStore from "app/core/hooks/useStore"
 import FilterPill from "app/core/components/FilterPill"
 import Pagination from "app/core/components/Pagination"
-import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
+import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 
 const RfpNotFound = () => (
   <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
@@ -47,16 +47,9 @@ const BulletinPage: BlitzPage = () => {
     { handle: terminalHandle as string },
     { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
   )
-  const [hasTagAdminPermissions] = useQuery(
-    hasAdminPermissionsBasedOnTags,
-    { terminalId: terminal?.id as number, accountId: session.userId as number },
-    {
-      suspense: false,
-    }
-  )
 
+  const isLoggedInAndIsAdmin = useAdminForTerminal(terminal)
   const [rfpStatusFilters, setRfpStatusFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
-  const [isLoggedInAndIsAdmin, setIsLoggedInAndIsAdmin] = useState<boolean>(false)
 
   const [page, setPage] = useState<number>(0)
 
@@ -89,17 +82,6 @@ const BulletinPage: BlitzPage = () => {
       refetchOnWindowFocus: false,
     }
   )
-
-  useEffect(() => {
-    if (
-      (session.siwe?.address && hasTagAdminPermissions) ||
-      terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string)
-    ) {
-      setIsLoggedInAndIsAdmin(true)
-    } else {
-      setIsLoggedInAndIsAdmin(false)
-    }
-  }, [session.siwe?.address, hasTagAdminPermissions, terminal?.data?.permissions?.accountWhitelist])
 
   const router = useRouter()
   useEffect(() => {

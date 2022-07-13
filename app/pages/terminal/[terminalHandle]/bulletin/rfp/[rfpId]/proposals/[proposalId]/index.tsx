@@ -31,6 +31,13 @@ import { useWaitForTransaction } from "wagmi"
 import { ZERO_ADDRESS } from "app/core/utils/constants"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import { formatUnits } from "ethers/lib/utils"
+import {
+  DotsHorizontalIcon,
+  ClipboardCheckIcon,
+  ClipboardIcon,
+  LightBulbIcon,
+} from "@heroicons/react/solid"
+import Dropdown from "app/core/components/Dropdown"
 
 const ProposalPage: BlitzPage = ({
   rfp,
@@ -44,6 +51,7 @@ const ProposalPage: BlitzPage = ({
   const [checkTxnHash, setCheckTxnHash] = useState<string>()
   const [tokenSymbol, setTokenSymbol] = useState<string>("ETH")
   const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
+  const [isProposalUrlCopied, setIsProposalUrlCopied] = useState<boolean>(false)
   const [check, setCheck] = useState<Check>()
 
   // not really a fan of this but we need to get the token symbol
@@ -100,7 +108,7 @@ const ProposalPage: BlitzPage = ({
 
   // show approve button, if there the proposal hasn't reached quorum, user can approve, user hasn't already approved
   const showApproveButton =
-    !hasQuorum && userCanApprove && parseFloat(fundsAvailable) < proposal.data.funding?.amount
+    !hasQuorum && userCanApprove && parseFloat(fundsAvailable) > proposal.data.funding?.amount
 
   // proposer has reached quorum and check has not been cashed and user is the proposer
   const showCashButton =
@@ -158,119 +166,213 @@ const ProposalPage: BlitzPage = ({
         />
       )}
       <TerminalNavigation>
-        <div className="grid grid-cols-3 h-screen w-full box-border">
-          <div className="col-span-2 p-6">
-            <p className="self-center">
-              <span className="text-concrete hover:text-light-concrete">
-                <Link href={Routes.BulletinPage({ terminalHandle })}>Bulletin</Link> /&nbsp;
-              </span>
-              <span className="text-concrete hover:text-light-concrete">
-                <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })}>
-                  {`RFP: ${rfp?.data?.content?.title}`}
-                </Link>{" "}
-                /&nbsp;
-              </span>
-              {proposal?.data.content.title}
-            </p>
-
-            <div className="flex flex-row items-center space-x-2 mt-6">
-              <span
-                className={`h-2 w-2 rounded-full ${
-                  PROPOSAL_STATUS_DISPLAY_MAP[proposal?.status]?.color || "bg-concrete"
-                }`}
-              />
-              <span className="text-xs uppercase tracking-wider font-bold">
-                {PROPOSAL_STATUS_DISPLAY_MAP[proposal?.status]?.copy}
-              </span>
+        <div className="h-screen flex flex-col">
+          <div className="w-full border-b border-concrete px-4 pt-4">
+            <div className="flex flex-row justify-between">
+              <p className="self-center">
+                <span className="text-concrete hover:text-light-concrete">
+                  <Link href={Routes.BulletinPage({ terminalHandle })}>Bulletin</Link> /&nbsp;
+                </span>
+                <span className="text-concrete hover:text-light-concrete">
+                  <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })}>
+                    {`RFP: ${rfp?.data?.content?.title}`}
+                  </Link>{" "}
+                  /&nbsp;
+                </span>
+                {proposal?.data.content.title}
+              </p>
             </div>
-            <h1 className="mt-6 text-2xl font-bold mb-2">{proposal.data.content.title}</h1>
-            {proposal.collaborators.map((collaborator, idx) => {
-              if (collaborator.account?.data) {
-                return <AccountMediaObject account={collaborator.account} />
-              } else {
-                return (
-                  <div className="flex flex-row items-center" key={`account-${idx}`}>
-                    <img
-                      src={DEFAULT_PFP_URLS.USER}
-                      alt="PFP"
-                      className="w-[32px] h-[32px] rounded-full"
+            <div className="flex flex-row mt-6">
+              <div className="flex-col w-full">
+                <div className="flex flex-row space-x-4">
+                  <span className=" bg-wet-concrete rounded-full px-2 py-1 flex items-center space-x-1">
+                    <LightBulbIcon className="h-4 w-4 text-marble-white" />
+                    <span className="text-xs uppercase">Proposal</span>
+                  </span>
+                  <div className="flex flex-row items-center space-x-2">
+                    <span
+                      className={`h-2 w-2 rounded-full ${
+                        PROPOSAL_STATUS_DISPLAY_MAP[proposal?.status]?.color || "bg-concrete"
+                      }`}
                     />
-                    <div className="ml-2">{truncateString(collaborator.account)}</div>
+                    <span className="text-xs uppercase tracking-wider font-bold">
+                      {PROPOSAL_STATUS_DISPLAY_MAP[proposal?.status]?.copy}
+                    </span>
                   </div>
-                )
-              }
-            })}
-
-            <div className="w-full overflow-y-scroll mt-6">
-              <Preview markdown={proposal?.data.content.body} />
-            </div>
-          </div>
-          <div className="col-span-1 h-full border-l border-concrete flex flex-col">
-            <div className="border-b border-concrete p-6">
-              <h4 className="text-xs font-bold text-concrete uppercase">Terminal</h4>
-              <div className="flex flex-row items-center mt-2">
-                <img
-                  src={rfp?.terminal.data.pfpURL || DEFAULT_PFP_URLS.TERMINAL}
-                  alt="PFP"
-                  className="w-[40px] h-[40px] rounded-lg"
-                  onError={(e) => {
-                    e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
-                  }}
-                />
-                <div className="ml-2">
-                  <span>{rfp?.terminal.data.name}</span>
-                  <span className="text-xs text-light-concrete flex">@{rfp?.terminal.handle}</span>
+                </div>
+                <div className="flex flex-row w-full mt-3">
+                  <div className="flex flex-col w-full">
+                    <div className="flex flex-col">
+                      <h1 className="text-2xl font-bold">{proposal.data.content.title}</h1>
+                      <div className="relative mr-6 mt-2 mb-8">
+                        <Dropdown
+                          className="inline"
+                          side="left"
+                          button={
+                            <DotsHorizontalIcon className="inline-block h-4 w-4 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
+                          }
+                          items={[
+                            {
+                              name: (
+                                <>
+                                  {isProposalUrlCopied ? (
+                                    <>
+                                      <ClipboardCheckIcon className="h-4 w-4 mr-2 inline" />
+                                      <p className="inline">Copied!</p>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <ClipboardIcon className="h-4 w-4 mr-2 inline" />
+                                      <p className="inline">Copy link</p>
+                                    </>
+                                  )}
+                                </>
+                              ),
+                              onClick: () => {
+                                navigator.clipboard.writeText(window.location.href).then(() => {
+                                  setIsProposalUrlCopied(true)
+                                  setTimeout(() => setIsProposalUrlCopied(false), 500)
+                                })
+                                setIsProposalUrlCopied(true)
+                              },
+                            },
+                          ]}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <h4 className="text-xs font-bold text-concrete uppercase mt-6">
-                Request for Proposal
-              </h4>
-              <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })} passHref>
-                <a target="_blank" rel="noopener noreferrer">
-                  <p className="mt-2 text-electric-violet cursor-pointer">
-                    {rfp?.data.content.title}
-                  </p>
-                </a>
-              </Link>
-              <h4 className="text-xs font-bold text-concrete uppercase mt-6">Total Amount</h4>
-              <p className="mt-2 font-normal">{`${proposal?.data.funding.amount} ${tokenSymbol}`}</p>
-              <h4 className="text-xs font-bold text-concrete uppercase mt-6">Fund Recipient</h4>
-              <p className="mt-2">{proposal?.data.funding.recipientAddress}</p>
-            </div>
-            <div
-              className={
-                check ? "border-b border-concrete p-6" : "p-6 grow flex flex-col justify-between"
-              }
-            >
-              <div>
-                <h4 className="text-xs font-bold text-concrete uppercase mt-4">Approval</h4>
-                <div className="flex flex-row space-x-2 items-center mt-2">
-                  <ProgressIndicator
-                    percent={proposal?.approvals.length / rfp?.checkbook.quorum}
-                    twsize={6}
-                    cutoff={0}
-                  />
-                  <p>
-                    {proposal?.approvals.length}/{rfp?.checkbook.quorum}
-                  </p>
-                </div>
-                <div className="mt-6">
-                  {proposal?.approvals.length > 0 && (
-                    <p className="text-xs text-concrete uppercase font-bold">Signers</p>
+              {showApproveButton ? (
+                <button
+                  onClick={() => {
+                    setSignModalOpen(true)
+                  }}
+                  className="bg-electric-violet text-tunnel-black px-6 mb-6 h-10 w-48 rounded block mx-auto hover:bg-opacity-70"
+                  disabled={waitingCreation}
+                >
+                  {waitingCreation ? (
+                    <div className="flex justify-center items-center">
+                      <Spinner fill="black" />
+                    </div>
+                  ) : (
+                    "Approve"
                   )}
-                  {(proposal?.approvals || []).map((approval, i) => (
-                    <AccountMediaObject account={approval.signerAccount} className="mt-4" key={i} />
-                  ))}
+                </button>
+              ) : showCashButton ? (
+                <button
+                  onClick={() => {
+                    setCashCheckModalOpen(true)
+                  }}
+                  className="bg-electric-violet text-tunnel-black px-6 h-[35px] w-48 rounded block mx-auto hover:bg-opacity-70"
+                  disabled={waitingCreation}
+                >
+                  {waitingCreation ? (
+                    <div className="flex justify-center items-center">
+                      <Spinner fill="black" />
+                    </div>
+                  ) : (
+                    "Cash check"
+                  )}
+                </button>
+              ) : null}
+            </div>
+          </div>
+          <div className="grid grid-cols-3 w-full box-border h-full">
+            <div className="col-span-2 p-6 w-full overflow-y-scroll">
+              <Preview markdown={proposal?.data.content.body} />
+            </div>
+            <div className="col-span-1 h-full border-l border-concrete flex flex-col">
+              <div className="border-b border-concrete p-6">
+                <h4 className="text-xs font-bold text-concrete uppercase mb-2">Author</h4>
+                {proposal.collaborators.map((collaborator, idx) => {
+                  if (collaborator.account?.data) {
+                    return <AccountMediaObject account={collaborator.account} />
+                  } else {
+                    return (
+                      <div className="flex flex-row items-center" key={`account-${idx}`}>
+                        <img
+                          src={DEFAULT_PFP_URLS.USER}
+                          alt="PFP"
+                          className="w-[32px] h-[32px] rounded-full"
+                        />
+                        <div className="ml-2">{truncateString(collaborator.address)}</div>
+                      </div>
+                    )
+                  }
+                })}
+                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Terminal</h4>
+                <div className="flex flex-row items-center mt-2">
+                  <img
+                    src={rfp?.terminal.data.pfpURL || DEFAULT_PFP_URLS.TERMINAL}
+                    alt="PFP"
+                    className="w-[40px] h-[40px] rounded-lg"
+                    onError={(e) => {
+                      e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
+                    }}
+                  />
+                  <div className="ml-2">
+                    <span>{rfp?.terminal.data.name}</span>
+                    <span className="text-xs text-light-concrete flex">
+                      @{rfp?.terminal.handle}
+                    </span>
+                  </div>
+                </div>
+                <h4 className="text-xs font-bold text-concrete uppercase mt-6">
+                  Request for Proposal
+                </h4>
+                <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })} passHref>
+                  <a target="_blank" rel="noopener noreferrer">
+                    <p className="mt-2 text-electric-violet cursor-pointer">
+                      {rfp?.data.content.title}
+                    </p>
+                  </a>
+                </Link>
+                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Total Amount</h4>
+                <p className="mt-2 font-normal">{`${proposal?.data.funding.amount} ${tokenSymbol}`}</p>
+                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Fund Recipient</h4>
+                <p className="mt-2">{proposal?.data.funding.recipientAddress}</p>
+              </div>
+              <div
+                className={
+                  check ? "border-b border-concrete p-6" : "p-6 grow flex flex-col justify-between"
+                }
+              >
+                <div>
+                  <h4 className="text-xs font-bold text-concrete uppercase mt-4">Approval</h4>
+                  <div className="flex flex-row space-x-2 items-center mt-2">
+                    <ProgressIndicator
+                      percent={proposal?.approvals.length / rfp?.checkbook.quorum}
+                      twsize={6}
+                      cutoff={0}
+                    />
+                    <p>
+                      {proposal?.approvals.length}/{rfp?.checkbook.quorum}
+                    </p>
+                  </div>
+                  <div className="mt-6">
+                    {proposal?.approvals.length > 0 && (
+                      <p className="text-xs text-concrete uppercase font-bold">Signers</p>
+                    )}
+                    {(proposal?.approvals || []).map((approval, i) => (
+                      <AccountMediaObject
+                        account={approval.signerAccount}
+                        className="mt-4"
+                        key={i}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
             {check && (
               <div className="p-6 grow flex flex-col justify-between">
-                <div className="mt-6">
+                <div>
                   <p className="text-xs text-concrete uppercase font-bold">Check</p>
-                  <div className="flex justify-between items-center">
-                    <AccountMediaObject account={check.recipientAccount} className="mt-4" />
-
+                  <div className="flex justify-between items-center mt-4">
+                    <div className="flex flex-row items-center">
+                      <div>{truncateString(check.recipientAddress)}</div>
+                    </div>
                     <div className="flex flex-row items-center space-x-1">
                       <span
                         className={`h-2 w-2 rounded-full bg-${
@@ -294,39 +396,6 @@ const ProposalPage: BlitzPage = ({
                 </div>
               </div>
             )}
-            {showApproveButton ? (
-              <button
-                onClick={() => {
-                  setSignModalOpen(true)
-                }}
-                className="bg-electric-violet text-tunnel-black px-6 mb-6 h-10 w-48 rounded block mx-auto hover:bg-opacity-70"
-                disabled={waitingCreation}
-              >
-                {waitingCreation ? (
-                  <div className="flex justify-center items-center">
-                    <Spinner fill="black" />
-                  </div>
-                ) : (
-                  "Approve"
-                )}
-              </button>
-            ) : showCashButton ? (
-              <button
-                onClick={() => {
-                  setCashCheckModalOpen(true)
-                }}
-                className="bg-electric-violet text-tunnel-black px-6 mb-6 h-10 w-48 rounded block mx-auto hover:bg-opacity-70"
-                disabled={waitingCreation}
-              >
-                {waitingCreation ? (
-                  <div className="flex justify-center items-center">
-                    <Spinner fill="black" />
-                  </div>
-                ) : (
-                  "Cash check"
-                )}
-              </button>
-            ) : null}
           </div>
         </div>
       </TerminalNavigation>

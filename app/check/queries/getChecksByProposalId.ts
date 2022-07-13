@@ -13,7 +13,6 @@ export default async function getChecksByProposalId(input: z.infer<typeof GetChe
         proposalId: input.proposalId,
       },
       include: {
-        recipientAccount: true,
         approvals: true,
       },
     })
