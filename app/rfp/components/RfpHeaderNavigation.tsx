@@ -11,6 +11,7 @@ import {
   DotsHorizontalIcon,
   ClipboardCheckIcon,
   ClipboardIcon,
+  SpeakerphoneIcon,
 } from "@heroicons/react/solid"
 import CloseRfpModal from "./CloseRfpModal"
 import ReopenRfpModal from "./ReopenRfpModal"
@@ -77,9 +78,10 @@ const RfpHeaderNavigation = ({ rfpId }) => {
         </div>
         <div className="flex flex-row mt-6">
           <div className="flex-col w-full">
-            <div className="flex flex-row space-x-2">
-              <span className="text-xs uppercase bg-wet-concrete rounded-full px-2 py-1">
-                Request for proposals
+            <div className="flex flex-row space-x-4">
+              <span className=" bg-wet-concrete rounded-full px-2 py-1 flex items-center space-x-1">
+                <SpeakerphoneIcon className="h-4 w-4 text-marble-white" />
+                <span className="text-xs uppercase">Request for proposals</span>
               </span>
               <div className="flex flex-row items-center space-x-2">
                 <span
@@ -213,11 +215,13 @@ const RfpHeaderNavigation = ({ rfpId }) => {
               </div>
             </div>
           </div>
-          <Link href={Routes.CreateProposalPage({ terminalHandle, rfpId })}>
-            <button className="bg-electric-violet text-tunnel-black rounded self-start px-6 h-[35px] hover:bg-opacity-70 whitespace-nowrap">
-              Create proposal
-            </button>
-          </Link>
+          {rfpOpen && (
+            <Link href={Routes.CreateProposalPage({ terminalHandle, rfpId })}>
+              <button className="bg-electric-violet text-tunnel-black rounded self-start px-6 h-[35px] hover:bg-opacity-70 whitespace-nowrap">
+                Create proposal
+              </button>
+            </Link>
+          )}
         </div>
         <ul className="mt-7 text-lg mb-2">
           <li

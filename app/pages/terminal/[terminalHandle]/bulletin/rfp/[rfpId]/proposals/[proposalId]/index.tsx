@@ -6,7 +6,6 @@ import {
   useQuery,
   Link,
   invoke,
-  useRouter,
   GetServerSideProps,
   InferGetServerSidePropsType,
 } from "blitz"
@@ -32,7 +31,12 @@ import { useWaitForTransaction } from "wagmi"
 import { ZERO_ADDRESS } from "app/core/utils/constants"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import { formatUnits } from "ethers/lib/utils"
-import { DotsHorizontalIcon, ClipboardCheckIcon, ClipboardIcon } from "@heroicons/react/solid"
+import {
+  DotsHorizontalIcon,
+  ClipboardCheckIcon,
+  ClipboardIcon,
+  LightBulbIcon,
+} from "@heroicons/react/solid"
 import Dropdown from "app/core/components/Dropdown"
 
 const ProposalPage: BlitzPage = ({
@@ -47,7 +51,7 @@ const ProposalPage: BlitzPage = ({
   const [checkTxnHash, setCheckTxnHash] = useState<string>()
   const [tokenSymbol, setTokenSymbol] = useState<string>("ETH")
   const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
-  const [isRFPUrlCopied, setIsRfpUrlCopied] = useState<boolean>(false)
+  const [isProposalUrlCopied, setIsProposalUrlCopied] = useState<boolean>(false)
   const [check, setCheck] = useState<Check>()
 
   // not really a fan of this but we need to get the token symbol
@@ -180,9 +184,10 @@ const ProposalPage: BlitzPage = ({
             </div>
             <div className="flex flex-row mt-6">
               <div className="flex-col w-full">
-                <div className="flex flex-row space-x-2">
-                  <span className="text-xs uppercase bg-wet-concrete rounded-full px-2 py-1">
-                    Proposal
+                <div className="flex flex-row space-x-4">
+                  <span className=" bg-wet-concrete rounded-full px-2 py-1 flex items-center space-x-1">
+                    <LightBulbIcon className="h-4 w-4 text-marble-white" />
+                    <span className="text-xs uppercase">Proposal</span>
                   </span>
                   <div className="flex flex-row items-center space-x-2">
                     <span
@@ -210,7 +215,7 @@ const ProposalPage: BlitzPage = ({
                             {
                               name: (
                                 <>
-                                  {isRFPUrlCopied ? (
+                                  {isProposalUrlCopied ? (
                                     <>
                                       <ClipboardCheckIcon className="h-4 w-4 mr-2 inline" />
                                       <p className="inline">Copied!</p>
@@ -225,10 +230,10 @@ const ProposalPage: BlitzPage = ({
                               ),
                               onClick: () => {
                                 navigator.clipboard.writeText(window.location.href).then(() => {
-                                  setIsRfpUrlCopied(true)
-                                  setTimeout(() => setIsRfpUrlCopied(false), 500)
+                                  setIsProposalUrlCopied(true)
+                                  setTimeout(() => setIsProposalUrlCopied(false), 500)
                                 })
-                                setIsRfpUrlCopied(true)
+                                setIsProposalUrlCopied(true)
                               },
                             },
                           ]}
@@ -259,7 +264,7 @@ const ProposalPage: BlitzPage = ({
                   onClick={() => {
                     setCashCheckModalOpen(true)
                   }}
-                  className="bg-electric-violet text-tunnel-black px-6 mb-6 h-10 w-48 rounded block mx-auto hover:bg-opacity-70"
+                  className="bg-electric-violet text-tunnel-black px-6 h-[35px] w-48 rounded block mx-auto hover:bg-opacity-70"
                   disabled={waitingCreation}
                 >
                   {waitingCreation ? (
@@ -291,7 +296,7 @@ const ProposalPage: BlitzPage = ({
                           alt="PFP"
                           className="w-[32px] h-[32px] rounded-full"
                         />
-                        <div className="ml-2">{truncateString(collaborator.account)}</div>
+                        <div className="ml-2">{truncateString(collaborator.address)}</div>
                       </div>
                     )
                   }

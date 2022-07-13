@@ -27,7 +27,7 @@ import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
 import useStore from "app/core/hooks/useStore"
 import FilterPill from "app/core/components/FilterPill"
 import Pagination from "app/core/components/Pagination"
-import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
+import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 
 const BulletinPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -40,16 +40,8 @@ const BulletinPage: BlitzPage = () => {
     { handle: terminalHandle as string },
     { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
   )
-  const [hasTagAdminPermissions] = useQuery(
-    hasAdminPermissionsBasedOnTags,
-    { terminalId: terminal?.id as number, accountId: session.userId as number },
-    {
-      suspense: false,
-    }
-  )
-  const isLoggedInAndIsAdmin =
-    (session.siwe?.address && hasTagAdminPermissions) ||
-    terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string)
+
+  const isLoggedInAndIsAdmin = useAdminForTerminal(terminal)
   const [rfpStatusFilters, setRfpStatusFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
 
   const [page, setPage] = useState<number>(0)
