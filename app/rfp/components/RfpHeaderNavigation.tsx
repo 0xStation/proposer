@@ -17,7 +17,6 @@ import CloseRfpModal from "./CloseRfpModal"
 import ReopenRfpModal from "./ReopenRfpModal"
 import Dropdown from "app/core/components/Dropdown"
 import { DeleteRfpModal } from "./DeleteRfpModal"
-import useStore from "app/core/hooks/useStore"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 
@@ -46,7 +45,6 @@ const RfpHeaderNavigation = ({ rfpId }) => {
     (session.siwe?.address && hasTagAdminPermissions) ||
     terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string)
   const router = useRouter()
-  const setToastState = useStore((state) => state.setToastState)
 
   useEffect(() => {
     if (rfp) {
@@ -99,14 +97,22 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                 <div className="flex flex-col">
                   <h1 className="text-2xl font-bold">RFP: {rfp?.data?.content?.title}</h1>
                   <div className="relative mr-6 mt-2">
-                    <button
-                      onClick={() => {
-                        router.push(Routes.EditRfpPage({ terminalHandle, rfpId }))
-                      }}
-                    >
-                      <PencilIcon className="inline h-4 w-4 fill-marble-white mr-3 hover:cursor-pointer hover:fill-concrete" />
-                    </button>
-                    {isLoggedInAndIsAdmin ? (
+                    {isLoggedInAndIsAdmin &&
+                      rfp?.author?.id &&
+                      session.userId &&
+                      rfp?.author?.id === session.userId && (
+                        <button
+                          onClick={() => {
+                            router.push(Routes.EditRfpPage({ terminalHandle, rfpId }))
+                          }}
+                        >
+                          <PencilIcon className="inline h-4 w-4 fill-marble-white mr-3 hover:cursor-pointer hover:fill-concrete" />
+                        </button>
+                      )}
+                    {isLoggedInAndIsAdmin &&
+                    rfp?.author?.id &&
+                    session.userId &&
+                    rfp?.author?.id === session.userId ? (
                       <Dropdown
                         className="inline"
                         side="left"
