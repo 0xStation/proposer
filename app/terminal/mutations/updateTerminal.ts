@@ -33,11 +33,7 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
   }
 
   // create new admins or delete removed admins
-  let adminTagIdWhitelist = [
-    ...((existingTerminal.data?.permissions?.adminTagIdWhitelist &&
-      existingTerminal.data?.permissions?.adminTagIdWhitelist) ||
-      []),
-  ]
+  let adminTagIdWhitelist = [...(existingTerminal.data?.permissions?.adminTagIdWhitelist || [])]
   if (input.adminAddresses) {
     const stationAdminTag = await db.tag.upsert({
       where: {
