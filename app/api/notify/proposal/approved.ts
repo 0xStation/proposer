@@ -5,6 +5,7 @@ import { Account, AccountMetadata } from "app/account/types"
 import { Proposal } from "app/proposal/types"
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
+import { getEmails } from "app/utils/privy"
 
 const EmailRequest = z.object({
   proposalId: z.string(),
@@ -47,18 +48,30 @@ export default async function handler(req, res) {
       return
     }
 
+    const addresses = proposal.collaborators
+      .filter((collaborator) => !!(collaborator.account?.data as AccountMetadata).hasSavedEmail) // TODO: replace with hasVerifiedEmail
+      .map((collaborator) => collaborator.account?.address as string)
+
     try {
-      await email.sendApprovedProposalEmail({
-        recipients: proposal.collaborators
-          .map((accountProposal) => (accountProposal.account?.data as AccountMetadata)?.email || "")
-          .filter((email) => !!email), // get rid of nonexistent emails
-        proposal: proposal,
-        rfp: proposal.rfp,
-        terminal: proposal.rfp.terminal,
-      })
+      // fetch emails from Privy to notify
+      const emails = await getEmails(addresses)
+
+      try {
+        await email.sendApprovedProposalEmail({
+          recipients: emails,
+          proposal: proposal,
+          rfp: proposal.rfp,
+          terminal: proposal.rfp.terminal,
+        })
+      } catch (e) {
+        console.error(e)
+        res.status(500).json({ response: "error", message: "error encountered in email emission" })
+      }
     } catch (e) {
       console.error(e)
-      res.status(500).json({ response: "error", message: "error encountered in email emission" })
+      res
+        .status(500)
+        .json({ response: "error", message: "error encountered in email fetching for accounts" })
     }
   } catch (e) {
     console.error(e)

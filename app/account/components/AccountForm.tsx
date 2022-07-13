@@ -184,8 +184,8 @@ const AccountForm = ({
             })
           }
         } catch (error) {
-          console.error(`Error creating account: ${error}`)
-          alert("Error applying.")
+          console.error(`Error updating account: ${error}`)
+          alert("Error saving information.")
         }
       }}
       render={({ handleSubmit }) => (
@@ -251,11 +251,7 @@ const AccountForm = ({
                   <span className="text-electric-violet font-bold"> Learn more</span>
                 </a>
               </p>
-              <Field
-                component="input"
-                name="email"
-                validate={composeValidators(requiredField, isValidEmail)}
-              >
+              <Field component="input" name="email" validate={isValidEmail}>
                 {({ input, meta }) => (
                   <div>
                     <input

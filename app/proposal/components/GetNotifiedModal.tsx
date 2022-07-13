@@ -3,14 +3,14 @@ import { Field, Form } from "react-final-form"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import { useMutation } from "blitz"
-import addEmailToAccount from "app/account/mutations/addEmailToAccount"
+import saveAccountEmail from "app/account/mutations/saveAccountEmail"
 import { composeValidators, requiredField, isValidEmail } from "app/utils/validators"
 
 const GetNotifiedModal = ({ isOpen, setIsOpen }) => {
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
 
-  const [addEmailMutation] = useMutation(addEmailToAccount, {
+  const [saveEmailMutation] = useMutation(saveAccountEmail, {
     onSuccess: async () => {
       setIsOpen(false)
       setToastState({
@@ -25,10 +25,11 @@ const GetNotifiedModal = ({ isOpen, setIsOpen }) => {
   })
 
   useEffect(() => {
-    if (!!activeUser?.data.email) {
+    // close modal if user has already saved an email
+    if (!!activeUser?.data.hasSavedEmail) {
       setIsOpen(false)
     }
-  }, [activeUser])
+  }, [activeUser?.data.hasSavedEmail])
 
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
@@ -44,7 +45,7 @@ const GetNotifiedModal = ({ isOpen, setIsOpen }) => {
         <Form
           onSubmit={async (values) => {
             if (activeUser) {
-              addEmailMutation({ accountId: activeUser.id, email: values.email })
+              saveEmailMutation({ accountId: activeUser.id, email: values.email })
             }
           }}
           render={({ form, handleSubmit }) => {

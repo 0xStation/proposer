@@ -1,6 +1,7 @@
 import db from "db"
 import * as z from "zod"
-import { Account } from "../types"
+import { Account, AccountMetadata } from "../types"
+import { saveEmail } from "app/utils/privy"
 
 const UpdateAccount = z.object({
   name: z.string(),
@@ -30,12 +31,16 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
     return null
   }
 
+  // store email with Privy so it does not live in our database to reduce leakage risk
+  // not in try-catch to handle errors on client
+  // allows saving if no email provided as the removal mechanism while Privy's delete API in development
+  await saveEmail(params.address as string, params.email || "")
+
   const payload = {
     address: params.address,
     data: {
       name: params.name,
       bio: params.bio,
-      email: params.email,
       pfpURL: params.pfpURL,
       coverURL: params.coverURL,
       contactURL: params.contactURL,
@@ -43,6 +48,9 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
       githubUrl: params.githubUrl,
       tiktokUrl: params.tiktokUrl,
       instagramUrl: params.instagramUrl,
+      // mark email as saved for this account to not show email input modals
+      hasSavedEmail: !!params.email,
+      // TODO: if email was saved with a new value, set hasVerifiedEmail to false
     },
   }
 
