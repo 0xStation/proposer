@@ -75,6 +75,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
           </div>
           <div className="w-1/2">
             <CheckbookForm
+              isEdit={true}
               callback={() =>
                 router.push(Routes.CheckbookSettingsPage({ terminalHandle, creationSuccess: true }))
               }

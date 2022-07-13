@@ -7,7 +7,7 @@ import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
 import { sortAddressesIncreasing } from "app/core/utils/sortAddressesIncreasing"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { uniqueName, isValidQuorum } from "app/utils/validators"
-import { useMutation, useParam, useQuery } from "blitz"
+import { useMutation, useParam, useQuery, useRouter, Routes } from "blitz"
 import { useState } from "react"
 import { Form, Field } from "react-final-form"
 import { useWaitForTransaction } from "wagmi"
@@ -19,14 +19,16 @@ type FormValues = {
   quorum: string
 }
 
-export const CheckbookForm = ({ callback }) => {
+export const CheckbookForm = ({ callback, isEdit = true }) => {
   const [createCheckbookMutation] = useMutation(createCheckbook)
   const [quorum, setQuorum] = useState<number>()
   const [signers, setSigners] = useState<string[]>()
   const [name, setName] = useState<string>()
   const [txnHash, setTxnHash] = useState<string>()
   const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
+  const [isDeployingCheckbook, setIsDeployingCheckbook] = useState<boolean>(false)
   const setToastState = useStore((state) => state.setToastState)
+  const router = useRouter()
 
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(
@@ -103,11 +105,13 @@ export const CheckbookForm = ({ callback }) => {
               const transaction = await createCheckbookOnChain({
                 args: [quorum, signers],
               })
+              setIsDeployingCheckbook(true)
 
               // triggers hook for useWaitForTransaction which parses checkbook address makes prisma mutation
               setTxnHash(transaction.hash)
             } catch (e) {
               setWaitingCreation(false)
+              setIsDeployingCheckbook(false)
               console.error(e)
               if (e.name == "ConnectorNotFoundError") {
                 setToastState({
@@ -125,6 +129,7 @@ export const CheckbookForm = ({ callback }) => {
             }
           } catch (e) {
             setWaitingCreation(false)
+            setIsDeployingCheckbook(false)
             console.error(e)
           }
         }
@@ -219,10 +224,32 @@ export const CheckbookForm = ({ callback }) => {
                   </div>
                 )}
               </Field>
-              <div>
+              <div className="mt-12">
+                {waitingCreation ? (
+                  isDeployingCheckbook ? (
+                    <p className="text-electric-violet mb-2">
+                      Sit tight. Contract is deploying. This might take a minute.
+                    </p>
+                  ) : (
+                    <p className="text-electric-violet mb-2">Check your wallet for next steps.</p>
+                  )
+                ) : null}
+                {!isEdit && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      router.push(Routes.BulletinPage({ terminalHandle }))
+                    }}
+                    className="rounded text-electric-violet border border-electric-violet h-[35px] w-28 mr-2 hover:bg-wet-concrete"
+                  >
+                    Skip
+                  </button>
+                )}
                 <button
-                  className={`rounded text-tunnel-black px-8 py-2 w-28 h-10 mt-12 ${
-                    formButtonDisabled ? "bg-concrete" : "bg-electric-violet"
+                  className={`rounded text-tunnel-black w-28 h-[35px] mb-8 bg-electric-violet ${
+                    formButtonDisabled
+                      ? "opacity-70 cursor-not-allowed"
+                      : "opacity-100 cursor-pointer"
                   }`}
                   type="submit"
                   disabled={formButtonDisabled || waitingCreation}

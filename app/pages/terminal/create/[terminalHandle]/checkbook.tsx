@@ -58,16 +58,16 @@ const NewCheckbookTerminalCreationPage: BlitzPage = () => {
   return (
     <Layout>
       <div
-        className="absolute top-0 left-2 cursor-pointer"
+        className="absolute top-4 left-4 cursor-pointer"
         onClick={() => {
-          router.back()
+          router.push(Routes.BulletinPage({ terminalHandle }))
         }}
       >
-        <Image src={Exit} alt="Close button" width={12} height={12} />
+        <Image src={Exit} alt="Close button" width={16} height={16} />
       </div>
       <main className="text-marble-white min-h-screen max-w-screen-sm sm:mx-auto mb-5">
         <div className="w-[31rem]">
-          <div className="flex flex-row mt-16">
+          <div className="flex flex-row pt-16">
             <div className="mr-1">
               <div className="w-60 h-1 bg-concrete" />
               <p className="text-concrete mt-2.5">Open a Terminal</p>
@@ -80,12 +80,16 @@ const NewCheckbookTerminalCreationPage: BlitzPage = () => {
           <h1 className="text-2xl font-bold mt-12">Create your first Checkbook</h1>
           <p className="mt-2">
             Checkbook allows you to create checks for proposers to cash after their proposals have
-            been approved. <a className="text-electric-violet">Learn more</a>
+            been approved.{" "}
+            <a className="text-electric-violet" href="#">
+              Learn more
+            </a>
           </p>
           <div className="mt-9 bg-wet-concrete text-torch-red h-[219px] w-[479px] pt-[90px] pl-[175px]">
             TO BE REPLACED
           </div>
           <CheckbookForm
+            isEdit={false}
             callback={() =>
               router.push(Routes.CheckbookSettingsPage({ terminalHandle, creationSuccess: true }))
             }

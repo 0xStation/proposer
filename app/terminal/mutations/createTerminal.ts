@@ -17,6 +17,7 @@ const CreateTerminal = z.object({
   twitterUrl: z.string().optional(),
   githubUrl: z.string().optional(),
   instagramUrl: z.string().optional(),
+  tiktokUrl: z.string().optional(),
 })
 
 export default async function createTerminal(input: z.infer<typeof CreateTerminal>, ctx: Ctx) {
@@ -31,6 +32,7 @@ export default async function createTerminal(input: z.infer<typeof CreateTermina
       twitterUrl: params.twitterUrl,
       githubUrl: params.githubUrl,
       instagramUrl: params.instagramUrl,
+      tiktokUrl: params.tiktokUrl,
       permissions: {
         accountWhitelist: [ctx.session.siwe?.address],
       },
