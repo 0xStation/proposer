@@ -1,4 +1,3 @@
-import getFundingTokens from "app/core/utils/getFundingTokens"
 import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
 import useCheckbookAvailability from "app/core/hooks/useCheckbookAvailability"
@@ -13,14 +12,7 @@ const CheckbookSelectToken = ({
   checkbook: Checkbook
   options?: any
 }) => {
-  const tokenOptions = getFundingTokens(checkbook, terminal)
-  const addresses = tokenOptions.map((option) => option.address)
-  const tokenTotals = useCheckbookAvailability(
-    checkbook.chainId,
-    checkbook.address,
-    checkbook.quorum,
-    addresses
-  )
+  const tokenTotals = useCheckbookAvailability(checkbook, terminal)
 
   const validTokens =
     (tokenTotals &&
