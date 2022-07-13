@@ -23,5 +23,4 @@ export type Check = {
   txnHash?: string
   proposal?: Proposal
   checkbook?: Checkbook
-  recipientAccount?: Account
 }
