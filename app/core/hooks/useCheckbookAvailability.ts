@@ -1,18 +1,19 @@
-import { useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useBalance } from "wagmi"
-import { BigNumber, utils } from "ethers"
-import { useQuery, invoke } from "blitz"
+import { BigNumber } from "ethers"
+import { invoke } from "blitz"
 import getAggregatedCheckAmounts from "app/check/queries/getAggregatedCheckAmounts"
 import { ZERO_ADDRESS } from "../utils/constants"
 import decimalToBigNumber from "../utils/decimalToBigNumber"
 import { formatUnits } from "ethers/lib/utils"
 
-const useCheckbookAvailable = (
+const useCheckbookAvailability = (
   chainId: number,
   checkbookAddress: string,
   quorum: number,
   tokenAddresses: string[]
 ) => {
+  const [totals, setTotals] = useState<any>()
   const balances = tokenAddresses.reduce((acc, address) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const { data } = useBalance({
@@ -28,13 +29,13 @@ const useCheckbookAvailable = (
     acc[address] = {
       balance,
       decimals,
+      symbol: data?.symbol,
     }
     return acc
   }, {})
 
   useEffect(() => {
-    if (balances) {
-      console.log(balances)
+    if (balances && !totals) {
       const aggregatedCheckTotals = Promise.all(
         tokenAddresses.map(async (address) => {
           const totals = await invoke(getAggregatedCheckAmounts, {
@@ -53,11 +54,12 @@ const useCheckbookAvailable = (
       aggregatedCheckTotals.then((data) => {
         const map = data.map((total) => {
           let balanceObject = balances[total.address]
-          console.log(balanceObject)
           const pending = decimalToBigNumber(total.pending || 0, balanceObject.decimals)
           const cashed = decimalToBigNumber(total.cashed || 0, balanceObject.decimals)
 
           return {
+            address: total.address,
+            symbol: balanceObject.symbol,
             cashed: formatUnits(cashed, balanceObject.decimals),
             pending: formatUnits(pending, balanceObject.decimals),
             available: formatUnits(balanceObject.balance.sub(pending), balanceObject.decimals),
@@ -65,10 +67,12 @@ const useCheckbookAvailable = (
           }
         })
 
-        console.log(map)
+        setTotals(map)
       })
     }
   }, [balances])
+
+  return totals
 }
 
-export default useCheckbookAvailable
+export default useCheckbookAvailability
