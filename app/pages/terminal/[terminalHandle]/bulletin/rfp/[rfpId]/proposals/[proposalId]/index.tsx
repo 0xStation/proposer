@@ -270,12 +270,7 @@ const ProposalPage: BlitzPage = ({
                   <p className="text-xs text-concrete uppercase font-bold">Check</p>
                   <div className="flex justify-between items-center mt-4">
                     <div className="flex flex-row items-center">
-                      <img
-                        src={DEFAULT_PFP_URLS.USER}
-                        alt="PFP"
-                        className="w-[40px] h-[40px] rounded-full"
-                      />
-                      <div className="ml-2">{truncateString(check.recipientAddress)}</div>
+                      <div>{truncateString(check.recipientAddress)}</div>
                     </div>
 
                     <div className="flex flex-row items-center space-x-1">
