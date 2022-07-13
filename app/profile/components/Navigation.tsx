@@ -2,8 +2,6 @@ import { useState } from "react"
 import useStore from "app/core/hooks/useStore"
 import { getWalletString } from "app/utils/getWalletString"
 import { useRouter, Image, Link, Routes } from "blitz"
-import TerminalIcon from "public/terminal-icon.svg"
-import LockedIcon from "public/locked-icon.svg"
 import GithubIcon from "public/github-icon.svg"
 import TwitterIcon from "public/twitter-icon.svg"
 import PersonalSiteIcon from "public/personal-site-icon.svg"
@@ -22,7 +20,6 @@ import {
 
 export const Navigation = ({
   account,
-  terminals,
   children,
   setIsConnectDiscordModalOpen,
 }: {

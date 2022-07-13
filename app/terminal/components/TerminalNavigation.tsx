@@ -9,6 +9,11 @@ import {
   useSession,
 } from "blitz"
 import { useState, useEffect } from "react"
+import GithubIcon from "public/github-icon.svg"
+import TwitterIcon from "public/twitter-icon.svg"
+import SiteIcon from "public/personal-site-icon.svg"
+import InstagramIcon from "public/instagram-icon.svg"
+import TikTokIcon from "public/tiktok-icon.svg"
 import SettingsIcon from "app/core/icons/SettingsIcon"
 import Exit from "/public/exit-button.svg"
 import getTerminalByHandle from "../queries/getTerminalByHandle"
@@ -50,65 +55,123 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
         } md:col-span-1`}
       >
         {!!tutorial && <div className="fixed inset-0 bg-tunnel-black opacity-70 z-10"></div>}
-        {/* Terminal Profile metadata + Settings icon*/}
-        <div className="flex mx-4 mt-7">
-          {terminal?.data.pfpURL ? (
-            <img
-              src={terminal?.data.pfpURL}
-              alt="Terminal PFP"
-              className="min-w-[41px] max-w-[41px] h-[41px] rounded-md cursor-pointer border border-wet-concrete mr-2"
-              onError={(e) => {
-                e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
-              }}
-            />
-          ) : (
-            <span className="w-[41px] h-[41px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red mr-2" />
-          )}
-          <div className="flex flex-col content-center w-[200px] mr-[5px]">
-            <div className="flex flex-row items-center">
-              <p className="text-xl text-marble-white font-bold">{terminal?.data.name}</p>
-            </div>
-            <p className="flex flex-row text-sm text-concrete overflow-hidden leading-4">
-              @{terminal?.handle}
-            </p>
-          </div>
-          {session?.siwe?.address && hasAdminPermissions && (
-            <div className="mt-3 mr-2 ml-auto">
-              <button
-                className={`${!!tutorial && "z-30"} group`}
-                onClick={() => {
-                  if (!tutorial) {
-                    router.push(Routes.TerminalSettingsPage({ terminalHandle }))
-                  } else {
-                    router.push(Routes.DiscordSettingsPage({ terminalHandle }))
-                  }
+        <div className="px-4 border-b border-concrete">
+          {/* Terminal Profile metadata + Settings icon*/}
+          <div className="flex mt-7">
+            {terminal?.data.pfpURL ? (
+              <img
+                src={terminal?.data.pfpURL}
+                alt="Terminal PFP"
+                className="min-w-[41px] max-w-[41px] h-[41px] rounded-md cursor-pointer border border-wet-concrete mr-2"
+                onError={(e) => {
+                  e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
                 }}
-              >
-                <SettingsIcon className="group-hover:fill-concrete cursor-pointer" />
-              </button>
-
-              {!!tutorial && (
-                <div
-                  className={`absolute bg-wet-concrete w-[200px] top-6 rounded p-2 flex items-center justify-between ${
-                    !!tutorial && "z-30"
-                  }`}
-                >
-                  <span className="text-xs mr-1">
-                    Next, connect with Discord to import roles and members.
-                  </span>
-                  <span
-                    className="text-torch-red cursor-pointer"
-                    onClick={() => {
-                      router.push(window.location.href.split("?")[0] || window.location.href)
-                    }}
-                  >
-                    <Image src={Exit} alt="Close button" width={16} height={16} />
-                  </span>
-                </div>
-              )}
+              />
+            ) : (
+              <span className="w-[41px] h-[41px] rounded-md cursor-pointer border border-wet-concrete bg-gradient-to-b from-neon-blue to-torch-red mr-2" />
+            )}
+            <div className="flex flex-col content-center w-[200px] mr-[5px]">
+              <div className="flex flex-row items-center">
+                <p className="text-xl text-marble-white font-bold">{terminal?.data.name}</p>
+              </div>
+              <p className="flex flex-row text-sm text-concrete overflow-hidden leading-4">
+                @{terminal?.handle}
+              </p>
             </div>
-          )}
+            {session?.siwe?.address && hasAdminPermissions && (
+              <div className="mt-3 mr-2 ml-auto">
+                <button
+                  className={`${!!tutorial && "z-30"} group`}
+                  onClick={() => {
+                    if (!tutorial) {
+                      router.push(Routes.TerminalSettingsPage({ terminalHandle }))
+                    } else {
+                      router.push(Routes.DiscordSettingsPage({ terminalHandle }))
+                    }
+                  }}
+                >
+                  <SettingsIcon className="group-hover:fill-concrete cursor-pointer" />
+                </button>
+
+                {!!tutorial && (
+                  <div
+                    className={`absolute bg-wet-concrete w-[200px] top-6 rounded p-2 flex items-center justify-between ${
+                      !!tutorial && "z-30"
+                    }`}
+                  >
+                    <span className="text-xs mr-1">
+                      Next, connect with Discord to import roles and members.
+                    </span>
+                    <span
+                      className="text-torch-red cursor-pointer"
+                      onClick={() => {
+                        router.push(window.location.href.split("?")[0] || window.location.href)
+                      }}
+                    >
+                      <Image src={Exit} alt="Close button" width={16} height={16} />
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          {/* Socials */}
+          <div className="mt-6 mb-6">
+            <p>{terminal?.data?.description}</p>
+            <div className="flex flex-row mt-2"></div>
+            {terminal?.data?.contactUrl && (
+              <a
+                href={terminal?.data?.contactUrl}
+                target="_blank"
+                className="hover:opacity-70 cursor-pointer mr-2"
+                rel="noreferrer"
+              >
+                <Image src={SiteIcon} alt="Personal Site Icon." width={15} height={15} />
+              </a>
+            )}
+            {terminal?.data?.twitterUrl && (
+              <a
+                href={terminal?.data?.twitterUrl}
+                target="_blank"
+                className="hover:opacity-70 cursor-pointer mr-2"
+                rel="noreferrer"
+              >
+                <Image src={TwitterIcon} alt="Twitter Icon." width={15} height={15} />
+              </a>
+            )}
+            {terminal?.data?.githubUrl && (
+              <a
+                href={terminal?.data?.githubUrl}
+                target="_blank"
+                className="hover:opacity-70 cursor-pointer mr-2"
+                rel="noreferrer"
+              >
+                <Image src={GithubIcon} alt="Github Icon." width={15} height={15} />
+              </a>
+            )}
+            {terminal?.data?.tiktokUrl && (
+              <a
+                href={terminal?.data?.tiktokUrl}
+                target="_blank"
+                className="hover:opacity-70 cursor-pointer mr-2"
+                rel="noreferrer"
+              >
+                <Image src={TikTokIcon} alt="TikTok Icon." width={15} height={15} />
+              </a>
+            )}
+            {terminal?.data?.instagramUrl && (
+              <a
+                href={terminal?.data?.instagramUrl}
+                target="_blank"
+                className="hover:opacity-70 cursor-pointer mr-2"
+                rel="noreferrer"
+              >
+                <Image src={InstagramIcon} alt="Instagram Icon." width={15} height={15} />
+              </a>
+            )}
+          </div>
         </div>
+
         {/* Terminal navigation */}
         <div>
           <ul className="mt-9 ml-8 text-lg space-y-2">

@@ -99,7 +99,6 @@ const DiscordProfileHome: BlitzPage = () => {
       />
       <ProfileNavigation
         account={account as Account}
-        terminals={terminals}
         setIsConnectDiscordModalOpen={setIsConnectDiscordModalOpen}
       >
         {terminals && terminals.length ? (

@@ -129,7 +129,7 @@ const TerminalsOnProfile: BlitzPage = () => {
           />
         )
       }
-      <ProfileNavigation account={account as Account} terminals={terminals}>
+      <ProfileNavigation account={account as Account}>
         {terminals && terminals.length ? (
           <>
             <div className="h-[108px] border-b border-concrete">
