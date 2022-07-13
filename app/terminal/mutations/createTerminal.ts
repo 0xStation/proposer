@@ -11,8 +11,6 @@ const CreateTerminal = z.object({
   description: z.string().optional(),
   adminAddresses: z.string().array().optional().default([]),
   pfpURL: z.string().optional(),
-  // require account id rather than address to create accountTerminal object
-  accountId: z.number().optional(),
   contactUrl: z.string().optional(),
   twitterUrl: z.string().optional(),
   githubUrl: z.string().optional(),
@@ -42,59 +40,59 @@ export default async function createTerminal(input: z.infer<typeof CreateTermina
 
   let allAdminAccountIds = [] as number[]
   let inputtedAdminAccountIds = [] as number[]
-  if (params.accountId || params.adminAddresses) {
-    if (params.adminAddresses) {
-      // create accounts if the inputted adminAddresses don't exist
-      await db.account.createMany({
-        skipDuplicates: true,
-        data: input.adminAddresses.map((address) => {
-          return {
-            address,
-            data: {
-              name: truncateString(address),
-            },
-          }
-        }),
-      })
-
-      const inputtedAdminAccounts = await db.account.findMany({
-        where: {
-          address: {
-            in: input.adminAddresses,
+  if (params.adminAddresses.length) {
+    // create accounts if the inputted adminAddresses don't exist
+    await db.account.createMany({
+      skipDuplicates: true,
+      data: input.adminAddresses.map((address) => {
+        return {
+          address,
+          data: {
+            name: truncateString(address),
           },
+        }
+      }),
+    })
+
+    // Grab the accounts of the inputted adminAddresses
+    // so that we can give them a membership and associate
+    // them to the station admin tag
+    const inputtedAdminAccounts = await db.account.findMany({
+      where: {
+        address: {
+          in: input.adminAddresses,
         },
-      })
-
-      // convert admin accounts array to array of account ids,
-      // filtering to remove the user's id since we will append
-      // to an array that already includes the user's id
-      inputtedAdminAccountIds = inputtedAdminAccounts
-        .map((account) => account.id)
-        .filter((accountId) => accountId !== params.accountId)
-    }
-    allAdminAccountIds = [params.accountId as number].concat(inputtedAdminAccountIds)
-
-    Object.assign(payload, {
-      members: {
-        create: allAdminAccountIds.map((id) => {
-          return {
-            account: {
-              connect: { id },
-            },
-          }
-        }),
-      },
-      tags: {
-        create: [
-          {
-            value: StationPlatformTagValues.STATION_ADMIN,
-            active: true,
-            type: TagType.ROLE,
-          },
-        ],
       },
     })
+
+    // Filter out the active user's id since we will append
+    // to an array that already includes the user's id
+    inputtedAdminAccountIds = inputtedAdminAccounts
+      .map((account) => account.id)
+      .filter((accountId) => accountId !== ctx.session.userId)
   }
+  allAdminAccountIds = [ctx.session.userId as number].concat(inputtedAdminAccountIds)
+
+  Object.assign(payload, {
+    members: {
+      create: allAdminAccountIds.map((id) => {
+        return {
+          account: {
+            connect: { id },
+          },
+        }
+      }),
+    },
+    tags: {
+      create: [
+        {
+          value: StationPlatformTagValues.STATION_ADMIN,
+          active: true,
+          type: TagType.ROLE,
+        },
+      ],
+    },
+  })
 
   try {
     const terminal = (await db.terminal.create({
@@ -104,6 +102,9 @@ export default async function createTerminal(input: z.infer<typeof CreateTermina
 
     const stationAdminTag = terminal.tags[0] as Tag
 
+    // Need to update the terminal again specifically
+    // to add the admin tag to the permissions obj
+    // since the tag is created on terminal creation :'(
     await db.terminal.update({
       where: { id: terminal.id },
       data: {
@@ -117,8 +118,9 @@ export default async function createTerminal(input: z.infer<typeof CreateTermina
       },
     })
 
-    if (params.accountId || params.adminAddresses) {
-      // create account tag association for station admin tag and inputted admin accounts
+    if (allAdminAccountIds.length) {
+      // Create account tag association for station admin tag
+      // and inputted admin accounts now that we have the station admin tag
       await db.accountTerminalTag.createMany({
         skipDuplicates: true,
         data: allAdminAccountIds.map((accountId) => {

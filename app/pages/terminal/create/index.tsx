@@ -135,7 +135,6 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                         ...values,
                         adminAddresses: parseUniqueAddresses(values.adminAddresses || ""),
                         pfpURL,
-                        accountId: session.userId as number,
                       })
                       if (window !== undefined && window.location.host === "app.station.express") {
                         sendTerminalCreationNotification(
