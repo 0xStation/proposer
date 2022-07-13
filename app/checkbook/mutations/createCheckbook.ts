@@ -10,14 +10,22 @@ const CreateCheckbook = z.object({
   name: z.string(),
   quorum: z.number(),
   signers: z.string().array(), // assumes sanitized
+  checkbookFeeAcknowledgement: z.boolean(),
 })
 
 export default async function createCheckbook(input: z.infer<typeof CreateCheckbook>) {
   // create checkbook
   const checkbook = await db.checkbook.create({
     data: {
-      ...input,
-      data: {},
+      address: input.address,
+      chainId: input.chainId,
+      name: input.name,
+      terminalId: input.terminalId,
+      quorum: input.quorum,
+      signers: input.signers,
+      data: {
+        checkbookFeeAcknowledgement: input.checkbookFeeAcknowledgement,
+      },
     },
   })
 

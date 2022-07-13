@@ -29,6 +29,13 @@ import FilterPill from "app/core/components/FilterPill"
 import Pagination from "app/core/components/Pagination"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 
+const RfpNotFound = () => (
+  <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
+    <p className="font-bold text-lg">Bulletin is empty</p>
+    <p>No RFPs have been created yet.</p>
+  </div>
+)
+
 const BulletinPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const setToastState = useStore((state) => state.setToastState)
@@ -78,20 +85,30 @@ const BulletinPage: BlitzPage = () => {
 
   const router = useRouter()
   useEffect(() => {
-    if (query.rfpPublished) {
+    if (query.rfpPublished && session?.siwe?.address) {
       setShowRfpSuccessModal(true)
     }
-  }, [query?.rfpPublished])
+  }, [query?.rfpPublished, session?.siwe?.address])
 
   useEffect(() => {
-    if (query.rfpDeleted) {
+    if (query.rfpDeleted && session?.siwe?.address) {
       setToastState({
         isToastShowing: true,
         type: "success",
         message: "Your request for proposal has been deleted.",
       })
     }
-  })
+  }, [query?.rfpDeleted, session?.siwe?.address])
+
+  useEffect(() => {
+    if (query.terminalCreated && session?.siwe?.address) {
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Congratulations! Your Terminal is now live!",
+      })
+    }
+  }, [query?.terminalCreated, session?.siwe?.address])
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
@@ -155,13 +172,9 @@ const BulletinPage: BlitzPage = () => {
               rfps?.map((rfp) => (
                 <RFPComponent rfp={rfp} terminalHandle={terminalHandle} key={rfp.id} />
               ))
-            ) : (rfps && rfpStatusFilters?.size) || rfps?.length === 0 ? (
-              <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
-                <p>No RFPs found</p>
-                <p>...</p>
-              </div>
+            ) : rfps && rfpStatusFilters?.size ? (
+              <RfpNotFound />
             ) : rfps && isLoggedInAndIsAdmin ? (
-              // TODO: hide this view from non-admins and show different copy once we have checkbook signer tags
               <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
                 <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
                   Create a request for proposals (RFPs)
@@ -177,6 +190,8 @@ const BulletinPage: BlitzPage = () => {
                   Create RFP
                 </button>
               </div>
+            ) : rfps?.length === 0 ? (
+              <RfpNotFound />
             ) : (
               Array.from(Array(15)).map((idx) => (
                 <div

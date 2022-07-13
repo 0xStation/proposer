@@ -154,7 +154,7 @@ const Navigation = ({ children }) => {
       >
         <SettingsIcon width={25} height={25} />
       </div>
-      <div className="absolute top-4 left-4 cursor-pointer hidden sm:block">
+      <div className="fixed top-4 left-4 cursor-pointer hidden sm:block">
         <Link href={Routes.BulletinPage({ terminalHandle })}>
           <Image src={Exit} alt="Close button" width={12} height={12} />
         </Link>

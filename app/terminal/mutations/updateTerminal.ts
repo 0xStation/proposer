@@ -1,4 +1,3 @@
-import set from "lodash.set"
 import truncateString from "app/core/utils/truncateString"
 import { StationPlatformTagValues, TagType } from "app/tag/types"
 import db from "db"
@@ -10,9 +9,15 @@ const UpdateTerminal = z.object({
   id: z.number(),
   name: z.string().optional(),
   handle: z.string().optional(),
+  description: z.string().optional(),
   pfpURL: z.string().optional(),
   guildId: z.string().optional(),
   adminAddresses: z.string().array().optional().default([]),
+  contactUrl: z.string().optional(),
+  twitterUrl: z.string().optional(),
+  githubUrl: z.string().optional(),
+  instagramUrl: z.string().optional(),
+  tiktokUrl: z.string().optional(),
 })
 
 export default async function updateTerminal(input: z.infer<typeof UpdateTerminal>) {
@@ -28,7 +33,7 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
   }
 
   // create new admins or delete removed admins
-  let updatedTerminalMetadata = JSON.parse(JSON.stringify(existingTerminal.data))
+  let adminTagIdWhitelist = [...(existingTerminal.data?.permissions?.adminTagIdWhitelist || [])]
   if (input.adminAddresses) {
     const stationAdminTag = await db.tag.upsert({
       where: {
@@ -117,16 +122,9 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
     })
 
     // If the station admin tag isn't already added to the admin permission whitelist, add it
-    if (
-      updatedTerminalMetadata?.permissions?.adminTagIdWhitelist &&
-      !updatedTerminalMetadata?.permissions?.adminTagIdWhitelist.includes(stationAdminTag.id)
-    ) {
-      // https://lodash.com/docs/4.17.15#set
-      // > Sets the value at path of object. If a portion of path doesn't exist, it's created.
-      set(
-        updatedTerminalMetadata,
-        "permissions.adminTagIdWhitelist",
-        [stationAdminTag.id].concat(existingTerminal.data?.permissions?.adminTagIdWhitelist || [])
+    if (!adminTagIdWhitelist?.includes(stationAdminTag.id)) {
+      adminTagIdWhitelist = [stationAdminTag.id].concat(
+        existingTerminal.data?.permissions?.adminTagIdWhitelist || []
       )
     }
   }
@@ -138,7 +136,16 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
    */
   const payload = {
     data: {
-      ...updatedTerminalMetadata,
+      contactUrl: params.contactUrl,
+      twitterUrl: params.twitterUrl,
+      githubUrl: params.githubUrl,
+      instagramUrl: params.instagramUrl,
+      tiktokUrl: params.tiktokUrl,
+      description: params.description,
+      permissions: {
+        adminTagIdWhitelist,
+        accountWhitelist: existingTerminal?.data?.permissions?.accountWhitelist || [],
+      },
       ...(params.pfpURL && { pfpURL: params.pfpURL }),
       ...(params.name && { name: params.name }),
       ...(params.guildId && { guildId: params.guildId }),
