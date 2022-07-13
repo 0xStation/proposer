@@ -6,6 +6,7 @@ import { Proposal } from "app/proposal/types"
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
+import { getEmails } from "app/utils/privy"
 
 const EmailRequest = z.object({
   proposalId: z.string(),
@@ -44,7 +45,12 @@ export default async function handler(req, res) {
       proposal: Proposal & { rfp: Rfp & { terminal: Terminal; checkbook: Checkbook } }
     }
 
-    const recipientAccounts = await db.account.findMany({
+    if (!data) {
+      res.status(404)
+      return
+    }
+
+    const checkbookSigners = await db.account.findMany({
       where: {
         address: {
           in: data.proposal.rfp.checkbook.signers,
@@ -52,24 +58,30 @@ export default async function handler(req, res) {
       },
     })
 
-    if (!data) {
-      res.status(404)
-      return
-    }
+    const addresses = checkbookSigners
+      .filter((account) => !!(account.data as AccountMetadata).hasSavedEmail) // TODO: replace with hasVerifiedEmail
+      .map((account) => account.address as string)
 
     try {
-      await email.sendNewProposalEmail({
-        recipients: recipientAccounts
-          .map((account) => (account.data as AccountMetadata)?.email || "")
-          .filter((s) => !!s),
-        account: data.account,
-        proposal: data.proposal,
-        rfp: data.proposal.rfp,
-        terminal: data.proposal.rfp.terminal,
-      })
+      const emails = await getEmails(addresses)
+
+      try {
+        await email.sendNewProposalEmail({
+          recipients: emails,
+          account: data.account,
+          proposal: data.proposal,
+          rfp: data.proposal.rfp,
+          terminal: data.proposal.rfp.terminal,
+        })
+      } catch (e) {
+        console.error(e)
+        res.status(500).json({ response: "error", message: "error encountered in email emission" })
+      }
     } catch (e) {
       console.error(e)
-      res.status(500).json({ response: "error", message: "error encountered in email emission" })
+      res
+        .status(500)
+        .json({ response: "error", message: "error encountered in email fetching for accounts" })
     }
   } catch (e) {
     console.error(e)
