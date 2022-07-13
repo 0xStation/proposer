@@ -100,7 +100,7 @@ const ProposalPage: BlitzPage = ({
 
   // show approve button, if there the proposal hasn't reached quorum, user can approve, user hasn't already approved
   const showApproveButton =
-    !hasQuorum && userCanApprove && parseFloat(fundsAvailable) < proposal.data.funding?.amount
+    !hasQuorum && userCanApprove && parseFloat(fundsAvailable) > proposal.data.funding?.amount
 
   // proposer has reached quorum and check has not been cashed and user is the proposer
   const showCashButton =
@@ -243,7 +243,7 @@ const ProposalPage: BlitzPage = ({
               }
             >
               <div>
-                <h4 className="text-xs font-bold text-concrete uppercase mt-4">Approval</h4>
+                <h4 className="text-xs font-bold text-concrete uppercase">Approval</h4>
                 <div className="flex flex-row space-x-2 items-center mt-2">
                   <ProgressIndicator
                     percent={proposal?.approvals.length / rfp?.checkbook.quorum}
@@ -266,10 +266,17 @@ const ProposalPage: BlitzPage = ({
             </div>
             {check && (
               <div className="p-6 grow flex flex-col justify-between">
-                <div className="mt-6">
+                <div>
                   <p className="text-xs text-concrete uppercase font-bold">Check</p>
-                  <div className="flex justify-between items-center">
-                    <AccountMediaObject account={check.recipientAccount} className="mt-4" />
+                  <div className="flex justify-between items-center mt-4">
+                    <div className="flex flex-row items-center">
+                      <img
+                        src={DEFAULT_PFP_URLS.USER}
+                        alt="PFP"
+                        className="w-[40px] h-[40px] rounded-full"
+                      />
+                      <div className="ml-2">{truncateString(check.recipientAddress)}</div>
+                    </div>
 
                     <div className="flex flex-row items-center space-x-1">
                       <span
