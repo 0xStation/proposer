@@ -1,4 +1,5 @@
 import { useCreateCheckbookOnChain } from "app/contracts/checkbook"
+import Checkbox from "app/core/components/form/Checkbox"
 import { Spinner } from "app/core/components/Spinner"
 import useAllowedNetwork from "app/core/hooks/useAllowedNetwork"
 import useStore from "app/core/hooks/useStore"
@@ -14,6 +15,7 @@ import { useWaitForTransaction } from "wagmi"
 import createCheckbook from "../mutations/createCheckbook"
 
 type FormValues = {
+  checkbookFeeAcknowledgement: boolean
   name: string
   signers: string
   quorum: string
@@ -24,6 +26,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
   const [quorum, setQuorum] = useState<number>()
   const [signers, setSigners] = useState<string[]>()
   const [name, setName] = useState<string>()
+  const [checkbookFeeAcknowledgement, setCheckbookFeeAcknowledgement] = useState<boolean>(false)
   const [txnHash, setTxnHash] = useState<string>()
   const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
   const [isDeployingCheckbook, setIsDeployingCheckbook] = useState<boolean>(false)
@@ -65,6 +68,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
           name: name as string,
           quorum: quorum as number,
           signers: signers as string[],
+          checkbookFeeAcknowledgement,
         })
 
         if (callback) {
@@ -89,24 +93,21 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
         if (terminal) {
           try {
             setWaitingCreation(true)
-
             const quorum = parseInt(values.quorum)
             // validation on checksummed addresses, no duplicates
             // must be sorted for contract to validate no duplicates
             const signers = sortAddressesIncreasing(parseUniqueAddresses(values.signers || ""))
-
             // trigger transaction
             // after execution, will save transaction hash to state to trigger waiting process to create Checkbook entity
             try {
               setQuorum(quorum)
               setSigners(signers)
               setName(values.name)
-
+              setCheckbookFeeAcknowledgement(values.checkbookFeeAcknowledgement)
               const transaction = await createCheckbookOnChain({
                 args: [quorum, signers],
               })
               setIsDeployingCheckbook(true)
-
               // triggers hook for useWaitForTransaction which parses checkbook address makes prisma mutation
               setTxnHash(transaction.hash)
             } catch (e) {
@@ -140,6 +141,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
           !formState.values.name ||
           !formState.values.signers ||
           !formState.values.quorum ||
+          !formState.values.checkbookFeeAcknowledgement ||
           formState.hasValidationErrors ||
           !!invalidSelectedNetwork
         return (
@@ -224,6 +226,12 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
                   </div>
                 )}
               </Field>
+              <div className="flex flex-row mt-6">
+                <Checkbox name="checkbookFeeAcknowledgement" />
+                <p className="align-middle mx-4 inline leading-none text-sm">
+                  I acknowledge that a 2.5% network fee will be applied upon fund deployment.
+                </p>
+              </div>
               <div className="mt-12">
                 {waitingCreation ? (
                   isDeployingCheckbook ? (

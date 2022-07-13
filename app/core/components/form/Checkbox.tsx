@@ -9,18 +9,21 @@ const Checkbox = ({
   checked,
   defaultChecked,
   className = "",
+  validate,
 }: {
   name: string
   value?: string
   checked?: boolean
   defaultChecked?: boolean
   className?: string
+  validate?: () => void
 }) => {
   return (
     <Field
       type="checkbox"
       name={name}
       value={value}
+      {...validate}
       render={({ input, meta }) => (
         <div
           className={`${className} custom-checkbox-container relative inline-block cursor-pointer border border-marble-white p-0.5`}
