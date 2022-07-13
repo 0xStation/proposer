@@ -20,8 +20,6 @@ import truncateString from "app/core/utils/truncateString"
 import { ClipboardIcon, ClipboardCheckIcon, ExternalLinkIcon } from "@heroicons/react/outline"
 import Modal from "app/core/components/Modal"
 import networks from "app/utils/networks.json"
-import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
-import getFundingTokens from "app/core/utils/getFundingTokens"
 import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 
@@ -69,9 +67,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
   const [isModalAddressCopied, setIsModalAddressCopied] = useState<boolean>(false)
-  const [isButtonAddressCopied, setIsButtonAddressCopied] = useState<boolean>(false)
   const [successModalOpen, setSuccessModalOpen] = useState<boolean>(!!creationSuccess)
-  const [selectedFundsToken, setSelectedFundsToken] = useState<string>()
 
   useQuery(
     getCheckbooksByTerminal,
@@ -90,15 +86,6 @@ const CheckbookSettingsPage: BlitzPage = () => {
         }
       },
     }
-  )
-
-  const tokenOptions = getFundingTokens(selectedCheckbook, terminal)
-
-  const selectedFunds = useCheckbookFunds(
-    selectedCheckbook?.chainId as number,
-    selectedCheckbook?.address as string,
-    selectedCheckbook?.quorum as number,
-    selectedFundsToken
   )
 
   const CheckbookComponent = ({ checkbook }) => {
