@@ -4,7 +4,7 @@ import { TerminalMetadata } from "app/terminal/types"
 
 const HasAdminPermissionsBasedOnTags = z.object({
   terminalId: z.number(),
-  accountId: z.number(),
+  accountId: z.number().optional(),
 })
 
 // returns true/false whether user has admin permissions
@@ -14,6 +14,10 @@ const HasAdminPermissionsBasedOnTags = z.object({
 export default async function hasAdminPermissionsBasedOnTags(
   input: z.infer<typeof HasAdminPermissionsBasedOnTags>
 ) {
+  if (!input.accountId) {
+    return false
+  }
+
   try {
     const terminal = await db.terminal.findFirst({
       where: { id: input.terminalId },

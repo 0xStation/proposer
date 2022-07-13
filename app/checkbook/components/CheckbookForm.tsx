@@ -227,9 +227,9 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
                 )}
               </Field>
               <div className="flex flex-row mt-6">
-                <Checkbox name="checkbookFeeAcknowledgement" />
-                <p className="align-middle mx-4 inline leading-none text-sm">
-                  I acknowledge that a 2.5% network fee will be applied upon fund deployment.
+                <Checkbox name="checkbookFeeAcknowledgement" className="h-[18px]" />
+                <p className="align-middle mx-4 leading-none text-sm">
+                  I acknowledge that a 2.5% network fee will be applied upon fund deployment.*
                 </p>
               </div>
               <div className="mt-12">
