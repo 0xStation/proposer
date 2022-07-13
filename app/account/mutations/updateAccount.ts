@@ -32,13 +32,9 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
   }
 
   // store email with Privy so it does not live in our database to reduce leakage risk
-  if (
-    (existingAccount.data as AccountMetadata).hasSavedEmail ||
-    // if no saved email yet, only save if email was provided
-    (!(existingAccount.data as AccountMetadata).hasSavedEmail && !!params.email)
-  ) {
-    await saveEmail(params.address as string, params.email || "")
-  }
+  // not in try-catch to handle errors on client
+  // allows saving if no email provided as the removal mechanism while Privy's delete API in development
+  await saveEmail(params.address as string, params.email || "")
 
   const payload = {
     address: params.address,

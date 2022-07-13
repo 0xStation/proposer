@@ -9,9 +9,11 @@ const SaveAccountEmail = z.object({
 })
 
 export default async function saveAccountEmail(input: z.infer<typeof SaveAccountEmail>) {
+  const params = SaveAccountEmail.parse(input)
+
   const existingAccount = (await db.account.findUnique({
     where: {
-      id: input.accountId,
+      id: params.accountId,
     },
   })) as Account
 
@@ -21,11 +23,12 @@ export default async function saveAccountEmail(input: z.infer<typeof SaveAccount
   }
 
   // store email with Privy so it does not live in our database to reduce leakage risk
-  await saveEmail(existingAccount.address as string, input.email)
+  // not in try-catch to handle errors on client
+  await saveEmail(existingAccount.address as string, params.email)
 
   // mark email as saved for this account to not show email input modals
   const account = await db.account.update({
-    where: { id: input.accountId },
+    where: { id: params.accountId },
     data: {
       data: {
         ...existingAccount.data,
