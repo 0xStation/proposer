@@ -50,7 +50,7 @@ const BulletinPage: BlitzPage = () => {
   )
 
   const isLoggedInAndIsAdmin = useAdminForTerminal(terminal)
-  const [isAddFundsModalOpen, setIsAddFundsModalOpen] = useState<boolean>(true)
+  const [isAddFundsModalOpen, setIsAddFundsModalOpen] = useState<boolean>(false)
   const [rfpStatusFilters, setRfpStatusFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
 
   const [page, setPage] = useState<number>(0)
