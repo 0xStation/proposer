@@ -282,7 +282,7 @@ const ProposalPage: BlitzPage = ({
             <div className="col-span-2 p-6 w-full overflow-y-scroll">
               <Preview markdown={proposal?.data.content.body} />
             </div>
-            <div className="col-span-1 h-full border-l border-concrete flex flex-col">
+            <div className="col-span-1 border-l border-concrete flex flex-col overflow-y-scroll">
               <div className="border-b border-concrete p-6">
                 <h4 className="text-xs font-bold text-concrete uppercase mb-2">Author</h4>
                 {proposal.collaborators.map((collaborator, idx) => {
@@ -339,7 +339,7 @@ const ProposalPage: BlitzPage = ({
                 }
               >
                 <div>
-                  <h4 className="text-xs font-bold text-concrete uppercase mt-4">Approval</h4>
+                  <h4 className="text-xs font-bold text-concrete uppercase">Approval</h4>
                   <div className="flex flex-row space-x-2 items-center mt-2">
                     <ProgressIndicator
                       percent={proposal?.approvals.length / rfp?.checkbook.quorum}
@@ -364,38 +364,40 @@ const ProposalPage: BlitzPage = ({
                   </div>
                 </div>
               </div>
-            </div>
-            {check && (
-              <div className="p-6 grow flex flex-col justify-between">
-                <div>
-                  <p className="text-xs text-concrete uppercase font-bold">Check</p>
-                  <div className="flex justify-between items-center mt-4">
-                    <div className="flex flex-row items-center">
-                      <div>{truncateString(check.recipientAddress)}</div>
-                    </div>
-                    <div className="flex flex-row items-center space-x-1">
-                      <span
-                        className={`h-2 w-2 rounded-full bg-${
-                          !!check.txnHash ? "magic-mint" : "neon-carrot"
-                        }`}
-                      />
-                      <div className="font-bold text-xs uppercase tracking-wider">
-                        {!!check.txnHash ? "cashed" : "pending"}
+              {check && (
+                <div className="p-6 grow flex flex-col justify-between">
+                  <div>
+                    <p className="text-xs text-concrete uppercase font-bold">Check</p>
+                    <div className="flex justify-between items-center mt-4">
+                      <div className="flex flex-row items-center">
+                        <div>{truncateString(check.recipientAddress)}</div>
                       </div>
-                      {!!check.txnHash && (
-                        <a
-                          href={`${networks[check.chainId as number].explorer}/tx/${check.txnHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <LinkArrow className="fill-marble-white" />
-                        </a>
-                      )}
+                      <div className="flex flex-row items-center space-x-1">
+                        <span
+                          className={`h-2 w-2 rounded-full bg-${
+                            !!check.txnHash ? "magic-mint" : "neon-carrot"
+                          }`}
+                        />
+                        <div className="font-bold text-xs uppercase tracking-wider">
+                          {!!check.txnHash ? "cashed" : "pending"}
+                        </div>
+                        {!!check.txnHash && (
+                          <a
+                            href={`${networks[check.chainId as number].explorer}/tx/${
+                              check.txnHash
+                            }`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <LinkArrow className="fill-marble-white" />
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </TerminalNavigation>
