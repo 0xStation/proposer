@@ -72,7 +72,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
         })
 
         if (callback) {
-          callback()
+          callback(checkbookAddress)
         }
       } catch (e) {
         setWaitingCreation(false)
