@@ -26,7 +26,7 @@ import createProposal from "app/proposal/mutations/createProposal"
 // utils
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
-import { requiredField } from "app/utils/validators"
+import { requiredField, isPositiveAmount, composeValidators, isAddress } from "app/utils/validators"
 //types
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
@@ -266,7 +266,10 @@ const CreateProposalPage: BlitzPage = ({
                       recommended.
                     </span>
 
-                    <Field name="recipientAddress" validate={requiredField}>
+                    <Field
+                      name="recipientAddress"
+                      validate={composeValidators(requiredField, isAddress)}
+                    >
                       {({ meta, input }) => (
                         <>
                           <input
@@ -278,9 +281,7 @@ const CreateProposalPage: BlitzPage = ({
                           />
 
                           {((meta.touched && input.value === "") || meta.error) && (
-                            <span className="text-torch-red text-xs">
-                              You must provide an address.
-                            </span>
+                            <span className="text-torch-red text-xs">{meta.error}</span>
                           )}
                         </>
                       )}
@@ -298,13 +299,16 @@ const CreateProposalPage: BlitzPage = ({
                             />
                           </div>
                           {((meta.touched && input.value === "") || meta.error) && (
-                            <span className="text-torch-red text-xs">You must select a token.</span>
+                            <span className="text-torch-red text-xs">{meta.error}</span>
                           )}
                         </>
                       )}
                     </Field>
 
-                    <Field name={`amount`} validate={requiredField}>
+                    <Field
+                      name={`amount`}
+                      validate={composeValidators(requiredField, isPositiveAmount)}
+                    >
                       {({ meta, input }) => (
                         <>
                           <label className="font-bold block mt-6">Total amount*</label>
@@ -315,9 +319,7 @@ const CreateProposalPage: BlitzPage = ({
                             className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                           />
                           {((meta.touched && input.value === "") || meta.error) && (
-                            <span className="text-torch-red text-xs">
-                              You must provide an amount.
-                            </span>
+                            <span className="text-torch-red text-xs">{meta.error}</span>
                           )}
                         </>
                       )}

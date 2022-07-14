@@ -254,9 +254,7 @@ const RfpMarkdownForm = ({
                                   className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
                                 />
                                 {((meta.touched && input.value === "") || meta.error) && (
-                                  <span className="text-torch-red text-xs">
-                                    You must select a start date.
-                                  </span>
+                                  <span className="text-torch-red text-xs">{meta.error}</span>
                                 )}
                               </div>
                             )
@@ -311,9 +309,7 @@ const RfpMarkdownForm = ({
                                   })}
                                 </select>
                                 {((meta.touched && input.value === "") || meta.error) && (
-                                  <span className="text-torch-red text-xs">
-                                    You must select a checkbook.
-                                  </span>
+                                  <span className="text-torch-red text-xs">{meta.error}</span>
                                 )}
                               </div>
                             )
