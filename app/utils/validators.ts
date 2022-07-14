@@ -63,10 +63,18 @@ export const uniqueName = (names: string[]) => {
 }
 
 export const isAddress = (address: string) => {
-  return utils.isAddress(address) ? undefined : "Not a valid address"
+  if (!address) return undefined
+  return utils.isAddress(address) ? undefined : "Not a valid address."
 }
 
 export const isValidEmail = (email: string) => {
   if (!email) return undefined // prevent empty strings from triggering validator for optional form inputs
   return isEmail(email) ? undefined : "Invalid email"
+}
+
+export const isPositiveAmount = (amount: number) => {
+  if (!amount) return undefined
+  if (typeof amount === "number") return undefined
+  if (amount >= 0) return undefined // want to allow 0 amount proposals?
+  return "Amount must be a number greater than or equal to zero."
 }
