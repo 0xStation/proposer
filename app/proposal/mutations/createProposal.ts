@@ -13,6 +13,10 @@ const CreateProposal = z.object({
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
+  if (input.amount < 0) {
+    throw new Error("amount must be greater or equal to zero.")
+  }
+
   const proposal = await db.proposal.create({
     data: {
       rfpId: input.rfpId,
