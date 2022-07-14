@@ -77,8 +77,8 @@ body {
 
 .custom-select-wrapper::after {
   content: "▾";
-  font-size: 0.75rem;
-  top: 12px;
+  font-size: 1rem;
+  top: calc(50% - 0.5rem);
   right: 10px;
   position: absolute;
 }
