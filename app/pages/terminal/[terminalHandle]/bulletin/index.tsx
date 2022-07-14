@@ -28,6 +28,7 @@ import useStore from "app/core/hooks/useStore"
 import FilterPill from "app/core/components/FilterPill"
 import Pagination from "app/core/components/Pagination"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
+import { AddFundsModal } from "../../../../core/components/AddFundsModal"
 
 const RfpNotFound = () => (
   <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
@@ -49,6 +50,7 @@ const BulletinPage: BlitzPage = () => {
   )
 
   const isLoggedInAndIsAdmin = useAdminForTerminal(terminal)
+  const [isAddFundsModalOpen, setIsAddFundsModalOpen] = useState<boolean>(true)
   const [rfpStatusFilters, setRfpStatusFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
 
   const [page, setPage] = useState<number>(0)
@@ -110,8 +112,20 @@ const BulletinPage: BlitzPage = () => {
     }
   }, [query?.terminalCreated, session?.siwe?.address])
 
+  useEffect(() => {
+    if (query.terminalAndCheckbookCreated && session?.siwe?.address) {
+      setIsAddFundsModalOpen(true)
+    }
+  }, [query?.terminalAndCheckbookCreated, session?.siwe?.address])
+
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
+      <AddFundsModal
+        setIsOpen={setIsAddFundsModalOpen}
+        isOpen={isAddFundsModalOpen}
+        checkbookAddress={query.terminalAndCheckbookCreated as string}
+        terminalCreationFlow={true}
+      />
       <SuccessRfpModal
         terminal={terminal}
         setIsOpen={setShowRfpSuccessModal}

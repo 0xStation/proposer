@@ -90,9 +90,18 @@ const NewCheckbookTerminalCreationPage: BlitzPage = () => {
           </div>
           <CheckbookForm
             isEdit={false}
-            callback={() =>
-              router.push(Routes.BulletinPage({ terminalHandle, terminalCreated: true }))
-            }
+            callback={(checkbookAddress?: string) => {
+              if (checkbookAddress) {
+                router.push(
+                  Routes.BulletinPage({
+                    terminalHandle,
+                    terminalAndCheckbookCreated: checkbookAddress,
+                  })
+                )
+              } else {
+                router.push(Routes.BulletinPage({ terminalHandle, terminalCreated: true }))
+              }
+            }}
           />
         </div>
       </main>
