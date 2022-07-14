@@ -37,12 +37,14 @@ import Pagination from "app/core/components/Pagination"
 import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpId"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import { formatUnits } from "ethers/lib/utils"
+import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 
 const ProposalsTab: BlitzPage = ({
   rfp,
   terminal,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const activeUser = useStore((state) => state.activeUser)
+  const isAdmin = useAdminForTerminal(terminal)
   const { proposalId } = useRouterQuery() as { proposalId: string }
   const terminalHandle = useParam("terminalHandle") as string
   const rfpId = useParam("rfpId") as string
@@ -148,6 +150,7 @@ const ProposalsTab: BlitzPage = ({
                   terminalHandle={terminalHandle}
                   proposal={proposal}
                   rfp={rfp}
+                  isAdmin={isAdmin}
                   key={idx}
                 />
               ))
@@ -176,10 +179,12 @@ const ProposalComponent = ({
   proposal,
   rfp,
   terminalHandle,
+  isAdmin,
 }: {
   proposal: Proposal
   rfp: Rfp
   terminalHandle: string
+  isAdmin: boolean
 }) => {
   const router = useRouter()
 
@@ -234,18 +239,19 @@ const ProposalComponent = ({
               proposal.checks.length === 0 && (
                 <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[100%] left-0 group hidden group-hover:block shadow-lg z-50">
                   Insufficient funds.{" "}
-                  <span
-                    className="text-electric-violet"
-                    onClick={(e) => {
-                      // overriding the parent click handler
-                      e.preventDefault()
-                      // todo: only want to show this to people who have permission to see the checkbook.
-                      router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
-                    }}
-                  >
-                    Go to checkbook
-                  </span>{" "}
-                  to refill.
+                  {isAdmin && (
+                    <span
+                      className="text-electric-violet"
+                      onClick={(e) => {
+                        // overriding the parent click handler
+                        e.preventDefault()
+                        // todo: only want to show this to people who have permission to see the checkbook.
+                        router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
+                      }}
+                    >
+                      Go to checkbook to refill.
+                    </span>
+                  )}
                 </span>
               )}
           </div>
