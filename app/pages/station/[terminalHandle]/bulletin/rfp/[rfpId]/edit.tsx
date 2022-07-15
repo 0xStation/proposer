@@ -15,7 +15,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
   if (!session?.userId) {
     return {
       redirect: {
-        destination: `/terminal/${params?.terminalHandle}/bulletin/rfp/${params?.rfpId}/info`,
+        destination: `/station/${params?.terminalHandle}/bulletin/rfp/${params?.rfpId}/info`,
         permanent: false,
       },
     }
@@ -37,7 +37,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
   ) {
     return {
       redirect: {
-        destination: `/terminal/${params?.terminalHandle}/bulletin/rfp/${params?.rfpId}/info`,
+        destination: `/station/${params?.terminalHandle}/bulletin/rfp/${params?.rfpId}/info`,
         permanent: false,
       },
     }

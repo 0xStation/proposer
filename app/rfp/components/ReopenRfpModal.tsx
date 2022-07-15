@@ -19,7 +19,7 @@ export const ReopenRfpModal = ({ isOpen, setIsOpen, rfp }) => {
         isToastShowing: true,
         type: "success",
         message:
-          "Your RFP has been reopened. You can close it anytime by visiting the RFP's information page.",
+          "RFP has been reopened. You can close it anytime by visiting the RFP's information page.",
       })
     },
     onError: (error: Error) => {
@@ -31,7 +31,9 @@ export const ReopenRfpModal = ({ isOpen, setIsOpen, rfp }) => {
     try {
       await reopenRfpMutation({
         rfpId: rfp?.id,
-        ...((newEndDate && { endDate: new Date(`${newEndDate} 23:59:59 UTC`) }) || {}),
+        ...((newEndDate && { endDate: new Date(`${newEndDate} 23:59:59 UTC`) }) || {
+          endDate: undefined,
+        }),
       })
     } catch (err) {
       console.error(err)
@@ -47,16 +49,15 @@ export const ReopenRfpModal = ({ isOpen, setIsOpen, rfp }) => {
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        <h3 className="text-2xl font-bold pt-6">Choose an end date</h3>
+        <h3 className="text-2xl font-bold pt-6">Select a closing date</h3>
         <p className="mt-2">
-          Select a new end date for your RFP. If this is an ongoing RFP, leave blank. You can close
-          an RFP anytime.
+          Set a deadline for RFP submissions. If this is an ongoing RFP, leave it blank. You can
+          close an RFP at any time.
         </p>
-        <label className="font-bold mt-6 mb-2 block">End date</label>
         <input
           min={getShortDate()}
           type="date"
-          className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-52"
+          className="bg-wet-concrete border border-concrete rounded p-1 mt-6 w-52"
           placeholder="Select date"
           onChange={(e) => {
             setNewEndDate(e.target.value)

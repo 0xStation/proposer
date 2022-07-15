@@ -170,7 +170,7 @@ export const Navigation = ({
               onClick={() => router.push("/profile/edit")}
               className="mt-4 p-[0.20rem] border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer"
             >
-              Edit Profile
+              Edit profile
             </button>
           ) : !account?.address && !activeUser?.discordId && setIsConnectDiscordModalOpen ? (
             <button
@@ -225,7 +225,7 @@ export const Navigation = ({
                 <Link
                   href={Routes.TerminalsOnProfile({ accountAddress: account?.address as string })}
                 >
-                  Terminals
+                  Stations
                 </Link>
               </p>
             </li>

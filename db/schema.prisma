@@ -34,7 +34,7 @@ model Account {
   endorsed    Endorsement[]       @relation("Endorsed")
 }
 
-// unique links by /terminal/[handle]
+// unique links by /station/[handle]
 model Terminal {
   id         Int               @id @default(autoincrement())
   handle     String            @unique
@@ -118,7 +118,7 @@ model Checkbook {
   checks     Check[]
 }
 
-// unique links by /terminal/[handle]/rfp/[localId]
+// unique links by /station/handle]/rfp/[localId]
 model Rfp {
   id             String     @id @default(uuid())
   terminalId     Int
@@ -134,7 +134,7 @@ model Rfp {
   proposals      Proposal[]
 }
 
-// unique links by /terminal/[handle]/proposal/[localId]
+// unique links by /station/handle]/proposal/[localId]
 model Proposal {
   id            String             @id @default(uuid())
   rfpId         String

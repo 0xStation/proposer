@@ -50,10 +50,10 @@ const RfpMarkdownForm = ({
   const [createRfpMutation] = useMutation(createRfp, {
     onSuccess: (_data) => {
       invalidateQuery(getRfpsByTerminalId)
-      router.push({
-        pathname: `/terminal/${terminal?.handle}/bulletin`,
-        query: { rfpPublished: _data?.id },
-      })
+      Routes.BulletinPage({ terminalHandle: terminal?.handle, rfpPublished: _data?.id })
+      router.push(
+        Routes.BulletinPage({ terminalHandle: terminal?.handle, rfpPublished: _data?.id })
+      )
     },
     onError: (error: Error) => {
       console.error(error)
@@ -63,10 +63,13 @@ const RfpMarkdownForm = ({
   const [updateRfpMutation] = useMutation(updateRfp, {
     onSuccess: (_data) => {
       invalidateQuery(getRfpsByTerminalId)
-      router.push({
-        pathname: `/terminal/${terminal?.handle}/bulletin/rfp/${rfp?.id}/info`,
-        query: { rfpEdited: rfp?.id },
-      })
+      router.push(
+        Routes.BulletinPage({
+          terminalHandle: terminal?.handle,
+          rfpId: rfp?.id,
+          rfpEdited: rfp?.id,
+        })
+      )
     },
     onError: (error: Error) => {
       console.error(error)
@@ -188,7 +191,7 @@ const RfpMarkdownForm = ({
                           <input
                             {...input}
                             className="bg-tunnel-black text-3xl ml-2 w-full outline-none"
-                            placeholder="Give your request a title..."
+                            placeholder="Give your RFP a title"
                           />
                         )
                       }}
@@ -218,7 +221,7 @@ const RfpMarkdownForm = ({
                             <textarea
                               {...input}
                               className="bg-tunnel-black w-full h-full outline-none resize-none"
-                              placeholder="enter some text..."
+                              placeholder="What is your DAO looking for?"
                             />
                           )
                         }}
@@ -239,10 +242,7 @@ const RfpMarkdownForm = ({
                   <form className="p-4 grow flex flex-col justify-between">
                     <div>
                       <div className="flex flex-col mt-2">
-                        <label className="font-bold">Start Date*</label>
-                        <span className="text-xs text-concrete block">
-                          Proposal submission opens
-                        </span>
+                        <label className="font-bold">Submission opens*</label>
                         <Field name="startDate" validate={requiredField}>
                           {({ input, meta }) => {
                             return (
@@ -262,10 +262,7 @@ const RfpMarkdownForm = ({
                         </Field>
                       </div>
                       <div className="flex flex-col mt-6">
-                        <label className="font-bold">End Date</label>
-                        <span className="text-xs text-concrete block">
-                          Proposal submission closes
-                        </span>
+                        <label className="font-bold">Submission closes*</label>
                         <Field name="endDate">
                           {({ input, meta }) => (
                             <div>
@@ -282,11 +279,8 @@ const RfpMarkdownForm = ({
                       <div className="flex flex-col mt-6">
                         <label className="font-bold block">Checkbook*</label>
                         <span className="text-xs text-concrete block">
-                          Checkbook is where you deposit funds to create checks for proposers to
-                          claim once their projects have been approved. You can connect RFP to
-                          Checkbook later.
-                          <br />
-                          {/* TODO: add a link here  */}
+                          Deposit funds here to create checks for proposers to claim once their
+                          projects have been approved.{" "}
                           <a href="#" className="text-electric-violet">
                             Learn more
                           </a>
@@ -322,14 +316,12 @@ const RfpMarkdownForm = ({
                           passHref
                         >
                           <a target="_blank" rel="noopener noreferrer">
-                            <span className="text-electric-violet cursor-pointer mt-1 block">
+                            <span className="text-electric-violet cursor-pointer mt-1 block font-bold">
                               + Create new
                             </span>
                           </a>
                         </Link>
                       </div>
-                    </div>
-                    <div>
                       <button
                         type="button"
                         onClick={() => {
@@ -346,7 +338,7 @@ const RfpMarkdownForm = ({
                           }
                           setConfirmationModalOpen(true)
                         }}
-                        className={`bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70`}
+                        className={`bg-electric-violet text-tunnel-black px-6 py-1 rounded block mt-14 hover:bg-opacity-70`}
                       >
                         Publish
                       </button>

@@ -7,12 +7,9 @@ const GENERAL = "general"
 const modalContent = {
   general: {
     heading: "Add funds to this Checkbook.",
-    subtitle: "Please transfer funds to the contract address.",
   },
   terminalCreation: {
     heading: "Terminal created! Next, add funds to Checkbook",
-    subtitle:
-      "To activate your Checkbook, copy the contract address to transfer funds from Gnosis or other wallet applications.",
   },
 }
 
@@ -28,7 +25,20 @@ export const AddFundsModal = ({
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
         <h3 className="text-2xl font-bold pt-6">{modalContent[contentKey].heading}</h3>
-        <p className="mt-2">{modalContent[contentKey].subtitle}</p>
+        <p className="mt-2 mr-6">
+          To activate your Checkbook, copy the contract address to transfer funds from{" "}
+          {
+            <a
+              href="https://gnosis-safe.io/"
+              rel="noopener noreferrer"
+              className="text-electric-violet"
+              target="_blank"
+            >
+              Safe
+            </a>
+          }{" "}
+          or other wallet applications.
+        </p>
         <div className="mt-8">
           <button
             className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
@@ -48,7 +58,7 @@ export const AddFundsModal = ({
               })
             }}
           >
-            {isModalAddressCopied ? "Copied!" : "Copy Address"}
+            {isModalAddressCopied ? "Copied!" : "Copy address"}
           </button>
         </div>
       </div>

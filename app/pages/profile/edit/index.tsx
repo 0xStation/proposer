@@ -70,7 +70,7 @@ const EditProfile: BlitzPage = ({
 
 EditProfile.suppressFirstRenderFlicker = true
 EditProfile.getLayout = (page) => (
-  <LayoutWithoutNavigation title="Edit Profile">{page}</LayoutWithoutNavigation>
+  <LayoutWithoutNavigation title="Edit profile">{page}</LayoutWithoutNavigation>
 )
 
 export default EditProfile

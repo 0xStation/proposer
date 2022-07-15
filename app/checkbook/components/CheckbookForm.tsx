@@ -157,7 +157,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
                     <input
                       {...input}
                       type="text"
-                      placeholder="e.g. 2022 Q3 Grants"
+                      placeholder="e.g. Q3 2022 Grants"
                       className="w-full bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
                     />
                     {/* this error shows up when the user focuses the field (meta.touched) */}
@@ -169,8 +169,8 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
               </Field>
               <h3 className="font-bold mt-4">Checkbook signers*</h3>
               <span className="text-xs text-concrete block">
-                Insert wallet addresses whose signatures are required to create checks, deploy
-                funds, and edit this Checkbook’s information.
+                Enter the wallet addresses whose signatures are required to create checks, deploy
+                funds, and edit this Checkbook&apos;s information.
               </span>
               <Field
                 name="signers"
@@ -198,7 +198,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
               </Field>
               <h3 className="font-bold mt-4">Approval quorum*</h3>
               <span className="text-xs text-concrete block">
-                The number of signers required for a proposal to be approved and for a check to be
+                The number of signatories required for a proposal to be approved and a check to be
                 generated.{" "}
                 <a href="#" className="text-electric-violet">
                   Learn more
@@ -215,7 +215,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
                     <input
                       {...input}
                       type="text"
-                      placeholder="e.g. 1"
+                      placeholder="0"
                       className="w-full bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
                     />
                     {/* this error shows up when the user focuses the field (meta.touched) */}
