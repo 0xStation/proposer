@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useMutation, invalidateQuery, Link, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
-import { LockClosedIcon, XIcon, RefreshIcon } from "@heroicons/react/solid"
+import { LockClosedIcon, XIcon, RefreshIcon, SpeakerphoneIcon } from "@heroicons/react/solid"
 import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS, RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
@@ -175,24 +175,29 @@ const RfpMarkdownForm = ({
               />
               <div className="grid grid-cols-4 h-screen w-full box-border">
                 <div className="overflow-y-auto col-span-3 p-20 relative">
-                  <div className="flex flex-row items-center space-x-2">
-                    <span
-                      className={`h-2 w-2 rounded-full ${
-                        RFP_STATUS_DISPLAY_MAP[rfp?.status || "DRAFT"]?.color
-                      }`}
-                    />
-                    <span className="text-xs uppercase tracking-wider font-bold">
-                      {RFP_STATUS_DISPLAY_MAP[rfp?.status || "DRAFT"]?.copy}
+                  <div className="flex flex-row space-x-4">
+                    <span className=" bg-wet-concrete rounded-full px-2 py-1 flex items-center space-x-1">
+                      <SpeakerphoneIcon className="h-4 w-4 text-marble-white" />
+                      <span className="text-xs uppercase">Request for proposals</span>
                     </span>
+                    <div className="flex flex-row items-center space-x-2">
+                      <span
+                        className={`h-2 w-2 rounded-full ${
+                          RFP_STATUS_DISPLAY_MAP[(rfp?.status as string) || "DRAFT"]?.color
+                        }`}
+                      />
+                      <span className="text-xs uppercase tracking-wider font-bold">
+                        {RFP_STATUS_DISPLAY_MAP[(rfp?.status as string) || "DRAFT"]?.copy}
+                      </span>
+                    </div>
                   </div>
                   <div className="mt-6 flex flex-row">
-                    <span className="text-3xl font-bold">RFP:</span>
                     <Field name="title" validate={requiredField}>
                       {({ input, meta }) => {
                         return (
                           <input
                             {...input}
-                            className="bg-tunnel-black text-3xl ml-2 w-full outline-none"
+                            className="bg-tunnel-black text-3xl w-full outline-none"
                             placeholder="Give your RFP a title"
                           />
                         )

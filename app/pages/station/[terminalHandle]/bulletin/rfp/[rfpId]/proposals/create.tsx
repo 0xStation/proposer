@@ -11,7 +11,7 @@ import {
   useMutation,
 } from "blitz"
 import { Field, Form } from "react-final-form"
-import { XIcon } from "@heroicons/react/solid"
+import { LightBulbIcon, XIcon } from "@heroicons/react/solid"
 // components
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
@@ -26,7 +26,7 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import createProposal from "app/proposal/mutations/createProposal"
 // utils
 import truncateString from "app/core/utils/truncateString"
-import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
+import { DEFAULT_PFP_URLS, PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import { requiredField, isPositiveAmount, composeValidators, isAddress } from "app/utils/validators"
 //types
 import { Rfp } from "app/rfp/types"
@@ -162,9 +162,15 @@ const CreateProposalPage: BlitzPage = ({
           return (
             <div className="grid grid-cols-4 h-screen w-full box-border">
               <div className="overflow-y-auto col-span-3 p-20 relative">
-                <div className="flex flex-row items-center space-x-2">
-                  <span className="h-2 w-2 rounded-full bg-concrete" />
-                  <span className="text-xs uppercase tracking-wider">Draft</span>
+                <div className="flex flex-row space-x-4">
+                  <span className=" bg-wet-concrete rounded-full px-2 py-1 flex items-center space-x-1">
+                    <LightBulbIcon className="h-4 w-4 text-marble-white" />
+                    <span className="text-xs uppercase">Proposal</span>
+                  </span>
+                  <div className="flex flex-row items-center space-x-2">
+                    <span className="h-2 w-2 rounded-full bg-concrete" />
+                    <span className="text-xs uppercase tracking-wider font-bold">DRAFT</span>
+                  </div>
                 </div>
                 <div className="mt-6 flex flex-row">
                   <Field name={`title`} validate={requiredField}>
@@ -202,7 +208,7 @@ const CreateProposalPage: BlitzPage = ({
                       {({ input }) => (
                         <textarea
                           {...input}
-                          placeholder="enter some text..."
+                          placeholder={`How are you looking to help ${data.rfp.terminal.data.name}?`}
                           className="bg-tunnel-black w-full h-full outline-none resize-none"
                         />
                       )}
