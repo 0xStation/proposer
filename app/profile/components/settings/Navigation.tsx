@@ -11,7 +11,7 @@ const Navigation = ({ children, activeUser }) => {
   const navigationContent = (
     <>
       <label className="font-bold text-sm text-marble-white uppercase tracking-wider">
-        Edit Profile
+        Edit profile
       </label>
       <ul className="mt-6">
         <li
