@@ -1,6 +1,7 @@
 import { utils } from "ethers"
 import isURL from "validator/lib/isURL"
 import isEmail from "validator/lib/isEmail"
+import { ethers } from "ethers"
 
 // reducer that takes in an array of validators (functions) and returns the appropriate error
 // useful if you have a form field that has a few different validations (required field, must be number, etc)

@@ -119,6 +119,10 @@ const ProposalPage: BlitzPage = ({
   const showCashButton =
     hasQuorum && !check?.txnHash && check?.recipientAddress === activeUser?.address
 
+  const fundsHaveNotBeenUsed = (proposal) => {
+    return proposal.checks.length === 0 || !proposal.checks[0].txnHash
+  }
+
   useWaitForTransaction({
     confirmations: 1, // low confirmation count gives us a feel of faster UX
     hash: checkTxnHash,
@@ -267,22 +271,23 @@ const ProposalPage: BlitzPage = ({
                       "Approve"
                     )}
                   </button>
-                  {parseFloat(fundsAvailable) < proposal.data.funding?.amount && (
-                    <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
-                      Insufficient funds.{" "}
-                      {isAdmin && (
-                        <span
-                          className="text-electric-violet cursor-pointer"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
-                          }}
-                        >
-                          Go to checkbook to refill.
-                        </span>
-                      )}
-                    </span>
-                  )}
+                  {parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
+                    fundsHaveNotBeenUsed(proposal) && (
+                      <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
+                        Insufficient funds.{" "}
+                        {isAdmin && (
+                          <span
+                            className="text-electric-violet cursor-pointer"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
+                            }}
+                          >
+                            Go to checkbook to refill.
+                          </span>
+                        )}
+                      </span>
+                    )}
                 </div>
               ) : showCashButton ? (
                 <button
