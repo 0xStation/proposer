@@ -180,7 +180,7 @@ const ProposalPage: BlitzPage = ({
                 </span>
                 <span className="text-concrete hover:text-light-concrete">
                   <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })}>
-                    {`RFP: ${rfp?.data?.content?.title}`}
+                    {rfp?.data?.content?.title}
                   </Link>{" "}
                   /&nbsp;
                 </span>
