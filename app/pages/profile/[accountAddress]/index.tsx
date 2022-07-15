@@ -110,11 +110,11 @@ const ProfileHome: BlitzPage = () => {
             <div className="grid grid-cols-7 h-[calc(100vh-108px)] w-full">
               <div className="overflow-y-auto col-span-7">
                 <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
-                  <span className="basis-[42rem] ml-6 mb-2 tracking-wider">Proposals</span>
-                  <span className="basis-32 ml-9 mb-2 tracking-wider">Approval</span>
-                  <span className="basis-32 ml-6 mb-2 tracking-wider">Amount</span>
-                  <span className="basis-32 ml-2 mb-2 tracking-wider">Submission Date</span>
-                  <span className="basis-32 ml-3 mr-2 mb-2 tracking-wider">Recipient</span>
+                  <span className="basis-[36rem] ml-6 mb-2 tracking-wider">Proposals</span>
+                  <span className="basis-28 ml-2 mb-2 tracking-wider">Approval</span>
+                  <span className="basis-36 ml-2 mb-2 tracking-wider">Amount requested</span>
+                  <span className="basis-36 ml-6 mb-2 tracking-wider">Submission date</span>
+                  <span className="basis-28   mb-2 tracking-wider">Station</span>
                 </div>
                 {accountProposals &&
                   accountProposals.map((accountProposal, idx) => (
@@ -130,17 +130,18 @@ const ProfileHome: BlitzPage = () => {
           <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
             <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
               {account && account?.id === activeUser?.id
-                ? "You haven't created any proposals yet."
-                : `${account?.data?.name} is not yet a part of any Terminal on Station`}
+                ? "You haven't created any proposals"
+                : account?.data?.name
+                ? `${account?.data?.name} is not yet a part of any Station`
+                : "...Loading"}
             </h1>
             {account?.id === activeUser?.id ? (
               <p className="my-2 w-[309px] text-center">
-                Proposals allow you to present your ideas and get funded by DAOs across the
-                ecosystem.
+                Submit your ideas and get funded by DAOs.
               </p>
             ) : (
               <p className="my-2 w-[309px] text-center">
-                {account?.data.name || "..."} hasn&apos;t created any proposals yet.
+                {account?.data.name || "..."} hasn&apos;t created any proposals
               </p>
             )}
           </div>
@@ -175,10 +176,10 @@ const ProposalComponent = ({ accountProposal }) => {
           </span>
         </div>
         <div className="w-full flex flex-row mb-5">
-          <div className="basis-[42rem] ml-6 mb-2">
+          <div className="basis-[36rem] ml-6 mb-2">
             <h2 className="text-xl mt-2 mb-3">{proposal?.data?.content?.title}</h2>
           </div>
-          <div className="basis-32 ml-9 mb-2 self-center">
+          <div className="basis-28 ml-5 mb-2 self-center">
             <div className="flex flex-row">
               <ProgressIndicator
                 percent={proposal.approvals.length / checkbook?.quorum}
@@ -190,13 +191,13 @@ const ProposalComponent = ({ accountProposal }) => {
               </p>
             </div>
           </div>
-          <div className="basis-32 ml-6 mb-2 self-center">
+          <div className="basis-36 ml-5 mb-2 self-center">
             {proposal.data?.funding?.amount || "N/A"}
           </div>
-          <div className="basis-32 ml-2 mb-2 self-center">
+          <div className="basis-36 ml-6 mb-2 self-center">
             {formatDate(proposal.createdAt) || "N/A"}
           </div>
-          <div className="basis-32 ml-3 mr-2 mb-2 self-center">
+          <div className="basis-28 mr-[6px] mb-2 self-center">
             <img
               src={terminal?.data?.pfpURL || DEFAULT_PFP_URLS.TERMINAL}
               alt="PFP"

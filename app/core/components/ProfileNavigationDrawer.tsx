@@ -31,11 +31,11 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
           router.push(`/profile/${activeUser?.address}`)
         }}
       >
-        View Profile
+        View profile
       </button>
     ) : session?.siwe?.address ? (
       <button className="block hover:opacity-70" onClick={() => router.push(`/profile/complete`)}>
-        Create Profile
+        Create profile
       </button>
     ) : null
 
