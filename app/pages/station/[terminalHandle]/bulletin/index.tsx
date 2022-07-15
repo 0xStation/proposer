@@ -241,7 +241,7 @@ const RFPComponent = ({ rfp, terminalHandle }) => {
         </div>
         <div className="w-full flex flex-row mb-5">
           <div className="basis-[42rem] ml-6 mb-2">
-            <h2 className="text-xl mt-2">{`RFP: ${rfp.data?.content?.title}`}</h2>
+            <h2 className="text-xl mt-2">{rfp.data?.content?.title}</h2>
           </div>
           <div className="basis-32 ml-9 mb-2 self-center">
             <p>{rfp?.submissionCount}</p>

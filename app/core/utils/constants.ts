@@ -50,7 +50,7 @@ export const RFP_STATUS_DISPLAY_MAP = {
 export const PROPOSAL_STATUS_DISPLAY_MAP = {
   [ProductProposalStatus.SUBMITTED]: {
     copy: "submitted",
-    color: "bg-concrete",
+    color: "bg-marble-white",
   },
   [ProductProposalStatus.IN_REVIEW]: {
     copy: "in review",

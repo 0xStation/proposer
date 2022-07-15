@@ -71,7 +71,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
             <span className="text-concrete hover:text-light-concrete">
               <Link href={Routes.BulletinPage({ terminalHandle })}>Bulletin</Link> /&nbsp;
             </span>
-            RFP: {rfp?.data?.content?.title}
+            {rfp?.data?.content?.title}
           </p>
         </div>
         <div className="flex flex-row mt-6">
@@ -95,7 +95,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
             <div className="flex flex-row w-full mt-3">
               <div className="flex flex-col w-full">
                 <div className="flex flex-col">
-                  <h1 className="text-2xl font-bold">RFP: {rfp?.data?.content?.title}</h1>
+                  <h1 className="text-2xl font-bold">{rfp?.data?.content?.title}</h1>
                   <div className="relative mr-6 mt-2">
                     {isLoggedInAndIsAdmin &&
                       rfp?.author?.id &&
