@@ -5,6 +5,7 @@ import {
   useParam,
   useQuery,
   Link,
+  useRouter,
   invoke,
   GetServerSideProps,
   InferGetServerSidePropsType,
@@ -38,10 +39,13 @@ import {
   LightBulbIcon,
 } from "@heroicons/react/solid"
 import Dropdown from "app/core/components/Dropdown"
+import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 
 const ProposalPage: BlitzPage = ({
   rfp,
   proposal,
+  terminal,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const activeUser = useStore((state) => state.activeUser)
   const terminalHandle = useParam("terminalHandle") as string
@@ -53,6 +57,8 @@ const ProposalPage: BlitzPage = ({
   const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
   const [isProposalUrlCopied, setIsProposalUrlCopied] = useState<boolean>(false)
   const [check, setCheck] = useState<Check>()
+  const isAdmin = useAdminForTerminal(terminal)
+  const router = useRouter()
 
   // not really a fan of this but we need to get the token symbol
   // should we just store that alongside proposal so we don't have to call this function anytime we need the symbol?
@@ -107,8 +113,7 @@ const ProposalPage: BlitzPage = ({
     !proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address)
 
   // show approve button, if there the proposal hasn't reached quorum, user can approve, user hasn't already approved
-  const showApproveButton =
-    !hasQuorum && userCanApprove && parseFloat(fundsAvailable) > proposal.data.funding?.amount
+  const showApproveButton = !hasQuorum && userCanApprove
 
   // proposer has reached quorum and check has not been cashed and user is the proposer
   const showCashButton =
@@ -244,21 +249,41 @@ const ProposalPage: BlitzPage = ({
                 </div>
               </div>
               {showApproveButton ? (
-                <button
-                  onClick={() => {
-                    setSignModalOpen(true)
-                  }}
-                  className="bg-electric-violet text-tunnel-black px-6 mb-6 h-10 w-48 rounded block mx-auto hover:bg-opacity-70"
-                  disabled={waitingCreation}
-                >
-                  {waitingCreation ? (
-                    <div className="flex justify-center items-center">
-                      <Spinner fill="black" />
-                    </div>
-                  ) : (
-                    "Approve"
+                <div className="relative self-start group">
+                  <button
+                    onClick={() => {
+                      setSignModalOpen(true)
+                    }}
+                    className="bg-electric-violet text-tunnel-black px-6 h-[35px] rounded block mx-auto hover:bg-opacity-70 mb-2"
+                    disabled={
+                      waitingCreation || parseFloat(fundsAvailable) < proposal.data.funding?.amount
+                    }
+                  >
+                    {waitingCreation ? (
+                      <div className="flex justify-center items-center">
+                        <Spinner fill="black" />
+                      </div>
+                    ) : (
+                      "Approve"
+                    )}
+                  </button>
+                  {parseFloat(fundsAvailable) < proposal.data.funding?.amount && (
+                    <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
+                      Insufficient funds.{" "}
+                      {isAdmin && (
+                        <span
+                          className="text-electric-violet cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
+                          }}
+                        >
+                          Go to checkbook to refill.
+                        </span>
+                      )}
+                    </span>
                   )}
-                </button>
+                </div>
               ) : showCashButton ? (
                 <button
                   onClick={() => {
@@ -415,8 +440,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
   const rfp = await invoke(getRfpById, { id: rfpId })
   const proposal = await invoke(getProposalById, { id: proposalId })
+  const terminal = await invoke(getTerminalByHandle, { handle: terminalHandle })
 
-  if (!rfp || !proposal) {
+  if (!rfp || !proposal || !terminal) {
     return {
       redirect: {
         destination: Routes.BulletinPage({ terminalHandle }),
@@ -426,7 +452,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   return {
-    props: { rfp, proposal },
+    props: { rfp, proposal, terminal },
   }
 }
 

@@ -241,11 +241,10 @@ const ProposalComponent = ({
                   Insufficient funds.{" "}
                   {isAdmin && (
                     <span
-                      className="text-electric-violet"
+                      className="text-electric-violet cursor-pointer"
                       onClick={(e) => {
                         // overriding the parent click handler
                         e.preventDefault()
-                        // todo: only want to show this to people who have permission to see the checkbook.
                         router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
                       }}
                     >
