@@ -16,7 +16,7 @@ const CreateRFPPage: BlitzPage = () => {
     { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
   )
 
-  const [checkbooks] = useQuery(
+  const [checkbooks, { refetch }] = useQuery(
     getCheckbooksByTerminal,
     { terminalId: terminal?.id || 0 },
     { suspense: false, enabled: !!terminal, refetchOnWindowFocus: false }
@@ -31,6 +31,7 @@ const CreateRFPPage: BlitzPage = () => {
     <Layout title={`New RFP`}>
       <RfpMarkdownForm
         checkbooks={checkbooks as unknown as Checkbook[]}
+        refetchCheckbooks={refetch}
         terminal={terminal}
         isEdit={false}
       />

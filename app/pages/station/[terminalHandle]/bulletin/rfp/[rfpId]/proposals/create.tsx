@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   BlitzPage,
   invoke,
@@ -19,6 +19,7 @@ import Modal from "app/core/components/Modal"
 import CheckbookSelectToken from "app/core/components/CheckbookSelectToken"
 // hooks
 import useStore from "app/core/hooks/useStore"
+import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
 // queries + mutations
 import getRfpById from "app/rfp/queries/getRfpById"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
@@ -44,6 +45,10 @@ const CreateProposalPage: BlitzPage = ({
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
+
+  useWarnIfUnsavedChanges(true, () => {
+    return confirm("Warning! You have unsaved changes.")
+  })
 
   const terminalHandle = useParam("terminalHandle") as string
   const [createProposalMutation] = useMutation(createProposal, {
