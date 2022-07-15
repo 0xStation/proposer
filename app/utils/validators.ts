@@ -11,7 +11,7 @@ export const composeValidators =
   (value) =>
     validators.reduce((error, validator) => error || validator(value), undefined)
 
-export const requiredField = (value) => (value ? undefined : "This field is required.")
+export const requiredField = (value) => (value ? undefined : "Required field")
 
 export const mustBeUnderNumCharacters =
   (maxNumCharacters = 50) =>

@@ -54,7 +54,7 @@ const PfpInput = ({ pfpURL, onUpload }) => {
         <>
           {pfpURL && (
             <img
-              alt="Terminal profile picture uploaded by the user."
+              alt="Station profile picture uploaded by the user."
               src={pfpURL}
               className="w-full h-full rounded-xl"
             />
@@ -96,17 +96,17 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
               <div className="flex flex-row pt-16">
                 <div className="mr-1">
                   <div className="w-60 h-1 bg-electric-violet" />
-                  <p className="text-electric-violet mt-2.5">Open a Terminal</p>
+                  <p className="text-electric-violet mt-2.5">Open a Station</p>
                 </div>
                 <div className="">
                   <div className="w-60 h-1 bg-concrete" />
                   <p className="text-concrete mt-2.5">Create a Checkbook</p>
                 </div>
               </div>
-              <h2 className="text-2xl font-bold mt-12">Open a Terminal</h2>
+              <h2 className="text-2xl font-bold mt-12">Open a Station</h2>
               <h6 className="mt-2">
-                A Terminal is where community members propose, coordinate, and fund ideas.
-                Let&apos;s get started.
+                A Station is where community members propose, coordinate, and fund ideas. Let&apos;s
+                get started.
               </h6>
               <Form
                 initialValues={{
@@ -163,7 +163,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                     <form onSubmit={handleSubmit} className="mt-9">
                       <div className="flex flex-col">
                         <div className="flex flex-col pb-2 col-span-2">
-                          <label className="font-bold">Terminal name*</label>
+                          <label className="font-bold">Station name*</label>
                           <span className="text-concrete text-xs">50 characters max</span>
                           <Field
                             name="name"
@@ -178,7 +178,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                           <span className="text-torch-red text-xs">
                             {formState.touched && formState?.touched["name"] && errors?.name}
                           </span>
-                          <label className="font-bold mt-6">Terminal handle*</label>
+                          <label className="font-bold mt-6">Station handle*</label>
                           <span className="text-concrete text-xs">50 characters max</span>
                           <Field
                             name="handle"
@@ -352,7 +352,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                           </Field>
                           <label className="font-bold mt-6">Admin addresses</label>
                           <span className="text-xs text-concrete block w-3/4 sm:w-[474px]">
-                            Insert wallet addresses that are allowed to manage Terminal settings and
+                            Insert wallet addresses that are allowed to manage Station settings and
                             information. Addresses should be comma-separated.
                           </span>
                           <Field name="adminAddresses" component="textarea">

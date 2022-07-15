@@ -326,7 +326,7 @@ const ProposalPage: BlitzPage = ({
                     )
                   }
                 })}
-                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Terminal</h4>
+                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Station</h4>
                 <div className="flex flex-row items-center mt-2">
                   <img
                     src={rfp?.terminal.data.pfpURL || DEFAULT_PFP_URLS.TERMINAL}
@@ -344,7 +344,7 @@ const ProposalPage: BlitzPage = ({
                   </div>
                 </div>
                 <h4 className="text-xs font-bold text-concrete uppercase mt-6">
-                  Request for Proposal
+                  Request for Proposals
                 </h4>
                 <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })} passHref>
                   <a target="_blank" rel="noopener noreferrer">
@@ -353,10 +353,12 @@ const ProposalPage: BlitzPage = ({
                     </p>
                   </a>
                 </Link>
-                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Total Amount</h4>
-                <p className="mt-2 font-normal">{`${proposal?.data.funding.amount} ${tokenSymbol}`}</p>
+                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Token</h4>
+                <p className="mt-2 font-normal">{`${tokenSymbol}`}</p>
+                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Amount Requested</h4>
+                <p className="mt-2">{`${proposal?.data.funding.amount}`}</p>
                 <h4 className="text-xs font-bold text-concrete uppercase mt-6">Fund Recipient</h4>
-                <p className="mt-2">{proposal?.data.funding.recipientAddress}</p>
+                <p className="mt-2">{truncateString(proposal?.data.funding.recipientAddress, 9)}</p>
               </div>
               <div
                 className={

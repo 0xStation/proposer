@@ -42,7 +42,7 @@ const Navigation = ({ children }) => {
                 : "text-concrete"
             } cursor-pointer hover:text-marble-white mt-4`}
           >
-            <Link href={Routes.CheckbookSettingsPage({ terminalHandle })}>Checkbook™</Link>
+            <Link href={Routes.CheckbookSettingsPage({ terminalHandle })}>Checkbook</Link>
           </li>
           <li
             className={`${

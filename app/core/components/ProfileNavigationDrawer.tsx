@@ -31,18 +31,18 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
           router.push(`/profile/${activeUser?.address}`)
         }}
       >
-        View Profile
+        View profile
       </button>
     ) : session?.siwe?.address ? (
       <button className="block hover:opacity-70" onClick={() => router.push(`/profile/complete`)}>
-        Create Profile
+        Create profile
       </button>
     ) : null
 
   const openATerminalLink =
     session?.siwe?.address && activeUser ? (
       <Link href={Routes.CreateTerminalDetailsPage()}>
-        <span className="block hover:opacity-70 cursor-pointer">Open a Terminal</span>
+        <span className="block hover:opacity-70 cursor-pointer">Open a Station</span>
       </Link>
     ) : (
       <a
@@ -51,7 +51,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
         rel="noopener noreferrer"
         className="block"
       >
-        <span className="block hover:opacity-70 cursor-pointer">Open a Terminal</span>
+        <span className="block hover:opacity-70 cursor-pointer">Open a Station</span>
       </a>
     )
 

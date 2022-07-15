@@ -296,7 +296,7 @@ export const DiscordAppCard = ({ activeUser }) => {
 
 EditProfileApps.suppressFirstRenderFlicker = true
 EditProfileApps.getLayout = (page) => (
-  <LayoutWithoutNavigation title="Edit Profile">{page}</LayoutWithoutNavigation>
+  <LayoutWithoutNavigation title="Edit profile">{page}</LayoutWithoutNavigation>
 )
 
 export default EditProfileApps

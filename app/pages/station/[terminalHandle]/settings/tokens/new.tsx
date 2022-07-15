@@ -22,28 +22,38 @@ import networks from "app/utils/networks.json"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
-  const session = await getSession(req, res)
+  try {
+    const session = await getSession(req, res)
 
-  if (!session?.userId) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+    if (!session?.userId) {
+      return {
+        redirect: {
+          destination: "/",
+          permanent: false,
+        },
+      }
     }
-  }
 
-  const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
+    const terminal = await invoke(getTerminalByHandle, { handle: params?.terminalHandle as string })
 
-  const hasTagAdminPermissions = await invoke(hasAdminPermissionsBasedOnTags, {
-    terminalId: terminal?.id as number,
-    accountId: session?.userId as number,
-  })
+    const hasTagAdminPermissions = await invoke(hasAdminPermissionsBasedOnTags, {
+      terminalId: terminal?.id as number,
+      accountId: session?.userId as number,
+    })
 
-  if (
-    !terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string) &&
-    !hasTagAdminPermissions
-  ) {
+    if (
+      !terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string) &&
+      !hasTagAdminPermissions
+    ) {
+      return {
+        redirect: {
+          destination: "/",
+          permanent: false,
+        },
+      }
+    }
+  } catch (err) {
+    console.error("Failed to check permissions", err)
     return {
       redirect: {
         destination: "/",
@@ -154,7 +164,7 @@ const NewTokenSettingsPage: BlitzPage = () => {
                         )
                       })}
                     </Field>
-                    <h3 className="font-bold mt-4">Contract Address*</h3>
+                    <h3 className="font-bold mt-4">Contract address*</h3>
                     <Field
                       name="address"
                       component="input"
@@ -164,8 +174,8 @@ const NewTokenSettingsPage: BlitzPage = () => {
                     />
                     <div>
                       <button
-                        className={`rounded text-tunnel-black px-8 py-2 h-full mt-12 ${
-                          formState.dirty ? "bg-electric-violet" : "bg-concrete"
+                        className={`rounded text-tunnel-black px-8 py-2 h-full mt-12 bg-electric-violet ${
+                          formState.dirty ? "opacity-100" : "opacity-70"
                         }`}
                         type="submit"
                       >

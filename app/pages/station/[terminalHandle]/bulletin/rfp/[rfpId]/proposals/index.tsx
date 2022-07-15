@@ -141,7 +141,7 @@ const ProposalsTab: BlitzPage = ({
             <span className="basis-32 ml-9 mb-2">Approval</span>
             <span className="basis-32 ml-6 mb-2">Amount</span>
             <span className="basis-32 ml-2 mb-2">Submission Date</span>
-            <span className="basis-32 ml-6 mr-6 mb-2">Creator</span>
+            <span className="basis-32 ml-6 mr-6 mb-2">Author</span>
           </div>
           <div className="h-[calc(100vh-284px)] overflow-y-auto">
             {proposals && rfp && proposals.length ? (
