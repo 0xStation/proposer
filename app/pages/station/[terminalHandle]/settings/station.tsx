@@ -136,7 +136,7 @@ const TerminalSettingsPage: BlitzPage = () => {
         message: "Successfully updated your terminal.",
       })
 
-      let route = `/terminal/${data?.handle || terminalHandle}/settings/terminal`
+      let route = `/station/${data?.handle || terminalHandle}/settings/station`
       router.push(route, undefined, { shallow: true })
     },
     onError: (error: Error) => {
@@ -155,7 +155,7 @@ const TerminalSettingsPage: BlitzPage = () => {
       <Navigation>
         <section className="flex-1">
           {!terminal ? (
-            <div>loading terminal...</div>
+            <div>loading station...</div>
           ) : (
             <Form
               initialValues={
@@ -191,7 +191,7 @@ const TerminalSettingsPage: BlitzPage = () => {
                   <form onSubmit={handleSubmit}>
                     <div className="flex flex-col">
                       <div className="p-6 border-b border-concrete flex justify-between">
-                        <h2 className="text-marble-white text-2xl font-bold">Terminal overview</h2>
+                        <h2 className="text-marble-white text-2xl font-bold">Station overview</h2>
                         <button
                           className={`rounded text-tunnel-black px-8 bg-electric-violet ${
                             formState.hasValidationErrors || !formState.dirty
@@ -207,7 +207,7 @@ const TerminalSettingsPage: BlitzPage = () => {
                       <div className="p-6">
                         <div className="grid grid-cols-3 gap-4">
                           <div className="flex flex-col pb-2 col-span-2">
-                            <label className="font-bold">Terminal name*</label>
+                            <label className="font-bold">Station name*</label>
                             <span className="text-concrete text-xs">50 characters max.</span>
                             <Field
                               name="name"
@@ -219,7 +219,7 @@ const TerminalSettingsPage: BlitzPage = () => {
                               className="w-3/4 sm:w-[474px] rounded bg-wet-concrete border border-concrete px-2 py-1 mt-2"
                             />
                             <span className="text-torch-red text-xs">{errors?.name}</span>
-                            <label className="font-bold mt-6">Terminal handle*</label>
+                            <label className="font-bold mt-6">Station handle*</label>
                             <span className="text-concrete text-xs">50 characters max.</span>
                             <Field
                               name="handle"
@@ -389,7 +389,7 @@ const TerminalSettingsPage: BlitzPage = () => {
                               </Field>
                               <label className="font-bold mt-4">Admin addresses</label>
                               <span className="text-xs text-concrete block w-3/4 sm:w-[474px]">
-                                Insert wallet addresses that are allowed to manage Terminal settings
+                                Insert wallet addresses that are allowed to manage Station settings
                                 and information. Addresses should be comma-separated.
                               </span>
                               <Field name="adminAddresses" component="textarea">

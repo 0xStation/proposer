@@ -175,11 +175,11 @@ const BulletinPage: BlitzPage = () => {
         </div>
         <div className="h-[calc(100vh-130px)] w-full">
           <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
-            <span className="basis-[42rem] ml-6 mb-2 tracking-wider">Information</span>
+            <span className="basis-[42rem] ml-6 mb-2 tracking-wider">Request for proposals</span>
             <span className="basis-32 ml-9 mb-2 tracking-wider">Submissions</span>
-            <span className="basis-32 ml-6 mb-2 tracking-wider">Start Date</span>
-            <span className="basis-32 ml-2 mb-2 tracking-wider">End Date</span>
-            <span className="basis-32 ml-2 mr-6 mb-2 tracking-wider">Creator</span>
+            <span className="basis-32 ml-6 mb-2 tracking-wider">Open Date</span>
+            <span className="basis-32 ml-2 mb-2 tracking-wider">Close Date</span>
+            <span className="basis-32 ml-2 mr-6 mb-2 tracking-wider">Author</span>
           </div>
           <div className="overflow-y-auto col-span-7 h-[calc(100vh-174px)] w-full">
             {rfps && rfps.length ? (
@@ -191,14 +191,21 @@ const BulletinPage: BlitzPage = () => {
             ) : rfps && isLoggedInAndIsAdmin ? (
               <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
                 <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
-                  Create a request for proposals (RFPs)
+                  Create a request for proposals (RFP)
                 </h1>
-                <p className="my-2 w-[325px] text-center">
-                  Help contributors write higher quality proposals by defining your DAOs’ needs and
-                  priorities.
+                <p className="mt-2 w-[340px] text-center">
+                  Define your DAO&apos;s needs to begin soliciting proposals from contributors. Need
+                  inspiration?
+                </p>
+                <p>
+                  Check out some{" "}
+                  <a href="#" className="text-electric-violet">
+                    examples
+                  </a>
+                  .
                 </p>
                 <button
-                  className="bg-electric-violet rounded text-tunnel-black px-6 h-[35px] mt-6 hover:opacity-70"
+                  className="bg-electric-violet rounded text-tunnel-black px-6 h-[35px] w-[133px] mt-6 hover:opacity-70"
                   onClick={() => router.push(Routes.CreateRFPPage({ terminalHandle }))}
                 >
                   Create RFP

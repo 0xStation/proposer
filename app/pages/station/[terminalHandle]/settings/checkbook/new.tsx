@@ -71,7 +71,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
                 className="cursor-pointer"
               />
             </Link>
-            <h1 className="text-2xl font-bold">New Checkbook</h1>
+            <h1 className="text-2xl font-bold">Create a new Checkbook</h1>
           </div>
           <div className="w-1/2">
             <CheckbookForm

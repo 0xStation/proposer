@@ -15,7 +15,7 @@ export const CloseRfpModal = ({ isOpen, setIsOpen, rfp }) => {
       setToastState({
         isToastShowing: true,
         type: "success",
-        message: "Your RFP has been closed. You can reopen it anytime when you edit your RFP.",
+        message: "RFP has been closed. You can reopen it at any time by going to the editor mode.",
       })
     },
     onError: (error: Error) => {
@@ -40,10 +40,10 @@ export const CloseRfpModal = ({ isOpen, setIsOpen, rfp }) => {
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        <h3 className="text-2xl font-bold pt-6">Closing RFP?</h3>
-        <p className="mt-2">
-          Contributors will no longer be able to submit proposals to this RFP. You can reopen the
-          RFP anytime.
+        <h3 className="text-2xl font-bold pt-6">Are you sure you want to close the RFP?</h3>
+        <p className="mt-2 mr-24">
+          Contributors will no longer be able to submit proposals to this RFP. You can reopen it at
+          any time.
         </p>
         <div className="mt-8">
           <button

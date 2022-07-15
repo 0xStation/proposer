@@ -1,4 +1,4 @@
-import { invalidateQuery, useMutation, useRouter } from "blitz"
+import { invalidateQuery, useMutation, useRouter, Routes } from "blitz"
 import Modal from "app/core/components/Modal"
 import getRfpsByTerminalId from "../queries/getRfpsByTerminalId"
 import getRfpById from "../queries/getRfpById"
@@ -13,10 +13,7 @@ export const DeleteRfpModal = ({ isOpen, setIsOpen, rfp, terminalHandle }) => {
       invalidateQuery(getRfpsByTerminalId)
       invalidateQuery(getRfpById)
       setIsOpen(false)
-      router.push({
-        pathname: `/terminal/${terminalHandle}/bulletin`,
-        query: { rfpDeleted: true },
-      })
+      router.push(Routes.BulletinPage({ terminalHandle: terminalHandle, rfpDeleted: true }))
     },
     onError: (error: Error) => {
       console.error(error)
@@ -38,9 +35,9 @@ export const DeleteRfpModal = ({ isOpen, setIsOpen, rfp, terminalHandle }) => {
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        <h3 className="text-2xl font-bold pt-6">Deleting RFP?</h3>
+        <h3 className="text-2xl font-bold pt-6">Are you sure you want to delete the RFP?</h3>
         <p className="mt-2">
-          Contributors will no longer be able to submit proposals to this RFP. You&apos;ll not be
+          Contributors will no longer be able to submit proposals to this RFP. You won&apos;t be
           able to undo this action.
         </p>
         <div className="mt-8">

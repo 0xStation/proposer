@@ -22,6 +22,7 @@ import Modal from "app/core/components/Modal"
 import networks from "app/utils/networks.json"
 import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
+import { AddFundsModal } from "app/core/components/AddFundsModal"
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   const session = await getSession(req, res)
@@ -66,7 +67,6 @@ const CheckbookSettingsPage: BlitzPage = () => {
   const [checkbooks, setCheckbooks] = useState<Checkbook[]>([])
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
-  const [isModalAddressCopied, setIsModalAddressCopied] = useState<boolean>(false)
   const [successModalOpen, setSuccessModalOpen] = useState<boolean>(!!creationSuccess)
 
   useQuery(
@@ -114,34 +114,20 @@ const CheckbookSettingsPage: BlitzPage = () => {
   return (
     <LayoutWithoutNavigation>
       <Navigation>
-        <Modal open={successModalOpen} toggle={setSuccessModalOpen}>
-          <div className="p-2">
-            <h3 className="text-2xl font-bold pt-6">Next, add funds to this Checkbook.</h3>
-            <p className="mt-2">
-              To activate your Checkbook, please transfer funds to the contract address.
-            </p>
-            <div className="mt-8">
-              <button
-                className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
-                onClick={() => {
-                  navigator.clipboard.writeText(selectedCheckbook?.address as string).then(() => {
-                    setIsModalAddressCopied(true)
-                    setTimeout(() => setSuccessModalOpen(false), 450) // slight delay before closing modal
-                  })
-                }}
-              >
-                {isModalAddressCopied ? "Copied!" : "Copy Address"}
-              </button>
-            </div>
-          </div>
-        </Modal>
+        <AddFundsModal
+          checkbookAddress={selectedCheckbook?.address}
+          setIsOpen={setSuccessModalOpen}
+          isOpen={successModalOpen}
+        />
         <div className="flex flex-col">
           <div className="p-6 border-b border-concrete flex justify-between">
             <div className="flex flex-col">
-              <h2 className="text-marble-white text-2xl font-bold">Checkbook™</h2>
+              <h2 className="text-marble-white text-2xl font-bold">Checkbook</h2>
               <h5 className="text-base mt-2">
-                A Checkbook is a contract that allows you to create checks for fund recipients to
-                cash out.
+                Checkbook allows you to create checks for fund recipients to cash.{" "}
+                <a href="#" className="text-electric-violet">
+                  Learn more
+                </a>
               </h5>
             </div>
             <Link href={Routes.NewCheckbookSettingsPage({ terminalHandle })}>

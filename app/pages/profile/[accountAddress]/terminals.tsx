@@ -133,7 +133,7 @@ const TerminalsOnProfile: BlitzPage = () => {
         {terminals && terminals.length ? (
           <>
             <div className="h-[108px] border-b border-concrete">
-              <h1 className="text-2xl font-bold ml-6 pt-6">Terminals</h1>
+              <h1 className="text-2xl font-bold ml-6 pt-6">Stations</h1>
               <p className="flex ml-6 pt-2">{`${account?.data?.name}'s communities`} </p>
             </div>
             <div className="grid grid-cols-7 h-[calc(100vh-108px)] w-full">
@@ -162,8 +162,10 @@ const TerminalsOnProfile: BlitzPage = () => {
           <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
             <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
               {account && account?.id === activeUser?.id
-                ? "You’re not yet a part of any Terminal on Station"
-                : `${account?.data?.name} is not yet a part of any Terminal on Station`}
+                ? "You’re not yet a part of any Station"
+                : account?.data?.name
+                ? `${account?.data?.name} is not yet a part of any Station`
+                : "...Loading"}
             </h1>
             {account?.id === activeUser?.id ? (
               <p className="my-2 w-[309px] text-center">
@@ -189,7 +191,9 @@ const TerminalsOnProfile: BlitzPage = () => {
               </p>
             ) : (
               <p className="my-2 w-[309px] text-center">
-                Communities {account?.data.name} is a part of will display here.
+                {account?.data?.name
+                  ? `Communities ${account?.data.name} is a part of will display here.`
+                  : "...Loading"}
               </p>
             )}
           </div>
