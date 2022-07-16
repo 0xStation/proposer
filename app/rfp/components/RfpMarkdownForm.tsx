@@ -19,8 +19,13 @@ import { requiredField } from "app/utils/validators"
 const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
   const isoDate = DateTime.fromISO(dateTime.toString())
 
+  // min date input value needs to match the pattern nnnn-nn-nnTnn:nn
+  // but isoDate.toString() returns nnnn-nn-nnTnn:nn:nn.nnn-nn:00
+  // so we are slicing off the offset
   return isoDate.toString().slice(0, -13)
 }
+
+console.log(DateTime.now().toString())
 
 const RfpMarkdownForm = ({
   terminal,
