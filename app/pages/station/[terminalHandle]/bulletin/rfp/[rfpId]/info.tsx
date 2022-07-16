@@ -12,6 +12,7 @@ import AccountMediaObject from "app/core/components/AccountMediaObject"
 import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import { AddFundsModal } from "app/core/components/AddFundsModal"
+import { DateTime } from "luxon"
 
 const RFPInfoTab: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -58,11 +59,27 @@ const RFPInfoTab: BlitzPage = () => {
             <div className="border-b border-concrete p-6 ">
               <div className="mt-2">
                 <p className="text-concrete uppercase text-xs font-bold">Open date</p>
-                <p className="mt-2">{(rfp?.startDate && formatDate(rfp?.startDate)) || "N/A"}</p>
+                <p className="mt-2 uppercase">
+                  {rfp?.startDate
+                    ? `${DateTime.fromJSDate(rfp.startDate as Date).toFormat(
+                        "dd-MMM-yyyy"
+                      )} · ${DateTime.fromJSDate(rfp.startDate as Date).toLocaleString(
+                        DateTime.TIME_SIMPLE
+                      )}`
+                    : ""}
+                </p>
               </div>
               <div className="mt-6">
                 <p className="text-concrete uppercase text-xs font-bold">Close date</p>
-                <p className="mt-2">{(rfp?.endDate && formatDate(rfp?.endDate)) || "N/A"}</p>
+                <p className="mt-2 uppercase">
+                  {rfp?.endDate
+                    ? `${DateTime.fromJSDate(rfp.endDate as Date).toFormat(
+                        "dd-MMM-yyyy"
+                      )} · ${DateTime.fromJSDate(rfp.endDate as Date).toLocaleString(
+                        DateTime.TIME_SIMPLE
+                      )}`
+                    : "N/A"}
+                </p>
               </div>
               <div className="mt-6">
                 <p className="text-concrete uppercase text-xs font-bold">Author</p>
@@ -85,7 +102,7 @@ const RFPInfoTab: BlitzPage = () => {
               </p>
               {isAdmin && (
                 <button
-                  className="border border-electric-violet rounded text-electric-violet px-6 h-[35px] mt-2"
+                  className="border border-electric-violet rounded text-electric-violet px-6 h-[35px] mt-2 hover:bg-wet-concrete"
                   onClick={() => setShowAddFundsModal(true)}
                 >
                   Add funds
