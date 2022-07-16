@@ -29,6 +29,7 @@ import FilterPill from "app/core/components/FilterPill"
 import Pagination from "app/core/components/Pagination"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import { AddFundsModal } from "../../../../core/components/AddFundsModal"
+import { DateTime } from "luxon"
 
 const RfpNotFound = () => (
   <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
@@ -246,8 +247,28 @@ const RFPComponent = ({ rfp, terminalHandle }) => {
           <div className="basis-32 ml-9 mb-2 self-center">
             <p>{rfp?.submissionCount}</p>
           </div>
-          <div className="basis-32 ml-6 mb-2 self-center">{formatDate(rfp.startDate)}</div>
-          <div className="basis-32 ml-2 mb-2 self-center">{formatDate(rfp.endDate) || "N/A"}</div>
+          <div className="basis-32 ml-6 mb-2 self-center uppercase">
+            <p>
+              {rfp.startDate
+                ? DateTime.fromJSDate(rfp.startDate as Date).toFormat("dd-MMM-yyyy")
+                : ""}
+            </p>
+            <p className="text-concrete text-sm">
+              {DateTime.fromJSDate(rfp.startDate as Date).toLocaleString(DateTime.TIME_SIMPLE)}
+            </p>
+          </div>
+          <div className="basis-32 ml-2 mb-2 self-center uppercase">
+            <p>
+              {rfp.endDate
+                ? DateTime.fromJSDate(rfp.endDate as Date).toFormat("dd-MMM-yyyy")
+                : "N/A"}
+            </p>
+            <p className="text-concrete text-sm h-5">
+              {rfp.endDate
+                ? DateTime.fromJSDate(rfp.endDate as Date).toLocaleString(DateTime.TIME_SIMPLE)
+                : ""}
+            </p>
+          </div>
           <div className="basis-32 ml-2 mr-6 mb-2 self-center">
             <img
               src={rfp.author.data.pfpURL || DEFAULT_PFP_URLS.USER}
