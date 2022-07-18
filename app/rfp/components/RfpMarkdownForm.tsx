@@ -25,8 +25,6 @@ const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
   return isoDate.toString().slice(0, -13)
 }
 
-console.log(DateTime.now().toString())
-
 const RfpMarkdownForm = ({
   terminal,
   checkbooks,
