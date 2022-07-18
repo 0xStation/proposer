@@ -44,9 +44,10 @@ const CreateProposalPage: BlitzPage = ({
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
+  const [unsavedChanges, setUnsavedChanges] = useState<boolean>(true)
   const router = useRouter()
 
-  useWarnIfUnsavedChanges(true, () => {
+  useWarnIfUnsavedChanges(unsavedChanges, () => {
     return confirm("Warning! You have unsaved changes.")
   })
 
@@ -351,6 +352,7 @@ const CreateProposalPage: BlitzPage = ({
                           })
                           return
                         }
+                        setUnsavedChanges(false)
                         setConfirmationModalOpen(true)
                       }}
                       className={`bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70`}
