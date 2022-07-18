@@ -222,10 +222,14 @@ const RfpHeaderNavigation = ({ rfpId }) => {
             </div>
           </div>
           {rfpOpen && (
-            <Link href={Routes.CreateProposalPage({ terminalHandle, rfpId })}>
-              <button className="bg-electric-violet text-tunnel-black rounded self-start px-6 h-[35px] hover:bg-opacity-70 whitespace-nowrap">
+            <Link href={Routes.CreateProposalPage({ terminalHandle, rfpId })} passHref>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-electric-violet text-tunnel-black rounded self-start px-6 h-[35px] leading-[35px] hover:bg-opacity-70 whitespace-nowrap"
+              >
                 Create proposal
-              </button>
+              </a>
             </Link>
           )}
         </div>
