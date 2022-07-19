@@ -200,7 +200,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
           <span className="font-bold">Token</span>
           <span>{truncateString(proposal?.data.funding.token)}</span>
         </div>
-        <div className="flex justify-between mt-4 pb-4 border-b border-concrete">
+        <div className="flex justify-between mt-4">
           <div className="flex flex-row space-x-2 items-center">
             <span className="font-bold">Expiration date</span>
             <span className="relative group">
@@ -216,37 +216,9 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
           <span>{checks && formatDate(getCheckDeadline())}</span>
         </div>
         <div className="flex justify-between mt-4">
-          <span className="font-bold">Total amount</span>
+          <span className="font-bold">Total</span>
           <span>{proposal?.data.funding.amount}</span>
         </div>
-        <div className="flex justify-between mt-4 pb-4 border-b border-concrete">
-          <div className="flex flex-row space-x-2 items-center">
-            <span className="font-bold">Network fee</span>
-            <span className="relative group">
-              <InformationCircleIcon className="h-4 w-4" />
-              <span className="p-2 bg-wet-concrete rounded hidden group-hover:block absolute top-[100%] w-[150px] text-xs">
-                Not sure what the copy is for this.{` `}
-                <a href="#" className="text-electric-violet">
-                  Learn more.
-                </a>
-              </span>
-            </span>
-          </div>
-          <span>{parseFloat(proposal?.data.funding.amount) * 0.025} (2.5%)</span>
-        </div>
-        <div className="flex justify-between mt-4">
-          <div className="flex flex-col">
-            <span className="font-bold">Total</span>
-            <span className="text-xs text-concrete">
-              The funds will be deployed when the check is cashed.
-            </span>
-          </div>
-          <span>
-            {parseFloat(proposal?.data.funding.amount) * 0.025 +
-              parseFloat(proposal?.data.funding.amount)}
-          </span>
-        </div>
-
         <div className="mt-8">
           <button
             type="button"
