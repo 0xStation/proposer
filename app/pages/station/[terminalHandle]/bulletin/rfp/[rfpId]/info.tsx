@@ -1,18 +1,59 @@
 import { useState, useEffect } from "react"
-import { BlitzPage, useParam, useQuery, useRouterQuery, Link, Routes } from "blitz"
+import {
+  BlitzPage,
+  useParam,
+  useQuery,
+  useRouterQuery,
+  Link,
+  Routes,
+  GetServerSideProps,
+  invoke,
+} from "blitz"
+import { DateTime } from "luxon"
 import Preview from "app/core/components/MarkdownPreview"
+import { RfpStatus } from "app/rfp/types"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
-import { formatDate } from "app/core/utils/formatDate"
 import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import { AddFundsModal } from "app/core/components/AddFundsModal"
-import { DateTime } from "luxon"
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { terminalHandle, rfpId, proposalId } = context.query as {
+    terminalHandle: string
+    rfpId: string
+    proposalId: string
+  }
+  const terminal = await invoke(getTerminalByHandle, { handle: terminalHandle })
+  const rfp = await invoke(getRfpById, { id: rfpId })
+
+  if (!rfp || !terminal) {
+    return {
+      redirect: {
+        destination: Routes.BulletinPage({ terminalHandle }),
+        permanent: false,
+      },
+    }
+  }
+
+  if (rfp.status === RfpStatus.DELETED) {
+    return {
+      redirect: {
+        destination: Routes.RfpDeletedPage({ terminalHandle, rfpId: rfp?.id, proposalId }),
+        permanent: true,
+      },
+    }
+  }
+
+  return {
+    props: { rfp, terminal },
+  }
+}
 
 const RFPInfoTab: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -35,7 +76,7 @@ const RFPInfoTab: BlitzPage = () => {
   }, [query?.rfpEdited])
 
   return (
-    <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
+    <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}RFP`}>
       <AddFundsModal
         setIsOpen={setShowAddFundsModal}
         isOpen={showAddFundsModal}

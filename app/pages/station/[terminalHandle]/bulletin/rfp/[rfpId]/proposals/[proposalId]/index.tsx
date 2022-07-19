@@ -183,7 +183,13 @@ const ProposalPage: BlitzPage = ({
                   <Link href={Routes.BulletinPage({ terminalHandle })}>Bulletin</Link> /&nbsp;
                 </span>
                 <span className="text-concrete hover:text-light-concrete">
-                  <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })}>
+                  <Link
+                    href={Routes.RFPInfoTab({
+                      terminalHandle,
+                      rfpId: rfp?.id,
+                      proposalId: proposal?.id,
+                    })}
+                  >
                     {rfp?.data?.content?.title}
                   </Link>{" "}
                   /&nbsp;

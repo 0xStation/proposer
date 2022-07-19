@@ -28,7 +28,7 @@ import {
   PROPOSAL_STATUSES_FILTER_OPTIONS,
 } from "app/core/utils/constants"
 import { formatDate } from "app/core/utils/formatDate"
-import { genPathFromUrlObject } from "app/utils"
+import { RfpStatus } from "app/rfp/types"
 import { Rfp } from "app/rfp/types"
 import ProgressIndicator from "app/core/components/ProgressIndicator"
 import { Proposal, ProposalStatus } from "app/proposal/types"
@@ -94,7 +94,7 @@ const ProposalsTab: BlitzPage = ({
   }, [proposalId, activeUser])
 
   return (
-    <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
+    <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Proposals`}>
       {terminal && activeUser && (
         <GetNotifiedModal isOpen={isGetNotifiedModalOpen} setIsOpen={setIsGetNotifiedModalOpen} />
       )}
@@ -292,6 +292,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       redirect: {
         destination: Routes.BulletinPage({ terminalHandle }),
         permanent: false,
+      },
+    }
+  }
+
+  if (rfp.status === RfpStatus.DELETED) {
+    return {
+      redirect: {
+        destination: Routes.RfpDeletedPage({ terminalHandle, rfpId: rfp?.id, proposalId }),
+        permanent: true,
       },
     }
   }
