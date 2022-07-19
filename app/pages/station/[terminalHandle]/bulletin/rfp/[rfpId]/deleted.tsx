@@ -68,7 +68,7 @@ export const RfpDeletedPage: BlitzPage = ({
                   })
                 )
               }
-              className="bg-electric-violet rounded text-tunnel-black h-[35px] px-4 mt-5"
+              className="bg-electric-violet rounded text-tunnel-black h-[35px] px-4 mt-5 hover:opacity-70"
             >
               Go back to proposal
             </button>
