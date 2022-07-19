@@ -16,6 +16,7 @@ import { DEFAULT_PFP_URLS, PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/co
 import getAccountProposalsByAddress from "app/account/queries/getAccountProposalsByAddress"
 import ProgressIndicator from "app/core/components/ProgressIndicator"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import { RfpStatus } from "app/rfp/types"
 
 // the profile homepage
 // can see a users terminals + profile info at a glance
@@ -155,6 +156,7 @@ const ProposalComponent = ({ accountProposal }) => {
   const { terminal, proposal } = accountProposal
   const rfp = proposal.rfp
   const checkbook = rfp.checkbook
+  const isRfpDeleted = rfp?.status === RfpStatus.DELETED
 
   return (
     <Link
@@ -173,6 +175,7 @@ const ProposalComponent = ({ accountProposal }) => {
           />
           <span className="text-xs uppercase tracking-wider font-bold">
             {PROPOSAL_STATUS_DISPLAY_MAP[proposal.status]?.copy}
+            {isRfpDeleted && <p className="text-concrete inline"> · rfp has been deleted</p>}
           </span>
         </div>
         <div className="w-full flex flex-row mb-5">
