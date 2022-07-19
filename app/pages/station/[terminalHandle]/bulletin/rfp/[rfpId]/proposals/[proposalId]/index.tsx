@@ -41,6 +41,7 @@ import {
 import Dropdown from "app/core/components/Dropdown"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
+import { RfpStatus } from "app/rfp/types"
 
 const ProposalPage: BlitzPage = ({
   rfp,
@@ -112,7 +113,7 @@ const ProposalPage: BlitzPage = ({
     rfp?.checkbook.signers.includes(activeUser?.address) &&
     !proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address)
 
-  // show approve button, if there the proposal hasn't reached quorum, user can approve, user hasn't already approved
+  // show approve button, if the proposal hasn't reached quorum, user can approve, user hasn't already approved
   const showApproveButton = !hasQuorum && userCanApprove
 
   // proposer has reached quorum and check has not been cashed and user is the proposer
@@ -357,13 +358,26 @@ const ProposalPage: BlitzPage = ({
                 <h4 className="text-xs font-bold text-concrete uppercase mt-6">
                   Request for Proposals
                 </h4>
-                <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })} passHref>
-                  <a target="_blank" rel="noopener noreferrer">
-                    <p className="mt-2 text-electric-violet cursor-pointer">
-                      {rfp?.data.content.title}
-                    </p>
-                  </a>
-                </Link>
+                <span className="flex flex-row items-center group relative w-fit">
+                  {rfp?.status !== RfpStatus.DELETED ? (
+                    <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })} passHref>
+                      <a target="_blank" rel="noopener noreferrer">
+                        <p className="mt-2 text-electric-violet cursor-pointer">
+                          {rfp?.data.content.title}
+                        </p>
+                      </a>
+                    </Link>
+                  ) : (
+                    <>
+                      <p className="mt-2 text-electric-violet opacity-70 cursor-not-allowed">
+                        {rfp?.data.content.title}
+                      </p>
+                      <div className="hidden group-hover:block absolute top-[100%] bg-wet-concrete p-2 rounded text-xs w-[140px]">
+                        RFP has been deleted.
+                      </div>
+                    </>
+                  )}
+                </span>
                 <h4 className="text-xs font-bold text-concrete uppercase mt-6">Token</h4>
                 <p className="mt-2 font-normal">{`${tokenSymbol}`}</p>
                 <h4 className="text-xs font-bold text-concrete uppercase mt-6">Amount Requested</h4>
