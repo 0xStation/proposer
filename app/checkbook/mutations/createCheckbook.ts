@@ -10,7 +10,6 @@ const CreateCheckbook = z.object({
   name: z.string(),
   quorum: z.number(),
   signers: z.string().array(), // assumes sanitized
-  checkbookFeeAcknowledgement: z.boolean(),
 })
 
 export default async function createCheckbook(input: z.infer<typeof CreateCheckbook>) {
@@ -23,9 +22,7 @@ export default async function createCheckbook(input: z.infer<typeof CreateCheckb
       terminalId: input.terminalId,
       quorum: input.quorum,
       signers: input.signers,
-      data: {
-        checkbookFeeAcknowledgement: input.checkbookFeeAcknowledgement,
-      },
+      data: {},
     },
   })
 

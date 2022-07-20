@@ -117,7 +117,8 @@ const TerminalsOnProfile: BlitzPage = () => {
         account?.data?.name ? account?.data?.name : truncateString(accountAddress, 3)
       } | Profile`}
     >
-      {
+      {/* commenting out for now, we can bring it back in when discord connection is more important */}
+      {/* {
         // only show discord popup if I don't have a discordId associated with my account
         // first account check prevents flicker of modal while account is still loading
         activeUser && !activeUser?.discordId && (
@@ -128,7 +129,7 @@ const TerminalsOnProfile: BlitzPage = () => {
             setNewAuth={setNewAuth}
           />
         )
-      }
+      } */}
       <ProfileNavigation account={account as Account}>
         {terminals && terminals.length ? (
           <>
