@@ -1,6 +1,6 @@
+import getFundingTokens from "app/core/utils/getFundingTokens"
 import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
-import useCheckbookAvailability from "app/core/hooks/useCheckbookAvailability"
 
 // A component that shows a dropdown of the tokens in a given checkbook
 const CheckbookSelectToken = ({
@@ -12,14 +12,7 @@ const CheckbookSelectToken = ({
   checkbook: Checkbook
   options?: any
 }) => {
-  const tokenTotals = useCheckbookAvailability(checkbook, terminal)
-
-  const validTokens =
-    (tokenTotals &&
-      tokenTotals.filter((token) => {
-        return token.available > 0
-      })) ||
-    []
+  const tokenOptions = getFundingTokens(checkbook, terminal)
 
   return (
     <div>
@@ -28,7 +21,7 @@ const CheckbookSelectToken = ({
         className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-3`}
       >
         <option>Select token</option>
-        {validTokens.map((token, i) => {
+        {tokenOptions.map((token, i) => {
           return (
             <option key={i} value={token.address}>
               {token.symbol}
