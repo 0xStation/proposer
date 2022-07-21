@@ -299,7 +299,10 @@ const RfpMarkdownForm = ({
                         <span className="text-xs text-concrete block">
                           Deposit funds here to create checks for proposers to claim once their
                           projects have been approved.{" "}
-                          <a href="#" className="text-electric-violet">
+                          <a
+                            href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
+                            className="text-electric-violet"
+                          >
                             Learn more
                           </a>
                         </span>

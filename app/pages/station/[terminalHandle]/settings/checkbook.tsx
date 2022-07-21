@@ -125,7 +125,10 @@ const CheckbookSettingsPage: BlitzPage = () => {
               <h2 className="text-marble-white text-2xl font-bold">Checkbook</h2>
               <h5 className="text-base mt-2">
                 Checkbook allows you to create checks for fund recipients to cash.{" "}
-                <a href="#" className="text-electric-violet">
+                <a
+                  href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
+                  className="text-electric-violet"
+                >
                   Learn more
                 </a>
               </h5>
