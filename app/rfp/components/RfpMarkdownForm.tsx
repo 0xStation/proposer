@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react"
-import { DateTime } from "luxon"
 import { useMutation, invalidateQuery, Link, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
-import { LockClosedIcon, XIcon, RefreshIcon, SpeakerphoneIcon } from "@heroicons/react/solid"
+import { LockClosedIcon, XIcon, RefreshIcon } from "@heroicons/react/solid"
 import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS, RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
@@ -13,17 +12,11 @@ import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
 import { Rfp } from "../types"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
+import { getShortDate } from "app/core/utils/getShortDate"
 import ConfirmationRfpModal from "./ConfirmationRfpModal"
 import { requiredField } from "app/utils/validators"
 
-const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
-  const isoDate = DateTime.fromISO(dateTime.toString())
-
-  // min date input value needs to match the pattern nnnn-nn-nnTnn:nn
-  // but isoDate.toString() returns nnnn-nn-nnTnn:nn:nn.nnn-nn:00
-  // so we are slicing off the offset
-  return isoDate.toString().slice(0, -13)
-}
+import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
 
 const RfpMarkdownForm = ({
   terminal,
@@ -39,6 +32,7 @@ const RfpMarkdownForm = ({
   rfp?: Rfp
 }) => {
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
+  const [shortcutsOpen, setShortcutsOpen] = useState<boolean>(false)
   const [title, setTitle] = useState<string>(rfp?.data?.content?.title || "")
   const [markdown, setMarkdown] = useState<string>(rfp?.data?.content?.body || "")
   const [previewMode, setPreviewMode] = useState<boolean>(false)
@@ -108,21 +102,33 @@ const RfpMarkdownForm = ({
             >
               <XIcon className="h-6 w-6 ml-3 fill-marble-white" />
             </button>
-            <div
-              className="space-x-1 items-center flex cursor-pointer"
-              onClick={() => setPreviewMode(!previewMode)}
-            >
-              {previewMode ? (
-                <>
-                  <img src="/pencil.svg" className="inline pr-2 self-center" />
-                  <span>Back to editing</span>
-                </>
-              ) : (
-                <>
-                  <img src="/eye.svg" className="inline pr-2 items-center" />
-                  <span>Preview</span>
-                </>
-              )}
+            <div className="flex flex-row items-center space-x-4">
+              <button
+                className={`${
+                  shortcutsOpen && "font-bold text-marble-white bg-wet-concrete"
+                } cursor-pointer h-[35px] rounded px-2`}
+                onClick={() => {
+                  setShortcutsOpen(!shortcutsOpen)
+                }}
+              >
+                Markdown shortcuts
+              </button>
+              <div
+                className="space-x-1 items-center flex cursor-pointer"
+                onClick={() => setPreviewMode(!previewMode)}
+              >
+                {previewMode ? (
+                  <>
+                    <img src="/pencil.svg" className="inline pr-2 self-center" />
+                    <span>Back to editing</span>
+                  </>
+                ) : (
+                  <>
+                    <img src="/eye.svg" className="inline pr-2 items-center" />
+                    <span>Preview</span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -133,18 +139,11 @@ const RfpMarkdownForm = ({
             ? {
                 title: title,
                 markdown: markdown,
-                startDate: getFormattedDate({ dateTime: DateTime.fromJSDate(rfp.startDate) }),
-                endDate: rfp?.endDate
-                  ? getFormattedDate({ dateTime: DateTime.fromJSDate(rfp?.endDate as Date) })
-                  : undefined,
+                startDate: getShortDate(rfp.startDate),
+                endDate: getShortDate(rfp?.endDate && rfp?.endDate),
                 checkbookAddress: rfp?.fundingAddress,
               }
-            : {
-                startDate: getFormattedDate({
-                  dateTime: DateTime.local().plus({ hour: 1 }),
-                }),
-                checkbookAddress: checkbooks?.[0]?.address,
-              }
+            : {}
         }
         onSubmit={async (values: {
           startDate: string
@@ -157,26 +156,13 @@ const RfpMarkdownForm = ({
             setToastState({
               isToastShowing: true,
               type: "error",
-              message: "You must connect your wallet in order to create RFPs.",
+              message: "You must connect your wallet in order to create RFPs",
             })
-            return
-          }
-
-          if (!values.checkbookAddress) {
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: "Please select a Checkbook first.",
-            })
-            return
-          }
-
-          if (isEdit) {
+          } else if (isEdit) {
             await updateRfpMutation({
               rfpId: rfp?.id as string,
-              // convert luxon's `DateTime` obj to UTC to store in db
-              startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
-              endDate: DateTime.fromISO(values.endDate).toUTC().toJSDate(),
+              startDate: new Date(`${values.startDate} 00:00:00 UTC`),
+              endDate: new Date(`${values.endDate} 23:59:59 UTC`),
               fundingAddress: values.checkbookAddress,
               contentBody: values.markdown,
               contentTitle: values.title,
@@ -184,11 +170,8 @@ const RfpMarkdownForm = ({
           } else {
             await createRfpMutation({
               terminalId: terminal?.id,
-              // convert luxon's `DateTime` obj to UTC to store in db
-              startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
-              endDate: values.endDate
-                ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
-                : undefined,
+              startDate: new Date(`${values.startDate} 00:00:00 UTC`),
+              endDate: new Date(`${values.endDate} 23:59:59 UTC`),
               authorAddress: activeUser?.address,
               fundingAddress: values.checkbookAddress,
               contentBody: values.markdown,
@@ -207,29 +190,24 @@ const RfpMarkdownForm = ({
               />
               <div className="grid grid-cols-4 h-screen w-full box-border">
                 <div className="overflow-y-auto col-span-3 p-20 relative">
-                  <div className="flex flex-row space-x-4">
-                    <span className=" bg-wet-concrete rounded-full px-2 py-1 flex items-center space-x-1">
-                      <SpeakerphoneIcon className="h-4 w-4 text-marble-white" />
-                      <span className="text-xs uppercase">Request for proposals</span>
+                  <div className="flex flex-row items-center space-x-2">
+                    <span
+                      className={`h-2 w-2 rounded-full ${
+                        RFP_STATUS_DISPLAY_MAP[rfp?.status || "DRAFT"]?.color
+                      }`}
+                    />
+                    <span className="text-xs uppercase tracking-wider font-bold">
+                      {RFP_STATUS_DISPLAY_MAP[rfp?.status || "DRAFT"]?.copy}
                     </span>
-                    <div className="flex flex-row items-center space-x-2">
-                      <span
-                        className={`h-2 w-2 rounded-full ${
-                          RFP_STATUS_DISPLAY_MAP[(rfp?.status as string) || "DRAFT"]?.color
-                        }`}
-                      />
-                      <span className="text-xs uppercase tracking-wider font-bold">
-                        {RFP_STATUS_DISPLAY_MAP[(rfp?.status as string) || "DRAFT"]?.copy}
-                      </span>
-                    </div>
                   </div>
                   <div className="mt-6 flex flex-row">
+                    <span className="text-3xl font-bold">RFP:</span>
                     <Field name="title" validate={requiredField}>
                       {({ input, meta }) => {
                         return (
                           <input
                             {...input}
-                            className="bg-tunnel-black text-3xl w-full outline-none"
+                            className="bg-tunnel-black text-3xl ml-2 w-full outline-none"
                             placeholder="Give your RFP a title"
                           />
                         )
@@ -269,6 +247,7 @@ const RfpMarkdownForm = ({
                       <Preview markdown={formState.values.markdown} />
                     )}
                   </div>
+                  <MarkdownShortcuts isOpen={shortcutsOpen} />
                 </div>
                 <div className="h-full border-l border-concrete col-span-1 flex flex-col">
                   <div className="border-b border-concrete p-4 flex flex-row space-x-8">
@@ -288,8 +267,8 @@ const RfpMarkdownForm = ({
                               <div>
                                 <input
                                   {...input}
-                                  type="datetime-local"
-                                  min={getFormattedDate({ dateTime: DateTime.local() })}
+                                  type="date"
+                                  min={getShortDate()}
                                   className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
                                 />
                                 {((meta.touched && input.value === "") || meta.error) && (
@@ -301,15 +280,14 @@ const RfpMarkdownForm = ({
                         </Field>
                       </div>
                       <div className="flex flex-col mt-6">
-                        <label className="font-bold">Submission closes</label>
+                        <label className="font-bold">Submission closes*</label>
                         <Field name="endDate">
                           {({ input, meta }) => (
                             <div>
                               <input
                                 {...input}
-                                type="datetime-local"
-                                // dates need to match the pattern nnnn-nn-nnTnn:nn
-                                min={getFormattedDate({ dateTime: DateTime.local() })}
+                                type="date"
+                                min={getShortDate()}
                                 className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
                               />
                             </div>
@@ -331,12 +309,12 @@ const RfpMarkdownForm = ({
                               <div className="custom-select-wrapper">
                                 <select
                                   {...input}
-                                  className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                                  className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-1`}
                                 >
                                   <option value="">Choose option</option>
                                   {checkbooks?.map((cb, idx) => {
                                     return (
-                                      <option key={cb.address} value={cb.address}>
+                                      <option key={`checkbook-${idx}`} value={cb.address}>
                                         {cb.name}
                                       </option>
                                     )
@@ -391,7 +369,7 @@ const RfpMarkdownForm = ({
                           }
                           setConfirmationModalOpen(true)
                         }}
-                        className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block mt-14 hover:bg-opacity-70"
+                        className={`bg-electric-violet text-tunnel-black px-6 py-1 rounded block mt-14 hover:bg-opacity-70`}
                       >
                         Publish
                       </button>

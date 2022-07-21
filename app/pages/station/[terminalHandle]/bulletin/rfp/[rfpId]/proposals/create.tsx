@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import {
   BlitzPage,
   invoke,
@@ -26,11 +26,12 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import createProposal from "app/proposal/mutations/createProposal"
 // utils
 import truncateString from "app/core/utils/truncateString"
-import { DEFAULT_PFP_URLS, PROPOSAL_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
+import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import { requiredField, isPositiveAmount, composeValidators, isAddress } from "app/utils/validators"
 //types
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
+import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
 
 type GetServerSidePropsData = {
   rfp: Rfp
@@ -40,6 +41,7 @@ type GetServerSidePropsData = {
 const CreateProposalPage: BlitzPage = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const [shortcutsOpen, setShortcutsOpen] = useState<boolean>(false)
   const [previewMode, setPreviewMode] = useState<boolean>(false)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
   const activeUser = useStore((state) => state.activeUser)
@@ -99,21 +101,33 @@ const CreateProposalPage: BlitzPage = ({
             >
               <XIcon className="h-6 w-6 ml-3 fill-marble-white" />
             </button>
-            <div
-              className="space-x-2 items-center flex cursor-pointer"
-              onClick={() => setPreviewMode(!previewMode)}
-            >
-              {previewMode ? (
-                <>
-                  <img src="/pencil.svg" className="inline pr-2 self-center" />
-                  <span>Back to editing</span>
-                </>
-              ) : (
-                <>
-                  <img src="/eye.svg" className="inline pr-2 items-center" />
-                  <span>Preview</span>
-                </>
-              )}
+            <div className="flex flex-row items-center space-x-4">
+              <button
+                className={`${
+                  shortcutsOpen && "font-bold text-marble-white bg-wet-concrete"
+                } cursor-pointer h-[35px] rounded px-2`}
+                onClick={() => {
+                  setShortcutsOpen(!shortcutsOpen)
+                }}
+              >
+                Markdown shortcuts
+              </button>
+              <div
+                className="space-x-2 items-center flex cursor-pointer"
+                onClick={() => setPreviewMode(!previewMode)}
+              >
+                {previewMode ? (
+                  <>
+                    <img src="/pencil.svg" className="inline pr-2 self-center" />
+                    <span>Back to editing</span>
+                  </>
+                ) : (
+                  <>
+                    <img src="/eye.svg" className="inline pr-2 items-center" />
+                    <span>Preview</span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -218,6 +232,8 @@ const CreateProposalPage: BlitzPage = ({
                     <Preview markdown={formState.values.markdown} />
                   )}
                 </div>
+
+                <MarkdownShortcuts isOpen={shortcutsOpen} />
               </div>
               <div className="h-full border-l border-concrete col-span-1 flex flex-col">
                 <form className="p-4 grow flex flex-col justify-between">
