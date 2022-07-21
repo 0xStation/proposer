@@ -15,7 +15,6 @@ import { useWaitForTransaction } from "wagmi"
 import createCheckbook from "../mutations/createCheckbook"
 
 type FormValues = {
-  checkbookFeeAcknowledgement: boolean
   name: string
   signers: string
   quorum: string
@@ -26,7 +25,6 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
   const [quorum, setQuorum] = useState<number>()
   const [signers, setSigners] = useState<string[]>()
   const [name, setName] = useState<string>()
-  const [checkbookFeeAcknowledgement, setCheckbookFeeAcknowledgement] = useState<boolean>(false)
   const [txnHash, setTxnHash] = useState<string>()
   const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
   const [isDeployingCheckbook, setIsDeployingCheckbook] = useState<boolean>(false)
@@ -68,7 +66,6 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
           name: name as string,
           quorum: quorum as number,
           signers: signers as string[],
-          checkbookFeeAcknowledgement,
         })
 
         if (callback) {
@@ -103,7 +100,6 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
               setQuorum(quorum)
               setSigners(signers)
               setName(values.name)
-              setCheckbookFeeAcknowledgement(values.checkbookFeeAcknowledgement)
               const transaction = await createCheckbookOnChain({
                 args: [quorum, signers],
               })
@@ -141,7 +137,6 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
           !formState.values.name ||
           !formState.values.signers ||
           !formState.values.quorum ||
-          !formState.values.checkbookFeeAcknowledgement ||
           formState.hasValidationErrors ||
           !!invalidSelectedNetwork
         return (
@@ -225,12 +220,6 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
                   </div>
                 )}
               </Field>
-              <div className="flex flex-row mt-6">
-                <Checkbox name="checkbookFeeAcknowledgement" className="h-[18px]" />
-                <p className="align-middle mx-4 leading-none text-sm">
-                  I acknowledge that a 2.5% network fee will be applied upon fund deployment.*
-                </p>
-              </div>
               <div className="mt-12">
                 {waitingCreation ? (
                   isDeployingCheckbook ? (
