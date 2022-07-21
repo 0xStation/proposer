@@ -54,8 +54,11 @@ const CheckbookIndicator = ({ terminal, checkbook }) => {
         </span>
         <InformationCircleIcon className="h-4 w-4 ml-1 fill-light-concrete" />
         <div className="hidden group-hover:block absolute top-[100%] bg-wet-concrete p-2 rounded text-xs w-1/2">
-          Token amount available minus pending network fee.{" "}
-          <a className="text-electric-violet" href="#">
+          Token amount available{" "}
+          <a
+            className="text-electric-violet"
+            href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
+          >
             Learn more
           </a>
         </div>

@@ -195,7 +195,10 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
               <span className="text-xs text-concrete block">
                 The number of signatories required for a proposal to be approved and a check to be
                 generated.{" "}
-                <a href="#" className="text-electric-violet">
+                <a
+                  href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
+                  className="text-electric-violet"
+                >
                   Learn more
                 </a>
               </span>

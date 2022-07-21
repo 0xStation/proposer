@@ -81,7 +81,10 @@ const NewCheckbookTerminalCreationPage: BlitzPage = () => {
           <p className="mt-2">
             Checkbook allows you to create checks for proposers to cash after their proposals have
             been approved.{" "}
-            <a className="text-electric-violet" href="#">
+            <a
+              className="text-electric-violet"
+              href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
+            >
               Learn more
             </a>
           </p>
