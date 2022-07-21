@@ -41,6 +41,7 @@ type GetServerSidePropsData = {
 const CreateProposalPage: BlitzPage = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false)
   const [shortcutsOpen, setShortcutsOpen] = useState<boolean>(false)
   const [previewMode, setPreviewMode] = useState<boolean>(false)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
@@ -174,6 +175,7 @@ const CreateProposalPage: BlitzPage = ({
         }}
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
+          console.log(formState)
           return (
             <div className="grid grid-cols-4 h-screen w-full box-border">
               <div className="overflow-y-auto col-span-3 p-20 relative">
@@ -308,7 +310,7 @@ const CreateProposalPage: BlitzPage = ({
                             className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                           />
 
-                          {((meta.touched && input.value === "") || meta.error) && (
+                          {(meta.touched || attemptedSubmit) && meta.error && (
                             <span className="text-torch-red text-xs">{meta.error}</span>
                           )}
                         </>
@@ -326,7 +328,7 @@ const CreateProposalPage: BlitzPage = ({
                               options={input}
                             />
                           </div>
-                          {((meta.touched && input.value === "") || meta.error) && (
+                          {(meta.touched || attemptedSubmit) && meta.error && (
                             <span className="text-torch-red text-xs">{meta.error}</span>
                           )}
                         </>
@@ -346,7 +348,7 @@ const CreateProposalPage: BlitzPage = ({
                             placeholder="Enter token amount"
                             className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                           />
-                          {((meta.touched && input.value === "") || meta.error) && (
+                          {(meta.touched || attemptedSubmit) && meta.error && (
                             <span className="text-torch-red text-xs">{meta.error}</span>
                           )}
                         </>
@@ -357,6 +359,7 @@ const CreateProposalPage: BlitzPage = ({
                     <button
                       type="button"
                       onClick={() => {
+                        setAttemptedSubmit(true)
                         if (formState.invalid) {
                           const fieldsWithErrors = Object.keys(formState.errors as Object)
                           setToastState({
