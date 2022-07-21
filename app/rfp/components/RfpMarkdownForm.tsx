@@ -31,6 +31,7 @@ const RfpMarkdownForm = ({
   isEdit?: boolean
   rfp?: Rfp
 }) => {
+  const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
   const [shortcutsOpen, setShortcutsOpen] = useState<boolean>(false)
   const [title, setTitle] = useState<string>(rfp?.data?.content?.title || "")
@@ -271,7 +272,7 @@ const RfpMarkdownForm = ({
                                   min={getShortDate()}
                                   className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
                                 />
-                                {((meta.touched && input.value === "") || meta.error) && (
+                                {(meta.touched || attemptedSubmit) && meta.error && (
                                   <span className="text-torch-red text-xs">{meta.error}</span>
                                 )}
                               </div>
@@ -320,7 +321,7 @@ const RfpMarkdownForm = ({
                                     )
                                   })}
                                 </select>
-                                {((meta.touched && input.value === "") || meta.error) && (
+                                {(meta.touched || attemptedSubmit) && meta.error && (
                                   <span className="text-torch-red text-xs">{meta.error}</span>
                                 )}
                               </div>
@@ -356,6 +357,7 @@ const RfpMarkdownForm = ({
                       <button
                         type="button"
                         onClick={() => {
+                          setAttemptedSubmit(true)
                           if (formState.invalid) {
                             const fieldsWithErrors = Object.keys(formState.errors as Object)
                             setToastState({
