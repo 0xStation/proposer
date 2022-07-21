@@ -200,7 +200,10 @@ const BulletinPage: BlitzPage = () => {
                 </p>
                 <p>
                   Check out some{" "}
-                  <a href="#" className="text-electric-violet">
+                  <a
+                    href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/request-for-proposal-rfp"
+                    className="text-electric-violet"
+                  >
                     examples
                   </a>
                   .
