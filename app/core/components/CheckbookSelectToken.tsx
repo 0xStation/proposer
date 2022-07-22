@@ -18,7 +18,7 @@ const CheckbookSelectToken = ({
     <div>
       <select
         {...options}
-        className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-3`}
+        className={`w-full bg-wet-concrete border border-concrete rounded p-2 mt-3`}
       >
         <option>Select token</option>
         {tokenOptions.map((token, i) => {
