@@ -12,7 +12,9 @@
     "prepare": "husky install",
     "postinstall": "prisma generate",
     "seed": "blitz run db seed",
-    "steward": "blitz run db seed -f db/steward.ts -e production"
+    "steward": "blitz run db seed -f db/steward.ts -e production",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "prisma": {
     "schema": "db/schema.prisma"
@@ -40,6 +42,8 @@
     "@privy-io/privy-node": "0.0.1",
     "@radix-ui/react-progress": "0.1.4",
     "@sendgrid/mail": "7.7.0",
+    "@storybook/addon-docs": "6.5.9",
+    "@storybook/addon-postcss": "3.0.0-alpha.1",
     "@types/remarkable": "2.0.3",
     "autoprefixer": "10.4.0",
     "aws-sdk": "2.1060.0",
@@ -70,12 +74,23 @@
     "zustand": "3.6.8"
   },
   "devDependencies": {
+    "@babel/core": "7.18.9",
+    "@storybook/addon-actions": "6.5.9",
+    "@storybook/addon-essentials": "6.5.9",
+    "@storybook/addon-interactions": "6.5.9",
+    "@storybook/addon-links": "6.5.9",
+    "@storybook/builder-webpack5": "6.5.9",
+    "@storybook/manager-webpack5": "6.5.9",
+    "@storybook/react": "6.5.9",
+    "@storybook/testing-library": "0.0.13",
     "@tailwindcss/typography": "0.5.2",
     "@types/luxon": "2.3.2",
     "@types/preview-email": "2.0.1",
     "@types/react": "17.0.37",
     "axios": "0.26.1",
+    "babel-loader": "8.2.5",
     "eslint": "7.32.0",
+    "eslint-plugin-storybook": "0.6.1",
     "file-loader": "6.2.0",
     "husky": "7.0.4",
     "lint-staged": "11.3.0-beta.2",
