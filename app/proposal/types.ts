@@ -18,6 +18,7 @@ export type ProposalMetadata = {
   funding: {
     recipientAddress: string
     token: string
+    symbol: string
     amount: number
   }
   startDate: Date
