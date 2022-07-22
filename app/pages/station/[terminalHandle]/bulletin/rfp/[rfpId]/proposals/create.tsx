@@ -20,6 +20,7 @@ import CheckbookSelectToken from "app/core/components/CheckbookSelectToken"
 // hooks
 import useStore from "app/core/hooks/useStore"
 import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
+import useCheckbookAvailability from "app/core/hooks/useCheckbookAvailability"
 // queries + mutations
 import getRfpById from "app/rfp/queries/getRfpById"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
@@ -53,6 +54,28 @@ const CreateProposalPage: BlitzPage = ({
   useWarnIfUnsavedChanges(unsavedChanges, () => {
     return confirm("Warning! You have unsaved changes.")
   })
+
+  const tokenTotals = useCheckbookAvailability(data.rfp.checkbook, data.terminal)
+
+  const tokenMessage = (selected) => {
+    const selectedToken = tokenTotals.find((token) => token.address === selected)
+    if (!selectedToken) {
+      return
+    }
+    if (parseFloat(selectedToken.available) <= 0) {
+      return `This RFP's checkbook does not contain any ${selectedToken.symbol}. You can continue with the proposal, but it cannot be approved until an admin adds more ${selectedToken.symbol} to the checkbook.`
+    }
+  }
+
+  const amountMessage = (selected, amount) => {
+    const selectedToken = tokenTotals.find((token) => token.address === selected)
+    if (!selectedToken) {
+      return
+    }
+    if (parseFloat(selectedToken.available) < amount) {
+      return `The RFP's checkbook only has ${selectedToken.available} ${selectedToken.symbol}. You can request ${amount}, but it cannot be approved until an admin adds more ${selectedToken.symbol} to the checkbook.`
+    }
+  }
 
   const terminalHandle = useParam("terminalHandle") as string
   const [createProposalMutation] = useMutation(createProposal, {
@@ -175,7 +198,6 @@ const CreateProposalPage: BlitzPage = ({
         }}
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
-          console.log(formState)
           return (
             <div className="grid grid-cols-4 h-screen w-full box-border">
               <div className="overflow-y-auto col-span-3 p-20 relative">
@@ -328,6 +350,11 @@ const CreateProposalPage: BlitzPage = ({
                               options={input}
                             />
                           </div>
+                          {formState.values.token && (
+                            <span className="text-neon-carrot text-xs block mt-2">
+                              {tokenMessage(formState.values.token)}
+                            </span>
+                          )}
                           {(meta.touched || attemptedSubmit) && meta.error && (
                             <span className="text-torch-red text-xs">{meta.error}</span>
                           )}
@@ -348,6 +375,11 @@ const CreateProposalPage: BlitzPage = ({
                             placeholder="Enter token amount"
                             className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                           />
+                          {formState.values.token && formState.values.amount && (
+                            <span className="text-neon-carrot text-xs block mt-2">
+                              {amountMessage(formState.values.token, formState.values.amount)}
+                            </span>
+                          )}
                           {(meta.touched || attemptedSubmit) && meta.error && (
                             <span className="text-torch-red text-xs">{meta.error}</span>
                           )}
