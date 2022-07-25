@@ -116,7 +116,7 @@ const ProfileHome: BlitzPage = () => {
                   <span className="basis-32 ml-2 mb-2 tracking-wider">Approval</span>
                   <span className="basis-28 ml-2 mb-2 tracking-wider">Amount</span>
                   <span className="basis-32 mb-2 tracking-wider">Submission date</span>
-                  <span className="basis-32 ml-12 mb-2 tracking-wider">Station</span>
+                  <span className="basis-32 ml-12 mb-2 tracking-wider">Recipient</span>
                 </div>
                 {accountProposals &&
                   accountProposals.map((accountProposal, idx) => (
