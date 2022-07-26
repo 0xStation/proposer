@@ -84,15 +84,15 @@ body {
 }
 
 .markdown-prose > h1 {
-  @apply text-2xl font-bold;
-}
-
-.markdown-prose > h2 {
   @apply text-xl font-bold;
 }
 
+.markdown-prose > h2 {
+  @apply text-lg font-bold;
+}
+
 .markdown-prose > h3 {
-  @apply text-base;
+  @apply text-base font-bold;
 }
 
 .markdown-prose > ul {
@@ -100,16 +100,20 @@ body {
 }
 
 .markdown-prose > blockquote {
-  @apply pl-2 border-l-2 border-light-concrete;
+  @apply pl-2  border-l-2 border-light-concrete;
   font-family: "Tobias-Italic";
 }
 
-.markdown-prose > code {
-  @apply p-1 bg-wet-concrete rounded;
+.markdown-prose > p > code {
+  @apply p-2 bg-wet-concrete rounded;
 }
 
-.markdown-prose > a {
-  @apply text-magic-mint;
+.markdown-prose > p > a {
+  @apply text-electric-violet;
+}
+
+.markdown-prose > p > a:hover {
+  @apply underline;
 }
 
 .markdown-prose > p,
@@ -117,6 +121,7 @@ body {
 .markdown-prose > h1,
 .markdown-prose > h2,
 .markdown-prose > h3,
+.markdown-prose > blockquote,
 .markdown-prose > hr {
   @apply mb-3;
 }
