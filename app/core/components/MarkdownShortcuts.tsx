@@ -17,7 +17,7 @@ const MarkdownShortcuts = ({ isOpen }) => {
         <h3 className="col-span-3 font-bold">Markdown Shortcuts</h3>
         <div className="space-y-6">
           <span className="flex flex-row justify-between text-sm">
-            <span>Headings 1-6</span>
+            <span>Headings 1-3</span>
             <div className="flex flex-col text-concrete">
               <span># Heading</span>
               <span>## Heading</span>
