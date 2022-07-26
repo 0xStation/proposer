@@ -59,7 +59,7 @@ export default async function handler(req, res) {
     })
 
     const addresses = checkbookSigners
-      .filter((account) => !!(account.data as AccountMetadata).hasSavedEmail) // TODO: replace with hasVerifiedEmail
+      .filter((account) => !!(account.data as AccountMetadata).hasVerifiedEmail)
       .map((account) => account.address as string)
 
     try {
