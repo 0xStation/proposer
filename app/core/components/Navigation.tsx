@@ -169,7 +169,7 @@ const TerminalIcon = ({ terminal }) => {
         className={`${
           isTerminalSelected ? "border-marble-white" : "border-wet-concrete"
         } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg mb-4`}
-        onClick={() => router.push(Routes.MemberDirectoryPage({ terminalHandle: terminal.handle }))}
+        onClick={() => router.push(Routes.BulletinPage({ terminalHandle: terminal.handle }))}
       >
         {(terminal?.data as TerminalMetadata)?.pfpURL ? (
           <img
