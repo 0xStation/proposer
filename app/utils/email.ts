@@ -12,12 +12,16 @@ const sendgrid = new SendGrid()
 sendgrid.setApiKey(requireEnv("SENDGRID_API_KEY"))
 const hostname = getUrlHost()
 
-type EmailArgs = {
+interface EmailArgs {
   recipients: string[]
   account?: Account
   proposal?: Proposal
   rfp?: Rfp
   terminal?: Terminal
+}
+
+interface VerificationEmailArgs extends EmailArgs {
+  verificationCode: string
 }
 
 const email = async (recipients: string[], templateId: string, dynamicTemplateData: any) => {
@@ -70,4 +74,12 @@ const sendApprovedProposalEmail = async ({ recipients, proposal, rfp, terminal }
   await email(recipients, SENDGRID_TEMPLATES.APPROVED_PROPOSAL, dynamicTemplateData)
 }
 
-export { sendNewProposalEmail, sendApprovedProposalEmail }
+const sendVerificationEmail = async ({ recipients, verificationCode }: VerificationEmailArgs) => {
+  const dynamicTemplateData = {
+    verificationUrl: `${hostname}/verify?code=${verificationCode}`,
+  }
+
+  await email(recipients, SENDGRID_TEMPLATES.VERIFY, dynamicTemplateData)
+}
+
+export { sendNewProposalEmail, sendApprovedProposalEmail, sendVerificationEmail }

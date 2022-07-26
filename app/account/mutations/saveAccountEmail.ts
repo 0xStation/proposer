@@ -2,6 +2,7 @@ import db from "db"
 import * as z from "zod"
 import { Account } from "../types"
 import { saveEmail } from "app/utils/privy"
+import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
 
 const SaveAccountEmail = z.object({
   email: z.string(),
@@ -33,10 +34,12 @@ export default async function saveAccountEmail(input: z.infer<typeof SaveAccount
       data: {
         ...existingAccount.data,
         hasSavedEmail: true,
-        // TODO: if email was saved with a new value, set hasVerifiedEmail to false
+        hasVerifiedEmail: false,
       },
     },
   })
+
+  await sendVerificationEmail({ accountId: params.accountId })
 
   return account as unknown as Account
 }

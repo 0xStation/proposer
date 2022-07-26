@@ -29,9 +29,16 @@ model Account {
   proposalApprovals ProposalApproval[]
 
   // v1
-  skills      AccountSkill[]
-  initiatives AccountInitiative[]
-  endorsed    Endorsement[]       @relation("Endorsed")
+  skills            AccountSkill[]
+  initiatives       AccountInitiative[]
+  endorsed          Endorsement[]       @relation("Endorsed")
+  EmailVerification EmailVerification[]
+}
+
+model EmailVerification {
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId Int     @id
+  code      String  @default(uuid())
 }
 
 // unique links by /station/[handle]

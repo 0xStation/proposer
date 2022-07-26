@@ -1,10 +1,10 @@
 import db from "db"
 import * as z from "zod"
-import { Account, AccountMetadata } from "../types"
+import { Account } from "../types"
 import { saveEmail } from "app/utils/privy"
 
 const UpdateAccount = z.object({
-  name: z.string(),
+  name: z.string().optional(),
   address: z.string().optional(),
   bio: z.string().optional(),
   email: z.string().optional(),
@@ -15,6 +15,7 @@ const UpdateAccount = z.object({
   githubUrl: z.string().optional(),
   tiktokUrl: z.string().optional(),
   instagramUrl: z.string().optional(),
+  hasVerifiedEmail: z.boolean().optional(),
 })
 
 export default async function updateAccount(input: z.infer<typeof UpdateAccount>) {
@@ -50,7 +51,8 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
       instagramUrl: params.instagramUrl,
       // mark email as saved for this account to not show email input modals
       hasSavedEmail: !!params.email,
-      // TODO: if email was saved with a new value, set hasVerifiedEmail to false
+      // if email was saved with a new value, set `hasVerifiedEmail` to false
+      hasVerifiedEmail: !!params.email ? false : params.hasVerifiedEmail,
     },
   }
 
