@@ -85,19 +85,11 @@ const RfpMarkdownForm = ({
     },
   })
 
-  console.log(checkbooks)
-
   let { signTypedDataAsync: signApproval } = useSignTypedData()
   const createRfpSignature = async (values, author) => {
-    const activeCheckbook = checkbooks.find((cb) => cb.address === values.checkbookAddress)
-    if (!activeCheckbook) {
-      throw Error("No checkbook found")
-    }
     const domain = {
       name: "Request for Proposals", // keep hardcoded
       version: "1", // keep hardcoded
-      chainId: activeCheckbook.chainId,
-      verifyingContract: activeCheckbook.address,
     }
 
     const types: TypedDataTypeDefinition = {
@@ -121,7 +113,7 @@ const RfpMarkdownForm = ({
       author: author,
       timestamp: now.valueOf(), // unix timestamp
       startDate: startDate.valueOf(), // unix timestamp
-      endDate: endDate.valueOf(), // unix timestamp
+      endDate: values.endDate ? endDate.valueOf() : 0, // unix timestamp
       title: utils.keccak256(utils.toUtf8Bytes(values.title)),
       body: utils.keccak256(utils.toUtf8Bytes(values.markdown)),
     }
@@ -357,9 +349,9 @@ const RfpMarkdownForm = ({
                         </Field>
                       </div>
                       <div className="flex flex-col mt-6">
-                        <label className="font-bold">Submission closes*</label>
+                        <label className="font-bold">Submission closes</label>
                         <Field name="endDate">
-                          {({ input, meta }) => (
+                          {({ input, _meta }) => (
                             <div>
                               <input
                                 {...input}

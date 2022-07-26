@@ -118,8 +118,6 @@ const CreateProposalPage: BlitzPage = ({
     const domain = {
       name: "Proposal", // keep hardcoded
       version: "1", // keep hardcoded
-      chainId: rfp.checkbook.chainId,
-      verifyingContract: rfp.checkbook.address,
     }
 
     const types: TypedDataTypeDefinition = {
