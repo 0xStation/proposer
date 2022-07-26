@@ -1,4 +1,4 @@
-import { AccountMetadata } from "app/account/types"
+import { Account, AccountMetadata } from "app/account/types"
 import db from "db"
 import * as z from "zod"
 
@@ -17,18 +17,26 @@ export default async function verifyEmail(input: z.infer<typeof VerifyEmail>) {
       },
     })
 
+    const existingAccount = (await db.account.findUnique({
+      where: { id: params.accountId },
+    })) as Account
+
+    if (!existingAccount) {
+      throw Error("account doesn't exist")
+    }
+
+    if (existingAccount?.data?.hasVerifiedEmail) {
+      return true
+    }
+
     if (emailVerification?.code === params.verificationCode) {
-      const existingAccount = await db.account.findUnique({ where: { id: params.accountId } })
-      if (!existingAccount) {
-        throw Error("account doesn't exist")
-      }
       await db.account.update({
         where: { id: params.accountId },
         data: {
           data: {
             ...(existingAccount.data as AccountMetadata),
             hasSavedEmail: true,
-            hasVerifiedEmail: false,
+            hasVerifiedEmail: true,
           },
         },
       })
