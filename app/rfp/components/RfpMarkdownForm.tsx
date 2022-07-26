@@ -15,6 +15,9 @@ import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import { getShortDate } from "app/core/utils/getShortDate"
 import ConfirmationRfpModal from "./ConfirmationRfpModal"
 import { requiredField } from "app/utils/validators"
+import { useSignTypedData } from "wagmi"
+import { utils } from "ethers"
+import { TypedDataTypeDefinition } from "app/types"
 
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
 
@@ -81,6 +84,60 @@ const RfpMarkdownForm = ({
       console.error(error)
     },
   })
+
+  console.log(checkbooks)
+
+  let { signTypedDataAsync: signApproval } = useSignTypedData()
+  const createRfpSignature = async (values, author) => {
+    const activeCheckbook = checkbooks.find((cb) => cb.address === values.checkbookAddress)
+    if (!activeCheckbook) {
+      throw Error("No checkbook found")
+    }
+    const domain = {
+      name: "Request for Proposals", // keep hardcoded
+      version: "1", // keep hardcoded
+      chainId: activeCheckbook.chainId,
+      verifyingContract: activeCheckbook.address,
+    }
+
+    const types: TypedDataTypeDefinition = {
+      Proposal: [
+        { name: "author", type: "address" },
+        { name: "replyTo", type: "address" }, // (checkbook address for now)
+        { name: "timestamp", type: "uint256" }, // hash of ISO formatted date string
+        { name: "startDate", type: "uint256" }, // hash of ISO formatted date string
+        { name: "endDate", type: "uint256" }, // hash of ISO formatted date string
+        { name: "title", type: "string" },
+        { name: "body", type: "string" },
+      ],
+    }
+
+    const now = new Date()
+    const value = {
+      replyTo: values.checkbookAddress,
+      author: author,
+      timestamp: utils.keccak256(utils.toUtf8Bytes(now.toISOString())),
+      startDate: utils.keccak256(utils.toUtf8Bytes(values.startDate)),
+      endDate: utils.keccak256(utils.toUtf8Bytes(values.endDate)),
+      title: utils.keccak256(utils.toUtf8Bytes(values.title)),
+      body: utils.keccak256(utils.toUtf8Bytes(values.markdown)),
+    }
+
+    try {
+      const signature = await signApproval({
+        domain,
+        types,
+        value,
+      })
+      return signature
+    } catch (e) {
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: "Signature denied",
+      })
+    }
+  }
 
   return (
     <>
@@ -160,6 +217,13 @@ const RfpMarkdownForm = ({
               message: "You must connect your wallet in order to create RFPs",
             })
           } else if (isEdit) {
+            const signature = await createRfpSignature(values, activeUser?.address)
+
+            // user must have denied signature
+            if (!signature) {
+              return
+            }
+
             await updateRfpMutation({
               rfpId: rfp?.id as string,
               startDate: new Date(`${values.startDate} 00:00:00 UTC`),
@@ -167,8 +231,16 @@ const RfpMarkdownForm = ({
               fundingAddress: values.checkbookAddress,
               contentBody: values.markdown,
               contentTitle: values.title,
+              signature,
             })
           } else {
+            const signature = await createRfpSignature(values, activeUser?.address)
+
+            // user must have denied signature
+            if (!signature) {
+              return
+            }
+
             await createRfpMutation({
               terminalId: terminal?.id,
               startDate: new Date(`${values.startDate} 00:00:00 UTC`),
@@ -177,6 +249,7 @@ const RfpMarkdownForm = ({
               fundingAddress: values.checkbookAddress,
               contentBody: values.markdown,
               contentTitle: values.title,
+              signature,
             })
           }
         }}

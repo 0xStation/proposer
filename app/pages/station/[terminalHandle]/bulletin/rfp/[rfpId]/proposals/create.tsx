@@ -13,7 +13,7 @@ import {
 import { useSignTypedData } from "wagmi"
 import { Field, Form } from "react-final-form"
 import { LightBulbIcon, XIcon } from "@heroicons/react/solid"
-import { utils, BigNumber } from "ethers"
+import { utils } from "ethers"
 // components
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
@@ -38,7 +38,6 @@ import { ZERO_ADDRESS } from "app/core/utils/constants"
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
 import { TypedDataTypeDefinition } from "app/types"
-import { Prisma } from "@prisma/client"
 
 type GetServerSidePropsData = {
   rfp: Rfp
@@ -132,6 +131,7 @@ const CreateProposalPage: BlitzPage = ({
       ],
       Proposal: [
         { name: "recipient", type: "address" }, // (checkbook address for now)
+        { name: "author", type: "address" },
         { name: "collaborators", type: "address[]" },
         { name: "timestamp", type: "uint256" }, // hash of ISO formatted date string
         { name: "funding", type: "Funding" },
@@ -151,6 +151,7 @@ const CreateProposalPage: BlitzPage = ({
 
     const value = {
       recipient: rfp.checkbook.address,
+      author: author,
       collaborators: [author],
       timestamp: utils.keccak256(utils.toUtf8Bytes(now.toISOString())),
       rfp: utils.keccak256(utils.toUtf8Bytes(rfp.id)),
