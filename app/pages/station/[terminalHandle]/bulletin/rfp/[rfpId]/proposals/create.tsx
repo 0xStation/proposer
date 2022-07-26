@@ -366,7 +366,7 @@ const CreateProposalPage: BlitzPage = ({
                   </Modal>
 
                   <div>
-                    <h4 className="text-xs font-bold text-concrete uppercase">Terminal</h4>
+                    <h4 className="text-xs font-bold text-concrete uppercase">Station</h4>
                     <div className="flex flex-row items-center mt-2">
                       <img
                         src={data.rfp.terminal.data.pfpURL}
