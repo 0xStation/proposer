@@ -34,10 +34,10 @@ import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import { requiredField, isPositiveAmount, composeValidators, isAddress } from "app/utils/validators"
 import { fetchTokenDecimals } from "app/utils/fetchTokenDecimals"
 import { ZERO_ADDRESS } from "app/core/utils/constants"
+import { genProposalSignatureMessage } from "app/signatures/proposal"
 //types
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
-import { TypedDataTypeDefinition } from "app/types"
 
 type GetServerSidePropsData = {
   rfp: Rfp
@@ -115,60 +115,22 @@ const CreateProposalPage: BlitzPage = ({
 
   let { signTypedDataAsync: signApproval } = useSignTypedData()
   const createProposalSignature = async (rfp: Rfp, formValues, author) => {
-    const domain = {
-      name: "Proposal", // keep hardcoded
-      version: "1", // keep hardcoded
-    }
-
-    const types: TypedDataTypeDefinition = {
-      Funding: [
-        { name: "type", type: "string" }, // hard coded to single-upon-approval
-        { name: "fundingRecipient", type: "address" }, // recieves the reward from the proposal
-        { name: "token", type: "address" },
-        { name: "amount", type: "uint256" },
-      ],
-      Proposal: [
-        { name: "proposalRecipient", type: "address" }, // (checkbook address for now) reciever of the proposal
-        { name: "author", type: "address" },
-        { name: "collaborators", type: "address[]" },
-        { name: "timestamp", type: "uint256" }, // hash of ISO formatted date string
-        { name: "funding", type: "Funding" },
-        { name: "rfp", type: "string" }, // hashed uuid since uuid is not at type?
-        { name: "title", type: "string" },
-        { name: "body", type: "string" },
-      ],
-    }
-
-    const now = new Date()
-
     const tokenDecimals =
       formValues.token === ZERO_ADDRESS
         ? 18 // ETH decimals
         : await fetchTokenDecimals(rfp.checkbook.chainId, formValues.token) // fetch from ERC20 contract
     const parsedTokenAmount = utils.parseUnits(formValues.amount, tokenDecimals)
 
-    const value = {
-      proposalRecipient: rfp.checkbook.address,
-      author: author,
-      collaborators: [author],
-      timestamp: now.valueOf(), // unix timestamp
-      rfp: utils.keccak256(utils.toUtf8Bytes(rfp.id)),
-      title: utils.keccak256(utils.toUtf8Bytes(formValues.title)),
-      body: utils.keccak256(utils.toUtf8Bytes(formValues.markdown)),
-      funding: {
-        type: "single-upon-approval",
-        fundingRecipient: formValues.recipientAddress,
-        token: formValues.token,
-        amount: parsedTokenAmount,
-      },
-    }
-
     try {
-      const signature = await signApproval({
-        domain,
-        types,
-        value,
-      })
+      const signature = await signApproval(
+        genProposalSignatureMessage(
+          rfp.checkbook.address,
+          author,
+          rfp.id,
+          parsedTokenAmount,
+          formValues
+        )
+      )
       return signature
     } catch (e) {
       setToastState({
