@@ -11,6 +11,7 @@ const UpdateRfp = z.object({
   contentBody: z.string(),
   startDate: z.date(),
   endDate: z.date().optional(),
+  signature: z.string(),
 })
 
 export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
@@ -26,6 +27,7 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
             title: input.contentTitle,
             body: input.contentBody,
           },
+          signature: input.signature,
         },
       },
     })

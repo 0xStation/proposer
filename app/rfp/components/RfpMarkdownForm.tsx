@@ -15,6 +15,9 @@ import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import { getShortDate } from "app/core/utils/getShortDate"
 import ConfirmationRfpModal from "./ConfirmationRfpModal"
 import { requiredField } from "app/utils/validators"
+import { useSignTypedData } from "wagmi"
+import { utils } from "ethers"
+import { TypedDataTypeDefinition } from "app/types"
 
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
 
@@ -81,6 +84,55 @@ const RfpMarkdownForm = ({
       console.error(error)
     },
   })
+
+  let { signTypedDataAsync: signApproval } = useSignTypedData()
+  const createRfpSignature = async (values, author) => {
+    const domain = {
+      name: "Request for Proposals", // keep hardcoded
+      version: "1", // keep hardcoded
+    }
+
+    const types: TypedDataTypeDefinition = {
+      Proposal: [
+        { name: "author", type: "address" },
+        { name: "replyTo", type: "address" }, // (checkbook address for now)
+        { name: "timestamp", type: "uint256" }, // hash of ISO formatted date string
+        { name: "startDate", type: "uint256" }, // hash of ISO formatted date string
+        { name: "endDate", type: "uint256" }, // hash of ISO formatted date string
+        { name: "title", type: "string" },
+        { name: "body", type: "string" },
+      ],
+    }
+
+    const now = new Date()
+    const startDate = new Date(values.startDate)
+    const endDate = new Date(values.endDate)
+
+    const value = {
+      replyTo: values.checkbookAddress,
+      author: author,
+      timestamp: now.valueOf(), // unix timestamp
+      startDate: startDate.valueOf(), // unix timestamp
+      endDate: values.endDate ? endDate.valueOf() : 0, // unix timestamp
+      title: utils.keccak256(utils.toUtf8Bytes(values.title)),
+      body: utils.keccak256(utils.toUtf8Bytes(values.markdown)),
+    }
+
+    try {
+      const signature = await signApproval({
+        domain,
+        types,
+        value,
+      })
+      return signature
+    } catch (e) {
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: "Signature denied",
+      })
+    }
+  }
 
   return (
     <>
@@ -160,6 +212,13 @@ const RfpMarkdownForm = ({
               message: "You must connect your wallet in order to create RFPs",
             })
           } else if (isEdit) {
+            const signature = await createRfpSignature(values, activeUser?.address)
+
+            // user must have denied signature
+            if (!signature) {
+              return
+            }
+
             await updateRfpMutation({
               rfpId: rfp?.id as string,
               startDate: new Date(`${values.startDate} 00:00:00 UTC`),
@@ -167,8 +226,16 @@ const RfpMarkdownForm = ({
               fundingAddress: values.checkbookAddress,
               contentBody: values.markdown,
               contentTitle: values.title,
+              signature,
             })
           } else {
+            const signature = await createRfpSignature(values, activeUser?.address)
+
+            // user must have denied signature
+            if (!signature) {
+              return
+            }
+
             await createRfpMutation({
               terminalId: terminal?.id,
               startDate: new Date(`${values.startDate} 00:00:00 UTC`),
@@ -177,6 +244,7 @@ const RfpMarkdownForm = ({
               fundingAddress: values.checkbookAddress,
               contentBody: values.markdown,
               contentTitle: values.title,
+              signature,
             })
           }
         }}
@@ -281,9 +349,9 @@ const RfpMarkdownForm = ({
                         </Field>
                       </div>
                       <div className="flex flex-col mt-6">
-                        <label className="font-bold">Submission closes*</label>
+                        <label className="font-bold">Submission closes</label>
                         <Field name="endDate">
-                          {({ input, meta }) => (
+                          {({ input, _meta }) => (
                             <div>
                               <input
                                 {...input}

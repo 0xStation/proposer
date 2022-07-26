@@ -13,7 +13,7 @@ import {
 import { useSignTypedData } from "wagmi"
 import { Field, Form } from "react-final-form"
 import { LightBulbIcon, XIcon } from "@heroicons/react/solid"
-import { utils, BigNumber } from "ethers"
+import { utils } from "ethers"
 // components
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
@@ -38,7 +38,6 @@ import { ZERO_ADDRESS } from "app/core/utils/constants"
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
 import { TypedDataTypeDefinition } from "app/types"
-import { Prisma } from "@prisma/client"
 
 type GetServerSidePropsData = {
   rfp: Rfp
@@ -119,19 +118,18 @@ const CreateProposalPage: BlitzPage = ({
     const domain = {
       name: "Proposal", // keep hardcoded
       version: "1", // keep hardcoded
-      chainId: rfp.checkbook.chainId,
-      verifyingContract: rfp.checkbook.address,
     }
 
     const types: TypedDataTypeDefinition = {
       Funding: [
         { name: "type", type: "string" }, // hard coded to single-upon-approval
-        { name: "recipient", type: "address" },
+        { name: "fundingRecipient", type: "address" }, // recieves the reward from the proposal
         { name: "token", type: "address" },
         { name: "amount", type: "uint256" },
       ],
       Proposal: [
-        { name: "recipient", type: "address" }, // (checkbook address for now)
+        { name: "proposalRecipient", type: "address" }, // (checkbook address for now) reciever of the proposal
+        { name: "author", type: "address" },
         { name: "collaborators", type: "address[]" },
         { name: "timestamp", type: "uint256" }, // hash of ISO formatted date string
         { name: "funding", type: "Funding" },
@@ -150,15 +148,16 @@ const CreateProposalPage: BlitzPage = ({
     const parsedTokenAmount = utils.parseUnits(formValues.amount, tokenDecimals)
 
     const value = {
-      recipient: rfp.checkbook.address,
+      proposalRecipient: rfp.checkbook.address,
+      author: author,
       collaborators: [author],
-      timestamp: utils.keccak256(utils.toUtf8Bytes(now.toISOString())),
+      timestamp: now.valueOf(), // unix timestamp
       rfp: utils.keccak256(utils.toUtf8Bytes(rfp.id)),
       title: utils.keccak256(utils.toUtf8Bytes(formValues.title)),
       body: utils.keccak256(utils.toUtf8Bytes(formValues.markdown)),
       funding: {
         type: "single-upon-approval",
-        recipient: formValues.recipientAddress,
+        fundingRecipient: formValues.recipientAddress,
         token: formValues.token,
         amount: parsedTokenAmount,
       },

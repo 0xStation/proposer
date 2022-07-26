@@ -17,6 +17,7 @@ export type RfpMetadata = {
     title: string
     body: string
   }
+  signature: string // string signature for now, although I see this more complex type below
   publishSignature: Signature
   // prefill all proposals to this RFP with this configuration
   proposalPrefill: {
