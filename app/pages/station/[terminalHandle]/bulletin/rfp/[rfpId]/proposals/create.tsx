@@ -125,12 +125,12 @@ const CreateProposalPage: BlitzPage = ({
     const types: TypedDataTypeDefinition = {
       Funding: [
         { name: "type", type: "string" }, // hard coded to single-upon-approval
-        { name: "recipient", type: "address" },
+        { name: "fundingRecipient", type: "address" }, // recieves the reward from the proposal
         { name: "token", type: "address" },
         { name: "amount", type: "uint256" },
       ],
       Proposal: [
-        { name: "recipient", type: "address" }, // (checkbook address for now)
+        { name: "proposalRecipient", type: "address" }, // (checkbook address for now) reciever of the proposal
         { name: "author", type: "address" },
         { name: "collaborators", type: "address[]" },
         { name: "timestamp", type: "uint256" }, // hash of ISO formatted date string
@@ -150,16 +150,16 @@ const CreateProposalPage: BlitzPage = ({
     const parsedTokenAmount = utils.parseUnits(formValues.amount, tokenDecimals)
 
     const value = {
-      recipient: rfp.checkbook.address,
+      proposalRecipient: rfp.checkbook.address,
       author: author,
       collaborators: [author],
-      timestamp: utils.keccak256(utils.toUtf8Bytes(now.toISOString())),
+      timestamp: now.valueOf(), // unix timestamp
       rfp: utils.keccak256(utils.toUtf8Bytes(rfp.id)),
       title: utils.keccak256(utils.toUtf8Bytes(formValues.title)),
       body: utils.keccak256(utils.toUtf8Bytes(formValues.markdown)),
       funding: {
         type: "single-upon-approval",
-        recipient: formValues.recipientAddress,
+        fundingRecipient: formValues.recipientAddress,
         token: formValues.token,
         amount: parsedTokenAmount,
       },

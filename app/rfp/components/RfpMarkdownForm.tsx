@@ -113,12 +113,15 @@ const RfpMarkdownForm = ({
     }
 
     const now = new Date()
+    const startDate = new Date(values.startDate)
+    const endDate = new Date(values.endDate)
+
     const value = {
       replyTo: values.checkbookAddress,
       author: author,
-      timestamp: utils.keccak256(utils.toUtf8Bytes(now.toISOString())),
-      startDate: utils.keccak256(utils.toUtf8Bytes(values.startDate)),
-      endDate: utils.keccak256(utils.toUtf8Bytes(values.endDate)),
+      timestamp: now.valueOf(), // unix timestamp
+      startDate: startDate.valueOf(), // unix timestamp
+      endDate: endDate.valueOf(), // unix timestamp
       title: utils.keccak256(utils.toUtf8Bytes(values.title)),
       body: utils.keccak256(utils.toUtf8Bytes(values.markdown)),
     }
