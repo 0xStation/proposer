@@ -6,6 +6,7 @@ const CreateProposal = z.object({
   rfpId: z.string(),
   token: z.string(),
   amount: z.number(),
+  symbol: z.string().optional(),
   recipientAddress: z.string(),
   contentTitle: z.string(),
   contentBody: z.string(),
@@ -29,6 +30,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
           recipientAddress: input.recipientAddress,
           token: input.token,
           amount: input.amount,
+          symbol: input.symbol,
         },
       },
       collaborators: {

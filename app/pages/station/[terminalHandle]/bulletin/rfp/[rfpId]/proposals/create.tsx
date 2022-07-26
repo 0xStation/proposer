@@ -55,10 +55,10 @@ const CreateProposalPage: BlitzPage = ({
     return confirm("Warning! You have unsaved changes.")
   })
 
-  const tokenTotals = useCheckbookAvailability(data.rfp.checkbook, data.terminal)
+  const checkbookTokens = useCheckbookAvailability(data.rfp.checkbook, data.terminal)
 
   const tokenMessage = (selected) => {
-    const selectedToken = tokenTotals.find((token) => token.address === selected)
+    const selectedToken = checkbookTokens.find((token) => token.address === selected)
     if (!selectedToken) {
       return
     }
@@ -68,7 +68,7 @@ const CreateProposalPage: BlitzPage = ({
   }
 
   const amountMessage = (selected, amount) => {
-    const selectedToken = tokenTotals.find((token) => token.address === selected)
+    const selectedToken = checkbookTokens.find((token) => token.address === selected)
     if (!selectedToken) {
       return
     }
@@ -176,12 +176,14 @@ const CreateProposalPage: BlitzPage = ({
             })
           } else {
             try {
+              const selectedToken = checkbookTokens.find((token) => token.address === values.token)
               await createProposalMutation({
                 rfpId: data.rfp.id,
                 terminalId: data.terminal.id,
                 recipientAddress: values.recipientAddress,
                 token: values.token,
                 amount: values.amount,
+                symbol: selectedToken ? selectedToken.symbol : undefined,
                 contentBody: values.markdown,
                 contentTitle: values.title,
                 collaborators: [activeUser.address],

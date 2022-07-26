@@ -196,7 +196,7 @@ const ProposalComponent = ({ accountProposal }) => {
             </div>
           </div>
           <div className="basis-28 ml-2 mb-2 self-center text-marble-white">
-            {proposal.data?.funding?.amount || "N/A"}
+            {proposal.data?.funding?.amount || "N/A"} {proposal.data?.funding?.symbol}
           </div>
           <div className="basis-32 mb-2 self-center">{formatDate(proposal.createdAt) || "N/A"}</div>
           <div className="basis-32 ml-12 mr-[6px] mb-2 self-center">
