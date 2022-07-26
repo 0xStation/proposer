@@ -16,8 +16,7 @@ import { getShortDate } from "app/core/utils/getShortDate"
 import ConfirmationRfpModal from "./ConfirmationRfpModal"
 import { requiredField } from "app/utils/validators"
 import { useSignTypedData } from "wagmi"
-import { utils } from "ethers"
-import { TypedDataTypeDefinition } from "app/types"
+import { genRfpSignatureMessage } from "app/signatures/rfp"
 
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
 
@@ -87,43 +86,8 @@ const RfpMarkdownForm = ({
 
   let { signTypedDataAsync: signApproval } = useSignTypedData()
   const createRfpSignature = async (values, author) => {
-    const domain = {
-      name: "Request for Proposals", // keep hardcoded
-      version: "1", // keep hardcoded
-    }
-
-    const types: TypedDataTypeDefinition = {
-      Proposal: [
-        { name: "author", type: "address" },
-        { name: "replyTo", type: "address" }, // (checkbook address for now)
-        { name: "timestamp", type: "uint256" }, // hash of ISO formatted date string
-        { name: "startDate", type: "uint256" }, // hash of ISO formatted date string
-        { name: "endDate", type: "uint256" }, // hash of ISO formatted date string
-        { name: "title", type: "string" },
-        { name: "body", type: "string" },
-      ],
-    }
-
-    const now = new Date()
-    const startDate = new Date(values.startDate)
-    const endDate = new Date(values.endDate)
-
-    const value = {
-      replyTo: values.checkbookAddress,
-      author: author,
-      timestamp: now.valueOf(), // unix timestamp
-      startDate: startDate.valueOf(), // unix timestamp
-      endDate: values.endDate ? endDate.valueOf() : 0, // unix timestamp
-      title: utils.keccak256(utils.toUtf8Bytes(values.title)),
-      body: utils.keccak256(utils.toUtf8Bytes(values.markdown)),
-    }
-
     try {
-      const signature = await signApproval({
-        domain,
-        types,
-        value,
-      })
+      const signature = await signApproval(genRfpSignatureMessage(values, author))
       return signature
     } catch (e) {
       setToastState({
