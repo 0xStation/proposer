@@ -32,7 +32,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
           router.push(`/profile/${activeUser?.address}`)
         }}
       >
-        View profile
+        Profile
       </button>
     ) : session?.siwe?.address ? (
       <button className="block hover:opacity-70" onClick={() => router.push(`/profile/complete`)}>
@@ -146,7 +146,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                         rel="noopener noreferrer"
                         className="flex items-center space-x-2 hover:opacity-70 cursor-pointer"
                       >
-                        <span className="block">Share feedback</span>
+                        <span className="block">Help desk</span>
                         <LinkArrow className="fill-marble-white" />
                       </a>
                       <button className="block hover:opacity-70" onClick={handleDisconnect}>
