@@ -237,7 +237,7 @@ const ProposalComponent = ({
               "text-torch-red"
             }`}
           >
-            {proposal.data?.funding?.amount || "N/A"}
+            {proposal.data?.funding?.amount || "N/A"} {proposal.data?.funding?.symbol}
             {/* if there are no checks, it means the value of this prop is not pending, and can be overallocated */}
             {parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
               fundsHaveNotBeenUsed(proposal) && (

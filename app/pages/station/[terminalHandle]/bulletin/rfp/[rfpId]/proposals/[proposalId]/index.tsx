@@ -54,36 +54,11 @@ const ProposalPage: BlitzPage = ({
   const [cashCheckModalOpen, setCashCheckModalOpen] = useState<boolean>(false)
   const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
   const [checkTxnHash, setCheckTxnHash] = useState<string>()
-  const [tokenSymbol, setTokenSymbol] = useState<string>("ETH")
   const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
   const [isProposalUrlCopied, setIsProposalUrlCopied] = useState<boolean>(false)
   const [check, setCheck] = useState<Check>()
   const isAdmin = useAdminForTerminal(terminal)
   const router = useRouter()
-
-  // not really a fan of this but we need to get the token symbol
-  // should we just store that alongside proposal so we don't have to call this function anytime we need the symbol?
-  useEffect(() => {
-    const getTokenData = async () => {
-      const a = await fetch("/api/fetch-token-metadata", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          address: proposal?.data.funding.token,
-          chainId: rfp?.checkbook.chainId,
-        }),
-      })
-      const r = await a.json()
-      setTokenSymbol(r.data.symbol)
-    }
-    if (proposal?.data.funding.token === ZERO_ADDRESS) {
-      setTokenSymbol("ETH")
-    } else {
-      getTokenData()
-    }
-  }, [])
 
   const [checks] = useQuery(
     getChecksByProposalId,
@@ -170,7 +145,7 @@ const ProposalPage: BlitzPage = ({
           setIsOpen={setCashCheckModalOpen}
           waitingCreation={waitingCreation}
           setWaitingCreation={setWaitingCreation}
-          tokenSymbol={tokenSymbol}
+          tokenSymbol={proposal?.data.funding.symbol || "ETH"} // don't like this as a fallback but currently symbol is not required
           setTxnHash={setCheckTxnHash}
           check={check}
         />
@@ -379,7 +354,7 @@ const ProposalPage: BlitzPage = ({
                   )}
                 </span>
                 <h4 className="text-xs font-bold text-concrete uppercase mt-6">Token</h4>
-                <p className="mt-2 font-normal">{`${tokenSymbol}`}</p>
+                <p className="mt-2 font-normal">{proposal?.data.funding.symbol}</p>
                 <h4 className="text-xs font-bold text-concrete uppercase mt-6">Amount Requested</h4>
                 <p className="mt-2">{`${proposal?.data.funding.amount}`}</p>
                 <h4 className="text-xs font-bold text-concrete uppercase mt-6">Fund Recipient</h4>
