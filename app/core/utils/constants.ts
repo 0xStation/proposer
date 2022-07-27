@@ -10,8 +10,8 @@ export const CONTRACTS = {
   },
   // Rinkeby, don't change
   4: {
-    CHECKBOOK_TEMPLATE: "0x41888fd98616f3dd2b0bc27f0c0110caecebc8ee",
-    CHECKBOOK_FACTORY: "0x9a2999512c3212f1cda63efc5fda7a2ee8ba2530",
+    CHECKBOOK_TEMPLATE: "0x704fbb6ee2a5db6a28269cb3263e6d39331a68ea",
+    CHECKBOOK_FACTORY: "0xfdb5121c03c41d1aa587726d005472e0e186d8b7",
   },
 }
 
