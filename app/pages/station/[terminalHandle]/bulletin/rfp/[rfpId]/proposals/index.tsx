@@ -83,8 +83,9 @@ const ProposalsTab: BlitzPage = ({
   useEffect(() => {
     if (proposalId) {
       // request user saves email to receive notifications if they do not have saved email
+      // TODO: if user has saved email, but unverified, should we retrigger another verification email and present a modal that asks them to verify by checking their email?
       // TODO: add dismissal of GetNotifiedModal in localStorage so we only show it once
-      if (!activeUser?.data.hasVerifiedEmail) {
+      if (!activeUser?.data.hasSavedEmail) {
         setIsGetNotifiedModalOpen(true)
       } else {
         setProposalCreatedConfirmationModal(true)
@@ -198,8 +199,8 @@ const ProposalComponent = ({
   )
   const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
 
-  const fundsHaveNotBeenUsed = (proposal) => {
-    return proposal.checks.length === 0 || !proposal.checks[0].txnHash
+  const fundsHaveNotBeenApproved = (proposal) => {
+    return proposal.checks.length === 0
   }
 
   return (
@@ -235,14 +236,14 @@ const ProposalComponent = ({
           <div
             className={`basis-32 ml-6 mb-2 self-center relative group ${
               parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
-              fundsHaveNotBeenUsed(proposal) &&
+              fundsHaveNotBeenApproved(proposal) &&
               "text-torch-red"
             }`}
           >
             {proposal.data?.funding?.amount || "N/A"} {proposal.data?.funding?.symbol}
             {/* if there are no checks, it means the value of this prop is not pending, and can be overallocated */}
             {parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
-              fundsHaveNotBeenUsed(proposal) && (
+              fundsHaveNotBeenApproved(proposal) && (
                 <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[100%] left-0 group hidden group-hover:block shadow-lg z-50">
                   Insufficient funds.{" "}
                   {isAdmin && (
