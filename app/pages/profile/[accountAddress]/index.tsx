@@ -104,64 +104,65 @@ const ProfileHome: BlitzPage = () => {
         )
       } */}
       <ProfileNavigation account={account as Account}>
-        {terminals && terminals.length ? (
-          <>
-            <div className="h-[108px] border-b border-concrete">
-              <h1 className="text-2xl font-bold ml-6 pt-6">Proposals</h1>
-              <p className="flex ml-6 pt-2">{`${account?.data?.name || ""}'s proposals`} </p>
-            </div>
-            <div className="grid grid-cols-7 h-[calc(100vh-108px)] w-full">
-              <div className="overflow-y-auto col-span-7">
-                <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
-                  <span className="basis-[38rem] ml-6 mb-2 tracking-wider">Proposals</span>
-                  <span className="basis-32 ml-2 mb-2 tracking-wider">Approval</span>
-                  <span className="basis-28 ml-2 mb-2 tracking-wider">Amount</span>
-                  <span className="basis-32 mb-2 tracking-wider">Submission date</span>
-                  <span className="basis-32 ml-12 mb-2 tracking-wider">Recipient</span>
-                </div>
-                {accountProposals &&
-                  accountProposals.map((accountProposal, idx) => (
-                    <ProposalComponent
-                      key={`${accountProposal.address}${idx}`}
-                      accountProposal={accountProposal}
-                    />
-                  ))}
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
-            {account && account?.id === activeUser?.id ? (
-              <>
-                <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
-                  You haven&apos;t created any proposals
-                </h1>
-                <p className="my-2 w-[350px] text-center">
-                  Proposals allow you to present your ideas and get funded by DAOs across the
-                  ecosystem.
-                </p>
-                <p className="my-2 w-[309px] text-center">
-                  Find a station to start creating proposals.
-                </p>
-                <button
-                  onClick={() => router.push(Routes.DiscoverStations())}
-                  className="bg-electric-violet text-tunnel-black h-[35px] px-5 rounded hover:opacity-70 mt-5"
-                >
-                  Explore stations
-                </button>
-              </>
-            ) : account?.data?.name ? (
-              <>
-                <h1>{account?.data?.name} is not yet a part of any Station</h1>
-                <p className="my-2 w-[309px] text-center">
-                  {account?.data.name || "..."} hasn&apos;t created any proposals
-                </p>
-              </>
-            ) : (
-              <h1>...Loading</h1>
-            )}
+        <>
+          <div className="h-[108px] border-b border-concrete">
+            <h1 className="text-2xl font-bold ml-6 pt-6">Proposals</h1>
+            <p className="flex ml-6 pt-2">
+              {`${account?.data?.name || truncateString(account?.address)}'s proposals`}{" "}
+            </p>
           </div>
-        )}
+          <div className="grid grid-cols-7 h-[calc(100vh-108px)] w-full">
+            <div className="overflow-y-auto col-span-7">
+              <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
+                <span className="basis-[38rem] ml-6 mb-2 tracking-wider">Proposals</span>
+                <span className="basis-32 ml-2 mb-2 tracking-wider">Approval</span>
+                <span className="basis-28 ml-2 mb-2 tracking-wider">Amount</span>
+                <span className="basis-32 mb-2 tracking-wider">Submission date</span>
+                <span className="basis-32 ml-12 mb-2 tracking-wider">Recipient</span>
+              </div>
+              {accountProposals && accountProposals.length ? (
+                accountProposals.map((accountProposal, idx) => (
+                  <ProposalComponent
+                    key={`${accountProposal.address}${idx}`}
+                    accountProposal={accountProposal}
+                  />
+                ))
+              ) : (
+                <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
+                  {account && account?.id === activeUser?.id ? (
+                    <>
+                      <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
+                        You haven&apos;t created any proposals
+                      </h1>
+                      <p className="my-2 w-[350px] text-center">
+                        Proposals allow you to present your ideas and get funded by DAOs across the
+                        ecosystem.
+                      </p>
+                      <p className="my-2 w-[309px] text-center">
+                        Find a station to start creating proposals.
+                      </p>
+                      <button
+                        onClick={() => router.push(Routes.DiscoverStations())}
+                        className="bg-electric-violet text-tunnel-black h-[35px] px-5 rounded hover:opacity-70 mt-5"
+                      >
+                        Explore stations
+                      </button>
+                    </>
+                  ) : account?.address ? (
+                    <>
+                      <h1 className="w-[309px] text-center">
+                        {account?.data.name || truncateString(account?.address)} hasn&apos;t created
+                        any proposals
+                      </h1>
+                    </>
+                  ) : (
+                    <h1>...Loading</h1>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </>
       </ProfileNavigation>
     </Layout>
   )
