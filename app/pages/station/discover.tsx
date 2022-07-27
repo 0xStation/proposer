@@ -85,7 +85,10 @@ const TerminalComponent = ({ terminal }) => {
 
   return (
     <Link href={Routes.BulletinPage({ terminalHandle: terminal?.handle })}>
-      <div className="w-full flex flex-row border-b border-concrete cursor-pointer hover:bg-wet-concrete py-3">
+      <div
+        className="w-full flex flex-row border-b border-concrete cursor-pointer hover:bg-wet-concrete py-3"
+        tabIndex={0}
+      >
         <div className="flex space-x-2 basis-96 ml-6">
           <div className="flex flex-col content-center align-middle mr-1">
             {terminal?.data?.pfpURL ? (
