@@ -34,9 +34,7 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
   }
 
   let hasVerifiedEmail = false
-
   const existingEmail = await getEmail(params.address as string)
-  // if email was saved with a new value, set `hasVerifiedEmail` to false
   if (params.email && params.email === existingEmail) {
     hasVerifiedEmail = !!existingAccount?.data?.hasVerifiedEmail
   } else {

@@ -159,7 +159,6 @@ const AccountForm = ({
   })
 
   const [sendVerificationEmailMutation] = useMutation(sendVerificationEmail, {
-    onSuccess: (data) => {},
     onError: (error) => {
       console.error(error)
     },

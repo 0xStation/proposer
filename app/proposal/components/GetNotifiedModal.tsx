@@ -120,6 +120,7 @@ const GetNotifiedModal = ({ isOpen, setIsOpen }) => {
           setEmailVerificationSent(true)
           await sendVerificationEmailMutation({ accountId: activeUser?.id as number })
         }}
+        disabled={emailVerificationSent}
       >
         {!emailVerificationSent ? "Resend" : "Sent!"}
       </button>

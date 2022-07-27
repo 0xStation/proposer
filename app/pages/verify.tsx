@@ -16,6 +16,22 @@ import verifyEmail from "app/email/mutations/verifyEmail"
 import useStore from "app/core/hooks/useStore"
 import { useEffect, useState } from "react"
 
+const VIEW_CONSTANTS = {
+  INVALID: "INVALID",
+  UNAUTHORIZED: "UNAUTHORIZED",
+  EMAIL_VERIFICATION_SUCCESS: "EMAIL_VERIFICATION_SUCCESS",
+  VERIFICATION_SENT: "VERIFICATION_SENT",
+  ERROR: "ERROR",
+  LOADING: "LOADING",
+}
+
+type ViewContent = {
+  heading?: string
+  subheading?: string
+  cta?: any
+  ctaTitle?: string
+}
+
 export const getServerSideProps: GetServerSideProps = async ({ req, res, query }) => {
   const session = await getSession(req, res)
 
@@ -59,7 +75,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
   }
 }
 
-const EmailVerificationView = ({ heading, subheading, ctaTitle, cta }) => {
+const EmailVerificationView = ({ heading, subheading, ctaTitle, cta }: ViewContent) => {
   return (
     <Layout title="Verify your email">
       <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
@@ -81,34 +97,36 @@ const EmailVerificationView = ({ heading, subheading, ctaTitle, cta }) => {
 const EmailVerification: BlitzPage = ({
   invalidLink,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const { INVALID, UNAUTHORIZED, EMAIL_VERIFICATION_SUCCESS, VERIFICATION_SENT, ERROR, LOADING } =
+    VIEW_CONSTANTS
   const [viewState, setViewState] = useState<string>(
-    invalidLink ? "INVALID" : "EMAIL_VERIFICATION_SUCCESS"
+    invalidLink ? INVALID : EMAIL_VERIFICATION_SUCCESS
   )
   const session = useSession({ suspense: false })
   const router = useRouter()
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const [sendVerificationEmailMutation] = useMutation(sendVerificationEmail, {
     onError: (error) => {
-      setViewState("ERROR")
+      setViewState(ERROR)
     },
   })
 
   useEffect(() => {
     if (!session.siwe?.address) {
-      setViewState("UNAUTHORIZED")
+      setViewState(UNAUTHORIZED)
     } else {
-      setViewState(invalidLink ? "INVALID" : "EMAIL_VERIFICATION_SUCCESS")
+      setViewState(invalidLink ? INVALID : EMAIL_VERIFICATION_SUCCESS)
     }
   }, [session.siwe?.address])
 
   const VIEW_CONTENT = {
-    UNAUTHORIZED: {
+    [UNAUTHORIZED]: {
       heading: "Please connect your wallet",
       subheading: "Connect your wallet first to verify your email.",
       ctaTitle: "Connect wallet",
       cta: () => toggleWalletModal(true),
     },
-    INVALID: {
+    [INVALID]: {
       heading: "Invalid link",
       subheading: "Validate your email again here.",
       ctaTitle: "Try again",
@@ -124,26 +142,26 @@ const EmailVerification: BlitzPage = ({
         }
       },
     },
-    EMAIL_VERIFICATION_SUCCESS: {
+    [EMAIL_VERIFICATION_SUCCESS]: {
       heading: "Email verified",
       subheading: "You'll now receive updates about your proposals.",
       ctaTitle: "Go to your profile",
       cta: () =>
         router.push(Routes.ProfileHome({ accountAddress: session?.siwe?.address as string })),
     },
-    VERIFICATION_SENT: {
+    [VERIFICATION_SENT]: {
       heading: "Verification sent",
       subheading: "Please check your email to verify.",
       ctaTitle: "",
       cta: undefined,
     },
-    ERROR: {
+    [ERROR]: {
       heading: "Something went wrong",
       subheading: "Sorry there's was an error verifying your email. Please check back again later.",
       ctaTitle: "",
       cta: undefined,
     },
-    LOADING: {
+    [LOADING]: {
       heading: "...Loading",
       subheading: "",
       ctaTitle: "",
@@ -151,7 +169,7 @@ const EmailVerification: BlitzPage = ({
     },
   }
 
-  return <EmailVerificationView {...VIEW_CONTENT[viewState]} />
+  return <EmailVerificationView {...(VIEW_CONTENT[viewState] as ViewContent)} />
 }
 
 EmailVerification.suppressFirstRenderFlicker = true
