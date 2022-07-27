@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react"
+import { useMutation, useQuery } from "blitz"
 import { Field, Form } from "react-final-form"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
-import { useMutation } from "blitz"
 import saveAccountEmail from "app/account/mutations/saveAccountEmail"
 import { composeValidators, requiredField, isValidEmail } from "app/utils/validators"
 import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
+import getEmailByAccountAddress from "app/email/queries/getEmailByAccountAddress"
 
 const GetNotifiedModal = ({ isOpen, setIsOpen }) => {
   const activeUser = useStore((state) => state.activeUser)
@@ -13,6 +14,11 @@ const GetNotifiedModal = ({ isOpen, setIsOpen }) => {
   const [showEmailVerificationView, setShowEmailVerificationView] = useState<boolean>(false)
   const [email, setEmail] = useState<string>("")
   const [emailVerificationSent, setEmailVerificationSent] = useState<boolean>(false)
+  const [existingEmail] = useQuery(
+    getEmailByAccountAddress,
+    { address: activeUser?.address as string },
+    { suspense: false, enabled: !!activeUser?.data?.hasSavedEmail }
+  )
 
   const [saveEmailMutation] = useMutation(saveAccountEmail, {
     onSuccess: async () => {
@@ -44,10 +50,10 @@ const GetNotifiedModal = ({ isOpen, setIsOpen }) => {
 
   useEffect(() => {
     // close modal if user has already saved an email
-    if (!!activeUser?.data.hasSavedEmail) {
+    if (!!activeUser?.data.hasVerifiedEmail) {
       setIsOpen(false)
     }
-  }, [activeUser?.data.hasSavedEmail])
+  }, [activeUser?.data.hasVerifiedEmail])
 
   const addEmailView = (
     <div className="p-2">
@@ -60,6 +66,9 @@ const GetNotifiedModal = ({ isOpen, setIsOpen }) => {
         </a>
       </p>
       <Form
+        initialValues={{
+          email: existingEmail || "",
+        }}
         onSubmit={async (values) => {
           if (activeUser) {
             saveEmailMutation({ accountId: activeUser.id, email: values.email })
