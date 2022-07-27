@@ -36,9 +36,9 @@ model Account {
 }
 
 model EmailVerification {
-  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  accountId Int
   code      String  @id @default(uuid())
+  accountId Int
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 }
 
 // unique links by /station/[handle]

@@ -18,6 +18,10 @@ export default async function verifyEmail(input: z.infer<typeof VerifyEmail>) {
       },
     })
 
+    if (!emailVerification) {
+      return false
+    }
+
     if ((emailVerification?.account as Account)?.data?.hasVerifiedEmail) {
       return true
     }

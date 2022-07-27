@@ -12,10 +12,6 @@ export async function sendVerificationEmail(input: z.infer<typeof SendVerificati
   try {
     const params = SendVerificationEmail.parse(input)
 
-    const emailVerification = await db.emailVerification.create({
-      data: { accountId: params.accountId },
-    })
-
     const account = (await db.account.findFirst({ where: { id: params.accountId } })) as Account
     let recipientEmail
     if (account?.data?.hasSavedEmail) {
@@ -25,6 +21,10 @@ export async function sendVerificationEmail(input: z.infer<typeof SendVerificati
     if (!recipientEmail) {
       throw Error("recipient email missing")
     }
+
+    const emailVerification = await db.emailVerification.create({
+      data: { accountId: params.accountId },
+    })
 
     await email.sendVerificationEmail({
       recipients: [recipientEmail],
