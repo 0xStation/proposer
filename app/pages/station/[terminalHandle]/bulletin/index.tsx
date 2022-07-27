@@ -120,7 +120,7 @@ const BulletinPage: BlitzPage = () => {
   }, [query?.terminalAndCheckbookCreated, session?.siwe?.address])
 
   return (
-    <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}Bulletin`}>
+    <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}RFPs`}>
       <AddFundsModal
         setIsOpen={setIsAddFundsModalOpen}
         isOpen={isAddFundsModalOpen}
@@ -138,7 +138,7 @@ const BulletinPage: BlitzPage = () => {
         {/* Filter View */}
         <div className="max-h-[250px] sm:h-[130px] border-b border-concrete">
           <div className="flex flex-row items-center ml-6 pt-7 justify-between mr-4">
-            <h1 className="text-2xl font-bold">Bulletin</h1>
+            <h1 className="text-2xl font-bold">Requests for Proposals</h1>
             {isLoggedInAndIsAdmin && (
               <button
                 className="h-[35px] bg-electric-violet px-9 rounded text-tunnel-black hover:bg-opacity-70"
@@ -200,10 +200,7 @@ const BulletinPage: BlitzPage = () => {
                 </p>
                 <p>
                   Check out some{" "}
-                  <a
-                    href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/request-for-proposal-rfp"
-                    className="text-electric-violet"
-                  >
+                  <a href="#" className="text-electric-violet">
                     examples
                   </a>
                   .
@@ -254,7 +251,7 @@ const RFPComponent = ({ rfp, terminalHandle }) => {
             <p>
               {rfp.startDate
                 ? DateTime.fromJSDate(rfp.startDate as Date).toFormat("dd-MMM-yyyy")
-                : ""}
+                : "N/A"}
             </p>
             <p className="text-concrete text-sm">
               {DateTime.fromJSDate(rfp.startDate as Date).toLocaleString(DateTime.TIME_SIMPLE)}
