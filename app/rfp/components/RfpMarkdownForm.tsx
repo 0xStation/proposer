@@ -14,7 +14,7 @@ import { Rfp } from "../types"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import { getShortDate } from "app/core/utils/getShortDate"
 import ConfirmationRfpModal from "./ConfirmationRfpModal"
-import { requiredField } from "app/utils/validators"
+import { requiredField, isAfterStartDate } from "app/utils/validators"
 import { useSignTypedData } from "wagmi"
 import { genRfpSignatureMessage } from "app/signatures/rfp"
 
@@ -314,15 +314,18 @@ const RfpMarkdownForm = ({
                       </div>
                       <div className="flex flex-col mt-6">
                         <label className="font-bold">Submission closes</label>
-                        <Field name="endDate">
-                          {({ input, _meta }) => (
+                        <Field name="endDate" validate={isAfterStartDate}>
+                          {({ input, meta }) => (
                             <div>
                               <input
                                 {...input}
                                 type="date"
-                                min={getShortDate()}
+                                min={formState.values.startDate || getShortDate()}
                                 className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
                               />
+                              {meta.error && (
+                                <span className="text-torch-red text-xs">{meta.error}</span>
+                              )}
                             </div>
                           )}
                         </Field>
