@@ -15,7 +15,7 @@ import { Auth } from "app/auth/types"
 import { Account } from "app/account/types"
 import { TagType } from "app/tag/types"
 import { Dialog, Transition } from "@headlessui/react"
-import truncateString from "app/core/utils/truncateString"
+import { truncateString } from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import useKeyPress from "app/core/hooks/useKeyPress"
 
@@ -164,8 +164,10 @@ const TerminalsOnProfile: BlitzPage = () => {
             <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
               {account && account?.id === activeUser?.id
                 ? "You’re not yet a part of any Station"
-                : account?.data?.name
-                ? `${account?.data?.name} is not yet a part of any Station`
+                : account?.address
+                ? `${
+                    account?.data?.name || truncateString(account?.address)
+                  } is not yet a part of any Station`
                 : "...Loading"}
             </h1>
             {account?.id === activeUser?.id ? (
@@ -192,8 +194,10 @@ const TerminalsOnProfile: BlitzPage = () => {
               </p>
             ) : (
               <p className="my-2 w-[309px] text-center">
-                {account?.data?.name
-                  ? `Communities ${account?.data.name} is a part of will display here.`
+                {account?.address
+                  ? `Communities ${
+                      account?.data?.name || truncateString(account?.address)
+                    } is a part of will display here.`
                   : "...Loading"}
               </p>
             )}
