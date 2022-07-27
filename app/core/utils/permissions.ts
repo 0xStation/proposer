@@ -25,6 +25,7 @@ const createStationWhitelist = [
   "0x78918036a8e4B9179bEE3CAB57110A3397986E44",
 ]
 export const canCreateStation = (address: string | undefined) => {
+  if (process.env.NODE_ENV !== "production") return true
   if (!address) return false
   const lowercaseAddress = address.toLowerCase()
   return createStationWhitelist.some((address) => address.toLowerCase() === lowercaseAddress)
