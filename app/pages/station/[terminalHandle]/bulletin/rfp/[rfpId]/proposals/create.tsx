@@ -10,7 +10,6 @@ import {
   useParam,
   useMutation,
 } from "blitz"
-import { useSignTypedData } from "wagmi"
 import { Field, Form } from "react-final-form"
 import { LightBulbIcon, XIcon } from "@heroicons/react/solid"
 import { utils } from "ethers"
@@ -24,6 +23,7 @@ import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
 import useStore from "app/core/hooks/useStore"
 import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
 import useCheckbookAvailability from "app/core/hooks/useCheckbookAvailability"
+import useSignature from "app/core/hooks/useSignature"
 // queries + mutations
 import getRfpById from "app/rfp/queries/getRfpById"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
@@ -113,33 +113,7 @@ const CreateProposalPage: BlitzPage = ({
     },
   })
 
-  let { signTypedDataAsync: signApproval } = useSignTypedData()
-  const createProposalSignature = async (rfp: Rfp, formValues, author) => {
-    const tokenDecimals =
-      formValues.token === ZERO_ADDRESS
-        ? 18 // ETH decimals
-        : await fetchTokenDecimals(rfp.checkbook.chainId, formValues.token) // fetch from ERC20 contract
-    const parsedTokenAmount = utils.parseUnits(formValues.amount, tokenDecimals)
-
-    try {
-      const signature = await signApproval(
-        genProposalSignatureMessage(
-          rfp.checkbook.address,
-          author,
-          rfp.id,
-          parsedTokenAmount,
-          formValues
-        )
-      )
-      return signature
-    } catch (e) {
-      setToastState({
-        isToastShowing: true,
-        type: "error",
-        message: "Signature denied",
-      })
-    }
-  }
+  let { signMessage } = useSignature()
 
   return (
     <Layout title={`New Proposal`}>
@@ -208,7 +182,21 @@ const CreateProposalPage: BlitzPage = ({
               message: "You must connect your wallet in order to create a proposal",
             })
           } else {
-            const signature = await createProposalSignature(data.rfp, values, activeUser?.address)
+            const tokenDecimals =
+              values.token === ZERO_ADDRESS
+                ? 18 // ETH decimals
+                : await fetchTokenDecimals(data.rfp.checkbook.chainId, values.token) // fetch from ERC20 contract
+            const parsedTokenAmount = utils.parseUnits(values.amount.toString(), tokenDecimals)
+
+            const message = genProposalSignatureMessage(
+              data.rfp.checkbook.address,
+              activeUser?.address,
+              data.rfp.id,
+              parsedTokenAmount,
+              values
+            )
+
+            const signature = await signMessage(message)
 
             // user must have denied signature
             if (!signature) {
@@ -228,6 +216,7 @@ const CreateProposalPage: BlitzPage = ({
                 contentTitle: values.title,
                 collaborators: [activeUser.address],
                 signature,
+                signatureMessage: message,
               })
             } catch (e) {
               console.error(e)
