@@ -49,6 +49,12 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
       </Link>
     )
 
+  const discoverLink = (
+    <Link href={Routes.DiscoverStations()}>
+      <span className="block hover:opacity-70 cursor-pointer">Discover</span>
+    </Link>
+  )
+
   const profilePfp =
     session?.siwe?.address && activeUser && activeUser.data?.pfpURL ? (
       <>
@@ -113,6 +119,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                       </div>
                     )}
                     <div className="space-y-2 mt-4">
+                      {discoverLink}
                       {profileLinkOption}
                       {openATerminalLink}
                       <a

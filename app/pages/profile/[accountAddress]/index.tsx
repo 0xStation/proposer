@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { BlitzPage, useParam, useQuery, Routes, Link, Image } from "blitz"
+import { BlitzPage, useParam, useQuery, Routes, Link, Image, useRouter } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import ConnectDiscordProfileModal from "app/core/components/ConnectDiscordProfileModal"
@@ -35,6 +35,7 @@ const ProfileHome: BlitzPage = () => {
     true
   )
   const activeUser = useStore((state) => state.activeUser)
+  const router = useRouter()
 
   // TODO: useLocalStorage doesn't return us the updated authentication value
   // so just manually setting it for now, but we can prob change it to use a hook
@@ -130,21 +131,34 @@ const ProfileHome: BlitzPage = () => {
           </>
         ) : (
           <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
-            <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
-              {account && account?.id === activeUser?.id
-                ? "You haven't created any proposals"
-                : account?.data?.name
-                ? `${account?.data?.name} is not yet a part of any Station`
-                : "...Loading"}
-            </h1>
-            {account?.id === activeUser?.id ? (
-              <p className="my-2 w-[309px] text-center">
-                Submit your ideas and get funded by DAOs.
-              </p>
+            {account && account?.id === activeUser?.id ? (
+              <>
+                <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
+                  You haven&apos;t created any proposals
+                </h1>
+                <p className="my-2 w-[350px] text-center">
+                  Proposals allow you to present your ideas and get funded by DAOs across the
+                  ecosystem.
+                </p>
+                <p className="my-2 w-[309px] text-center">
+                  Find a station to start creating proposals.
+                </p>
+                <button
+                  onClick={() => router.push(Routes.DiscoverStations())}
+                  className="bg-electric-violet text-tunnel-black h-[35px] px-5 rounded hover:opacity-70 mt-5"
+                >
+                  Explore stations
+                </button>
+              </>
+            ) : account?.data?.name ? (
+              <>
+                <h1>{account?.data?.name} is not yet a part of any Station</h1>
+                <p className="my-2 w-[309px] text-center">
+                  {account?.data.name || "..."} hasn&apos;t created any proposals
+                </p>
+              </>
             ) : (
-              <p className="my-2 w-[309px] text-center">
-                {account?.data.name || "..."} hasn&apos;t created any proposals
-              </p>
+              <h1>...Loading</h1>
             )}
           </div>
         )}
