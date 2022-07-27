@@ -192,6 +192,7 @@ model Check {
   nonce            Int
   // transaction hash of cashed check, marks status as "CASHED" if not null
   txnHash          String?
+  data             Json
   approvals        CheckApproval[]
 
   // nonces are unique per checkbook to prevent re-cashing of the same check
