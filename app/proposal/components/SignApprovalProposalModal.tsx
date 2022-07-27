@@ -1,12 +1,12 @@
 import { useMutation, useRouter, invalidateQuery } from "blitz"
-import { useSignTypedData, useToken } from "wagmi"
+import { useToken } from "wagmi"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
+import useSignature from "app/core/hooks/useSignature"
 import createCheck from "app/check/mutations/createCheck"
 import approveProposal from "app/proposal/mutations/approveProposal"
 import { ZERO_ADDRESS } from "app/core/utils/constants"
 import getChecksByProposalId from "../../check/queries/getChecksByProposalId"
-import { Check } from "@prisma/client"
 import { truncateString } from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 import { InformationCircleIcon } from "@heroicons/react/solid"
@@ -24,7 +24,8 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
     },
   })
 
-  let { signTypedDataAsync: signApproval } = useSignTypedData()
+  let { signMessage } = useSignature()
+
   const { data: tokenData } = useToken({
     ...(!!proposal?.data.funding.token &&
       proposal?.data.funding.token !== ZERO_ADDRESS && { address: proposal?.data.funding.token }),
@@ -46,7 +47,8 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
       invalidateQuery(getChecksByProposalId)
     }
 
-    const signature = await approveCheck(check, decimals)
+    const message = genCheckSignatureMessage(check, decimals)
+    const signature = await signMessage(message)
 
     // user must have denied signature
     if (!signature) {
@@ -66,7 +68,8 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
           proposalId: proposal?.id,
           checkId: check.id,
           signerAddress: activeUser.address,
-          signature: signature,
+          signature,
+          signatureMessage: message,
         })
         router.replace(router.asPath)
         setIsOpen(false)
@@ -94,20 +97,6 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
       } catch (e) {
         console.error(e)
       }
-    }
-  }
-
-  const approveCheck = async (check: Check, decimals: number) => {
-    // prompt the Metamask signature modal
-    try {
-      const signature = await signApproval(genCheckSignatureMessage(check, decimals))
-      return signature
-    } catch (e) {
-      setToastState({
-        isToastShowing: true,
-        type: "error",
-        message: "Signature denied",
-      })
     }
   }
 

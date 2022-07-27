@@ -4,6 +4,7 @@ import { useMutation, invalidateQuery, Link, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
 import { LockClosedIcon, XIcon, RefreshIcon } from "@heroicons/react/solid"
 import useStore from "app/core/hooks/useStore"
+import useSignature from "app/core/hooks/useSignature"
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS, RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
@@ -93,19 +94,7 @@ const RfpMarkdownForm = ({
     },
   })
 
-  let { signTypedDataAsync: signApproval } = useSignTypedData()
-  const createRfpSignature = async (values, author) => {
-    try {
-      const signature = await signApproval(genRfpSignatureMessage(values, author))
-      return signature
-    } catch (e) {
-      setToastState({
-        isToastShowing: true,
-        type: "error",
-        message: "Signature denied",
-      })
-    }
-  }
+  let { signMessage } = useSignature()
 
   return (
     <>
@@ -193,7 +182,6 @@ const RfpMarkdownForm = ({
             })
             return
           }
-
           if (!values.checkbookAddress) {
             setToastState({
               isToastShowing: true,
@@ -203,13 +191,15 @@ const RfpMarkdownForm = ({
             return
           }
 
-          if (isEdit) {
-            const signature = await createRfpSignature(values, activeUser?.address)
-            // user must have denied signature
-            if (!signature) {
-              return
-            }
+          const message = genRfpSignatureMessage(values, activeUser?.address)
+          const signature = await signMessage(message)
 
+          // user must have denied signature
+          if (!signature) {
+            return
+          }
+
+          if (isEdit) {
             await updateRfpMutation({
               rfpId: rfp?.id as string,
               // convert luxon's `DateTime` obj to UTC to store in db
@@ -219,15 +209,9 @@ const RfpMarkdownForm = ({
               contentBody: values.markdown,
               contentTitle: values.title,
               signature,
+              signatureMessage: message,
             })
           } else {
-            const signature = await createRfpSignature(values, activeUser?.address)
-
-            // user must have denied signature
-            if (!signature) {
-              return
-            }
-
             await createRfpMutation({
               terminalId: terminal?.id,
               // convert luxon's `DateTime` obj to UTC to store in db
@@ -240,6 +224,7 @@ const RfpMarkdownForm = ({
               contentBody: values.markdown,
               contentTitle: values.title,
               signature,
+              signatureMessage: message,
             })
           }
         }}

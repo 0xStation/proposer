@@ -11,6 +11,7 @@ const CreateRfp = z.object({
   startDate: z.date(),
   endDate: z.date().optional(),
   signature: z.string(),
+  signatureMessage: z.any(),
 })
 
 const defaultProposalPrefill =
@@ -31,6 +32,7 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
           body: input.contentBody,
         },
         signature: input.signature,
+        signatureMessage: input.signatureMessage,
         proposalPrefill: defaultProposalPrefill,
       },
     },
