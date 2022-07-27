@@ -15,7 +15,7 @@ const DiscoverStations: BlitzPage = () => {
   const [terminals] = useQuery(
     getAllTerminals,
     { page: page, paginationTake: PAGINATION_TAKE },
-    { suspense: false }
+    { suspense: false, refetchOnReconnect: false, refetchOnWindowFocus: false }
   )
 
   return (
@@ -65,7 +65,7 @@ const TerminalComponent = ({ terminal }) => {
     {
       terminalId: terminal.id,
     },
-    { suspense: false }
+    { suspense: false, refetchOnReconnect: false, refetchOnWindowFocus: false }
   )
   const [rfpCount] = useQuery(
     getRfpCountByTerminalId,
@@ -74,19 +74,22 @@ const TerminalComponent = ({ terminal }) => {
       includeDeletedRfps: false,
       statuses: [],
     },
-    { suspense: false }
+    { suspense: false, refetchOnReconnect: false, refetchOnWindowFocus: false }
   )
 
   const [proposalCount] = useQuery(
     getProposalCountByTerminal,
     { terminalId: terminal.id },
-    { suspense: false }
+    { suspense: false, refetchOnReconnect: false, refetchOnWindowFocus: false }
   )
 
   return (
     <Link href={Routes.BulletinPage({ terminalHandle: terminal?.handle })}>
-      <div className="w-full flex flex-row border-b border-concrete cursor-pointer hover:bg-wet-concrete pl-6 py-3 pr-4">
-        <div className="flex space-x-2 basis-96">
+      <div
+        className="w-full flex flex-row border-b border-concrete cursor-pointer hover:bg-wet-concrete py-3"
+        tabIndex={0}
+      >
+        <div className="flex space-x-2 basis-96 ml-6">
           <div className="flex flex-col content-center align-middle mr-1">
             {terminal?.data?.pfpURL ? (
               <img
@@ -110,10 +113,10 @@ const TerminalComponent = ({ terminal }) => {
             </div>
           </div>
         </div>
-        <div className="basis-[38rem] mr-9 truncate self-center">{terminal?.data?.description}</div>
-        <div className="basis-32 self-center">{memberCount || "-"}</div>
-        <div className="basis-32 self-center">{rfpCount || "-"}</div>
-        <div className="basis-28 self-center">{proposalCount || "-"}</div>
+        <div className="basis-[42rem] ml-9 truncate self-center">{terminal?.data?.description}</div>
+        <div className="basis-32 ml-6 self-center">{memberCount || "-"}</div>
+        <div className="basis-32 ml-2 self-center">{rfpCount || "-"}</div>
+        <div className="basis-32 ml-2 self-center">{proposalCount || "-"}</div>
       </div>
     </Link>
   )
