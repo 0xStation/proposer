@@ -17,15 +17,15 @@ export const genCheckSignatureMessage = (
       verifyingContract: checkbookAddress,
     },
     types: {
+      BatchTxn: [{ name: "txns", type: "Txn[]" }],
       Txn: [
         { name: "nonce", type: "uint256" },
-        { name: "deadline", type: "uint48" },
+        { name: "deadline", type: "uint256" },
         { name: "executor", type: "address" },
         { name: "target", type: "address" },
         { name: "value", type: "uint256" },
         { name: "data", type: "bytes" },
       ],
-      BatchTxn: [{ name: "txns", type: "Txn[]" }],
     },
     value: {
       txns: [
