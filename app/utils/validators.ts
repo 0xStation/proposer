@@ -79,3 +79,10 @@ export const isPositiveAmount = (amount: number) => {
   if (amount >= 0) return undefined // want to allow 0 amount proposals?
   return "Amount must be a number greater than or equal to zero."
 }
+
+export const isAfterStartDate = (_endDate, values) => {
+  if (!values.startDate || !values.endDate) return undefined
+  const start = new Date(values.startDate)
+  const end = new Date(values.endDate)
+  return start < end ? undefined : "End date cannot come before start date."
+}
