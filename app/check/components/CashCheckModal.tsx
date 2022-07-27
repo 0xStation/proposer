@@ -35,14 +35,9 @@ export const CashCheckModal = ({
       const parsedCheck = checkToContractTypes(check)
 
       const transaction = await cashCheck({
-        args: [
-          parsedCheck.recipient,
-          parsedCheck.token,
-          parsedCheck.amount,
-          parsedCheck.deadline,
-          parsedCheck.nonce,
-          parsedCheck.signatures,
-        ],
+        // first argument is which transaction in list to execute
+        // before we implement split-checks, there will only be one txn so we hardcode the index to `0`
+        args: [0, parsedCheck.txns, parsedCheck.signatures],
       })
 
       await cashCheckMutation({
