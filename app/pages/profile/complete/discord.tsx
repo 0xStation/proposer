@@ -6,6 +6,8 @@ import {
   GetServerSideProps,
   getSession,
   InferGetServerSidePropsType,
+  Link,
+  Routes,
 } from "blitz"
 import Layout from "app/core/layouts/LayoutWithoutNavigation"
 import Exit from "/public/exit-button.svg"
@@ -89,10 +91,10 @@ const CreateConnectDiscord: BlitzPage = ({
 
   return (
     <div>
-      <div className="absolute top-5 left-5">
-        <a href="https://station.express">
+      <div className="absolute top-5 left-5 cursor-pointer">
+        <Link href={Routes.ProfileHome({ accountAddress: activeUser?.address })}>
           <Image src={Exit} alt="Close button" width={16} height={16} />
-        </a>
+        </Link>
       </div>
       <div className="bg-tunnel-black relative mx-auto w-[31rem]">
         <div className="flex flex-row mt-16">
@@ -132,7 +134,7 @@ const CreateConnectDiscord: BlitzPage = ({
         )}
         {!(discordAuthToken || authorization) && (
           <button
-            className="border border-electric-violet h-[35px] text-electric-violet rounded px-10 mt-6"
+            className="border border-electric-violet h-[35px] text-electric-violet rounded px-10 mt-6 hover:bg-wet-concrete"
             onClick={() => router.push(`/profile/${activeUser?.address}`)}
           >
             Skip

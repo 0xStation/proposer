@@ -45,7 +45,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
     activeUser &&
     canCreateStation(activeUser?.address) && (
       <Link href={Routes.CreateTerminalDetailsPage()}>
-        <span className="block hover:opacity-70 cursor-pointer">New Station</span>
+        <span className="block hover:opacity-70 cursor-pointer">New station</span>
       </Link>
     )
 
