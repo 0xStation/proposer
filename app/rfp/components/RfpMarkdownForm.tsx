@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { DateTime } from "luxon"
 import { useMutation, invalidateQuery, Link, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
 import { LockClosedIcon, XIcon, RefreshIcon } from "@heroicons/react/solid"
@@ -13,13 +14,21 @@ import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
 import { Rfp } from "../types"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
-import { getShortDate } from "app/core/utils/getShortDate"
 import ConfirmationRfpModal from "./ConfirmationRfpModal"
 import { requiredField } from "app/utils/validators"
 import { useSignTypedData } from "wagmi"
 import { genRfpSignatureMessage } from "app/signatures/rfp"
 
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
+
+const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
+  const isoDate = DateTime.fromISO(dateTime.toString())
+
+  // min date input value needs to match the pattern nnnn-nn-nnTnn:nn
+  // but isoDate.toString() returns nnnn-nn-nnTnn:nn:nn.nnn-nn:00
+  // so we are slicing off the offset
+  return isoDate.toString().slice(0, -13)
+}
 
 const RfpMarkdownForm = ({
   terminal,
@@ -145,11 +154,18 @@ const RfpMarkdownForm = ({
             ? {
                 title: title,
                 markdown: markdown,
-                startDate: getShortDate(rfp.startDate),
-                endDate: getShortDate(rfp?.endDate && rfp?.endDate),
+                startDate: getFormattedDate({ dateTime: DateTime.fromJSDate(rfp.startDate) }),
+                endDate: rfp?.endDate
+                  ? getFormattedDate({ dateTime: DateTime.fromJSDate(rfp?.endDate as Date) })
+                  : undefined,
                 checkbookAddress: rfp?.fundingAddress,
               }
-            : {}
+            : {
+                startDate: getFormattedDate({
+                  dateTime: DateTime.local().plus({ hour: 1 }),
+                }),
+                checkbookAddress: checkbooks?.[0]?.address,
+              }
         }
         onSubmit={async (values: {
           startDate: string
@@ -162,7 +178,15 @@ const RfpMarkdownForm = ({
             setToastState({
               isToastShowing: true,
               type: "error",
-              message: "You must connect your wallet in order to create RFPs",
+              message: "You must connect your wallet in order to create RFPs.",
+            })
+            return
+          }
+          if (!values.checkbookAddress) {
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "Please select a Checkbook first.",
             })
             return
           }
@@ -178,8 +202,9 @@ const RfpMarkdownForm = ({
           if (isEdit) {
             await updateRfpMutation({
               rfpId: rfp?.id as string,
-              startDate: new Date(`${values.startDate} 00:00:00 UTC`),
-              endDate: new Date(`${values.endDate} 23:59:59 UTC`),
+              // convert luxon's `DateTime` obj to UTC to store in db
+              startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
+              endDate: DateTime.fromISO(values.endDate).toUTC().toJSDate(),
               fundingAddress: values.checkbookAddress,
               contentBody: values.markdown,
               contentTitle: values.title,
@@ -189,8 +214,11 @@ const RfpMarkdownForm = ({
           } else {
             await createRfpMutation({
               terminalId: terminal?.id,
-              startDate: new Date(`${values.startDate} 00:00:00 UTC`),
-              endDate: new Date(`${values.endDate} 23:59:59 UTC`),
+              // convert luxon's `DateTime` obj to UTC to store in db
+              startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
+              endDate: values.endDate
+                ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
+                : undefined,
               authorAddress: activeUser?.address,
               fundingAddress: values.checkbookAddress,
               contentBody: values.markdown,
@@ -288,8 +316,8 @@ const RfpMarkdownForm = ({
                               <div>
                                 <input
                                   {...input}
-                                  type="date"
-                                  min={getShortDate()}
+                                  type="datetime-local"
+                                  min={getFormattedDate({ dateTime: DateTime.local() })}
                                   className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
                                 />
                                 {(meta.touched || attemptedSubmit) && meta.error && (
@@ -307,8 +335,17 @@ const RfpMarkdownForm = ({
                             <div>
                               <input
                                 {...input}
-                                type="date"
-                                min={getShortDate()}
+                                type="datetime-local"
+                                // dates need to match the pattern nnnn-nn-nnTnn:nn
+                                min={
+                                  formState.values.startDate
+                                    ? getFormattedDate({
+                                        dateTime: DateTime.fromISO(formState.values.startDate),
+                                      })
+                                    : getFormattedDate({
+                                        dateTime: DateTime.local(),
+                                      })
+                                }
                                 className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
                               />
                             </div>
@@ -333,12 +370,12 @@ const RfpMarkdownForm = ({
                               <div className="custom-select-wrapper">
                                 <select
                                   {...input}
-                                  className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-1`}
+                                  className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
                                 >
                                   <option value="">Choose option</option>
                                   {checkbooks?.map((cb, idx) => {
                                     return (
-                                      <option key={`checkbook-${idx}`} value={cb.address}>
+                                      <option key={cb.address} value={cb.address}>
                                         {cb.name}
                                       </option>
                                     )
@@ -394,7 +431,7 @@ const RfpMarkdownForm = ({
                           }
                           setConfirmationModalOpen(true)
                         }}
-                        className={`bg-electric-violet text-tunnel-black px-6 py-1 rounded block mt-14 hover:bg-opacity-70`}
+                        className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block mt-14 hover:bg-opacity-70"
                       >
                         Publish
                       </button>
