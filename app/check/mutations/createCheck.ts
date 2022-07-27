@@ -60,6 +60,7 @@ export default async function createCheck(input: z.infer<typeof CreateCheck>) {
           tokenAmount: cleanedTokenAmount,
           nonce,
           deadline,
+          // @ts-ignore TODO: remove this later
           data: {
             signatureMessage,
           },
