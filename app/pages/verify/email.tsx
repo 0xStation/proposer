@@ -1,7 +1,6 @@
 import {
   BlitzPage,
   GetServerSideProps,
-  getSession,
   InferGetServerSidePropsType,
   invoke,
   useMutation,
@@ -10,15 +9,12 @@ import {
   Routes,
 } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import getEmailVerificationByAccountId from "app/email/queries/getEmailVerificationByAccountId"
 import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
 import verifyEmail from "app/email/mutations/verifyEmail"
-import useStore from "app/core/hooks/useStore"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 const VIEW_CONSTANTS = {
   INVALID: "INVALID",
-  UNAUTHORIZED: "UNAUTHORIZED",
   EMAIL_VERIFICATION_SUCCESS: "EMAIL_VERIFICATION_SUCCESS",
   VERIFICATION_SENT: "VERIFICATION_SENT",
   ERROR: "ERROR",
@@ -32,15 +28,7 @@ type ViewContent = {
   ctaTitle?: string
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res, query }) => {
-  const session = await getSession(req, res)
-
-  if (!session?.userId || !session?.siwe?.address) {
-    return {
-      props: {},
-    }
-  }
-
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   if (!query.code) {
     return {
       props: {
@@ -49,28 +37,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, query }
     }
   }
 
-  const emailVerification = await invoke(getEmailVerificationByAccountId, {
-    accountId: session?.userId as number,
-  })
-
-  if (!emailVerification || !emailVerification.code) {
-    return {
-      props: {
-        invalidLink: true,
-      },
-    }
-  }
-
   const verifiedEmail = await invoke(verifyEmail, {
-    accountId: session?.userId as number,
-    accountAddress: session?.siwe?.address as string,
     verificationCode: query.code,
   })
 
   return {
     props: {
-      authenticated: !!session?.userId,
-      invalidLink: !emailVerification.code || !verifiedEmail,
+      verified: !!verifiedEmail,
     }, // will be passed to the page component as props
   }
 }
@@ -96,36 +69,21 @@ const EmailVerificationView = ({ heading, subheading, ctaTitle, cta }: ViewConte
 
 const EmailVerification: BlitzPage = ({
   invalidLink,
+  verified,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const { INVALID, UNAUTHORIZED, EMAIL_VERIFICATION_SUCCESS, VERIFICATION_SENT, ERROR, LOADING } =
-    VIEW_CONSTANTS
+  const { INVALID, EMAIL_VERIFICATION_SUCCESS, VERIFICATION_SENT, ERROR, LOADING } = VIEW_CONSTANTS
   const [viewState, setViewState] = useState<string>(
-    invalidLink ? INVALID : EMAIL_VERIFICATION_SUCCESS
+    invalidLink || !verified ? INVALID : EMAIL_VERIFICATION_SUCCESS
   )
   const session = useSession({ suspense: false })
   const router = useRouter()
-  const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const [sendVerificationEmailMutation] = useMutation(sendVerificationEmail, {
     onError: (error) => {
       setViewState(ERROR)
     },
   })
 
-  useEffect(() => {
-    if (!session.siwe?.address) {
-      setViewState(UNAUTHORIZED)
-    } else {
-      setViewState(invalidLink ? INVALID : EMAIL_VERIFICATION_SUCCESS)
-    }
-  }, [session.siwe?.address])
-
   const VIEW_CONTENT = {
-    [UNAUTHORIZED]: {
-      heading: "Please connect your wallet",
-      subheading: "Connect your wallet first to verify your email.",
-      ctaTitle: "Connect wallet",
-      cta: () => toggleWalletModal(true),
-    },
     [INVALID]: {
       heading: "Invalid link",
       subheading: "Validate your email again here.",

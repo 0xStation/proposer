@@ -12,15 +12,18 @@ const sendgrid = new SendGrid()
 sendgrid.setApiKey(requireEnv("SENDGRID_API_KEY"))
 const hostname = getUrlHost()
 
-interface EmailArgs {
+type EmailArgs = {
   recipients: string[]
+}
+
+type ProposalArgs = EmailArgs & {
   account?: Account
   proposal?: Proposal
   rfp?: Rfp
   terminal?: Terminal
 }
 
-interface VerificationEmailArgs extends EmailArgs {
+type VerificationEmailArgs = EmailArgs & {
   verificationCode: string
 }
 
@@ -54,7 +57,7 @@ const sendNewProposalEmail = async ({
   proposal,
   rfp,
   terminal,
-}: EmailArgs) => {
+}: ProposalArgs) => {
   const dynamicTemplateData = {
     proposerProfileUrl: `${hostname}/profile/${account?.address}`,
     proposerName: account?.data?.name || truncateString(account?.address),
@@ -66,7 +69,7 @@ const sendNewProposalEmail = async ({
   await email(recipients, SENDGRID_TEMPLATES.NEW_PROPOSAL, dynamicTemplateData)
 }
 
-const sendApprovedProposalEmail = async ({ recipients, proposal, rfp, terminal }: EmailArgs) => {
+const sendApprovedProposalEmail = async ({ recipients, proposal, rfp, terminal }: ProposalArgs) => {
   const dynamicTemplateData = {
     proposalUrl: `${hostname}/station/${terminal?.handle}/bulletin/rfp/${rfp?.id}/proposals/${proposal?.id}`,
   }
@@ -76,7 +79,7 @@ const sendApprovedProposalEmail = async ({ recipients, proposal, rfp, terminal }
 
 const sendVerificationEmail = async ({ recipients, verificationCode }: VerificationEmailArgs) => {
   const dynamicTemplateData = {
-    verificationUrl: `${hostname}/verify?code=${verificationCode}`,
+    verificationUrl: `${hostname}/verify/email?code=${verificationCode}`,
   }
 
   await email(recipients, SENDGRID_TEMPLATES.VERIFY, dynamicTemplateData)

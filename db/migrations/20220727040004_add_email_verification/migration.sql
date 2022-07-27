@@ -3,7 +3,7 @@ CREATE TABLE "EmailVerification" (
     "accountId" INTEGER NOT NULL,
     "code" TEXT NOT NULL,
 
-    CONSTRAINT "EmailVerification_pkey" PRIMARY KEY ("accountId")
+    CONSTRAINT "EmailVerification_pkey" PRIMARY KEY ("code")
 );
 
 -- AddForeignKey

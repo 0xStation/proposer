@@ -16,7 +16,6 @@ const UpdateAccount = z.object({
   githubUrl: z.string().optional(),
   tiktokUrl: z.string().optional(),
   instagramUrl: z.string().optional(),
-  hasVerifiedEmail: z.boolean().optional(),
 })
 
 export default async function updateAccount(input: z.infer<typeof UpdateAccount>) {
@@ -41,8 +40,9 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
     // store email with Privy so it does not live in our database to reduce leakage risk
     // not in try-catch to handle errors on client
     // allows saving if no email provided as the removal mechanism while Privy's delete API in development
-    await saveEmail(params.address as string, params.email || "")
-    if (params.email) {
+    const email = await saveEmail(params.address as string, params.email || "")
+
+    if (params.email && email) {
       await sendVerificationEmail({ accountId: existingAccount.id })
     }
   }

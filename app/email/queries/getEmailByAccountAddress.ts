@@ -1,5 +1,4 @@
 import { getEmail } from "app/utils/privy"
-import db from "db"
 import * as z from "zod"
 
 const GetEmailByAccountAddress = z.object({

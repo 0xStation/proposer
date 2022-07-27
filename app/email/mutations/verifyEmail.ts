@@ -3,8 +3,6 @@ import db from "db"
 import * as z from "zod"
 
 const VerifyEmail = z.object({
-  accountId: z.number(),
-  accountAddress: z.string(),
   verificationCode: z.string(),
 })
 
@@ -13,37 +11,30 @@ export default async function verifyEmail(input: z.infer<typeof VerifyEmail>) {
     const params = VerifyEmail.parse(input)
     const emailVerification = await db.emailVerification.findUnique({
       where: {
-        accountId: params.accountId,
+        code: params.verificationCode,
+      },
+      include: {
+        account: true,
       },
     })
 
-    const existingAccount = (await db.account.findUnique({
-      where: { id: params.accountId },
-    })) as Account
-
-    if (!existingAccount) {
-      throw Error("account doesn't exist")
-    }
-
-    if (existingAccount?.data?.hasVerifiedEmail) {
+    if ((emailVerification?.account as Account)?.data?.hasVerifiedEmail) {
       return true
     }
 
-    if (emailVerification?.code === params.verificationCode) {
-      await db.account.update({
-        where: { id: params.accountId },
+    await db.account.update({
+      where: { id: emailVerification?.account.id },
+      data: {
         data: {
-          data: {
-            ...(existingAccount.data as AccountMetadata),
-            hasSavedEmail: true,
-            hasVerifiedEmail: true,
-          },
+          ...(emailVerification?.account.data as AccountMetadata),
+          hasSavedEmail: true,
+          hasVerifiedEmail: true,
         },
-      })
-      return true
-    }
+      },
+    })
 
-    return false
+    await db.emailVerification.deleteMany({ where: { accountId: emailVerification?.account.id } })
+    return true
   } catch (err) {
     console.error("Error verifying email. Failed with err: ", err)
     return false
