@@ -34,16 +34,17 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
   }
 
   let hasVerifiedEmail = false
-  if (params.email) {
-    const existingEmail = await getEmail(params.address as string)
-    // if email was saved with a new value, set `hasVerifiedEmail` to false
-    if (params.email === existingEmail) {
-      hasVerifiedEmail = !!existingAccount?.data?.hasVerifiedEmail
-    } else {
-      // store email with Privy so it does not live in our database to reduce leakage risk
-      // not in try-catch to handle errors on client
-      // allows saving if no email provided as the removal mechanism while Privy's delete API in development
-      await saveEmail(params.address as string, params.email || "")
+
+  const existingEmail = await getEmail(params.address as string)
+  // if email was saved with a new value, set `hasVerifiedEmail` to false
+  if (params.email && params.email === existingEmail) {
+    hasVerifiedEmail = !!existingAccount?.data?.hasVerifiedEmail
+  } else {
+    // store email with Privy so it does not live in our database to reduce leakage risk
+    // not in try-catch to handle errors on client
+    // allows saving if no email provided as the removal mechanism while Privy's delete API in development
+    await saveEmail(params.address as string, params.email || "")
+    if (params.email) {
       await sendVerificationEmail({ accountId: existingAccount.id })
     }
   }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useMutation, useQuery, Image } from "blitz"
+import { useMutation, Image } from "blitz"
 import { Field, Form } from "react-final-form"
 import updateAccount from "../mutations/updateAccount"
 import createAccount from "../mutations/createAccount"
@@ -19,6 +19,7 @@ import {
   mustBeUnderNumCharacters,
   isValidEmail,
 } from "app/utils/validators"
+import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
 
 interface ApplicationParams {
   name: string
@@ -134,6 +135,7 @@ const AccountForm = ({
 }) => {
   const [coverURL, setCoverURL] = useState<string | undefined>()
   const [pfpURL, setPfpURL] = useState<string | undefined>()
+  const [emailVerificationSent, setEmailVerificationSent] = useState<boolean>(false)
   const setActiveUser = useStore((state) => state.setActiveUser)
 
   const [createAccountMutation] = useMutation(createAccount, {
@@ -151,6 +153,13 @@ const AccountForm = ({
       onSuccess()
       setActiveUser(data)
     },
+    onError: (error) => {
+      console.error(error)
+    },
+  })
+
+  const [sendVerificationEmailMutation] = useMutation(sendVerificationEmail, {
+    onSuccess: (data) => {},
     onError: (error) => {
       console.error(error)
     },
@@ -260,6 +269,24 @@ const AccountForm = ({
                       placeholder="e.g. member@dao.xyz"
                       className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 rounded w-full"
                     />
+                    {account?.data.hasSavedEmail && !account?.data.hasVerifiedEmail && (
+                      <p className="text-concrete text-xs pt-1">
+                        Check your inbox to verify your email. Don&apos;t see an email from us?{" "}
+                        <button
+                          className="text-electric-violet font-bold"
+                          disabled={emailVerificationSent}
+                          onClick={async (e) => {
+                            e.preventDefault()
+                            setEmailVerificationSent(true)
+                            await sendVerificationEmailMutation({
+                              accountId: account?.id as number,
+                            })
+                          }}
+                        >
+                          {!emailVerificationSent ? "Resend" : "Sent!"}
+                        </button>
+                      </p>
+                    )}
                     {/* this error shows up when the user focuses the field (meta.touched) */}
                     {meta.error && meta.touched && (
                       <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
