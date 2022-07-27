@@ -96,16 +96,16 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
               <div className="flex flex-row pt-16">
                 <div className="mr-1">
                   <div className="w-60 h-1 bg-electric-violet" />
-                  <p className="text-electric-violet mt-2.5">Open a Station</p>
+                  <p className="text-electric-violet mt-2.5">Open a station</p>
                 </div>
                 <div className="">
                   <div className="w-60 h-1 bg-concrete" />
                   <p className="text-concrete mt-2.5">Create a Checkbook</p>
                 </div>
               </div>
-              <h2 className="text-2xl font-bold mt-12">Open a Station</h2>
+              <h2 className="text-2xl font-bold mt-12">Open a station</h2>
               <h6 className="mt-2">
-                A Station is where community members propose, coordinate, and fund ideas. Let&apos;s
+                A station is where community members propose, coordinate, and fund ideas. Let&apos;s
                 get started.
               </h6>
               <Form

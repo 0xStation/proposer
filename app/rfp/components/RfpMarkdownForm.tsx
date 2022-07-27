@@ -250,7 +250,6 @@ const RfpMarkdownForm = ({
                     </span>
                   </div>
                   <div className="mt-6 flex flex-row">
-                    <span className="text-3xl font-bold">RFP:</span>
                     <Field name="title" validate={requiredField}>
                       {({ input, meta }) => {
                         return (

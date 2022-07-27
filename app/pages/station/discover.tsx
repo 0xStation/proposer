@@ -27,7 +27,7 @@ const DiscoverStations: BlitzPage = () => {
             <p>All stations, find your tribe</p>
           </div>
           <button className="text-tunnel-black bg-electric-violet rounded hover:opacity-70 h-[35px] px-6 mr-8">
-            Open a Station
+            Open a station
           </button>
         </div>
         <div className="border-t border-concrete">
