@@ -9,6 +9,10 @@ export enum CheckStatus {
   CASHED = "CASHED", // cashed by recipient post-approval
 }
 
+export type CheckMetadata = {
+  signatureMessage: any
+}
+
 export type Check = {
   id: string
   proposalId: string
@@ -23,4 +27,5 @@ export type Check = {
   txnHash?: string
   proposal?: Proposal
   checkbook?: Checkbook
+  data: CheckMetadata
 }

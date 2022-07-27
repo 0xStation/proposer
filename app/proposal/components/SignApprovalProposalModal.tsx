@@ -10,7 +10,6 @@ import getChecksByProposalId from "../../check/queries/getChecksByProposalId"
 import { truncateString } from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 import { InformationCircleIcon } from "@heroicons/react/solid"
-import { genCheckSignatureMessage } from "app/signatures/check"
 
 export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, checks }) => {
   const router = useRouter()
@@ -47,8 +46,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
       invalidateQuery(getChecksByProposalId)
     }
 
-    const message = genCheckSignatureMessage(check, decimals)
-    const signature = await signMessage(message)
+    const signature = await signMessage(check.data.signatureMessage)
 
     // user must have denied signature
     if (!signature) {
@@ -69,7 +67,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
           checkId: check.id,
           signerAddress: activeUser.address,
           signature,
-          signatureMessage: message,
+          signatureMessage: check.data.signatureMessage,
         })
         router.replace(router.asPath)
         setIsOpen(false)
