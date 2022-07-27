@@ -189,10 +189,9 @@ const CreateProposalPage: BlitzPage = ({
               message: "You must connect your wallet in order to create a proposal",
             })
           } else {
-            const parsedTokenAmount = utils.parseUnits(
-              values.amount.toString(),
-              balanceData?.decimals
-            )
+            const decimals = token === ZERO_ADDRESS ? 18 : balanceData?.decimals
+            // 18 is ETH decimals
+            const parsedTokenAmount = utils.parseUnits(values.amount.toString(), decimals)
 
             const message = genProposalSignatureMessage(
               data.rfp.checkbook.address,
