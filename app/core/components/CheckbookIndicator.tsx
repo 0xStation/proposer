@@ -74,11 +74,6 @@ const CheckbookIndicator = ({ terminal, checkbook }) => {
           color="neon-carrot"
           title="Pending cash"
         />
-        {pending > available && (
-          <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[120%] left-[10%] w-[80%] group hidden group-hover:block shadow-lg z-50">
-            Overallocated. You will not be able to approve all proposals.
-          </span>
-        )}
       </div>
     </div>
   )
