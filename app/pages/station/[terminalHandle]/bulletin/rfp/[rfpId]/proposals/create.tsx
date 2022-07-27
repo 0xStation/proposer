@@ -13,7 +13,7 @@ import {
 import { useSignTypedData } from "wagmi"
 import { Field, Form } from "react-final-form"
 import { LightBulbIcon, XIcon } from "@heroicons/react/solid"
-import { utils, BigNumber } from "ethers"
+import { utils } from "ethers"
 // components
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
@@ -34,11 +34,10 @@ import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import { requiredField, isPositiveAmount, composeValidators, isAddress } from "app/utils/validators"
 import { fetchTokenDecimals } from "app/utils/fetchTokenDecimals"
 import { ZERO_ADDRESS } from "app/core/utils/constants"
+import { genProposalSignatureMessage } from "app/signatures/proposal"
 //types
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
-import { TypedDataTypeDefinition } from "app/types"
-import { Prisma } from "@prisma/client"
 
 type GetServerSidePropsData = {
   rfp: Rfp
@@ -116,60 +115,22 @@ const CreateProposalPage: BlitzPage = ({
 
   let { signTypedDataAsync: signApproval } = useSignTypedData()
   const createProposalSignature = async (rfp: Rfp, formValues, author) => {
-    const domain = {
-      name: "Proposal", // keep hardcoded
-      version: "1", // keep hardcoded
-      chainId: rfp.checkbook.chainId,
-      verifyingContract: rfp.checkbook.address,
-    }
-
-    const types: TypedDataTypeDefinition = {
-      Funding: [
-        { name: "type", type: "string" }, // hard coded to single-upon-approval
-        { name: "recipient", type: "address" },
-        { name: "token", type: "address" },
-        { name: "amount", type: "uint256" },
-      ],
-      Proposal: [
-        { name: "recipient", type: "address" }, // (checkbook address for now)
-        { name: "collaborators", type: "address[]" },
-        { name: "timestamp", type: "uint256" }, // hash of ISO formatted date string
-        { name: "funding", type: "Funding" },
-        { name: "rfp", type: "string" }, // hashed uuid since uuid is not at type?
-        { name: "title", type: "string" },
-        { name: "body", type: "string" },
-      ],
-    }
-
-    const now = new Date()
-
     const tokenDecimals =
       formValues.token === ZERO_ADDRESS
         ? 18 // ETH decimals
         : await fetchTokenDecimals(rfp.checkbook.chainId, formValues.token) // fetch from ERC20 contract
     const parsedTokenAmount = utils.parseUnits(formValues.amount, tokenDecimals)
 
-    const value = {
-      recipient: rfp.checkbook.address,
-      collaborators: [author],
-      timestamp: utils.keccak256(utils.toUtf8Bytes(now.toISOString())),
-      rfp: utils.keccak256(utils.toUtf8Bytes(rfp.id)),
-      title: utils.keccak256(utils.toUtf8Bytes(formValues.title)),
-      body: utils.keccak256(utils.toUtf8Bytes(formValues.markdown)),
-      funding: {
-        type: "single-upon-approval",
-        recipient: formValues.recipientAddress,
-        token: formValues.token,
-        amount: parsedTokenAmount,
-      },
-    }
-
     try {
-      const signature = await signApproval({
-        domain,
-        types,
-        value,
-      })
+      const signature = await signApproval(
+        genProposalSignatureMessage(
+          rfp.checkbook.address,
+          author,
+          rfp.id,
+          parsedTokenAmount,
+          formValues
+        )
+      )
       return signature
     } catch (e) {
       setToastState({
@@ -367,7 +328,7 @@ const CreateProposalPage: BlitzPage = ({
                   </Modal>
 
                   <div>
-                    <h4 className="text-xs font-bold text-concrete uppercase">Terminal</h4>
+                    <h4 className="text-xs font-bold text-concrete uppercase">Station</h4>
                     <div className="flex flex-row items-center mt-2">
                       <img
                         src={data.rfp.terminal.data.pfpURL}

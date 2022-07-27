@@ -68,6 +68,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
   const [successModalOpen, setSuccessModalOpen] = useState<boolean>(!!creationSuccess)
+  const [showAddFundsModal, setShowAddFundsModal] = useState<boolean>(false)
 
   useQuery(
     getCheckbooksByTerminal,
@@ -118,6 +119,11 @@ const CheckbookSettingsPage: BlitzPage = () => {
           checkbookAddress={selectedCheckbook?.address}
           setIsOpen={setSuccessModalOpen}
           isOpen={successModalOpen}
+        />
+        <AddFundsModal
+          setIsOpen={setShowAddFundsModal}
+          isOpen={showAddFundsModal}
+          checkbookAddress={selectedCheckbook?.address}
         />
         <div className="flex flex-col">
           <div className="p-6 border-b border-concrete flex justify-between">
@@ -271,6 +277,12 @@ const CheckbookSettingsPage: BlitzPage = () => {
                         {isButtonAddressCopied ? "Copied!" : "Copy Address"}
                       </button> */}
                       <CheckbookIndicator checkbook={selectedCheckbook} terminal={terminal} />
+                      <button
+                        className="border border-electric-violet rounded text-electric-violet px-6 h-[35px] mt-2 hover:bg-wet-concrete mt-4"
+                        onClick={() => setShowAddFundsModal(true)}
+                      >
+                        Add funds
+                      </button>
                     </div>
                   </div>
                 </div>

@@ -135,7 +135,7 @@ const CreateConnectDiscord: BlitzPage = ({
             className="border border-electric-violet h-[35px] text-electric-violet rounded px-10 mt-6"
             onClick={() => router.push(`/profile/${activeUser?.address}`)}
           >
-            skip
+            Skip
           </button>
         )}
       </div>

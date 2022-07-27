@@ -155,8 +155,11 @@ const ProposalsTab: BlitzPage = ({
               ))
             ) : proposals && rfp && !proposals.length ? (
               <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
-                <p>No proposals found</p>
-                <p>...</p>
+                <p className="text-2xl font-bold w-[295px] text-center">No proposals found</p>
+                <p className="text-base w-[320px] text-center">
+                  Share the link with your community to solicit proposals to shape the future of{" "}
+                  {terminal.data.name}.
+                </p>
               </div>
             ) : (
               Array.from(Array(15)).map((idx) => (
