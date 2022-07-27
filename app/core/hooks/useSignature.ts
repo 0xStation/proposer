@@ -1,5 +1,5 @@
 import useStore from "app/core/hooks/useStore"
-import { useSignTypedData, useToken } from "wagmi"
+import { useSignTypedData } from "wagmi"
 
 const useSignature = () => {
   const setToastState = useStore((state) => state.setToastState)
