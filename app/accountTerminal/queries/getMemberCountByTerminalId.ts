@@ -1,6 +1,5 @@
 import db from "db"
 import * as z from "zod"
-import { AccountTerminalWithTagsAndAccount } from "../types"
 const GetMembersByTerminalId = z.object({
   terminalId: z.number(),
   tagGroups: z.number().array().array(),
