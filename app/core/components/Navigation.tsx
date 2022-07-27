@@ -11,6 +11,7 @@ import { TerminalMetadata } from "app/terminal/types"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import createAccount from "app/account/mutations/createAccount"
 import { DEFAULT_PFP_URLS } from "../utils/constants"
+import ExploreIcon from "public/explore.svg"
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -137,6 +138,7 @@ const Navigation = ({ children }: { children?: any }) => {
           <Image src={StationLogo} alt="Station logo" height={20} width={54} />
         </a>
         <div className="h-full mt-4">
+          <DiscoverIcon />
           {terminalsView}
           {profilePfp && (
             <div className="fixed bottom-[10px] left-[12px]" onClick={() => handlePfpClick()}>
@@ -180,6 +182,30 @@ const TerminalIcon = ({ terminal }) => {
         ) : (
           <span className="w-[46px] h-[46px] bg-gradient-to-b  from-neon-blue to-torch-red block" />
         )}
+      </button>
+    </div>
+  )
+}
+
+const DiscoverIcon = () => {
+  const discoverSelected = window?.location?.pathname === Routes.DiscoverStations().pathname
+  const router = useRouter()
+  return (
+    <div className="relative flex items-center justify-center group">
+      <span
+        className={`${
+          discoverSelected ? "scale-100" : "scale-0 group-hover:scale-75"
+        }  absolute w-[3px] h-[46px] min-w-max left-0 rounded-r-lg inline-block mr-2 mb-4
+bg-marble-white
+transition-all duration-200 origin-left`}
+      />
+      <button
+        className={`${
+          discoverSelected ? "border-marble-white" : "border-wet-concrete"
+        } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg h-[48px] mb-4`}
+        onClick={() => router.push(Routes.DiscoverStations())}
+      >
+        <Image src={ExploreIcon} alt="Explore icon" height={46} width={46} />
       </button>
     </div>
   )
