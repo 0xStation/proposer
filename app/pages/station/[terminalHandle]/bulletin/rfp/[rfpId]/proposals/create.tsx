@@ -13,6 +13,7 @@ import {
 import { Field, Form } from "react-final-form"
 import { LightBulbIcon, XIcon } from "@heroicons/react/solid"
 import { utils } from "ethers"
+import { useBalance } from "wagmi"
 // components
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
@@ -54,7 +55,12 @@ const CreateProposalPage: BlitzPage = ({
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(true)
+  const [token, setToken] = useState<string>(ZERO_ADDRESS)
   const router = useRouter()
+  const { data: balanceData } = useBalance({
+    addressOrName: token,
+    chainId: data.rfp.checkbook.chainId,
+  })
 
   useWarnIfUnsavedChanges(unsavedChanges, () => {
     return confirm("Warning! You have unsaved changes.")
@@ -175,6 +181,7 @@ const CreateProposalPage: BlitzPage = ({
           markdown: string
           title: string
         }) => {
+          setToken(values.token)
           if (!activeUser?.address) {
             setToastState({
               isToastShowing: true,
@@ -182,11 +189,10 @@ const CreateProposalPage: BlitzPage = ({
               message: "You must connect your wallet in order to create a proposal",
             })
           } else {
-            const tokenDecimals =
-              values.token === ZERO_ADDRESS
-                ? 18 // ETH decimals
-                : await fetchTokenDecimals(data.rfp.checkbook.chainId, values.token) // fetch from ERC20 contract
-            const parsedTokenAmount = utils.parseUnits(values.amount.toString(), tokenDecimals)
+            const parsedTokenAmount = utils.parseUnits(
+              values.amount.toString(),
+              balanceData?.decimals
+            )
 
             const message = genProposalSignatureMessage(
               data.rfp.checkbook.address,
