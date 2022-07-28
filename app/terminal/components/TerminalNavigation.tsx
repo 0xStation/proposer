@@ -19,8 +19,6 @@ import Exit from "/public/exit-button.svg"
 import getTerminalByHandle from "../queries/getTerminalByHandle"
 import useStore from "app/core/hooks/useStore"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
-import DirectoryIcon from "app/core/icons/DirectoryIcon"
-// import BulletinIcon from "app/core/icons/BulletinIcon"
 import { InboxInIcon, UserGroupIcon } from "@heroicons/react/solid"
 import hasAdminPermissionsBasedOnTags from "../../permissions/queries/hasAdminPermissionsBasedOnTags"
 
