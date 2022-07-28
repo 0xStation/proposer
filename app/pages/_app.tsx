@@ -1,16 +1,18 @@
 import { AppProps } from "blitz"
 import "app/core/styles/index.css"
-import { providers } from "ethers"
-import { WagmiConfig, defaultChains, createClient } from "wagmi"
+import { WagmiConfig, defaultChains, createClient, configureChains } from "wagmi"
 import { MetaMaskConnector } from "wagmi/connectors/metaMask"
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect"
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet"
+import { alchemyProvider } from "wagmi/providers/alchemy"
+import { publicProvider } from "wagmi/providers/public"
 
-// Chains for connectors to support
-const chains = defaultChains
+const { chains, provider } = configureChains(defaultChains, [
+  alchemyProvider({ alchemyId: process.env.ALCHEMY_API_KEY }),
+  publicProvider(),
+])
 
-const provider = () => new providers.AlchemyProvider(4, process.env.RINKEBY_API_KEY)
-// Set up connectors
+// // Set up connectors
 const connectors = () => {
   return [
     // MetaMask
@@ -30,10 +32,9 @@ const connectors = () => {
   ]
 }
 
-// Manages wallet connection and state for the wagmi provider
 const client = createClient({
   autoConnect: true,
-  connectors,
+  connectors: connectors,
   provider,
 })
 
