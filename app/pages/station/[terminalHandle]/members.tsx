@@ -305,7 +305,7 @@ const MemberDirectoryPage: BlitzPage = () => {
                   )}
                   {groupedTags && groupedTags[TagType.SEASON] && (
                     <FilterPill
-                      label={TagType.TOKEN}
+                      label={TagType.SEASON}
                       filterOptions={groupedTags[TagType.SEASON].map((tag) => {
                         return { name: tag.value, value: tag?.id?.toString() }
                       })}
