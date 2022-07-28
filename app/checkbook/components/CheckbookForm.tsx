@@ -56,7 +56,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
       // to get the address, we throw away the first 2 characters ("0x") + the next 2*12bytes characters (0-padding)
       // which leads us to use `.substring(26)` and extract the address string
       // this string is lowercased though, so we checksum it to give it proper casing before storing in database
-      const checkbookAddress = toChecksumAddress("0x" + data.logs[0]?.topics[1]?.substring(26))
+      const checkbookAddress = toChecksumAddress("0x" + data.logs[2]?.topics[1]?.substring(26))
 
       try {
         await createCheckbookMutation({
