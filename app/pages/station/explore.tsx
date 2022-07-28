@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { BlitzPage, Link, Routes, useQuery } from "blitz"
+import { BlitzPage, Link, Routes, useQuery, useRouter } from "blitz"
 
 import Layout from "app/core/layouts/Layout"
 import Pagination from "app/core/components/Pagination"
@@ -11,6 +11,7 @@ import getProposalCountByTerminal from "app/proposal/queries/getProposalCountByT
 
 const ExploreStations: BlitzPage = () => {
   const [page, setPage] = useState<number>(0)
+  const router = useRouter()
 
   const [terminals] = useQuery(
     getAllTerminals,
@@ -26,7 +27,10 @@ const ExploreStations: BlitzPage = () => {
             <h1 className="font-bold text-2xl">Explore</h1>
             <p>All stations, find your tribe</p>
           </div>
-          <button className="text-tunnel-black bg-electric-violet rounded hover:opacity-70 h-[35px] px-6 mr-8">
+          <button
+            className="text-tunnel-black bg-electric-violet rounded hover:opacity-70 h-[35px] px-6 mr-8"
+            onClick={() => router.push(Routes.CreateTerminalDetailsPage())}
+          >
             Open a station
           </button>
         </div>
