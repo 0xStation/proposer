@@ -134,12 +134,8 @@ const ProfileHome: BlitzPage = () => {
                       <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
                         You haven&apos;t created any proposals
                       </h1>
-                      <p className="my-2 w-[350px] text-center">
-                        Proposals allow you to present your ideas and get funded by DAOs across the
-                        ecosystem.
-                      </p>
                       <p className="my-2 w-[309px] text-center">
-                        Find a station to start creating proposals.
+                        Find a station to create proposals and get funded by DAOs.
                       </p>
                       <button
                         onClick={() => router.push(Routes.ExploreStations())}
