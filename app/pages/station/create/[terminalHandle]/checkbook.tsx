@@ -13,6 +13,8 @@ import Layout from "app/core/layouts/Layout"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import CheckbookForm from "app/checkbook/components/CheckbookForm"
+import CheckAnimation from "public/check_animation.gif"
+import TikTokIcon from "public/tiktok-icon.svg"
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   const session = await getSession(req, res)
@@ -88,6 +90,8 @@ const NewCheckbookTerminalCreationPage: BlitzPage = () => {
               Learn more
             </a>
           </p>
+          <Image src={CheckAnimation} alt="TikTok Icon." width={496} height={240} />
+
           <CheckbookForm
             isEdit={false}
             callback={(checkbookAddress?: string) => {
