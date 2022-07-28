@@ -10,6 +10,7 @@ import TikTokIcon from "public/tiktok-icon.svg"
 import { Terminal } from "app/terminal/types"
 import { Account } from "app/account/types"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
+import LockedIcon from "public/locked-icon.svg"
 import {
   ClipboardCheckIcon,
   ClipboardIcon,
@@ -182,54 +183,72 @@ export const Navigation = ({
           ) : null}
         </div>
         <div>
-          <ul className="mt-6 ml-8 text-lg space-y-2">
-            <li className="group cursor-pointer font-bold">
-              <LightBulbIcon
-                className={`inline h-6 w-6 mr-5 mb-1 ${
-                  router.pathname ===
-                  Routes.ProfileHome({ accountAddress: account?.address as string }).pathname
-                    ? "fill-marble-white"
-                    : "fill-concrete group-hover:fill-light-concrete"
-                }`}
-              />
-              <p
-                className={`inline ${
-                  router.pathname ===
-                  Routes.ProfileHome({ accountAddress: account?.address as string }).pathname
-                    ? "text-marble-white font-bold"
-                    : "text-concrete group-hover:text-light-concrete font-normal"
-                }`}
-              >
-                <Link href={Routes.ProfileHome({ accountAddress: account?.address as string })}>
-                  Proposals
-                </Link>
-              </p>
-            </li>
-            <li className="group cursor-pointer font-bold">
-              <LibraryIcon
-                className={`inline h-6 w-6 mr-5 mb-1 ${
-                  router.pathname ===
-                  Routes.TerminalsOnProfile({ accountAddress: account?.address as string }).pathname
-                    ? "fill-marble-white"
-                    : "fill-concrete group-hover:fill-light-concrete"
-                }`}
-              />
-              <p
-                className={`inline ${
-                  router.pathname ===
-                  Routes.TerminalsOnProfile({ accountAddress: account?.address as string }).pathname
-                    ? "text-marble-white font-bold"
-                    : "text-concrete group-hover:text-light-concrete font-normal"
-                }`}
-              >
-                <Link
-                  href={Routes.TerminalsOnProfile({ accountAddress: account?.address as string })}
+          {router.pathname ===
+          Routes.DiscordProfileHome({ discordId: account?.discordId as string }).pathname ? (
+            <ul className="mt-6 ml-8 text-lg space-y-2">
+              <li className="group cursor-not-allowed font-bold">
+                <div className="inline mr-6 ml-1.5 h-6 w-6 align-middle ">
+                  <Image src={LockedIcon} alt="Locked icon" />
+                </div>
+                <p className="inline text-concrete font-normal">Proposals</p>
+              </li>
+              <li className="group cursor-pointer font-bold">
+                <LibraryIcon className="inline h-6 w-6 mr-5 mb-1 text-marble-white" />
+                <p className="text-marble-white inline">Stations</p>
+              </li>
+            </ul>
+          ) : (
+            <ul className="mt-6 ml-8 text-lg space-y-2">
+              <li className="group cursor-pointer font-bold">
+                <LightBulbIcon
+                  className={`inline h-6 w-6 mr-5 mb-1 ${
+                    router.pathname ===
+                    Routes.ProfileHome({ accountAddress: account?.address as string }).pathname
+                      ? "fill-marble-white"
+                      : "fill-concrete group-hover:fill-light-concrete"
+                  }`}
+                />
+                <p
+                  className={`inline ${
+                    router.pathname ===
+                    Routes.ProfileHome({ accountAddress: account?.address as string }).pathname
+                      ? "text-marble-white font-bold"
+                      : "text-concrete group-hover:text-light-concrete font-normal"
+                  }`}
                 >
-                  Stations
-                </Link>
-              </p>
-            </li>
-          </ul>
+                  <Link href={Routes.ProfileHome({ accountAddress: account?.address as string })}>
+                    Proposals
+                  </Link>
+                </p>
+              </li>
+              <li className="group cursor-pointer font-bold">
+                <LibraryIcon
+                  className={`inline h-6 w-6 mr-5 mb-1 ${
+                    router.pathname ===
+                    Routes.TerminalsOnProfile({ accountAddress: account?.address as string })
+                      .pathname
+                      ? "fill-marble-white"
+                      : "fill-concrete group-hover:fill-light-concrete"
+                  }`}
+                />
+                <p
+                  className={`inline ${
+                    router.pathname ===
+                    Routes.TerminalsOnProfile({ accountAddress: account?.address as string })
+                      .pathname
+                      ? "text-marble-white font-bold"
+                      : "text-concrete group-hover:text-light-concrete font-normal"
+                  }`}
+                >
+                  <Link
+                    href={Routes.TerminalsOnProfile({ accountAddress: account?.address as string })}
+                  >
+                    Stations
+                  </Link>
+                </p>
+              </li>
+            </ul>
+          )}
         </div>
       </div>
       <div className="h-screen md:col-span-4">{children}</div>
