@@ -1,7 +1,6 @@
 import { useCreateCheckbookOnChain } from "app/contracts/checkbook"
-import Checkbox from "app/core/components/form/Checkbox"
 import { Spinner } from "app/core/components/Spinner"
-import useAllowedNetwork from "app/core/hooks/useAllowedNetwork"
+import { useNetwork } from "wagmi"
 import useStore from "app/core/hooks/useStore"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
@@ -38,8 +37,8 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
     { suspense: false }
   )
 
-  const { chainId, error: invalidSelectedNetwork } = useAllowedNetwork()
-
+  const { activeChain } = useNetwork()
+  const chainId = activeChain?.id as number
   const { createCheckbook: createCheckbookOnChain } = useCreateCheckbookOnChain(chainId)
 
   const data = useWaitForTransaction({
@@ -137,8 +136,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
           !formState.values.name ||
           !formState.values.signers ||
           !formState.values.quorum ||
-          formState.hasValidationErrors ||
-          !!invalidSelectedNetwork
+          formState.hasValidationErrors
         return (
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col">
