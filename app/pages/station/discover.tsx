@@ -21,7 +21,7 @@ const DiscoverStations: BlitzPage = () => {
   return (
     <Layout title="Discover Stations">
       <div className="h-screen">
-        <div className="pt-8 pl-8 pb-12 flex flex-row justify-between">
+        <div className="pt-8 pl-8 pb-3 flex flex-row justify-between">
           <div>
             <h1 className="font-bold text-2xl">Discover</h1>
             <p>All stations, find your tribe</p>
@@ -30,24 +30,22 @@ const DiscoverStations: BlitzPage = () => {
             Open a station
           </button>
         </div>
-        <div className="border-t border-concrete">
-          <div className="flex flex-col sm:flex-row justify-end items-center">
-            <Pagination
-              results={terminals as any[]}
-              resultsCount={terminals?.length as number}
-              page={page}
-              setPage={setPage}
-              resultsLabel="stations"
-              className="pl-6 sm:pr-6 text-sm pt-5"
-            />
-          </div>
-          <div className="border-b border-concrete mt-5 text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
-            <span className="basis-96 ml-6 mb-2 tracking-wider">Station info</span>
-            <span className="basis-[42rem] ml-9 mb-2 tracking-wider">Station description</span>
-            <span className="basis-32 ml-6 mb-2 tracking-wider">Members</span>
-            <span className="basis-32 ml-2 mb-2 tracking-wider">Open RFPs</span>
-            <span className="basis-32 ml-2 mr-6 mb-2 tracking-wider">Proposals</span>
-          </div>
+        <div className="flex flex-col sm:flex-row justify-end items-center">
+          <Pagination
+            results={terminals as any[]}
+            resultsCount={terminals?.length as number}
+            page={page}
+            setPage={setPage}
+            resultsLabel="stations"
+            className="pl-6 sm:pr-6 text-sm pt-5"
+          />
+        </div>
+        <div className="border-y border-concrete mt-5 pt-2 text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
+          <span className="basis-96 ml-6 mb-2 tracking-wider">Station info</span>
+          <span className="basis-[42rem] ml-9 mb-2 tracking-wider">Station description</span>
+          <span className="basis-32 ml-6 mb-2 tracking-wider">Members</span>
+          <span className="basis-32 ml-2 mb-2 tracking-wider">Open RFPs</span>
+          <span className="basis-32 ml-2 mr-6 mb-2 tracking-wider">Proposals</span>
         </div>
         <div className="overflow-y-scroll h-[calc(100vh-141px)]">
           {terminals?.map((terminal) => {

@@ -137,7 +137,7 @@ const ProposalsTab: BlitzPage = ({
           </div>
 
           <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
-            <span className="basis-[38rem] ml-6 mb-2">Proposal</span>
+            <span className="basis-[38rem] ml-6 mb-2">Title</span>
             <span className="basis-32 ml-9 mb-2">Approval</span>
             <span className="basis-32 ml-6 mb-2">Amount</span>
             <span className="basis-32 ml-2 mb-2">Submission Date</span>
