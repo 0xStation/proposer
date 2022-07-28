@@ -303,6 +303,17 @@ const MemberDirectoryPage: BlitzPage = () => {
                       refetchCallback={filtersRefetchCallback}
                     />
                   )}
+                  {groupedTags && groupedTags[TagType.SEASON] && (
+                    <FilterPill
+                      label={TagType.SEASON}
+                      filterOptions={groupedTags[TagType.SEASON].map((tag) => {
+                        return { name: tag.value, value: tag?.id?.toString() }
+                      })}
+                      appliedFilters={tokenFilters}
+                      setAppliedFilters={setTokenFilters}
+                      refetchCallback={filtersRefetchCallback}
+                    />
+                  )}
                 </>
               ) : (
                 <p className="text-marble-white">View other members in the terminal.</p>
