@@ -33,7 +33,7 @@ import { DateTime } from "luxon"
 
 const RfpNotFound = () => (
   <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
-    <p className="font-bold text-lg">Bulletin is empty</p>
+    <p className="font-bold text-lg">Requests for proposals is empty</p>
     <p>No RFPs have been created yet.</p>
   </div>
 )
