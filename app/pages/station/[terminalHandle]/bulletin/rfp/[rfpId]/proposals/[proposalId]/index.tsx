@@ -156,7 +156,7 @@ const ProposalPage: BlitzPage = ({
             <div className="flex flex-row justify-between">
               <p className="self-center">
                 <span className="text-concrete hover:text-light-concrete">
-                  <Link href={Routes.BulletinPage({ terminalHandle })}>Requests for Proposals</Link>{" "}
+                  <Link href={Routes.BulletinPage({ terminalHandle })}>Requests for proposals</Link>{" "}
                   /&nbsp;
                 </span>
                 <span className="text-concrete hover:text-light-concrete">

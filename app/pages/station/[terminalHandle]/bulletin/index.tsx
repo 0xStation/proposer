@@ -138,7 +138,7 @@ const BulletinPage: BlitzPage = () => {
         {/* Filter View */}
         <div className="max-h-[250px] sm:h-[130px] border-b border-concrete">
           <div className="flex flex-row items-center ml-6 pt-7 justify-between mr-4">
-            <h1 className="text-2xl font-bold">Requests for Proposals</h1>
+            <h1 className="text-2xl font-bold">Requests for proposals</h1>
             {isLoggedInAndIsAdmin && (
               <button
                 className="h-[35px] bg-electric-violet px-9 rounded text-tunnel-black hover:bg-opacity-70"
@@ -176,7 +176,7 @@ const BulletinPage: BlitzPage = () => {
         </div>
         <div className="h-[calc(100vh-130px)] w-full">
           <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
-            <span className="basis-[42rem] ml-6 mb-2 tracking-wider">Request for proposals</span>
+            <span className="basis-[42rem] ml-6 mb-2 tracking-wider">Title</span>
             <span className="basis-32 ml-9 mb-2 tracking-wider">Submissions</span>
             <span className="basis-32 ml-6 mb-2 tracking-wider">Open Date</span>
             <span className="basis-32 ml-2 mb-2 tracking-wider">Close Date</span>
