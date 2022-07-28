@@ -9,7 +9,7 @@ import getTerminalMemberCount from "app/accountTerminal/queries/getTerminalMembe
 import getRfpCountByTerminalId from "app/rfp/queries/getRfpCountByTerminalId"
 import getProposalCountByTerminal from "app/proposal/queries/getProposalCountByTerminal"
 
-const DiscoverStations: BlitzPage = () => {
+const ExploreStations: BlitzPage = () => {
   const [page, setPage] = useState<number>(0)
 
   const [terminals] = useQuery(
@@ -19,11 +19,11 @@ const DiscoverStations: BlitzPage = () => {
   )
 
   return (
-    <Layout title="Discover Stations">
+    <Layout title="Explore stations">
       <div className="h-screen">
         <div className="pt-8 pl-8 pb-3 flex flex-row justify-between">
           <div>
-            <h1 className="font-bold text-2xl">Discover</h1>
+            <h1 className="font-bold text-2xl">Explore</h1>
             <p>All stations, find your tribe</p>
           </div>
           <button className="text-tunnel-black bg-electric-violet rounded hover:opacity-70 h-[35px] px-6 mr-8">
@@ -120,5 +120,5 @@ const TerminalComponent = ({ terminal }) => {
   )
 }
 
-DiscoverStations.suppressFirstRenderFlicker = true
-export default DiscoverStations
+ExploreStations.suppressFirstRenderFlicker = true
+export default ExploreStations

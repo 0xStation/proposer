@@ -262,14 +262,18 @@ const CreateProposalPage: BlitzPage = ({
                 </div>
                 <div className="mt-6 grid grid-cols-5 gap-4">
                   <div className="flex flex-row items-center">
-                    <img
-                      src={activeUser?.data.pfpURL}
-                      alt="PFP"
-                      className="w-[46px] h-[46px] rounded-full"
-                      onError={(e) => {
-                        e.currentTarget.src = DEFAULT_PFP_URLS.USER
-                      }}
-                    />
+                    {activeUser?.data.pfpURL ? (
+                      <img
+                        src={activeUser?.data.pfpURL}
+                        alt="PFP"
+                        className="w-[46px] h-[46px] rounded-full"
+                        onError={(e) => {
+                          e.currentTarget.src = DEFAULT_PFP_URLS.USER
+                        }}
+                      />
+                    ) : (
+                      <div className="h-[46px] min-w-[46px] max-w-[46px] place-self-center border border-wet-concrete bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
+                    )}
                     <div className="ml-2">
                       <span>{activeUser?.data.name}</span>
                       <span className="text-xs text-light-concrete flex">
@@ -324,14 +328,18 @@ const CreateProposalPage: BlitzPage = ({
                   <div>
                     <h4 className="text-xs font-bold text-concrete uppercase">Station</h4>
                     <div className="flex flex-row items-center mt-2">
-                      <img
-                        src={data.rfp.terminal.data.pfpURL}
-                        alt="PFP"
-                        className="w-[46px] h-[46px] rounded-lg"
-                        onError={(e) => {
-                          e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
-                        }}
-                      />
+                      {data.rfp.terminal.data.pfpURL ? (
+                        <img
+                          src={data.rfp.terminal.data.pfpURL}
+                          alt="PFP"
+                          className="w-[46px] h-[46px] rounded-lg"
+                          onError={(e) => {
+                            e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
+                          }}
+                        />
+                      ) : (
+                        <span className="w-[46px] h-[46px] bg-gradient-to-b  from-neon-blue to-torch-red block rounded-lg" />
+                      )}
                       <div className="ml-2">
                         <span>{data.rfp.terminal.data.name}</span>
                         <span className="text-xs text-light-concrete flex">
