@@ -161,9 +161,6 @@ const RfpMarkdownForm = ({
                 checkbookAddress: rfp?.fundingAddress,
               }
             : {
-                startDate: getFormattedDate({
-                  dateTime: DateTime.local().plus({ hour: 1 }),
-                }),
                 checkbookAddress: checkbooks?.[0]?.address,
               }
         }
