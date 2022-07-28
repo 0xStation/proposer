@@ -15,7 +15,10 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session = await getSession(req, res)
 
-  const user = await invoke(getAccountByAddress, { address: session?.siwe?.address })
+  const user = await invoke(getAccountByAddress, {
+    address: session?.siwe?.address,
+    includeEmail: true,
+  })
 
   if (!session?.siwe?.address) {
     return {
@@ -67,7 +70,7 @@ const EditProfile: BlitzPage = ({
 
 EditProfile.suppressFirstRenderFlicker = true
 EditProfile.getLayout = (page) => (
-  <LayoutWithoutNavigation title="Edit Profile">{page}</LayoutWithoutNavigation>
+  <LayoutWithoutNavigation title="Edit profile">{page}</LayoutWithoutNavigation>
 )
 
 export default EditProfile

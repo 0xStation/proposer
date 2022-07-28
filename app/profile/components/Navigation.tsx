@@ -1,9 +1,7 @@
 import { useState } from "react"
 import useStore from "app/core/hooks/useStore"
 import { getWalletString } from "app/utils/getWalletString"
-import { useRouter, Image } from "blitz"
-import TerminalIcon from "public/terminal-icon.svg"
-import LockedIcon from "public/locked-icon.svg"
+import { useRouter, Image, Link, Routes } from "blitz"
 import GithubIcon from "public/github-icon.svg"
 import TwitterIcon from "public/twitter-icon.svg"
 import PersonalSiteIcon from "public/personal-site-icon.svg"
@@ -12,11 +10,17 @@ import TikTokIcon from "public/tiktok-icon.svg"
 import { Terminal } from "app/terminal/types"
 import { Account } from "app/account/types"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
-import { ClipboardCheckIcon, ClipboardIcon, ExternalLinkIcon } from "@heroicons/react/outline"
+import LockedIcon from "public/locked-icon.svg"
+import {
+  ClipboardCheckIcon,
+  ClipboardIcon,
+  ExternalLinkIcon,
+  LightBulbIcon,
+  LibraryIcon,
+} from "@heroicons/react/solid"
 
 export const Navigation = ({
   account,
-  terminals,
   children,
   setIsConnectDiscordModalOpen,
 }: {
@@ -167,7 +171,7 @@ export const Navigation = ({
               onClick={() => router.push("/profile/edit")}
               className="mt-4 p-[0.20rem] border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer"
             >
-              Edit Profile
+              Edit profile
             </button>
           ) : !account?.address && !activeUser?.discordId && setIsConnectDiscordModalOpen ? (
             <button
@@ -179,39 +183,72 @@ export const Navigation = ({
           ) : null}
         </div>
         <div>
-          <ul className="mt-6 ml-8 text-lg space-y-2">
-            <li
-              className={`cursor-pointer group ${
-                terminals && terminals?.length
-                  ? "hover:text-marble-white font-bold"
-                  : "text-concrete"
-              }`}
-            >
-              <div className="inline mr-5 align-middle ">
-                {terminals && terminals?.length ? (
-                  <Image src={TerminalIcon} alt="Member directory icon" />
-                ) : (
+          {router.pathname ===
+          Routes.DiscordProfileHome({ discordId: account?.discordId as string }).pathname ? (
+            <ul className="mt-6 ml-8 text-lg space-y-2">
+              <li className="group cursor-not-allowed font-bold">
+                <div className="inline mr-6 ml-1.5 h-6 w-6 align-middle ">
                   <Image src={LockedIcon} alt="Locked icon" />
-                )}
-              </div>
-              <p className="inline">Terminals</p>
-              {!terminals ||
-                (!terminals.length && (
-                  <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0">
-                    Coming soon
-                  </span>
-                ))}
-            </li>
-            <li className="text-concrete cursor-pointer group">
-              <div className="inline mr-5 align-middle">
-                <Image src={LockedIcon} alt="Locked icon" />
-              </div>
-              <p className="inline">Proposals</p>
-              <span className="group-hover:scale-100 text-xs uppercase font-bold tracking-wider rounded-md p-2 ml-3 absolute text-marble-white bg-wet-concrete sidebar-tooltip transition-all duration-100 scale-0">
-                Coming soon
-              </span>
-            </li>
-          </ul>
+                </div>
+                <p className="inline text-concrete font-normal">Proposals</p>
+              </li>
+              <li className="group cursor-pointer font-bold">
+                <LibraryIcon className="inline h-6 w-6 mr-5 mb-1 text-marble-white" />
+                <p className="text-marble-white inline">Stations</p>
+              </li>
+            </ul>
+          ) : (
+            <ul className="mt-6 ml-8 text-lg space-y-2">
+              <li className="group cursor-pointer font-bold">
+                <LightBulbIcon
+                  className={`inline h-6 w-6 mr-5 mb-1 ${
+                    router.pathname ===
+                    Routes.ProfileHome({ accountAddress: account?.address as string }).pathname
+                      ? "fill-marble-white"
+                      : "fill-concrete group-hover:fill-light-concrete"
+                  }`}
+                />
+                <p
+                  className={`inline ${
+                    router.pathname ===
+                    Routes.ProfileHome({ accountAddress: account?.address as string }).pathname
+                      ? "text-marble-white font-bold"
+                      : "text-concrete group-hover:text-light-concrete font-normal"
+                  }`}
+                >
+                  <Link href={Routes.ProfileHome({ accountAddress: account?.address as string })}>
+                    Proposals
+                  </Link>
+                </p>
+              </li>
+              <li className="group cursor-pointer font-bold">
+                <LibraryIcon
+                  className={`inline h-6 w-6 mr-5 mb-1 ${
+                    router.pathname ===
+                    Routes.TerminalsOnProfile({ accountAddress: account?.address as string })
+                      .pathname
+                      ? "fill-marble-white"
+                      : "fill-concrete group-hover:fill-light-concrete"
+                  }`}
+                />
+                <p
+                  className={`inline ${
+                    router.pathname ===
+                    Routes.TerminalsOnProfile({ accountAddress: account?.address as string })
+                      .pathname
+                      ? "text-marble-white font-bold"
+                      : "text-concrete group-hover:text-light-concrete font-normal"
+                  }`}
+                >
+                  <Link
+                    href={Routes.TerminalsOnProfile({ accountAddress: account?.address as string })}
+                  >
+                    Stations
+                  </Link>
+                </p>
+              </li>
+            </ul>
+          )}
         </div>
       </div>
       <div className="h-screen md:col-span-4">{children}</div>

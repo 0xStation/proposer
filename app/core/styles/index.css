@@ -10,6 +10,13 @@
 }
 
 @font-face {
+  font-family: "Tobias-Italic";
+  src: url("../../../public/fonts/Tobias-RegularItalic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
   font-family: "Favorit Pro";
   src: url("../../../public/fonts/favoritpro-regular-webfont.woff2") format("woff2");
   font-weight: 400;
@@ -43,6 +50,10 @@ body {
   font-family: "Favorit Pro";
 }
 
+.tobias-italic {
+  font-family: "Tobias-Italic";
+}
+
 ::-webkit-scrollbar {
   display: none;
 }
@@ -65,9 +76,61 @@ body {
 }
 
 .custom-select-wrapper::after {
-  content: "▼";
-  font-size: 0.75rem;
-  top: 12px;
+  content: "▾";
+  font-size: 1rem;
+  top: calc(50% - 0.5rem);
   right: 10px;
   position: absolute;
+}
+
+.markdown-prose > h1 {
+  @apply text-xl font-bold;
+}
+
+.markdown-prose > h2 {
+  @apply text-lg font-bold;
+}
+
+.markdown-prose > h3 {
+  @apply text-base font-bold;
+}
+
+.markdown-prose > ul {
+  @apply list-disc pl-6;
+}
+
+.markdown-prose > blockquote {
+  @apply pl-2  border-l-2 border-light-concrete;
+  font-family: "Tobias-Italic";
+}
+
+.markdown-prose > p > code {
+  @apply p-2 bg-wet-concrete rounded;
+}
+
+.markdown-prose > p > a {
+  @apply text-electric-violet;
+}
+
+.markdown-prose > p > a:hover {
+  @apply underline;
+}
+
+.markdown-prose > p,
+.markdown-prose > ul,
+.markdown-prose > h1,
+.markdown-prose > h2,
+.markdown-prose > h3,
+.markdown-prose > blockquote,
+.markdown-prose > hr {
+  @apply mb-3;
+}
+
+.markdown-prose h1:not(:first-child),
+.markdown-prose h2:not(:first-child) {
+  @apply mt-6;
+}
+
+::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 }

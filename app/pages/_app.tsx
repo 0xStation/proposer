@@ -9,10 +9,9 @@ import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet"
 // Chains for connectors to support
 const chains = defaultChains
 
-const provider = ({ chainId }) => new providers.AlchemyProvider(4, process.env.RINKEBY_API_KEY)
-
+const provider = () => new providers.AlchemyProvider(4, process.env.RINKEBY_API_KEY)
 // Set up connectors
-const connectors = ({ chainId }) => {
+const connectors = () => {
   return [
     // MetaMask
     new MetaMaskConnector({ chains }),
@@ -33,7 +32,7 @@ const connectors = ({ chainId }) => {
 
 // Manages wallet connection and state for the wagmi provider
 const client = createClient({
-  autoConnect: false,
+  autoConnect: true,
   connectors,
   provider,
 })

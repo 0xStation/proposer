@@ -18,7 +18,7 @@ const Navigation = ({ children }) => {
   const navigationContent = (
     <>
       <div className="fixed mt-5 sm:mt-0">
-        <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>
+        <Link href={Routes.BulletinPage({ terminalHandle })}>
           <label className="font-bold text-sm text-marble-white uppercase tracking-wider cursor-pointer">
             {terminal?.data.name || terminalHandle}
           </label>
@@ -33,6 +33,16 @@ const Navigation = ({ children }) => {
             } cursor-pointer hover:text-marble-white`}
           >
             <Link href={Routes.TerminalSettingsPage({ terminalHandle })}>Overview</Link>
+          </li>
+          <li
+            className={`${
+              router.pathname === Routes.CheckbookSettingsPage({ terminalHandle }).pathname ||
+              router.pathname === Routes.NewCheckbookSettingsPage({ terminalHandle }).pathname
+                ? "text-marble-white font-bold"
+                : "text-concrete"
+            } cursor-pointer hover:text-marble-white mt-4`}
+          >
+            <Link href={Routes.CheckbookSettingsPage({ terminalHandle })}>Checkbook</Link>
           </li>
           <li
             className={`${
@@ -60,6 +70,27 @@ const Navigation = ({ children }) => {
             <Link href={Routes.DiscordSettingsPage({ terminalHandle })}>Discord</Link>
           </li>
         </ul>
+        {
+          // show dev tools if on localhost
+          typeof window !== "undefined" && window.location.hostname === "localhost" && (
+            <>
+              <label className="font-bold text-sm text-marble-white uppercase tracking-wider mt-8 block">
+                Dev Tools
+              </label>
+              <ul className="mt-6">
+                <li
+                  className={`${
+                    router.pathname === Routes.PlaygroundPage({ terminalHandle }).pathname
+                      ? "text-marble-white font-bold"
+                      : "text-concrete"
+                  } cursor-pointer hover:text-marble-white mt-4`}
+                >
+                  <Link href={Routes.PlaygroundPage({ terminalHandle })}>Playground</Link>
+                </li>
+              </ul>
+            </>
+          )
+        }
       </div>
     </>
   )
@@ -104,8 +135,8 @@ const Navigation = ({ children }) => {
                   </button>
                   {navigationContent}
                   <div className="fixed bottom-6 left-6">
-                    <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>
-                      Back to Members
+                    <Link href={Routes.BulletinPage({ terminalHandle })}>
+                      Back to Requests for proposals
                     </Link>
                   </div>
                 </div>
@@ -125,8 +156,8 @@ const Navigation = ({ children }) => {
       >
         <SettingsIcon width={25} height={25} />
       </div>
-      <div className="absolute top-4 left-4 cursor-pointer hidden sm:block">
-        <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>
+      <div className="fixed top-4 left-4 cursor-pointer hidden sm:block">
+        <Link href={Routes.BulletinPage({ terminalHandle })}>
           <Image src={Exit} alt="Close button" width={12} height={12} />
         </Link>
       </div>

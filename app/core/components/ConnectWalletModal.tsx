@@ -143,7 +143,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           ) : null}
           <div className="m-6 text-center">
             <button
-              className="border border-tunnel-black bg-magic-mint text-tunnel-black rounded-md content-center hover:opacity-70 cursor:pointer w-36 h-[35px]"
+              className="border border-tunnel-black bg-electric-violet text-tunnel-black rounded-md content-center hover:opacity-70 cursor:pointer w-36 h-[35px]"
               onClick={handleSignInWithEthereum}
               disabled={connectState.loading}
             >
@@ -165,7 +165,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           <p className="text-lg text-center mt-4">Connect your wallet to enter Station.</p>
           <p className="text-lg text-center">
             New to web3? Learn how to create a wallet{" "}
-            <a className="text-magic-mint" href="https://www.youtube.com/watch?v=OsRIHlr0_Iw">
+            <a className="text-electric-violet" href="https://www.youtube.com/watch?v=OsRIHlr0_Iw">
               here
             </a>
             .

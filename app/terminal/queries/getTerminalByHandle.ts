@@ -4,21 +4,24 @@ import { Terminal } from "app/terminal/types"
 
 const GetTerminalByHandle = z.object({
   handle: z.string(),
+  include: z.string().array().optional(),
 })
 
 export default async function getTerminalByHandle(input: z.infer<typeof GetTerminalByHandle>) {
-  const data = GetTerminalByHandle.parse(input)
+  const include = {
+    tags: true,
+  }
+  input.include?.forEach((key) => {
+    include[key] = true
+  })
   const terminal = await db.terminal.findFirst({
     where: {
       handle: {
-        equals: data.handle,
+        equals: input.handle,
         mode: "insensitive",
       },
     },
-    include: {
-      roles: true,
-      tags: true,
-    },
+    include,
   })
 
   if (!terminal) {

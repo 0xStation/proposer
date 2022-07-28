@@ -1,6 +1,7 @@
 import { Initiative } from "app/deprecated/v1/initiative/types"
 import { Role } from "app/role/types"
 import { Tag } from "app/tag/types"
+import { Checkbook } from "app/checkbook/types"
 
 export enum MethodToVisualizeContributorsNft {
   ROLE = "ROLE", // images are created per role, e.g. CCS NFT
@@ -9,14 +10,25 @@ export enum MethodToVisualizeContributorsNft {
 
 export type TerminalMetadata = {
   name: string
-  description: string
-  pfpURL: string
-  coverURL?: string
+  description?: string
+  pfpURL?: string
+  contactUrl?: string
+  twitterUrl?: string
+  githubUrl?: string
+  tiktokUrl?: string
+  instagramUrl?: string
+  guildId?: string
   permissions: {
+    accountWhitelist?: string[] // provides `isAdmin` access based on specific addresses
+    adminTagIdWhitelist?: number[] // `isAdmin` provides access to all subpages within Station settings
+
+    // v1
     invite: Record<string, number[]>
     edit: Record<string, number[]>
-    accountWhitelist?: string[]
   }
+
+  // v1
+  coverURL?: string
   contracts: {
     addresses: {
       endorsements: string
@@ -32,15 +44,17 @@ export type TerminalMetadata = {
   hide?: boolean
   discordWebhookUrl?: string
   visualizeNftMethod?: string
-  guildId?: string
 }
 
 export type Terminal = {
   id: number
-  ticketAddress: string
   handle: string
   data: TerminalMetadata
-  roles: Role[]
   tags: Tag[]
+  checkbooks?: Checkbook[]
+
+  // v1
+  ticketAddress: string
+  roles: Role[]
   initiatives?: Initiative[]
 }

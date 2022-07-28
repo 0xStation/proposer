@@ -99,13 +99,12 @@ const DiscordProfileHome: BlitzPage = () => {
       />
       <ProfileNavigation
         account={account as Account}
-        terminals={terminals}
         setIsConnectDiscordModalOpen={setIsConnectDiscordModalOpen}
       >
         {terminals && terminals.length ? (
           <>
             <div className="h-[108px] border-b border-concrete">
-              <h1 className="text-2xl font-bold ml-6 pt-6">Terminals</h1>
+              <h1 className="text-2xl font-bold ml-6 pt-6">Stations</h1>
               <p className="flex ml-6 pt-2">{`${account?.data?.name}'s communities`} </p>
             </div>
             <div className="grid grid-cols-7 h-[calc(100vh-108px)] w-full">

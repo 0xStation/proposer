@@ -129,7 +129,7 @@ export const ConnectWalletComponent = () => {
             ) : null}
             <div className="m-6 text-center">
               <button
-                className={`bg-magic-mint text-tunnel-black rounded-md content-center hover:opacity-70 cursor:pointer w-36 h-[35px] ${
+                className={`bg-electric-violet text-tunnel-black rounded-md content-center hover:opacity-70 cursor:pointer w-36 h-[35px] ${
                   connectState.loading && "cursor-not-allowed"
                 }`}
                 onClick={handleSignInWithEthereum}
@@ -155,7 +155,10 @@ export const ConnectWalletComponent = () => {
             </p>
             <p className="text-lg text-center px-4 sm:px-0">
               New to web3? Learn how to create a wallet{" "}
-              <a className="text-magic-mint" href="https://www.youtube.com/watch?v=OsRIHlr0_Iw">
+              <a
+                className="text-electric-violet"
+                href="https://www.youtube.com/watch?v=OsRIHlr0_Iw"
+              >
                 here
               </a>
               .

@@ -1,4 +1,4 @@
-import { Skill } from "app/skills/types"
+import { AccountProposal } from "@prisma/client"
 
 export type AccountMetadata = {
   name: string
@@ -18,7 +18,8 @@ export type AccountMetadata = {
   timezone?: string
   verified?: boolean
   bio?: string
-  initiatives?: number[]
+  hasSavedEmail?: boolean
+  hasVerifiedEmail?: boolean
 }
 
 export type Account = {
@@ -32,4 +33,5 @@ export type Account = {
   skills?: any[]
   tickets?: any[]
   initiatives?: any[]
+  proposals?: AccountProposal[]
 }

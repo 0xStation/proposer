@@ -7,6 +7,8 @@ import { useDisconnect } from "wagmi"
 import useStore from "../hooks/useStore"
 import logout from "app/session/mutations/logout"
 import { DEFAULT_PFP_URLS } from "../utils/constants"
+import LinkArrow from "app/core/icons/LinkArrow"
+import { canCreateStation } from "app/core/utils/permissions"
 
 export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
   const router = useRouter()
@@ -31,28 +33,20 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
           router.push(`/profile/${activeUser?.address}`)
         }}
       >
-        View Profile
+        Profile
       </button>
     ) : session?.siwe?.address ? (
       <button className="block hover:opacity-70" onClick={() => router.push(`/profile/complete`)}>
-        Create Profile
+        Create profile
       </button>
     ) : null
 
-  const openATerminalLink =
-    session?.siwe?.address && activeUser ? (
+  const openATerminalLink = session?.siwe?.address &&
+    activeUser &&
+    canCreateStation(activeUser?.address) && (
       <Link href={Routes.CreateTerminalDetailsPage()}>
-        <span className="block hover:opacity-70 cursor-pointer">Open a Terminal</span>
+        <span className="block hover:opacity-70 cursor-pointer">New station</span>
       </Link>
-    ) : (
-      <a
-        href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block"
-      >
-        <span className="block hover:opacity-70 cursor-pointer">Open a Terminal</span>
-      </a>
     )
 
   const profilePfp =
@@ -121,6 +115,33 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                     <div className="space-y-2 mt-4">
                       {profileLinkOption}
                       {openATerminalLink}
+                      <a
+                        href="https://station-labs.gitbook.io/station-product-manual/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-2 hover:opacity-70 cursor-pointer"
+                      >
+                        <span className="block">Product manual</span>
+                        <LinkArrow className="fill-marble-white" />
+                      </a>
+                      <a
+                        href="https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-2 hover:opacity-70 cursor-pointer"
+                      >
+                        <span className="block">Legal and privacy</span>
+                        <LinkArrow className="fill-marble-white" />
+                      </a>
+                      <a
+                        href="https://6vdcjqzyfj3.typeform.com/to/F0QFs9aC"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-2 hover:opacity-70 cursor-pointer"
+                      >
+                        <span className="block">Help desk</span>
+                        <LinkArrow className="fill-marble-white" />
+                      </a>
                       <button className="block hover:opacity-70" onClick={handleDisconnect}>
                         Disconnect
                       </button>

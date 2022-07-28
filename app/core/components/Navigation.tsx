@@ -11,6 +11,7 @@ import { TerminalMetadata } from "app/terminal/types"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import createAccount from "app/account/mutations/createAccount"
 import { DEFAULT_PFP_URLS } from "../utils/constants"
+import ExploreImageIcon from "public/explore.svg"
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -31,7 +32,10 @@ const Navigation = ({ children }: { children?: any }) => {
       const setActiveAccount = async () => {
         const account = await invoke(getAccountByAddress, { address: session?.siwe?.address })
         if (!account) {
-          const newUser = await invoke(createAccount, { address: session?.siwe?.address })
+          const newUser = await invoke(createAccount, {
+            address: session?.siwe?.address,
+            createSession: true,
+          })
           setActiveUser(newUser)
           router.push(`/profile/complete`)
         } else {
@@ -103,7 +107,7 @@ const Navigation = ({ children }: { children?: any }) => {
       />
       {/* Need a parent element around the banner or else there's a chance for a hydration issue and the dom rearranges */}
       <div>
-        {!session?.siwe?.address && (
+        {!session.isLoading && !session?.siwe?.address && (
           <div className="w-full h-36 lg:h-[70px] fixed z-40 bg-wet-concrete bottom-0">
             <div className="fixed mt-2 left-1/3 ml-[-6.65rem]">
               <h2 className="inline-block mr-5 text-xl font-bold justify-center">
@@ -119,8 +123,8 @@ const Navigation = ({ children }: { children?: any }) => {
               onClick={() => toggleWalletModal(true)}
               className={`h-[35px] ${
                 !address
-                  ? "bg-magic-mint text-tunnel-black hover:opacity-70"
-                  : "border border-magic-mint text-magic-mint hover:bg-concrete"
+                  ? "bg-electric-violet text-tunnel-black hover:opacity-70"
+                  : "border border-electric-violet text-electric-violet hover:bg-concrete"
               }  w-48 rounded align-middle p-1 ml-28 mt-4 mr-[-2rem] mb-3 lg:mb-0 md:mr-[-6.65rem] right-1/3 fixed bottom-0 lg:bottom-auto`}
               disabled={walletModalOpen}
             >
@@ -130,12 +134,11 @@ const Navigation = ({ children }: { children?: any }) => {
         )}
       </div>
       <div className="h-screen w-[70px] bg-tunnel-black border-r border-concrete fixed top-0 left-0 text-center flex flex-col">
-        {/* hardcoding the link for now - we don't have access to the window object unless we pass it via
-        serverside props through the `Layout` component on every page */}
-        <a className="mt-1 inline-block" href="https://app.station.express">
+        <a className="mt-1 inline-block" href="https://station.express">
           <Image src={StationLogo} alt="Station logo" height={20} width={54} />
         </a>
         <div className="h-full mt-4">
+          <ExploreIcon />
           {terminalsView}
           {profilePfp && (
             <div className="fixed bottom-[10px] left-[12px]" onClick={() => handlePfpClick()}>
@@ -166,7 +169,7 @@ const TerminalIcon = ({ terminal }) => {
         className={`${
           isTerminalSelected ? "border-marble-white" : "border-wet-concrete"
         } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg mb-4`}
-        onClick={() => router.push(Routes.MemberDirectoryPage({ terminalHandle: terminal.handle }))}
+        onClick={() => router.push(Routes.BulletinPage({ terminalHandle: terminal.handle }))}
       >
         {(terminal?.data as TerminalMetadata)?.pfpURL ? (
           <img
@@ -177,8 +180,34 @@ const TerminalIcon = ({ terminal }) => {
             }}
           />
         ) : (
-          <span className="w-[46px] h-[46px] bg-gradient-to-b  from-neon-blue to-torch-red block" />
+          <span className="w-[46px] h-[46px] bg-gradient-to-b  from-neon-blue to-torch-red block rounded-lg" />
         )}
+      </button>
+    </div>
+  )
+}
+
+const ExploreIcon = () => {
+  const exploreSelected =
+    typeof window !== "undefined" &&
+    window?.location?.pathname === Routes.ExploreStations().pathname
+  const router = useRouter()
+  return (
+    <div className="relative flex items-center justify-center group">
+      <span
+        className={`${
+          exploreSelected ? "scale-100" : "scale-0 group-hover:scale-75"
+        }  absolute w-[3px] h-[46px] min-w-max left-0 rounded-r-lg inline-block mr-2 mb-4
+bg-marble-white
+transition-all duration-200 origin-left`}
+      />
+      <button
+        className={`${
+          exploreSelected ? "border-marble-white" : "border-wet-concrete"
+        } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg h-[47px] mb-4`}
+        onClick={() => router.push(Routes.ExploreStations())}
+      >
+        <Image src={ExploreImageIcon} alt="Explore icon" height={46} width={46} />
       </button>
     </div>
   )
