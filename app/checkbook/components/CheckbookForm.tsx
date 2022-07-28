@@ -140,7 +140,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
           formState.hasValidationErrors ||
           !!invalidSelectedNetwork
         return (
-          <form onSubmit={handleSubmit} className="mt-12">
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col">
               <h3 className="font-bold">Checkbook name*</h3>
               <Field
