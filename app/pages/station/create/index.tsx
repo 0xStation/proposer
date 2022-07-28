@@ -381,7 +381,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                             )}
                           </Field>
                         </div>
-                        <div className="mt-14 mb-8">
+                        <div className="mt-14 mb-12">
                           <button
                             className="rounded text-tunnel-black px-8 h-[35px] bg-electric-violet hover:opacity-70"
                             type="submit"

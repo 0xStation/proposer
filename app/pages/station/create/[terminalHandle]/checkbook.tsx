@@ -88,9 +88,6 @@ const NewCheckbookTerminalCreationPage: BlitzPage = () => {
               Learn more
             </a>
           </p>
-          <div className="mt-9 bg-wet-concrete text-torch-red h-[219px] w-[479px] pt-[90px] pl-[175px]">
-            TO BE REPLACED
-          </div>
           <CheckbookForm
             isEdit={false}
             callback={(checkbookAddress?: string) => {
