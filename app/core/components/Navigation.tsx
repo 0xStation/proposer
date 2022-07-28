@@ -180,7 +180,7 @@ const TerminalIcon = ({ terminal }) => {
             }}
           />
         ) : (
-          <span className="w-[46px] h-[46px] bg-gradient-to-b  from-neon-blue to-torch-red block" />
+          <span className="w-[46px] h-[46px] bg-gradient-to-b  from-neon-blue to-torch-red block rounded-lg" />
         )}
       </button>
     </div>
