@@ -303,6 +303,17 @@ const MemberDirectoryPage: BlitzPage = () => {
                       refetchCallback={filtersRefetchCallback}
                     />
                   )}
+                  {groupedTags && groupedTags[TagType.SEASON] && (
+                    <FilterPill
+                      label={TagType.TOKEN}
+                      filterOptions={groupedTags[TagType.SEASON].map((tag) => {
+                        return { name: tag.value, value: tag?.id?.toString() }
+                      })}
+                      appliedFilters={tokenFilters}
+                      setAppliedFilters={setTokenFilters}
+                      refetchCallback={filtersRefetchCallback}
+                    />
+                  )}
                 </>
               ) : (
                 <p className="text-marble-white">View other members in the terminal.</p>
@@ -415,6 +426,9 @@ const SelectedContributorCard = ({
 
   const statusTags = member.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === TagType.STATUS
+  )
+  const seasonTags = member.tags?.filter(
+    (accountTerminalTag) => accountTerminalTag.tag.type === TagType.SEASON
   )
   const roleTags = member.tags?.filter(
     (accountTerminalTag) => accountTerminalTag.tag.type === TagType.ROLE
@@ -567,6 +581,7 @@ const SelectedContributorCard = ({
             <p className="text-base">{formatDate(member.joinedAt)}</p>
           </div>
         )}
+        <TagDetails tagType="seasons" tags={seasonTags} />
         <TagDetails tagType="roles" tags={roleTags} />
         <TagDetails tagType="projects" tags={projectTags} />
         <TagDetails tagType="guilds" tags={guildTags} />
