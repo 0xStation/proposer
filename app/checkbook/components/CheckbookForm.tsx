@@ -42,6 +42,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
   const { createCheckbook: createCheckbookOnChain } = useCreateCheckbookOnChain(chainId)
 
   const data = useWaitForTransaction({
+    chainId,
     confirmations: 1,
     hash: txnHash,
     onSuccess: async (data) => {
