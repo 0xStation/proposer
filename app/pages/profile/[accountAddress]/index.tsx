@@ -142,7 +142,7 @@ const ProfileHome: BlitzPage = () => {
                         Find a station to start creating proposals.
                       </p>
                       <button
-                        onClick={() => router.push(Routes.DiscoverStations())}
+                        onClick={() => router.push(Routes.ExploreStations())}
                         className="bg-electric-violet text-tunnel-black h-[35px] px-5 rounded hover:opacity-70 mt-5"
                       >
                         Explore stations

@@ -192,7 +192,7 @@ const BulletinPage: BlitzPage = () => {
             ) : rfps && isLoggedInAndIsAdmin ? (
               <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
                 <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
-                  Create a request for proposals (RFP)
+                  Create a requests for proposals (RFP)
                 </h1>
                 <p className="mt-2 w-[340px] text-center">
                   Define your DAO&apos;s needs to begin soliciting proposals from contributors. Need
