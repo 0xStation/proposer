@@ -310,10 +310,6 @@ const RfpMarkdownForm = ({
                 <div className="h-full border-l border-concrete col-span-1 flex flex-col">
                   <div className="border-b border-concrete p-4 flex flex-row space-x-8">
                     <span className="font-bold cursor-pointer">General</span>
-                    <div className="flex flex-row space-x-1 items-center cursor-not-allowed">
-                      <LockClosedIcon className="h-4 w-4 hover:stroke-light-concrete text-concrete" />
-                      <span className="text-concrete">Custom questions</span>
-                    </div>
                   </div>
                   <form className="p-4 grow flex flex-col justify-between">
                     <div>
@@ -400,7 +396,7 @@ const RfpMarkdownForm = ({
                             )
                           }}
                         </Field>
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between mt-1">
                           <Link
                             href={Routes.NewCheckbookSettingsPage({
                               terminalHandle: terminal?.handle,
@@ -408,7 +404,7 @@ const RfpMarkdownForm = ({
                             passHref
                           >
                             <a target="_blank" rel="noopener noreferrer">
-                              <span className="text-electric-violet cursor-pointer mt-1 block">
+                              <span className="text-electric-violet cursor-pointer block">
                                 + Create new
                               </span>
                             </a>
