@@ -72,7 +72,7 @@ const NewCheckbookTerminalCreationPage: BlitzPage = () => {
           <div className="flex flex-row pt-16">
             <div className="mr-1">
               <div className="w-60 h-1 bg-concrete" />
-              <p className="text-concrete mt-2.5">Open a Station</p>
+              <p className="text-concrete mt-2.5">Open a station</p>
             </div>
             <div className="">
               <div className="w-60 h-1 bg-electric-violet" />
@@ -90,8 +90,7 @@ const NewCheckbookTerminalCreationPage: BlitzPage = () => {
               Learn more
             </a>
           </p>
-          <Image src={CheckAnimation} alt="TikTok Icon." width={496} height={240} />
-
+          <Image src={CheckAnimation} alt="Checkbook animation." width={496} height={240} />
           <CheckbookForm
             isEdit={false}
             callback={(checkbookAddress?: string) => {

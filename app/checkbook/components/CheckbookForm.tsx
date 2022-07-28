@@ -223,7 +223,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
                   </div>
                 )}
               </Field>
-              <div className="mt-12">
+              <div className="mt-12 mb-12">
                 {waitingCreation ? (
                   isDeployingCheckbook ? (
                     <p className="text-marble-white mb-2">

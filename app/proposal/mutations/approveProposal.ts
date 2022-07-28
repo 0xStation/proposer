@@ -6,6 +6,7 @@ const ApproveProposal = z.object({
   proposalId: z.string(),
   signerAddress: z.string(),
   signature: z.string(),
+  signatureMessage: z.any(),
 })
 
 export default async function approveProposal(input: z.infer<typeof ApproveProposal>) {
@@ -16,6 +17,7 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
         signerAddress: input.signerAddress,
         data: {
           signature: input.signature,
+          signatureMessage: input.signatureMessage,
         },
       },
     }),
@@ -25,6 +27,7 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
         signerAddress: input.signerAddress,
         data: {
           signature: input.signature,
+          signatureMessage: input.signatureMessage,
         },
       },
     }),

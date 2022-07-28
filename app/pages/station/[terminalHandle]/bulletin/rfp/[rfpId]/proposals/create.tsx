@@ -10,10 +10,10 @@ import {
   useParam,
   useMutation,
 } from "blitz"
-import { useSignTypedData } from "wagmi"
 import { Field, Form } from "react-final-form"
 import { LightBulbIcon, XIcon } from "@heroicons/react/solid"
 import { utils } from "ethers"
+import { useBalance } from "wagmi"
 // components
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
@@ -24,6 +24,7 @@ import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
 import useStore from "app/core/hooks/useStore"
 import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
 import useCheckbookAvailability from "app/core/hooks/useCheckbookAvailability"
+import useSignature from "app/core/hooks/useSignature"
 // queries + mutations
 import getRfpById from "app/rfp/queries/getRfpById"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
@@ -54,7 +55,12 @@ const CreateProposalPage: BlitzPage = ({
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(true)
+  const [token, setToken] = useState<string>(ZERO_ADDRESS)
   const router = useRouter()
+  const { data: balanceData } = useBalance({
+    addressOrName: token,
+    chainId: data.rfp.checkbook.chainId,
+  })
 
   useWarnIfUnsavedChanges(unsavedChanges, () => {
     return confirm("Warning! You have unsaved changes.")
@@ -113,33 +119,7 @@ const CreateProposalPage: BlitzPage = ({
     },
   })
 
-  let { signTypedDataAsync: signApproval } = useSignTypedData()
-  const createProposalSignature = async (rfp: Rfp, formValues, author) => {
-    const tokenDecimals =
-      formValues.token === ZERO_ADDRESS
-        ? 18 // ETH decimals
-        : await fetchTokenDecimals(rfp.checkbook.chainId, formValues.token) // fetch from ERC20 contract
-    const parsedTokenAmount = utils.parseUnits(formValues.amount, tokenDecimals)
-
-    try {
-      const signature = await signApproval(
-        genProposalSignatureMessage(
-          rfp.checkbook.address,
-          author,
-          rfp.id,
-          parsedTokenAmount,
-          formValues
-        )
-      )
-      return signature
-    } catch (e) {
-      setToastState({
-        isToastShowing: true,
-        type: "error",
-        message: "Signature denied",
-      })
-    }
-  }
+  let { signMessage } = useSignature()
 
   return (
     <Layout title={`New Proposal`}>
@@ -201,6 +181,7 @@ const CreateProposalPage: BlitzPage = ({
           markdown: string
           title: string
         }) => {
+          setToken(values.token)
           if (!activeUser?.address) {
             setToastState({
               isToastShowing: true,
@@ -208,7 +189,19 @@ const CreateProposalPage: BlitzPage = ({
               message: "You must connect your wallet in order to create a proposal",
             })
           } else {
-            const signature = await createProposalSignature(data.rfp, values, activeUser?.address)
+            const decimals = token === ZERO_ADDRESS ? 18 : balanceData?.decimals
+            // 18 is ETH decimals
+            const parsedTokenAmount = utils.parseUnits(values.amount.toString(), decimals)
+
+            const message = genProposalSignatureMessage(
+              data.rfp.checkbook.address,
+              activeUser?.address,
+              data.rfp.id,
+              parsedTokenAmount,
+              values
+            )
+
+            const signature = await signMessage(message)
 
             // user must have denied signature
             if (!signature) {
@@ -228,6 +221,7 @@ const CreateProposalPage: BlitzPage = ({
                 contentTitle: values.title,
                 collaborators: [activeUser.address],
                 signature,
+                signatureMessage: message,
               })
             } catch (e) {
               console.error(e)
@@ -268,14 +262,18 @@ const CreateProposalPage: BlitzPage = ({
                 </div>
                 <div className="mt-6 grid grid-cols-5 gap-4">
                   <div className="flex flex-row items-center">
-                    <img
-                      src={activeUser?.data.pfpURL}
-                      alt="PFP"
-                      className="w-[46px] h-[46px] rounded-full"
-                      onError={(e) => {
-                        e.currentTarget.src = DEFAULT_PFP_URLS.USER
-                      }}
-                    />
+                    {activeUser?.data.pfpURL ? (
+                      <img
+                        src={activeUser?.data.pfpURL}
+                        alt="PFP"
+                        className="w-[46px] h-[46px] rounded-full"
+                        onError={(e) => {
+                          e.currentTarget.src = DEFAULT_PFP_URLS.USER
+                        }}
+                      />
+                    ) : (
+                      <div className="h-[46px] min-w-[46px] max-w-[46px] place-self-center border border-wet-concrete bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
+                    )}
                     <div className="ml-2">
                       <span>{activeUser?.data.name}</span>
                       <span className="text-xs text-light-concrete flex">
@@ -330,14 +328,18 @@ const CreateProposalPage: BlitzPage = ({
                   <div>
                     <h4 className="text-xs font-bold text-concrete uppercase">Station</h4>
                     <div className="flex flex-row items-center mt-2">
-                      <img
-                        src={data.rfp.terminal.data.pfpURL}
-                        alt="PFP"
-                        className="w-[46px] h-[46px] rounded-lg"
-                        onError={(e) => {
-                          e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
-                        }}
-                      />
+                      {data.rfp.terminal.data.pfpURL ? (
+                        <img
+                          src={data.rfp.terminal.data.pfpURL}
+                          alt="PFP"
+                          className="w-[46px] h-[46px] rounded-lg"
+                          onError={(e) => {
+                            e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
+                          }}
+                        />
+                      ) : (
+                        <span className="w-[46px] h-[46px] bg-gradient-to-b  from-neon-blue to-torch-red block rounded-lg" />
+                      )}
                       <div className="ml-2">
                         <span>{data.rfp.terminal.data.name}</span>
                         <span className="text-xs text-light-concrete flex">

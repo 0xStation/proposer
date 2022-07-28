@@ -11,12 +11,19 @@ const CreateRfp = z.object({
   startDate: z.date(),
   endDate: z.date().optional(),
   signature: z.string(),
+  signatureMessage: z.any(),
 })
 
 const defaultProposalPrefill =
   "# Proposal summary \n\n # Goals \n\n # Roadmap and deliverable details \n\n # Challenges \n\n # Team background and previous contributions \n\n # Support request"
 
 export default async function createRfp(input: z.infer<typeof CreateRfp>) {
+  if (input.endDate) {
+    if (input.startDate > input.endDate) {
+      throw new Error("end date cannot come before start date")
+    }
+  }
+
   const rfp = await db.rfp.create({
     data: {
       fundingAddress: input.fundingAddress,
@@ -31,6 +38,7 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
           body: input.contentBody,
         },
         signature: input.signature,
+        signatureMessage: input.signatureMessage,
         proposalPrefill: defaultProposalPrefill,
       },
     },

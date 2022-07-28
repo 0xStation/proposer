@@ -12,6 +12,7 @@ const CreateProposal = z.object({
   contentBody: z.string(),
   collaborators: z.array(z.string()),
   signature: z.string(),
+  signatureMessage: z.any(),
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
@@ -24,6 +25,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       rfpId: input.rfpId,
       data: {
         signature: input.signature,
+        signatureMessage: input.signatureMessage,
         content: {
           title: input.contentTitle,
           body: input.contentBody,

@@ -137,7 +137,7 @@ const ProposalsTab: BlitzPage = ({
           </div>
 
           <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
-            <span className="basis-[38rem] ml-6 mb-2">Proposal</span>
+            <span className="basis-[38rem] ml-6 mb-2">Title</span>
             <span className="basis-32 ml-9 mb-2">Approval</span>
             <span className="basis-32 ml-6 mb-2">Amount</span>
             <span className="basis-32 ml-2 mb-2">Submission Date</span>
@@ -199,8 +199,8 @@ const ProposalComponent = ({
   )
   const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
 
-  const fundsHaveNotBeenUsed = (proposal) => {
-    return proposal.checks.length === 0 || !proposal.checks[0].txnHash
+  const fundsHaveNotBeenApproved = (proposal) => {
+    return proposal.checks.length === 0
   }
 
   return (
@@ -236,14 +236,14 @@ const ProposalComponent = ({
           <div
             className={`basis-32 ml-6 mb-2 self-center relative group ${
               parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
-              fundsHaveNotBeenUsed(proposal) &&
+              fundsHaveNotBeenApproved(proposal) &&
               "text-torch-red"
             }`}
           >
             {proposal.data?.funding?.amount || "N/A"} {proposal.data?.funding?.symbol}
             {/* if there are no checks, it means the value of this prop is not pending, and can be overallocated */}
             {parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
-              fundsHaveNotBeenUsed(proposal) && (
+              fundsHaveNotBeenApproved(proposal) && (
                 <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[100%] left-0 group hidden group-hover:block shadow-lg z-50">
                   Insufficient funds.{" "}
                   {isAdmin && (

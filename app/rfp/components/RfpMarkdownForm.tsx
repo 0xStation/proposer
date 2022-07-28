@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
+import { DateTime } from "luxon"
 import { useMutation, invalidateQuery, Link, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
-import { LockClosedIcon, XIcon, RefreshIcon } from "@heroicons/react/solid"
+import { LockClosedIcon, XIcon, RefreshIcon, SpeakerphoneIcon } from "@heroicons/react/solid"
 import useStore from "app/core/hooks/useStore"
+import useSignature from "app/core/hooks/useSignature"
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS, RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
@@ -12,13 +14,21 @@ import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
 import { Rfp } from "../types"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
-import { getShortDate } from "app/core/utils/getShortDate"
 import ConfirmationRfpModal from "./ConfirmationRfpModal"
-import { requiredField } from "app/utils/validators"
+import { requiredField, isAfterStartDate } from "app/utils/validators"
 import { useSignTypedData } from "wagmi"
 import { genRfpSignatureMessage } from "app/signatures/rfp"
 
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
+
+const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
+  const isoDate = DateTime.fromISO(dateTime.toString())
+
+  // min date input value needs to match the pattern nnnn-nn-nnTnn:nn
+  // but isoDate.toString() returns nnnn-nn-nnTnn:nn:nn.nnn-nn:00
+  // so we are slicing off the offset
+  return isoDate.toString().slice(0, -13)
+}
 
 const RfpMarkdownForm = ({
   terminal,
@@ -84,19 +94,7 @@ const RfpMarkdownForm = ({
     },
   })
 
-  let { signTypedDataAsync: signApproval } = useSignTypedData()
-  const createRfpSignature = async (values, author) => {
-    try {
-      const signature = await signApproval(genRfpSignatureMessage(values, author))
-      return signature
-    } catch (e) {
-      setToastState({
-        isToastShowing: true,
-        type: "error",
-        message: "Signature denied",
-      })
-    }
-  }
+  let { signMessage } = useSignature()
 
   return (
     <>
@@ -156,11 +154,18 @@ const RfpMarkdownForm = ({
             ? {
                 title: title,
                 markdown: markdown,
-                startDate: getShortDate(rfp.startDate),
-                endDate: getShortDate(rfp?.endDate && rfp?.endDate),
+                startDate: getFormattedDate({ dateTime: DateTime.fromJSDate(rfp.startDate) }),
+                endDate: rfp?.endDate
+                  ? getFormattedDate({ dateTime: DateTime.fromJSDate(rfp?.endDate as Date) })
+                  : undefined,
                 checkbookAddress: rfp?.fundingAddress,
               }
-            : {}
+            : {
+                startDate: getFormattedDate({
+                  dateTime: DateTime.local().plus({ hour: 1 }),
+                }),
+                checkbookAddress: checkbooks?.[0]?.address,
+              }
         }
         onSubmit={async (values: {
           startDate: string
@@ -173,42 +178,53 @@ const RfpMarkdownForm = ({
             setToastState({
               isToastShowing: true,
               type: "error",
-              message: "You must connect your wallet in order to create RFPs",
+              message: "You must connect your wallet in order to create RFPs.",
             })
-          } else if (isEdit) {
-            const signature = await createRfpSignature(values, activeUser?.address)
+            return
+          }
+          if (!values.checkbookAddress) {
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "Please select a Checkbook first.",
+            })
+            return
+          }
 
-            // user must have denied signature
-            if (!signature) {
-              return
-            }
+          const message = genRfpSignatureMessage(values, activeUser?.address)
+          const signature = await signMessage(message)
 
+          // user must have denied signature
+          if (!signature) {
+            return
+          }
+
+          if (isEdit) {
             await updateRfpMutation({
               rfpId: rfp?.id as string,
-              startDate: new Date(`${values.startDate} 00:00:00 UTC`),
-              endDate: new Date(`${values.endDate} 23:59:59 UTC`),
+              // convert luxon's `DateTime` obj to UTC to store in db
+              startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
+              endDate: DateTime.fromISO(values.endDate).toUTC().toJSDate(),
               fundingAddress: values.checkbookAddress,
               contentBody: values.markdown,
               contentTitle: values.title,
               signature,
+              signatureMessage: message,
             })
           } else {
-            const signature = await createRfpSignature(values, activeUser?.address)
-
-            // user must have denied signature
-            if (!signature) {
-              return
-            }
-
             await createRfpMutation({
               terminalId: terminal?.id,
-              startDate: new Date(`${values.startDate} 00:00:00 UTC`),
-              endDate: new Date(`${values.endDate} 23:59:59 UTC`),
+              // convert luxon's `DateTime` obj to UTC to store in db
+              startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
+              endDate: values.endDate
+                ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
+                : undefined,
               authorAddress: activeUser?.address,
               fundingAddress: values.checkbookAddress,
               contentBody: values.markdown,
               contentTitle: values.title,
               signature,
+              signatureMessage: message,
             })
           }
         }}
@@ -223,18 +239,23 @@ const RfpMarkdownForm = ({
               />
               <div className="grid grid-cols-4 h-screen w-full box-border">
                 <div className="overflow-y-auto col-span-3 p-20 relative">
-                  <div className="flex flex-row items-center space-x-2">
-                    <span
-                      className={`h-2 w-2 rounded-full ${
-                        RFP_STATUS_DISPLAY_MAP[rfp?.status || "DRAFT"]?.color
-                      }`}
-                    />
-                    <span className="text-xs uppercase tracking-wider font-bold">
-                      {RFP_STATUS_DISPLAY_MAP[rfp?.status || "DRAFT"]?.copy}
+                  <div className="flex flex-row space-x-4">
+                    <span className=" bg-wet-concrete rounded-full px-2 py-1 flex items-center space-x-1">
+                      <SpeakerphoneIcon className="h-4 w-4 text-marble-white" />
+                      <span className="text-xs uppercase">Request for proposal</span>
                     </span>
+                    <div className="flex flex-row items-center space-x-2">
+                      <span
+                        className={`h-2 w-2 rounded-full ${
+                          RFP_STATUS_DISPLAY_MAP[rfp?.status || "DRAFT"]?.color
+                        }`}
+                      />
+                      <span className="text-xs uppercase tracking-wider font-bold">
+                        {RFP_STATUS_DISPLAY_MAP[rfp?.status || "DRAFT"]?.copy}
+                      </span>
+                    </div>
                   </div>
                   <div className="mt-6 flex flex-row">
-                    <span className="text-3xl font-bold">RFP:</span>
                     <Field name="title" validate={requiredField}>
                       {({ input, meta }) => {
                         return (
@@ -248,14 +269,18 @@ const RfpMarkdownForm = ({
                     </Field>
                   </div>
                   <div className="mt-6 flex flex-row">
-                    <img
-                      src={activeUser?.data.pfpURL}
-                      alt="PFP"
-                      className={"w-[46px] h-[46px] rounded-full"}
-                      onError={(e) => {
-                        e.currentTarget.src = DEFAULT_PFP_URLS.USER
-                      }}
-                    />
+                    {activeUser?.data.pfpURL ? (
+                      <img
+                        src={activeUser?.data.pfpURL}
+                        alt="PFP"
+                        className={"w-[46px] h-[46px] rounded-full"}
+                        onError={(e) => {
+                          e.currentTarget.src = DEFAULT_PFP_URLS.USER
+                        }}
+                      />
+                    ) : (
+                      <div className="h-[46px] min-w-[46px] max-w-[46px] place-self-center border border-wet-concrete bg-gradient-to-b object-cover from-electric-violet to-magic-mint rounded-full place-items-center" />
+                    )}
                     <div className="ml-2">
                       <span>{activeUser?.data.name}</span>
                       <span className="text-xs text-light-concrete flex mt-1">
@@ -300,8 +325,8 @@ const RfpMarkdownForm = ({
                               <div>
                                 <input
                                   {...input}
-                                  type="date"
-                                  min={getShortDate()}
+                                  type="datetime-local"
+                                  min={getFormattedDate({ dateTime: DateTime.local() })}
                                   className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
                                 />
                                 {(meta.touched || attemptedSubmit) && meta.error && (
@@ -314,15 +339,27 @@ const RfpMarkdownForm = ({
                       </div>
                       <div className="flex flex-col mt-6">
                         <label className="font-bold">Submission closes</label>
-                        <Field name="endDate">
-                          {({ input, _meta }) => (
+                        <Field name="endDate" validate={isAfterStartDate}>
+                          {({ input, meta }) => (
                             <div>
                               <input
                                 {...input}
-                                type="date"
-                                min={getShortDate()}
+                                type="datetime-local"
+                                // dates need to match the pattern nnnn-nn-nnTnn:nn
+                                min={
+                                  formState.values.startDate
+                                    ? getFormattedDate({
+                                        dateTime: DateTime.fromISO(formState.values.startDate),
+                                      })
+                                    : getFormattedDate({
+                                        dateTime: DateTime.local(),
+                                      })
+                                }
                                 className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
                               />
+                              {meta.error && (
+                                <span className="text-torch-red text-xs">{meta.error}</span>
+                              )}
                             </div>
                           )}
                         </Field>
@@ -345,12 +382,12 @@ const RfpMarkdownForm = ({
                               <div className="custom-select-wrapper">
                                 <select
                                   {...input}
-                                  className={`w-full bg-wet-concrete border border-concrete rounded p-1 mt-1`}
+                                  className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
                                 >
                                   <option value="">Choose option</option>
                                   {checkbooks?.map((cb, idx) => {
                                     return (
-                                      <option key={`checkbook-${idx}`} value={cb.address}>
+                                      <option key={cb.address} value={cb.address}>
                                         {cb.name}
                                       </option>
                                     )
@@ -406,7 +443,7 @@ const RfpMarkdownForm = ({
                           }
                           setConfirmationModalOpen(true)
                         }}
-                        className={`bg-electric-violet text-tunnel-black px-6 py-1 rounded block mt-14 hover:bg-opacity-70`}
+                        className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block mt-14 hover:bg-opacity-70"
                       >
                         Publish
                       </button>

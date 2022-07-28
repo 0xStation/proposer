@@ -8,7 +8,8 @@ const client = new PrivyClient(
 
 export const saveEmail = async (address: string, email: string) => {
   try {
-    await client.put(address, "email", email)
+    const res = await client.put(address, "email", email)
+    return res.text()
   } catch (e) {
     console.error("saveEmail failure: ", e)
     throw e

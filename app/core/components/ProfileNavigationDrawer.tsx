@@ -8,6 +8,7 @@ import useStore from "../hooks/useStore"
 import logout from "app/session/mutations/logout"
 import { DEFAULT_PFP_URLS } from "../utils/constants"
 import LinkArrow from "app/core/icons/LinkArrow"
+import { canCreateStation } from "app/core/utils/permissions"
 
 export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
   const router = useRouter()
@@ -40,20 +41,12 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
       </button>
     ) : null
 
-  const openATerminalLink =
-    session?.siwe?.address && activeUser ? (
+  const openATerminalLink = session?.siwe?.address &&
+    activeUser &&
+    canCreateStation(activeUser?.address) && (
       <Link href={Routes.CreateTerminalDetailsPage()}>
-        <span className="block hover:opacity-70 cursor-pointer">New Station</span>
+        <span className="block hover:opacity-70 cursor-pointer">New station</span>
       </Link>
-    ) : (
-      <a
-        href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block"
-      >
-        <span className="block hover:opacity-70 cursor-pointer">New Station</span>
-      </a>
     )
 
   const profilePfp =

@@ -95,8 +95,8 @@ const ProposalPage: BlitzPage = ({
   const showCashButton =
     hasQuorum && !check?.txnHash && check?.recipientAddress === activeUser?.address
 
-  const fundsHaveNotBeenUsed = (proposal) => {
-    return proposal.checks.length === 0 || !proposal.checks[0].txnHash
+  const fundsHaveNotBeenApproved = (proposal) => {
+    return proposal.checks.length === 0
   }
 
   useWaitForTransaction({
@@ -156,7 +156,8 @@ const ProposalPage: BlitzPage = ({
             <div className="flex flex-row justify-between">
               <p className="self-center">
                 <span className="text-concrete hover:text-light-concrete">
-                  <Link href={Routes.BulletinPage({ terminalHandle })}>Bulletin</Link> /&nbsp;
+                  <Link href={Routes.BulletinPage({ terminalHandle })}>Requests for proposals</Link>{" "}
+                  /&nbsp;
                 </span>
                 <span className="text-concrete hover:text-light-concrete">
                   <Link
@@ -254,7 +255,7 @@ const ProposalPage: BlitzPage = ({
                     )}
                   </button>
                   {parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
-                    fundsHaveNotBeenUsed(proposal) && (
+                    fundsHaveNotBeenApproved(proposal) && (
                       <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
                         Insufficient funds.{" "}
                         {isAdmin && (

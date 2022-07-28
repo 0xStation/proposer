@@ -3,6 +3,8 @@ import * as z from "zod"
 import { ZERO_ADDRESS } from "app/core/utils/constants"
 import { Prisma } from "@prisma/client"
 import { fetchTokenDecimals } from "app/utils/fetchTokenDecimals"
+import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
+import { genCheckSignatureMessage } from "app/signatures/check"
 
 const CreateCheck = z.object({
   proposalId: z.string(),
@@ -42,12 +44,26 @@ export default async function createCheck(input: z.infer<typeof CreateCheck>) {
 
       const nonce = (lastCheck?.nonce || 0) + 1
 
+      const signatureMessage = genCheckSignatureMessage(
+        input.chainId,
+        input.fundingAddress,
+        nonce,
+        deadline,
+        input.recipientAddress,
+        input.tokenAddress,
+        decimalToBigNumber(input.tokenAmount, tokenDecimals)
+      )
+
       const check = await db.check.create({
         data: {
           ...input,
           tokenAmount: cleanedTokenAmount,
           nonce,
           deadline,
+          // @ts-ignore TODO: remove this later
+          data: {
+            signatureMessage,
+          },
         },
       })
 

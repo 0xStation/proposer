@@ -9,7 +9,7 @@ export const useCreateCheckbookOnChain = (chainId: number) => {
       addressOrName: CONTRACTS[chainId]?.CHECKBOOK_FACTORY,
       contractInterface: checkbookFactoryAbi,
     },
-    "create(uint256,address[])" // have to specify arguments because two functions with name create but different arguments
+    "create"
   )
   return { createCheckbook }
 }
@@ -20,8 +20,7 @@ export const useCashCheckOnChain = (address: string) => {
       addressOrName: address,
       contractInterface: checkbookAbi,
     },
-    "withdraw(address,address,uint256,uint256,uint256,bytes[])" // have to specify arguments because two functions with name create but different arguments
-    // recipient, token, amount, deadline, nonce, signatures
+    "execute"
   )
   return { cashCheck }
 }

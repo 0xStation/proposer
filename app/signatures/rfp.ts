@@ -11,7 +11,7 @@ export const genRfpSignatureMessage = (values, author) => {
       version: "1", // keep hardcoded
     },
     types: {
-      Proposal: [
+      Rfp: [
         { name: "author", type: "address" },
         { name: "replyTo", type: "address" }, // (checkbook address for now)
         { name: "timestamp", type: "uint256" }, // ISO formatted date string
