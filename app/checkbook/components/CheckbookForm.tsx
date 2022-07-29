@@ -42,21 +42,26 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
   const { createCheckbook: createCheckbookOnChain } = useCreateCheckbookOnChain(chainId)
 
   const data = useWaitForTransaction({
-    chainId,
     confirmations: 1,
     hash: txnHash,
     onSuccess: async (data) => {
       // transaction emits an event that contains the address of the new Checkbook
       // events are contained in the TransactionReceipt's `.logs` field
+      // in the checkbook creation transaction, variable number of logs are emitted in this order:
+      // * n SignerAdded(signer) for n signers
+      // * 1 QuorumUpdated(quorum)
+      // * 1 CheckbookCreated(checkbook, quorum, signers)
+      // we want the last event, so we parse the last log in the list
+      const eventCheckbookCreated = data.logs[data.logs.length - 1]
       // each log has a `topics` list object for event parameters that have an index
-      // the first topic is always the name of the event, the next is our Checkbook address
-      // the location of the Checkbook address in the topics array is dependent on ordering within the contract
+      // the first topic is always the name of the event, the next is our Checkbook address and does not change once deployed
+      const topicCheckbookAddress = eventCheckbookCreated?.topics[1]
       // a topic string has 32 bytes, but an address is only 20 bytes so the topic is 0-padded in the front
       // a topic string also adds "0x" to the front of its 32 bytes
       // to get the address, we throw away the first 2 characters ("0x") + the next 2*12bytes characters (0-padding)
-      // which leads us to use `.substring(26)` and extract the address string
+      // which leads us to throw away first 26 characters using `.substring(26)` and extract the address string
       // this string is lowercased though, so we checksum it to give it proper casing before storing in database
-      const checkbookAddress = toChecksumAddress("0x" + data.logs[2]?.topics[1]?.substring(26))
+      const checkbookAddress = toChecksumAddress("0x" + topicCheckbookAddress?.substring(26))
 
       try {
         await createCheckbookMutation({
