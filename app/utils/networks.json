@@ -56,8 +56,8 @@
   },
   "5": {
     "key": "5",
-    "name": "Görli (testnet)",
-    "shortName": "Görli",
+    "name": "Goerli (testnet)",
+    "shortName": "Goerli",
     "chainId": 5,
     "network": "goerli",
     "testnet": true,

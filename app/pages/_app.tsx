@@ -34,7 +34,7 @@ const connectors = () => {
 
 const client = createClient({
   autoConnect: true,
-  connectors: connectors,
+  connectors,
   provider,
 })
 
