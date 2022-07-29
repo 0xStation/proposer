@@ -8,8 +8,11 @@ import getAllTerminals from "app/terminal/queries/getAllTerminals"
 import getTerminalMemberCount from "app/accountTerminal/queries/getTerminalMemberCount"
 import getRfpCountByTerminalId from "app/rfp/queries/getRfpCountByTerminalId"
 import getProposalCountByTerminal from "app/proposal/queries/getProposalCountByTerminal"
+import useStore from "app/core/hooks/useStore"
+import { canCreateStation } from "app/core/utils/permissions"
 
 const ExploreStations: BlitzPage = () => {
+  const activeUser = useStore((state) => state.activeUser)
   const [page, setPage] = useState<number>(0)
   const router = useRouter()
 
@@ -27,12 +30,28 @@ const ExploreStations: BlitzPage = () => {
             <h1 className="font-bold text-2xl">Explore</h1>
             <p>All stations, find your tribe</p>
           </div>
-          <button
-            className="text-tunnel-black bg-electric-violet rounded hover:opacity-70 h-[35px] px-6 mr-8"
-            onClick={() => router.push(Routes.CreateTerminalDetailsPage())}
-          >
-            Open a station
-          </button>
+          <div className="relative self-start group">
+            <button
+              className="text-tunnel-black bg-electric-violet rounded hover:opacity-70 h-[35px] px-6 mr-8"
+              onClick={() => router.push(Routes.CreateTerminalDetailsPage())}
+              disabled={!canCreateStation(activeUser?.address)}
+            >
+              Open a station
+            </button>
+            {!canCreateStation(activeUser?.address) && (
+              <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
+                Early Access users only.{" "}
+                <a
+                  href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
+                  target="_blank"
+                  className="text-electric-violet"
+                  rel="noreferrer"
+                >
+                  Join waitlist.
+                </a>
+              </span>
+            )}
+          </div>
         </div>
         <div className="flex flex-col sm:flex-row justify-end items-center">
           <Pagination
