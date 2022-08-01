@@ -46,6 +46,8 @@ const createStationWhitelist = [
   "0x924C15E11612b0F58968e90F566E52BbA41870A0",
   "0x22B660F6E6A007AceA649AcD028A8d057c15620c",
   "0x68fE87c69848375A846fc666c41aC8d5047a4Dc2",
+  "0x52217bAD145A7a80D510f24A9572781D260f33D3", // Radical DAO
+  "0xbeC26FFa12c90217943D1b2958f60A821aE6E549", // CabinDAO
 ]
 export const canCreateStation = (address: string | undefined) => {
   if (process.env.NODE_ENV !== "production") return true
