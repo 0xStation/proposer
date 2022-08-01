@@ -3,6 +3,7 @@ import { DateTime } from "luxon"
 import { useMutation, invalidateQuery, Link, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
 import { LockClosedIcon, XIcon, RefreshIcon, SpeakerphoneIcon } from "@heroicons/react/solid"
+import { utils } from "ethers"
 import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
 import truncateString from "app/core/utils/truncateString"
@@ -15,9 +16,15 @@ import { Checkbook } from "app/checkbook/types"
 import { Rfp } from "../types"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import ConfirmationRfpModal from "./ConfirmationRfpModal"
-import { requiredField, isAfterStartDate } from "app/utils/validators"
-import { useSignTypedData } from "wagmi"
+import {
+  composeValidators,
+  isPositiveAmount,
+  requiredField,
+  isAfterStartDate,
+} from "app/utils/validators"
+import { useNetwork } from "wagmi"
 import { genRfpSignatureMessage } from "app/signatures/rfp"
+import getFundingTokens from "app/core/utils/getFundingTokens"
 
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
 
@@ -52,6 +59,11 @@ const RfpMarkdownForm = ({
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
+
+  const { activeChain } = useNetwork()
+  const chainId = activeChain?.id as number
+
+  const tokenOptions = getFundingTokens({ chainId } as unknown as Checkbook, terminal) // hacky way to get ETH for now :(
 
   useEffect(() => {
     if (rfp?.data?.content?.title) {
@@ -168,6 +180,8 @@ const RfpMarkdownForm = ({
           startDate: string
           endDate: string
           checkbookAddress: string
+          fundingTokenAddress: string
+          budgetAmount: string
           markdown: string
           title: string
         }) => {
@@ -188,7 +202,15 @@ const RfpMarkdownForm = ({
             return
           }
 
-          const message = genRfpSignatureMessage(values, activeUser?.address)
+          const parsedBudgetAmount = utils.parseUnits(
+            values.budgetAmount.toString(),
+            tokenOptions.find((t) => t.address === values.fundingTokenAddress).decimals
+          )
+
+          const message = genRfpSignatureMessage(
+            { ...values, budgetAmount: parsedBudgetAmount },
+            activeUser?.address
+          )
           const signature = await signMessage(message)
 
           // user must have denied signature
@@ -218,6 +240,8 @@ const RfpMarkdownForm = ({
                 : undefined,
               authorAddress: activeUser?.address,
               fundingAddress: values.checkbookAddress,
+              fundingTokenAddress: values.fundingTokenAddress,
+              budgetAmount: parsedBudgetAmount.toString(),
               contentBody: values.markdown,
               contentTitle: values.title,
               signature,
@@ -417,6 +441,56 @@ const RfpMarkdownForm = ({
                               })
                             }}
                           />
+                        </div>
+                        <div className="flex flex-col mt-6">
+                          <label className="font-bold block">Funding Token*</label>
+                          <Field name="fundingTokenAddress" validate={requiredField}>
+                            {({ input, meta }) => {
+                              return (
+                                <div className="custom-select-wrapper">
+                                  <select
+                                    {...input}
+                                    className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                                  >
+                                    <option value="">Choose option</option>
+                                    {tokenOptions?.map((token, idx) => {
+                                      return (
+                                        <option key={token.address} value={token.address}>
+                                          {token.symbol}
+                                        </option>
+                                      )
+                                    })}
+                                  </select>
+                                  {(meta.touched || attemptedSubmit) && meta.error && (
+                                    <span className="text-torch-red text-xs">{meta.error}</span>
+                                  )}
+                                </div>
+                              )
+                            }}
+                          </Field>
+                        </div>
+                        <div className="flex flex-col mt-6">
+                          <label className="font-bold">Budget*</label>
+                          <Field
+                            name="budgetAmount"
+                            validate={composeValidators(requiredField, isPositiveAmount)}
+                          >
+                            {({ input, meta }) => {
+                              return (
+                                <div>
+                                  <input
+                                    {...input}
+                                    type="text"
+                                    className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
+                                    placeholder="e.g. 1000.00"
+                                  />
+                                  {(meta.touched || attemptedSubmit) && meta.error && (
+                                    <span className="text-torch-red text-xs">{meta.error}</span>
+                                  )}
+                                </div>
+                              )
+                            }}
+                          </Field>
                         </div>
                       </div>
                       <button

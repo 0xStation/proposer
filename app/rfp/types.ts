@@ -23,6 +23,10 @@ export type RfpMetadata = {
   proposalPrefill: {
     body: string // template body for customized inclusion + addition of questions
   }
+  funding: {
+    token: string
+    budgetAmount: number
+  }
 }
 
 export type Rfp = {
