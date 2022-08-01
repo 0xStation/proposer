@@ -1,19 +1,21 @@
 import { useState } from "react"
 import { BlitzPage, Link, Routes, useQuery, useRouter } from "blitz"
-
 import Layout from "app/core/layouts/Layout"
 import Pagination from "app/core/components/Pagination"
-import { DEFAULT_PFP_URLS, PAGINATION_TAKE } from "app/core/utils/constants"
+import { RFP_STATUS_DISPLAY_MAP, DEFAULT_PFP_URLS, PAGINATION_TAKE } from "app/core/utils/constants"
+import getAllRfps from "app/rfp/queries/getAllRfps"
 import getAllTerminals from "app/terminal/queries/getAllTerminals"
 import getTerminalMemberCount from "app/accountTerminal/queries/getTerminalMemberCount"
 import getRfpCountByTerminalId from "app/rfp/queries/getRfpCountByTerminalId"
 import getProposalCountByTerminal from "app/proposal/queries/getProposalCountByTerminal"
 import useStore from "app/core/hooks/useStore"
 import { canCreateStation } from "app/core/utils/permissions"
+import { DateTime } from "luxon"
 
 const ExploreStations: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
   const [page, setPage] = useState<number>(0)
+  const [tab, setTab] = useState<"STATION" | "RFP">("STATION")
   const router = useRouter()
 
   const [terminals] = useQuery(
@@ -21,6 +23,18 @@ const ExploreStations: BlitzPage = () => {
     { page: page, paginationTake: PAGINATION_TAKE },
     { suspense: false, refetchOnReconnect: false, refetchOnWindowFocus: false }
   )
+
+  const [rfps] = useQuery(
+    getAllRfps,
+    { page: page, paginationTake: PAGINATION_TAKE },
+    {
+      suspense: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
+    }
+  )
+
+  console.log(rfps)
 
   return (
     <Layout title="Explore stations">
@@ -53,30 +67,126 @@ const ExploreStations: BlitzPage = () => {
             )}
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row justify-end items-center">
+        <div className="flex flex-col sm:flex-row justify-between pl-8">
+          <div className="self-end flex flex-row space-x-4">
+            <span
+              className={`${tab === "STATION" && "border-b mb-[-1px] font-bold"} cursor-pointer`}
+              onClick={() => setTab("STATION")}
+            >
+              Stations
+            </span>
+            <span
+              className={`${tab === "RFP" && "border-b mb-[-1px] font-bold"} cursor-pointer`}
+              onClick={() => setTab("RFP")}
+            >
+              Requests for proposals
+            </span>
+          </div>
+
           <Pagination
-            results={terminals as any[]}
-            resultsCount={terminals?.length as number}
+            results={tab === "STATION" ? (terminals as any[]) : (rfps as any[])}
+            resultsCount={
+              tab === "STATION" ? (terminals?.length as number) : (rfps?.length as number)
+            }
             page={page}
             setPage={setPage}
-            resultsLabel="stations"
-            className="pl-6 sm:pr-6 text-sm pt-5"
+            resultsLabel={tab === "STATION" ? "stations" : "RFPs"}
+            className="pl-6 sm:pr-6 text-sm pt-5 mb-5"
           />
         </div>
-        <div className="border-y border-concrete mt-5 pt-2 text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
-          <span className="basis-96 ml-6 mb-2 tracking-wider">Station info</span>
-          <span className="basis-[42rem] ml-9 mb-2 tracking-wider">Station description</span>
-          <span className="basis-32 ml-6 mb-2 tracking-wider">Members</span>
-          <span className="basis-32 ml-2 mb-2 tracking-wider">Open RFPs</span>
-          <span className="basis-32 ml-2 mr-6 mb-2 tracking-wider">Proposals</span>
-        </div>
+        {tab === "STATION" ? (
+          <div className="border-y border-concrete pt-8 text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
+            <span className="basis-96 ml-6 mb-2 tracking-wider">Station info</span>
+            <span className="basis-[42rem] ml-9 mb-2 tracking-wider">Station description</span>
+            <span className="basis-32 ml-6 mb-2 tracking-wider">Members</span>
+            <span className="basis-32 ml-2 mb-2 tracking-wider">Open RFPs</span>
+            <span className="basis-32 ml-2 mr-6 mb-2 tracking-wider">Proposals</span>
+          </div>
+        ) : (
+          <div className="border-y border-concrete pt-8 text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
+            <span className="basis-[44rem] ml-6 mb-2 tracking-wider">Request for proposals</span>
+            <span className="basis-44 ml-9 mb-2 tracking-wider">Submissions</span>
+            <span className="basis-44 ml-6 mb-2 tracking-wider">Open date</span>
+            <span className="basis-44 ml-2 mb-2 tracking-wider">Close date</span>
+            <span className="basis-44 ml-2 mb-2 tracking-wider">Creator</span>
+            <span className="basis-44 ml-2 mb-2 tracking-wider">Station</span>
+          </div>
+        )}
         <div className="overflow-y-scroll h-[calc(100vh-141px)]">
-          {terminals?.map((terminal) => {
-            return <TerminalComponent terminal={terminal} key={terminal?.id} />
-          })}
+          {tab === "STATION"
+            ? terminals?.map((terminal) => {
+                return <TerminalComponent terminal={terminal} key={terminal?.id} />
+              })
+            : rfps?.map((rfp) => {
+                return <RfpComponent terminal={rfp?.terminal} key={rfp?.id} rfp={rfp} />
+              })}
         </div>
       </div>
     </Layout>
+  )
+}
+
+const RfpComponent = ({ rfp, terminal }) => {
+  return (
+    <Link href={Routes.RFPInfoTab({ terminalHandle: terminal?.handle, rfpId: rfp.id })}>
+      <div
+        className="w-full flex flex-row border-b border-concrete cursor-pointer hover:bg-wet-concrete py-3"
+        tabIndex={0}
+      >
+        <div className="flex flex-col basis-[44rem] ml-6">
+          <div className="flex flex-row items-center space-x-2 mb-2">
+            <span className={`h-2 w-2 rounded-full ${RFP_STATUS_DISPLAY_MAP[rfp.status]?.color}`} />
+            <span className="text-xs uppercase tracking-wider font-bold">
+              {RFP_STATUS_DISPLAY_MAP[rfp.status]?.copy}
+            </span>
+          </div>
+          <span className="font-bold text-lg">RFP: {rfp.data.content.title}</span>
+        </div>
+        <div className="flex space-x-2 basis-44 ml-9 self-center">
+          <span>{rfp.submissionCount}</span>
+        </div>
+        <div className="basis-44 ml-6 self-center">
+          <p>
+            {rfp.startDate
+              ? DateTime.fromJSDate(rfp.startDate as Date).toFormat("dd-MMM-yyyy")
+              : "N/A"}
+          </p>
+          <p className="text-concrete text-sm self-center">
+            {DateTime.fromJSDate(rfp.startDate as Date).toLocaleString(DateTime.TIME_SIMPLE)}
+          </p>
+        </div>
+        <div className="basis-44 ml-2 self-center">
+          <p>
+            {rfp.startDate
+              ? DateTime.fromJSDate(rfp.startDate as Date).toFormat("dd-MMM-yyyy")
+              : "N/A"}
+          </p>
+          <p className="text-concrete text-sm">
+            {DateTime.fromJSDate(rfp.startDate as Date).toLocaleString(DateTime.TIME_SIMPLE)}
+          </p>
+        </div>
+        <div className="basis-44 ml-2 self-center">
+          <img
+            src={rfp.author.data.pfpURL || DEFAULT_PFP_URLS.USER}
+            className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
+            alt="pfp"
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_PFP_URLS.USER
+            }}
+          />
+        </div>
+        <div className="basis-44 ml-2">
+          <img
+            src={rfp.terminal.data.pfpURL || DEFAULT_PFP_URLS.USER}
+            className="min-w-[46px] max-w-[46px] h-[46px] rounded cursor-pointer border border-marble-white"
+            alt="pfp"
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_PFP_URLS.USER
+            }}
+          />
+        </div>
+      </div>
+    </Link>
   )
 }
 
