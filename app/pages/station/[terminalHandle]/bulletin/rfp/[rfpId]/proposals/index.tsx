@@ -21,6 +21,7 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
 import getProposalsByRfpId from "app/proposal/queries/getProposalsByRfpId"
 import getRfpById from "app/rfp/queries/getRfpById"
+import { genPathFromUrlObject } from "app/utils"
 import {
   DEFAULT_PFP_URLS,
   PROPOSAL_STATUS_DISPLAY_MAP,
@@ -52,6 +53,7 @@ const ProposalsTab: BlitzPage = ({
     new Set<ProposalStatus>()
   )
   const [page, setPage] = useState<number>(0)
+  const [isUrlCopied, setIsUrlCopied] = useState<boolean>(false)
 
   const [proposals] = useQuery(
     getProposalsByRfpId,
@@ -161,6 +163,22 @@ const ProposalsTab: BlitzPage = ({
                   Share the link with your community to solicit proposals to shape the future of{" "}
                   {terminal.data.name}.
                 </p>
+                <button
+                  className="bg-electric-violet text-tunnel-black rounded px-6 h-[35px] leading-[35px] hover:bg-opacity-70 whitespace-nowrap mt-2"
+                  onClick={() => {
+                    setIsUrlCopied(true)
+                    navigator.clipboard.writeText(
+                      genPathFromUrlObject(
+                        Routes.ProposalsTab({
+                          terminalHandle: terminal.handle,
+                          rfpId,
+                        })
+                      )
+                    )
+                  }}
+                >
+                  {isUrlCopied ? "Copied!" : "Copy link"}
+                </button>
               </div>
             ) : (
               Array.from(Array(15)).map((idx) => (
