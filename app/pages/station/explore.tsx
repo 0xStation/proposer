@@ -34,8 +34,6 @@ const ExploreStations: BlitzPage = () => {
     }
   )
 
-  console.log(rfps)
-
   return (
     <Layout title="Explore stations">
       <div className="h-screen">
@@ -146,22 +144,22 @@ const RfpComponent = ({ rfp, terminal }) => {
           <span>{rfp.submissionCount}</span>
         </div>
         <div className="basis-44 ml-6 self-center">
-          <p>
+          <p className="uppercase">
             {rfp.startDate
               ? DateTime.fromJSDate(rfp.startDate as Date).toFormat("dd-MMM-yyyy")
               : "N/A"}
           </p>
-          <p className="text-concrete text-sm self-center">
+          <p className="text-concrete text-sm self-center uppercase">
             {DateTime.fromJSDate(rfp.startDate as Date).toLocaleString(DateTime.TIME_SIMPLE)}
           </p>
         </div>
         <div className="basis-44 ml-2 self-center">
-          <p>
+          <p className="uppercase">
             {rfp.startDate
               ? DateTime.fromJSDate(rfp.startDate as Date).toFormat("dd-MMM-yyyy")
               : "N/A"}
           </p>
-          <p className="text-concrete text-sm">
+          <p className="text-concrete text-sm uppercase">
             {DateTime.fromJSDate(rfp.startDate as Date).toLocaleString(DateTime.TIME_SIMPLE)}
           </p>
         </div>
@@ -177,11 +175,11 @@ const RfpComponent = ({ rfp, terminal }) => {
         </div>
         <div className="basis-44 ml-2">
           <img
-            src={rfp.terminal.data.pfpURL || DEFAULT_PFP_URLS.USER}
-            className="min-w-[46px] max-w-[46px] h-[46px] rounded cursor-pointer border border-marble-white"
+            src={rfp.terminal.data.pfpURL || DEFAULT_PFP_URLS.TERMINAL}
+            className="min-w-[46px] max-w-[46px] h-[46px] rounded cursor-pointer border border-wet-concrete hover:border-marble-white"
             alt="pfp"
             onError={(e) => {
-              e.currentTarget.src = DEFAULT_PFP_URLS.USER
+              e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
             }}
           />
         </div>
