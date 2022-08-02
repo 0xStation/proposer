@@ -48,6 +48,10 @@ const createStationWhitelist = [
   "0x68fE87c69848375A846fc666c41aC8d5047a4Dc2",
   "0x52217bAD145A7a80D510f24A9572781D260f33D3", // Radical DAO
   "0xbeC26FFa12c90217943D1b2958f60A821aE6E549", // CabinDAO
+  "0x267a3195ea57ad38e65993dbcb9fbebf8995621d", // CityDAO
+  "0x4ce2dd8373ece0d7baaa16e559a5817cc875b16a", // Unlock Protocol
+  "0x5dc70a9b884f78ee030a8c6ad3b3b7dc10bbe7f4", // Unlock Protocol
+  "0xff4ec2057a4180a4cd18fdea144e53245e39869d", // Unlock Protocol
 ]
 export const canCreateStation = (address: string | undefined) => {
   if (process.env.NODE_ENV !== "production") return true
