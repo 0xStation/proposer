@@ -16,7 +16,6 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import getRfpCountByTerminalId from "app/rfp/queries/getRfpCountByTerminalId"
-import { formatDate } from "app/core/utils/formatDate"
 import {
   RFP_STATUS_DISPLAY_MAP,
   PAGINATION_TAKE,
