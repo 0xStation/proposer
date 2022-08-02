@@ -134,7 +134,7 @@ const Navigation = ({ children }: { children?: any }) => {
         )}
       </div>
       <div className="h-screen w-[70px] bg-tunnel-black border-r border-concrete fixed top-0 left-0 text-center flex flex-col">
-        <a className="mt-1 inline-block" href="https://station.express">
+        <a className="mt-1 inline-block" href="https://app.station.express">
           <Image src={StationLogo} alt="Station logo" height={20} width={54} />
         </a>
         <div className="h-full mt-4">
