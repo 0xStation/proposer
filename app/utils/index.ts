@@ -25,3 +25,15 @@ export const genPathFromUrlObject = (route: RouteUrlObject) => {
 
   return `${genBaseUrl()}${route.pathname}`
 }
+
+export const isDev = () => {
+  return !!(process.env.NEXT_PUBLIC_VERCEL_ENV === "development")
+}
+
+export const isStaging = () => {
+  return !!(process.env.NEXT_PUBLIC_VERCEL_ENV === "preview")
+}
+
+export const isProd = () => {
+  return !!(process.env.NEXT_PUBLIC_VERCEL_ENV === "production")
+}
