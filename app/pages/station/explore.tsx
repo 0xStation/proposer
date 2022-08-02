@@ -138,7 +138,7 @@ const RfpComponent = ({ rfp, terminal }) => {
               {RFP_STATUS_DISPLAY_MAP[rfp.status]?.copy}
             </span>
           </div>
-          <span className="font-bold text-lg">RFP: {rfp.data.content.title}</span>
+          <span className="font-bold text-lg">{rfp.data.content.title}</span>
         </div>
         <div className="flex space-x-2 basis-44 ml-9 self-center">
           <span>{rfp.submissionCount}</span>
