@@ -1,19 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
-
-@font-face {
-  font-family: "VT323";
-  font-style: normal;
-  font-weight: 400;
-}
 
 @font-face {
   font-family: "Tobias-Italic";
   src: url("../../../public/fonts/Tobias-RegularItalic.otf") format("opentype");
   font-weight: 400;
   font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
@@ -21,6 +15,7 @@
   src: url("../../../public/fonts/favoritpro-regular-webfont.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -28,6 +23,7 @@
   src: url("../../../public/fonts/favoritpro-bold-webfont.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -35,6 +31,7 @@
   src: url("../../../public/fonts/Emigre_-_LoRes9PlusOT-WideRegular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -42,6 +39,7 @@
   src: url("../../../public/fonts/terminal-grotesque-webfont.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
 
 body {
