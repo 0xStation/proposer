@@ -52,6 +52,7 @@ const createStationWhitelist = [
   "0x4ce2dd8373ece0d7baaa16e559a5817cc875b16a", // Unlock Protocol
   "0x5dc70a9b884f78ee030a8c6ad3b3b7dc10bbe7f4", // Unlock Protocol
   "0xff4ec2057a4180a4cd18fdea144e53245e39869d", // Unlock Protocol
+  "0xcd5a7d5c7dc605e42fb4a9e11da38a06a96d1f9a", // ? https://station-x9f9249.slack.com/archives/C03K741GSBU/p1659490787813199
 ]
 export const canCreateStation = (address: string | undefined) => {
   if (process.env.NODE_ENV !== "production") return true
