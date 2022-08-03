@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { DateTime } from "luxon"
 import { useMutation, invalidateQuery, Link, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
-import { LockClosedIcon, XIcon, RefreshIcon, SpeakerphoneIcon } from "@heroicons/react/solid"
+import { XIcon, RefreshIcon, SpeakerphoneIcon } from "@heroicons/react/solid"
 import { utils } from "ethers"
 import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
@@ -22,11 +22,11 @@ import {
   requiredField,
   isAfterStartDate,
 } from "app/utils/validators"
-import { useNetwork } from "wagmi"
 import { genRfpSignatureMessage } from "app/signatures/rfp"
 import getFundingTokens from "app/core/utils/getFundingTokens"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
+import useLocalStorage from "app/core/hooks/useLocalStorage"
 
 const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
   const isoDate = DateTime.fromISO(dateTime.toString())
@@ -59,6 +59,7 @@ const RfpMarkdownForm = ({
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
+  const [localStorageValues, setLocalStorageValues] = useLocalStorage("cached-rfp", {})
 
   // hack for now, address gets resolved on submit
   // not scalable for token importing, will probably need to switch to more state vars
@@ -106,6 +107,8 @@ const RfpMarkdownForm = ({
   })
 
   let { signMessage } = useSignature()
+
+  console.log("local", localStorageValues)
 
   return (
     <>
@@ -160,6 +163,14 @@ const RfpMarkdownForm = ({
         </div>
       </div>
       <Form
+        // called on every state change
+        // might be too much but we can test if this is hurting perf
+        // my thought is that a smaller form like this wouldn't be that bad
+        debug={(formState, _values) => {
+          if (formState.dirty) {
+            setLocalStorageValues(formState.values)
+          }
+        }}
         initialValues={
           rfp
             ? {
@@ -173,6 +184,8 @@ const RfpMarkdownForm = ({
                 fundingTokenSymbol: rfp.data.funding.token.symbol,
                 budgetAmount: rfp.data.funding.budgetAmount,
               }
+            : localStorageValues
+            ? localStorageValues
             : {
                 checkbookAddress: checkbooks?.[0]?.address,
               }
