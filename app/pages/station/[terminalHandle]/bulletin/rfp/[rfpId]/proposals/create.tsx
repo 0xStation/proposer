@@ -341,10 +341,6 @@ const CreateProposalPage: BlitzPage = ({
                         </p>
                       </a>
                     </Link>
-                    <div className="mt-6">
-                      <p className="text-concrete uppercase text-xs font-bold">Token</p>
-                      <p className="mt-2 uppercase">{data.rfp.data.funding.token.symbol}</p>
-                    </div>
                     <label className="font-bold block mt-6">Fund recipient*</label>
                     <span className="text-xs text-concrete block">
                       Primary destination of the funds. Project lead/creator’s wallet address is
@@ -395,6 +391,11 @@ const CreateProposalPage: BlitzPage = ({
                         </>
                       )}
                     </Field>
+
+                    <div className="mt-6">
+                      <p className="text-concrete uppercase text-xs font-bold">Token</p>
+                      <p className="mt-2 uppercase">{data.rfp.data.funding.token.symbol}</p>
+                    </div>
                   </div>
                   <div>
                     <button
