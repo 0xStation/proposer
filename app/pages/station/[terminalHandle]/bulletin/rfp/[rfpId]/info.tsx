@@ -22,6 +22,7 @@ import AccountMediaObject from "app/core/components/AccountMediaObject"
 import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import { AddFundsModal } from "app/core/components/AddFundsModal"
+import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { terminalHandle, rfpId, proposalId } = context.query as {
@@ -129,9 +130,15 @@ const RFPInfoTab: BlitzPage = () => {
             </div>
             <div className="p-6">
               <div className="mt-6">
-                <p className="text-concrete uppercase text-xs font-bold">Available Funds</p>
-                <p className="mt-2 uppercase">{rfp?.data.funding.budgetAmount}</p>
-                <p className="mt-2 uppercase">{rfp?.data.funding.token.symbol}</p>
+                <p className="text-concrete uppercase text-xs font-bold">Available Funding</p>
+                <div className="flex flex-row items-end space-x-1 mt-2">
+                  <p className="text-2xl">
+                    {formatCurrencyAmount(rfp?.data.funding.budgetAmount) +
+                      " " +
+                      rfp?.data.funding.token.symbol}
+                  </p>
+                </div>
+                <p className="text-concrete text-xs mt-1">{`Total RFP budget: ${rfp?.data.funding.budgetAmount} ${rfp?.data.funding.token.symbol}`}</p>
               </div>
               <div className="mt-9">
                 <p className="text-xs text-concrete uppercase font-bold">Signers</p>

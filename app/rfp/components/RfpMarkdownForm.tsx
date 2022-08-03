@@ -229,10 +229,7 @@ const RfpMarkdownForm = ({
             return
           }
 
-          const parsedBudgetAmount = utils.parseUnits(
-            values.budgetAmount.toString(),
-            fundingToken.decimals
-          )
+          const parsedBudgetAmount = utils.parseUnits(values.budgetAmount, fundingToken.decimals)
 
           const message = genRfpSignatureMessage(
             {
@@ -263,7 +260,7 @@ const RfpMarkdownForm = ({
                 symbol: fundingToken.symbol,
                 decimals: fundingToken.decimals,
               },
-              fundingBudgetAmount: parsedBudgetAmount.toString(),
+              fundingBudgetAmount: values.budgetAmount,
               contentBody: values.markdown,
               contentTitle: values.title,
               signature,
@@ -285,7 +282,7 @@ const RfpMarkdownForm = ({
                 symbol: fundingToken.symbol,
                 decimals: fundingToken.decimals,
               },
-              fundingBudgetAmount: parsedBudgetAmount.toString(),
+              fundingBudgetAmount: values.budgetAmount,
               contentBody: values.markdown,
               contentTitle: values.title,
               signature,
