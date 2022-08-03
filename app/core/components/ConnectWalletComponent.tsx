@@ -86,6 +86,7 @@ export const ConnectWalletComponent = () => {
         throw Error("Unsuccessful signature.")
       }
     } catch (err) {
+      console.log(err)
       console.error(err.cause)
       if (err.code === 4001) {
         setErrorMessage("Signature declined.")
