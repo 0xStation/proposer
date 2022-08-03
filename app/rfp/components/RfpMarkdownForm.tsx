@@ -170,7 +170,7 @@ const RfpMarkdownForm = ({
                   ? getFormattedDate({ dateTime: DateTime.fromJSDate(rfp?.endDate as Date) })
                   : undefined,
                 checkbookAddress: rfp?.fundingAddress,
-                fundingTokenAddress: rfp.data.funding.token.address,
+                fundingTokenSymbol: rfp.data.funding.token.symbol,
                 budgetAmount: rfp.data.funding.budgetAmount,
               }
             : {

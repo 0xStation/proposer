@@ -17,7 +17,7 @@ const CreateProposal = z.object({
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
-  if (BigNumber.from(input.amount).lt(BigNumber.from(0))) {
+  if (parseFloat(input.amount) < 0) {
     throw new Error("amount must be greater or equal to zero.")
   }
 

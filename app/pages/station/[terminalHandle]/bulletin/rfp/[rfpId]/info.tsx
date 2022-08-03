@@ -23,6 +23,8 @@ import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import { AddFundsModal } from "app/core/components/AddFundsModal"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
+import getRfpApprovedProposalFunding from "app/rfp/queries/getRfpApprovedFunding"
+import { ZERO_ADDRESS } from "app/core/utils/constants"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { terminalHandle, rfpId, proposalId } = context.query as {
@@ -69,6 +71,17 @@ const RFPInfoTab: BlitzPage = () => {
   )
   const isAdmin = useAdminForTerminal(terminal)
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
+  const [rfpApprovedProposalFunding] = useQuery(
+    getRfpApprovedProposalFunding,
+    {
+      rfpId: rfpId,
+      approvalQuorum: rfp?.checkbook.quorum || 100,
+      tokenChainId: rfp?.data.funding.token.chainId || 1,
+      tokenAddress: rfp?.data.funding.token.address || ZERO_ADDRESS,
+    },
+    { suspense: false, enabled: !!rfp?.checkbook && !!rfp.data }
+    // for some reason typescript does not recognize enabled checks as sufficient to remove default values in query?
+  )
 
   useEffect(() => {
     if (query.rfpEdited) {
@@ -133,12 +146,20 @@ const RFPInfoTab: BlitzPage = () => {
                 <p className="text-concrete uppercase text-xs font-bold">Available Funding</p>
                 <div className="flex flex-row items-end space-x-1 mt-2">
                   <p className="text-2xl">
-                    {formatCurrencyAmount(rfp?.data.funding.budgetAmount) +
+                    {formatCurrencyAmount(
+                      Math.max(
+                        parseFloat(rfp?.data.funding.budgetAmount || "0") -
+                          (rfpApprovedProposalFunding || 0),
+                        0
+                      ).toString()
+                    ) +
                       " " +
                       rfp?.data.funding.token.symbol}
                   </p>
                 </div>
-                <p className="text-concrete text-xs mt-1">{`Total RFP budget: ${rfp?.data.funding.budgetAmount} ${rfp?.data.funding.token.symbol}`}</p>
+                <p className="text-concrete text-xs mt-1">{`Total RFP budget: ${formatCurrencyAmount(
+                  rfp?.data.funding.budgetAmount
+                )} ${rfp?.data.funding.token.symbol}`}</p>
               </div>
               <div className="mt-9">
                 <p className="text-xs text-concrete uppercase font-bold">Signers</p>
