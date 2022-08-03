@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "blitz dev",
+    "analyze": "ANALYZE=true blitz dev",
     "build": "blitz build",
     "start": "blitz start",
     "studio": "blitz prisma studio",
@@ -36,6 +37,7 @@
     "@heroicons/react": "1.0.5",
     "@mui/icons-material": "5.5.1",
     "@mui/material": "5.5.3",
+    "@next/bundle-analyzer": "12.2.3",
     "@prisma/client": "3.6.0",
     "@privy-io/privy-node": "0.0.1",
     "@radix-ui/react-progress": "0.1.4",
