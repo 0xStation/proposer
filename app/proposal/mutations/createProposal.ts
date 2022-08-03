@@ -1,11 +1,12 @@
 import db from "db"
 import * as z from "zod"
+import { BigNumber } from "ethers"
 
 const CreateProposal = z.object({
   terminalId: z.number(),
   rfpId: z.string(),
   token: z.string(),
-  amount: z.number(),
+  amount: z.string(),
   symbol: z.string().optional(),
   recipientAddress: z.string(),
   contentTitle: z.string(),
@@ -16,7 +17,7 @@ const CreateProposal = z.object({
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
-  if (input.amount < 0) {
+  if (BigNumber.from(input.amount).lt(BigNumber.from(0))) {
     throw new Error("amount must be greater or equal to zero.")
   }
 

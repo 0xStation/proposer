@@ -128,28 +128,11 @@ const RFPInfoTab: BlitzPage = () => {
               </div>
             </div>
             <div className="p-6">
-              <CheckbookIndicator checkbook={rfp?.checkbook} terminal={terminal} />
-              <p className="mt-4 text-sm">
-                Checkbook:{" "}
-                {isAdmin ? (
-                  <Link href={Routes.CheckbookSettingsPage({ terminalHandle })}>
-                    <span className="text-electric-violet cursor-pointer">
-                      {rfp?.checkbook.name}
-                    </span>
-                  </Link>
-                ) : (
-                  <span className="text-marble-white">{rfp?.checkbook.name}</span>
-                )}
-              </p>
-              {isAdmin && (
-                <button
-                  className="border border-electric-violet rounded text-electric-violet px-6 h-[35px] mt-2 hover:bg-wet-concrete"
-                  onClick={() => setShowAddFundsModal(true)}
-                >
-                  Add funds
-                </button>
-              )}
-
+              <div className="mt-6">
+                <p className="text-concrete uppercase text-xs font-bold">Available Funds</p>
+                <p className="mt-2 uppercase">{rfp?.data.funding.budgetAmount}</p>
+                <p className="mt-2 uppercase">{rfp?.data.funding.token.symbol}</p>
+              </div>
               <div className="mt-9">
                 <p className="text-xs text-concrete uppercase font-bold">Signers</p>
                 {(rfp?.checkbook?.signerAccounts || []).map((account, i) => (

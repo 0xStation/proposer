@@ -25,7 +25,7 @@ import {
 import { useNetwork } from "wagmi"
 import { genRfpSignatureMessage } from "app/signatures/rfp"
 import getFundingTokens from "app/core/utils/getFundingTokens"
-
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
 
 const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
@@ -60,10 +60,9 @@ const RfpMarkdownForm = ({
   const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
 
-  const { activeChain } = useNetwork()
-  const chainId = activeChain?.id as number
-
-  const tokenOptions = getFundingTokens({ chainId } as unknown as Checkbook, terminal) // hacky way to get ETH for now :(
+  // hack for now, address gets resolved on submit
+  // not scalable for token importing, will probably need to switch to more state vars
+  const tokenOptions = ["ETH", "USDC"]
 
   useEffect(() => {
     if (rfp?.data?.content?.title) {
@@ -171,6 +170,8 @@ const RfpMarkdownForm = ({
                   ? getFormattedDate({ dateTime: DateTime.fromJSDate(rfp?.endDate as Date) })
                   : undefined,
                 checkbookAddress: rfp?.fundingAddress,
+                fundingTokenAddress: rfp.data.funding.token.address,
+                budgetAmount: rfp.data.funding.budgetAmount,
               }
             : {
                 checkbookAddress: checkbooks?.[0]?.address,
@@ -180,7 +181,7 @@ const RfpMarkdownForm = ({
           startDate: string
           endDate: string
           checkbookAddress: string
-          fundingTokenAddress: string
+          fundingTokenSymbol: string
           budgetAmount: string
           markdown: string
           title: string
@@ -202,13 +203,43 @@ const RfpMarkdownForm = ({
             return
           }
 
+          const checkbook = checkbooks.find((checkbook) =>
+            addressesAreEqual(checkbook.address, values.checkbookAddress)
+          )
+
+          if (!checkbook) {
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "Could not find selected Checkbook.",
+            })
+            return
+          }
+
+          const fundingToken = getFundingTokens(checkbook, terminal).find(
+            (token) => token.symbol === values.fundingTokenSymbol
+          )
+
+          if (!fundingToken) {
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "Could not find token.",
+            })
+            return
+          }
+
           const parsedBudgetAmount = utils.parseUnits(
             values.budgetAmount.toString(),
-            tokenOptions.find((t) => t.address === values.fundingTokenAddress).decimals
+            fundingToken.decimals
           )
 
           const message = genRfpSignatureMessage(
-            { ...values, budgetAmount: parsedBudgetAmount },
+            {
+              ...values,
+              fundingTokenAddress: fundingToken.address,
+              budgetAmount: parsedBudgetAmount,
+            },
             activeUser?.address
           )
           const signature = await signMessage(message)
@@ -225,6 +256,14 @@ const RfpMarkdownForm = ({
               startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
               endDate: DateTime.fromISO(values.endDate).toUTC().toJSDate(),
               fundingAddress: values.checkbookAddress,
+              fundingToken: {
+                chainId: checkbook.chainId,
+                address: fundingToken.address,
+
+                symbol: fundingToken.symbol,
+                decimals: fundingToken.decimals,
+              },
+              fundingBudgetAmount: parsedBudgetAmount.toString(),
               contentBody: values.markdown,
               contentTitle: values.title,
               signature,
@@ -240,8 +279,13 @@ const RfpMarkdownForm = ({
                 : undefined,
               authorAddress: activeUser?.address,
               fundingAddress: values.checkbookAddress,
-              fundingTokenAddress: values.fundingTokenAddress,
-              budgetAmount: parsedBudgetAmount.toString(),
+              fundingToken: {
+                chainId: checkbook.chainId,
+                address: fundingToken.address,
+                symbol: fundingToken.symbol,
+                decimals: fundingToken.decimals,
+              },
+              fundingBudgetAmount: parsedBudgetAmount.toString(),
               contentBody: values.markdown,
               contentTitle: values.title,
               signature,
@@ -444,7 +488,7 @@ const RfpMarkdownForm = ({
                         </div>
                         <div className="flex flex-col mt-6">
                           <label className="font-bold block">Funding Token*</label>
-                          <Field name="fundingTokenAddress" validate={requiredField}>
+                          <Field name="fundingTokenSymbol" validate={requiredField}>
                             {({ input, meta }) => {
                               return (
                                 <div className="custom-select-wrapper">
@@ -455,8 +499,8 @@ const RfpMarkdownForm = ({
                                     <option value="">Choose option</option>
                                     {tokenOptions?.map((token, idx) => {
                                       return (
-                                        <option key={token.address} value={token.address}>
-                                          {token.symbol}
+                                        <option key={token + idx} value={token}>
+                                          {token}
                                         </option>
                                       )
                                     })}

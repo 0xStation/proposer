@@ -24,8 +24,13 @@ export type RfpMetadata = {
     body: string // template body for customized inclusion + addition of questions
   }
   funding: {
-    token: string
-    budgetAmount: number
+    token: {
+      chainId: number
+      address: string
+      symbol: string
+      decimals: number
+    }
+    budgetAmount: string
   }
 }
 
