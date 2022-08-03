@@ -1,6 +1,8 @@
 import db from "db"
 import * as z from "zod"
 import { RfpStatus as PrismaRfpStatus } from "@prisma/client"
+import { Token } from "types"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 const CreateRfp = z.object({
   terminalId: z.number(),
@@ -10,6 +12,8 @@ const CreateRfp = z.object({
   contentBody: z.string(),
   startDate: z.date(),
   endDate: z.date().optional(),
+  fundingToken: Token,
+  fundingBudgetAmount: z.string(),
   signature: z.string(),
   signatureMessage: z.any(),
 })
@@ -18,28 +22,37 @@ const defaultProposalPrefill =
   "# Proposal summary \n\n # Goals \n\n # Roadmap and deliverable details \n\n # Challenges \n\n # Team background and previous contributions \n\n # Support request"
 
 export default async function createRfp(input: z.infer<typeof CreateRfp>) {
-  if (input.endDate) {
-    if (input.startDate > input.endDate) {
+  const params = CreateRfp.parse(input)
+
+  if (params.endDate) {
+    if (params.startDate > params.endDate) {
       throw new Error("end date cannot come before start date")
     }
   }
 
   const rfp = await db.rfp.create({
     data: {
-      fundingAddress: input.fundingAddress,
-      authorAddress: input.authorAddress,
-      terminalId: input.terminalId,
-      startDate: input.startDate,
-      ...(input.endDate && { endDate: input.endDate }),
+      fundingAddress: params.fundingAddress,
+      authorAddress: params.authorAddress,
+      terminalId: params.terminalId,
+      startDate: params.startDate,
+      ...(params.endDate && { endDate: params.endDate }),
       status: PrismaRfpStatus.PUBLISHED,
       data: {
         content: {
-          title: input.contentTitle,
-          body: input.contentBody,
+          title: params.contentTitle,
+          body: params.contentBody,
         },
-        signature: input.signature,
-        signatureMessage: input.signatureMessage,
+        signature: params.signature,
+        signatureMessage: params.signatureMessage,
         proposalPrefill: defaultProposalPrefill,
+        funding: {
+          token: {
+            ...input.fundingToken,
+            address: toChecksumAddress(input.fundingToken.address),
+          },
+          budgetAmount: params.fundingBudgetAmount,
+        },
       },
     },
   })

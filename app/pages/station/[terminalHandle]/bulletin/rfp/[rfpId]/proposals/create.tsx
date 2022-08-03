@@ -36,6 +36,7 @@ import { requiredField, isPositiveAmount, composeValidators, isAddress } from "a
 import { fetchTokenDecimals } from "app/utils/fetchTokenDecimals"
 import { ZERO_ADDRESS } from "app/core/utils/constants"
 import { genProposalSignatureMessage } from "app/signatures/proposal"
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 //types
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
@@ -55,12 +56,8 @@ const CreateProposalPage: BlitzPage = ({
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(true)
-  const [token, setToken] = useState<string>(ZERO_ADDRESS)
   const router = useRouter()
-  const { data: balanceData } = useBalance({
-    addressOrName: token,
-    chainId: data.rfp.checkbook.chainId,
-  })
+  const fundingToken = data.rfp.data.funding.token
 
   useWarnIfUnsavedChanges(unsavedChanges, () => {
     return confirm("Warning! You have unsaved changes.")
@@ -68,22 +65,14 @@ const CreateProposalPage: BlitzPage = ({
 
   const checkbookTokens = useCheckbookAvailability(data.rfp.checkbook, data.terminal)
 
-  const tokenMessage = (selected) => {
-    const selectedToken = checkbookTokens.find((token) => token.address === selected)
+  const amountMessage = (amount) => {
+    const selectedToken = checkbookTokens.find((token) =>
+      addressesAreEqual(token.address, fundingToken.address)
+    )
     if (!selectedToken) {
       return
     }
-    if (parseFloat(selectedToken.available) <= 0) {
-      return `This RFP's checkbook does not contain any ${selectedToken.symbol}. You can continue with the proposal, but it cannot be approved until an admin adds more ${selectedToken.symbol} to the checkbook.`
-    }
-  }
-
-  const amountMessage = (selected, amount) => {
-    const selectedToken = checkbookTokens.find((token) => token.address === selected)
-    if (!selectedToken) {
-      return
-    }
-    if (parseFloat(selectedToken.available) < amount) {
+    if (parseFloat(fundingToken.available) < amount) {
       return `The RFP's checkbook only has ${selectedToken.available} ${selectedToken.symbol}. You can request ${amount}, but it cannot be approved until an admin adds more ${selectedToken.symbol} to the checkbook.`
     }
   }
@@ -176,12 +165,10 @@ const CreateProposalPage: BlitzPage = ({
         }}
         onSubmit={async (values: {
           recipientAddress: string
-          token: string
-          amount: number
+          amount: string
           markdown: string
           title: string
         }) => {
-          setToken(values.token)
           if (!activeUser?.address) {
             setToastState({
               isToastShowing: true,
@@ -189,16 +176,14 @@ const CreateProposalPage: BlitzPage = ({
               message: "You must connect your wallet in order to create a proposal",
             })
           } else {
-            const decimals = token === ZERO_ADDRESS ? 18 : balanceData?.decimals
-            // 18 is ETH decimals
-            const parsedTokenAmount = utils.parseUnits(values.amount.toString(), decimals)
+            const parsedTokenAmount = utils.parseUnits(values.amount, fundingToken.decimals)
 
             const message = genProposalSignatureMessage(
               data.rfp.checkbook.address,
               activeUser?.address,
               data.rfp.id,
               parsedTokenAmount,
-              values
+              { ...values, token: fundingToken.address }
             )
 
             const signature = await signMessage(message)
@@ -209,14 +194,13 @@ const CreateProposalPage: BlitzPage = ({
             }
 
             try {
-              const selectedToken = checkbookTokens.find((token) => token.address === values.token)
               await createProposalMutation({
                 rfpId: data.rfp.id,
                 terminalId: data.terminal.id,
                 recipientAddress: values.recipientAddress,
-                token: values.token,
+                token: fundingToken.address,
                 amount: values.amount,
-                symbol: selectedToken ? selectedToken.symbol : undefined,
+                symbol: fundingToken.symbol,
                 contentBody: values.markdown,
                 contentTitle: values.title,
                 collaborators: [activeUser.address],
@@ -357,12 +341,15 @@ const CreateProposalPage: BlitzPage = ({
                         </p>
                       </a>
                     </Link>
+                    <div className="mt-6">
+                      <p className="text-concrete uppercase text-xs font-bold">Token</p>
+                      <p className="mt-2 uppercase">{data.rfp.data.funding.token.symbol}</p>
+                    </div>
                     <label className="font-bold block mt-6">Fund recipient*</label>
                     <span className="text-xs text-concrete block">
                       Primary destination of the funds. Project lead/creator’s wallet address is
                       recommended.
                     </span>
-
                     <Field
                       name="recipientAddress"
                       validate={composeValidators(requiredField, isAddress)}
@@ -384,29 +371,6 @@ const CreateProposalPage: BlitzPage = ({
                       )}
                     </Field>
 
-                    <Field name={`token`} validate={requiredField}>
-                      {({ meta, input }) => (
-                        <>
-                          <label className="font-bold block mt-6">Token*</label>
-                          <div className="custom-select-wrapper">
-                            <CheckbookSelectToken
-                              terminal={data.terminal}
-                              checkbook={data.rfp.checkbook}
-                              options={input}
-                            />
-                          </div>
-                          {formState.values.token && (
-                            <span className="text-neon-carrot text-xs block mt-2">
-                              {tokenMessage(formState.values.token)}
-                            </span>
-                          )}
-                          {(meta.touched || attemptedSubmit) && meta.error && (
-                            <span className="text-torch-red text-xs">{meta.error}</span>
-                          )}
-                        </>
-                      )}
-                    </Field>
-
                     <Field
                       name={`amount`}
                       validate={composeValidators(requiredField, isPositiveAmount)}
@@ -420,9 +384,9 @@ const CreateProposalPage: BlitzPage = ({
                             placeholder="Enter token amount"
                             className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                           />
-                          {formState.values.token && formState.values.amount && (
+                          {formState.values.amount && (
                             <span className="text-neon-carrot text-xs block mt-2">
-                              {amountMessage(formState.values.token, formState.values.amount)}
+                              {amountMessage(formState.values.amount)}
                             </span>
                           )}
                           {(meta.touched || attemptedSubmit) && meta.error && (

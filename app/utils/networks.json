@@ -26,7 +26,8 @@
     "stablecoins": [
       {
         "symbol": "USDC",
-        "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+        "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "decimals": 6
       }
     ]
   },
@@ -50,7 +51,8 @@
     "stablecoins": [
       {
         "symbol": "USDC",
-        "address": "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926"
+        "address": "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
+        "decimals": 6
       }
     ]
   },
@@ -69,7 +71,8 @@
     "stablecoins": [
       {
         "symbol": "USDC",
-        "address": "0x2f3A40A3db8a7e3D09B0adfEfbCe4f6F81927557"
+        "address": "0x2f3A40A3db8a7e3D09B0adfEfbCe4f6F81927557",
+        "decimals": 6
       }
     ]
   },
@@ -83,12 +86,7 @@
     "explorer": "https://optimistic.etherscan.io",
     "start": 657806,
     "logo": "ipfs://QmfF4kwhGL8QosUXvgq2KWCmavhKBvwD6kbhs7L4p5ZAWb",
-    "stablecoins": [
-      {
-        "symbol": "USDC",
-        "address": "0x7f5c764cbc14f9669b88837ca1490cca17c31607"
-      }
-    ]
+    "stablecoins": []
   },
   "100": {
     "key": "100",
@@ -108,12 +106,7 @@
     "explorer": "https://blockscout.com/poa/xdai",
     "start": 4108192,
     "logo": "ipfs://QmZeiy8Ax4133wzxUQM9ky8z5XFVf6YLFjJMmTWbWVniZR",
-    "stablecoins": [
-      {
-        "symbol": "USDC",
-        "address": "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83"
-      }
-    ]
+    "stablecoins": []
   },
   "137": {
     "key": "137",
@@ -131,12 +124,7 @@
     "explorer": "https://polygonscan.com",
     "start": 9834491,
     "logo": "ipfs://QmaGokGqgjknfa4xnXKnnwC5ZyXzUjQ7p6KEe4D8G5uFFE",
-    "stablecoins": [
-      {
-        "symbol": "USDC",
-        "address": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
-      }
-    ]
+    "stablecoins": []
   },
   "250": {
     "key": "250",
@@ -149,12 +137,7 @@
     "explorer": "https://ftmscan.com",
     "start": 2497732,
     "logo": "ipfs://QmVEgNeQDKnXygeGxfY9FywZpNGQu98ktZtRJ9bToYF6g7",
-    "stablecoins": [
-      {
-        "symbol": "USDC",
-        "address": "0x04068da6c83afcfa0e13ba15a6696662335d5b75"
-      }
-    ]
+    "stablecoins": []
   },
   "42161": {
     "key": "42161",
@@ -169,12 +152,7 @@
     "explorer": "https://arbiscan.io",
     "start": 256508,
     "logo": "ipfs://QmWZ5SMRfvcK8tycsDqojQaSiKedgtVkS7CkZdxPgeCVsZ",
-    "stablecoins": [
-      {
-        "symbol": "USDC",
-        "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"
-      }
-    ]
+    "stablecoins": []
   },
   "1337": {
     "key": "1337",
@@ -213,11 +191,6 @@
     "explorer": "https://snowtrace.io",
     "start": 536483,
     "logo": "ipfs://QmeS75uS7XLR8o8uUzhLRVYPX9vMFf4DXgKxQeCzyy7vM2",
-    "stablecoins": [
-      {
-        "symbol": "USDC",
-        "address": "0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
-      }
-    ]
+    "stablecoins": []
   }
 }

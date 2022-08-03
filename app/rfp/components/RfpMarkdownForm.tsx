@@ -3,6 +3,7 @@ import { DateTime } from "luxon"
 import { useMutation, invalidateQuery, Link, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
 import { LockClosedIcon, XIcon, RefreshIcon, SpeakerphoneIcon } from "@heroicons/react/solid"
+import { utils } from "ethers"
 import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
 import truncateString from "app/core/utils/truncateString"
@@ -15,10 +16,16 @@ import { Checkbook } from "app/checkbook/types"
 import { Rfp } from "../types"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import ConfirmationRfpModal from "./ConfirmationRfpModal"
-import { requiredField, isAfterStartDate } from "app/utils/validators"
-import { useSignTypedData } from "wagmi"
+import {
+  composeValidators,
+  isPositiveAmount,
+  requiredField,
+  isAfterStartDate,
+} from "app/utils/validators"
+import { useNetwork } from "wagmi"
 import { genRfpSignatureMessage } from "app/signatures/rfp"
-
+import getFundingTokens from "app/core/utils/getFundingTokens"
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
 
 const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
@@ -52,6 +59,10 @@ const RfpMarkdownForm = ({
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
+
+  // hack for now, address gets resolved on submit
+  // not scalable for token importing, will probably need to switch to more state vars
+  const tokenOptions = ["ETH", "USDC"]
 
   useEffect(() => {
     if (rfp?.data?.content?.title) {
@@ -159,6 +170,8 @@ const RfpMarkdownForm = ({
                   ? getFormattedDate({ dateTime: DateTime.fromJSDate(rfp?.endDate as Date) })
                   : undefined,
                 checkbookAddress: rfp?.fundingAddress,
+                fundingTokenSymbol: rfp.data.funding.token.symbol,
+                budgetAmount: rfp.data.funding.budgetAmount,
               }
             : {
                 checkbookAddress: checkbooks?.[0]?.address,
@@ -168,6 +181,8 @@ const RfpMarkdownForm = ({
           startDate: string
           endDate: string
           checkbookAddress: string
+          fundingTokenSymbol: string
+          budgetAmount: string
           markdown: string
           title: string
         }) => {
@@ -188,7 +203,42 @@ const RfpMarkdownForm = ({
             return
           }
 
-          const message = genRfpSignatureMessage(values, activeUser?.address)
+          const checkbook = checkbooks.find((checkbook) =>
+            addressesAreEqual(checkbook.address, values.checkbookAddress)
+          )
+
+          if (!checkbook) {
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "Could not find selected Checkbook.",
+            })
+            return
+          }
+
+          const fundingToken = getFundingTokens(checkbook, terminal).find(
+            (token) => token.symbol === values.fundingTokenSymbol
+          )
+
+          if (!fundingToken) {
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "Could not find token.",
+            })
+            return
+          }
+
+          const parsedBudgetAmount = utils.parseUnits(values.budgetAmount, fundingToken.decimals)
+
+          const message = genRfpSignatureMessage(
+            {
+              ...values,
+              fundingTokenAddress: fundingToken.address,
+              budgetAmount: parsedBudgetAmount,
+            },
+            activeUser?.address
+          )
           const signature = await signMessage(message)
 
           // user must have denied signature
@@ -203,6 +253,14 @@ const RfpMarkdownForm = ({
               startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
               endDate: DateTime.fromISO(values.endDate).toUTC().toJSDate(),
               fundingAddress: values.checkbookAddress,
+              fundingToken: {
+                chainId: checkbook.chainId,
+                address: fundingToken.address,
+
+                symbol: fundingToken.symbol,
+                decimals: fundingToken.decimals,
+              },
+              fundingBudgetAmount: values.budgetAmount,
               contentBody: values.markdown,
               contentTitle: values.title,
               signature,
@@ -218,6 +276,13 @@ const RfpMarkdownForm = ({
                 : undefined,
               authorAddress: activeUser?.address,
               fundingAddress: values.checkbookAddress,
+              fundingToken: {
+                chainId: checkbook.chainId,
+                address: fundingToken.address,
+                symbol: fundingToken.symbol,
+                decimals: fundingToken.decimals,
+              },
+              fundingBudgetAmount: values.budgetAmount,
               contentBody: values.markdown,
               contentTitle: values.title,
               signature,
@@ -417,6 +482,56 @@ const RfpMarkdownForm = ({
                               })
                             }}
                           />
+                        </div>
+                        <div className="flex flex-col mt-6">
+                          <label className="font-bold block">Funding Token*</label>
+                          <Field name="fundingTokenSymbol" validate={requiredField}>
+                            {({ input, meta }) => {
+                              return (
+                                <div className="custom-select-wrapper">
+                                  <select
+                                    {...input}
+                                    className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                                  >
+                                    <option value="">Choose option</option>
+                                    {tokenOptions?.map((token, idx) => {
+                                      return (
+                                        <option key={token + idx} value={token}>
+                                          {token}
+                                        </option>
+                                      )
+                                    })}
+                                  </select>
+                                  {(meta.touched || attemptedSubmit) && meta.error && (
+                                    <span className="text-torch-red text-xs">{meta.error}</span>
+                                  )}
+                                </div>
+                              )
+                            }}
+                          </Field>
+                        </div>
+                        <div className="flex flex-col mt-6">
+                          <label className="font-bold">Budget*</label>
+                          <Field
+                            name="budgetAmount"
+                            validate={composeValidators(requiredField, isPositiveAmount)}
+                          >
+                            {({ input, meta }) => {
+                              return (
+                                <div>
+                                  <input
+                                    {...input}
+                                    type="text"
+                                    className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
+                                    placeholder="e.g. 1000.00"
+                                  />
+                                  {(meta.touched || attemptedSubmit) && meta.error && (
+                                    <span className="text-torch-red text-xs">{meta.error}</span>
+                                  )}
+                                </div>
+                              )
+                            }}
+                          </Field>
                         </div>
                       </div>
                       <button

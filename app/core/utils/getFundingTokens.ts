@@ -11,7 +11,7 @@ const getFundingTokens = (
   const eth = [CHAIN_IDS.ETHEREUM, CHAIN_IDS.RINKEBY, CHAIN_IDS.GOERLI].includes(
     checkbook?.chainId || 0
   )
-    ? [{ symbol: "ETH", address: ZERO_ADDRESS }]
+    ? [{ symbol: "ETH", address: ZERO_ADDRESS, decimals: 18 }]
     : []
 
   const stablecoins = networks[checkbook?.chainId as number]?.stablecoins || []
@@ -26,7 +26,7 @@ const getFundingTokens = (
           !stablecoins.map((s) => s.address).includes(t.data.address)
       )
       .map((t) => {
-        return { symbol: t.data.symbol, address: t.data.address }
+        return { symbol: t.data.symbol, address: t.data.address, decimals: t.data.decimals }
       }) || []
 
   return [
