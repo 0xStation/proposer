@@ -3,7 +3,7 @@ import { BlitzConfig, sessionMiddleware, simpleRolesIsAuthorized } from "blitz"
 const config: BlitzConfig = {
   middleware: [
     sessionMiddleware({
-      cookiePrefix: `${process.env.APP_ENV || "development"}_session`,
+      cookiePrefix: `${process.env.NEXT_PUBLIC_VERCEL_URL || "development"}_session`, // vercel_url guarantees uniqueness per preview environment
       isAuthorized: simpleRolesIsAuthorized,
     }),
   ],
@@ -23,4 +23,5 @@ const config: BlitzConfig = {
   },
   */
 }
+
 module.exports = config

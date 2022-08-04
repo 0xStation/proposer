@@ -3,7 +3,7 @@ import useStore from "app/core/hooks/useStore"
 
 const useAllowedNetwork = () => {
   const setToastState = useStore((state) => state.setToastState)
-  const { activeChain } = useNetwork()
+  const { chain: activeChain } = useNetwork()
 
   if (!!activeChain?.id && activeChain?.id != 4 && activeChain?.id != 1337) {
     const error = "Invalid chain selected. Please select Rinkeby or Localhost"

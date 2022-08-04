@@ -7,7 +7,7 @@ import Coinbase from "/public/coinbase-logo.svg"
 import WalletConnect from "/public/wallet-logo.svg"
 import BackIcon from "/public/back-icon.svg"
 import Banner from "/public/walletconnect-banner.png"
-import { useConnect, useAccount } from "wagmi"
+import { useConnect, useAccount, useNetwork } from "wagmi"
 import generateNonce from "app/session/queries/generateNonce"
 import { SiweMessage } from "siwe"
 import verify from "app/session/mutations/verify"
@@ -24,16 +24,9 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   })
   const [errorMessage, setErrorMessage] = useState<string>("")
   const [showSignView, setShowSignView] = useState<boolean>(false)
-  const { data: accountData } = useAccount()
-  const {
-    activeConnector,
-    connectors,
-    connectAsync,
-    data: connectData,
-    pendingConnector,
-    isConnecting,
-    isConnected,
-  } = useConnect()
+  const accountData = useAccount()
+  const { chain: activeChain } = useNetwork()
+  const { connectors, connectAsync, data: connectData, pendingConnector } = useConnect()
   const [metamaskWallet, walletConnect, coinbaseWallet] = connectors
 
   const handleCloseConnectWalletModal = () => {
@@ -51,9 +44,9 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   const handleWalletConnection = async (connector) => {
     setConnectState({ error: false, success: false, loading: true })
     let address = accountData?.address
-    if (!address || connector?.id !== activeConnector?.id) {
+    if (!address || connector?.id !== accountData?.connector?.id) {
       try {
-        await connectAsync(connector)
+        await connectAsync({ connector, chainId: activeChain?.id })
         setConnectState({ error: false, success: false, loading: false })
         setShowSignView(true)
       } catch (err) {
@@ -74,9 +67,18 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
 
   const handleSignInWithEthereum = async () => {
     setConnectState({ error: false, success: false, loading: true })
-    const address = accountData?.address
-    const chainId = connectData?.chain.id
+
     try {
+      const address = accountData?.address
+      const chainId = activeChain?.id
+      if (!address) {
+        throw Error("Error reading user's address")
+      }
+
+      if (!chainId) {
+        throw Error("Error reading chain id")
+      }
+
       const nonceRes = await invoke(generateNonce, {})
       const message = new SiweMessage({
         domain: window.location.host,
@@ -84,11 +86,11 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         statement: "Sign in with Ethereum to access your account on Station.",
         uri: window.location.origin,
         version: "1",
-        chainId, // chainId is optional
+        chainId: activeChain?.id, // chainId is optional
         nonce: nonceRes,
       })
 
-      const signer = await activeConnector?.getSigner()
+      const signer = await accountData?.connector?.getSigner()
       const signature = await signer?.signMessage(message.prepareMessage())
       const verificationSuccessful = await invoke(verify, {
         message: JSON.stringify(message),
@@ -119,7 +121,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
       showTitle={false}
       error={connectState.error}
     >
-      {showSignView && isConnected ? (
+      {showSignView && accountData?.isConnected ? (
         <>
           <button
             className="h-[20px] w-[20px] absolute mt-2 ml-2"
@@ -184,7 +186,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                   await handleWalletConnection(metamaskWallet)
                 }}
               >
-                {isConnecting && metamaskWallet?.id === pendingConnector?.id ? (
+                {accountData?.isConnecting && metamaskWallet?.id === pendingConnector?.id ? (
                   <div className="flex justify-center items-center">
                     <Spinner fill="white" />
                   </div>
@@ -206,7 +208,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                   await handleWalletConnection(walletConnect)
                 }}
               >
-                {isConnecting && walletConnect?.id === pendingConnector?.id ? (
+                {accountData?.isConnecting && walletConnect?.id === pendingConnector?.id ? (
                   <div className="flex justify-center items-center">
                     <Spinner fill="white" />
                   </div>
@@ -233,7 +235,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                   await handleWalletConnection(coinbaseWallet)
                 }}
               >
-                {isConnecting && coinbaseWallet?.id === pendingConnector?.id ? (
+                {accountData?.isConnecting && coinbaseWallet?.id === pendingConnector?.id ? (
                   <div className="flex justify-center items-center">
                     <Spinner fill="white" />
                   </div>
