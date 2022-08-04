@@ -27,7 +27,7 @@ export const genPathFromUrlObject = (route: RouteUrlObject) => {
 }
 
 export const isDev = () => {
-  return !!(process.env.NEXT_PUBLIC_VERCEL_ENV === "development")
+  return !!(process.env.NEXT_PUBLIC_VERCEL_ENV === "development" || (!isStaging() && !isProd()))
 }
 
 export const isStaging = () => {
