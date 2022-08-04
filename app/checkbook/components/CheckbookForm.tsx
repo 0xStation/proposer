@@ -1,3 +1,4 @@
+import { track } from "@amplitude/analytics-browser"
 import { useCreateCheckbookOnChain } from "app/contracts/checkbook"
 import { Spinner } from "app/core/components/Spinner"
 import { useNetwork } from "wagmi"
@@ -28,6 +29,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
   const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
   const [isDeployingCheckbook, setIsDeployingCheckbook] = useState<boolean>(false)
   const setToastState = useStore((state) => state.setToastState)
+  const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
 
   const terminalHandle = useParam("terminalHandle") as string
@@ -63,6 +65,16 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
       // this string is lowercased though, so we checksum it to give it proper casing before storing in database
       const checkbookAddress = toChecksumAddress("0x" + topicCheckbookAddress?.substring(26))
 
+      track("checkbook_contract_created", {
+        page: "checkbook_create_page",
+        event_category: "event",
+        address: activeUser?.address,
+        quorum,
+        signers,
+        checkbook_name: name,
+        checkbook_address: checkbookAddress,
+      })
+
       try {
         await createCheckbookMutation({
           terminalId: terminal?.id as number,
@@ -71,6 +83,16 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
           name: name as string,
           quorum: quorum as number,
           signers: signers as string[],
+        })
+
+        track("checkbook_model_created", {
+          page: "checkbook_create_page",
+          event_category: "event",
+          address: activeUser?.address,
+          quorum,
+          signers,
+          checkbook_name: name,
+          checkbook_address: checkbookAddress,
         })
 
         if (callback) {
@@ -102,6 +124,14 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
             // trigger transaction
             // after execution, will save transaction hash to state to trigger waiting process to create Checkbook entity
             try {
+              track("checkbook_create_button_clicked", {
+                page: "checkbook_create_page",
+                event_category: "click",
+                address: activeUser?.address,
+                quorum,
+                signers,
+                checkbook_name: values.name,
+              })
               setQuorum(quorum)
               setSigners(signers)
               setName(values.name)
@@ -128,8 +158,26 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
                   message: "Contract creation failed.",
                 })
               }
+              track("checkbook_create_error", {
+                page: "checkbook_create_page",
+                event_category: "error",
+                address: activeUser?.address,
+                quorum,
+                signers,
+                checkbook_name: values.name,
+                error_msg: e.name,
+              })
             }
           } catch (e) {
+            track("checkbook_create_error", {
+              page: "checkbook_create_page",
+              event_category: "error",
+              address: activeUser?.address,
+              quorum,
+              signers,
+              checkbook_name: values.name,
+              error_msg: e.name,
+            })
             setWaitingCreation(false)
             setIsDeployingCheckbook(false)
             console.error(e)

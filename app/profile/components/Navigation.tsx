@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { track } from "@amplitude/analytics-browser"
 import useStore from "app/core/hooks/useStore"
 import { getWalletString } from "app/utils/getWalletString"
 import { useRouter, Image, Link, Routes } from "blitz"
@@ -170,7 +169,6 @@ export const Navigation = ({
           {activeUser?.address === account?.address ? (
             <button
               onClick={() => {
-                track("Edit Profile")
                 router.push("/profile/edit")
               }}
               className="mt-4 p-[0.20rem] border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer"

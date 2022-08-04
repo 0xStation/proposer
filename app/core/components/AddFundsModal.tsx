@@ -1,5 +1,7 @@
 import { useState } from "react"
+import { track } from "@amplitude/analytics-browser"
 import Modal from "./Modal"
+import useStore from "../hooks/useStore"
 
 const TERMINAL_CREATION = "terminalCreation"
 const GENERAL = "general"
@@ -18,7 +20,10 @@ export const AddFundsModal = ({
   setIsOpen,
   checkbookAddress,
   terminalCreationFlow = false,
+  pageName,
+  stationName,
 }) => {
+  const activeUser = useStore((state) => state.activeUser)
   const [isModalAddressCopied, setIsModalAddressCopied] = useState<boolean>(false)
   const contentKey = terminalCreationFlow ? TERMINAL_CREATION : GENERAL
   return (
@@ -43,6 +48,13 @@ export const AddFundsModal = ({
           <button
             className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
             onClick={() => {
+              track("checkbook_add_funds_clicked", {
+                page: pageName,
+                event_category: "click",
+                address: activeUser?.address,
+                checkbookAddress,
+                station_name: stationName,
+              })
               navigator.clipboard.writeText(checkbookAddress as string).then(() => {
                 setIsModalAddressCopied(true)
                 setTimeout(() => {
