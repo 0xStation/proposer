@@ -108,8 +108,6 @@ const RfpMarkdownForm = ({
 
   let { signMessage } = useSignature()
 
-  console.log("local", localStorageValues)
-
   return (
     <>
       <div className="fixed grid grid-cols-4 w-[calc(100%-70px)] border-box z-50">
@@ -168,7 +166,11 @@ const RfpMarkdownForm = ({
         // my thought is that a smaller form like this wouldn't be that bad
         debug={(formState, _values) => {
           if (formState.dirty) {
-            setLocalStorageValues(formState.values)
+            let current = new Date()
+            setLocalStorageValues({
+              ...formState.values,
+              created: current.valueOf(),
+            })
           }
         }}
         initialValues={
@@ -184,7 +186,7 @@ const RfpMarkdownForm = ({
                 fundingTokenSymbol: rfp.data.funding.token.symbol,
                 budgetAmount: rfp.data.funding.budgetAmount,
               }
-            : localStorageValues
+            : localStorageValues && +new Date() - localStorageValues.created < 15000 // and if the values came from a certain short time frame ago (30 seconds?)
             ? localStorageValues
             : {
                 checkbookAddress: checkbooks?.[0]?.address,
