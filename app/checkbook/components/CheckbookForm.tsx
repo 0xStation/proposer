@@ -20,7 +20,7 @@ type FormValues = {
   quorum: string
 }
 
-export const CheckbookForm = ({ callback, isEdit = true }) => {
+export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
   const [createCheckbookMutation] = useMutation(createCheckbook)
   const [quorum, setQuorum] = useState<number>()
   const [signers, setSigners] = useState<string[]>()
@@ -66,7 +66,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
       const checkbookAddress = toChecksumAddress("0x" + topicCheckbookAddress?.substring(26))
 
       track("checkbook_contract_created", {
-        page: "checkbook_create_page",
+        page: pageName,
         event_category: "event",
         address: activeUser?.address,
         quorum,
@@ -86,7 +86,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
         })
 
         track("checkbook_model_created", {
-          page: "checkbook_create_page",
+          page: pageName,
           event_category: "event",
           address: activeUser?.address,
           quorum,
@@ -125,7 +125,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
             // after execution, will save transaction hash to state to trigger waiting process to create Checkbook entity
             try {
               track("checkbook_create_button_clicked", {
-                page: "checkbook_create_page",
+                page: pageName,
                 event_category: "click",
                 address: activeUser?.address,
                 quorum,
@@ -159,7 +159,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
                 })
               }
               track("checkbook_create_error", {
-                page: "checkbook_create_page",
+                page: pageName,
                 event_category: "error",
                 address: activeUser?.address,
                 quorum,
@@ -170,7 +170,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
             }
           } catch (e) {
             track("checkbook_create_error", {
-              page: "checkbook_create_page",
+              page: pageName,
               event_category: "error",
               address: activeUser?.address,
               quorum,

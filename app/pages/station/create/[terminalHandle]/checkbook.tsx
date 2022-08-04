@@ -14,7 +14,6 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import CheckbookForm from "app/checkbook/components/CheckbookForm"
 import CheckAnimation from "public/check_animation.gif"
-import TikTokIcon from "public/tiktok-icon.svg"
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   const session = await getSession(req, res)
@@ -93,6 +92,7 @@ const NewCheckbookTerminalCreationPage: BlitzPage = () => {
           <Image src={CheckAnimation} alt="Checkbook animation." width={496} height={240} />
           <CheckbookForm
             isEdit={false}
+            pageName="complete_profile_checkbook_page"
             callback={(checkbookAddress?: string) => {
               if (checkbookAddress) {
                 router.push(
