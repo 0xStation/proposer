@@ -1,4 +1,5 @@
 import StationLogo from "public/station-letters.svg"
+import { track } from "@amplitude/analytics-browser"
 import { useEffect } from "react"
 import { Image, invoke, Routes, useParam, useQuery, useRouter, useSession } from "blitz"
 import { useAccount } from "wagmi"
@@ -23,6 +24,7 @@ const Navigation = ({ children }: { children?: any }) => {
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [profileNavDrawerIsOpen, setProfileNavDrawerIsOpen] = useState<boolean>(false)
   const router = useRouter()
+  const terminalHandle = useParam("terminalHandle")
 
   // If the user connects + signs their wallet,
   // set the active user. The active user will be
@@ -120,7 +122,13 @@ const Navigation = ({ children }: { children?: any }) => {
               </p>
             </div>
             <button
-              onClick={() => toggleWalletModal(true)}
+              onClick={() => {
+                track("wallet_connect_banner_clicked", {
+                  page: window.location.href,
+                  station_name: terminalHandle,
+                })
+                toggleWalletModal(true)
+              }}
               className={`h-[35px] ${
                 !address
                   ? "bg-electric-violet text-tunnel-black hover:opacity-70"

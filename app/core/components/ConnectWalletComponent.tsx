@@ -1,4 +1,5 @@
-import { invoke, Image } from "blitz"
+import { invoke, Image, useParam } from "blitz"
+import { identify, Identify, setUserId, track } from "@amplitude/analytics-browser"
 import { SiweMessage } from "siwe"
 import { useState } from "react"
 import { Spinner } from "app/core/components/Spinner"
@@ -31,6 +32,7 @@ export const ConnectWalletComponent = () => {
     isConnecting,
     isConnected,
   } = useConnect()
+  const terminalHandle = useParam("terminalHandle")
   const [metamaskWallet, walletConnect, coinbaseWallet] = connectors
 
   const handleWalletConnection = async (connector) => {
@@ -43,11 +45,17 @@ export const ConnectWalletComponent = () => {
         setShowSignView(true)
       } catch (err) {
         console.error(err)
+        let errorMsg
         if (err.code === 4001) {
-          setErrorMessage("Declined connection.")
+          setErrorMessage(errorMsg)
         } else {
-          setErrorMessage("Something went wrong.")
+          errorMsg = "Something went wrong."
+          setErrorMessage(errorMsg)
         }
+        track("wallet_connect_error", {
+          page: window.location.href,
+          station_name: terminalHandle,
+        })
         setConnectState({ error: true, loading: false })
         return
       }
@@ -58,6 +66,11 @@ export const ConnectWalletComponent = () => {
   }
 
   const handleSignInWithEthereum = async () => {
+    track("sign_in_with_ethereum_back_button_clicked", {
+      page: window.location.href,
+      station_name: terminalHandle,
+      address: accountData?.address,
+    })
     setConnectState({ error: false, loading: true })
     const address = accountData?.address
     const chainId = connectData?.chain.id
@@ -81,17 +94,28 @@ export const ConnectWalletComponent = () => {
       })
 
       if (verificationSuccessful) {
+        const identifyObj = new Identify()
+        identify(identifyObj)
+        setUserId(address)
         setConnectState({ error: false, loading: true })
       } else {
         throw Error("Unsuccessful signature.")
       }
     } catch (err) {
       console.error(err.cause)
+      let errorMsg
       if (err.code === 4001) {
-        setErrorMessage("Signature declined.")
+        errorMsg = "Signature declined."
+        setErrorMessage(errorMsg)
       } else {
-        setErrorMessage(`Something went wrong. ${err.message || ""}`)
+        errorMsg = `Something went wrong. ${err.message || ""}`
+        setErrorMessage(errorMsg)
       }
+      track("sign_in_with_ethereum_error", {
+        page: window.location.href,
+        station_name: terminalHandle,
+        errorMsg,
+      })
       setConnectState({ error: true, loading: false })
     }
   }
@@ -175,6 +199,12 @@ export const ConnectWalletComponent = () => {
                 }`}
                 disabled={connectState.loading}
                 onClick={async () => {
+                  track("wallet_connect_button_clicked", {
+                    page: window.location.href,
+                    station_name: terminalHandle,
+                    address: accountData?.address,
+                    wallet: "metamask",
+                  })
                   await handleWalletConnection(metamaskWallet)
                 }}
               >
@@ -197,6 +227,12 @@ export const ConnectWalletComponent = () => {
                 }`}
                 disabled={connectState.loading}
                 onClick={async () => {
+                  track("wallet_connect_button_clicked", {
+                    page: window.location.href,
+                    station_name: terminalHandle,
+                    address: accountData?.address,
+                    wallet: "wallet_connect",
+                  })
                   await handleWalletConnection(walletConnect)
                 }}
               >
@@ -224,6 +260,12 @@ export const ConnectWalletComponent = () => {
                 }`}
                 disabled={connectState.loading}
                 onClick={async () => {
+                  track("wallet_connect_button_clicked", {
+                    page: window.location.href,
+                    station_name: terminalHandle,
+                    address: accountData?.address,
+                    wallet: "coinbase",
+                  })
                   await handleWalletConnection(coinbaseWallet)
                 }}
               >
