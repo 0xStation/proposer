@@ -59,7 +59,7 @@ const RfpMarkdownForm = ({
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
-  const [localStorageValues, setLocalStorageValues] = useLocalStorage("cached-rfp", {})
+  const [localStorageValues, setLocalStorageValues] = useLocalStorage("cached-rfp", { created: 0 })
 
   // hack for now, address gets resolved on submit
   // not scalable for token importing, will probably need to switch to more state vars
@@ -186,7 +186,7 @@ const RfpMarkdownForm = ({
                 fundingTokenSymbol: rfp.data.funding.token.symbol,
                 budgetAmount: rfp.data.funding.budgetAmount,
               }
-            : localStorageValues && +new Date() - localStorageValues.created < 15000 // and if the values came from a certain short time frame ago (30 seconds?)
+            : localStorageValues && +new Date() - localStorageValues.created < 15000 // and if the values came from a certain short time frame ago (15 seconds right now)
             ? localStorageValues
             : {
                 checkbookAddress: checkbooks?.[0]?.address,
