@@ -55,6 +55,7 @@ const createStationWhitelist = [
   "0xcd5a7d5c7dc605e42fb4a9e11da38a06a96d1f9a", // Philosophical Foxes
   "0xf6910D47FbB1F5518d60C721D4189936eCd5a1b6", // InfoToken
   "0x285b7eea81a5b66b62e7276a24c1e0f83f7409c1", // 0xmaki
+  "0x84c30aeca40bcf38e17E52A85f0D383E373E5D55", // Osmosis Grants
 ]
 export const canCreateStation = (address: string | undefined) => {
   if (process.env.NODE_ENV !== "production") return true
