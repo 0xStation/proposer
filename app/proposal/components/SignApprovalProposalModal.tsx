@@ -1,5 +1,5 @@
 import { useMutation, useRouter, invalidateQuery } from "blitz"
-import { useToken } from "wagmi"
+import { useToken, useNetwork } from "wagmi"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
@@ -29,7 +29,11 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
     ...(!!proposal?.data.funding.token &&
       proposal?.data.funding.token !== ZERO_ADDRESS && { address: proposal?.data.funding.token }),
   })
-  const decimals = proposal?.data.funding.token === ZERO_ADDRESS ? 18 : tokenData?.decimals || 0
+
+  // going to have to change this when Kristens wagmi v6 gets merged bc its breaking change but should be easy switch
+  // active chain -> chain
+  const { activeChain, switchNetwork } = useNetwork()
+  // const { switchNetwork } = useSwitchNetwork()
 
   const createOrFindCheckAndFetchSignature = async () => {
     let check = checks[0]
@@ -48,7 +52,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
 
     const signature = await signMessage(check.data.signatureMessage)
 
-    // user must have denied signature
+    // no signature - user must have denied signature
     if (!signature) {
       return
     }
@@ -112,60 +116,89 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        <h3 className="text-2xl font-bold pt-6">Sign to confirm approval</h3>
-        <p className="mt-2">
-          Your approval moves this proposal a step closer to reality. Once this approval meets the
-          quorum the check will be generated for the fund recipient to cash.
-        </p>
+        {activeChain && activeChain.id === rfp.checkbook.chainId ? (
+          <>
+            <h3 className="text-2xl font-bold pt-6">Sign to confirm approval</h3>
+            <p className="mt-2">
+              Your approval moves this proposal a step closer to reality. Once this approval meets
+              the quorum the check will be generated for the fund recipient to cash.
+            </p>
 
-        <div className="flex justify-between mt-4">
-          <span className="font-bold">Fund recipient</span>
-          <span>{truncateString(proposal?.data.funding.recipientAddress)}</span>
-        </div>
-        <div className="flex justify-between mt-4">
-          <span className="font-bold">Token</span>
-          <span>{truncateString(proposal?.data.funding.token)}</span>
-        </div>
-        <div className="flex justify-between mt-4">
-          <div className="flex flex-row space-x-2 items-center">
-            <span className="font-bold">Expiration date</span>
-            <span className="relative group">
-              <InformationCircleIcon className="h-4 w-4" />
-              <span className="p-2 bg-wet-concrete rounded hidden group-hover:block absolute top-[100%] w-[150px] text-xs">
-                The date the check expires.{" "}
-                <a
-                  href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
-                  className="text-electric-violet"
-                >
-                  Learn more.
-                </a>
-              </span>
-            </span>
+            <div className="flex justify-between mt-4">
+              <span className="font-bold">Fund recipient</span>
+              <span>{truncateString(proposal?.data.funding.recipientAddress)}</span>
+            </div>
+            <div className="flex justify-between mt-4">
+              <span className="font-bold">Token</span>
+              <span>{truncateString(proposal?.data.funding.token)}</span>
+            </div>
+            <div className="flex justify-between mt-4">
+              <div className="flex flex-row space-x-2 items-center">
+                <span className="font-bold">Expiration date</span>
+                <span className="relative group">
+                  <InformationCircleIcon className="h-4 w-4" />
+                  <span className="p-2 bg-wet-concrete rounded hidden group-hover:block absolute top-[100%] w-[150px] text-xs">
+                    The date the check expires.{" "}
+                    <a
+                      href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
+                      className="text-electric-violet"
+                    >
+                      Learn more.
+                    </a>
+                  </span>
+                </span>
+              </div>
+              <span>{checks && formatDate(getCheckDeadline())}</span>
+            </div>
+            <div className="flex justify-between mt-4">
+              <span className="font-bold">Total</span>
+              <span>{proposal?.data.funding.amount}</span>
+            </div>
+            <div className="mt-8">
+              <button
+                type="button"
+                className="text-electric-violet border border-electric-violet mr-2 py-1 w-[98px] rounded hover:opacity-75"
+                onClick={() => setIsOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 w-[98px] rounded hover:opacity-75"
+                onClick={() => {
+                  createOrFindCheckAndFetchSignature()
+                }}
+              >
+                Sign
+              </button>
+            </div>
+          </>
+        ) : (
+          <div>
+            <h3 className="text-2xl font-bold pt-6">Change chain to approve</h3>
+            <p className="mt-2">
+              You are connected to the wrong chain! Click below to switch chains.
+            </p>
+            <div className="mt-8">
+              <button
+                type="button"
+                className="text-electric-violet border border-electric-violet mr-2 py-1 w-[98px] rounded hover:opacity-75"
+                onClick={() => setIsOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 w-[98px] rounded hover:opacity-75"
+                onClick={() => {
+                  switchNetwork?.(rfp.checkbook.chainId)
+                }}
+              >
+                Switch
+              </button>
+            </div>
           </div>
-          <span>{checks && formatDate(getCheckDeadline())}</span>
-        </div>
-        <div className="flex justify-between mt-4">
-          <span className="font-bold">Total</span>
-          <span>{proposal?.data.funding.amount}</span>
-        </div>
-        <div className="mt-8">
-          <button
-            type="button"
-            className="text-electric-violet border border-electric-violet mr-2 py-1 w-[98px] rounded hover:opacity-75"
-            onClick={() => setIsOpen(false)}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 w-[98px] rounded hover:opacity-75"
-            onClick={() => {
-              createOrFindCheckAndFetchSignature()
-            }}
-          >
-            Sign
-          </button>
-        </div>
+        )}
       </div>
     </Modal>
   )
