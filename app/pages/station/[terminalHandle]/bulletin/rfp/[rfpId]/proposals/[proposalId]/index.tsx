@@ -31,7 +31,7 @@ import { Spinner } from "app/core/components/Spinner"
 import { useWaitForTransaction } from "wagmi"
 import { ZERO_ADDRESS } from "app/core/utils/constants"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
-import { formatUnits } from "ethers/lib/utils"
+import { formatUnits } from "@ethersproject/units"
 import {
   DotsHorizontalIcon,
   ClipboardCheckIcon,

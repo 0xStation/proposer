@@ -1,6 +1,6 @@
 import { Check } from "app/check/types"
 import { CheckApprovalMetadata } from "app/checkApproval/types"
-import { BigNumber } from "ethers"
+import { BigNumber } from "@ethersproject/bignumber"
 
 // prepare check object from database to types ready for ethers for signatures or transactions
 export const checkToContractTypes = (check: Check) => {
