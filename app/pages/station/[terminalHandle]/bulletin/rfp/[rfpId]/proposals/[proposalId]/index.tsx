@@ -43,6 +43,7 @@ import Dropdown from "app/core/components/Dropdown"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { RfpStatus } from "app/rfp/types"
+import SelectCheckbookModal from "app/checkbook/components/SelectCheckbookModal"
 
 const ProposalPage: BlitzPage = ({
   rfp,
@@ -55,6 +56,7 @@ const ProposalPage: BlitzPage = ({
   const [cashCheckModalOpen, setCashCheckModalOpen] = useState<boolean>(false)
   const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
   const [checkTxnHash, setCheckTxnHash] = useState<string>()
+  const [checkbookModalOpen, setCheckbookModalOpen] = useState<boolean>(false)
   const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
   const [isProposalUrlCopied, setIsProposalUrlCopied] = useState<boolean>(false)
   const [check, setCheck] = useState<Check>()
@@ -87,16 +89,18 @@ const ProposalPage: BlitzPage = ({
   )
 
   const funds = useCheckbookFunds(
-    rfp.checkbook?.chainId as number,
-    rfp.checkbook?.address as string,
-    rfp.checkbook?.quorum as number,
+    checkbook?.chainId as number,
+    checkbook?.address as string,
+    checkbook?.quorum as number,
     proposal.data?.funding.token
   )
   const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
 
   useEffect(() => {
     setOverallocated(
-      parseFloat(fundsAvailable) < proposal.data.funding?.amount && proposal.checks.length === 0
+      !!checkbook &&
+        parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
+        proposal.checks.length === 0
     )
   }, [fundsAvailable])
 
@@ -104,7 +108,8 @@ const ProposalPage: BlitzPage = ({
 
   // user can approve if they are a signer and they haven't approved before
   const userCanApprove =
-    checkbook?.signers.includes(activeUser?.address || "") &&
+    (rfp.authorAddress === activeUser?.address ||
+      checkbook?.signers.includes(activeUser?.address || "")) &&
     !proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address)
 
   // show approve button, if the proposal hasn't reached quorum, user can approve, user hasn't already approved
@@ -147,6 +152,11 @@ const ProposalPage: BlitzPage = ({
 
   return (
     <Layout title={`Proposals`}>
+      <SelectCheckbookModal
+        isOpen={checkbookModalOpen}
+        setIsOpen={setCheckbookModalOpen}
+        terminal={terminal}
+      />
       <SignApprovalProposalModal
         isOpen={signModalOpen}
         setIsOpen={setSignModalOpen}
@@ -254,7 +264,11 @@ const ProposalPage: BlitzPage = ({
                 <div className="relative self-start group">
                   <button
                     onClick={() => {
-                      setSignModalOpen(true)
+                      if (!!checkbook) {
+                        setSignModalOpen(true)
+                      } else {
+                        setCheckbookModalOpen(true)
+                      }
                     }}
                     className="bg-electric-violet text-tunnel-black px-6 h-[35px] rounded block mx-auto hover:bg-opacity-70 mb-2"
                     disabled={waitingCreation || overallocated}
