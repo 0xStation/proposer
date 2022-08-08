@@ -103,18 +103,19 @@ const ProposalPage: BlitzPage = ({
     })
   }, [])
 
-  if (!!checkbook) {
-    const funds = useCheckbookFunds(
-      checkbook?.chainId as number,
-      checkbook?.address as string,
-      checkbook?.quorum as number,
-      proposal.data?.funding.token
-    )
-    const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
+  const funds = useCheckbookFunds(
+    rfp.checkbook?.chainId as number,
+    rfp.checkbook?.address as string,
+    rfp.checkbook?.quorum as number,
+    proposal.data?.funding.token
+  )
+  const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
+
+  useEffect(() => {
     setOverallocated(
       parseFloat(fundsAvailable) < proposal.data.funding?.amount && proposal.checks.length === 0
     )
-  }
+  }, [fundsAvailable])
 
   const hasQuorum = checkbook && check?.approvals?.length === checkbook?.quorum
 
