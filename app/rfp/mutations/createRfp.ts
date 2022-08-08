@@ -16,6 +16,8 @@ const CreateRfp = z.object({
   fundingBudgetAmount: z.string(),
   signature: z.string(),
   signatureMessage: z.any(),
+  submittingPermission: z.string(),
+  viewingPermission: z.string(),
 })
 
 const defaultProposalPrefill =
@@ -52,6 +54,10 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
             address: toChecksumAddress(input.fundingToken.address),
           },
           budgetAmount: params.fundingBudgetAmount,
+        },
+        permissions: {
+          submit: input.submittingPermission,
+          view: input.viewingPermission,
         },
       },
     },
