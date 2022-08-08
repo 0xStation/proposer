@@ -14,7 +14,7 @@ const useCheckbookFunds = (
   const [aggregatedCheckTotals] = useQuery(
     getAggregatedCheckAmounts,
     { checkbookAddress, quorum: quorum, tokenAddress: tokenAddress as string },
-    { suspense: false, enabled: !!tokenAddress }
+    { suspense: false, enabled: !!chainId && !!checkbookAddress && !!quorum && !!tokenAddress }
   )
 
   const { data } = useBalance({

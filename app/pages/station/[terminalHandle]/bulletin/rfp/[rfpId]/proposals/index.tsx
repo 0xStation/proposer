@@ -140,7 +140,7 @@ const ProposalsTab: BlitzPage = ({
 
           <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
             <span className="basis-[38rem] ml-6 mb-2">Title</span>
-            <span className="basis-32 ml-9 mb-2">Approval</span>
+            {/* <span className="basis-32 ml-9 mb-2">Approval</span> */}
             <span className="basis-32 ml-6 mb-2">Amount</span>
             <span className="basis-32 ml-2 mb-2">Submission Date</span>
             <span className="basis-32 ml-6 mr-6 mb-2">Author</span>
@@ -210,18 +210,19 @@ const ProposalComponent = ({
   const router = useRouter()
   const [overallocated, setOverallocated] = useState<boolean>(false)
 
-  if (!!rfp.checkbook) {
-    const funds = useCheckbookFunds(
-      rfp.checkbook?.chainId as number,
-      rfp.checkbook?.address as string,
-      rfp.checkbook?.quorum as number,
-      proposal.data?.funding.token
-    )
-    const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
+  const funds = useCheckbookFunds(
+    rfp.checkbook?.chainId as number,
+    rfp.checkbook?.address as string,
+    rfp.checkbook?.quorum as number,
+    proposal.data?.funding.token
+  )
+  const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
+
+  useEffect(() => {
     setOverallocated(
       parseFloat(fundsAvailable) < proposal.data.funding?.amount && proposal.checks.length === 0
     )
-  }
+  }, [fundsAvailable])
 
   return (
     <Link href={Routes.ProposalPage({ terminalHandle, rfpId: rfp.id, proposalId: proposal.id })}>
@@ -240,11 +241,7 @@ const ProposalComponent = ({
           <div className="basis-[38rem] ml-6 mb-2">
             <h2 className="text-xl mt-2 mb-3">{proposal?.data?.content?.title}</h2>
           </div>
-          <div
-            className={`basis-32 ml-6 mb-2 self-center relative group ${
-              overallocated && "text-torch-red"
-            }`}
-          >
+          <div className="basis-32 ml-6 mb-2 self-center relative group">
             {proposal.data?.funding?.amount || "N/A"} {proposal.data?.funding?.symbol}
             {/* if there are no checks, it means the value of this prop is not pending, and can be overallocated */}
             {overallocated && (
