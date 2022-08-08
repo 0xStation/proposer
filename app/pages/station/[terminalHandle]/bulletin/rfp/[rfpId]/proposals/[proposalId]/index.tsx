@@ -10,6 +10,7 @@ import {
   GetServerSideProps,
   InferGetServerSidePropsType,
 } from "blitz"
+import { track } from "@amplitude/analytics-browser"
 import useStore from "app/core/hooks/useStore"
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
@@ -72,6 +73,18 @@ const ProposalPage: BlitzPage = ({
       },
     }
   )
+
+  useEffect(() => {
+    track("proposal_page_shown", {
+      page: "proposal_page",
+      event_category: "impression",
+      address: activeUser?.address,
+      station_name: terminal?.handle,
+      station_id: terminal?.id,
+      rfp_id: rfp?.id,
+      proposal_id: proposal?.id,
+    })
+  }, [])
 
   const funds = useCheckbookFunds(
     rfp.checkbook?.chainId as number,

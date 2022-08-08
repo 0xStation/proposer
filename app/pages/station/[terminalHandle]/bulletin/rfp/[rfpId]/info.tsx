@@ -9,6 +9,7 @@ import {
   GetServerSideProps,
   invoke,
 } from "blitz"
+import { track } from "@amplitude/analytics-browser"
 import { DateTime } from "luxon"
 import Preview from "app/core/components/MarkdownPreview"
 import { RfpStatus } from "app/rfp/types"
@@ -22,6 +23,7 @@ import AccountMediaObject from "app/core/components/AccountMediaObject"
 import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import { AddFundsModal } from "app/core/components/AddFundsModal"
+import useStore from "app/core/hooks/useStore"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { terminalHandle, rfpId, proposalId } = context.query as {
@@ -61,13 +63,32 @@ const RFPInfoTab: BlitzPage = () => {
   const [showAddFundsModal, setShowAddFundsModal] = useState<boolean>(false)
   const query = useRouterQuery()
   const rfpId = useParam("rfpId") as string
-  const [terminal] = useQuery(
+  const [terminal, { isSuccess: isFinishedFetchingTerminal }] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle as string },
-    { suspense: false, enabled: !!terminalHandle }
+    {
+      suspense: false,
+      enabled: !!terminalHandle,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }
   )
+  const activeUser = useStore((state) => state.activeUser)
   const isAdmin = useAdminForTerminal(terminal)
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
+
+  useEffect(() => {
+    if (isFinishedFetchingTerminal) {
+      track("rfp_info_page_shown", {
+        page: "rfp_info_page",
+        event_category: "impression",
+        address: activeUser?.address,
+        station_name: terminal?.handle,
+        station_id: terminal?.id,
+        rfp_id: rfpId,
+      })
+    }
+  }, [isFinishedFetchingTerminal])
 
   useEffect(() => {
     if (query.rfpEdited) {

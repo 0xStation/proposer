@@ -270,15 +270,21 @@ const RfpHeaderNavigation = ({ rfpId }) => {
             </div>
           </div>
           {rfpOpen && (
-            <Link href={Routes.CreateProposalPage({ terminalHandle, rfpId })} passHref>
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-electric-violet text-tunnel-black rounded self-start px-6 h-[35px] leading-[35px] hover:bg-opacity-70 whitespace-nowrap"
-              >
-                Create proposal
-              </a>
-            </Link>
+            <button
+              onClick={() => {
+                track("proposal_show_editor_clicked", {
+                  event_category: "click",
+                  page: "rfp_info_page",
+                  station_name: terminalHandle,
+                  station_id: terminal?.id,
+                  rfp_id: rfp?.id,
+                })
+                router.push(Routes.CreateProposalPage({ terminalHandle, rfpId }))
+              }}
+              className="bg-electric-violet text-tunnel-black rounded self-start px-6 h-[35px] leading-[35px] hover:bg-opacity-70 whitespace-nowrap"
+            >
+              Create proposal
+            </button>
           )}
         </div>
         <ul className="mt-7 text-lg mb-2">

@@ -241,6 +241,7 @@ const BulletinPage: BlitzPage = () => {
                   className="bg-electric-violet rounded text-tunnel-black px-6 h-[35px] w-[133px] mt-6 hover:opacity-70"
                   onClick={() => {
                     track("rfp_show_editor_clicked", {
+                      event_category: "click",
                       address: activeUser?.address,
                       station_name: terminalHandle,
                       station_id: terminal?.id,

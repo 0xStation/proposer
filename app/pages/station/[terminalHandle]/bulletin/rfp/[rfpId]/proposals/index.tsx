@@ -12,6 +12,7 @@ import {
   InferGetServerSidePropsType,
   invoke,
 } from "blitz"
+import { track } from "@amplitude/analytics-browser"
 import useStore from "app/core/hooks/useStore"
 import Layout from "app/core/layouts/Layout"
 import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
@@ -65,20 +66,39 @@ const ProposalsTab: BlitzPage = ({
     { suspense: false, enabled: !!rfpId && !!rfp?.checkbook, refetchOnWindowFocus: false }
   )
 
-  const [proposalCount] = useQuery(
+  const [proposalCount, { isSuccess: isFinishedFetchingProposalCount }] = useQuery(
     getProposalCountByRfpId,
     {
       rfpId,
       quorum: rfp?.checkbook.quorum as number,
       statuses: Array.from(proposalStatusFilters),
     },
-    { suspense: false, enabled: !!rfpId && !!rfp?.checkbook, refetchOnWindowFocus: false }
+    {
+      suspense: false,
+      enabled: !!rfpId && !!rfp?.checkbook,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }
   )
 
   const [proposalCreatedConfirmationModal, setProposalCreatedConfirmationModal] =
     useState<boolean>(false)
 
   const [isGetNotifiedModalOpen, setIsGetNotifiedModalOpen] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (isFinishedFetchingProposalCount) {
+      track("rfp_proposals_page_shown", {
+        page: "rfp_proposals_page",
+        event_category: "impression",
+        address: activeUser?.address,
+        station_name: terminal?.handle,
+        station_id: terminal?.id,
+        rfp_id: rfpId,
+        num_proposals: proposalCount,
+      })
+    }
+  }, [isFinishedFetchingProposalCount])
 
   useEffect(() => {
     if (proposalId) {

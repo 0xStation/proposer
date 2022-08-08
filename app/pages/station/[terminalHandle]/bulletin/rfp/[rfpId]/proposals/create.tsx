@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   BlitzPage,
   invoke,
@@ -10,6 +10,7 @@ import {
   useParam,
   useMutation,
 } from "blitz"
+import { track } from "@amplitude/analytics-browser"
 import { Field, Form } from "react-final-form"
 import { LightBulbIcon, XIcon } from "@heroicons/react/solid"
 import { utils } from "ethers"
@@ -65,6 +66,16 @@ const CreateProposalPage: BlitzPage = ({
   useWarnIfUnsavedChanges(unsavedChanges, () => {
     return confirm("Warning! You have unsaved changes.")
   })
+
+  useEffect(() => {
+    track("proposal_editor_page_shown", {
+      event_category: "impression",
+      page: "proposal_editor_page",
+      address: activeUser?.address,
+      station_name: data.terminal?.handle,
+      station_id: data.terminal?.id,
+    })
+  }, [])
 
   const checkbookTokens = useCheckbookAvailability(data.rfp.checkbook, data.terminal)
 
@@ -181,6 +192,17 @@ const CreateProposalPage: BlitzPage = ({
           markdown: string
           title: string
         }) => {
+          track("proposal_editor_modal_publish_clicked", {
+            event_category: "click",
+            page: "proposal_editor_page",
+            address: activeUser?.address,
+            station_name: data.terminal?.handle,
+            station_id: data.terminal?.id,
+            recipient_address: values?.recipientAddress,
+            token: values.token,
+            amount: values?.amount,
+            title: values?.title,
+          })
           setToken(values.token)
           if (!activeUser?.address) {
             setToastState({
@@ -224,6 +246,18 @@ const CreateProposalPage: BlitzPage = ({
                 signatureMessage: message,
               })
             } catch (e) {
+              track("error_creating_proposal", {
+                event_category: "error",
+                page: "proposal_editor_page",
+                address: activeUser?.address,
+                station_name: data.terminal?.handle,
+                station_id: data.terminal?.id,
+                recipient_address: values?.recipientAddress,
+                token: values.token,
+                amount: values?.amount,
+                title: values?.title,
+                error_msg: e.message,
+              })
               console.error(e)
               setToastState({
                 isToastShowing: true,
@@ -317,7 +351,9 @@ const CreateProposalPage: BlitzPage = ({
                         <button
                           type="submit"
                           className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
-                          onClick={() => handleSubmit()}
+                          onClick={() => {
+                            handleSubmit()
+                          }}
                         >
                           Continue
                         </button>
@@ -436,6 +472,12 @@ const CreateProposalPage: BlitzPage = ({
                     <button
                       type="button"
                       onClick={() => {
+                        track("proposal_editor_publish_clicked", {
+                          event_category: "click",
+                          station_name: data?.terminal?.handle,
+                          station_id: data?.terminal?.id,
+                          address: activeUser?.address,
+                        })
                         setAttemptedSubmit(true)
                         if (formState.invalid) {
                           const fieldsWithErrors = Object.keys(formState.errors as Object)
