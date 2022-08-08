@@ -1,4 +1,5 @@
-import { computeProposalStatus } from "app/proposal/utils"
+import { ProposalStatus } from "app/proposal/types"
+// import { computeProposalStatus } from "app/proposal/utils"
 import db from "db"
 import * as z from "zod"
 import { Account } from "../types"
@@ -23,6 +24,18 @@ export default async function getAccountProposalsByAddress(
       },
     },
   })
+
+  const accountProposalsWithProductStatus = accountProposals.map((accountProposal) => {
+    return {
+      ...accountProposal,
+      proposal: {
+        ...accountProposal.proposal,
+        status: ProposalStatus.SUBMITTED,
+      },
+    }
+  })
+
+  return accountProposalsWithProductStatus
 
   return accountProposals
 }

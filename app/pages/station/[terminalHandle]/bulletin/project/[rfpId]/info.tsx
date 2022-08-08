@@ -30,6 +30,7 @@ const {
   PAGE_NAME,
   FEATURE: { RFP },
 } = TRACKING_EVENTS
+// import getRfpApprovedProposalFunding from "app/rfp/queries/getRfpApprovedFunding"
 import getCheckbook from "app/checkbook/queries/getCheckbook"
 import { FundingSenderType } from "app/types"
 

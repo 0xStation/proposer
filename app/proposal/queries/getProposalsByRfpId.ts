@@ -2,7 +2,7 @@ import db from "db"
 import * as z from "zod"
 import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 import { Proposal } from "../types"
-import { computeProposalDbFilterFromProposalApprovals, computeProposalStatus } from "../utils"
+// import { computeProposalDbFilterFromProposalApprovals, computeProposalStatus } from "../utils"
 import { PAGINATION_TAKE } from "app/core/utils/constants"
 
 const GetProposalsByRfpId = z.object({
