@@ -63,6 +63,7 @@ const createStationWhitelist = [
   "0x75d2e010392c99e1dab54781bFe4760a091A2c51", // flashbots
   "0x586Bc43937C2eC42348cc83Acf44CED42Fe3d5f7", // fingerprintsDAO
   "0xb4248430C7AF4Ce104b25C1677cE4FB32884210f", // squiggleDAO
+  "0x93730CE5Ac9de1DB9F3FBb73bF522a690629CCEc", // Tribute Labs
 ]
 export const canCreateStation = (address: string | undefined) => {
   if (process.env.NODE_ENV !== "production") return true
