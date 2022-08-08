@@ -414,6 +414,56 @@ const RfpMarkdownForm = ({
                         </Field>
                       </div>
                       <div className="flex flex-col mt-6">
+                        <label className="font-bold block">Funding Token*</label>
+                        <Field name="fundingTokenSymbol" validate={requiredField}>
+                          {({ input, meta }) => {
+                            return (
+                              <div className="custom-select-wrapper">
+                                <select
+                                  {...input}
+                                  className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                                >
+                                  <option value="">Choose option</option>
+                                  {tokenOptions?.map((token, idx) => {
+                                    return (
+                                      <option key={token + idx} value={token}>
+                                        {token}
+                                      </option>
+                                    )
+                                  })}
+                                </select>
+                                {(meta.touched || attemptedSubmit) && meta.error && (
+                                  <span className="text-torch-red text-xs">{meta.error}</span>
+                                )}
+                              </div>
+                            )
+                          }}
+                        </Field>
+                      </div>
+                      <div className="flex flex-col mt-6">
+                        <label className="font-bold">Budget*</label>
+                        <Field
+                          name="budgetAmount"
+                          validate={composeValidators(requiredField, isPositiveAmount)}
+                        >
+                          {({ input, meta }) => {
+                            return (
+                              <div>
+                                <input
+                                  {...input}
+                                  type="text"
+                                  className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
+                                  placeholder="e.g. 1000.00"
+                                />
+                                {(meta.touched || attemptedSubmit) && meta.error && (
+                                  <span className="text-torch-red text-xs">{meta.error}</span>
+                                )}
+                              </div>
+                            )
+                          }}
+                        </Field>
+                      </div>
+                      <div className="flex flex-col mt-6">
                         <label className="font-bold block">Checkbook</label>
                         <span className="text-xs text-concrete block">
                           Deposit funds here to create checks for proposers to claim once their
@@ -473,56 +523,6 @@ const RfpMarkdownForm = ({
                               })
                             }}
                           />
-                        </div>
-                        <div className="flex flex-col mt-6">
-                          <label className="font-bold block">Funding Token*</label>
-                          <Field name="fundingTokenSymbol" validate={requiredField}>
-                            {({ input, meta }) => {
-                              return (
-                                <div className="custom-select-wrapper">
-                                  <select
-                                    {...input}
-                                    className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
-                                  >
-                                    <option value="">Choose option</option>
-                                    {tokenOptions?.map((token, idx) => {
-                                      return (
-                                        <option key={token + idx} value={token}>
-                                          {token}
-                                        </option>
-                                      )
-                                    })}
-                                  </select>
-                                  {(meta.touched || attemptedSubmit) && meta.error && (
-                                    <span className="text-torch-red text-xs">{meta.error}</span>
-                                  )}
-                                </div>
-                              )
-                            }}
-                          </Field>
-                        </div>
-                        <div className="flex flex-col mt-6">
-                          <label className="font-bold">Budget*</label>
-                          <Field
-                            name="budgetAmount"
-                            validate={composeValidators(requiredField, isPositiveAmount)}
-                          >
-                            {({ input, meta }) => {
-                              return (
-                                <div>
-                                  <input
-                                    {...input}
-                                    type="text"
-                                    className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
-                                    placeholder="e.g. 1000.00"
-                                  />
-                                  {(meta.touched || attemptedSubmit) && meta.error && (
-                                    <span className="text-torch-red text-xs">{meta.error}</span>
-                                  )}
-                                </div>
-                              )
-                            }}
-                          </Field>
                         </div>
                       </div>
                       <button

@@ -208,17 +208,19 @@ const ProposalComponent = ({
   isAdmin: boolean
 }) => {
   const router = useRouter()
+  const [overallocated, setOverallocated] = useState<boolean>(false)
 
-  const funds = useCheckbookFunds(
-    rfp.checkbook?.chainId as number,
-    rfp.checkbook?.address as string,
-    rfp.checkbook?.quorum as number,
-    proposal.data?.funding.token
-  )
-  const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
-
-  const fundsHaveNotBeenApproved = (proposal) => {
-    return proposal.checks.length === 0
+  if (!!rfp.checkbook) {
+    const funds = useCheckbookFunds(
+      rfp.checkbook?.chainId as number,
+      rfp.checkbook?.address as string,
+      rfp.checkbook?.quorum as number,
+      proposal.data?.funding.token
+    )
+    const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
+    setOverallocated(
+      parseFloat(fundsAvailable) < proposal.data.funding?.amount && proposal.checks.length === 0
+    )
   }
 
   return (
@@ -240,31 +242,28 @@ const ProposalComponent = ({
           </div>
           <div
             className={`basis-32 ml-6 mb-2 self-center relative group ${
-              parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
-              fundsHaveNotBeenApproved(proposal) &&
-              "text-torch-red"
+              overallocated && "text-torch-red"
             }`}
           >
             {proposal.data?.funding?.amount || "N/A"} {proposal.data?.funding?.symbol}
             {/* if there are no checks, it means the value of this prop is not pending, and can be overallocated */}
-            {parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
-              fundsHaveNotBeenApproved(proposal) && (
-                <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[100%] left-0 group hidden group-hover:block shadow-lg z-50">
-                  Insufficient funds.{" "}
-                  {isAdmin && (
-                    <span
-                      className="text-electric-violet cursor-pointer"
-                      onClick={(e) => {
-                        // overriding the parent click handler
-                        e.preventDefault()
-                        router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
-                      }}
-                    >
-                      Go to checkbook to refill.
-                    </span>
-                  )}
-                </span>
-              )}
+            {overallocated && (
+              <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[100%] left-0 group hidden group-hover:block shadow-lg z-50">
+                Insufficient funds.{" "}
+                {isAdmin && (
+                  <span
+                    className="text-electric-violet cursor-pointer"
+                    onClick={(e) => {
+                      // overriding the parent click handler
+                      e.preventDefault()
+                      router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
+                    }}
+                  >
+                    Go to checkbook to refill.
+                  </span>
+                )}
+              </span>
+            )}
           </div>
           <div className="basis-32 ml-2 mb-2 self-center">
             {formatDate(proposal.createdAt) || "N/A"}

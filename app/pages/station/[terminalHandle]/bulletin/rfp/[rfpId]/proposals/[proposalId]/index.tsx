@@ -60,6 +60,7 @@ const ProposalPage: BlitzPage = ({
   const [check, setCheck] = useState<Check>()
   const isAdmin = useAdminForTerminal(terminal)
   const router = useRouter()
+  const [overallocated, setOverallocated] = useState<boolean>(false)
 
   const [checkbook] = useQuery(
     getCheckbook,
@@ -85,13 +86,18 @@ const ProposalPage: BlitzPage = ({
     }
   )
 
-  const funds = useCheckbookFunds(
-    checkbook?.chainId as number,
-    checkbook?.address as string,
-    checkbook?.quorum as number,
-    proposal.data?.funding.token
-  )
-  const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
+  if (!!checkbook) {
+    const funds = useCheckbookFunds(
+      checkbook?.chainId as number,
+      checkbook?.address as string,
+      checkbook?.quorum as number,
+      proposal.data?.funding.token
+    )
+    const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
+    setOverallocated(
+      parseFloat(fundsAvailable) < proposal.data.funding?.amount && proposal.checks.length === 0
+    )
+  }
 
   const hasQuorum = checkbook && check?.approvals?.length === checkbook?.quorum
 
@@ -106,10 +112,6 @@ const ProposalPage: BlitzPage = ({
   // proposer has reached quorum and check has not been cashed and user is the proposer
   const showCashButton =
     hasQuorum && !check?.txnHash && check?.recipientAddress === activeUser?.address
-
-  const fundsHaveNotBeenApproved = (proposal) => {
-    return proposal.checks.length === 0
-  }
 
   useWaitForTransaction({
     confirmations: 1, // low confirmation count gives us a feel of faster UX
@@ -254,9 +256,7 @@ const ProposalPage: BlitzPage = ({
                       setSignModalOpen(true)
                     }}
                     className="bg-electric-violet text-tunnel-black px-6 h-[35px] rounded block mx-auto hover:bg-opacity-70 mb-2"
-                    disabled={
-                      waitingCreation || parseFloat(fundsAvailable) < proposal.data.funding?.amount
-                    }
+                    disabled={waitingCreation || overallocated}
                   >
                     {waitingCreation ? (
                       <div className="flex justify-center items-center">
@@ -266,23 +266,22 @@ const ProposalPage: BlitzPage = ({
                       "Approve"
                     )}
                   </button>
-                  {parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
-                    fundsHaveNotBeenApproved(proposal) && (
-                      <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
-                        Insufficient funds.{" "}
-                        {isAdmin && (
-                          <span
-                            className="text-electric-violet cursor-pointer"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
-                            }}
-                          >
-                            Go to checkbook to refill.
-                          </span>
-                        )}
-                      </span>
-                    )}
+                  {overallocated && (
+                    <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
+                      Insufficient funds.{" "}
+                      {isAdmin && (
+                        <span
+                          className="text-electric-violet cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
+                          }}
+                        >
+                          Go to checkbook to refill.
+                        </span>
+                      )}
+                    </span>
+                  )}
                 </div>
               ) : showCashButton ? (
                 <button
