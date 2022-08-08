@@ -61,7 +61,8 @@ const createStationWhitelist = [
   "0xf0fbaaa7ece80ac41508e442929b81a4c8c8543b", // ready player DAO
   "0xc7814D61A8236303a8854fc272cA0419A7e18E32", // ceramic
   "0x75d2e010392c99e1dab54781bFe4760a091A2c51", // flashbots
-  "0x586Bc43937C2eC42348cc83Acf44CED42Fe3d5f7", // fingerprints DAO
+  "0x586Bc43937C2eC42348cc83Acf44CED42Fe3d5f7", // fingerprintsDAO
+  "0xb4248430C7AF4Ce104b25C1677cE4FB32884210f", // squiggleDAO
 ]
 export const canCreateStation = (address: string | undefined) => {
   if (process.env.NODE_ENV !== "production") return true
