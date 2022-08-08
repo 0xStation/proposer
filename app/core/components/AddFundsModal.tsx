@@ -22,6 +22,7 @@ export const AddFundsModal = ({
   terminalCreationFlow = false,
   pageName,
   stationName,
+  terminalId,
 }) => {
   const activeUser = useStore((state) => state.activeUser)
   const [isModalAddressCopied, setIsModalAddressCopied] = useState<boolean>(false)
@@ -53,6 +54,7 @@ export const AddFundsModal = ({
                 event_category: "click",
                 address: activeUser?.address,
                 checkbookAddress,
+                station_id: terminalId,
                 station_name: stationName,
               })
               navigator.clipboard.writeText(checkbookAddress as string).then(() => {

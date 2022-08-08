@@ -82,6 +82,7 @@ const RFPInfoTab: BlitzPage = () => {
         isOpen={showAddFundsModal}
         checkbookAddress={rfp?.checkbook?.address}
         pageName="rfp_info_tab"
+        terminalId={terminal?.id as number}
         stationName={terminalHandle}
       />
       <TerminalNavigation>

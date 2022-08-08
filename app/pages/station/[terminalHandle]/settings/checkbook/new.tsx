@@ -9,15 +9,12 @@ import {
   getSession,
   invoke,
 } from "blitz"
-import { useEffect } from "react"
-import { track } from "@amplitude/analytics-browser"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Navigation from "app/terminal/components/settings/navigation"
 import Back from "/public/back-icon.svg"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import CheckbookForm from "app/checkbook/components/CheckbookForm"
-import useStore from "app/core/hooks/useStore"
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   const session = await getSession(req, res)
@@ -59,16 +56,6 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
   const router = useRouter()
 
   const terminalHandle = useParam("terminalHandle") as string
-  const activeUser = useStore((state) => state.activeUser)
-
-  useEffect(() => {
-    track("checkbook_create_page_shown", {
-      event_category: "impression",
-      page: "checkbook_create_page",
-      station_name: terminalHandle,
-      address: activeUser?.address,
-    })
-  }, [])
 
   return (
     <LayoutWithoutNavigation>

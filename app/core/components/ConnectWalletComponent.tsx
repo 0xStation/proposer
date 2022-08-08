@@ -53,6 +53,7 @@ export const ConnectWalletComponent = () => {
           setErrorMessage(errorMsg)
         }
         track("wallet_connect_error", {
+          event_category: "error",
           page: window.location.href,
           station_name: terminalHandle,
         })
@@ -66,7 +67,8 @@ export const ConnectWalletComponent = () => {
   }
 
   const handleSignInWithEthereum = async () => {
-    track("sign_in_with_ethereum_back_button_clicked", {
+    track("sign_in_with_ethereum_button_clicked", {
+      event_category: "click",
       page: window.location.href,
       station_name: terminalHandle,
       address: accountData?.address,
@@ -112,6 +114,7 @@ export const ConnectWalletComponent = () => {
         setErrorMessage(errorMsg)
       }
       track("sign_in_with_ethereum_error", {
+        event_category: "error",
         page: window.location.href,
         station_name: terminalHandle,
         errorMsg,
@@ -200,6 +203,7 @@ export const ConnectWalletComponent = () => {
                 disabled={connectState.loading}
                 onClick={async () => {
                   track("wallet_connect_button_clicked", {
+                    event_category: "click",
                     page: window.location.href,
                     station_name: terminalHandle,
                     address: accountData?.address,
@@ -228,6 +232,7 @@ export const ConnectWalletComponent = () => {
                 disabled={connectState.loading}
                 onClick={async () => {
                   track("wallet_connect_button_clicked", {
+                    event_category: "click",
                     page: window.location.href,
                     station_name: terminalHandle,
                     address: accountData?.address,
@@ -261,6 +266,7 @@ export const ConnectWalletComponent = () => {
                 disabled={connectState.loading}
                 onClick={async () => {
                   track("wallet_connect_button_clicked", {
+                    event_category: "click",
                     page: window.location.href,
                     station_name: terminalHandle,
                     address: accountData?.address,

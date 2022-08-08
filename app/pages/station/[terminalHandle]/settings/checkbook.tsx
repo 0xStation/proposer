@@ -64,7 +64,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
 const CheckbookSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const { creationSuccess } = useRouterQuery()
-  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+  const [terminal, { isSuccess: finishedFetchingTerminal }] = useQuery(
+    getTerminalByHandle,
+    { handle: terminalHandle },
+    { suspense: false }
+  )
   const [checkbooks, setCheckbooks] = useState<Checkbook[]>([])
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
@@ -95,16 +99,17 @@ const CheckbookSettingsPage: BlitzPage = () => {
   )
 
   useEffect(() => {
-    if (finishedFetchingCheckbooks) {
+    if (finishedFetchingCheckbooks && finishedFetchingTerminal) {
       track("checkbook_settings_page_shown", {
         event_category: "impression",
         page: "checkbook_settings_page",
+        station_id: terminal?.id,
         station_name: terminalHandle,
         address: activeUser?.address,
         num_checkbooks: books?.length,
       })
     }
-  }, [finishedFetchingCheckbooks])
+  }, [finishedFetchingCheckbooks, finishedFetchingTerminal])
 
   const CheckbookComponent = ({ checkbook }) => {
     return (
@@ -137,6 +142,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
           isOpen={showAddFundsModal || successModalOpen}
           checkbookAddress={selectedCheckbook?.address}
           pageName="checkbook_settings_page"
+          terminalId={terminal?.id as number}
           stationName={terminalHandle}
         />
         <div className="flex flex-col h-full">
@@ -160,6 +166,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
                   event_category: "click",
                   page: "checkbook_settings_page",
                   station_name: terminalHandle,
+                  station_id: terminal?.id,
                   address: activeUser?.address,
                   num_checkbooks: books?.length,
                 })

@@ -1,4 +1,5 @@
 import { track } from "@amplitude/analytics-browser"
+import { useEffect } from "react"
 import { useCreateCheckbookOnChain } from "app/contracts/checkbook"
 import { Spinner } from "app/core/components/Spinner"
 import { useNetwork } from "wagmi"
@@ -33,7 +34,7 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
   const router = useRouter()
 
   const terminalHandle = useParam("terminalHandle") as string
-  const [terminal] = useQuery(
+  const [terminal, { isSuccess: finishedFetchingTerminal }] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle, include: ["checkbooks"] },
     { suspense: false }
@@ -42,6 +43,18 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
   const { activeChain } = useNetwork()
   const chainId = activeChain?.id as number
   const { createCheckbook: createCheckbookOnChain } = useCreateCheckbookOnChain(chainId)
+
+  useEffect(() => {
+    if (finishedFetchingTerminal) {
+      track("checkbook_create_page_shown", {
+        event_category: "impression",
+        page: pageName,
+        station_id: terminal?.id,
+        station_name: terminalHandle,
+        address: activeUser?.address,
+      })
+    }
+  }, [finishedFetchingTerminal])
 
   const data = useWaitForTransaction({
     confirmations: 1,
@@ -73,6 +86,8 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
         signers,
         checkbook_name: name,
         checkbook_address: checkbookAddress,
+        station_id: terminal?.id,
+        station_name: terminalHandle,
       })
 
       try {
@@ -93,6 +108,8 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
           signers,
           checkbook_name: name,
           checkbook_address: checkbookAddress,
+          station_name: terminalHandle,
+          station_id: terminal?.id,
         })
 
         if (callback) {
@@ -131,6 +148,8 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
                 quorum,
                 signers,
                 checkbook_name: values.name,
+                station_name: terminalHandle,
+                station_id: terminal?.id,
               })
               setQuorum(quorum)
               setSigners(signers)
@@ -166,6 +185,8 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
                 signers,
                 checkbook_name: values.name,
                 error_msg: e.name,
+                station_name: terminalHandle,
+                station_id: terminal?.id,
               })
             }
           } catch (e) {
@@ -177,6 +198,8 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
               signers,
               checkbook_name: values.name,
               error_msg: e.name,
+              station_name: terminalHandle,
+              station_id: terminal?.id,
             })
             setWaitingCreation(false)
             setIsDeployingCheckbook(false)

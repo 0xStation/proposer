@@ -126,6 +126,7 @@ const BulletinPage: BlitzPage = () => {
         checkbookAddress={query.terminalAndCheckbookCreated as string}
         terminalCreationFlow={true}
         pageName="bulletin_page"
+        terminalId={terminal?.id as number}
         stationName={terminalHandle}
       />
       <SuccessRfpModal
