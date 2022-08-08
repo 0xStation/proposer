@@ -1,7 +1,6 @@
 import { Account } from "app/account/types"
 import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
 import { SiweMessage } from "siwe"
-import * as z from "zod"
 
 export type Role = "ADMIN" | "USER"
 declare module "blitz" {
@@ -19,10 +18,3 @@ declare module "blitz" {
     }
   }
 }
-
-export const Token = z.object({
-  chainId: z.number(),
-  address: z.string(),
-  symbol: z.string(),
-  decimals: z.number(),
-})

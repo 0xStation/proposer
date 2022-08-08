@@ -2,13 +2,16 @@ import { keccak256, toUtf8Bytes } from "ethers/lib/utils"
 import { BigNumber } from "ethers"
 
 export const genProposalSignatureMessage = (
-  proposalRecipient: string,
+  // add proposalRecipient once P2P proposals enabled
   author: string,
   rfpId: string,
   parsedTokenAmount: BigNumber,
+  chainId: number,
   formValues: any
 ) => {
   const now = new Date()
+
+  console.log(author, formValues)
 
   return {
     domain: {
@@ -18,12 +21,12 @@ export const genProposalSignatureMessage = (
     types: {
       Funding: [
         { name: "type", type: "string" }, // hard coded to single-upon-approval
+        { name: "chainId", type: "uint256" },
         { name: "fundingRecipient", type: "address" }, // recieves the reward from the proposal
         { name: "token", type: "address" },
         { name: "amount", type: "uint256" },
       ],
       Proposal: [
-        { name: "proposalRecipient", type: "address" }, // (checkbook address for now) reciever of the proposal
         { name: "author", type: "address" },
         { name: "collaborators", type: "address[]" },
         { name: "timestamp", type: "uint256" }, // hash of ISO formatted date string
@@ -34,7 +37,6 @@ export const genProposalSignatureMessage = (
       ],
     },
     value: {
-      proposalRecipient,
       author,
       collaborators: [author],
       timestamp: now.valueOf(), // unix timestamp
@@ -43,6 +45,7 @@ export const genProposalSignatureMessage = (
       body: keccak256(toUtf8Bytes(formValues.markdown)),
       funding: {
         type: "single-upon-approval",
+        chainId,
         fundingRecipient: formValues.recipientAddress,
         token: formValues.token,
         amount: parsedTokenAmount,

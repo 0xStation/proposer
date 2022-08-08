@@ -38,7 +38,7 @@ import { ZERO_ADDRESS } from "app/core/utils/constants"
 import { genProposalSignatureMessage } from "app/signatures/proposal"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 //types
-import { Rfp } from "app/rfp/types"
+import { Rfp, RfpMetadata } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
 
 type GetServerSidePropsData = {
@@ -57,24 +57,18 @@ const CreateProposalPage: BlitzPage = ({
   const setToastState = useStore((state) => state.setToastState)
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(true)
   const router = useRouter()
-  const fundingToken = data.rfp.data.funding.token
+  const fundingToken = (data.rfp.data as RfpMetadata).funding.token
 
   useWarnIfUnsavedChanges(unsavedChanges, () => {
     return confirm("Warning! You have unsaved changes.")
   })
 
-  const checkbookTokens = useCheckbookAvailability(data.rfp.checkbook, data.terminal)
-
   const amountMessage = (amount) => {
-    const selectedToken = checkbookTokens.find((token) =>
-      addressesAreEqual(token.address, fundingToken.address)
-    )
-    if (!selectedToken) {
-      return
-    }
-    if (parseFloat(fundingToken.available) < amount) {
-      return `The RFP's checkbook only has ${selectedToken.available} ${selectedToken.symbol}. You can request ${amount}, but it cannot be approved until an admin adds more ${selectedToken.symbol} to the checkbook.`
-    }
+    // need to change to use getRfpApprovedProposalFunding query to compare to
+    // if (parseFloat(fundingToken.available) < amount) {
+    //   return `The RFP's checkbook only has ${selectedToken.available} ${selectedToken.symbol}. You can request ${amount}, but it cannot be approved until an admin adds more ${selectedToken.symbol} to the checkbook.`
+    // }
+    return ""
   }
 
   const terminalHandle = useParam("terminalHandle") as string
@@ -161,7 +155,7 @@ const CreateProposalPage: BlitzPage = ({
 
       <Form
         initialValues={{
-          markdown: data.rfp.data.proposalPrefill,
+          markdown: data.rfp.data.proposalPrefill.body,
         }}
         onSubmit={async (values: {
           recipientAddress: string
@@ -179,10 +173,10 @@ const CreateProposalPage: BlitzPage = ({
             const parsedTokenAmount = utils.parseUnits(values.amount, fundingToken.decimals)
 
             const message = genProposalSignatureMessage(
-              data.rfp.checkbook.address,
               activeUser?.address,
               data.rfp.id,
               parsedTokenAmount,
+              fundingToken.chainId,
               { ...values, token: fundingToken.address }
             )
 
@@ -195,12 +189,12 @@ const CreateProposalPage: BlitzPage = ({
 
             try {
               await createProposalMutation({
+                authorAddress: activeUser?.address,
                 rfpId: data.rfp.id,
                 terminalId: data.terminal.id,
                 recipientAddress: values.recipientAddress,
-                token: fundingToken.address,
+                token: fundingToken,
                 amount: values.amount,
-                symbol: fundingToken.symbol,
                 contentBody: values.markdown,
                 contentTitle: values.title,
                 collaborators: [activeUser.address],

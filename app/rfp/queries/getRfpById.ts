@@ -8,17 +8,18 @@ const GetRfpById = z.object({
 })
 
 export default async function getRfpById(input: z.infer<typeof GetRfpById>) {
+  const params = GetRfpById.parse(input)
+
   const rfp = await db.rfp.findUnique({
     where: {
-      id: input.id,
+      id: params.id,
     },
     include: {
       terminal: true,
       author: true,
-      checkbook: true,
-      _count: {
-        select: { proposals: true },
-      },
+      // _count: {
+      //   select: { proposals: true },
+      // },
     },
   })
 
@@ -26,21 +27,9 @@ export default async function getRfpById(input: z.infer<typeof GetRfpById>) {
     return null
   }
 
-  const signers = await db.account.findMany({
-    where: {
-      address: {
-        in: rfp.checkbook?.signers || [],
-      },
-    },
-  })
-
   return {
     ...rfp,
-    checkbook: {
-      ...rfp.checkbook,
-      signerAccounts: signers,
-    },
     status: computeRfpProductStatus(rfp.status, rfp.startDate, rfp.endDate),
-    submissionCount: rfp._count.proposals,
+    submissionCount: 0, //rfp._count.proposals,
   } as unknown as Rfp
 }

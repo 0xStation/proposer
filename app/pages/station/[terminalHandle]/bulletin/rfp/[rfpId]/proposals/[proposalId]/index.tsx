@@ -16,6 +16,7 @@ import Preview from "app/core/components/MarkdownPreview"
 import SignApprovalProposalModal from "app/proposal/components/SignApprovalProposalModal"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
+import getCheckbook from "app/checkbook/queries/getCheckbook"
 import getChecksByProposalId from "app/check/queries/getChecksByProposalId"
 import getProposalById from "app/proposal/queries/getProposalById"
 import { Check } from "app/check/types"
@@ -60,13 +61,24 @@ const ProposalPage: BlitzPage = ({
   const isAdmin = useAdminForTerminal(terminal)
   const router = useRouter()
 
+  const [checkbook] = useQuery(
+    getCheckbook,
+    {
+      chainId: proposal.data.funding?.chainId || 0,
+      address: proposal.data.funding?.senderAddress || "",
+    },
+    {
+      suspense: false,
+    }
+  )
+
   const [checks] = useQuery(
     getChecksByProposalId,
     { proposalId: proposal?.id as string },
     {
       suspense: false,
       onSuccess: (checks) => {
-        if (checks[0]?.approvals.length === rfp.checkbook.quorum) {
+        if (checkbook && checks[0]?.approvals.length === checkbook.quorum) {
           setCheck(checks[0])
         }
       },
@@ -74,18 +86,18 @@ const ProposalPage: BlitzPage = ({
   )
 
   const funds = useCheckbookFunds(
-    rfp.checkbook?.chainId as number,
-    rfp.checkbook?.address as string,
-    rfp.checkbook?.quorum as number,
+    checkbook?.chainId as number,
+    checkbook?.address as string,
+    checkbook?.quorum as number,
     proposal.data?.funding.token
   )
   const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
 
-  const hasQuorum = check?.approvals?.length === rfp?.checkbook.quorum
+  const hasQuorum = checkbook && check?.approvals?.length === checkbook?.quorum
 
   // user can approve if they are a signer and they haven't approved before
   const userCanApprove =
-    rfp?.checkbook.signers.includes(activeUser?.address) &&
+    checkbook?.signers.includes(activeUser?.address || "") &&
     !proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address)
 
   // show approve button, if the proposal hasn't reached quorum, user can approve, user hasn't already approved
@@ -366,31 +378,33 @@ const ProposalPage: BlitzPage = ({
                   check ? "border-b border-concrete p-6" : "p-6 grow flex flex-col justify-between"
                 }
               >
-                <div>
-                  <h4 className="text-xs font-bold text-concrete uppercase">Approval</h4>
-                  <div className="flex flex-row space-x-2 items-center mt-2">
-                    <ProgressIndicator
-                      percent={proposal?.approvals.length / rfp?.checkbook.quorum}
-                      twsize={6}
-                      cutoff={0}
-                    />
-                    <p>
-                      {proposal?.approvals.length}/{rfp?.checkbook.quorum}
-                    </p>
-                  </div>
-                  <div className="mt-6">
-                    {proposal?.approvals.length > 0 && (
-                      <p className="text-xs text-concrete uppercase font-bold">Signers</p>
-                    )}
-                    {(proposal?.approvals || []).map((approval, i) => (
-                      <AccountMediaObject
-                        account={approval.signerAccount}
-                        className="mt-4"
-                        key={i}
+                {checkbook && (
+                  <div>
+                    <h4 className="text-xs font-bold text-concrete uppercase">Approval</h4>
+                    <div className="flex flex-row space-x-2 items-center mt-2">
+                      <ProgressIndicator
+                        percent={proposal?.approvals.length / checkbook?.quorum}
+                        twsize={6}
+                        cutoff={0}
                       />
-                    ))}
+                      <p>
+                        {proposal?.approvals.length}/{checkbook?.quorum}
+                      </p>
+                    </div>
+                    <div className="mt-6">
+                      {proposal?.approvals.length > 0 && (
+                        <p className="text-xs text-concrete uppercase font-bold">Signers</p>
+                      )}
+                      {(proposal?.approvals || []).map((approval, i) => (
+                        <AccountMediaObject
+                          account={approval.signerAccount}
+                          className="mt-4"
+                          key={i}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
               {check && (
                 <div className="p-6 grow flex flex-col justify-between">

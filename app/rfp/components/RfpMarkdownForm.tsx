@@ -64,6 +64,9 @@ const RfpMarkdownForm = ({
   // not scalable for token importing, will probably need to switch to more state vars
   const tokenOptions = ["ETH", "USDC"]
 
+  const { activeChain } = useNetwork()
+  const activeNeworkChainId = activeChain?.id as number
+
   useEffect(() => {
     if (rfp?.data?.content?.title) {
       setTitle(rfp?.data?.content?.title)
@@ -194,29 +197,22 @@ const RfpMarkdownForm = ({
             })
             return
           }
-          if (!values.checkbookAddress) {
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: "Please select a Checkbook first.",
-            })
-            return
-          }
+          // if (!values.checkbookAddress) {
+          //   setToastState({
+          //     isToastShowing: true,
+          //     type: "error",
+          //     message: "Please select a Checkbook first.",
+          //   })
+          //   return
+          // }
 
           const checkbook = checkbooks.find((checkbook) =>
             addressesAreEqual(checkbook.address, values.checkbookAddress)
           )
 
-          if (!checkbook) {
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: "Could not find selected Checkbook.",
-            })
-            return
-          }
+          console.log("network", activeNeworkChainId)
 
-          const fundingToken = getFundingTokens(checkbook, terminal).find(
+          const fundingToken = getFundingTokens(activeNeworkChainId, checkbook, terminal).find(
             (token) => token.symbol === values.fundingTokenSymbol
           )
 
@@ -231,13 +227,16 @@ const RfpMarkdownForm = ({
 
           const parsedBudgetAmount = utils.parseUnits(values.budgetAmount, fundingToken.decimals)
 
+          const chainId = checkbook ? checkbook.chainId : activeNeworkChainId // if no checkbook selected, default to user's active network chain id
+
           const message = genRfpSignatureMessage(
             {
               ...values,
               fundingTokenAddress: fundingToken.address,
               budgetAmount: parsedBudgetAmount,
             },
-            activeUser?.address
+            activeUser?.address,
+            chainId
           )
           const signature = await signMessage(message)
 
@@ -246,47 +245,39 @@ const RfpMarkdownForm = ({
             return
           }
 
+          let mutationObject = {
+            authorAddress: activeUser.address,
+            fundingAddress: values.checkbookAddress,
+            // convert luxon's `DateTime` obj to UTC to store in db
+            startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
+            fundingToken: {
+              chainId: chainId, // either chain id of checkbook or user's current selected network
+              address: fundingToken.address,
+
+              symbol: fundingToken.symbol,
+              decimals: fundingToken.decimals,
+            },
+            fundingBudgetAmount: values.budgetAmount,
+            contentBody: values.markdown,
+            contentTitle: values.title,
+            signature,
+            signatureMessage: message,
+          }
+
           if (isEdit) {
             await updateRfpMutation({
+              ...mutationObject,
               rfpId: rfp?.id as string,
-              // convert luxon's `DateTime` obj to UTC to store in db
-              startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
               endDate: DateTime.fromISO(values.endDate).toUTC().toJSDate(),
-              fundingAddress: values.checkbookAddress,
-              fundingToken: {
-                chainId: checkbook.chainId,
-                address: fundingToken.address,
-
-                symbol: fundingToken.symbol,
-                decimals: fundingToken.decimals,
-              },
-              fundingBudgetAmount: values.budgetAmount,
-              contentBody: values.markdown,
-              contentTitle: values.title,
-              signature,
-              signatureMessage: message,
+              proposalPrefillBody: rfp?.data.proposalPrefill.body || "",
             })
           } else {
             await createRfpMutation({
+              ...mutationObject,
               terminalId: terminal?.id,
-              // convert luxon's `DateTime` obj to UTC to store in db
-              startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
               endDate: values.endDate
                 ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
                 : undefined,
-              authorAddress: activeUser?.address,
-              fundingAddress: values.checkbookAddress,
-              fundingToken: {
-                chainId: checkbook.chainId,
-                address: fundingToken.address,
-                symbol: fundingToken.symbol,
-                decimals: fundingToken.decimals,
-              },
-              fundingBudgetAmount: values.budgetAmount,
-              contentBody: values.markdown,
-              contentTitle: values.title,
-              signature,
-              signatureMessage: message,
             })
           }
         }}
@@ -403,7 +394,7 @@ const RfpMarkdownForm = ({
                               <input
                                 {...input}
                                 type="datetime-local"
-                                // dates need to match the pattern nnnn-nn-nnTnn:nn
+                                // dates need to match the pattern yyyy-mm-ddThh:mm
                                 min={
                                   formState.values.startDate
                                     ? getFormattedDate({
@@ -423,7 +414,7 @@ const RfpMarkdownForm = ({
                         </Field>
                       </div>
                       <div className="flex flex-col mt-6">
-                        <label className="font-bold block">Checkbook*</label>
+                        <label className="font-bold block">Checkbook</label>
                         <span className="text-xs text-concrete block">
                           Deposit funds here to create checks for proposers to claim once their
                           projects have been approved.{" "}
@@ -434,7 +425,7 @@ const RfpMarkdownForm = ({
                             Learn more
                           </a>
                         </span>
-                        <Field name={`checkbookAddress`} validate={requiredField}>
+                        <Field name="checkbookAddress">
                           {({ input, meta }) => {
                             return (
                               <div className="custom-select-wrapper">

@@ -8,7 +8,7 @@ import getFundingTokens from "app/core/utils/getFundingTokens"
 // A component that shows a dropdown of the tokens in a given checkbook
 // and indicators for the levels of those tokens that are used / pending / available
 const CheckbookIndicator = ({ terminal, checkbook }) => {
-  const tokenOptions = getFundingTokens(checkbook, terminal)
+  const tokenOptions = getFundingTokens(checkbook.chainId, checkbook, terminal)
   const [selectedFundsToken, setSelectedFundsToken] = useState<string>()
 
   // needed to fetch data for first page load
