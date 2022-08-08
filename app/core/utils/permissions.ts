@@ -56,6 +56,12 @@ const createStationWhitelist = [
   "0xf6910D47FbB1F5518d60C721D4189936eCd5a1b6", // InfoToken
   "0x285b7eea81a5b66b62e7276a24c1e0f83f7409c1", // 0xmaki
   "0x84c30aeca40bcf38e17E52A85f0D383E373E5D55", // Osmosis Grants
+  "0x16921fd2c4221a8c2f4d729cbd65a0c4a80be940", // not fellows
+  "0x2D888de2a429Cb43359a8420722e79491F07DC73", // Fiat DAO
+  "0xf0fbaaa7ece80ac41508e442929b81a4c8c8543b", // ready player DAO
+  "0xc7814D61A8236303a8854fc272cA0419A7e18E32", // ceramic
+  "0x75d2e010392c99e1dab54781bFe4760a091A2c51", // flashbots
+  "0x586Bc43937C2eC42348cc83Acf44CED42Fe3d5f7", // fingerprints DAO
 ]
 export const canCreateStation = (address: string | undefined) => {
   if (process.env.NODE_ENV !== "production") return true
