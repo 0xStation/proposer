@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { invalidateQuery, useMutation } from "blitz"
+import { track } from "@amplitude/analytics-browser"
 import Modal from "app/core/components/Modal"
 import getRfpsByTerminalId from "../queries/getRfpsByTerminalId"
 import useStore from "app/core/hooks/useStore"
@@ -7,7 +8,14 @@ import getRfpById from "../queries/getRfpById"
 import reopenRfp from "../mutations/reopenRfp"
 import getShortDate from "app/core/utils/getShortDate"
 
-export const ReopenRfpModal = ({ isOpen, setIsOpen, rfp }) => {
+export const ReopenRfpModal = ({
+  isOpen,
+  setIsOpen,
+  rfp,
+  pageName,
+  terminalId,
+  terminalHandle,
+}) => {
   const [newEndDate, setNewEndDate] = useState<string | undefined>()
   const setToastState = useStore((state) => state.setToastState)
   const [reopenRfpMutation] = useMutation(reopenRfp, {
@@ -29,6 +37,14 @@ export const ReopenRfpModal = ({ isOpen, setIsOpen, rfp }) => {
 
   const handleSubmit = async () => {
     try {
+      track("reopen_rfp_clicked", {
+        event_category: "click",
+        page: pageName,
+        station_name: terminalHandle,
+        station_id: terminalId,
+        rfp_id: rfp?.id,
+        end_date: newEndDate,
+      })
       await reopenRfpMutation({
         rfpId: rfp?.id,
         ...((newEndDate && { endDate: new Date(`${newEndDate} 23:59:59 UTC`) }) || {
@@ -36,6 +52,14 @@ export const ReopenRfpModal = ({ isOpen, setIsOpen, rfp }) => {
         }),
       })
     } catch (err) {
+      track("error_reopening_rfp", {
+        event_category: "error",
+        page: pageName,
+        station_name: terminalHandle,
+        station_id: terminalId,
+        rfp_id: rfp?.id,
+        error_msg: err.message,
+      })
       console.error(err)
       setIsOpen(false)
       setToastState({

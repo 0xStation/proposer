@@ -66,7 +66,8 @@ const NewCheckbookTerminalCreationPage: BlitzPage = ({
       <div
         className="absolute top-4 left-4 cursor-pointer"
         onClick={() => {
-          track("complete_profile_checkbook_exit_button", {
+          track("complete_profile_checkbook_exit_button_clicked", {
+            event_category: "click",
             page: "complete_profile_checkbook_page",
             station_id: terminal?.id,
             station_name: terminalHandle,

@@ -9,6 +9,7 @@ import {
   invalidateQuery,
   useSession,
 } from "blitz"
+import { track } from "@amplitude/analytics-browser"
 import { useState, useEffect } from "react"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
@@ -43,11 +44,12 @@ const BulletinPage: BlitzPage = () => {
   const session = useSession({ suspense: false })
   const query = useRouterQuery()
   const [showRfpSuccessModal, setShowRfpSuccessModal] = useState<boolean>(false)
-  const [terminal] = useQuery(
+  const [terminal, { isSuccess: finishedFetchingTerminal }] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle as string },
     { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
   )
+  const activeUser = useStore((state) => state.activeUser)
 
   const isLoggedInAndIsAdmin = useAdminForTerminal(terminal)
   const [isAddFundsModalOpen, setIsAddFundsModalOpen] = useState<boolean>(false)
@@ -68,10 +70,11 @@ const BulletinPage: BlitzPage = () => {
       suspense: false,
       enabled: !!terminal?.id,
       refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     }
   )
 
-  const [rfpCount] = useQuery(
+  const [rfpCount, { isSuccess: finishedFetchingRfpCount }] = useQuery(
     getRfpCountByTerminalId,
     {
       terminalId: terminal?.id as number,
@@ -82,8 +85,22 @@ const BulletinPage: BlitzPage = () => {
       suspense: false,
       enabled: !!terminal?.id,
       refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     }
   )
+
+  useEffect(() => {
+    if (finishedFetchingTerminal && finishedFetchingRfpCount) {
+      track("bulletin_page_shown", {
+        event_category: "impression",
+        page: "bulletin_page",
+        address: activeUser?.address,
+        station_name: terminalHandle,
+        station_id: terminal?.id,
+        num_rfps: rfpCount,
+      })
+    }
+  }, [finishedFetchingTerminal, finishedFetchingRfpCount])
 
   const router = useRouter()
   useEffect(() => {
@@ -144,7 +161,17 @@ const BulletinPage: BlitzPage = () => {
             {isLoggedInAndIsAdmin && (
               <button
                 className="h-[35px] bg-electric-violet px-9 rounded text-tunnel-black hover:bg-opacity-70"
-                onClick={() => router.push(Routes.CreateRFPPage({ terminalHandle }))}
+                onClick={() => {
+                  track("rfp_show_editor_clicked", {
+                    event_category: "click",
+                    address: activeUser?.address,
+                    station_name: terminalHandle,
+                    station_id: terminal?.id,
+                    num_rfps: rfpCount,
+                    is_edit: false,
+                  })
+                  router.push(Routes.CreateRFPPage({ terminalHandle }))
+                }}
               >
                 Create RFP
               </button>
@@ -212,7 +239,16 @@ const BulletinPage: BlitzPage = () => {
                 </p>
                 <button
                   className="bg-electric-violet rounded text-tunnel-black px-6 h-[35px] w-[133px] mt-6 hover:opacity-70"
-                  onClick={() => router.push(Routes.CreateRFPPage({ terminalHandle }))}
+                  onClick={() => {
+                    track("rfp_show_editor_clicked", {
+                      address: activeUser?.address,
+                      station_name: terminalHandle,
+                      station_id: terminal?.id,
+                      num_rfps: rfpCount,
+                      is_edit: false,
+                    })
+                    router.push(Routes.CreateRFPPage({ terminalHandle }))
+                  }}
                 >
                   Create RFP
                 </button>

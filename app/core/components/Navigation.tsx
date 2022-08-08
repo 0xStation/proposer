@@ -124,6 +124,7 @@ const Navigation = ({ children }: { children?: any }) => {
             <button
               onClick={() => {
                 track("wallet_connect_banner_clicked", {
+                  event_category: "click",
                   page: window.location.href,
                   station_name: terminalHandle,
                 })

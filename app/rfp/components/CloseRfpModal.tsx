@@ -1,11 +1,12 @@
 import { invalidateQuery, useMutation } from "blitz"
+import { track } from "@amplitude/analytics-browser"
 import Modal from "app/core/components/Modal"
 import closeRfp from "app/rfp/mutations/closeRfp"
 import getRfpsByTerminalId from "../queries/getRfpsByTerminalId"
 import useStore from "app/core/hooks/useStore"
 import getRfpById from "../queries/getRfpById"
 
-export const CloseRfpModal = ({ isOpen, setIsOpen, rfp }) => {
+export const CloseRfpModal = ({ isOpen, setIsOpen, rfp, pageName, terminalId, terminalHandle }) => {
   const setToastState = useStore((state) => state.setToastState)
   const [closeRfpMutation] = useMutation(closeRfp, {
     onSuccess: (_data) => {
@@ -25,9 +26,24 @@ export const CloseRfpModal = ({ isOpen, setIsOpen, rfp }) => {
 
   const handleSubmit = async () => {
     try {
+      track("close_rfp_clicked", {
+        event_category: "click",
+        page: pageName,
+        station_name: terminalHandle,
+        station_id: terminalId,
+        rfp_id: rfp?.id,
+      })
       await closeRfpMutation({ rfpId: rfp?.id })
     } catch (err) {
       console.error(err)
+      track("error_closing_rfp", {
+        event_category: "error",
+        page: pageName,
+        station_name: terminalHandle,
+        station_id: terminalId,
+        rfp_id: rfp?.id,
+        error_msg: err.message,
+      })
       setIsOpen(false)
       setToastState({
         isToastShowing: true,

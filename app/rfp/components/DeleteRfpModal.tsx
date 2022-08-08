@@ -1,11 +1,19 @@
 import { invalidateQuery, useMutation, useRouter, Routes } from "blitz"
+import { track } from "@amplitude/analytics-browser"
 import Modal from "app/core/components/Modal"
 import getRfpsByTerminalId from "../queries/getRfpsByTerminalId"
 import getRfpById from "../queries/getRfpById"
 import useStore from "app/core/hooks/useStore"
 import deleteRfp from "../mutations/deleteRfp"
 
-export const DeleteRfpModal = ({ isOpen, setIsOpen, rfp, terminalHandle }) => {
+export const DeleteRfpModal = ({
+  isOpen,
+  setIsOpen,
+  rfp,
+  terminalHandle,
+  pageName,
+  terminalId,
+}) => {
   const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
   const [deleteRfpMutation] = useMutation(deleteRfp, {
@@ -19,12 +27,21 @@ export const DeleteRfpModal = ({ isOpen, setIsOpen, rfp, terminalHandle }) => {
       console.error(error)
     },
   })
+  const activeUser = useStore((state) => state.activeUser)
 
   const handleSubmit = async () => {
     try {
       await deleteRfpMutation({ rfpId: rfp?.id as string })
     } catch (error) {
       console.error("Error deleting RFP", error)
+      track("error_deleting_rfp", {
+        page: pageName,
+        address: activeUser?.address,
+        station_name: terminalHandle,
+        station_id: terminalId,
+        rfp_id: rfp?.id,
+        error_msg: error.message,
+      })
       setToastState({
         isToastShowing: true,
         type: "error",
@@ -51,7 +68,17 @@ export const DeleteRfpModal = ({ isOpen, setIsOpen, rfp, terminalHandle }) => {
           <button
             type="submit"
             className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
-            onClick={() => handleSubmit()}
+            onClick={() => {
+              track("delete_rfp_clicked", {
+                event_category: "click",
+                page: pageName,
+                address: activeUser?.address,
+                station_name: terminalHandle,
+                station_id: terminalId,
+                rfp_id: rfp?.id,
+              })
+              handleSubmit()
+            }}
           >
             Delete RFP
           </button>
