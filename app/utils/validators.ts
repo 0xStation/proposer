@@ -1,7 +1,6 @@
-import { utils } from "ethers"
+import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import isURL from "validator/lib/isURL"
 import isEmail from "validator/lib/isEmail"
-import { ethers } from "ethers"
 
 // reducer that takes in an array of validators (functions) and returns the appropriate error
 // useful if you have a form field that has a few different validations (required field, must be number, etc)
@@ -65,7 +64,7 @@ export const uniqueName = (names: string[]) => {
 
 export const isAddress = (address: string) => {
   if (!address) return undefined
-  return utils.isAddress(address) ? undefined : "Not a valid address."
+  return ethersIsAddress(address) ? undefined : "Not a valid address."
 }
 
 export const isValidEmail = (email: string) => {

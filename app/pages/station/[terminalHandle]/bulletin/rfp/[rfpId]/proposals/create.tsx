@@ -12,7 +12,7 @@ import {
 } from "blitz"
 import { Field, Form } from "react-final-form"
 import { LightBulbIcon, XIcon } from "@heroicons/react/solid"
-import { utils } from "ethers"
+import { parseUnits } from "@ethersproject/units"
 import { useBalance } from "wagmi"
 // components
 import Layout from "app/core/layouts/Layout"
@@ -176,7 +176,7 @@ const CreateProposalPage: BlitzPage = ({
               message: "You must connect your wallet in order to create a proposal",
             })
           } else {
-            const parsedTokenAmount = utils.parseUnits(values.amount, fundingToken.decimals)
+            const parsedTokenAmount = parseUnits(values.amount, fundingToken.decimals)
 
             const message = genProposalSignatureMessage(
               data.rfp.checkbook.address,

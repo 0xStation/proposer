@@ -1,6 +1,5 @@
 import db from "db"
 import * as z from "zod"
-import { BigNumber } from "ethers"
 
 const CreateProposal = z.object({
   terminalId: z.number(),

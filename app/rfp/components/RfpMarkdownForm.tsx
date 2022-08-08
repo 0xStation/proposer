@@ -3,7 +3,7 @@ import { DateTime } from "luxon"
 import { useMutation, invalidateQuery, Link, Routes, useRouter } from "blitz"
 import { Field, Form } from "react-final-form"
 import { LockClosedIcon, XIcon, RefreshIcon, SpeakerphoneIcon } from "@heroicons/react/solid"
-import { utils } from "ethers"
+import { parseUnits } from "@ethersproject/units"
 import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
 import truncateString from "app/core/utils/truncateString"
@@ -229,7 +229,7 @@ const RfpMarkdownForm = ({
             return
           }
 
-          const parsedBudgetAmount = utils.parseUnits(values.budgetAmount, fundingToken.decimals)
+          const parsedBudgetAmount = parseUnits(values.budgetAmount, fundingToken.decimals)
 
           const message = genRfpSignatureMessage(
             {
