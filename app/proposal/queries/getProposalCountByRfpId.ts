@@ -6,23 +6,23 @@ import { computeProposalDbFilterFromProposalApprovals, computeProposalStatus } f
 
 const GetProposalCountByRfpId = z.object({
   rfpId: z.string(),
-  statuses: z.string().array().optional().default([]),
-  quorum: z.number(),
+  // statuses: z.string().array().optional().default([]),
+  // quorum: z.number(),
 })
 
 export const getProposalCountByRfpId = async (input: z.infer<typeof GetProposalCountByRfpId>) => {
   try {
-    const proposalsWhere = await computeProposalDbFilterFromProposalApprovals({
-      statuses: input.statuses,
-      quorum: input.quorum,
-      rfpId: input.rfpId,
-    })
+    // const proposalsWhere = await computeProposalDbFilterFromProposalApprovals({
+    //   statuses: input.statuses,
+    //   quorum: input.quorum,
+    //   rfpId: input.rfpId,
+    // })
 
     const proposalCount = await db.proposal.count({
       where: {
         rfpId: input.rfpId,
         status: PrismaProposalStatus.PUBLISHED,
-        ...proposalsWhere,
+        // ...proposalsWhere,
       },
     })
 

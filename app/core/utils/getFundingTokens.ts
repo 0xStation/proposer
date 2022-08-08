@@ -5,16 +5,17 @@ import { TagType, TokenType } from "app/tag/types"
 import { ZERO_ADDRESS, CHAIN_IDS } from "./constants"
 
 const getFundingTokens = (
+  chainId: number,
   checkbook: Checkbook | undefined,
   terminal: Terminal | null | undefined
 ) => {
-  const eth = [CHAIN_IDS.ETHEREUM, CHAIN_IDS.RINKEBY, CHAIN_IDS.GOERLI].includes(
-    checkbook?.chainId || 0
-  )
+  const selectedChainId = checkbook ? checkbook.chainId : chainId
+
+  const eth = [CHAIN_IDS.ETHEREUM, CHAIN_IDS.RINKEBY, CHAIN_IDS.GOERLI].includes(selectedChainId)
     ? [{ symbol: "ETH", address: ZERO_ADDRESS, decimals: 18 }]
     : []
 
-  const stablecoins = networks[checkbook?.chainId as number]?.stablecoins || []
+  const stablecoins = networks[selectedChainId]?.stablecoins || []
 
   const tokenTags =
     terminal?.tags
@@ -22,7 +23,7 @@ const getFundingTokens = (
         (t) =>
           t.type === TagType.TOKEN &&
           t.data.type === TokenType.ERC20 &&
-          t.data.chainId === checkbook?.chainId &&
+          t.data.chainId === selectedChainId &&
           !stablecoins.map((s) => s.address).includes(t.data.address)
       )
       .map((t) => {

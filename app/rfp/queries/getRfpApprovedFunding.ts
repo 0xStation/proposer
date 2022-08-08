@@ -49,5 +49,5 @@ export default async function getRfpApprovedProposalFunding(
     }
   }, 0)
 
-  return approvedFunding
+  return approvedFunding as unknown as number
 }

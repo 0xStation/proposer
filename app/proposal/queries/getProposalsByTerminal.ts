@@ -39,11 +39,7 @@ export default async function getProposalsByTerminal(
       },
     },
     include: {
-      rfp: {
-        include: {
-          checkbook: true,
-        },
-      },
+      rfp: true,
       checks: true,
     },
   })

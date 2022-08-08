@@ -13,7 +13,7 @@ import { Checkbook } from "app/checkbook/types"
 const useCheckbookAvailability = (checkbook: Checkbook, terminal: Terminal) => {
   const [totals, setTotals] = useState<any>()
 
-  const tokenOptions = getFundingTokens(checkbook, terminal)
+  const tokenOptions = getFundingTokens(checkbook.chainId, checkbook, terminal)
   const tokenAddresses = tokenOptions.map((option) => option.address)
   const balances = tokenAddresses.reduce((acc, address) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks

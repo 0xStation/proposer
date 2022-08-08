@@ -155,6 +155,8 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
     })
   }, [])
 
+  const activeNeworkChainId = activeChain?.id as number
+
   useEffect(() => {
     if (rfp?.data?.content?.title) {
       setTitle(rfp?.data?.content?.title)
@@ -278,27 +280,20 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
             })
             return
           }
-          if (!values.checkbookAddress) {
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: "Please select a Checkbook first.",
-            })
-            return
-          }
+          // if (!values.checkbookAddress) {
+          //   setToastState({
+          //     isToastShowing: true,
+          //     type: "error",
+          //     message: "Please select a Checkbook first.",
+          //   })
+          //   return
+          // }
 
           const checkbook = checkbooks?.find((checkbook) =>
             addressesAreEqual(checkbook.address, values.checkbookAddress)
           )
 
-          if (!checkbook) {
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: "Could not find selected Checkbook.",
-            })
-            return
-          }
+          console.log("network", activeNeworkChainId)
 
           if (selectedToken.symbol !== ETH && selectedToken.symbol !== USDC) {
             if (tokenFetchSuccess) {
@@ -324,13 +319,16 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
 
           const parsedBudgetAmount = parseUnits(values.budgetAmount, selectedToken.decimals)
 
+          const chainId = checkbook ? checkbook.chainId : activeNeworkChainId // if no checkbook selected, default to user's active network chain id
+
           const message = genRfpSignatureMessage(
             {
               ...values,
               fundingTokenAddress: selectedToken.address,
               budgetAmount: parsedBudgetAmount,
             },
-            activeUser?.address
+            activeUser?.address,
+            chainId
           )
           const signature = await signMessage(message)
 
@@ -339,32 +337,38 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
             return
           }
 
+          let mutationObject = {
+            authorAddress: activeUser.address,
+            fundingAddress: values.checkbookAddress,
+            // convert luxon's `DateTime` obj to UTC to store in db
+            startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
+            fundingToken: {
+              chainId: chainId, // either chain id of checkbook or user's current selected network
+              address: selectedToken.address,
+
+              symbol: selectedToken.symbol,
+              decimals: selectedToken.decimals,
+            },
+            submittingPermission: tokenTags.find(
+              (tag) => tag.data.address === values.submittingPermissionTokenAddress
+            )?.data,
+            viewingPermission: tokenTags.find(
+              (tag) => tag.data.address === values.viewingPermissionTokenAddress
+            )?.data,
+            fundingBudgetAmount: values.budgetAmount,
+            contentBody: values.markdown,
+            contentTitle: values.title,
+            signature,
+            signatureMessage: message,
+          }
+
           if (isEdit) {
             try {
               await updateRfpMutation({
+                ...mutationObject,
                 rfpId: rfp?.id as string,
-                // convert luxon's `DateTime` obj to UTC to store in db
-                startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
                 endDate: DateTime.fromISO(values.endDate).toUTC().toJSDate(),
-                fundingAddress: values.checkbookAddress,
-                fundingToken: {
-                  chainId: checkbook.chainId,
-                  address: selectedToken.address,
-
-                  symbol: selectedToken.symbol,
-                  decimals: selectedToken.decimals,
-                },
-                submittingPermission: tokenTags.find(
-                  (tag) => tag.data.address === values.submittingPermissionTokenAddress
-                )?.data,
-                viewingPermission: tokenTags.find(
-                  (tag) => tag.data.address === values.viewingPermissionTokenAddress
-                )?.data,
-                fundingBudgetAmount: values.budgetAmount,
-                contentBody: values.markdown,
-                contentTitle: values.title,
-                signature,
-                signatureMessage: message,
+                proposalPrefillBody: rfp?.data.proposalPrefill.body || "",
               })
             } catch (err) {
               console.error(err)
@@ -384,31 +388,11 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
           } else {
             try {
               await createRfpMutation({
-                terminalId: terminal?.id as number,
-                // convert luxon's `DateTime` obj to UTC to store in db
-                startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
+                ...mutationObject,
+                terminalId: terminal!.id,
                 endDate: values.endDate
                   ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
                   : undefined,
-                authorAddress: activeUser?.address,
-                fundingAddress: values.checkbookAddress,
-                fundingToken: {
-                  chainId: checkbook.chainId,
-                  address: selectedToken.address,
-                  symbol: selectedToken.symbol,
-                  decimals: selectedToken.decimals,
-                },
-                submittingPermission: tokenTags.find(
-                  (tag) => tag.data.address === values.submittingPermissionTokenAddress
-                )?.data,
-                viewingPermission: tokenTags.find(
-                  (tag) => tag.data.address === values.viewingPermissionTokenAddress
-                )?.data,
-                fundingBudgetAmount: values.budgetAmount,
-                contentBody: values.markdown,
-                contentTitle: values.title,
-                signature,
-                signatureMessage: message,
               })
             } catch (err) {
               console.error(err)

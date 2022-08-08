@@ -12,7 +12,7 @@ const CheckbookSelectToken = ({
   checkbook: Checkbook
   options?: any
 }) => {
-  const tokenOptions = getFundingTokens(checkbook, terminal)
+  const tokenOptions = getFundingTokens(checkbook.chainId, checkbook, terminal)
 
   return (
     <div>

@@ -56,9 +56,9 @@ const ProposalsTab: BlitzPage = ({
   const { proposalId } = useRouterQuery() as { proposalId: string }
   const terminalHandle = useParam("terminalHandle") as string
   const rfpId = useParam("rfpId") as string
-  const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
-    new Set<ProposalStatus>()
-  )
+  // const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
+  //   new Set<ProposalStatus>()
+  // )
   const [page, setPage] = useState<number>(0)
   const [isUrlCopied, setIsUrlCopied] = useState<boolean>(false)
 
@@ -66,27 +66,22 @@ const ProposalsTab: BlitzPage = ({
     getProposalsByRfpId,
     {
       rfpId,
-      quorum: rfp?.checkbook.quorum as number,
-      statuses: Array.from(proposalStatusFilters),
+      // quorum: rfp?.checkbook.quorum as number,
+      // statuses: Array.from(proposalStatusFilters),
       page: page,
       paginationTake: PAGINATION_TAKE,
     },
-    { suspense: false, enabled: !!rfpId && !!rfp?.checkbook, refetchOnWindowFocus: false }
+    { suspense: false, enabled: !!rfpId, refetchOnWindowFocus: false }
   )
 
   const [proposalCount, { isSuccess: isFinishedFetchingProposalCount }] = useQuery(
     getProposalCountByRfpId,
     {
       rfpId,
-      quorum: rfp?.checkbook.quorum as number,
-      statuses: Array.from(proposalStatusFilters),
+      // quorum: rfp?.checkbook.quorum as number,
+      // statuses: Array.from(proposalStatusFilters),
     },
-    {
-      suspense: false,
-      enabled: !!rfpId && !!rfp?.checkbook,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-    }
+    { suspense: false, enabled: !!rfpId, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
   const [proposalCreatedConfirmationModal, setProposalCreatedConfirmationModal] =
@@ -138,7 +133,7 @@ const ProposalsTab: BlitzPage = ({
         <RfpHeaderNavigation rfp={rfp} />
         <div className="h-[calc(100vh-240px)] flex flex-col">
           <div className="w-full h-20 flex sm:flex-row justify-between items-center">
-            <div className="flex ml-5">
+            {/* <div className="flex ml-5">
               <FilterPill
                 label="status"
                 filterOptions={PROPOSAL_STATUSES_FILTER_OPTIONS.map((proposalStatus) => ({
@@ -152,7 +147,7 @@ const ProposalsTab: BlitzPage = ({
                   invalidateQuery(getProposalsByRfpId)
                 }}
               />
-            </div>
+            </div> */}
             <Pagination
               results={proposals as any[]}
               resultsCount={proposalCount as number}
@@ -262,19 +257,6 @@ const ProposalComponent = ({
         <div className="w-full flex flex-row mb-5">
           <div className="basis-[38rem] ml-6 mb-2">
             <h2 className="text-xl mt-2 mb-3">{proposal?.data?.content?.title}</h2>
-          </div>
-          <div className="basis-32 ml-9 mb-2 self-center">
-            <div className="flex flex-row">
-              <ProgressIndicator
-                percent={proposal.approvals?.length / rfp?.checkbook?.quorum}
-                twsize={6}
-                cutoff={0}
-              />
-              <p className="ml-2">
-                {/* TODO: Figure out how to show signers per milestone */}
-                {`${proposal.approvals?.length || "0"} / ${rfp?.checkbook?.quorum || "N/A"}`}
-              </p>
-            </div>
           </div>
           <div
             className={`basis-32 ml-6 mb-2 self-center relative group ${

@@ -18,29 +18,11 @@ export default async function getAccountProposalsByAddress(
       terminal: true,
       proposal: {
         include: {
-          rfp: {
-            include: {
-              checkbook: true,
-            },
-          },
-          approvals: true,
+          rfp: true,
         },
       },
     },
   })
 
-  const accountProposalsWithProductStatus = accountProposals.map((accountProposal) => {
-    return {
-      ...accountProposal,
-      proposal: {
-        ...accountProposal.proposal,
-        status: computeProposalStatus(
-          accountProposal.proposal.approvals.length,
-          accountProposal.proposal.rfp.checkbook?.quorum as number
-        ),
-      },
-    }
-  })
-
-  return accountProposalsWithProductStatus
+  return accountProposals
 }

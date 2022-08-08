@@ -121,24 +121,21 @@ model Checkbook {
   quorum     Int
   signers    String[]
   data       Json
-  rfps       Rfp[]
   checks     Check[]
 }
 
 // unique links by /station/handle]/rfp/[localId]
 model Rfp {
-  id             String     @id @default(uuid())
-  terminalId     Int
-  terminal       Terminal   @relation(fields: [terminalId], references: [id])
-  fundingAddress String
-  checkbook      Checkbook? @relation(fields: [fundingAddress], references: [address])
-  authorAddress  String
-  author         Account?   @relation(fields: [authorAddress], references: [address])
-  startDate      DateTime
-  endDate        DateTime?
-  status         RfpStatus  @default(DRAFT)
-  data           Json
-  proposals      Proposal[]
+  id            String     @id @default(uuid())
+  terminalId    Int
+  terminal      Terminal   @relation(fields: [terminalId], references: [id])
+  authorAddress String
+  author        Account?   @relation(fields: [authorAddress], references: [address])
+  startDate     DateTime
+  endDate       DateTime?
+  status        RfpStatus  @default(DRAFT)
+  data          Json
+  proposals     Proposal[]
 }
 
 // unique links by /station/handle]/proposal/[localId]
