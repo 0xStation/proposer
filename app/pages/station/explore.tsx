@@ -11,7 +11,7 @@ import getTerminalMemberCount from "app/accountTerminal/queries/getTerminalMembe
 import getRfpCountByTerminalId from "app/rfp/queries/getRfpCountByTerminalId"
 import getProposalCountByTerminal from "app/proposal/queries/getProposalCountByTerminal"
 import useStore from "app/core/hooks/useStore"
-import { canCreateStation } from "app/core/utils/permissions"
+import { canCreateStation, addressHasToken } from "app/core/utils/permissions"
 import { DateTime } from "luxon"
 
 const {
@@ -40,6 +40,12 @@ const ExploreStations: BlitzPage = () => {
       refetchOnWindowFocus: false,
     }
   )
+
+  const hasToken = addressHasToken(
+    activeUser?.address,
+    "0x18aAA7115705e8be94bfFEBDE57Af9BFc265B998"
+  )
+  console.log(hasToken)
 
   return (
     <Layout title="Explore stations">
