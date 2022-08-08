@@ -37,7 +37,7 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
   const [terminal, { isSuccess: finishedFetchingTerminal }] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle, include: ["checkbooks"] },
-    { suspense: false }
+    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
   const { activeChain } = useNetwork()
@@ -45,8 +45,8 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
   const { createCheckbook: createCheckbookOnChain } = useCreateCheckbookOnChain(chainId)
 
   useEffect(() => {
-    if (finishedFetchingTerminal) {
-      track("checkbook_create_page_shown", {
+    if (finishedFetchingTerminal && activeUser?.address) {
+      track("create_checkbook_page_shown", {
         event_category: "impression",
         page: pageName,
         station_id: terminal?.id,
@@ -54,7 +54,7 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
         address: activeUser?.address,
       })
     }
-  }, [finishedFetchingTerminal])
+  }, [finishedFetchingTerminal, activeUser?.address])
 
   const data = useWaitForTransaction({
     confirmations: 1,

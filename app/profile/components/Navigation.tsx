@@ -168,9 +168,7 @@ export const Navigation = ({
           </div>
           {activeUser?.address === account?.address ? (
             <button
-              onClick={() => {
-                router.push("/profile/edit")
-              }}
+              onClick={() => router.push("/profile/edit")}
               className="mt-4 p-[0.20rem] border border-marble-white text-marble-white text-base w-full rounded-md hover:bg-wet-concrete cursor-pointer"
             >
               Edit profile

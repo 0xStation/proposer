@@ -99,7 +99,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
   )
 
   useEffect(() => {
-    if (finishedFetchingCheckbooks && finishedFetchingTerminal) {
+    if (finishedFetchingCheckbooks && finishedFetchingTerminal && activeUser?.address) {
       track("checkbook_settings_page_shown", {
         event_category: "impression",
         page: "checkbook_settings_page",
@@ -109,7 +109,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
         num_checkbooks: books?.length,
       })
     }
-  }, [finishedFetchingCheckbooks, finishedFetchingTerminal])
+  }, [finishedFetchingCheckbooks, finishedFetchingTerminal, activeUser?.address])
 
   const CheckbookComponent = ({ checkbook }) => {
     return (

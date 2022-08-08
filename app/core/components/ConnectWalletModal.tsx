@@ -82,15 +82,17 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   }
 
   const handleSignInWithEthereum = async () => {
+    const address = accountData?.address
+    const chainId = connectData?.chain.id
     track("sign_in_with_ethereum_button_clicked", {
       event_category: "click",
       page: window.location.href,
       station_name: terminalHandle,
       address: accountData?.address,
+      chain_id: chainId,
     })
     setConnectState({ error: false, success: false, loading: true })
-    const address = accountData?.address
-    const chainId = connectData?.chain.id
+
     try {
       const nonceRes = await invoke(generateNonce, {})
       const message = new SiweMessage({
@@ -132,7 +134,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         event_category: "error",
         page: window.location.href,
         station_name: terminalHandle,
-        errorMsg,
+        error_msg: errorMsg,
       })
       setConnectState({ error: true, success: false, loading: false })
     }

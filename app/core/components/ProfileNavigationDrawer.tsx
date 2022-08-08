@@ -1,5 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react"
-import { Fragment, useMemo } from "react"
+import { track } from "@amplitude/analytics-browser"
+import { Fragment } from "react"
 import { Image, useRouter, invoke, useSession, Link, Routes } from "blitz"
 import Exit from "public/exit-button.svg"
 import truncateString from "../utils/truncateString"
@@ -18,6 +19,10 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
   const setActiveUser = useStore((state) => state.setActiveUser)
 
   const handleDisconnect = async () => {
+    track("wallet_disconnect", {
+      event_category: "click",
+      page: window.location.href,
+    })
     setIsOpen(false)
     setActiveUser(null)
     await invoke(logout, {})

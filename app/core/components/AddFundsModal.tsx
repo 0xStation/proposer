@@ -53,7 +53,7 @@ export const AddFundsModal = ({
                 page: pageName,
                 event_category: "click",
                 address: activeUser?.address,
-                checkbookAddress,
+                checkbook_address: checkbookAddress,
                 station_id: terminalId,
                 station_name: stationName,
               })

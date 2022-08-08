@@ -1,13 +1,14 @@
 import {
   BlitzPage,
-  useParam,
   Routes,
   useRouter,
+  InferGetServerSidePropsType,
   GetServerSideProps,
   getSession,
   invoke,
   Image,
 } from "blitz"
+import { track } from "@amplitude/analytics-browser"
 import Exit from "/public/exit-button.svg"
 import Layout from "app/core/layouts/Layout"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
@@ -47,20 +48,29 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
   }
 
   return {
-    props: {}, // will be passed to the page component as props
+    props: {
+      terminalHandle: params?.terminalHandle,
+      terminal,
+    }, // will be passed to the page component as props
   }
 }
 
-const NewCheckbookTerminalCreationPage: BlitzPage = () => {
+const NewCheckbookTerminalCreationPage: BlitzPage = ({
+  terminalHandle,
+  terminal,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-
-  const terminalHandle = useParam("terminalHandle") as string
 
   return (
     <Layout>
       <div
         className="absolute top-4 left-4 cursor-pointer"
         onClick={() => {
+          track("complete_profile_checkbook_exit_button", {
+            page: "complete_profile_checkbook_page",
+            station_id: terminal?.id,
+            station_name: terminalHandle,
+          })
           router.push(Routes.BulletinPage({ terminalHandle, terminalCreated: true }))
         }}
       >
