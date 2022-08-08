@@ -1,3 +1,5 @@
+import { useBalance } from "wagmi"
+
 export const canEdit = (activeUser, terminalId, type) => {
   if (!activeUser) {
     return false
@@ -70,4 +72,22 @@ export const canCreateStation = (address: string | undefined) => {
   if (!address) return false
   const lowercaseAddress = address.toLowerCase()
   return createStationWhitelist.some((address) => address.toLowerCase() === lowercaseAddress)
+}
+
+export const addressHasToken = (walletAddress: string | undefined, tokenAddress: string) => {
+  if (!walletAddress) {
+    return false
+  }
+
+  const balance = useBalance({
+    addressOrName: walletAddress,
+    token: tokenAddress,
+    formatUnits: "gwei",
+  })
+
+  if (balance.data) {
+    return balance.data.value.gt(0)
+  }
+
+  return false
 }

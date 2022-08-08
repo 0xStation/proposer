@@ -72,6 +72,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
+  const [currentTab, setCurrentTab] = useState<"GENERAL" | "PERMISSION">("GENERAL")
   const router = useRouter()
   const defaultTokenOptionSymbols = [ETH, USDC]
 
@@ -203,7 +204,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
 
   return (
     <>
-      <div className="fixed grid grid-cols-4 w-[calc(100%-70px)] border-box z-50">
+      <div className="fixed grid grid-cols-4 w-[calc(100%-70px)] border-box z-40">
         <div className="col-span-3 pt-4 pr-4 h-full bg-tunnel-black">
           <div className="text-light-concrete flex flex-row justify-between w-full">
             <button
@@ -514,9 +515,24 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                   </div>
                   <MarkdownShortcuts isOpen={shortcutsOpen} />
                 </div>
-                <div className="h-full border-l border-concrete col-span-1 flex flex-col">
-                  <div className="border-b border-concrete p-4 flex flex-row space-x-8">
-                    <span className="font-bold cursor-pointer">General</span>
+                <div className="h-full border-l border-concrete col-span-1 flex flex-col z-50">
+                  <div className="border-b border-concrete px-4 pt-4 flex flex-row space-x-4">
+                    <span
+                      className={`cursor-pointer ${
+                        currentTab === "GENERAL" && "mb-[-1px] border-b-2 font-bold"
+                      }`}
+                      onClick={() => setCurrentTab("GENERAL")}
+                    >
+                      General
+                    </span>
+                    <span
+                      className={`cursor-pointer ${
+                        currentTab === "PERMISSION" && "mb-[-1px] border-b-2 font-bold"
+                      }`}
+                      onClick={() => setCurrentTab("PERMISSION")}
+                    >
+                      Permission
+                    </span>
                   </div>
                   <form className="p-4 grow flex flex-col justify-between">
                     <div>
