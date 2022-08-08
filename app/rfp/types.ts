@@ -23,6 +23,10 @@ export type RfpMetadata = {
   proposalPrefill: {
     body: string // template body for customized inclusion + addition of questions
   }
+  permissions: {
+    view: string
+    submit: string
+  }
   funding: {
     token: {
       chainId: number

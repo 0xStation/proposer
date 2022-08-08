@@ -16,6 +16,8 @@ const UpdateRfp = z.object({
   fundingToken: Token,
   fundingBudgetAmount: z.string(),
   signature: z.string(),
+  submittingPermission: z.string(),
+  viewingPermission: z.string(),
   signatureMessage: z.any(),
 })
 
@@ -40,6 +42,10 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
               address: toChecksumAddress(input.fundingToken.address),
             },
             budgetAmount: input.fundingBudgetAmount,
+          },
+          permissions: {
+            submit: input.submittingPermission,
+            view: input.viewingPermission,
           },
         },
       },

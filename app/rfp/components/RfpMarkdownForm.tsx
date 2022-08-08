@@ -269,6 +269,8 @@ const RfpMarkdownForm = ({
                 checkbookAddress: rfp?.fundingAddress,
                 fundingTokenSymbol: rfp.data.funding.token.symbol,
                 budgetAmount: rfp.data.funding.budgetAmount,
+                submittingPermission: rfp.data.permissions.submit,
+                viewingPermission: rfp.data.permissions.view,
               }
             : {
                 checkbookAddress: checkbooks?.[0]?.address,
@@ -282,6 +284,8 @@ const RfpMarkdownForm = ({
           budgetAmount: string
           markdown: string
           title: string
+          submittingPermission: string
+          viewingPermission: string
         }) => {
           trackClick(RFP.EVENT_NAME.RFP_EDITOR_MODAL_PUBLISH_CLICKED, {
             pageName: PAGE_NAME.RFP_EDITOR_PAGE,
@@ -377,6 +381,8 @@ const RfpMarkdownForm = ({
                   symbol: selectedToken.symbol,
                   decimals: selectedToken.decimals,
                 },
+                submittingPermission: values.submittingPermission,
+                viewingPermission: values.viewingPermission,
                 fundingBudgetAmount: values.budgetAmount,
                 contentBody: values.markdown,
                 contentTitle: values.title,
@@ -415,6 +421,8 @@ const RfpMarkdownForm = ({
                   symbol: selectedToken.symbol,
                   decimals: selectedToken.decimals,
                 },
+                submittingPermission: values.submittingPermission,
+                viewingPermission: values.viewingPermission,
                 fundingBudgetAmount: values.budgetAmount,
                 contentBody: values.markdown,
                 contentTitle: values.title,
@@ -537,55 +545,56 @@ const RfpMarkdownForm = ({
                     </span>
                   </div>
                   <form className="p-4 grow flex flex-col justify-between">
-                    <div>
-                      <div className="flex flex-col mt-2">
-                        <label className="font-bold">Submission opens*</label>
-                        <Field name="startDate" validate={requiredField}>
-                          {({ input, meta }) => {
-                            return (
-                              <div>
-                                <input
-                                  {...input}
-                                  type="datetime-local"
-                                  min={getFormattedDate({ dateTime: DateTime.local() })}
-                                  className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
-                                />
-                                {(meta.touched || attemptedSubmit) && meta.error && (
-                                  <span className="text-torch-red text-xs">{meta.error}</span>
-                                )}
-                              </div>
-                            )
-                          }}
-                        </Field>
-                      </div>
-                      <div className="flex flex-col mt-6">
-                        <label className="font-bold">Submission closes</label>
-                        <Field name="endDate" validate={isAfterStartDate}>
-                          {({ input, meta }) => (
-                            <div>
-                              <input
-                                {...input}
-                                type="datetime-local"
-                                // dates need to match the pattern nnnn-nn-nnTnn:nn
-                                min={
-                                  formState.values.startDate
-                                    ? getFormattedDate({
-                                        dateTime: DateTime.fromISO(formState.values.startDate),
-                                      })
-                                    : getFormattedDate({
-                                        dateTime: DateTime.local(),
-                                      })
-                                }
-                                className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
-                              />
-                              {meta.error && (
-                                <span className="text-torch-red text-xs">{meta.error}</span>
-                              )}
-                            </div>
-                          )}
-                        </Field>
-                      </div>
+                    {currentTab === "GENERAL" ? (
                       <div>
+                        <div className="flex flex-col mt-2">
+                          <label className="font-bold">Submission opens*</label>
+                          <Field name="startDate" validate={requiredField}>
+                            {({ input, meta }) => {
+                              return (
+                                <div>
+                                  <input
+                                    {...input}
+                                    type="datetime-local"
+                                    min={getFormattedDate({ dateTime: DateTime.local() })}
+                                    className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
+                                  />
+                                  {(meta.touched || attemptedSubmit) && meta.error && (
+                                    <span className="text-torch-red text-xs">{meta.error}</span>
+                                  )}
+                                </div>
+                              )
+                            }}
+                          </Field>
+                        </div>
+                        <div className="flex flex-col mt-6">
+                          <label className="font-bold">Submission closes</label>
+                          <Field name="endDate">
+                            {({ input, meta }) => {
+                              return (
+                                <div>
+                                  <input
+                                    {...input}
+                                    type="datetime-local"
+                                    min={
+                                      formState.values.startDate
+                                        ? getFormattedDate({
+                                            dateTime: DateTime.fromISO(formState.values.startDate),
+                                          })
+                                        : getFormattedDate({
+                                            dateTime: DateTime.local(),
+                                          })
+                                    }
+                                    className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
+                                  />
+                                  {(meta.touched || attemptedSubmit) && meta.error && (
+                                    <span className="text-torch-red text-xs">{meta.error}</span>
+                                  )}
+                                </div>
+                              )
+                            }}
+                          </Field>
+                        </div>
                         <div className="flex flex-col mt-6">
                           <label className="font-bold">Network*</label>
                           <Field name="network">
@@ -799,66 +808,111 @@ const RfpMarkdownForm = ({
                             />
                           </div>
                         </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          trackClick(RFP.EVENT_NAME.RFP_EDITOR_PUBLISH_CLICKED, {
-                            pageName: PAGE_NAME.RFP_EDITOR_PAGE,
-                            userAddress: activeUser?.address,
-                            stationHandle: terminal?.handle as string,
-                            stationId: terminal?.id,
-                          })
-                          setAttemptedSubmit(true)
-                          if (
-                            formState.invalid ||
-                            !selectedToken ||
-                            !selectedNetworkId ||
-                            !selectedCheckbook
-                          ) {
-                            if (!selectedNetworkId) {
-                              setToastState({
-                                isToastShowing: true,
-                                type: "error",
-                                message: `Please fill in the Network field to publish your RFP.`,
-                              })
-                              return
-                            }
-
-                            if (!formState.values.fundingTokenSymbol && !selectedToken) {
-                              setToastState({
-                                isToastShowing: true,
-                                type: "error",
-                                message: `Please fill in the Reward token field to publish your RFP.`,
-                              })
-                              return
-                            }
-
-                            if (!selectedCheckbook) {
-                              setToastState({
-                                isToastShowing: true,
-                                type: "error",
-                                message: `Please add a Checkbook to publish your RFP.`,
-                              })
-                              return
-                            }
-                            const fieldsWithErrors = Object.keys(formState.errors as Object)
-                            setToastState({
-                              isToastShowing: true,
-                              type: "error",
-                              message: `Please fill in ${fieldsWithErrors.join(
-                                ", "
-                              )} to publish RFP.`,
+                        <button
+                          type="button"
+                          onClick={() => {
+                            trackClick(RFP.EVENT_NAME.RFP_EDITOR_PUBLISH_CLICKED, {
+                              pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+                              userAddress: activeUser?.address,
+                              stationHandle: terminal?.handle as string,
+                              stationId: terminal?.id,
                             })
-                            return
-                          }
-                          setConfirmationModalOpen(true)
-                        }}
-                        className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block mt-14 hover:bg-opacity-70"
-                      >
-                        Publish
-                      </button>
-                    </div>
+                            setAttemptedSubmit(true)
+                            if (
+                              formState.invalid ||
+                              !selectedToken ||
+                              !selectedNetworkId ||
+                              !selectedCheckbook
+                            ) {
+                              if (!selectedNetworkId) {
+                                setToastState({
+                                  isToastShowing: true,
+                                  type: "error",
+                                  message: `Please fill in the Network field to publish your RFP.`,
+                                })
+                                return
+                              }
+
+                              if (!formState.values.fundingTokenSymbol && !selectedToken) {
+                                setToastState({
+                                  isToastShowing: true,
+                                  type: "error",
+                                  message: `Please fill in the Reward token field to publish your RFP.`,
+                                })
+                                return
+                              }
+
+                              if (!selectedCheckbook) {
+                                setToastState({
+                                  isToastShowing: true,
+                                  type: "error",
+                                  message: `Please add a Checkbook to publish your RFP.`,
+                                })
+                                return
+                              }
+                              const fieldsWithErrors = Object.keys(formState.errors as Object)
+                              setToastState({
+                                isToastShowing: true,
+                                type: "error",
+                                message: `Please fill in ${fieldsWithErrors.join(
+                                  ", "
+                                )} to publish RFP.`,
+                              })
+                              return
+                            }
+                            setConfirmationModalOpen(true)
+                          }}
+                          className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block mt-14 hover:bg-opacity-70"
+                        >
+                          Publish
+                        </button>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="flex flex-col">
+                          <label className="font-bold">Submitting proposals</label>
+                          <span className="text-xs text-concrete">
+                            Only those who hold this token will be able to submit a proposal to this
+                            RFP.
+                          </span>
+                          <Field name="submittingPermission">
+                            {({ input, meta }) => {
+                              return (
+                                <div>
+                                  <input
+                                    {...input}
+                                    type="text"
+                                    className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
+                                    placeholder="Paste address"
+                                  />
+                                </div>
+                              )
+                            }}
+                          </Field>
+                        </div>
+                        <div className="flex flex-col mt-6">
+                          <label className="font-bold">Viewing proposals</label>
+                          <span className="text-xs text-concrete">
+                            Only those who hold this token will be able to view a proposal to this
+                            RFP.
+                          </span>
+                          <Field name="viewingPermission">
+                            {({ input, meta }) => {
+                              return (
+                                <div>
+                                  <input
+                                    {...input}
+                                    type="text"
+                                    className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
+                                    placeholder="Paste address"
+                                  />
+                                </div>
+                              )
+                            }}
+                          </Field>
+                        </div>
+                      </div>
+                    )}
                   </form>
                 </div>
               </div>
