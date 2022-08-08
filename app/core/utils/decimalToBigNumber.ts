@@ -1,9 +1,9 @@
 import { Prisma } from "@prisma/client"
-import { utils } from "ethers"
+import { parseUnits } from "@ethersproject/units"
 
 const decimalToBigNumber = (value, decimals: number) => {
   const n = new Prisma.Decimal(value)
-  return utils.parseUnits(n.toFixed(decimals), decimals)
+  return parseUnits(n.toFixed(decimals), decimals)
 }
 
 export default decimalToBigNumber

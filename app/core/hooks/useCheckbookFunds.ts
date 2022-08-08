@@ -1,5 +1,5 @@
 import { useBalance } from "wagmi"
-import { BigNumber, utils } from "ethers"
+import { BigNumber } from "@ethersproject/bignumber"
 import { useQuery } from "blitz"
 import getAggregatedCheckAmounts from "app/check/queries/getAggregatedCheckAmounts"
 import { ZERO_ADDRESS } from "../utils/constants"

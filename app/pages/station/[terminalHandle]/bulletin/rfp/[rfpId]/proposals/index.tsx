@@ -37,7 +37,7 @@ import FilterPill from "app/core/components/FilterPill"
 import Pagination from "app/core/components/Pagination"
 import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpId"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
-import { formatUnits } from "ethers/lib/utils"
+import { formatUnits } from "@ethersproject/units"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 
 const ProposalsTab: BlitzPage = ({

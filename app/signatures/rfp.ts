@@ -1,4 +1,5 @@
-import { keccak256, toUtf8Bytes } from "ethers/lib/utils"
+import { toUtf8Bytes } from "@ethersproject/strings"
+import { keccak256 } from "@ethersproject/keccak256"
 
 export const genRfpSignatureMessage = (values, author) => {
   const now = new Date()
