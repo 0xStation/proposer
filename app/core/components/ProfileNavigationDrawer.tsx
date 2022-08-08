@@ -41,7 +41,13 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
         Profile
       </button>
     ) : session?.siwe?.address ? (
-      <button className="block hover:opacity-70" onClick={() => router.push(`/profile/complete`)}>
+      <button
+        className="block hover:opacity-70"
+        onClick={() => {
+          router.push(`/profile/complete`)
+          setIsOpen(false)
+        }}
+      >
         Create profile
       </button>
     ) : null
@@ -49,9 +55,19 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
   const openATerminalLink = session?.siwe?.address &&
     activeUser &&
     canCreateStation(activeUser?.address) && (
-      <Link href={Routes.CreateTerminalDetailsPage()}>
-        <span className="block hover:opacity-70 cursor-pointer">New station</span>
-      </Link>
+      <button
+        className="block hover:opacity-70"
+        onClick={() => {
+          track("show_create_station_page_clicked", {
+            page: "profile_nav",
+            event_category: "click",
+          })
+          router.push(Routes.CreateTerminalDetailsPage())
+          setIsOpen(false)
+        }}
+      >
+        New station
+      </button>
     )
 
   const profilePfp =

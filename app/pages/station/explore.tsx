@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { BlitzPage, Link, Routes, useQuery, useRouter } from "blitz"
-
+import { track } from "@amplitude/analytics-browser"
 import Layout from "app/core/layouts/Layout"
 import Pagination from "app/core/components/Pagination"
 import { DEFAULT_PFP_URLS, PAGINATION_TAKE } from "app/core/utils/constants"
@@ -33,7 +33,13 @@ const ExploreStations: BlitzPage = () => {
           <div className="relative self-start group">
             <button
               className="text-tunnel-black bg-electric-violet rounded hover:opacity-70 h-[35px] px-6 mr-8"
-              onClick={() => router.push(Routes.CreateTerminalDetailsPage())}
+              onClick={() => {
+                track("show_create_station_page_clicked", {
+                  page: "explore",
+                  address: activeUser?.address,
+                })
+                router.push(Routes.CreateTerminalDetailsPage())
+              }}
               disabled={!canCreateStation(activeUser?.address)}
             >
               Open a station
