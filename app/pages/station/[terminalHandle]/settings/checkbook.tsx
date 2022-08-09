@@ -10,7 +10,8 @@ import {
   useQuery,
   useRouterQuery,
 } from "blitz"
-import { track } from "@amplitude/analytics-browser"
+import { trackClick, trackImpression } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import Navigation from "app/terminal/components/settings/navigation"
 import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
@@ -24,6 +25,11 @@ import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import { AddFundsModal } from "app/core/components/AddFundsModal"
 import useStore from "app/core/hooks/useStore"
+
+const {
+  PAGE_NAME,
+  FEATURE: { CHECKBOOK },
+} = TRACKING_EVENTS
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   const session = await getSession(req, res)
@@ -100,13 +106,12 @@ const CheckbookSettingsPage: BlitzPage = () => {
 
   useEffect(() => {
     if (finishedFetchingCheckbooks && finishedFetchingTerminal && activeUser?.address) {
-      track("checkbook_settings_page_shown", {
-        event_category: "impression",
-        page: "checkbook_settings_page",
-        station_id: terminal?.id,
-        station_name: terminalHandle,
-        address: activeUser?.address,
-        num_checkbooks: books?.length,
+      trackImpression(CHECKBOOK.EVENT_NAME.CHECKBOOK_SETTINGS_PAGE_SHOWN, {
+        pageName: PAGE_NAME.CHECKBOOK_SETTINGS_PAGE,
+        stationName: terminalHandle as string,
+        stationId: terminal?.id,
+        userAddress: activeUser?.address,
+        numCheckbooks: books?.length,
       })
     }
   }, [finishedFetchingCheckbooks, finishedFetchingTerminal, activeUser?.address])
@@ -141,7 +146,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
           setIsOpen={setShowAddFundsModal || setSuccessModalOpen}
           isOpen={showAddFundsModal || successModalOpen}
           checkbookAddress={selectedCheckbook?.address}
-          pageName="checkbook_settings_page"
+          pageName={PAGE_NAME.CHECKBOOK_SETTINGS_PAGE}
           terminalId={terminal?.id as number}
           stationName={terminalHandle}
         />
@@ -162,13 +167,12 @@ const CheckbookSettingsPage: BlitzPage = () => {
             <button
               className="rounded text-tunnel-black px-8 h-[32px] bg-electric-violet self-start"
               onClick={() => {
-                track("checkbook_show_create_page_clicked", {
-                  event_category: "click",
-                  page: "checkbook_settings_page",
-                  station_name: terminalHandle,
-                  station_id: terminal?.id,
-                  address: activeUser?.address,
-                  num_checkbooks: books?.length,
+                trackClick(CHECKBOOK.EVENT_NAME.CHECKBOOK_SHOW_CREATE_PAGE_CLICKED, {
+                  pageName: PAGE_NAME.CHECKBOOK_SETTINGS_PAGE,
+                  stationName: terminalHandle as string,
+                  stationId: terminal?.id,
+                  userAddress: activeUser?.address,
+                  numCheckbooks: books?.length,
                 })
                 router.push(Routes.NewCheckbookSettingsPage({ terminalHandle }))
               }}

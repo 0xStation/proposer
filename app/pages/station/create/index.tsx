@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { BlitzPage, useMutation, useRouter, Routes, Image, Router, useSession } from "blitz"
-import { track } from "@amplitude/analytics-browser"
+import { trackClick, trackImpression, trackError } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import PersonalSiteIcon from "public/personal-site-icon.svg"
 import TwitterIcon from "public/twitter-icon.svg"
 import GithubIcon from "public/github-icon.svg"
@@ -21,6 +22,11 @@ import useStore from "app/core/hooks/useStore"
 import Layout from "app/core/layouts/Layout"
 import { sendTerminalCreationNotification } from "app/utils/sendTerminalCreatedNotification"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
+
+const {
+  PAGE_NAME,
+  FEATURE: { NEW_STATION },
+} = TRACKING_EVENTS
 
 const PfpInput = ({ pfpURL, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
@@ -82,10 +88,9 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
 
   useEffect(() => {
-    track("create_station_page_shown", {
-      page: "station_creation_page",
-      event_category: "impression",
-      address: activeUser?.address,
+    trackImpression(NEW_STATION.EVENT_NAME.CREATE_STATION_PAGE_SHOWN, {
+      userAddress: activeUser?.address,
+      pageName: PAGE_NAME.STATION_CREATION_PAGE,
     })
   }, [])
 
@@ -95,10 +100,9 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
         <div
           className="absolute top-4 left-4 cursor-pointer"
           onClick={() => {
-            track("create_station_back_button_clicked", {
-              page: "station_creation_page",
-              event_category: "click",
-              address: activeUser?.address,
+            trackClick(NEW_STATION.EVENT_NAME.CREATE_STATION_BACK_BUTTON_CLICKED, {
+              userAddress: activeUser?.address,
+              pageName: PAGE_NAME.STATION_CREATION_PAGE,
             })
             Router.back()
           }}
@@ -141,10 +145,9 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                   },
                   form
                 ) => {
-                  track("create_station_create_continue_clicked", {
-                    page: "station_creation_page",
-                    event_category: "click",
-                    address: activeUser?.address,
+                  trackClick(NEW_STATION.EVENT_NAME.CREATE_STATION_CREATE_CONTINUTE_CLICKED, {
+                    userAddress: activeUser?.address,
+                    pageName: PAGE_NAME.STATION_CREATION_PAGE,
                   })
                   if (
                     session.userId !== null &&
@@ -168,11 +171,10 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                         Routes.NewCheckbookTerminalCreationPage({ terminalHandle: terminal.handle })
                       )
                     } catch (err) {
-                      track("error_creating_station", {
-                        page: "station_creation_page",
-                        event_category: "error",
-                        station_name: values.handle,
-                        address: activeUser?.address,
+                      trackError(NEW_STATION.EVENT_NAME.ERROR_CREATING_STATION, {
+                        userAddress: activeUser?.address,
+                        pageName: PAGE_NAME.STATION_CREATION_PAGE,
+                        stationName: values.handle,
                       })
                       setToastState({
                         isToastShowing: true,

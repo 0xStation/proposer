@@ -1,10 +1,15 @@
 import { invalidateQuery, useMutation } from "blitz"
-import { track } from "@amplitude/analytics-browser"
+import { trackClick, trackError } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Modal from "app/core/components/Modal"
 import closeRfp from "app/rfp/mutations/closeRfp"
 import getRfpsByTerminalId from "../queries/getRfpsByTerminalId"
 import useStore from "app/core/hooks/useStore"
 import getRfpById from "../queries/getRfpById"
+
+const {
+  FEATURE: { RFP },
+} = TRACKING_EVENTS
 
 export const CloseRfpModal = ({ isOpen, setIsOpen, rfp, pageName, terminalId, terminalHandle }) => {
   const setToastState = useStore((state) => state.setToastState)
@@ -26,23 +31,21 @@ export const CloseRfpModal = ({ isOpen, setIsOpen, rfp, pageName, terminalId, te
 
   const handleSubmit = async () => {
     try {
-      track("close_rfp_clicked", {
-        event_category: "click",
-        page: pageName,
-        station_name: terminalHandle,
-        station_id: terminalId,
-        rfp_id: rfp?.id,
+      trackClick(RFP.EVENT_NAME.CLOSE_RFP_CLICKED, {
+        pageName,
+        stationName: terminalHandle as string,
+        stationId: terminalId,
+        rfpId: rfp?.id,
       })
       await closeRfpMutation({ rfpId: rfp?.id })
     } catch (err) {
       console.error(err)
-      track("error_closing_rfp", {
-        event_category: "error",
-        page: pageName,
-        station_name: terminalHandle,
-        station_id: terminalId,
-        rfp_id: rfp?.id,
-        error_msg: err.message,
+      trackError(RFP.EVENT_NAME.ERROR_CLOSING_RFP, {
+        pageName,
+        stationName: terminalHandle as string,
+        stationId: terminalId,
+        rfpId: rfp?.id,
+        errorMsg: err.message,
       })
       setIsOpen(false)
       setToastState({

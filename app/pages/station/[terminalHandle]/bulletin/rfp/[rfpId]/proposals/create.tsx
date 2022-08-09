@@ -10,7 +10,8 @@ import {
   useParam,
   useMutation,
 } from "blitz"
-import { track } from "@amplitude/analytics-browser"
+import { trackClick, trackImpression, trackError } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import { Field, Form } from "react-final-form"
 import { LightBulbIcon, XIcon } from "@heroicons/react/solid"
 import { parseUnits } from "@ethersproject/units"
@@ -38,6 +39,11 @@ import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
 
+const {
+  PAGE_NAME,
+  FEATURE: { PROPOSAL },
+} = TRACKING_EVENTS
+
 type GetServerSidePropsData = {
   rfp: Rfp
   terminal: Terminal
@@ -61,12 +67,11 @@ const CreateProposalPage: BlitzPage = ({
   })
 
   useEffect(() => {
-    track("proposal_editor_page_shown", {
-      event_category: "impression",
-      page: "proposal_editor_page",
-      address: activeUser?.address,
-      station_name: data.terminal?.handle,
-      station_id: data.terminal?.id,
+    trackImpression(PROPOSAL.EVENT_NAME.PROPSOAL_EDITOR_PAGE_SHOWN, {
+      pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
+      userAddress: activeUser?.address,
+      stationName: data.terminal?.handle,
+      stationId: data.terminal?.id,
     })
   }, [])
 
@@ -176,13 +181,12 @@ const CreateProposalPage: BlitzPage = ({
           markdown: string
           title: string
         }) => {
-          track("proposal_editor_modal_publish_clicked", {
-            event_category: "click",
-            page: "proposal_editor_page",
-            address: activeUser?.address,
-            station_name: data.terminal?.handle,
-            station_id: data.terminal?.id,
-            recipient_address: values?.recipientAddress,
+          trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_EDITOR_MODAL_PUBLISH_CLICKED, {
+            pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
+            userAddress: activeUser?.address,
+            stationName: data.terminal?.handle,
+            stationId: data.terminal?.id,
+            recipientAddress: values?.recipientAddress,
             amount: values?.amount,
             title: values?.title,
           })
@@ -225,16 +229,15 @@ const CreateProposalPage: BlitzPage = ({
                 signatureMessage: message,
               })
             } catch (e) {
-              track("error_creating_proposal", {
-                event_category: "error",
-                page: "proposal_editor_page",
-                address: activeUser?.address,
-                station_name: data.terminal?.handle,
-                station_id: data.terminal?.id,
-                recipient_address: values?.recipientAddress,
+              trackError(PROPOSAL.EVENT_NAME.ERROR_CREATING_PROPOSAL, {
+                pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
+                userAddress: activeUser?.address,
+                stationName: data.terminal?.handle,
+                stationId: data.terminal?.id,
+                recipientAddress: values?.recipientAddress,
                 amount: values?.amount,
                 title: values?.title,
-                error_msg: e.message,
+                errorMsg: e.message,
               })
               console.error(e)
               setToastState({
@@ -431,11 +434,10 @@ const CreateProposalPage: BlitzPage = ({
                     <button
                       type="button"
                       onClick={() => {
-                        track("proposal_editor_publish_clicked", {
-                          event_category: "click",
-                          station_name: data?.terminal?.handle,
-                          station_id: data?.terminal?.id,
-                          address: activeUser?.address,
+                        trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_EDITOR_PUBLISH_CLICKED, {
+                          userAddress: activeUser?.address,
+                          stationName: data.terminal?.handle,
+                          stationId: data.terminal?.id,
                         })
                         setAttemptedSubmit(true)
                         if (formState.invalid) {

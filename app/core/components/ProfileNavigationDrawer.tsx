@@ -1,7 +1,8 @@
 import { Dialog, Transition } from "@headlessui/react"
-import { track } from "@amplitude/analytics-browser"
+import { trackClick } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "../utils/constants"
 import { Fragment } from "react"
-import { Image, useRouter, invoke, useSession, Link, Routes } from "blitz"
+import { Image, useRouter, invoke, useSession, Routes } from "blitz"
 import Exit from "public/exit-button.svg"
 import truncateString from "../utils/truncateString"
 import { useDisconnect } from "wagmi"
@@ -11,6 +12,9 @@ import { DEFAULT_PFP_URLS } from "../utils/constants"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { canCreateStation } from "app/core/utils/permissions"
 
+const { FEATURE, PAGE_NAME } = TRACKING_EVENTS
+const { NEW_STATION, WALLET_CONNECTION } = FEATURE
+
 export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
   const router = useRouter()
   const session = useSession({ suspense: false })
@@ -19,9 +23,8 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
   const setActiveUser = useStore((state) => state.setActiveUser)
 
   const handleDisconnect = async () => {
-    track("wallet_disconnect", {
-      event_category: "click",
-      page: window.location.href,
+    trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_DISCONNECT_CLICKED, {
+      pageName: window.location.href,
     })
     setIsOpen(false)
     setActiveUser(null)
@@ -58,9 +61,8 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
       <button
         className="block hover:opacity-70"
         onClick={() => {
-          track("show_create_station_page_clicked", {
-            page: "profile_nav",
-            event_category: "click",
+          trackClick(NEW_STATION.EVENT_NAME.SHOW_CREATE_STATION_PAGE_CLICKED, {
+            pageName: PAGE_NAME.PROFILE_NAV,
           })
           router.push(Routes.CreateTerminalDetailsPage())
           setIsOpen(false)

@@ -23,11 +23,17 @@ import {
   requiredField,
   isAfterStartDate,
 } from "app/utils/validators"
-import { useNetwork } from "wagmi"
 import { genRfpSignatureMessage } from "app/signatures/rfp"
 import getFundingTokens from "app/core/utils/getFundingTokens"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
+import { trackClick, trackEvent, trackError } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
+
+const {
+  PAGE_NAME,
+  FEATURE: { RFP, PROPOSAL },
+} = TRACKING_EVENTS
 
 const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
   const isoDate = DateTime.fromISO(dateTime.toString())
@@ -66,11 +72,11 @@ const RfpMarkdownForm = ({
   const tokenOptions = ["ETH", "USDC"]
 
   useEffect(() => {
-    track("rfp_editor_page_shown", {
-      event_category: "impression",
-      page: "rfp_editor_page",
-      address: activeUser?.address,
-      station_name: terminal?.handle,
+    trackClick(RFP.EVENT_NAME.RFP_EDITOR_PAGE_SHOWN, {
+      pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+      userAddress: activeUser?.address,
+      stationName: terminal?.handle as string,
+      stationId: terminal?.id,
     })
   }, [])
 
@@ -88,12 +94,11 @@ const RfpMarkdownForm = ({
 
   const [createRfpMutation] = useMutation(createRfp, {
     onSuccess: (_data) => {
-      track("rfp_created", {
-        event_category: "event",
-        page: "rfp_editor_page",
-        address: activeUser?.address,
-        station_name: terminal?.handle,
-        station_id: terminal?.id,
+      trackEvent(RFP.EVENT_NAME.RFP_CREATED, "event", {
+        pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+        userAddress: activeUser?.address,
+        stationName: terminal?.handle as string,
+        stationId: terminal?.id,
       })
       invalidateQuery(getRfpsByTerminalId)
       Routes.BulletinPage({ terminalHandle: terminal?.handle, rfpPublished: _data?.id })
@@ -108,12 +113,11 @@ const RfpMarkdownForm = ({
 
   const [updateRfpMutation] = useMutation(updateRfp, {
     onSuccess: (_data) => {
-      track("rfp_edited", {
-        event_category: "event",
-        page: "rfp_editor_page",
-        address: activeUser?.address,
-        station_name: terminal?.handle,
-        station_id: terminal?.id,
+      trackEvent(RFP.EVENT_NAME.RFP_EDITED, "event", {
+        pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+        userAddress: activeUser?.address,
+        stationName: terminal?.handle as string,
+        stationId: terminal?.id,
         rfpId: rfp?.id,
       })
       invalidateQuery(getRfpsByTerminalId)
@@ -211,16 +215,15 @@ const RfpMarkdownForm = ({
           markdown: string
           title: string
         }) => {
-          track("rfp_editor_modal_publish_clicked", {
-            event_category: "click",
-            page: "rfp_editor_page",
-            start_date: values.startDate,
-            end_date: values.endDate,
-            checkbook_address: values.checkbookAddress,
-            rfp_title: values.title,
-            address: activeUser?.address,
-            station_name: terminal?.handle,
-            station_id: terminal?.id,
+          trackClick(RFP.EVENT_NAME.RFP_EDITOR_MODAL_PUBLISH_CLICKED, {
+            pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+            userAddress: activeUser?.address,
+            stationName: terminal?.handle as string,
+            stationId: terminal?.id,
+            startDate: values.startDate,
+            endDate: values.endDate,
+            checkbookAddress: values.checkbookAddress,
+            title: values.title,
           })
           if (!activeUser?.address) {
             setToastState({
@@ -305,18 +308,17 @@ const RfpMarkdownForm = ({
               })
             } catch (err) {
               console.error(err)
-              track("error_editing_rfp", {
-                event_category: "error",
-                page: "rfp_editor_page",
-                start_date: values.startDate,
-                end_date: values.endDate,
-                checkbook_address: values.checkbookAddress,
-                rfp_title: values.title,
-                address: activeUser?.address,
-                station_name: terminal?.handle,
-                station_id: terminal?.id,
-                rfp_id: rfp?.id,
-                error_msg: err.message,
+              trackError(RFP.EVENT_NAME.ERROR_EDITING_RFP, {
+                pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+                userAddress: activeUser?.address,
+                stationName: terminal?.handle as string,
+                stationId: terminal?.id,
+                startDate: values.startDate,
+                endDate: values.endDate,
+                checkbookAddress: values.checkbookAddress,
+                title: values.title,
+                rfpId: rfp?.id,
+                errorMsg: err.message,
               })
             }
           } else {
@@ -344,17 +346,17 @@ const RfpMarkdownForm = ({
               })
             } catch (err) {
               console.error(err)
-              track("error_creating_rfp", {
-                event_category: "error",
-                page: "rfp_editor_page",
-                start_date: values.startDate,
-                end_date: values.endDate,
-                checkbook_address: values.checkbookAddress,
-                rfp_title: values.title,
-                address: activeUser?.address,
-                station_name: terminal?.handle,
-                station_id: terminal?.id,
-                error_msg: err.message,
+              trackError(RFP.EVENT_NAME.ERROR_CREATING_RFP, {
+                pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+                userAddress: activeUser?.address,
+                stationName: terminal?.handle as string,
+                stationId: terminal?.id,
+                startDate: values.startDate,
+                endDate: values.endDate,
+                checkbookAddress: values.checkbookAddress,
+                title: values.title,
+                rfpId: rfp?.id,
+                errorMsg: err.message,
               })
             }
           }
@@ -606,12 +608,11 @@ const RfpMarkdownForm = ({
                       <button
                         type="button"
                         onClick={() => {
-                          track("rfp_editor_publish_clicked", {
-                            event_category: "click",
-                            page: "rfp_editor_page",
-                            address: activeUser?.address,
-                            station_name: terminal?.handle,
-                            station_id: terminal?.id,
+                          trackClick(RFP.EVENT_NAME.RFP_EDITOR_PUBLISH_CLICKED, {
+                            pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+                            userAddress: activeUser?.address,
+                            stationName: terminal?.handle as string,
+                            stationId: terminal?.id,
                           })
                           setAttemptedSubmit(true)
                           if (formState.invalid) {

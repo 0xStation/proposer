@@ -21,6 +21,13 @@ import { DeleteRfpModal } from "./DeleteRfpModal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import useStore from "app/core/hooks/useStore"
+import { trackClick } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
+
+const {
+  PAGE_NAME,
+  FEATURE: { RFP, PROPOSAL },
+} = TRACKING_EVENTS
 
 const RfpHeaderNavigation = ({ rfpId }) => {
   const terminalHandle = useParam("terminalHandle") as string
@@ -64,7 +71,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
         isOpen={deleteRfpModalOpen}
         setIsOpen={setDeleteRfpModalOpen}
         rfp={rfp}
-        pageName={"rfp_info_page"}
+        pageName={PAGE_NAME.RFP_INFO_PAGE}
         terminalHandle={terminalHandle}
         terminalId={terminal?.id}
       />
@@ -72,7 +79,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
         isOpen={isReopenRfpModalOpen}
         setIsOpen={setIsReopenRfpModalOpen}
         rfp={rfp}
-        pageName="rfp_info_page"
+        pageName={PAGE_NAME.RFP_INFO_PAGE}
         terminalHandle={terminalHandle}
         terminalId={terminal?.id}
       />
@@ -80,7 +87,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
         isOpen={isClosedRfpModalOpen}
         setIsOpen={setIsClosedRfpModalOpen}
         rfp={rfp}
-        pageName="rfp_info_page"
+        pageName={PAGE_NAME.RFP_INFO_PAGE}
         terminalHandle={terminalHandle}
         terminalId={terminal?.id}
       />
@@ -123,12 +130,11 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                       rfp?.author?.id === session.userId && (
                         <button
                           onClick={() => {
-                            track("rfp_show_editor_clicked", {
-                              event_category: "click",
-                              address: activeUser?.address,
-                              station_name: terminalHandle,
-                              station_id: terminal?.id,
-                              is_edit: true,
+                            trackClick(RFP.EVENT_NAME.RFP_SHOW_EDITOR_CLICKED, {
+                              userAddress: activeUser?.address,
+                              stationName: terminalHandle,
+                              stationId: terminal?.id,
+                              isEdit: true,
                             })
                             router.push(Routes.EditRfpPage({ terminalHandle, rfpId }))
                           }}
@@ -189,21 +195,19 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                             ),
                             onClick: () => {
                               if (rfp?.status !== RfpStatus.CLOSED) {
-                                track("rfp_settings_close_rfp_clicked", {
-                                  event_category: "click",
-                                  page: "rfp_info_page",
-                                  station_name: terminalHandle,
-                                  station_id: terminal?.id,
-                                  rfp_id: rfp?.id,
+                                trackClick(RFP.EVENT_NAME.RFP_SETTINGS_CLOSE_RFP_CLICKED, {
+                                  pageName: PAGE_NAME.RFP_INFO_PAGE,
+                                  stationName: terminalHandle,
+                                  stationId: terminal?.id,
+                                  rfpId: rfp?.id,
                                 })
                                 setIsClosedRfpModalOpen(true)
                               } else {
-                                track("rfp_settings_reopen_rfp_clicked", {
-                                  event_category: "click",
-                                  page: "rfp_info_page",
-                                  station_name: terminalHandle,
-                                  station_id: terminal?.id,
-                                  rfp_id: rfp?.id,
+                                trackClick(RFP.EVENT_NAME.RFP_SETTINGS_REOPEN_RFP_CLICKED, {
+                                  pageName: PAGE_NAME.RFP_INFO_PAGE,
+                                  stationName: terminalHandle,
+                                  stationId: terminal?.id,
+                                  rfpId: rfp?.id,
                                 })
                                 setIsReopenRfpModalOpen(true)
                               }
@@ -217,12 +221,11 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                               </>
                             ),
                             onClick: () => {
-                              track("rfp_settings_delete_rfp_clicked", {
-                                event_category: "click",
-                                page: "rfp_info_page",
-                                station_name: terminalHandle,
-                                station_id: terminal?.id,
-                                rfp_id: rfp?.id,
+                              trackClick(RFP.EVENT_NAME.RFP_SETTINGS_DELETE_RFP_CLICKED, {
+                                pageName: PAGE_NAME.RFP_INFO_PAGE,
+                                stationName: terminalHandle,
+                                stationId: terminal?.id,
+                                rfpId: rfp?.id,
                               })
                               setDeleteRfpModalOpen(true)
                             },
@@ -272,12 +275,11 @@ const RfpHeaderNavigation = ({ rfpId }) => {
           {rfpOpen && (
             <button
               onClick={() => {
-                track("proposal_show_editor_clicked", {
-                  event_category: "click",
-                  page: "rfp_info_page",
-                  station_name: terminalHandle,
-                  station_id: terminal?.id,
-                  rfp_id: rfp?.id,
+                trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_SHOW_EDITOR_CLICKED, {
+                  pageName: PAGE_NAME.RFP_INFO_PAGE,
+                  stationName: terminalHandle,
+                  stationId: terminal?.id,
+                  rfpId: rfp?.id,
                 })
                 router.push(Routes.CreateProposalPage({ terminalHandle, rfpId }))
               }}

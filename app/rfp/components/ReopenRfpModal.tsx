@@ -1,12 +1,18 @@
 import { useState } from "react"
 import { invalidateQuery, useMutation } from "blitz"
 import { track } from "@amplitude/analytics-browser"
+import { trackClick, trackError } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Modal from "app/core/components/Modal"
 import getRfpsByTerminalId from "../queries/getRfpsByTerminalId"
 import useStore from "app/core/hooks/useStore"
 import getRfpById from "../queries/getRfpById"
 import reopenRfp from "../mutations/reopenRfp"
 import getShortDate from "app/core/utils/getShortDate"
+
+const {
+  FEATURE: { RFP },
+} = TRACKING_EVENTS
 
 export const ReopenRfpModal = ({
   isOpen,
@@ -37,13 +43,12 @@ export const ReopenRfpModal = ({
 
   const handleSubmit = async () => {
     try {
-      track("reopen_rfp_clicked", {
-        event_category: "click",
-        page: pageName,
-        station_name: terminalHandle,
-        station_id: terminalId,
-        rfp_id: rfp?.id,
-        end_date: newEndDate,
+      trackClick(RFP.EVENT_NAME.REOPEN_RFP_CLICKED, {
+        pageName,
+        stationName: terminalHandle as string,
+        stationId: terminalId,
+        rfpId: rfp?.id,
+        endDate: newEndDate,
       })
       await reopenRfpMutation({
         rfpId: rfp?.id,
@@ -52,13 +57,12 @@ export const ReopenRfpModal = ({
         }),
       })
     } catch (err) {
-      track("error_reopening_rfp", {
-        event_category: "error",
-        page: pageName,
-        station_name: terminalHandle,
-        station_id: terminalId,
-        rfp_id: rfp?.id,
-        error_msg: err.message,
+      trackError(RFP.EVENT_NAME.ERROR_REOPENING_RFP, {
+        pageName,
+        stationName: terminalHandle as string,
+        stationId: terminalId,
+        rfpId: rfp?.id,
+        errorMsg: err.message,
       })
       console.error(err)
       setIsOpen(false)

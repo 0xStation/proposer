@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "blitz dev",
+    "track": "NEXT_PUBLIC_TRACK=true blitz dev",
     "build": "blitz build",
     "start": "blitz start",
     "studio": "blitz prisma studio",

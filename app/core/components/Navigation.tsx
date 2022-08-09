@@ -1,5 +1,6 @@
 import StationLogo from "public/station-letters.svg"
-import { track } from "@amplitude/analytics-browser"
+import { trackClick } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import { useEffect } from "react"
 import { Image, invoke, Routes, useQuery, useParam, useRouter, useSession } from "blitz"
 import { useAccount } from "wagmi"
@@ -13,6 +14,10 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import createAccount from "app/account/mutations/createAccount"
 import { DEFAULT_PFP_URLS } from "../utils/constants"
 import ExploreImageIcon from "public/explore.svg"
+
+const {
+  FEATURE: { WALLET_CONNECTION },
+} = TRACKING_EVENTS
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -123,10 +128,9 @@ const Navigation = ({ children }: { children?: any }) => {
             </div>
             <button
               onClick={() => {
-                track("wallet_connect_banner_clicked", {
-                  event_category: "click",
-                  page: window.location.href,
-                  station_name: terminalHandle,
+                trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECT_BANNER_CLICKED, {
+                  pageName: window.location.href,
+                  stationName: terminalHandle as string,
                 })
                 toggleWalletModal(true)
               }}

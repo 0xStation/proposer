@@ -12,7 +12,8 @@ import {
   InferGetServerSidePropsType,
   invoke,
 } from "blitz"
-import { track } from "@amplitude/analytics-browser"
+import { trackClick } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import useStore from "app/core/hooks/useStore"
 import Layout from "app/core/layouts/Layout"
 import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
@@ -40,6 +41,11 @@ import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpI
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import { formatUnits } from "@ethersproject/units"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
+
+const {
+  PAGE_NAME,
+  FEATURE: { RFP },
+} = TRACKING_EVENTS
 
 const ProposalsTab: BlitzPage = ({
   rfp,
@@ -90,14 +96,13 @@ const ProposalsTab: BlitzPage = ({
 
   useEffect(() => {
     if (isFinishedFetchingProposalCount) {
-      track("rfp_proposals_page_shown", {
-        page: "rfp_proposals_page",
-        event_category: "impression",
-        address: activeUser?.address,
-        station_name: terminal?.handle,
-        station_id: terminal?.id,
-        rfp_id: rfpId,
-        num_proposals: proposalCount,
+      trackClick(RFP.EVENT_NAME.RFP_PROPOSALS_PAGE_SHOWN, {
+        pageName: PAGE_NAME.RFP_PROPOSALS_PAGE,
+        userAddress: activeUser?.address,
+        stationName: terminal?.handle,
+        stationId: terminal?.id,
+        rfpId,
+        numProposals: proposalCount,
       })
     }
   }, [isFinishedFetchingProposalCount])

@@ -4,12 +4,11 @@ import {
   useParam,
   useQuery,
   useRouterQuery,
-  Link,
   Routes,
   GetServerSideProps,
   invoke,
 } from "blitz"
-import { track } from "@amplitude/analytics-browser"
+import { trackImpression } from "app/utils/amplitude"
 import { DateTime } from "luxon"
 import Preview from "app/core/components/MarkdownPreview"
 import { RfpStatus } from "app/rfp/types"
@@ -20,13 +19,17 @@ import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
 import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
-import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import { AddFundsModal } from "app/core/components/AddFundsModal"
 import useStore from "app/core/hooks/useStore"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 import getRfpApprovedProposalFunding from "app/rfp/queries/getRfpApprovedFunding"
-import { ZERO_ADDRESS } from "app/core/utils/constants"
+import { ZERO_ADDRESS, TRACKING_EVENTS } from "app/core/utils/constants"
+
+const {
+  PAGE_NAME,
+  FEATURE: { RFP },
+} = TRACKING_EVENTS
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { terminalHandle, rfpId, proposalId } = context.query as {
@@ -84,8 +87,8 @@ const RFPInfoTab: BlitzPage = () => {
     {
       rfpId: rfpId,
       approvalQuorum: rfp?.checkbook.quorum || 100,
-      tokenChainId: rfp?.data.funding.token.chainId || 1,
-      tokenAddress: rfp?.data.funding.token.address || ZERO_ADDRESS,
+      tokenChainId: rfp?.data?.funding?.token.chainId || 1,
+      tokenAddress: rfp?.data?.funding?.token.address || ZERO_ADDRESS,
     },
     { suspense: false, enabled: !!rfp?.checkbook && !!rfp.data }
     // for some reason typescript does not recognize enabled checks as sufficient to remove default values in query?
@@ -93,13 +96,12 @@ const RFPInfoTab: BlitzPage = () => {
 
   useEffect(() => {
     if (isFinishedFetchingTerminal) {
-      track("rfp_info_page_shown", {
-        page: "rfp_info_page",
-        event_category: "impression",
-        address: activeUser?.address,
-        station_name: terminal?.handle,
-        station_id: terminal?.id,
-        rfp_id: rfpId,
+      trackImpression(RFP.EVENT_NAME.RFP_INFO_PAGE_SHOWN, {
+        pageName: PAGE_NAME.RFP_INFO_PAGE,
+        userAddress: activeUser?.address,
+        stationName: terminal?.handle,
+        stationId: terminal?.id,
+        rfpId: rfpId,
       })
     }
   }, [isFinishedFetchingTerminal])
@@ -116,7 +118,7 @@ const RFPInfoTab: BlitzPage = () => {
         setIsOpen={setShowAddFundsModal}
         isOpen={showAddFundsModal}
         checkbookAddress={rfp?.checkbook?.address}
-        pageName="rfp_info_tab"
+        pageName={PAGE_NAME.RFP_INFO_PAGE}
         terminalId={terminal?.id as number}
         stationName={terminalHandle}
       />

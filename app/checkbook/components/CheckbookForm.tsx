@@ -1,4 +1,5 @@
-import { track } from "@amplitude/analytics-browser"
+import { trackClick, trackImpression, trackEvent, trackError } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import { useEffect } from "react"
 import { useNetwork } from "wagmi"
 import { useCreateCheckbookOnChain } from "app/contracts/checkbook"
@@ -14,6 +15,10 @@ import { useState } from "react"
 import { Form, Field } from "react-final-form"
 import { useWaitForTransaction } from "wagmi"
 import createCheckbook from "../mutations/createCheckbook"
+
+const {
+  FEATURE: { CHECKBOOK },
+} = TRACKING_EVENTS
 
 type FormValues = {
   name: string
@@ -48,12 +53,11 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
 
   useEffect(() => {
     if (finishedFetchingTerminal && activeUser?.address) {
-      track("create_checkbook_page_shown", {
-        event_category: "impression",
-        page: pageName,
-        station_id: terminal?.id,
-        station_name: terminalHandle,
-        address: activeUser?.address,
+      trackImpression(CHECKBOOK.EVENT_NAME.CREATE_CHECKBOOK_PAGE_SHOWN, {
+        pageName,
+        stationId: terminal?.id,
+        stationName: terminalHandle,
+        userAddress: activeUser?.address,
       })
     }
   }, [finishedFetchingTerminal, activeUser?.address])
@@ -80,16 +84,15 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
       // this string is lowercased though, so we checksum it to give it proper casing before storing in database
       const checkbookAddress = toChecksumAddress("0x" + topicCheckbookAddress?.substring(26))
 
-      track("checkbook_contract_created", {
-        page: pageName,
-        event_category: "event",
-        address: activeUser?.address,
+      trackEvent(CHECKBOOK.EVENT_NAME.CHECKBOOK_CONTRACT_CREATED, "event", {
+        pageName,
+        stationId: terminal?.id,
+        stationName: terminalHandle as string,
+        userAddress: activeUser?.address,
         quorum,
         signers,
-        checkbook_name: name,
-        checkbook_address: checkbookAddress,
-        station_id: terminal?.id,
-        station_name: terminalHandle,
+        checkbookName: name,
+        checkbookAddress,
       })
 
       try {
@@ -102,16 +105,15 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
           signers: signers as string[],
         })
 
-        track("checkbook_model_created", {
-          page: pageName,
-          event_category: "event",
-          address: activeUser?.address,
+        trackEvent(CHECKBOOK.EVENT_NAME.CHECKBOOK_MODEL_CREATED, "event", {
+          pageName,
+          stationId: terminal?.id,
+          stationName: terminalHandle as string,
+          userAddress: activeUser?.address,
           quorum,
           signers,
-          checkbook_name: name,
-          checkbook_address: checkbookAddress,
-          station_name: terminalHandle,
-          station_id: terminal?.id,
+          checkbookName: name,
+          checkbookAddress,
         })
 
         if (callback) {
@@ -143,16 +145,16 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
             // trigger transaction
             // after execution, will save transaction hash to state to trigger waiting process to create Checkbook entity
             try {
-              track("checkbook_create_button_clicked", {
-                page: pageName,
-                event_category: "click",
-                address: activeUser?.address,
+              trackClick(CHECKBOOK.EVENT_NAME.CHECKBOOK_CREATE_BUTTON_CLICKED, {
+                pageName,
+                stationId: terminal?.id,
+                stationName: terminalHandle as string,
+                userAddress: activeUser?.address,
                 quorum,
                 signers,
-                checkbook_name: values.name,
-                station_name: terminalHandle,
-                station_id: terminal?.id,
+                checkbookName: name,
               })
+
               setQuorum(quorum)
               setSigners(signers)
               setName(values.name)
@@ -181,29 +183,28 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
                   message: "Contract creation failed.",
                 })
               }
-              track("checkbook_create_error", {
-                page: pageName,
-                event_category: "error",
-                address: activeUser?.address,
+
+              trackError(CHECKBOOK.EVENT_NAME.CHECKBOOK_CREATE_ERROR, {
+                pageName,
+                stationId: terminal?.id,
+                stationName: terminalHandle as string,
+                userAddress: activeUser?.address,
                 quorum,
                 signers,
-                checkbook_name: values.name,
-                error_msg: e.name,
-                station_name: terminalHandle,
-                station_id: terminal?.id,
+                checkbookName: name,
+                errorMsg: e.name,
               })
             }
           } catch (e) {
-            track("checkbook_create_error", {
-              page: pageName,
-              event_category: "error",
-              address: activeUser?.address,
+            trackError(CHECKBOOK.EVENT_NAME.CHECKBOOK_CREATE_ERROR, {
+              pageName,
+              stationId: terminal?.id,
+              stationName: terminalHandle as string,
+              userAddress: activeUser?.address,
               quorum,
               signers,
-              checkbook_name: values.name,
-              error_msg: e.name,
-              station_name: terminalHandle,
-              station_id: terminal?.id,
+              checkbookName: name,
+              errorMsg: e.name,
             })
             setWaitingCreation(false)
             setIsDeployingCheckbook(false)

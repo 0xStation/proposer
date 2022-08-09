@@ -10,7 +10,8 @@ import {
   GetServerSideProps,
   InferGetServerSidePropsType,
 } from "blitz"
-import { track } from "@amplitude/analytics-browser"
+import { trackClick } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import useStore from "app/core/hooks/useStore"
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
@@ -30,7 +31,6 @@ import networks from "app/utils/networks.json"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { Spinner } from "app/core/components/Spinner"
 import { useWaitForTransaction } from "wagmi"
-import { ZERO_ADDRESS } from "app/core/utils/constants"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import { formatUnits } from "@ethersproject/units"
 import {
@@ -43,6 +43,11 @@ import Dropdown from "app/core/components/Dropdown"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { RfpStatus } from "app/rfp/types"
+
+const {
+  PAGE_NAME,
+  FEATURE: { PROPOSAL },
+} = TRACKING_EVENTS
 
 const ProposalPage: BlitzPage = ({
   rfp,
@@ -75,14 +80,13 @@ const ProposalPage: BlitzPage = ({
   )
 
   useEffect(() => {
-    track("proposal_page_shown", {
-      page: "proposal_page",
-      event_category: "impression",
-      address: activeUser?.address,
-      station_name: terminal?.handle,
-      station_id: terminal?.id,
-      rfp_id: rfp?.id,
-      proposal_id: proposal?.id,
+    trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_INFO_PAGE_SHOWN, {
+      pageName: PAGE_NAME.PROPOSAL_INFO_PAGE,
+      userAddress: activeUser?.address,
+      stationName: terminal?.handle,
+      stationId: terminal?.id,
+      rfpId: rfp?.id,
+      proposalId: proposal?.id,
     })
   }, [])
 

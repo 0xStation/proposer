@@ -1,5 +1,6 @@
 import { invoke, Image, useParam } from "blitz"
-import { identify, Identify, setUserId, track } from "@amplitude/analytics-browser"
+import { trackClick, trackError, initializeUser } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import { SiweMessage } from "siwe"
 import { useState } from "react"
 import { Spinner } from "app/core/components/Spinner"
@@ -11,6 +12,10 @@ import BackIcon from "/public/back-icon.svg"
 import verify from "app/session/mutations/verify"
 import generateNonce from "app/session/queries/generateNonce"
 import { useAccount, useConnect, useNetwork } from "wagmi"
+
+const {
+  FEATURE: { WALLET_CONNECTION },
+} = TRACKING_EVENTS
 
 export const ConnectWalletComponent = () => {
   const [connectState, setConnectState] = useState<{
@@ -45,11 +50,10 @@ export const ConnectWalletComponent = () => {
           errorMsg = "Something went wrong."
           setErrorMessage(errorMsg)
         }
-        track("wallet_connect_error", {
-          event_category: "error",
-          page: window.location.href,
-          station_name: terminalHandle,
-          error_msg: errorMsg,
+        trackError(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECT_ERROR, {
+          pageName: window.location.href,
+          stationName: terminalHandle as string,
+          errorMsg,
         })
         setConnectState({ error: true, loading: false })
         return
@@ -63,12 +67,11 @@ export const ConnectWalletComponent = () => {
   const handleSignInWithEthereum = async () => {
     const address = accountData?.address
     const chainId = activeChain?.id
-    track("sign_in_with_ethereum_button_clicked", {
-      event_category: "click",
-      page: window.location.href,
-      station_name: terminalHandle,
-      address: accountData?.address,
-      chain_id: chainId,
+    trackClick(WALLET_CONNECTION.EVENT_NAME.SIGN_IN_WITH_ETHEREUM_BUTTON_CLICKED, {
+      pageName: window.location.href,
+      stationName: terminalHandle as string,
+      userAddress: accountData?.address,
+      chainId,
     })
     setConnectState({ error: false, loading: true })
 
@@ -100,9 +103,7 @@ export const ConnectWalletComponent = () => {
       })
 
       if (verificationSuccessful) {
-        const identifyObj = new Identify()
-        identify(identifyObj)
-        setUserId(address)
+        initializeUser(address)
         setConnectState({ error: false, loading: true })
       } else {
         throw Error("Unsuccessful signature.")
@@ -118,10 +119,9 @@ export const ConnectWalletComponent = () => {
         errorMsg = `Something went wrong. ${err.message || ""}`
         setErrorMessage(errorMsg)
       }
-      track("sign_in_with_ethereum_error", {
-        event_category: "error",
-        page: window.location.href,
-        station_name: terminalHandle,
+      trackError(WALLET_CONNECTION.EVENT_NAME.SIGN_IN_WITH_ETHEREUM_ERROR, {
+        pageName: window.location.href,
+        stationName: terminalHandle as string,
         errorMsg,
       })
       setConnectState({ error: true, loading: false })
@@ -207,11 +207,10 @@ export const ConnectWalletComponent = () => {
                 }`}
                 disabled={connectState.loading}
                 onClick={async () => {
-                  track("wallet_connect_button_clicked", {
-                    event_category: "click",
-                    page: window.location.href,
-                    station_name: terminalHandle,
-                    address: accountData?.address,
+                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECT_BUTTON_CLICKED, {
+                    pageName: window.location.href,
+                    stationName: terminalHandle as string,
+                    userAddress: accountData?.address,
                     wallet: "metamask",
                   })
                   await handleWalletConnection(metamaskWallet)
@@ -236,11 +235,10 @@ export const ConnectWalletComponent = () => {
                 }`}
                 disabled={connectState.loading}
                 onClick={async () => {
-                  track("wallet_connect_button_clicked", {
-                    event_category: "click",
-                    page: window.location.href,
-                    station_name: terminalHandle,
-                    address: accountData?.address,
+                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECT_BUTTON_CLICKED, {
+                    pageName: window.location.href,
+                    stationName: terminalHandle as string,
+                    userAddress: accountData?.address,
                     wallet: "wallet_connect",
                   })
                   await handleWalletConnection(walletConnect)
@@ -270,11 +268,10 @@ export const ConnectWalletComponent = () => {
                 }`}
                 disabled={connectState.loading}
                 onClick={async () => {
-                  track("wallet_connect_button_clicked", {
-                    event_category: "click",
-                    page: window.location.href,
-                    station_name: terminalHandle,
-                    address: accountData?.address,
+                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECT_BUTTON_CLICKED, {
+                    pageName: window.location.href,
+                    stationName: terminalHandle as string,
+                    userAddress: accountData?.address,
                     wallet: "coinbase",
                   })
                   await handleWalletConnection(coinbaseWallet)

@@ -9,8 +9,9 @@ import {
   invalidateQuery,
   useSession,
 } from "blitz"
-import { track } from "@amplitude/analytics-browser"
 import { useState, useEffect } from "react"
+import { trackClick, trackImpression } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
@@ -30,6 +31,11 @@ import Pagination from "app/core/components/Pagination"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import { AddFundsModal } from "../../../../core/components/AddFundsModal"
 import { DateTime } from "luxon"
+
+const {
+  FEATURE: { RFP },
+  PAGE_NAME,
+} = TRACKING_EVENTS
 
 const RfpNotFound = () => (
   <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
@@ -91,13 +97,12 @@ const BulletinPage: BlitzPage = () => {
 
   useEffect(() => {
     if (finishedFetchingTerminal && finishedFetchingRfpCount) {
-      track("bulletin_page_shown", {
-        event_category: "impression",
-        page: "bulletin_page",
-        address: activeUser?.address,
-        station_name: terminalHandle,
-        station_id: terminal?.id,
-        num_rfps: rfpCount,
+      trackImpression(RFP.EVENT_NAME.BULLETIN_PAGE_SHOWN, {
+        pageName: PAGE_NAME.BULLETIN_PAGE,
+        stationName: terminalHandle as string,
+        stationId: terminal?.id,
+        numRfps: rfpCount,
+        userAddress: activeUser?.address,
       })
     }
   }, [finishedFetchingTerminal, finishedFetchingRfpCount])
@@ -142,7 +147,7 @@ const BulletinPage: BlitzPage = () => {
         isOpen={isAddFundsModalOpen}
         checkbookAddress={query.terminalAndCheckbookCreated as string}
         terminalCreationFlow={true}
-        pageName="bulletin_page"
+        pageName={PAGE_NAME.BULLETIN_PAGE}
         terminalId={terminal?.id as number}
         stationName={terminalHandle}
       />
@@ -162,13 +167,13 @@ const BulletinPage: BlitzPage = () => {
               <button
                 className="h-[35px] bg-electric-violet px-9 rounded text-tunnel-black hover:bg-opacity-70"
                 onClick={() => {
-                  track("rfp_show_editor_clicked", {
-                    event_category: "click",
-                    address: activeUser?.address,
-                    station_name: terminalHandle,
-                    station_id: terminal?.id,
-                    num_rfps: rfpCount,
-                    is_edit: false,
+                  trackClick(RFP.EVENT_NAME.RFP_SHOW_EDITOR_CLICKED, {
+                    pageName: PAGE_NAME.BULLETIN_PAGE,
+                    stationName: terminalHandle as string,
+                    stationId: terminal?.id,
+                    numRfps: rfpCount,
+                    userAddress: activeUser?.address,
+                    isEdit: false,
                   })
                   router.push(Routes.CreateRFPPage({ terminalHandle }))
                 }}
@@ -241,13 +246,13 @@ const BulletinPage: BlitzPage = () => {
                 <button
                   className="bg-electric-violet rounded text-tunnel-black px-6 h-[35px] w-[133px] mt-6 hover:opacity-70"
                   onClick={() => {
-                    track("rfp_show_editor_clicked", {
-                      event_category: "click",
-                      address: activeUser?.address,
-                      station_name: terminalHandle,
-                      station_id: terminal?.id,
-                      num_rfps: rfpCount,
-                      is_edit: false,
+                    trackClick(RFP.EVENT_NAME.RFP_SHOW_EDITOR_CLICKED, {
+                      pageName: PAGE_NAME.BULLETIN_PAGE,
+                      stationName: terminalHandle as string,
+                      stationId: terminal?.id,
+                      numRfps: rfpCount,
+                      userAddress: activeUser?.address,
+                      isEdit: false,
                     })
                     router.push(Routes.CreateRFPPage({ terminalHandle }))
                   }}

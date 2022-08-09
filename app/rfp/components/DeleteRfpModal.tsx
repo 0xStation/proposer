@@ -1,10 +1,15 @@
 import { invalidateQuery, useMutation, useRouter, Routes } from "blitz"
-import { track } from "@amplitude/analytics-browser"
+import { trackClick, trackError } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Modal from "app/core/components/Modal"
 import getRfpsByTerminalId from "../queries/getRfpsByTerminalId"
 import getRfpById from "../queries/getRfpById"
 import useStore from "app/core/hooks/useStore"
 import deleteRfp from "../mutations/deleteRfp"
+
+const {
+  FEATURE: { RFP },
+} = TRACKING_EVENTS
 
 export const DeleteRfpModal = ({
   isOpen,
@@ -34,13 +39,13 @@ export const DeleteRfpModal = ({
       await deleteRfpMutation({ rfpId: rfp?.id as string })
     } catch (error) {
       console.error("Error deleting RFP", error)
-      track("error_deleting_rfp", {
-        page: pageName,
-        address: activeUser?.address,
-        station_name: terminalHandle,
-        station_id: terminalId,
-        rfp_id: rfp?.id,
-        error_msg: error.message,
+      trackError(RFP.EVENT_NAME.ERROR_DELETING_RFP, {
+        pageName,
+        userAddress: activeUser?.address,
+        stationName: terminalHandle as string,
+        stationId: terminalId,
+        rfpId: rfp?.id,
+        errorMsg: error.message,
       })
       setToastState({
         isToastShowing: true,
@@ -69,13 +74,12 @@ export const DeleteRfpModal = ({
             type="submit"
             className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
             onClick={() => {
-              track("delete_rfp_clicked", {
-                event_category: "click",
-                page: pageName,
-                address: activeUser?.address,
-                station_name: terminalHandle,
-                station_id: terminalId,
-                rfp_id: rfp?.id,
+              trackClick(RFP.EVENT_NAME.DELETE_RFP_CLICKED, {
+                pageName,
+                userAddress: activeUser?.address,
+                stationName: terminalHandle as string,
+                stationId: terminalId,
+                rfpId: rfp?.id,
               })
               handleSubmit()
             }}

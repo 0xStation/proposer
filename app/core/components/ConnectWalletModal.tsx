@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
-import { identify, Identify, setUserId, track } from "@amplitude/analytics-browser"
 import { Image, invoke, useParam } from "blitz"
+import { trackClick, trackError, initializeUser } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Modal from "./Modal"
 import { Spinner } from "app/core/components/Spinner"
 import Metamask from "/public/metamask-logo.svg"
@@ -12,6 +13,10 @@ import { useConnect, useAccount, useNetwork } from "wagmi"
 import generateNonce from "app/session/queries/generateNonce"
 import { SiweMessage } from "siwe"
 import verify from "app/session/mutations/verify"
+
+const {
+  FEATURE: { WALLET_CONNECTION },
+} = TRACKING_EVENTS
 
 const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   const [connectState, setConnectState] = useState<{
@@ -60,10 +65,11 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           errorMsg = "Something went wrong."
           setErrorMessage(errorMsg)
         }
-        track("wallet_connect_error", {
-          event_category: "error",
-          page: window.location.href,
-          station_name: terminalHandle,
+
+        trackError(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECT_ERROR, {
+          pageName: window.location.href,
+          stationName: terminalHandle as string,
+          errorMsg,
         })
         setConnectState({ error: true, success: false, loading: false })
         return
@@ -77,12 +83,12 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   const handleSignInWithEthereum = async () => {
     const address = accountData?.address
     const chainId = activeChain?.id
-    track("sign_in_with_ethereum_button_clicked", {
-      event_category: "click",
-      page: window.location.href,
-      station_name: terminalHandle,
-      address: accountData?.address,
-      chain_id: chainId,
+
+    trackClick(WALLET_CONNECTION.EVENT_NAME.SIGN_IN_WITH_ETHEREUM_BUTTON_CLICKED, {
+      pageName: window.location.href,
+      stationName: terminalHandle as string,
+      userAddress: accountData?.address,
+      chainId,
     })
     setConnectState({ error: false, success: false, loading: true })
 
@@ -114,9 +120,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
       })
 
       if (verificationSuccessful) {
-        const identifyObj = new Identify()
-        identify(identifyObj)
-        setUserId(address)
+        initializeUser(address)
         setConnectState({ error: false, success: true, loading: false })
       } else {
         throw Error("Unsuccessful signature.")
@@ -131,12 +135,13 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         errorMsg = `Something went wrong. ${err.message || ""}`
         setErrorMessage(errorMsg)
       }
-      track("sign_in_with_ethereum_error", {
-        event_category: "error",
-        page: window.location.href,
-        station_name: terminalHandle,
-        error_msg: errorMsg,
+
+      trackError(WALLET_CONNECTION.EVENT_NAME.SIGN_IN_WITH_ETHEREUM_ERROR, {
+        pageName: window.location.href,
+        stationName: terminalHandle as string,
+        errorMsg,
       })
+
       setConnectState({ error: true, success: false, loading: false })
     }
   }
@@ -211,11 +216,10 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                 className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2 sm:mt-0 mt-2 h-[35px]"
                 disabled={connectState.loading}
                 onClick={async () => {
-                  track("wallet_connect_button_clicked", {
-                    event_category: "click",
-                    page: window.location.href,
-                    station_name: terminalHandle,
-                    address: accountData?.address,
+                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECT_BUTTON_CLICKED, {
+                    pageName: window.location.href,
+                    stationName: terminalHandle as string,
+                    userAddress: accountData?.address,
                     wallet: "metamask",
                   })
                   await handleWalletConnection(metamaskWallet)
@@ -240,12 +244,11 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                 className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2 sm:mt-0 mt-2 h-[35px]"
                 disabled={connectState.loading}
                 onClick={async () => {
-                  track("wallet_connect_button_clicked", {
-                    event_category: "click",
-                    page: window.location.href,
-                    station_name: terminalHandle,
-                    address: accountData?.address,
-                    wallet: "walletConnect",
+                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECT_BUTTON_CLICKED, {
+                    pageName: window.location.href,
+                    stationName: terminalHandle as string,
+                    userAddress: accountData?.address,
+                    wallet: "wallet_connect",
                   })
                   await handleWalletConnection(walletConnect)
                 }}
@@ -274,11 +277,10 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                 className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor-pointer w-40 sm:mr-2 sm:mt-0 mt-2 h-[35px]"
                 disabled={connectState.loading}
                 onClick={async () => {
-                  track("wallet_connect_button_clicked", {
-                    event_category: "click",
-                    page: window.location.href,
-                    station_name: terminalHandle,
-                    address: accountData?.address,
+                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECT_BUTTON_CLICKED, {
+                    pageName: window.location.href,
+                    stationName: terminalHandle as string,
+                    userAddress: accountData?.address,
                     wallet: "coinbase",
                   })
                   await handleWalletConnection(coinbaseWallet)

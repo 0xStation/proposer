@@ -8,13 +8,19 @@ import {
   invoke,
   Image,
 } from "blitz"
-import { track } from "@amplitude/analytics-browser"
+import { trackClick } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Exit from "/public/exit-button.svg"
 import Layout from "app/core/layouts/Layout"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import CheckbookForm from "app/checkbook/components/CheckbookForm"
 import CheckAnimation from "public/check_animation.gif"
+
+const {
+  PAGE_NAME,
+  FEATURE: { CHECKBOOK },
+} = TRACKING_EVENTS
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   const session = await getSession(req, res)
@@ -66,11 +72,10 @@ const NewCheckbookTerminalCreationPage: BlitzPage = ({
       <div
         className="absolute top-4 left-4 cursor-pointer"
         onClick={() => {
-          track("complete_profile_checkbook_exit_button_clicked", {
-            event_category: "click",
-            page: "complete_profile_checkbook_page",
-            station_id: terminal?.id,
-            station_name: terminalHandle,
+          trackClick(CHECKBOOK.EVENT_NAME.COMPLETE_PROFILE_CHECKBOOK_EXIT_CLICKED, {
+            pageName: PAGE_NAME.COMPLETE_PROFILE_CHECKBOOK_PAGE,
+            stationId: terminal?.id,
+            stationName: terminalHandle as string,
           })
           router.push(Routes.BulletinPage({ terminalHandle, terminalCreated: true }))
         }}
@@ -103,7 +108,7 @@ const NewCheckbookTerminalCreationPage: BlitzPage = ({
           <Image src={CheckAnimation} alt="Checkbook animation." width={496} height={240} />
           <CheckbookForm
             isEdit={false}
-            pageName="complete_profile_checkbook_page"
+            pageName={PAGE_NAME.COMPLETE_PROFILE_CHECKBOOK_PAGE}
             callback={(checkbookAddress?: string) => {
               if (checkbookAddress) {
                 router.push(

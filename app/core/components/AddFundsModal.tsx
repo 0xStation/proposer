@@ -1,7 +1,12 @@
 import { useState } from "react"
-import { track } from "@amplitude/analytics-browser"
+import { trackClick } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Modal from "./Modal"
 import useStore from "../hooks/useStore"
+
+const {
+  FEATURE: { CHECKBOOK },
+} = TRACKING_EVENTS
 
 const TERMINAL_CREATION = "terminalCreation"
 const GENERAL = "general"
@@ -49,13 +54,12 @@ export const AddFundsModal = ({
           <button
             className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
             onClick={() => {
-              track("checkbook_add_funds_clicked", {
-                page: pageName,
-                event_category: "click",
-                address: activeUser?.address,
-                checkbook_address: checkbookAddress,
-                station_id: terminalId,
-                station_name: stationName,
+              trackClick(CHECKBOOK.EVENT_NAME.CHECKBOOK_ADD_FUNDS_CLICKED, {
+                pageName,
+                userAddress: activeUser?.address,
+                checkbookAddress,
+                stationId: terminalId,
+                stationName,
               })
               navigator.clipboard.writeText(checkbookAddress as string).then(() => {
                 setIsModalAddressCopied(true)
