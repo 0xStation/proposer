@@ -16,7 +16,7 @@ import Preview from "app/core/components/MarkdownPreview"
 import SignApprovalProposalModal from "app/proposal/components/SignApprovalProposalModal"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
-import getCheckbook from "app/checkbook/queries/getCheckbook"
+import getCheckbookByProposal from "app/checkbook/queries/getCheckbookByProposal"
 import getChecksByProposalId from "app/check/queries/getChecksByProposalId"
 import getProposalById from "app/proposal/queries/getProposalById"
 import { Check } from "app/check/types"
@@ -44,6 +44,7 @@ import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { RfpStatus } from "app/rfp/types"
 import SelectCheckbookModal from "app/checkbook/components/SelectCheckbookModal"
+import { FundingSenderType } from "app/types"
 
 const ProposalPage: BlitzPage = ({
   rfp,
@@ -65,14 +66,9 @@ const ProposalPage: BlitzPage = ({
   const [overallocated, setOverallocated] = useState<boolean>(false)
 
   const [checkbook] = useQuery(
-    getCheckbook,
-    {
-      chainId: proposal.data.funding?.chainId || 0,
-      address: proposal.data.funding?.senderAddress || "",
-    },
-    {
-      suspense: false,
-    }
+    getCheckbookByProposal,
+    { proposalId: proposal?.id as string },
+    { suspense: false }
   )
 
   const [checks] = useQuery(
@@ -108,7 +104,7 @@ const ProposalPage: BlitzPage = ({
 
   // user can approve if they are a signer and they haven't approved before
   const userCanApprove =
-    (rfp.authorAddress === activeUser?.address ||
+    ((!checkbook && rfp.authorAddress === activeUser?.address) ||
       checkbook?.signers.includes(activeUser?.address || "")) &&
     !proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address)
 
@@ -156,6 +152,7 @@ const ProposalPage: BlitzPage = ({
         isOpen={checkbookModalOpen}
         setIsOpen={setCheckbookModalOpen}
         terminal={terminal}
+        proposal={proposal}
       />
       <SignApprovalProposalModal
         isOpen={signModalOpen}
@@ -322,7 +319,7 @@ const ProposalPage: BlitzPage = ({
               <Preview markdown={proposal?.data.content.body} />
             </div>
             <div className="col-span-1 border-l border-concrete flex flex-col overflow-y-scroll">
-              <div className="border-b border-concrete p-6">
+              <div className="p-6">
                 <h4 className="text-xs font-bold text-concrete uppercase mb-2">Author</h4>
                 {proposal.collaborators.map((collaborator, idx) => {
                   if (collaborator.account?.data) {
@@ -387,13 +384,15 @@ const ProposalPage: BlitzPage = ({
                 <h4 className="text-xs font-bold text-concrete uppercase mt-6">Fund Recipient</h4>
                 <p className="mt-2">{truncateString(proposal?.data.funding.recipientAddress, 9)}</p>
               </div>
-              <div
-                className={
-                  check ? "border-b border-concrete p-6" : "p-6 grow flex flex-col justify-between"
-                }
-              >
-                {checkbook && (
-                  <div>
+              {checkbook && (
+                <div>
+                  <div
+                    className={
+                      check
+                        ? "border-t border-concrete p-6"
+                        : "border-t border-concrete p-6 grow flex flex-col justify-between"
+                    }
+                  >
                     <h4 className="text-xs font-bold text-concrete uppercase">Approval</h4>
                     <div className="flex flex-row space-x-2 items-center mt-2">
                       <ProgressIndicator
@@ -418,10 +417,10 @@ const ProposalPage: BlitzPage = ({
                       ))}
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
               {check && (
-                <div className="p-6 grow flex flex-col justify-between">
+                <div className="border-t border-concrete p-6 grow flex flex-col justify-between">
                   <div>
                     <p className="text-xs text-concrete uppercase font-bold">Check</p>
                     <div className="flex justify-between items-center mt-4">

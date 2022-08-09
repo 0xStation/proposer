@@ -1,14 +1,16 @@
-import { useMutation, useRouter, invalidateQuery, Image, useQuery, Link, Routes } from "blitz"
+import { useMutation, useRouter, Image, useQuery, Link, Routes, invalidateQuery } from "blitz"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
-import createCheck from "app/check/mutations/createCheck"
-import approveProposal from "app/proposal/mutations/approveProposal"
 import CheckAnimation from "public/check_animation.gif"
 import { Field, Form } from "react-final-form"
 import getCheckbooksByTerminal from "../queries/getCheckbooksByTerminal"
+import assignCheckbookToProposal from "app/proposal/mutations/assignCheckbookToProposal"
+import getCheckbookByProposal from "app/checkbook/queries/getCheckbookByProposal"
+import getProposalById from "app/proposal/queries/getProposalById"
 import { RefreshIcon } from "@heroicons/react/solid"
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
-export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal }) => {
+export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) => {
   const router = useRouter()
   const setToastState = useStore((state) => state.setToastState)
 
@@ -17,6 +19,15 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal }) => {
     { terminalId: terminal?.id as number },
     { suspense: false, enabled: !!terminal, refetchOnWindowFocus: false }
   )
+
+  const [assignCheckbookToProposalMutation] = useMutation(assignCheckbookToProposal, {
+    onSuccess: (_data) => {
+      console.log("success", _data)
+    },
+    onError: (error: Error) => {
+      console.error(error)
+    },
+  })
 
   const stationHasCheckbook = true
 
@@ -68,12 +79,40 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal }) => {
           checkbookAddress: checkbooks?.[0]?.address,
         }}
         onSubmit={async (values: any, form) => {
-          console.log("submit")
-          // set checkbook to Proposal
+          const selectedCheckbook = checkbooks?.find((checkbook) =>
+            addressesAreEqual(checkbook.address, values.checkbookAddress)
+          )
+
+          if (!selectedCheckbook) {
+            throw Error("could not find checkbook?")
+          }
+
+          const success = await assignCheckbookToProposalMutation({
+            proposalId: proposal.id,
+            chainId: selectedCheckbook.chainId,
+            checkbookAddress: selectedCheckbook.address,
+          })
+
+          if (success) {
+            setToastState({
+              isToastShowing: true,
+              type: "success",
+              message: "Assigned Checkbook to this proposal.",
+            })
+            // invalidate query to reset and fetch assigned checkbook
+            invalidateQuery(getCheckbookByProposal)
+            setIsOpen(false)
+          } else {
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "Checkbook assignment failed.",
+            })
+          }
         }}
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
-          const disableSubmit = true
+          const disableSubmit = !formState.values?.checkbookAddress
           return (
             <form onSubmit={handleSubmit}>
               <label className="font-bold block mt-8">Checkbook*</label>
@@ -135,6 +174,7 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal }) => {
                 <button
                   type="submit"
                   className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
+                  disabled={disableSubmit}
                 >
                   Continue
                 </button>
