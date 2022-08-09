@@ -74,16 +74,25 @@ export const canCreateStation = (address: string | undefined) => {
   return createStationWhitelist.some((address) => address.toLowerCase() === lowercaseAddress)
 }
 
-export const addressHasToken = (walletAddress: string | undefined, tokenAddress: string) => {
-  if (!walletAddress) {
-    return false
-  }
-
+export const useAddressHasToken = (
+  walletAddress: string | undefined,
+  tokenAddress: string | undefined,
+  skip: boolean
+) => {
   const balance = useBalance({
     addressOrName: walletAddress,
     token: tokenAddress,
     formatUnits: "gwei",
   })
+
+  // itention of skip is to allow for "skipping" over this check for rfps that do not have permissions
+  // we have to pass as a param so we are still calling this hook and not "conditionally calling the hook"
+  // which react does not like.
+  // we can't just rely on tokenAddress being empty or undefined becuase it might actually be undefined
+  // with the intention of checking permissions (not an intentional skip)
+  if (skip) {
+    return true
+  }
 
   if (balance.data) {
     return balance.data.value.gt(0)

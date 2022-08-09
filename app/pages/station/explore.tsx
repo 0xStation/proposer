@@ -11,7 +11,7 @@ import getTerminalMemberCount from "app/accountTerminal/queries/getTerminalMembe
 import getRfpCountByTerminalId from "app/rfp/queries/getRfpCountByTerminalId"
 import getProposalCountByTerminal from "app/proposal/queries/getProposalCountByTerminal"
 import useStore from "app/core/hooks/useStore"
-import { canCreateStation, addressHasToken } from "app/core/utils/permissions"
+import { canCreateStation, useAddressHasToken } from "app/core/utils/permissions"
 import { DateTime } from "luxon"
 
 const {
@@ -40,12 +40,6 @@ const ExploreStations: BlitzPage = () => {
       refetchOnWindowFocus: false,
     }
   )
-
-  const hasToken = addressHasToken(
-    activeUser?.address,
-    "0x18aAA7115705e8be94bfFEBDE57Af9BFc265B998"
-  )
-  console.log(hasToken)
 
   return (
     <Layout title="Explore stations">
@@ -135,7 +129,14 @@ const ExploreStations: BlitzPage = () => {
                 return <TerminalComponent terminal={terminal} key={terminal?.id} />
               })
             : rfps?.map((rfp) => {
-                return <RfpComponent terminal={rfp?.terminal} key={rfp?.id} rfp={rfp} />
+                return (
+                  <RfpComponent
+                    activeUser={activeUser}
+                    terminal={rfp?.terminal}
+                    key={rfp?.id}
+                    rfp={rfp}
+                  />
+                )
               })}
         </div>
       </div>
@@ -143,7 +144,17 @@ const ExploreStations: BlitzPage = () => {
   )
 }
 
-const RfpComponent = ({ rfp, terminal }) => {
+const RfpComponent = ({ rfp, terminal, activeUser }) => {
+  const canView = useAddressHasToken(
+    activeUser?.address,
+    rfp?.data?.permissions ? rfp?.data?.permissions.view : undefined,
+    rfp?.data?.permissions === undefined
+  )
+
+  if (!canView) {
+    return <></>
+  }
+
   return (
     <Link href={Routes.RFPInfoTab({ terminalHandle: terminal?.handle, rfpId: rfp.id })}>
       <div
