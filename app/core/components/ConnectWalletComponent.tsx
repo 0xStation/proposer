@@ -3,7 +3,7 @@ import { identify, Identify, setUserId, track } from "@amplitude/analytics-brows
 import { SiweMessage } from "siwe"
 import { useState } from "react"
 import { Spinner } from "app/core/components/Spinner"
-import Banner from "/public/walletconnect-banner.svg"
+import Banner from "/public/walletconnect-banner.png"
 import Metamask from "/public/metamask-logo.svg"
 import Coinbase from "/public/coinbase-logo.svg"
 import WalletConnect from "/public/wallet-logo.svg"
@@ -107,6 +107,7 @@ export const ConnectWalletComponent = () => {
         throw Error("Unsuccessful signature.")
       }
     } catch (err) {
+      console.log(err)
       console.error(err.cause)
       let errorMsg
       if (err.code === 4001) {

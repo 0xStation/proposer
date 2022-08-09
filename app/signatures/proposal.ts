@@ -1,5 +1,6 @@
-import { keccak256, toUtf8Bytes } from "ethers/lib/utils"
-import { BigNumber } from "ethers"
+import { toUtf8Bytes } from "@ethersproject/strings"
+import { keccak256 } from "@ethersproject/keccak256"
+import { BigNumber } from "@ethersproject/bignumber"
 
 export const genProposalSignatureMessage = (
   proposalRecipient: string,

@@ -48,6 +48,22 @@ const createStationWhitelist = [
   "0x68fE87c69848375A846fc666c41aC8d5047a4Dc2",
   "0x52217bAD145A7a80D510f24A9572781D260f33D3", // Radical DAO
   "0xbeC26FFa12c90217943D1b2958f60A821aE6E549", // CabinDAO
+  "0x267a3195ea57ad38e65993dbcb9fbebf8995621d", // CityDAO
+  "0x4ce2dd8373ece0d7baaa16e559a5817cc875b16a", // Unlock Protocol
+  "0x5dc70a9b884f78ee030a8c6ad3b3b7dc10bbe7f4", // Unlock Protocol
+  "0xff4ec2057a4180a4cd18fdea144e53245e39869d", // Unlock Protocol
+  "0xcd5a7d5c7dc605e42fb4a9e11da38a06a96d1f9a", // Philosophical Foxes
+  "0xf6910D47FbB1F5518d60C721D4189936eCd5a1b6", // InfoToken
+  "0x285b7eea81a5b66b62e7276a24c1e0f83f7409c1", // 0xmaki
+  "0x84c30aeca40bcf38e17E52A85f0D383E373E5D55", // Osmosis Grants
+  "0x16921fd2c4221a8c2f4d729cbd65a0c4a80be940", // not fellows
+  "0x2D888de2a429Cb43359a8420722e79491F07DC73", // Fiat DAO
+  "0xf0fbaaa7ece80ac41508e442929b81a4c8c8543b", // ready player DAO
+  "0xc7814D61A8236303a8854fc272cA0419A7e18E32", // ceramic
+  "0x75d2e010392c99e1dab54781bFe4760a091A2c51", // flashbots
+  "0x586Bc43937C2eC42348cc83Acf44CED42Fe3d5f7", // fingerprintsDAO
+  "0xb4248430C7AF4Ce104b25C1677cE4FB32884210f", // squiggleDAO
+  "0x93730CE5Ac9de1DB9F3FBb73bF522a690629CCEc", // Tribute Labs
 ]
 export const canCreateStation = (address: string | undefined) => {
   if (process.env.NODE_ENV !== "production") return true

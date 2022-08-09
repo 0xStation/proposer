@@ -16,7 +16,6 @@ module.exports = {
       "light-concrete": "#858585",
     },
     fontFamily: {
-      vt323: ["VT323", "Monospace"],
       sans: ["Graphik", "sans-serif"],
       serif: ["Merriweather", "serif"],
       lores: ["LoRes9PlusOT", "Monospace"],

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import LinearProgressIndicator from "./LinearProgressIndicator"
-import { formatUnits } from "ethers/lib/utils"
+import { formatUnits } from "@ethersproject/units"
 import { InformationCircleIcon } from "@heroicons/react/solid"
 import getFundingTokens from "app/core/utils/getFundingTokens"
 

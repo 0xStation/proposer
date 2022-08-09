@@ -205,11 +205,12 @@ const BulletinPage: BlitzPage = () => {
         </div>
         <div className="h-[calc(100vh-130px)] w-full">
           <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
-            <span className="basis-[42rem] ml-6 mb-2 tracking-wider">Title</span>
-            <span className="basis-32 ml-9 mb-2 tracking-wider">Submissions</span>
-            <span className="basis-32 ml-6 mb-2 tracking-wider">Open Date</span>
-            <span className="basis-32 ml-2 mb-2 tracking-wider">Close Date</span>
-            <span className="basis-32 ml-2 mr-6 mb-2 tracking-wider">Author</span>
+            <span className="basis-[36rem] ml-6 mb-2 tracking-wider">Title</span>
+            <span className="basis-40 ml-9 mb-2 tracking-wider">Submissions</span>
+            <span className="basis-40 ml-6 mb-2 tracking-wider">Open Date</span>
+            <span className="basis-40 ml-2 mb-2 tracking-wider">Close Date</span>
+            <span className="basis-40 ml-2 mr-6 mb-2 tracking-wider">Author</span>
+            <span className="basis-40 mr-6"></span>
           </div>
           <div className="overflow-y-auto col-span-7 h-[calc(100vh-174px)] w-full">
             {rfps && rfps.length ? (
@@ -273,6 +274,16 @@ const BulletinPage: BlitzPage = () => {
 }
 
 const RFPComponent = ({ rfp, terminalHandle }) => {
+  const [rfpOpen, setRfpOpen] = useState<boolean>(false)
+  useEffect(() => {
+    if (rfp) {
+      const today = new Date()
+      if (today > rfp.startDate && (!rfp.endDate || today < rfp.endDate)) {
+        setRfpOpen(true)
+      }
+    }
+  }, [rfp])
+
   return (
     <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp.id })}>
       <div className="w-full border-b border-concrete cursor-pointer hover:bg-wet-concrete pt-5">
@@ -283,13 +294,13 @@ const RFPComponent = ({ rfp, terminalHandle }) => {
           </span>
         </div>
         <div className="w-full flex flex-row mb-5">
-          <div className="basis-[42rem] ml-6 mb-2">
+          <div className="basis-[36rem] ml-6 mb-2">
             <h2 className="text-xl mt-2">{rfp.data?.content?.title}</h2>
           </div>
-          <div className="basis-32 ml-9 mb-2 self-center">
+          <div className="basis-40 ml-9 mb-2 self-center">
             <p>{rfp?.submissionCount}</p>
           </div>
-          <div className="basis-32 ml-6 mb-2 self-center uppercase">
+          <div className="basis-40 ml-6 mb-2 self-center uppercase">
             <p>
               {rfp.startDate
                 ? DateTime.fromJSDate(rfp.startDate as Date).toFormat("dd-MMM-yyyy")
@@ -299,7 +310,7 @@ const RFPComponent = ({ rfp, terminalHandle }) => {
               {DateTime.fromJSDate(rfp.startDate as Date).toLocaleString(DateTime.TIME_SIMPLE)}
             </p>
           </div>
-          <div className="basis-32 ml-2 mb-2 self-center uppercase">
+          <div className="basis-40 ml-2 mb-2 self-center uppercase">
             <p>
               {rfp.endDate
                 ? DateTime.fromJSDate(rfp.endDate as Date).toFormat("dd-MMM-yyyy")
@@ -311,7 +322,7 @@ const RFPComponent = ({ rfp, terminalHandle }) => {
                 : ""}
             </p>
           </div>
-          <div className="basis-32 ml-2 mr-6 mb-2 self-center">
+          <div className="basis-40 ml-2 mr-6 mb-2 self-center">
             <img
               src={rfp.author.data.pfpURL || DEFAULT_PFP_URLS.USER}
               className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
@@ -320,6 +331,33 @@ const RFPComponent = ({ rfp, terminalHandle }) => {
                 e.currentTarget.src = DEFAULT_PFP_URLS.USER
               }}
             />
+          </div>
+          <div
+            className="basis-40 mr-6 self-center relative group"
+            onClick={(e) => {
+              e.stopPropagation()
+            }}
+          >
+            {rfpOpen ? (
+              <Link href={Routes.CreateProposalPage({ terminalHandle, rfpId: rfp.id })} passHref>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block border border-electric-violet text-electric-violet rounded px-6 h-[35px] leading-[35px]  whitespace-nowrap hover:bg-electric-violet hover:text-tunnel-black"
+                >
+                  Propose
+                </a>
+              </Link>
+            ) : (
+              <>
+                <button className="inline-block border border-electric-violet text-electric-violet rounded px-6 h-[35px] leading-[35px]  whitespace-nowrap opacity-60">
+                  Propose
+                </button>
+                <span className="hidden group-hover:block absolute top-[110%] right-0 bg-wet-concrete text-xs p-2 rounded border border-tunnel-black">
+                  You will be able to create a proposal for this RFP when it opens for submissions.
+                </span>
+              </>
+            )}
           </div>
         </div>
       </div>
