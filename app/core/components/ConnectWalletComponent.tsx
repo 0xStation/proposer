@@ -9,7 +9,7 @@ import WalletConnect from "/public/wallet-logo.svg"
 import BackIcon from "/public/back-icon.svg"
 import verify from "app/session/mutations/verify"
 import generateNonce from "app/session/queries/generateNonce"
-import { useAccount, useConnect } from "wagmi"
+import { useAccount, useConnect, useNetwork } from "wagmi"
 
 export const ConnectWalletComponent = () => {
   const [connectState, setConnectState] = useState<{
@@ -21,24 +21,17 @@ export const ConnectWalletComponent = () => {
   })
   const [errorMessage, setErrorMessage] = useState<string>("")
   const [showSignView, setShowSignView] = useState<boolean>(false)
-  const { data: accountData } = useAccount()
-  const {
-    activeConnector,
-    connectors,
-    connectAsync,
-    data: connectData,
-    pendingConnector,
-    isConnecting,
-    isConnected,
-  } = useConnect()
+  const accountData = useAccount()
+  const { connectors, connectAsync, pendingConnector } = useConnect()
+  const { chain: activeChain } = useNetwork()
   const [metamaskWallet, walletConnect, coinbaseWallet] = connectors
 
   const handleWalletConnection = async (connector) => {
     setConnectState({ error: false, loading: true })
     let address = accountData?.address
-    if (!address || connector?.id !== activeConnector?.id) {
+    if (!address || connector?.id !== accountData?.connector?.id) {
       try {
-        await connectAsync(connector)
+        await connectAsync({ connector, chainId: activeChain?.id })
         setConnectState({ error: false, loading: false })
         setShowSignView(true)
       } catch (err) {
@@ -59,9 +52,18 @@ export const ConnectWalletComponent = () => {
 
   const handleSignInWithEthereum = async () => {
     setConnectState({ error: false, loading: true })
-    const address = accountData?.address
-    const chainId = connectData?.chain.id
     try {
+      const address = accountData?.address
+      const chainId = activeChain?.id
+
+      if (!address) {
+        throw Error("Error reading user's address")
+      }
+
+      if (!chainId) {
+        throw Error("Error reading chain id")
+      }
+
       const nonceRes = await invoke(generateNonce, {})
       const message = new SiweMessage({
         domain: window.location.host,
@@ -73,7 +75,7 @@ export const ConnectWalletComponent = () => {
         nonce: nonceRes,
       })
 
-      const signer = await activeConnector?.getSigner()
+      const signer = await accountData?.connector?.getSigner()
       const signature = await signer?.signMessage(message.prepareMessage())
       const verificationSuccessful = await invoke(verify, {
         message: JSON.stringify(message),
@@ -106,7 +108,7 @@ export const ConnectWalletComponent = () => {
       <div className="w-full h-full relative">
         <Image src={Banner} alt="Modal banner" layout="responsive" />
 
-        {showSignView && isConnected ? (
+        {showSignView && accountData?.isConnected ? (
           <>
             <button
               className="h-[20px] w-[20px] absolute mt-2 ml-2"
@@ -179,7 +181,7 @@ export const ConnectWalletComponent = () => {
                   await handleWalletConnection(metamaskWallet)
                 }}
               >
-                {isConnecting && metamaskWallet?.id === pendingConnector?.id ? (
+                {accountData?.isConnecting && metamaskWallet?.id === pendingConnector?.id ? (
                   <div className="flex justify-center items-center">
                     <Spinner fill="white" />
                   </div>
@@ -201,7 +203,7 @@ export const ConnectWalletComponent = () => {
                   await handleWalletConnection(walletConnect)
                 }}
               >
-                {isConnecting && walletConnect?.id === pendingConnector?.id ? (
+                {accountData?.isConnecting && walletConnect?.id === pendingConnector?.id ? (
                   <div className="flex justify-center items-center">
                     <Spinner fill="white" />
                   </div>
@@ -228,7 +230,7 @@ export const ConnectWalletComponent = () => {
                   await handleWalletConnection(coinbaseWallet)
                 }}
               >
-                {isConnecting && coinbaseWallet?.id === pendingConnector?.id ? (
+                {accountData?.isConnecting && coinbaseWallet?.id === pendingConnector?.id ? (
                   <div className="flex justify-center items-center">
                     <Spinner fill="white" />
                   </div>

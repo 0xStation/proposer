@@ -15,7 +15,7 @@ import ExploreImageIcon from "public/explore.svg"
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
-  const { data: accountData } = useAccount()
+  const accountData = useAccount()
   const activeUser = useStore((state) => state.activeUser)
   const setActiveUser = useStore((state) => state.setActiveUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)

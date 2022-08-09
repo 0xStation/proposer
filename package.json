@@ -65,7 +65,7 @@
     "tailwindcss": "3.0.1",
     "uuid": "8.3.2",
     "validator": "13.7.0",
-    "wagmi": "0.4.6",
+    "wagmi": "0.6.0",
     "zod": "3.11.6",
     "zustand": "3.6.8"
   },
