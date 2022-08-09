@@ -54,7 +54,7 @@ export default async function handler(req, res) {
     // res.status(200).json({ response: "success" })
     // return
 
-    let addresses: string[] = []
+    let addresses: string[] = [data.proposal.rfp.authorAddress]
 
     try {
       if (data.proposal.rfp.data.funding?.senderType === FundingSenderType.CHECKBOOK) {
@@ -66,22 +66,22 @@ export default async function handler(req, res) {
           },
         })
 
-        if (!checkbook) {
-          res.status(404)
-          return
-        }
-
-        const checkbookSigners = await db.account.findMany({
-          where: {
-            address: {
-              in: checkbook?.signers || [],
+        if (!!checkbook) {
+          const checkbookSigners = await db.account.findMany({
+            where: {
+              address: {
+                in: checkbook?.signers || [],
+              },
             },
-          },
-        })
+          })
 
-        addresses = checkbookSigners
-          .filter((account) => !!(account.data as AccountMetadata).hasVerifiedEmail)
-          .map((account) => account.address as string)
+          addresses = [
+            ...addresses,
+            ...checkbookSigners
+              .filter((account) => !!(account.data as AccountMetadata).hasVerifiedEmail)
+              .map((account) => account.address as string),
+          ]
+        }
       }
     } catch (e) {
       console.error(e)
