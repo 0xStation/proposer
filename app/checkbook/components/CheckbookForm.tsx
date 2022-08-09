@@ -19,8 +19,6 @@ type FormValues = {
   quorum: string
 }
 
-type OnChainCheckbookArgs = { chainId: number; quorum: number; signers: string[] }
-
 export const CheckbookForm = ({ callback, isEdit = true }) => {
   const [createCheckbookMutation] = useMutation(createCheckbook)
   const [quorum, setQuorum] = useState<number>()
@@ -43,9 +41,7 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
   const chainId = activeChain?.id as number
   const { writeAsync: createCheckbookOnChain } = useCreateCheckbookOnChain({
     chainId,
-    quorum,
-    signers,
-  } as OnChainCheckbookArgs)
+  })
 
   useWaitForTransaction({
     confirmations: 1,
