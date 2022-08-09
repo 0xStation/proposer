@@ -92,6 +92,11 @@ export const SENDGRID_TEMPLATES = {
   VERIFY: "d-9e113acf1a9f4830beaf3aa3553f9fde",
 }
 
+export const DOCS = {
+  CHECKBOOK:
+    "https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook",
+}
+
 // LEGACY BELOW
 
 // LEGACY
