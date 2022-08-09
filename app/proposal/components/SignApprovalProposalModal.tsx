@@ -11,7 +11,7 @@ import { truncateString } from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 import { InformationCircleIcon } from "@heroicons/react/solid"
 
-export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, checks }) => {
+export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, checkbook, checks }) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
@@ -39,13 +39,12 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
       // need to create a check if it does not exist
       check = await createCheckMutation({
         proposalId: proposal?.id,
-        fundingAddress: rfp.checkbook.address,
-        chainId: rfp.checkbook.chainId,
+        fundingAddress: checkbook.address,
+        chainId: checkbook.chainId,
         recipientAddress: proposal?.data.funding.recipientAddress,
         tokenAddress: proposal?.data.funding.token,
         tokenAmount: proposal?.data.funding.amount, // store as decimal value instead of BigNumber
       })
-      invalidateQuery(getChecksByProposalId)
     }
 
     const signature = await signMessage(check.data.signatureMessage)
@@ -71,16 +70,19 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
           signature,
           signatureMessage: check.data.signatureMessage,
         })
-        router.replace(router.asPath)
-        setIsOpen(false)
+
         setToastState({
           isToastShowing: true,
           type: "success",
           message: "Your approval moves this proposal a step closer to reality.",
         })
+        // refresh check fetching to render check if quorum is now hit
+        invalidateQuery(getChecksByProposalId)
+        router.replace(router.asPath)
+        setIsOpen(false)
         try {
           // if this approval makes proposal reach quorum, send notification to collaborators
-          if (proposal.approvals.length + 1 === rfp.checkbook.quorum) {
+          if (proposal.approvals.length + 1 === checkbook.quorum) {
             await fetch("/api/notify/proposal/approved", {
               method: "POST",
               headers: {

@@ -29,7 +29,7 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) 
     },
   })
 
-  const stationHasCheckbook = true
+  const stationHasCheckbook = (checkbooks?.length || 0) > 0
 
   const createCheckbookView = (
     <div className="p-2">

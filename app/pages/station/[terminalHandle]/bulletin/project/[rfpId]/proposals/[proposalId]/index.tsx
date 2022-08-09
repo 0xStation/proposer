@@ -119,14 +119,19 @@ const ProposalPage: BlitzPage = ({
 
   const hasQuorum = checkbook && check?.approvals?.length === checkbook?.quorum
 
-  // user can approve if they are a signer and they haven't approved before
-  const userCanApprove =
-    ((!checkbook && rfp.authorAddress === activeUser?.address) ||
-      checkbook?.signers.includes(activeUser?.address || "")) &&
-    !proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address)
+  const userIsAuthor = rfp.authorAddress === activeUser?.address
+  const userIsSigner = checkbook?.signers.includes(activeUser?.address || "")
+  const userHasApproved = proposal.approvals.some(
+    (approval) => approval.signerAddress === activeUser?.address
+  )
 
-  // show approve button, if the proposal hasn't reached quorum, user can approve, user hasn't already approved
-  const showApproveButton = !hasQuorum && userCanApprove
+  const userCanApprove =
+    !userHasApproved &&
+    // no checkbook and is rfp author or there is checkbook and user is signer
+    ((!checkbook && userIsAuthor) || userIsSigner)
+
+  // show approve button, if the proposal hasn't reached quorum, user can approve or user is author and can't approve
+  const showApproveButton = (!checkbook && userIsAuthor) || (!userHasApproved && !hasQuorum)
 
   // proposer has reached quorum and check has not been cashed and user is the proposer
   const showCashButton =
@@ -174,7 +179,7 @@ const ProposalPage: BlitzPage = ({
       <SignApprovalProposalModal
         isOpen={signModalOpen}
         setIsOpen={setSignModalOpen}
-        rfp={rfp}
+        checkbook={checkbook}
         proposal={proposal}
         checks={checks}
       />
@@ -284,7 +289,7 @@ const ProposalPage: BlitzPage = ({
                       }
                     }}
                     className="bg-electric-violet text-tunnel-black px-6 h-[35px] rounded block mx-auto hover:bg-opacity-70 mb-2"
-                    disabled={waitingCreation || overallocated}
+                    disabled={waitingCreation || overallocated || (!!checkbook && !userIsSigner)}
                   >
                     {waitingCreation ? (
                       <div className="flex justify-center items-center">
@@ -294,7 +299,7 @@ const ProposalPage: BlitzPage = ({
                       "Approve"
                     )}
                   </button>
-                  {overallocated && (
+                  {overallocated && userIsSigner && (
                     <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
                       Insufficient funds.{" "}
                       {isAdmin && (
@@ -308,6 +313,11 @@ const ProposalPage: BlitzPage = ({
                           Go to checkbook to refill.
                         </span>
                       )}
+                    </span>
+                  )}
+                  {checkbook && !userIsSigner && (
+                    <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
+                      You need to be a signer of the associated Checkbook to approve.
                     </span>
                   )}
                 </div>
