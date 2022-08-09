@@ -168,8 +168,8 @@ const ProposalPage: BlitzPage = ({
         />
       )}
       <TerminalNavigation>
-        <div className="h-screen flex flex-col">
-          <div className="w-full border-b border-concrete px-4 pt-4">
+        <div className="h-full flex flex-col">
+          <div className="border-b border-concrete px-4 pt-4">
             <div className="flex flex-row justify-between">
               <p className="self-center">
                 <span className="text-concrete hover:text-light-concrete">
@@ -308,11 +308,11 @@ const ProposalPage: BlitzPage = ({
               ) : null}
             </div>
           </div>
-          <div className="grid grid-cols-3 w-full box-border h-full">
-            <div className="col-span-2 p-6 w-full overflow-y-scroll">
+          <div className="grow flex flex-row overflow-y-scroll">
+            <div className="p-6 w-full overflow-y-scroll">
               <Preview markdown={proposal?.data.content.body} />
             </div>
-            <div className="col-span-1 border-l border-concrete flex flex-col overflow-y-scroll">
+            <div className="w-[36rem] border-l border-concrete flex-col overflow-y-scroll">
               <div className="border-b border-concrete p-6">
                 <h4 className="text-xs font-bold text-concrete uppercase mb-2">Author</h4>
                 {proposal.collaborators.map((collaborator, idx) => {
