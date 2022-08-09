@@ -77,6 +77,9 @@ export const trackerInit = () => {
 }
 
 export const initializeUser = (address: string) => {
+  if ((isDev() || isStaging()) && process.env.NEXT_PUBLIC_TRACK !== "true") {
+    return
+  }
   const identifyObj = new Identify()
   identify(identifyObj)
   setUserId(address)
