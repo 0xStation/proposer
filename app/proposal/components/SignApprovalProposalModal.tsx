@@ -30,8 +30,6 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
       proposal?.data.funding.token !== ZERO_ADDRESS && { address: proposal?.data.funding.token }),
   })
 
-  // going to have to change this when Kristens wagmi v6 gets merged bc its breaking change but should be easy switch
-  // active chain -> chain
   const { chain: activeChain } = useNetwork()
   const { switchNetwork } = useSwitchNetwork()
 
