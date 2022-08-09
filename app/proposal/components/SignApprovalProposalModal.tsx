@@ -1,5 +1,5 @@
 import { useMutation, useRouter, invalidateQuery } from "blitz"
-import { useToken, useNetwork } from "wagmi"
+import { useToken, useNetwork, useSwitchNetwork } from "wagmi"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
@@ -30,10 +30,8 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
       proposal?.data.funding.token !== ZERO_ADDRESS && { address: proposal?.data.funding.token }),
   })
 
-  // going to have to change this when Kristens wagmi v6 gets merged bc its breaking change but should be easy switch
-  // active chain -> chain
-  const { activeChain, switchNetwork } = useNetwork()
-  // const { switchNetwork } = useSwitchNetwork()
+  const { chain: activeChain } = useNetwork()
+  const { switchNetwork } = useSwitchNetwork()
 
   const createOrFindCheckAndFetchSignature = async () => {
     let check = checks[0]
