@@ -3,21 +3,12 @@ import { CONTRACTS } from "app/core/utils/constants"
 import checkbookFactoryAbi from "./abi/CheckbookFactory.json"
 import checkbookAbi from "./abi/Checkbook.json"
 
-export const useCreateCheckbookOnChain = ({
-  chainId,
-  quorum,
-  signers,
-}: {
-  chainId: number
-  quorum: number
-  signers: string[]
-}) => {
+export const useCreateCheckbookOnChain = ({ chainId }: { chainId: number }) => {
   const { data, write, isLoading, writeAsync, isSuccess } = useContractWrite({
     mode: "recklesslyUnprepared", // TODO: usePrepareContractWrite with args
     addressOrName: CONTRACTS[chainId]?.CHECKBOOK_FACTORY,
     contractInterface: checkbookFactoryAbi,
     functionName: "create",
-    args: [quorum, signers],
   })
   return { data, write, writeAsync, isLoading, isSuccess }
 }
