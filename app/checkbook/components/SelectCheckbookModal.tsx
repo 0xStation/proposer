@@ -9,6 +9,7 @@ import getCheckbookByProposal from "app/checkbook/queries/getCheckbookByProposal
 import getProposalById from "app/proposal/queries/getProposalById"
 import { RefreshIcon } from "@heroicons/react/solid"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
+import { DOCS } from "app/core/utils/constants"
 
 export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) => {
   const router = useRouter()
@@ -41,10 +42,7 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) 
         to claim once their projects have met the approval quorum.
       </p>
       <div className="mt-8">
-        <Link
-          href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
-          passHref
-        >
+        <Link href={DOCS.CHECKBOOK} passHref>
           <a
             target="_blank"
             rel="noopener noreferrer"

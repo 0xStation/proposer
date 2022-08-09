@@ -1,4 +1,7 @@
 import Modal from "app/core/components/Modal"
+import { Link, Image } from "blitz"
+import { DOCS } from "app/core/utils/constants"
+import RfpPublishStepper from "public/rfp-publish-stepper.svg"
 
 export const ConfirmationRfpModal = ({ isOpen, setIsOpen, handleSubmit }) => {
   return (
@@ -9,7 +12,10 @@ export const ConfirmationRfpModal = ({ isOpen, setIsOpen, handleSubmit }) => {
           Contributors will be able to submit proposals after the open date. You can edit your
           project at any time.
         </p>
-        <div className="mt-8">
+        <div className="py-8">
+          <Image src={RfpPublishStepper} alt="RFP Publish Stepper." />
+        </div>
+        <div>
           <button
             type="button"
             className="text-electric-violet border border-electric-violet mr-2 py-1 px-4 rounded hover:opacity-75"
@@ -19,11 +25,16 @@ export const ConfirmationRfpModal = ({ isOpen, setIsOpen, handleSubmit }) => {
           </button>
           <button
             type="submit"
-            className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
+            className="bg-electric-violet text-tunnel-black border border-electric-violet mr-10 py-1 px-4 rounded hover:opacity-75"
             onClick={() => handleSubmit()}
           >
             Continue
           </button>
+          <Link href={DOCS.CHECKBOOK} passHref>
+            <a target="_blank" rel="noopener noreferrer" className="text-electric-violet font-bold">
+              Learn more about Checkbook
+            </a>
+          </Link>
         </div>
       </div>
     </Modal>

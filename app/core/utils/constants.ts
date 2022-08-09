@@ -199,6 +199,11 @@ export const TOKEN_SYMBOLS = {
   USDC: "USDC",
 }
 
+export const DOCS = {
+  CHECKBOOK:
+    "https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook",
+}
+
 // LEGACY BELOW
 
 // LEGACY
