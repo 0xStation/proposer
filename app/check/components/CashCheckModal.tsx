@@ -27,7 +27,7 @@ export const CashCheckModal = ({
     },
   })
 
-  const { cashCheck } = useCashCheckOnChain(check.fundingAddress as string)
+  const { writeAsync: cashCheck } = useCashCheckOnChain(check.fundingAddress as string)
 
   const executeCashCheck = async () => {
     try {
@@ -37,7 +37,7 @@ export const CashCheckModal = ({
       const transaction = await cashCheck({
         // first argument is which transaction in list to execute
         // before we implement split-checks, there will only be one txn so we hardcode the index to `0`
-        args: [0, parsedCheck.txns, parsedCheck.signatures],
+        recklesslySetUnpreparedArgs: [0, parsedCheck.txns, parsedCheck.signatures],
       })
 
       await cashCheckMutation({

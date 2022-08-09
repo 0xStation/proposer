@@ -1,8 +1,8 @@
 import { track } from "@amplitude/analytics-browser"
 import { useEffect } from "react"
+import { useNetwork } from "wagmi"
 import { useCreateCheckbookOnChain } from "app/contracts/checkbook"
 import { Spinner } from "app/core/components/Spinner"
-import { useNetwork } from "wagmi"
 import useStore from "app/core/hooks/useStore"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
@@ -40,9 +40,11 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
-  const { activeChain } = useNetwork()
+  const { chain: activeChain } = useNetwork()
   const chainId = activeChain?.id as number
-  const { createCheckbook: createCheckbookOnChain } = useCreateCheckbookOnChain(chainId)
+  const { writeAsync: createCheckbookOnChain } = useCreateCheckbookOnChain({
+    chainId,
+  })
 
   useEffect(() => {
     if (finishedFetchingTerminal && activeUser?.address) {
@@ -56,9 +58,9 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
     }
   }, [finishedFetchingTerminal, activeUser?.address])
 
-  const data = useWaitForTransaction({
+  useWaitForTransaction({
     confirmations: 1,
-    hash: txnHash,
+    hash: txnHash as string,
     onSuccess: async (data) => {
       // transaction emits an event that contains the address of the new Checkbook
       // events are contained in the TransactionReceipt's `.logs` field
@@ -154,8 +156,10 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
               setQuorum(quorum)
               setSigners(signers)
               setName(values.name)
-              const transaction = await createCheckbookOnChain({
-                args: [quorum, signers],
+
+              // sets transaction hash in `useWaitForTransaction` via data returned from `useCreateCheckbookOnChain` hook
+              const transaction = await createCheckbookOnChain?.({
+                recklesslySetUnpreparedArgs: [quorum, signers],
               })
               setIsDeployingCheckbook(true)
               // triggers hook for useWaitForTransaction which parses checkbook address makes prisma mutation
