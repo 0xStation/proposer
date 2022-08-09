@@ -23,6 +23,7 @@ import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPerm
 import useStore from "app/core/hooks/useStore"
 import { trackClick } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
+import { useAddressHasToken } from "app/core/utils/permissions"
 
 const {
   PAGE_NAME,
@@ -64,6 +65,12 @@ const RfpHeaderNavigation = ({ rfpId }) => {
       }
     }
   }, [rfp])
+
+  const canSubmit = useAddressHasToken(
+    session.siwe?.address,
+    rfp?.data?.permissions ? rfp?.data?.permissions.submit : undefined,
+    rfp?.data?.permissions === undefined
+  )
 
   return (
     <>
@@ -272,7 +279,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
               </div>
             </div>
           </div>
-          {rfpOpen && (
+          {rfpOpen && canSubmit ? (
             <button
               onClick={() => {
                 trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_SHOW_EDITOR_CLICKED, {
@@ -287,6 +294,15 @@ const RfpHeaderNavigation = ({ rfpId }) => {
             >
               Create proposal
             </button>
+          ) : (
+            <div className="relative group self-start">
+              <button className="bg-electric-violet text-tunnel-black rounded self-start px-6 h-[35px] leading-[35px] bg-opacity-70 whitespace-nowrap">
+                Create proposal
+              </button>
+              <span className="absolute top-[110%] bg-wet-concrete rounded p-2 hidden group-hover:block text-xs">
+                You do not have access to apply to this RFP.
+              </span>
+            </div>
           )}
         </div>
         <ul className="mt-7 text-lg mb-2">

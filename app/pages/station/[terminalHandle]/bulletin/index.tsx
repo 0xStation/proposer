@@ -31,6 +31,7 @@ import Pagination from "app/core/components/Pagination"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import { AddFundsModal } from "../../../../core/components/AddFundsModal"
 import { DateTime } from "luxon"
+import { useAddressHasToken } from "app/core/utils/permissions"
 
 const {
   FEATURE: { RFP },
@@ -220,7 +221,12 @@ const BulletinPage: BlitzPage = () => {
           <div className="overflow-y-auto col-span-7 h-[calc(100vh-174px)] w-full">
             {rfps && rfps.length ? (
               rfps?.map((rfp) => (
-                <RFPComponent rfp={rfp} terminalHandle={terminalHandle} key={rfp.id} />
+                <RFPComponent
+                  rfp={rfp}
+                  terminalHandle={terminalHandle}
+                  key={rfp.id}
+                  activeAddress={session?.siwe?.address}
+                />
               ))
             ) : rfps && rfpStatusFilters?.size ? (
               <RfpNotFound />
@@ -278,7 +284,7 @@ const BulletinPage: BlitzPage = () => {
   )
 }
 
-const RFPComponent = ({ rfp, terminalHandle }) => {
+const RFPComponent = ({ rfp, terminalHandle, activeAddress }) => {
   const [rfpOpen, setRfpOpen] = useState<boolean>(false)
   useEffect(() => {
     if (rfp) {
@@ -288,6 +294,22 @@ const RFPComponent = ({ rfp, terminalHandle }) => {
       }
     }
   }, [rfp])
+
+  const canView = useAddressHasToken(
+    activeAddress,
+    rfp?.data?.permissions ? rfp?.data?.permissions.view : undefined,
+    rfp?.data?.permissions === undefined
+  )
+
+  const canSubmit = useAddressHasToken(
+    activeAddress,
+    rfp?.data?.permissions ? rfp?.data?.permissions.submit : undefined,
+    rfp?.data?.permissions === undefined
+  )
+
+  if (!canView) {
+    return <></>
+  }
 
   return (
     <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp.id })}>
@@ -344,15 +366,26 @@ const RFPComponent = ({ rfp, terminalHandle }) => {
             }}
           >
             {rfpOpen ? (
-              <Link href={Routes.CreateProposalPage({ terminalHandle, rfpId: rfp.id })} passHref>
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block border border-electric-violet text-electric-violet rounded px-6 h-[35px] leading-[35px]  whitespace-nowrap hover:bg-electric-violet hover:text-tunnel-black"
-                >
-                  Propose
-                </a>
-              </Link>
+              canSubmit ? (
+                <Link href={Routes.CreateProposalPage({ terminalHandle, rfpId: rfp.id })} passHref>
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block border border-electric-violet text-electric-violet rounded px-6 h-[35px] leading-[35px]  whitespace-nowrap hover:bg-electric-violet hover:text-tunnel-black"
+                  >
+                    Propose
+                  </a>
+                </Link>
+              ) : (
+                <>
+                  <button className="inline-block border border-electric-violet text-electric-violet rounded px-6 h-[35px] leading-[35px]  whitespace-nowrap opacity-60">
+                    Propose
+                  </button>
+                  <span className="hidden group-hover:block absolute top-[110%] right-0 bg-wet-concrete text-xs p-2 rounded border border-tunnel-black">
+                    You do not have permission to propose to this RFP.
+                  </span>
+                </>
+              )
             ) : (
               <>
                 <button className="inline-block border border-electric-violet text-electric-violet rounded px-6 h-[35px] leading-[35px]  whitespace-nowrap opacity-60">
