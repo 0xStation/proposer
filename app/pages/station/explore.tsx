@@ -145,10 +145,12 @@ const ExploreStations: BlitzPage = () => {
 }
 
 const RfpComponent = ({ rfp, terminal, activeUser }) => {
+  const noPermissionSet =
+    rfp?.data?.permissions === undefined || Object.keys(rfp?.data?.permissions).length === 0
   const canView = useAddressHasToken(
     activeUser?.address,
-    rfp?.data?.permissions ? rfp?.data?.permissions.view : undefined,
-    rfp?.data?.permissions === undefined
+    rfp?.data?.permissions ? rfp?.data?.permissions.view : "",
+    noPermissionSet
   )
 
   if (!canView) {

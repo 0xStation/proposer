@@ -295,16 +295,18 @@ const RFPComponent = ({ rfp, terminalHandle, activeAddress }) => {
     }
   }, [rfp])
 
+  const noPermissionSet =
+    rfp?.data?.permissions === undefined || Object.keys(rfp?.data?.permissions).length === 0
   const canView = useAddressHasToken(
     activeAddress,
-    rfp?.data?.permissions ? rfp?.data?.permissions.view : undefined,
-    rfp?.data?.permissions === undefined
+    rfp?.data?.permissions ? rfp?.data?.permissions.view : "",
+    noPermissionSet
   )
 
   const canSubmit = useAddressHasToken(
     activeAddress,
-    rfp?.data?.permissions ? rfp?.data?.permissions.submit : undefined,
-    rfp?.data?.permissions === undefined
+    rfp?.data?.permissions ? rfp?.data?.permissions.submit : "",
+    noPermissionSet
   )
 
   if (!canView) {

@@ -17,8 +17,8 @@ const UpdateRfp = z.object({
   fundingBudgetAmount: z.string(),
   signature: z.string(),
   submittingPermission: z.string(),
-  viewingPermission: z.string(),
-  signatureMessage: z.any(),
+  viewingPermission: z.string().optional(),
+  signatureMessage: z.any().optional(),
 })
 
 export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
