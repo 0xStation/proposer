@@ -84,17 +84,23 @@ const NewTokenSettingsPage: BlitzPage = () => {
       <Navigation>
         <div className="px-6 py-8">
           <div className="flex flex-row space-x-4">
-            <Link href={Routes.TokenSettingsPage({ terminalHandle })}>
-              <Image
-                src={Back}
-                alt="Close button"
-                width={16}
-                height={16}
-                className="cursor-pointer"
-              />
-            </Link>
-            <h1 className="text-2xl font-bold">New token</h1>
+            <div className="items-start pt-1">
+              <Link href={Routes.TokenSettingsPage({ terminalHandle })}>
+                <Image
+                  src={Back}
+                  alt="Close button"
+                  width={16}
+                  height={16}
+                  className="cursor-pointer"
+                />
+              </Link>
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">New token</h1>
+              <p>Import ERC-20s (or NFTs) to fund proposals in tokens of your choice. </p>
+            </div>
           </div>
+
           <Form
             initialValues={{}}
             onSubmit={async (values) => {
