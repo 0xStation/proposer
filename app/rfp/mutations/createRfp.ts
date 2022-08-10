@@ -16,8 +16,8 @@ const CreateRfp = z.object({
   fundingBudgetAmount: z.string(),
   signature: z.string(),
   signatureMessage: z.any(),
-  submittingPermission: z.string(),
-  viewingPermission: z.string(),
+  submittingPermission: z.string().optional(),
+  viewingPermission: z.string().optional(),
 })
 
 const defaultProposalPrefill =

@@ -66,11 +66,13 @@ const RfpHeaderNavigation = ({ rfpId }) => {
     }
   }, [rfp])
 
-  // dude not being able to call hooks conditionally is so garbage
+  const noPermissionSet =
+    rfp?.data?.permissions === undefined || Object.keys(rfp?.data?.permissions).length === 0
+
   const canSubmit = useAddressHasToken(
     session.siwe?.address,
     rfp?.data?.permissions ? rfp?.data?.permissions.submit : "", // junk because I have to call it with something
-    rfp?.data?.permissions === undefined
+    noPermissionSet
   )
 
   return (
