@@ -1,5 +1,7 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { BlitzPage, useMutation, useRouter, Routes, Image, Router, useSession } from "blitz"
+import { trackClick, trackImpression, trackError } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import PersonalSiteIcon from "public/personal-site-icon.svg"
 import TwitterIcon from "public/twitter-icon.svg"
 import GithubIcon from "public/github-icon.svg"
@@ -20,6 +22,11 @@ import useStore from "app/core/hooks/useStore"
 import Layout from "app/core/layouts/Layout"
 import { sendTerminalCreationNotification } from "app/utils/sendTerminalCreatedNotification"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
+
+const {
+  PAGE_NAME,
+  FEATURE: { NEW_STATION },
+} = TRACKING_EVENTS
 
 const PfpInput = ({ pfpURL, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
@@ -78,6 +85,14 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
   const setToastState = useStore((state) => state.setToastState)
   const [pfpURL, setPfpURL] = useState<string>("")
   const [createTerminalMutation] = useMutation(createTerminal)
+  const activeUser = useStore((state) => state.activeUser)
+
+  useEffect(() => {
+    trackImpression(NEW_STATION.EVENT_NAME.CREATE_STATION_PAGE_SHOWN, {
+      userAddress: activeUser?.address,
+      pageName: PAGE_NAME.STATION_CREATION_PAGE,
+    })
+  }, [])
 
   return (
     <Layout>
@@ -85,6 +100,10 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
         <div
           className="absolute top-4 left-4 cursor-pointer"
           onClick={() => {
+            trackClick(NEW_STATION.EVENT_NAME.CREATE_STATION_BACK_BUTTON_CLICKED, {
+              userAddress: activeUser?.address,
+              pageName: PAGE_NAME.STATION_CREATION_PAGE,
+            })
             Router.back()
           }}
         >
@@ -98,7 +117,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                   <div className="w-60 h-1 bg-electric-violet" />
                   <p className="text-electric-violet mt-2.5">Open a station</p>
                 </div>
-                <div className="">
+                <div>
                   <div className="w-60 h-1 bg-concrete" />
                   <p className="text-concrete mt-2.5">Create a Checkbook</p>
                 </div>
@@ -126,6 +145,10 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                   },
                   form
                 ) => {
+                  trackClick(NEW_STATION.EVENT_NAME.CREATE_STATION_CREATE_CONTINUTE_CLICKED, {
+                    userAddress: activeUser?.address,
+                    pageName: PAGE_NAME.STATION_CREATION_PAGE,
+                  })
                   if (
                     session.userId !== null &&
                     !Object.keys(form.getState().errors || {}).length
@@ -148,6 +171,11 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                         Routes.NewCheckbookTerminalCreationPage({ terminalHandle: terminal.handle })
                       )
                     } catch (err) {
+                      trackError(NEW_STATION.EVENT_NAME.ERROR_CREATING_STATION, {
+                        userAddress: activeUser?.address,
+                        pageName: PAGE_NAME.STATION_CREATION_PAGE,
+                        stationHandle: values.handle,
+                      })
                       setToastState({
                         isToastShowing: true,
                         type: "error",

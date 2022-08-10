@@ -10,6 +10,8 @@ import {
   useSession,
 } from "blitz"
 import { useState, useEffect } from "react"
+import { trackClick, trackImpression } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
@@ -30,6 +32,11 @@ import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import { AddFundsModal } from "../../../../core/components/AddFundsModal"
 import { DateTime } from "luxon"
 
+const {
+  FEATURE: { RFP },
+  PAGE_NAME,
+} = TRACKING_EVENTS
+
 const RfpNotFound = () => (
   <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
     <p className="font-bold text-lg">Requests for proposals is empty</p>
@@ -43,11 +50,12 @@ const BulletinPage: BlitzPage = () => {
   const session = useSession({ suspense: false })
   const query = useRouterQuery()
   const [showRfpSuccessModal, setShowRfpSuccessModal] = useState<boolean>(false)
-  const [terminal] = useQuery(
+  const [terminal, { isSuccess: finishedFetchingTerminal }] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle as string },
     { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
   )
+  const activeUser = useStore((state) => state.activeUser)
 
   const isLoggedInAndIsAdmin = useAdminForTerminal(terminal)
   const [isAddFundsModalOpen, setIsAddFundsModalOpen] = useState<boolean>(false)
@@ -68,10 +76,11 @@ const BulletinPage: BlitzPage = () => {
       suspense: false,
       enabled: !!terminal?.id,
       refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     }
   )
 
-  const [rfpCount] = useQuery(
+  const [rfpCount, { isSuccess: finishedFetchingRfpCount }] = useQuery(
     getRfpCountByTerminalId,
     {
       terminalId: terminal?.id as number,
@@ -82,8 +91,21 @@ const BulletinPage: BlitzPage = () => {
       suspense: false,
       enabled: !!terminal?.id,
       refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     }
   )
+
+  useEffect(() => {
+    if (finishedFetchingTerminal && finishedFetchingRfpCount) {
+      trackImpression(RFP.EVENT_NAME.RFP_LIST_PAGE_SHOWN, {
+        pageName: PAGE_NAME.RFP_LIST_PAGE,
+        stationHandle: terminalHandle as string,
+        stationId: terminal?.id,
+        numRfps: rfpCount,
+        userAddress: activeUser?.address,
+      })
+    }
+  }, [finishedFetchingTerminal, finishedFetchingRfpCount])
 
   const router = useRouter()
   useEffect(() => {
@@ -125,6 +147,9 @@ const BulletinPage: BlitzPage = () => {
         isOpen={isAddFundsModalOpen}
         checkbookAddress={query.terminalAndCheckbookCreated as string}
         terminalCreationFlow={true}
+        pageName={PAGE_NAME.RFP_LIST_PAGE}
+        terminalId={terminal?.id as number}
+        stationHandle={terminalHandle}
       />
       <SuccessRfpModal
         terminal={terminal}
@@ -141,7 +166,17 @@ const BulletinPage: BlitzPage = () => {
             {isLoggedInAndIsAdmin && (
               <button
                 className="h-[35px] bg-electric-violet px-9 rounded text-tunnel-black hover:bg-opacity-70"
-                onClick={() => router.push(Routes.CreateRFPPage({ terminalHandle }))}
+                onClick={() => {
+                  trackClick(RFP.EVENT_NAME.RFP_SHOW_EDITOR_CLICKED, {
+                    pageName: PAGE_NAME.RFP_LIST_PAGE,
+                    stationHandle: terminalHandle as string,
+                    stationId: terminal?.id,
+                    numRfps: rfpCount,
+                    userAddress: activeUser?.address,
+                    isEdit: false,
+                  })
+                  router.push(Routes.CreateRFPPage({ terminalHandle }))
+                }}
               >
                 Create RFP
               </button>
@@ -210,7 +245,17 @@ const BulletinPage: BlitzPage = () => {
                 </p>
                 <button
                   className="bg-electric-violet rounded text-tunnel-black px-6 h-[35px] w-[133px] mt-6 hover:opacity-70"
-                  onClick={() => router.push(Routes.CreateRFPPage({ terminalHandle }))}
+                  onClick={() => {
+                    trackClick(RFP.EVENT_NAME.RFP_SHOW_EDITOR_CLICKED, {
+                      pageName: PAGE_NAME.RFP_LIST_PAGE,
+                      stationHandle: terminalHandle as string,
+                      stationId: terminal?.id,
+                      numRfps: rfpCount,
+                      userAddress: activeUser?.address,
+                      isEdit: false,
+                    })
+                    router.push(Routes.CreateRFPPage({ terminalHandle }))
+                  }}
                 >
                   Create RFP
                 </button>

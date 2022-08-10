@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   BlitzPage,
   invoke,
@@ -10,15 +10,15 @@ import {
   useParam,
   useMutation,
 } from "blitz"
+import { trackClick, trackImpression, trackError } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import { Field, Form } from "react-final-form"
 import { LightBulbIcon, XIcon } from "@heroicons/react/solid"
 import { parseUnits } from "@ethersproject/units"
-import { useBalance } from "wagmi"
 // components
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
 import Modal from "app/core/components/Modal"
-import CheckbookSelectToken from "app/core/components/CheckbookSelectToken"
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
 // hooks
 import useStore from "app/core/hooks/useStore"
@@ -33,13 +33,16 @@ import createProposal from "app/proposal/mutations/createProposal"
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import { requiredField, isPositiveAmount, composeValidators, isAddress } from "app/utils/validators"
-import { fetchTokenDecimals } from "app/utils/fetchTokenDecimals"
-import { ZERO_ADDRESS } from "app/core/utils/constants"
 import { genProposalSignatureMessage } from "app/signatures/proposal"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 //types
 import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
+
+const {
+  PAGE_NAME,
+  FEATURE: { PROPOSAL },
+} = TRACKING_EVENTS
 
 type GetServerSidePropsData = {
   rfp: Rfp
@@ -62,6 +65,15 @@ const CreateProposalPage: BlitzPage = ({
   useWarnIfUnsavedChanges(unsavedChanges, () => {
     return confirm("Warning! You have unsaved changes.")
   })
+
+  useEffect(() => {
+    trackImpression(PROPOSAL.EVENT_NAME.PROPSOAL_EDITOR_PAGE_SHOWN, {
+      pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
+      userAddress: activeUser?.address,
+      stationHandle: data.terminal?.handle,
+      stationId: data.terminal?.id,
+    })
+  }, [])
 
   const checkbookTokens = useCheckbookAvailability(data.rfp.checkbook, data.terminal)
 
@@ -169,6 +181,15 @@ const CreateProposalPage: BlitzPage = ({
           markdown: string
           title: string
         }) => {
+          trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_EDITOR_MODAL_PUBLISH_CLICKED, {
+            pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
+            userAddress: activeUser?.address,
+            stationHandle: data.terminal?.handle,
+            stationId: data.terminal?.id,
+            recipientAddress: values?.recipientAddress,
+            amount: values?.amount,
+            title: values?.title,
+          })
           if (!activeUser?.address) {
             setToastState({
               isToastShowing: true,
@@ -208,6 +229,16 @@ const CreateProposalPage: BlitzPage = ({
                 signatureMessage: message,
               })
             } catch (e) {
+              trackError(PROPOSAL.EVENT_NAME.ERROR_CREATING_PROPOSAL, {
+                pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
+                userAddress: activeUser?.address,
+                stationHandle: data.terminal?.handle,
+                stationId: data.terminal?.id,
+                recipientAddress: values?.recipientAddress,
+                amount: values?.amount,
+                title: values?.title,
+                errorMsg: e.message,
+              })
               console.error(e)
               setToastState({
                 isToastShowing: true,
@@ -301,7 +332,9 @@ const CreateProposalPage: BlitzPage = ({
                         <button
                           type="submit"
                           className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
-                          onClick={() => handleSubmit()}
+                          onClick={() => {
+                            handleSubmit()
+                          }}
                         >
                           Continue
                         </button>
@@ -401,6 +434,11 @@ const CreateProposalPage: BlitzPage = ({
                     <button
                       type="button"
                       onClick={() => {
+                        trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_EDITOR_PUBLISH_CLICKED, {
+                          userAddress: activeUser?.address,
+                          stationHandle: data.terminal?.handle,
+                          stationId: data.terminal?.id,
+                        })
                         setAttemptedSubmit(true)
                         if (formState.invalid) {
                           const fieldsWithErrors = Object.keys(formState.errors as Object)

@@ -1,4 +1,6 @@
-import { invoke, Image } from "blitz"
+import { invoke, Image, useParam } from "blitz"
+import { trackClick, trackError, initializeUser } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import { SiweMessage } from "siwe"
 import { useState } from "react"
 import { Spinner } from "app/core/components/Spinner"
@@ -11,6 +13,10 @@ import verify from "app/session/mutations/verify"
 import generateNonce from "app/session/queries/generateNonce"
 import { useAccount, useConnect, useNetwork } from "wagmi"
 
+const {
+  FEATURE: { WALLET_CONNECTION },
+} = TRACKING_EVENTS
+
 export const ConnectWalletComponent = () => {
   const [connectState, setConnectState] = useState<{
     loading: boolean
@@ -21,6 +27,7 @@ export const ConnectWalletComponent = () => {
   })
   const [errorMessage, setErrorMessage] = useState<string>("")
   const [showSignView, setShowSignView] = useState<boolean>(false)
+  const terminalHandle = useParam("terminalHandle")
   const accountData = useAccount()
   const { connectors, connectAsync, pendingConnector } = useConnect()
   const { chain: activeChain } = useNetwork()
@@ -36,11 +43,18 @@ export const ConnectWalletComponent = () => {
         setShowSignView(true)
       } catch (err) {
         console.error(err)
+        let errorMsg = "Declined connection."
         if (err.code === 4001) {
-          setErrorMessage("Declined connection.")
+          setErrorMessage(errorMsg)
         } else {
-          setErrorMessage("Something went wrong.")
+          errorMsg = "Something went wrong."
+          setErrorMessage(errorMsg)
         }
+        trackError(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_ERROR, {
+          pageName: window.location.href,
+          stationHandle: terminalHandle as string,
+          errorMsg,
+        })
         setConnectState({ error: true, loading: false })
         return
       }
@@ -51,11 +65,17 @@ export const ConnectWalletComponent = () => {
   }
 
   const handleSignInWithEthereum = async () => {
+    const address = accountData?.address
+    const chainId = activeChain?.id
+    trackClick(WALLET_CONNECTION.EVENT_NAME.SIGN_IN_WITH_ETHEREUM_BUTTON_CLICKED, {
+      pageName: window.location.href,
+      stationHandle: terminalHandle as string,
+      userAddress: accountData?.address,
+      chainId,
+    })
     setConnectState({ error: false, loading: true })
-    try {
-      const address = accountData?.address
-      const chainId = activeChain?.id
 
+    try {
       if (!address) {
         throw Error("Error reading user's address")
       }
@@ -83,6 +103,7 @@ export const ConnectWalletComponent = () => {
       })
 
       if (verificationSuccessful) {
+        initializeUser(address)
         setConnectState({ error: false, loading: true })
       } else {
         throw Error("Unsuccessful signature.")
@@ -90,11 +111,19 @@ export const ConnectWalletComponent = () => {
     } catch (err) {
       console.log(err)
       console.error(err.cause)
+      let errorMsg
       if (err.code === 4001) {
-        setErrorMessage("Signature declined.")
+        errorMsg = "Signature declined."
+        setErrorMessage(errorMsg)
       } else {
-        setErrorMessage(`Something went wrong. ${err.message || ""}`)
+        errorMsg = `Something went wrong. ${err.message || ""}`
+        setErrorMessage(errorMsg)
       }
+      trackError(WALLET_CONNECTION.EVENT_NAME.SIGN_IN_WITH_ETHEREUM_ERROR, {
+        pageName: window.location.href,
+        stationHandle: terminalHandle as string,
+        errorMsg,
+      })
       setConnectState({ error: true, loading: false })
     }
   }
@@ -178,6 +207,12 @@ export const ConnectWalletComponent = () => {
                 }`}
                 disabled={connectState.loading}
                 onClick={async () => {
+                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BUTTON_CLICKED, {
+                    pageName: window.location.href,
+                    stationHandle: terminalHandle as string,
+                    userAddress: accountData?.address,
+                    wallet: "metamask",
+                  })
                   await handleWalletConnection(metamaskWallet)
                 }}
               >
@@ -200,6 +235,12 @@ export const ConnectWalletComponent = () => {
                 }`}
                 disabled={connectState.loading}
                 onClick={async () => {
+                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BUTTON_CLICKED, {
+                    pageName: window.location.href,
+                    stationHandle: terminalHandle as string,
+                    userAddress: accountData?.address,
+                    wallet: "wallet_connection",
+                  })
                   await handleWalletConnection(walletConnect)
                 }}
               >
@@ -227,6 +268,12 @@ export const ConnectWalletComponent = () => {
                 }`}
                 disabled={connectState.loading}
                 onClick={async () => {
+                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BUTTON_CLICKED, {
+                    pageName: window.location.href,
+                    stationHandle: terminalHandle as string,
+                    userAddress: accountData?.address,
+                    wallet: "coinbase",
+                  })
                   await handleWalletConnection(coinbaseWallet)
                 }}
               >

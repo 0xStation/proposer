@@ -92,6 +92,99 @@ export const SENDGRID_TEMPLATES = {
   VERIFY: "d-9e113acf1a9f4830beaf3aa3553f9fde",
 }
 
+export const EVENT_TYPE = {
+  CLICK: "click",
+  IMPRESSION: "impression",
+  EVENT: "event",
+  ERROR: "error",
+}
+
+export const TRACKING_EVENTS = {
+  PAGE_NAME: {
+    PROFILE_NAV: "profile_nav",
+    EXPLORE: "explore",
+    STATION_CREATION_PAGE: "station_creation_page",
+    COMPLETE_PROFILE_PAGE: "complete_profile_checkbook_page",
+    COMPLETE_PROFILE_CHECKBOOK_PAGE: "complete_profile_checkbook_page",
+    CHECKBOOK_CREATE_SETTINGS_PAGE: "checkbook_create_settings_page",
+    CHECKBOOK_SETTINGS_PAGE: "checkbook_settings_page",
+    RFP_LIST_PAGE: "rfp_list_page",
+    RFP_INFO_PAGE: "rfp_info_page",
+    RFP_PROPOSALS_PAGE: "rfp_proposals_page",
+    RFP_EDITOR_PAGE: "rfp_editor_page",
+    PROPOSAL_INFO_PAGE: "proposal_info_page",
+    PROPOSAL_EDITOR_PAGE: "proposal_editor_page",
+  },
+  FEATURE: {
+    CHECKBOOK: {
+      EVENT_NAME: {
+        COMPLETE_PROFILE_CHECKBOOK_EXIT_CLICKED: "complete_profile_checkbook_exit_clicked",
+        CREATE_CHECKBOOK_PAGE_SHOWN: "checkbook_create_page_shown",
+        CHECKBOOK_SETTINGS_PAGE_SHOWN: "checkbook_settings_page_shown",
+        CHECKBOOK_SHOW_CREATE_PAGE_CLICKED: "checkbook_show_create_page_clicked",
+        CHECKBOOK_CREATE_BUTTON_CLICKED: "checkbook_create_button_clicked",
+        CHECKBOOK_CONTRACT_CREATED: "checkbook_contract_created",
+        CHECKBOOK_MODEL_CREATED: "checkbook_model_created",
+        CHECKBOOK_CREATE_ERROR: "checkbook_create_error",
+        CHECKBOOK_ADD_FUNDS_CLICKED: "checkbook_add_funds_clicked",
+      },
+    },
+    RFP: {
+      EVENT_NAME: {
+        RFP_LIST_PAGE_SHOWN: "rfp_list_page_shown",
+        RFP_SHOW_EDITOR_CLICKED: "rfp_show_editor_clicked",
+        RFP_EDITOR_PAGE_SHOWN: "rfp_editor_page_shown",
+        RFP_EDITOR_PUBLISH_CLICKED: "rfp_editor_publish_clicked",
+        RFP_EDITOR_MODAL_PUBLISH_CLICKED: "rfp_editor_modal_publish_clicked",
+        RFP_CREATED: "rfp_created",
+        RFP_EDITED: "rfp_edited",
+        ERROR_CREATING_RFP: "error_creating_rfp",
+        ERROR_EDITING_RFP: "error_editing_rfp",
+        RFP_SETTINGS_CLOSE_RFP_CLICKED: "rfp_settings_close_rfp_clicked",
+        CLOSE_RFP_CLICKED: "close_rfp_clicked",
+        ERROR_CLOSING_RFP: "error_closing_rfp",
+        RFP_SETTINGS_REOPEN_RFP_CLICKED: "rfp_settings_reopen_rfp_clicked",
+        REOPEN_RFP_CLICKED: "reopen_rfp_clicked",
+        ERROR_REOPENING_RFP: "error_reopening_rfp",
+        RFP_SETTINGS_DELETE_RFP_CLICKED: "rfp_settings_delete_rfp_clicked",
+        DELETE_RFP_CLICKED: "delete_rfp_clicked",
+        ERROR_DELETING_RFP: "error_deleting_rfp",
+        RFP_INFO_PAGE_SHOWN: "rfp_info_page_shown",
+        RFP_PROPOSALS_PAGE_SHOWN: "rfp_proposals_page_shown",
+      },
+    },
+    PROPOSAL: {
+      EVENT_NAME: {
+        PROPOSAL_INFO_PAGE_SHOWN: "proposal_info_page_shown",
+        PROPSOAL_EDITOR_PAGE_SHOWN: "proposal_editor_page_shown",
+        PROPOSAL_SHOW_EDITOR_CLICKED: "proposal_show_editor_clicked",
+        PROPOSAL_EDITOR_PUBLISH_CLICKED: "proposal_editor_publish_clicked",
+        PROPOSAL_EDITOR_MODAL_PUBLISH_CLICKED: "proposal_editor_modal_publish_clicked",
+        ERROR_CREATING_PROPOSAL: "error_creating_proposal",
+      },
+    },
+    NEW_STATION: {
+      EVENT_NAME: {
+        SHOW_CREATE_STATION_PAGE_CLICKED: "show_create_station_page_clicked",
+        CREATE_STATION_PAGE_SHOWN: "create_station_page_shown",
+        CREATE_STATION_BACK_BUTTON_CLICKED: "create_station_back_button_clicked",
+        CREATE_STATION_CREATE_CONTINUTE_CLICKED: "create_station_create_continue_clicked",
+        ERROR_CREATING_STATION: "error_creating_station",
+      },
+    },
+    WALLET_CONNECTION: {
+      EVENT_NAME: {
+        WALLET_CONNECTION_BANNER_CLICKED: "wallet_connection_banner_clicked",
+        WALLET_CONNECTION_BUTTON_CLICKED: "wallet_connection_button_clicked",
+        WALLET_CONNECTION_ERROR: "wallet_connection_error",
+        SIGN_IN_WITH_ETHEREUM_BUTTON_CLICKED: "sign_in_with_ethereum_button_clicked",
+        SIGN_IN_WITH_ETHEREUM_ERROR: "sign_in_with_ethereum_error",
+        WALLET_DISCONNECT_CLICKED: "wallet_disconnect_clicked",
+      },
+    },
+  },
+}
+
 // LEGACY BELOW
 
 // LEGACY

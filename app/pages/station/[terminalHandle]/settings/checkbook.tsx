@@ -1,15 +1,17 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   BlitzPage,
   GetServerSideProps,
   getSession,
   invoke,
-  Link,
+  useRouter,
   Routes,
   useParam,
   useQuery,
   useRouterQuery,
 } from "blitz"
+import { trackClick, trackImpression } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import Navigation from "app/terminal/components/settings/navigation"
 import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
@@ -18,11 +20,16 @@ import { Checkbook } from "app/checkbook/types"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import truncateString from "app/core/utils/truncateString"
 import { ClipboardIcon, ClipboardCheckIcon, ExternalLinkIcon } from "@heroicons/react/outline"
-import Modal from "app/core/components/Modal"
 import networks from "app/utils/networks.json"
 import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import { AddFundsModal } from "app/core/components/AddFundsModal"
+import useStore from "app/core/hooks/useStore"
+
+const {
+  PAGE_NAME,
+  FEATURE: { CHECKBOOK },
+} = TRACKING_EVENTS
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   const session = await getSession(req, res)
@@ -63,19 +70,27 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
 const CheckbookSettingsPage: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const { creationSuccess } = useRouterQuery()
-  const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+  const [terminal, { isSuccess: finishedFetchingTerminal }] = useQuery(
+    getTerminalByHandle,
+    { handle: terminalHandle },
+    { suspense: false }
+  )
   const [checkbooks, setCheckbooks] = useState<Checkbook[]>([])
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
   const [successModalOpen, setSuccessModalOpen] = useState<boolean>(!!creationSuccess)
   const [showAddFundsModal, setShowAddFundsModal] = useState<boolean>(false)
+  const activeUser = useStore((state) => state.activeUser)
+  const router = useRouter()
 
-  useQuery(
+  const [books, { isSuccess: finishedFetchingCheckbooks }] = useQuery(
     getCheckbooksByTerminal,
     { terminalId: terminal?.id as number },
     {
       suspense: false,
       enabled: !!terminal?.id,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
       onSuccess: (books) => {
         if (!books || (Array.isArray(books) && books.length === 0)) {
           return
@@ -88,6 +103,18 @@ const CheckbookSettingsPage: BlitzPage = () => {
       },
     }
   )
+
+  useEffect(() => {
+    if (finishedFetchingCheckbooks && finishedFetchingTerminal && activeUser?.address) {
+      trackImpression(CHECKBOOK.EVENT_NAME.CHECKBOOK_SETTINGS_PAGE_SHOWN, {
+        pageName: PAGE_NAME.CHECKBOOK_SETTINGS_PAGE,
+        stationHandle: terminalHandle as string,
+        stationId: terminal?.id,
+        userAddress: activeUser?.address,
+        numCheckbooks: books?.length,
+      })
+    }
+  }, [finishedFetchingCheckbooks, finishedFetchingTerminal, activeUser?.address])
 
   const CheckbookComponent = ({ checkbook }) => {
     return (
@@ -116,14 +143,12 @@ const CheckbookSettingsPage: BlitzPage = () => {
     <LayoutWithoutNavigation>
       <Navigation>
         <AddFundsModal
+          setIsOpen={setShowAddFundsModal || setSuccessModalOpen}
+          isOpen={showAddFundsModal || successModalOpen}
           checkbookAddress={selectedCheckbook?.address}
-          setIsOpen={setSuccessModalOpen}
-          isOpen={successModalOpen}
-        />
-        <AddFundsModal
-          setIsOpen={setShowAddFundsModal}
-          isOpen={showAddFundsModal}
-          checkbookAddress={selectedCheckbook?.address}
+          pageName={PAGE_NAME.CHECKBOOK_SETTINGS_PAGE}
+          terminalId={terminal?.id as number}
+          stationHandle={terminalHandle}
         />
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-concrete flex justify-between">
@@ -139,14 +164,21 @@ const CheckbookSettingsPage: BlitzPage = () => {
                 </a>
               </h5>
             </div>
-            <Link href={Routes.NewCheckbookSettingsPage({ terminalHandle })}>
-              <button
-                className="rounded text-tunnel-black px-8 h-[32px] bg-electric-violet self-start"
-                type="submit"
-              >
-                Create
-              </button>
-            </Link>
+            <button
+              className="rounded text-tunnel-black px-8 h-[32px] bg-electric-violet self-start"
+              onClick={() => {
+                trackClick(CHECKBOOK.EVENT_NAME.CHECKBOOK_SHOW_CREATE_PAGE_CLICKED, {
+                  pageName: PAGE_NAME.CHECKBOOK_SETTINGS_PAGE,
+                  stationHandle: terminalHandle as string,
+                  stationId: terminal?.id,
+                  userAddress: activeUser?.address,
+                  numCheckbooks: books?.length,
+                })
+                router.push(Routes.NewCheckbookSettingsPage({ terminalHandle }))
+              }}
+            >
+              Create
+            </button>
           </div>
           {checkbooks.length === 0 ? (
             <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">

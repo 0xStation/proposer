@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
 import { DateTime } from "luxon"
 import { useMutation, invalidateQuery, Link, Routes, useRouter } from "blitz"
+import { track } from "@amplitude/analytics-browser"
 import { Field, Form } from "react-final-form"
-import { LockClosedIcon, XIcon, RefreshIcon, SpeakerphoneIcon } from "@heroicons/react/solid"
+import { XIcon, RefreshIcon, SpeakerphoneIcon } from "@heroicons/react/solid"
 import { parseUnits } from "@ethersproject/units"
 import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
@@ -22,11 +23,17 @@ import {
   requiredField,
   isAfterStartDate,
 } from "app/utils/validators"
-import { useNetwork } from "wagmi"
 import { genRfpSignatureMessage } from "app/signatures/rfp"
 import getFundingTokens from "app/core/utils/getFundingTokens"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
+import { trackClick, trackEvent, trackError } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
+
+const {
+  PAGE_NAME,
+  FEATURE: { RFP, PROPOSAL },
+} = TRACKING_EVENTS
 
 const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
   const isoDate = DateTime.fromISO(dateTime.toString())
@@ -65,6 +72,15 @@ const RfpMarkdownForm = ({
   const tokenOptions = ["ETH", "USDC"]
 
   useEffect(() => {
+    trackClick(RFP.EVENT_NAME.RFP_EDITOR_PAGE_SHOWN, {
+      pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+      userAddress: activeUser?.address,
+      stationHandle: terminal?.handle as string,
+      stationId: terminal?.id,
+    })
+  }, [])
+
+  useEffect(() => {
     if (rfp?.data?.content?.title) {
       setTitle(rfp?.data?.content?.title)
     }
@@ -78,6 +94,12 @@ const RfpMarkdownForm = ({
 
   const [createRfpMutation] = useMutation(createRfp, {
     onSuccess: (_data) => {
+      trackEvent(RFP.EVENT_NAME.RFP_CREATED, {
+        pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+        userAddress: activeUser?.address,
+        stationHandle: terminal?.handle as string,
+        stationId: terminal?.id,
+      })
       invalidateQuery(getRfpsByTerminalId)
       Routes.BulletinPage({ terminalHandle: terminal?.handle, rfpPublished: _data?.id })
       router.push(
@@ -91,6 +113,13 @@ const RfpMarkdownForm = ({
 
   const [updateRfpMutation] = useMutation(updateRfp, {
     onSuccess: (_data) => {
+      trackEvent(RFP.EVENT_NAME.RFP_EDITED, {
+        pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+        userAddress: activeUser?.address,
+        stationHandle: terminal?.handle as string,
+        stationId: terminal?.id,
+        rfpId: rfp?.id,
+      })
       invalidateQuery(getRfpsByTerminalId)
       router.push(
         Routes.BulletinPage({
@@ -186,6 +215,16 @@ const RfpMarkdownForm = ({
           markdown: string
           title: string
         }) => {
+          trackClick(RFP.EVENT_NAME.RFP_EDITOR_MODAL_PUBLISH_CLICKED, {
+            pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+            userAddress: activeUser?.address,
+            stationHandle: terminal?.handle as string,
+            stationId: terminal?.id,
+            startDate: values.startDate,
+            endDate: values.endDate,
+            checkbookAddress: values.checkbookAddress,
+            title: values.title,
+          })
           if (!activeUser?.address) {
             setToastState({
               isToastShowing: true,
@@ -247,47 +286,79 @@ const RfpMarkdownForm = ({
           }
 
           if (isEdit) {
-            await updateRfpMutation({
-              rfpId: rfp?.id as string,
-              // convert luxon's `DateTime` obj to UTC to store in db
-              startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
-              endDate: DateTime.fromISO(values.endDate).toUTC().toJSDate(),
-              fundingAddress: values.checkbookAddress,
-              fundingToken: {
-                chainId: checkbook.chainId,
-                address: fundingToken.address,
+            try {
+              await updateRfpMutation({
+                rfpId: rfp?.id as string,
+                // convert luxon's `DateTime` obj to UTC to store in db
+                startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
+                endDate: DateTime.fromISO(values.endDate).toUTC().toJSDate(),
+                fundingAddress: values.checkbookAddress,
+                fundingToken: {
+                  chainId: checkbook.chainId,
+                  address: fundingToken.address,
 
-                symbol: fundingToken.symbol,
-                decimals: fundingToken.decimals,
-              },
-              fundingBudgetAmount: values.budgetAmount,
-              contentBody: values.markdown,
-              contentTitle: values.title,
-              signature,
-              signatureMessage: message,
-            })
+                  symbol: fundingToken.symbol,
+                  decimals: fundingToken.decimals,
+                },
+                fundingBudgetAmount: values.budgetAmount,
+                contentBody: values.markdown,
+                contentTitle: values.title,
+                signature,
+                signatureMessage: message,
+              })
+            } catch (err) {
+              console.error(err)
+              trackError(RFP.EVENT_NAME.ERROR_EDITING_RFP, {
+                pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+                userAddress: activeUser?.address,
+                stationHandle: terminal?.handle as string,
+                stationId: terminal?.id,
+                startDate: values.startDate,
+                endDate: values.endDate,
+                checkbookAddress: values.checkbookAddress,
+                title: values.title,
+                rfpId: rfp?.id,
+                errorMsg: err.message,
+              })
+            }
           } else {
-            await createRfpMutation({
-              terminalId: terminal?.id,
-              // convert luxon's `DateTime` obj to UTC to store in db
-              startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
-              endDate: values.endDate
-                ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
-                : undefined,
-              authorAddress: activeUser?.address,
-              fundingAddress: values.checkbookAddress,
-              fundingToken: {
-                chainId: checkbook.chainId,
-                address: fundingToken.address,
-                symbol: fundingToken.symbol,
-                decimals: fundingToken.decimals,
-              },
-              fundingBudgetAmount: values.budgetAmount,
-              contentBody: values.markdown,
-              contentTitle: values.title,
-              signature,
-              signatureMessage: message,
-            })
+            try {
+              await createRfpMutation({
+                terminalId: terminal?.id,
+                // convert luxon's `DateTime` obj to UTC to store in db
+                startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
+                endDate: values.endDate
+                  ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
+                  : undefined,
+                authorAddress: activeUser?.address,
+                fundingAddress: values.checkbookAddress,
+                fundingToken: {
+                  chainId: checkbook.chainId,
+                  address: fundingToken.address,
+                  symbol: fundingToken.symbol,
+                  decimals: fundingToken.decimals,
+                },
+                fundingBudgetAmount: values.budgetAmount,
+                contentBody: values.markdown,
+                contentTitle: values.title,
+                signature,
+                signatureMessage: message,
+              })
+            } catch (err) {
+              console.error(err)
+              trackError(RFP.EVENT_NAME.ERROR_CREATING_RFP, {
+                pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+                userAddress: activeUser?.address,
+                stationHandle: terminal?.handle as string,
+                stationId: terminal?.id,
+                startDate: values.startDate,
+                endDate: values.endDate,
+                checkbookAddress: values.checkbookAddress,
+                title: values.title,
+                rfpId: rfp?.id,
+                errorMsg: err.message,
+              })
+            }
           }
         }}
         render={({ form, handleSubmit }) => {
@@ -537,6 +608,12 @@ const RfpMarkdownForm = ({
                       <button
                         type="button"
                         onClick={() => {
+                          trackClick(RFP.EVENT_NAME.RFP_EDITOR_PUBLISH_CLICKED, {
+                            pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+                            userAddress: activeUser?.address,
+                            stationHandle: terminal?.handle as string,
+                            stationId: terminal?.id,
+                          })
                           setAttemptedSubmit(true)
                           if (formState.invalid) {
                             const fieldsWithErrors = Object.keys(formState.errors as Object)

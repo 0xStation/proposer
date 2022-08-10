@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "blitz dev",
+    "track": "NEXT_PUBLIC_TRACK=true blitz dev",
     "build": "blitz build",
     "start": "blitz start",
     "studio": "blitz prisma studio",
@@ -27,6 +28,7 @@
     ]
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "1.1.1",
     "@emotion/react": "11.8.2",
     "@emotion/styled": "11.8.1",
     "@ethersproject/abi": "5.6.3",

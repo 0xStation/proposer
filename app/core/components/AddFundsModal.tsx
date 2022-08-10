@@ -1,5 +1,12 @@
 import { useState } from "react"
+import { trackClick } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Modal from "./Modal"
+import useStore from "../hooks/useStore"
+
+const {
+  FEATURE: { CHECKBOOK },
+} = TRACKING_EVENTS
 
 const TERMINAL_CREATION = "terminalCreation"
 const GENERAL = "general"
@@ -18,7 +25,11 @@ export const AddFundsModal = ({
   setIsOpen,
   checkbookAddress,
   terminalCreationFlow = false,
+  pageName,
+  stationHandle,
+  terminalId,
 }) => {
+  const activeUser = useStore((state) => state.activeUser)
   const [isModalAddressCopied, setIsModalAddressCopied] = useState<boolean>(false)
   const contentKey = terminalCreationFlow ? TERMINAL_CREATION : GENERAL
   return (
@@ -43,6 +54,13 @@ export const AddFundsModal = ({
           <button
             className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
             onClick={() => {
+              trackClick(CHECKBOOK.EVENT_NAME.CHECKBOOK_ADD_FUNDS_CLICKED, {
+                pageName,
+                userAddress: activeUser?.address,
+                checkbookAddress,
+                stationId: terminalId,
+                stationHandle,
+              })
               navigator.clipboard.writeText(checkbookAddress as string).then(() => {
                 setIsModalAddressCopied(true)
                 setTimeout(() => {

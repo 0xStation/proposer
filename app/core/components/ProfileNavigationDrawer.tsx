@@ -1,6 +1,8 @@
 import { Dialog, Transition } from "@headlessui/react"
-import { Fragment, useMemo } from "react"
-import { Image, useRouter, invoke, useSession, Link, Routes } from "blitz"
+import { trackClick } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "../utils/constants"
+import { Fragment } from "react"
+import { Image, useRouter, invoke, useSession, Routes } from "blitz"
 import Exit from "public/exit-button.svg"
 import truncateString from "../utils/truncateString"
 import { useDisconnect } from "wagmi"
@@ -10,6 +12,9 @@ import { DEFAULT_PFP_URLS } from "../utils/constants"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { canCreateStation } from "app/core/utils/permissions"
 
+const { FEATURE, PAGE_NAME } = TRACKING_EVENTS
+const { NEW_STATION, WALLET_CONNECTION } = FEATURE
+
 export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
   const router = useRouter()
   const session = useSession({ suspense: false })
@@ -18,6 +23,9 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
   const setActiveUser = useStore((state) => state.setActiveUser)
 
   const handleDisconnect = async () => {
+    trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_DISCONNECT_CLICKED, {
+      pageName: window.location.href,
+    })
     setIsOpen(false)
     setActiveUser(null)
     await invoke(logout, {})
@@ -36,7 +44,13 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
         Profile
       </button>
     ) : session?.siwe?.address ? (
-      <button className="block hover:opacity-70" onClick={() => router.push(`/profile/complete`)}>
+      <button
+        className="block hover:opacity-70"
+        onClick={() => {
+          router.push(`/profile/complete`)
+          setIsOpen(false)
+        }}
+      >
         Create profile
       </button>
     ) : null
@@ -44,9 +58,18 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
   const openATerminalLink = session?.siwe?.address &&
     activeUser &&
     canCreateStation(activeUser?.address) && (
-      <Link href={Routes.CreateTerminalDetailsPage()}>
-        <span className="block hover:opacity-70 cursor-pointer">New station</span>
-      </Link>
+      <button
+        className="block hover:opacity-70"
+        onClick={() => {
+          trackClick(NEW_STATION.EVENT_NAME.SHOW_CREATE_STATION_PAGE_CLICKED, {
+            pageName: PAGE_NAME.PROFILE_NAV,
+          })
+          router.push(Routes.CreateTerminalDetailsPage())
+          setIsOpen(false)
+        }}
+      >
+        New station
+      </button>
     )
 
   const profilePfp =
