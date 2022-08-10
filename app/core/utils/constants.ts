@@ -105,10 +105,10 @@ export const TRACKING_EVENTS = {
     EXPLORE: "explore",
     STATION_CREATION_PAGE: "station_creation_page",
     COMPLETE_PROFILE_PAGE: "complete_profile_checkbook_page",
-    CHECKBOOK_CREATE_SETTINGS_PAGE: "checkbook_create_settings_page",
     COMPLETE_PROFILE_CHECKBOOK_PAGE: "complete_profile_checkbook_page",
+    CHECKBOOK_CREATE_SETTINGS_PAGE: "checkbook_create_settings_page",
     CHECKBOOK_SETTINGS_PAGE: "checkbook_settings_page",
-    BULLETIN_PAGE: "bulletin_page",
+    RFP_LIST_PAGE: "rfp_list_page",
     RFP_INFO_PAGE: "rfp_info_page",
     RFP_PROPOSALS_PAGE: "rfp_proposals_page",
     RFP_EDITOR_PAGE: "rfp_editor_page",
@@ -131,7 +131,7 @@ export const TRACKING_EVENTS = {
     },
     RFP: {
       EVENT_NAME: {
-        BULLETIN_PAGE_SHOWN: "bulletin_page_shown",
+        RFP_LIST_PAGE_SHOWN: "rfp_list_page_shown",
         RFP_SHOW_EDITOR_CLICKED: "rfp_show_editor_clicked",
         RFP_EDITOR_PAGE_SHOWN: "rfp_editor_page_shown",
         RFP_EDITOR_PUBLISH_CLICKED: "rfp_editor_publish_clicked",
@@ -174,9 +174,9 @@ export const TRACKING_EVENTS = {
     },
     WALLET_CONNECTION: {
       EVENT_NAME: {
-        WALLET_CONNECT_BANNER_CLICKED: "wallet_connect_banner_clicked",
-        WALLET_CONNECT_BUTTON_CLICKED: "wallet_connect_button_clicked",
-        WALLET_CONNECT_ERROR: "wallet_connect_error",
+        WALLET_CONNECTION_BANNER_CLICKED: "wallet_connection_banner_clicked",
+        WALLET_CONNECTION_BUTTON_CLICKED: "wallet_connection_button_clicked",
+        WALLET_CONNECTION_ERROR: "wallet_connection_error",
         SIGN_IN_WITH_ETHEREUM_BUTTON_CLICKED: "sign_in_with_ethereum_button_clicked",
         SIGN_IN_WITH_ETHEREUM_ERROR: "sign_in_with_ethereum_error",
         WALLET_DISCONNECT_CLICKED: "wallet_disconnect_clicked",

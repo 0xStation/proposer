@@ -58,7 +58,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         setShowSignView(true)
       } catch (err) {
         console.error(err)
-        let errorMsg
+        let errorMsg = "Declined connection."
         if (err.code === 4001) {
           setErrorMessage(errorMsg)
         } else {
@@ -66,9 +66,9 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           setErrorMessage(errorMsg)
         }
 
-        trackError(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECT_ERROR, {
+        trackError(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_ERROR, {
           pageName: window.location.href,
-          stationName: terminalHandle as string,
+          stationHandle: terminalHandle as string,
           errorMsg,
         })
         setConnectState({ error: true, success: false, loading: false })
@@ -86,8 +86,8 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
 
     trackClick(WALLET_CONNECTION.EVENT_NAME.SIGN_IN_WITH_ETHEREUM_BUTTON_CLICKED, {
       pageName: window.location.href,
-      stationName: terminalHandle as string,
-      userAddress: accountData?.address,
+      stationHandle: terminalHandle as string,
+      userAddress: address,
       chainId,
     })
     setConnectState({ error: false, success: false, loading: true })
@@ -138,7 +138,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
 
       trackError(WALLET_CONNECTION.EVENT_NAME.SIGN_IN_WITH_ETHEREUM_ERROR, {
         pageName: window.location.href,
-        stationName: terminalHandle as string,
+        stationHandle: terminalHandle as string,
         errorMsg,
       })
 
@@ -216,9 +216,9 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                 className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2 sm:mt-0 mt-2 h-[35px]"
                 disabled={connectState.loading}
                 onClick={async () => {
-                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECT_BUTTON_CLICKED, {
+                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BUTTON_CLICKED, {
                     pageName: window.location.href,
-                    stationName: terminalHandle as string,
+                    stationHandle: terminalHandle as string,
                     userAddress: accountData?.address,
                     wallet: "metamask",
                   })
@@ -244,9 +244,9 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                 className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor:pointer w-40 sm:mr-2 sm:mt-0 mt-2 h-[35px]"
                 disabled={connectState.loading}
                 onClick={async () => {
-                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECT_BUTTON_CLICKED, {
+                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BUTTON_CLICKED, {
                     pageName: window.location.href,
-                    stationName: terminalHandle as string,
+                    stationHandle: terminalHandle as string,
                     userAddress: accountData?.address,
                     wallet: "wallet_connect",
                   })
@@ -277,9 +277,9 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                 className="border border-marble-white rounded-md content-center hover:bg-wet-concrete cursor-pointer w-40 sm:mr-2 sm:mt-0 mt-2 h-[35px]"
                 disabled={connectState.loading}
                 onClick={async () => {
-                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECT_BUTTON_CLICKED, {
+                  trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BUTTON_CLICKED, {
                     pageName: window.location.href,
-                    stationName: terminalHandle as string,
+                    stationHandle: terminalHandle as string,
                     userAddress: accountData?.address,
                     wallet: "coinbase",
                   })

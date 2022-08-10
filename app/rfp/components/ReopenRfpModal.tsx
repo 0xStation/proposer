@@ -45,7 +45,7 @@ export const ReopenRfpModal = ({
     try {
       trackClick(RFP.EVENT_NAME.REOPEN_RFP_CLICKED, {
         pageName,
-        stationName: terminalHandle as string,
+        stationHandle: terminalHandle as string,
         stationId: terminalId,
         rfpId: rfp?.id,
         endDate: newEndDate,
@@ -59,7 +59,7 @@ export const ReopenRfpModal = ({
     } catch (err) {
       trackError(RFP.EVENT_NAME.ERROR_REOPENING_RFP, {
         pageName,
-        stationName: terminalHandle as string,
+        stationHandle: terminalHandle as string,
         stationId: terminalId,
         rfpId: rfp?.id,
         errorMsg: err.message,

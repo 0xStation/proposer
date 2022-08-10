@@ -42,7 +42,7 @@ export const DeleteRfpModal = ({
       trackError(RFP.EVENT_NAME.ERROR_DELETING_RFP, {
         pageName,
         userAddress: activeUser?.address,
-        stationName: terminalHandle as string,
+        stationHandle: terminalHandle as string,
         stationId: terminalId,
         rfpId: rfp?.id,
         errorMsg: error.message,
@@ -77,7 +77,7 @@ export const DeleteRfpModal = ({
               trackClick(RFP.EVENT_NAME.DELETE_RFP_CLICKED, {
                 pageName,
                 userAddress: activeUser?.address,
-                stationName: terminalHandle as string,
+                stationHandle: terminalHandle as string,
                 stationId: terminalId,
                 rfpId: rfp?.id,
               })

@@ -108,7 +108,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
     if (finishedFetchingCheckbooks && finishedFetchingTerminal && activeUser?.address) {
       trackImpression(CHECKBOOK.EVENT_NAME.CHECKBOOK_SETTINGS_PAGE_SHOWN, {
         pageName: PAGE_NAME.CHECKBOOK_SETTINGS_PAGE,
-        stationName: terminalHandle as string,
+        stationHandle: terminalHandle as string,
         stationId: terminal?.id,
         userAddress: activeUser?.address,
         numCheckbooks: books?.length,
@@ -148,7 +148,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
           checkbookAddress={selectedCheckbook?.address}
           pageName={PAGE_NAME.CHECKBOOK_SETTINGS_PAGE}
           terminalId={terminal?.id as number}
-          stationName={terminalHandle}
+          stationHandle={terminalHandle}
         />
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-concrete flex justify-between">
@@ -169,7 +169,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
               onClick={() => {
                 trackClick(CHECKBOOK.EVENT_NAME.CHECKBOOK_SHOW_CREATE_PAGE_CLICKED, {
                   pageName: PAGE_NAME.CHECKBOOK_SETTINGS_PAGE,
-                  stationName: terminalHandle as string,
+                  stationHandle: terminalHandle as string,
                   stationId: terminal?.id,
                   userAddress: activeUser?.address,
                   numCheckbooks: books?.length,

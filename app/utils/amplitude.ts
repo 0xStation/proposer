@@ -6,7 +6,7 @@ const { CLICK, IMPRESSION, EVENT, ERROR } = EVENT_TYPE
 
 type ClickProperties = {
   pageName: string
-  stationName: string
+  stationHandle: string
   stationId: number
   wallet: string
   userAddress: string
@@ -30,7 +30,7 @@ type ClickProperties = {
 
 type ImpressionProperties = {
   pageName: string
-  stationName: string
+  stationHandle: string
   stationId: number
   userAddress: string
   numCheckbooks: number
@@ -41,7 +41,7 @@ type ImpressionProperties = {
 
 type EventProperties = {
   pageName: string
-  stationName: string
+  stationHandle: string
   stationId: number
   userAddress: string
   quorum: number
@@ -49,11 +49,12 @@ type EventProperties = {
   checkbookName: string
   checkbookAddress: string
   rfpId: string
+  transactionHash: string
 }
 
 type ErrorProperties = {
   pageName: string
-  stationName: string
+  stationHandle: string
   stationId: number
   userAddress: string
   description: string
@@ -70,6 +71,8 @@ type ErrorProperties = {
   checkbookAddress: string
 }
 
+const inactiveTracking = (isDev() || isStaging()) && process.env.NEXT_PUBLIC_TRACK !== "true"
+
 export const trackerInit = () => {
   if (process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY) {
     init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY as string)
@@ -77,7 +80,7 @@ export const trackerInit = () => {
 }
 
 export const initializeUser = (address: string) => {
-  if ((isDev() || isStaging()) && process.env.NEXT_PUBLIC_TRACK !== "true") {
+  if (inactiveTracking) {
     return
   }
   const identifyObj = new Identify()
@@ -86,13 +89,13 @@ export const initializeUser = (address: string) => {
 }
 
 export const trackClick = (eventName: string, metadata: Partial<ClickProperties>) => {
-  if ((isDev() || isStaging()) && process.env.NEXT_PUBLIC_TRACK !== "true") {
+  if (inactiveTracking) {
     return
   }
 
   const {
     pageName,
-    stationName,
+    stationHandle,
     stationId,
     wallet,
     userAddress,
@@ -116,7 +119,7 @@ export const trackClick = (eventName: string, metadata: Partial<ClickProperties>
   track(eventName, {
     event_category: CLICK,
     page: pageName,
-    station_name: stationName,
+    station_handle: stationHandle,
     station_id: stationId,
     user_address: userAddress,
     wallet,
@@ -140,13 +143,13 @@ export const trackClick = (eventName: string, metadata: Partial<ClickProperties>
 }
 
 export const trackImpression = (eventName: string, metadata: Partial<ImpressionProperties>) => {
-  if ((isDev() || isStaging()) && !process.env.NEXT_PUBLIC_TRACK) {
+  if (inactiveTracking) {
     return
   }
 
   const {
     pageName,
-    stationName,
+    stationHandle,
     stationId,
     userAddress,
     numCheckbooks,
@@ -158,7 +161,7 @@ export const trackImpression = (eventName: string, metadata: Partial<ImpressionP
   track(eventName, {
     event_category: IMPRESSION,
     page: pageName,
-    station_name: stationName,
+    station_handle: stationHandle,
     station_id: stationId,
     user_address: userAddress,
     num_checkbooks: numCheckbooks,
@@ -168,18 +171,14 @@ export const trackImpression = (eventName: string, metadata: Partial<ImpressionP
   })
 }
 
-export const trackEvent = (
-  eventName: string,
-  eventCategory = EVENT,
-  metadata: Partial<EventProperties>
-) => {
-  if ((isDev() || isStaging()) && !process.env.NEXT_PUBLIC_TRACK) {
+export const trackEvent = (eventName: string, metadata: Partial<EventProperties>) => {
+  if (inactiveTracking) {
     return
   }
 
   const {
     pageName,
-    stationName,
+    stationHandle,
     stationId,
     userAddress,
     quorum,
@@ -187,12 +186,13 @@ export const trackEvent = (
     checkbookName,
     checkbookAddress,
     rfpId,
+    transactionHash,
   } = metadata
 
   track(eventName, {
-    event_category: eventCategory,
+    event_category: EVENT,
     page: pageName,
-    station_name: stationName,
+    station_handle: stationHandle,
     station_id: stationId,
     user_address: userAddress,
     quorum,
@@ -200,17 +200,18 @@ export const trackEvent = (
     checkbook_name: checkbookName,
     checkbook_address: checkbookAddress,
     rfp_id: rfpId,
+    transaction_hash: transactionHash,
   })
 }
 
 export const trackError = (eventName: string, metadata: Partial<ErrorProperties>) => {
-  if ((isDev() || isStaging()) && !process.env.NEXT_PUBLIC_TRACK) {
+  if (inactiveTracking) {
     return
   }
 
   const {
     pageName,
-    stationName,
+    stationHandle,
     stationId,
     userAddress,
     description,
@@ -230,7 +231,7 @@ export const trackError = (eventName: string, metadata: Partial<ErrorProperties>
   track(eventName, {
     event_category: ERROR,
     page: pageName,
-    station_name: stationName,
+    station_handle: stationHandle,
     station_id: stationId,
     user_address: userAddress,
     description: description,

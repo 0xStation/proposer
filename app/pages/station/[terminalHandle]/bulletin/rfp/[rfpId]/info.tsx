@@ -99,7 +99,7 @@ const RFPInfoTab: BlitzPage = () => {
       trackImpression(RFP.EVENT_NAME.RFP_INFO_PAGE_SHOWN, {
         pageName: PAGE_NAME.RFP_INFO_PAGE,
         userAddress: activeUser?.address,
-        stationName: terminal?.handle,
+        stationHandle: terminal?.handle,
         stationId: terminal?.id,
         rfpId: rfpId,
       })
@@ -120,7 +120,7 @@ const RFPInfoTab: BlitzPage = () => {
         checkbookAddress={rfp?.checkbook?.address}
         pageName={PAGE_NAME.RFP_INFO_PAGE}
         terminalId={terminal?.id as number}
-        stationName={terminalHandle}
+        stationHandle={terminalHandle}
       />
       <TerminalNavigation>
         <SuccessRfpModal
@@ -174,18 +174,18 @@ const RFPInfoTab: BlitzPage = () => {
                   <p className="text-2xl">
                     {formatCurrencyAmount(
                       Math.max(
-                        parseFloat(rfp?.data.funding.budgetAmount || "0") -
+                        parseFloat(rfp?.data?.funding?.budgetAmount || "0") -
                           (rfpApprovedProposalFunding || 0),
                         0
                       ).toString()
                     ) +
                       " " +
-                      rfp?.data.funding.token.symbol}
+                      rfp?.data?.funding?.token?.symbol}
                   </p>
                 </div>
                 <p className="text-concrete text-xs mt-1">{`Total RFP budget: ${formatCurrencyAmount(
-                  rfp?.data.funding.budgetAmount
-                )} ${rfp?.data.funding.token.symbol}`}</p>
+                  rfp?.data?.funding?.budgetAmount
+                )} ${rfp?.data?.funding?.token?.symbol}`}</p>
               </div>
               <div className="mt-9">
                 <p className="text-xs text-concrete uppercase font-bold">Signers</p>

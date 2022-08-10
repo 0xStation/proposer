@@ -128,9 +128,9 @@ const Navigation = ({ children }: { children?: any }) => {
             </div>
             <button
               onClick={() => {
-                trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECT_BANNER_CLICKED, {
+                trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BANNER_CLICKED, {
                   pageName: window.location.href,
-                  stationName: terminalHandle as string,
+                  stationHandle: terminalHandle as string,
                 })
                 toggleWalletModal(true)
               }}

@@ -75,7 +75,7 @@ const NewCheckbookTerminalCreationPage: BlitzPage = ({
           trackClick(CHECKBOOK.EVENT_NAME.COMPLETE_PROFILE_CHECKBOOK_EXIT_CLICKED, {
             pageName: PAGE_NAME.COMPLETE_PROFILE_CHECKBOOK_PAGE,
             stationId: terminal?.id,
-            stationName: terminalHandle as string,
+            stationHandle: terminalHandle as string,
           })
           router.push(Routes.BulletinPage({ terminalHandle, terminalCreated: true }))
         }}

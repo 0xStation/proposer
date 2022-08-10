@@ -56,7 +56,7 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
       trackImpression(CHECKBOOK.EVENT_NAME.CREATE_CHECKBOOK_PAGE_SHOWN, {
         pageName,
         stationId: terminal?.id,
-        stationName: terminalHandle,
+        stationHandle: terminalHandle,
         userAddress: activeUser?.address,
       })
     }
@@ -84,17 +84,6 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
       // this string is lowercased though, so we checksum it to give it proper casing before storing in database
       const checkbookAddress = toChecksumAddress("0x" + topicCheckbookAddress?.substring(26))
 
-      trackEvent(CHECKBOOK.EVENT_NAME.CHECKBOOK_CONTRACT_CREATED, "event", {
-        pageName,
-        stationId: terminal?.id,
-        stationName: terminalHandle as string,
-        userAddress: activeUser?.address,
-        quorum,
-        signers,
-        checkbookName: name,
-        checkbookAddress,
-      })
-
       try {
         await createCheckbookMutation({
           terminalId: terminal?.id as number,
@@ -105,10 +94,10 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
           signers: signers as string[],
         })
 
-        trackEvent(CHECKBOOK.EVENT_NAME.CHECKBOOK_MODEL_CREATED, "event", {
+        trackEvent(CHECKBOOK.EVENT_NAME.CHECKBOOK_MODEL_CREATED, {
           pageName,
           stationId: terminal?.id,
-          stationName: terminalHandle as string,
+          stationHandle: terminalHandle as string,
           userAddress: activeUser?.address,
           quorum,
           signers,
@@ -122,6 +111,16 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
       } catch (e) {
         setWaitingCreation(false)
         console.error(e)
+        trackError(CHECKBOOK.EVENT_NAME.CHECKBOOK_CREATE_ERROR, {
+          pageName,
+          stationId: terminal?.id,
+          stationHandle: terminalHandle as string,
+          userAddress: activeUser?.address,
+          quorum,
+          signers,
+          checkbookName: name,
+          errorMsg: e.name,
+        })
         setToastState({
           isToastShowing: true,
           type: "error",
@@ -148,7 +147,7 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
               trackClick(CHECKBOOK.EVENT_NAME.CHECKBOOK_CREATE_BUTTON_CLICKED, {
                 pageName,
                 stationId: terminal?.id,
-                stationName: terminalHandle as string,
+                stationHandle: terminalHandle as string,
                 userAddress: activeUser?.address,
                 quorum,
                 signers,
@@ -163,6 +162,18 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
               const transaction = await createCheckbookOnChain?.({
                 recklesslySetUnpreparedArgs: [quorum, signers],
               })
+
+              trackEvent(CHECKBOOK.EVENT_NAME.CHECKBOOK_CONTRACT_CREATED, {
+                pageName,
+                stationId: terminal?.id,
+                stationHandle: terminalHandle as string,
+                userAddress: activeUser?.address,
+                quorum,
+                signers,
+                checkbookName: name,
+                transactionHash: transaction.hash,
+              })
+
               setIsDeployingCheckbook(true)
               // triggers hook for useWaitForTransaction which parses checkbook address makes prisma mutation
               setTxnHash(transaction.hash)
@@ -187,7 +198,7 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
               trackError(CHECKBOOK.EVENT_NAME.CHECKBOOK_CREATE_ERROR, {
                 pageName,
                 stationId: terminal?.id,
-                stationName: terminalHandle as string,
+                stationHandle: terminalHandle as string,
                 userAddress: activeUser?.address,
                 quorum,
                 signers,
@@ -199,7 +210,7 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
             trackError(CHECKBOOK.EVENT_NAME.CHECKBOOK_CREATE_ERROR, {
               pageName,
               stationId: terminal?.id,
-              stationName: terminalHandle as string,
+              stationHandle: terminalHandle as string,
               userAddress: activeUser?.address,
               quorum,
               signers,

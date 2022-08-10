@@ -70,7 +70,7 @@ const CreateProposalPage: BlitzPage = ({
     trackImpression(PROPOSAL.EVENT_NAME.PROPSOAL_EDITOR_PAGE_SHOWN, {
       pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
       userAddress: activeUser?.address,
-      stationName: data.terminal?.handle,
+      stationHandle: data.terminal?.handle,
       stationId: data.terminal?.id,
     })
   }, [])
@@ -184,7 +184,7 @@ const CreateProposalPage: BlitzPage = ({
           trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_EDITOR_MODAL_PUBLISH_CLICKED, {
             pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
             userAddress: activeUser?.address,
-            stationName: data.terminal?.handle,
+            stationHandle: data.terminal?.handle,
             stationId: data.terminal?.id,
             recipientAddress: values?.recipientAddress,
             amount: values?.amount,
@@ -232,7 +232,7 @@ const CreateProposalPage: BlitzPage = ({
               trackError(PROPOSAL.EVENT_NAME.ERROR_CREATING_PROPOSAL, {
                 pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
                 userAddress: activeUser?.address,
-                stationName: data.terminal?.handle,
+                stationHandle: data.terminal?.handle,
                 stationId: data.terminal?.id,
                 recipientAddress: values?.recipientAddress,
                 amount: values?.amount,
@@ -436,7 +436,7 @@ const CreateProposalPage: BlitzPage = ({
                       onClick={() => {
                         trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_EDITOR_PUBLISH_CLICKED, {
                           userAddress: activeUser?.address,
-                          stationName: data.terminal?.handle,
+                          stationHandle: data.terminal?.handle,
                           stationId: data.terminal?.id,
                         })
                         setAttemptedSubmit(true)

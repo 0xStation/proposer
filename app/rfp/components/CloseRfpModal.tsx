@@ -33,7 +33,7 @@ export const CloseRfpModal = ({ isOpen, setIsOpen, rfp, pageName, terminalId, te
     try {
       trackClick(RFP.EVENT_NAME.CLOSE_RFP_CLICKED, {
         pageName,
-        stationName: terminalHandle as string,
+        stationHandle: terminalHandle as string,
         stationId: terminalId,
         rfpId: rfp?.id,
       })
@@ -42,7 +42,7 @@ export const CloseRfpModal = ({ isOpen, setIsOpen, rfp, pageName, terminalId, te
       console.error(err)
       trackError(RFP.EVENT_NAME.ERROR_CLOSING_RFP, {
         pageName,
-        stationName: terminalHandle as string,
+        stationHandle: terminalHandle as string,
         stationId: terminalId,
         rfpId: rfp?.id,
         errorMsg: err.message,

@@ -99,7 +99,7 @@ const ProposalsTab: BlitzPage = ({
       trackClick(RFP.EVENT_NAME.RFP_PROPOSALS_PAGE_SHOWN, {
         pageName: PAGE_NAME.RFP_PROPOSALS_PAGE,
         userAddress: activeUser?.address,
-        stationName: terminal?.handle,
+        stationHandle: terminal?.handle,
         stationId: terminal?.id,
         rfpId,
         numProposals: proposalCount,

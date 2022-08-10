@@ -174,7 +174,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
                       trackError(NEW_STATION.EVENT_NAME.ERROR_CREATING_STATION, {
                         userAddress: activeUser?.address,
                         pageName: PAGE_NAME.STATION_CREATION_PAGE,
-                        stationName: values.handle,
+                        stationHandle: values.handle,
                       })
                       setToastState({
                         isToastShowing: true,

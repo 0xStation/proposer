@@ -75,7 +75,7 @@ const RfpMarkdownForm = ({
     trackClick(RFP.EVENT_NAME.RFP_EDITOR_PAGE_SHOWN, {
       pageName: PAGE_NAME.RFP_EDITOR_PAGE,
       userAddress: activeUser?.address,
-      stationName: terminal?.handle as string,
+      stationHandle: terminal?.handle as string,
       stationId: terminal?.id,
     })
   }, [])
@@ -94,10 +94,10 @@ const RfpMarkdownForm = ({
 
   const [createRfpMutation] = useMutation(createRfp, {
     onSuccess: (_data) => {
-      trackEvent(RFP.EVENT_NAME.RFP_CREATED, "event", {
+      trackEvent(RFP.EVENT_NAME.RFP_CREATED, {
         pageName: PAGE_NAME.RFP_EDITOR_PAGE,
         userAddress: activeUser?.address,
-        stationName: terminal?.handle as string,
+        stationHandle: terminal?.handle as string,
         stationId: terminal?.id,
       })
       invalidateQuery(getRfpsByTerminalId)
@@ -113,10 +113,10 @@ const RfpMarkdownForm = ({
 
   const [updateRfpMutation] = useMutation(updateRfp, {
     onSuccess: (_data) => {
-      trackEvent(RFP.EVENT_NAME.RFP_EDITED, "event", {
+      trackEvent(RFP.EVENT_NAME.RFP_EDITED, {
         pageName: PAGE_NAME.RFP_EDITOR_PAGE,
         userAddress: activeUser?.address,
-        stationName: terminal?.handle as string,
+        stationHandle: terminal?.handle as string,
         stationId: terminal?.id,
         rfpId: rfp?.id,
       })
@@ -218,7 +218,7 @@ const RfpMarkdownForm = ({
           trackClick(RFP.EVENT_NAME.RFP_EDITOR_MODAL_PUBLISH_CLICKED, {
             pageName: PAGE_NAME.RFP_EDITOR_PAGE,
             userAddress: activeUser?.address,
-            stationName: terminal?.handle as string,
+            stationHandle: terminal?.handle as string,
             stationId: terminal?.id,
             startDate: values.startDate,
             endDate: values.endDate,
@@ -311,7 +311,7 @@ const RfpMarkdownForm = ({
               trackError(RFP.EVENT_NAME.ERROR_EDITING_RFP, {
                 pageName: PAGE_NAME.RFP_EDITOR_PAGE,
                 userAddress: activeUser?.address,
-                stationName: terminal?.handle as string,
+                stationHandle: terminal?.handle as string,
                 stationId: terminal?.id,
                 startDate: values.startDate,
                 endDate: values.endDate,
@@ -349,7 +349,7 @@ const RfpMarkdownForm = ({
               trackError(RFP.EVENT_NAME.ERROR_CREATING_RFP, {
                 pageName: PAGE_NAME.RFP_EDITOR_PAGE,
                 userAddress: activeUser?.address,
-                stationName: terminal?.handle as string,
+                stationHandle: terminal?.handle as string,
                 stationId: terminal?.id,
                 startDate: values.startDate,
                 endDate: values.endDate,
@@ -611,7 +611,7 @@ const RfpMarkdownForm = ({
                           trackClick(RFP.EVENT_NAME.RFP_EDITOR_PUBLISH_CLICKED, {
                             pageName: PAGE_NAME.RFP_EDITOR_PAGE,
                             userAddress: activeUser?.address,
-                            stationName: terminal?.handle as string,
+                            stationHandle: terminal?.handle as string,
                             stationId: terminal?.id,
                           })
                           setAttemptedSubmit(true)

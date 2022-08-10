@@ -97,9 +97,9 @@ const BulletinPage: BlitzPage = () => {
 
   useEffect(() => {
     if (finishedFetchingTerminal && finishedFetchingRfpCount) {
-      trackImpression(RFP.EVENT_NAME.BULLETIN_PAGE_SHOWN, {
-        pageName: PAGE_NAME.BULLETIN_PAGE,
-        stationName: terminalHandle as string,
+      trackImpression(RFP.EVENT_NAME.RFP_LIST_PAGE_SHOWN, {
+        pageName: PAGE_NAME.RFP_LIST_PAGE,
+        stationHandle: terminalHandle as string,
         stationId: terminal?.id,
         numRfps: rfpCount,
         userAddress: activeUser?.address,
@@ -147,9 +147,9 @@ const BulletinPage: BlitzPage = () => {
         isOpen={isAddFundsModalOpen}
         checkbookAddress={query.terminalAndCheckbookCreated as string}
         terminalCreationFlow={true}
-        pageName={PAGE_NAME.BULLETIN_PAGE}
+        pageName={PAGE_NAME.RFP_LIST_PAGE}
         terminalId={terminal?.id as number}
-        stationName={terminalHandle}
+        stationHandle={terminalHandle}
       />
       <SuccessRfpModal
         terminal={terminal}
@@ -168,8 +168,8 @@ const BulletinPage: BlitzPage = () => {
                 className="h-[35px] bg-electric-violet px-9 rounded text-tunnel-black hover:bg-opacity-70"
                 onClick={() => {
                   trackClick(RFP.EVENT_NAME.RFP_SHOW_EDITOR_CLICKED, {
-                    pageName: PAGE_NAME.BULLETIN_PAGE,
-                    stationName: terminalHandle as string,
+                    pageName: PAGE_NAME.RFP_LIST_PAGE,
+                    stationHandle: terminalHandle as string,
                     stationId: terminal?.id,
                     numRfps: rfpCount,
                     userAddress: activeUser?.address,
@@ -247,8 +247,8 @@ const BulletinPage: BlitzPage = () => {
                   className="bg-electric-violet rounded text-tunnel-black px-6 h-[35px] w-[133px] mt-6 hover:opacity-70"
                   onClick={() => {
                     trackClick(RFP.EVENT_NAME.RFP_SHOW_EDITOR_CLICKED, {
-                      pageName: PAGE_NAME.BULLETIN_PAGE,
-                      stationName: terminalHandle as string,
+                      pageName: PAGE_NAME.RFP_LIST_PAGE,
+                      stationHandle: terminalHandle as string,
                       stationId: terminal?.id,
                       numRfps: rfpCount,
                       userAddress: activeUser?.address,

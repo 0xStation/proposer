@@ -132,7 +132,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                           onClick={() => {
                             trackClick(RFP.EVENT_NAME.RFP_SHOW_EDITOR_CLICKED, {
                               userAddress: activeUser?.address,
-                              stationName: terminalHandle,
+                              stationHandle: terminalHandle,
                               stationId: terminal?.id,
                               isEdit: true,
                             })
@@ -197,7 +197,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                               if (rfp?.status !== RfpStatus.CLOSED) {
                                 trackClick(RFP.EVENT_NAME.RFP_SETTINGS_CLOSE_RFP_CLICKED, {
                                   pageName: PAGE_NAME.RFP_INFO_PAGE,
-                                  stationName: terminalHandle,
+                                  stationHandle: terminalHandle,
                                   stationId: terminal?.id,
                                   rfpId: rfp?.id,
                                 })
@@ -205,7 +205,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                               } else {
                                 trackClick(RFP.EVENT_NAME.RFP_SETTINGS_REOPEN_RFP_CLICKED, {
                                   pageName: PAGE_NAME.RFP_INFO_PAGE,
-                                  stationName: terminalHandle,
+                                  stationHandle: terminalHandle,
                                   stationId: terminal?.id,
                                   rfpId: rfp?.id,
                                 })
@@ -223,7 +223,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                             onClick: () => {
                               trackClick(RFP.EVENT_NAME.RFP_SETTINGS_DELETE_RFP_CLICKED, {
                                 pageName: PAGE_NAME.RFP_INFO_PAGE,
-                                stationName: terminalHandle,
+                                stationHandle: terminalHandle,
                                 stationId: terminal?.id,
                                 rfpId: rfp?.id,
                               })
@@ -277,7 +277,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
               onClick={() => {
                 trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_SHOW_EDITOR_CLICKED, {
                   pageName: PAGE_NAME.RFP_INFO_PAGE,
-                  stationName: terminalHandle,
+                  stationHandle: terminalHandle,
                   stationId: terminal?.id,
                   rfpId: rfp?.id,
                 })
