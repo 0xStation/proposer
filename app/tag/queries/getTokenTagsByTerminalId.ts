@@ -1,13 +1,13 @@
 import db from "db"
 import * as z from "zod"
-import { Tag } from "../types"
+import { Tag, TagType } from "../types"
 
-const GetTokenTagByTerminalId = z.object({
+const GetTokenTagsByTerminalId = z.object({
   terminalId: z.number(),
 })
 
-export const getTokenTagByTerminalId = async (input: z.infer<typeof GetTokenTagByTerminalId>) => {
-  const data = GetTokenTagByTerminalId.parse(input)
+export const getTokenTagsByTerminalId = async (input: z.infer<typeof GetTokenTagsByTerminalId>) => {
+  const data = GetTokenTagsByTerminalId.parse(input)
   const { terminalId } = data
 
   try {
@@ -15,25 +15,25 @@ export const getTokenTagByTerminalId = async (input: z.infer<typeof GetTokenTagB
       where: {
         terminalId: terminalId,
         type: {
-          equals: "token",
+          equals: TagType.TOKEN,
         },
         NOT: {
           type: {
-            contains: "inactive",
+            contains: TagType.INACTIVE,
           },
         },
       },
     })
 
     if (!tags) {
-      return null
+      return []
     }
 
     return tags as Tag[]
   } catch (err) {
     console.error("Error fetching token tags. Failed with error: ", err)
-    return null
+    return []
   }
 }
 
-export default getTokenTagByTerminalId
+export default getTokenTagsByTerminalId

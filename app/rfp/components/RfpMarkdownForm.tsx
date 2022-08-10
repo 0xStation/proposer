@@ -32,15 +32,17 @@ import {
 import { genRfpSignatureMessage } from "app/signatures/rfp"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
-import getTokenTagByTerminalId from "app/tag/queries/getTokenTagByTerminalId"
+import getTokenTagsByTerminalId from "app/tag/queries/getTokenTagsByTerminalId"
 import { TokenType } from "app/tag/types"
 import { trackClick, trackEvent, trackError } from "app/utils/amplitude"
-import { TRACKING_EVENTS } from "app/core/utils/constants"
+import { TRACKING_EVENTS, TOKEN_SYMBOLS } from "app/core/utils/constants"
 
 const {
   PAGE_NAME,
   FEATURE: { RFP },
 } = TRACKING_EVENTS
+
+const { ETH, USDC } = TOKEN_SYMBOLS
 
 const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
   const isoDate = DateTime.fromISO(dateTime.toString())
@@ -83,7 +85,7 @@ const RfpMarkdownForm = ({
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
-  const defaultTokenOptions = ["ETH", "USDC"]
+  const defaultTokenOptionSymbols = [ETH, USDC]
 
   const {
     data: balanceData,
@@ -96,7 +98,7 @@ const RfpMarkdownForm = ({
   })
 
   const [tags, { refetch: refetchTags, isSuccess: finishedFetchingTags }] = useQuery(
-    getTokenTagByTerminalId,
+    getTokenTagsByTerminalId,
     { terminalId: terminal?.id as number },
     {
       suspense: false,
@@ -118,8 +120,8 @@ const RfpMarkdownForm = ({
           (tag) =>
             tag?.data?.type === TokenType.ERC20 &&
             tag?.data?.chainId === selectedNetworkId &&
-            tag?.data?.symbol !== "USDC" &&
-            tag?.data?.symbol !== "ETH"
+            tag?.data?.symbol !== USDC &&
+            tag?.data?.symbol !== ETH
         )
         ?.map((tag) => tag?.data)
 
@@ -320,7 +322,7 @@ const RfpMarkdownForm = ({
             return
           }
 
-          if (selectedToken.symbol !== "ETH" || selectedToken.symbol !== "USDC") {
+          if (selectedToken.symbol !== ETH || selectedToken.symbol !== USDC) {
             if (tokenFetchSuccess) {
               selectedToken.decimals = balanceData?.decimals
             } else {
@@ -580,9 +582,12 @@ const RfpMarkdownForm = ({
                                     value={selectedNetworkId as number}
                                     onChange={(e) => {
                                       const network = SUPPORTED_CHAINS.find(
-                                        (chain) => chain.id === parseFloat(e.target.value)
+                                        (chain) => chain.id === parseInt(e.target.value)
                                       )
                                       setSelectedNetworkId(network?.id as number)
+                                      // custom values can be compatible with react-final-form by calling
+                                      // the props.input.onChange callback
+                                      // https://final-form.org/docs/react-final-form/api/Field
                                       input.onChange(network?.id)
                                     }}
                                   >
@@ -612,15 +617,15 @@ const RfpMarkdownForm = ({
                                   <select
                                     {...input}
                                     className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
-                                    value={(selectedToken?.symbol as string) || "ETH"}
+                                    value={(selectedToken?.symbol as string) || ETH}
                                     onChange={(e) => {
                                       let fundingToken
-                                      if (e.target.value === "ETH") {
+                                      if (e.target.value === ETH) {
                                         fundingToken = ETH_METADATA
-                                      } else if (e.target.value === "USDC") {
+                                      } else if (e.target.value === USDC) {
                                         fundingToken = getStablecoinMetadataBySymbol({
                                           chain: selectedNetworkId,
-                                          symbol: "USDC",
+                                          symbol: USDC,
                                         })
                                       } else {
                                         fundingToken = importedTokenOptions?.find(
@@ -628,6 +633,9 @@ const RfpMarkdownForm = ({
                                         )
                                       }
                                       setSelectedToken(fundingToken)
+                                      // custom values can be compatible with react-final-form by calling
+                                      // the props.input.onChange callback
+                                      // https://final-form.org/docs/react-final-form/api/Field
                                       input.onChange(fundingToken?.symbol)
 
                                       refetchToken()
@@ -641,9 +649,9 @@ const RfpMarkdownForm = ({
                                         </option>
                                       )
                                     })}
-                                    {defaultTokenOptions.map((token) => (
-                                      <option key={token} value={token}>
-                                        {token}
+                                    {defaultTokenOptionSymbols.map((tokenSymbol) => (
+                                      <option key={tokenSymbol} value={tokenSymbol}>
+                                        {tokenSymbol}
                                       </option>
                                     ))}
                                   </select>
@@ -727,6 +735,9 @@ const RfpMarkdownForm = ({
                                         (checkbook) => checkbook.address === e.target.value
                                       )
                                       setSelectedCheckbook(checkbook)
+                                      // custom values can be compatible with react-final-form by calling
+                                      // the props.input.onChange callback
+                                      // https://final-form.org/docs/react-final-form/api/Field
                                       input.onChange(checkbook?.address as string)
                                     }}
                                   >
@@ -798,7 +809,7 @@ const RfpMarkdownForm = ({
                               return
                             }
 
-                            if (!selectedToken) {
+                            if (!formState.values.fundingTokenSymbol && !selectedToken) {
                               setToastState({
                                 isToastShowing: true,
                                 type: "error",

@@ -194,6 +194,11 @@ export const TRACKING_EVENTS = {
   },
 }
 
+export const TOKEN_SYMBOLS = {
+  ETH: "ETH",
+  USDC: "USDC",
+}
+
 // LEGACY BELOW
 
 // LEGACY
