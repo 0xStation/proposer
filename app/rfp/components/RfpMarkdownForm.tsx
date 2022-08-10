@@ -656,6 +656,7 @@ const RfpMarkdownForm = ({
                                         (checkbook) => checkbook.address === e.target.value
                                       )
                                       setSelectedCheckbook(checkbook)
+                                      input.onChange(checkbook?.address as string)
                                     }}
                                   >
                                     <option value="">Choose option</option>
