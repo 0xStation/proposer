@@ -1,20 +1,26 @@
 import {
   BlitzPage,
-  useParam,
   Routes,
   useRouter,
+  InferGetServerSidePropsType,
   GetServerSideProps,
   getSession,
   invoke,
   Image,
 } from "blitz"
+import { trackClick } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Exit from "/public/exit-button.svg"
 import Layout from "app/core/layouts/Layout"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import CheckbookForm from "app/checkbook/components/CheckbookForm"
 import CheckAnimation from "public/check_animation.gif"
-import TikTokIcon from "public/tiktok-icon.svg"
+
+const {
+  PAGE_NAME,
+  FEATURE: { CHECKBOOK },
+} = TRACKING_EVENTS
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   const session = await getSession(req, res)
@@ -48,20 +54,29 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
   }
 
   return {
-    props: {}, // will be passed to the page component as props
+    props: {
+      terminalHandle: params?.terminalHandle,
+      terminal,
+    }, // will be passed to the page component as props
   }
 }
 
-const NewCheckbookTerminalCreationPage: BlitzPage = () => {
+const NewCheckbookTerminalCreationPage: BlitzPage = ({
+  terminalHandle,
+  terminal,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-
-  const terminalHandle = useParam("terminalHandle") as string
 
   return (
     <Layout>
       <div
         className="absolute top-4 left-4 cursor-pointer"
         onClick={() => {
+          trackClick(CHECKBOOK.EVENT_NAME.COMPLETE_PROFILE_CHECKBOOK_EXIT_CLICKED, {
+            pageName: PAGE_NAME.COMPLETE_PROFILE_CHECKBOOK_PAGE,
+            stationId: terminal?.id,
+            stationHandle: terminalHandle as string,
+          })
           router.push(Routes.BulletinPage({ terminalHandle, terminalCreated: true }))
         }}
       >
@@ -93,6 +108,7 @@ const NewCheckbookTerminalCreationPage: BlitzPage = () => {
           <Image src={CheckAnimation} alt="Checkbook animation." width={496} height={240} />
           <CheckbookForm
             isEdit={false}
+            pageName={PAGE_NAME.COMPLETE_PROFILE_CHECKBOOK_PAGE}
             callback={(checkbookAddress?: string) => {
               if (checkbookAddress) {
                 router.push(

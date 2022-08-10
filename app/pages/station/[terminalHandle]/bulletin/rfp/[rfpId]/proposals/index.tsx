@@ -12,6 +12,8 @@ import {
   InferGetServerSidePropsType,
   invoke,
 } from "blitz"
+import { trackClick } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import useStore from "app/core/hooks/useStore"
 import Layout from "app/core/layouts/Layout"
 import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
@@ -40,6 +42,11 @@ import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import { formatUnits } from "@ethersproject/units"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 
+const {
+  PAGE_NAME,
+  FEATURE: { RFP },
+} = TRACKING_EVENTS
+
 const ProposalsTab: BlitzPage = ({
   rfp,
   terminal,
@@ -67,20 +74,38 @@ const ProposalsTab: BlitzPage = ({
     { suspense: false, enabled: !!rfpId && !!rfp?.checkbook, refetchOnWindowFocus: false }
   )
 
-  const [proposalCount] = useQuery(
+  const [proposalCount, { isSuccess: isFinishedFetchingProposalCount }] = useQuery(
     getProposalCountByRfpId,
     {
       rfpId,
       quorum: rfp?.checkbook.quorum as number,
       statuses: Array.from(proposalStatusFilters),
     },
-    { suspense: false, enabled: !!rfpId && !!rfp?.checkbook, refetchOnWindowFocus: false }
+    {
+      suspense: false,
+      enabled: !!rfpId && !!rfp?.checkbook,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }
   )
 
   const [proposalCreatedConfirmationModal, setProposalCreatedConfirmationModal] =
     useState<boolean>(false)
 
   const [isGetNotifiedModalOpen, setIsGetNotifiedModalOpen] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (isFinishedFetchingProposalCount) {
+      trackClick(RFP.EVENT_NAME.RFP_PROPOSALS_PAGE_SHOWN, {
+        pageName: PAGE_NAME.RFP_PROPOSALS_PAGE,
+        userAddress: activeUser?.address,
+        stationHandle: terminal?.handle,
+        stationId: terminal?.id,
+        rfpId,
+        numProposals: proposalCount,
+      })
+    }
+  }, [isFinishedFetchingProposalCount])
 
   useEffect(() => {
     if (proposalId) {

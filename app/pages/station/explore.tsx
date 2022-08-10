@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { BlitzPage, Link, Routes, useQuery, useRouter } from "blitz"
+import { trackClick } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Layout from "app/core/layouts/Layout"
 import Pagination from "app/core/components/Pagination"
 import { RFP_STATUS_DISPLAY_MAP, DEFAULT_PFP_URLS, PAGINATION_TAKE } from "app/core/utils/constants"
@@ -11,6 +13,11 @@ import getProposalCountByTerminal from "app/proposal/queries/getProposalCountByT
 import useStore from "app/core/hooks/useStore"
 import { canCreateStation } from "app/core/utils/permissions"
 import { DateTime } from "luxon"
+
+const {
+  FEATURE: { NEW_STATION },
+  PAGE_NAME,
+} = TRACKING_EVENTS
 
 const ExploreStations: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
@@ -45,7 +52,13 @@ const ExploreStations: BlitzPage = () => {
           <div className="relative self-start group">
             <button
               className="text-tunnel-black bg-electric-violet rounded hover:opacity-70 h-[35px] px-6 mr-8"
-              onClick={() => router.push(Routes.CreateTerminalDetailsPage())}
+              onClick={() => {
+                trackClick(NEW_STATION.EVENT_NAME.SHOW_CREATE_STATION_PAGE_CLICKED, {
+                  pageName: PAGE_NAME.EXPLORE,
+                  userAddress: activeUser?.address,
+                })
+                router.push(Routes.CreateTerminalDetailsPage())
+              }}
               disabled={!canCreateStation(activeUser?.address)}
             >
               Open a station

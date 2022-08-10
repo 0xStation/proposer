@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useRouter, Link, Routes, useParam, useQuery, useSession } from "blitz"
+import { track } from "@amplitude/analytics-browser"
 import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
 import getRfpById from "../queries/getRfpById"
 import { RfpStatus } from "../types"
@@ -19,10 +20,19 @@ import Dropdown from "app/core/components/Dropdown"
 import { DeleteRfpModal } from "./DeleteRfpModal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
+import useStore from "app/core/hooks/useStore"
+import { trackClick } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
+
+const {
+  PAGE_NAME,
+  FEATURE: { RFP, PROPOSAL },
+} = TRACKING_EVENTS
 
 const RfpHeaderNavigation = ({ rfpId }) => {
   const terminalHandle = useParam("terminalHandle") as string
   const session = useSession({ suspense: false })
+  const activeUser = useStore((state) => state.activeUser)
   const [isRFPUrlCopied, setIsRfpUrlCopied] = useState<boolean>(false)
   const [isClosedRfpModalOpen, setIsClosedRfpModalOpen] = useState<boolean>(false)
   const [isReopenRfpModalOpen, setIsReopenRfpModalOpen] = useState<boolean>(false)
@@ -61,10 +71,26 @@ const RfpHeaderNavigation = ({ rfpId }) => {
         isOpen={deleteRfpModalOpen}
         setIsOpen={setDeleteRfpModalOpen}
         rfp={rfp}
+        pageName={PAGE_NAME.RFP_INFO_PAGE}
         terminalHandle={terminalHandle}
+        terminalId={terminal?.id}
       />
-      <ReopenRfpModal isOpen={isReopenRfpModalOpen} setIsOpen={setIsReopenRfpModalOpen} rfp={rfp} />
-      <CloseRfpModal isOpen={isClosedRfpModalOpen} setIsOpen={setIsClosedRfpModalOpen} rfp={rfp} />
+      <ReopenRfpModal
+        isOpen={isReopenRfpModalOpen}
+        setIsOpen={setIsReopenRfpModalOpen}
+        rfp={rfp}
+        pageName={PAGE_NAME.RFP_INFO_PAGE}
+        terminalHandle={terminalHandle}
+        terminalId={terminal?.id}
+      />
+      <CloseRfpModal
+        isOpen={isClosedRfpModalOpen}
+        setIsOpen={setIsClosedRfpModalOpen}
+        rfp={rfp}
+        pageName={PAGE_NAME.RFP_INFO_PAGE}
+        terminalHandle={terminalHandle}
+        terminalId={terminal?.id}
+      />
       <div className="border-b border-concrete px-4 pt-4">
         <div className="flex flex-row justify-between">
           <p className="self-center">
@@ -104,6 +130,12 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                       rfp?.author?.id === session.userId && (
                         <button
                           onClick={() => {
+                            trackClick(RFP.EVENT_NAME.RFP_SHOW_EDITOR_CLICKED, {
+                              userAddress: activeUser?.address,
+                              stationHandle: terminalHandle,
+                              stationId: terminal?.id,
+                              isEdit: true,
+                            })
                             router.push(Routes.EditRfpPage({ terminalHandle, rfpId }))
                           }}
                         >
@@ -163,8 +195,20 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                             ),
                             onClick: () => {
                               if (rfp?.status !== RfpStatus.CLOSED) {
+                                trackClick(RFP.EVENT_NAME.RFP_SETTINGS_CLOSE_RFP_CLICKED, {
+                                  pageName: PAGE_NAME.RFP_INFO_PAGE,
+                                  stationHandle: terminalHandle,
+                                  stationId: terminal?.id,
+                                  rfpId: rfp?.id,
+                                })
                                 setIsClosedRfpModalOpen(true)
                               } else {
+                                trackClick(RFP.EVENT_NAME.RFP_SETTINGS_REOPEN_RFP_CLICKED, {
+                                  pageName: PAGE_NAME.RFP_INFO_PAGE,
+                                  stationHandle: terminalHandle,
+                                  stationId: terminal?.id,
+                                  rfpId: rfp?.id,
+                                })
                                 setIsReopenRfpModalOpen(true)
                               }
                             },
@@ -177,6 +221,12 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                               </>
                             ),
                             onClick: () => {
+                              trackClick(RFP.EVENT_NAME.RFP_SETTINGS_DELETE_RFP_CLICKED, {
+                                pageName: PAGE_NAME.RFP_INFO_PAGE,
+                                stationHandle: terminalHandle,
+                                stationId: terminal?.id,
+                                rfpId: rfp?.id,
+                              })
                               setDeleteRfpModalOpen(true)
                             },
                           },
@@ -223,15 +273,20 @@ const RfpHeaderNavigation = ({ rfpId }) => {
             </div>
           </div>
           {rfpOpen && (
-            <Link href={Routes.CreateProposalPage({ terminalHandle, rfpId })} passHref>
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-electric-violet text-tunnel-black rounded self-start px-6 h-[35px] leading-[35px] hover:bg-opacity-70 whitespace-nowrap"
-              >
-                Create proposal
-              </a>
-            </Link>
+            <button
+              onClick={() => {
+                trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_SHOW_EDITOR_CLICKED, {
+                  pageName: PAGE_NAME.RFP_INFO_PAGE,
+                  stationHandle: terminalHandle,
+                  stationId: terminal?.id,
+                  rfpId: rfp?.id,
+                })
+                router.push(Routes.CreateProposalPage({ terminalHandle, rfpId }))
+              }}
+              className="bg-electric-violet text-tunnel-black rounded self-start px-6 h-[35px] leading-[35px] hover:bg-opacity-70 whitespace-nowrap"
+            >
+              Create proposal
+            </button>
           )}
         </div>
         <ul className="mt-7 text-lg mb-2">

@@ -1,6 +1,8 @@
 import StationLogo from "public/station-letters.svg"
+import { trackClick } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import { useEffect } from "react"
-import { Image, invoke, Routes, useParam, useQuery, useRouter, useSession } from "blitz"
+import { Image, invoke, Routes, useQuery, useParam, useRouter, useSession } from "blitz"
 import { useAccount } from "wagmi"
 import useStore from "../hooks/useStore"
 import truncateString from "../utils/truncateString"
@@ -13,6 +15,10 @@ import createAccount from "app/account/mutations/createAccount"
 import { DEFAULT_PFP_URLS } from "../utils/constants"
 import ExploreImageIcon from "public/explore.svg"
 
+const {
+  FEATURE: { WALLET_CONNECTION },
+} = TRACKING_EVENTS
+
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
   const accountData = useAccount()
@@ -23,6 +29,7 @@ const Navigation = ({ children }: { children?: any }) => {
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [profileNavDrawerIsOpen, setProfileNavDrawerIsOpen] = useState<boolean>(false)
   const router = useRouter()
+  const terminalHandle = useParam("terminalHandle")
 
   // If the user connects + signs their wallet,
   // set the active user. The active user will be
@@ -120,7 +127,13 @@ const Navigation = ({ children }: { children?: any }) => {
               </p>
             </div>
             <button
-              onClick={() => toggleWalletModal(true)}
+              onClick={() => {
+                trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BANNER_CLICKED, {
+                  pageName: window.location.href,
+                  stationHandle: terminalHandle as string,
+                })
+                toggleWalletModal(true)
+              }}
               className={`h-[35px] ${
                 !address
                   ? "bg-electric-violet text-tunnel-black hover:opacity-70"

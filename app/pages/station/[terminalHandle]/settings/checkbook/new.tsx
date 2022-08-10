@@ -15,6 +15,9 @@ import Navigation from "app/terminal/components/settings/navigation"
 import Back from "/public/back-icon.svg"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import CheckbookForm from "app/checkbook/components/CheckbookForm"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
+
+const { PAGE_NAME } = TRACKING_EVENTS
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   const session = await getSession(req, res)
@@ -75,6 +78,7 @@ const NewCheckbookSettingsPage: BlitzPage = () => {
           </div>
           <div className="w-1/2">
             <CheckbookForm
+              pageName={PAGE_NAME.CHECKBOOK_CREATE_SETTINGS_PAGE}
               isEdit={true}
               callback={(checkbookAddress) =>
                 router.push(Routes.CheckbookSettingsPage({ terminalHandle, creationSuccess: true }))

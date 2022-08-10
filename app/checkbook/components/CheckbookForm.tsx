@@ -1,3 +1,6 @@
+import { trackClick, trackImpression, trackEvent, trackError } from "app/utils/amplitude"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
+import { useEffect } from "react"
 import { useNetwork } from "wagmi"
 import { useCreateCheckbookOnChain } from "app/contracts/checkbook"
 import { Spinner } from "app/core/components/Spinner"
@@ -13,13 +16,17 @@ import { Form, Field } from "react-final-form"
 import { useWaitForTransaction } from "wagmi"
 import createCheckbook from "../mutations/createCheckbook"
 
+const {
+  FEATURE: { CHECKBOOK },
+} = TRACKING_EVENTS
+
 type FormValues = {
   name: string
   signers: string
   quorum: string
 }
 
-export const CheckbookForm = ({ callback, isEdit = true }) => {
+export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
   const [createCheckbookMutation] = useMutation(createCheckbook)
   const [quorum, setQuorum] = useState<number>()
   const [signers, setSigners] = useState<string[]>()
@@ -28,13 +35,14 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
   const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
   const [isDeployingCheckbook, setIsDeployingCheckbook] = useState<boolean>(false)
   const setToastState = useStore((state) => state.setToastState)
+  const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
 
   const terminalHandle = useParam("terminalHandle") as string
-  const [terminal] = useQuery(
+  const [terminal, { isSuccess: finishedFetchingTerminal }] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle, include: ["checkbooks"] },
-    { suspense: false }
+    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
   const { chain: activeChain } = useNetwork()
@@ -42,6 +50,17 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
   const { writeAsync: createCheckbookOnChain } = useCreateCheckbookOnChain({
     chainId,
   })
+
+  useEffect(() => {
+    if (finishedFetchingTerminal && activeUser?.address) {
+      trackImpression(CHECKBOOK.EVENT_NAME.CREATE_CHECKBOOK_PAGE_SHOWN, {
+        pageName,
+        stationId: terminal?.id,
+        stationHandle: terminalHandle,
+        userAddress: activeUser?.address,
+      })
+    }
+  }, [finishedFetchingTerminal, activeUser?.address])
 
   useWaitForTransaction({
     confirmations: 1,
@@ -75,12 +94,33 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
           signers: signers as string[],
         })
 
+        trackEvent(CHECKBOOK.EVENT_NAME.CHECKBOOK_MODEL_CREATED, {
+          pageName,
+          stationId: terminal?.id,
+          stationHandle: terminalHandle as string,
+          userAddress: activeUser?.address,
+          quorum,
+          signers,
+          checkbookName: name,
+          checkbookAddress,
+        })
+
         if (callback) {
           callback(checkbookAddress)
         }
       } catch (e) {
         setWaitingCreation(false)
         console.error(e)
+        trackError(CHECKBOOK.EVENT_NAME.CHECKBOOK_CREATE_ERROR, {
+          pageName,
+          stationId: terminal?.id,
+          stationHandle: terminalHandle as string,
+          userAddress: activeUser?.address,
+          quorum,
+          signers,
+          checkbookName: name,
+          errorMsg: e.name,
+        })
         setToastState({
           isToastShowing: true,
           type: "error",
@@ -104,6 +144,16 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
             // trigger transaction
             // after execution, will save transaction hash to state to trigger waiting process to create Checkbook entity
             try {
+              trackClick(CHECKBOOK.EVENT_NAME.CHECKBOOK_CREATE_BUTTON_CLICKED, {
+                pageName,
+                stationId: terminal?.id,
+                stationHandle: terminalHandle as string,
+                userAddress: activeUser?.address,
+                quorum,
+                signers,
+                checkbookName: name,
+              })
+
               setQuorum(quorum)
               setSigners(signers)
               setName(values.name)
@@ -112,6 +162,18 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
               const transaction = await createCheckbookOnChain?.({
                 recklesslySetUnpreparedArgs: [quorum, signers],
               })
+
+              trackEvent(CHECKBOOK.EVENT_NAME.CHECKBOOK_CONTRACT_CREATED, {
+                pageName,
+                stationId: terminal?.id,
+                stationHandle: terminalHandle as string,
+                userAddress: activeUser?.address,
+                quorum,
+                signers,
+                checkbookName: name,
+                transactionHash: transaction.hash,
+              })
+
               setIsDeployingCheckbook(true)
               // triggers hook for useWaitForTransaction which parses checkbook address makes prisma mutation
               setTxnHash(transaction.hash)
@@ -132,8 +194,29 @@ export const CheckbookForm = ({ callback, isEdit = true }) => {
                   message: "Contract creation failed.",
                 })
               }
+
+              trackError(CHECKBOOK.EVENT_NAME.CHECKBOOK_CREATE_ERROR, {
+                pageName,
+                stationId: terminal?.id,
+                stationHandle: terminalHandle as string,
+                userAddress: activeUser?.address,
+                quorum,
+                signers,
+                checkbookName: name,
+                errorMsg: e.name,
+              })
             }
           } catch (e) {
+            trackError(CHECKBOOK.EVENT_NAME.CHECKBOOK_CREATE_ERROR, {
+              pageName,
+              stationId: terminal?.id,
+              stationHandle: terminalHandle as string,
+              userAddress: activeUser?.address,
+              quorum,
+              signers,
+              checkbookName: name,
+              errorMsg: e.name,
+            })
             setWaitingCreation(false)
             setIsDeployingCheckbook(false)
             console.error(e)

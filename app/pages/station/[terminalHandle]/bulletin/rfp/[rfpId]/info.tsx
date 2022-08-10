@@ -4,11 +4,11 @@ import {
   useParam,
   useQuery,
   useRouterQuery,
-  Link,
   Routes,
   GetServerSideProps,
   invoke,
 } from "blitz"
+import { trackImpression } from "app/utils/amplitude"
 import { DateTime } from "luxon"
 import Preview from "app/core/components/MarkdownPreview"
 import { RfpStatus } from "app/rfp/types"
@@ -19,12 +19,17 @@ import RfpHeaderNavigation from "app/rfp/components/RfpHeaderNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
 import SuccessRfpModal from "app/rfp/components/SuccessRfpModal"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
-import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import { AddFundsModal } from "app/core/components/AddFundsModal"
+import useStore from "app/core/hooks/useStore"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 import getRfpApprovedProposalFunding from "app/rfp/queries/getRfpApprovedFunding"
-import { ZERO_ADDRESS } from "app/core/utils/constants"
+import { ZERO_ADDRESS, TRACKING_EVENTS } from "app/core/utils/constants"
+
+const {
+  PAGE_NAME,
+  FEATURE: { RFP },
+} = TRACKING_EVENTS
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { terminalHandle, rfpId, proposalId } = context.query as {
@@ -64,11 +69,17 @@ const RFPInfoTab: BlitzPage = () => {
   const [showAddFundsModal, setShowAddFundsModal] = useState<boolean>(false)
   const query = useRouterQuery()
   const rfpId = useParam("rfpId") as string
-  const [terminal] = useQuery(
+  const [terminal, { isSuccess: isFinishedFetchingTerminal }] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle as string },
-    { suspense: false, enabled: !!terminalHandle }
+    {
+      suspense: false,
+      enabled: !!terminalHandle,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }
   )
+  const activeUser = useStore((state) => state.activeUser)
   const isAdmin = useAdminForTerminal(terminal)
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
   const [rfpApprovedProposalFunding] = useQuery(
@@ -76,12 +87,24 @@ const RFPInfoTab: BlitzPage = () => {
     {
       rfpId: rfpId,
       approvalQuorum: rfp?.checkbook.quorum || 100,
-      tokenChainId: rfp?.data.funding.token.chainId || 1,
-      tokenAddress: rfp?.data.funding.token.address || ZERO_ADDRESS,
+      tokenChainId: rfp?.data?.funding?.token.chainId || 1,
+      tokenAddress: rfp?.data?.funding?.token.address || ZERO_ADDRESS,
     },
     { suspense: false, enabled: !!rfp?.checkbook && !!rfp.data }
     // for some reason typescript does not recognize enabled checks as sufficient to remove default values in query?
   )
+
+  useEffect(() => {
+    if (isFinishedFetchingTerminal) {
+      trackImpression(RFP.EVENT_NAME.RFP_INFO_PAGE_SHOWN, {
+        pageName: PAGE_NAME.RFP_INFO_PAGE,
+        userAddress: activeUser?.address,
+        stationHandle: terminal?.handle,
+        stationId: terminal?.id,
+        rfpId: rfpId,
+      })
+    }
+  }, [isFinishedFetchingTerminal])
 
   useEffect(() => {
     if (query.rfpEdited) {
@@ -95,6 +118,9 @@ const RFPInfoTab: BlitzPage = () => {
         setIsOpen={setShowAddFundsModal}
         isOpen={showAddFundsModal}
         checkbookAddress={rfp?.checkbook?.address}
+        pageName={PAGE_NAME.RFP_INFO_PAGE}
+        terminalId={terminal?.id as number}
+        stationHandle={terminalHandle}
       />
       <TerminalNavigation>
         <SuccessRfpModal
@@ -148,18 +174,18 @@ const RFPInfoTab: BlitzPage = () => {
                   <p className="text-2xl">
                     {formatCurrencyAmount(
                       Math.max(
-                        parseFloat(rfp?.data.funding.budgetAmount || "0") -
+                        parseFloat(rfp?.data?.funding?.budgetAmount || "0") -
                           (rfpApprovedProposalFunding || 0),
                         0
                       ).toString()
                     ) +
                       " " +
-                      rfp?.data.funding.token.symbol}
+                      rfp?.data?.funding?.token?.symbol}
                   </p>
                 </div>
                 <p className="text-concrete text-xs mt-1">{`Total RFP budget: ${formatCurrencyAmount(
-                  rfp?.data.funding.budgetAmount
-                )} ${rfp?.data.funding.token.symbol}`}</p>
+                  rfp?.data?.funding?.budgetAmount
+                )} ${rfp?.data?.funding?.token?.symbol}`}</p>
               </div>
               <div className="mt-9">
                 <p className="text-xs text-concrete uppercase font-bold">Signers</p>
