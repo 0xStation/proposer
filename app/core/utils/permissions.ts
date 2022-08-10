@@ -74,19 +74,19 @@ export const canCreateStation = (address: string | undefined) => {
   return createStationWhitelist.some((address) => address.toLowerCase() === lowercaseAddress)
 }
 
-const balanceOfAbi = ["function balanceOf(address owner) view returns (uint256 balance)"]
+const balanceOfAbi = ["function balanceOf(address _owner) public view returns (uint256 balance)"]
 
 export const useAddressHasToken = (
   walletAddress: string | undefined,
   tokenAddress: string,
   skip: boolean
 ) => {
-  // const { data, error, isError, isLoading } = useContractRead({
-  //   addressOrName: tokenAddress,
-  //   contractInterface: balanceOfAbi,
-  //   functionName: "balanceOf",
-  //   args: walletAddress,
-  // })
+  const { data } = useContractRead({
+    addressOrName: tokenAddress,
+    contractInterface: balanceOfAbi,
+    functionName: "balanceOf",
+    args: [walletAddress],
+  })
 
   // itention of skip is to allow for "skipping" over this check for rfps that do not have permissions
   // we have to pass as a param so we are still calling this hook and not "conditionally calling the hook"
@@ -97,12 +97,9 @@ export const useAddressHasToken = (
     return true
   }
 
-  // console.log(data)
-  // console.log(error)
-
-  // if (balance.data) {
-  //   return balance.data.value.gt(0)
-  // }
+  if (data) {
+    return data.gt(0)
+  }
 
   return false
 }
