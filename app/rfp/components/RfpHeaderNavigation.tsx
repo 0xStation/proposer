@@ -296,7 +296,7 @@ const RfpHeaderNavigation = ({ rfp }: { rfp: Rfp }) => {
                 Create proposal
               </button>
               <span className="absolute top-[110%] bg-wet-concrete rounded p-2 hidden group-hover:block text-xs">
-                You must hold ${rfp.data.permissions.submit.symbol} to propose.
+                You must hold ${rfp?.data?.permissions?.submit?.symbol} to propose.
               </span>
             </div>
           )}
