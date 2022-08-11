@@ -97,7 +97,7 @@ const NewTokenSettingsPage: BlitzPage = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold">New token</h1>
-              <p>Import ERC-20s (or NFTs) to fund proposals in tokens of your choice. </p>
+              <p>Import ERC-20s to fund proposals in tokens of your choice. </p>
             </div>
           </div>
 
