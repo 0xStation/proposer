@@ -1,4 +1,4 @@
-import { invoke, Image, useParam, useSession } from "blitz"
+import { invoke, Image, useParam } from "blitz"
 import { trackClick, trackError, initializeUser } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
 import { METAMASK_ERROR_CODES } from "app/utils/metamaskErrorCodes"
@@ -26,7 +26,6 @@ export const ConnectWalletComponent = () => {
     loading: false,
     error: false,
   })
-  const session = useSession({ suspense: false })
   const [errorMessage, setErrorMessage] = useState<string>("")
   const [showSignView, setShowSignView] = useState<boolean>(false)
   const terminalHandle = useParam("terminalHandle")
@@ -35,15 +34,11 @@ export const ConnectWalletComponent = () => {
   const { chain: activeChain } = useNetwork()
   const [metamaskWallet, walletConnect, coinbaseWallet] = connectors
 
-  console.log("session", session)
-
   const handleWalletConnection = async (connector) => {
     setConnectState({ error: false, loading: true })
     let address = accountData?.address
-    console.log("address", address)
-    console.log("connector", connector)
-    console.log("accountData", accountData)
-    if (!address || connector?.id !== accountData?.connector?.id) {
+
+    if (!address || (connector && connector?.id !== accountData?.connector?.id)) {
       try {
         await connectAsync({ connector, chainId: activeChain?.id })
         setConnectState({ error: false, loading: false })
