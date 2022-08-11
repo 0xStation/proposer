@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react"
 import { DateTime } from "luxon"
-import { useMutation, invalidateQuery, Link, Routes, useRouter } from "blitz"
-import { track } from "@amplitude/analytics-browser"
+import { useMutation, invalidateQuery, Link, Routes, useRouter, useQuery } from "blitz"
+import { useNetwork, useToken } from "wagmi"
 import { Field, Form } from "react-final-form"
 import { XIcon, RefreshIcon, SpeakerphoneIcon } from "@heroicons/react/solid"
 import { parseUnits } from "@ethersproject/units"
 import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
 import truncateString from "app/core/utils/truncateString"
-import { DEFAULT_PFP_URLS, RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
+import {
+  DEFAULT_PFP_URLS,
+  ETH_METADATA,
+  getStablecoinMetadataBySymbol,
+  RFP_STATUS_DISPLAY_MAP,
+  SUPPORTED_CHAINS,
+} from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
 import createRfp from "app/rfp/mutations/createRfp"
 import updateRfp from "app/rfp/mutations/updateRfp"
@@ -24,16 +30,19 @@ import {
   isAfterStartDate,
 } from "app/utils/validators"
 import { genRfpSignatureMessage } from "app/signatures/rfp"
-import getFundingTokens from "app/core/utils/getFundingTokens"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
+import getTokenTagsByTerminalId from "app/tag/queries/getTokenTagsByTerminalId"
+import { TokenType } from "app/tag/types"
 import { trackClick, trackEvent, trackError } from "app/utils/amplitude"
-import { TRACKING_EVENTS } from "app/core/utils/constants"
+import { TRACKING_EVENTS, TOKEN_SYMBOLS } from "app/core/utils/constants"
 
 const {
   PAGE_NAME,
-  FEATURE: { RFP, PROPOSAL },
+  FEATURE: { RFP },
 } = TRACKING_EVENTS
+
+const { ETH, USDC } = TOKEN_SYMBOLS
 
 const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
   const isoDate = DateTime.fromISO(dateTime.toString())
@@ -57,19 +66,77 @@ const RfpMarkdownForm = ({
   isEdit?: boolean
   rfp?: Rfp
 }) => {
+  const { chain: activeChain } = useNetwork()
+  const [checkbookOptions, setCheckbookOptions] = useState<Checkbook[]>(checkbooks)
   const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
   const [shortcutsOpen, setShortcutsOpen] = useState<boolean>(false)
   const [title, setTitle] = useState<string>(rfp?.data?.content?.title || "")
   const [markdown, setMarkdown] = useState<string>(rfp?.data?.content?.body || "")
   const [previewMode, setPreviewMode] = useState<boolean>(false)
+  const [importedTokenOptions, setImportedTokenOptions] = useState<any[]>()
+  const [selectedNetworkId, setSelectedNetworkId] = useState<number>(
+    rfp?.data?.funding?.token?.chainId ||
+      (checkbooks?.[0]?.chainId as number) ||
+      (activeChain?.id as number)
+  )
+  const [selectedToken, setSelectedToken] = useState<any>("")
+  const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
+  const defaultTokenOptionSymbols = [ETH, USDC]
 
-  // hack for now, address gets resolved on submit
-  // not scalable for token importing, will probably need to switch to more state vars
-  const tokenOptions = ["ETH", "USDC"]
+  const {
+    data: balanceData,
+    refetch: refetchToken,
+    isSuccess: tokenFetchSuccess,
+  } = useToken({
+    address: selectedToken?.address as string,
+    chainId: selectedNetworkId as number,
+    enabled: !!selectedToken?.address && !!selectedNetworkId,
+  })
+
+  const [tags, { refetch: refetchTags, isSuccess: finishedFetchingTags }] = useQuery(
+    getTokenTagsByTerminalId,
+    { terminalId: terminal?.id as number },
+    {
+      suspense: false,
+      enabled: !!terminal?.id,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }
+  )
+
+  useEffect(() => {
+    setCheckbookOptions(checkbooks)
+  }, [checkbooks])
+
+  useEffect(() => {
+    if (selectedNetworkId) {
+      // filter tokens based on selected network
+      const filteredTokenOptions = tags
+        ?.filter(
+          (tag) =>
+            tag?.data?.type === TokenType.ERC20 &&
+            tag?.data?.chainId === selectedNetworkId &&
+            tag?.data?.symbol !== USDC &&
+            tag?.data?.symbol !== ETH
+        )
+        ?.map((tag) => tag?.data)
+
+      setImportedTokenOptions(filteredTokenOptions)
+
+      setSelectedToken(filteredTokenOptions?.[0])
+
+      // filter checkbooks based on selected network
+      const filteredCheckbookOptions = checkbooks?.filter(
+        (checkbook) => checkbook.chainId === selectedNetworkId
+      )
+      setCheckbookOptions(filteredCheckbookOptions)
+      setSelectedCheckbook(filteredCheckbookOptions?.[0])
+    }
+  }, [selectedNetworkId, finishedFetchingTags])
 
   useEffect(() => {
     trackClick(RFP.EVENT_NAME.RFP_EDITOR_PAGE_SHOWN, {
@@ -255,11 +322,20 @@ const RfpMarkdownForm = ({
             return
           }
 
-          const fundingToken = getFundingTokens(checkbook, terminal).find(
-            (token) => token.symbol === values.fundingTokenSymbol
-          )
+          if (selectedToken.symbol !== ETH || selectedToken.symbol !== USDC) {
+            if (tokenFetchSuccess) {
+              selectedToken.decimals = balanceData?.decimals
+            } else {
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Unable to retrieve decimals for the provided token.",
+              })
+              return
+            }
+          }
 
-          if (!fundingToken) {
+          if (!selectedToken) {
             setToastState({
               isToastShowing: true,
               type: "error",
@@ -268,12 +344,12 @@ const RfpMarkdownForm = ({
             return
           }
 
-          const parsedBudgetAmount = parseUnits(values.budgetAmount, fundingToken.decimals)
+          const parsedBudgetAmount = parseUnits(values.budgetAmount, selectedToken.decimals)
 
           const message = genRfpSignatureMessage(
             {
               ...values,
-              fundingTokenAddress: fundingToken.address,
+              fundingTokenAddress: selectedToken.address,
               budgetAmount: parsedBudgetAmount,
             },
             activeUser?.address
@@ -295,10 +371,10 @@ const RfpMarkdownForm = ({
                 fundingAddress: values.checkbookAddress,
                 fundingToken: {
                   chainId: checkbook.chainId,
-                  address: fundingToken.address,
+                  address: selectedToken.address,
 
-                  symbol: fundingToken.symbol,
-                  decimals: fundingToken.decimals,
+                  symbol: selectedToken.symbol,
+                  decimals: selectedToken.decimals,
                 },
                 fundingBudgetAmount: values.budgetAmount,
                 contentBody: values.markdown,
@@ -334,9 +410,9 @@ const RfpMarkdownForm = ({
                 fundingAddress: values.checkbookAddress,
                 fundingToken: {
                   chainId: checkbook.chainId,
-                  address: fundingToken.address,
-                  symbol: fundingToken.symbol,
-                  decimals: fundingToken.decimals,
+                  address: selectedToken.address,
+                  symbol: selectedToken.symbol,
+                  decimals: selectedToken.decimals,
                 },
                 fundingBudgetAmount: values.budgetAmount,
                 contentBody: values.markdown,
@@ -493,82 +569,33 @@ const RfpMarkdownForm = ({
                           )}
                         </Field>
                       </div>
-                      <div className="flex flex-col mt-6">
-                        <label className="font-bold block">Checkbook*</label>
-                        <span className="text-xs text-concrete block">
-                          Deposit funds here to create checks for proposers to claim once their
-                          projects have been approved.{" "}
-                          <a
-                            href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
-                            className="text-electric-violet"
-                          >
-                            Learn more
-                          </a>
-                        </span>
-                        <Field name={`checkbookAddress`} validate={requiredField}>
-                          {({ input, meta }) => {
-                            return (
-                              <div className="custom-select-wrapper">
-                                <select
-                                  {...input}
-                                  className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
-                                >
-                                  <option value="">Choose option</option>
-                                  {checkbooks?.map((cb, idx) => {
-                                    return (
-                                      <option key={cb.address} value={cb.address}>
-                                        {cb.name}
-                                      </option>
-                                    )
-                                  })}
-                                </select>
-                                {(meta.touched || attemptedSubmit) && meta.error && (
-                                  <span className="text-torch-red text-xs">{meta.error}</span>
-                                )}
-                              </div>
-                            )
-                          }}
-                        </Field>
-                        <div className="flex items-center justify-between mt-1">
-                          <Link
-                            href={Routes.NewCheckbookSettingsPage({
-                              terminalHandle: terminal?.handle,
-                            })}
-                            passHref
-                          >
-                            <a target="_blank" rel="noopener noreferrer">
-                              <span className="text-electric-violet cursor-pointer block">
-                                + Create new
-                              </span>
-                            </a>
-                          </Link>
-                          <RefreshIcon
-                            className="h-4 w-4 text-white cursor-pointer"
-                            onClick={() => {
-                              refetchCheckbooks()
-                              setToastState({
-                                isToastShowing: true,
-                                type: "success",
-                                message: "Refetched checkbooks.",
-                              })
-                            }}
-                          />
-                        </div>
+                      <div>
                         <div className="flex flex-col mt-6">
-                          <label className="font-bold block">Funding Token*</label>
-                          <Field name="fundingTokenSymbol" validate={requiredField}>
+                          <label className="font-bold">Network*</label>
+                          <Field name="network">
                             {({ input, meta }) => {
                               return (
                                 <div className="custom-select-wrapper">
                                   <select
                                     {...input}
                                     className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                                    value={selectedNetworkId as number}
+                                    onChange={(e) => {
+                                      const network = SUPPORTED_CHAINS.find(
+                                        (chain) => chain.id === parseInt(e.target.value)
+                                      )
+                                      setSelectedNetworkId(network?.id as number)
+                                      // custom values can be compatible with react-final-form by calling
+                                      // the props.input.onChange callback
+                                      // https://final-form.org/docs/react-final-form/api/Field
+                                      input.onChange(network?.id)
+                                    }}
                                   >
                                     <option value="">Choose option</option>
-                                    {tokenOptions?.map((token, idx) => {
+                                    {SUPPORTED_CHAINS?.map((chain, idx) => {
                                       return (
-                                        <option key={token + idx} value={token}>
-                                          {token}
+                                        <option key={chain.id} value={chain.id}>
+                                          {chain.name}
                                         </option>
                                       )
                                     })}
@@ -580,6 +607,86 @@ const RfpMarkdownForm = ({
                               )
                             }}
                           </Field>
+                        </div>
+                        <div className="flex flex-col mt-6">
+                          <label className="font-bold block">Reward token*</label>
+                          <Field name="fundingTokenSymbol">
+                            {({ input, meta }) => {
+                              return (
+                                <div className="custom-select-wrapper">
+                                  <select
+                                    {...input}
+                                    className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                                    value={(selectedToken?.symbol as string) || ETH}
+                                    onChange={(e) => {
+                                      let fundingToken
+                                      if (e.target.value === ETH) {
+                                        fundingToken = ETH_METADATA
+                                      } else if (e.target.value === USDC) {
+                                        fundingToken = getStablecoinMetadataBySymbol({
+                                          chain: selectedNetworkId,
+                                          symbol: USDC,
+                                        })
+                                      } else {
+                                        fundingToken = importedTokenOptions?.find(
+                                          (token) => token.symbol === e.target.value
+                                        )
+                                      }
+                                      setSelectedToken(fundingToken)
+                                      // custom values can be compatible with react-final-form by calling
+                                      // the props.input.onChange callback
+                                      // https://final-form.org/docs/react-final-form/api/Field
+                                      input.onChange(fundingToken?.symbol)
+
+                                      refetchToken()
+                                    }}
+                                  >
+                                    <option value="">Choose option</option>
+                                    {importedTokenOptions?.map((token, idx) => {
+                                      return (
+                                        <option key={token.address} value={token.symbol}>
+                                          {token.symbol}
+                                        </option>
+                                      )
+                                    })}
+                                    {defaultTokenOptionSymbols.map((tokenSymbol) => (
+                                      <option key={tokenSymbol} value={tokenSymbol}>
+                                        {tokenSymbol}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  {(meta.touched || attemptedSubmit) && meta.error && (
+                                    <span className="text-torch-red text-xs">{meta.error}</span>
+                                  )}
+                                </div>
+                              )
+                            }}
+                          </Field>
+                          <div className="flex items-center justify-between mt-1">
+                            <Link
+                              href={Routes.NewTokenSettingsPage({
+                                terminalHandle: terminal?.handle,
+                              })}
+                              passHref
+                            >
+                              <a target="_blank" rel="noopener noreferrer">
+                                <span className="text-electric-violet cursor-pointer block">
+                                  + Import
+                                </span>
+                              </a>
+                            </Link>
+                            <RefreshIcon
+                              className="h-4 w-4 text-white cursor-pointer"
+                              onClick={() => {
+                                refetchTags()
+                                setToastState({
+                                  isToastShowing: true,
+                                  type: "success",
+                                  message: "Refetched tokens.",
+                                })
+                              }}
+                            />
+                          </div>
                         </div>
                         <div className="flex flex-col mt-6">
                           <label className="font-bold">Budget*</label>
@@ -604,6 +711,78 @@ const RfpMarkdownForm = ({
                             }}
                           </Field>
                         </div>
+                        <div className="flex flex-col mt-6">
+                          <label className="font-bold block">Checkbook*</label>
+                          <span className="text-xs text-concrete block">
+                            Deposit funds here to create checks for proposers to claim once their
+                            projects have been approved.{" "}
+                            <a
+                              href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
+                              className="text-electric-violet"
+                            >
+                              Learn more
+                            </a>
+                          </span>
+                          <Field name="checkbookAddress">
+                            {({ input, meta }) => {
+                              return (
+                                <div className="custom-select-wrapper">
+                                  <select
+                                    {...input}
+                                    className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                                    onChange={(e) => {
+                                      const checkbook = checkbookOptions.find(
+                                        (checkbook) => checkbook.address === e.target.value
+                                      )
+                                      setSelectedCheckbook(checkbook)
+                                      // custom values can be compatible with react-final-form by calling
+                                      // the props.input.onChange callback
+                                      // https://final-form.org/docs/react-final-form/api/Field
+                                      input.onChange(checkbook?.address as string)
+                                    }}
+                                  >
+                                    <option value="">Choose option</option>
+                                    {checkbookOptions?.map((cb, idx) => {
+                                      return (
+                                        <option key={cb.address} value={cb.address}>
+                                          {cb.name}
+                                        </option>
+                                      )
+                                    })}
+                                  </select>
+                                  {(meta.touched || attemptedSubmit) && meta.error && (
+                                    <span className="text-torch-red text-xs">{meta.error}</span>
+                                  )}
+                                </div>
+                              )
+                            }}
+                          </Field>
+                          <div className="flex items-center justify-between mt-1">
+                            <Link
+                              href={Routes.NewCheckbookSettingsPage({
+                                terminalHandle: terminal?.handle,
+                              })}
+                              passHref
+                            >
+                              <a target="_blank" rel="noopener noreferrer">
+                                <span className="text-electric-violet cursor-pointer block">
+                                  + Create new
+                                </span>
+                              </a>
+                            </Link>
+                            <RefreshIcon
+                              className="h-4 w-4 text-white cursor-pointer"
+                              onClick={() => {
+                                refetchCheckbooks()
+                                setToastState({
+                                  isToastShowing: true,
+                                  type: "success",
+                                  message: "Refetched checkbooks.",
+                                })
+                              }}
+                            />
+                          </div>
+                        </div>
                       </div>
                       <button
                         type="button"
@@ -615,7 +794,38 @@ const RfpMarkdownForm = ({
                             stationId: terminal?.id,
                           })
                           setAttemptedSubmit(true)
-                          if (formState.invalid) {
+                          if (
+                            formState.invalid ||
+                            !selectedToken ||
+                            !selectedNetworkId ||
+                            !selectedCheckbook
+                          ) {
+                            if (!selectedNetworkId) {
+                              setToastState({
+                                isToastShowing: true,
+                                type: "error",
+                                message: `Please fill in the Network field to publish your RFP.`,
+                              })
+                              return
+                            }
+
+                            if (!formState.values.fundingTokenSymbol && !selectedToken) {
+                              setToastState({
+                                isToastShowing: true,
+                                type: "error",
+                                message: `Please fill in the Reward token field to publish your RFP.`,
+                              })
+                              return
+                            }
+
+                            if (!selectedCheckbook) {
+                              setToastState({
+                                isToastShowing: true,
+                                type: "error",
+                                message: `Please add a Checkbook to publish your RFP.`,
+                              })
+                              return
+                            }
                             const fieldsWithErrors = Object.keys(formState.errors as Object)
                             setToastState({
                               isToastShowing: true,

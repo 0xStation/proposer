@@ -106,13 +106,13 @@ const TokenSettingsPage: BlitzPage = () => {
       <Navigation>
         {tokenTags.length === 0 ? (
           <div className="w-full h-full flex items-center flex-col justify-center">
-            <p className="text-marble-white text-2xl font-bold">Add Tokens</p>
+            <p className="text-marble-white text-2xl font-bold">Import Tokens</p>
             <p className="mt-2 text-marble-white text-base w-[400px] text-center">
-              Add tokens that represent your community&apos;s membership and ownership.
+              Import tokens that represent your community&apos;s membership and ownership.
             </p>
             <Link href={Routes.NewTokenSettingsPage({ terminalHandle })}>
               <button className="cursor-pointer mt-8 w-[200px] py-1 bg-electric-violet text-tunnel-black rounded text-base">
-                Add
+                Import
               </button>
             </Link>
           </div>
@@ -122,7 +122,7 @@ const TokenSettingsPage: BlitzPage = () => {
               <div className="flex flex-col">
                 <h2 className="text-marble-white text-2xl font-bold">Tokens</h2>
                 <h5 className="text-base mt-2">
-                  Add tokens that represent your community&apos;s membership and ownership.
+                  Import tokens that represent your community&apos;s membership and ownership.
                 </h5>
               </div>
               <Link href={Routes.NewTokenSettingsPage({ terminalHandle })}>
@@ -130,7 +130,7 @@ const TokenSettingsPage: BlitzPage = () => {
                   className="rounded text-tunnel-black px-8 h-[32px] bg-electric-violet self-start"
                   type="submit"
                 >
-                  Add
+                  Import
                 </button>
               </Link>
             </div>

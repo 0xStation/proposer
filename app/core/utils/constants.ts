@@ -1,6 +1,7 @@
+import { chain } from "wagmi"
 import { RfpStatus } from "app/rfp/types"
-import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
+import networks from "app/utils/networks.json"
 
 export const CONTRACTS = {
   // Localhost, change to whatever the forge script outputs when running local anvil
@@ -90,6 +91,14 @@ export const SENDGRID_TEMPLATES = {
   NEW_PROPOSAL: "d-a73399b0868b4dbaae6dbff04b887f53",
   APPROVED_PROPOSAL: "d-1e84326048464c8c8277949bfde770fe",
   VERIFY: "d-9e113acf1a9f4830beaf3aa3553f9fde",
+}
+
+export const SUPPORTED_CHAINS = [chain.mainnet, chain.rinkeby, chain.goerli]
+
+export const ETH_METADATA = { symbol: "ETH", address: ZERO_ADDRESS, decimals: 18 }
+
+export const getStablecoinMetadataBySymbol = ({ chain = 1, symbol = "USDC" }) => {
+  return networks[chain as number]?.stablecoins.find((stablecoin) => stablecoin.symbol === symbol)
 }
 
 export const EVENT_TYPE = {
@@ -183,6 +192,11 @@ export const TRACKING_EVENTS = {
       },
     },
   },
+}
+
+export const TOKEN_SYMBOLS = {
+  ETH: "ETH",
+  USDC: "USDC",
 }
 
 // LEGACY BELOW

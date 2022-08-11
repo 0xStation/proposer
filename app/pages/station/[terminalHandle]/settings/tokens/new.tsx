@@ -11,6 +11,7 @@ import {
   getSession,
   invoke,
 } from "blitz"
+import { useState } from "react"
 import { Field, Form } from "react-final-form"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import createTokenTag from "app/tag/mutations/createTokenTag"
@@ -20,6 +21,7 @@ import useStore from "app/core/hooks/useStore"
 import Back from "/public/back-icon.svg"
 import networks from "app/utils/networks.json"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
+import { Spinner } from "app/core/components/Spinner"
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   try {
@@ -73,6 +75,7 @@ const NewTokenSettingsPage: BlitzPage = () => {
 
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
+  const [loading, setLoading] = useState<boolean>(false)
 
   const setToastState = useStore((state) => state.setToastState)
 
@@ -81,21 +84,28 @@ const NewTokenSettingsPage: BlitzPage = () => {
       <Navigation>
         <div className="px-6 py-8">
           <div className="flex flex-row space-x-4">
-            <Link href={Routes.TokenSettingsPage({ terminalHandle })}>
-              <Image
-                src={Back}
-                alt="Close button"
-                width={16}
-                height={16}
-                className="cursor-pointer"
-              />
-            </Link>
-            <h1 className="text-2xl font-bold">New token</h1>
+            <div className="items-start pt-1">
+              <Link href={Routes.TokenSettingsPage({ terminalHandle })}>
+                <Image
+                  src={Back}
+                  alt="Close button"
+                  width={16}
+                  height={16}
+                  className="cursor-pointer"
+                />
+              </Link>
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">New token</h1>
+              <p>Import ERC-20s (or NFTs) to fund proposals in tokens of your choice. </p>
+            </div>
           </div>
+
           <Form
             initialValues={{}}
             onSubmit={async (values) => {
               if (terminal) {
+                setLoading(true)
                 try {
                   const metadataResponse = await fetch("/api/fetch-token-metadata", {
                     method: "POST",
@@ -117,7 +127,7 @@ const NewTokenSettingsPage: BlitzPage = () => {
                       type: "error",
                       message: metadata.message,
                     })
-
+                    setLoading(false)
                     return
                   }
 
@@ -133,6 +143,7 @@ const NewTokenSettingsPage: BlitzPage = () => {
 
                     router.push(Routes.TokenSettingsPage({ terminalHandle }))
                   } catch (e) {
+                    setLoading(false)
                     console.error(e)
                     setToastState({
                       isToastShowing: true,
@@ -141,6 +152,7 @@ const NewTokenSettingsPage: BlitzPage = () => {
                     })
                   }
                 } catch (e) {
+                  setLoading(false)
                   console.error(e)
                 }
               }
@@ -150,7 +162,7 @@ const NewTokenSettingsPage: BlitzPage = () => {
               return (
                 <form onSubmit={handleSubmit} className="mt-12">
                   <div className="flex flex-col w-1/2">
-                    <h3 className="font-bold">Chain*</h3>
+                    <h3 className="font-bold">Network*</h3>
                     <Field
                       name="chainId"
                       component="select"
@@ -174,12 +186,18 @@ const NewTokenSettingsPage: BlitzPage = () => {
                     />
                     <div>
                       <button
-                        className={`rounded text-tunnel-black px-8 py-2 h-full mt-12 bg-electric-violet ${
+                        className={`rounded text-tunnel-black w-32 h-[35px] mt-12 bg-electric-violet ${
                           formState.dirty ? "opacity-100" : "opacity-70"
                         }`}
                         type="submit"
                       >
-                        Add
+                        {loading ? (
+                          <div className="flex justify-center items-center">
+                            <Spinner fill="black" />
+                          </div>
+                        ) : (
+                          "Import"
+                        )}
                       </button>
                     </div>
                   </div>

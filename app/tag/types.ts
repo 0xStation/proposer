@@ -10,6 +10,7 @@ export enum TagType {
   SEASON = "season",
   TOKEN = "token",
   CHECKBOOK_SIGNER = "checkbook signer",
+  INACTIVE = "inactive",
 }
 
 export enum TokenType {
