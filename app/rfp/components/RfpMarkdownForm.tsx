@@ -291,8 +291,10 @@ const RfpMarkdownForm = ({
                 checkbookAddress: rfp?.fundingAddress,
                 fundingTokenSymbol: rfp.data.funding.token.symbol,
                 budgetAmount: rfp.data.funding.budgetAmount,
-                submittingPermission: rfp.data.permissions.submit,
-                viewingPermission: rfp.data.permissions.view,
+                submittingPermissionTokenAddress:
+                  rfp.data.permissions.submit && rfp.data.permissions.submit.address,
+                viewingPermissionTokenAddress:
+                  rfp.data.permissions.view && rfp.data.permissions.view.address,
               }
             : {
                 checkbookAddress: checkbooks?.[0]?.address,
@@ -478,6 +480,7 @@ const RfpMarkdownForm = ({
         }}
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
+          console.log(formState)
           return (
             <>
               <ConfirmationRfpModal
