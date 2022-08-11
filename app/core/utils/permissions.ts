@@ -77,14 +77,24 @@ export const canCreateStation = (address: string | undefined) => {
 }
 
 export const useUserCanSubmitToRfp = (walletAddress: string | undefined, rfp: Rfp) => {
-  const hasNoSubmitPermission = rfp?.data && !rfp.data?.permissions?.submit
+  const hasNoSubmitPermissionSet = rfp?.data && !rfp.data?.permissions?.submit
 
   const canSubmit = useAddressHasToken(
     walletAddress,
     rfp?.data?.permissions && rfp?.data?.permissions.submit
   )
 
-  if (hasNoSubmitPermission) {
+  // if the user has no submit permission set it means the object {data: {permissions: { }}} is empty for submit
+  // this means the RFP has not set any submit permissions, and should default to public
+  // we want to return true no matter the result of canSubmit
+  // --
+  // We are doing an "empty call" to the canSubmit function above
+  // It is a hook, so we cannot call this first and do an early return if true
+  // If we did, react would consider it a conditional in front of a hook, which is not allowed.
+  // Instead, we ALWAYS run the useAddressHasToken function, but we throw out the value if its not set
+  // Otherwise, useAddressHasToken will be false for empty value because user cannot have empty token
+  // or not signed in user cannot have a token (either of the undefined cases)
+  if (hasNoSubmitPermissionSet) {
     return true
   }
 
@@ -92,14 +102,15 @@ export const useUserCanSubmitToRfp = (walletAddress: string | undefined, rfp: Rf
 }
 
 export const useUserCanViewRfp = (walletAddress: string | undefined, rfp: Rfp) => {
-  const hasNoViewPermission = rfp?.data && !rfp.data?.permissions?.view
+  const hasNoViewPermissionSet = rfp?.data && !rfp.data?.permissions?.view
 
   const canView = useAddressHasToken(
     walletAddress,
     rfp?.data?.permissions && rfp?.data?.permissions.view
   )
 
-  if (hasNoViewPermission) {
+  // see useUserCanSubmitToRfp above for details
+  if (hasNoViewPermissionSet) {
     return true
   }
 
@@ -108,6 +119,7 @@ export const useUserCanViewRfp = (walletAddress: string | undefined, rfp: Rfp) =
 
 const balanceOfAbi = ["function balanceOf(address _owner) public view returns (uint256 balance)"]
 
+// returns true if the given address has a positive balance of the token at the given contract address
 export const useAddressHasToken = (
   walletAddress: string | undefined,
   tokenTag: TagTokenMetadata | undefined
