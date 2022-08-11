@@ -1,4 +1,4 @@
-import { invoke, Image, useParam } from "blitz"
+import { invoke, Image, useParam, useSession } from "blitz"
 import { trackClick, trackError, initializeUser } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
 import { METAMASK_ERROR_CODES } from "app/utils/metamaskErrorCodes"
@@ -26,6 +26,7 @@ export const ConnectWalletComponent = () => {
     loading: false,
     error: false,
   })
+  const session = useSession({ suspense: false })
   const [errorMessage, setErrorMessage] = useState<string>("")
   const [showSignView, setShowSignView] = useState<boolean>(false)
   const terminalHandle = useParam("terminalHandle")
@@ -34,9 +35,14 @@ export const ConnectWalletComponent = () => {
   const { chain: activeChain } = useNetwork()
   const [metamaskWallet, walletConnect, coinbaseWallet] = connectors
 
+  console.log("session", session)
+
   const handleWalletConnection = async (connector) => {
     setConnectState({ error: false, loading: true })
     let address = accountData?.address
+    console.log("address", address)
+    console.log("connector", connector)
+    console.log("accountData", accountData)
     if (!address || connector?.id !== accountData?.connector?.id) {
       try {
         await connectAsync({ connector, chainId: activeChain?.id })
@@ -45,7 +51,7 @@ export const ConnectWalletComponent = () => {
       } catch (err) {
         const error = METAMASK_ERROR_CODES[err.code]
         console.error(err)
-        const errorMsg = error.friendlyMessage || error.message || "Something went wrong"
+        const errorMsg = error?.friendlyMessage || error?.message || err.msg
         setErrorMessage(errorMsg)
         trackError(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_ERROR, {
           pageName: window.location.href,
