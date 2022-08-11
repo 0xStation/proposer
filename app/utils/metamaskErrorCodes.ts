@@ -1,3 +1,4 @@
+// https://github.com/MetaMask/eth-rpc-errors/blob/main/src/error-constants.ts
 export const METAMASK_ERROR_CODES = {
   "-32700": {
     standard: "JSON RPC 2.0",
