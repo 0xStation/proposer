@@ -373,7 +373,7 @@ const RFPComponent = ({ rfp, terminalHandle, activeAddress }) => {
                     Propose
                   </button>
                   <span className="hidden group-hover:block absolute top-[110%] right-0 bg-wet-concrete text-xs p-2 rounded border border-tunnel-black z-50">
-                    You must hold ${rfp.data.permissions.submit.symbol} to propose.
+                    You must hold ${rfp?.data?.permissions?.submit?.symbol} to propose.
                   </span>
                 </>
               )

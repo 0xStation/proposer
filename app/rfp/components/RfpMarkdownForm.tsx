@@ -48,6 +48,11 @@ const {
 
 const { ETH, USDC } = TOKEN_SYMBOLS
 
+enum RfpFormTab {
+  General = "GENERAL",
+  Permissions = "PERMISSIONS",
+}
+
 const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
   const isoDate = DateTime.fromISO(dateTime.toString())
 
@@ -74,7 +79,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
-  const [currentTab, setCurrentTab] = useState<"GENERAL" | "PERMISSION">("GENERAL")
+  const [currentTab, setCurrentTab] = useState<RfpFormTab>(RfpFormTab.General)
   const [tokenTags, setTokenTags] = useState<Tag[]>([])
   const router = useRouter()
   const defaultTokenOptionSymbols = [ETH, USDC]
@@ -299,8 +304,8 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
           budgetAmount: string
           markdown: string
           title: string
-          submittingPermission: string
-          viewingPermission: string
+          submittingPermissionTokenAddress: string
+          viewingPermissionTokenAddress: string
         }) => {
           trackClick(RFP.EVENT_NAME.RFP_EDITOR_MODAL_PUBLISH_CLICKED, {
             pageName: PAGE_NAME.RFP_EDITOR_PAGE,
@@ -397,10 +402,10 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                   decimals: selectedToken.decimals,
                 },
                 submittingPermission: tokenTags.find(
-                  (tag) => tag.data.address === values.submittingPermission
+                  (tag) => tag.data.address === values.submittingPermissionTokenAddress
                 )?.data,
                 viewingPermission: tokenTags.find(
-                  (tag) => tag.data.address === values.viewingPermission
+                  (tag) => tag.data.address === values.viewingPermissionTokenAddress
                 )?.data,
                 fundingBudgetAmount: values.budgetAmount,
                 contentBody: values.markdown,
@@ -441,10 +446,10 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                   decimals: selectedToken.decimals,
                 },
                 submittingPermission: tokenTags.find(
-                  (tag) => tag.data.address === values.submittingPermission
+                  (tag) => tag.data.address === values.submittingPermissionTokenAddress
                 )?.data,
                 viewingPermission: tokenTags.find(
-                  (tag) => tag.data.address === values.viewingPermission
+                  (tag) => tag.data.address === values.viewingPermissionTokenAddress
                 )?.data,
                 fundingBudgetAmount: values.budgetAmount,
                 contentBody: values.markdown,
@@ -552,23 +557,23 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                   <div className="border-b border-concrete px-4 pt-4 flex flex-row space-x-4">
                     <span
                       className={`cursor-pointer ${
-                        currentTab === "GENERAL" && "mb-[-1px] border-b-2 font-bold"
+                        currentTab === RfpFormTab.General && "mb-[-1px] border-b-2 font-bold"
                       }`}
-                      onClick={() => setCurrentTab("GENERAL")}
+                      onClick={() => setCurrentTab(RfpFormTab.General)}
                     >
                       General
                     </span>
                     <span
                       className={`cursor-pointer ${
-                        currentTab === "PERMISSION" && "mb-[-1px] border-b-2 font-bold"
+                        currentTab === RfpFormTab.Permissions && "mb-[-1px] border-b-2 font-bold"
                       }`}
-                      onClick={() => setCurrentTab("PERMISSION")}
+                      onClick={() => setCurrentTab(RfpFormTab.Permissions)}
                     >
                       Permission
                     </span>
                   </div>
                   <form className="p-4 grow flex flex-col justify-between">
-                    {currentTab === "GENERAL" ? (
+                    {currentTab === RfpFormTab.General ? (
                       <div>
                         <div className="flex flex-col mt-2">
                           <label className="font-bold">Submission opens*</label>
@@ -898,7 +903,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                             Only those who hold this token will be able to submit a proposal to this
                             RFP.
                           </span>
-                          <Field name="submittingPermission">
+                          <Field name="submittingPermissionTokenAddress">
                             {({ input, meta }) => {
                               return (
                                 <div className="custom-select-wrapper">
@@ -929,7 +934,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                             Only those who hold this token will be able to view a proposal to this
                             RFP.
                           </span>
-                          <Field name="viewingPermission">
+                          <Field name="viewingPermissionTokenAddress">
                             {({ input, meta }) => {
                               return (
                                 <div className="custom-select-wrapper">
