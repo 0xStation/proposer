@@ -26,7 +26,7 @@ export const ConnectWalletComponent = () => {
     loading: false,
     error: false,
   })
-  const session = useSession()
+  const session = useSession({ suspense: false })
   const [errorMessage, setErrorMessage] = useState<string>("")
   const [showSignView, setShowSignView] = useState<boolean>(false)
   const terminalHandle = useParam("terminalHandle")
