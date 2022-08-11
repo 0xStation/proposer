@@ -108,7 +108,7 @@ const TokenSettingsPage: BlitzPage = () => {
           <div className="w-full h-full flex items-center flex-col justify-center">
             <p className="text-marble-white text-2xl font-bold">Import Tokens</p>
             <p className="mt-2 text-marble-white text-base w-[400px] text-center">
-              Import tokens that represent your community&apos;s membership and ownership.
+              Import ERC-20s to fund proposals in tokens of your choice.
             </p>
             <Link href={Routes.NewTokenSettingsPage({ terminalHandle })}>
               <button className="cursor-pointer mt-8 w-[200px] py-1 bg-electric-violet text-tunnel-black rounded text-base">
