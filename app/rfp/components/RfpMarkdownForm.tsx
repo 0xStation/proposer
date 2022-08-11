@@ -36,6 +36,8 @@ import getTokenTagsByTerminalId from "app/tag/queries/getTokenTagsByTerminalId"
 import { TokenType } from "app/tag/types"
 import { trackClick, trackEvent, trackError } from "app/utils/amplitude"
 import { TRACKING_EVENTS, TOKEN_SYMBOLS } from "app/core/utils/constants"
+import getGroupedTagsByTerminalId from "app/tag/queries/getGroupedTagsByTerminalId"
+import { Tag } from "app/tag/types"
 
 const {
   PAGE_NAME,
@@ -85,6 +87,7 @@ const RfpMarkdownForm = ({
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const [currentTab, setCurrentTab] = useState<"GENERAL" | "PERMISSION">("GENERAL")
+  const [tokenTags, setTokenTags] = useState<Tag[]>([])
   const router = useRouter()
   const defaultTokenOptionSymbols = [ETH, USDC]
 
@@ -203,6 +206,20 @@ const RfpMarkdownForm = ({
   })
 
   let { signMessage } = useSignature()
+
+  useQuery(
+    getGroupedTagsByTerminalId,
+    { terminalId: terminal?.id as number },
+    {
+      suspense: false,
+      onSuccess: (groupedTags) => {
+        if (!groupedTags || !groupedTags["token"]) {
+          return
+        }
+        setTokenTags(groupedTags["token"])
+      },
+    }
+  )
 
   return (
     <>
@@ -381,8 +398,12 @@ const RfpMarkdownForm = ({
                   symbol: selectedToken.symbol,
                   decimals: selectedToken.decimals,
                 },
-                submittingPermission: values.submittingPermission,
-                viewingPermission: values.viewingPermission,
+                submittingPermission: tokenTags.find(
+                  (tag) => tag.data.address === values.submittingPermission
+                )?.data,
+                viewingPermission: tokenTags.find(
+                  (tag) => tag.data.address === values.viewingPermission
+                )?.data,
                 fundingBudgetAmount: values.budgetAmount,
                 contentBody: values.markdown,
                 contentTitle: values.title,
@@ -421,8 +442,12 @@ const RfpMarkdownForm = ({
                   symbol: selectedToken.symbol,
                   decimals: selectedToken.decimals,
                 },
-                submittingPermission: values.submittingPermission,
-                viewingPermission: values.viewingPermission,
+                submittingPermission: tokenTags.find(
+                  (tag) => tag.data.address === values.submittingPermission
+                )?.data,
+                viewingPermission: tokenTags.find(
+                  (tag) => tag.data.address === values.viewingPermission
+                )?.data,
                 fundingBudgetAmount: values.budgetAmount,
                 contentBody: values.markdown,
                 contentTitle: values.title,
@@ -878,13 +903,23 @@ const RfpMarkdownForm = ({
                           <Field name="submittingPermission">
                             {({ input, meta }) => {
                               return (
-                                <div>
-                                  <input
+                                <div className="custom-select-wrapper">
+                                  <select
                                     {...input}
-                                    type="text"
-                                    className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
-                                    placeholder="Paste address"
-                                  />
+                                    className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                                  >
+                                    <option value="">No token (public access)</option>
+                                    {tokenTags?.map((token, idx) => {
+                                      return (
+                                        <option
+                                          key={`submit-permission-token-${idx}`}
+                                          value={token.data.address}
+                                        >
+                                          {token.data.symbol}
+                                        </option>
+                                      )
+                                    })}
+                                  </select>
                                 </div>
                               )
                             }}
@@ -899,13 +934,23 @@ const RfpMarkdownForm = ({
                           <Field name="viewingPermission">
                             {({ input, meta }) => {
                               return (
-                                <div>
-                                  <input
+                                <div className="custom-select-wrapper">
+                                  <select
                                     {...input}
-                                    type="text"
-                                    className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
-                                    placeholder="Paste address"
-                                  />
+                                    className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                                  >
+                                    <option value="">No token (public access)</option>
+                                    {tokenTags?.map((token, idx) => {
+                                      return (
+                                        <option
+                                          key={`submit-permission-token-${idx}`}
+                                          value={token.data.address}
+                                        >
+                                          {token.data.symbol}
+                                        </option>
+                                      )
+                                    })}
+                                  </select>
                                 </div>
                               )
                             }}

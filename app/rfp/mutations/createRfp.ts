@@ -1,7 +1,7 @@
 import db from "db"
 import * as z from "zod"
 import { RfpStatus as PrismaRfpStatus } from "@prisma/client"
-import { Token } from "types"
+import { TokenTag, Token } from "types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 const CreateRfp = z.object({
@@ -16,8 +16,8 @@ const CreateRfp = z.object({
   fundingBudgetAmount: z.string(),
   signature: z.string(),
   signatureMessage: z.any(),
-  submittingPermission: z.string().optional(),
-  viewingPermission: z.string().optional(),
+  submittingPermission: TokenTag.optional(),
+  viewingPermission: TokenTag.optional(),
 })
 
 const defaultProposalPrefill =

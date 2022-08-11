@@ -1,4 +1,6 @@
 import { useContractRead } from "wagmi"
+import { TagTokenMetadata } from "app/tag/types"
+import { Rfp } from "app/rfp/types"
 
 export const canEdit = (activeUser, terminalId, type) => {
   if (!activeUser) {
@@ -74,28 +76,50 @@ export const canCreateStation = (address: string | undefined) => {
   return createStationWhitelist.some((address) => address.toLowerCase() === lowercaseAddress)
 }
 
+export const useUserCanSubmitToRfp = (walletAddress: string | undefined, rfp: Rfp) => {
+  const hasNoSubmitPermission = rfp?.data && !rfp.data?.permissions?.submit
+
+  const canSubmit = useAddressHasToken(
+    walletAddress,
+    rfp?.data?.permissions && rfp?.data?.permissions.submit
+  )
+
+  if (hasNoSubmitPermission) {
+    return true
+  }
+
+  return canSubmit
+}
+
+export const useUserCanViewRfp = (walletAddress: string | undefined, rfp: Rfp) => {
+  const hasNoViewPermission = rfp?.data && !rfp.data?.permissions?.view
+
+  const canView = useAddressHasToken(
+    walletAddress,
+    rfp?.data?.permissions && rfp?.data?.permissions.view
+  )
+
+  if (hasNoViewPermission) {
+    return true
+  }
+
+  return canView
+}
+
 const balanceOfAbi = ["function balanceOf(address _owner) public view returns (uint256 balance)"]
 
 export const useAddressHasToken = (
   walletAddress: string | undefined,
-  tokenAddress: string,
-  skip: boolean
+  tokenTag: TagTokenMetadata | undefined
 ) => {
   const { data } = useContractRead({
-    addressOrName: tokenAddress,
+    addressOrName: tokenTag?.address || "",
+    chainId: tokenTag?.chainId,
     contractInterface: balanceOfAbi,
     functionName: "balanceOf",
     args: [walletAddress],
+    enabled: !!tokenTag,
   })
-
-  // itention of skip is to allow for "skipping" over this check for rfps that do not have permissions
-  // we have to pass as a param so we are still calling this hook and not "conditionally calling the hook"
-  // which react does not like.
-  // we can't just rely on tokenAddress being empty or undefined becuase it might actually be undefined
-  // with the intention of checking permissions (not an intentional skip)
-  if (skip) {
-    return true
-  }
 
   if (data) {
     return data.gt(0)

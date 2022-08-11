@@ -11,7 +11,7 @@ import getTerminalMemberCount from "app/accountTerminal/queries/getTerminalMembe
 import getRfpCountByTerminalId from "app/rfp/queries/getRfpCountByTerminalId"
 import getProposalCountByTerminal from "app/proposal/queries/getProposalCountByTerminal"
 import useStore from "app/core/hooks/useStore"
-import { canCreateStation, useAddressHasToken } from "app/core/utils/permissions"
+import { canCreateStation, useUserCanViewRfp } from "app/core/utils/permissions"
 import { DateTime } from "luxon"
 
 const {
@@ -145,13 +145,7 @@ const ExploreStations: BlitzPage = () => {
 }
 
 const RfpComponent = ({ rfp, terminal, activeUser }) => {
-  const noPermissionSet =
-    rfp?.data?.permissions === undefined || Object.keys(rfp?.data?.permissions).length === 0
-  const canView = useAddressHasToken(
-    activeUser?.address,
-    rfp?.data?.permissions ? rfp?.data?.permissions.view : "",
-    noPermissionSet
-  )
+  const canView = useUserCanViewRfp(activeUser?.address, rfp)
 
   if (!canView) {
     return <></>
