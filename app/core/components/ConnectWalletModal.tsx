@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Image, invoke, useParam } from "blitz"
 import { trackClick, trackError, initializeUser } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
+import { METAMASK_ERROR_CODES } from "app/utils/metamaskErrorCodes"
 import Modal from "./Modal"
 import { Spinner } from "app/core/components/Spinner"
 import Metamask from "/public/metamask-logo.svg"
@@ -57,14 +58,10 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         setConnectState({ error: false, success: false, loading: false })
         setShowSignView(true)
       } catch (err) {
+        const error = METAMASK_ERROR_CODES[err.code]
         console.error(err)
-        let errorMsg = "Declined connection."
-        if (err.code === 4001) {
-          setErrorMessage(errorMsg)
-        } else {
-          errorMsg = "Something went wrong."
-          setErrorMessage(errorMsg)
-        }
+        let errorMsg = error.friendlyMessage || error.message || "Something went wrong"
+        setErrorMessage(errorMsg)
 
         trackError(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_ERROR, {
           pageName: window.location.href,
