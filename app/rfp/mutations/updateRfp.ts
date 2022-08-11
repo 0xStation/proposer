@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { Token } from "types"
+import { Token, TokenTag } from "types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 // going to be calling this from edit RFP page, so we will still be passing in all of these data
@@ -16,8 +16,8 @@ const UpdateRfp = z.object({
   fundingToken: Token,
   fundingBudgetAmount: z.string(),
   signature: z.string(),
-  submittingPermission: z.string(),
-  viewingPermission: z.string().optional(),
+  submittingPermission: TokenTag.optional(),
+  viewingPermission: TokenTag.optional(),
   signatureMessage: z.any().optional(),
 })
 

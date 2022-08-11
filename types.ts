@@ -26,3 +26,10 @@ export const Token = z.object({
   symbol: z.string(),
   decimals: z.number(),
 })
+
+export const TokenTag = z.object({
+  type: z.string(),
+  address: z.string(),
+  symbol: z.string(),
+  chainId: z.number(),
+})

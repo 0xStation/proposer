@@ -112,6 +112,10 @@ const RFPInfoTab: BlitzPage = () => {
     }
   }, [query?.rfpEdited])
 
+  if (!rfp) {
+    return <></>
+  }
+
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}RFP`}>
       <AddFundsModal
@@ -130,7 +134,7 @@ const RFPInfoTab: BlitzPage = () => {
           rfpId={query?.rfpEdited}
           isEdit={true}
         />
-        <RfpHeaderNavigation rfpId={rfpId} />
+        <RfpHeaderNavigation rfp={rfp} />
         <div className="h-[calc(100vh-240px)] flex flex-row">
           <div className="w-full p-6 overflow-y-scroll">
             <Preview markdown={rfp?.data?.content?.body} />

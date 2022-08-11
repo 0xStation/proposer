@@ -31,7 +31,7 @@ import Pagination from "app/core/components/Pagination"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import { AddFundsModal } from "../../../../core/components/AddFundsModal"
 import { DateTime } from "luxon"
-import { useAddressHasToken } from "app/core/utils/permissions"
+import { useUserCanSubmitToRfp, useUserCanViewRfp } from "app/core/utils/permissions"
 
 const {
   FEATURE: { RFP },
@@ -295,19 +295,8 @@ const RFPComponent = ({ rfp, terminalHandle, activeAddress }) => {
     }
   }, [rfp])
 
-  const noPermissionSet =
-    rfp?.data?.permissions === undefined || Object.keys(rfp?.data?.permissions).length === 0
-  const canView = useAddressHasToken(
-    activeAddress,
-    rfp?.data?.permissions ? rfp?.data?.permissions.view : "",
-    noPermissionSet
-  )
-
-  const canSubmit = useAddressHasToken(
-    activeAddress,
-    rfp?.data?.permissions ? rfp?.data?.permissions.submit : "",
-    noPermissionSet
-  )
+  const canView = useUserCanViewRfp(activeAddress, rfp)
+  const canSubmit = useUserCanSubmitToRfp(activeAddress, rfp)
 
   if (!canView) {
     return <></>
@@ -383,8 +372,8 @@ const RFPComponent = ({ rfp, terminalHandle, activeAddress }) => {
                   <button className="inline-block border border-electric-violet text-electric-violet rounded px-6 h-[35px] leading-[35px]  whitespace-nowrap opacity-60">
                     Propose
                   </button>
-                  <span className="hidden group-hover:block absolute top-[110%] right-0 bg-wet-concrete text-xs p-2 rounded border border-tunnel-black">
-                    You do not have permission to propose to this RFP.
+                  <span className="hidden group-hover:block absolute top-[110%] right-0 bg-wet-concrete text-xs p-2 rounded border border-tunnel-black z-50">
+                    You must hold ${rfp.data.permissions.submit.symbol} to propose.
                   </span>
                 </>
               )

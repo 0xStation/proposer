@@ -135,7 +135,7 @@ const ProposalsTab: BlitzPage = ({
         />
       )}
       <TerminalNavigation>
-        <RfpHeaderNavigation rfpId={rfpId} />
+        <RfpHeaderNavigation rfp={rfp} />
         <div className="h-[calc(100vh-240px)] flex flex-col">
           <div className="w-full h-20 flex sm:flex-row justify-between items-center">
             <div className="flex ml-5">
