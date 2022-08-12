@@ -13,6 +13,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       permanent: true,
     },
   }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  }
 }
 
 const Home: BlitzPage = () => {
