@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react"
-import { Image, invoke, useParam } from "blitz"
+import { invoke, useParam } from "blitz"
 import { trackClick, trackError, initializeUser } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
-import { METAMASK_ERROR_CODES } from "app/utils/metamaskErrorCodes"
+// import { METAMASK_ERROR_CODES } from "app/utils/metamaskErrorCodes"
 import Modal from "./Modal"
 import { Spinner } from "app/core/components/Spinner"
-import Metamask from "/public/metamask-logo.svg"
-import Coinbase from "/public/coinbase-logo.svg"
-import WalletConnect from "/public/wallet-logo.svg"
-import BackIcon from "/public/back-icon.svg"
+// import Metamask from "/public/metamask-logo.svg"
+// import Coinbase from "/public/coinbase-logo.svg"
+// import WalletConnect from "/public/wallet-logo.svg"
+// import BackIcon from "/public/back-icon.svg"
 import Banner from "/public/walletconnect-banner.png"
 import { useConnect, useAccount, useNetwork } from "wagmi"
 import generateNonce from "app/session/queries/generateNonce"
@@ -19,7 +19,7 @@ const {
   FEATURE: { WALLET_CONNECTION },
 } = TRACKING_EVENTS
 
-const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
+const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen, setConnectWalletClicked }) => {
   const [connectState, setConnectState] = useState<{
     loading: boolean
     success: boolean
@@ -30,17 +30,23 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
     error: false,
   })
   const [errorMessage, setErrorMessage] = useState<string>("")
-  const [showSignView, setShowSignView] = useState<boolean>(false)
+  // const [showSignView, setShowSignView] = useState<boolean>(true)
   const accountData = useAccount()
   const { chain: activeChain } = useNetwork()
   const { connectors, connectAsync, data: connectData, pendingConnector } = useConnect()
-  const [metamaskWallet, walletConnect, coinbaseWallet] = connectors
+  // const [metamaskWallet, walletConnect, coinbaseWallet] = connectors
   const terminalHandle = useParam("terminalHandle")
+  const [mounted, setMounted] = useState<boolean>(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleCloseConnectWalletModal = () => {
     setConnectState({ error: false, success: false, loading: false })
     setErrorMessage("")
     setIsWalletOpen(false)
+    setConnectWalletClicked(false)
   }
 
   useEffect(() => {
@@ -49,33 +55,33 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
     }
   }, [connectState.success])
 
-  const handleWalletConnection = async (connector) => {
-    setConnectState({ error: false, success: false, loading: true })
-    let address = accountData?.address
-    if (!address || connector?.id !== accountData?.connector?.id) {
-      try {
-        await connectAsync({ connector, chainId: activeChain?.id })
-        setConnectState({ error: false, success: false, loading: false })
-        setShowSignView(true)
-      } catch (err) {
-        const error = METAMASK_ERROR_CODES[err.code]
-        console.error(err)
-        const errorMsg = error.friendlyMessage || error.message || "Something went wrong"
-        setErrorMessage(errorMsg)
+  // const handleWalletConnection = async (connector) => {
+  //   setConnectState({ error: false, success: false, loading: true })
+  //   let address = accountData?.address
+  //   if (!address || connector?.id !== accountData?.connector?.id) {
+  //     try {
+  //       await connectAsync({ connector, chainId: activeChain?.id })
+  //       setConnectState({ error: false, success: false, loading: false })
+  //       setShowSignView(true)
+  //     } catch (err) {
+  //       const error = METAMASK_ERROR_CODES[err.code]
+  //       console.error(err)
+  //       const errorMsg = error.friendlyMessage || error.message || "Something went wrong"
+  //       setErrorMessage(errorMsg)
 
-        trackError(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_ERROR, {
-          pageName: window.location.href,
-          stationHandle: terminalHandle as string,
-          errorMsg,
-        })
-        setConnectState({ error: true, success: false, loading: false })
-        return
-      }
-    } else {
-      setConnectState({ error: false, success: false, loading: false })
-      setShowSignView(true)
-    }
-  }
+  //       trackError(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_ERROR, {
+  //         pageName: window.location.href,
+  //         stationHandle: terminalHandle as string,
+  //         errorMsg,
+  //       })
+  //       setConnectState({ error: true, success: false, loading: false })
+  //       return
+  //     }
+  //   } else {
+  //     setConnectState({ error: false, success: false, loading: false })
+  //     setShowSignView(true)
+  //   }
+  // }
 
   const handleSignInWithEthereum = async () => {
     const address = accountData?.address
@@ -105,7 +111,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         statement: "Sign in with Ethereum to access your account on Station.",
         uri: window.location.origin,
         version: "1",
-        chainId: activeChain?.id, // chainId is optional
+        chainId: chainId, // chainId is optional
         nonce: nonceRes,
       })
 
@@ -151,45 +157,45 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
       showTitle={false}
       error={connectState.error}
     >
-      {showSignView && accountData?.isConnected ? (
-        <>
-          <button
-            className="h-[20px] w-[20px] absolute mt-2 ml-2"
-            onClick={() => {
-              setConnectState({ error: false, success: false, loading: false })
-              setShowSignView(false)
-            }}
-          >
-            <Image src={BackIcon} alt="Back icon" />
-          </button>
-          <h1 className="text-2xl font-bold text-marble-white text-center mt-6 mb-2">
-            {connectState.loading ? "Check your wallet to continue " : "Sign in with Ethereum"}
-          </h1>
-          <p className="text-lg text-center">
-            Verify your address so we can securely authenticate you.
-          </p>
-          {connectState.error ? (
-            <div className="mt-2 text-center text-torch-red">
-              <p>{errorMessage || "Something went wrong"}</p>
-            </div>
-          ) : null}
-          <div className="m-6 text-center">
-            <button
-              className="border border-tunnel-black bg-electric-violet text-tunnel-black rounded-md content-center hover:opacity-70 cursor:pointer w-36 h-[35px]"
-              onClick={handleSignInWithEthereum}
-              disabled={connectState.loading}
-            >
-              {connectState.loading ? (
-                <div className="flex justify-center items-center">
-                  <Spinner fill="black" />
-                </div>
-              ) : (
-                "Sign"
-              )}
-            </button>
+      {/* {showSignView && accountData?.isConnected ? ( */}
+      <>
+        {/* <button
+          className="h-[20px] w-[20px] absolute mt-2 ml-2"
+          onClick={() => {
+            setConnectState({ error: false, success: false, loading: false })
+            setShowSignView(false)
+          }}
+        >
+          <Image src={BackIcon} alt="Back icon" />
+        </button> */}
+        <h1 className="text-2xl font-bold text-marble-white text-center mt-6 mb-2">
+          {connectState.loading ? "Check your wallet to continue " : "Sign in with Ethereum"}
+        </h1>
+        <p className="text-lg text-center">
+          Verify your address so we can securely authenticate you.
+        </p>
+        {connectState.error ? (
+          <div className="mt-2 text-center text-torch-red">
+            <p>{errorMessage || "Something went wrong"}</p>
           </div>
-        </>
-      ) : (
+        ) : null}
+        <div className="m-6 text-center">
+          <button
+            className="border border-tunnel-black bg-electric-violet text-tunnel-black rounded-md content-center hover:opacity-70 cursor:pointer w-36 h-[35px]"
+            onClick={handleSignInWithEthereum}
+            disabled={connectState.loading || !mounted || accountData?.isConnecting}
+          >
+            {connectState.loading || !mounted || accountData?.isConnecting ? (
+              <div className="flex justify-center items-center">
+                <Spinner fill="black" />
+              </div>
+            ) : (
+              "Sign"
+            )}
+          </button>
+        </div>
+      </>
+      {/* ) : (
         <>
           <h1 className="text-2xl font-bold text-marble-white text-center mt-6">
             {connectState.loading ? "Check your wallet to continue " : "Enter Station"}
@@ -300,8 +306,8 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
               </button>
             </div>
           </div>
-        </>
-      )}
+        </> 
+      )}*/}
     </Modal>
   )
 }

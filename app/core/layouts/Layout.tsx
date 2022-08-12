@@ -1,6 +1,6 @@
 import { Head, BlitzLayout } from "blitz"
 import Navigation from "../components/Navigation"
-import ModalContainer from "../components/ModalContainer"
+// import ModalContainer from "../components/ModalContainer"
 import ToastContainer from "../components/ToastContainer"
 
 const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
@@ -19,7 +19,7 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
         />
         <link rel="apple-touch-icon" href="/station-logo-favicon.ico" />
       </Head>
-      <ModalContainer />
+      {/* <ModalContainer /> */}
       <ToastContainer />
       <Navigation>{children}</Navigation>
     </>

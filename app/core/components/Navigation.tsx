@@ -1,9 +1,10 @@
 import StationLogo from "public/station-letters.svg"
+import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { trackClick } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
 import { useEffect } from "react"
 import { Image, invoke, Routes, useQuery, useParam, useRouter, useSession } from "blitz"
-import { useAccount } from "wagmi"
+import { useAccount, useNetwork } from "wagmi"
 import useStore from "../hooks/useStore"
 import truncateString from "../utils/truncateString"
 import { useMemo, useState } from "react"
@@ -14,6 +15,7 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import createAccount from "app/account/mutations/createAccount"
 import { DEFAULT_PFP_URLS } from "../utils/constants"
 import ExploreImageIcon from "public/explore.svg"
+import ConnectWalletModal from "./ConnectWalletModal"
 
 const {
   FEATURE: { WALLET_CONNECTION },
@@ -24,12 +26,30 @@ const Navigation = ({ children }: { children?: any }) => {
   const accountData = useAccount()
   const activeUser = useStore((state) => state.activeUser)
   const setActiveUser = useStore((state) => state.setActiveUser)
-  const toggleWalletModal = useStore((state) => state.toggleWalletModal)
-  const walletModalOpen = useStore((state) => state.walletModalOpen)
+  // const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  // const walletModalOpen = useStore((state) => state.walletModalOpen)
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [profileNavDrawerIsOpen, setProfileNavDrawerIsOpen] = useState<boolean>(false)
   const router = useRouter()
   const terminalHandle = useParam("terminalHandle")
+  const { openConnectModal } = useConnectModal()
+  const [isWalletOpen, setIsWalletOpen] = useState<boolean>(false)
+  const [connectWalletClicked, setConnectWalletClicked] = useState<boolean>(false)
+  const [mounted, setMounted] = useState<boolean>(false)
+  const { chain: activeChain } = useNetwork()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (mounted && connectWalletClicked) {
+      if (accountData.address && activeChain?.id && !session?.siwe?.address) {
+        setIsWalletOpen(true)
+        setConnectWalletClicked(false)
+      }
+    }
+  }, [mounted, connectWalletClicked, accountData?.address, session?.siwe?.address])
 
   // If the user connects + signs their wallet,
   // set the active user. The active user will be
@@ -112,6 +132,11 @@ const Navigation = ({ children }: { children?: any }) => {
         isOpen={profileNavDrawerIsOpen}
         setIsOpen={setProfileNavDrawerIsOpen}
       />
+      <ConnectWalletModal
+        isWalletOpen={isWalletOpen}
+        setIsWalletOpen={setIsWalletOpen}
+        setConnectWalletClicked={setConnectWalletClicked}
+      />
       {/* Need a parent element around the banner or else there's a chance for a hydration issue and the dom rearranges */}
       <div>
         {!session.isLoading && !session?.siwe?.address && (
@@ -132,14 +157,15 @@ const Navigation = ({ children }: { children?: any }) => {
                   pageName: window.location.href,
                   stationHandle: terminalHandle as string,
                 })
-                toggleWalletModal(true)
+                openConnectModal?.()
+                setConnectWalletClicked(true)
               }}
               className={`h-[35px] ${
                 !address
                   ? "bg-electric-violet text-tunnel-black hover:opacity-70"
                   : "border border-electric-violet text-electric-violet hover:bg-concrete"
               }  w-48 rounded align-middle p-1 ml-28 mt-4 mr-[-2rem] mb-3 lg:mb-0 md:mr-[-6.65rem] right-1/3 fixed bottom-0 lg:bottom-auto`}
-              disabled={walletModalOpen}
+              disabled={isWalletOpen}
             >
               {!address ? "Connect Wallet" : "Sign in with Ethereum"}
             </button>

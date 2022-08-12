@@ -7,19 +7,11 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import createAccount from "app/account/mutations/createAccount"
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  const session = await getSession(req, res)
-
-  if (session?.siwe?.address) {
-    return {
-      redirect: {
-        destination: `/profile/${session?.siwe?.address}`,
-        permanent: false,
-      },
-    }
-  }
-
   return {
-    props: {}, // will be passed to the page component as props
+    redirect: {
+      destination: "/station/explore",
+      permanent: false,
+    },
   }
 }
 
