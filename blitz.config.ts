@@ -26,31 +26,6 @@ const config: BlitzConfig = {
         destination: "/station/explore",
         permanent: true,
       },
-      {
-        source: "/station/:terminalHandle",
-        destination: "/station/:terminalHandle/bulletin",
-        permanent: false,
-      },
-      {
-        source: "/station/:terminalHandle/",
-        destination: "/station/:terminalHandle/bulletin",
-        permanent: false,
-      },
-      {
-        source: "/station/:terminalHandle/",
-        destination: "/station/:terminalHandle/bulletin",
-        permanent: false,
-      },
-      {
-        source: "/station/:terminalHandle/bulletin/rfp/:rfpId",
-        destination: "/station/:terminalHandle/bulletin/rfp/:rfpId/info",
-        permanent: false,
-      },
-      {
-        source: "/station/:terminalHandle/bulletin/rfp/:rfpId/",
-        destination: "/station/:terminalHandle/bulletin/rfp/:rfpId/info",
-        permanent: false,
-      },
     ]
   },
   /* Uncomment this to customize the webpack config
