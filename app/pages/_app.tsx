@@ -1,6 +1,6 @@
 import { AppProps } from "blitz"
 import "@rainbow-me/rainbowkit/styles.css"
-import { getDefaultWallets, RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit"
+import { getDefaultWallets, RainbowKitProvider, midnightTheme } from "@rainbow-me/rainbowkit"
 import trackerInit from "app/utils/amplitude"
 import "app/core/styles/index.css"
 import { WagmiConfig, defaultChains, createClient, configureChains } from "wagmi"
@@ -53,7 +53,15 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <WagmiConfig client={client}>
-      <RainbowKitProvider chains={chains} theme={darkTheme()}>
+      <RainbowKitProvider
+        chains={chains}
+        theme={midnightTheme({
+          accentColor: "#AD72FF",
+          accentColorForeground: "#000000",
+          fontStack: "system",
+          borderRadius: "small",
+        })}
+      >
         {getLayout(<Component {...pageProps} />)}
       </RainbowKitProvider>
     </WagmiConfig>

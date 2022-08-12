@@ -10,7 +10,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
     redirect: {
       destination: "/station/explore",
-      permanent: false,
+      permanent: true,
     },
   }
 }
