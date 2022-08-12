@@ -10,7 +10,7 @@ const ModalContainer = () => {
     // <Fragment>
     //   <ConnectWalletModal isWalletOpen={walletModalOpen} setIsWalletOpen={toggleWalletModal} />
     // </Fragment>
-    <></>
+    <div></div>
   )
 }
 
