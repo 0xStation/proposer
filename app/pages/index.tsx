@@ -6,14 +6,14 @@ import { ConnectWalletComponent } from "app/core/components/ConnectWalletCompone
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import createAccount from "app/account/mutations/createAccount"
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  return {
-    redirect: {
-      destination: "/station/explore",
-      permanent: true,
-    },
-  }
-}
+// export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+//   return {
+//     redirect: {
+//       destination: "/station/explore",
+//       permanent: true,
+//     },
+//   }
+// }
 
 const Home: BlitzPage = () => {
   const router = useRouter()
