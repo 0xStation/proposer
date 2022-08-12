@@ -52,7 +52,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   const handleWalletConnection = async (connector) => {
     setConnectState({ error: false, success: false, loading: true })
     let address = accountData?.address
-    if (!address || connector?.id !== accountData?.connector?.id) {
+    if (!address || (accountData.connector && connector?.id !== accountData?.connector?.id)) {
       try {
         await connectAsync({ connector, chainId: activeChain?.id })
         setConnectState({ error: false, success: false, loading: false })
