@@ -2,16 +2,15 @@
 // import ConnectWalletModal from "app/core/components/ConnectWalletModal"
 // import useStore from "../hooks/useStore"
 
-const ModalContainer = () => {
-  // const walletModalOpen = useStore((state) => state.walletModalOpen)
-  // const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+// const ModalContainer = () => {
+//   // const walletModalOpen = useStore((state) => state.walletModalOpen)
+//   // const toggleWalletModal = useStore((state) => state.toggleWalletModal)
 
-  return (
-    // <Fragment>
-    //   <ConnectWalletModal isWalletOpen={walletModalOpen} setIsWalletOpen={toggleWalletModal} />
-    // </Fragment>
-    <div></div>
-  )
-}
-
+//   return (
+//     // <Fragment>
+//     //   <ConnectWalletModal isWalletOpen={walletModalOpen} setIsWalletOpen={toggleWalletModal} />
+//     // </Fragment>
+//   )
+// }
+export const ModalContainer = () => <div></div>
 export default ModalContainer
