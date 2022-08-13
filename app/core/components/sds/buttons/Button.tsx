@@ -1,14 +1,33 @@
 import React from "react"
+import { Spinner } from "../../Spinner"
+
+export enum ButtonType {
+  Primary = "primary",
+  Secondary = "secondary",
+  Unemphesized = "unemphesized",
+}
+
+const classNames = (...classes) => {
+  return classes.filter(Boolean).join(" ")
+}
 
 interface ButtonProps {
-  /**
-   * Is this the principal call to action on the page?
-   */
-  primary?: boolean
   /**
    * Button contents
    */
   label: string
+  /**
+   * Is this the principal call to action on the page?
+   */
+  type?: ButtonType
+  /**
+   * If the button is disabled
+   */
+  isDisabled?: boolean
+  /**
+   * If the button is in a loading state
+   */
+  isLoading?: boolean
   /**
    * Optional click handler
    */
@@ -18,15 +37,37 @@ interface ButtonProps {
 /**
  * Primary UI component for user interaction.
  */
-const Button = ({ primary = false, label, ...props }: ButtonProps) => {
+const Button = ({
+  type = ButtonType.Primary,
+  label,
+  isDisabled = false,
+  isLoading = false,
+  ...props
+}: ButtonProps) => {
   return (
     <button
       type="button"
-      className={`${primary ? "bg-electric-violet text-tunnel-black" : "text-electric-violet"}
-        ${label.length <= 5 ? "w-[98px]" : "px-6"} border border-electric-violet rounded h-[35px]`}
+      disabled={isDisabled}
+      className={classNames(
+        "border rounded h-[35px] font-bold cursor-pointer",
+        isDisabled && "opacity-50 cursor-default",
+        type === ButtonType.Primary &&
+          "bg-electric-violet border-electric-violet text-tunnel-black hover:bg-electric-violet/80 hover:border-transparent",
+        type === ButtonType.Secondary &&
+          "text-electric-violet border-electric-violet bg-tunnel-black hover:bg-tunnel-black/80",
+        type === ButtonType.Unemphesized &&
+          "text-marble-white border-marble-white bg-tunnel-black hover:bg-tunnel-black/80",
+        label.length <= 5 || isLoading ? "w-[98px]" : "px-6"
+      )}
       {...props}
     >
-      {label}
+      {isLoading ? (
+        <div className="flex justify-center items-center">
+          <Spinner fill="black" />
+        </div>
+      ) : (
+        label
+      )}
     </button>
   )
 }
