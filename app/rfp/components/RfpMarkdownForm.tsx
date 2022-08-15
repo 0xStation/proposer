@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { DateTime } from "luxon"
-import { useMutation, invalidateQuery, Link, Routes, useRouter, useQuery } from "blitz"
+import { useMutation, invalidateQuery, Link, Routes, useRouter, useQuery, useParam } from "blitz"
 import { useNetwork, useToken } from "wagmi"
 import { Field, Form } from "react-final-form"
 import { XIcon, RefreshIcon, SpeakerphoneIcon } from "@heroicons/react/solid"
@@ -36,6 +36,8 @@ import getTokenTagsByTerminalId from "app/tag/queries/getTokenTagsByTerminalId"
 import { TokenType } from "app/tag/types"
 import { trackClick, trackEvent, trackError } from "app/utils/amplitude"
 import { TRACKING_EVENTS, TOKEN_SYMBOLS } from "app/core/utils/constants"
+import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
+import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
 
 const {
   PAGE_NAME,
@@ -53,21 +55,9 @@ const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
   return isoDate.toString().slice(0, -13)
 }
 
-const RfpMarkdownForm = ({
-  terminal,
-  checkbooks,
-  refetchCheckbooks,
-  isEdit = false,
-  rfp = undefined,
-}: {
-  terminal: Terminal
-  refetchCheckbooks: any
-  checkbooks: Checkbook[]
-  isEdit?: boolean
-  rfp?: Rfp
-}) => {
+const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean; rfp?: Rfp }) => {
   const { chain: activeChain } = useNetwork()
-  const [checkbookOptions, setCheckbookOptions] = useState<Checkbook[]>(checkbooks)
+  const [checkbookOptions, setCheckbookOptions] = useState<Checkbook[]>()
   const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
   const [shortcutsOpen, setShortcutsOpen] = useState<boolean>(false)
@@ -76,9 +66,7 @@ const RfpMarkdownForm = ({
   const [previewMode, setPreviewMode] = useState<boolean>(false)
   const [importedTokenOptions, setImportedTokenOptions] = useState<any[]>()
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(
-    rfp?.data?.funding?.token?.chainId ||
-      (checkbooks?.[0]?.chainId as number) ||
-      (activeChain?.id as number)
+    rfp?.data?.funding?.token?.chainId || (activeChain?.id as number)
   )
   const [selectedToken, setSelectedToken] = useState<any>(ETH_METADATA)
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
@@ -86,6 +74,20 @@ const RfpMarkdownForm = ({
   const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
   const defaultTokenOptionSymbols = [ETH, USDC]
+
+  const terminalHandle = useParam("terminalHandle") as string
+  const [terminal, { isSuccess: finishedFetchingTerminal }] = useQuery(
+    getTerminalByHandle,
+    { handle: terminalHandle },
+    { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
+  )
+
+  const [checkbooks, { refetch: refetchCheckbooks, isSuccess: finishedFetchingCheckbooks }] =
+    useQuery(
+      getCheckbooksByTerminal,
+      { terminalId: terminal?.id || 0 },
+      { suspense: false, enabled: !!finishedFetchingTerminal, refetchOnWindowFocus: false }
+    )
 
   const {
     data: balanceData,
@@ -132,7 +134,7 @@ const RfpMarkdownForm = ({
       setCheckbookOptions(filteredCheckbookOptions)
       setSelectedCheckbook(filteredCheckbookOptions?.[0])
     }
-  }, [selectedNetworkId, finishedFetchingTags])
+  }, [selectedNetworkId, finishedFetchingTags, finishedFetchingCheckbooks])
 
   useEffect(() => {
     trackClick(RFP.EVENT_NAME.RFP_EDITOR_PAGE_SHOWN, {
@@ -164,9 +166,9 @@ const RfpMarkdownForm = ({
         stationId: terminal?.id,
       })
       invalidateQuery(getRfpsByTerminalId)
-      Routes.BulletinPage({ terminalHandle: terminal?.handle, rfpPublished: _data?.id })
+      Routes.BulletinPage({ terminalHandle: terminalHandle as string, rfpPublished: _data?.id })
       router.push(
-        Routes.BulletinPage({ terminalHandle: terminal?.handle, rfpPublished: _data?.id })
+        Routes.BulletinPage({ terminalHandle: terminalHandle as string, rfpPublished: _data?.id })
       )
     },
     onError: (error: Error) => {
@@ -179,14 +181,14 @@ const RfpMarkdownForm = ({
       trackEvent(RFP.EVENT_NAME.RFP_EDITED, {
         pageName: PAGE_NAME.RFP_EDITOR_PAGE,
         userAddress: activeUser?.address,
-        stationHandle: terminal?.handle as string,
+        stationHandle: terminalHandle as string,
         stationId: terminal?.id,
         rfpId: rfp?.id,
       })
       invalidateQuery(getRfpsByTerminalId)
       router.push(
         Routes.BulletinPage({
-          terminalHandle: terminal?.handle,
+          terminalHandle: terminalHandle as string,
           rfpId: rfp?.id,
           rfpEdited: rfp?.id,
         })
@@ -209,12 +211,12 @@ const RfpMarkdownForm = ({
                 if (isEdit) {
                   router.push(
                     Routes.RFPInfoTab({
-                      terminalHandle: terminal?.handle,
+                      terminalHandle: terminalHandle as string,
                       rfpId: rfp?.id as string,
                     })
                   )
                 } else {
-                  router.push(Routes.BulletinPage({ terminalHandle: terminal?.handle }))
+                  router.push(Routes.BulletinPage({ terminalHandle: terminalHandle as string }))
                 }
               }}
             >
@@ -305,7 +307,7 @@ const RfpMarkdownForm = ({
             return
           }
 
-          const checkbook = checkbooks.find((checkbook) =>
+          const checkbook = checkbooks?.find((checkbook) =>
             addressesAreEqual(checkbook.address, values.checkbookAddress)
           )
 
@@ -383,7 +385,7 @@ const RfpMarkdownForm = ({
               trackError(RFP.EVENT_NAME.ERROR_EDITING_RFP, {
                 pageName: PAGE_NAME.RFP_EDITOR_PAGE,
                 userAddress: activeUser?.address,
-                stationHandle: terminal?.handle as string,
+                stationHandle: terminalHandle as string,
                 stationId: terminal?.id,
                 startDate: values.startDate,
                 endDate: values.endDate,
@@ -396,7 +398,7 @@ const RfpMarkdownForm = ({
           } else {
             try {
               await createRfpMutation({
-                terminalId: terminal?.id,
+                terminalId: terminal?.id as number,
                 // convert luxon's `DateTime` obj to UTC to store in db
                 startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
                 endDate: values.endDate
@@ -661,7 +663,7 @@ const RfpMarkdownForm = ({
                           <div className="flex items-center justify-between mt-1">
                             <Link
                               href={Routes.NewTokenSettingsPage({
-                                terminalHandle: terminal?.handle,
+                                terminalHandle: terminalHandle as string,
                               })}
                               passHref
                             >
@@ -727,7 +729,7 @@ const RfpMarkdownForm = ({
                                     {...input}
                                     className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
                                     onChange={(e) => {
-                                      const checkbook = checkbookOptions.find(
+                                      const checkbook = checkbookOptions?.find(
                                         (checkbook) => checkbook.address === e.target.value
                                       )
                                       setSelectedCheckbook(checkbook)
@@ -756,7 +758,7 @@ const RfpMarkdownForm = ({
                           <div className="flex items-center justify-between mt-1">
                             <Link
                               href={Routes.NewCheckbookSettingsPage({
-                                terminalHandle: terminal?.handle,
+                                terminalHandle: terminalHandle,
                               })}
                               passHref
                             >
