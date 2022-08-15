@@ -80,7 +80,7 @@ const RfpMarkdownForm = ({
       (checkbooks?.[0]?.chainId as number) ||
       (activeChain?.id as number)
   )
-  const [selectedToken, setSelectedToken] = useState<any>("")
+  const [selectedToken, setSelectedToken] = useState<any>(ETH_METADATA)
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
@@ -127,7 +127,7 @@ const RfpMarkdownForm = ({
 
       setImportedTokenOptions(filteredTokenOptions)
 
-      setSelectedToken(filteredTokenOptions?.[0])
+      setSelectedToken(filteredTokenOptions?.[0] || ETH_METADATA)
 
       // filter checkbooks based on selected network
       const filteredCheckbookOptions = checkbooks?.filter(
@@ -322,7 +322,7 @@ const RfpMarkdownForm = ({
             return
           }
 
-          if (selectedToken.symbol !== ETH || selectedToken.symbol !== USDC) {
+          if (selectedToken.symbol !== ETH && selectedToken.symbol !== USDC) {
             if (tokenFetchSuccess) {
               selectedToken.decimals = balanceData?.decimals
             } else {
@@ -617,7 +617,7 @@ const RfpMarkdownForm = ({
                                   <select
                                     {...input}
                                     className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
-                                    value={(selectedToken?.symbol as string) || ETH}
+                                    value={selectedToken.symbol as string}
                                     onChange={(e) => {
                                       let fundingToken
                                       if (e.target.value === ETH) {
