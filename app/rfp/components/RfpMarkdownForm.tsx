@@ -109,10 +109,6 @@ const RfpMarkdownForm = ({
   )
 
   useEffect(() => {
-    setCheckbookOptions(checkbooks)
-  }, [checkbooks])
-
-  useEffect(() => {
     if (selectedNetworkId) {
       // filter tokens based on selected network
       const filteredTokenOptions = tags
