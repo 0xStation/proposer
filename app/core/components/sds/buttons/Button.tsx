@@ -21,6 +21,11 @@ interface ButtonProps {
    */
   type?: ButtonType
   /**
+   * If the button is part of a form and should have submit type (vs button type)
+   * There is also reset button type, but I don't think we ever use that.
+   */
+  isSubmitType?: boolean
+  /**
    * If the button is disabled
    */
   isDisabled?: boolean
@@ -40,13 +45,14 @@ interface ButtonProps {
 const Button = ({
   type = ButtonType.Primary,
   label,
+  isSubmitType = false,
   isDisabled = false,
   isLoading = false,
   ...props
 }: ButtonProps) => {
   return (
     <button
-      type="button"
+      type={isSubmitType ? "submit" : "button"}
       disabled={isDisabled}
       className={classNames(
         "border rounded h-[35px] font-bold cursor-pointer",
@@ -54,9 +60,9 @@ const Button = ({
         type === ButtonType.Primary &&
           "bg-electric-violet border-electric-violet text-tunnel-black hover:bg-electric-violet/80 hover:border-transparent",
         type === ButtonType.Secondary &&
-          "text-electric-violet border-electric-violet bg-tunnel-black hover:bg-tunnel-black/80",
+          "text-electric-violet border-electric-violet bg-tunnel-black hover:bg-wet-concrete",
         type === ButtonType.Unemphesized &&
-          "text-marble-white border-marble-white bg-tunnel-black hover:bg-tunnel-black/80",
+          "text-marble-white border-marble-white bg-tunnel-black hover:bg-wet-concrete",
         label.length <= 5 || isLoading ? "w-[98px]" : "px-6"
       )}
       {...props}
