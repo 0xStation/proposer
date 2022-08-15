@@ -10,7 +10,7 @@ import { Spinner } from "app/core/components/Spinner"
 // import WalletConnect from "/public/wallet-logo.svg"
 // import BackIcon from "/public/back-icon.svg"
 import Banner from "/public/walletconnect-banner.png"
-import { useConnect, useAccount, useNetwork } from "wagmi"
+import { useAccount, useNetwork } from "wagmi"
 import generateNonce from "app/session/queries/generateNonce"
 import { SiweMessage } from "siwe"
 import verify from "app/session/mutations/verify"
@@ -19,7 +19,7 @@ const {
   FEATURE: { WALLET_CONNECTION },
 } = TRACKING_EVENTS
 
-const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen, setConnectWalletClicked }) => {
+export const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen, setConnectWalletClicked }) => {
   const [connectState, setConnectState] = useState<{
     loading: boolean
     success: boolean
@@ -33,7 +33,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen, setConnectWalletCli
   // const [showSignView, setShowSignView] = useState<boolean>(true)
   const accountData = useAccount()
   const { chain: activeChain } = useNetwork()
-  const { connectors, connectAsync, data: connectData, pendingConnector } = useConnect()
+  // const { connectors, connectAsync, data: connectData, pendingConnector } = useConnect()
   // const [metamaskWallet, walletConnect, coinbaseWallet] = connectors
   const terminalHandle = useParam("terminalHandle")
   const [mounted, setMounted] = useState<boolean>(false)
