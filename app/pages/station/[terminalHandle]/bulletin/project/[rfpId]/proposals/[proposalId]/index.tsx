@@ -347,7 +347,7 @@ const ProposalPage: BlitzPage = ({
                     </span>
                   </div>
                 </div>
-                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Projects</h4>
+                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Project</h4>
                 <span className="flex flex-row items-center group relative w-fit">
                   {rfp?.status !== RfpStatus.DELETED ? (
                     <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })} passHref>

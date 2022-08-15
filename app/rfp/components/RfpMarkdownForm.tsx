@@ -771,7 +771,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                           <label className="font-bold block">Checkbook*</label>
                           <span className="text-xs text-concrete block">
                             Deposit funds here to create checks for proposers to claim once their
-                            projects have been approved.{" "}
+                            proposals have been approved.{" "}
                             <a
                               href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
                               className="text-electric-violet"

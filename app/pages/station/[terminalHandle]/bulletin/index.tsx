@@ -179,7 +179,7 @@ const BulletinPage: BlitzPage = () => {
                   router.push(Routes.CreateRFPPage({ terminalHandle }))
                 }}
               >
-                Create Project
+                Create project
               </button>
             )}
           </div>
@@ -263,7 +263,7 @@ const BulletinPage: BlitzPage = () => {
                     router.push(Routes.CreateRFPPage({ terminalHandle }))
                   }}
                 >
-                  Create Project
+                  Create project
                 </button>
               </div>
             ) : rfps?.length === 0 ? (
