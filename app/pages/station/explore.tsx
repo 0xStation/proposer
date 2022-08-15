@@ -90,7 +90,7 @@ const ExploreStations: BlitzPage = () => {
               className={`${tab === "RFP" && "border-b mb-[-1px] font-bold"} cursor-pointer`}
               onClick={() => setTab("RFP")}
             >
-              Requests for proposals
+              Projects
             </span>
           </div>
 
@@ -101,7 +101,7 @@ const ExploreStations: BlitzPage = () => {
             }
             page={page}
             setPage={setPage}
-            resultsLabel={tab === "STATION" ? "stations" : "RFPs"}
+            resultsLabel={tab === "STATION" ? "stations" : "projects"}
             className="pl-6 sm:pr-6 text-sm pt-5 mb-5"
           />
         </div>
@@ -110,12 +110,12 @@ const ExploreStations: BlitzPage = () => {
             <span className="basis-96 ml-6 mb-2 tracking-wider">Station info</span>
             <span className="basis-[42rem] ml-9 mb-2 tracking-wider">Station description</span>
             <span className="basis-32 ml-6 mb-2 tracking-wider">Members</span>
-            <span className="basis-32 ml-2 mb-2 tracking-wider">Open RFPs</span>
+            <span className="basis-32 ml-2 mb-2 tracking-wider">Open projects</span>
             <span className="basis-32 ml-2 mr-6 mb-2 tracking-wider">Proposals</span>
           </div>
         ) : (
           <div className="border-y border-concrete pt-8 text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
-            <span className="basis-[44rem] ml-6 mb-2 tracking-wider">Request for proposals</span>
+            <span className="basis-[44rem] ml-6 mb-2 tracking-wider">Title</span>
             <span className="basis-44 ml-9 mb-2 tracking-wider">Submissions</span>
             <span className="basis-44 ml-6 mb-2 tracking-wider">Open date</span>
             <span className="basis-44 ml-2 mb-2 tracking-wider">Close date</span>

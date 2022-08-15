@@ -135,9 +135,7 @@ const Navigation = ({ children }) => {
                   </button>
                   {navigationContent}
                   <div className="fixed bottom-6 left-6">
-                    <Link href={Routes.BulletinPage({ terminalHandle })}>
-                      Back to Requests for proposals
-                    </Link>
+                    <Link href={Routes.BulletinPage({ terminalHandle })}>Back to projects</Link>
                   </div>
                 </div>
               </div>
