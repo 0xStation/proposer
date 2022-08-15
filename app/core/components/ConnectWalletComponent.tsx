@@ -37,7 +37,8 @@ export const ConnectWalletComponent = () => {
   const handleWalletConnection = async (connector) => {
     setConnectState({ error: false, loading: true })
     let address = accountData?.address
-    if (!address || connector?.id !== accountData?.connector?.id) {
+
+    if (!address || (accountData?.connector && connector?.id !== accountData?.connector?.id)) {
       try {
         await connectAsync({ connector, chainId: activeChain?.id })
         setConnectState({ error: false, loading: false })
@@ -45,7 +46,7 @@ export const ConnectWalletComponent = () => {
       } catch (err) {
         const error = METAMASK_ERROR_CODES[err.code]
         console.error(err)
-        const errorMsg = error.friendlyMessage || error.message || "Something went wrong"
+        const errorMsg = error?.friendlyMessage || error?.message || err.msg
         setErrorMessage(errorMsg)
         trackError(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_ERROR, {
           pageName: window.location.href,

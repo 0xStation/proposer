@@ -87,7 +87,7 @@ const RfpMarkdownForm = ({
       (checkbooks?.[0]?.chainId as number) ||
       (activeChain?.id as number)
   )
-  const [selectedToken, setSelectedToken] = useState<any>("")
+  const [selectedToken, setSelectedToken] = useState<any>(ETH_METADATA)
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
@@ -118,10 +118,6 @@ const RfpMarkdownForm = ({
   )
 
   useEffect(() => {
-    setCheckbookOptions(checkbooks)
-  }, [checkbooks])
-
-  useEffect(() => {
     if (selectedNetworkId) {
       // filter tokens based on selected network
       const filteredTokenOptions = tags
@@ -136,7 +132,7 @@ const RfpMarkdownForm = ({
 
       setImportedTokenOptions(filteredTokenOptions)
 
-      setSelectedToken(filteredTokenOptions?.[0])
+      setSelectedToken(filteredTokenOptions?.[0] || ETH_METADATA)
 
       // filter checkbooks based on selected network
       const filteredCheckbookOptions = checkbooks?.filter(
@@ -313,13 +309,17 @@ const RfpMarkdownForm = ({
           }
         }
 
-        if (!selectedToken) {
-          setToastState({
-            isToastShowing: true,
-            type: "error",
-            message: "Could not find token.",
-          })
-          return
+        if (selectedToken.symbol !== ETH && selectedToken.symbol !== USDC) {
+          if (tokenFetchSuccess) {
+            selectedToken.decimals = balanceData?.decimals
+          } else {
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "Unable to retrieve decimals for the provided token.",
+            })
+            return
+          }
         }
 
         const parsedBudgetAmount = parseUnits(values.budgetAmount, selectedToken.decimals)
@@ -676,66 +676,84 @@ const RfpMarkdownForm = ({
                           }}
                         </Field>
                       </div>
-                      <div className="flex flex-col mt-6">
-                        <label className="font-bold">Network*</label>
-                        <Field name="network">
-                          {({ input, meta }) => {
-                            return (
-                              <div className="custom-select-wrapper">
-                                <select
-                                  {...input}
-                                  className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
-                                  value={selectedNetworkId as number}
-                                  onChange={(e) => {
-                                    const network = SUPPORTED_CHAINS.find(
-                                      (chain) => chain.id === parseInt(e.target.value)
-                                    )
-                                    setSelectedNetworkId(network?.id as number)
-                                    // custom values can be compatible with react-final-form by calling
-                                    // the props.input.onChange callback
-                                    // https://final-form.org/docs/react-final-form/api/Field
-                                    input.onChange(network?.id)
-                                  }}
-                                >
-                                  <option value="">Choose option</option>
-                                  {SUPPORTED_CHAINS?.map((chain, idx) => {
-                                    return (
-                                      <option key={chain.id} value={chain.id}>
-                                        {chain.name}
-                                      </option>
-                                    )
-                                  })}
-                                </select>
-                                {(meta.touched || attemptedSubmit) && meta.error && (
-                                  <span className="text-torch-red text-xs">{meta.error}</span>
-                                )}
-                              </div>
-                            )
-                          }}
-                        </Field>
-                      </div>
-                      <div className="flex flex-col mt-6">
-                        <label className="font-bold block">Reward token*</label>
-                        <Field name="fundingTokenSymbol">
-                          {({ input, meta }) => {
-                            return (
-                              <div className="custom-select-wrapper">
-                                <select
-                                  {...input}
-                                  className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
-                                  value={(selectedToken?.symbol as string) || ETH}
-                                  onChange={(e) => {
-                                    let fundingToken
-                                    if (e.target.value === ETH) {
-                                      fundingToken = ETH_METADATA
-                                    } else if (e.target.value === USDC) {
-                                      fundingToken = getStablecoinMetadataBySymbol({
-                                        chain: selectedNetworkId,
-                                        symbol: USDC,
-                                      })
-                                    } else {
-                                      fundingToken = importedTokenOptions?.find(
-                                        (token) => token.symbol === e.target.value
+                      <div>
+                        <div className="flex flex-col mt-6">
+                          <label className="font-bold">Network*</label>
+                          <Field name="network">
+                            {({ input, meta }) => {
+                              return (
+                                <div className="custom-select-wrapper">
+                                  <select
+                                    {...input}
+                                    className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                                    value={selectedNetworkId as number}
+                                    onChange={(e) => {
+                                      const network = SUPPORTED_CHAINS.find(
+                                        (chain) => chain.id === parseInt(e.target.value)
+                                      )
+                                      setSelectedNetworkId(network?.id as number)
+                                      // custom values can be compatible with react-final-form by calling
+                                      // the props.input.onChange callback
+                                      // https://final-form.org/docs/react-final-form/api/Field
+                                      input.onChange(network?.id)
+                                    }}
+                                  >
+                                    <option value="">Choose option</option>
+                                    {SUPPORTED_CHAINS?.map((chain, idx) => {
+                                      return (
+                                        <option key={chain.id} value={chain.id}>
+                                          {chain.name}
+                                        </option>
+                                      )
+                                    })}
+                                  </select>
+                                  {(meta.touched || attemptedSubmit) && meta.error && (
+                                    <span className="text-torch-red text-xs">{meta.error}</span>
+                                  )}
+                                </div>
+                              )
+                            }}
+                          </Field>
+                        </div>
+                        <div className="flex flex-col mt-6">
+                          <label className="font-bold block">Reward token*</label>
+                          <Field name="fundingTokenSymbol">
+                            {({ input, meta }) => {
+                              return (
+                                <div className="custom-select-wrapper">
+                                  <select
+                                    {...input}
+                                    className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                                    value={selectedToken.symbol as string}
+                                    onChange={(e) => {
+                                      let fundingToken
+                                      if (e.target.value === ETH) {
+                                        fundingToken = ETH_METADATA
+                                      } else if (e.target.value === USDC) {
+                                        fundingToken = getStablecoinMetadataBySymbol({
+                                          chain: selectedNetworkId,
+                                          symbol: USDC,
+                                        })
+                                      } else {
+                                        fundingToken = importedTokenOptions?.find(
+                                          (token) => token.symbol === e.target.value
+                                        )
+                                      }
+                                      setSelectedToken(fundingToken)
+                                      // custom values can be compatible with react-final-form by calling
+                                      // the props.input.onChange callback
+                                      // https://final-form.org/docs/react-final-form/api/Field
+                                      input.onChange(fundingToken?.symbol)
+
+                                      refetchToken()
+                                    }}
+                                  >
+                                    <option value="">Choose option</option>
+                                    {importedTokenOptions?.map((token, idx) => {
+                                      return (
+                                        <option key={token.address} value={token.symbol}>
+                                          {token.symbol}
+                                        </option>
                                       )
                                     }
                                     setSelectedToken(fundingToken)
