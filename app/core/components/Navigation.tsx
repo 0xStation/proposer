@@ -157,7 +157,7 @@ export const Navigation = ({ children }: { children?: any }) => {
                   pageName: window.location.href,
                   stationHandle: terminalHandle as string,
                 })
-                openConnectModal?.()
+                //openConnectModal?.()
                 setConnectWalletClicked(true)
               }}
               className={`h-[35px] ${
