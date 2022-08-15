@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { Token } from "types"
+import { Token, TokenTag } from "types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 // going to be calling this from edit RFP page, so we will still be passing in all of these data
@@ -16,7 +16,9 @@ const UpdateRfp = z.object({
   fundingToken: Token,
   fundingBudgetAmount: z.string(),
   signature: z.string(),
-  signatureMessage: z.any(),
+  submittingPermission: TokenTag.optional(),
+  viewingPermission: TokenTag.optional(),
+  signatureMessage: z.any().optional(),
 })
 
 export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
@@ -40,6 +42,10 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
               address: toChecksumAddress(input.fundingToken.address),
             },
             budgetAmount: input.fundingBudgetAmount,
+          },
+          permissions: {
+            submit: input.submittingPermission,
+            view: input.viewingPermission,
           },
         },
       },

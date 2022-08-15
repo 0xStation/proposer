@@ -1,7 +1,13 @@
 import { PAGINATION_TAKE } from "app/core/utils/constants"
 import db from "db"
 import { z } from "zod"
+import { Rfp } from "../types"
+import { Terminal } from "app/terminal/types"
 import { computeRfpProductStatus } from "../utils"
+
+interface RfpWithTerminal extends Rfp {
+  terminal: Terminal
+}
 
 const GetAllRfps = z.object({
   page: z.number().optional().default(0),
@@ -28,7 +34,7 @@ export async function getAllRfps(input: z.infer<typeof GetAllRfps>) {
         status: computeRfpProductStatus(rfp.status, rfp.startDate, rfp.endDate),
         submissionCount: rfp._count.proposals,
       }
-    })
+    }) as unknown as RfpWithTerminal[]
   } catch (err) {
     console.error("Could not query for rfps. Failed with err: ", err)
     return null

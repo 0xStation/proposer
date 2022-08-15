@@ -23,13 +23,15 @@ import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPerm
 import useStore from "app/core/hooks/useStore"
 import { trackClick } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
+import { useUserCanSubmitToRfp } from "app/core/utils/permissions"
+import { Rfp } from "app/rfp/types"
 
 const {
   PAGE_NAME,
   FEATURE: { RFP, PROPOSAL },
 } = TRACKING_EVENTS
 
-const RfpHeaderNavigation = ({ rfpId }) => {
+const RfpHeaderNavigation = ({ rfp }: { rfp: Rfp }) => {
   const terminalHandle = useParam("terminalHandle") as string
   const session = useSession({ suspense: false })
   const activeUser = useStore((state) => state.activeUser)
@@ -38,7 +40,6 @@ const RfpHeaderNavigation = ({ rfpId }) => {
   const [isReopenRfpModalOpen, setIsReopenRfpModalOpen] = useState<boolean>(false)
   const [deleteRfpModalOpen, setDeleteRfpModalOpen] = useState<boolean>(false)
   const [rfpOpen, setRfpOpen] = useState<boolean>(false)
-  const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
   const [terminal] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle as string },
@@ -64,6 +65,8 @@ const RfpHeaderNavigation = ({ rfpId }) => {
       }
     }
   }, [rfp])
+
+  const canSubmit = useUserCanSubmitToRfp(session.siwe?.address, rfp)
 
   return (
     <>
@@ -136,7 +139,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                               stationId: terminal?.id,
                               isEdit: true,
                             })
-                            router.push(Routes.EditRfpPage({ terminalHandle, rfpId }))
+                            router.push(Routes.EditRfpPage({ terminalHandle, rfpId: rfp.id }))
                           }}
                         >
                           <PencilIcon className="inline h-4 w-4 fill-marble-white mr-3 hover:cursor-pointer hover:fill-concrete" />
@@ -272,7 +275,7 @@ const RfpHeaderNavigation = ({ rfpId }) => {
               </div>
             </div>
           </div>
-          {rfpOpen && (
+          {rfpOpen && canSubmit ? (
             <button
               onClick={() => {
                 trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_SHOW_EDITOR_CLICKED, {
@@ -281,32 +284,41 @@ const RfpHeaderNavigation = ({ rfpId }) => {
                   stationId: terminal?.id,
                   rfpId: rfp?.id,
                 })
-                router.push(Routes.CreateProposalPage({ terminalHandle, rfpId }))
+                router.push(Routes.CreateProposalPage({ terminalHandle, rfpId: rfp.id }))
               }}
               className="bg-electric-violet text-tunnel-black rounded self-start px-6 h-[35px] leading-[35px] hover:bg-opacity-70 whitespace-nowrap"
             >
               Create proposal
             </button>
+          ) : (
+            <div className="relative group self-start">
+              <button className="bg-electric-violet text-tunnel-black rounded self-start px-6 h-[35px] leading-[35px] bg-opacity-70 whitespace-nowrap">
+                Create proposal
+              </button>
+              <span className="absolute top-[110%] bg-wet-concrete rounded p-2 hidden group-hover:block text-xs">
+                You must hold ${rfp?.data?.permissions?.submit?.symbol} to propose.
+              </span>
+            </div>
           )}
         </div>
         <ul className="mt-7 text-lg mb-2">
           <li
             className={`inline mr-8 cursor-pointer ${
-              router.pathname === Routes.RFPInfoTab({ terminalHandle, rfpId: rfpId }).pathname
+              router.pathname === Routes.RFPInfoTab({ terminalHandle, rfpId: rfp.id }).pathname
                 ? "font-bold text-marble-white"
                 : "text-concrete hover:text-light-concrete"
             }`}
           >
-            <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfpId })}>Info</Link>
+            <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp.id })}>Info</Link>
           </li>
           <li
             className={`inline cursor-pointer ${
-              router.pathname === Routes.ProposalsTab({ terminalHandle, rfpId: rfpId }).pathname
+              router.pathname === Routes.ProposalsTab({ terminalHandle, rfpId: rfp.id }).pathname
                 ? "font-bold text-marble-white"
                 : "text-concrete hover:text-light-concrete"
             }`}
           >
-            <Link href={Routes.ProposalsTab({ terminalHandle, rfpId: rfpId })}>Proposals</Link>
+            <Link href={Routes.ProposalsTab({ terminalHandle, rfpId: rfp.id })}>Proposals</Link>
           </li>
         </ul>
       </div>

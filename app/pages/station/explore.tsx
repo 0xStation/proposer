@@ -11,7 +11,7 @@ import getTerminalMemberCount from "app/accountTerminal/queries/getTerminalMembe
 import getRfpCountByTerminalId from "app/rfp/queries/getRfpCountByTerminalId"
 import getProposalCountByTerminal from "app/proposal/queries/getProposalCountByTerminal"
 import useStore from "app/core/hooks/useStore"
-import { canCreateStation } from "app/core/utils/permissions"
+import { canCreateStation, useUserCanViewRfp } from "app/core/utils/permissions"
 import { DateTime } from "luxon"
 
 const {
@@ -129,7 +129,14 @@ const ExploreStations: BlitzPage = () => {
                 return <TerminalComponent terminal={terminal} key={terminal?.id} />
               })
             : rfps?.map((rfp) => {
-                return <RfpComponent terminal={rfp?.terminal} key={rfp?.id} rfp={rfp} />
+                return (
+                  <RfpComponent
+                    activeUser={activeUser}
+                    terminal={rfp?.terminal}
+                    key={rfp?.id}
+                    rfp={rfp}
+                  />
+                )
               })}
         </div>
       </div>
@@ -137,7 +144,13 @@ const ExploreStations: BlitzPage = () => {
   )
 }
 
-const RfpComponent = ({ rfp, terminal }) => {
+const RfpComponent = ({ rfp, terminal, activeUser }) => {
+  const canView = useUserCanViewRfp(activeUser?.address, rfp)
+
+  if (!canView) {
+    return <></>
+  }
+
   return (
     <Link href={Routes.RFPInfoTab({ terminalHandle: terminal?.handle, rfpId: rfp.id })}>
       <div
