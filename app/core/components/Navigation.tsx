@@ -1,5 +1,5 @@
 import StationLogo from "public/station-letters.svg"
-//import { useConnectModal } from "@rainbow-me/rainbowkit"
+import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { trackClick } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
 import { useEffect } from "react"
@@ -32,7 +32,7 @@ export const Navigation = ({ children }: { children?: any }) => {
   const [profileNavDrawerIsOpen, setProfileNavDrawerIsOpen] = useState<boolean>(false)
   const router = useRouter()
   const terminalHandle = useParam("terminalHandle")
-  //const { openConnectModal } = useConnectModal()
+  const { openConnectModal } = useConnectModal()
   const [isWalletOpen, setIsWalletOpen] = useState<boolean>(false)
   const [connectWalletClicked, setConnectWalletClicked] = useState<boolean>(false)
   const [mounted, setMounted] = useState<boolean>(false)
@@ -157,7 +157,7 @@ export const Navigation = ({ children }: { children?: any }) => {
                   pageName: window.location.href,
                   stationHandle: terminalHandle as string,
                 })
-                //openConnectModal?.()
+                openConnectModal?.()
                 setConnectWalletClicked(true)
               }}
               className={`h-[35px] ${
