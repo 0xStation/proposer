@@ -16,6 +16,7 @@ import {
   SUPPORTED_CHAINS,
 } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
+import UploadImageButton from "app/core/components/UploadImageButton"
 import createRfp from "app/rfp/mutations/createRfp"
 import updateRfp from "app/rfp/mutations/updateRfp"
 import { Terminal } from "app/terminal/types"
@@ -272,6 +273,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                   </>
                 )}
               </div>
+              <UploadImageButton />
             </div>
           </div>
         </div>
@@ -478,7 +480,6 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
         }}
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
-          console.log(formState)
           return (
             <>
               <ConfirmationRfpModal

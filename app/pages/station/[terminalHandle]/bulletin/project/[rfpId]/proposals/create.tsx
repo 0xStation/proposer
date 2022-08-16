@@ -18,6 +18,7 @@ import { parseUnits } from "@ethersproject/units"
 // components
 import Layout from "app/core/layouts/Layout"
 import Preview from "app/core/components/MarkdownPreview"
+import UploadImageButton from "app/core/components/UploadImageButton"
 import Modal from "app/core/components/Modal"
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
 // hooks
@@ -166,6 +167,7 @@ const CreateProposalPage: BlitzPage = ({
                   </>
                 )}
               </div>
+              <UploadImageButton />
             </div>
           </div>
         </div>
