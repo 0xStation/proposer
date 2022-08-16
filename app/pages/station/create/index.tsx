@@ -6,6 +6,7 @@ import PersonalSiteIcon from "public/personal-site-icon.svg"
 import TwitterIcon from "public/twitter-icon.svg"
 import GithubIcon from "public/github-icon.svg"
 import TikTokIcon from "public/tiktok-icon.svg"
+import LockedIcon from "public/locked-icon.svg"
 import InstagramIcon from "public/instagram-icon.svg"
 import createTerminal from "app/terminal/mutations/createTerminal"
 import { Field, Form } from "react-final-form"
@@ -81,6 +82,7 @@ const PfpInput = ({ pfpURL, onUpload }) => {
 
 const CreateTerminalDetailsPage: BlitzPage = () => {
   const session = useSession({ suspense: false })
+  const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const router = useRouter()
   const setToastState = useStore((state) => state.setToastState)
   const [pfpURL, setPfpURL] = useState<string>("")
@@ -109,7 +111,7 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
         >
           <Image src={Back} alt="Close button" width={16} height={16} />
         </div>
-        <main className="text-marble-white min-h-screen max-w-screen-sm sm:mx-auto mb-5 box-border">
+        <main className="text-marble-white h-full max-w-screen-sm sm:mx-auto mb-5 box-border">
           {session.userId ? (
             <div className="w-[31rem]">
               <div className="flex flex-row pt-16">
@@ -435,7 +437,25 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
               />
             </div>
           ) : (
-            <div>You need to have an account to create a terminal.</div>
+            <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0 pb-20">
+              <div className="flex flex-row align-middle ">
+                <div className="mr-3">
+                  <Image src={LockedIcon} alt="Locked icon" />
+                </div>
+              </div>
+              <h1 className="text-2xl font-bold text-marble-white text-center w-[330px]">
+                You&apos;re on your way to create a station
+              </h1>
+              <p className="my-2 w-[309px] text-center">
+                Connect your wallet to start funding proposals and legitmizing contributors.
+              </p>
+              <button
+                onClick={() => toggleWalletModal(true)}
+                className="bg-electric-violet text-tunnel-black h-[35px] px-5 rounded hover:opacity-70 mt-5"
+              >
+                Connect wallet
+              </button>
+            </div>
           )}
         </main>
       </div>
