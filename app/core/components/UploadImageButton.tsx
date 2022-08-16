@@ -3,6 +3,22 @@ import { useDropzone } from "react-dropzone"
 import useStore from "app/core/hooks/useStore"
 import { Spinner } from "app/core/components/Spinner"
 
+// ;<div
+//   className="space-x-1 items-center flex cursor-pointer"
+//   onClick={() => setPreviewMode(!previewMode)}
+// >
+//   {previewMode ? (
+//     <>
+//       <img src="/pencil.svg" className="inline pr-2 self-center" />
+//       <span>Back to editing</span>
+//     </>
+//   ) : (
+//     <>
+//       <img src="/eye.svg" className="inline pr-2 items-center" />
+//       <span>Preview</span>
+//     </>
+//   )}
+// </div>
 const UploadImageButton = () => {
   const setToastState = useStore((state) => state.setToastState)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -51,7 +67,7 @@ const UploadImageButton = () => {
   return (
     <button
       type="button"
-      className="text-marble-white border border-marble-white mr-2 py-1 px-4 w-36 h-[35px] rounded hover:opacity-75"
+      className="text-marble-white h-[35px] rounded hover:opacity-75 flex items-center"
       disabled={isLoading}
       {...getRootProps()}
     >
@@ -60,7 +76,10 @@ const UploadImageButton = () => {
           <Spinner fill="marble-white" />
         </div>
       ) : (
-        "Upload image"
+        <>
+          <img src="/image.svg" className="inline pr-2 self-center" />
+          <span>Upload image</span>
+        </>
       )}
       <input {...getInputProps()} />
     </button>

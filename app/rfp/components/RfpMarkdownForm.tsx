@@ -227,57 +227,6 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
 
   return (
     <>
-      <div className="fixed grid grid-cols-4 w-[calc(100%-70px)] border-box z-40">
-        <div className="col-span-3 pt-4 pr-4 h-full bg-tunnel-black">
-          <div className="text-light-concrete flex flex-row justify-between w-full">
-            <button
-              onClick={() => {
-                if (isEdit) {
-                  router.push(
-                    Routes.RFPInfoTab({
-                      terminalHandle: terminalHandle as string,
-                      rfpId: rfp?.id as string,
-                    })
-                  )
-                } else {
-                  router.push(Routes.BulletinPage({ terminalHandle: terminalHandle as string }))
-                }
-              }}
-            >
-              <XIcon className="h-6 w-6 ml-3 fill-marble-white" />
-            </button>
-            <div className="flex flex-row items-center space-x-4">
-              <button
-                className={`${
-                  shortcutsOpen && "font-bold text-marble-white bg-wet-concrete"
-                } cursor-pointer h-[35px] rounded px-2`}
-                onClick={() => {
-                  setShortcutsOpen(!shortcutsOpen)
-                }}
-              >
-                Markdown shortcuts
-              </button>
-              <div
-                className="space-x-1 items-center flex cursor-pointer"
-                onClick={() => setPreviewMode(!previewMode)}
-              >
-                {previewMode ? (
-                  <>
-                    <img src="/pencil.svg" className="inline pr-2 self-center" />
-                    <span>Back to editing</span>
-                  </>
-                ) : (
-                  <>
-                    <img src="/eye.svg" className="inline pr-2 items-center" />
-                    <span>Preview</span>
-                  </>
-                )}
-              </div>
-              <UploadImageButton />
-            </div>
-          </div>
-        </div>
-      </div>
       <Form
         initialValues={
           rfp
@@ -482,6 +431,110 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
           const formState = form.getState()
           return (
             <>
+              <div className="fixed grid grid-cols-4 w-[calc(100%-70px)] border-box z-40">
+                <div className="col-span-3 pt-4 pr-4 h-full bg-tunnel-black">
+                  <div className="text-light-concrete flex flex-row justify-between w-full">
+                    <button
+                      onClick={() => {
+                        if (isEdit) {
+                          router.push(
+                            Routes.RFPInfoTab({
+                              terminalHandle: terminalHandle as string,
+                              rfpId: rfp?.id as string,
+                            })
+                          )
+                        } else {
+                          router.push(
+                            Routes.BulletinPage({ terminalHandle: terminalHandle as string })
+                          )
+                        }
+                      }}
+                    >
+                      <XIcon className="h-6 w-6 ml-3 fill-marble-white" />
+                    </button>
+                    <div className="flex flex-row items-center space-x-4">
+                      <button
+                        className={`${
+                          shortcutsOpen && "font-bold bg-wet-concrete"
+                        } cursor-pointer h-[35px] rounded px-2 text-marble-white hover:opacity-75 flex items-center`}
+                        onClick={() => {
+                          setShortcutsOpen(!shortcutsOpen)
+                        }}
+                      >
+                        <img src="/keyboard.svg" className="inline pr-2 self-center" />
+                        <span>Markdown shortcuts</span>
+                      </button>
+                      <UploadImageButton />
+                      <button
+                        type="button"
+                        className="border border-electric-violet text-electric-violet px-6 py-1 rounded block hover:bg-wet-concrete"
+                        onClick={() => setPreviewMode(!previewMode)}
+                      >
+                        <span>{previewMode ? "Back to editing" : "Preview"}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          trackClick(RFP.EVENT_NAME.RFP_EDITOR_PUBLISH_CLICKED, {
+                            pageName: PAGE_NAME.RFP_EDITOR_PAGE,
+                            userAddress: activeUser?.address,
+                            stationHandle: terminal?.handle as string,
+                            stationId: terminal?.id,
+                          })
+                          setAttemptedSubmit(true)
+                          if (
+                            formState.invalid ||
+                            !selectedToken ||
+                            !selectedNetworkId ||
+                            !selectedCheckbook
+                          ) {
+                            if (!selectedNetworkId) {
+                              setToastState({
+                                isToastShowing: true,
+                                type: "error",
+                                message: `Please fill in the Network field to publish your RFP.`,
+                              })
+                              return
+                            }
+
+                            if (!formState.values.fundingTokenSymbol && !selectedToken) {
+                              setToastState({
+                                isToastShowing: true,
+                                type: "error",
+                                message: `Please fill in the Reward token field to publish your RFP.`,
+                              })
+                              return
+                            }
+
+                            if (!selectedCheckbook) {
+                              setToastState({
+                                isToastShowing: true,
+                                type: "error",
+                                message: `Please add a Checkbook to publish your RFP.`,
+                              })
+                              return
+                            }
+                            const fieldsWithErrors = Object.keys(formState.errors as Object)
+                            setToastState({
+                              isToastShowing: true,
+                              type: "error",
+                              message: `Please fill in ${fieldsWithErrors.join(
+                                ", "
+                              )} to publish RFP.`,
+                            })
+                            return
+                          }
+                          setConfirmationModalOpen(true)
+                        }}
+                        className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block hover:bg-opacity-70"
+                      >
+                        Publish
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <ConfirmationRfpModal
                 isOpen={confirmationModalOpen}
                 setIsOpen={setConfirmationModalOpen}
@@ -840,64 +893,6 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                             />
                           </div>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            trackClick(RFP.EVENT_NAME.RFP_EDITOR_PUBLISH_CLICKED, {
-                              pageName: PAGE_NAME.RFP_EDITOR_PAGE,
-                              userAddress: activeUser?.address,
-                              stationHandle: terminal?.handle as string,
-                              stationId: terminal?.id,
-                            })
-                            setAttemptedSubmit(true)
-                            if (
-                              formState.invalid ||
-                              !selectedToken ||
-                              !selectedNetworkId ||
-                              !selectedCheckbook
-                            ) {
-                              if (!selectedNetworkId) {
-                                setToastState({
-                                  isToastShowing: true,
-                                  type: "error",
-                                  message: `Please fill in the Network field to publish your RFP.`,
-                                })
-                                return
-                              }
-
-                              if (!formState.values.fundingTokenSymbol && !selectedToken) {
-                                setToastState({
-                                  isToastShowing: true,
-                                  type: "error",
-                                  message: `Please fill in the Reward token field to publish your RFP.`,
-                                })
-                                return
-                              }
-
-                              if (!selectedCheckbook) {
-                                setToastState({
-                                  isToastShowing: true,
-                                  type: "error",
-                                  message: `Please add a Checkbook to publish your RFP.`,
-                                })
-                                return
-                              }
-                              const fieldsWithErrors = Object.keys(formState.errors as Object)
-                              setToastState({
-                                isToastShowing: true,
-                                type: "error",
-                                message: `Please fill in ${fieldsWithErrors.join(
-                                  ", "
-                                )} to publish RFP.`,
-                              })
-                              return
-                            }
-                            setConfirmationModalOpen(true)
-                          }}
-                          className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block mt-14 hover:bg-opacity-70"
-                        >
-                          Publish
-                        </button>
                       </div>
                     ) : (
                       <div>
