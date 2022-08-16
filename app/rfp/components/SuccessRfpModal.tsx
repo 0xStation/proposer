@@ -8,7 +8,7 @@ export const SuccessRfpModal = ({ terminal, isOpen, setIsOpen, rfpId, isEdit = t
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
         <h3 className="text-2xl font-bold pt-6">
-          {isEdit ? "Changes published!" : "RFP published!"}
+          {isEdit ? "Changes published!" : "Project published!"}
         </h3>
         <p className="mt-2 mr-24">
           Share the link with your community to solicit proposals to shape the future of{" "}

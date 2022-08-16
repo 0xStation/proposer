@@ -40,8 +40,8 @@ const {
 
 const RfpNotFound = () => (
   <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
-    <p className="font-bold text-lg">Requests for proposals is empty</p>
-    <p>No RFPs have been created yet.</p>
+    <p className="font-bold text-lg">Projects is empty</p>
+    <p>No projects have been created yet.</p>
   </div>
 )
 
@@ -120,7 +120,7 @@ const BulletinPage: BlitzPage = () => {
       setToastState({
         isToastShowing: true,
         type: "success",
-        message: "Your request for proposal has been deleted.",
+        message: "Your project has been deleted.",
       })
     }
   }, [query?.rfpDeleted, session?.siwe?.address])
@@ -142,7 +142,7 @@ const BulletinPage: BlitzPage = () => {
   }, [query?.terminalAndCheckbookCreated, session?.siwe?.address])
 
   return (
-    <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}RFPs`}>
+    <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}projects`}>
       <AddFundsModal
         setIsOpen={setIsAddFundsModalOpen}
         isOpen={isAddFundsModalOpen}
@@ -163,7 +163,7 @@ const BulletinPage: BlitzPage = () => {
         {/* Filter View */}
         <div className="max-h-[250px] sm:h-[130px] border-b border-concrete">
           <div className="flex flex-row items-center ml-6 pt-7 justify-between mr-4">
-            <h1 className="text-2xl font-bold">Requests for proposals</h1>
+            <h1 className="text-2xl font-bold">Projects</h1>
             {isLoggedInAndIsAdmin && (
               <button
                 className="h-[35px] bg-electric-violet px-9 rounded text-tunnel-black hover:bg-opacity-70"
@@ -179,7 +179,7 @@ const BulletinPage: BlitzPage = () => {
                   router.push(Routes.CreateRFPPage({ terminalHandle }))
                 }}
               >
-                Create RFP
+                Create project
               </button>
             )}
           </div>
@@ -204,7 +204,7 @@ const BulletinPage: BlitzPage = () => {
               resultsCount={rfpCount as number}
               page={page}
               setPage={setPage}
-              resultsLabel="rfps"
+              resultsLabel="projects"
               className="ml-6 sm:mr-6 text-sm pt-2"
             />
           </div>
@@ -233,7 +233,7 @@ const BulletinPage: BlitzPage = () => {
             ) : rfps && isLoggedInAndIsAdmin ? (
               <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
                 <h1 className="text-2xl font-bold text-marble-white text-center w-[295px]">
-                  Create a request for proposals (RFP)
+                  Create a project
                 </h1>
                 <p className="mt-2 w-[340px] text-center">
                   Define your DAO&apos;s needs to begin soliciting proposals from contributors. Need
@@ -263,7 +263,7 @@ const BulletinPage: BlitzPage = () => {
                     router.push(Routes.CreateRFPPage({ terminalHandle }))
                   }}
                 >
-                  Create RFP
+                  Create project
                 </button>
               </div>
             ) : rfps?.length === 0 ? (

@@ -189,7 +189,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
                     : "text-concrete font-normal group-hover:text-light-concrete"
                 }`}
               >
-                <Link href={Routes.BulletinPage({ terminalHandle })}>Requests for proposals</Link>
+                <Link href={Routes.BulletinPage({ terminalHandle })}>Projects</Link>
               </p>
             </li>
             <li className="group cursor-pointer font-bold">

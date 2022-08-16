@@ -98,8 +98,7 @@ const RfpHeaderNavigation = ({ rfp }: { rfp: Rfp }) => {
         <div className="flex flex-row justify-between">
           <p className="self-center">
             <span className="text-concrete hover:text-light-concrete">
-              <Link href={Routes.BulletinPage({ terminalHandle })}>Requests for proposals</Link>{" "}
-              /&nbsp;
+              <Link href={Routes.BulletinPage({ terminalHandle })}>Projects</Link> /&nbsp;
             </span>
             {rfp?.data?.content?.title}
           </p>
@@ -109,7 +108,7 @@ const RfpHeaderNavigation = ({ rfp }: { rfp: Rfp }) => {
             <div className="flex flex-row space-x-4">
               <span className=" bg-wet-concrete rounded-full px-2 py-1 flex items-center space-x-1">
                 <SpeakerphoneIcon className="h-4 w-4 text-marble-white" />
-                <span className="text-xs uppercase">Request for proposals</span>
+                <span className="text-xs uppercase">Projects</span>
               </span>
               <div className="flex flex-row items-center space-x-2">
                 <span

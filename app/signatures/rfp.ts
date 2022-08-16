@@ -8,7 +8,7 @@ export const genRfpSignatureMessage = (values, author) => {
 
   return {
     domain: {
-      name: "Request for Proposals", // keep hardcoded
+      name: "Projects", // keep hardcoded
       version: "1", // keep hardcoded
     },
     types: {

@@ -323,7 +323,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
             setToastState({
               isToastShowing: true,
               type: "error",
-              message: "You must connect your wallet in order to create RFPs.",
+              message: "You must connect your wallet in order to create projects.",
             })
             return
           }
@@ -491,7 +491,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                   <div className="flex flex-row space-x-4">
                     <span className=" bg-wet-concrete rounded-full px-2 py-1 flex items-center space-x-1">
                       <SpeakerphoneIcon className="h-4 w-4 text-marble-white" />
-                      <span className="text-xs uppercase">Request for proposal</span>
+                      <span className="text-xs uppercase">Project</span>
                     </span>
                     <div className="flex flex-row items-center space-x-2">
                       <span
@@ -511,7 +511,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                           <input
                             {...input}
                             className="bg-tunnel-black text-3xl ml-2 w-full outline-none"
-                            placeholder="Give your RFP a title"
+                            placeholder="Give your project a title"
                           />
                         )
                       }}
@@ -771,7 +771,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                           <label className="font-bold block">Checkbook*</label>
                           <span className="text-xs text-concrete block">
                             Deposit funds here to create checks for proposers to claim once their
-                            projects have been approved.{" "}
+                            proposals have been approved.{" "}
                             <a
                               href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
                               className="text-electric-violet"

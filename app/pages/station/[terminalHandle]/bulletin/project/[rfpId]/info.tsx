@@ -187,7 +187,7 @@ const RFPInfoTab: BlitzPage = () => {
                       rfp?.data?.funding?.token?.symbol}
                   </p>
                 </div>
-                <p className="text-concrete text-xs mt-1">{`Total RFP budget: ${formatCurrencyAmount(
+                <p className="text-concrete text-xs mt-1">{`Total project budget: ${formatCurrencyAmount(
                   rfp?.data?.funding?.budgetAmount
                 )} ${rfp?.data?.funding?.token?.symbol}`}</p>
               </div>

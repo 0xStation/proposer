@@ -173,8 +173,7 @@ const ProposalPage: BlitzPage = ({
             <div className="flex flex-row justify-between">
               <p className="self-center">
                 <span className="text-concrete hover:text-light-concrete">
-                  <Link href={Routes.BulletinPage({ terminalHandle })}>Requests for proposals</Link>{" "}
-                  /&nbsp;
+                  <Link href={Routes.BulletinPage({ terminalHandle })}>Projects</Link> /&nbsp;
                 </span>
                 <span className="text-concrete hover:text-light-concrete">
                   <Link
@@ -348,9 +347,7 @@ const ProposalPage: BlitzPage = ({
                     </span>
                   </div>
                 </div>
-                <h4 className="text-xs font-bold text-concrete uppercase mt-6">
-                  Request for Proposals
-                </h4>
+                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Project</h4>
                 <span className="flex flex-row items-center group relative w-fit">
                   {rfp?.status !== RfpStatus.DELETED ? (
                     <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })} passHref>

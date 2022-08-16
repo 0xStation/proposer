@@ -45,7 +45,7 @@ export const RFP_STATUS_DISPLAY_MAP = {
     color: "bg-concrete",
   },
   [RfpStatus.STARTING_SOON]: {
-    copy: "starting soon",
+    copy: "open for submissions soon",
     color: "bg-neon-carrot",
   },
   [RfpStatus.OPEN_FOR_SUBMISSIONS]: {
