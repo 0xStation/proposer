@@ -6,7 +6,6 @@ import PersonalSiteIcon from "public/personal-site-icon.svg"
 import TwitterIcon from "public/twitter-icon.svg"
 import GithubIcon from "public/github-icon.svg"
 import TikTokIcon from "public/tiktok-icon.svg"
-import LockedIcon from "public/locked-icon.svg"
 import InstagramIcon from "public/instagram-icon.svg"
 import createTerminal from "app/terminal/mutations/createTerminal"
 import { Field, Form } from "react-final-form"
@@ -438,11 +437,6 @@ const CreateTerminalDetailsPage: BlitzPage = () => {
             </div>
           ) : (
             <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0 pb-20">
-              <div className="flex flex-row align-middle ">
-                <div className="mr-3">
-                  <Image src={LockedIcon} alt="Locked icon" />
-                </div>
-              </div>
               <h1 className="text-2xl font-bold text-marble-white text-center w-[330px]">
                 You&apos;re on your way to create a station.
               </h1>
