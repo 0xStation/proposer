@@ -60,13 +60,13 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
       } catch (err) {
         const error = METAMASK_ERROR_CODES[err.code]
         console.error(err)
-        const errorMsg = error.friendlyMessage || error.message || "Something went wrong"
+        const errorMsg = error?.friendlyMessage || error?.message || "Something went wrong"
         setErrorMessage(errorMsg)
 
         trackError(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_ERROR, {
           pageName: window.location.href,
           stationHandle: terminalHandle as string,
-          errorMsg,
+          errorMsg: err.message,
         })
         setConnectState({ error: true, success: false, loading: false })
         return
