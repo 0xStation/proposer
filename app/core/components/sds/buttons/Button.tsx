@@ -69,7 +69,15 @@ const Button = ({
     >
       {isLoading ? (
         <div className="flex justify-center items-center">
-          <Spinner fill="black" />
+          <Spinner
+            fill={
+              type === ButtonType.Primary
+                ? "black"
+                : type === ButtonType.Secondary
+                ? "#AD72FF"
+                : "white"
+            }
+          />
         </div>
       ) : (
         label
