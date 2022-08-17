@@ -241,9 +241,9 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 fundingTokenSymbol: rfp.data.funding.token.symbol,
                 budgetAmount: rfp.data.funding.budgetAmount,
                 submittingPermissionTokenAddress:
-                  rfp.data.permissions.submit && rfp.data.permissions.submit.address,
+                  rfp.data.permissions?.submit && rfp.data.permissions?.submit?.address,
                 viewingPermissionTokenAddress:
-                  rfp.data.permissions.view && rfp.data.permissions.view.address,
+                  rfp.data.permissions?.view && rfp.data.permissions?.view?.address,
               }
             : {
                 checkbookAddress: checkbooks?.[0]?.address,
