@@ -34,6 +34,7 @@ import { useWaitForTransaction } from "wagmi"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import { formatUnits } from "@ethersproject/units"
 import {
+  PencilIcon,
   DotsHorizontalIcon,
   ClipboardCheckIcon,
   ClipboardIcon,
@@ -213,6 +214,27 @@ const ProposalPage: BlitzPage = ({
                     <div className="flex flex-col">
                       <h1 className="text-2xl font-bold">{proposal.data.content.title}</h1>
                       <div className="relative mr-6 mt-2 mb-8">
+                        {proposal?.collaborators?.[0]?.account?.address === activeUser?.address && (
+                          <button
+                            onClick={() => {
+                              trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_SHOW_EDITOR_CLICKED, {
+                                userAddress: activeUser?.address,
+                                stationHandle: terminalHandle,
+                                stationId: terminal?.id,
+                                isEdit: true,
+                              })
+                              router.push(
+                                Routes.EditProposalPage({
+                                  terminalHandle,
+                                  rfpId: rfp.id,
+                                  proposalId: proposal.id,
+                                })
+                              )
+                            }}
+                          >
+                            <PencilIcon className="inline h-4 w-4 fill-marble-white mr-3 hover:cursor-pointer hover:fill-concrete" />
+                          </button>
+                        )}
                         <Dropdown
                           className="inline"
                           side="left"

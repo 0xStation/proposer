@@ -34,6 +34,7 @@ export type RfpMetadata = {
       address: string
       symbol: string
       decimals: number
+      available: string
     }
     budgetAmount: string
   }
