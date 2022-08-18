@@ -14,12 +14,12 @@ import {
   getStablecoinMetadataBySymbol,
   RFP_STATUS_DISPLAY_MAP,
   SUPPORTED_CHAINS,
+  ZERO_ADDRESS,
 } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
 import UploadImageButton from "app/core/components/UploadImageButton"
 import createRfp from "app/rfp/mutations/createRfp"
 import updateRfp from "app/rfp/mutations/updateRfp"
-import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
 import { Rfp } from "../types"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
@@ -76,7 +76,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(
     rfp?.data?.funding?.token?.chainId || (activeChain?.id as number)
   )
-  const [selectedToken, setSelectedToken] = useState<any>(ETH_METADATA)
+  const [selectedToken, setSelectedToken] = useState<any>()
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
@@ -96,7 +96,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
     useQuery(
       getCheckbooksByTerminal,
       { terminalId: terminal?.id || 0 },
-      { suspense: false, enabled: !!finishedFetchingTerminal, refetchOnWindowFocus: false }
+      { suspense: false, enabled: !!terminal?.id, refetchOnWindowFocus: false }
     )
 
   const {
@@ -121,21 +121,23 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
   )
 
   useEffect(() => {
-    if (selectedNetworkId) {
+    if (selectedNetworkId && finishedFetchingTags && finishedFetchingCheckbooks) {
+      const rfpFundingToken = rfp?.data?.funding?.token
+
       // filter tokens based on selected network
       const filteredTokenOptions = tags
         ?.filter(
-          (tag) =>
-            tag?.data?.type === TokenType.ERC20 &&
-            tag?.data?.chainId === selectedNetworkId &&
-            tag?.data?.symbol !== USDC &&
-            tag?.data?.symbol !== ETH
+          ({ data: tagData }) =>
+            tagData.type === TokenType.ERC20 &&
+            tagData.chainId === selectedNetworkId &&
+            tagData.symbol !== USDC &&
+            tagData.symbol !== ETH
         )
         ?.map((tag) => tag?.data)
 
       setImportedTokenOptions(filteredTokenOptions)
 
-      setSelectedToken(filteredTokenOptions?.[0] || ETH_METADATA)
+      setSelectedToken(rfpFundingToken || filteredTokenOptions?.[0] || ETH_METADATA)
 
       // filter checkbooks based on selected network
       const filteredCheckbookOptions = checkbooks?.filter(
@@ -238,12 +240,12 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                   ? getFormattedDate({ dateTime: DateTime.fromJSDate(rfp?.endDate as Date) })
                   : undefined,
                 checkbookAddress: rfp?.fundingAddress,
-                fundingTokenSymbol: rfp.data.funding.token.symbol,
-                budgetAmount: rfp.data.funding.budgetAmount,
+                fundingTokenSymbol: rfp?.data?.funding?.token?.symbol,
+                budgetAmount: rfp?.data?.funding?.budgetAmount,
                 submittingPermissionTokenAddress:
-                  rfp.data.permissions.submit && rfp.data.permissions.submit.address,
+                  rfp?.data?.permissions?.submit && rfp?.data?.permissions?.submit?.address,
                 viewingPermissionTokenAddress:
-                  rfp.data.permissions.view && rfp.data.permissions.view.address,
+                  rfp?.data?.permissions?.view && rfp?.data?.permissions?.view?.address,
               }
             : {
                 checkbookAddress: checkbooks?.[0]?.address,
@@ -727,7 +729,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                                   <select
                                     {...input}
                                     className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
-                                    value={selectedToken.symbol as string}
+                                    value={selectedToken?.symbol as string}
                                     onChange={(e) => {
                                       let fundingToken
                                       if (e.target.value === ETH) {
