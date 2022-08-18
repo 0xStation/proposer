@@ -218,6 +218,8 @@ enum RfpStatus {
 enum ProposalStatus {
   DRAFT
   PUBLISHED
+  IN_REVIEW
+  APPROVED
 }
 
 //

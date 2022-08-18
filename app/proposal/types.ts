@@ -8,7 +8,7 @@ import { Signature } from "app/signatures/types"
 
 export enum ProposalStatus {
   SUBMITTED = "SUBMITTED",
-  IN_REVIEW = "IN REVIEW",
+  IN_REVIEW = "IN_REVIEW",
   APPROVED = "APPROVED",
 }
 

@@ -1,28 +1,24 @@
 import db from "db"
 import * as z from "zod"
 import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
+import { ProposalStatus } from "../types"
 import { Proposal } from "../types"
-// import { computeProposalDbFilterFromProposalApprovals, computeProposalStatus } from "../utils"
 
 const GetProposalCountByRfpId = z.object({
   rfpId: z.string(),
-  // statuses: z.string().array().optional().default([]),
-  // quorum: z.number(),
+  statuses: z.string().array().optional().default([]),
 })
 
 export const getProposalCountByRfpId = async (input: z.infer<typeof GetProposalCountByRfpId>) => {
   try {
-    // const proposalsWhere = await computeProposalDbFilterFromProposalApprovals({
-    //   statuses: input.statuses,
-    //   quorum: input.quorum,
-    //   rfpId: input.rfpId,
-    // })
+    const selectedStatuses = input.statuses.map((s) =>
+      s === ProposalStatus.SUBMITTED ? PrismaProposalStatus.PUBLISHED : s
+    ) as PrismaProposalStatus[]
 
     const proposalCount = await db.proposal.count({
       where: {
         rfpId: input.rfpId,
-        status: PrismaProposalStatus.PUBLISHED,
-        // ...proposalsWhere,
+        ...(selectedStatuses.length > 0 && { status: { in: selectedStatuses } }),
       },
     })
 

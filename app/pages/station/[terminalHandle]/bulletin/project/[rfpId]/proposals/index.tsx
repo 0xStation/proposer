@@ -56,9 +56,9 @@ const ProposalsTab: BlitzPage = ({
   const { proposalId } = useRouterQuery() as { proposalId: string }
   const terminalHandle = useParam("terminalHandle") as string
   const rfpId = useParam("rfpId") as string
-  // const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
-  //   new Set<ProposalStatus>()
-  // )
+  const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
+    new Set<ProposalStatus>()
+  )
   const [page, setPage] = useState<number>(0)
   const [isUrlCopied, setIsUrlCopied] = useState<boolean>(false)
 
@@ -67,7 +67,7 @@ const ProposalsTab: BlitzPage = ({
     {
       rfpId,
       // quorum: rfp?.checkbook.quorum as number,
-      // statuses: Array.from(proposalStatusFilters),
+      statuses: Array.from(proposalStatusFilters),
       page: page,
       paginationTake: PAGINATION_TAKE,
     },
@@ -79,7 +79,7 @@ const ProposalsTab: BlitzPage = ({
     {
       rfpId,
       // quorum: rfp?.checkbook.quorum as number,
-      // statuses: Array.from(proposalStatusFilters),
+      statuses: Array.from(proposalStatusFilters),
     },
     { suspense: false, enabled: !!rfpId, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
@@ -133,7 +133,7 @@ const ProposalsTab: BlitzPage = ({
         <RfpHeaderNavigation rfp={rfp} />
         <div className="h-[calc(100vh-240px)] flex flex-col">
           <div className="w-full h-20 flex sm:flex-row justify-between items-center">
-            {/* <div className="flex ml-5">
+            <div className="flex ml-5">
               <FilterPill
                 label="status"
                 filterOptions={PROPOSAL_STATUSES_FILTER_OPTIONS.map((proposalStatus) => ({
@@ -147,7 +147,7 @@ const ProposalsTab: BlitzPage = ({
                   invalidateQuery(getProposalsByRfpId)
                 }}
               />
-            </div> */}
+            </div>
             <Pagination
               results={proposals as any[]}
               resultsCount={proposalCount as number}
@@ -160,7 +160,6 @@ const ProposalsTab: BlitzPage = ({
 
           <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
             <span className="basis-[38rem] ml-6 mb-2">Title</span>
-            {/* <span className="basis-32 ml-9 mb-2">Approval</span> */}
             <span className="basis-32 ml-6 mb-2">Amount</span>
             <span className="basis-32 ml-2 mb-2">Submission Date</span>
             <span className="basis-32 ml-6 mr-6 mb-2">Author</span>
