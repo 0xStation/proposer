@@ -51,9 +51,6 @@ export default async function handler(req, res) {
       return
     }
 
-    // res.status(200).json({ response: "success" })
-    // return
-
     let addresses: string[] = [data.proposal.rfp.authorAddress]
 
     try {

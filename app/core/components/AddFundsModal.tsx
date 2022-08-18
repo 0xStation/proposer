@@ -3,7 +3,6 @@ import { trackClick } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Modal from "./Modal"
 import useStore from "../hooks/useStore"
-import { Link } from "blitz"
 
 const {
   FEATURE: { CHECKBOOK },
@@ -39,7 +38,16 @@ export const AddFundsModal = ({
         <h3 className="text-2xl font-bold pt-6">{modalContent[contentKey].heading}</h3>
         <p className="mt-2 mr-6">
           To activate your Checkbook, copy the contract address to transfer funds from{" "}
-          <Link href="https://gnosis-safe.io/">Safe</Link>
+          {
+            <a
+              href="https://gnosis-safe.io/"
+              rel="noopener noreferrer"
+              className="text-electric-violet"
+              target="_blank"
+            >
+              Safe
+            </a>
+          }{" "}
           or other wallet applications.
         </p>
         <div className="mt-8">

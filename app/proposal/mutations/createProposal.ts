@@ -62,7 +62,5 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     },
   })
 
-  console.log(proposal)
-
   return proposal
 }

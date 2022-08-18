@@ -280,20 +280,10 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
             })
             return
           }
-          // if (!values.checkbookAddress) {
-          //   setToastState({
-          //     isToastShowing: true,
-          //     type: "error",
-          //     message: "Please select a Checkbook first.",
-          //   })
-          //   return
-          // }
 
           const checkbook = checkbooks?.find((checkbook) =>
             addressesAreEqual(checkbook.address, values.checkbookAddress)
           )
-
-          console.log("network", activeNeworkChainId)
 
           if (selectedToken.symbol !== ETH && selectedToken.symbol !== USDC) {
             if (tokenFetchSuccess) {

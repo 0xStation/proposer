@@ -25,14 +25,14 @@ import useStore from "app/core/hooks/useStore"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 import getRfpApprovedProposalFunding from "app/rfp/queries/getRfpApprovedFunding"
 import { ZERO_ADDRESS, TRACKING_EVENTS } from "app/core/utils/constants"
+import getCheckbook from "app/checkbook/queries/getCheckbook"
+import { FundingSenderType } from "app/types"
 
 const {
   PAGE_NAME,
   FEATURE: { RFP },
 } = TRACKING_EVENTS
 // import getRfpApprovedProposalFunding from "app/rfp/queries/getRfpApprovedFunding"
-import getCheckbook from "app/checkbook/queries/getCheckbook"
-import { FundingSenderType } from "app/types"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { terminalHandle, rfpId, proposalId } = context.query as {
@@ -134,14 +134,6 @@ const RFPInfoTab: BlitzPage = () => {
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}RFP`}>
-      {/* <AddFundsModal
-        setIsOpen={setShowAddFundsModal}
-        isOpen={showAddFundsModal}
-        checkbookAddress={rfp?.checkbook?.address}
-        pageName={PAGE_NAME.RFP_INFO_PAGE}
-        terminalId={terminal?.id as number}
-        stationHandle={terminalHandle}
-      /> */}
       <TerminalNavigation>
         <SuccessRfpModal
           terminal={terminal}

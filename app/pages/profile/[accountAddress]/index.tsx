@@ -115,7 +115,6 @@ const ProfileHome: BlitzPage = () => {
             <div className="overflow-y-auto col-span-7">
               <div className="border-b border-concrete h-[44px] text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
                 <span className="basis-[38rem] ml-6 mb-2 tracking-wider">Proposals</span>
-                {/* <span className="basis-32 ml-2 mb-2 tracking-wider">Approval</span> */}
                 <span className="basis-28 ml-2 mb-2 tracking-wider">Amount</span>
                 <span className="basis-32 mb-2 tracking-wider">Submission date</span>
                 <span className="basis-32 ml-12 mb-2 tracking-wider">Recipient</span>
@@ -194,18 +193,6 @@ const ProposalComponent = ({ accountProposal }) => {
           <div className="basis-[38rem] ml-6 mb-2">
             <h2 className="text-xl mt-2 mb-3">{proposal?.data?.content?.title}</h2>
           </div>
-          {/* <div className="basis-32 ml-2 mb-2 self-center">
-            <div className="flex flex-row">
-              <ProgressIndicator
-                percent={proposal.approvals.length / checkbook?.quorum}
-                twsize={6}
-                cutoff={0}
-              />
-              <p className="ml-2">
-                {`${proposal.approvals.length || "0"} / ${checkbook?.quorum || "N/A"}`}
-              </p>
-            </div>
-          </div> */}
           <div className="basis-28 ml-2 mb-2 self-center text-marble-white">
             {proposal.data?.funding?.amount || "N/A"} {proposal.data?.funding?.symbol}
           </div>

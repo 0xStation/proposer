@@ -344,7 +344,7 @@ const ProposalPage: BlitzPage = ({
             <div className="p-6 w-full overflow-y-scroll">
               <Preview markdown={proposal?.data.content.body} />
             </div>
-            <div className="w-[36rem] col-span-1 border-l border-concrete flex flex-col overflow-y-scroll">
+            <div className="w-[36rem] border-l border-concrete flex-col overflow-y-scroll">
               <div className="p-6">
                 <h4 className="text-xs font-bold text-concrete uppercase mb-2">Author</h4>
                 {proposal.collaborators.map((collaborator, idx) => {

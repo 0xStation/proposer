@@ -11,8 +11,6 @@ const GetAggregatedCheckAmounts = z.object({
 export default async function getAggregatedCheckAmounts(
   input: z.infer<typeof GetAggregatedCheckAmounts>
 ) {
-  const params = GetAggregatedCheckAmounts.parse(input)
-
   // get checks that have >= quorum approvals
   // only way to make a query of this nature is with groupBy
   const approvedUncashedChecksGroup = await db.checkApproval.groupBy({

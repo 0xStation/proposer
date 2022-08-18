@@ -12,8 +12,6 @@ export const genProposalSignatureMessage = (
 ) => {
   const now = new Date()
 
-  console.log(author, formValues)
-
   return {
     domain: {
       name: "Proposal", // keep hardcoded
