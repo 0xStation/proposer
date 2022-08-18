@@ -35,7 +35,6 @@ export default async function handler(req, res) {
             rfp: {
               include: {
                 terminal: true,
-                // checkbook: true,
               },
             },
           },

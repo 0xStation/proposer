@@ -9,6 +9,7 @@ import {
   useRouter,
   useParam,
   useMutation,
+  useQuery,
 } from "blitz"
 import { trackClick, trackImpression, trackError } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
@@ -30,6 +31,7 @@ import useSignature from "app/core/hooks/useSignature"
 import getRfpById from "app/rfp/queries/getRfpById"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import createProposal from "app/proposal/mutations/createProposal"
+import getCheckbook from "app/checkbook/queries/getCheckbook"
 // utils
 import truncateString from "app/core/utils/truncateString"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
@@ -39,6 +41,7 @@ import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 //types
 import { Rfp, RfpMetadata } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
+import { FundingSenderType } from "app/types"
 
 const {
   PAGE_NAME,
@@ -75,16 +78,6 @@ const CreateProposalPage: BlitzPage = ({
       stationId: data.terminal?.id,
     })
   }, [])
-
-  const checkbookTokens = useCheckbookAvailability(data.rfp.checkbook, data.terminal)
-
-  const amountMessage = (amount) => {
-    // need to change to use getRfpApprovedProposalFunding query to compare to
-    // if (parseFloat(fundingToken.available) < amount) {
-    //   return `The RFP's checkbook only has ${selectedToken.available} ${selectedToken.symbol}. You can request ${amount}, but it cannot be approved until an admin adds more ${selectedToken.symbol} to the checkbook.`
-    // }
-    return ""
-  }
 
   const terminalHandle = useParam("terminalHandle") as string
   const [createProposalMutation] = useMutation(createProposal, {
@@ -409,11 +402,13 @@ const CreateProposalPage: BlitzPage = ({
                             placeholder="Enter token amount"
                             className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                           />
+                          {/* 
+                          // commenting out for now because cannot get past wagmi error :(
                           {formState.values.amount && (
                             <span className="text-neon-carrot text-xs block mt-2">
                               {amountMessage(formState.values.amount)}
                             </span>
-                          )}
+                          )} */}
                           {(meta.touched || attemptedSubmit) && meta.error && (
                             <span className="text-torch-red text-xs">{meta.error}</span>
                           )}

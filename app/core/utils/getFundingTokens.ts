@@ -5,11 +5,15 @@ import { TagType, TokenType } from "app/tag/types"
 import { ZERO_ADDRESS, CHAIN_IDS } from "./constants"
 
 const getFundingTokens = (
-  chainId: number,
+  chainId: number | undefined,
   checkbook: Checkbook | undefined,
   terminal: Terminal | null | undefined
 ) => {
   const selectedChainId = checkbook ? checkbook.chainId : chainId
+
+  if (!selectedChainId) {
+    return []
+  }
 
   const eth = [CHAIN_IDS.ETHEREUM, CHAIN_IDS.RINKEBY, CHAIN_IDS.GOERLI].includes(selectedChainId)
     ? [{ symbol: "ETH", address: ZERO_ADDRESS, decimals: 18 }]

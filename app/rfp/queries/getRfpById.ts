@@ -17,9 +17,9 @@ export default async function getRfpById(input: z.infer<typeof GetRfpById>) {
     include: {
       terminal: true,
       author: true,
-      // _count: {
-      //   select: { proposals: true },
-      // },
+      _count: {
+        select: { proposals: true },
+      },
     },
   })
 
@@ -30,6 +30,6 @@ export default async function getRfpById(input: z.infer<typeof GetRfpById>) {
   return {
     ...rfp,
     status: computeRfpProductStatus(rfp.status, rfp.startDate, rfp.endDate),
-    submissionCount: 0, //rfp._count.proposals,
+    submissionCount: rfp._count.proposals,
   } as unknown as Rfp
 }

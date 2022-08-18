@@ -10,7 +10,7 @@ import getFundingTokens from "app/core/utils/getFundingTokens"
 import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
 
-const useCheckbookAvailability = (checkbook: Checkbook, terminal: Terminal) => {
+const useCheckbookAvailability = (checkbook: Checkbook | undefined, terminal: Terminal) => {
   const [totals, setTotals] = useState<any>()
 
   const tokenOptions = getFundingTokens(checkbook?.chainId, checkbook, terminal)
@@ -18,10 +18,11 @@ const useCheckbookAvailability = (checkbook: Checkbook, terminal: Terminal) => {
   const balances = tokenAddresses.reduce((acc, address) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const { data } = useBalance({
-      addressOrName: checkbook.address,
-      chainId: checkbook.chainId,
+      addressOrName: checkbook?.address,
+      chainId: checkbook?.chainId,
       cacheTime: 10_000, // 10 seconds
       ...(!!address && address !== ZERO_ADDRESS && { token: address }), // if tokenAddress is zero address, use gas token (e.g. ETH)
+      enabled: !!checkbook,
     })
 
     const balance = data?.value || BigNumber.from(0)
@@ -40,8 +41,8 @@ const useCheckbookAvailability = (checkbook: Checkbook, terminal: Terminal) => {
       const aggregatedCheckTotals = Promise.all(
         tokenAddresses.map(async (address) => {
           const totals = await invoke(getAggregatedCheckAmounts, {
-            checkbookAddress: checkbook.address,
-            quorum: checkbook.quorum,
+            checkbookAddress: checkbook?.address,
+            quorum: checkbook?.quorum,
             tokenAddress: address as string,
           })
 

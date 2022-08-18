@@ -66,7 +66,6 @@ const ProposalsTab: BlitzPage = ({
     getProposalsByRfpId,
     {
       rfpId,
-      // quorum: rfp?.checkbook.quorum as number,
       statuses: Array.from(proposalStatusFilters),
       page: page,
       paginationTake: PAGINATION_TAKE,
@@ -78,7 +77,6 @@ const ProposalsTab: BlitzPage = ({
     getProposalCountByRfpId,
     {
       rfpId,
-      // quorum: rfp?.checkbook.quorum as number,
       statuses: Array.from(proposalStatusFilters),
     },
     { suspense: false, enabled: !!rfpId, refetchOnWindowFocus: false, refetchOnReconnect: false }

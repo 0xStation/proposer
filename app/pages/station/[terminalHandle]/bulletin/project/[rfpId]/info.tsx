@@ -32,7 +32,6 @@ const {
   PAGE_NAME,
   FEATURE: { RFP },
 } = TRACKING_EVENTS
-// import getRfpApprovedProposalFunding from "app/rfp/queries/getRfpApprovedFunding"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { terminalHandle, rfpId, proposalId } = context.query as {
@@ -69,7 +68,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const RFPInfoTab: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const [showRfpSuccessModal, setShowRfpSuccessModal] = useState<boolean>(false)
-  const [showAddFundsModal, setShowAddFundsModal] = useState<boolean>(false)
   const query = useRouterQuery()
   const rfpId = useParam("rfpId") as string
   const [terminal, { isSuccess: isFinishedFetchingTerminal }] = useQuery(
@@ -199,7 +197,7 @@ const RFPInfoTab: BlitzPage = () => {
               </div>
               {checkbook && (
                 <div className="mt-9">
-                  <p className="text-xs text-concrete uppercase font-bold">Signers</p>
+                  <p className="text-xs text-concrete uppercase font-bold">Reviewers</p>
                   {(checkbook?.signerAccounts || []).map((account, i) => (
                     <AccountMediaObject account={account} className="mt-4" key={i} />
                   ))}
