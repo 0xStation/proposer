@@ -1,5 +1,5 @@
-import { ProposalStatus } from "app/proposal/types"
-// import { computeProposalStatus } from "app/proposal/utils"
+import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
+import { ProposalStatus as PrismaProposalStatus } from "db"
 import db from "db"
 import * as z from "zod"
 import { Account } from "../types"
@@ -30,7 +30,10 @@ export default async function getAccountProposalsByAddress(
       ...accountProposal,
       proposal: {
         ...accountProposal.proposal,
-        status: ProposalStatus.SUBMITTED,
+        status:
+          accountProposal.proposal.status === PrismaProposalStatus.PUBLISHED
+            ? ProductProposalStatus.SUBMITTED
+            : accountProposal.proposal.status,
       },
     }
   })
