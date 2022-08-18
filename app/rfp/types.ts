@@ -26,8 +26,8 @@ export type RfpMetadata = {
     body: string // template body for customized inclusion + addition of questions
   }
   permissions: {
-    view: TagTokenMetadata
-    submit: TagTokenMetadata
+    view: TagTokenMetadata | undefined
+    submit: TagTokenMetadata | undefined
   }
   funding: {
     senderAddress?: string

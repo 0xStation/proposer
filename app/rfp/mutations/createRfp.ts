@@ -5,6 +5,7 @@ import { TokenTag, Token } from "types"
 import { FundingSenderType } from "app/types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { RfpMetadata } from "../types"
+import { TagTokenMetadata } from "app/tag/types"
 
 const CreateRfp = z.object({
   terminalId: z.number(),
@@ -68,8 +69,8 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
       }),
     },
     permissions: {
-      submit: input.submittingPermission,
-      view: input.viewingPermission,
+      submit: input.submittingPermission as TagTokenMetadata,
+      view: input.viewingPermission as TagTokenMetadata,
     },
   }
 

@@ -28,8 +28,9 @@ export const Token = z.object({
 })
 
 export const TokenTag = z.object({
-  type: z.string(),
-  address: z.string(),
-  symbol: z.string(),
   chainId: z.number(),
+  address: z.string(),
+  type: z.string(),
+  name: z.string(),
+  symbol: z.string(),
 })

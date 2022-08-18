@@ -116,7 +116,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, checkbo
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        {activeChain && activeChain.id === rfp.checkbook.chainId ? (
+        {activeChain && activeChain.id === checkbook?.chainId ? (
           <>
             <h3 className="text-2xl font-bold pt-6">Sign to confirm approval</h3>
             <p className="mt-2">
@@ -191,7 +191,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, checkbo
                 type="button"
                 className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 w-[98px] rounded hover:opacity-75"
                 onClick={() => {
-                  switchNetwork?.(rfp.checkbook.chainId)
+                  switchNetwork?.(checkbook.chainId)
                 }}
               >
                 Switch

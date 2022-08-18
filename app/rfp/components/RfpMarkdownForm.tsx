@@ -491,23 +491,17 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                               return
                             }
 
-                            if (!selectedCheckbook) {
+                            const fieldsWithErrors = Object.keys(formState.errors as Object)
+                            if (fieldsWithErrors.length > 0) {
                               setToastState({
                                 isToastShowing: true,
                                 type: "error",
-                                message: `Please add a Checkbook to publish your RFP.`,
+                                message: `Please fill in ${fieldsWithErrors.join(
+                                  ", "
+                                )} to publish RFP.`,
                               })
                               return
                             }
-                            const fieldsWithErrors = Object.keys(formState.errors as Object)
-                            setToastState({
-                              isToastShowing: true,
-                              type: "error",
-                              message: `Please fill in ${fieldsWithErrors.join(
-                                ", "
-                              )} to publish RFP.`,
-                            })
-                            return
                           }
                           setConfirmationModalOpen(true)
                         }}
@@ -806,7 +800,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                           </Field>
                         </div>
                         <div className="flex flex-col mt-6">
-                          <label className="font-bold block">Checkbook*</label>
+                          <label className="font-bold block">Checkbook</label>
                           <span className="text-xs text-concrete block">
                             Deposit funds here to create checks for proposers to claim once their
                             proposals have been approved.{" "}

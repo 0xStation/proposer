@@ -4,6 +4,7 @@ import { Token, TokenTag } from "types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { FundingSenderType } from "app/types"
 import { RfpMetadata } from "../types"
+import { TagTokenMetadata } from "app/tag/types"
 
 // going to be calling this from edit RFP page, so we will still be passing in all of these data
 // just bc they might not be changed does not mean we will be omitting them, because the form
@@ -56,8 +57,8 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
       }),
     },
     permissions: {
-      submit: input.submittingPermission,
-      view: input.viewingPermission,
+      submit: input.submittingPermission as TagTokenMetadata,
+      view: input.viewingPermission as TagTokenMetadata,
     },
   }
 
