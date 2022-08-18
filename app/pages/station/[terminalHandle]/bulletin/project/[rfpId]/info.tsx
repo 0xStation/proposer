@@ -85,18 +85,16 @@ const RFPInfoTab: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
   const isAdmin = useAdminForTerminal(terminal)
   const [rfp] = useQuery(getRfpById, { id: rfpId }, { suspense: false, enabled: !!rfpId })
-  // const [rfpApprovedProposalFunding] = useQuery(
-  //   getRfpApprovedProposalFunding,
-  //   {
-  //     rfpId: rfpId,
-  //     approvalQuorum: rfp?.checkbook.quorum || 100,
-  //     tokenChainId: rfp?.data.funding.token.chainId || 1,
-  //     tokenAddress: rfp?.data.funding.token.address || ZERO_ADDRESS,
-  //   },
-  //   { suspense: false, enabled: !!rfp?.checkbook && !!rfp.data }
-  //   // for some reason typescript does not recognize enabled checks as sufficient to remove default values in query?
-  // )
-  const rfpApprovedProposalFunding = 0 // temporary reduction in blast radius
+  const [rfpApprovedProposalFunding] = useQuery(
+    getRfpApprovedProposalFunding,
+    {
+      rfpId: rfpId,
+      tokenChainId: rfp?.data.funding.token.chainId || 1,
+      tokenAddress: rfp?.data.funding.token.address || ZERO_ADDRESS,
+    },
+    { suspense: false, enabled: !!rfp?.data }
+    // for some reason typescript does not recognize enabled checks as sufficient to remove default values in query?
+  )
 
   const [checkbook] = useQuery(
     getCheckbook,
