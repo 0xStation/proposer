@@ -86,7 +86,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
   const defaultTokenOptionSymbols = [ETH, USDC]
 
   const terminalHandle = useParam("terminalHandle") as string
-  const [terminal, { isSuccess: finishedFetchingTerminal }] = useQuery(
+  const [terminal] = useQuery(
     getTerminalByHandle,
     { handle: terminalHandle },
     { suspense: false, enabled: !!terminalHandle, refetchOnWindowFocus: false }
