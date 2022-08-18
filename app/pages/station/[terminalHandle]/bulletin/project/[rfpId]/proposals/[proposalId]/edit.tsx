@@ -3,6 +3,7 @@ import {
   GetServerSideProps,
   InferGetServerSidePropsType,
   invoke,
+  Routes,
   useParam,
   useQuery,
 } from "blitz"
@@ -13,32 +14,51 @@ import { ProposalMarkdownForm } from "app/proposal/components/ProposalMarkdownFo
 import getProposalById from "app/proposal/queries/getProposalById"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { terminalHandle, rfpId } = context.query as { terminalHandle: string; rfpId: string }
+  const { terminalHandle, rfpId, proposalId } = context.query as {
+    terminalHandle: string
+    rfpId: string
+    proposalId: string
+  }
   const rfp = await invoke(getRfpById, { id: rfpId })
+  if (!rfp) {
+    return {
+      notFound: true,
+    }
+  }
   const terminal = await invoke(getTerminalByHandle, { handle: terminalHandle })
 
-  if (!rfp || !terminal) {
+  if (!terminal) {
+    return {
+      notFound: true,
+    }
+  }
+  const proposal = await invoke(getProposalById, { id: proposalId })
+
+  if (!proposal) {
     return {
       notFound: true,
     }
   }
 
+  if (proposal.approvals?.length) {
+    return {
+      redirect: {
+        destination: Routes.ProposalPage({ terminalHandle, rfpId, proposalId }),
+        permanent: false,
+      },
+    }
+  }
+
   return {
-    props: { rfp, terminal },
+    props: { rfp, terminal, proposal },
   }
 }
 
 const EditProposalPage: BlitzPage = ({
   rfp,
   terminal,
+  proposal,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const proposalId = useParam("proposalId")
-  const [proposal] = useQuery(
-    getProposalById,
-    { id: proposalId as string },
-    { suspense: false, enabled: !!proposalId }
-  )
-
   return (
     <Layout title="Edit Proposal">
       <ProposalMarkdownForm
