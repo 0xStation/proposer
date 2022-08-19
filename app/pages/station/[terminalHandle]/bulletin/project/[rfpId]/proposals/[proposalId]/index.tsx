@@ -125,13 +125,10 @@ const ProposalPage: BlitzPage = ({
     (approval) => approval.signerAddress === activeUser?.address
   )
 
-  const userCanApprove =
-    !userHasApproved &&
-    // no checkbook and is rfp author or there is checkbook and user is signer
-    ((!checkbook && userIsAuthor) || userIsSigner)
-
   // show approve button, if the proposal hasn't reached quorum, user can approve or user is author and can't approve
-  const showApproveButton = (!checkbook && userIsAuthor) || (!userHasApproved && !hasQuorum)
+  const showApproveButton = userIsAuthor || (!!userIsSigner && !userHasApproved && !hasQuorum)
+  const showInsufficientFundsWarning = overallocated && userIsSigner
+  const showNotSignerWarning = !!checkbook && !userIsSigner
 
   // proposer has reached quorum and check has not been cashed and user is the proposer
   const showCashButton =
@@ -299,7 +296,7 @@ const ProposalPage: BlitzPage = ({
                       "Approve"
                     )}
                   </button>
-                  {overallocated && userIsSigner && (
+                  {showInsufficientFundsWarning && (
                     <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
                       Insufficient funds.{" "}
                       {isAdmin && (
@@ -315,7 +312,7 @@ const ProposalPage: BlitzPage = ({
                       )}
                     </span>
                   )}
-                  {checkbook && !userIsSigner && (
+                  {showNotSignerWarning && (
                     <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
                       You need to be a signer of the associated Checkbook to approve.
                     </span>

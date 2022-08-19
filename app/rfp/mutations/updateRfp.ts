@@ -37,7 +37,7 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
     },
     signature: params.signature,
     publishSignature: {
-      address: params.authorAddress,
+      address: toChecksumAddress(params.authorAddress),
       signature: params.signature,
       message: params.signatureMessage,
       timestamp: new Date(),
@@ -52,7 +52,7 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
       },
       budgetAmount: params.fundingBudgetAmount,
       ...(params.fundingAddress !== "" && {
-        senderAddress: params.fundingAddress,
+        senderAddress: params.fundingAddress ? toChecksumAddress(params.fundingAddress) : undefined,
         senderType: FundingSenderType.CHECKBOOK,
       }),
     },

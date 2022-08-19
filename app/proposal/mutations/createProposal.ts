@@ -2,6 +2,7 @@ import db from "db"
 import * as z from "zod"
 import { FundingSenderType, Token } from "app/types"
 import { ProposalMetadata } from "../types"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 const CreateProposal = z.object({
   authorAddress: z.string(),
@@ -36,11 +37,11 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     },
     funding: {
       chainId: input.token.chainId,
-      recipientAddress: input.recipientAddress,
-      token: input.token.address,
+      recipientAddress: toChecksumAddress(input.recipientAddress),
+      token: toChecksumAddress(input.token.address),
       amount,
       symbol: input.token.symbol,
-      senderAddress: input.senderAddress,
+      senderAddress: input.senderAddress ? toChecksumAddress(input.senderAddress) : undefined,
       senderType: input.senderType,
     },
   }
