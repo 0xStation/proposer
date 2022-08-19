@@ -57,6 +57,8 @@ const RfpHeaderNavigation = ({ rfp }: { rfp: Rfp }) => {
     terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string)
   const router = useRouter()
 
+  console.log("rfp submission count", rfp.submissionCount)
+
   useEffect(() => {
     if (rfp) {
       const today = new Date()
@@ -317,7 +319,9 @@ const RfpHeaderNavigation = ({ rfp }: { rfp: Rfp }) => {
                 : "text-concrete hover:text-light-concrete"
             }`}
           >
-            <Link href={Routes.ProposalsTab({ terminalHandle, rfpId: rfp.id })}>Proposals</Link>
+            <Link href={Routes.ProposalsTab({ terminalHandle, rfpId: rfp.id })}>{`Proposals ${
+              rfp.submissionCount ? `(${rfp.submissionCount})` : "(0)"
+            }`}</Link>
           </li>
         </ul>
       </div>

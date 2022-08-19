@@ -3,6 +3,7 @@ import * as z from "zod"
 import { Rfp } from "../types"
 import { computeRfpDbAndDeletedStatusFilter, computeRfpProductStatus } from "../utils"
 import { PAGINATION_TAKE } from "../../core/utils/constants"
+import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
 const GetRfpsByTerminalId = z.object({
   terminalId: z.number(),
@@ -25,8 +26,12 @@ export async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsByTermina
     },
     include: {
       author: true,
-      _count: {
-        select: { proposals: true },
+      proposals: {
+        where: {
+          status: {
+            not: PrismaProposalStatus.DELETED,
+          },
+        },
       },
     },
     take: input.paginationTake,
@@ -37,7 +42,7 @@ export async function getRfpsByTerminalId(input: z.infer<typeof GetRfpsByTermina
     return {
       ...rfp,
       status: computeRfpProductStatus(rfp.status, rfp.startDate, rfp.endDate),
-      submissionCount: rfp._count.proposals,
+      submissionCount: rfp.proposals.length,
     } as unknown as Rfp
   })
 }

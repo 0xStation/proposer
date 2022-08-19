@@ -177,7 +177,7 @@ const ProposalPage: BlitzPage = ({
   }
 
   return (
-    <Layout title={`Proposals`}>
+    <Layout title="Proposals">
       <DeleteProposalModal
         isOpen={deleteProposalModalOpen}
         setIsOpen={setDeleteProposalModalOpen}
@@ -215,10 +215,9 @@ const ProposalPage: BlitzPage = ({
                   </span>
                   <span className="text-concrete hover:text-light-concrete">
                     <Link
-                      href={Routes.RFPInfoTab({
+                      href={Routes.ProposalsTab({
                         terminalHandle,
                         rfpId: rfp?.id,
-                        proposalId: proposal?.id,
                       })}
                     >
                       {rfp?.data?.content?.title}
