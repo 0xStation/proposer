@@ -439,7 +439,7 @@ export const ProposalMarkdownForm = ({
                     </Field>
 
                     <Field
-                      name={`amount`}
+                      name="amount"
                       validate={composeValidators(requiredField, isPositiveAmount)}
                     >
                       {({ meta, input }) => (
@@ -492,7 +492,10 @@ export const ProposalMarkdownForm = ({
                         setUnsavedChanges(false)
                         setConfirmationModalOpen(true)
                       }}
-                      className={`bg-electric-violet text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70`}
+                      disabled={!formState.dirty}
+                      className={`bg-electric-violet ${
+                        !formState.dirty ? "bg-opacity-70" : ""
+                      } text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70`}
                     >
                       Publish
                     </button>

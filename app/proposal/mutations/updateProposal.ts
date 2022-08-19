@@ -15,8 +15,7 @@ const UpdateProposal = z.object({
 })
 
 export default async function updateProposal(input: z.infer<typeof UpdateProposal>) {
-  const amount = parseFloat(input.amount)
-  if (amount < 0) {
+  if (parseFloat(input.amount) < 0) {
     throw new Error("amount must be greater or equal to zero.")
   }
 
@@ -30,7 +29,7 @@ export default async function updateProposal(input: z.infer<typeof UpdateProposa
     funding: {
       recipientAddress: input.recipientAddress,
       token: input.token,
-      amount,
+      amount: input.amount,
       symbol: input.symbol,
     },
   } as ProposalMetadata
