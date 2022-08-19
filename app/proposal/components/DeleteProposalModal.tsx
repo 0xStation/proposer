@@ -41,14 +41,14 @@ export const DeleteProposalModal = ({
       await deleteProposalMutation({ proposalId: proposal?.id as string })
     } catch (error) {
       console.error("Error deleting proposal", error)
-      //   trackError(RFP.EVENT_NAME.ERROR_DELETING_RFP, {
-      //     pageName,
-      //     userAddress: activeUser?.address,
-      //     stationHandle: terminalHandle as string,
-      //     stationId: terminalId,
-      //     rfpId: rfp?.id,
-      //     errorMsg: error.message,
-      //   })
+      trackError(PROPOSAL.EVENT_NAME.ERROR_DELETING_PROPOSAL, {
+        pageName,
+        userAddress: activeUser?.address,
+        stationHandle: terminalHandle as string,
+        stationId: terminalId,
+        proposalId: proposal?.id,
+        errorMsg: error.message,
+      })
       setToastState({
         isToastShowing: true,
         type: "error",
@@ -76,13 +76,13 @@ export const DeleteProposalModal = ({
             type="submit"
             className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
             onClick={() => {
-              //   trackClick(RFP.EVENT_NAME.DELETE_RFP_CLICKED, {
-              //     pageName,
-              //     userAddress: activeUser?.address,
-              //     stationHandle: terminalHandle as string,
-              //     stationId: terminalId,
-              //     rfpId: rfp?.id,
-              //   })
+              trackClick(PROPOSAL.EVENT_NAME.DELETE_PROPOSAL_CLICKED, {
+                pageName,
+                userAddress: activeUser?.address,
+                stationHandle: terminalHandle as string,
+                stationId: terminalId,
+                proposalId: proposal?.id,
+              })
               handleSubmit()
             }}
           >

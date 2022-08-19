@@ -112,7 +112,6 @@ const ProposalPage: BlitzPage = ({
 
   // user can delete the proposal if the proposal hasn't reached quorum
   const canDeleteProposal = proposal.status !== ProposalStatus.APPROVED
-  console.log(proposal.status)
 
   // user can approve if they are a signer and they haven't approved before
   const userCanApprove =
@@ -296,12 +295,15 @@ const ProposalPage: BlitzPage = ({
                                   </>
                                 ),
                                 onClick: () => {
-                                  // trackClick(RFP.EVENT_NAME.RFP_SETTINGS_DELETE_RFP_CLICKED, {
-                                  //   pageName: PAGE_NAME.RFP_INFO_PAGE,
-                                  //   stationHandle: terminalHandle,
-                                  //   stationId: terminal?.id,
-                                  //   rfpId: rfp?.id,
-                                  // })
+                                  trackClick(
+                                    PROPOSAL.EVENT_NAME.PROPOSAL_SETTINGS_DELETE_PROPOSAL_CLICKED,
+                                    {
+                                      pageName: PAGE_NAME.PROPOSAL_INFO_PAGE,
+                                      stationHandle: terminalHandle,
+                                      stationId: terminal?.id,
+                                      proposalId: proposal?.id,
+                                    }
+                                  )
                                   setDeleteProposalModalOpen(true)
                                 },
                               },
