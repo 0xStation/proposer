@@ -1,17 +1,10 @@
-import {
-  BlitzPage,
-  GetServerSideProps,
-  InferGetServerSidePropsType,
-  invoke,
-  Routes,
-  useParam,
-  useQuery,
-} from "blitz"
+import { BlitzPage, GetServerSideProps, InferGetServerSidePropsType, invoke, Routes } from "blitz"
 import getRfpById from "app/rfp/queries/getRfpById"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Layout from "app/core/layouts/Layout"
 import { ProposalMarkdownForm } from "app/proposal/components/ProposalMarkdownForm"
 import getProposalById from "app/proposal/queries/getProposalById"
+import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { terminalHandle, rfpId, proposalId } = context.query as {
@@ -43,6 +36,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (proposal.approvals?.length) {
     return {
       redirect: {
+        destination: Routes.ProposalPage({ terminalHandle, rfpId, proposalId }),
+        permanent: false,
+      },
+    }
+  }
+
+  if (proposal.status === ProductProposalStatus.DELETED) {
+    return {
+      redirect: {
+        // redirects to the proposal deleted view
         destination: Routes.ProposalPage({ terminalHandle, rfpId, proposalId }),
         permanent: false,
       },
