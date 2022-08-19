@@ -136,6 +136,9 @@ model Rfp {
   status        RfpStatus  @default(DRAFT)
   data          Json
   proposals     Proposal[]
+  // uncomment for data migration
+  // fundingAddress String
+  // checkbook      Checkbook  @relation(fields: [fundingAddress], references: [address])
 }
 
 // unique links by /station/handle]/proposal/[localId]
