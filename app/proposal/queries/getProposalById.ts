@@ -41,7 +41,7 @@ export default async function getProposalById(params: z.infer<typeof GetProposal
   if (firstCheck) {
     // todo - need to remove quorum from checkbook if we ever want to remove dep of checkbook
     const quorum = firstCheck.checkbook.quorum
-    console.log("firstCheck.checkbook.quorum", firstCheck.checkbook.quorum)
+
     return {
       ...proposal,
       status: computeProposalStatus(proposal.approvals.length, quorum),
