@@ -54,21 +54,6 @@ const ProfileHome: BlitzPage = () => {
     { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
   )
 
-  const [terminals] = useQuery(
-    getTerminalsByAccount,
-    { accountId: account?.id as number },
-    {
-      enabled: !!account?.id,
-      suspense: false,
-      refetchOnWindowFocus: false,
-      onSuccess: (terminals: Terminal[]) => {
-        if (terminals && terminals.length > 0 && !selectedTerminal) {
-          setSelectedTerminal(terminals[0] || null)
-        }
-      },
-    }
-  )
-
   useEffect(() => {
     // if it's not the first render, and the activeUser hasn't
     // connected their account, show the connect discord modal.

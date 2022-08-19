@@ -1,7 +1,7 @@
 import { computeProposalStatus } from "app/proposal/utils"
 import db from "db"
 import * as z from "zod"
-import { Account } from "../types"
+import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
 const GetAccountProposalsByAddress = z.object({
   address: z.string(),
@@ -29,18 +29,20 @@ export default async function getAccountProposalsByAddress(
     },
   })
 
-  const accountProposalsWithProductStatus = accountProposals.map((accountProposal) => {
-    return {
-      ...accountProposal,
-      proposal: {
-        ...accountProposal.proposal,
-        status: computeProposalStatus(
-          accountProposal.proposal.approvals.length,
-          accountProposal.proposal.rfp.checkbook?.quorum as number
-        ),
-      },
-    }
-  })
+  const accountProposalsWithProductStatus = accountProposals
+    .filter((accountProposal) => accountProposal.proposal.status !== PrismaProposalStatus.DELETED)
+    .map((accountProposal) => {
+      return {
+        ...accountProposal,
+        proposal: {
+          ...accountProposal.proposal,
+          status: computeProposalStatus(
+            accountProposal.proposal.approvals.length,
+            accountProposal.proposal.rfp.checkbook?.quorum as number
+          ),
+        },
+      }
+    })
 
   return accountProposalsWithProductStatus
 }
