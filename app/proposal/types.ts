@@ -22,10 +22,6 @@ export type ProposalMetadata = {
     symbol: string
     amount: number
   }
-  startDate: Date
-  endDate: Date
-  milestonePercentages: number[] // list of percentages, number of milestones is length
-  collaborators: { address: string; percent: number }[] // list of collaborator splits, number of collaborators is length
   signature: string
 }
 

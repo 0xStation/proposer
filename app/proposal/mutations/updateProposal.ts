@@ -1,5 +1,6 @@
 import db from "db"
 import * as z from "zod"
+import { ProposalMetadata } from "../types"
 
 const UpdateProposal = z.object({
   proposalId: z.string(),
@@ -14,28 +15,31 @@ const UpdateProposal = z.object({
 })
 
 export default async function updateProposal(input: z.infer<typeof UpdateProposal>) {
-  if (parseFloat(input.amount) < 0) {
+  const amount = parseFloat(input.amount)
+  if (amount < 0) {
     throw new Error("amount must be greater or equal to zero.")
   }
+
+  const proposalMetadata = {
+    signature: input.signature,
+    signatureMessage: input.signatureMessage,
+    content: {
+      title: input.contentTitle,
+      body: input.contentBody,
+    },
+    funding: {
+      recipientAddress: input.recipientAddress,
+      token: input.token,
+      amount,
+      symbol: input.symbol,
+    },
+  } as ProposalMetadata
 
   try {
     const proposal = await db.proposal.update({
       where: { id: input.proposalId },
       data: {
-        data: {
-          signature: input.signature,
-          signatureMessage: input.signatureMessage,
-          content: {
-            title: input.contentTitle,
-            body: input.contentBody,
-          },
-          funding: {
-            recipientAddress: input.recipientAddress,
-            token: input.token,
-            amount: input.amount,
-            symbol: input.symbol,
-          },
-        },
+        data: proposalMetadata,
         // Update: we're changing collaborators on the proposal model
         // so ignoring them for now in the update mutation.
       },
