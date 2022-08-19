@@ -25,6 +25,8 @@ import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import { AddFundsModal } from "app/core/components/AddFundsModal"
 import useStore from "app/core/hooks/useStore"
+import Button from "app/core/components/sds/buttons/Button"
+import { ButtonType } from "app/core/components/sds/buttons/Button"
 
 const {
   PAGE_NAME,
@@ -164,8 +166,8 @@ const CheckbookSettingsPage: BlitzPage = () => {
                 </a>
               </h5>
             </div>
-            <button
-              className="rounded text-tunnel-black px-8 h-[32px] bg-electric-violet self-start"
+            <Button
+              label="Create"
               onClick={() => {
                 trackClick(CHECKBOOK.EVENT_NAME.CHECKBOOK_SHOW_CREATE_PAGE_CLICKED, {
                   pageName: PAGE_NAME.CHECKBOOK_SETTINGS_PAGE,
@@ -176,9 +178,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
                 })
                 router.push(Routes.NewCheckbookSettingsPage({ terminalHandle }))
               }}
-            >
-              Create
-            </button>
+            />
           </div>
           {checkbooks.length === 0 ? (
             <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
@@ -319,12 +319,13 @@ const CheckbookSettingsPage: BlitzPage = () => {
                         {isButtonAddressCopied ? "Copied!" : "Copy Address"}
                       </button> */}
                         <CheckbookIndicator checkbook={selectedCheckbook} terminal={terminal} />
-                        <button
-                          className="border border-electric-violet rounded text-electric-violet px-6 h-[35px] mt-2 hover:bg-wet-concrete mt-4"
-                          onClick={() => setShowAddFundsModal(true)}
-                        >
-                          Add funds
-                        </button>
+                        <div className="mt-2">
+                          <Button
+                            label="Add funds"
+                            type={ButtonType.Secondary}
+                            onClick={() => setShowAddFundsModal(true)}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -21,7 +21,7 @@ import useStore from "app/core/hooks/useStore"
 import Back from "/public/back-icon.svg"
 import networks from "app/utils/networks.json"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
-import { Spinner } from "app/core/components/Spinner"
+import Button from "app/core/components/sds/buttons/Button"
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   try {
@@ -184,21 +184,13 @@ const NewTokenSettingsPage: BlitzPage = () => {
                       placeholder="0x..."
                       className="bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
                     />
-                    <div>
-                      <button
-                        className={`rounded text-tunnel-black w-32 h-[35px] mt-12 bg-electric-violet ${
-                          formState.dirty ? "opacity-100" : "opacity-70"
-                        }`}
-                        type="submit"
-                      >
-                        {loading ? (
-                          <div className="flex justify-center items-center">
-                            <Spinner fill="black" />
-                          </div>
-                        ) : (
-                          "Import"
-                        )}
-                      </button>
+                    <div className="mt-12">
+                      <Button
+                        label="Import"
+                        isDisabled={!formState.dirty}
+                        isSubmitType={true}
+                        isLoading={loading}
+                      />
                     </div>
                   </div>
                 </form>

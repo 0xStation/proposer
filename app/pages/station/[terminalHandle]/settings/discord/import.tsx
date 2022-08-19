@@ -8,6 +8,7 @@ import useGuildMembers from "app/core/hooks/useGuildMembers"
 import Checkbox from "app/core/components/form/Checkbox"
 import useStore from "app/core/hooks/useStore"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
+import Button from "app/core/components/sds/buttons/Button"
 
 const DiscordImportPage: BlitzPage = () => {
   const router = useRouter()
@@ -189,15 +190,8 @@ const DiscordImportPage: BlitzPage = () => {
                         )
                       })}
                   </div>
-                  <div>
-                    <button
-                      className={`rounded text-tunnel-black px-8 mt-12 py-2 ${
-                        formState.dirty ? "bg-electric-violet" : "bg-concrete"
-                      }`}
-                      type="submit"
-                    >
-                      Done
-                    </button>
+                  <div className="mt-12">
+                    <Button isSubmitType={true} label="Done" isDisabled={!formState.dirty} />
                   </div>
                 </div>
               </form>

@@ -17,6 +17,8 @@ import useActiveUserDiscordGuilds from "app/core/hooks/useActiveUserDiscordGuild
 import updateTerminal from "app/terminal/mutations/updateTerminal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
+import Button from "app/core/components/sds/buttons/Button"
+import { ButtonType } from "app/core/components/sds/buttons/Button"
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   const session = await getSession(req, res)
@@ -139,13 +141,12 @@ const DiscordConnectPage: BlitzPage = () => {
                 {/* likely means the auth didn't go through, the guild is not connected yet */}
                 {selectedGuildStatus !== "ready" ? (
                   <div>
-                    <button
-                      type="button"
-                      className="border border-marble-white w-full rounded py-2"
+                    <Button
+                      className="w-full"
+                      label="Connect Station bot"
                       onClick={() => onBotOpen()}
-                    >
-                      Connect Station bot
-                    </button>
+                      type={ButtonType.Unemphesized}
+                    />
                   </div>
                 ) : (
                   <div>
@@ -158,15 +159,8 @@ const DiscordConnectPage: BlitzPage = () => {
                   </div>
                 )}
 
-                <div>
-                  <button
-                    className={`rounded text-tunnel-black px-8 mt-12 py-2 ${
-                      formState.dirty ? "bg-electric-violet" : "bg-concrete"
-                    }`}
-                    type="submit"
-                  >
-                    Next
-                  </button>
+                <div className="mt-12">
+                  <Button label="Next" isSubmitType={true} isDisabled={!formState.dirty} />
                 </div>
               </div>
             </form>

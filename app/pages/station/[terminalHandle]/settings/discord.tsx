@@ -23,6 +23,7 @@ import NoSsr from "app/core/components/NoSsr"
 import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import useStore from "app/core/hooks/useStore"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
+import Button from "app/core/components/sds/buttons/Button"
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   const session = await getSession(req, res)
@@ -142,17 +143,10 @@ const DiscordSettingsPage: BlitzPage = () => {
               ) : (
                 <div className="w-full h-full flex items-center flex-col justify-center">
                   <p className="text-marble-white text-2xl font-bold">Connect with Discord</p>
-                  <p className="mt-2 text-marble-white text-base w-[400px] text-center">
+                  <p className="mt-2 text-marble-white text-base w-[400px] text-center mb-4">
                     Connect with Discord to import roles and members.
                   </p>
-                  <button
-                    onClick={() => {
-                      onOpen()
-                    }}
-                    className="cursor-pointer mt-8 w-[200px] py-1 bg-electric-violet text-tunnel-black rounded text-base"
-                  >
-                    Connect
-                  </button>
+                  <Button label="Connect" onClick={() => onOpen()} />
                 </div>
               )}
             </>
@@ -211,19 +205,7 @@ const DiscordSettingsPage: BlitzPage = () => {
                   <div className="flex flex-col">
                     <div className="p-6 border-b border-concrete flex justify-between">
                       <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
-                      <div>
-                        <button
-                          className={`rounded text-tunnel-black px-8 h-full bg-electric-violet ${
-                            formState.dirty
-                              ? "hover:bg-opacity-70"
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          type="submit"
-                          disabled={!formState.dirty}
-                        >
-                          Save
-                        </button>
-                      </div>
+                      <Button label="Submit" isSubmitType={true} isDisabled={formState.dirty} />
                     </div>
                     <div className="p-6">
                       <div className="grid grid-cols-3 gap-4">
