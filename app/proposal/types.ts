@@ -8,6 +8,7 @@ export enum ProposalStatus {
   SUBMITTED = "SUBMITTED",
   IN_REVIEW = "IN REVIEW",
   APPROVED = "APPROVED",
+  DELETED = "DELETED",
 }
 
 export type ProposalMetadata = {

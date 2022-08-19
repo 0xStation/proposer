@@ -39,11 +39,14 @@ import {
   ClipboardCheckIcon,
   ClipboardIcon,
   LightBulbIcon,
+  TrashIcon,
 } from "@heroicons/react/solid"
 import Dropdown from "app/core/components/Dropdown"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { RfpStatus } from "app/rfp/types"
+import DeleteProposalModal from "app/proposal/components/DeleteProposalModal"
+import { ProposalStatus } from "app/proposal/types"
 
 const {
   PAGE_NAME,
@@ -62,6 +65,7 @@ const ProposalPage: BlitzPage = ({
   const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
   const [checkTxnHash, setCheckTxnHash] = useState<string>()
   const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
+  const [deleteProposalModalOpen, setDeleteProposalModalOpen] = useState<boolean>(false)
   const [isProposalUrlCopied, setIsProposalUrlCopied] = useState<boolean>(false)
   const [check, setCheck] = useState<Check>()
   const isAdmin = useAdminForTerminal(terminal)
@@ -100,6 +104,15 @@ const ProposalPage: BlitzPage = ({
   const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
 
   const hasQuorum = check?.approvals?.length === rfp?.checkbook.quorum
+
+  // user can edit proposal if they are the author and the proposal hasn't been approved yet
+  const canEditProposal =
+    proposal?.collaborators?.[0]?.account?.address === activeUser?.address &&
+    proposal?.approvals?.length === 0
+
+  // user can delete the proposal if the proposal hasn't reached quorum
+  const canDeleteProposal = proposal.status !== ProposalStatus.APPROVED
+  console.log(proposal.status)
 
   // user can approve if they are a signer and they haven't approved before
   const userCanApprove =
@@ -150,6 +163,14 @@ const ProposalPage: BlitzPage = ({
 
   return (
     <Layout title={`Proposals`}>
+      <DeleteProposalModal
+        isOpen={deleteProposalModalOpen}
+        setIsOpen={setDeleteProposalModalOpen}
+        proposal={proposal}
+        pageName="Proposal page"
+        terminalHandle={terminalHandle}
+        terminalId={terminal?.id as number}
+      />
       <SignApprovalProposalModal
         isOpen={signModalOpen}
         setIsOpen={setSignModalOpen}
@@ -214,61 +235,113 @@ const ProposalPage: BlitzPage = ({
                     <div className="flex flex-col">
                       <h1 className="text-2xl font-bold">{proposal.data.content.title}</h1>
                       <div className="relative mr-6 mt-2 mb-8">
-                        {proposal?.collaborators?.[0]?.account?.address === activeUser?.address &&
-                          proposal?.approvals?.length === 0 && (
-                            <button
-                              onClick={() => {
-                                trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_SHOW_EDITOR_CLICKED, {
-                                  userAddress: activeUser?.address,
-                                  stationHandle: terminalHandle,
-                                  stationId: terminal?.id,
-                                  isEdit: true,
+                        {canEditProposal && (
+                          <button
+                            onClick={() => {
+                              trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_SHOW_EDITOR_CLICKED, {
+                                userAddress: activeUser?.address,
+                                stationHandle: terminalHandle,
+                                stationId: terminal?.id,
+                                isEdit: true,
+                              })
+                              router.push(
+                                Routes.EditProposalPage({
+                                  terminalHandle,
+                                  rfpId: rfp.id,
+                                  proposalId: proposal.id,
                                 })
-                                router.push(
-                                  Routes.EditProposalPage({
-                                    terminalHandle,
-                                    rfpId: rfp.id,
-                                    proposalId: proposal.id,
+                              )
+                            }}
+                          >
+                            <PencilIcon className="inline h-4 w-4 fill-marble-white mr-3 hover:cursor-pointer hover:fill-concrete" />
+                          </button>
+                        )}
+                        {canDeleteProposal ? (
+                          <Dropdown
+                            className="inline"
+                            side="left"
+                            button={
+                              <DotsHorizontalIcon className="inline-block h-4 w-4 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
+                            }
+                            items={[
+                              {
+                                name: (
+                                  <>
+                                    {isProposalUrlCopied ? (
+                                      <>
+                                        <ClipboardCheckIcon className="h-4 w-4 mr-2 inline" />
+                                        <p className="inline">Copied!</p>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <ClipboardIcon className="h-4 w-4 mr-2 inline" />
+                                        <p className="inline">Copy link</p>
+                                      </>
+                                    )}
+                                  </>
+                                ),
+                                onClick: () => {
+                                  navigator.clipboard.writeText(window.location.href).then(() => {
+                                    setIsProposalUrlCopied(true)
+                                    setTimeout(() => setIsProposalUrlCopied(false), 500)
                                   })
-                                )
-                              }}
-                            >
-                              <PencilIcon className="inline h-4 w-4 fill-marble-white mr-3 hover:cursor-pointer hover:fill-concrete" />
-                            </button>
-                          )}
-                        <Dropdown
-                          className="inline"
-                          side="left"
-                          button={
-                            <DotsHorizontalIcon className="inline-block h-4 w-4 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
-                          }
-                          items={[
-                            {
-                              name: (
-                                <>
-                                  {isProposalUrlCopied ? (
-                                    <>
-                                      <ClipboardCheckIcon className="h-4 w-4 mr-2 inline" />
-                                      <p className="inline">Copied!</p>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <ClipboardIcon className="h-4 w-4 mr-2 inline" />
-                                      <p className="inline">Copy link</p>
-                                    </>
-                                  )}
-                                </>
-                              ),
-                              onClick: () => {
-                                navigator.clipboard.writeText(window.location.href).then(() => {
                                   setIsProposalUrlCopied(true)
-                                  setTimeout(() => setIsProposalUrlCopied(false), 500)
-                                })
-                                setIsProposalUrlCopied(true)
+                                },
                               },
-                            },
-                          ]}
-                        />
+                              {
+                                name: (
+                                  <>
+                                    <TrashIcon className="h-4 w-4 mr-2 fill-torch-red" />
+                                    <p className="text-torch-red">Delete</p>
+                                  </>
+                                ),
+                                onClick: () => {
+                                  // trackClick(RFP.EVENT_NAME.RFP_SETTINGS_DELETE_RFP_CLICKED, {
+                                  //   pageName: PAGE_NAME.RFP_INFO_PAGE,
+                                  //   stationHandle: terminalHandle,
+                                  //   stationId: terminal?.id,
+                                  //   rfpId: rfp?.id,
+                                  // })
+                                  setDeleteProposalModalOpen(true)
+                                },
+                              },
+                            ]}
+                          />
+                        ) : (
+                          <Dropdown
+                            className="inline"
+                            side="left"
+                            button={
+                              <DotsHorizontalIcon className="inline-block h-4 w-4 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
+                            }
+                            items={[
+                              {
+                                name: (
+                                  <>
+                                    {isProposalUrlCopied ? (
+                                      <>
+                                        <ClipboardCheckIcon className="h-4 w-4 mr-2 inline" />
+                                        <p className="inline">Copied!</p>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <ClipboardIcon className="h-4 w-4 mr-2 inline" />
+                                        <p className="inline">Copy link</p>
+                                      </>
+                                    )}
+                                  </>
+                                ),
+                                onClick: () => {
+                                  navigator.clipboard.writeText(window.location.href).then(() => {
+                                    setIsProposalUrlCopied(true)
+                                    setTimeout(() => setIsProposalUrlCopied(false), 500)
+                                  })
+                                  setIsProposalUrlCopied(true)
+                                },
+                              },
+                            ]}
+                          />
+                        )}
                       </div>
                     </div>
                   </div>

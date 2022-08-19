@@ -52,8 +52,9 @@ const ProposalsTab: BlitzPage = ({
   terminal,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const activeUser = useStore((state) => state.activeUser)
+  const setToastState = useStore((state) => state.setToastState)
   const isAdmin = useAdminForTerminal(terminal)
-  const { proposalId } = useRouterQuery() as { proposalId: string }
+  const { proposalId, proposalDeleted } = useRouterQuery()
   const terminalHandle = useParam("terminalHandle") as string
   const rfpId = useParam("rfpId") as string
   const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
@@ -106,6 +107,16 @@ const ProposalsTab: BlitzPage = ({
       })
     }
   }, [isFinishedFetchingProposalCount])
+
+  useEffect(() => {
+    if (proposalDeleted) {
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Proposal successfully deleted",
+      })
+    }
+  }, [proposalDeleted])
 
   useEffect(() => {
     if (proposalId) {
@@ -357,3 +368,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 }
 
 export default ProposalsTab
+function setToastState(arg0: { isToastShowing: boolean; type: string; message: string }) {
+  throw new Error("Function not implemented.")
+}
