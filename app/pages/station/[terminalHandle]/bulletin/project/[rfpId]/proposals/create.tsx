@@ -211,6 +211,8 @@ const CreateProposalPage: BlitzPage = ({
                 rfpId: data.rfp.id,
                 terminalId: data.terminal.id,
                 recipientAddress: values.recipientAddress,
+                senderAddress: data.rfp.data.funding.senderAddress,
+                senderType: data.rfp.data.funding.senderType,
                 token: fundingToken,
                 amount: values.amount,
                 contentBody: values.markdown,

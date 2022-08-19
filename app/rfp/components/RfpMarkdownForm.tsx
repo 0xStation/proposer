@@ -327,7 +327,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
             return
           }
 
-          let mutationObject = {
+          const mutationObject = {
             authorAddress: activeUser.address,
             fundingAddress: values.checkbookAddress,
             // convert luxon's `DateTime` obj to UTC to store in db

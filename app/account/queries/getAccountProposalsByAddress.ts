@@ -39,6 +39,4 @@ export default async function getAccountProposalsByAddress(
   })
 
   return accountProposalsWithProductStatus
-
-  return accountProposals
 }

@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { Token } from "app/types"
+import { FundingSenderType, Token } from "app/types"
 import { ProposalMetadata } from "../types"
 
 const CreateProposal = z.object({
@@ -10,6 +10,10 @@ const CreateProposal = z.object({
   token: Token,
   amount: z.string(),
   recipientAddress: z.string(),
+  senderAddress: z.string().optional(),
+  senderType: z
+    .enum([FundingSenderType.CHECKBOOK, FundingSenderType.SAFE, FundingSenderType.WALLET])
+    .optional(),
   contentTitle: z.string(),
   contentBody: z.string(),
   collaborators: z.array(z.string()),
@@ -24,12 +28,8 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
   }
 
   const metadata: ProposalMetadata = {
-    publishSignature: {
-      signature: input.signature,
-      message: input.signatureMessage,
-      address: input.authorAddress,
-      timestamp: new Date(),
-    },
+    signature: input.signature,
+    signatureMessage: input.signatureMessage,
     content: {
       title: input.contentTitle,
       body: input.contentBody,
@@ -40,8 +40,8 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       token: input.token.address,
       amount,
       symbol: input.token.symbol,
-      // senderAddress left for proposal recipient to decide
-      // senderType left for proposal recipient to decide
+      senderAddress: input.senderAddress,
+      senderType: input.senderType,
     },
   }
 
