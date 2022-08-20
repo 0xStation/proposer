@@ -6,7 +6,7 @@ import { Rfp } from "app/rfp/types"
 
 export enum ProposalStatus {
   SUBMITTED = "SUBMITTED",
-  IN_REVIEW = "IN REVIEW",
+  IN_REVIEW = "IN_REVIEW",
   APPROVED = "APPROVED",
 }
 
@@ -21,10 +21,6 @@ export type ProposalMetadata = {
     symbol: string
     amount: number
   }
-  startDate: Date
-  endDate: Date
-  milestonePercentages: number[] // list of percentages, number of milestones is length
-  collaborators: { address: string; percent: number }[] // list of collaborator splits, number of collaborators is length
   signature: string
 }
 

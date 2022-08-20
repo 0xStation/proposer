@@ -1,5 +1,6 @@
-import db from "db"
 import * as z from "zod"
+import db, { ProposalStatus } from "db"
+import { ProposalMetadata } from "../types"
 
 const ApproveProposal = z.object({
   checkId: z.string(),
@@ -10,8 +11,11 @@ const ApproveProposal = z.object({
 })
 
 export default async function approveProposal(input: z.infer<typeof ApproveProposal>) {
-  const results = await db.$transaction([
-    db.proposalApproval.create({
+  // use a transaction to apply many database writes at once
+  // creates proposal approval, check approval, and potentially status update to proposal
+  const results = await db.$transaction(async (db) => {
+    // create approval objects, throws if creating duplicate
+    await db.proposalApproval.create({
       data: {
         proposalId: input.proposalId,
         signerAddress: input.signerAddress,
@@ -20,8 +24,9 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
           signatureMessage: input.signatureMessage,
         },
       },
-    }),
-    db.checkApproval.create({
+    })
+
+    await db.checkApproval.create({
       data: {
         checkId: input.checkId,
         signerAddress: input.signerAddress,
@@ -30,8 +35,47 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
           signatureMessage: input.signatureMessage,
         },
       },
-    }),
-  ])
+    })
+
+    // Fetch proposal and update status if needed
+
+    const proposal = await db.proposal.findUnique({
+      where: { id: input.proposalId },
+      include: {
+        approvals: true,
+        rfp: { include: { checkbook: true } },
+      },
+    })
+
+    // get typescript to compile
+    // if proposal object does not exist, will have thrown earlier on proposalApproval create
+    if (!proposal || !proposal.rfp || !proposal.rfp?.checkbook) {
+      return
+    }
+
+    // determine new status for proposal
+    let newStatus
+    if (
+      proposal.approvals.length + 1 >= (proposal.rfp.checkbook.quorum || 0) &&
+      proposal.status !== ProposalStatus.APPROVED
+    ) {
+      newStatus = ProposalStatus.APPROVED
+    } else if (
+      proposal.approvals.length + 1 < (proposal.rfp.checkbook.quorum || 0) &&
+      proposal.status !== ProposalStatus.IN_REVIEW
+    ) {
+      newStatus = ProposalStatus.IN_REVIEW
+    }
+    // if there is a new status to set, apply update
+    if (newStatus) {
+      await db.proposal.update({
+        where: { id: input.proposalId },
+        data: {
+          status: newStatus,
+        },
+      })
+    }
+  })
 
   return results
 }

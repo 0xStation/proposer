@@ -2,6 +2,8 @@ import { computeProposalStatus } from "app/proposal/utils"
 import db from "db"
 import * as z from "zod"
 import { Account } from "../types"
+import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
+import { ProposalStatus as PrismaProposalStatus } from "db"
 
 const GetAccountProposalsByAddress = z.object({
   address: z.string(),
@@ -34,10 +36,10 @@ export default async function getAccountProposalsByAddress(
       ...accountProposal,
       proposal: {
         ...accountProposal.proposal,
-        status: computeProposalStatus(
-          accountProposal.proposal.approvals.length,
-          accountProposal.proposal.rfp.checkbook?.quorum as number
-        ),
+        status:
+          accountProposal.proposal.status === PrismaProposalStatus.PUBLISHED
+            ? ProductProposalStatus.SUBMITTED
+            : accountProposal.proposal.status,
       },
     }
   })

@@ -175,7 +175,7 @@ const CreateProposalPage: BlitzPage = ({
 
       <Form
         initialValues={{
-          markdown: data.rfp.data.proposalPrefill,
+          markdown: data.rfp.data.proposalPrefill.body,
         }}
         onSubmit={async (values: {
           recipientAddress: string

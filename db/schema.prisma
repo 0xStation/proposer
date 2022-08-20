@@ -131,7 +131,7 @@ model Rfp {
   terminalId     Int
   terminal       Terminal   @relation(fields: [terminalId], references: [id])
   fundingAddress String
-  checkbook      Checkbook? @relation(fields: [fundingAddress], references: [address])
+  checkbook      Checkbook  @relation(fields: [fundingAddress], references: [address])
   authorAddress  String
   author         Account?   @relation(fields: [authorAddress], references: [address])
   startDate      DateTime
@@ -221,6 +221,8 @@ enum RfpStatus {
 enum ProposalStatus {
   DRAFT
   PUBLISHED
+  IN_REVIEW
+  APPROVED
 }
 
 //
