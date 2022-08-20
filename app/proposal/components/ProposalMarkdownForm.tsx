@@ -72,7 +72,7 @@ export const ProposalMarkdownForm = ({
     if (!selectedToken) {
       return
     }
-    if (parseFloat(fundingToken?.available) < amount) {
+    if (parseFloat(selectedToken?.available) < amount) {
       return `The RFP's checkbook only has ${selectedToken.available} ${selectedToken.symbol}. You can request ${amount}, but it cannot be approved until an admin adds more ${selectedToken.symbol} to the checkbook.`
     }
   }
@@ -110,13 +110,24 @@ export const ProposalMarkdownForm = ({
 
   const [updateProposalMutation] = useMutation(updateProposal, {
     onSuccess: async (response) => {
-      router.push(
-        Routes.ProposalsTab({
-          terminalHandle: terminalHandle,
-          rfpId: rfp?.id,
-          proposalId: response.id,
-        })
-      )
+      if (isEdit) {
+        router.push(
+          Routes.ProposalPage({
+            terminalHandle: terminalHandle as string,
+            rfpId: rfp?.id as string,
+            proposalId: proposal?.id as string,
+            proposalCreationSuccess: true,
+          })
+        )
+      } else {
+        router.push(
+          Routes.ProposalsTab({
+            terminalHandle: terminalHandle,
+            rfpId: rfp?.id,
+            proposalId: response.id,
+          })
+        )
+      }
     },
     onError: (error: Error) => {
       console.error(error)
@@ -125,172 +136,193 @@ export const ProposalMarkdownForm = ({
 
   let { signMessage } = useSignature()
   return (
-    <>
-      <div className="fixed grid grid-cols-4 w-[calc(100%-70px)] border-box z-50">
-        <div className="col-span-3 pt-4 pr-4">
-          <div className="text-light-concrete flex flex-row justify-between w-full">
-            <button
-              onClick={() => {
-                if (isEdit) {
-                  router.push(
-                    Routes.ProposalPage({
-                      terminalHandle: terminalHandle as string,
-                      rfpId: rfp?.id as string,
-                      proposalId: proposal?.id as string,
-                    })
-                  )
-                } else {
-                  router.push(
-                    Routes.RFPInfoTab({
-                      terminalHandle: terminalHandle,
-                      rfpId: rfp?.id as string,
-                      proposalCreationSuccess: true,
-                    })
-                  )
-                }
-              }}
-            >
-              <XIcon className="h-6 w-6 ml-3 fill-marble-white" />
-            </button>
-            <div className="flex flex-row items-center space-x-4">
-              <button
-                className={`${
-                  shortcutsOpen && "font-bold text-marble-white bg-wet-concrete"
-                } cursor-pointer h-[35px] rounded px-2`}
-                onClick={() => {
-                  setShortcutsOpen(!shortcutsOpen)
-                }}
-              >
-                Markdown shortcuts
-              </button>
-              <div
-                className="space-x-2 items-center flex cursor-pointer"
-                onClick={() => setPreviewMode(!previewMode)}
-              >
-                {previewMode ? (
-                  <>
-                    <img src="/pencil.svg" className="inline pr-2 self-center" />
-                    <span>Back to editing</span>
-                  </>
-                ) : (
-                  <>
-                    <img src="/eye.svg" className="inline pr-2 items-center" />
-                    <span>Preview</span>
-                  </>
-                )}
-              </div>
-              <UploadImageButton />
-            </div>
-          </div>
-        </div>
-      </div>
-      <Form
-        initialValues={
-          proposal
-            ? {
-                title: proposal?.data?.content?.title,
-                markdown: proposal?.data?.content?.body,
-                recipientAddress: proposal?.data?.funding?.recipientAddress,
-                amount: proposal?.data?.funding?.amount,
-              }
-            : {
-                markdown: rfp?.data?.proposalPrefill,
-              }
-        }
-        onSubmit={async (values: {
-          recipientAddress: string
-          amount: string
-          markdown: string
-          title: string
-        }) => {
-          trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_EDITOR_MODAL_PUBLISH_CLICKED, {
-            pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
-            userAddress: activeUser?.address,
-            stationHandle: terminal?.handle,
-            stationId: terminal?.id,
-            recipientAddress: values?.recipientAddress,
-            amount: values?.amount,
-            title: values?.title,
+    <Form
+      initialValues={
+        proposal
+          ? {
+              title: proposal?.data?.content?.title,
+              markdown: proposal?.data?.content?.body,
+              recipientAddress: proposal?.data?.funding?.recipientAddress,
+              amount: proposal?.data?.funding?.amount,
+            }
+          : {
+              markdown: rfp?.data?.proposalPrefill,
+            }
+      }
+      onSubmit={async (values: {
+        recipientAddress: string
+        amount: string
+        markdown: string
+        title: string
+      }) => {
+        trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_EDITOR_MODAL_PUBLISH_CLICKED, {
+          pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
+          userAddress: activeUser?.address,
+          stationHandle: terminal?.handle,
+          stationId: terminal?.id,
+          recipientAddress: values?.recipientAddress,
+          amount: values?.amount,
+          title: values?.title,
+        })
+        if (!activeUser?.address) {
+          setToastState({
+            isToastShowing: true,
+            type: "error",
+            message: "You must connect your wallet in order to create a proposal",
           })
-          if (!activeUser?.address) {
+        } else {
+          const parsedTokenAmount = parseUnits(values.amount, fundingToken.decimals)
+
+          const message = genProposalSignatureMessage(
+            rfp?.checkbook.address,
+            activeUser?.address,
+            rfp?.id,
+            parsedTokenAmount,
+            { ...values, token: fundingToken.address }
+          )
+
+          const signature = await signMessage(message)
+
+          // user must have denied signature
+          if (!signature) {
+            return
+          }
+
+          try {
+            if (isEdit) {
+              await updateProposalMutation({
+                proposalId: proposal?.id as string,
+                recipientAddress: values.recipientAddress,
+                token: fundingToken.address,
+                amount: values.amount,
+                symbol: fundingToken.symbol,
+                contentBody: values.markdown,
+                contentTitle: values.title,
+                signature,
+                signatureMessage: message,
+              })
+            } else {
+              await createProposalMutation({
+                rfpId: rfp?.id,
+                terminalId: terminal?.id,
+                recipientAddress: values.recipientAddress,
+                token: fundingToken.address,
+                amount: values.amount,
+                symbol: fundingToken.symbol,
+                contentBody: values.markdown,
+                contentTitle: values.title,
+                collaborators: [activeUser.address],
+                signature,
+                signatureMessage: message,
+              })
+            }
+          } catch (e) {
+            trackError(PROPOSAL.EVENT_NAME.ERROR_CREATING_PROPOSAL, {
+              pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
+              userAddress: activeUser?.address,
+              stationHandle: terminal?.handle,
+              stationId: terminal?.id,
+              recipientAddress: values?.recipientAddress,
+              amount: values?.amount,
+              title: values?.title,
+              errorMsg: e.message,
+            })
+            console.error(e)
             setToastState({
               isToastShowing: true,
               type: "error",
-              message: "You must connect your wallet in order to create a proposal",
+              message: "Something went wrong.",
             })
-          } else {
-            const parsedTokenAmount = parseUnits(values.amount, fundingToken.decimals)
-
-            const message = genProposalSignatureMessage(
-              rfp?.checkbook.address,
-              activeUser?.address,
-              rfp?.id,
-              parsedTokenAmount,
-              { ...values, token: fundingToken.address }
-            )
-
-            const signature = await signMessage(message)
-
-            // user must have denied signature
-            if (!signature) {
-              return
-            }
-
-            try {
-              if (isEdit) {
-                await updateProposalMutation({
-                  proposalId: proposal?.id as string,
-                  recipientAddress: values.recipientAddress,
-                  token: fundingToken.address,
-                  amount: values.amount,
-                  symbol: fundingToken.symbol,
-                  contentBody: values.markdown,
-                  contentTitle: values.title,
-                  signature,
-                  signatureMessage: message,
-                })
-              } else {
-                await createProposalMutation({
-                  rfpId: rfp?.id,
-                  terminalId: terminal?.id,
-                  recipientAddress: values.recipientAddress,
-                  token: fundingToken.address,
-                  amount: values.amount,
-                  symbol: fundingToken.symbol,
-                  contentBody: values.markdown,
-                  contentTitle: values.title,
-                  collaborators: [activeUser.address],
-                  signature,
-                  signatureMessage: message,
-                })
-              }
-            } catch (e) {
-              trackError(PROPOSAL.EVENT_NAME.ERROR_CREATING_PROPOSAL, {
-                pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
-                userAddress: activeUser?.address,
-                stationHandle: terminal?.handle,
-                stationId: terminal?.id,
-                recipientAddress: values?.recipientAddress,
-                amount: values?.amount,
-                title: values?.title,
-                errorMsg: e.message,
-              })
-              console.error(e)
-              setToastState({
-                isToastShowing: true,
-                type: "error",
-                message: "Something went wrong.",
-              })
-            }
           }
-        }}
-        render={({ form, handleSubmit }) => {
-          const formState = form.getState()
-          if (isEdit && !unsavedChanges && !attemptedSubmit && formState.dirty) {
-            setUnsavedChanges(formState.dirty)
-          }
+        }
+      }}
+      render={({ form, handleSubmit }) => {
+        const formState = form.getState()
+        if (isEdit && !unsavedChanges && !attemptedSubmit && formState.dirty) {
+          setUnsavedChanges(formState.dirty)
+        }
 
-          return (
+        return (
+          <>
+            <div className="fixed grid grid-cols-4 w-[calc(100%-70px)] border-box z-50">
+              <div className="col-span-3 pt-4 pr-4">
+                <div className="text-light-concrete flex flex-row justify-between w-full">
+                  <button
+                    onClick={() => {
+                      if (isEdit) {
+                        router.push(
+                          Routes.ProposalPage({
+                            terminalHandle: terminalHandle as string,
+                            rfpId: rfp?.id as string,
+                            proposalId: proposal?.id as string,
+                          })
+                        )
+                      } else {
+                        router.push(
+                          Routes.RFPInfoTab({
+                            terminalHandle: terminalHandle,
+                            rfpId: rfp?.id as string,
+                          })
+                        )
+                      }
+                    }}
+                  >
+                    <XIcon className="h-6 w-6 ml-3 fill-marble-white" />
+                  </button>
+                  <div className="flex flex-row items-center space-x-4 text-marble-white">
+                    <button
+                      className={`${
+                        shortcutsOpen && "font-bold bg-wet-concrete"
+                      } cursor-pointer h-[35px] rounded px-2 text-marble-white hover:opacity-75 flex items-center`}
+                      onClick={() => {
+                        setShortcutsOpen(!shortcutsOpen)
+                      }}
+                    >
+                      <img src="/keyboard.svg" className="inline pr-2 self-center" />
+                      <span>Markdown shortcuts</span>
+                    </button>
+                    <UploadImageButton />
+                    <button
+                      type="button"
+                      className="border border-electric-violet text-electric-violet px-6 py-1 rounded block hover:bg-wet-concrete"
+                      onClick={() => setPreviewMode(!previewMode)}
+                    >
+                      <span>{previewMode ? "Back to editing" : "Preview"}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_EDITOR_PUBLISH_CLICKED, {
+                          userAddress: activeUser?.address,
+                          stationHandle: terminal?.handle,
+                          stationId: terminal?.id,
+                        })
+                        setAttemptedSubmit(true)
+                        if (formState.invalid) {
+                          const fieldsWithErrors = Object.keys(formState.errors as Object)
+                          setToastState({
+                            isToastShowing: true,
+                            type: "error",
+                            message: `Please fill in ${fieldsWithErrors.join(
+                              ", "
+                            )} to publish RFP.`,
+                          })
+                          return
+                        }
+                        setUnsavedChanges(false)
+                        setConfirmationModalOpen(true)
+                      }}
+                      disabled={!formState.dirty}
+                      className={`bg-electric-violet ${
+                        !formState.dirty ? "bg-opacity-70 cursor-not-allowed" : ""
+                      } text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70`}
+                    >
+                      Publish
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div className="grid grid-cols-4 h-screen w-full box-border">
               <div className="overflow-y-auto col-span-3 p-20 relative">
                 <div className="flex flex-row space-x-4">
@@ -468,44 +500,12 @@ export const ProposalMarkdownForm = ({
                       <p className="mt-2 uppercase">{rfp?.data?.funding?.token?.symbol}</p>
                     </div>
                   </div>
-                  <div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_EDITOR_PUBLISH_CLICKED, {
-                          userAddress: activeUser?.address,
-                          stationHandle: terminal?.handle,
-                          stationId: terminal?.id,
-                        })
-                        setAttemptedSubmit(true)
-                        if (formState.invalid) {
-                          const fieldsWithErrors = Object.keys(formState.errors as Object)
-                          setToastState({
-                            isToastShowing: true,
-                            type: "error",
-                            message: `Please fill in ${fieldsWithErrors.join(
-                              ", "
-                            )} to publish RFP.`,
-                          })
-                          return
-                        }
-                        setUnsavedChanges(false)
-                        setConfirmationModalOpen(true)
-                      }}
-                      disabled={!formState.dirty}
-                      className={`bg-electric-violet ${
-                        !formState.dirty ? "bg-opacity-70" : ""
-                      } text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70`}
-                    >
-                      Publish
-                    </button>
-                  </div>
                 </form>
               </div>
             </div>
-          )
-        }}
-      />
-    </>
+          </>
+        )
+      }}
+    />
   )
 }

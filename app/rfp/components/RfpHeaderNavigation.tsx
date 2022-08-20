@@ -57,8 +57,6 @@ const RfpHeaderNavigation = ({ rfp }: { rfp: Rfp }) => {
     terminal?.data?.permissions?.accountWhitelist?.includes(session?.siwe?.address as string)
   const router = useRouter()
 
-  console.log("rfp submission count", rfp.submissionCount)
-
   useEffect(() => {
     if (rfp) {
       const today = new Date()

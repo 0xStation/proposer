@@ -15,28 +15,29 @@ const UpdateProposal = z.object({
 })
 
 export default async function updateProposal(input: z.infer<typeof UpdateProposal>) {
-  if (parseFloat(input.amount) < 0) {
+  const params = UpdateProposal.parse(input)
+  if (parseFloat(params.amount) < 0) {
     throw new Error("amount must be greater or equal to zero.")
   }
 
   const proposalMetadata = {
-    signature: input.signature,
-    signatureMessage: input.signatureMessage,
+    signature: params.signature,
+    signatureMessage: params.signatureMessage,
     content: {
-      title: input.contentTitle,
-      body: input.contentBody,
+      title: params.contentTitle,
+      body: params.contentBody,
     },
     funding: {
-      recipientAddress: input.recipientAddress,
-      token: input.token,
-      amount: input.amount,
-      symbol: input.symbol,
+      recipientAddress: params.recipientAddress,
+      token: params.token,
+      amount: params.amount,
+      symbol: params.symbol,
     },
   } as ProposalMetadata
 
   try {
     const proposal = await db.proposal.update({
-      where: { id: input.proposalId },
+      where: { id: params.proposalId },
       data: {
         data: proposalMetadata,
         // Update: we're changing collaborators on the proposal model

@@ -113,7 +113,7 @@ const ProposalsTab: BlitzPage = ({
       setToastState({
         isToastShowing: true,
         type: "success",
-        message: "Proposal successfully deleted",
+        message: "Proposal successfully deleted.",
       })
     }
   }, [proposalDeleted])
@@ -368,6 +368,3 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 }
 
 export default ProposalsTab
-function setToastState(arg0: { isToastShowing: boolean; type: string; message: string }) {
-  throw new Error("Function not implemented.")
-}

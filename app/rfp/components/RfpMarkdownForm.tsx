@@ -197,9 +197,9 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
       })
       invalidateQuery(getRfpsByTerminalId)
       router.push(
-        Routes.BulletinPage({
+        Routes.RFPInfoTab({
           terminalHandle: terminalHandle as string,
-          rfpId: rfp?.id,
+          rfpId: rfp?.id as string,
           rfpEdited: rfp?.id,
         })
       )

@@ -9,6 +9,7 @@ import {
   invoke,
   GetServerSideProps,
   InferGetServerSidePropsType,
+  useRouterQuery,
 } from "blitz"
 import { trackClick } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
@@ -47,6 +48,7 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { RfpStatus } from "app/rfp/types"
 import DeleteProposalModal from "app/proposal/components/DeleteProposalModal"
 import { ProposalStatus } from "app/proposal/types"
+import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
 
 const {
   PAGE_NAME,
@@ -61,12 +63,14 @@ const ProposalPage: BlitzPage = ({
   const activeUser = useStore((state) => state.activeUser)
   const terminalHandle = useParam("terminalHandle") as string
   const setToastState = useStore((state) => state.setToastState)
+  const { proposalCreationSuccess } = useRouterQuery()
   const [cashCheckModalOpen, setCashCheckModalOpen] = useState<boolean>(false)
   const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
   const [checkTxnHash, setCheckTxnHash] = useState<string>()
   const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
   const [deleteProposalModalOpen, setDeleteProposalModalOpen] = useState<boolean>(false)
   const [isProposalUrlCopied, setIsProposalUrlCopied] = useState<boolean>(false)
+  const [isSuccessProposalModalOpen, setSuccessProposalModalOpen] = useState<boolean>(false)
   const [check, setCheck] = useState<Check>()
   const isAdmin = useAdminForTerminal(terminal)
   const router = useRouter()
@@ -83,6 +87,12 @@ const ProposalPage: BlitzPage = ({
       },
     }
   )
+
+  useEffect(() => {
+    if (proposalCreationSuccess) {
+      setSuccessProposalModalOpen(true)
+    }
+  }, [proposalCreationSuccess])
 
   useEffect(() => {
     trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_INFO_PAGE_SHOWN, {
@@ -108,7 +118,8 @@ const ProposalPage: BlitzPage = ({
   // user can edit proposal if they are the author and the proposal hasn't been approved yet
   const canEditProposal =
     proposal?.collaborators?.[0]?.account?.address === activeUser?.address &&
-    proposal?.approvals?.length === 0
+    proposal?.approvals?.length === 0 &&
+    rfp.status === RfpStatus.OPEN_FOR_SUBMISSIONS
 
   // user can delete the proposal if the proposal hasn't reached quorum
   const canDeleteProposal = proposal.status !== ProposalStatus.APPROVED
@@ -178,6 +189,15 @@ const ProposalPage: BlitzPage = ({
 
   return (
     <Layout title="Proposals">
+      {terminal && (
+        <SuccessProposalModal
+          terminal={terminal}
+          rfpId={rfp?.id}
+          proposalId={proposal?.id}
+          isOpen={isSuccessProposalModalOpen}
+          setIsOpen={setSuccessProposalModalOpen}
+        />
+      )}
       <DeleteProposalModal
         isOpen={deleteProposalModalOpen}
         setIsOpen={setDeleteProposalModalOpen}

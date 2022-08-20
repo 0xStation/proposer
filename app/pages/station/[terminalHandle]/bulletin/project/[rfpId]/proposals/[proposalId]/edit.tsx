@@ -1,10 +1,18 @@
-import { BlitzPage, GetServerSideProps, InferGetServerSidePropsType, invoke, Routes } from "blitz"
+import {
+  BlitzPage,
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+  invoke,
+  Routes,
+  getSession,
+} from "blitz"
 import getRfpById from "app/rfp/queries/getRfpById"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import Layout from "app/core/layouts/Layout"
 import { ProposalMarkdownForm } from "app/proposal/components/ProposalMarkdownForm"
 import getProposalById from "app/proposal/queries/getProposalById"
 import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
+import { RfpStatus } from "app/rfp/types"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { terminalHandle, rfpId, proposalId } = context.query as {
@@ -12,6 +20,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     rfpId: string
     proposalId: string
   }
+
   const rfp = await invoke(getRfpById, { id: rfpId })
   if (!rfp) {
     return {
@@ -41,8 +50,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     }
   }
-
-  if (proposal.status === ProductProposalStatus.DELETED) {
+  const session = await getSession(context.req, context.res)
+  if (
+    proposal.status === ProductProposalStatus.DELETED ||
+    !session?.siwe?.address ||
+    proposal?.collaborators?.[0]?.account?.address !== session?.siwe?.address ||
+    rfp.status !== RfpStatus.OPEN_FOR_SUBMISSIONS
+  ) {
     return {
       redirect: {
         // redirects to the proposal deleted view
