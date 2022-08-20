@@ -4,6 +4,7 @@ import { FundingSenderType } from "app/types"
 import db from "../index"
 import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
+// // run with: blitz db seed -f db/data-migrations/2-checkbook-optional.ts
 // const seed = async () => {
 //   // 1. Copy linked checkbook address into rfp's metadata
 
@@ -28,7 +29,7 @@ import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 //   })
 
 //   const res1 = await db.$transaction(rfpUpdates)
-//   console.log("rfp metadata update transaction complete", res1)
+//   console.log("rfp metadata update transaction complete", res1.length)
 
 //   // 2. Copy linked checkbook addresses into rfp's proposals' metadata
 
@@ -44,7 +45,7 @@ import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 //       funding: {
 //         ...oldMetadata.funding,
 //         senderType: FundingSenderType.CHECKBOOK,
-//         senderAdderss: proposal.rfp.checkbook.address,
+//         senderAddress: proposal.rfp.checkbook.address,
 //         chainId: proposal.rfp.checkbook.chainId,
 //       },
 //     }
@@ -58,38 +59,7 @@ import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 //   })
 
 //   const res2 = await db.$transaction(proposalUpdates1)
-//   console.log("proposal metadata update transaction complete", res2)
-
-//   // 3. Update proposal approval status based on signature count and quorum
-
-//   const proposalsWithApprovals = await db.proposal.findMany({
-//     include: {
-//       approvals: true,
-//       rfp: { include: { checkbook: true } },
-//     },
-//   })
-//   const proposalUpdates2 = proposalsWithApprovals.map((proposal) => {
-//     const quorum = proposal.rfp.checkbook.quorum
-//     const numApprovals = proposal.approvals.length
-//     let newStatus
-//     if (numApprovals >= quorum) {
-//       newStatus = PrismaProposalStatus.APPROVED
-//     } else if (numApprovals > 0) {
-//       newStatus = PrismaProposalStatus.IN_REVIEW
-//     } else {
-//       newStatus = proposal.status
-//     }
-
-//     return db.proposal.update({
-//       where: { id: proposal.id },
-//       data: {
-//         status: newStatus,
-//       },
-//     })
-//   })
-
-//   const res3 = await db.$transaction(proposalUpdates2)
-//   console.log("proposal status update transaction complete", res3)
+//   console.log("proposal metadata update transaction complete", res2.length)
 // }
 
 // export default seed

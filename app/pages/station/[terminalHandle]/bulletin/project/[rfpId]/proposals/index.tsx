@@ -237,7 +237,8 @@ const ProposalComponent = ({
 
   useEffect(() => {
     setOverallocated(
-      parseFloat(fundsAvailable) < proposal.data.funding?.amount && proposal.checks.length === 0
+      parseFloat(fundsAvailable) < parseFloat(proposal.data.funding?.amount) &&
+        proposal.checks.length === 0
     )
   }, [fundsAvailable])
 

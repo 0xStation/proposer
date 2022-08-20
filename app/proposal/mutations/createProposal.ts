@@ -23,8 +23,7 @@ const CreateProposal = z.object({
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
-  const amount = parseFloat(input.amount)
-  if (amount < 0) {
+  if (parseFloat(input.amount) < 0) {
     throw new Error("amount must be greater or equal to zero.")
   }
 
@@ -39,7 +38,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       chainId: input.token.chainId,
       recipientAddress: toChecksumAddress(input.recipientAddress),
       token: toChecksumAddress(input.token.address),
-      amount,
+      amount: input.amount,
       symbol: input.token.symbol,
       senderAddress: input.senderAddress ? toChecksumAddress(input.senderAddress) : undefined,
       senderType: input.senderType,

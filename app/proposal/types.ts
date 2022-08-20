@@ -24,7 +24,7 @@ export type ProposalMetadata = {
     chainId: number
     token: string
     symbol: string
-    amount: number
+    amount: string
   }
   signature: string
   signatureMessage: any

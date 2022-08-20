@@ -1,6 +1,7 @@
 import db from "db"
 import * as z from "zod"
-import { Proposal } from "../types"
+import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
+import { Proposal, ProposalStatus as ProductProposalStatus } from "../types"
 
 const GetProposalsByTerminal = z.object({
   terminalId: z.number(),
@@ -44,5 +45,13 @@ export default async function getProposalsByTerminal(
     },
   })
 
-  return proposals as unknown as Proposal[]
+  return proposals.map((proposal) => {
+    return {
+      ...proposal,
+      status:
+        proposal.status === PrismaProposalStatus.PUBLISHED
+          ? ProductProposalStatus.SUBMITTED
+          : proposal.status,
+    }
+  }) as unknown as Proposal[]
 }

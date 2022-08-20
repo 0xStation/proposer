@@ -1,7 +1,7 @@
 import db from "db"
 import * as z from "zod"
 import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
-import { ProposalStatus } from "../types"
+import { ProposalStatus as ProductProposalStatus } from "../types"
 import { Proposal } from "../types"
 import { PAGINATION_TAKE } from "app/core/utils/constants"
 
@@ -14,7 +14,7 @@ const GetProposalsByRfpId = z.object({
 
 export default async function getProposalsByRfpId(input: z.infer<typeof GetProposalsByRfpId>) {
   const selectedStatuses = input.statuses.map((s) =>
-    s === ProposalStatus.SUBMITTED ? PrismaProposalStatus.PUBLISHED : s
+    s === ProductProposalStatus.SUBMITTED ? PrismaProposalStatus.PUBLISHED : s
   ) as PrismaProposalStatus[]
 
   const proposals = await db.proposal.findMany({
@@ -51,7 +51,7 @@ export default async function getProposalsByRfpId(input: z.infer<typeof GetPropo
       ...proposal,
       status:
         proposal.status === PrismaProposalStatus.PUBLISHED
-          ? ProposalStatus.SUBMITTED
+          ? ProductProposalStatus.SUBMITTED
           : proposal.status,
     }
   }) as unknown as Proposal[]

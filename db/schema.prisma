@@ -122,6 +122,7 @@ model Checkbook {
   signers    String[]
   data       Json
   checks     Check[]
+  // Rfp        Rfp[]
 }
 
 // unique links by /station/handle]/rfp/[localId]
