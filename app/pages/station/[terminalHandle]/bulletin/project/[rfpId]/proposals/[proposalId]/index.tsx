@@ -122,7 +122,9 @@ const ProposalPage: BlitzPage = ({
     rfp.status === RfpStatus.OPEN_FOR_SUBMISSIONS
 
   // user can delete the proposal if the proposal hasn't reached quorum
-  const canDeleteProposal = proposal.status !== ProposalStatus.APPROVED
+  const canDeleteProposal =
+    proposal?.collaborators?.[0]?.account?.address === activeUser?.address &&
+    proposal.status !== ProposalStatus.APPROVED
 
   // user can approve if they are a signer and they haven't approved before
   const userCanApprove =
