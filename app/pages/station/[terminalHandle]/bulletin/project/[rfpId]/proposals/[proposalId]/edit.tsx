@@ -51,6 +51,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   }
   const session = await getSession(context.req, context.res)
+
+  // redirect the user if the proposal is deleted,
+  // the user is not the author,
+  // the RFP/porject is not open for submissions
+  // (user shouldn't be able to edit a proposal for a closed RFP)
+
   if (
     proposal.status === ProductProposalStatus.DELETED ||
     !session?.siwe?.address ||
