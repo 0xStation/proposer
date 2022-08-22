@@ -222,7 +222,7 @@ export const DOCS = {
   CREATE_WALLET: "https://www.youtube.com/watch?v=OsRIHlr0_Iw",
 }
 
-export const PROPOSAL_TEMPLATES = {
+export const PROPOSAL_TEMPLATE_PREFILL = {
   DEFAULT: `
   # Proposal summary\n\n
   # Goals\n\n

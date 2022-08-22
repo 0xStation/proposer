@@ -3,7 +3,7 @@ import { Terminal } from "app/terminal/types"
 import networks from "app/utils/networks.json"
 import { TagType } from "app/tag/types"
 import { TokenType } from "app/types/token"
-import { ZERO_ADDRESS, CHAIN_IDS } from "./constants"
+import { ETH_METADATA, CHAIN_IDS } from "./constants"
 
 const getFundingTokens = (
   checkbook: Checkbook | undefined,
@@ -12,7 +12,7 @@ const getFundingTokens = (
   const eth = [CHAIN_IDS.ETHEREUM, CHAIN_IDS.RINKEBY, CHAIN_IDS.GOERLI].includes(
     checkbook?.chainId || 0
   )
-    ? [{ symbol: "ETH", address: ZERO_ADDRESS, decimals: 18 }]
+    ? [ETH_METADATA]
     : []
 
   const stablecoins = networks[checkbook?.chainId as number]?.stablecoins || []

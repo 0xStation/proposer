@@ -35,6 +35,16 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
   const { switchNetwork } = useSwitchNetwork()
 
   const createOrFindCheckAndFetchSignature = async () => {
+    if (!activeUser?.address) {
+      setIsOpen(false)
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: "You must connect your wallet in order to approve proposals.",
+      })
+      return
+    }
+
     let check = checks[0]
     if (!check) {
       // need to create a check if it does not exist
@@ -56,49 +66,41 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
       return
     }
 
-    if (!activeUser?.address) {
+    try {
+      await approveProposalMutation({
+        proposalId: proposal?.id,
+        checkId: check.id,
+        signerAddress: activeUser.address,
+        signature,
+        signatureMessage: check.data.signatureMessage,
+      })
+      // refresh check fetching to render check if quorum is now hit
+      invalidateQuery(getChecksByProposalId)
+      router.replace(router.asPath)
       setIsOpen(false)
       setToastState({
         isToastShowing: true,
-        type: "error",
-        message: "You must connect your wallet in order to approve proposals.",
+        type: "success",
+        message: "Your approval moves this proposal a step closer to reality.",
       })
-    } else {
       try {
-        await approveProposalMutation({
-          proposalId: proposal?.id,
-          checkId: check.id,
-          signerAddress: activeUser.address,
-          signature,
-          signatureMessage: check.data.signatureMessage,
-        })
-        invalidateQuery(getChecksByProposalId)
-        router.replace(router.asPath)
-        setIsOpen(false)
-        setToastState({
-          isToastShowing: true,
-          type: "success",
-          message: "Your approval moves this proposal a step closer to reality.",
-        })
-        try {
-          // if this approval makes proposal reach quorum, send notification to collaborators
-          if (proposal.approvals.length + 1 === rfp.checkbook.quorum) {
-            await fetch("/api/notify/proposal/approved", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                proposalId: proposal.id,
-              }),
-            })
-          }
-        } catch (e) {
-          console.error(e)
+        // if this approval makes proposal reach quorum, send notification to collaborators
+        if (proposal.approvals.length + 1 === rfp.checkbook.quorum) {
+          await fetch("/api/notify/proposal/approved", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              proposalId: proposal.id,
+            }),
+          })
         }
       } catch (e) {
         console.error(e)
       }
+    } catch (e) {
+      console.error(e)
     }
   }
 

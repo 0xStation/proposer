@@ -3,6 +3,7 @@ import { TagType } from "app/tag/types"
 import { Token } from "app/types/token"
 import { AtomicCall, multicall } from "app/utils/rpcMulticall"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import { deepCopy } from "app/core/utils/deepCopy"
 
 /**
  * API endpoint for "refreshing" token ownership tags for members of a Station terminal.
@@ -78,7 +79,7 @@ export default async function handler(req, res) {
   sortedTokens.forEach((t) => {
     const tokenChain = (t.data as Token).chainId
     if (tokenChain !== currentChainId) {
-      const calls = JSON.parse(JSON.stringify(currentChainCalls)) // hard copy to prevent side-effects risk
+      const calls = deepCopy(currentChainCalls) // hard copy to prevent side-effects risk
       promises.push(multicall(currentChainId.toString(), abi, calls))
       currentChainId = tokenChain
       currentChainCalls = []

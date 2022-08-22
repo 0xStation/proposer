@@ -8,7 +8,7 @@ export async function sendTerminalCreationNotification(
     await fetch(discordWebhookUrl, {
       method: "POST",
       body: JSON.stringify({
-        content: `New Terminal created: **${terminalName}**\nView: ${baseUrl}/station/${terminalHandle}/members`,
+        content: `New Station created: **${terminalName}**\nView: ${baseUrl}/station/${terminalHandle}/members`,
       }),
       headers: {
         "Content-Type": "application/json",

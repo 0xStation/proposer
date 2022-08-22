@@ -16,7 +16,7 @@ const modalContent = {
     heading: "Add funds to this Checkbook.",
   },
   terminalCreation: {
-    heading: "Terminal created! Next, add funds to Checkbook",
+    heading: "Station created! Next, add funds to Checkbook",
   },
 }
 

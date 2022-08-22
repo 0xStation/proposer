@@ -1,6 +1,5 @@
 import { Account } from "app/account/types"
 import { Checkbook } from "app/checkbook/types"
-import { Signature } from "app/signatures/types"
 import { Token } from "app/types/token"
 
 // note that these statuses are different than those in the database enum
@@ -19,7 +18,7 @@ export type RfpMetadata = {
     body: string
   }
   signature: string // string signature for now, although I see this more complex type below
-  signatureMessage: any
+  signatureMessage: any // refactor this into Signature object to include signer address for verifiable data bundle (message, signer, signature)
   // prefill all proposals to this RFP with this configuration
   proposalPrefill: {
     body: string // template body for customized inclusion + addition of questions

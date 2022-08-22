@@ -20,7 +20,7 @@ export type SignatureMessage = {
 
 export type Signature = {
   address: string
-  message: any
+  message: any // typed-data messages follow {domain, types, value}, but we may also sign plaintext in future
   signature: string
   timestamp: Date
 }

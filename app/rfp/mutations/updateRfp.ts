@@ -3,6 +3,7 @@ import * as z from "zod"
 import { ZodToken, Token } from "app/types/token"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { RfpMetadata } from "../types"
+import { deepCopy } from "app/core/utils/deepCopy"
 
 // going to be calling this from edit RFP page, so we will still be passing in all of these data
 // just bc they might not be changed does not mean we will be omitting them, because the form
@@ -57,7 +58,7 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
         fundingAddress: input.fundingAddress,
         startDate: input.startDate,
         endDate: input.endDate,
-        data: JSON.parse(JSON.stringify(metadata)),
+        data: deepCopy(metadata),
       },
     })
 
