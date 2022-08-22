@@ -37,6 +37,7 @@ type ImpressionProperties = {
   numRfps: number
   rfpId: string
   proposalId: string
+  isEdit: boolean
 }
 
 type EventProperties = {
@@ -70,6 +71,7 @@ type ErrorProperties = {
   amount: string
   title: string
   checkbookAddress: string
+  isEdit: true
 }
 
 const inactiveTracking = (isDev() || isStaging()) && process.env.NEXT_PUBLIC_TRACK !== "true"

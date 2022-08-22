@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react"
 import { useRouter, Link, Routes, useParam, useQuery, useSession } from "blitz"
-import { track } from "@amplitude/analytics-browser"
 import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
-import getRfpById from "../queries/getRfpById"
 import { RfpStatus } from "../types"
 import {
   TrashIcon,

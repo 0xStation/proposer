@@ -121,7 +121,9 @@ const ProposalPage: BlitzPage = ({
     proposal?.approvals?.length === 0 &&
     rfp.status === RfpStatus.OPEN_FOR_SUBMISSIONS
 
-  // user can delete the proposal if the proposal hasn't reached quorum
+  // user can delete the proposal if they are the author and the proposal hasn't reached quorum.
+  // if the user has reached quorum, ideally there should be a voiding process that needs to be
+  // approved by both parties.
   const canDeleteProposal =
     proposal?.collaborators?.[0]?.account?.address === activeUser?.address &&
     proposal.status !== ProposalStatus.APPROVED
@@ -204,7 +206,7 @@ const ProposalPage: BlitzPage = ({
         isOpen={deleteProposalModalOpen}
         setIsOpen={setDeleteProposalModalOpen}
         proposal={proposal}
-        pageName="Proposal page"
+        pageName={PAGE_NAME.PROPOSAL_INFO_PAGE}
         terminalHandle={terminalHandle}
         terminalId={terminal?.id as number}
       />

@@ -60,6 +60,7 @@ export const ProposalMarkdownForm = ({
       userAddress: activeUser?.address,
       stationHandle: terminal?.handle,
       stationId: terminal?.id,
+      isEdit,
     })
   }, [])
 
@@ -163,6 +164,7 @@ export const ProposalMarkdownForm = ({
           recipientAddress: values?.recipientAddress,
           amount: values?.amount,
           title: values?.title,
+          isEdit,
         })
         if (!activeUser?.address) {
           setToastState({
