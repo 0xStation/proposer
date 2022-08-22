@@ -1,6 +1,8 @@
 import { computeProposalStatus } from "app/proposal/utils"
 import db from "db"
 import * as z from "zod"
+import { Account } from "../types"
+import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
 const GetAccountProposalsByAddress = z.object({
@@ -36,10 +38,11 @@ export default async function getAccountProposalsByAddress(
         ...accountProposal,
         proposal: {
           ...accountProposal.proposal,
-          status: computeProposalStatus(
-            accountProposal.proposal.approvals.length,
-            accountProposal.proposal.rfp.checkbook?.quorum as number
-          ),
+          status:
+            // returns db status or converts from PUBLISHED->SUBMITTED (only difference right now)
+            accountProposal.proposal.status === PrismaProposalStatus.PUBLISHED
+              ? ProductProposalStatus.SUBMITTED
+              : accountProposal.proposal.status,
         },
       }
     })

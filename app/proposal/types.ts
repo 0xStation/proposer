@@ -5,8 +5,9 @@ import { Check } from "@prisma/client"
 import { Rfp } from "app/rfp/types"
 
 export enum ProposalStatus {
+  DRAFT = "DRAFT",
   SUBMITTED = "SUBMITTED",
-  IN_REVIEW = "IN REVIEW",
+  IN_REVIEW = "IN_REVIEW",
   APPROVED = "APPROVED",
   DELETED = "DELETED",
 }
