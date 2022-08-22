@@ -45,14 +45,14 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
     },
     funding: {
       token: {
-        ...input.fundingToken,
-        address: toChecksumAddress(input.fundingToken.address),
+        ...params.fundingToken,
+        address: toChecksumAddress(params.fundingToken.address),
       },
       budgetAmount: params.fundingBudgetAmount,
     },
     permissions: {
-      submit: input.submittingPermission as Token,
-      view: input.viewingPermission as Token,
+      submit: params.submittingPermission as Token,
+      view: params.viewingPermission as Token,
     },
   }
 

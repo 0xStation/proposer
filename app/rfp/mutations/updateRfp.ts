@@ -40,24 +40,24 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
     },
     funding: {
       token: {
-        ...input.fundingToken,
-        address: toChecksumAddress(input.fundingToken.address),
+        ...params.fundingToken,
+        address: toChecksumAddress(params.fundingToken.address),
       },
       budgetAmount: params.fundingBudgetAmount,
     },
     permissions: {
-      submit: input.submittingPermission as Token,
-      view: input.viewingPermission as Token,
+      submit: params.submittingPermission as Token,
+      view: params.viewingPermission as Token,
     },
   }
 
   try {
     const rfp = await db.rfp.update({
-      where: { id: input.rfpId },
+      where: { id: params.rfpId },
       data: {
-        fundingAddress: input.fundingAddress,
-        startDate: input.startDate,
-        endDate: input.endDate,
+        fundingAddress: params.fundingAddress,
+        startDate: params.startDate,
+        endDate: params.endDate,
         data: deepCopy(metadata),
       },
     })
