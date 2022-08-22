@@ -1,5 +1,5 @@
 import { useContractRead } from "wagmi"
-import { TagTokenMetadata } from "app/tag/types"
+import { Token } from "app/types/token"
 import { Rfp } from "app/rfp/types"
 
 export const canEdit = (activeUser, terminalId, type) => {
@@ -123,7 +123,7 @@ const balanceOfAbi = ["function balanceOf(address _owner) public view returns (u
 // returns true if the given address has a positive balance of the token at the given contract address
 export const useAddressHasToken = (
   walletAddress: string | undefined,
-  tokenTag: TagTokenMetadata | undefined
+  tokenTag: Token | undefined
 ) => {
   const { data } = useContractRead({
     addressOrName: tokenTag?.address || "",

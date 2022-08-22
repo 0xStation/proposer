@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { TokenType } from "app/tag/types"
+import { TokenType } from "app/types/token"
 import { multicall } from "app/utils/rpcMulticall"
 
 export type TokenMetadataResponse = {

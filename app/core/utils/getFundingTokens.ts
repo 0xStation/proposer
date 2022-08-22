@@ -1,7 +1,8 @@
 import { Checkbook } from "app/checkbook/types"
 import { Terminal } from "app/terminal/types"
 import networks from "app/utils/networks.json"
-import { TagType, TokenType } from "app/tag/types"
+import { TagType } from "app/tag/types"
+import { TokenType } from "app/types/token"
 import { ZERO_ADDRESS, CHAIN_IDS } from "./constants"
 
 const getFundingTokens = (

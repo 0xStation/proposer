@@ -2,6 +2,7 @@ import { chain } from "wagmi"
 import { RfpStatus } from "app/rfp/types"
 import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import networks from "app/utils/networks.json"
+import { TokenType } from "app/types/token"
 
 export const CONTRACTS = {
   // Localhost, change to whatever the forge script outputs when running local anvil
@@ -95,7 +96,13 @@ export const SENDGRID_TEMPLATES = {
 
 export const SUPPORTED_CHAINS = [chain.mainnet, chain.rinkeby, chain.goerli]
 
-export const ETH_METADATA = { symbol: "ETH", address: ZERO_ADDRESS, decimals: 18 }
+export const ETH_METADATA = {
+  address: ZERO_ADDRESS,
+  type: TokenType.COIN,
+  name: "Ether",
+  symbol: "ETH",
+  decimals: 18,
+}
 
 export const getStablecoinMetadataBySymbol = ({ chain = 1, symbol = "USDC" }) => {
   return networks[chain as number]?.stablecoins.find((stablecoin) => stablecoin.symbol === symbol)
@@ -200,6 +207,19 @@ export const TRACKING_EVENTS = {
 export const TOKEN_SYMBOLS = {
   ETH: "ETH",
   USDC: "USDC",
+}
+
+export const DOCS = {
+  CHECKBOOK:
+    "https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook",
+  GETTING_STARTED:
+    "https://station-labs.gitbook.io/station-product-manual/for-contributors/getting-started",
+  PRODUCT_MANUAL: "https://station-labs.gitbook.io/station-product-manual/",
+  LEGAL_PRIVACY: "https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176",
+  HELP_DESK: "https://6vdcjqzyfj3.typeform.com/to/F0QFs9aC",
+  RFP_EXAMPLES:
+    "https://station-labs.gitbook.io/station-product-manual/for-daos-communities/request-for-proposal-rfp",
+  CREATE_WALLET: "https://www.youtube.com/watch?v=OsRIHlr0_Iw",
 }
 
 // LEGACY BELOW

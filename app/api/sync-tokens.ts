@@ -1,5 +1,6 @@
 import db from "db"
-import { TagTokenMetadata, TagType } from "app/tag/types"
+import { TagType } from "app/tag/types"
+import { Token } from "app/types/token"
 import { AtomicCall, multicall } from "app/utils/rpcMulticall"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
@@ -35,9 +36,7 @@ export default async function handler(req, res) {
   }
 
   // sort tokens by chainId so that multicalls can be shared by tokens on same chain
-  const sortedTokens = tokens.sort(
-    (a, b) => (b.data as TagTokenMetadata).chainId - (a.data as TagTokenMetadata).chainId
-  )
+  const sortedTokens = tokens.sort((a, b) => (b.data as Token).chainId - (a.data as Token).chainId)
 
   // 2. Get accounts with addresses and their token tags
 
@@ -74,10 +73,10 @@ export default async function handler(req, res) {
   // split multicalls by chainId so that multiple tokens on same chain can share one multicall
   // per chain, generate a call list with one call per membership per token
   let promises: any[] = []
-  let currentChainId = (sortedTokens[0]?.data as TagTokenMetadata).chainId
+  let currentChainId = (sortedTokens[0]?.data as Token).chainId
   let currentChainCalls: AtomicCall[] = []
   sortedTokens.forEach((t) => {
-    const tokenChain = (t.data as TagTokenMetadata).chainId
+    const tokenChain = (t.data as Token).chainId
     if (tokenChain !== currentChainId) {
       const calls = JSON.parse(JSON.stringify(currentChainCalls)) // hard copy to prevent side-effects risk
       promises.push(multicall(currentChainId.toString(), abi, calls))
@@ -86,7 +85,7 @@ export default async function handler(req, res) {
     }
     memberships.forEach((m) => {
       currentChainCalls.push({
-        targetAddress: (t.data as TagTokenMetadata).address,
+        targetAddress: (t.data as Token).address,
         functionSignature: "balanceOf",
         callParameters: [toChecksumAddress(m.account.address as string)],
       })

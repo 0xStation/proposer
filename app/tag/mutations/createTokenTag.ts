@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { TokenType } from "app/tag/types"
+import { TokenType } from "app/types/token"
 
 const CreateTokenTag = z.object({
   terminalId: z.number(),

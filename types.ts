@@ -19,17 +19,3 @@ declare module "blitz" {
     }
   }
 }
-
-export const Token = z.object({
-  chainId: z.number(),
-  address: z.string(),
-  symbol: z.string(),
-  decimals: z.number(),
-})
-
-export const TokenTag = z.object({
-  type: z.string(),
-  address: z.string(),
-  symbol: z.string(),
-  chainId: z.number(),
-})

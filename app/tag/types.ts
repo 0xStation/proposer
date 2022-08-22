@@ -13,20 +13,6 @@ export enum TagType {
   INACTIVE = "inactive",
 }
 
-export enum TokenType {
-  ERC20 = "ERC20",
-  ERC721 = "ERC721",
-  ERC1155 = "ERC1155",
-}
-
-export type TagTokenMetadata = {
-  chainId: number
-  address: string
-  type: TokenType
-  name: string
-  symbol: string
-}
-
 export type Tag = {
   id: number
   terminalId: number
@@ -35,5 +21,5 @@ export type Tag = {
   type: TagType
   active: boolean
   discordId?: string
-  data?: TagTokenMetadata | any
+  data?: any
 }
