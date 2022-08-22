@@ -74,6 +74,7 @@ const ProposalPage: BlitzPage = ({
   const [check, setCheck] = useState<Check>()
   const isAdmin = useAdminForTerminal(terminal)
   const router = useRouter()
+  const [insufficientFunds, setInsufficientFunds] = useState<boolean>(false)
 
   const [checks] = useQuery(
     getChecksByProposalId,
@@ -113,36 +114,40 @@ const ProposalPage: BlitzPage = ({
   )
   const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
 
-  const hasQuorum = check?.approvals?.length === rfp?.checkbook.quorum
+  useEffect(() => {
+    setInsufficientFunds(
+      !!rfp.checkbook &&
+        parseFloat(fundsAvailable) < parseFloat(proposal.data.funding?.amount) &&
+        proposal.checks.length === 0
+    )
+  }, [fundsAvailable])
+
+  const hasQuorum = rfp.checkbook && check?.approvals?.length === rfp.checkbook?.quorum
+  const proposalHasNoApprovals = proposal?.approvals?.length === 0
+  const userHasApproved = proposal.approvals.some(
+    (approval) => approval.signerAddress === activeUser?.address
+  )
+  const userIsProposalAuthor =
+    proposal?.collaborators?.[0]?.account?.address === activeUser?.address
+  const userIsRfpAuthor = rfp.authorAddress === activeUser?.address
+  const userIsSigner = rfp.checkbook?.signers.includes(activeUser?.address || "")
 
   // user can edit proposal if they are the author and the proposal hasn't been approved yet
   const canEditProposal =
-    proposal?.collaborators?.[0]?.account?.address === activeUser?.address &&
-    proposal?.approvals?.length === 0 &&
-    rfp.status === RfpStatus.OPEN_FOR_SUBMISSIONS
+    userIsProposalAuthor && proposalHasNoApprovals && rfp.status === RfpStatus.OPEN_FOR_SUBMISSIONS
 
   // user can delete the proposal if they are the author and the proposal hasn't reached quorum.
   // if the user has reached quorum, ideally there should be a voiding process that needs to be
   // approved by both parties.
-  const canDeleteProposal =
-    proposal?.collaborators?.[0]?.account?.address === activeUser?.address &&
-    proposal.status !== ProposalStatus.APPROVED
+  const canDeleteProposal = userIsProposalAuthor && proposal.status !== ProposalStatus.APPROVED
 
-  // user can approve if they are a signer and they haven't approved before
-  const userCanApprove =
-    rfp?.checkbook.signers.includes(activeUser?.address) &&
-    !proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address)
-
-  // show approve button, if the proposal hasn't reached quorum, user can approve, user hasn't already approved
-  const showApproveButton = !hasQuorum && userCanApprove
-
+  // show approve button, if the proposal hasn't reached quorum, user can approve or user is author and can't approve
+  const showApproveButton = userIsRfpAuthor || (!!userIsSigner && !userHasApproved && !hasQuorum)
+  // insufficient funds warning shown if user is also signer
+  const showInsufficientFundsWarning = insufficientFunds && userIsSigner
   // proposer has reached quorum and check has not been cashed and user is the proposer
   const showCashButton =
     hasQuorum && !check?.txnHash && check?.recipientAddress === activeUser?.address
-
-  const fundsHaveNotBeenApproved = (proposal) => {
-    return proposal.checks.length === 0
-  }
 
   useWaitForTransaction({
     confirmations: 1, // low confirmation count gives us a feel of faster UX
@@ -396,10 +401,7 @@ const ProposalPage: BlitzPage = ({
                         setSignModalOpen(true)
                       }}
                       className="bg-electric-violet text-tunnel-black px-6 h-[35px] rounded block mx-auto hover:bg-opacity-70 mb-2"
-                      disabled={
-                        waitingCreation ||
-                        parseFloat(fundsAvailable) < proposal.data.funding?.amount
-                      }
+                      disabled={waitingCreation || insufficientFunds}
                     >
                       {waitingCreation ? (
                         <div className="flex justify-center items-center">
@@ -409,23 +411,22 @@ const ProposalPage: BlitzPage = ({
                         "Approve"
                       )}
                     </button>
-                    {parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
-                      fundsHaveNotBeenApproved(proposal) && (
-                        <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
-                          Insufficient funds.{" "}
-                          {isAdmin && (
-                            <span
-                              className="text-electric-violet cursor-pointer"
-                              onClick={(e) => {
-                                e.preventDefault()
-                                router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
-                              }}
-                            >
-                              Go to checkbook to refill.
-                            </span>
-                          )}
-                        </span>
-                      )}
+                    {showInsufficientFundsWarning && (
+                      <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
+                        Insufficient funds.{" "}
+                        {isAdmin && (
+                          <span
+                            className="text-electric-violet cursor-pointer"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
+                            }}
+                          >
+                            Go to checkbook to refill.
+                          </span>
+                        )}
+                      </span>
+                    )}
                   </div>
                 ) : showCashButton ? (
                   <button
