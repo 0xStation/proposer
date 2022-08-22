@@ -19,7 +19,7 @@ export type ProposalMetadata = {
     recipientAddress: string
     token: string
     symbol: string
-    amount: number
+    amount: string
   }
   signature: string
 }
