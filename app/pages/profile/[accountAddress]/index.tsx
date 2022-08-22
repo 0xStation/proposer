@@ -4,7 +4,6 @@ import Layout from "app/core/layouts/Layout"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import ConnectDiscordProfileModal from "app/core/components/ConnectDiscordProfileModal"
 import ProfileNavigation from "app/profile/components/Navigation"
-import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
 import { Terminal } from "app/terminal/types"
 import { formatDate } from "app/core/utils/formatDate"
 import useLocalStorage from "app/core/hooks/useLocalStorage"
@@ -52,21 +51,6 @@ const ProfileHome: BlitzPage = () => {
     getAccountProposalsByAddress,
     { address: toChecksumAddress(accountAddress) },
     { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
-  )
-
-  const [terminals] = useQuery(
-    getTerminalsByAccount,
-    { accountId: account?.id as number },
-    {
-      enabled: !!account?.id,
-      suspense: false,
-      refetchOnWindowFocus: false,
-      onSuccess: (terminals: Terminal[]) => {
-        if (terminals && terminals.length > 0 && !selectedTerminal) {
-          setSelectedTerminal(terminals[0] || null)
-        }
-      },
-    }
   )
 
   useEffect(() => {

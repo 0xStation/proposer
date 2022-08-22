@@ -221,6 +221,7 @@ enum RfpStatus {
 enum ProposalStatus {
   DRAFT
   PUBLISHED
+  DELETED
 }
 
 //

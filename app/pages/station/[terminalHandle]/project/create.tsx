@@ -1,10 +1,8 @@
 import { BlitzPage, GetServerSideProps, getSession, invoke } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
-import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import RfpMarkdownForm from "app/rfp/components/RfpMarkdownForm"
-import { Checkbook } from "app/checkbook/types"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {

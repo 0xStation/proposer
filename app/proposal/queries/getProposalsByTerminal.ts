@@ -1,6 +1,7 @@
 import db from "db"
 import * as z from "zod"
 import { Proposal } from "../types"
+import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
 const GetProposalsByTerminal = z.object({
   terminalId: z.number(),
@@ -37,6 +38,11 @@ export default async function getProposalsByTerminal(
       id: {
         in: ids,
       },
+      NOT: [
+        {
+          status: PrismaProposalStatus.DELETED,
+        },
+      ],
     },
     include: {
       rfp: {

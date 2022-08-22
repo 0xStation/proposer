@@ -9,6 +9,7 @@ import {
   invoke,
   GetServerSideProps,
   InferGetServerSidePropsType,
+  useRouterQuery,
 } from "blitz"
 import { trackClick } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
@@ -34,15 +35,20 @@ import { useWaitForTransaction } from "wagmi"
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import { formatUnits } from "@ethersproject/units"
 import {
+  PencilIcon,
   DotsHorizontalIcon,
   ClipboardCheckIcon,
   ClipboardIcon,
   LightBulbIcon,
+  TrashIcon,
 } from "@heroicons/react/solid"
 import Dropdown from "app/core/components/Dropdown"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { RfpStatus } from "app/rfp/types"
+import DeleteProposalModal from "app/proposal/components/DeleteProposalModal"
+import { ProposalStatus } from "app/proposal/types"
+import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
 
 const {
   PAGE_NAME,
@@ -57,11 +63,14 @@ const ProposalPage: BlitzPage = ({
   const activeUser = useStore((state) => state.activeUser)
   const terminalHandle = useParam("terminalHandle") as string
   const setToastState = useStore((state) => state.setToastState)
+  const { proposalCreationSuccess } = useRouterQuery()
   const [cashCheckModalOpen, setCashCheckModalOpen] = useState<boolean>(false)
   const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
   const [checkTxnHash, setCheckTxnHash] = useState<string>()
   const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
+  const [deleteProposalModalOpen, setDeleteProposalModalOpen] = useState<boolean>(false)
   const [isProposalUrlCopied, setIsProposalUrlCopied] = useState<boolean>(false)
+  const [isSuccessProposalModalOpen, setSuccessProposalModalOpen] = useState<boolean>(false)
   const [check, setCheck] = useState<Check>()
   const isAdmin = useAdminForTerminal(terminal)
   const router = useRouter()
@@ -78,6 +87,12 @@ const ProposalPage: BlitzPage = ({
       },
     }
   )
+
+  useEffect(() => {
+    if (proposalCreationSuccess) {
+      setSuccessProposalModalOpen(true)
+    }
+  }, [proposalCreationSuccess])
 
   useEffect(() => {
     trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_INFO_PAGE_SHOWN, {
@@ -99,6 +114,19 @@ const ProposalPage: BlitzPage = ({
   const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
 
   const hasQuorum = check?.approvals?.length === rfp?.checkbook.quorum
+
+  // user can edit proposal if they are the author and the proposal hasn't been approved yet
+  const canEditProposal =
+    proposal?.collaborators?.[0]?.account?.address === activeUser?.address &&
+    proposal?.approvals?.length === 0 &&
+    rfp.status === RfpStatus.OPEN_FOR_SUBMISSIONS
+
+  // user can delete the proposal if they are the author and the proposal hasn't reached quorum.
+  // if the user has reached quorum, ideally there should be a voiding process that needs to be
+  // approved by both parties.
+  const canDeleteProposal =
+    proposal?.collaborators?.[0]?.account?.address === activeUser?.address &&
+    proposal.status !== ProposalStatus.APPROVED
 
   // user can approve if they are a signer and they haven't approved before
   const userCanApprove =
@@ -147,8 +175,41 @@ const ProposalPage: BlitzPage = ({
     },
   })
 
+  const DeletedView = () => {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
+          <h1 className="font-bold text-2xl">Proposal has been deleted</h1>
+          <button
+            onClick={() => router.push(Routes.ProposalsTab({ terminalHandle, rfpId: rfp?.id }))}
+            className="bg-electric-violet text-tunnel-black h-[35px] px-5 rounded hover:opacity-70 mt-5"
+          >
+            View other proposals
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <Layout title={`Proposals`}>
+    <Layout title="Proposals">
+      {terminal && (
+        <SuccessProposalModal
+          terminal={terminal}
+          rfpId={rfp?.id}
+          proposalId={proposal?.id}
+          isOpen={isSuccessProposalModalOpen}
+          setIsOpen={setSuccessProposalModalOpen}
+        />
+      )}
+      <DeleteProposalModal
+        isOpen={deleteProposalModalOpen}
+        setIsOpen={setDeleteProposalModalOpen}
+        proposal={proposal}
+        pageName={PAGE_NAME.PROPOSAL_INFO_PAGE}
+        terminalHandle={terminalHandle}
+        terminalId={terminal?.id as number}
+      />
       <SignApprovalProposalModal
         isOpen={signModalOpen}
         setIsOpen={setSignModalOpen}
@@ -168,280 +229,367 @@ const ProposalPage: BlitzPage = ({
         />
       )}
       <TerminalNavigation>
-        <div className="h-full flex flex-col">
-          <div className="border-b border-concrete px-4 pt-4">
-            <div className="flex flex-row justify-between">
-              <p className="self-center">
-                <span className="text-concrete hover:text-light-concrete">
-                  <Link href={Routes.BulletinPage({ terminalHandle })}>Projects</Link> /&nbsp;
-                </span>
-                <span className="text-concrete hover:text-light-concrete">
-                  <Link
-                    href={Routes.RFPInfoTab({
-                      terminalHandle,
-                      rfpId: rfp?.id,
-                      proposalId: proposal?.id,
-                    })}
-                  >
-                    {rfp?.data?.content?.title}
-                  </Link>{" "}
-                  /&nbsp;
-                </span>
-                {proposal?.data.content.title}
-              </p>
-            </div>
-            <div className="flex flex-row mt-6">
-              <div className="flex-col w-full">
-                <div className="flex flex-row space-x-4">
-                  <span className=" bg-wet-concrete rounded-full px-2 py-1 flex items-center space-x-1">
-                    <LightBulbIcon className="h-4 w-4 text-marble-white" />
-                    <span className="text-xs uppercase">Proposal</span>
+        {proposal.status !== ProposalStatus.DELETED ? (
+          <div className="h-full flex flex-col">
+            <div className="border-b border-concrete px-4 pt-4">
+              <div className="flex flex-row justify-between">
+                <p className="self-center">
+                  <span className="text-concrete hover:text-light-concrete">
+                    <Link href={Routes.BulletinPage({ terminalHandle })}>Projects</Link> /&nbsp;
                   </span>
-                  <div className="flex flex-row items-center space-x-2">
-                    <span
-                      className={`h-2 w-2 rounded-full ${
-                        PROPOSAL_STATUS_DISPLAY_MAP[proposal?.status]?.color || "bg-concrete"
-                      }`}
-                    />
-                    <span className="text-xs uppercase tracking-wider font-bold">
-                      {PROPOSAL_STATUS_DISPLAY_MAP[proposal?.status]?.copy}
+                  <span className="text-concrete hover:text-light-concrete">
+                    <Link
+                      href={Routes.ProposalsTab({
+                        terminalHandle,
+                        rfpId: rfp?.id,
+                      })}
+                    >
+                      {rfp?.data?.content?.title}
+                    </Link>{" "}
+                    /&nbsp;
+                  </span>
+                  {proposal?.data.content.title}
+                </p>
+              </div>
+              <div className="flex flex-row mt-6">
+                <div className="flex-col w-full">
+                  <div className="flex flex-row space-x-4">
+                    <span className=" bg-wet-concrete rounded-full px-2 py-1 flex items-center space-x-1">
+                      <LightBulbIcon className="h-4 w-4 text-marble-white" />
+                      <span className="text-xs uppercase">Proposal</span>
                     </span>
+                    <div className="flex flex-row items-center space-x-2">
+                      <span
+                        className={`h-2 w-2 rounded-full ${
+                          PROPOSAL_STATUS_DISPLAY_MAP[proposal?.status]?.color || "bg-concrete"
+                        }`}
+                      />
+                      <span className="text-xs uppercase tracking-wider font-bold">
+                        {PROPOSAL_STATUS_DISPLAY_MAP[proposal?.status]?.copy}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex flex-row w-full mt-3">
-                  <div className="flex flex-col w-full">
-                    <div className="flex flex-col">
-                      <h1 className="text-2xl font-bold">{proposal.data.content.title}</h1>
-                      <div className="relative mr-6 mt-2 mb-8">
-                        <Dropdown
-                          className="inline"
-                          side="left"
-                          button={
-                            <DotsHorizontalIcon className="inline-block h-4 w-4 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
-                          }
-                          items={[
-                            {
-                              name: (
-                                <>
-                                  {isProposalUrlCopied ? (
-                                    <>
-                                      <ClipboardCheckIcon className="h-4 w-4 mr-2 inline" />
-                                      <p className="inline">Copied!</p>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <ClipboardIcon className="h-4 w-4 mr-2 inline" />
-                                      <p className="inline">Copy link</p>
-                                    </>
-                                  )}
-                                </>
-                              ),
-                              onClick: () => {
-                                navigator.clipboard.writeText(window.location.href).then(() => {
-                                  setIsProposalUrlCopied(true)
-                                  setTimeout(() => setIsProposalUrlCopied(false), 500)
+                  <div className="flex flex-row w-full mt-3">
+                    <div className="flex flex-col w-full">
+                      <div className="flex flex-col">
+                        <h1 className="text-2xl font-bold">{proposal.data.content.title}</h1>
+                        <div className="relative mr-6 mt-2 mb-8">
+                          {canEditProposal && (
+                            <button
+                              onClick={() => {
+                                trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_SHOW_EDITOR_CLICKED, {
+                                  userAddress: activeUser?.address,
+                                  stationHandle: terminalHandle,
+                                  stationId: terminal?.id,
+                                  isEdit: true,
                                 })
-                                setIsProposalUrlCopied(true)
-                              },
-                            },
-                          ]}
-                        />
+                                router.push(
+                                  Routes.EditProposalPage({
+                                    terminalHandle,
+                                    rfpId: rfp.id,
+                                    proposalId: proposal.id,
+                                  })
+                                )
+                              }}
+                            >
+                              <PencilIcon className="inline h-4 w-4 fill-marble-white mr-3 hover:cursor-pointer hover:fill-concrete" />
+                            </button>
+                          )}
+                          {canDeleteProposal ? (
+                            <Dropdown
+                              className="inline"
+                              side="left"
+                              button={
+                                <DotsHorizontalIcon className="inline-block h-4 w-4 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
+                              }
+                              items={[
+                                {
+                                  name: (
+                                    <>
+                                      {isProposalUrlCopied ? (
+                                        <>
+                                          <ClipboardCheckIcon className="h-4 w-4 mr-2 inline" />
+                                          <p className="inline">Copied!</p>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <ClipboardIcon className="h-4 w-4 mr-2 inline" />
+                                          <p className="inline">Copy link</p>
+                                        </>
+                                      )}
+                                    </>
+                                  ),
+                                  onClick: () => {
+                                    navigator.clipboard.writeText(window.location.href).then(() => {
+                                      setIsProposalUrlCopied(true)
+                                      setTimeout(() => setIsProposalUrlCopied(false), 500)
+                                    })
+                                    setIsProposalUrlCopied(true)
+                                  },
+                                },
+                                {
+                                  name: (
+                                    <>
+                                      <TrashIcon className="h-4 w-4 mr-2 fill-torch-red" />
+                                      <p className="text-torch-red">Delete</p>
+                                    </>
+                                  ),
+                                  onClick: () => {
+                                    trackClick(
+                                      PROPOSAL.EVENT_NAME.PROPOSAL_SETTINGS_DELETE_PROPOSAL_CLICKED,
+                                      {
+                                        pageName: PAGE_NAME.PROPOSAL_INFO_PAGE,
+                                        stationHandle: terminalHandle,
+                                        stationId: terminal?.id,
+                                        proposalId: proposal?.id,
+                                      }
+                                    )
+                                    setDeleteProposalModalOpen(true)
+                                  },
+                                },
+                              ]}
+                            />
+                          ) : (
+                            <Dropdown
+                              className="inline"
+                              side="left"
+                              button={
+                                <DotsHorizontalIcon className="inline-block h-4 w-4 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
+                              }
+                              items={[
+                                {
+                                  name: (
+                                    <>
+                                      {isProposalUrlCopied ? (
+                                        <>
+                                          <ClipboardCheckIcon className="h-4 w-4 mr-2 inline" />
+                                          <p className="inline">Copied!</p>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <ClipboardIcon className="h-4 w-4 mr-2 inline" />
+                                          <p className="inline">Copy link</p>
+                                        </>
+                                      )}
+                                    </>
+                                  ),
+                                  onClick: () => {
+                                    navigator.clipboard.writeText(window.location.href).then(() => {
+                                      setIsProposalUrlCopied(true)
+                                      setTimeout(() => setIsProposalUrlCopied(false), 500)
+                                    })
+                                    setIsProposalUrlCopied(true)
+                                  },
+                                },
+                              ]}
+                            />
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              {showApproveButton ? (
-                <div className="relative self-start group">
+                {showApproveButton ? (
+                  <div className="relative self-start group">
+                    <button
+                      onClick={() => {
+                        setSignModalOpen(true)
+                      }}
+                      className="bg-electric-violet text-tunnel-black px-6 h-[35px] rounded block mx-auto hover:bg-opacity-70 mb-2"
+                      disabled={
+                        waitingCreation ||
+                        parseFloat(fundsAvailable) < proposal.data.funding?.amount
+                      }
+                    >
+                      {waitingCreation ? (
+                        <div className="flex justify-center items-center">
+                          <Spinner fill="black" />
+                        </div>
+                      ) : (
+                        "Approve"
+                      )}
+                    </button>
+                    {parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
+                      fundsHaveNotBeenApproved(proposal) && (
+                        <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
+                          Insufficient funds.{" "}
+                          {isAdmin && (
+                            <span
+                              className="text-electric-violet cursor-pointer"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
+                              }}
+                            >
+                              Go to checkbook to refill.
+                            </span>
+                          )}
+                        </span>
+                      )}
+                  </div>
+                ) : showCashButton ? (
                   <button
                     onClick={() => {
-                      setSignModalOpen(true)
+                      setCashCheckModalOpen(true)
                     }}
-                    className="bg-electric-violet text-tunnel-black px-6 h-[35px] rounded block mx-auto hover:bg-opacity-70 mb-2"
-                    disabled={
-                      waitingCreation || parseFloat(fundsAvailable) < proposal.data.funding?.amount
-                    }
+                    className="bg-electric-violet text-tunnel-black px-6 h-[35px] w-48 rounded block mx-auto hover:bg-opacity-70"
+                    disabled={waitingCreation}
                   >
                     {waitingCreation ? (
                       <div className="flex justify-center items-center">
                         <Spinner fill="black" />
                       </div>
                     ) : (
-                      "Approve"
+                      "Cash check"
                     )}
                   </button>
-                  {parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
-                    fundsHaveNotBeenApproved(proposal) && (
-                      <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
-                        Insufficient funds.{" "}
-                        {isAdmin && (
-                          <span
-                            className="text-electric-violet cursor-pointer"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
-                            }}
-                          >
-                            Go to checkbook to refill.
-                          </span>
-                        )}
+                ) : null}
+              </div>
+            </div>
+            <div className="grow flex flex-row overflow-y-scroll">
+              <div className="p-6 w-full overflow-y-scroll">
+                <Preview markdown={proposal?.data.content.body} />
+              </div>
+              <div className="w-[36rem] border-l border-concrete flex-col overflow-y-scroll">
+                <div className="border-b border-concrete p-6">
+                  <h4 className="text-xs font-bold text-concrete uppercase mb-2">Author</h4>
+                  {proposal.collaborators.map((collaborator, idx) => {
+                    if (collaborator.account?.data) {
+                      return <AccountMediaObject account={collaborator.account} />
+                    } else {
+                      return (
+                        <div className="flex flex-row items-center" key={`account-${idx}`}>
+                          <img
+                            src={DEFAULT_PFP_URLS.USER}
+                            alt="PFP"
+                            className="w-[32px] h-[32px] rounded-full"
+                          />
+                          <div className="ml-2">{truncateString(collaborator.address)}</div>
+                        </div>
+                      )
+                    }
+                  })}
+                  <h4 className="text-xs font-bold text-concrete uppercase mt-6">Station</h4>
+                  <div className="flex flex-row items-center mt-2">
+                    <img
+                      src={rfp?.terminal.data.pfpURL || DEFAULT_PFP_URLS.TERMINAL}
+                      alt="PFP"
+                      className="w-[40px] h-[40px] rounded-lg"
+                      onError={(e) => {
+                        e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
+                      }}
+                    />
+                    <div className="ml-2">
+                      <span>{rfp?.terminal.data.name}</span>
+                      <span className="text-xs text-light-concrete flex">
+                        @{rfp?.terminal.handle}
                       </span>
-                    )}
-                </div>
-              ) : showCashButton ? (
-                <button
-                  onClick={() => {
-                    setCashCheckModalOpen(true)
-                  }}
-                  className="bg-electric-violet text-tunnel-black px-6 h-[35px] w-48 rounded block mx-auto hover:bg-opacity-70"
-                  disabled={waitingCreation}
-                >
-                  {waitingCreation ? (
-                    <div className="flex justify-center items-center">
-                      <Spinner fill="black" />
                     </div>
-                  ) : (
-                    "Cash check"
-                  )}
-                </button>
-              ) : null}
-            </div>
-          </div>
-          <div className="grow flex flex-row overflow-y-scroll">
-            <div className="p-6 w-full overflow-y-scroll">
-              <Preview markdown={proposal?.data.content.body} />
-            </div>
-            <div className="w-[36rem] border-l border-concrete flex-col overflow-y-scroll">
-              <div className="border-b border-concrete p-6">
-                <h4 className="text-xs font-bold text-concrete uppercase mb-2">Author</h4>
-                {proposal.collaborators.map((collaborator, idx) => {
-                  if (collaborator.account?.data) {
-                    return <AccountMediaObject account={collaborator.account} />
-                  } else {
-                    return (
-                      <div className="flex flex-row items-center" key={`account-${idx}`}>
-                        <img
-                          src={DEFAULT_PFP_URLS.USER}
-                          alt="PFP"
-                          className="w-[32px] h-[32px] rounded-full"
-                        />
-                        <div className="ml-2">{truncateString(collaborator.address)}</div>
-                      </div>
-                    )
-                  }
-                })}
-                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Station</h4>
-                <div className="flex flex-row items-center mt-2">
-                  <img
-                    src={rfp?.terminal.data.pfpURL || DEFAULT_PFP_URLS.TERMINAL}
-                    alt="PFP"
-                    className="w-[40px] h-[40px] rounded-lg"
-                    onError={(e) => {
-                      e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
-                    }}
-                  />
-                  <div className="ml-2">
-                    <span>{rfp?.terminal.data.name}</span>
-                    <span className="text-xs text-light-concrete flex">
-                      @{rfp?.terminal.handle}
-                    </span>
                   </div>
-                </div>
-                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Project</h4>
-                <span className="flex flex-row items-center group relative w-fit">
-                  {rfp?.status !== RfpStatus.DELETED ? (
-                    <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })} passHref>
-                      <a target="_blank" rel="noopener noreferrer">
-                        <p className="mt-2 text-electric-violet cursor-pointer">
+                  <h4 className="text-xs font-bold text-concrete uppercase mt-6">Project</h4>
+                  <span className="flex flex-row items-center group relative w-fit">
+                    {rfp?.status !== RfpStatus.DELETED ? (
+                      <Link href={Routes.RFPInfoTab({ terminalHandle, rfpId: rfp?.id })} passHref>
+                        <a target="_blank" rel="noopener noreferrer">
+                          <p className="mt-2 text-electric-violet cursor-pointer">
+                            {rfp?.data.content.title}
+                          </p>
+                        </a>
+                      </Link>
+                    ) : (
+                      <>
+                        <p className="mt-2 text-electric-violet opacity-70 cursor-not-allowed">
                           {rfp?.data.content.title}
                         </p>
-                      </a>
-                    </Link>
-                  ) : (
-                    <>
-                      <p className="mt-2 text-electric-violet opacity-70 cursor-not-allowed">
-                        {rfp?.data.content.title}
-                      </p>
-                      <div className="hidden group-hover:block absolute top-[100%] bg-wet-concrete p-2 rounded text-xs w-[140px]">
-                        RFP has been deleted.
-                      </div>
-                    </>
-                  )}
-                </span>
-                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Token</h4>
-                <p className="mt-2 font-normal">{proposal?.data.funding.symbol}</p>
-                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Amount Requested</h4>
-                <p className="mt-2">{`${proposal?.data.funding.amount}`}</p>
-                <h4 className="text-xs font-bold text-concrete uppercase mt-6">Fund Recipient</h4>
-                <p className="mt-2">{truncateString(proposal?.data.funding.recipientAddress, 9)}</p>
-              </div>
-              <div
-                className={
-                  check ? "border-b border-concrete p-6" : "p-6 grow flex flex-col justify-between"
-                }
-              >
-                <div>
-                  <h4 className="text-xs font-bold text-concrete uppercase">Approval</h4>
-                  <div className="flex flex-row space-x-2 items-center mt-2">
-                    <ProgressIndicator
-                      percent={proposal?.approvals.length / rfp?.checkbook.quorum}
-                      twsize={6}
-                      cutoff={0}
-                    />
-                    <p>
-                      {proposal?.approvals.length}/{rfp?.checkbook.quorum}
-                    </p>
-                  </div>
-                  <div className="mt-6">
-                    {proposal?.approvals.length > 0 && (
-                      <p className="text-xs text-concrete uppercase font-bold">Signers</p>
-                    )}
-                    {(proposal?.approvals || []).map((approval, i) => (
-                      <AccountMediaObject
-                        account={approval.signerAccount}
-                        className="mt-4"
-                        key={i}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-              {check && (
-                <div className="p-6 grow flex flex-col justify-between">
-                  <div>
-                    <p className="text-xs text-concrete uppercase font-bold">Check</p>
-                    <div className="flex justify-between items-center mt-4">
-                      <div className="flex flex-row items-center">
-                        <div>{truncateString(check.recipientAddress)}</div>
-                      </div>
-                      <div className="flex flex-row items-center space-x-1">
-                        <span
-                          className={`h-2 w-2 rounded-full bg-${
-                            !!check.txnHash ? "magic-mint" : "neon-carrot"
-                          }`}
-                        />
-                        <div className="font-bold text-xs uppercase tracking-wider">
-                          {!!check.txnHash ? "cashed" : "pending"}
+                        <div className="hidden group-hover:block absolute top-[100%] bg-wet-concrete p-2 rounded text-xs w-[140px]">
+                          RFP has been deleted.
                         </div>
-                        {!!check.txnHash && (
-                          <a
-                            href={`${networks[check.chainId as number].explorer}/tx/${
-                              check.txnHash
-                            }`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <LinkArrow className="fill-marble-white" />
-                          </a>
-                        )}
-                      </div>
+                      </>
+                    )}
+                  </span>
+                  <h4 className="text-xs font-bold text-concrete uppercase mt-6">Token</h4>
+                  <p className="mt-2 font-normal">{proposal?.data.funding.symbol}</p>
+                  <h4 className="text-xs font-bold text-concrete uppercase mt-6">
+                    Amount Requested
+                  </h4>
+                  <p className="mt-2">{`${proposal?.data.funding.amount}`}</p>
+                  <h4 className="text-xs font-bold text-concrete uppercase mt-6">Fund Recipient</h4>
+                  <p className="mt-2">
+                    {truncateString(proposal?.data.funding.recipientAddress, 9)}
+                  </p>
+                </div>
+                <div
+                  className={
+                    check
+                      ? "border-b border-concrete p-6"
+                      : "p-6 grow flex flex-col justify-between"
+                  }
+                >
+                  <div>
+                    <h4 className="text-xs font-bold text-concrete uppercase">Approval</h4>
+                    <div className="flex flex-row space-x-2 items-center mt-2">
+                      <ProgressIndicator
+                        percent={proposal?.approvals.length / rfp?.checkbook.quorum}
+                        twsize={6}
+                        cutoff={0}
+                      />
+                      <p>
+                        {proposal?.approvals.length}/{rfp?.checkbook.quorum}
+                      </p>
+                    </div>
+                    <div className="mt-6">
+                      {proposal?.approvals.length > 0 && (
+                        <p className="text-xs text-concrete uppercase font-bold">Signers</p>
+                      )}
+                      {(proposal?.approvals || []).map((approval, i) => (
+                        <AccountMediaObject
+                          account={approval.signerAccount}
+                          className="mt-4"
+                          key={i}
+                        />
+                      ))}
                     </div>
                   </div>
                 </div>
-              )}
+                {check && (
+                  <div className="p-6 grow flex flex-col justify-between">
+                    <div>
+                      <p className="text-xs text-concrete uppercase font-bold">Check</p>
+                      <div className="flex justify-between items-center mt-4">
+                        <div className="flex flex-row items-center">
+                          <div>{truncateString(check.recipientAddress)}</div>
+                        </div>
+                        <div className="flex flex-row items-center space-x-1">
+                          <span
+                            className={`h-2 w-2 rounded-full bg-${
+                              !!check.txnHash ? "magic-mint" : "neon-carrot"
+                            }`}
+                          />
+                          <div className="font-bold text-xs uppercase tracking-wider">
+                            {!!check.txnHash ? "cashed" : "pending"}
+                          </div>
+                          {!!check.txnHash && (
+                            <a
+                              href={`${networks[check.chainId as number].explorer}/tx/${
+                                check.txnHash
+                              }`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <LinkArrow className="fill-marble-white" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <DeletedView />
+        )}
       </TerminalNavigation>
     </Layout>
   )

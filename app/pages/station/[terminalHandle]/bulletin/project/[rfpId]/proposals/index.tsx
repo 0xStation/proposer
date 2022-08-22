@@ -52,8 +52,9 @@ const ProposalsTab: BlitzPage = ({
   terminal,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const activeUser = useStore((state) => state.activeUser)
+  const setToastState = useStore((state) => state.setToastState)
   const isAdmin = useAdminForTerminal(terminal)
-  const { proposalId } = useRouterQuery() as { proposalId: string }
+  const { proposalId, proposalDeleted } = useRouterQuery()
   const terminalHandle = useParam("terminalHandle") as string
   const rfpId = useParam("rfpId") as string
   const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
@@ -106,6 +107,16 @@ const ProposalsTab: BlitzPage = ({
       })
     }
   }, [isFinishedFetchingProposalCount])
+
+  useEffect(() => {
+    if (proposalDeleted) {
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Proposal successfully deleted.",
+      })
+    }
+  }, [proposalDeleted])
 
   useEffect(() => {
     if (proposalId) {
@@ -278,14 +289,14 @@ const ProposalComponent = ({
           </div>
           <div
             className={`basis-32 ml-6 mb-2 self-center relative group ${
-              parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
+              parseFloat(fundsAvailable) < parseFloat(proposal.data.funding?.amount) &&
               fundsHaveNotBeenApproved(proposal) &&
               "text-torch-red"
             }`}
           >
             {proposal.data?.funding?.amount || "N/A"} {proposal.data?.funding?.symbol}
             {/* if there are no checks, it means the value of this prop is not pending, and can be overallocated */}
-            {parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
+            {parseFloat(fundsAvailable) < parseFloat(proposal.data.funding?.amount) &&
               fundsHaveNotBeenApproved(proposal) && (
                 <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[100%] left-0 group hidden group-hover:block shadow-lg z-50">
                   Insufficient funds.{" "}

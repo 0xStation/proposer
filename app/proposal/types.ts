@@ -8,6 +8,7 @@ export enum ProposalStatus {
   SUBMITTED = "SUBMITTED",
   IN_REVIEW = "IN REVIEW",
   APPROVED = "APPROVED",
+  DELETED = "DELETED",
 }
 
 export type ProposalMetadata = {
@@ -19,12 +20,8 @@ export type ProposalMetadata = {
     recipientAddress: string
     token: string
     symbol: string
-    amount: number
+    amount: string
   }
-  startDate: Date
-  endDate: Date
-  milestonePercentages: number[] // list of percentages, number of milestones is length
-  collaborators: { address: string; percent: number }[] // list of collaborator splits, number of collaborators is length
   signature: string
 }
 
