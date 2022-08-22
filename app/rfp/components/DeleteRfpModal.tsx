@@ -38,7 +38,7 @@ export const DeleteRfpModal = ({
     try {
       await deleteRfpMutation({ rfpId: rfp?.id as string })
     } catch (error) {
-      console.error("Error deleting RFP", error)
+      console.error("Error deleting project", error)
       trackError(RFP.EVENT_NAME.ERROR_DELETING_RFP, {
         pageName,
         userAddress: activeUser?.address,
@@ -50,16 +50,16 @@ export const DeleteRfpModal = ({
       setToastState({
         isToastShowing: true,
         type: "error",
-        message: "Error deleting RFPs",
+        message: "Error deleting project.",
       })
     }
   }
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        <h3 className="text-2xl font-bold pt-6">Are you sure you want to delete the RFP?</h3>
+        <h3 className="text-2xl font-bold pt-6">Are you sure you want to delete the project?</h3>
         <p className="mt-2">
-          Contributors will no longer be able to submit proposals to this RFP. You won&apos;t be
+          Contributors will no longer be able to submit proposals to this project. You won&apos;t be
           able to undo this action.
         </p>
         <div className="mt-8">
@@ -84,7 +84,7 @@ export const DeleteRfpModal = ({
               handleSubmit()
             }}
           >
-            Delete RFP
+            Delete project
           </button>
         </div>
       </div>

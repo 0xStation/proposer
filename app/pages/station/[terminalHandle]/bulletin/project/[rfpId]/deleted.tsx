@@ -56,7 +56,7 @@ export const RfpDeletedPage: BlitzPage = ({
     <Layout title="Deleted RFP">
       <TerminalNavigation>
         <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
-          <h1 className="font-bold text-2xl">RFP has been deleted.</h1>
+          <h1 className="font-bold text-2xl">Project has been deleted.</h1>
           {proposalId && (
             <button
               onClick={() =>

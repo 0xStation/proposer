@@ -171,7 +171,7 @@ const ProposalComponent = ({ accountProposal }) => {
           />
           <span className="text-xs uppercase tracking-wider font-bold">
             {PROPOSAL_STATUS_DISPLAY_MAP[proposal.status]?.copy}
-            {isRfpDeleted && <p className="text-concrete inline"> · rfp has been deleted</p>}
+            {isRfpDeleted && <p className="text-concrete inline"> · project has been deleted</p>}
           </span>
         </div>
         <div className="w-full flex flex-row mb-5">

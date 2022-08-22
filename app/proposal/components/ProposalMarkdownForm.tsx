@@ -74,7 +74,7 @@ export const ProposalMarkdownForm = ({
       return
     }
     if (parseFloat(selectedToken?.available) < amount) {
-      return `The RFP's checkbook only has ${selectedToken.available} ${selectedToken.symbol}. You can request ${amount}, but it cannot be approved until an admin adds more ${selectedToken.symbol} to the checkbook.`
+      return `The project's checkbook only has ${selectedToken.available} ${selectedToken.symbol}. You can request ${amount}, but it cannot be approved until an admin adds more ${selectedToken.symbol} to the checkbook.`
     }
   }
 
@@ -307,7 +307,7 @@ export const ProposalMarkdownForm = ({
                             type: "error",
                             message: `Please fill in ${fieldsWithErrors.join(
                               ", "
-                            )} to publish RFP.`,
+                            )} to publish project.`,
                           })
                           return
                         }

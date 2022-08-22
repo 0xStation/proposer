@@ -498,7 +498,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                               setToastState({
                                 isToastShowing: true,
                                 type: "error",
-                                message: `Please fill in the Network field to publish your RFP.`,
+                                message: `Please fill in the Network field to publish your project.`,
                               })
                               return
                             }
@@ -507,7 +507,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                               setToastState({
                                 isToastShowing: true,
                                 type: "error",
-                                message: `Please fill in the Reward token field to publish your RFP.`,
+                                message: `Please fill in the Reward token field to publish your project.`,
                               })
                               return
                             }
@@ -516,7 +516,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                               setToastState({
                                 isToastShowing: true,
                                 type: "error",
-                                message: `Please add a Checkbook to publish your RFP.`,
+                                message: `Please add a Checkbook to publish your project.`,
                               })
                               return
                             }
@@ -528,7 +528,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                                 type: "error",
                                 message: `Please fill in ${fieldsWithErrors.join(
                                   ", "
-                                )} to publish RFP.`,
+                                )} to publish project.`,
                               })
                               return
                             }
@@ -905,7 +905,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                           <label className="font-bold">Submitting proposals</label>
                           <span className="text-xs text-concrete">
                             Only those who hold this token will be able to submit a proposal to this
-                            RFP.
+                            project.
                           </span>
                           <Field name="submittingPermissionTokenAddress">
                             {({ input, meta }) => {
@@ -936,7 +936,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                           <label className="font-bold">Viewing proposals</label>
                           <span className="text-xs text-concrete">
                             Only those who hold this token will be able to view a proposal to this
-                            RFP.
+                            project.
                           </span>
                           <Field name="viewingPermissionTokenAddress">
                             {({ input, meta }) => {

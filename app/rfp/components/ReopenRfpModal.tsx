@@ -33,7 +33,7 @@ export const ReopenRfpModal = ({
         isToastShowing: true,
         type: "success",
         message:
-          "RFP has been reopened. You can close it anytime by visiting the RFP's information page.",
+          "Project has been reopened. You can close it anytime by visiting the project's information page.",
       })
     },
     onError: (error: Error) => {
@@ -69,7 +69,7 @@ export const ReopenRfpModal = ({
       setToastState({
         isToastShowing: true,
         type: "error",
-        message: "Error closing your RFP.",
+        message: "Error closing your project.",
       })
     }
   }
@@ -79,8 +79,8 @@ export const ReopenRfpModal = ({
       <div className="p-2">
         <h3 className="text-2xl font-bold pt-6">Select a closing date</h3>
         <p className="mt-2">
-          Set a deadline for RFP submissions. If this is an ongoing RFP, leave it blank. You can
-          close an RFP at any time.
+          Set a deadline for project submissions. If this is an ongoing project, leave it blank. You
+          can close a project at any time.
         </p>
         <input
           min={getShortDate()}

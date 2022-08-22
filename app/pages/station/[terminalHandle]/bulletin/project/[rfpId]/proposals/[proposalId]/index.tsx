@@ -502,7 +502,7 @@ const ProposalPage: BlitzPage = ({
                           {rfp?.data.content.title}
                         </p>
                         <div className="hidden group-hover:block absolute top-[100%] bg-wet-concrete p-2 rounded text-xs w-[140px]">
-                          RFP has been deleted.
+                          Project has been deleted.
                         </div>
                       </>
                     )}

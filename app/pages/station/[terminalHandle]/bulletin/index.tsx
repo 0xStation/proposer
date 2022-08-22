@@ -381,7 +381,8 @@ const RFPComponent = ({ rfp, terminalHandle, activeAddress }) => {
                   Propose
                 </button>
                 <span className="hidden group-hover:block absolute top-[110%] right-0 bg-wet-concrete text-xs p-2 rounded border border-tunnel-black">
-                  You will be able to create a proposal for this RFP when it opens for submissions.
+                  You will be able to create a proposal for this project when it opens for
+                  submissions.
                 </span>
               </>
             )}

@@ -173,7 +173,7 @@ const RFPInfoTab: BlitzPage = () => {
             </div>
             <div className="p-6">
               <div className="mt-6">
-                <p className="text-concrete uppercase text-xs font-bold">Available Funding</p>
+                <p className="text-concrete uppercase text-xs font-bold">Available funding</p>
                 <div className="flex flex-row items-end space-x-1 mt-2">
                   <p className="text-2xl">
                     {formatCurrencyAmount(
