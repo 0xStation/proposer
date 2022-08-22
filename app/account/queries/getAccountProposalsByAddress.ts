@@ -3,7 +3,7 @@ import db from "db"
 import * as z from "zod"
 import { Account } from "../types"
 import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
-import { ProposalStatus as PrismaProposalStatus } from "db"
+import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
 const GetAccountProposalsByAddress = z.object({
   address: z.string(),
@@ -31,19 +31,21 @@ export default async function getAccountProposalsByAddress(
     },
   })
 
-  const accountProposalsWithProductStatus = accountProposals.map((accountProposal) => {
-    return {
-      ...accountProposal,
-      proposal: {
-        ...accountProposal.proposal,
-        status:
-          // returns db status or converts from PUBLISHED->SUBMITTED (only difference right now)
-          accountProposal.proposal.status === PrismaProposalStatus.PUBLISHED
-            ? ProductProposalStatus.SUBMITTED
-            : accountProposal.proposal.status,
-      },
-    }
-  })
+  const accountProposalsWithProductStatus = accountProposals
+    .filter((accountProposal) => accountProposal.proposal.status !== PrismaProposalStatus.DELETED)
+    .map((accountProposal) => {
+      return {
+        ...accountProposal,
+        proposal: {
+          ...accountProposal.proposal,
+          status:
+            // returns db status or converts from PUBLISHED->SUBMITTED (only difference right now)
+            accountProposal.proposal.status === PrismaProposalStatus.PUBLISHED
+              ? ProductProposalStatus.SUBMITTED
+              : accountProposal.proposal.status,
+        },
+      }
+    })
 
   return accountProposalsWithProductStatus
 }

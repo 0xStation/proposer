@@ -178,7 +178,7 @@ const RFPInfoTab: BlitzPage = () => {
                     {formatCurrencyAmount(
                       Math.max(
                         parseFloat(rfp?.data?.funding?.budgetAmount || "0") -
-                          (rfpApprovedProposalFunding || 0),
+                          (parseFloat(rfpApprovedProposalFunding as string) || 0),
                         0
                       ).toString()
                     ) +

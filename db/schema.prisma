@@ -223,6 +223,7 @@ enum ProposalStatus {
   PUBLISHED
   IN_REVIEW
   APPROVED
+  DELETED
 }
 
 //

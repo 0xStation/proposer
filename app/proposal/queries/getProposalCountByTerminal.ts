@@ -29,6 +29,11 @@ export const getProposalCountByTerminal = async (
         rfpId: {
           in: rfpIds.map((obj) => obj.id),
         },
+        NOT: [
+          {
+            status: PrismaProposalStatus.DELETED,
+          },
+        ],
       },
     })
 

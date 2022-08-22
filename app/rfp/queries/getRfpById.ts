@@ -2,6 +2,7 @@ import db from "db"
 import * as z from "zod"
 import { Rfp } from "../types"
 import { computeRfpProductStatus } from "../utils"
+import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
 const GetRfpById = z.object({
   id: z.string(),
@@ -16,8 +17,12 @@ export default async function getRfpById(input: z.infer<typeof GetRfpById>) {
       terminal: true,
       author: true,
       checkbook: true,
-      _count: {
-        select: { proposals: true },
+      proposals: {
+        where: {
+          status: {
+            not: PrismaProposalStatus.DELETED,
+          },
+        },
       },
     },
   })
@@ -41,6 +46,6 @@ export default async function getRfpById(input: z.infer<typeof GetRfpById>) {
       signerAccounts: signers,
     },
     status: computeRfpProductStatus(rfp.status, rfp.startDate, rfp.endDate),
-    submissionCount: rfp._count.proposals,
+    submissionCount: rfp.proposals.length,
   } as unknown as Rfp
 }

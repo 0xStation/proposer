@@ -4,6 +4,7 @@ import { z } from "zod"
 import { Rfp } from "../types"
 import { Terminal } from "app/terminal/types"
 import { computeRfpProductStatus } from "../utils"
+import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
 interface RfpWithTerminal extends Rfp {
   terminal: Terminal
@@ -22,8 +23,12 @@ export async function getAllRfps(input: z.infer<typeof GetAllRfps>) {
       include: {
         author: true,
         terminal: true,
-        _count: {
-          select: { proposals: true },
+        proposals: {
+          where: {
+            status: {
+              not: PrismaProposalStatus.DELETED,
+            },
+          },
         },
       },
     })
@@ -32,7 +37,7 @@ export async function getAllRfps(input: z.infer<typeof GetAllRfps>) {
       return {
         ...rfp,
         status: computeRfpProductStatus(rfp.status, rfp.startDate, rfp.endDate),
-        submissionCount: rfp._count.proposals,
+        submissionCount: rfp.proposals.length,
       }
     }) as unknown as RfpWithTerminal[]
   } catch (err) {

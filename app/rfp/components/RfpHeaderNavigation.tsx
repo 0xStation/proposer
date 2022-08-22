@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react"
 import { useRouter, Link, Routes, useParam, useQuery, useSession } from "blitz"
-import { track } from "@amplitude/analytics-browser"
 import { RFP_STATUS_DISPLAY_MAP } from "app/core/utils/constants"
-import getRfpById from "../queries/getRfpById"
 import { RfpStatus } from "../types"
 import {
   TrashIcon,
@@ -317,7 +315,9 @@ const RfpHeaderNavigation = ({ rfp }: { rfp: Rfp }) => {
                 : "text-concrete hover:text-light-concrete"
             }`}
           >
-            <Link href={Routes.ProposalsTab({ terminalHandle, rfpId: rfp.id })}>Proposals</Link>
+            <Link href={Routes.ProposalsTab({ terminalHandle, rfpId: rfp.id })}>{`Proposals ${
+              rfp.submissionCount ? `(${rfp.submissionCount})` : "(0)"
+            }`}</Link>
           </li>
         </ul>
       </div>

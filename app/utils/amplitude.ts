@@ -37,6 +37,7 @@ type ImpressionProperties = {
   numRfps: number
   rfpId: string
   proposalId: string
+  isEdit: boolean
 }
 
 type EventProperties = {
@@ -63,12 +64,14 @@ type ErrorProperties = {
   quorum: number
   errorMsg: string
   rfpId: string
+  proposalId: string
   startDate: string
   endDate: string
   recipientAddress: string
   amount: string
   title: string
   checkbookAddress: string
+  isEdit: true
 }
 
 const inactiveTracking = (isDev() || isStaging()) && process.env.NEXT_PUBLIC_TRACK !== "true"
@@ -219,6 +222,7 @@ export const trackError = (eventName: string, metadata: Partial<ErrorProperties>
     signers,
     errorMsg,
     rfpId,
+    proposalId,
     startDate,
     endDate,
     quorum,
@@ -239,6 +243,7 @@ export const trackError = (eventName: string, metadata: Partial<ErrorProperties>
     signers,
     quorum,
     error_msg: errorMsg,
+    proposal_id: proposalId,
     rfp_id: rfpId,
     start_date: startDate,
     end_date: endDate,
