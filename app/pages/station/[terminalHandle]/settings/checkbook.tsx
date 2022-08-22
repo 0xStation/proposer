@@ -25,6 +25,7 @@ import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import { AddFundsModal } from "app/core/components/AddFundsModal"
 import useStore from "app/core/hooks/useStore"
+import { DOCS } from "app/core/utils/constants"
 
 const {
   PAGE_NAME,
@@ -155,10 +156,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
               <h2 className="text-marble-white text-2xl font-bold">Checkbook</h2>
               <h5 className="text-base mt-2">
                 Checkbook allows you to create checks for fund recipients to cash.{" "}
-                <a
-                  href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
-                  className="text-electric-violet"
-                >
+                <a href={DOCS.CHECKBOOK} className="text-electric-violet">
                   Learn more
                 </a>
               </h5>

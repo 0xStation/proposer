@@ -10,6 +10,7 @@ import getChecksByProposalId from "../../check/queries/getChecksByProposalId"
 import { truncateString } from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 import { InformationCircleIcon } from "@heroicons/react/solid"
+import { DOCS } from "app/core/utils/constants"
 
 export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, checks }) => {
   const router = useRouter()
@@ -137,10 +138,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
                   <InformationCircleIcon className="h-4 w-4" />
                   <span className="p-2 bg-wet-concrete rounded hidden group-hover:block absolute top-[100%] w-[150px] text-xs">
                     The date the check expires.{" "}
-                    <a
-                      href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
-                      className="text-electric-violet"
-                    >
+                    <a href={DOCS.CHECKBOOK} className="text-electric-violet">
                       Learn more.
                     </a>
                   </span>

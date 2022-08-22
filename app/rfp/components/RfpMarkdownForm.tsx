@@ -34,13 +34,14 @@ import { genRfpSignatureMessage } from "app/signatures/rfp"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
 import getTokenTagsByTerminalId from "app/tag/queries/getTokenTagsByTerminalId"
-import { TokenType } from "app/tag/types"
+import { TokenType } from "app/types/token"
 import { trackClick, trackEvent, trackError } from "app/utils/amplitude"
 import { TRACKING_EVENTS, TOKEN_SYMBOLS } from "app/core/utils/constants"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
 import getGroupedTagsByTerminalId from "app/tag/queries/getGroupedTagsByTerminalId"
 import { Tag } from "app/tag/types"
+import { DOCS } from "app/core/utils/constants"
 
 const {
   PAGE_NAME,
@@ -352,7 +353,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 fundingToken: {
                   chainId: checkbook.chainId,
                   address: selectedToken.address,
-
+                  type: selectedToken.type,
                   symbol: selectedToken.symbol,
                   decimals: selectedToken.decimals,
                 },
@@ -397,6 +398,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 fundingToken: {
                   chainId: checkbook.chainId,
                   address: selectedToken.address,
+                  type: selectedToken.type,
                   symbol: selectedToken.symbol,
                   decimals: selectedToken.decimals,
                 },
@@ -517,15 +519,18 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                               })
                               return
                             }
+
                             const fieldsWithErrors = Object.keys(formState.errors as Object)
-                            setToastState({
-                              isToastShowing: true,
-                              type: "error",
-                              message: `Please fill in ${fieldsWithErrors.join(
-                                ", "
-                              )} to publish RFP.`,
-                            })
-                            return
+                            if (fieldsWithErrors.length > 0) {
+                              setToastState({
+                                isToastShowing: true,
+                                type: "error",
+                                message: `Please fill in ${fieldsWithErrors.join(
+                                  ", "
+                                )} to publish RFP.`,
+                              })
+                              return
+                            }
                           }
                           setConfirmationModalOpen(true)
                         }}
@@ -828,10 +833,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                           <span className="text-xs text-concrete block">
                             Deposit funds here to create checks for proposers to claim once their
                             proposals have been approved.{" "}
-                            <a
-                              href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
-                              className="text-electric-violet"
-                            >
+                            <a href={DOCS.CHECKBOOK} className="text-electric-violet">
                               Learn more
                             </a>
                           </span>

@@ -11,6 +11,7 @@ import logout from "app/session/mutations/logout"
 import { DEFAULT_PFP_URLS } from "../utils/constants"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { canCreateStation } from "app/core/utils/permissions"
+import { DOCS } from "app/core/utils/constants"
 
 const { FEATURE, PAGE_NAME } = TRACKING_EVENTS
 const { NEW_STATION, WALLET_CONNECTION } = FEATURE
@@ -139,7 +140,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                       {profileLinkOption}
                       {openATerminalLink}
                       <a
-                        href="https://station-labs.gitbook.io/station-product-manual/"
+                        href={DOCS.PRODUCT_MANUAL}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center space-x-2 hover:opacity-70 cursor-pointer"
@@ -148,7 +149,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                         <LinkArrow className="fill-marble-white" />
                       </a>
                       <a
-                        href="https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176"
+                        href={DOCS.LEGAL_PRIVACY}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center space-x-2 hover:opacity-70 cursor-pointer"
@@ -157,7 +158,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                         <LinkArrow className="fill-marble-white" />
                       </a>
                       <a
-                        href="https://6vdcjqzyfj3.typeform.com/to/F0QFs9aC"
+                        href={DOCS.HELP_DESK}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center space-x-2 hover:opacity-70 cursor-pointer"

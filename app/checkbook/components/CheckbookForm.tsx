@@ -15,6 +15,7 @@ import { useState } from "react"
 import { Form, Field } from "react-final-form"
 import { useWaitForTransaction } from "wagmi"
 import createCheckbook from "../mutations/createCheckbook"
+import { DOCS } from "app/core/utils/constants"
 
 const {
   FEATURE: { CHECKBOOK },
@@ -286,10 +287,7 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
               <span className="text-xs text-concrete block">
                 The number of signatories required for a proposal to be approved and a check to be
                 generated.{" "}
-                <a
-                  href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
-                  className="text-electric-violet"
-                >
+                <a href={DOCS.CHECKBOOK} className="text-electric-violet">
                   Learn more
                 </a>
               </span>

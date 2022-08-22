@@ -14,6 +14,7 @@ import { useConnect, useAccount, useNetwork } from "wagmi"
 import generateNonce from "app/session/queries/generateNonce"
 import { SiweMessage } from "siwe"
 import verify from "app/session/mutations/verify"
+import { DOCS } from "app/core/utils/constants"
 
 const {
   FEATURE: { WALLET_CONNECTION },
@@ -197,7 +198,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
           <p className="text-lg text-center mt-4">Connect your wallet to enter Station.</p>
           <p className="text-lg text-center">
             New to web3? Learn how to create a wallet{" "}
-            <a className="text-electric-violet" href="https://www.youtube.com/watch?v=OsRIHlr0_Iw">
+            <a className="text-electric-violet" href={DOCS.CREATE_WALLET}>
               here
             </a>
             .

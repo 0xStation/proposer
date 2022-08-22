@@ -1,6 +1,6 @@
 import { invoke, Image, useParam } from "blitz"
 import { trackClick, trackError, initializeUser } from "app/utils/amplitude"
-import { TRACKING_EVENTS } from "app/core/utils/constants"
+import { DOCS, TRACKING_EVENTS } from "app/core/utils/constants"
 import { METAMASK_ERROR_CODES } from "app/utils/metamaskErrorCodes"
 import { SiweMessage } from "siwe"
 import { useState } from "react"
@@ -185,10 +185,7 @@ export const ConnectWalletComponent = () => {
             </p>
             <p className="text-lg text-center px-4 sm:px-0">
               New to web3? Learn how to create a wallet{" "}
-              <a
-                className="text-electric-violet"
-                href="https://www.youtube.com/watch?v=OsRIHlr0_Iw"
-              >
+              <a className="text-electric-violet" href={DOCS.CREATE_WALLET}>
                 here
               </a>
               .
