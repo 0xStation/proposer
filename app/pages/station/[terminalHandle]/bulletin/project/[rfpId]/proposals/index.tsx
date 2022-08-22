@@ -244,6 +244,7 @@ const ProposalComponent = ({
   isAdmin: boolean
 }) => {
   const router = useRouter()
+  const [insufficientFunds, setInsufficientFunds] = useState<boolean>(false)
 
   const funds = useCheckbookFunds(
     rfp.checkbook?.chainId as number,
@@ -253,9 +254,12 @@ const ProposalComponent = ({
   )
   const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
 
-  const fundsHaveNotBeenApproved = (proposal) => {
-    return proposal.checks.length === 0
-  }
+  useEffect(() => {
+    setInsufficientFunds(
+      parseFloat(fundsAvailable) < parseFloat(proposal.data.funding?.amount) &&
+        proposal.checks.length === 0
+    )
+  }, [fundsAvailable])
 
   return (
     <Link href={Routes.ProposalPage({ terminalHandle, rfpId: rfp.id, proposalId: proposal.id })}>
@@ -287,33 +291,26 @@ const ProposalComponent = ({
               </p>
             </div>
           </div>
-          <div
-            className={`basis-32 ml-6 mb-2 self-center relative group ${
-              parseFloat(fundsAvailable) < parseFloat(proposal.data.funding?.amount) &&
-              fundsHaveNotBeenApproved(proposal) &&
-              "text-torch-red"
-            }`}
-          >
+          <div className="basis-32 ml-6 mb-2 self-center relative group">
             {proposal.data?.funding?.amount || "N/A"} {proposal.data?.funding?.symbol}
             {/* if there are no checks, it means the value of this prop is not pending, and can be overallocated */}
-            {parseFloat(fundsAvailable) < parseFloat(proposal.data.funding?.amount) &&
-              fundsHaveNotBeenApproved(proposal) && (
-                <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[100%] left-0 group hidden group-hover:block shadow-lg z-50">
-                  Insufficient funds.{" "}
-                  {isAdmin && (
-                    <span
-                      className="text-electric-violet cursor-pointer"
-                      onClick={(e) => {
-                        // overriding the parent click handler
-                        e.preventDefault()
-                        router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
-                      }}
-                    >
-                      Go to checkbook to refill.
-                    </span>
-                  )}
-                </span>
-              )}
+            {insufficientFunds && (
+              <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[100%] left-0 group hidden group-hover:block shadow-lg z-50">
+                Insufficient funds.{" "}
+                {isAdmin && (
+                  <span
+                    className="text-electric-violet cursor-pointer"
+                    onClick={(e) => {
+                      // overriding the parent click handler
+                      e.preventDefault()
+                      router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
+                    }}
+                  >
+                    Go to checkbook to refill.
+                  </span>
+                )}
+              </span>
+            )}
           </div>
           <div className="basis-32 ml-2 mb-2 self-center">
             {formatDate(proposal.createdAt) || "N/A"}
