@@ -1,4 +1,5 @@
 import db from "db"
+import { Ctx } from "blitz"
 import * as z from "zod"
 import { Token, TokenTag } from "types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
@@ -20,9 +21,30 @@ const UpdateRfp = z.object({
   signatureMessage: z.any().optional(),
 })
 
-export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
+export default async function updateRfp(input: z.infer<typeof UpdateRfp>, ctx: Ctx) {
+  const userId = ctx.session.$publicData.userId
+  if (!userId) throw new Error("Cannot update RFP: unauthorized.") // minimal error handling to obscure the reason
+
+  const rfp = await db.rfp.findUnique({
+    where: {
+      id: input.rfpId,
+    },
+    include: {
+      author: true,
+    },
+  })
+
+  if (rfp?.author?.id !== userId) {
+    throw new Error("Cannot update RFP: unauthorized.")
+  }
+
+  // requires SIWE to be set?
+  if (rfp?.authorAddress !== ctx.session.$publicData?.siwe?.address) {
+    throw new Error("Cannot update RFP: unauthorized.")
+  }
+
   try {
-    const rfp = await db.rfp.update({
+    const updatedRfp = await db.rfp.update({
       where: { id: input.rfpId },
       data: {
         startDate: input.startDate,
@@ -49,7 +71,7 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
       },
     })
 
-    return rfp
+    return updatedRfp
   } catch (error) {
     throw error
   }
