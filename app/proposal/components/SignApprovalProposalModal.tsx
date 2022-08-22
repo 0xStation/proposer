@@ -45,6 +45,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
         tokenAddress: proposal?.data.funding.token,
         tokenAmount: proposal?.data.funding.amount, // store as decimal value instead of BigNumber
       })
+      invalidateQuery(getChecksByProposalId)
     }
 
     const signature = await signMessage(check.data.signatureMessage)
@@ -70,16 +71,13 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
           signature,
           signatureMessage: check.data.signatureMessage,
         })
-
+        router.replace(router.asPath)
+        setIsOpen(false)
         setToastState({
           isToastShowing: true,
           type: "success",
           message: "Your approval moves this proposal a step closer to reality.",
         })
-        // refresh check fetching to render check if quorum is now hit
-        invalidateQuery(getChecksByProposalId)
-        router.replace(router.asPath)
-        setIsOpen(false)
         try {
           // if this approval makes proposal reach quorum, send notification to collaborators
           if (proposal.approvals.length + 1 === rfp.checkbook.quorum) {

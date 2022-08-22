@@ -367,7 +367,6 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 contentTitle: values.title,
                 signature,
                 signatureMessage: message,
-                proposalPrefillBody: rfp?.data.proposalPrefill.body || "",
               })
             } catch (err) {
               console.error(err)

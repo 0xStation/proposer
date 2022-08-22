@@ -37,6 +37,7 @@ export default async function getAccountProposalsByAddress(
       proposal: {
         ...accountProposal.proposal,
         status:
+          // returns db status or converts from PUBLISHED->SUBMITTED (only difference right now)
           accountProposal.proposal.status === PrismaProposalStatus.PUBLISHED
             ? ProductProposalStatus.SUBMITTED
             : accountProposal.proposal.status,

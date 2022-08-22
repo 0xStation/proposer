@@ -25,7 +25,7 @@ export default async function getRfpApprovedProposalFunding(
     if (funding.token !== input.tokenAddress) {
       return acc
     } else {
-      return acc + parseFloat(funding.amount)
+      return acc + funding.amount
     }
   }, 0)
 

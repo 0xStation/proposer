@@ -5,6 +5,7 @@ import { Check } from "@prisma/client"
 import { Rfp } from "app/rfp/types"
 
 export enum ProposalStatus {
+  DRAFT = "DRAFT",
   SUBMITTED = "SUBMITTED",
   IN_REVIEW = "IN_REVIEW",
   APPROVED = "APPROVED",
@@ -19,8 +20,12 @@ export type ProposalMetadata = {
     recipientAddress: string
     token: string
     symbol: string
-    amount: string
+    amount: number
   }
+  startDate: Date
+  endDate: Date
+  milestonePercentages: number[] // list of percentages, number of milestones is length
+  collaborators: { address: string; percent: number }[] // list of collaborator splits, number of collaborators is length
   signature: string
 }
 

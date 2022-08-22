@@ -20,7 +20,7 @@ export type SignatureMessage = {
 
 export type Signature = {
   address: string
-  message: any
+  message: string
   signature: string
   timestamp: Date
 }

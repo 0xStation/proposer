@@ -10,28 +10,30 @@ const ApproveProposal = z.object({
 })
 
 export default async function approveProposal(input: z.infer<typeof ApproveProposal>) {
+  const params = ApproveProposal.parse(input)
   // use a transaction to apply many database writes at once
-  // creates proposal approval, check approval, and potentially status update to proposal
+  // creates proposal approval, check approval
+  // also updates proposal status if moving from SUBMITTED->IN_REVIEW (first approval) or IN_REVIEW->APPROVED (quorum approval)
   const results = await db.$transaction(async (db) => {
     // create approval objects, throws if creating duplicate
     await db.proposalApproval.create({
       data: {
-        proposalId: input.proposalId,
-        signerAddress: input.signerAddress,
+        proposalId: params.proposalId,
+        signerAddress: params.signerAddress,
         data: {
-          signature: input.signature,
-          signatureMessage: input.signatureMessage,
+          signature: params.signature,
+          signatureMessage: params.signatureMessage,
         },
       },
     })
 
     await db.checkApproval.create({
       data: {
-        checkId: input.checkId,
-        signerAddress: input.signerAddress,
+        checkId: params.checkId,
+        signerAddress: params.signerAddress,
         data: {
-          signature: input.signature,
-          signatureMessage: input.signatureMessage,
+          signature: params.signature,
+          signatureMessage: params.signatureMessage,
         },
       },
     })
@@ -39,7 +41,7 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
     // Fetch proposal and update status if needed
 
     const proposal = await db.proposal.findUnique({
-      where: { id: input.proposalId },
+      where: { id: params.proposalId },
       include: {
         approvals: true,
         rfp: { include: { checkbook: true } },
@@ -68,7 +70,7 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
     // if there is a new status to set, apply update
     if (newStatus) {
       await db.proposal.update({
-        where: { id: input.proposalId },
+        where: { id: params.proposalId },
         data: {
           status: newStatus,
         },

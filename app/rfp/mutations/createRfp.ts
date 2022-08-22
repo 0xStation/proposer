@@ -3,8 +3,6 @@ import * as z from "zod"
 import { RfpStatus as PrismaRfpStatus } from "@prisma/client"
 import { TokenTag, Token } from "types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
-import { RfpMetadata } from "../types"
-import { TagTokenMetadata } from "app/tag/types"
 
 const CreateRfp = z.object({
   terminalId: z.number(),
@@ -22,14 +20,8 @@ const CreateRfp = z.object({
   viewingPermission: TokenTag.optional(),
 })
 
-const defaultProposalPrefillBody = `
-  # Proposal summary\n\n
-  # Goals\n\n
-  # Roadmap and deliverable details\n\n
-  # Challenges\n\n
-  # Team background and previous contributions\n\n
-  # Support request\n\n
-`
+const defaultProposalPrefill =
+  "# Proposal summary \n\n # Goals \n\n # Roadmap and deliverable details \n\n # Challenges \n\n # Team background and previous contributions \n\n # Support request"
 
 export default async function createRfp(input: z.infer<typeof CreateRfp>) {
   const params = CreateRfp.parse(input)
@@ -40,30 +32,6 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
     }
   }
 
-  // prepare metadata object for compiler checks
-  const rfpMetadata: RfpMetadata = {
-    content: {
-      title: params.contentTitle,
-      body: params.contentBody,
-    },
-    signature: params.signature,
-    signatureMessage: params.signatureMessage,
-    proposalPrefill: {
-      body: defaultProposalPrefillBody,
-    },
-    funding: {
-      token: {
-        ...input.fundingToken,
-        address: toChecksumAddress(input.fundingToken.address),
-      },
-      budgetAmount: params.fundingBudgetAmount,
-    },
-    permissions: {
-      submit: input.submittingPermission as TagTokenMetadata,
-      view: input.viewingPermission as TagTokenMetadata,
-    },
-  }
-
   const rfp = await db.rfp.create({
     data: {
       fundingAddress: params.fundingAddress,
@@ -72,7 +40,26 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
       startDate: params.startDate,
       ...(params.endDate && { endDate: params.endDate }),
       status: PrismaRfpStatus.PUBLISHED,
-      data: JSON.parse(JSON.stringify(rfpMetadata)),
+      data: {
+        content: {
+          title: params.contentTitle,
+          body: params.contentBody,
+        },
+        signature: params.signature,
+        signatureMessage: params.signatureMessage,
+        proposalPrefill: defaultProposalPrefill,
+        funding: {
+          token: {
+            ...input.fundingToken,
+            address: toChecksumAddress(input.fundingToken.address),
+          },
+          budgetAmount: params.fundingBudgetAmount,
+        },
+        permissions: {
+          submit: input.submittingPermission,
+          view: input.viewingPermission,
+        },
+      },
     },
   })
 

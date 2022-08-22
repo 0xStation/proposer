@@ -78,7 +78,8 @@ const CheckbookSettingsPage: BlitzPage = () => {
   const [checkbooks, setCheckbooks] = useState<Checkbook[]>([])
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
-  const [showAddFundsModal, setShowAddFundsModal] = useState<boolean>(!!creationSuccess)
+  const [successModalOpen, setSuccessModalOpen] = useState<boolean>(!!creationSuccess)
+  const [showAddFundsModal, setShowAddFundsModal] = useState<boolean>(false)
   const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
 
@@ -142,8 +143,8 @@ const CheckbookSettingsPage: BlitzPage = () => {
     <LayoutWithoutNavigation>
       <Navigation>
         <AddFundsModal
-          setIsOpen={setShowAddFundsModal}
-          isOpen={showAddFundsModal}
+          setIsOpen={setShowAddFundsModal || setSuccessModalOpen}
+          isOpen={showAddFundsModal || successModalOpen}
           checkbookAddress={selectedCheckbook?.address}
           pageName={PAGE_NAME.CHECKBOOK_SETTINGS_PAGE}
           terminalId={terminal?.id as number}

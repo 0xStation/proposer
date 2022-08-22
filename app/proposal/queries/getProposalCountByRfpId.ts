@@ -10,8 +10,8 @@ const GetProposalCountByRfpId = z.object({
 
 export const getProposalCountByRfpId = async (input: z.infer<typeof GetProposalCountByRfpId>) => {
   try {
-    const selectedStatuses = input.statuses.map((s) =>
-      s === ProposalStatus.SUBMITTED ? PrismaProposalStatus.PUBLISHED : s
+    const selectedStatuses = input.statuses.map((status) =>
+      status === ProposalStatus.SUBMITTED ? PrismaProposalStatus.PUBLISHED : status
     ) as PrismaProposalStatus[]
 
     const proposalCount = await db.proposal.count({
