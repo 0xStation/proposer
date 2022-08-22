@@ -22,9 +22,6 @@ const UpdateRfp = z.object({
 })
 
 export default async function updateRfp(input: z.infer<typeof UpdateRfp>, ctx: Ctx) {
-  const userId = ctx.session.$publicData.userId
-  if (!userId) throw new Error("Cannot update RFP: unauthorized.") // minimal error handling to obscure the reason
-
   const rfp = await db.rfp.findUnique({
     where: {
       id: input.rfpId,
@@ -34,14 +31,11 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>, ctx: C
     },
   })
 
-  if (rfp?.author?.id !== userId) {
-    throw new Error("Cannot update RFP: unauthorized.")
+  if (!rfp) {
+    throw new Error(`Cannot find RFP with id ${input.rfpId}`)
   }
 
-  // requires SIWE to be set?
-  if (rfp?.authorAddress !== ctx.session.$publicData?.siwe?.address) {
-    throw new Error("Cannot update RFP: unauthorized.")
-  }
+  ctx.session.$authorize([rfp.authorAddress], [])
 
   try {
     const updatedRfp = await db.rfp.update({
