@@ -2,7 +2,6 @@ import db from "db"
 import * as z from "zod"
 import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 import { Proposal, ProposalStatus as ProductProposalStatus } from "../types"
-import { ProposalStatus as PrismaProposalStatus } from "db"
 
 const GetProposalById = z.object({
   id: z.string(),
