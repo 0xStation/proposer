@@ -1,6 +1,5 @@
 import * as z from "zod"
 import db, { ProposalStatus } from "db"
-import { ProposalMetadata } from "../types"
 
 const ApproveProposal = z.object({
   checkId: z.string(),
@@ -56,12 +55,12 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
     // determine new status for proposal
     let newStatus
     if (
-      proposal.approvals.length + 1 >= (proposal.rfp.checkbook.quorum || 0) &&
+      proposal.approvals.length >= (proposal.rfp.checkbook.quorum || 0) &&
       proposal.status !== ProposalStatus.APPROVED
     ) {
       newStatus = ProposalStatus.APPROVED
     } else if (
-      proposal.approvals.length + 1 < (proposal.rfp.checkbook.quorum || 0) &&
+      proposal.approvals.length < (proposal.rfp.checkbook.quorum || 0) &&
       proposal.status !== ProposalStatus.IN_REVIEW
     ) {
       newStatus = ProposalStatus.IN_REVIEW
