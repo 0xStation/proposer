@@ -1,7 +1,8 @@
 import db from "db"
 import * as z from "zod"
-import { ZodToken } from "app/types/token"
+import { ZodToken, Token } from "app/types/token"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import { RfpMetadata } from "../types"
 
 // going to be calling this from edit RFP page, so we will still be passing in all of these data
 // just bc they might not be changed does not mean we will be omitting them, because the form
@@ -12,16 +13,43 @@ const UpdateRfp = z.object({
   contentTitle: z.string(),
   contentBody: z.string(),
   startDate: z.date(),
-  endDate: z.date().optional(),
+  endDate: z.date().nullable(),
   fundingToken: ZodToken,
   fundingBudgetAmount: z.string(),
   signature: z.string(),
   submittingPermission: ZodToken.optional(),
   viewingPermission: ZodToken.optional(),
   signatureMessage: z.any().optional(),
+  proposalPrefillBody: z.string(),
 })
 
 export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
+  const params = UpdateRfp.parse(input)
+
+  // prepare metadata object for compiler checks
+  const metadata: RfpMetadata = {
+    content: {
+      title: params.contentTitle,
+      body: params.contentBody,
+    },
+    signature: params.signature,
+    signatureMessage: params.signatureMessage,
+    proposalPrefill: {
+      body: params.proposalPrefillBody,
+    },
+    funding: {
+      token: {
+        ...input.fundingToken,
+        address: toChecksumAddress(input.fundingToken.address),
+      },
+      budgetAmount: params.fundingBudgetAmount,
+    },
+    permissions: {
+      submit: input.submittingPermission as Token,
+      view: input.viewingPermission as Token,
+    },
+  }
+
   try {
     const rfp = await db.rfp.update({
       where: { id: input.rfpId },
@@ -29,25 +57,7 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
         fundingAddress: input.fundingAddress,
         startDate: input.startDate,
         endDate: input.endDate,
-        data: {
-          content: {
-            title: input.contentTitle,
-            body: input.contentBody,
-          },
-          signature: input.signature,
-          signatureMessage: input.signatureMessage,
-          funding: {
-            token: {
-              ...input.fundingToken,
-              address: toChecksumAddress(input.fundingToken.address),
-            },
-            budgetAmount: input.fundingBudgetAmount,
-          },
-          permissions: {
-            submit: input.submittingPermission,
-            view: input.viewingPermission,
-          },
-        },
+        data: JSON.parse(JSON.stringify(metadata)),
       },
     })
 

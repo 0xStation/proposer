@@ -222,6 +222,17 @@ export const DOCS = {
   CREATE_WALLET: "https://www.youtube.com/watch?v=OsRIHlr0_Iw",
 }
 
+export const PROPOSAL_TEMPLATES = {
+  DEFAULT: `
+  # Proposal summary\n\n
+  # Goals\n\n
+  # Roadmap and deliverable details\n\n
+  # Challenges\n\n
+  # Team background and previous contributions\n\n
+  # Support request\n\n
+`,
+}
+
 // LEGACY BELOW
 
 // LEGACY

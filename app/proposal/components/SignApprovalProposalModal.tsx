@@ -72,6 +72,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
           signature,
           signatureMessage: check.data.signatureMessage,
         })
+        invalidateQuery(getChecksByProposalId)
         router.replace(router.asPath)
         setIsOpen(false)
         setToastState({

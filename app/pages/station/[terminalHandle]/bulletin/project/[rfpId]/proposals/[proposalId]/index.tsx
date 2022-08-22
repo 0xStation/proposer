@@ -124,13 +124,13 @@ const ProposalPage: BlitzPage = ({
 
   const hasQuorum = rfp.checkbook && check?.approvals?.length === rfp.checkbook?.quorum
   const proposalHasNoApprovals = proposal?.approvals?.length === 0
-  const userHasApproved = proposal.approvals.some(
+  const userHasApproved = proposal?.approvals?.some(
     (approval) => approval.signerAddress === activeUser?.address
   )
   const userIsProposalAuthor =
     proposal?.collaborators?.[0]?.account?.address === activeUser?.address
-  const userIsRfpAuthor = rfp.authorAddress === activeUser?.address
   const userIsSigner = rfp.checkbook?.signers.includes(activeUser?.address || "")
+  const userIsFundingRecipient = check?.recipientAddress === activeUser?.address
 
   // user can edit proposal if they are the author and the proposal hasn't been approved yet
   const canEditProposal =
@@ -142,12 +142,11 @@ const ProposalPage: BlitzPage = ({
   const canDeleteProposal = userIsProposalAuthor && proposal.status !== ProposalStatus.APPROVED
 
   // show approve button, if the proposal hasn't reached quorum, user can approve or user is author and can't approve
-  const showApproveButton = userIsRfpAuthor || (!!userIsSigner && !userHasApproved && !hasQuorum)
+  const showApproveButton = userIsSigner && !userHasApproved && !hasQuorum
   // insufficient funds warning shown if user is also signer
   const showInsufficientFundsWarning = insufficientFunds && userIsSigner
-  // proposer has reached quorum and check has not been cashed and user is the proposer
-  const showCashButton =
-    hasQuorum && !check?.txnHash && check?.recipientAddress === activeUser?.address
+  // proposer has reached quorum and user is the proposer and check has not been cashed
+  const showCashButton = hasQuorum && userIsFundingRecipient && !check?.txnHash
 
   useWaitForTransaction({
     confirmations: 1, // low confirmation count gives us a feel of faster UX

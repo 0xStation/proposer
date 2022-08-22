@@ -19,7 +19,7 @@ export type RfpMetadata = {
     body: string
   }
   signature: string // string signature for now, although I see this more complex type below
-  publishSignature: Signature
+  signatureMessage: any
   // prefill all proposals to this RFP with this configuration
   proposalPrefill: {
     body: string // template body for customized inclusion + addition of questions
@@ -29,12 +29,7 @@ export type RfpMetadata = {
     submit: Token
   }
   funding: {
-    token: {
-      chainId: number
-      address: string
-      symbol: string
-      decimals: number
-    }
+    token: Token
     budgetAmount: string
   }
 }

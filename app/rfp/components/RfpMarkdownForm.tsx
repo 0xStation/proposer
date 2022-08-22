@@ -353,9 +353,9 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 fundingToken: {
                   chainId: checkbook.chainId,
                   address: selectedToken.address,
-                  type: selectedToken.type,
-                  symbol: selectedToken.symbol,
-                  decimals: selectedToken.decimals,
+                  type: selectedToken?.type,
+                  symbol: selectedToken?.symbol,
+                  decimals: selectedToken?.decimals,
                 },
                 submittingPermission: tokenTags.find(
                   (tag) => tag.data.address === values.submittingPermissionTokenAddress
@@ -368,6 +368,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 contentTitle: values.title,
                 signature,
                 signatureMessage: message,
+                proposalPrefillBody: rfp?.data.proposalPrefill.body || "",
               })
             } catch (err) {
               console.error(err)
@@ -398,9 +399,9 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 fundingToken: {
                   chainId: checkbook.chainId,
                   address: selectedToken.address,
-                  type: selectedToken.type,
-                  symbol: selectedToken.symbol,
-                  decimals: selectedToken.decimals,
+                  type: selectedToken?.type,
+                  symbol: selectedToken?.symbol,
+                  decimals: selectedToken?.decimals,
                 },
                 submittingPermission: tokenTags.find(
                   (tag) => tag.data.address === values.submittingPermissionTokenAddress

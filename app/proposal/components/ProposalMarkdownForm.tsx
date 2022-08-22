@@ -147,7 +147,7 @@ export const ProposalMarkdownForm = ({
               amount: proposal?.data?.funding?.amount,
             }
           : {
-              markdown: rfp?.data?.proposalPrefill,
+              markdown: rfp?.data?.proposalPrefill.body,
             }
       }
       onSubmit={async (values: {
