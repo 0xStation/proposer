@@ -275,39 +275,38 @@ const ProposalComponent = ({
           <div className="basis-[38rem] ml-6 mb-2">
             <h2 className="text-xl mt-2 mb-3">{proposal?.data?.content?.title}</h2>
           </div>
-            {/* if there are no checks, it means the value of this prop is not pending, and can be overallocated */}
-            {insufficientFunds && (
-              <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[100%] left-0 group hidden group-hover:block shadow-lg z-50">
-                Insufficient funds.{" "}
-                {isAdmin && (
-                  <span
-                    className="text-electric-violet cursor-pointer"
-                    onClick={(e) => {
-                      // overriding the parent click handler
-                      e.preventDefault()
-                      router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
-                    }}
-                  >
-                    Go to checkbook to refill.
-                  </span>
-                )}
-              </span>
-            )}
-          </div>
-          <div className="basis-32 ml-2 mb-2 self-center">
-            {formatDate(proposal.createdAt) || "N/A"}
-          </div>
-          <div className="basis-32 ml-6 mr-6 mb-2 self-center">
-            {/* TODO: create a flag to indicate the main author when creating an account proposal */}
-            <img
-              src={proposal?.collaborators[0]?.account?.data?.pfpURL || DEFAULT_PFP_URLS.USER}
-              alt="PFP"
-              className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
-              onError={(e) => {
-                e.currentTarget.src = DEFAULT_PFP_URLS.USER
-              }}
-            />
-          </div>
+          {/* if there are no checks, it means the value of this prop is not pending, and can be overallocated */}
+          {insufficientFunds && (
+            <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[100%] left-0 group hidden group-hover:block shadow-lg z-50">
+              Insufficient funds.{" "}
+              {isAdmin && (
+                <span
+                  className="text-electric-violet cursor-pointer"
+                  onClick={(e) => {
+                    // overriding the parent click handler
+                    e.preventDefault()
+                    router.push(Routes.CheckbookSettingsPage({ terminalHandle }))
+                  }}
+                >
+                  Go to checkbook to refill.
+                </span>
+              )}
+            </span>
+          )}
+        </div>
+        <div className="basis-32 ml-2 mb-2 self-center">
+          {formatDate(proposal.createdAt) || "N/A"}
+        </div>
+        <div className="basis-32 ml-6 mr-6 mb-2 self-center">
+          {/* TODO: create a flag to indicate the main author when creating an account proposal */}
+          <img
+            src={proposal?.collaborators[0]?.account?.data?.pfpURL || DEFAULT_PFP_URLS.USER}
+            alt="PFP"
+            className="min-w-[46px] max-w-[46px] h-[46px] rounded-full cursor-pointer border border-wet-concrete"
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_PFP_URLS.USER
+            }}
+          />
         </div>
       </div>
     </Link>
