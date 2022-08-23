@@ -328,21 +328,23 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
                 ) : null}
                 {isEdit && (
                   <Button
-                    label="Skip"
                     type={ButtonType.Secondary}
                     onClick={() => {
                       router.push(Routes.BulletinPage({ terminalHandle }))
                     }}
                     className="mr-2"
-                  />
+                  >
+                    Skip
+                  </Button>
                 )}
                 <Button
                   className="mb-8"
-                  label="Create"
                   isLoading={waitingCreation}
                   isDisabled={formButtonDisabled || waitingCreation}
                   isSubmitType={true}
-                />
+                >
+                  Create
+                </Button>
               </div>
             </div>
           </form>

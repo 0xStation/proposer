@@ -13,10 +13,6 @@ const classNames = (...classes) => {
 
 interface ButtonProps {
   /**
-   * Button contents
-   */
-  label: string
-  /**
    * Is this the principal call to action on the page?
    */
   type?: ButtonType
@@ -41,6 +37,10 @@ interface ButtonProps {
    * Optional click handler
    */
   onClick?: () => void
+  /**
+   * Button contents
+   */
+  children: string
 }
 
 /**
@@ -48,11 +48,11 @@ interface ButtonProps {
  */
 const Button = ({
   type = ButtonType.Primary,
-  label,
   isSubmitType = false,
   isDisabled = false,
   isLoading = false,
   className,
+  children,
   ...props
 }: ButtonProps) => {
   return (
@@ -68,7 +68,7 @@ const Button = ({
           "text-electric-violet border-electric-violet bg-tunnel-black hover:bg-wet-concrete",
         type === ButtonType.Unemphesized &&
           "text-marble-white border-marble-white bg-tunnel-black hover:bg-wet-concrete",
-        label.length <= 5 || isLoading ? "w-[98px]" : "px-6"
+        children.length <= 5 || isLoading ? "w-[98px]" : "px-6"
       )}
       {...props}
     >
@@ -85,7 +85,7 @@ const Button = ({
           />
         </div>
       ) : (
-        label
+        { children }
       )}
     </button>
   )

@@ -52,7 +52,6 @@ const ExploreStations: BlitzPage = () => {
           </div>
           <div className="relative self-start group">
             <Button
-              label="Open a station"
               onClick={() => {
                 trackClick(NEW_STATION.EVENT_NAME.SHOW_CREATE_STATION_PAGE_CLICKED, {
                   pageName: PAGE_NAME.EXPLORE,
@@ -61,7 +60,9 @@ const ExploreStations: BlitzPage = () => {
                 router.push(Routes.CreateTerminalDetailsPage())
               }}
               isDisabled={!canCreateStation(activeUser?.address)}
-            />
+            >
+              Open a station
+            </Button>
             {!canCreateStation(activeUser?.address) && (
               <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
                 Early Access users only.{" "}

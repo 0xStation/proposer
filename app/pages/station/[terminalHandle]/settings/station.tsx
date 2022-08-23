@@ -194,10 +194,11 @@ const TerminalSettingsPage: BlitzPage = () => {
                       <div className="p-6 border-b border-concrete flex justify-between">
                         <h2 className="text-marble-white text-2xl font-bold">Station overview</h2>
                         <Button
-                          label="Save"
                           isSubmitType={true}
                           isDisabled={formState.hasValidationErrors || !formState.dirty}
-                        />
+                        >
+                          Save
+                        </Button>
                       </div>
                       <div className="p-6">
                         <div className="grid grid-cols-3 gap-4">

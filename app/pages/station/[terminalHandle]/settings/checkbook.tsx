@@ -167,7 +167,6 @@ const CheckbookSettingsPage: BlitzPage = () => {
               </h5>
             </div>
             <Button
-              label="Create"
               onClick={() => {
                 trackClick(CHECKBOOK.EVENT_NAME.CHECKBOOK_SHOW_CREATE_PAGE_CLICKED, {
                   pageName: PAGE_NAME.CHECKBOOK_SETTINGS_PAGE,
@@ -178,7 +177,9 @@ const CheckbookSettingsPage: BlitzPage = () => {
                 })
                 router.push(Routes.NewCheckbookSettingsPage({ terminalHandle }))
               }}
-            />
+            >
+              Create
+            </Button>
           </div>
           {checkbooks.length === 0 ? (
             <div className="w-full h-full flex items-center flex-col mt-20 sm:justify-center sm:mt-0">
@@ -321,10 +322,11 @@ const CheckbookSettingsPage: BlitzPage = () => {
                         <CheckbookIndicator checkbook={selectedCheckbook} terminal={terminal} />
                         <div className="mt-2">
                           <Button
-                            label="Add funds"
                             type={ButtonType.Secondary}
                             onClick={() => setShowAddFundsModal(true)}
-                          />
+                          >
+                            Add funds
+                          </Button>
                         </div>
                       </div>
                     </div>

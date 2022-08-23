@@ -10,22 +10,22 @@ export default {
 } as ComponentMeta<typeof Button>
 
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
-const Template: ComponentStory<typeof Button> = (args) => <Button {...args} />
+const Template: ComponentStory<typeof Button> = (args) => <Button {...args}>{args.children}</Button>
 export const Primary = Template.bind({})
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
 Primary.args = {
   type: ButtonType.Primary,
-  label: "Button",
+  children: "Button",
 }
 
 export const Secondary = Template.bind({})
 Secondary.args = {
   type: ButtonType.Secondary,
-  label: "Short",
+  children: "Short",
 }
 
 export const Unemphesized = Template.bind({})
 Unemphesized.args = {
   type: ButtonType.Unemphesized,
-  label: "Blank",
+  children: "Blank",
 }

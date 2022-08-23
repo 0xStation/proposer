@@ -191,7 +191,9 @@ const DiscordImportPage: BlitzPage = () => {
                       })}
                   </div>
                   <div className="mt-12">
-                    <Button isSubmitType={true} label="Done" isDisabled={!formState.dirty} />
+                    <Button isSubmitType={true} isDisabled={!formState.dirty}>
+                      Done
+                    </Button>
                   </div>
                 </div>
               </form>

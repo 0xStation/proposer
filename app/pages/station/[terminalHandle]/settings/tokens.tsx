@@ -112,10 +112,9 @@ const TokenSettingsPage: BlitzPage = () => {
             <p className="mt-2 text-marble-white text-base w-[400px] text-center">
               Import ERC-20s to fund proposals in tokens of your choice.
             </p>
-            <Button
-              label="Import"
-              onClick={() => router.push(Routes.NewTokenSettingsPage({ terminalHandle }))}
-            />
+            <Button onClick={() => router.push(Routes.NewTokenSettingsPage({ terminalHandle }))}>
+              Import
+            </Button>
           </div>
         ) : (
           <div className="flex flex-col">
@@ -126,10 +125,9 @@ const TokenSettingsPage: BlitzPage = () => {
                   Import tokens that represent your community&apos;s membership and ownership.
                 </h5>
               </div>
-              <Button
-                label="Import"
-                onClick={() => router.push(Routes.NewTokenSettingsPage({ terminalHandle }))}
-              />
+              <Button onClick={() => router.push(Routes.NewTokenSettingsPage({ terminalHandle }))}>
+                Import
+              </Button>
             </div>
             <div className="grid grid-cols-7 h-[calc(100vh-115px)] w-full box-border">
               <div className="overflow-y-auto col-span-4">

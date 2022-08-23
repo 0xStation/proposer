@@ -275,7 +275,6 @@ const RfpHeaderNavigation = ({ rfp }: { rfp: Rfp }) => {
           </div>
           {rfpOpen && canSubmit ? (
             <Button
-              label="Create proposal"
               onClick={() => {
                 trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_SHOW_EDITOR_CLICKED, {
                   pageName: PAGE_NAME.RFP_INFO_PAGE,
@@ -285,7 +284,9 @@ const RfpHeaderNavigation = ({ rfp }: { rfp: Rfp }) => {
                 })
                 router.push(Routes.CreateProposalPage({ terminalHandle, rfpId: rfp.id }))
               }}
-            />
+            >
+              Create proposal
+            </Button>
           ) : (
             <div className="relative group self-start">
               <button className="bg-electric-violet text-tunnel-black rounded self-start px-6 h-[35px] leading-[35px] bg-opacity-70 whitespace-nowrap">

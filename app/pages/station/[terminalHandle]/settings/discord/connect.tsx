@@ -143,10 +143,11 @@ const DiscordConnectPage: BlitzPage = () => {
                   <div>
                     <Button
                       className="w-full"
-                      label="Connect Station bot"
                       onClick={() => onBotOpen()}
                       type={ButtonType.Unemphesized}
-                    />
+                    >
+                      Connect Station bot
+                    </Button>
                   </div>
                 ) : (
                   <div>
@@ -160,7 +161,9 @@ const DiscordConnectPage: BlitzPage = () => {
                 )}
 
                 <div className="mt-12">
-                  <Button label="Next" isSubmitType={true} isDisabled={!formState.dirty} />
+                  <Button isSubmitType={true} isDisabled={!formState.dirty}>
+                    Next
+                  </Button>
                 </div>
               </div>
             </form>

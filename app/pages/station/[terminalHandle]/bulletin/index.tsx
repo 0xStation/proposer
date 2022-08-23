@@ -169,7 +169,6 @@ const BulletinPage: BlitzPage = () => {
             <h1 className="text-2xl font-bold">Projects</h1>
             {isLoggedInAndIsAdmin && (
               <Button
-                label="Create project"
                 onClick={() => {
                   trackClick(RFP.EVENT_NAME.RFP_SHOW_EDITOR_CLICKED, {
                     pageName: PAGE_NAME.RFP_LIST_PAGE,
@@ -181,7 +180,9 @@ const BulletinPage: BlitzPage = () => {
                   })
                   router.push(Routes.CreateRFPPage({ terminalHandle }))
                 }}
-              />
+              >
+                Create project
+              </Button>
             )}
           </div>
           <div className="flex flex-col sm:flex-row justify-between items-center">
@@ -251,7 +252,6 @@ const BulletinPage: BlitzPage = () => {
                   .
                 </p>
                 <Button
-                  label={"Create project"}
                   onClick={() => {
                     trackClick(RFP.EVENT_NAME.RFP_SHOW_EDITOR_CLICKED, {
                       pageName: PAGE_NAME.RFP_LIST_PAGE,
@@ -263,7 +263,9 @@ const BulletinPage: BlitzPage = () => {
                     })
                     router.push(Routes.CreateRFPPage({ terminalHandle }))
                   }}
-                />
+                >
+                  Create project
+                </Button>
               </div>
             ) : rfps?.length === 0 ? (
               <RfpNotFound />
@@ -358,7 +360,6 @@ const RFPComponent = ({ rfp, terminalHandle, activeAddress }) => {
             {rfpOpen ? (
               canSubmit ? (
                 <Button
-                  label="Propose"
                   type={ButtonType.Secondary}
                   onClick={() => {
                     window.open(
@@ -366,10 +367,14 @@ const RFPComponent = ({ rfp, terminalHandle, activeAddress }) => {
                       "_blank"
                     )
                   }}
-                />
+                >
+                  Propose
+                </Button>
               ) : (
                 <>
-                  <Button label="Propose" type={ButtonType.Secondary} isDisabled={true} />
+                  <Button type={ButtonType.Secondary} isDisabled={true}>
+                    Propose
+                  </Button>
                   <span className="hidden group-hover:block absolute top-[110%] right-0 bg-wet-concrete text-xs p-2 rounded border border-tunnel-black z-50">
                     You must hold ${rfp?.data?.permissions?.submit?.symbol} to propose.
                   </span>
@@ -377,7 +382,9 @@ const RFPComponent = ({ rfp, terminalHandle, activeAddress }) => {
               )
             ) : (
               <>
-                <Button label="Propose" type={ButtonType.Secondary} isDisabled={true} />
+                <Button type={ButtonType.Secondary} isDisabled={true}>
+                  Propose
+                </Button>
                 <span className="hidden group-hover:block absolute top-[110%] right-0 bg-wet-concrete text-xs p-2 rounded border border-tunnel-black">
                   You will be able to create a proposal for this RFP when it opens for submissions.
                 </span>

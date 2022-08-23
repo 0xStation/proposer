@@ -146,7 +146,7 @@ const DiscordSettingsPage: BlitzPage = () => {
                   <p className="mt-2 text-marble-white text-base w-[400px] text-center mb-4">
                     Connect with Discord to import roles and members.
                   </p>
-                  <Button label="Connect" onClick={() => onOpen()} />
+                  <Button onClick={() => onOpen()}>Connect</Button>
                 </div>
               )}
             </>
@@ -205,7 +205,9 @@ const DiscordSettingsPage: BlitzPage = () => {
                   <div className="flex flex-col">
                     <div className="p-6 border-b border-concrete flex justify-between">
                       <h2 className="text-marble-white text-2xl font-bold">Discord</h2>
-                      <Button label="Submit" isSubmitType={true} isDisabled={formState.dirty} />
+                      <Button isSubmitType={true} isDisabled={formState.dirty}>
+                        Submit
+                      </Button>
                     </div>
                     <div className="p-6">
                       <div className="grid grid-cols-3 gap-4">

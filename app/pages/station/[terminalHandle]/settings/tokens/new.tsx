@@ -185,12 +185,9 @@ const NewTokenSettingsPage: BlitzPage = () => {
                       className="bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
                     />
                     <div className="mt-12">
-                      <Button
-                        label="Import"
-                        isDisabled={!formState.dirty}
-                        isSubmitType={true}
-                        isLoading={loading}
-                      />
+                      <Button isDisabled={!formState.dirty} isSubmitType={true} isLoading={loading}>
+                        Import
+                      </Button>
                     </div>
                   </div>
                 </form>
