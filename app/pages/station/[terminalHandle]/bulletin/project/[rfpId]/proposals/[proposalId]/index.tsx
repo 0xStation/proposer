@@ -51,7 +51,7 @@ import DeleteProposalModal from "app/proposal/components/DeleteProposalModal"
 import { ProposalStatus } from "app/proposal/types"
 import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
 import SelectCheckbookModal from "app/checkbook/components/SelectCheckbookModal"
-import { FundingSenderType } from "app/types"
+import { AddressType } from "app/types"
 
 const {
   PAGE_NAME,

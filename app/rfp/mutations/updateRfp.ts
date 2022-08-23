@@ -2,7 +2,7 @@ import db from "db"
 import * as z from "zod"
 import { Token, TokenTag } from "types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
-import { FundingSenderType } from "app/types"
+import { AddressType } from "app/types"
 
 // going to be calling this from edit RFP page, so we will still be passing in all of these data
 // just bc they might not be changed does not mean we will be omitting them, because the form
@@ -40,7 +40,7 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
             senderAddress: input.fundingAddress
               ? toChecksumAddress(input.fundingAddress)
               : undefined,
-            senderType: input.fundingAddress ? FundingSenderType.CHECKBOOK : undefined,
+            senderType: input.fundingAddress ? AddressType.CHECKBOOK : undefined,
             token: {
               ...input.fundingToken,
               address: toChecksumAddress(input.fundingToken.address),

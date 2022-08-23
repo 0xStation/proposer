@@ -1,6 +1,6 @@
 import * as z from "zod"
 import db, { ProposalStatus } from "db"
-import { FundingSenderType } from "app/types"
+import { AddressType } from "app/types"
 import { ProposalMetadata } from "../types"
 
 const ApproveProposal = z.object({
@@ -56,10 +56,7 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
     }
 
     const metadata = proposal.data as unknown as ProposalMetadata
-    if (
-      metadata.funding.senderType !== FundingSenderType.CHECKBOOK ||
-      !metadata.funding.senderAddress
-    ) {
+    if (metadata.funding.senderType !== AddressType.CHECKBOOK || !metadata.funding.senderAddress) {
       return
     }
 

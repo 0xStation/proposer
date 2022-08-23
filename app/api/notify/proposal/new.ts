@@ -7,7 +7,7 @@ import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
 import { getEmails } from "app/utils/privy"
-import { FundingSenderType } from "app/types"
+import { AddressType } from "app/types"
 
 const EmailRequest = z.object({
   proposalId: z.string(),
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
       addresses.push(data.proposal.rfp.authorAddress)
     }
     // add addresses of checkbook signers if an rfp has an associated checkbook
-    if (data.proposal.rfp.data.funding?.senderType === FundingSenderType.CHECKBOOK) {
+    if (data.proposal.rfp.data.funding?.senderType === AddressType.CHECKBOOK) {
       const fundingData = data.proposal.rfp.data.funding
       const checkbook = await db.checkbook.findFirst({
         where: {

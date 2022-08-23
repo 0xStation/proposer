@@ -17,7 +17,7 @@ export enum Role {
   VISITOR = "VISITOR",
 }
 
-export enum FundingSenderType {
+export enum AddressType {
   CHECKBOOK = "CHECKBOOK",
   SAFE = "SAFE",
   WALLET = "WALLET",

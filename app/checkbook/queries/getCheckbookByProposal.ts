@@ -1,5 +1,5 @@
 import { ProposalMetadata } from "app/proposal/types"
-import { FundingSenderType } from "app/types"
+import { AddressType } from "app/types"
 import db from "db"
 import * as z from "zod"
 import { Checkbook } from "../types"
@@ -25,7 +25,7 @@ export default async function getCheckbookByProposal(
 
   const fundingMetadata = (proposal.data as unknown as ProposalMetadata).funding
 
-  if (fundingMetadata.senderType !== FundingSenderType.CHECKBOOK) {
+  if (fundingMetadata.senderType !== AddressType.CHECKBOOK) {
     return null
   }
 

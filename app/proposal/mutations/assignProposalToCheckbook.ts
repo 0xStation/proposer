@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { FundingSenderType } from "app/types"
+import { AddressType } from "app/types"
 import { ProposalMetadata } from "../types"
 
 const AssignCheckbookToProposal = z.object({
@@ -47,7 +47,7 @@ export default async function assignCheckbookToProposal(
       ...oldMetadata,
       funding: {
         ...oldMetadata.funding,
-        senderType: FundingSenderType.CHECKBOOK,
+        senderType: AddressType.CHECKBOOK,
         senderAddress: params.checkbookAddress,
       },
     }

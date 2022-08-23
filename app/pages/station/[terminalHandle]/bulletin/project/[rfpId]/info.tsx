@@ -26,7 +26,7 @@ import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 import getRfpApprovedProposalFunding from "app/rfp/queries/getRfpApprovedFunding"
 import { ZERO_ADDRESS, TRACKING_EVENTS } from "app/core/utils/constants"
 import getCheckbook from "app/checkbook/queries/getCheckbook"
-import { FundingSenderType } from "app/types"
+import { AddressType } from "app/types"
 
 const {
   PAGE_NAME,
@@ -105,7 +105,7 @@ const RFPInfoTab: BlitzPage = () => {
       enabled:
         !!rfp &&
         !!rfp?.data.funding.token.chainId &&
-        rfp.data.funding?.senderType === FundingSenderType.CHECKBOOK &&
+        rfp.data.funding?.senderType === AddressType.CHECKBOOK &&
         !!rfp?.data.funding.senderAddress,
     }
   )

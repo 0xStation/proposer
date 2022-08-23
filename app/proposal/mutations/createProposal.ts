@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { FundingSenderType } from "app/types"
+import { AddressType } from "app/types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 const CreateProposal = z.object({
@@ -17,9 +17,7 @@ const CreateProposal = z.object({
   signature: z.string(),
   signatureMessage: z.any(),
   senderAddress: z.string().optional(),
-  senderType: z
-    .enum([FundingSenderType.CHECKBOOK, FundingSenderType.SAFE, FundingSenderType.WALLET])
-    .optional(),
+  senderType: z.enum([AddressType.CHECKBOOK, AddressType.SAFE, AddressType.WALLET]).optional(),
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {

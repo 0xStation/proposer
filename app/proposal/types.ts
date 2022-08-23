@@ -3,7 +3,7 @@ import { Account } from "app/account/types"
 import { ProposalApproval } from "app/proposalApproval/types"
 import { Check } from "@prisma/client"
 import { Rfp } from "app/rfp/types"
-import { FundingSenderType } from "app/types"
+import { AddressType } from "app/types"
 
 export enum ProposalStatus {
   DRAFT = "DRAFT",
@@ -20,7 +20,7 @@ export type ProposalMetadata = {
   }
   funding: {
     senderAddress?: string
-    senderType?: FundingSenderType
+    senderType?: AddressType
     chainId: number
     recipientAddress: string
     token: string

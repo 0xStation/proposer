@@ -41,7 +41,7 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
 import getGroupedTagsByTerminalId from "app/tag/queries/getGroupedTagsByTerminalId"
 import { Tag } from "app/tag/types"
-import { FundingSenderType } from "app/types"
+import { AddressType } from "app/types"
 
 const {
   PAGE_NAME,
@@ -241,7 +241,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                   ? getFormattedDate({ dateTime: DateTime.fromJSDate(rfp?.endDate as Date) })
                   : undefined,
                 checkbookAddress:
-                  rfp?.data.funding.senderType === FundingSenderType.CHECKBOOK
+                  rfp?.data.funding.senderType === AddressType.CHECKBOOK
                     ? rfp?.data.funding.senderAddress
                     : undefined,
                 fundingTokenSymbol: rfp?.data?.funding?.token?.symbol,

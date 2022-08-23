@@ -1,6 +1,6 @@
 import { ProposalMetadata } from "app/proposal/types"
 import { RfpMetadata } from "app/rfp/types"
-import { FundingSenderType } from "app/types"
+import { AddressType } from "app/types"
 import db from "../../index"
 import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
@@ -19,7 +19,7 @@ import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 //       ...oldMetadata,
 //       funding: {
 //         ...oldMetadata.funding,
-//         senderType: FundingSenderType.CHECKBOOK,
+//         senderType: AddressType.CHECKBOOK,
 //         senderAddress: rfp.fundingAddress,
 //       },
 //     }
@@ -48,7 +48,7 @@ import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 //       ...oldMetadata,
 //       funding: {
 //         ...oldMetadata.funding,
-//         senderType: FundingSenderType.CHECKBOOK,
+//         senderType: AddressType.CHECKBOOK,
 //         senderAddress: proposal.rfp.checkbook.address,
 //         chainId: proposal.rfp.checkbook.chainId,
 //       },
