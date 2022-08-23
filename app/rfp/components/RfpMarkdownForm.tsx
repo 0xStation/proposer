@@ -280,27 +280,10 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
             })
             return
           }
-          if (!values.checkbookAddress) {
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: "Please select a Checkbook first.",
-            })
-            return
-          }
 
           const checkbook = checkbooks?.find((checkbook) =>
             addressesAreEqual(checkbook.address, values.checkbookAddress)
           )
-
-          if (!checkbook) {
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: "Could not find selected Checkbook.",
-            })
-            return
-          }
 
           if (selectedToken.symbol !== ETH && selectedToken.symbol !== USDC) {
             if (tokenFetchSuccess) {
@@ -326,13 +309,16 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
 
           const parsedBudgetAmount = parseUnits(values.budgetAmount, selectedToken.decimals)
 
+          const chainId = checkbook ? checkbook.chainId : selectedNetworkId
+
           const message = genRfpSignatureMessage(
             {
               ...values,
               fundingTokenAddress: selectedToken.address,
               budgetAmount: parsedBudgetAmount,
             },
-            activeUser?.address
+            activeUser?.address,
+            chainId
           )
           const signature = await signMessage(message)
 
@@ -350,7 +336,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 endDate: DateTime.fromISO(values.endDate).toUTC().toJSDate(),
                 fundingAddress: values.checkbookAddress,
                 fundingToken: {
-                  chainId: checkbook.chainId,
+                  chainId,
                   address: selectedToken.address,
 
                   symbol: selectedToken.symbol,
@@ -395,7 +381,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 authorAddress: activeUser?.address,
                 fundingAddress: values.checkbookAddress,
                 fundingToken: {
-                  chainId: checkbook.chainId,
+                  chainId,
                   address: selectedToken.address,
                   symbol: selectedToken.symbol,
                   decimals: selectedToken.decimals,
@@ -824,7 +810,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                           </Field>
                         </div>
                         <div className="flex flex-col mt-6">
-                          <label className="font-bold block">Checkbook*</label>
+                          <label className="font-bold block">Checkbook</label>
                           <span className="text-xs text-concrete block">
                             Deposit funds here to create checks for proposers to claim once their
                             proposals have been approved.{" "}
