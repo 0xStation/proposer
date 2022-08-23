@@ -14,7 +14,6 @@ import {
   getStablecoinMetadataBySymbol,
   RFP_STATUS_DISPLAY_MAP,
   SUPPORTED_CHAINS,
-  ZERO_ADDRESS,
 } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
 import UploadImageButton from "app/core/components/UploadImageButton"
@@ -24,12 +23,7 @@ import { Checkbook } from "app/checkbook/types"
 import { Rfp } from "../types"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import ConfirmationRfpModal from "./ConfirmationRfpModal"
-import {
-  composeValidators,
-  isPositiveAmount,
-  requiredField,
-  isAfterStartDate,
-} from "app/utils/validators"
+import { composeValidators, isPositiveAmount, requiredField } from "app/utils/validators"
 import { genRfpSignatureMessage } from "app/signatures/rfp"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
@@ -41,6 +35,8 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
 import getGroupedTagsByTerminalId from "app/tag/queries/getGroupedTagsByTerminalId"
 import { Tag } from "app/tag/types"
+import Button from "app/core/components/sds/buttons/Button"
+import { ButtonType } from "app/core/components/sds/buttons/Button"
 
 const {
   PAGE_NAME,
@@ -467,16 +463,15 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                         <span>Markdown shortcuts</span>
                       </button>
                       <UploadImageButton />
-                      <button
-                        type="button"
+                      <Button
+                        type={ButtonType.Secondary}
                         className="border border-electric-violet text-electric-violet px-6 py-1 rounded block hover:bg-wet-concrete"
                         onClick={() => setPreviewMode(!previewMode)}
                       >
-                        <span>{previewMode ? "Back to editing" : "Preview"}</span>
-                      </button>
+                        {previewMode ? "Back to editing" : "Preview"}
+                      </Button>
 
-                      <button
-                        type="button"
+                      <Button
                         onClick={() => {
                           trackClick(RFP.EVENT_NAME.RFP_EDITOR_PUBLISH_CLICKED, {
                             pageName: PAGE_NAME.RFP_EDITOR_PAGE,
@@ -529,10 +524,9 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                           }
                           setConfirmationModalOpen(true)
                         }}
-                        className="bg-electric-violet text-tunnel-black px-6 py-1 rounded block hover:bg-opacity-70"
                       >
                         Publish
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>
