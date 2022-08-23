@@ -110,7 +110,7 @@ const ProposalPage: BlitzPage = ({
     rfp.checkbook?.chainId as number,
     rfp.checkbook?.address as string,
     rfp.checkbook?.quorum as number,
-    proposal.data?.funding.token
+    proposal.data?.funding.token.address
   )
   const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
 
@@ -227,7 +227,7 @@ const ProposalPage: BlitzPage = ({
           setIsOpen={setCashCheckModalOpen}
           waitingCreation={waitingCreation}
           setWaitingCreation={setWaitingCreation}
-          tokenSymbol={proposal?.data.funding.symbol || "ETH"} // don't like this as a fallback but currently symbol is not required
+          tokenSymbol={proposal?.data.funding.token.symbol || "ETH"} // don't like this as a fallback but currently symbol is not required
           setTxnHash={setCheckTxnHash}
           check={check}
         />
@@ -508,7 +508,7 @@ const ProposalPage: BlitzPage = ({
                     )}
                   </span>
                   <h4 className="text-xs font-bold text-concrete uppercase mt-6">Token</h4>
-                  <p className="mt-2 font-normal">{proposal?.data.funding.symbol}</p>
+                  <p className="mt-2 font-normal">{proposal?.data.funding.token.symbol}</p>
                   <h4 className="text-xs font-bold text-concrete uppercase mt-6">
                     Amount Requested
                   </h4>

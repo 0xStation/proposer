@@ -250,7 +250,7 @@ const ProposalComponent = ({
     rfp.checkbook?.chainId as number,
     rfp.checkbook?.address as string,
     rfp.checkbook?.quorum as number,
-    proposal.data?.funding.token
+    proposal.data?.funding.token.address
   )
   const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
 
@@ -292,7 +292,7 @@ const ProposalComponent = ({
             </div>
           </div>
           <div className="basis-32 ml-6 mb-2 self-center relative group">
-            {proposal.data?.funding?.amount || "N/A"} {proposal.data?.funding?.symbol}
+            {proposal.data?.funding?.amount || "N/A"} {proposal.data?.funding?.token?.symbol}
             {/* if there are no checks, it means the value of this prop is not pending, and can be overallocated */}
             {insufficientFunds && (
               <span className="bg-wet-concrete border border-[#262626] text-marble-white text-xs p-2 rounded absolute top-[100%] left-0 group hidden group-hover:block shadow-lg z-50">

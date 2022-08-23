@@ -1,6 +1,7 @@
 import db from "db"
 import * as z from "zod"
 import { TokenType } from "app/types/token"
+import { TagType } from "../types"
 
 const CreateTokenTag = z.object({
   terminalId: z.number(),
@@ -19,12 +20,13 @@ export default async function createTokenTag(input: z.infer<typeof CreateTokenTa
       terminalId: params.terminalId,
       value: params.type === TokenType.ERC20 ? `$${params.symbol}` : params.name,
       active: true,
-      type: "token",
+      type: TagType.TOKEN,
       data: {
-        address: params.address,
-        symbol: params.symbol,
-        type: params.type,
         chainId: params.chainId,
+        address: params.address,
+        type: params.type,
+        name: params.name,
+        symbol: params.symbol,
       },
     },
   })

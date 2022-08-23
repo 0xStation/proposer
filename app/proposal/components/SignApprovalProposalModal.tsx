@@ -10,7 +10,7 @@ import getChecksByProposalId from "../../check/queries/getChecksByProposalId"
 import { truncateString } from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 import { InformationCircleIcon } from "@heroicons/react/solid"
-import { DOCS } from "app/core/utils/constants"
+import { LINKS } from "app/core/utils/constants"
 
 export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, checks }) => {
   const router = useRouter()
@@ -27,8 +27,10 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
   let { signMessage } = useSignature()
 
   const { data: tokenData } = useToken({
-    ...(!!proposal?.data.funding.token &&
-      proposal?.data.funding.token !== ZERO_ADDRESS && { address: proposal?.data.funding.token }),
+    ...(!!proposal?.data.funding.token.address &&
+      proposal?.data.funding.token.address !== ZERO_ADDRESS && {
+        address: proposal?.data.funding.token.address,
+      }),
   })
 
   const { chain: activeChain } = useNetwork()
@@ -53,7 +55,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
         fundingAddress: rfp.checkbook.address,
         chainId: rfp.checkbook.chainId,
         recipientAddress: proposal?.data.funding.recipientAddress,
-        tokenAddress: proposal?.data.funding.token,
+        tokenAddress: proposal?.data.funding.token.address,
         tokenAmount: proposal?.data.funding.amount, // store as decimal value instead of BigNumber
       })
       invalidateQuery(getChecksByProposalId)
@@ -132,7 +134,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
             </div>
             <div className="flex justify-between mt-4">
               <span className="font-bold">Token</span>
-              <span>{truncateString(proposal?.data.funding.token)}</span>
+              <span>{truncateString(proposal?.data.funding.token.address)}</span>
             </div>
             <div className="flex justify-between mt-4">
               <div className="flex flex-row space-x-2 items-center">
@@ -141,7 +143,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
                   <InformationCircleIcon className="h-4 w-4" />
                   <span className="p-2 bg-wet-concrete rounded hidden group-hover:block absolute top-[100%] w-[150px] text-xs">
                     The date the check expires.{" "}
-                    <a href={DOCS.CHECKBOOK} className="text-electric-violet">
+                    <a href={LINKS.CHECKBOOK} className="text-electric-violet">
                       Learn more.
                     </a>
                   </span>

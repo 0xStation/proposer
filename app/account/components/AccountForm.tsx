@@ -20,7 +20,7 @@ import {
   isValidEmail,
 } from "app/utils/validators"
 import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
-import { DOCS } from "app/core/utils/constants"
+import { LINKS } from "app/core/utils/constants"
 
 interface ApplicationParams {
   name: string
@@ -255,7 +255,7 @@ const AccountForm = ({
               <p className="text-concrete text-sm">
                 Only reviewers of your proposal can contact you via email. Your email won&apos;t be
                 displayed or shared with anyone.
-                <a href={DOCS.GETTING_STARTED}>
+                <a href={LINKS.GETTING_STARTED}>
                   <span className="text-electric-violet font-bold"> Learn more</span>
                 </a>
               </p>

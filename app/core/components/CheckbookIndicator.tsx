@@ -4,7 +4,7 @@ import LinearProgressIndicator from "./LinearProgressIndicator"
 import { formatUnits } from "@ethersproject/units"
 import { InformationCircleIcon } from "@heroicons/react/solid"
 import getFundingTokens from "app/core/utils/getFundingTokens"
-import { DOCS } from "app/core/utils/constants"
+import { LINKS } from "app/core/utils/constants"
 
 // A component that shows a dropdown of the tokens in a given checkbook
 // and indicators for the levels of those tokens that are used / pending / available
@@ -56,7 +56,7 @@ const CheckbookIndicator = ({ terminal, checkbook }) => {
         <InformationCircleIcon className="h-4 w-4 ml-1 fill-light-concrete" />
         <div className="hidden group-hover:block absolute top-[100%] bg-wet-concrete p-2 rounded text-xs w-1/2">
           Token amount available{" "}
-          <a className="text-electric-violet" href={DOCS.CHECKBOOK}>
+          <a className="text-electric-violet" href={LINKS.CHECKBOOK}>
             Learn more
           </a>
         </div>

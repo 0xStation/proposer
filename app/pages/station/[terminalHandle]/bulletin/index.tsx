@@ -32,7 +32,7 @@ import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import { AddFundsModal } from "../../../../core/components/AddFundsModal"
 import { DateTime } from "luxon"
 import { useUserCanSubmitToRfp, useUserCanViewRfp } from "app/core/utils/permissions"
-import { DOCS } from "app/core/utils/constants"
+import { LINKS } from "app/core/utils/constants"
 
 const {
   FEATURE: { RFP },
@@ -242,7 +242,7 @@ const BulletinPage: BlitzPage = () => {
                 </p>
                 <p>
                   Check out some{" "}
-                  <a href={DOCS.RFP_EXAMPLES} className="text-electric-violet">
+                  <a href={LINKS.RFP_EXAMPLES} className="text-electric-violet">
                     examples
                   </a>
                   .

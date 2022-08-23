@@ -16,7 +16,7 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import CheckbookForm from "app/checkbook/components/CheckbookForm"
 import CheckAnimation from "public/check_animation.gif"
-import { DOCS } from "app/core/utils/constants"
+import { LINKS } from "app/core/utils/constants"
 
 const {
   PAGE_NAME,
@@ -99,7 +99,7 @@ const NewCheckbookTerminalCreationPage: BlitzPage = ({
           <p className="mt-2">
             Checkbook allows you to create checks for proposers to cash after their proposals have
             been approved.{" "}
-            <a className="text-electric-violet" href={DOCS.CHECKBOOK}>
+            <a className="text-electric-violet" href={LINKS.CHECKBOOK}>
               Learn more
             </a>
           </p>

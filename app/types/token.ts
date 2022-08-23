@@ -19,7 +19,7 @@ export type Token = {
 export const ZodToken = z.object({
   chainId: z.number(),
   address: z.string(),
-  type: z.enum([TokenType.COIN, TokenType.ERC20, TokenType.ERC721, TokenType.ERC1155]),
+  type: z.enum([TokenType.COIN, TokenType.ERC20, TokenType.ERC721, TokenType.ERC1155]).optional(),
   name: z.string().optional(),
   symbol: z.string().optional(),
   decimals: z.number().optional(),

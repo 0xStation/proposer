@@ -11,7 +11,7 @@ import logout from "app/session/mutations/logout"
 import { DEFAULT_PFP_URLS } from "../utils/constants"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { canCreateStation } from "app/core/utils/permissions"
-import { DOCS } from "app/core/utils/constants"
+import { LINKS } from "app/core/utils/constants"
 
 const { FEATURE, PAGE_NAME } = TRACKING_EVENTS
 const { NEW_STATION, WALLET_CONNECTION } = FEATURE
@@ -140,7 +140,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                       {profileLinkOption}
                       {openATerminalLink}
                       <a
-                        href={DOCS.PRODUCT_MANUAL}
+                        href={LINKS.PRODUCT_MANUAL}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center space-x-2 hover:opacity-70 cursor-pointer"
@@ -149,7 +149,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                         <LinkArrow className="fill-marble-white" />
                       </a>
                       <a
-                        href={DOCS.LEGAL_PRIVACY}
+                        href={LINKS.LEGAL_PRIVACY}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center space-x-2 hover:opacity-70 cursor-pointer"
@@ -158,7 +158,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                         <LinkArrow className="fill-marble-white" />
                       </a>
                       <a
-                        href={DOCS.HELP_DESK}
+                        href={LINKS.HELP_DESK}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center space-x-2 hover:opacity-70 cursor-pointer"

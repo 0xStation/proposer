@@ -42,7 +42,7 @@ export default async function getRfpApprovedProposalFunding(
   // compute funding from approved proposals of token
   const approvedFunding = approvedProposals.reduce((acc, proposal) => {
     const funding = (proposal.data as unknown as ProposalMetadata)?.funding
-    if (funding.token !== input.tokenAddress) {
+    if (funding.token.address !== input.tokenAddress) {
       return acc
     } else {
       return acc + funding.amount

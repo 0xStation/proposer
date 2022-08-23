@@ -5,7 +5,6 @@ import { ZodToken, Token } from "app/types/token"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { RfpMetadata } from "../types"
 import { PROPOSAL_TEMPLATE_PREFILL } from "app/core/utils/constants"
-import { deepCopy } from "app/core/utils/deepCopy"
 
 const CreateRfp = z.object({
   terminalId: z.number(),
@@ -64,7 +63,7 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
       startDate: params.startDate,
       ...(params.endDate && { endDate: params.endDate }),
       status: PrismaRfpStatus.PUBLISHED,
-      data: deepCopy(metadata),
+      data: metadata,
     },
   })
 

@@ -190,32 +190,28 @@ export const ProposalMarkdownForm = ({
             return
           }
 
+          const mutationObj = {
+            recipientAddress: values.recipientAddress,
+            token: fundingToken,
+            amount: values.amount,
+            contentBody: values.markdown,
+            contentTitle: values.title,
+            signature,
+            signatureMessage: message,
+          }
+
           try {
             if (isEdit) {
               await updateProposalMutation({
+                ...mutationObj,
                 proposalId: proposal?.id as string,
-                recipientAddress: values.recipientAddress,
-                token: fundingToken.address,
-                amount: values.amount,
-                symbol: fundingToken.symbol,
-                contentBody: values.markdown,
-                contentTitle: values.title,
-                signature,
-                signatureMessage: message,
               })
             } else {
               await createProposalMutation({
+                ...mutationObj,
                 rfpId: rfp?.id,
                 terminalId: terminal?.id,
-                recipientAddress: values.recipientAddress,
-                token: fundingToken.address,
-                amount: values.amount,
-                symbol: fundingToken.symbol,
-                contentBody: values.markdown,
-                contentTitle: values.title,
                 collaborators: [activeUser.address],
-                signature,
-                signatureMessage: message,
               })
             }
           } catch (e) {

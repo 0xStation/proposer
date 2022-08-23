@@ -2,7 +2,7 @@ import { chain } from "wagmi"
 import { RfpStatus } from "app/rfp/types"
 import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import networks from "app/utils/networks.json"
-import { TokenType } from "app/types/token"
+import { TokenType, Token } from "app/types/token"
 
 export const CONTRACTS = {
   // Localhost, change to whatever the forge script outputs when running local anvil
@@ -96,16 +96,27 @@ export const SENDGRID_TEMPLATES = {
 
 export const SUPPORTED_CHAINS = [chain.mainnet, chain.rinkeby, chain.goerli]
 
+export const TOKEN_SYMBOLS = {
+  ETH: "ETH",
+  USDC: "USDC",
+}
+
 export const ETH_METADATA = {
   address: ZERO_ADDRESS,
   type: TokenType.COIN,
   name: "Ether",
-  symbol: "ETH",
+  symbol: TOKEN_SYMBOLS.ETH,
   decimals: 18,
 }
 
-export const getStablecoinMetadataBySymbol = ({ chain = 1, symbol = "USDC" }) => {
-  return networks[chain as number]?.stablecoins.find((stablecoin) => stablecoin.symbol === symbol)
+export const getStablecoinMetadataBySymbol = ({
+  chainId = 1,
+  symbol = TOKEN_SYMBOLS.USDC,
+}): Token | undefined => {
+  const token = networks[chainId as number]?.stablecoins.find(
+    (stablecoin) => stablecoin.symbol === symbol
+  )
+  return !!token ? { ...token, chainId } : undefined
 }
 
 export const EVENT_TYPE = {
@@ -204,12 +215,7 @@ export const TRACKING_EVENTS = {
   },
 }
 
-export const TOKEN_SYMBOLS = {
-  ETH: "ETH",
-  USDC: "USDC",
-}
-
-export const DOCS = {
+export const LINKS = {
   CHECKBOOK:
     "https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook",
   GETTING_STARTED:

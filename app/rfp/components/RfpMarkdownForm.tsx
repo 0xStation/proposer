@@ -14,7 +14,6 @@ import {
   getStablecoinMetadataBySymbol,
   RFP_STATUS_DISPLAY_MAP,
   SUPPORTED_CHAINS,
-  ZERO_ADDRESS,
 } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
 import UploadImageButton from "app/core/components/UploadImageButton"
@@ -24,12 +23,7 @@ import { Checkbook } from "app/checkbook/types"
 import { Rfp } from "../types"
 import getRfpsByTerminalId from "app/rfp/queries/getRfpsByTerminalId"
 import ConfirmationRfpModal from "./ConfirmationRfpModal"
-import {
-  composeValidators,
-  isPositiveAmount,
-  requiredField,
-  isAfterStartDate,
-} from "app/utils/validators"
+import { composeValidators, isPositiveAmount, requiredField } from "app/utils/validators"
 import { genRfpSignatureMessage } from "app/signatures/rfp"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
@@ -41,7 +35,8 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
 import getGroupedTagsByTerminalId from "app/tag/queries/getGroupedTagsByTerminalId"
 import { Tag } from "app/tag/types"
-import { DOCS } from "app/core/utils/constants"
+import { LINKS } from "app/core/utils/constants"
+import { Token } from "app/types/token"
 
 const {
   PAGE_NAME,
@@ -66,18 +61,18 @@ const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
 
 const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean; rfp?: Rfp }) => {
   const { chain: activeChain } = useNetwork()
-  const [checkbookOptions, setCheckbookOptions] = useState<Checkbook[]>()
   const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false)
   const [shortcutsOpen, setShortcutsOpen] = useState<boolean>(false)
   const [title, setTitle] = useState<string>(rfp?.data?.content?.title || "")
   const [markdown, setMarkdown] = useState<string>(rfp?.data?.content?.body || "")
   const [previewMode, setPreviewMode] = useState<boolean>(false)
-  const [importedTokenOptions, setImportedTokenOptions] = useState<any[]>()
+  const [importedTokenOptions, setImportedTokenOptions] = useState<Token[]>()
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(
     rfp?.data?.funding?.token?.chainId || (activeChain?.id as number)
   )
-  const [selectedToken, setSelectedToken] = useState<any>()
+  const [selectedToken, setSelectedToken] = useState<Token>()
+  const [checkbookOptions, setCheckbookOptions] = useState<Checkbook[]>()
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
@@ -303,6 +298,15 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
             return
           }
 
+          if (!selectedToken) {
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "Could not find token.",
+            })
+            return
+          }
+
           if (selectedToken.symbol !== ETH && selectedToken.symbol !== USDC) {
             if (tokenFetchSuccess) {
               selectedToken.decimals = balanceData?.decimals
@@ -314,15 +318,6 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
               })
               return
             }
-          }
-
-          if (!selectedToken) {
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: "Could not find token.",
-            })
-            return
           }
 
           const parsedBudgetAmount = parseUnits(values.budgetAmount, selectedToken.decimals)
@@ -342,32 +337,36 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
             return
           }
 
+          const mutationObj = {
+            startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
+            fundingAddress: values.checkbookAddress,
+            fundingToken: {
+              chainId: selectedToken.chainId,
+              address: selectedToken.address,
+              type: selectedToken?.type,
+              name: selectedToken?.name,
+              symbol: selectedToken?.symbol,
+              decimals: selectedToken?.decimals,
+            },
+            submittingPermission: tokenTags.find(
+              (tag) => tag.data.address === values.submittingPermissionTokenAddress
+            )?.data,
+            viewingPermission: tokenTags.find(
+              (tag) => tag.data.address === values.viewingPermissionTokenAddress
+            )?.data,
+            fundingBudgetAmount: values.budgetAmount,
+            contentBody: values.markdown,
+            contentTitle: values.title,
+            signature,
+            signatureMessage: message,
+          }
+
           if (isEdit) {
             try {
               await updateRfpMutation({
+                ...mutationObj,
                 rfpId: rfp?.id as string,
-                // convert luxon's `DateTime` obj to UTC to store in db
-                startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
-                endDate: DateTime.fromISO(values.endDate).toUTC().toJSDate(),
-                fundingAddress: values.checkbookAddress,
-                fundingToken: {
-                  chainId: checkbook.chainId,
-                  address: selectedToken.address,
-                  type: selectedToken?.type,
-                  symbol: selectedToken?.symbol,
-                  decimals: selectedToken?.decimals,
-                },
-                submittingPermission: tokenTags.find(
-                  (tag) => tag.data.address === values.submittingPermissionTokenAddress
-                )?.data,
-                viewingPermission: tokenTags.find(
-                  (tag) => tag.data.address === values.viewingPermissionTokenAddress
-                )?.data,
-                fundingBudgetAmount: values.budgetAmount,
-                contentBody: values.markdown,
-                contentTitle: values.title,
-                signature,
-                signatureMessage: message,
+                endDate: DateTime.fromISO(values.endDate).toUTC().toJSDate(), // convert DateTime to UTC timestamp
                 proposalPrefillBody: rfp?.data.proposalPrefill.body || "",
               })
             } catch (err) {
@@ -388,32 +387,12 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
           } else {
             try {
               await createRfpMutation({
+                ...mutationObj,
                 terminalId: terminal?.id as number,
-                // convert luxon's `DateTime` obj to UTC to store in db
-                startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
                 endDate: values.endDate
-                  ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
+                  ? DateTime.fromISO(values.endDate).toUTC().toJSDate() // convert DateTime to UTC timestamp
                   : undefined,
                 authorAddress: activeUser?.address,
-                fundingAddress: values.checkbookAddress,
-                fundingToken: {
-                  chainId: checkbook.chainId,
-                  address: selectedToken.address,
-                  type: selectedToken?.type,
-                  symbol: selectedToken?.symbol,
-                  decimals: selectedToken?.decimals,
-                },
-                submittingPermission: tokenTags.find(
-                  (tag) => tag.data.address === values.submittingPermissionTokenAddress
-                )?.data,
-                viewingPermission: tokenTags.find(
-                  (tag) => tag.data.address === values.viewingPermissionTokenAddress
-                )?.data,
-                fundingBudgetAmount: values.budgetAmount,
-                contentBody: values.markdown,
-                contentTitle: values.title,
-                signature,
-                signatureMessage: message,
               })
             } catch (err) {
               console.error(err)
@@ -737,18 +716,33 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                                     className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
                                     value={selectedToken?.symbol as string}
                                     onChange={(e) => {
-                                      let fundingToken
+                                      let fundingToken: Token
                                       if (e.target.value === ETH) {
-                                        fundingToken = ETH_METADATA
+                                        fundingToken = {
+                                          chainId: selectedNetworkId,
+                                          ...ETH_METADATA,
+                                        }
                                       } else if (e.target.value === USDC) {
-                                        fundingToken = getStablecoinMetadataBySymbol({
-                                          chain: selectedNetworkId,
+                                        const token = getStablecoinMetadataBySymbol({
+                                          chainId: selectedNetworkId,
                                           symbol: USDC,
                                         })
+                                        if (!token) {
+                                          console.error("Could not find USDC token")
+                                          throw Error("Could not find USDC token")
+                                        } else {
+                                          fundingToken = token
+                                        }
                                       } else {
-                                        fundingToken = importedTokenOptions?.find(
+                                        const token = importedTokenOptions?.find(
                                           (token) => token.symbol === e.target.value
                                         )
+                                        if (!token) {
+                                          console.error("Could not find USDC token")
+                                          throw Error("Could not find USDC token")
+                                        } else {
+                                          fundingToken = token
+                                        }
                                       }
                                       setSelectedToken(fundingToken)
                                       // custom values can be compatible with react-final-form by calling
@@ -834,7 +828,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                           <span className="text-xs text-concrete block">
                             Deposit funds here to create checks for proposers to claim once their
                             proposals have been approved.{" "}
-                            <a href={DOCS.CHECKBOOK} className="text-electric-violet">
+                            <a href={LINKS.CHECKBOOK} className="text-electric-violet">
                               Learn more
                             </a>
                           </span>
