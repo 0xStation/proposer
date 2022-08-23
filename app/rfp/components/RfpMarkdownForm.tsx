@@ -475,12 +475,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                             stationId: terminal?.id,
                           })
                           setAttemptedSubmit(true)
-                          if (
-                            formState.invalid ||
-                            !selectedToken ||
-                            !selectedNetworkId ||
-                            !selectedCheckbook
-                          ) {
+                          if (formState.invalid || !selectedToken || !selectedNetworkId) {
                             if (!selectedNetworkId) {
                               setToastState({
                                 isToastShowing: true,
