@@ -7,7 +7,7 @@ import { FundingSenderType } from "app/types"
 
 const CreateRfp = z.object({
   terminalId: z.number(),
-  fundingAddress: z.string(),
+  fundingAddress: z.string().optional(),
   authorAddress: z.string(),
   contentTitle: z.string(),
   contentBody: z.string(),

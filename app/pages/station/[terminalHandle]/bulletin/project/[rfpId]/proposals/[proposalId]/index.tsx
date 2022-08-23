@@ -124,33 +124,34 @@ const ProposalPage: BlitzPage = ({
   )
   const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
 
-  const hasQuorum = checkbook && check?.approvals?.length === checkbook?.quorum
   const userIsSigner = checkbook?.signers.includes(activeUser?.address || "")
   const userIsRfpAuthor = rfp.authorAddress === activeUser?.address
-  const userHasApproved = proposal.approvals.some(
+  const userIsProposalAuthor =
+    proposal?.collaborators?.[0]?.account?.address === activeUser?.address
+  const userHasApprovedProposal = proposal.approvals.some(
     (approval) => approval.signerAddress === activeUser?.address
   )
+  const proposalHasQuorum = checkbook && check?.approvals?.length === checkbook?.quorum
 
-  // user can edit proposal if they are the author and the proposal hasn't been approved yet
+  // user can edit proposal if they are the author and the proposal is not in review
   const canEditProposal =
-    proposal?.collaborators?.[0]?.account?.address === activeUser?.address &&
-    proposal?.approvals?.length === 0 &&
+    userIsProposalAuthor &&
+    (proposal.status === ProposalStatus.SUBMITTED || proposal.status === ProposalStatus.DRAFT) &&
     rfp.status === RfpStatus.OPEN_FOR_SUBMISSIONS
 
   // user can delete the proposal if they are the author and the proposal hasn't reached quorum.
   // if the user has reached quorum, ideally there should be a voiding process that needs to be
   // approved by both parties.
-  const canDeleteProposal =
-    proposal?.collaborators?.[0]?.account?.address === activeUser?.address &&
-    proposal.status !== ProposalStatus.APPROVED
+  const canDeleteProposal = userIsProposalAuthor && proposal.status !== ProposalStatus.APPROVED
 
   // show approve button, if the proposal hasn't reached quorum, user can approve, user hasn't already approved
-  const showApproveButton = !userHasApproved && (userIsRfpAuthor || (userIsSigner && !hasQuorum))
+  const showApproveButton =
+    !userHasApprovedProposal && (userIsRfpAuthor || (userIsSigner && !proposalHasQuorum))
   const showNotSignerWarning = !!checkbook && !userIsSigner
 
   // proposer has reached quorum and check has not been cashed and user is the proposer
   const showCashButton =
-    hasQuorum && !check?.txnHash && check?.recipientAddress === activeUser?.address
+    proposalHasQuorum && !check?.txnHash && check?.recipientAddress === activeUser?.address
 
   const fundsHaveNotBeenApproved = (proposal) => {
     return proposal.checks.length === 0

@@ -2,6 +2,10 @@ import db from "../../index"
 import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
 // run with: blitz db seed -f db/migrations/20220820012751_add_proposal_statuses_approved_in_review/data.ts
+
+// Note: Data migration scripts need to be commented out to prevent typescript errors 
+//       due to schema conflicts between latest and the time when a script is used
+
 // const seed = async () => {
 //   // Update proposal approval status based on signature count and quorum
 

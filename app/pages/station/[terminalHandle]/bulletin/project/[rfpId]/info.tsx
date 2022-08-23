@@ -102,7 +102,11 @@ const RFPInfoTab: BlitzPage = () => {
     },
     {
       suspense: false,
-      enabled: !!rfp && rfp.data.funding?.senderType === FundingSenderType.CHECKBOOK,
+      enabled:
+        !!rfp &&
+        !!rfp?.data.funding.token.chainId &&
+        rfp.data.funding?.senderType === FundingSenderType.CHECKBOOK &&
+        !!rfp?.data.funding.senderAddress,
     }
   )
 

@@ -9,7 +9,7 @@ import { FundingSenderType } from "app/types"
 // will still be capturing them while they are filled in for the edit view.
 const UpdateRfp = z.object({
   rfpId: z.string(), // uuid as string?
-  fundingAddress: z.string(),
+  fundingAddress: z.string().optional(),
   contentTitle: z.string(),
   contentBody: z.string(),
   startDate: z.date(),

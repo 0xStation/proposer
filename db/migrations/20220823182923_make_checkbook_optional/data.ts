@@ -5,6 +5,10 @@ import db from "../../index"
 import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
 // run with: blitz db seed -f db/migrations/20220823182923_make_checkbook_optional/data.ts
+
+// Note: Data migration scripts need to be commented out to prevent typescript errors 
+//       due to schema conflicts between latest and the time when a script is used
+
 // const seed = async () => {
 //   // 1. Copy linked checkbook address into rfp's metadata
 

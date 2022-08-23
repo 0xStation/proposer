@@ -8,6 +8,7 @@ import assignProposalToCheckbook from "app/proposal/mutations/assignProposalToCh
 import getCheckbookByProposal from "app/checkbook/queries/getCheckbookByProposal"
 import { RefreshIcon } from "@heroicons/react/solid"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
+import { LINKS } from "app/core/utils/constants"
 
 export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) => {
   const router = useRouter()
@@ -28,7 +29,7 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) 
     },
   })
 
-  const stationHasCheckbook = (checkbooks?.length || 0) > 0
+  const terminalHasCheckbook = (checkbooks?.length || 0) > 0
 
   // shown if station has no checkbooks to guide creating one
   const createCheckbookView = (
@@ -36,15 +37,13 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) 
       <Image src={CheckAnimation} alt="Checkbook animation." />
       <h3 className="text-2xl font-bold pt-6">Create your first Checkbook</h3>
       <p className="mt-2">
-        To start deploying funds to the proposals, create and connect the initiative to a Checkbook.
-        Checkbook is a multi-signature wallet created for funding operations. Proposers will be able
-        to claim once their projects have met the approval quorum.
+        To start deploying funds to the proposals, create a Checkbook and connect it to this
+        proposal. Checkbook is a multi-signature wallet created for funding operations. Proposal
+        contributors will be able to claim their funding once the proposal has been approved by the
+        assigned Checkbook.
       </p>
       <div className="mt-8">
-        <Link
-          href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
-          passHref
-        >
+        <Link href={LINKS.CHECKBOOK} passHref>
           <a
             target="_blank"
             rel="noopener noreferrer"
@@ -72,8 +71,9 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) 
     <div className="p-2">
       <h3 className="text-2xl font-bold pt-6">Select a Checkbook</h3>
       <p className="mt-2">
-        To start deploying funds to the proposals, create and connect the RFP to a Checkbook.
-        Proposers will be able to claim once their projects have met the approval quorum.
+        To start deploying funds to the proposals, create and connect this proposal to a Checkbook.
+        Proposal contributors will be able to claim funding once this proposal has been approved by
+        the assigned Checkbook.
       </p>
       <Form
         initialValues={{
@@ -85,25 +85,38 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) 
           )
 
           if (!selectedCheckbook) {
-            throw Error("could not find checkbook?")
-          }
-
-          const success = await assignProposalToCheckbookMutation({
-            proposalId: proposal.id,
-            chainId: selectedCheckbook.chainId,
-            checkbookAddress: selectedCheckbook.address,
-          })
-
-          if (success) {
             setToastState({
               isToastShowing: true,
-              type: "success",
-              message: "Assigned Checkbook to this proposal.",
+              type: "error",
+              message: "Checkbook assignment failed.",
             })
-            // invalidate query to reset and fetch assigned checkbook
-            invalidateQuery(getCheckbookByProposal)
-            setIsOpen(false)
-          } else {
+            return
+          }
+
+          try {
+            const success = await assignProposalToCheckbookMutation({
+              proposalId: proposal.id,
+              chainId: selectedCheckbook.chainId,
+              checkbookAddress: selectedCheckbook.address,
+            })
+            if (success) {
+              setToastState({
+                isToastShowing: true,
+                type: "success",
+                message: "Assigned Checkbook to this proposal.",
+              })
+              // invalidate query to reset and fetch assigned checkbook
+              invalidateQuery(getCheckbookByProposal)
+              setIsOpen(false)
+            } else {
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Checkbook assignment failed.",
+              })
+            }
+          } catch (e) {
+            console.error(e)
             setToastState({
               isToastShowing: true,
               type: "error",
@@ -126,10 +139,10 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) 
                         className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
                       >
                         <option value="">Choose option</option>
-                        {checkbooks?.map((cb, idx) => {
+                        {checkbooks?.map((checkbook, idx) => {
                           return (
-                            <option key={cb.address} value={cb.address}>
-                              {cb.name}
+                            <option key={checkbook.address} value={checkbook.address}>
+                              {checkbook.name}
                             </option>
                           )
                         })}
@@ -189,7 +202,7 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) 
 
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
-      {stationHasCheckbook ? selectCheckbookView : createCheckbookView}
+      {terminalHasCheckbook ? selectCheckbookView : createCheckbookView}
     </Modal>
   )
 }
