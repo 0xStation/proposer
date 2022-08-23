@@ -185,7 +185,7 @@ export const ConnectWalletComponent = () => {
             </p>
             <p className="text-lg text-center px-4 sm:px-0">
               New to web3? Learn how to create a wallet{" "}
-              <a className="text-electric-violet" href={LINKS.CREATE_WALLET}>
+              <a className="text-electric-violet" href={LINKS.CREATE_WALLET_TUTORIAL}>
                 here
               </a>
               .

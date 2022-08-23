@@ -225,7 +225,7 @@ export const LINKS = {
   HELP_DESK: "https://6vdcjqzyfj3.typeform.com/to/F0QFs9aC",
   RFP_EXAMPLES:
     "https://station-labs.gitbook.io/station-product-manual/for-daos-communities/request-for-proposal-rfp",
-  CREATE_WALLET: "https://www.youtube.com/watch?v=OsRIHlr0_Iw",
+  CREATE_WALLET_TUTORIAL: "https://www.youtube.com/watch?v=OsRIHlr0_Iw",
 }
 
 export const PROPOSAL_TEMPLATE_PREFILL = {
