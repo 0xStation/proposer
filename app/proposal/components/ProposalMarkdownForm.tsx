@@ -190,8 +190,8 @@ export const ProposalMarkdownForm = ({
             return
           }
 
-          try {
-            if (isEdit) {
+          if (isEdit) {
+            try {
               await updateProposalMutation({
                 proposalId: proposal?.id as string,
                 recipientAddress: values.recipientAddress,
@@ -203,7 +203,27 @@ export const ProposalMarkdownForm = ({
                 signature,
                 signatureMessage: message,
               })
-            } else {
+            } catch (err) {
+              trackError(PROPOSAL.EVENT_NAME.ERROR_CREATING_PROPOSAL, {
+                pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
+                userAddress: activeUser?.address,
+                stationHandle: terminal?.handle,
+                stationId: terminal?.id,
+                recipientAddress: values?.recipientAddress,
+                amount: values?.amount,
+                title: values?.title,
+                errorMsg: err.message,
+                isEdit,
+              })
+              console.error(err)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Something went wrong.",
+              })
+            }
+          } else {
+            try {
               await createProposalMutation({
                 rfpId: rfp?.id,
                 terminalId: terminal?.id,
@@ -217,24 +237,25 @@ export const ProposalMarkdownForm = ({
                 signature,
                 signatureMessage: message,
               })
+            } catch (err) {
+              trackError(PROPOSAL.EVENT_NAME.ERROR_CREATING_PROPOSAL, {
+                pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
+                userAddress: activeUser?.address,
+                stationHandle: terminal?.handle,
+                stationId: terminal?.id,
+                recipientAddress: values?.recipientAddress,
+                amount: values?.amount,
+                title: values?.title,
+                errorMsg: err.message,
+                isEdit,
+              })
+              console.error(err)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Something went wrong.",
+              })
             }
-          } catch (e) {
-            trackError(PROPOSAL.EVENT_NAME.ERROR_CREATING_PROPOSAL, {
-              pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
-              userAddress: activeUser?.address,
-              stationHandle: terminal?.handle,
-              stationId: terminal?.id,
-              recipientAddress: values?.recipientAddress,
-              amount: values?.amount,
-              title: values?.title,
-              errorMsg: e.message,
-            })
-            console.error(e)
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: "Something went wrong.",
-            })
           }
         }
       }}
@@ -298,6 +319,8 @@ export const ProposalMarkdownForm = ({
                           userAddress: activeUser?.address,
                           stationHandle: terminal?.handle,
                           stationId: terminal?.id,
+                          rfpId: rfp?.id,
+                          isEdit,
                         })
                         setAttemptedSubmit(true)
                         if (formState.invalid) {
