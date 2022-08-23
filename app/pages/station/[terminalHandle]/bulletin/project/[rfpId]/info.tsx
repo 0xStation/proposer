@@ -25,6 +25,8 @@ import useStore from "app/core/hooks/useStore"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 import getRfpApprovedProposalFunding from "app/rfp/queries/getRfpApprovedFunding"
 import { ZERO_ADDRESS, TRACKING_EVENTS } from "app/core/utils/constants"
+import getCheckbook from "app/checkbook/queries/getCheckbook"
+import { FundingSenderType } from "app/types"
 
 const {
   PAGE_NAME,
@@ -66,7 +68,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const RFPInfoTab: BlitzPage = () => {
   const terminalHandle = useParam("terminalHandle") as string
   const [showRfpSuccessModal, setShowRfpSuccessModal] = useState<boolean>(false)
-  const [showAddFundsModal, setShowAddFundsModal] = useState<boolean>(false)
   const query = useRouterQuery()
   const rfpId = useParam("rfpId") as string
   const [terminal, { isSuccess: isFinishedFetchingTerminal }] = useQuery(
@@ -89,8 +90,20 @@ const RFPInfoTab: BlitzPage = () => {
       tokenChainId: rfp?.data?.funding?.token.chainId || 1,
       tokenAddress: rfp?.data?.funding?.token.address || ZERO_ADDRESS,
     },
-    { suspense: false, enabled: !!rfp?.checkbook && !!rfp.data }
+    { suspense: false, enabled: !!rfp?.data }
     // for some reason typescript does not recognize enabled checks as sufficient to remove default values in query?
+  )
+
+  const [checkbook] = useQuery(
+    getCheckbook,
+    {
+      chainId: rfp?.data.funding.token.chainId || 0,
+      address: rfp?.data.funding.senderAddress || "",
+    },
+    {
+      suspense: false,
+      enabled: !!rfp && rfp.data.funding?.senderType === FundingSenderType.CHECKBOOK,
+    }
   )
 
   useEffect(() => {
@@ -117,14 +130,6 @@ const RFPInfoTab: BlitzPage = () => {
 
   return (
     <Layout title={`${terminal?.data?.name ? terminal?.data?.name + " | " : ""}RFP`}>
-      <AddFundsModal
-        setIsOpen={setShowAddFundsModal}
-        isOpen={showAddFundsModal}
-        checkbookAddress={rfp?.checkbook?.address}
-        pageName={PAGE_NAME.RFP_INFO_PAGE}
-        terminalId={terminal?.id as number}
-        stationHandle={terminalHandle}
-      />
       <TerminalNavigation>
         <SuccessRfpModal
           terminal={terminal}
@@ -190,12 +195,14 @@ const RFPInfoTab: BlitzPage = () => {
                   rfp?.data?.funding?.budgetAmount
                 )} ${rfp?.data?.funding?.token?.symbol}`}</p>
               </div>
-              <div className="mt-9">
-                <p className="text-xs text-concrete uppercase font-bold">Signers</p>
-                {(rfp?.checkbook?.signerAccounts || []).map((account, i) => (
-                  <AccountMediaObject account={account} className="mt-4" key={i} />
-                ))}
-              </div>
+              {checkbook && (
+                <div className="mt-9">
+                  <p className="text-xs text-concrete uppercase font-bold">Reviewers</p>
+                  {(checkbook?.signerAccounts || []).map((account, i) => (
+                    <AccountMediaObject account={account} className="mt-4" key={i} />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
