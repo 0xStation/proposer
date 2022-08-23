@@ -85,7 +85,7 @@ const Button = ({
           />
         </div>
       ) : (
-        { children }
+        children
       )}
     </button>
   )
