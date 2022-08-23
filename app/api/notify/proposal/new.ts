@@ -7,6 +7,7 @@ import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
 import { getEmails } from "app/utils/privy"
+import { FundingSenderType } from "app/types"
 
 const EmailRequest = z.object({
   proposalId: z.string(),
@@ -34,7 +35,6 @@ export default async function handler(req, res) {
             rfp: {
               include: {
                 terminal: true,
-                checkbook: true,
               },
             },
           },
@@ -42,7 +42,7 @@ export default async function handler(req, res) {
       },
     })) as unknown as {
       account: Account
-      proposal: Proposal & { rfp: Rfp & { terminal: Terminal; checkbook: Checkbook } }
+      proposal: Proposal & { rfp: Rfp & { terminal: Terminal } }
     }
 
     if (!data) {
@@ -50,17 +50,43 @@ export default async function handler(req, res) {
       return
     }
 
-    const checkbookSigners = await db.account.findMany({
-      where: {
-        address: {
-          in: data.proposal.rfp.checkbook.signers,
-        },
-      },
-    })
+    let addresses: string[] = []
 
-    const addresses = checkbookSigners
-      .filter((account) => !!(account.data as AccountMetadata).hasVerifiedEmail)
-      .map((account) => account.address as string)
+    if (!!data.proposal.rfp.authorAddress) {
+      addresses.push(data.proposal.rfp.authorAddress)
+    }
+
+    if (data.proposal.rfp.data.funding?.senderType === FundingSenderType.CHECKBOOK) {
+      const fundingData = data.proposal.rfp.data.funding
+      const checkbook = await db.checkbook.findFirst({
+        where: {
+          chainId: fundingData.token.chainId,
+          address: fundingData.senderAddress,
+        },
+      })
+
+      if (!!checkbook) {
+        const checkbookSigners = await db.account.findMany({
+          where: {
+            address: {
+              in: checkbook?.signers || [],
+            },
+          },
+        })
+
+        addresses = [
+          ...addresses,
+          ...checkbookSigners
+            .filter((account) => !!(account.data as AccountMetadata).hasVerifiedEmail)
+            .map((account) => account.address as string),
+        ]
+      }
+    }
+
+    if (addresses.length === 0) {
+      res.status(200).json({ response: "success" })
+      return
+    }
 
     try {
       const emails = await getEmails(addresses)
