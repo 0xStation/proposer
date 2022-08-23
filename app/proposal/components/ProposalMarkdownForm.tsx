@@ -195,6 +195,7 @@ export const ProposalMarkdownForm = ({
               await updateProposalMutation({
                 proposalId: proposal?.id as string,
                 recipientAddress: values.recipientAddress,
+                chainId: fundingToken.chainId,
                 token: fundingToken.address,
                 amount: values.amount,
                 symbol: fundingToken.symbol,
