@@ -86,7 +86,6 @@ const RFPInfoTab: BlitzPage = () => {
     getRfpApprovedProposalFunding,
     {
       rfpId: rfpId,
-      approvalQuorum: rfp?.checkbook.quorum || 100,
       tokenChainId: rfp?.data?.funding?.token.chainId || 1,
       tokenAddress: rfp?.data?.funding?.token.address || ZERO_ADDRESS,
     },

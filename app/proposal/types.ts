@@ -6,8 +6,9 @@ import { Rfp } from "app/rfp/types"
 import { Token } from "app/types/token"
 
 export enum ProposalStatus {
+  DRAFT = "DRAFT",
   SUBMITTED = "SUBMITTED",
-  IN_REVIEW = "IN REVIEW",
+  IN_REVIEW = "IN_REVIEW",
   APPROVED = "APPROVED",
   DELETED = "DELETED",
 }

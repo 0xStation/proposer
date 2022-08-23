@@ -5,7 +5,6 @@ import { ProposalMetadata } from "app/proposal/types"
 
 const GetRfpApprovedProposalFunding = z.object({
   rfpId: z.string(),
-  approvalQuorum: z.number(),
   tokenChainId: z.number(),
   tokenAddress: z.string(),
 })
@@ -13,30 +12,11 @@ const GetRfpApprovedProposalFunding = z.object({
 export default async function getRfpApprovedProposalFunding(
   input: z.infer<typeof GetRfpApprovedProposalFunding>
 ) {
-  // grab the proposal ids where the proposalApprovals are above quorum
-  const proposalStatusGroup = await db.proposalApproval.groupBy({
-    where: {
-      proposal: {
-        rfpId: input.rfpId,
-        status: PrismaProposalStatus.PUBLISHED,
-      },
-    },
-    by: ["proposalId"],
-    having: {
-      proposalId: {
-        _count: { gte: input.approvalQuorum },
-      },
-    },
-    _count: {
-      _all: true,
-      proposalId: true,
-    },
-  })
-  const proposalIds = proposalStatusGroup.map((g) => g.proposalId)
   // fetch approved proposals
   const approvedProposals = await db.proposal.findMany({
     where: {
-      id: { in: proposalIds },
+      rfpId: input.rfpId,
+      status: PrismaProposalStatus.APPROVED,
     },
   })
   // compute funding from approved proposals of token
