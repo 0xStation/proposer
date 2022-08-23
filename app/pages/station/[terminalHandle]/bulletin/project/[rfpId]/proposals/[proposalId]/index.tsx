@@ -127,7 +127,7 @@ const ProposalPage: BlitzPage = ({
   const hasQuorum = checkbook && check?.approvals?.length === checkbook?.quorum
   const userIsSigner = checkbook?.signers.includes(activeUser?.address || "")
   const userIsRfpAuthor = rfp.authorAddress === activeUser?.address
-  const userHasApproved = !proposal.approvals.some(
+  const userHasApproved = proposal.approvals.some(
     (approval) => approval.signerAddress === activeUser?.address
   )
 
@@ -145,7 +145,7 @@ const ProposalPage: BlitzPage = ({
     proposal.status !== ProposalStatus.APPROVED
 
   // show approve button, if the proposal hasn't reached quorum, user can approve, user hasn't already approved
-  const showApproveButton = userIsRfpAuthor || (userIsSigner && !userHasApproved && !hasQuorum)
+  const showApproveButton = !userHasApproved && (userIsRfpAuthor || (userIsSigner && !hasQuorum))
   const showNotSignerWarning = !!checkbook && !userIsSigner
 
   // proposer has reached quorum and check has not been cashed and user is the proposer

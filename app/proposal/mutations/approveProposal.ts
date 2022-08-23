@@ -58,7 +58,7 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
     const metadata = proposal.data as unknown as ProposalMetadata
     if (
       metadata.funding.senderType !== FundingSenderType.CHECKBOOK ||
-      !!metadata.funding.senderAddress
+      !metadata.funding.senderAddress
     ) {
       return
     }
