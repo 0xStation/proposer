@@ -77,7 +77,7 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) 
         initialValues={{
           checkbookAddress: checkbooks?.[0]?.address,
         }}
-        onSubmit={async (values: any, form) => {
+        onSubmit={async (values: any) => {
           const selectedCheckbook = checkbooks?.find((checkbook) =>
             addressesAreEqual(checkbook.address, values.checkbookAddress)
           )

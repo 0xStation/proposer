@@ -4,7 +4,7 @@ import { FundingSenderType } from "app/types"
 import db from "../../index"
 import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
-// // run with: blitz db seed -f db/data-migrations/2-checkbook-optional.ts
+// // run with: blitz db seed -f db/migrations/20220823182923_make_checkbook_optional/data.ts
 // const seed = async () => {
 //   // 1. Copy linked checkbook address into rfp's metadata
 

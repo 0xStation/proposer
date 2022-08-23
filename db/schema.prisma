@@ -122,6 +122,7 @@ model Checkbook {
   signers    String[]
   data       Json
   checks     Check[]
+  // Rfp        Rfp[]
 }
 
 // unique links by /station/handle]/rfp/[localId]
@@ -136,6 +137,8 @@ model Rfp {
   status        RfpStatus  @default(DRAFT)
   data          Json
   proposals     Proposal[]
+  // fundingAddress String
+  // checkbook      Checkbook  @relation(fields: [fundingAddress], references: [address])
 }
 
 // unique links by /station/handle]/proposal/[localId]

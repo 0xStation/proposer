@@ -41,6 +41,7 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
 import getGroupedTagsByTerminalId from "app/tag/queries/getGroupedTagsByTerminalId"
 import { Tag } from "app/tag/types"
+import { FundingSenderType } from "app/types"
 
 const {
   PAGE_NAME,
@@ -239,7 +240,10 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 endDate: rfp?.endDate
                   ? getFormattedDate({ dateTime: DateTime.fromJSDate(rfp?.endDate as Date) })
                   : undefined,
-                checkbookAddress: rfp?.fundingAddress,
+                checkbookAddress:
+                  rfp?.data.funding.senderType === FundingSenderType.CHECKBOOK
+                    ? rfp?.data.funding.senderAddress
+                    : undefined,
                 fundingTokenSymbol: rfp?.data?.funding?.token?.symbol,
                 budgetAmount: rfp?.data?.funding?.budgetAmount,
                 submittingPermissionTokenAddress:
@@ -495,23 +499,17 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                               return
                             }
 
-                            if (!selectedCheckbook) {
+                            const fieldsWithErrors = Object.keys(formState.errors as Object)
+                            if (fieldsWithErrors.length > 0) {
                               setToastState({
                                 isToastShowing: true,
                                 type: "error",
-                                message: `Please add a Checkbook to publish your RFP.`,
+                                message: `Please fill in ${fieldsWithErrors.join(
+                                  ", "
+                                )} to publish RFP.`,
                               })
                               return
                             }
-                            const fieldsWithErrors = Object.keys(formState.errors as Object)
-                            setToastState({
-                              isToastShowing: true,
-                              type: "error",
-                              message: `Please fill in ${fieldsWithErrors.join(
-                                ", "
-                              )} to publish RFP.`,
-                            })
-                            return
                           }
                           setConfirmationModalOpen(true)
                         }}

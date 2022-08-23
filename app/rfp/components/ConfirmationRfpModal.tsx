@@ -11,7 +11,7 @@ export const ConfirmationRfpModal = ({ isOpen, setIsOpen, handleSubmit }) => {
           Contributors will be able to submit proposals after the open date. You can edit your
           project at any time.
         </p>
-        <div className="py-8 content-center">
+        <div className="py-8">
           <Image src={RfpPublishStepper} alt="RFP Publish Stepper." />
         </div>
         <div>

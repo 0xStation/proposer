@@ -114,7 +114,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, checkbo
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        {activeChain && activeChain.id === checkbook.chainId ? (
+        {activeChain && activeChain.id === checkbook?.chainId ? (
           <>
             <h3 className="text-2xl font-bold pt-6">Sign to confirm approval</h3>
             <p className="mt-2">

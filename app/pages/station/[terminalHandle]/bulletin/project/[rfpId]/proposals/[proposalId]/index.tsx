@@ -91,7 +91,7 @@ const ProposalPage: BlitzPage = ({
     {
       suspense: false,
       onSuccess: (checks) => {
-        if (checkbook && checks[0]?.approvals.length === rfp.checkbook.quorum) {
+        if (checkbook && checks[0]?.approvals.length === checkbook.quorum) {
           setCheck(checks[0])
         }
       },
@@ -124,8 +124,12 @@ const ProposalPage: BlitzPage = ({
   )
   const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
 
-  const hasQuorum = check?.approvals?.length === rfp?.checkbook.quorum
+  const hasQuorum = checkbook && check?.approvals?.length === checkbook?.quorum
   const userIsSigner = checkbook?.signers.includes(activeUser?.address || "")
+  const userIsRfpAuthor = rfp.authorAddress === activeUser?.address
+  const userHasApproved = !proposal.approvals.some(
+    (approval) => approval.signerAddress === activeUser?.address
+  )
 
   // user can edit proposal if they are the author and the proposal hasn't been approved yet
   const canEditProposal =
@@ -140,13 +144,8 @@ const ProposalPage: BlitzPage = ({
     proposal?.collaborators?.[0]?.account?.address === activeUser?.address &&
     proposal.status !== ProposalStatus.APPROVED
 
-  // user can approve if they are a signer and they haven't approved before
-  const userCanApprove =
-    rfp?.checkbook.signers.includes(activeUser?.address) &&
-    !proposal.approvals.some((approval) => approval.signerAddress === activeUser?.address)
-
   // show approve button, if the proposal hasn't reached quorum, user can approve, user hasn't already approved
-  const showApproveButton = !hasQuorum && userCanApprove
+  const showApproveButton = userIsRfpAuthor || (userIsSigner && !userHasApproved && !hasQuorum)
   const showNotSignerWarning = !!checkbook && !userIsSigner
 
   // proposer has reached quorum and check has not been cashed and user is the proposer
@@ -421,7 +420,8 @@ const ProposalPage: BlitzPage = ({
                       className="bg-electric-violet text-tunnel-black px-6 h-[35px] rounded block mx-auto hover:bg-opacity-70 mb-2"
                       disabled={
                         waitingCreation ||
-                        parseFloat(fundsAvailable) < proposal.data.funding?.amount ||
+                        (!!checkbook &&
+                          parseFloat(fundsAvailable) < proposal.data.funding?.amount) ||
                         (!!checkbook && !userIsSigner)
                       }
                     >
@@ -433,7 +433,8 @@ const ProposalPage: BlitzPage = ({
                         "Approve"
                       )}
                     </button>
-                    {parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
+                    {!!checkbook &&
+                      parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
                       fundsHaveNotBeenApproved(proposal) && (
                         <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
                           Insufficient funds.{" "}
@@ -559,12 +560,12 @@ const ProposalPage: BlitzPage = ({
                       <h4 className="text-xs font-bold text-concrete uppercase">Approval</h4>
                       <div className="flex flex-row space-x-2 items-center mt-2">
                         <ProgressIndicator
-                          percent={proposal?.approvals.length / rfp?.checkbook.quorum}
+                          percent={proposal?.approvals.length / checkbook?.quorum}
                           twsize={6}
                           cutoff={0}
                         />
                         <p>
-                          {proposal?.approvals.length}/{rfp?.checkbook.quorum}
+                          {proposal?.approvals.length}/{checkbook?.quorum}
                         </p>
                       </div>
                       <div className="mt-6">

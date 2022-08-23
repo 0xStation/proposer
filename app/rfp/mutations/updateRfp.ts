@@ -37,12 +37,10 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
           signature: input.signature,
           signatureMessage: input.signatureMessage,
           funding: {
-            ...(input.fundingAddress !== "" && {
-              senderAddress: input.fundingAddress
-                ? toChecksumAddress(input.fundingAddress)
-                : undefined,
-              senderType: FundingSenderType.CHECKBOOK,
-            }),
+            senderAddress: input.fundingAddress
+              ? toChecksumAddress(input.fundingAddress)
+              : undefined,
+            senderType: input.fundingAddress ? FundingSenderType.CHECKBOOK : undefined,
             token: {
               ...input.fundingToken,
               address: toChecksumAddress(input.fundingToken.address),
