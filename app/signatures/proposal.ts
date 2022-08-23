@@ -3,10 +3,10 @@ import { keccak256 } from "@ethersproject/keccak256"
 import { BigNumber } from "@ethersproject/bignumber"
 
 export const genProposalSignatureMessage = (
-  proposalRecipient: string,
   author: string,
   rfpId: string,
   parsedTokenAmount: BigNumber,
+  chainId: number,
   formValues: any
 ) => {
   const now = new Date()
@@ -15,6 +15,7 @@ export const genProposalSignatureMessage = (
     domain: {
       name: "Proposal", // keep hardcoded
       version: "1", // keep hardcoded
+      chainId,
     },
     types: {
       Funding: [
@@ -24,7 +25,6 @@ export const genProposalSignatureMessage = (
         { name: "amount", type: "uint256" },
       ],
       Proposal: [
-        { name: "proposalRecipient", type: "address" }, // (checkbook address for now) reciever of the proposal
         { name: "author", type: "address" },
         { name: "collaborators", type: "address[]" },
         { name: "timestamp", type: "uint256" }, // hash of ISO formatted date string
@@ -35,7 +35,6 @@ export const genProposalSignatureMessage = (
       ],
     },
     value: {
-      proposalRecipient,
       author,
       collaborators: [author],
       timestamp: now.valueOf(), // unix timestamp

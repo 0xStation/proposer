@@ -71,7 +71,7 @@ const ProposalsTab: BlitzPage = ({
       page: page,
       paginationTake: PAGINATION_TAKE,
     },
-    { suspense: false, enabled: !!rfpId && !!rfp?.checkbook, refetchOnWindowFocus: false }
+    { suspense: false, enabled: !!rfpId, refetchOnWindowFocus: false }
   )
 
   const [proposalCount, { isSuccess: isFinishedFetchingProposalCount }] = useQuery(
@@ -82,7 +82,7 @@ const ProposalsTab: BlitzPage = ({
     },
     {
       suspense: false,
-      enabled: !!rfpId && !!rfp?.checkbook,
+      enabled: !!rfpId,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
     }
