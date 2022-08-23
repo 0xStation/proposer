@@ -11,7 +11,7 @@ import { truncateString } from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 import { InformationCircleIcon } from "@heroicons/react/solid"
 
-export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, checks }) => {
+export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, checkbook, checks }) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
@@ -39,8 +39,8 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
       // need to create a check if it does not exist
       check = await createCheckMutation({
         proposalId: proposal?.id,
-        fundingAddress: rfp.checkbook.address,
-        chainId: rfp.checkbook.chainId,
+        fundingAddress: checkbook.address,
+        chainId: checkbook.chainId,
         recipientAddress: proposal?.data.funding.recipientAddress,
         tokenAddress: proposal?.data.funding.token,
         tokenAmount: proposal?.data.funding.amount, // store as decimal value instead of BigNumber
@@ -80,7 +80,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
         })
         try {
           // if this approval makes proposal reach quorum, send notification to collaborators
-          if (proposal.approvals.length + 1 === rfp.checkbook.quorum) {
+          if (proposal.approvals.length + 1 === checkbook.quorum) {
             await fetch("/api/notify/proposal/approved", {
               method: "POST",
               headers: {
@@ -114,7 +114,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        {activeChain && activeChain.id === rfp.checkbook.chainId ? (
+        {activeChain && activeChain.id === checkbook.chainId ? (
           <>
             <h3 className="text-2xl font-bold pt-6">Sign to confirm approval</h3>
             <p className="mt-2">
@@ -189,7 +189,7 @@ export const SignApprovalProposalModal = ({ isOpen, setIsOpen, proposal, rfp, ch
                 type="button"
                 className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 w-[98px] rounded hover:opacity-75"
                 onClick={() => {
-                  switchNetwork?.(rfp.checkbook.chainId)
+                  switchNetwork?.(checkbook.chainId)
                 }}
               >
                 Switch

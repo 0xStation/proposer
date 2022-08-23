@@ -19,6 +19,7 @@ import Preview from "app/core/components/MarkdownPreview"
 import SignApprovalProposalModal from "app/proposal/components/SignApprovalProposalModal"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getRfpById from "app/rfp/queries/getRfpById"
+import getCheckbookByProposal from "app/checkbook/queries/getCheckbookByProposal"
 import getChecksByProposalId from "app/check/queries/getChecksByProposalId"
 import getProposalById from "app/proposal/queries/getProposalById"
 import { Check } from "app/check/types"
@@ -49,6 +50,8 @@ import { RfpStatus } from "app/rfp/types"
 import DeleteProposalModal from "app/proposal/components/DeleteProposalModal"
 import { ProposalStatus } from "app/proposal/types"
 import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
+import SelectCheckbookModal from "app/checkbook/components/SelectCheckbookModal"
+import { FundingSenderType } from "app/types"
 
 const {
   PAGE_NAME,
@@ -67,6 +70,7 @@ const ProposalPage: BlitzPage = ({
   const [cashCheckModalOpen, setCashCheckModalOpen] = useState<boolean>(false)
   const [waitingCreation, setWaitingCreation] = useState<boolean>(false)
   const [checkTxnHash, setCheckTxnHash] = useState<string>()
+  const [checkbookModalOpen, setCheckbookModalOpen] = useState<boolean>(false)
   const [signModalOpen, setSignModalOpen] = useState<boolean>(false)
   const [deleteProposalModalOpen, setDeleteProposalModalOpen] = useState<boolean>(false)
   const [isProposalUrlCopied, setIsProposalUrlCopied] = useState<boolean>(false)
@@ -75,16 +79,23 @@ const ProposalPage: BlitzPage = ({
   const isAdmin = useAdminForTerminal(terminal)
   const router = useRouter()
 
+  const [checkbook] = useQuery(
+    getCheckbookByProposal,
+    { proposalId: proposal?.id as string },
+    { suspense: false }
+  )
+
   const [checks] = useQuery(
     getChecksByProposalId,
     { proposalId: proposal?.id as string },
     {
       suspense: false,
       onSuccess: (checks) => {
-        if (checks[0]?.approvals.length === rfp.checkbook.quorum) {
+        if (checkbook && checks[0]?.approvals.length === rfp.checkbook.quorum) {
           setCheck(checks[0])
         }
       },
+      enabled: !!checkbook,
     }
   )
 
@@ -106,14 +117,15 @@ const ProposalPage: BlitzPage = ({
   }, [])
 
   const funds = useCheckbookFunds(
-    rfp.checkbook?.chainId as number,
-    rfp.checkbook?.address as string,
-    rfp.checkbook?.quorum as number,
+    checkbook?.chainId as number,
+    checkbook?.address as string,
+    checkbook?.quorum as number,
     proposal.data?.funding.token
   )
   const fundsAvailable = formatUnits(funds?.available, funds?.decimals)
 
   const hasQuorum = check?.approvals?.length === rfp?.checkbook.quorum
+  const userIsSigner = checkbook?.signers.includes(activeUser?.address || "")
 
   // user can edit proposal if they are the author and the proposal hasn't been approved yet
   const canEditProposal =
@@ -135,6 +147,7 @@ const ProposalPage: BlitzPage = ({
 
   // show approve button, if the proposal hasn't reached quorum, user can approve, user hasn't already approved
   const showApproveButton = !hasQuorum && userCanApprove
+  const showNotSignerWarning = !!checkbook && !userIsSigner
 
   // proposer has reached quorum and check has not been cashed and user is the proposer
   const showCashButton =
@@ -210,10 +223,16 @@ const ProposalPage: BlitzPage = ({
         terminalHandle={terminalHandle}
         terminalId={terminal?.id as number}
       />
+      <SelectCheckbookModal
+        isOpen={checkbookModalOpen}
+        setIsOpen={setCheckbookModalOpen}
+        terminal={terminal}
+        proposal={proposal}
+      />
       <SignApprovalProposalModal
         isOpen={signModalOpen}
         setIsOpen={setSignModalOpen}
-        rfp={rfp}
+        checkbook={checkbook}
         proposal={proposal}
         checks={checks}
       />
@@ -393,12 +412,17 @@ const ProposalPage: BlitzPage = ({
                   <div className="relative self-start group">
                     <button
                       onClick={() => {
-                        setSignModalOpen(true)
+                        if (!!checkbook) {
+                          setSignModalOpen(true)
+                        } else {
+                          setCheckbookModalOpen(true)
+                        }
                       }}
                       className="bg-electric-violet text-tunnel-black px-6 h-[35px] rounded block mx-auto hover:bg-opacity-70 mb-2"
                       disabled={
                         waitingCreation ||
-                        parseFloat(fundsAvailable) < proposal.data.funding?.amount
+                        parseFloat(fundsAvailable) < proposal.data.funding?.amount ||
+                        (!!checkbook && !userIsSigner)
                       }
                     >
                       {waitingCreation ? (
@@ -426,6 +450,11 @@ const ProposalPage: BlitzPage = ({
                           )}
                         </span>
                       )}
+                    {showNotSignerWarning && (
+                      <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
+                        You need to be a signer of the associated Checkbook to approve.
+                      </span>
+                    )}
                   </div>
                 ) : showCashButton ? (
                   <button
@@ -451,7 +480,7 @@ const ProposalPage: BlitzPage = ({
                 <Preview markdown={proposal?.data.content.body} />
               </div>
               <div className="w-[36rem] border-l border-concrete flex-col overflow-y-scroll">
-                <div className="border-b border-concrete p-6">
+                <div className="p-6">
                   <h4 className="text-xs font-bold text-concrete uppercase mb-2">Author</h4>
                   {proposal.collaborators.map((collaborator, idx) => {
                     if (collaborator.account?.data) {
@@ -518,41 +547,43 @@ const ProposalPage: BlitzPage = ({
                     {truncateString(proposal?.data.funding.recipientAddress, 9)}
                   </p>
                 </div>
-                <div
-                  className={
-                    check
-                      ? "border-b border-concrete p-6"
-                      : "p-6 grow flex flex-col justify-between"
-                  }
-                >
-                  <div>
-                    <h4 className="text-xs font-bold text-concrete uppercase">Approval</h4>
-                    <div className="flex flex-row space-x-2 items-center mt-2">
-                      <ProgressIndicator
-                        percent={proposal?.approvals.length / rfp?.checkbook.quorum}
-                        twsize={6}
-                        cutoff={0}
-                      />
-                      <p>
-                        {proposal?.approvals.length}/{rfp?.checkbook.quorum}
-                      </p>
-                    </div>
-                    <div className="mt-6">
-                      {proposal?.approvals.length > 0 && (
-                        <p className="text-xs text-concrete uppercase font-bold">Signers</p>
-                      )}
-                      {(proposal?.approvals || []).map((approval, i) => (
-                        <AccountMediaObject
-                          account={approval.signerAccount}
-                          className="mt-4"
-                          key={i}
+                {!!checkbook && (
+                  <div
+                    className={
+                      check
+                        ? "border-t border-concrete p-6"
+                        : "border-t border-concrete p-6 grow flex flex-col justify-between"
+                    }
+                  >
+                    <div>
+                      <h4 className="text-xs font-bold text-concrete uppercase">Approval</h4>
+                      <div className="flex flex-row space-x-2 items-center mt-2">
+                        <ProgressIndicator
+                          percent={proposal?.approvals.length / rfp?.checkbook.quorum}
+                          twsize={6}
+                          cutoff={0}
                         />
-                      ))}
+                        <p>
+                          {proposal?.approvals.length}/{rfp?.checkbook.quorum}
+                        </p>
+                      </div>
+                      <div className="mt-6">
+                        {proposal?.approvals.length > 0 && (
+                          <p className="text-xs text-concrete uppercase font-bold">Signers</p>
+                        )}
+                        {(proposal?.approvals || []).map((approval, i) => (
+                          <AccountMediaObject
+                            account={approval.signerAccount}
+                            className="mt-4"
+                            key={i}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-                {check && (
-                  <div className="p-6 grow flex flex-col justify-between">
+                )}
+                {!!check && (
+                  <div className="border-t border-concrete p-6 grow flex flex-col justify-between">
                     <div>
                       <p className="text-xs text-concrete uppercase font-bold">Check</p>
                       <div className="flex justify-between items-center mt-4">
