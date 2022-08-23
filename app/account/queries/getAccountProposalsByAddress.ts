@@ -20,12 +20,7 @@ export default async function getAccountProposalsByAddress(
       terminal: true,
       proposal: {
         include: {
-          rfp: {
-            include: {
-              checkbook: true,
-            },
-          },
-          approvals: true,
+          rfp: true,
         },
       },
     },

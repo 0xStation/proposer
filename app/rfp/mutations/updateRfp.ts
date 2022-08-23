@@ -2,6 +2,7 @@ import db from "db"
 import * as z from "zod"
 import { Token, TokenTag } from "types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import { FundingSenderType } from "app/types"
 
 // going to be calling this from edit RFP page, so we will still be passing in all of these data
 // just bc they might not be changed does not mean we will be omitting them, because the form
@@ -26,7 +27,6 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
     const rfp = await db.rfp.update({
       where: { id: input.rfpId },
       data: {
-        fundingAddress: input.fundingAddress,
         startDate: input.startDate,
         endDate: input.endDate,
         data: {
@@ -37,6 +37,12 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
           signature: input.signature,
           signatureMessage: input.signatureMessage,
           funding: {
+            ...(input.fundingAddress !== "" && {
+              senderAddress: input.fundingAddress
+                ? toChecksumAddress(input.fundingAddress)
+                : undefined,
+              senderType: FundingSenderType.CHECKBOOK,
+            }),
             token: {
               ...input.fundingToken,
               address: toChecksumAddress(input.fundingToken.address),

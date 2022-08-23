@@ -3,6 +3,7 @@ import * as z from "zod"
 import { RfpStatus as PrismaRfpStatus } from "@prisma/client"
 import { TokenTag, Token } from "types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import { FundingSenderType } from "app/types"
 
 const CreateRfp = z.object({
   terminalId: z.number(),
@@ -34,7 +35,6 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
 
   const rfp = await db.rfp.create({
     data: {
-      fundingAddress: params.fundingAddress,
       authorAddress: params.authorAddress,
       terminalId: params.terminalId,
       startDate: params.startDate,
@@ -49,6 +49,12 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
         signatureMessage: params.signatureMessage,
         proposalPrefill: defaultProposalPrefill,
         funding: {
+          ...(params.fundingAddress !== "" && {
+            senderAddress: params.fundingAddress
+              ? toChecksumAddress(params.fundingAddress)
+              : undefined,
+            senderType: FundingSenderType.CHECKBOOK,
+          }),
           token: {
             ...input.fundingToken,
             address: toChecksumAddress(input.fundingToken.address),

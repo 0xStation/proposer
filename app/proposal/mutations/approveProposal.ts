@@ -1,5 +1,7 @@
 import * as z from "zod"
 import db, { ProposalStatus } from "db"
+import { FundingSenderType } from "app/types"
+import { ProposalMetadata } from "../types"
 
 const ApproveProposal = z.object({
   checkId: z.string(),
@@ -44,25 +46,36 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
       where: { id: params.proposalId },
       include: {
         approvals: true,
-        rfp: { include: { checkbook: true } },
       },
     })
 
     // get typescript to compile
     // if proposal object does not exist, will have thrown earlier on proposalApproval create
-    if (!proposal || !proposal.rfp || !proposal.rfp?.checkbook) {
+    if (!proposal) {
       return
     }
+
+    const metadata = proposal.data as unknown as ProposalMetadata
+    if (
+      metadata.funding.senderType !== FundingSenderType.CHECKBOOK ||
+      !!metadata.funding.senderAddress
+    ) {
+      return
+    }
+
+    const checkbook = await db.checkbook.findUnique({
+      where: { address: metadata.funding.senderAddress },
+    })
 
     // determine new status for proposal
     let newStatus
     if (
-      proposal.approvals.length >= (proposal.rfp.checkbook.quorum || 0) &&
+      proposal.approvals.length >= (checkbook?.quorum || 0) &&
       proposal.status !== ProposalStatus.APPROVED
     ) {
       newStatus = ProposalStatus.APPROVED
     } else if (
-      proposal.approvals.length < (proposal.rfp.checkbook.quorum || 0) &&
+      proposal.approvals.length < (checkbook?.quorum || 0) &&
       proposal.status !== ProposalStatus.IN_REVIEW
     ) {
       newStatus = ProposalStatus.IN_REVIEW
