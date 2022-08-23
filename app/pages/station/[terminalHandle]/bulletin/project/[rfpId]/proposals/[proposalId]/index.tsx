@@ -49,6 +49,7 @@ import { RfpStatus } from "app/rfp/types"
 import DeleteProposalModal from "app/proposal/components/DeleteProposalModal"
 import { ProposalStatus } from "app/proposal/types"
 import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
+import Button from "app/core/components/sds/buttons/Button"
 
 const {
   PAGE_NAME,
@@ -391,24 +392,18 @@ const ProposalPage: BlitzPage = ({
                 </div>
                 {showApproveButton ? (
                   <div className="relative self-start group">
-                    <button
+                    <Button
                       onClick={() => {
                         setSignModalOpen(true)
                       }}
-                      className="bg-electric-violet text-tunnel-black px-6 h-[35px] rounded block mx-auto hover:bg-opacity-70 mb-2"
-                      disabled={
+                      isDisabled={
                         waitingCreation ||
                         parseFloat(fundsAvailable) < proposal.data.funding?.amount
                       }
+                      isLoading={waitingCreation}
                     >
-                      {waitingCreation ? (
-                        <div className="flex justify-center items-center">
-                          <Spinner fill="black" />
-                        </div>
-                      ) : (
-                        "Approve"
-                      )}
-                    </button>
+                      Approve
+                    </Button>
                     {parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
                       fundsHaveNotBeenApproved(proposal) && (
                         <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">

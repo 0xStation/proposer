@@ -24,8 +24,8 @@ Secondary.args = {
   children: "Short",
 }
 
-export const Unemphesized = Template.bind({})
-Unemphesized.args = {
-  type: ButtonType.Unemphesized,
+export const Unemphasized = Template.bind({})
+Unemphasized.args = {
+  type: ButtonType.Unemphasized,
   children: "Blank",
 }

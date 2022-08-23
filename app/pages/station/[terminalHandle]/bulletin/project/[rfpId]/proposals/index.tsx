@@ -41,6 +41,7 @@ import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpI
 import useCheckbookFunds from "app/core/hooks/useCheckbookFunds"
 import { formatUnits } from "@ethersproject/units"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
+import Button from "app/core/components/sds/buttons/Button"
 
 const {
   PAGE_NAME,
@@ -199,8 +200,7 @@ const ProposalsTab: BlitzPage = ({
                   Share the link with your community to solicit proposals to shape the future of{" "}
                   {terminal.data.name}.
                 </p>
-                <button
-                  className="bg-electric-violet text-tunnel-black rounded px-6 h-[35px] leading-[35px] hover:bg-opacity-70 whitespace-nowrap mt-2"
+                <Button
                   onClick={() => {
                     setIsUrlCopied(true)
                     navigator.clipboard.writeText(
@@ -214,7 +214,7 @@ const ProposalsTab: BlitzPage = ({
                   }}
                 >
                   {isUrlCopied ? "Copied!" : "Copy link"}
-                </button>
+                </Button>
               </div>
             ) : (
               Array.from(Array(15)).map((idx) => (

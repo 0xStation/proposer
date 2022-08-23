@@ -144,7 +144,7 @@ const DiscordConnectPage: BlitzPage = () => {
                     <Button
                       className="w-full"
                       onClick={() => onBotOpen()}
-                      type={ButtonType.Unemphesized}
+                      type={ButtonType.Unemphasized}
                     >
                       Connect Station bot
                     </Button>

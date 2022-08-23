@@ -4,7 +4,7 @@ import { Spinner } from "../../Spinner"
 export enum ButtonType {
   Primary = "primary",
   Secondary = "secondary",
-  Unemphesized = "unemphesized",
+  Unemphasized = "unemphasized",
 }
 
 const classNames = (...classes) => {
@@ -66,7 +66,7 @@ const Button = ({
           "bg-electric-violet border-electric-violet text-tunnel-black hover:bg-electric-violet/80 hover:border-transparent",
         type === ButtonType.Secondary &&
           "text-electric-violet border-electric-violet bg-tunnel-black hover:bg-wet-concrete",
-        type === ButtonType.Unemphesized &&
+        type === ButtonType.Unemphasized &&
           "text-marble-white border-marble-white bg-tunnel-black hover:bg-wet-concrete",
         children.length <= 5 || isLoading ? "w-[98px]" : "px-6"
       )}
