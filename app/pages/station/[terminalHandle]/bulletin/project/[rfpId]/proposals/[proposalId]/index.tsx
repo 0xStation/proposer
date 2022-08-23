@@ -207,6 +207,7 @@ const ProposalPage: BlitzPage = ({
         setIsOpen={setDeleteProposalModalOpen}
         proposal={proposal}
         pageName={PAGE_NAME.PROPOSAL_INFO_PAGE}
+        rfpId={rfp?.id}
         terminalHandle={terminalHandle}
         terminalId={terminal?.id as number}
       />
@@ -282,6 +283,7 @@ const ProposalPage: BlitzPage = ({
                                   stationHandle: terminalHandle,
                                   stationId: terminal?.id,
                                   isEdit: true,
+                                  rfpId: rfp.id,
                                 })
                                 router.push(
                                   Routes.EditProposalPage({
@@ -339,8 +341,10 @@ const ProposalPage: BlitzPage = ({
                                       PROPOSAL.EVENT_NAME.PROPOSAL_SETTINGS_DELETE_PROPOSAL_CLICKED,
                                       {
                                         pageName: PAGE_NAME.PROPOSAL_INFO_PAGE,
+                                        userAddress: activeUser?.address,
                                         stationHandle: terminalHandle,
                                         stationId: terminal?.id,
+                                        rfpId: rfp?.id,
                                         proposalId: proposal?.id,
                                       }
                                     )
