@@ -30,6 +30,7 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) 
 
   const stationHasCheckbook = (checkbooks?.length || 0) > 0
 
+  // shown if station has no checkbooks to guide creating one
   const createCheckbookView = (
     <div className="p-2">
       <Image src={CheckAnimation} alt="Checkbook animation." />
@@ -66,6 +67,7 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) 
     </div>
   )
 
+  // shown if station has checkbooks to guide selecting one
   const selectCheckbookView = (
     <div className="p-2">
       <h3 className="text-2xl font-bold pt-6">Select a Checkbook</h3>

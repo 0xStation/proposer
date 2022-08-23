@@ -83,6 +83,7 @@ export default async function handler(req, res) {
       }
     }
 
+    // if no emails to send, exit and return success
     if (addresses.length === 0) {
       res.status(200).json({ response: "success" })
       return

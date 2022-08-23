@@ -64,6 +64,8 @@ export const ProposalMarkdownForm = ({
     })
   }, [])
 
+  // TODO: add back support for token warning text, likely with new and better designed hook
+
   // const checkbookTokens = useCheckbookAvailability(rfp?.checkbook, terminal)
 
   // const amountMessage = (amount) => {
@@ -489,6 +491,7 @@ export const ProposalMarkdownForm = ({
                             placeholder="Enter token amount"
                             className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                           />
+                          {/* TODO: add back support for token warning text, likely with new and better designed hook */}
                           {/* {formState.values.amount && (
                             <span className="text-neon-carrot text-xs block mt-2">
                               {amountMessage(formState.values.amount)}
