@@ -15,7 +15,6 @@ export const genRfpSignatureMessage = (values, author, chainId) => {
     types: {
       Rfp: [
         { name: "author", type: "address" },
-        { name: "replyTo", type: "address" }, // (checkbook address for now)
         { name: "timestamp", type: "uint256" }, // ISO formatted date string
         { name: "startDate", type: "uint256" }, // ISO formatted date string
         { name: "endDate", type: "uint256" }, // ISO formatted date string
@@ -27,7 +26,6 @@ export const genRfpSignatureMessage = (values, author, chainId) => {
     },
     value: {
       author: author,
-      replyTo: values.checkbookAddress,
       timestamp: now.valueOf(), // unix timestamp
       startDate: startDate.valueOf(), // unix timestamp
       endDate: values.endDate ? endDate.valueOf() : 0, // unix timestamp
