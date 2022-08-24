@@ -85,3 +85,16 @@ export const isAfterStartDate = (_endDate, values) => {
   const end = new Date(values.endDate)
   return start < end ? undefined : "End date cannot come before start date."
 }
+
+export const maximumDecimals = (decimals: number) => {
+  return (value: string) => {
+    const [int, fraction] = value.split(".")
+    if (!fraction) {
+      return undefined
+    }
+    if (fraction?.length > decimals) {
+      return `Cannot have more than ${decimals} decimal places.`
+    }
+    return undefined
+  }
+}

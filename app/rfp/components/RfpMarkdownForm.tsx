@@ -28,6 +28,7 @@ import {
   isPositiveAmount,
   requiredField,
   isAfterStartDate,
+  maximumDecimals,
 } from "app/utils/validators"
 import { genRfpSignatureMessage } from "app/signatures/rfp"
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
@@ -762,7 +763,11 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                           <label className="font-bold">Budget*</label>
                           <Field
                             name="budgetAmount"
-                            validate={composeValidators(requiredField, isPositiveAmount)}
+                            validate={composeValidators(
+                              requiredField,
+                              isPositiveAmount,
+                              maximumDecimals(selectedToken?.decimals || 0)
+                            )}
                           >
                             {({ input, meta }) => {
                               return (

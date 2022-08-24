@@ -16,7 +16,13 @@ import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import truncateString from "app/core/utils/truncateString"
 import { genProposalSignatureMessage } from "app/signatures/proposal"
 import { trackImpression, trackClick, trackError } from "app/utils/amplitude"
-import { requiredField, composeValidators, isPositiveAmount, isAddress } from "app/utils/validators"
+import {
+  requiredField,
+  composeValidators,
+  isPositiveAmount,
+  isAddress,
+  maximumDecimals,
+} from "app/utils/validators"
 import { parseUnits } from "@ethersproject/units"
 import createProposal from "../mutations/createProposal"
 import { Rfp } from "app/rfp/types"
@@ -480,7 +486,11 @@ export const ProposalMarkdownForm = ({
 
                     <Field
                       name="amount"
-                      validate={composeValidators(requiredField, isPositiveAmount)}
+                      validate={composeValidators(
+                        requiredField,
+                        isPositiveAmount,
+                        maximumDecimals(fundingToken.decimals)
+                      )}
                     >
                       {({ meta, input }) => (
                         <>
