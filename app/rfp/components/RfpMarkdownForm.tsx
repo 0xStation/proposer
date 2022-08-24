@@ -14,7 +14,6 @@ import {
   getStablecoinMetadataBySymbol,
   RFP_STATUS_DISPLAY_MAP,
   SUPPORTED_CHAINS,
-  ZERO_ADDRESS,
 } from "app/core/utils/constants"
 import Preview from "app/core/components/MarkdownPreview"
 import UploadImageButton from "app/core/components/UploadImageButton"
@@ -31,7 +30,6 @@ import {
   isAfterStartDate,
 } from "app/utils/validators"
 import { genRfpSignatureMessage } from "app/signatures/rfp"
-import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import MarkdownShortcuts from "app/core/components/MarkdownShortcuts"
 import getTokenTagsByTerminalId from "app/tag/queries/getTokenTagsByTerminalId"
 import { TokenType } from "app/tag/types"
@@ -41,7 +39,6 @@ import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import getCheckbooksByTerminal from "app/checkbook/queries/getCheckbooksByTerminal"
 import getGroupedTagsByTerminalId from "app/tag/queries/getGroupedTagsByTerminalId"
 import { Tag } from "app/tag/types"
-import { AddressType } from "app/types"
 
 const {
   PAGE_NAME,
@@ -240,10 +237,6 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 endDate: rfp?.endDate
                   ? getFormattedDate({ dateTime: DateTime.fromJSDate(rfp?.endDate as Date) })
                   : undefined,
-                checkbookAddress:
-                  rfp?.data.funding.senderType === AddressType.CHECKBOOK
-                    ? rfp?.data.funding.senderAddress
-                    : undefined,
                 fundingTokenSymbol: rfp?.data?.funding?.token?.symbol,
                 budgetAmount: rfp?.data?.funding?.budgetAmount,
                 submittingPermissionTokenAddress:
@@ -251,14 +244,11 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 viewingPermissionTokenAddress:
                   rfp?.data?.permissions?.view && rfp?.data?.permissions?.view?.address,
               }
-            : {
-                checkbookAddress: checkbooks?.[0]?.address,
-              }
+            : {}
         }
         onSubmit={async (values: {
           startDate: string
           endDate: string
-          checkbookAddress: string
           fundingTokenSymbol: string
           budgetAmount: string
           markdown: string
@@ -273,7 +263,6 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
             stationId: terminal?.id,
             startDate: values.startDate,
             endDate: values.endDate,
-            checkbookAddress: values.checkbookAddress,
             title: values.title,
           })
           if (!activeUser?.address) {
@@ -284,10 +273,6 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
             })
             return
           }
-
-          const checkbook = checkbooks?.find((checkbook) =>
-            addressesAreEqual(checkbook.address, values.checkbookAddress)
-          )
 
           if (selectedToken.symbol !== ETH && selectedToken.symbol !== USDC) {
             if (tokenFetchSuccess) {
@@ -313,8 +298,6 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
 
           const parsedBudgetAmount = parseUnits(values.budgetAmount, selectedToken.decimals)
 
-          const chainId = checkbook ? checkbook.chainId : selectedNetworkId
-
           const message = genRfpSignatureMessage(
             {
               ...values,
@@ -322,7 +305,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
               budgetAmount: parsedBudgetAmount,
             },
             activeUser?.address,
-            chainId
+            selectedNetworkId
           )
           const signature = await signMessage(message)
 
@@ -338,9 +321,8 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 // convert luxon's `DateTime` obj to UTC to store in db
                 startDate: DateTime.fromISO(values.startDate).toUTC().toJSDate(),
                 endDate: DateTime.fromISO(values.endDate).toUTC().toJSDate(),
-                fundingAddress: values.checkbookAddress,
                 fundingToken: {
-                  chainId,
+                  chainId: selectedNetworkId,
                   address: selectedToken.address,
 
                   symbol: selectedToken.symbol,
@@ -367,7 +349,6 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 stationId: terminal?.id,
                 startDate: values.startDate,
                 endDate: values.endDate,
-                checkbookAddress: values.checkbookAddress,
                 title: values.title,
                 rfpId: rfp?.id,
                 errorMsg: err.message,
@@ -383,9 +364,8 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                   ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
                   : undefined,
                 authorAddress: activeUser?.address,
-                fundingAddress: values.checkbookAddress,
                 fundingToken: {
-                  chainId,
+                  chainId: selectedNetworkId,
                   address: selectedToken.address,
                   symbol: selectedToken.symbol,
                   decimals: selectedToken.decimals,
@@ -411,7 +391,6 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                 stationId: terminal?.id,
                 startDate: values.startDate,
                 endDate: values.endDate,
-                checkbookAddress: values.checkbookAddress,
                 title: values.title,
                 rfpId: rfp?.id,
                 errorMsg: err.message,
@@ -801,78 +780,6 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                               )
                             }}
                           </Field>
-                        </div>
-                        <div className="flex flex-col mt-6">
-                          <label className="font-bold block">Checkbook</label>
-                          <span className="text-xs text-concrete block">
-                            Deposit funds here to create checks for proposers to claim once their
-                            proposals have been approved.{" "}
-                            <a
-                              href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
-                              className="text-electric-violet"
-                            >
-                              Learn more
-                            </a>
-                          </span>
-                          <Field name="checkbookAddress">
-                            {({ input, meta }) => {
-                              return (
-                                <div className="custom-select-wrapper">
-                                  <select
-                                    {...input}
-                                    className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
-                                    onChange={(e) => {
-                                      const checkbook = checkbookOptions?.find(
-                                        (checkbook) => checkbook.address === e.target.value
-                                      )
-                                      setSelectedCheckbook(checkbook)
-                                      // custom values can be compatible with react-final-form by calling
-                                      // the props.input.onChange callback
-                                      // https://final-form.org/docs/react-final-form/api/Field
-                                      input.onChange(checkbook?.address as string)
-                                    }}
-                                  >
-                                    <option value="">Choose option</option>
-                                    {checkbookOptions?.map((cb, idx) => {
-                                      return (
-                                        <option key={cb.address} value={cb.address}>
-                                          {cb.name}
-                                        </option>
-                                      )
-                                    })}
-                                  </select>
-                                  {(meta.touched || attemptedSubmit) && meta.error && (
-                                    <span className="text-torch-red text-xs">{meta.error}</span>
-                                  )}
-                                </div>
-                              )
-                            }}
-                          </Field>
-                          <div className="flex items-center justify-between mt-1">
-                            <Link
-                              href={Routes.NewCheckbookSettingsPage({
-                                terminalHandle: terminalHandle,
-                              })}
-                              passHref
-                            >
-                              <a target="_blank" rel="noopener noreferrer">
-                                <span className="text-electric-violet cursor-pointer block">
-                                  + Create new
-                                </span>
-                              </a>
-                            </Link>
-                            <RefreshIcon
-                              className="h-4 w-4 text-white cursor-pointer"
-                              onClick={() => {
-                                refetchCheckbooks()
-                                setToastState({
-                                  isToastShowing: true,
-                                  type: "success",
-                                  message: "Refetched checkbooks.",
-                                })
-                              }}
-                            />
-                          </div>
                         </div>
                       </div>
                     ) : (

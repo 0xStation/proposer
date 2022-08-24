@@ -10,39 +10,14 @@ import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 //       due to schema conflicts between latest and the time when a script is used
 
 // const seed = async () => {
-//   // 1. Copy linked checkbook address into rfp's metadata
-
-//   const rfps = await db.rfp.findMany()
-//   const rfpUpdates = rfps.map((rfp) => {
-//     const oldMetadata = rfp.data as unknown as RfpMetadata
-//     const newMetadata = {
-//       ...oldMetadata,
-//       funding: {
-//         ...oldMetadata.funding,
-//         senderType: AddressType.CHECKBOOK,
-//         senderAddress: rfp.fundingAddress,
-//       },
-//     }
-
-//     return db.rfp.update({
-//       where: { id: rfp.id },
-//       data: {
-//         data: JSON.parse(JSON.stringify(newMetadata)),
-//       },
-//     })
-//   })
-
-//   const res1 = await db.$transaction(rfpUpdates)
-//   console.log("rfp metadata update transaction complete", res1.length)
-
-//   // 2. Copy linked checkbook addresses into rfp's proposals' metadata
+//   // Copy linked checkbook addresses into rfp's proposals' metadata
 
 //   const proposals = await db.proposal.findMany({
 //     include: {
 //       rfp: { include: { checkbook: true } },
 //     },
 //   })
-//   const proposalUpdates1 = proposals.map((proposal) => {
+//   const updates = proposals.map((proposal) => {
 //     const oldMetadata = proposal.data as unknown as ProposalMetadata
 //     const newMetadata = {
 //       ...oldMetadata,
@@ -62,8 +37,8 @@ import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 //     })
 //   })
 
-//   const res2 = await db.$transaction(proposalUpdates1)
-//   console.log("proposal metadata update transaction complete", res2.length)
+//   const res = await db.$transaction(updates)
+//   console.log("proposal metadata update transaction complete", res.length)
 // }
 
 // export default seed
