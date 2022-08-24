@@ -20,7 +20,9 @@ export default async function getProposalsByRfpId(input: z.infer<typeof GetPropo
   const proposals = await db.proposal.findMany({
     where: {
       rfpId: input.rfpId,
-      ...(selectedStatuses.length > 0 && { status: { in: selectedStatuses } }),
+      ...(selectedStatuses.length > 0
+        ? { status: { in: selectedStatuses } } // filter on selected status options
+        : { status: { not: PrismaProposalStatus.DELETED } }), // default filter on not DELETED status
     },
     include: {
       checks: true,
