@@ -2,6 +2,7 @@ import db from "db"
 import * as z from "zod"
 import { TagType } from "app/tag/types"
 import { truncateString } from "app/core/utils/truncateString"
+import { Terminal } from "app/terminal/types"
 
 const CreateCheckbook = z.object({
   terminalId: z.number(),
@@ -13,6 +14,36 @@ const CreateCheckbook = z.object({
 })
 
 export default async function createCheckbook(input: z.infer<typeof CreateCheckbook>) {
+  const terminal = (await db.terminal.findUnique({
+    where: { id: input.terminalId },
+  })) as Terminal
+
+  if (!terminal) {
+    throw new Error("Cannot create a checkbook for a terminal that does not exist.")
+  }
+
+  const terminalAdminTags = terminal.data.permissions.adminTagIdWhitelist
+  // const fullAdminTags = await db.tag.findMany({
+  //   where: {
+  //     id: {
+  //       in: terminalAdminTags,
+  //     },
+  //   },
+  //   include: {
+  //     tickets: true,
+  //   },
+  // })
+
+  // const usersWithAdminTags = await db.account.findMany({
+  //   where: {
+  //     tickets: {
+  //       some: {
+
+  //       }
+  //     },
+  //   },
+  // })
+
   // create checkbook
   const checkbook = await db.checkbook.create({
     data: {
