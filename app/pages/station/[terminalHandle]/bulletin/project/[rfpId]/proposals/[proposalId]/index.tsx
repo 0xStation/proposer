@@ -44,6 +44,8 @@ import {
   TrashIcon,
 } from "@heroicons/react/solid"
 import Dropdown from "app/core/components/Dropdown"
+import AddressLink from "app/core/components/AddressLink"
+import TextClipboard from "app/core/components/TextClipboard"
 import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"
 import { RfpStatus } from "app/rfp/types"
@@ -544,7 +546,7 @@ const ProposalPage: BlitzPage = ({
                     Amount Requested
                   </h4>
                   <p className="mt-2">{`${proposal?.data.funding.amount}`}</p>
-                  <h4 className="text-xs font-bold text-concrete uppercase mt-6">Fund Recipient</h4>
+                  <h4 className="text-xs font-bold text-concrete uppercase mt-6">Pay to</h4>
                   <p className="mt-2">
                     {truncateString(proposal?.data.funding.recipientAddress, 9)}
                   </p>
@@ -558,6 +560,23 @@ const ProposalPage: BlitzPage = ({
                     }
                   >
                     <div>
+                      <h4 className="text-xs font-bold text-concrete uppercase">Pay from</h4>
+                      <div className="flex flex-col mt-2 content-center">
+                        <p className="text-base text-marble-white font-bold">{checkbook.name}</p>
+                        <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
+                          <p className="w-max truncate leading-4 mr-2">
+                            {truncateString(checkbook.address)}
+                          </p>
+                          <AddressLink
+                            chainId={checkbook.chainId}
+                            address={checkbook.address}
+                            className="flex flex-row"
+                          />
+                          <TextClipboard text={checkbook.address} className="flex flex-row" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-6">
                       <h4 className="text-xs font-bold text-concrete uppercase">Approval</h4>
                       <div className="flex flex-row space-x-2 items-center mt-2">
                         <ProgressIndicator
@@ -571,7 +590,9 @@ const ProposalPage: BlitzPage = ({
                       </div>
                       <div className="mt-6">
                         {proposal?.approvals.length > 0 && (
-                          <p className="text-xs text-concrete uppercase font-bold">Signers</p>
+                          <p className="text-xs text-concrete uppercase font-bold">
+                            Approves payment
+                          </p>
                         )}
                         {(proposal?.approvals || []).map((approval, i) => (
                           <AccountMediaObject
