@@ -23,6 +23,8 @@ import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
 import updateProposal from "../mutations/updateProposal"
 import { Proposal } from "../types"
+import Button from "app/core/components/sds/buttons/Button"
+import { ButtonType } from "app/core/components/sds/buttons/Button"
 
 const {
   PAGE_NAME,
@@ -305,15 +307,13 @@ export const ProposalMarkdownForm = ({
                       <span>Markdown shortcuts</span>
                     </button>
                     <UploadImageButton />
-                    <button
-                      type="button"
-                      className="border border-electric-violet text-electric-violet px-6 py-1 rounded block hover:bg-wet-concrete"
+                    <Button
                       onClick={() => setPreviewMode(!previewMode)}
+                      type={ButtonType.Secondary}
                     >
-                      <span>{previewMode ? "Back to editing" : "Preview"}</span>
-                    </button>
-                    <button
-                      type="button"
+                      {previewMode ? "Back to editing" : "Preview"}
+                    </Button>
+                    <Button
                       onClick={() => {
                         trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_EDITOR_PUBLISH_CLICKED, {
                           userAddress: activeUser?.address,
@@ -337,13 +337,10 @@ export const ProposalMarkdownForm = ({
                         setUnsavedChanges(false)
                         setConfirmationModalOpen(true)
                       }}
-                      disabled={!formState.dirty}
-                      className={`bg-electric-violet ${
-                        !formState.dirty ? "bg-opacity-70 cursor-not-allowed" : ""
-                      } text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70`}
+                      isDisabled={!formState.dirty}
                     >
                       Publish
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

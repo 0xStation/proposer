@@ -23,6 +23,7 @@ import { trackClick } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
 import { useUserCanSubmitToRfp } from "app/core/utils/permissions"
 import { Rfp } from "app/rfp/types"
+import Button from "app/core/components/sds/buttons/Button"
 
 const {
   PAGE_NAME,
@@ -102,7 +103,7 @@ const RfpHeaderNavigation = ({ rfp }: { rfp: Rfp }) => {
           </p>
         </div>
         <div className="flex flex-row mt-6">
-          <div className="flex-col w-full">
+          <div className="flex-col grow">
             <div className="flex flex-row space-x-4">
               <span className=" bg-wet-concrete rounded-full px-2 py-1 flex items-center space-x-1">
                 <SpeakerphoneIcon className="h-4 w-4 text-marble-white" />
@@ -273,7 +274,7 @@ const RfpHeaderNavigation = ({ rfp }: { rfp: Rfp }) => {
             </div>
           </div>
           {rfpOpen && canSubmit ? (
-            <button
+            <Button
               onClick={() => {
                 trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_SHOW_EDITOR_CLICKED, {
                   pageName: PAGE_NAME.RFP_INFO_PAGE,
@@ -283,10 +284,9 @@ const RfpHeaderNavigation = ({ rfp }: { rfp: Rfp }) => {
                 })
                 router.push(Routes.CreateProposalPage({ terminalHandle, rfpId: rfp.id }))
               }}
-              className="bg-electric-violet text-tunnel-black rounded self-start px-6 h-[35px] leading-[35px] hover:bg-opacity-70 whitespace-nowrap"
             >
               Create proposal
-            </button>
+            </Button>
           ) : (
             <div className="relative group self-start">
               <button className="bg-electric-violet text-tunnel-black rounded self-start px-6 h-[35px] leading-[35px] bg-opacity-70 whitespace-nowrap">

@@ -1,8 +1,6 @@
 import { BlitzPage, useQuery, useParam, Image, Link, Routes, invalidateQuery } from "blitz"
 import { Fragment, useEffect, useState } from "react"
 import { DEFAULT_PFP_URLS, PAGINATION_TAKE } from "app/core/utils/constants"
-import BackArrow from "app/core/icons/BackArrow"
-import ForwardArrow from "app/core/icons/ForwardArrow"
 import Layout from "app/core/layouts/Layout"
 import TerminalNavigation from "app/terminal/components/TerminalNavigation"
 import getTerminalByHandle from "app/terminal/queries/getTerminalByHandle"

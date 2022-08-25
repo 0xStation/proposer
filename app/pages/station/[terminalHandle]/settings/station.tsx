@@ -33,6 +33,7 @@ import LayoutWithoutNavigation from "app/core/layouts/LayoutWithoutNavigation"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
 import getAdminAccountsForTerminal from "app/permissions/queries/getAdminAccountsForTerminal"
+import Button from "app/core/components/sds/buttons/Button"
 
 const PfpInput = ({ pfpURL, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
@@ -192,17 +193,12 @@ const TerminalSettingsPage: BlitzPage = () => {
                     <div className="flex flex-col">
                       <div className="p-6 border-b border-concrete flex justify-between">
                         <h2 className="text-marble-white text-2xl font-bold">Station overview</h2>
-                        <button
-                          className={`rounded text-tunnel-black px-8 bg-electric-violet ${
-                            formState.hasValidationErrors || !formState.dirty
-                              ? "opacity-50 cursor-not-allowed"
-                              : "hover:bg-opacity-70"
-                          }`}
-                          disabled={formState.hasValidationErrors || !formState.dirty}
-                          type="submit"
+                        <Button
+                          isSubmitType={true}
+                          isDisabled={formState.hasValidationErrors || !formState.dirty}
                         >
                           Save
-                        </button>
+                        </Button>
                       </div>
                       <div className="p-6">
                         <div className="grid grid-cols-3 gap-4">

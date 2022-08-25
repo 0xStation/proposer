@@ -32,6 +32,9 @@ import useAdminForTerminal from "app/core/hooks/useAdminForTerminal"
 import { AddFundsModal } from "../../../../core/components/AddFundsModal"
 import { DateTime } from "luxon"
 import { useUserCanSubmitToRfp, useUserCanViewRfp } from "app/core/utils/permissions"
+import Button from "app/core/components/sds/buttons/Button"
+import { ButtonType } from "app/core/components/sds/buttons/Button"
+import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 
 const {
   FEATURE: { RFP },
@@ -165,8 +168,7 @@ const BulletinPage: BlitzPage = () => {
           <div className="flex flex-row items-center ml-6 pt-7 justify-between mr-4">
             <h1 className="text-2xl font-bold">Projects</h1>
             {isLoggedInAndIsAdmin && (
-              <button
-                className="h-[35px] bg-electric-violet px-9 rounded text-tunnel-black hover:bg-opacity-70"
+              <Button
                 onClick={() => {
                   trackClick(RFP.EVENT_NAME.RFP_SHOW_EDITOR_CLICKED, {
                     pageName: PAGE_NAME.RFP_LIST_PAGE,
@@ -180,7 +182,7 @@ const BulletinPage: BlitzPage = () => {
                 }}
               >
                 Create project
-              </button>
+              </Button>
             )}
           </div>
           <div className="flex flex-col sm:flex-row justify-between items-center">
@@ -249,8 +251,7 @@ const BulletinPage: BlitzPage = () => {
                   </a>
                   .
                 </p>
-                <button
-                  className="bg-electric-violet rounded text-tunnel-black px-6 h-[35px] w-[133px] mt-6 hover:opacity-70"
+                <Button
                   onClick={() => {
                     trackClick(RFP.EVENT_NAME.RFP_SHOW_EDITOR_CLICKED, {
                       pageName: PAGE_NAME.RFP_LIST_PAGE,
@@ -264,7 +265,7 @@ const BulletinPage: BlitzPage = () => {
                   }}
                 >
                   Create project
-                </button>
+                </Button>
               </div>
             ) : rfps?.length === 0 ? (
               <RfpNotFound />
@@ -358,20 +359,22 @@ const RFPComponent = ({ rfp, terminalHandle, activeAddress }) => {
           >
             {rfpOpen ? (
               canSubmit ? (
-                <Link href={Routes.CreateProposalPage({ terminalHandle, rfpId: rfp.id })} passHref>
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block border border-electric-violet text-electric-violet rounded px-6 h-[35px] leading-[35px]  whitespace-nowrap hover:bg-electric-violet hover:text-tunnel-black"
-                  >
-                    Propose
-                  </a>
-                </Link>
+                <Button
+                  type={ButtonType.Secondary}
+                  onClick={() => {
+                    window.open(
+                      genUrlFromRoute(Routes.CreateProposalPage({ terminalHandle, rfpId: rfp.id })),
+                      "_blank"
+                    )
+                  }}
+                >
+                  Propose
+                </Button>
               ) : (
                 <>
-                  <button className="inline-block border border-electric-violet text-electric-violet rounded px-6 h-[35px] leading-[35px]  whitespace-nowrap opacity-60">
+                  <Button type={ButtonType.Secondary} isDisabled={true}>
                     Propose
-                  </button>
+                  </Button>
                   <span className="hidden group-hover:block absolute top-[110%] right-0 bg-wet-concrete text-xs p-2 rounded border border-tunnel-black z-50">
                     You must hold ${rfp?.data?.permissions?.submit?.symbol} to propose.
                   </span>
@@ -379,9 +382,9 @@ const RFPComponent = ({ rfp, terminalHandle, activeAddress }) => {
               )
             ) : (
               <>
-                <button className="inline-block border border-electric-violet text-electric-violet rounded px-6 h-[35px] leading-[35px]  whitespace-nowrap opacity-60">
+                <Button type={ButtonType.Secondary} isDisabled={true}>
                   Propose
-                </button>
+                </Button>
                 <span className="hidden group-hover:block absolute top-[110%] right-0 bg-wet-concrete text-xs p-2 rounded border border-tunnel-black">
                   You will be able to create a proposal for this RFP when it opens for submissions.
                 </span>

@@ -2,9 +2,9 @@ import { useState } from "react"
 import {
   BlitzPage,
   GetServerSideProps,
-  Link,
   Routes,
   useParam,
+  useRouter,
   useQuery,
   getSession,
   invoke,
@@ -17,6 +17,7 @@ import { Tag } from "app/tag/types"
 import networks from "app/utils/networks.json"
 import hasAdminPermissionsBasedOnTags from "../../../../permissions/queries/hasAdminPermissionsBasedOnTags"
 import { ClipboardIcon, ClipboardCheckIcon, ExternalLinkIcon } from "@heroicons/react/outline"
+import Button from "app/core/components/sds/buttons/Button"
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   const session = await getSession(req, res)
@@ -55,6 +56,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
 }
 
 const TokenSettingsPage: BlitzPage = () => {
+  const router = useRouter()
   const terminalHandle = useParam("terminalHandle") as string
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
   const [tokenTags, setTokenTags] = useState<Tag[]>([])
@@ -110,11 +112,9 @@ const TokenSettingsPage: BlitzPage = () => {
             <p className="mt-2 text-marble-white text-base w-[400px] text-center">
               Import ERC-20s to fund proposals in tokens of your choice.
             </p>
-            <Link href={Routes.NewTokenSettingsPage({ terminalHandle })}>
-              <button className="cursor-pointer mt-8 w-[200px] py-1 bg-electric-violet text-tunnel-black rounded text-base">
-                Import
-              </button>
-            </Link>
+            <Button onClick={() => router.push(Routes.NewTokenSettingsPage({ terminalHandle }))}>
+              Import
+            </Button>
           </div>
         ) : (
           <div className="flex flex-col">
@@ -125,14 +125,9 @@ const TokenSettingsPage: BlitzPage = () => {
                   Import tokens that represent your community&apos;s membership and ownership.
                 </h5>
               </div>
-              <Link href={Routes.NewTokenSettingsPage({ terminalHandle })}>
-                <button
-                  className="rounded text-tunnel-black px-8 h-[32px] bg-electric-violet self-start"
-                  type="submit"
-                >
-                  Import
-                </button>
-              </Link>
+              <Button onClick={() => router.push(Routes.NewTokenSettingsPage({ terminalHandle }))}>
+                Import
+              </Button>
             </div>
             <div className="grid grid-cols-7 h-[calc(100vh-115px)] w-full box-border">
               <div className="overflow-y-auto col-span-4">

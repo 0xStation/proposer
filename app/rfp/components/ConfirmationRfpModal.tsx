@@ -1,4 +1,6 @@
 import Modal from "app/core/components/Modal"
+import Button from "app/core/components/sds/buttons/Button"
+import { ButtonType } from "app/core/components/sds/buttons/Button"
 
 export const ConfirmationRfpModal = ({ isOpen, setIsOpen, handleSubmit }) => {
   return (
@@ -10,20 +12,12 @@ export const ConfirmationRfpModal = ({ isOpen, setIsOpen, handleSubmit }) => {
           project at any time.
         </p>
         <div className="mt-8">
-          <button
-            type="button"
-            className="text-electric-violet border border-electric-violet mr-2 py-1 px-4 rounded hover:opacity-75"
-            onClick={() => setIsOpen(false)}
-          >
+          <Button onClick={() => setIsOpen(false)} type={ButtonType.Secondary}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
-            onClick={() => handleSubmit()}
-          >
+          </Button>
+          <Button isSubmitType={true} onClick={() => handleSubmit()}>
             Continue
-          </button>
+          </Button>
         </div>
       </div>
     </Modal>
