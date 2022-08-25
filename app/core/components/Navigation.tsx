@@ -14,6 +14,7 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import createAccount from "app/account/mutations/createAccount"
 import { DEFAULT_PFP_URLS } from "../utils/constants"
 import ExploreImageIcon from "public/explore.svg"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 
 const {
   FEATURE: { WALLET_CONNECTION },
@@ -126,7 +127,8 @@ const Navigation = ({ children }: { children?: any }) => {
                   : "Verify that it's you"}
               </p>
             </div>
-            <button
+            <Button
+              type={!address ? ButtonType.Primary : ButtonType.Secondary}
               onClick={() => {
                 trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BANNER_CLICKED, {
                   pageName: window.location.href,
@@ -134,15 +136,11 @@ const Navigation = ({ children }: { children?: any }) => {
                 })
                 toggleWalletModal(true)
               }}
-              className={`h-[35px] ${
-                !address
-                  ? "bg-electric-violet text-tunnel-black hover:opacity-70"
-                  : "border border-electric-violet text-electric-violet hover:bg-concrete"
-              }  w-48 rounded align-middle p-1 ml-28 mt-4 mr-[-2rem] mb-3 lg:mb-0 md:mr-[-6.65rem] right-1/3 fixed bottom-0 lg:bottom-auto`}
-              disabled={walletModalOpen}
+              className="align-middle p-1 ml-28 mt-4 mr-[-2rem] mb-3 lg:mb-0 md:mr-[-6.65rem] right-1/3 fixed bottom-0 lg:bottom-auto"
+              isDisabled={walletModalOpen}
             >
-              {!address ? "Connect Wallet" : "Sign in with Ethereum"}
-            </button>
+              {!address ? "Connect wallet" : "Sign in with Ethereum"}
+            </Button>
           </div>
         )}
       </div>
