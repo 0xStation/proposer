@@ -3,16 +3,16 @@ import * as z from "zod"
 import { AddressType } from "app/types"
 import { ProposalMetadata } from "../types"
 
-const AssignCheckbookToProposal = z.object({
+const AssignProposalToCheckbook = z.object({
   proposalId: z.string(),
   checkbookAddress: z.string(),
   chainId: z.number(),
 })
 
-export default async function assignCheckbookToProposal(
-  input: z.infer<typeof AssignCheckbookToProposal>
+export default async function assignProposalToCheckbook(
+  input: z.infer<typeof AssignProposalToCheckbook>
 ) {
-  const params = AssignCheckbookToProposal.parse(input)
+  const params = AssignProposalToCheckbook.parse(input)
 
   const checkbook = await db.checkbook.findFirst({
     where: {
