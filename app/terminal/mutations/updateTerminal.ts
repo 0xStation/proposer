@@ -1,4 +1,5 @@
 import truncateString from "app/core/utils/truncateString"
+import { Ctx } from "blitz"
 import { StationPlatformTagValues, TagType } from "app/tag/types"
 import db from "db"
 import * as z from "zod"
@@ -20,7 +21,7 @@ const UpdateTerminal = z.object({
   tiktokUrl: z.string().optional(),
 })
 
-export default async function updateTerminal(input: z.infer<typeof UpdateTerminal>) {
+export default async function updateTerminal(input: z.infer<typeof UpdateTerminal>, ctx: Ctx) {
   const params = UpdateTerminal.parse(input)
 
   const existingTerminal = (await db.terminal.findUnique({
@@ -31,6 +32,30 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
     console.log("cannot update a terminal that does not exist")
     return null
   }
+
+  const terminalAdminTags = existingTerminal.data.permissions.adminTagIdWhitelist
+
+  if (!terminalAdminTags || terminalAdminTags.length === 0) {
+    throw new Error(
+      "No admin tags available for this terminal. Nobody is in control, so there is no way to auth."
+    )
+  }
+
+  // easier to write a custom SQL command to fetch the accounts with tags in the list of terminalAdmin tags
+  // than to make a deeply nested prisma command
+  const accountsWithAdminTags: any[] = await db.$queryRaw`
+    SELECT distinct("Account".id), "Account".address
+    FROM "Account"
+    INNER JOIN "AccountTerminal" ON "AccountTerminal"."accountId" = "Account".id
+    INNER JOIN "AccountTerminalTag" ON "AccountTerminalTag"."ticketAccountId" = "Account".id
+    INNER JOIN "Tag" ON "Tag".id = "AccountTerminalTag"."tagId"
+    WHERE "Tag".id in (${terminalAdminTags?.join(",")})
+  `
+
+  ctx.session.$authorize(
+    accountsWithAdminTags.map((account) => account.address),
+    []
+  )
 
   // create new admins or delete removed admins
   let adminTagIdWhitelist = [...(existingTerminal.data?.permissions?.adminTagIdWhitelist || [])]
