@@ -70,6 +70,8 @@ const createStationWhitelist = [
   "0x93730CE5Ac9de1DB9F3FBb73bF522a690629CCEc", // Tribute Labs
   "0xa2bf1b0a7e079767b4701b5a1d9d5700eb42d1d1", // Uniswap Foundation
   "0xeBf8c12A6Ebc94143baf2c8506CFCBD2BE7B5D33", // TempuraDAO
+  "0xeBf8c12A6Ebc94143baf2c8506CFCBD2BE7B5D33", // TempuraDAO
+  "0xF177FaecA47F3F301581b6F94BeA46Be32cd8344", // TempuraDAO
 ]
 export const canCreateStation = (address: string | undefined) => {
   if (process.env.NODE_ENV !== "production") return true
