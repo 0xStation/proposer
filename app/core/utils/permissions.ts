@@ -72,6 +72,7 @@ const createStationWhitelist = [
   "0xeBf8c12A6Ebc94143baf2c8506CFCBD2BE7B5D33", // TempuraDAO
   "0xeBf8c12A6Ebc94143baf2c8506CFCBD2BE7B5D33", // TempuraDAO
   "0xF177FaecA47F3F301581b6F94BeA46Be32cd8344", // TempuraDAO
+  "0xbc1796b4d9d112de8cf29849ee3e732ffd27d4d8", // Livepeer
 ]
 export const canCreateStation = (address: string | undefined) => {
   if (process.env.NODE_ENV !== "production") return true
