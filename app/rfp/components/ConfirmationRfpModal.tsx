@@ -1,6 +1,8 @@
 import Modal from "app/core/components/Modal"
 import { Link, Image } from "blitz"
 import RfpPublishStepper from "public/rfp-publish-stepper.svg"
+import Button from "app/core/components/sds/buttons/Button"
+import { ButtonType } from "app/core/components/sds/buttons/Button"
 
 export const ConfirmationRfpModal = ({ isOpen, setIsOpen, handleSubmit }) => {
   return (
@@ -14,21 +16,13 @@ export const ConfirmationRfpModal = ({ isOpen, setIsOpen, handleSubmit }) => {
         <div className="py-8 text-center">
           <Image src={RfpPublishStepper} alt="RFP Publish Stepper." />
         </div>
-        <div>
-          <button
-            type="button"
-            className="text-electric-violet border border-electric-violet mr-2 py-1 px-4 rounded hover:opacity-75"
-            onClick={() => setIsOpen(false)}
-          >
+        <div className="mt-8">
+          <Button onClick={() => setIsOpen(false)} type={ButtonType.Secondary}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-electric-violet text-tunnel-black border border-electric-violet mr-10 py-1 px-4 rounded hover:opacity-75"
-            onClick={() => handleSubmit()}
-          >
+          </Button>
+          <Button isSubmitType={true} onClick={() => handleSubmit()}>
             Continue
-          </button>
+          </Button>
           <Link
             href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
             passHref

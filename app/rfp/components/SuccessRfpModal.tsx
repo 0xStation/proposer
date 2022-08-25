@@ -1,6 +1,7 @@
 import { useState } from "react"
 import Modal from "app/core/components/Modal"
 import { genBaseUrl } from "app/utils"
+import Button from "app/core/components/sds/buttons/Button"
 
 export const SuccessRfpModal = ({ terminal, isOpen, setIsOpen, rfpId, isEdit = true }) => {
   const [isUrlCopied, setIsUrlCopied] = useState<boolean>(false)
@@ -15,9 +16,7 @@ export const SuccessRfpModal = ({ terminal, isOpen, setIsOpen, rfpId, isEdit = t
           {terminal?.data?.name}.
         </p>
         <div className="mt-8">
-          <button
-            type="button"
-            className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75 w-32"
+          <Button
             onClick={() => {
               navigator.clipboard
                 .writeText(`${genBaseUrl()}/station/${terminal?.handle}/bulletin/rfp/${rfpId}/info`)
@@ -28,7 +27,7 @@ export const SuccessRfpModal = ({ terminal, isOpen, setIsOpen, rfpId, isEdit = t
             }}
           >
             {isUrlCopied ? "Copied!" : "Copy link"}
-          </button>
+          </Button>
         </div>
       </div>
     </Modal>

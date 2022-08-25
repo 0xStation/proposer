@@ -6,6 +6,8 @@ import getRfpsByTerminalId from "../queries/getRfpsByTerminalId"
 import getRfpById from "../queries/getRfpById"
 import useStore from "app/core/hooks/useStore"
 import deleteRfp from "../mutations/deleteRfp"
+import Button from "app/core/components/sds/buttons/Button"
+import { ButtonType } from "app/core/components/sds/buttons/Button"
 
 const {
   FEATURE: { RFP },
@@ -63,16 +65,11 @@ export const DeleteRfpModal = ({
           able to undo this action.
         </p>
         <div className="mt-8">
-          <button
-            type="button"
-            className="text-electric-violet border border-electric-violet mr-2 py-1 px-4 rounded hover:opacity-75"
-            onClick={() => setIsOpen(false)}
-          >
+          <Button type={ButtonType.Secondary} onClick={() => setIsOpen(false)}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
+          </Button>
+          <Button
+            isSubmitType={true}
             onClick={() => {
               trackClick(RFP.EVENT_NAME.DELETE_RFP_CLICKED, {
                 pageName,
@@ -85,7 +82,7 @@ export const DeleteRfpModal = ({
             }}
           >
             Delete RFP
-          </button>
+          </Button>
         </div>
       </div>
     </Modal>

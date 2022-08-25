@@ -1,9 +1,11 @@
-import { invalidateQuery, useMutation, useRouter, Routes } from "blitz"
+import { useMutation, useRouter, Routes } from "blitz"
 import { trackClick, trackError } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import deleteProposal from "../mutations/deleteProposal"
+import Button from "app/core/components/sds/buttons/Button"
+import { ButtonType } from "app/core/components/sds/buttons/Button"
 
 const {
   FEATURE: { PROPOSAL },
@@ -14,6 +16,7 @@ export const DeleteProposalModal = ({
   setIsOpen,
   proposal,
   terminalHandle,
+  rfpId,
   pageName,
   terminalId,
 }) => {
@@ -38,6 +41,14 @@ export const DeleteProposalModal = ({
 
   const handleSubmit = async () => {
     try {
+      trackClick(PROPOSAL.EVENT_NAME.DELETE_PROPOSAL_CLICKED, {
+        pageName,
+        userAddress: activeUser?.address,
+        stationHandle: terminalHandle,
+        stationId: terminalId,
+        rfpId: rfpId,
+        proposalId: proposal?.id,
+      })
       await deleteProposalMutation({ proposalId: proposal?.id as string })
     } catch (error) {
       console.error("Error deleting proposal", error)
@@ -47,6 +58,7 @@ export const DeleteProposalModal = ({
         stationHandle: terminalHandle as string,
         stationId: terminalId,
         proposalId: proposal?.id,
+        rfpId,
         errorMsg: error.message,
       })
       setToastState({
@@ -65,29 +77,17 @@ export const DeleteProposalModal = ({
           to undo this action.
         </p>
         <div className="mt-8">
-          <button
-            type="button"
-            className="text-electric-violet border border-electric-violet mr-2 py-1 px-4 rounded hover:opacity-75"
-            onClick={() => setIsOpen(false)}
-          >
+          <Button type={ButtonType.Secondary} onClick={() => setIsOpen(false)}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
+          </Button>
+          <Button
+            isSubmitType={true}
             onClick={() => {
-              trackClick(PROPOSAL.EVENT_NAME.DELETE_PROPOSAL_CLICKED, {
-                pageName,
-                userAddress: activeUser?.address,
-                stationHandle: terminalHandle as string,
-                stationId: terminalId,
-                proposalId: proposal?.id,
-              })
               handleSubmit()
             }}
           >
             Delete proposal
-          </button>
+          </Button>
         </div>
       </div>
     </Modal>

@@ -13,6 +13,7 @@ import getProposalCountByTerminal from "app/proposal/queries/getProposalCountByT
 import useStore from "app/core/hooks/useStore"
 import { canCreateStation, useUserCanViewRfp } from "app/core/utils/permissions"
 import { DateTime } from "luxon"
+import Button from "app/core/components/sds/buttons/Button"
 
 const {
   FEATURE: { NEW_STATION },
@@ -44,14 +45,13 @@ const ExploreStations: BlitzPage = () => {
   return (
     <Layout title="Explore stations">
       <div className="h-screen">
-        <div className="pt-8 pl-8 pb-3 flex flex-row justify-between">
+        <div className="pt-8 px-8 pb-3 flex flex-row justify-between">
           <div>
             <h1 className="font-bold text-2xl">Explore</h1>
             <p>All stations, find your tribe</p>
           </div>
           <div className="relative self-start group">
-            <button
-              className="text-tunnel-black bg-electric-violet rounded hover:opacity-70 h-[35px] px-6 mr-8"
+            <Button
               onClick={() => {
                 trackClick(NEW_STATION.EVENT_NAME.SHOW_CREATE_STATION_PAGE_CLICKED, {
                   pageName: PAGE_NAME.EXPLORE,
@@ -59,10 +59,10 @@ const ExploreStations: BlitzPage = () => {
                 })
                 router.push(Routes.CreateTerminalDetailsPage())
               }}
-              disabled={!canCreateStation(activeUser?.address)}
+              isDisabled={!canCreateStation(activeUser?.address)}
             >
               Open a station
-            </button>
+            </Button>
             {!canCreateStation(activeUser?.address) && (
               <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
                 Early Access users only.{" "}

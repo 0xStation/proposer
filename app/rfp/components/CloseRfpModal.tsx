@@ -6,6 +6,8 @@ import closeRfp from "app/rfp/mutations/closeRfp"
 import getRfpsByTerminalId from "../queries/getRfpsByTerminalId"
 import useStore from "app/core/hooks/useStore"
 import getRfpById from "../queries/getRfpById"
+import Button from "app/core/components/sds/buttons/Button"
+import { ButtonType } from "app/core/components/sds/buttons/Button"
 
 const {
   FEATURE: { RFP },
@@ -65,20 +67,12 @@ export const CloseRfpModal = ({ isOpen, setIsOpen, rfp, pageName, terminalId, te
           any time.
         </p>
         <div className="mt-8">
-          <button
-            type="button"
-            className="text-electric-violet border border-electric-violet mr-2 py-1 px-4 rounded hover:opacity-75"
-            onClick={() => setIsOpen(false)}
-          >
+          <Button type={ButtonType.Secondary} onClick={() => setIsOpen(false)}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
-            onClick={() => handleSubmit()}
-          >
+          </Button>
+          <Button isSubmitType={true} onClick={() => handleSubmit()}>
             Close RFP
-          </button>
+          </Button>
         </div>
       </div>
     </Modal>

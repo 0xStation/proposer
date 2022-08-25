@@ -51,6 +51,7 @@ type EventProperties = {
   checkbookAddress: string
   rfpId: string
   transactionHash: string
+  isEdit: boolean
 }
 
 type ErrorProperties = {
@@ -71,7 +72,7 @@ type ErrorProperties = {
   amount: string
   title: string
   checkbookAddress: string
-  isEdit: true
+  isEdit: boolean
 }
 
 const inactiveTracking = (isDev() || isStaging()) && process.env.NEXT_PUBLIC_TRACK !== "true"
@@ -159,6 +160,7 @@ export const trackImpression = (eventName: string, metadata: Partial<ImpressionP
     numRfps,
     rfpId,
     proposalId,
+    isEdit,
   } = metadata
 
   track(eventName, {
@@ -171,6 +173,7 @@ export const trackImpression = (eventName: string, metadata: Partial<ImpressionP
     num_rfps: numRfps,
     rfp_id: rfpId,
     proposal_id: proposalId,
+    is_edit: isEdit,
   })
 }
 
@@ -190,6 +193,7 @@ export const trackEvent = (eventName: string, metadata: Partial<EventProperties>
     checkbookAddress,
     rfpId,
     transactionHash,
+    isEdit,
   } = metadata
 
   track(eventName, {
@@ -204,6 +208,7 @@ export const trackEvent = (eventName: string, metadata: Partial<EventProperties>
     checkbook_address: checkbookAddress,
     rfp_id: rfpId,
     transaction_hash: transactionHash,
+    is_edit: isEdit,
   })
 }
 
@@ -230,6 +235,7 @@ export const trackError = (eventName: string, metadata: Partial<ErrorProperties>
     amount,
     title,
     checkbookAddress,
+    isEdit,
   } = metadata
 
   track(eventName, {
@@ -251,6 +257,7 @@ export const trackError = (eventName: string, metadata: Partial<ErrorProperties>
     amount,
     title,
     checkbook_address: checkbookAddress,
+    is_edit: isEdit,
   })
 }
 

@@ -55,6 +55,7 @@ import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
 import SelectCheckbookModal from "app/checkbook/components/SelectCheckbookModal"
 import { AddressType } from "app/types"
 import { getNetworkName } from "app/core/utils/getNetworkName"
+import Button from "app/core/components/sds/buttons/Button"
 
 const {
   PAGE_NAME,
@@ -223,6 +224,7 @@ const ProposalPage: BlitzPage = ({
         setIsOpen={setDeleteProposalModalOpen}
         proposal={proposal}
         pageName={PAGE_NAME.PROPOSAL_INFO_PAGE}
+        rfpId={rfp?.id}
         terminalHandle={terminalHandle}
         terminalId={terminal?.id as number}
       />
@@ -304,6 +306,7 @@ const ProposalPage: BlitzPage = ({
                                   stationHandle: terminalHandle,
                                   stationId: terminal?.id,
                                   isEdit: true,
+                                  rfpId: rfp.id,
                                 })
                                 router.push(
                                   Routes.EditProposalPage({
@@ -361,8 +364,10 @@ const ProposalPage: BlitzPage = ({
                                       PROPOSAL.EVENT_NAME.PROPOSAL_SETTINGS_DELETE_PROPOSAL_CLICKED,
                                       {
                                         pageName: PAGE_NAME.PROPOSAL_INFO_PAGE,
+                                        userAddress: activeUser?.address,
                                         stationHandle: terminalHandle,
                                         stationId: terminal?.id,
+                                        rfpId: rfp?.id,
                                         proposalId: proposal?.id,
                                       }
                                     )
@@ -413,7 +418,7 @@ const ProposalPage: BlitzPage = ({
                 </div>
                 {showApproveButton ? (
                   <div className="relative self-start group">
-                    <button
+                    <Button
                       onClick={() => {
                         if (!!checkbook) {
                           setSignModalOpen(true)
@@ -421,24 +426,17 @@ const ProposalPage: BlitzPage = ({
                           setCheckbookModalOpen(true)
                         }
                       }}
-                      className="bg-electric-violet text-tunnel-black px-6 h-[35px] rounded block mx-auto hover:bg-opacity-70 mb-2"
-                      disabled={
+                      isDisabled={
                         waitingCreation ||
-                        (!!checkbook &&
+                        (checkbook &&
                           parseFloat(fundsAvailable) < proposal.data.funding?.amount) ||
-                        (!!checkbook && !userIsSigner)
+                        (checkbook && !userIsSigner)
                       }
+                      isLoading={waitingCreation}
                     >
-                      {waitingCreation ? (
-                        <div className="flex justify-center items-center">
-                          <Spinner fill="black" />
-                        </div>
-                      ) : (
-                        "Approve"
-                      )}
-                    </button>
-                    {!!checkbook &&
-                      parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
+                      Approve
+                    </Button>
+                    {checkbook && parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
                       fundsHaveNotBeenApproved(proposal) && (
                         <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
                           Insufficient funds.{" "}

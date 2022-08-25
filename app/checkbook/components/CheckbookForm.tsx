@@ -15,6 +15,8 @@ import { useState } from "react"
 import { Form, Field } from "react-final-form"
 import { useWaitForTransaction } from "wagmi"
 import createCheckbook from "../mutations/createCheckbook"
+import Button from "app/core/components/sds/buttons/Button"
+import { ButtonType } from "app/core/components/sds/buttons/Button"
 
 const {
   FEATURE: { CHECKBOOK },
@@ -324,34 +326,25 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
                     <p className="text-marble-white mb-2">Check your wallet for next steps.</p>
                   )
                 ) : null}
-                {!isEdit && (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault()
+                {isEdit && (
+                  <Button
+                    type={ButtonType.Secondary}
+                    onClick={() => {
                       router.push(Routes.BulletinPage({ terminalHandle }))
                     }}
-                    className="rounded text-electric-violet border border-electric-violet h-[35px] w-28 mr-2 hover:bg-wet-concrete"
+                    className="mr-2"
                   >
                     Skip
-                  </button>
+                  </Button>
                 )}
-                <button
-                  className={`rounded text-tunnel-black w-28 h-[35px] mb-8 bg-electric-violet ${
-                    formButtonDisabled
-                      ? "opacity-70 cursor-not-allowed"
-                      : "opacity-100 cursor-pointer"
-                  }`}
-                  type="submit"
-                  disabled={formButtonDisabled || waitingCreation}
+                <Button
+                  className="mb-8"
+                  isLoading={waitingCreation}
+                  isDisabled={formButtonDisabled || waitingCreation}
+                  isSubmitType={true}
                 >
-                  {waitingCreation ? (
-                    <div className="flex justify-center items-center">
-                      <Spinner fill="black" />
-                    </div>
-                  ) : (
-                    "Create"
-                  )}
-                </button>
+                  Create
+                </Button>
               </div>
             </div>
           </form>

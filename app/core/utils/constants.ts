@@ -170,6 +170,7 @@ export const TRACKING_EVENTS = {
         PROPOSAL_EDITOR_PUBLISH_CLICKED: "proposal_editor_publish_clicked",
         PROPOSAL_EDITOR_MODAL_PUBLISH_CLICKED: "proposal_editor_modal_publish_clicked",
         ERROR_CREATING_PROPOSAL: "error_creating_proposal",
+        ERROR_EDITING_PROPOSAL: "error_deleting_proposal",
         ERROR_DELETING_PROPOSAL: "error_deleting_proposal",
         PROPOSAL_SETTINGS_DELETE_PROPOSAL_CLICKED: "proposal_settings_delete_proposal_clicked",
         DELETE_PROPOSAL_CLICKED: "delete_proposal_clicked",

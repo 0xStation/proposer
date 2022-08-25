@@ -29,6 +29,8 @@ import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
 import updateProposal from "../mutations/updateProposal"
 import { Proposal } from "../types"
+import Button from "app/core/components/sds/buttons/Button"
+import { ButtonType } from "app/core/components/sds/buttons/Button"
 
 const {
   PAGE_NAME,
@@ -198,8 +200,8 @@ export const ProposalMarkdownForm = ({
             return
           }
 
-          try {
-            if (isEdit) {
+          if (isEdit) {
+            try {
               await updateProposalMutation({
                 proposalId: proposal?.id as string,
                 recipientAddress: values.recipientAddress,
@@ -212,7 +214,27 @@ export const ProposalMarkdownForm = ({
                 signature,
                 signatureMessage: message,
               })
-            } else {
+            } catch (err) {
+              trackError(PROPOSAL.EVENT_NAME.ERROR_CREATING_PROPOSAL, {
+                pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
+                userAddress: activeUser?.address,
+                stationHandle: terminal?.handle,
+                stationId: terminal?.id,
+                recipientAddress: values?.recipientAddress,
+                amount: values?.amount,
+                title: values?.title,
+                errorMsg: err.message,
+                isEdit,
+              })
+              console.error(err)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Something went wrong.",
+              })
+            }
+          } else {
+            try {
               await createProposalMutation({
                 rfpId: rfp?.id,
                 terminalId: terminal?.id,
@@ -229,24 +251,25 @@ export const ProposalMarkdownForm = ({
                 senderAddress: rfp.data.funding.senderAddress,
                 senderType: rfp.data.funding.senderType,
               })
+            } catch (err) {
+              trackError(PROPOSAL.EVENT_NAME.ERROR_CREATING_PROPOSAL, {
+                pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
+                userAddress: activeUser?.address,
+                stationHandle: terminal?.handle,
+                stationId: terminal?.id,
+                recipientAddress: values?.recipientAddress,
+                amount: values?.amount,
+                title: values?.title,
+                errorMsg: err.message,
+                isEdit,
+              })
+              console.error(err)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Something went wrong.",
+              })
             }
-          } catch (e) {
-            trackError(PROPOSAL.EVENT_NAME.ERROR_CREATING_PROPOSAL, {
-              pageName: PAGE_NAME.PROPOSAL_EDITOR_PAGE,
-              userAddress: activeUser?.address,
-              stationHandle: terminal?.handle,
-              stationId: terminal?.id,
-              recipientAddress: values?.recipientAddress,
-              amount: values?.amount,
-              title: values?.title,
-              errorMsg: e.message,
-            })
-            console.error(e)
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: "Something went wrong.",
-            })
           }
         }
       }}
@@ -296,20 +319,20 @@ export const ProposalMarkdownForm = ({
                       <span>Markdown shortcuts</span>
                     </button>
                     <UploadImageButton />
-                    <button
-                      type="button"
-                      className="border border-electric-violet text-electric-violet px-6 py-1 rounded block hover:bg-wet-concrete"
+                    <Button
                       onClick={() => setPreviewMode(!previewMode)}
+                      type={ButtonType.Secondary}
                     >
-                      <span>{previewMode ? "Back to editing" : "Preview"}</span>
-                    </button>
-                    <button
-                      type="button"
+                      {previewMode ? "Back to editing" : "Preview"}
+                    </Button>
+                    <Button
                       onClick={() => {
                         trackClick(PROPOSAL.EVENT_NAME.PROPOSAL_EDITOR_PUBLISH_CLICKED, {
                           userAddress: activeUser?.address,
                           stationHandle: terminal?.handle,
                           stationId: terminal?.id,
+                          rfpId: rfp?.id,
+                          isEdit,
                         })
                         setAttemptedSubmit(true)
                         if (formState.invalid) {
@@ -326,13 +349,10 @@ export const ProposalMarkdownForm = ({
                         setUnsavedChanges(false)
                         setConfirmationModalOpen(true)
                       }}
-                      disabled={!formState.dirty}
-                      className={`bg-electric-violet ${
-                        !formState.dirty ? "bg-opacity-70 cursor-not-allowed" : ""
-                      } text-tunnel-black px-6 py-1 rounded block mx-auto hover:bg-opacity-70`}
+                      isDisabled={!formState.dirty}
                     >
                       Publish
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
