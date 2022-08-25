@@ -27,6 +27,7 @@ import getRfpApprovedProposalFunding from "app/rfp/queries/getRfpApprovedFunding
 import { ZERO_ADDRESS, TRACKING_EVENTS } from "app/core/utils/constants"
 import getCheckbook from "app/checkbook/queries/getCheckbook"
 import { AddressType } from "app/types"
+import { getNetworkName } from "app/core/utils/getNetworkName"
 
 const {
   PAGE_NAME,
@@ -180,6 +181,9 @@ const RFPInfoTab: BlitzPage = () => {
               </div>
             </div>
             <div className="p-6">
+              {/* Network */}
+              <h4 className="text-xs font-bold text-concrete uppercase mt-6">Network</h4>
+              <p className="mt-2 font-normal">{getNetworkName(rfp?.data.funding.token.chainId)}</p>
               <div className="mt-6">
                 <p className="text-concrete uppercase text-xs font-bold">Available Funding</p>
                 <div className="flex flex-row items-end space-x-1 mt-2">

@@ -9,6 +9,7 @@ import getCheckbookByProposal from "app/checkbook/queries/getCheckbookByProposal
 import { RefreshIcon } from "@heroicons/react/solid"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { LINKS } from "app/core/utils/constants"
+import { ProposalMetadata } from "app/proposal/types"
 
 export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) => {
   const router = useRouter()
@@ -16,7 +17,10 @@ export const SelectCheckbookModal = ({ isOpen, setIsOpen, terminal, proposal }) 
 
   const [checkbooks, { refetch: refetchCheckbooks }] = useQuery(
     getCheckbooksByTerminal,
-    { terminalId: terminal?.id as number },
+    {
+      terminalId: terminal?.id as number,
+      chainId: (proposal.data as ProposalMetadata).funding.chainId,
+    },
     { suspense: false, enabled: !!terminal, refetchOnWindowFocus: false }
   )
 

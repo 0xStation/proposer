@@ -54,6 +54,7 @@ import { ProposalStatus } from "app/proposal/types"
 import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
 import SelectCheckbookModal from "app/checkbook/components/SelectCheckbookModal"
 import { AddressType } from "app/types"
+import { getNetworkName } from "app/core/utils/getNetworkName"
 
 const {
   PAGE_NAME,
@@ -540,18 +541,26 @@ const ProposalPage: BlitzPage = ({
                       </>
                     )}
                   </span>
+                  {/* Network */}
+                  <h4 className="text-xs font-bold text-concrete uppercase mt-6">Network</h4>
+                  <p className="mt-2 font-normal">
+                    {getNetworkName(proposal?.data.funding.chainId)}
+                  </p>
+                  {/* Token */}
                   <h4 className="text-xs font-bold text-concrete uppercase mt-6">Token</h4>
                   <p className="mt-2 font-normal">{proposal?.data.funding.symbol}</p>
+                  {/* Amount */}
                   <h4 className="text-xs font-bold text-concrete uppercase mt-6">
                     Amount Requested
                   </h4>
                   <p className="mt-2">{`${proposal?.data.funding.amount}`}</p>
+                  {/* Pay to */}
                   <h4 className="text-xs font-bold text-concrete uppercase mt-6">Pay to</h4>
                   <p className="mt-2">
                     {truncateString(proposal?.data.funding.recipientAddress, 9)}
                   </p>
                 </div>
-                {!!checkbook && (
+                {checkbook && (
                   <div
                     className={
                       check
@@ -605,7 +614,7 @@ const ProposalPage: BlitzPage = ({
                     </div>
                   </div>
                 )}
-                {!!check && (
+                {check && (
                   <div className="border-t border-concrete p-6 grow flex flex-col justify-between">
                     <div>
                       <p className="text-xs text-concrete uppercase font-bold">Check</p>
