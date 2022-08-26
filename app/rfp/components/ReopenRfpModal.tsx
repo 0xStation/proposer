@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { invalidateQuery, useMutation } from "blitz"
-import { track } from "@amplitude/analytics-browser"
 import { trackClick, trackError } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Modal from "app/core/components/Modal"
@@ -9,6 +8,7 @@ import useStore from "app/core/hooks/useStore"
 import getRfpById from "../queries/getRfpById"
 import reopenRfp from "../mutations/reopenRfp"
 import getShortDate from "app/core/utils/getShortDate"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 
 const {
   FEATURE: { RFP },
@@ -92,20 +92,12 @@ export const ReopenRfpModal = ({
           }}
         />
         <div className="mt-8">
-          <button
-            type="button"
-            className="text-electric-violet border border-electric-violet mr-2 py-1 px-4 rounded hover:opacity-75"
-            onClick={() => setIsOpen(false)}
-          >
+          <Button className="mr-2" onClick={() => setIsOpen(false)} type={ButtonType.Secondary}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 px-4 rounded hover:opacity-75"
-            onClick={() => handleSubmit()}
-          >
+          </Button>
+          <Button isSubmitType={true} onClick={() => handleSubmit()}>
             Continue
-          </button>
+          </Button>
         </div>
       </div>
     </Modal>

@@ -4,8 +4,7 @@ import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import deleteProposal from "../mutations/deleteProposal"
-import Button from "app/core/components/sds/buttons/Button"
-import { ButtonType } from "app/core/components/sds/buttons/Button"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 
 const {
   FEATURE: { PROPOSAL },
@@ -77,7 +76,7 @@ export const DeleteProposalModal = ({
           to undo this action.
         </p>
         <div className="mt-8">
-          <Button type={ButtonType.Secondary} onClick={() => setIsOpen(false)}>
+          <Button className="mr-2" type={ButtonType.Secondary} onClick={() => setIsOpen(false)}>
             Cancel
           </Button>
           <Button
