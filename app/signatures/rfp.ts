@@ -1,7 +1,7 @@
 import { toUtf8Bytes } from "@ethersproject/strings"
 import { keccak256 } from "@ethersproject/keccak256"
 
-export const genRfpSignatureMessage = (values, author) => {
+export const genRfpSignatureMessage = (values, author, chainId) => {
   const now = new Date()
   const startDate = new Date(values.startDate)
   const endDate = new Date(values.endDate)
@@ -10,11 +10,11 @@ export const genRfpSignatureMessage = (values, author) => {
     domain: {
       name: "Projects", // keep hardcoded
       version: "1", // keep hardcoded
+      chainId,
     },
     types: {
       Rfp: [
         { name: "author", type: "address" },
-        { name: "replyTo", type: "address" }, // (checkbook address for now)
         { name: "timestamp", type: "uint256" }, // ISO formatted date string
         { name: "startDate", type: "uint256" }, // ISO formatted date string
         { name: "endDate", type: "uint256" }, // ISO formatted date string
@@ -26,7 +26,6 @@ export const genRfpSignatureMessage = (values, author) => {
     },
     value: {
       author: author,
-      replyTo: values.checkbookAddress,
       timestamp: now.valueOf(), // unix timestamp
       startDate: startDate.valueOf(), // unix timestamp
       endDate: values.endDate ? endDate.valueOf() : 0, // unix timestamp

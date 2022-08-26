@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { Form, Field } from "react-final-form"
 import { XIcon, LightBulbIcon } from "@heroicons/react/solid"
-import { useRouter, useParam, useMutation, Routes, Link } from "blitz"
+import { useRouter, useParam, useMutation, useQuery, Routes, Link } from "blitz"
 import Preview from "app/core/components/MarkdownPreview"
 import Modal from "app/core/components/Modal"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
@@ -16,7 +16,13 @@ import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import truncateString from "app/core/utils/truncateString"
 import { genProposalSignatureMessage } from "app/signatures/proposal"
 import { trackImpression, trackClick, trackError } from "app/utils/amplitude"
-import { requiredField, composeValidators, isPositiveAmount, isAddress } from "app/utils/validators"
+import {
+  requiredField,
+  composeValidators,
+  isPositiveAmount,
+  isAddress,
+  maximumDecimals,
+} from "app/utils/validators"
 import { parseUnits } from "@ethersproject/units"
 import createProposal from "../mutations/createProposal"
 import { Rfp } from "app/rfp/types"
@@ -66,19 +72,21 @@ export const ProposalMarkdownForm = ({
     })
   }, [])
 
-  const checkbookTokens = useCheckbookAvailability(rfp?.checkbook, terminal)
+  // TODO: add back support for token warning text, likely with new and better designed hook
 
-  const amountMessage = (amount) => {
-    const selectedToken = checkbookTokens?.find((token) =>
-      addressesAreEqual(token?.address, fundingToken?.address)
-    )
-    if (!selectedToken) {
-      return
-    }
-    if (parseFloat(selectedToken?.available) < amount) {
-      return `The RFP's checkbook only has ${selectedToken.available} ${selectedToken.symbol}. You can request ${amount}, but it cannot be approved until an admin adds more ${selectedToken.symbol} to the checkbook.`
-    }
-  }
+  // const checkbookTokens = useCheckbookAvailability(rfp?.checkbook, terminal)
+
+  // const amountMessage = (amount) => {
+  //   const selectedToken = checkbookTokens?.find((token) =>
+  //     addressesAreEqual(token?.address, fundingToken?.address)
+  //   )
+  //   if (!selectedToken) {
+  //     return
+  //   }
+  //   if (parseFloat(selectedToken?.available) < amount) {
+  //     return `The RFP's checkbook only has ${selectedToken.available} ${selectedToken.symbol}. You can request ${amount}, but it cannot be approved until an admin adds more ${selectedToken.symbol} to the checkbook.`
+  //   }
+  // }
 
   const terminalHandle = useParam("terminalHandle") as string
   const [createProposalMutation] = useMutation(createProposal, {
@@ -178,10 +186,10 @@ export const ProposalMarkdownForm = ({
           const parsedTokenAmount = parseUnits(values.amount, fundingToken.decimals)
 
           const message = genProposalSignatureMessage(
-            rfp?.checkbook.address,
             activeUser?.address,
             rfp?.id,
             parsedTokenAmount,
+            fundingToken.chainId,
             { ...values, token: fundingToken.address }
           )
 
@@ -197,6 +205,7 @@ export const ProposalMarkdownForm = ({
               await updateProposalMutation({
                 proposalId: proposal?.id as string,
                 recipientAddress: values.recipientAddress,
+                chainId: fundingToken.chainId,
                 token: fundingToken.address,
                 amount: values.amount,
                 symbol: fundingToken.symbol,
@@ -230,6 +239,7 @@ export const ProposalMarkdownForm = ({
                 rfpId: rfp?.id,
                 terminalId: terminal?.id,
                 recipientAddress: values.recipientAddress,
+                chainId: fundingToken.chainId,
                 token: fundingToken.address,
                 amount: values.amount,
                 symbol: fundingToken.symbol,
@@ -238,6 +248,8 @@ export const ProposalMarkdownForm = ({
                 collaborators: [activeUser.address],
                 signature,
                 signatureMessage: message,
+                senderAddress: rfp.data.funding.senderAddress,
+                senderType: rfp.data.funding.senderType,
               })
             } catch (err) {
               trackError(PROPOSAL.EVENT_NAME.ERROR_CREATING_PROPOSAL, {
@@ -494,7 +506,11 @@ export const ProposalMarkdownForm = ({
 
                     <Field
                       name="amount"
-                      validate={composeValidators(requiredField, isPositiveAmount)}
+                      validate={composeValidators(
+                        requiredField,
+                        isPositiveAmount,
+                        maximumDecimals(fundingToken.decimals)
+                      )}
                     >
                       {({ meta, input }) => (
                         <>
@@ -505,11 +521,12 @@ export const ProposalMarkdownForm = ({
                             placeholder="Enter token amount"
                             className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                           />
-                          {formState.values.amount && (
+                          {/* TODO: add back support for token warning text, likely with new and better designed hook */}
+                          {/* {formState.values.amount && (
                             <span className="text-neon-carrot text-xs block mt-2">
                               {amountMessage(formState.values.amount)}
                             </span>
-                          )}
+                          )} */}
                           {(meta.touched || attemptedSubmit) && meta.error && (
                             <span className="text-torch-red text-xs">{meta.error}</span>
                           )}

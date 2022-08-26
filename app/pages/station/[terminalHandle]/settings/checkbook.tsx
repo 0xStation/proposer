@@ -25,6 +25,7 @@ import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import { AddFundsModal } from "app/core/components/AddFundsModal"
 import useStore from "app/core/hooks/useStore"
+import { getNetworkName } from "app/core/utils/getNetworkName"
 import Button from "app/core/components/sds/buttons/Button"
 import { ButtonType } from "app/core/components/sds/buttons/Button"
 
@@ -80,8 +81,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
   const [checkbooks, setCheckbooks] = useState<Checkbook[]>([])
   const [selectedCheckbook, setSelectedCheckbook] = useState<Checkbook>()
   const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
-  const [successModalOpen, setSuccessModalOpen] = useState<boolean>(!!creationSuccess)
-  const [showAddFundsModal, setShowAddFundsModal] = useState<boolean>(false)
+  const [showAddFundsModal, setShowAddFundsModal] = useState<boolean>(!!creationSuccess)
   const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
 
@@ -145,8 +145,8 @@ const CheckbookSettingsPage: BlitzPage = () => {
     <LayoutWithoutNavigation>
       <Navigation>
         <AddFundsModal
-          setIsOpen={setShowAddFundsModal || setSuccessModalOpen}
-          isOpen={showAddFundsModal || successModalOpen}
+          setIsOpen={setShowAddFundsModal}
+          isOpen={showAddFundsModal}
           checkbookAddress={selectedCheckbook?.address}
           pageName={PAGE_NAME.CHECKBOOK_SETTINGS_PAGE}
           terminalId={terminal?.id as number}
@@ -249,9 +249,9 @@ const CheckbookSettingsPage: BlitzPage = () => {
                     <div className="space-y-6 mt-9">
                       <div>
                         <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">
-                          Chain
+                          Network
                         </h3>
-                        <p className="mt-2">{networks[selectedCheckbook?.chainId!].name}</p>
+                        <p className="mt-2">{getNetworkName(selectedCheckbook?.chainId!)}</p>
                       </div>
                       <div>
                         <h3 className="uppercase text-xs text-concrete font-bold tracking-wider">

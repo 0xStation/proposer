@@ -6,7 +6,6 @@ import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 const CreateRfp = z.object({
   terminalId: z.number(),
-  fundingAddress: z.string(),
   authorAddress: z.string(),
   contentTitle: z.string(),
   contentBody: z.string(),
@@ -34,7 +33,6 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
 
   const rfp = await db.rfp.create({
     data: {
-      fundingAddress: params.fundingAddress,
       authorAddress: params.authorAddress,
       terminalId: params.terminalId,
       startDate: params.startDate,

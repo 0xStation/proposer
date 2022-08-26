@@ -1,9 +1,12 @@
 import db from "db"
 import * as z from "zod"
+import { AddressType } from "app/types"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 const CreateProposal = z.object({
   terminalId: z.number(),
   rfpId: z.string(),
+  chainId: z.number(),
   token: z.string(),
   amount: z.string(),
   symbol: z.string().optional(),
@@ -13,6 +16,8 @@ const CreateProposal = z.object({
   collaborators: z.array(z.string()),
   signature: z.string(),
   signatureMessage: z.any(),
+  senderAddress: z.string().optional(),
+  senderType: z.enum([AddressType.CHECKBOOK, AddressType.SAFE, AddressType.WALLET]).optional(),
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
@@ -31,6 +36,9 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
           body: input.contentBody,
         },
         funding: {
+          senderAddress: input.senderAddress ? toChecksumAddress(input.senderAddress) : undefined,
+          senderType: input.senderType,
+          chainId: input.chainId,
           recipientAddress: input.recipientAddress,
           token: input.token,
           amount: input.amount,

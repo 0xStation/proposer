@@ -4,6 +4,7 @@ import { ProposalMetadata } from "../types"
 
 const UpdateProposal = z.object({
   proposalId: z.string(),
+  chainId: z.number(),
   token: z.string(),
   amount: z.string(),
   symbol: z.string().optional(),
@@ -29,6 +30,7 @@ export default async function updateProposal(input: z.infer<typeof UpdateProposa
     },
     funding: {
       recipientAddress: params.recipientAddress,
+      chainId: params.chainId,
       token: params.token,
       amount: params.amount,
       symbol: params.symbol,

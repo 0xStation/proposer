@@ -8,7 +8,6 @@ import { toChecksumAddress } from "app/core/utils/checksumAddress"
 // will still be capturing them while they are filled in for the edit view.
 const UpdateRfp = z.object({
   rfpId: z.string(), // uuid as string?
-  fundingAddress: z.string(),
   contentTitle: z.string(),
   contentBody: z.string(),
   startDate: z.date(),
@@ -26,7 +25,6 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
     const rfp = await db.rfp.update({
       where: { id: input.rfpId },
       data: {
-        fundingAddress: input.fundingAddress,
         startDate: input.startDate,
         endDate: input.endDate,
         data: {

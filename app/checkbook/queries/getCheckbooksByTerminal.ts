@@ -4,6 +4,7 @@ import { Checkbook } from "../types"
 
 const GetCheckbooksByTerminal = z.object({
   terminalId: z.number(),
+  chainId: z.number().optional(),
 })
 
 export default async function getCheckbooksByTerminal(
@@ -12,6 +13,7 @@ export default async function getCheckbooksByTerminal(
   const checkbooks = await db.checkbook.findMany({
     where: {
       terminalId: input.terminalId,
+      ...(input.chainId && { chainId: input.chainId }),
     },
   })
 
