@@ -3,6 +3,7 @@ import { Link, Image } from "blitz"
 import RfpPublishStepper from "public/rfp-publish-stepper.svg"
 import Button from "app/core/components/sds/buttons/Button"
 import { ButtonType } from "app/core/components/sds/buttons/Button"
+import { LINKS } from "app/core/utils/constants"
 
 export const ConfirmationRfpModal = ({ isOpen, setIsOpen, handleSubmit }) => {
   return (
@@ -23,10 +24,7 @@ export const ConfirmationRfpModal = ({ isOpen, setIsOpen, handleSubmit }) => {
           <Button isSubmitType={true} onClick={() => handleSubmit()}>
             Continue
           </Button>
-          <Link
-            href="https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook"
-            passHref
-          >
+          <Link href={LINKS.CHECKBOOK} passHref>
             <a target="_blank" rel="noopener noreferrer" className="text-electric-violet font-bold">
               Learn more about Checkbook
             </a>

@@ -428,15 +428,16 @@ const ProposalPage: BlitzPage = ({
                       }}
                       isDisabled={
                         waitingCreation ||
-                        (checkbook &&
+                        (!!checkbook &&
                           parseFloat(fundsAvailable) < proposal.data.funding?.amount) ||
-                        (checkbook && !userIsSigner)
+                        (!!checkbook && !userIsSigner)
                       }
                       isLoading={waitingCreation}
                     >
                       Approve
                     </Button>
-                    {checkbook && parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
+                    {checkbook &&
+                      parseFloat(fundsAvailable) < proposal.data.funding?.amount &&
                       fundsHaveNotBeenApproved(proposal) && (
                         <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
                           Insufficient funds.{" "}
