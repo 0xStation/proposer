@@ -18,14 +18,18 @@ export const ConfirmationRfpModal = ({ isOpen, setIsOpen, handleSubmit }) => {
           <Image src={RfpPublishStepper} alt="RFP Publish Stepper." />
         </div>
         <div className="mt-8">
-          <Button onClick={() => setIsOpen(false)} type={ButtonType.Secondary}>
+          <Button className="mr-2" onClick={() => setIsOpen(false)} type={ButtonType.Secondary}>
             Cancel
           </Button>
           <Button isSubmitType={true} onClick={() => handleSubmit()}>
             Continue
           </Button>
           <Link href={LINKS.CHECKBOOK} passHref>
-            <a target="_blank" rel="noopener noreferrer" className="text-electric-violet font-bold">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-10 text-electric-violet font-bold"
+            >
               Learn more about Checkbook
             </a>
           </Link>

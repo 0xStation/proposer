@@ -10,7 +10,6 @@ export const genRfpSignatureMessage = (values, author, chainId) => {
     domain: {
       name: "Projects", // keep hardcoded
       version: "1", // keep hardcoded
-      chainId,
     },
     types: {
       Rfp: [
@@ -18,6 +17,7 @@ export const genRfpSignatureMessage = (values, author, chainId) => {
         { name: "timestamp", type: "uint256" }, // ISO formatted date string
         { name: "startDate", type: "uint256" }, // ISO formatted date string
         { name: "endDate", type: "uint256" }, // ISO formatted date string
+        { name: "chainId", type: "uint256" },
         { name: "token", type: "address" },
         { name: "budget", type: "uint256" },
         { name: "title", type: "string" },
@@ -29,6 +29,7 @@ export const genRfpSignatureMessage = (values, author, chainId) => {
       timestamp: now.valueOf(), // unix timestamp
       startDate: startDate.valueOf(), // unix timestamp
       endDate: values.endDate ? endDate.valueOf() : 0, // unix timestamp
+      chainId,
       token: values.fundingTokenAddress,
       budget: values.budgetAmount,
       title: keccak256(toUtf8Bytes(values.title)),
