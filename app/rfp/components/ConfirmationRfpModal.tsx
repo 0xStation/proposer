@@ -1,8 +1,7 @@
 import Modal from "app/core/components/Modal"
 import { Link, Image } from "blitz"
 import RfpPublishStepper from "public/rfp-publish-stepper.svg"
-import Button from "app/core/components/sds/buttons/Button"
-import { ButtonType } from "app/core/components/sds/buttons/Button"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { LINKS } from "app/core/utils/constants"
 
 export const ConfirmationRfpModal = ({ isOpen, setIsOpen, handleSubmit }) => {

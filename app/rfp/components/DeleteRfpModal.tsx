@@ -6,8 +6,7 @@ import getRfpsByTerminalId from "../queries/getRfpsByTerminalId"
 import getRfpById from "../queries/getRfpById"
 import useStore from "app/core/hooks/useStore"
 import deleteRfp from "../mutations/deleteRfp"
-import Button from "app/core/components/sds/buttons/Button"
-import { ButtonType } from "app/core/components/sds/buttons/Button"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 
 const {
   FEATURE: { RFP },
@@ -65,7 +64,7 @@ export const DeleteRfpModal = ({
           able to undo this action.
         </p>
         <div className="mt-8">
-          <Button type={ButtonType.Secondary} onClick={() => setIsOpen(false)}>
+          <Button className="mr-2" type={ButtonType.Secondary} onClick={() => setIsOpen(false)}>
             Cancel
           </Button>
           <Button
