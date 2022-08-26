@@ -326,7 +326,7 @@ export const CheckbookForm = ({ callback, isEdit = true, pageName }) => {
                     <p className="text-marble-white mb-2">Check your wallet for next steps.</p>
                   )
                 ) : null}
-                {isEdit && (
+                {!isEdit && (
                   <Button
                     type={ButtonType.Secondary}
                     onClick={() => {

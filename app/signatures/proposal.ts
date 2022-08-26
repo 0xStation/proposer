@@ -15,12 +15,12 @@ export const genProposalSignatureMessage = (
     domain: {
       name: "Proposal", // keep hardcoded
       version: "1", // keep hardcoded
-      chainId,
     },
     types: {
       Funding: [
         { name: "type", type: "string" }, // hard coded to single-upon-approval
         { name: "fundingRecipient", type: "address" }, // recieves the reward from the proposal
+        { name: "chainId", type: "uint256" },
         { name: "token", type: "address" },
         { name: "amount", type: "uint256" },
       ],
@@ -44,6 +44,7 @@ export const genProposalSignatureMessage = (
       funding: {
         type: "single-upon-approval",
         fundingRecipient: formValues.recipientAddress,
+        chainId,
         token: formValues.token,
         amount: parsedTokenAmount,
       },
