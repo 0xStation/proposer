@@ -4,6 +4,7 @@ import { Ctx } from "blitz"
 import { TagType } from "app/tag/types"
 import { truncateString } from "app/core/utils/truncateString"
 import { Terminal } from "app/terminal/types"
+import { Prisma } from "@prisma/client"
 
 const CreateCheckbook = z.object({
   terminalId: z.number(),
@@ -39,7 +40,7 @@ export default async function createCheckbook(input: z.infer<typeof CreateCheckb
     INNER JOIN "AccountTerminal" ON "AccountTerminal"."accountId" = "Account".id
     INNER JOIN "AccountTerminalTag" ON "AccountTerminalTag"."ticketAccountId" = "Account".id
     INNER JOIN "Tag" ON "Tag".id = "AccountTerminalTag"."tagId"
-    WHERE "Tag".id in (${terminalAdminTags?.join(",")})
+    WHERE "Tag".id in (${Prisma.join(terminalAdminTags)})
   `
 
   ctx.session.$authorize(

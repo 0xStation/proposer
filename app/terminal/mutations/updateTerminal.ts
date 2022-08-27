@@ -5,6 +5,7 @@ import db from "db"
 import * as z from "zod"
 import { Terminal } from "../types"
 import getAdminAccountsForTerminal from "app/permissions/queries/getAdminAccountsForTerminal"
+import { Prisma } from "@prisma/client"
 
 const UpdateTerminal = z.object({
   id: z.number(),
@@ -49,7 +50,7 @@ export default async function updateTerminal(input: z.infer<typeof UpdateTermina
     INNER JOIN "AccountTerminal" ON "AccountTerminal"."accountId" = "Account".id
     INNER JOIN "AccountTerminalTag" ON "AccountTerminalTag"."ticketAccountId" = "Account".id
     INNER JOIN "Tag" ON "Tag".id = "AccountTerminalTag"."tagId"
-    WHERE "Tag".id in (${terminalAdminTags?.join(",")})
+    WHERE "Tag".id in (${Prisma.join(terminalAdminTags)})
   `
 
   ctx.session.$authorize(

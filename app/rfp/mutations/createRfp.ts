@@ -1,6 +1,7 @@
 import db from "db"
 import * as z from "zod"
 import { Ctx } from "blitz"
+import { Prisma } from "@prisma/client"
 import { RfpStatus as PrismaRfpStatus } from "@prisma/client"
 import { TokenTag, Token } from "types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
@@ -57,7 +58,7 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>, ctx: C
     INNER JOIN "AccountTerminal" ON "AccountTerminal"."accountId" = "Account".id
     INNER JOIN "AccountTerminalTag" ON "AccountTerminalTag"."ticketAccountId" = "Account".id
     INNER JOIN "Tag" ON "Tag".id = "AccountTerminalTag"."tagId"
-    WHERE "Tag".id in (${terminalAdminTags?.join(",")})
+    WHERE "Tag".id in (${Prisma.join(terminalAdminTags)})
   `
 
   ctx.session.$authorize(

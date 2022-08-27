@@ -262,7 +262,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
                           (selectedCheckbook?.signerAccounts || []).map((account, i) => (
                             <div key={i} className="flex flex-row mt-4">
                               <div className="flex flex-col content-center align-middle mr-3">
-                                {account.data.pfpURL ? (
+                                {account?.data?.pfpURL ? (
                                   <img
                                     src={account.data.pfpURL}
                                     alt="PFP"
@@ -278,7 +278,7 @@ const CheckbookSettingsPage: BlitzPage = () => {
                               <div className="flex flex-col content-center">
                                 <div className="flex flex-row items-center space-x-1">
                                   <p className="text-base text-marble-white font-bold">
-                                    {account.data.name}
+                                    {account?.data?.name}
                                   </p>
                                 </div>
                                 <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
