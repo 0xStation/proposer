@@ -7,8 +7,9 @@ const GetFeatureFlag = z.object({
 })
 
 export async function getFeatureFlag(input: z.infer<typeof GetFeatureFlag>) {
+  const params = GetFeatureFlag.parse(input)
   const flag = await db.featureFlag.findUnique({
-    where: { key: input.key },
+    where: { key: params.key },
   })
 
   if (!flag) {

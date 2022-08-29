@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "FeatureFlagStatus" AS ENUM ('OFF', 'ON', 'RELEASED');
+CREATE TYPE "FeatureFlagStatus" AS ENUM ('OFF', 'ON');
 
 -- CreateTable
 CREATE TABLE "FeatureFlag" (
@@ -8,7 +8,7 @@ CREATE TABLE "FeatureFlag" (
     "title" TEXT NOT NULL,
     "description" TEXT,
     "status" "FeatureFlagStatus" NOT NULL DEFAULT E'OFF',
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "FeatureFlag_pkey" PRIMARY KEY ("id")
 );

@@ -22,6 +22,7 @@ import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import { InboxInIcon, UserGroupIcon } from "@heroicons/react/solid"
 import hasAdminPermissionsBasedOnTags from "../../permissions/queries/hasAdminPermissionsBasedOnTags"
 import getFeatureFlag from "app/featureFlag/queries/getFeatureFlag"
+import { FEATURE_FLAG_KEYS } from "app/core/utils/constants"
 
 const TerminalNavigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -34,7 +35,7 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
 
   const [isMemberDirectoryOpen] = useQuery(
     getFeatureFlag,
-    { key: "md" },
+    { key: FEATURE_FLAG_KEYS.MEMBER_DIRECTORY },
     {
       suspense: false,
     }

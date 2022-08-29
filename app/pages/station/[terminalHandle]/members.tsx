@@ -39,13 +39,14 @@ import useKeyPress from "app/core/hooks/useKeyPress"
 import FilterPill from "app/core/components/FilterPill"
 import Pagination from "app/core/components/Pagination"
 import getFeatureFlag from "app/featureFlag/queries/getFeatureFlag"
+import { FEATURE_FLAG_KEYS } from "app/core/utils/constants"
 
 const MemberDirectoryPage: BlitzPage = () => {
   // we get that little flash of members so maybe should move this to server side
   // or make use of the loading indicator
   const [isMemberDirectoryOpen, { isLoading }] = useQuery(
     getFeatureFlag,
-    { key: "md" },
+    { key: FEATURE_FLAG_KEYS.MEMBER_DIRECTORY },
     {
       suspense: false,
     }

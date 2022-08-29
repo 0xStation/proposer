@@ -212,6 +212,11 @@ export enum FeatureFlagStatus {
   ON = "ON",
   OFF = "OFF",
 }
+
+export const FEATURE_FLAG_KEYS = {
+  MEMBER_DIRECTORY: "member_directory",
+}
+
 // LEGACY BELOW
 
 // LEGACY

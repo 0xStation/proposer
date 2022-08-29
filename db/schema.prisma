@@ -218,7 +218,7 @@ model FeatureFlag {
   title       String
   description String?
   status      FeatureFlagStatus @default(OFF)
-  created_at  DateTime          @default(now())
+  createdAt   DateTime          @default(now())
 }
 
 enum FeatureFlagStatus {
