@@ -1,3 +1,8 @@
+/**
+ * THIS IS CONNERS PLAY SPACE FOR TESTING
+ * DO NOT TOUCH
+ */
+
 import { BlitzPage, Link, Routes, useMutation } from "blitz"
 import { useEffect, useState } from "react"
 import Layout from "app/core/layouts/Layout"
@@ -10,7 +15,7 @@ import networks from "app/utils/networks.json"
 import createProposal from "app/proposalNew/mutations/createProposalNew"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
-const ProposalNew: BlitzPage = () => {
+const ConnerProposal: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(1)
@@ -249,6 +254,6 @@ const ProposalNew: BlitzPage = () => {
   )
 }
 
-ProposalNew.suppressFirstRenderFlicker = true
+ConnerProposal.suppressFirstRenderFlicker = true
 
-export default ProposalNew
+export default ConnerProposal
