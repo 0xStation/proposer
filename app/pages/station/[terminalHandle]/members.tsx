@@ -1,4 +1,13 @@
-import { BlitzPage, useQuery, useParam, Image, Link, Routes, invalidateQuery } from "blitz"
+import {
+  BlitzPage,
+  useQuery,
+  useParam,
+  Image,
+  Link,
+  Routes,
+  invalidateQuery,
+  ErrorComponent,
+} from "blitz"
 import { Fragment, useEffect, useState } from "react"
 import { DEFAULT_PFP_URLS, PAGINATION_TAKE } from "app/core/utils/constants"
 import Layout from "app/core/layouts/Layout"
@@ -29,8 +38,19 @@ import { TagType } from "app/tag/types"
 import useKeyPress from "app/core/hooks/useKeyPress"
 import FilterPill from "app/core/components/FilterPill"
 import Pagination from "app/core/components/Pagination"
+import getFeatureFlag from "app/featureFlag/queries/getFeatureFlag"
 
 const MemberDirectoryPage: BlitzPage = () => {
+  // we get that little flash of members so maybe should move this to server side
+  // or make use of the loading indicator
+  const [isMemberDirectoryOpen, { isLoading }] = useQuery(
+    getFeatureFlag,
+    { key: "md" },
+    {
+      suspense: false,
+    }
+  )
+
   const terminalHandle = useParam("terminalHandle")
   const [terminal] = useQuery(
     getTerminalByHandle,
@@ -213,6 +233,10 @@ const MemberDirectoryPage: BlitzPage = () => {
     invalidateQuery(getMembersByTerminalId)
     invalidateQuery(getMemberCountByTerminalId)
     setPage(0)
+  }
+
+  if (!isMemberDirectoryOpen && !isLoading) {
+    return <ErrorComponent statusCode={404} />
   }
 
   return (

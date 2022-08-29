@@ -21,6 +21,7 @@ import useStore from "app/core/hooks/useStore"
 import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
 import { InboxInIcon, UserGroupIcon } from "@heroicons/react/solid"
 import hasAdminPermissionsBasedOnTags from "../../permissions/queries/hasAdminPermissionsBasedOnTags"
+import getFeatureFlag from "app/featureFlag/queries/getFeatureFlag"
 
 const TerminalNavigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -30,6 +31,14 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
   const [terminal] = useQuery(getTerminalByHandle, { handle: terminalHandle }, { suspense: false })
   const activeUser = useStore((state) => state.activeUser)
   const [hasAdminPermissions, setHasAdminPermissions] = useState<boolean>(false)
+
+  const [isMemberDirectoryOpen] = useQuery(
+    getFeatureFlag,
+    { key: "md" },
+    {
+      suspense: false,
+    }
+  )
 
   const [hasAdminPermissionsFromTags] = useQuery(
     hasAdminPermissionsBasedOnTags,
@@ -192,24 +201,26 @@ const TerminalNavigation = ({ children }: { children?: any }) => {
                 <Link href={Routes.BulletinPage({ terminalHandle })}>Projects</Link>
               </p>
             </li>
-            <li className="group cursor-pointer font-bold">
-              <UserGroupIcon
-                className={`inline mr-3 mb-1.5 w-5 h-5 ${
-                  router.pathname === Routes.MemberDirectoryPage({ terminalHandle }).pathname
-                    ? "fill-marble-white"
-                    : "fill-concrete group-hover:fill-light-concrete"
-                }`}
-              />
-              <p
-                className={`inline ${
-                  router.pathname === Routes.MemberDirectoryPage({ terminalHandle }).pathname
-                    ? "text-marble-white font-bold"
-                    : "text-concrete font-normal group-hover:text-light-concrete"
-                }`}
-              >
-                <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>Members</Link>
-              </p>
-            </li>
+            {isMemberDirectoryOpen && (
+              <li className="group cursor-pointer font-bold">
+                <UserGroupIcon
+                  className={`inline mr-3 mb-1.5 w-5 h-5 ${
+                    router.pathname === Routes.MemberDirectoryPage({ terminalHandle }).pathname
+                      ? "fill-marble-white"
+                      : "fill-concrete group-hover:fill-light-concrete"
+                  }`}
+                />
+                <p
+                  className={`inline ${
+                    router.pathname === Routes.MemberDirectoryPage({ terminalHandle }).pathname
+                      ? "text-marble-white font-bold"
+                      : "text-concrete font-normal group-hover:text-light-concrete"
+                  }`}
+                >
+                  <Link href={Routes.MemberDirectoryPage({ terminalHandle })}>Members</Link>
+                </p>
+              </li>
+            )}
           </ul>
         </div>
       </div>

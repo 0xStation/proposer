@@ -212,6 +212,20 @@ model CheckApproval {
   @@unique([checkId, signerAddress])
 }
 
+model FeatureFlag {
+  id          Int               @id @default(autoincrement())
+  key         String            @unique
+  title       String
+  description String?
+  status      FeatureFlagStatus @default(OFF)
+  created_at  DateTime          @default(now())
+}
+
+enum FeatureFlagStatus {
+  OFF
+  ON
+}
+
 enum RfpStatus {
   DRAFT
   PUBLISHED
