@@ -212,6 +212,26 @@ model CheckApproval {
   @@unique([checkId, signerAddress])
 }
 
+model ProposalNew {
+  id    String         @id @default(uuid())
+  data  Json
+  roles ProposalRole[]
+}
+
+model ProposalRole {
+  id         String           @id @default(uuid())
+  proposalId String
+  proposal   ProposalNew      @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  address    String
+  role       ProposalRoleType
+}
+
+enum ProposalRoleType {
+  AUTHOR
+  CONTRIBUTOR
+  CLIENT
+}
+
 enum RfpStatus {
   DRAFT
   PUBLISHED
