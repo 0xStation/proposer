@@ -3,18 +3,17 @@
  * DO NOT TOUCH
  */
 
-import { BlitzPage, Link, Routes } from "blitz"
+import { BlitzPage, Link, Routes, useMutation } from "blitz"
 import { useEffect, useState } from "react"
-import { RefreshIcon } from "@heroicons/react/solid"
 import Layout from "app/core/layouts/Layout"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { parseUniqueAddresses } from "app/core/utils/parseUniqueAddresses"
-import { SUPPORTED_CHAINS, ETH_METADATA, TOKEN_SYMBOLS } from "app/core/utils/constants"
+import { SUPPORTED_CHAINS, ETH_METADATA } from "app/core/utils/constants"
 import networks from "app/utils/networks.json"
-
-const { ETH, USDC } = TOKEN_SYMBOLS
+import createProposal from "app/proposalNew/mutations/createProposalNew"
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
 const ConnerProposal: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
@@ -32,13 +31,38 @@ const ConnerProposal: BlitzPage = () => {
     }
   }, [selectedNetworkId])
 
+  const [createProposalMutation] = useMutation(createProposal, {
+    onSuccess: (_data) => {
+      console.log("proposal created", _data)
+    },
+    onError: (error: Error) => {
+      console.error(error)
+    },
+  })
+
   return (
     <Layout title="New Proposal">
       <section className="flex-1 ml-10">
         <h2 className="text-marble-white text-2xl font-bold mt-10">New Proposal</h2>
         <Form
           onSubmit={async (values: any, form) => {
-            console.log("submit")
+            const token = tokenOptions?.find((token) =>
+              addressesAreEqual(token.address, values.tokenAddress)
+            )
+
+            if (!token) {
+              throw Error("token not found")
+            }
+
+            createProposalMutation({
+              contentTitle: values.title,
+              contentBody: values.body,
+              contributorAddress: values.contributor,
+              clientAddress: values.client,
+              authorAddresses: [activeUser!.address!],
+              token: { ...token, chainId: selectedNetworkId },
+              paymentAmount: values.paymentAmount,
+            })
           }}
           render={({ form, handleSubmit }) => {
             const formState = form.getState()
@@ -84,60 +108,48 @@ const ConnerProposal: BlitzPage = () => {
                       </div>
                     )}
                   </Field>
-                  {/* CONTRIBUTORS */}
-                  <label className="font-bold block mt-6">Contributors</label>
+                  {/* CONTRIBUTOR */}
+                  <label className="font-bold block mt-6">Contributor</label>
                   <span className="text-xs text-concrete block">
-                    Paste addresses of people who are doing work
+                    Paste the address of who is doing work
                   </span>
-                  <Field
-                    name="contributors"
-                    component="textarea" // automatically enter new lines for user
-                    format={(value) => value?.replace(/,\s*|\s+/g, ",\n")}
-                  >
-                    {({ input, meta }) => (
-                      <div>
-                        <textarea
+                  <Field name="contributor">
+                    {({ meta, input }) => (
+                      <>
+                        <input
                           {...input}
-                          placeholder="0x123, 0x456, 0x789"
-                          className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 rounded min-h-[112px] w-full"
+                          type="text"
+                          required
+                          placeholder="Enter wallet or ENS address"
+                          className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                         />
-                        {/* user feedback on number of registered unique addresses, not an error */}
-                        {input && (
-                          <span className=" text-xs text-marble-white ml-2 mb-2 block">
-                            {`${
-                              parseUniqueAddresses(input.value || "").length
-                            } unique addresses detected`}
-                          </span>
+
+                        {(meta.touched || attemptedSubmit) && meta.error && (
+                          <span className="text-torch-red text-xs">{meta.error}</span>
                         )}
-                      </div>
+                      </>
                     )}
                   </Field>
-                  {/* CLIENTS */}
-                  <label className="font-bold block mt-6">Clients</label>
+                  {/* CLIENT */}
+                  <label className="font-bold block mt-6">Client</label>
                   <span className="text-xs text-concrete block">
-                    Paste addresses of people who are paying for work
+                    Paste address of who is paying for work
                   </span>
-                  <Field
-                    name="clients"
-                    component="textarea" // automatically enter new lines for user
-                    format={(value) => value?.replace(/,\s*|\s+/g, ",\n")}
-                  >
-                    {({ input, meta }) => (
-                      <div>
-                        <textarea
+                  <Field name="client">
+                    {({ meta, input }) => (
+                      <>
+                        <input
                           {...input}
-                          placeholder="0x123, 0x456, 0x789"
-                          className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 rounded min-h-[112px] w-full"
+                          type="text"
+                          required
+                          placeholder="Enter wallet or ENS address"
+                          className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                         />
-                        {/* user feedback on number of registered unique addresses, not an error */}
-                        {input && (
-                          <span className=" text-xs text-marble-white ml-2 mb-2 block">
-                            {`${
-                              parseUniqueAddresses(input.value || "").length
-                            } unique addresses detected`}
-                          </span>
+
+                        {(meta.touched || attemptedSubmit) && meta.error && (
+                          <span className="text-torch-red text-xs">{meta.error}</span>
                         )}
-                      </div>
+                      </>
                     )}
                   </Field>
                   {/* NETWORK */}
@@ -207,32 +219,8 @@ const ConnerProposal: BlitzPage = () => {
                         )
                       }}
                     </Field>
-                    {/* <div className="flex items-center justify-between mt-1">
-                      <Link
-                        href={Routes.NewTokenSettingsPage({
-                          terminalHandle: terminalHandle as string,
-                        })}
-                        passHref
-                      >
-                        <a target="_blank" rel="noopener noreferrer">
-                          <span className="text-electric-violet cursor-pointer block">
-                            + Import
-                          </span>
-                        </a>
-                      </Link>
-                      <RefreshIcon
-                        className="h-4 w-4 text-white cursor-pointer"
-                        onClick={() => {
-                          setToastState({
-                            isToastShowing: true,
-                            type: "success",
-                            message: "Refetched tokens.",
-                          })
-                        }}
-                      />
-                    </div> */}
                   </div>
-                  {/* AMOUNT */}
+                  {/* PAYMENT AMOUNT */}
                   <label className="font-bold block mt-6">Payment Amount</label>
                   <span className="text-xs text-concrete block">How many tokens to be paid</span>
                   <Field name="paymentAmount">

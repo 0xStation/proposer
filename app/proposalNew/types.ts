@@ -1,14 +1,18 @@
-export type ProposalNew = {
+export type ProposalNewMetadata = {
   type: ProposalType
   timestamp: Date // needed for public verifiability of multisig representation
   content: { title: string; body: string }
-  roles: Role[]
   payments?: Payment[]
   milestones?: Milestone[]
   digest: Digest
   // below not included in digest
   commitments: Commitment[]
   tokens: Token[]
+}
+
+export type ProposalNew = {
+  data: ProposalNewMetadata
+  roles: Role
 }
 
 export enum RoleType {
