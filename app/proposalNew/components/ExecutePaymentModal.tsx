@@ -157,9 +157,9 @@ export const ExecutePaymentModal = ({
           </>
         ) : (
           <div>
-            <h3 className="text-2xl font-bold pt-6">Change chain to approve</h3>
+            <h3 className="text-2xl font-bold pt-6">Change network to approve</h3>
             <p className="mt-2">
-              You are connected to the wrong chain! Click below to switch chains.
+              You are connected to the wrong network! Click below to switch networks.
             </p>
             <div className="mt-8">
               <button

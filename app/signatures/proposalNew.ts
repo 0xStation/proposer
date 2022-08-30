@@ -1,7 +1,7 @@
 import { toUtf8Bytes } from "@ethersproject/strings"
 import { keccak256 } from "@ethersproject/keccak256"
 import { BigNumber } from "@ethersproject/bignumber"
-import { ProposalNew, ProposalType } from "app/proposalNew/types"
+import { ProposalNew } from "app/proposalNew/types"
 import { parseUnits } from "@ethersproject/units"
 
 export const genProposalNewDigest = (proposal: ProposalNew) => {

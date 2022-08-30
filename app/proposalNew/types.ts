@@ -1,40 +1,20 @@
+import { ProposalSignature, ProposalRole, ProposalType } from "@prisma/client"
+
+export type ProposalNew = {
+  id: string
+  type: ProposalType
+  timestamp: Date // needed for public verifiability of multisig representation
+  roles: ProposalRole[]
+  signatures: ProposalSignature[]
+  data: ProposalNewMetadata
+}
+
 export type ProposalNewMetadata = {
   content: { title: string; body: string }
   payments?: Payment[]
   milestones?: Milestone[]
   digest: Digest
   // below not included in digest
-  commitments: Commitment[]
-}
-
-export type ProposalNew = {
-  id: string
-  type: ProposalType
-  timestamp: Date // needed for public verifiability of multisig representation
-  data: ProposalNewMetadata
-  roles: Role[]
-}
-
-export enum RoleType {
-  AUTHOR = "AUTHOR",
-  CONTRIBUTOR = "CONTRIBUTOR",
-  CLIENT = "CLIENT",
-}
-
-export enum ProposalStatus {
-  DRAFT = "DRAFT",
-  CONSENTED = "CONSENTED",
-  COMPLETE = "COMPLETE",
-  INCOMPLETE = "INCOMPLETE",
-}
-
-export enum ProposalType {
-  FUNDING = "FUNDING",
-}
-
-export type Role = {
-  address: string
-  role: RoleType
 }
 
 // role: who is responsible for something in the agreement
@@ -46,6 +26,7 @@ export type Role = {
 // enables transfers of multiple tokens to multiple addresses across time (milestones)
 // amount and tokenId used depending on token type to support ERC20, ERC721, and ERC1155
 export type Payment = {
+  id: number
   milestoneId: number // value of 0 indicates upon proposal approval
   recipientAddress: string
   token: Token

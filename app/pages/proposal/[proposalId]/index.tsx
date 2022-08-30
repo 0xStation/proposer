@@ -5,6 +5,7 @@ import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
+import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import { getNetworkName } from "app/core/utils/getNetworkName"
 import { ProposalRoleType } from "@prisma/client"
 import truncateString from "app/core/utils/truncateString"
@@ -28,14 +29,15 @@ const ViewProposalNew: BlitzPage = () => {
     { id: proposalId },
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
+  const [signatures] = useQuery(
+    getProposalNewSignaturesById,
+    { proposalId },
+    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
+  )
 
   const RoleSignature = ({ role }) => {
     const addressHasSigned = (address: string) => {
-      return (
-        proposal?.data.commitments.some((commitment) =>
-          addressesAreEqual(address, commitment.address)
-        ) || false
-      )
+      return signatures?.some((signature) => addressesAreEqual(address, signature.address)) || false
     }
 
     return (
@@ -58,7 +60,7 @@ const ViewProposalNew: BlitzPage = () => {
   const userHasRole = proposal?.roles.some((role) =>
     addressesAreEqual(activeUser?.address || "", role.address)
   )
-  const userHasSigned = proposal?.data.commitments.some((commitment) =>
+  const userHasSigned = signatures?.some((commitment) =>
     addressesAreEqual(activeUser?.address || "", commitment.address)
   )
   const userIsPayer = proposal?.roles.some(
@@ -73,7 +75,7 @@ const ViewProposalNew: BlitzPage = () => {
       requiredSignatures[role.address] = false
     })
 
-    proposal?.data.commitments.forEach((commitment) => {
+    signatures?.forEach((commitment) => {
       requiredSignatures[commitment.address] = true
     })
 
@@ -88,7 +90,7 @@ const ViewProposalNew: BlitzPage = () => {
   const uniqueRoleAddresses = (proposal?.roles || [])
     .map((role) => toChecksumAddress(role.address))
     .filter((v, i, addresses) => addresses.indexOf(v) === i).length
-  const signatureCount = proposal?.data.commitments.length || 0
+  const signatureCount = signatures?.length || 0
 
   return (
     <Layout title="View Proposal">
@@ -96,6 +98,8 @@ const ViewProposalNew: BlitzPage = () => {
         isOpen={isApproveProposalModalOpen}
         setIsOpen={setIsApproveProposalModalOpen}
         proposal={proposal}
+        isSigning={isActionPending}
+        setIsSigning={setIsActionPending}
       />
       <ExecutePaymentModal
         isOpen={isExecutePaymentModalOpen}
