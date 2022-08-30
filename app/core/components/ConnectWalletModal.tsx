@@ -97,6 +97,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
       if (!chainId) {
         throw Error("Error reading chain id")
       }
+      console.log("next url", process.env.NEXT_PUBLIC_VERCEL_URL?.replace(/[./]/g, ""))
 
       const nonceRes = await invoke(generateNonce, {})
       const message = new SiweMessage({
