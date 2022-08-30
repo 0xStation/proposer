@@ -14,10 +14,11 @@ const CreateProposalNew: BlitzPage = () => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
-  const [selectedNetworkId, setSelectedNetworkId] = useState<number>(1)
+  const [selectedNetworkId, setSelectedNetworkId] = useState<number>(0)
   const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false)
   const [selectedToken, setSelectedToken] = useState<any>()
   const [tokenOptions, setTokenOptions] = useState<any[]>()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {
     if (selectedNetworkId) {
@@ -35,9 +36,11 @@ const CreateProposalNew: BlitzPage = () => {
           proposalId: data.id,
         })
       )
+      setIsLoading(false)
     },
     onError: (error: Error) => {
       console.error(error)
+      setIsLoading(false)
     },
   })
 
@@ -47,6 +50,8 @@ const CreateProposalNew: BlitzPage = () => {
         <h2 className="text-marble-white text-2xl font-bold mt-10">New Proposal</h2>
         <Form
           onSubmit={async (values: any, form) => {
+            setIsLoading(true)
+
             const token = tokenOptions?.find((token) =>
               addressesAreEqual(token.address, values.tokenAddress)
             )
@@ -175,7 +180,7 @@ const CreateProposalNew: BlitzPage = () => {
                               input.onChange(network?.id)
                             }}
                           >
-                            <option value="">Choose option</option>
+                            <option value={0}>Choose option</option>
                             {SUPPORTED_CHAINS?.map((chain, idx) => {
                               return (
                                 <option key={chain.id} value={chain.id}>
@@ -242,7 +247,12 @@ const CreateProposalNew: BlitzPage = () => {
                     )}
                   </Field>
                   {/* SUBMIT BUTTON */}
-                  <Button className="my-16" isSubmitType={true}>
+                  <Button
+                    className="my-16"
+                    isSubmitType={true}
+                    isLoading={isLoading}
+                    isDisabled={isLoading}
+                  >
                     Submit
                   </Button>
                 </div>

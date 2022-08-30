@@ -45,7 +45,7 @@ export type Role = {
 // defines payment details of an atomic transfer of fungible and non-fungible tokens
 // enables transfers of multiple tokens to multiple addresses across time (milestones)
 // amount and tokenId used depending on token type to support ERC20, ERC721, and ERC1155
-type Payment = {
+export type Payment = {
   milestoneId: number // value of 0 indicates upon proposal approval
   recipientAddress: string
   token: Token
@@ -56,7 +56,7 @@ type Payment = {
 
 // addition to EXECUTION utility
 // enriches application with metadata and mechanisms for acceptance critera and reviewers
-type Milestone = {
+export type Milestone = {
   id: number // also used to imply ordering
   title: string
   // missing something on acceptance criteria, reviewers, etc.
@@ -74,14 +74,14 @@ type Digest = {
 // a signature from a specific user on the proposals Digest
 // default behavior is for signature to represent the self, but can optionally represent a Role
 // note that to validate `representing`, the `timestamp` field from Proposal is required
-type Commitment = {
+export type Commitment = {
   address: string
   signature: string
   representing?: { address: string; validationType: ""; chainId?: number }
 }
 
 // convenience metadata for application consumption, metadata is verifiable on-chain
-type Token = {
+export type Token = {
   chainId: number
   address: string
   type?: TokenType

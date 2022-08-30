@@ -6,11 +6,11 @@ import truncateString from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { getNetworkName } from "app/core/utils/getNetworkName"
-import { parseUnits } from "ethers/lib/utils"
 import { useNetwork, useSwitchNetwork, useWaitForTransaction } from "wagmi"
 import { useState } from "react"
 import saveTransactionHashToPayments from "../mutations/saveTransactionToPayments"
 import getProposalNewById from "../queries/getProposalNewById"
+import { preparePaymentTransaction } from "app/transaction/payments"
 
 export const ExecutePaymentModal = ({
   isOpen,
@@ -63,14 +63,15 @@ export const ExecutePaymentModal = ({
     try {
       setIsLoading(true)
 
+      const transactionPayload = preparePaymentTransaction(
+        payment.recipientAddress,
+        payment.token,
+        payment.amount
+      )
+
       const transaction = await sendEtherAsync({
         recklesslySetUnpreparedRequest: {
-          //   mode: "recklesslyUnprepared", // TODO: usePrepareContractWrite with args
-          //   request: {
-          chainId: payment.chainId,
-          to: payment.recipientAddress,
-          value: parseUnits(payment.amount, 18),
-          //   },
+          ...transactionPayload,
         },
       })
 
