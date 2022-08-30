@@ -1,16 +1,16 @@
 import { invalidateQuery, useMutation } from "blitz"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
-import { useSendEther } from "app/contracts/ether"
 import truncateString from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { getNetworkName } from "app/core/utils/getNetworkName"
 import { useNetwork, useSwitchNetwork, useWaitForTransaction } from "wagmi"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import saveTransactionHashToPayments from "../mutations/saveTransactionToPayments"
 import getProposalNewById from "../queries/getProposalNewById"
 import { preparePaymentTransaction } from "app/transaction/payments"
+import { useSendTransaction } from "wagmi"
 
 export const ExecutePaymentModal = ({
   isOpen,
@@ -22,6 +22,7 @@ export const ExecutePaymentModal = ({
 }) => {
   const setToastState = useStore((state) => state.setToastState)
   const [txnHash, setTxnHash] = useState<string>()
+  const [transactionPayload, setTransactionPayload] = useState<any>()
   const [saveTransactionHashToPaymentsMutation] = useMutation(saveTransactionHashToPayments, {
     onSuccess: (_data) => {
       console.log("success", _data)
@@ -33,7 +34,18 @@ export const ExecutePaymentModal = ({
 
   const { chain: activeChain } = useNetwork()
   const { switchNetwork } = useSwitchNetwork()
-  const { sendEtherAsync } = useSendEther()
+  const { sendTransactionAsync } = useSendTransaction({ mode: "recklesslyUnprepared" })
+
+  useEffect(() => {
+    if (payment) {
+      const payload = preparePaymentTransaction(
+        payment?.recipientAddress,
+        payment?.token,
+        payment?.amount
+      )
+      setTransactionPayload(payload)
+    }
+  }, [payment])
 
   useWaitForTransaction({
     confirmations: 1,
@@ -63,13 +75,7 @@ export const ExecutePaymentModal = ({
     try {
       setIsLoading(true)
 
-      const transactionPayload = preparePaymentTransaction(
-        payment.recipientAddress,
-        payment.token,
-        payment.amount
-      )
-
-      const transaction = await sendEtherAsync({
+      const transaction = await sendTransactionAsync({
         recklesslySetUnpreparedRequest: {
           ...transactionPayload,
         },
@@ -159,7 +165,10 @@ export const ExecutePaymentModal = ({
               <button
                 type="button"
                 className="text-electric-violet border border-electric-violet mr-2 py-1 w-[98px] rounded hover:opacity-75"
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false)
+                  setIsLoading(false)
+                }}
               >
                 Cancel
               </button>

@@ -14,6 +14,7 @@ import TransactionLink from "app/core/components/TransactionLink"
 import ProgressIndicator from "app/core/components/ProgressIndicator"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
+import MetadataLabel from "app/core/components/MetadataLabel"
 
 const ViewProposalNew: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
@@ -142,7 +143,7 @@ const ViewProposalNew: BlitzPage = () => {
         <div className="flex-col overflow-y-scroll">
           <div className="w-[36rem] flex-col overflow-y-scroll ml-12">
             {/* STATUS */}
-            <h4 className="text-xs font-bold text-concrete uppercase mt-6">Proposal status</h4>
+            <MetadataLabel label="Proposal status" />
             <div className="flex flex-row space-x-2">
               <p className="mt-2 font-normal">
                 {paymentComplete
@@ -165,30 +166,30 @@ const ViewProposalNew: BlitzPage = () => {
               )}
             </div>
             {/* AUTHOR */}
-            <h4 className="text-xs font-bold text-concrete uppercase mt-6">Author</h4>
+            <MetadataLabel label="Author" />
             <RoleSignature
               role={proposal?.roles?.find((role) => role.role === ProposalRoleType.AUTHOR)}
             />
             {/* CONTRIBUTOR */}
-            <h4 className="text-xs font-bold text-concrete uppercase mt-6">Contributor</h4>
+            <MetadataLabel label="Contributor" />
             <RoleSignature
               role={proposal?.roles?.find((role) => role.role === ProposalRoleType.CONTRIBUTOR)}
             />
             {/* CLIENT */}
-            <h4 className="text-xs font-bold text-concrete uppercase mt-6">Client</h4>
+            <MetadataLabel label="Client" />
             <RoleSignature
               role={proposal?.roles?.find((role) => role.role === ProposalRoleType.CLIENT)}
             />
             {/* NETWORK */}
-            <h4 className="text-xs font-bold text-concrete uppercase mt-6">Network</h4>
+            <MetadataLabel label="Network" />
             <p className="mt-2 font-normal">
               {getNetworkName(proposal?.data?.payments?.[0]?.token.chainId || 0)}
             </p>
             {/* TOKEN */}
-            <h4 className="text-xs font-bold text-concrete uppercase mt-6">Token</h4>
+            <MetadataLabel label="Payment token" />
             <p className="mt-2 font-normal">{proposal?.data?.payments?.[0]?.token.symbol}</p>
             {/* PAYMENT AMOUNT */}
-            <h4 className="text-xs font-bold text-concrete uppercase mt-6">Payment Amount</h4>
+            <MetadataLabel label="Payment amount" />
             <p className="mt-2 font-normal">{proposal?.data?.payments?.[0]?.amount}</p>
           </div>
         </div>
