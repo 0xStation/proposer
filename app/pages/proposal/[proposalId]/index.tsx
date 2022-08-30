@@ -51,6 +51,15 @@ const ViewProposalNew: BlitzPage = () => {
     )
   }
 
+  const userHasRole = proposal?.roles.some((role) =>
+    addressesAreEqual(activeUser?.address || "", role.address)
+  )
+  const userHasSigned = proposal?.data.commitments.some((commitment) =>
+    addressesAreEqual(activeUser?.address || "", commitment.address)
+  )
+
+  const showApproveButton = userHasRole && !userHasSigned
+
   return (
     <Layout title="View Proposal">
       <ApproveProposalNewModal
@@ -62,16 +71,18 @@ const ViewProposalNew: BlitzPage = () => {
         <h2 className="ml-10 text-marble-white text-xl font-bold w-full">
           {proposal?.data.content.title}
         </h2>
-        <div className="relative self-start group mr-10">
-          <Button
-            type={ButtonType.Primary}
-            onClick={() => {
-              setIsApproveProposalModalOpen(true)
-            }}
-          >
-            Approve
-          </Button>
-        </div>
+        {showApproveButton && (
+          <div className="relative self-start group mr-10">
+            <Button
+              type={ButtonType.Primary}
+              onClick={() => {
+                setIsApproveProposalModalOpen(true)
+              }}
+            >
+              Approve
+            </Button>
+          </div>
+        )}
       </div>
       <div className="ml-10 mt-10 grow flex flex-row overflow-y-scroll">
         <p className="mt-6 w-full font-normal">{proposal?.data.content.body}</p>
