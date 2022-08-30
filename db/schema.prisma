@@ -213,11 +213,22 @@ model CheckApproval {
 }
 
 model ProposalNew {
-  id        String         @id @default(uuid())
-  type      ProposalType
-  timestamp DateTime       @default(now())
-  data      Json
-  roles     ProposalRole[]
+  id         String              @id @default(uuid())
+  type       ProposalType
+  timestamp  DateTime            @default(now())
+  data       Json
+  roles      ProposalRole[]
+  signatures ProposalSignature[]
+}
+
+model ProposalSignature {
+  proposalId String
+  proposal   ProposalNew @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  address    String
+  timestamp  DateTime    @default(now())
+  data       Json
+
+  @@id([proposalId, address])
 }
 
 model ProposalRole {

@@ -38,7 +38,6 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     digest: {
       hash: "",
     },
-    commitments: [],
   } as unknown as ProposalNewMetadata
 
   const proposal = await db.proposalNew.create({
