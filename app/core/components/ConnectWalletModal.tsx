@@ -123,7 +123,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
         throw Error("Unsuccessful signature.")
       }
     } catch (err) {
-      console.error(err.cause)
+      console.error("error", err)
       let errorMsg
       if (err.code === 4001) {
         errorMsg = "Signature declined."
