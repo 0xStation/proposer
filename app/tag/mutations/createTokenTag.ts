@@ -33,20 +33,14 @@ export default async function createTokenTag(input: z.infer<typeof CreateTokenTa
     )
   }
 
-  // easier to write a custom SQL command to fetch the accounts with tags in the list of terminalAdmin tags
-  // than to make a deeply nested prisma command
-  const accountsWithAdminTags: any[] = await db.$queryRaw`
-    SELECT distinct("Account".id), "Account".address
-    FROM "Account"
-    INNER JOIN "AccountTerminal" ON "AccountTerminal"."accountId" = "Account".id
-    INNER JOIN "AccountTerminalTag" ON "AccountTerminalTag"."ticketAccountId" = "Account".id
-    INNER JOIN "Tag" ON "Tag".id = "AccountTerminalTag"."tagId"
-    WHERE "Tag".id in (${Prisma.join(terminalAdminTags)})
-  `
+  const accountTerminalTags = await db.accountTerminalTag.findMany({
+    where: { tagId: { in: terminalAdminTags } },
+    select: { ticketAccountId: true },
+  })
 
   ctx.session.$authorize(
-    accountsWithAdminTags.map((account) => account.address),
-    []
+    [],
+    accountTerminalTags.map((accountTerminalTag) => accountTerminalTag.ticketAccountId)
   )
 
   const tag = await db.tag.create({

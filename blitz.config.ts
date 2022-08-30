@@ -1,4 +1,5 @@
 import { BlitzConfig, sessionMiddleware } from "blitz"
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
 type AddressOrUserIdIsAuthorizedArgs = {
   ctx: any
@@ -14,7 +15,7 @@ const addressOrUserIdIsAuthorized = ({ ctx, args }: AddressOrUserIdIsAuthorizedA
   const userAddress = ctx.session.$publicData.siwe.address
   const userId = ctx.session.$publicData.userId
 
-  const addressAllowed = addresses?.some((address) => address === userAddress)
+  const addressAllowed = addresses?.some((address) => addressesAreEqual(address, userAddress))
   const idAllowed = ids?.some((id) => id === userId)
   return addressAllowed || idAllowed
 }
