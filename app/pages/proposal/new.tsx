@@ -10,7 +10,7 @@ import networks from "app/utils/networks.json"
 import createProposal from "app/proposalNew/mutations/createProposalNew"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
-const ProposalNew: BlitzPage = () => {
+const CreateProposalNew: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(1)
@@ -249,6 +249,6 @@ const ProposalNew: BlitzPage = () => {
   )
 }
 
-ProposalNew.suppressFirstRenderFlicker = true
+CreateProposalNew.suppressFirstRenderFlicker = true
 
-export default ProposalNew
+export default CreateProposalNew
