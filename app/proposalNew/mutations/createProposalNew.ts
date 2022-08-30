@@ -1,7 +1,7 @@
 import db, { ProposalRoleType } from "db"
 import * as z from "zod"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
-import { ZodToken } from "app/types/zod"
+import { OptionalZodToken } from "app/types/zod"
 import { ProposalNewMetadata } from "../types"
 import { ProposalType } from "db"
 
@@ -11,14 +11,14 @@ const CreateProposal = z.object({
   contributorAddress: z.string(),
   clientAddress: z.string(),
   authorAddresses: z.string().array(),
-  token: ZodToken,
-  paymentAmount: z.string(),
+  token: OptionalZodToken,
+  paymentAmount: z.string().optional(),
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
   const params = CreateProposal.parse(input)
 
-  if (parseFloat(input.paymentAmount) < 0) {
+  if (params.paymentAmount && parseFloat(params.paymentAmount) < 0) {
     throw new Error("amount must be greater or equal to zero.")
   }
 
@@ -27,14 +27,20 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       title: params.contentTitle,
       body: params.contentBody,
     },
-    payments: [
-      {
-        milestoneId: 0,
-        recipientAddress: params.contributorAddress,
-        token: params.token,
-        amount: params.paymentAmount,
-      },
-    ],
+    // if no payment amount we can infer that there is no payment requested
+    // it might be better to pass this through more explicitly with a flag for "no funding"
+    // but we are doing this the quick way with minimal infra
+    // if we get validation this is good idea we can improve
+    payments: params.paymentAmount
+      ? [
+          {
+            milestoneId: 0,
+            recipientAddress: params.contributorAddress,
+            token: params.token,
+            amount: params.paymentAmount,
+          },
+        ]
+      : [],
     digest: {
       hash: "",
     },
@@ -59,6 +65,9 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
           ],
         },
       },
+    },
+    include: {
+      roles: true,
     },
   })
 
