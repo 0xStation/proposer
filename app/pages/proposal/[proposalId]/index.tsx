@@ -12,10 +12,12 @@ import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
 import { getNetworkName } from "app/core/utils/getNetworkName"
 import { ProposalRoleType } from "@prisma/client"
 import truncateString from "app/core/utils/truncateString"
+import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
 
 const ViewProposalNew: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
+  const [isApproveProposalModalOpen, setIsApproveProposalModalOpen] = useState<boolean>(false)
   const proposalId = useParam("proposalId") as string
   const [proposal] = useQuery(
     getProposalNewById,
@@ -34,15 +36,15 @@ const ViewProposalNew: BlitzPage = () => {
 
     return (
       <div className="flex flex-row">
-        <p className="mr-4">{truncateString(role.address)}</p>
+        <p className="mr-4">{truncateString(role?.address)}</p>
         <div className="flex flex-row items-center space-x-1 ml-4">
           <span
             className={`h-2 w-2 rounded-full bg-${
-              addressHasSigned(role.address) ? "magic-mint" : "neon-carrot"
+              addressHasSigned(role?.address) ? "magic-mint" : "neon-carrot"
             }`}
           />
           <div className="font-bold text-xs uppercase tracking-wider">
-            {addressHasSigned(role.address) ? "signed" : "pending"}
+            {addressHasSigned(role?.address) ? "signed" : "pending"}
           </div>
         </div>
       </div>
@@ -51,6 +53,11 @@ const ViewProposalNew: BlitzPage = () => {
 
   return (
     <Layout title="View Proposal">
+      <ApproveProposalNewModal
+        isOpen={isApproveProposalModalOpen}
+        setIsOpen={setIsApproveProposalModalOpen}
+        proposal={proposal}
+      />
       <div className="flex flex-row mt-16">
         <h2 className="ml-10 text-marble-white text-xl font-bold w-full">
           {proposal?.data.content.title}
@@ -59,7 +66,7 @@ const ViewProposalNew: BlitzPage = () => {
           <Button
             type={ButtonType.Primary}
             onClick={() => {
-              console.log("approve")
+              setIsApproveProposalModalOpen(true)
             }}
           >
             Approve

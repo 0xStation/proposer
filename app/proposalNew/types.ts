@@ -1,16 +1,15 @@
 export type ProposalNewMetadata = {
-  type: ProposalType
-  timestamp: Date // needed for public verifiability of multisig representation
   content: { title: string; body: string }
   payments?: Payment[]
   milestones?: Milestone[]
   digest: Digest
   // below not included in digest
   commitments: Commitment[]
-  tokens: Token[]
 }
 
 export type ProposalNew = {
+  type: ProposalType
+  timestamp: Date // needed for public verifiability of multisig representation
   data: ProposalNewMetadata
   roles: Role[]
 }
@@ -49,7 +48,7 @@ type Payment = {
   milestoneId: number // value of 0 indicates upon proposal approval
   recipientAddress: string
   token: Token
-  amount?: number
+  amount?: string
   tokenId?: number
   transactionHash?: string // filled in after execution
 }
