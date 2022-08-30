@@ -8,6 +8,7 @@ export type ProposalNewMetadata = {
 }
 
 export type ProposalNew = {
+  id: string
   type: ProposalType
   timestamp: Date // needed for public verifiability of multisig representation
   data: ProposalNewMetadata
