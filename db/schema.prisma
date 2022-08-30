@@ -213,9 +213,11 @@ model CheckApproval {
 }
 
 model ProposalNew {
-  id    String         @id @default(uuid())
-  data  Json
-  roles ProposalRole[]
+  id        String         @id @default(uuid())
+  type      ProposalType
+  timestamp DateTime       @default(now())
+  data      Json
+  roles     ProposalRole[]
 }
 
 model ProposalRole {
@@ -224,6 +226,10 @@ model ProposalRole {
   proposal   ProposalNew      @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   address    String
   role       ProposalRoleType
+}
+
+enum ProposalType {
+  FUNDING
 }
 
 enum ProposalRoleType {

@@ -2,7 +2,8 @@ import db, { ProposalRoleType } from "db"
 import * as z from "zod"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { ZodToken } from "app/types/zod"
-import { ProposalNewMetadata, ProposalType } from "../types"
+import { ProposalNewMetadata } from "../types"
+import { ProposalType } from "db"
 
 const CreateProposal = z.object({
   contentTitle: z.string(),
@@ -22,8 +23,6 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
   }
 
   const metadata = {
-    type: ProposalType.FUNDING,
-    timestamp: new Date(),
     content: {
       title: params.contentTitle,
       body: params.contentBody,
@@ -38,15 +37,13 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     ],
     digest: {
       hash: "",
-      domain: { name: "ProposalNew", version: "1" },
-      types: [],
     },
     commitments: [],
-    tokens: [],
   } as unknown as ProposalNewMetadata
 
   const proposal = await db.proposalNew.create({
     data: {
+      type: ProposalType.FUNDING,
       data: JSON.parse(JSON.stringify(metadata)),
       roles: {
         createMany: {

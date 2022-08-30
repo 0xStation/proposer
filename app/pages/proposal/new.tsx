@@ -1,4 +1,4 @@
-import { BlitzPage, Link, Routes, useMutation } from "blitz"
+import { BlitzPage, Link, Routes, useRouter, useMutation } from "blitz"
 import { useEffect, useState } from "react"
 import Layout from "app/core/layouts/Layout"
 import { Field, Form } from "react-final-form"
@@ -10,7 +10,8 @@ import networks from "app/utils/networks.json"
 import createProposal from "app/proposalNew/mutations/createProposalNew"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
-const ProposalNew: BlitzPage = () => {
+const CreateProposalNew: BlitzPage = () => {
+  const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(1)
@@ -27,8 +28,13 @@ const ProposalNew: BlitzPage = () => {
   }, [selectedNetworkId])
 
   const [createProposalMutation] = useMutation(createProposal, {
-    onSuccess: (_data) => {
-      console.log("proposal created", _data)
+    onSuccess: (data) => {
+      console.log("proposal created", data)
+      router.push(
+        Routes.ViewProposalNew({
+          proposalId: data.id,
+        })
+      )
     },
     onError: (error: Error) => {
       console.error(error)
@@ -249,6 +255,6 @@ const ProposalNew: BlitzPage = () => {
   )
 }
 
-ProposalNew.suppressFirstRenderFlicker = true
+CreateProposalNew.suppressFirstRenderFlicker = true
 
-export default ProposalNew
+export default CreateProposalNew

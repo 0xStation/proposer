@@ -1,18 +1,17 @@
 export type ProposalNewMetadata = {
-  type: ProposalType
-  timestamp: Date // needed for public verifiability of multisig representation
   content: { title: string; body: string }
   payments?: Payment[]
   milestones?: Milestone[]
   digest: Digest
   // below not included in digest
   commitments: Commitment[]
-  tokens: Token[]
 }
 
 export type ProposalNew = {
+  type: ProposalType
+  timestamp: Date // needed for public verifiability of multisig representation
   data: ProposalNewMetadata
-  roles: Role
+  roles: Role[]
 }
 
 export enum RoleType {
@@ -34,7 +33,7 @@ export enum ProposalType {
 
 export type Role = {
   address: string
-  type: RoleType
+  role: RoleType
 }
 
 // role: who is responsible for something in the agreement
@@ -48,8 +47,8 @@ export type Role = {
 type Payment = {
   milestoneId: number // value of 0 indicates upon proposal approval
   recipientAddress: string
-  token: { chainId: number; address: string }
-  amount?: number
+  token: Token
+  amount?: string
   tokenId?: number
   transactionHash?: string // filled in after execution
 }
@@ -84,9 +83,9 @@ type Commitment = {
 type Token = {
   chainId: number
   address: string
-  type: TokenType
+  type?: TokenType
   name?: string
-  symboL?: string
+  symbol?: string
   decimals?: number
 }
 
