@@ -1,5 +1,5 @@
-import { BlitzPage, Link, Routes, useMutation, useQuery, useParam } from "blitz"
-import { useEffect, useState } from "react"
+import { BlitzPage, useQuery, useParam } from "blitz"
+import { useState } from "react"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
@@ -12,7 +12,6 @@ import truncateString from "app/core/utils/truncateString"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
 import ExecutePaymentModal from "app/proposalNew/components/ExecutePaymentModal"
 import TransactionLink from "app/core/components/TransactionLink"
-import ProgressIndicator from "app/core/components/ProgressIndicator"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import MetadataLabel from "app/core/components/MetadataLabel"
@@ -109,8 +108,8 @@ const ViewProposalNew: BlitzPage = () => {
         payment={proposal?.data?.payments?.[0]}
         proposalId={proposal?.id}
       />
-      <div className="flex flex-row mt-16">
-        <h2 className="ml-10 text-marble-white text-xl font-bold w-full">
+      <div className="flex flex-row py-16 border-b border-concrete">
+        <h2 className="ml-6 text-marble-white text-xl font-bold w-full">
           {proposal?.data.content.title}
         </h2>
         {showApproveButton && (
@@ -142,12 +141,14 @@ const ViewProposalNew: BlitzPage = () => {
           </div>
         )}
       </div>
-      <div className="ml-10 mt-10 grow flex flex-row overflow-y-scroll">
-        <p className="mt-6 w-full font-normal">{proposal?.data.content.body}</p>
-        <div className="flex-col overflow-y-scroll">
-          <div className="w-[36rem] flex-col overflow-y-scroll ml-12">
-            {/* STATUS */}
-            <MetadataLabel label="Proposal status" />
+      <div className="h-[calc(100vh-164px)] flex flex-row">
+        <div className="w-full p-6 overflow-y-scroll">
+          <p>{proposal?.data.content.body}</p>
+        </div>
+        <div className="w-[36rem] border-l border-concrete flex-col overflow-y-scroll">
+          {/* STATUS */}
+          <div className="border-b border-concrete p-6">
+            <h4 className="text-xs font-bold text-concrete uppercase">Proposal status</h4>
             <div className="flex flex-row space-x-2">
               <p className="mt-2 font-normal">
                 {paymentComplete
@@ -169,8 +170,10 @@ const ViewProposalNew: BlitzPage = () => {
                 />
               )}
             </div>
+          </div>
+          <div className="border-b border-concrete p-6">
             {/* AUTHOR */}
-            <MetadataLabel label="Author" />
+            <h4 className="text-xs font-bold text-concrete uppercase">Author</h4>
             <RoleSignature
               role={proposal?.roles?.find((role) => role.role === ProposalRoleType.AUTHOR)}
             />
@@ -184,8 +187,10 @@ const ViewProposalNew: BlitzPage = () => {
             <RoleSignature
               role={proposal?.roles?.find((role) => role.role === ProposalRoleType.CLIENT)}
             />
+          </div>
+          <div className="p-6">
             {/* NETWORK */}
-            <MetadataLabel label="Network" />
+            <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
             <p className="mt-2 font-normal">
               {getNetworkName(proposal?.data?.payments?.[0]?.token.chainId || 0)}
             </p>

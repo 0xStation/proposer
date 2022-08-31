@@ -17,7 +17,6 @@ import { ProposalRoleType } from "@prisma/client"
 enum ProposalStep {
   PROPOSE = "PROPOSE",
   REWARDS = "REWARDS",
-  SIGN = "SIGN",
 }
 
 function classNames(...classes) {
@@ -27,13 +26,13 @@ function classNames(...classes) {
 const Stepper = ({ step }) => {
   return (
     <div className="w-full h-4 bg-neon-carrot relative">
-      <div className="absolute left-[20px] top-[-4px]">
+      <div className="absolute left-[100px] top-[-4px]">
         <span className="h-6 w-6 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
           <span className="h-3 w-1.5 bg-neon-carrot block absolute rounded-l-full top-[4px] left-[3.5px]"></span>
         </span>
         <p className="font-bold mt-2">Propose</p>
       </div>
-      <div className="absolute left-[220px] top-[-4px]">
+      <div className="absolute left-[400px] top-[-4px]">
         <span className="h-6 w-6 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
           {step !== ProposalStep.PROPOSE && (
             <span className="h-3 w-1.5 bg-neon-carrot block absolute rounded-l-full top-[4px] left-[3.5px]"></span>
@@ -42,14 +41,6 @@ const Stepper = ({ step }) => {
         <p className={`font-bold mt-2 ${step === ProposalStep.PROPOSE && "text-concrete"}`}>
           Select rewards
         </p>
-      </div>
-      <div className="absolute left-[420px] top-[-4px]">
-        <span className="h-6 w-6 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
-          {step === ProposalStep.SIGN && (
-            <span className="h-3 w-1.5 bg-neon-carrot block absolute rounded-l-full top-[4px] left-[3.5px]"></span>
-          )}
-        </span>
-        <p className={`font-bold mt-2 ${step !== ProposalStep.SIGN && "text-concrete"}`}>Sign</p>
       </div>
     </div>
   )
@@ -398,12 +389,11 @@ export const ProposalNewForm = () => {
     onSuccess: (data) => {
       console.log("proposal created", data)
       setProposal(data)
-      // router.push(
-      //   Routes.ViewProposalNew({
-      //     proposalId: data.id,
-      //   })
-      // )
-      setProposalStep(ProposalStep.SIGN)
+      router.push(
+        Routes.ViewProposalNew({
+          proposalId: data.id,
+        })
+      )
       setIsLoading(false)
     },
     onError: (error: Error) => {
@@ -460,7 +450,6 @@ export const ProposalNewForm = () => {
                       selectedToken={selectedToken}
                     />
                   )}
-                  {proposalStep === ProposalStep.SIGN && <SignForm proposal={proposal} />}
                 </div>
               </div>
               {proposalStep === ProposalStep.PROPOSE && (
