@@ -48,6 +48,7 @@ export default async function verify(input: z.infer<typeof Verify>, ctx: Ctx) {
 
   try {
     await ctx.session.$setPublicData({ siwe: fields })
+    console.log("session created", ctx.session.siwe)
   } catch (err) {
     console.error("Failed to setPublicData with error: ", err)
     // @ts-ignore
