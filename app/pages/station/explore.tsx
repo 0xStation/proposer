@@ -4,7 +4,12 @@ import { trackClick } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
 import Layout from "app/core/layouts/Layout"
 import Pagination from "app/core/components/Pagination"
-import { RFP_STATUS_DISPLAY_MAP, DEFAULT_PFP_URLS, PAGINATION_TAKE } from "app/core/utils/constants"
+import {
+  RFP_STATUS_DISPLAY_MAP,
+  DEFAULT_PFP_URLS,
+  PAGINATION_TAKE,
+  LINKS,
+} from "app/core/utils/constants"
 import getAllRfps from "app/rfp/queries/getAllRfps"
 import getAllTerminals from "app/terminal/queries/getAllTerminals"
 import getTerminalMemberCount from "app/accountTerminal/queries/getTerminalMemberCount"
@@ -67,7 +72,7 @@ const ExploreStations: BlitzPage = () => {
               <span className="absolute top-[100%] text-white bg-wet-concrete rounded p-2 text-xs hidden group group-hover:block w-[120%] right-0">
                 Early Access users only.{" "}
                 <a
-                  href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
+                  href={LINKS.TYPEFORM_WAITLIST}
                   target="_blank"
                   className="text-electric-violet"
                   rel="noreferrer"

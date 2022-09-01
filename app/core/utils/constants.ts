@@ -206,6 +206,7 @@ export const TOKEN_SYMBOLS = {
 export const LINKS = {
   CHECKBOOK:
     "https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook",
+  TYPEFORM_WAITLIST: "https://6vdcjqzyfj3.typeform.com/to/G3LN1FlM",
 }
 
 // LEGACY BELOW

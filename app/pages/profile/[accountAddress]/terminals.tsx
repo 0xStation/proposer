@@ -16,7 +16,7 @@ import { Account } from "app/account/types"
 import { TagType } from "app/tag/types"
 import { Dialog, Transition } from "@headlessui/react"
 import { truncateString } from "app/core/utils/truncateString"
-import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
+import { DEFAULT_PFP_URLS, LINKS } from "app/core/utils/constants"
 import useKeyPress from "app/core/hooks/useKeyPress"
 
 // the profile homepage
@@ -184,7 +184,7 @@ const TerminalsOnProfile: BlitzPage = () => {
                 to learn more or{" "}
                 <a
                   className="text-magic-mint"
-                  href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
+                  href={LINKS.TYPEFORM_WAITLIST}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
