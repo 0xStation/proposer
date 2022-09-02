@@ -14,6 +14,7 @@ import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNew
 import truncateString from "app/core/utils/truncateString"
 import { ProposalRoleType } from "@prisma/client"
 import BackArrow from "app/core/icons/BackArrow"
+import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -393,13 +394,24 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
   )
 }
 
-const SignForm = ({ proposal }) => {
+const SignForm = ({ activeUser, proposal }) => {
   const [signatures] = useQuery(
     getProposalNewSignaturesById,
     { proposalId: proposal.id },
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
+  const [isApproveProposalModalOpen, setIsApproveProposalModalOpen] = useState<boolean>(false)
+  const [isActionPending, setIsActionPending] = useState<boolean>(false)
+
   const RoleSignature = ({ role }) => {
+    const userHasRole = addressesAreEqual(activeUser?.address || "", role.address)
+
+    const userHasSigned = signatures?.some((commitment) =>
+      addressesAreEqual(activeUser?.address || "", commitment.address)
+    )
+
+    const showSignButton = userHasRole && !userHasSigned
+
     const addressHasSigned = (address: string) => {
       return signatures?.some((signature) => addressesAreEqual(address, signature.address)) || false
     }
@@ -422,22 +434,39 @@ const SignForm = ({ proposal }) => {
           </div>
           <p className="mt-1 text-xs text-light-concrete">{responsiblityCopy[role.role]}</p>
         </div>
-        <div className="flex flex-row items-center space-x-1 ml-4">
+        {showSignButton ? (
           <span
-            className={`h-2 w-2 rounded-full bg-${
-              addressHasSigned(role?.address) ? "magic-mint" : "neon-carrot"
-            }`}
-          />
-          <div className="font-bold text-xs uppercase tracking-wider">
-            {addressHasSigned(role?.address) ? "signed" : "pending"}
+            className="text-electric-violet cursor-pointer"
+            onClick={() => setIsApproveProposalModalOpen(true)}
+          >
+            Sign
+          </span>
+        ) : (
+          <div className="flex flex-row items-center space-x-1 ml-4">
+            <span
+              className={`h-2 w-2 rounded-full bg-${
+                addressHasSigned(role?.address) ? "magic-mint" : "neon-carrot"
+              }`}
+            />
+
+            <div className="font-bold text-xs uppercase tracking-wider">
+              {addressHasSigned(role?.address) ? "signed" : "pending"}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     )
   }
 
   return (
     <div className="mt-6">
+      <ApproveProposalNewModal
+        isOpen={isApproveProposalModalOpen}
+        setIsOpen={setIsApproveProposalModalOpen}
+        proposal={proposal}
+        isSigning={isActionPending}
+        setIsSigning={setIsActionPending}
+      />
       <p>All signatures are required to activate the agreement.</p>
       <div className="space-y-4 mt-6">
         <RoleSignature
@@ -541,7 +570,9 @@ export const ProposalNewForm = () => {
                       selectedToken={selectedToken}
                     />
                   )}
-                  {proposalStep === ProposalStep.SIGN && <SignForm proposal={proposal} />}
+                  {proposalStep === ProposalStep.SIGN && (
+                    <SignForm proposal={proposal} activeUser={activeUser} />
+                  )}
                 </div>
               </div>
               {proposalStep === ProposalStep.PROPOSE && (
