@@ -1,6 +1,6 @@
 import { getGnosisSafeDetails } from "./getGnosisSafeDetails"
 import { CHAIN_IDS } from "app/core/utils/constants"
-import { AddressType } from "app/types"
+import { AddressType } from "@prisma/client"
 // import { AlchemyProvider } from "@ethersproject/providers"
 // import networks from "./networks.json"
 // import { requireEnv } from "./requireEnv"
@@ -11,12 +11,24 @@ import { AddressType } from "app/types"
  * so we have this recursive algorithm to keep fetching until we have
  * all members and return them as one list
  */
-export const classifyAddress = async (address) => {
+export const getAddressDetails = async (
+  address
+): Promise<{ type: AddressType; chainId: number }> => {
   const validChainIds = Object.values(CHAIN_IDS)
   const requests = validChainIds.map((chainId) => getGnosisSafeDetails(chainId, address))
   const responses = await Promise.all(requests)
 
-  const isSafe = responses.some((val) => !!val)
+  responses.forEach((value, i) => {
+    if (!value) {
+      return {
+        type: AddressType.SAFE,
+        chainId: validChainIds[i],
+      }
+    }
+  })
 
-  return isSafe ? AddressType.SAFE : AddressType.WALLET
+  return {
+    type: AddressType.WALLET,
+    chainId: 0,
+  }
 }

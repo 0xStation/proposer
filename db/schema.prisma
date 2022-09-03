@@ -17,7 +17,7 @@ model Account {
   id                Int                @id @default(autoincrement())
   address           String?            @unique
   discordId         String?            @unique
-  type              AccountType?
+  type              AddressType?
   tickets           AccountTerminal[]
   data              Json?
   sessions          Session[]
@@ -242,9 +242,10 @@ model ProposalRole {
   role       ProposalRoleType
 }
 
-enum AccountType {
+enum AddressType {
   WALLET
   SAFE
+  CHECKBOOK
 }
 
 enum ProposalType {

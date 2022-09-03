@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "AccountType" AS ENUM ('WALLET', 'SAFE');
+CREATE TYPE "AccountType" AS ENUM ('WALLET', 'SAFE', 'CHECKBOOK');
 
 -- AlterTable
 ALTER TABLE "Account" ADD COLUMN     "type" "AccountType";

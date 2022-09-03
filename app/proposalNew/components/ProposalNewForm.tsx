@@ -534,18 +534,18 @@ export const ProposalNewForm = () => {
             throw Error("token not found")
           }
 
+          const contributor = !authorIsContributor ? values.contributor : activeUser!.address!
+
           createProposalMutation({
             contentTitle: values.title,
             contentBody: values.body,
-            contributorAddresses: [
-              !authorIsContributor ? values.contributor : activeUser!.address!,
-            ],
+            contributorAddresses: [contributor],
             clientAddresses: [values.client],
             authorAddresses: [activeUser!.address!],
             payments: [
               {
                 milestoneId: 0, // assumption for now is one payment expected on approval
-                recipientAddress: values.contributor,
+                recipientAddress: contributor,
                 token: { ...token, chainId: selectedNetworkId },
                 amount: values.paymentAmount,
               },

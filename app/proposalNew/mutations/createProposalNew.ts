@@ -1,10 +1,11 @@
-import db, { ProposalRoleType } from "db"
+import db, { AddressType, ProposalRoleType } from "db"
 import * as z from "zod"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { ZodToken } from "app/types/zod"
 import { ProposalNewMetadata } from "../types"
 import { ProposalType } from "db"
-import { classifyAddress } from "app/utils/classifyAddress"
+import { getAddressDetails } from "app/utils/getAddressDetails"
+import truncateString from "app/core/utils/truncateString"
 
 const CreateProposal = z.object({
   contentTitle: z.string(),
@@ -45,20 +46,25 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
   })
 
   const addressesMissingAccounts = uniqueRoleAddresses.filter((address) =>
-    accounts.some((account) => account.address === address)
+    accounts.some((account) => account.address !== address)
   )
 
   const addressClassificationRequests = addressesMissingAccounts.map((address) =>
-    classifyAddress(address)
+    getAddressDetails(address)
   )
   const addressClassificationResponses = await Promise.all(addressClassificationRequests)
 
   await db.account.createMany({
     skipDuplicates: true, // do not create entries that already exist
     data: addressesMissingAccounts.map((address, i) => {
+      const { type, chainId } = addressClassificationResponses[i]!
       return {
         address,
-        type: addressClassificationResponses[i],
+        type,
+        data: {
+          name: truncateString(address),
+          ...(type !== AddressType.WALLET && { chainId }),
+        },
       }
     }),
   })

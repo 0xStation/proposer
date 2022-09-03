@@ -1,7 +1,7 @@
 import * as z from "zod"
 import { multicall } from "app/utils/rpcMulticall"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
-import { classifyAddress } from "app/utils/classifyAddress"
+import { getAddressDetails } from "app/utils/getAddressDetails"
 
 const MultisigMetadataRequest = z.object({
   address: z.string(),
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     res.status(500).json({ response: "error", message: "missing required parameter" })
   }
 
-  const safe = await classifyAddress(params.address)
+  const safe = await getAddressDetails(params.address)
   if (!safe) {
     res.status(404).json({ message: "safe not found " })
     return
