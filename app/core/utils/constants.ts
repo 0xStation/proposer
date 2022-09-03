@@ -28,7 +28,7 @@ export const CONTRACTS = {
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
-export const CHAIN_IDS = {
+export const CHAIN_IDS: Record<string, number> = {
   ETHEREUM: 1,
   RINKEBY: 4,
   GOERLI: 5,

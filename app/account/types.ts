@@ -26,6 +26,7 @@ export type Account = {
   id: number
   address?: string
   discordId?: string
+  type?: string
   data: AccountMetadata
   role?: string
   points?: number

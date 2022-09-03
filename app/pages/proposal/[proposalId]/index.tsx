@@ -15,6 +15,8 @@ import TransactionLink from "app/core/components/TransactionLink"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import MetadataLabel from "app/core/components/MetadataLabel"
+import { useFetchMultisigParametersBatch } from "app/contracts/multisig"
+import { AddressType } from "app/types"
 
 const ViewProposalNew: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)

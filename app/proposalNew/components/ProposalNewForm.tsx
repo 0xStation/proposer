@@ -537,11 +537,19 @@ export const ProposalNewForm = () => {
           createProposalMutation({
             contentTitle: values.title,
             contentBody: values.body,
-            contributorAddress: !authorIsContributor ? values.contributor : activeUser!.address!,
-            clientAddress: values.client,
+            contributorAddresses: [
+              !authorIsContributor ? values.contributor : activeUser!.address!,
+            ],
+            clientAddresses: [values.client],
             authorAddresses: [activeUser!.address!],
-            token: { ...token, chainId: selectedNetworkId },
-            paymentAmount: values.paymentAmount,
+            payments: [
+              {
+                milestoneId: 0, // assumption for now is one payment expected on approval
+                recipientAddress: values.contributor,
+                token: { ...token, chainId: selectedNetworkId },
+                amount: values.paymentAmount,
+              },
+            ],
           })
         }}
         render={({ form, handleSubmit }) => {

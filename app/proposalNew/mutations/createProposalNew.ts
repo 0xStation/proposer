@@ -1,26 +1,67 @@
 import db, { ProposalRoleType } from "db"
 import * as z from "zod"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
-import { OptionalZodToken } from "app/types/zod"
+import { ZodToken } from "app/types/zod"
 import { ProposalNewMetadata } from "../types"
 import { ProposalType } from "db"
+import { classifyAddress } from "app/utils/classifyAddress"
 
 const CreateProposal = z.object({
   contentTitle: z.string(),
   contentBody: z.string(),
-  contributorAddress: z.string(),
-  clientAddress: z.string(),
+  contributorAddresses: z.string().array(),
+  clientAddresses: z.string().array(),
   authorAddresses: z.string().array(),
-  token: OptionalZodToken,
-  paymentAmount: z.string().optional(),
+  payments: z
+    .object({
+      milestoneId: z.number(),
+      recipientAddress: z.string(),
+      token: ZodToken,
+      amount: z.string(),
+    })
+    .array(),
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
   const params = CreateProposal.parse(input)
 
-  if (params.paymentAmount && parseFloat(params.paymentAmount) < 0) {
+  if (!params.payments.every((payment) => parseFloat(payment.amount) >= 0)) {
     throw new Error("amount must be greater or equal to zero.")
   }
+
+  const roleAddresses = [
+    ...params.contributorAddresses,
+    ...params.clientAddresses,
+    ...params.authorAddresses,
+  ]
+  const uniqueRoleAddresses = roleAddresses.filter((v, i, addresses) => addresses.indexOf(v) === i)
+
+  const accounts = await db.account.findMany({
+    where: {
+      address: {
+        in: uniqueRoleAddresses,
+      },
+    },
+  })
+
+  const addressesMissingAccounts = uniqueRoleAddresses.filter((address) =>
+    accounts.some((account) => account.address === address)
+  )
+
+  const addressClassificationRequests = addressesMissingAccounts.map((address) =>
+    classifyAddress(address)
+  )
+  const addressClassificationResponses = await Promise.all(addressClassificationRequests)
+
+  await db.account.createMany({
+    skipDuplicates: true, // do not create entries that already exist
+    data: addressesMissingAccounts.map((address, i) => {
+      return {
+        address,
+        type: addressClassificationResponses[i],
+      }
+    }),
+  })
 
   const metadata = {
     content: {
@@ -31,16 +72,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     // it might be better to pass this through more explicitly with a flag for "no funding"
     // but we are doing this the quick way with minimal infra
     // if we get validation this is good idea we can improve
-    payments: params.paymentAmount
-      ? [
-          {
-            milestoneId: 0,
-            recipientAddress: params.contributorAddress,
-            token: params.token,
-            amount: params.paymentAmount,
-          },
-        ]
-      : [],
+    payments: params.payments,
     digest: {
       hash: "",
     },
@@ -53,10 +85,10 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       roles: {
         createMany: {
           data: [
-            ...[params.contributorAddress].map((a) => {
+            ...params.contributorAddresses.map((a) => {
               return { address: toChecksumAddress(a), role: ProposalRoleType.CONTRIBUTOR }
             }),
-            ...[params.clientAddress].map((a) => {
+            ...params.clientAddresses.map((a) => {
               return { address: toChecksumAddress(a), role: ProposalRoleType.CLIENT }
             }),
             ...params.authorAddresses.map((a) => {
