@@ -18,14 +18,16 @@ export const getAddressDetails = async (
   const requests = validChainIds.map((chainId) => getGnosisSafeDetails(chainId, address))
   const responses = await Promise.all(requests)
 
-  responses.forEach((value, i) => {
-    if (!value) {
+  console.log("address", address)
+
+  for (let i in validChainIds) {
+    if (!!responses[i]) {
       return {
         type: AddressType.SAFE,
-        chainId: validChainIds[i],
+        chainId: validChainIds[i]!,
       }
     }
-  })
+  }
 
   return {
     type: AddressType.WALLET,

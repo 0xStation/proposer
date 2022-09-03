@@ -1,5 +1,5 @@
 import { BlitzPage, useQuery, useParam } from "blitz"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
@@ -16,7 +16,8 @@ import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import MetadataLabel from "app/core/components/MetadataLabel"
 import { useFetchMultisigParametersBatch } from "app/contracts/multisig"
-import { AddressType } from "app/types"
+import { AddressType } from "@prisma/client"
+import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 
 const ViewProposalNew: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
@@ -37,24 +38,43 @@ const ViewProposalNew: BlitzPage = () => {
   )
 
   const RoleSignature = ({ role }) => {
-    const addressHasSigned = (address: string) => {
-      return signatures?.some((signature) => addressesAreEqual(address, signature.address)) || false
-    }
+    const [quorum, setQuorum] = useState<number>(0)
+    const [roleHasSigned, setRoleHasSigned] = useState<boolean>(false)
+
+    const isSafe = role?.account?.type === AddressType.SAFE
+
+    useEffect(() => {
+      if (isSafe) {
+        getGnosisSafeDetails(role.account.data.chainId, role.address).then((details) => {
+          if (details) {
+            setQuorum(details.quorum)
+          }
+        })
+      }
+    }, [])
+
+    useEffect(() => {
+      setRoleHasSigned(
+        signatures?.some((signature) => addressesAreEqual(role?.address, signature.address)) ||
+          false
+      )
+    }, [signatures])
 
     return (
-      <div className="flex flex-row">
-        <p className="mr-4">{truncateString(role?.address)}</p>
-        <div className="flex flex-row items-center space-x-1 ml-4">
-          <span
-            className={`h-2 w-2 rounded-full bg-${
-              addressHasSigned(role?.address) ? "magic-mint" : "neon-carrot"
-            }`}
-          />
-          <div className="font-bold text-xs uppercase tracking-wider">
-            {addressHasSigned(role?.address) ? "signed" : "pending"}
+      <>
+        <div className="flex flex-row">
+          <p className="mr-4">{truncateString(role?.address)}</p>
+          <div className="flex flex-row items-center space-x-1 ml-4">
+            <span
+              className={`h-2 w-2 rounded-full bg-${roleHasSigned ? "magic-mint" : "neon-carrot"}`}
+            />
+            <div className="font-bold text-xs uppercase tracking-wider">
+              {roleHasSigned ? "signed" : "pending"}
+            </div>
           </div>
         </div>
-      </div>
+        {isSafe && <ProgressCircleAndNumber numerator={0} denominator={quorum} />}
+      </>
     )
   }
 

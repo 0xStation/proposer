@@ -26,7 +26,9 @@ export const getGnosisSafeDetails = async (chainId: number, address: string) => 
   }
 
   const results = await response.json()
-  console.log(results)
 
-  return results
+  return {
+    quorum: results.threshold,
+    signers: results.owners,
+  }
 }
