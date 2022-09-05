@@ -1,4 +1,4 @@
-import { Routes, useRouter, useMutation, useQuery } from "blitz"
+import { Routes, useRouter, useMutation, useQuery, useSession } from "blitz"
 import { useEffect, useState } from "react"
 import { RadioGroup } from "@headlessui/react"
 import { Field, Form } from "react-final-form"
@@ -394,12 +394,7 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
   )
 }
 
-const SignForm = ({ activeUser, proposal }) => {
-  const [signatures] = useQuery(
-    getProposalNewSignaturesById,
-    { proposalId: proposal.id },
-    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
-  )
+const SignForm = ({ activeUser, proposal, signatures }) => {
   const [isApproveProposalModalOpen, setIsApproveProposalModalOpen] = useState<boolean>(false)
   const [isActionPending, setIsActionPending] = useState<boolean>(false)
 
@@ -484,7 +479,10 @@ const SignForm = ({ activeUser, proposal }) => {
 }
 
 export const ProposalNewForm = () => {
+  const session = useSession({ suspense: false })
   const router = useRouter()
+  const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  const walletModalOpen = useStore((state) => state.walletModalOpen)
   const activeUser = useStore((state) => state.activeUser)
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(0)
   const [selectedToken, setSelectedToken] = useState<any>()
@@ -492,6 +490,16 @@ export const ProposalNewForm = () => {
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
   const [proposal, setProposal] = useState<any>()
   const [authorIsContributor, setAuthorIsContributor] = useState<boolean>(true)
+
+  const [signatures] = useQuery(
+    getProposalNewSignaturesById,
+    { proposalId: proposal && proposal.id },
+    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
+  )
+
+  const userHasSigned = signatures?.some((commitment) =>
+    addressesAreEqual(activeUser?.address || "", commitment.address)
+  )
 
   const HeaderCopy = {
     [ProposalStep.PROPOSE]: "Propose",
@@ -520,101 +528,114 @@ export const ProposalNewForm = () => {
   })
 
   return (
-    <div className="max-w-[580px] mx-auto mt-12">
-      <Stepper step={proposalStep} />
-      <Form
-        onSubmit={async (values: any, form) => {
-          // tokenAddress might just be null if they are not requesting funding
-          // need to check tokenAddress exists, AND it is not found before erroring
-          const token = values.tokenAddress
-            ? tokenOptions?.find((token) => addressesAreEqual(token.address, values.tokenAddress))
-            : null
+    <div>
+      <div className="max-w-[580px] mx-auto mt-12">
+        <Stepper step={proposalStep} />
+        <Form
+          onSubmit={async (values: any, form) => {
+            // tokenAddress might just be null if they are not requesting funding
+            // need to check tokenAddress exists, AND it is not found before erroring
+            const token = values.tokenAddress
+              ? tokenOptions?.find((token) => addressesAreEqual(token.address, values.tokenAddress))
+              : null
 
-          if (values.tokenAddress && !token) {
-            throw Error("token not found")
-          }
+            if (values.tokenAddress && !token) {
+              throw Error("token not found")
+            }
 
-          createProposalMutation({
-            contentTitle: values.title,
-            contentBody: values.body,
-            contributorAddress: !authorIsContributor ? values.contributor : activeUser!.address!,
-            clientAddress: values.client,
-            authorAddresses: [activeUser!.address!],
-            token: { ...token, chainId: selectedNetworkId },
-            paymentAmount: values.paymentAmount,
-          })
-        }}
-        render={({ form, handleSubmit }) => {
-          const formState = form.getState()
-          return (
-            <form onSubmit={handleSubmit} className="mt-20">
-              <div className="rounded-lg border border-concrete p-6">
-                <div className="flex flex-row justify-between items-center">
-                  <h2 className="text-marble-white text-2xl font-bold">
-                    {HeaderCopy[proposalStep]}
-                  </h2>
-                  <span className="text-xs text-light-concrete">Last updated: insert date</span>
+            createProposalMutation({
+              contentTitle: values.title,
+              contentBody: values.body,
+              contributorAddress: !authorIsContributor ? values.contributor : activeUser!.address!,
+              clientAddress: values.client,
+              authorAddresses: [activeUser!.address!],
+              token: { ...token, chainId: selectedNetworkId },
+              paymentAmount: values.paymentAmount,
+            })
+          }}
+          render={({ form, handleSubmit }) => {
+            const formState = form.getState()
+            return (
+              <form onSubmit={handleSubmit} className="mt-20">
+                <div className="rounded-lg border border-concrete p-6 h-[600px] overflow-y-scroll">
+                  <div className="flex flex-row justify-between items-center">
+                    <h2 className="text-marble-white text-2xl font-bold">
+                      {HeaderCopy[proposalStep]}
+                    </h2>
+                    <span className="text-xs text-light-concrete">Last updated: insert date</span>
+                  </div>
+                  <div className="flex flex-col col-span-2">
+                    {proposalStep === ProposalStep.PROPOSE && (
+                      <ProposeForm
+                        authorIsContributor={authorIsContributor}
+                        setAuthorIsContributor={setAuthorIsContributor}
+                      />
+                    )}
+                    {proposalStep === ProposalStep.REWARDS && (
+                      <RewardForm
+                        tokenOptions={tokenOptions}
+                        selectedNetworkId={selectedNetworkId}
+                        setSelectedNetworkId={setSelectedNetworkId}
+                        selectedToken={selectedToken}
+                      />
+                    )}
+                    {proposalStep === ProposalStep.SIGN && (
+                      <SignForm
+                        proposal={proposal}
+                        activeUser={activeUser}
+                        signatures={signatures}
+                      />
+                    )}
+                  </div>
                 </div>
-                <div className="flex flex-col col-span-2">
-                  {proposalStep === ProposalStep.PROPOSE && (
-                    <ProposeForm
-                      authorIsContributor={authorIsContributor}
-                      setAuthorIsContributor={setAuthorIsContributor}
-                    />
-                  )}
-                  {proposalStep === ProposalStep.REWARDS && (
-                    <RewardForm
-                      tokenOptions={tokenOptions}
-                      selectedNetworkId={selectedNetworkId}
-                      setSelectedNetworkId={setSelectedNetworkId}
-                      selectedToken={selectedToken}
-                    />
-                  )}
-                  {proposalStep === ProposalStep.SIGN && (
-                    <SignForm proposal={proposal} activeUser={activeUser} />
-                  )}
-                </div>
-              </div>
-              {proposalStep === ProposalStep.PROPOSE && (
-                <Button
-                  isDisabled={!formState.values.title || !formState.values.body}
-                  className="mt-6 float-right"
-                  onClick={() => {
-                    setProposalStep(ProposalStep.REWARDS)
-                  }}
-                >
-                  Next
-                </Button>
-              )}
-              {proposalStep === ProposalStep.REWARDS && (
-                <div className="flex justify-between mt-6">
-                  <span
-                    onClick={() => setProposalStep(ProposalStep.PROPOSE)}
-                    className="cursor-pointer border rounded border-marble-white p-2 self-start"
+                {proposalStep === ProposalStep.PROPOSE && (
+                  <Button
+                    isDisabled={
+                      !formState.values.title || !formState.values.body || !formState.values.client
+                    }
+                    className="mt-6 float-right"
+                    onClick={() => {
+                      setProposalStep(ProposalStep.REWARDS)
+                    }}
                   >
-                    <BackArrow className="fill-marble-white" />
-                  </span>
-                  <Button isSubmitType={true}>Save</Button>
-                </div>
-              )}
-              {proposalStep === ProposalStep.SIGN && (
-                <Button
-                  className="mt-6 float-right"
-                  onClick={() => {
-                    router.push(
-                      Routes.ViewProposalNew({
-                        proposalId: proposal.id,
-                      })
-                    )
-                  }}
-                >
-                  Done
-                </Button>
-              )}
-            </form>
-          )
-        }}
-      />
+                    Next
+                  </Button>
+                )}
+                {proposalStep === ProposalStep.REWARDS && (
+                  <div className="flex justify-between mt-6">
+                    <span
+                      onClick={() => setProposalStep(ProposalStep.PROPOSE)}
+                      className="cursor-pointer border rounded border-marble-white p-2 self-start"
+                    >
+                      <BackArrow className="fill-marble-white" />
+                    </span>
+                    {activeUser ? (
+                      <Button isSubmitType={true}>Save</Button>
+                    ) : (
+                      <Button onClick={() => toggleWalletModal(true)}>Connect</Button>
+                    )}
+                  </div>
+                )}
+                {proposalStep === ProposalStep.SIGN && (
+                  <Button
+                    isDisabled={!userHasSigned}
+                    className="mt-6 float-right"
+                    onClick={() => {
+                      router.push(
+                        Routes.ViewProposalNew({
+                          proposalId: proposal.id,
+                        })
+                      )
+                    }}
+                  >
+                    Done
+                  </Button>
+                )}
+              </form>
+            )
+          }}
+        />
+      </div>
     </div>
   )
 }
