@@ -31,17 +31,31 @@ const Stepper = ({ step }) => {
     <div className="w-full h-4 bg-neon-carrot relative">
       <div className="absolute left-[20px] top-[-4px]">
         <span className="h-6 w-6 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
-          <span className="h-3 w-1.5 bg-neon-carrot block absolute rounded-l-full top-[4px] left-[3.5px]"></span>
+          <span
+            className={`h-3 bg-neon-carrot block absolute ${
+              step === ProposalStep.PROPOSE
+                ? "w-1.5 rounded-l-full top-[4px] left-[3.5px]"
+                : "w-3 rounded-full top-[4px] left-[4px]"
+            }`}
+          ></span>
         </span>
-        <p className="font-bold mt-2">Propose</p>
+        <p className={`font-bold mt-2 ${step !== ProposalStep.PROPOSE && "text-concrete"}`}>
+          Propose
+        </p>
       </div>
       <div className="absolute left-[220px] top-[-4px]">
         <span className="h-6 w-6 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
           {step !== ProposalStep.PROPOSE && (
-            <span className="h-3 w-1.5 bg-neon-carrot block absolute rounded-l-full top-[4px] left-[3.5px]"></span>
+            <span
+              className={`h-3 bg-neon-carrot block absolute ${
+                step === ProposalStep.REWARDS
+                  ? "w-1.5 rounded-l-full top-[4px] left-[3.5px]"
+                  : "w-3 rounded-full top-[4px] left-[4px]"
+              }`}
+            ></span>
           )}
         </span>
-        <p className={`font-bold mt-2 ${step === ProposalStep.PROPOSE && "text-concrete"}`}>
+        <p className={`font-bold mt-2 ${step !== ProposalStep.REWARDS && "text-concrete"}`}>
           Define terms
         </p>
       </div>
