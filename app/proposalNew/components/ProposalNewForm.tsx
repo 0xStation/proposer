@@ -1,9 +1,9 @@
-import { Routes, useRouter, useMutation, useQuery, useSession } from "blitz"
+import { Routes, useRouter, useMutation, useQuery } from "blitz"
 import { useEffect, useState } from "react"
 import { RadioGroup } from "@headlessui/react"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
-import Button from "app/core/components/sds/buttons/Button"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { SUPPORTED_CHAINS, ETH_METADATA } from "app/core/utils/constants"
 import networks from "app/utils/networks.json"
 import createProposal from "app/proposalNew/mutations/createProposalNew"
@@ -15,6 +15,7 @@ import truncateString from "app/core/utils/truncateString"
 import { ProposalRoleType } from "@prisma/client"
 import BackArrow from "app/core/icons/BackArrow"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
+import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -493,7 +494,6 @@ const SignForm = ({ activeUser, proposal, signatures }) => {
 }
 
 export const ProposalNewForm = () => {
-  const session = useSession({ suspense: false })
   const router = useRouter()
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const walletModalOpen = useStore((state) => state.walletModalOpen)
@@ -504,6 +504,7 @@ export const ProposalNewForm = () => {
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
   const [proposal, setProposal] = useState<any>()
   const [authorIsContributor, setAuthorIsContributor] = useState<boolean>(true)
+  const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
 
   const [signatures] = useQuery(
     getProposalNewSignaturesById,
@@ -631,19 +632,40 @@ export const ProposalNewForm = () => {
                   </div>
                 )}
                 {proposalStep === ProposalStep.SIGN && (
-                  <Button
-                    isDisabled={!userHasSigned}
-                    className="mt-6 float-right"
-                    onClick={() => {
-                      router.push(
-                        Routes.ViewProposalNew({
-                          proposalId: proposal.id,
-                        })
-                      )
-                    }}
-                  >
-                    Done
-                  </Button>
+                  <div className="mt-6 flex justify-end">
+                    <Button
+                      className="mr-2"
+                      type={ButtonType.Secondary}
+                      onClick={() => {
+                        const path = genUrlFromRoute(
+                          Routes.ViewProposalNew({
+                            proposalId: proposal.id,
+                          })
+                        )
+
+                        navigator.clipboard
+                          .writeText(`${window.location.protocol}//${window.location.host}${path}`)
+                          .then(() => {
+                            setIsClipboardAddressCopied(true)
+                            setTimeout(() => setIsClipboardAddressCopied(false), 3000)
+                          })
+                      }}
+                    >
+                      {isClipboardAddressCopied ? "Copied!" : "Copy Link"}
+                    </Button>
+                    <Button
+                      isDisabled={!userHasSigned}
+                      onClick={() => {
+                        router.push(
+                          Routes.ViewProposalNew({
+                            proposalId: proposal.id,
+                          })
+                        )
+                      }}
+                    >
+                      Done
+                    </Button>
+                  </div>
                 )}
               </form>
             )
