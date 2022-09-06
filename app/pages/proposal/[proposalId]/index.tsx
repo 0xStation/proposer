@@ -1,5 +1,6 @@
 import { BlitzPage, useQuery, useParam } from "blitz"
 import { useState } from "react"
+import { ExternalLinkIcon } from "@heroicons/react/solid"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
@@ -34,6 +35,7 @@ const ViewProposalNew: BlitzPage = () => {
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
+  console.log("proposal", proposal)
   const RoleSignature = ({ role }) => {
     const addressHasSigned = (address: string) => {
       return signatures?.some((signature) => addressesAreEqual(address, signature.address)) || false
@@ -145,6 +147,32 @@ const ViewProposalNew: BlitzPage = () => {
         <div className="w-full p-6 overflow-y-scroll">
           <p>{proposal?.data.content.body}</p>
         </div>
+        {proposal?.data?.ipfsMetadata?.hash && (
+          <div className="absolute bottom-7 left-6 border border-concrete rounded p-4">
+            <div className="flex flex-col">
+              <div className="flex-row border-b border-concrete pb-2">
+                <a
+                  target="_blank"
+                  className="inline mr-2 cursor-pointer"
+                  href={`https://gateway.pinata.cloud/ipfs/${proposal?.data?.ipfsMetadata?.hash}`}
+                  rel="noreferrer"
+                >
+                  <p className="inline font-bold tracking-wide uppercase text-concrete text-xs">
+                    Ipfs link
+                  </p>
+                  <ExternalLinkIcon className="inline h-4 w-4 fill-concrete cursor-pointer" />
+                </a>
+                <p className="inline">{proposal?.data?.ipfsMetadata?.hash}</p>
+              </div>
+              <div className="flex-row mt-2">
+                <p className="inline font-bold tracking-wide uppercase text-concrete text-xs mr-2">
+                  Last updated
+                </p>
+                <p className="inline">{proposal?.data?.ipfsMetadata?.timestamp}</p>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="w-[36rem] border-l border-concrete flex-col overflow-y-scroll">
           {/* STATUS */}
           <div className="border-b border-concrete p-6">

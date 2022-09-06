@@ -1,27 +1,23 @@
-import db, { ProposalRoleType } from "db"
+import db from "db"
 import * as z from "zod"
-import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { OptionalZodToken } from "app/types/zod"
 import { ProposalNewMetadata } from "../types"
-import { ProposalType } from "db"
 
-const CreateProposal = z.object({
+const UpdateProposalNew = z.object({
+  proposalId: z.string(),
   contentTitle: z.string(),
   contentBody: z.string(),
   contributorAddress: z.string(),
-  clientAddress: z.string(),
-  authorAddresses: z.string().array(),
   token: OptionalZodToken,
   paymentAmount: z.string().optional(),
   ipfsHash: z.string().optional(),
   pinSize: z.number().optional(), // ipfs
-  ipfsTimestamp: z.date().optional(),
+  ipfsTimestamp: z.string().optional(),
 })
 
-export default async function createProposal(input: z.infer<typeof CreateProposal>) {
-  const params = CreateProposal.parse(input)
-
-  if (params.paymentAmount && parseFloat(params.paymentAmount) < 0) {
+export default async function updateProposal(input: z.infer<typeof UpdateProposalNew>) {
+  const params = UpdateProposalNew.parse(input)
+  if (parseFloat(params.paymentAmount || "") < 0) {
     throw new Error("amount must be greater or equal to zero.")
   }
 
@@ -32,7 +28,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     timestamp: ipfsTimestamp,
   }
 
-  const metadata = {
+  const proposalMetadata = {
     content: {
       title: params.contentTitle,
       body: params.contentBody,
@@ -57,30 +53,21 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     ipfsMetadata,
   } as unknown as ProposalNewMetadata
 
-  const proposal = await db.proposalNew.create({
-    data: {
-      type: ProposalType.FUNDING,
-      data: JSON.parse(JSON.stringify(metadata)),
-      roles: {
-        createMany: {
-          data: [
-            ...[params.contributorAddress].map((a) => {
-              return { address: toChecksumAddress(a), role: ProposalRoleType.CONTRIBUTOR }
-            }),
-            ...[params.clientAddress].map((a) => {
-              return { address: toChecksumAddress(a), role: ProposalRoleType.CLIENT }
-            }),
-            ...params.authorAddresses.map((a) => {
-              return { address: toChecksumAddress(a), role: ProposalRoleType.AUTHOR }
-            }),
-          ],
-        },
+  try {
+    const proposal = await db.proposalNew.update({
+      where: { id: params.proposalId },
+      // TODO: as of 9/1 we currently only support proposals of type "FUNDING"
+      // but in the future we need to figure out how to void a funding proposal
+      // and change it to a different type and vice versa.
+      data: {
+        data: JSON.parse(JSON.stringify(proposalMetadata)),
       },
-    },
-    include: {
-      roles: true,
-    },
-  })
-
-  return proposal
+      include: {
+        roles: true,
+      },
+    })
+    return proposal
+  } catch (err) {
+    throw Error(`Error updating proposal, failed with error: ${err.message}`)
+  }
 }
