@@ -72,29 +72,9 @@ const Stepper = ({ step }) => {
   )
 }
 
-const ProposeForm = ({ authorIsContributor, setAuthorIsContributor }) => {
+const ProposeForm = () => {
   return (
     <>
-      {/* CLIENT */}
-      <label className="font-bold block mt-6">To*</label>
-      <span className="text-xs text-concrete block">Who will be approving this proposal?</span>
-      <Field name="client">
-        {({ meta, input }) => (
-          <>
-            <input
-              {...input}
-              type="text"
-              required
-              placeholder="Enter wallet or ENS address"
-              className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
-            />
-
-            {meta.touched && meta.error && (
-              <span className="text-torch-red text-xs">{meta.error}</span>
-            )}
-          </>
-        )}
-      </Field>
       {/* TITLE */}
       <label className="font-bold block mt-6">Subject*</label>
       <Field name="title" validate={requiredField}>
@@ -131,103 +111,6 @@ const ProposeForm = ({ authorIsContributor, setAuthorIsContributor }) => {
           </div>
         )}
       </Field>
-      <RadioGroup value={authorIsContributor} onChange={setAuthorIsContributor}>
-        <RadioGroup.Label className="mt-6 block font-bold">
-          Are you the one delivering the work?
-        </RadioGroup.Label>
-
-        <div className="mt-1 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
-          <RadioGroup.Option
-            value={true}
-            className={({ checked, active }) =>
-              classNames(
-                checked ? "border-transparent" : "border-gray-300",
-                active ? "border-indigo-500 ring-2 ring-indigo-500" : "",
-                "relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none"
-              )
-            }
-          >
-            {({ checked, active }) => (
-              <>
-                <RadioGroup.Label
-                  as="span"
-                  className="block text-sm font-medium text-gray-900 mx-auto"
-                >
-                  Yes
-                </RadioGroup.Label>
-                <CheckCircleIcon
-                  className={classNames(!checked ? "invisible" : "", "h-5 w-5 text-indigo-600")}
-                  aria-hidden="true"
-                />
-                <span
-                  className={classNames(
-                    active ? "border" : "border-2",
-                    checked ? "border-indigo-500" : "border-transparent",
-                    "pointer-events-none absolute -inset-px rounded-lg"
-                  )}
-                  aria-hidden="true"
-                />
-              </>
-            )}
-          </RadioGroup.Option>
-          <RadioGroup.Option
-            value={false}
-            className={({ checked, active }) =>
-              classNames(
-                checked ? "border-transparent" : "border-gray-300",
-                active ? "border-indigo-500 ring-2 ring-indigo-500" : "",
-                "relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none"
-              )
-            }
-          >
-            {({ checked, active }) => (
-              <>
-                <RadioGroup.Label
-                  as="span"
-                  className="block text-sm font-medium text-gray-900 mx-auto"
-                >
-                  No
-                </RadioGroup.Label>
-                <CheckCircleIcon
-                  className={classNames(!checked ? "invisible" : "", "h-5 w-5 text-indigo-600")}
-                  aria-hidden="true"
-                />
-                <span
-                  className={classNames(
-                    active ? "border" : "border-2",
-                    checked ? "border-indigo-500" : "border-transparent",
-                    "pointer-events-none absolute -inset-px rounded-lg"
-                  )}
-                  aria-hidden="true"
-                />
-              </>
-            )}
-          </RadioGroup.Option>
-        </div>
-      </RadioGroup>
-      {!authorIsContributor && (
-        <>
-          {/* CONTRIBUTOR */}
-          <label className="font-bold block mt-6">Who will deliver the work?</label>
-          <Field name="contributor">
-            {({ meta, input }) => (
-              <>
-                <input
-                  {...input}
-                  type="text"
-                  required
-                  placeholder="Enter wallet or ENS address"
-                  className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
-                />
-
-                {meta.touched && meta.error && (
-                  <span className="text-torch-red text-xs">{meta.error}</span>
-                )}
-              </>
-            )}
-          </Field>
-        </>
-      )}
     </>
   )
 }
@@ -238,7 +121,7 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
     <>
       <RadioGroup value={needFunding} onChange={setNeedFunding}>
         <RadioGroup.Label className="text-base font-medium text-gray-900">
-          Do you need funding?
+          Does this proposal need funding?
         </RadioGroup.Label>
 
         <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
@@ -310,6 +193,53 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
           </RadioGroup.Option>
         </div>
       </RadioGroup>
+
+      {/* CONTRIBUTOR */}
+      <label className="font-bold block mt-6">Contributor</label>
+      <span className="text-xs text-concrete block">
+        Who will be responsible for delivering the work outlined in this proposal? Paste your
+        address if this is you.
+      </span>
+      <Field name="contributor">
+        {({ meta, input }) => (
+          <>
+            <input
+              {...input}
+              type="text"
+              required
+              placeholder="Enter wallet or ENS address"
+              className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
+            />
+
+            {meta.touched && meta.error && (
+              <span className="text-torch-red text-xs">{meta.error}</span>
+            )}
+          </>
+        )}
+      </Field>
+      {/* CLIENT */}
+      <label className="font-bold block mt-6">Reviewer*</label>
+      <span className="text-xs text-concrete block">
+        Who will be responsible for reviewing and deploying the funds outlined in this proposal? See
+        the list of community addresses here.
+      </span>
+      <Field name="client">
+        {({ meta, input }) => (
+          <>
+            <input
+              {...input}
+              type="text"
+              required
+              placeholder="Enter wallet or ENS address"
+              className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
+            />
+
+            {meta.touched && meta.error && (
+              <span className="text-torch-red text-xs">{meta.error}</span>
+            )}
+          </>
+        )}
+      </Field>
 
       {needFunding && (
         <>
@@ -503,7 +433,6 @@ export const ProposalNewForm = () => {
   const [tokenOptions, setTokenOptions] = useState<any[]>()
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
   const [proposal, setProposal] = useState<any>()
-  const [authorIsContributor, setAuthorIsContributor] = useState<boolean>(true)
   const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
 
   const [signatures] = useQuery(
@@ -561,7 +490,7 @@ export const ProposalNewForm = () => {
             createProposalMutation({
               contentTitle: values.title,
               contentBody: values.body,
-              contributorAddress: !authorIsContributor ? values.contributor : activeUser!.address!,
+              contributorAddress: values.contributor,
               clientAddress: values.client,
               authorAddresses: [activeUser!.address!],
               token: { ...token, chainId: selectedNetworkId },
@@ -580,12 +509,7 @@ export const ProposalNewForm = () => {
                     <span className="text-xs text-light-concrete">Last updated: insert date</span>
                   </div>
                   <div className="flex flex-col col-span-2">
-                    {proposalStep === ProposalStep.PROPOSE && (
-                      <ProposeForm
-                        authorIsContributor={authorIsContributor}
-                        setAuthorIsContributor={setAuthorIsContributor}
-                      />
-                    )}
+                    {proposalStep === ProposalStep.PROPOSE && <ProposeForm />}
                     {proposalStep === ProposalStep.REWARDS && (
                       <RewardForm
                         tokenOptions={tokenOptions}
@@ -605,9 +529,7 @@ export const ProposalNewForm = () => {
                 </div>
                 {proposalStep === ProposalStep.PROPOSE && (
                   <Button
-                    isDisabled={
-                      !formState.values.title || !formState.values.body || !formState.values.client
-                    }
+                    isDisabled={!formState.values.title || !formState.values.body}
                     className="mt-6 float-right"
                     onClick={() => {
                       setProposalStep(ProposalStep.REWARDS)

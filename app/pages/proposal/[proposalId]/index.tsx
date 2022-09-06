@@ -28,6 +28,9 @@ const ViewProposalNew: BlitzPage = () => {
     { id: proposalId },
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
+  const proposalContainsPayment =
+    (proposal?.data.payments && proposal?.data?.payments.length > 0) || false
+
   const [signatures] = useQuery(
     getProposalNewSignaturesById,
     { proposalId },
@@ -188,19 +191,25 @@ const ViewProposalNew: BlitzPage = () => {
               role={proposal?.roles?.find((role) => role.role === ProposalRoleType.CLIENT)}
             />
           </div>
-          <div className="p-6">
-            {/* NETWORK */}
-            <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
-            <p className="mt-2 font-normal">
-              {getNetworkName(proposal?.data?.payments?.[0]?.token.chainId || 0)}
-            </p>
-            {/* TOKEN */}
-            <MetadataLabel label="Payment token" />
-            <p className="mt-2 font-normal">{proposal?.data?.payments?.[0]?.token.symbol}</p>
-            {/* PAYMENT AMOUNT */}
-            <MetadataLabel label="Payment amount" />
-            <p className="mt-2 font-normal">{proposal?.data?.payments?.[0]?.amount}</p>
-          </div>
+          {proposalContainsPayment ? (
+            <div className="p-6">
+              {/* NETWORK */}
+              <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
+              <p className="mt-2 font-normal">
+                {getNetworkName(proposal?.data?.payments?.[0]?.token.chainId || 0)}
+              </p>
+              {/* TOKEN */}
+              <MetadataLabel label="Payment token" />
+              <p className="mt-2 font-normal">{proposal?.data?.payments?.[0]?.token.symbol}</p>
+              {/* PAYMENT AMOUNT */}
+              <MetadataLabel label="Payment amount" />
+              <p className="mt-2 font-normal">{proposal?.data?.payments?.[0]?.amount}</p>
+            </div>
+          ) : (
+            <div className="p-6">
+              <p className="text-sm">This proposal contains no payments.</p>
+            </div>
+          )}
         </div>
       </div>
     </Layout>
