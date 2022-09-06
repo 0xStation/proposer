@@ -252,6 +252,7 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
                 <div className="custom-select-wrapper">
                   <select
                     {...input}
+                    required
                     className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
                     value={selectedNetworkId as number}
                     onChange={(e) => {
@@ -290,6 +291,7 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
                 return (
                   <div className="custom-select-wrapper">
                     <select
+                      required
                       {...input}
                       className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
                       value={selectedToken?.address as string}
@@ -327,6 +329,48 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
                   className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
                 />
 
+                {meta.touched && meta.error && (
+                  <span className="text-torch-red text-xs">{meta.error}</span>
+                )}
+              </>
+            )}
+          </Field>
+          {/* PAYMENT TYPE */}
+          <label className="font-bold block mt-6">Term</label>
+          <span className="text-xs text-concrete block">How will the funds get deployed?</span>
+          <Field name="paymentTermType">
+            {({ meta, input }) => (
+              <>
+                <div className="custom-select-wrapper">
+                  <select
+                    {...input}
+                    required
+                    className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                    value={selectedToken?.address as string}
+                  >
+                    <option value="">Choose option</option>
+                    <option value="completion">Pay upon completion</option>
+                  </select>
+                  {meta.touched && meta.error && (
+                    <span className="text-torch-red text-xs">{meta.error}</span>
+                  )}
+                </div>
+              </>
+            )}
+          </Field>
+          {/* ADVANCED PAYMENT */}
+          <label className="font-bold block mt-6">Advanced payment</label>
+          <span className="text-xs text-concrete block">As a percentage (25 = 25%, 0 = none)</span>
+          <Field name="advancedPaymentPercentage">
+            {({ meta, input }) => (
+              <>
+                <input
+                  {...input}
+                  type="text"
+                  required
+                  placeholder="0%"
+                  className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
+                />
                 {meta.touched && meta.error && (
                   <span className="text-torch-red text-xs">{meta.error}</span>
                 )}
@@ -495,6 +539,8 @@ export const ProposalNewForm = () => {
               authorAddresses: [activeUser!.address!],
               token: { ...token, chainId: selectedNetworkId },
               paymentAmount: values.paymentAmount,
+              paymentTermType: values.paymentTermType,
+              advancedPaymentPercentage: Number(values.advancedPaymentPercentage),
             })
           }}
           render={({ form, handleSubmit }) => {

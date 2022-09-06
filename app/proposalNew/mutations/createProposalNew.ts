@@ -13,6 +13,8 @@ const CreateProposal = z.object({
   authorAddresses: z.string().array(),
   token: OptionalZodToken,
   paymentAmount: z.string().optional(),
+  paymentTermType: z.string().optional(),
+  advancedPaymentPercentage: z.number().optional(),
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
@@ -31,16 +33,54 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     // it might be better to pass this through more explicitly with a flag for "no funding"
     // but we are doing this the quick way with minimal infra
     // if we get validation this is good idea we can improve
+    // if advancedPaymentPercentage is greater than 0, we need two milestones
     payments: params.paymentAmount
-      ? [
-          {
-            milestoneId: 0,
-            recipientAddress: params.contributorAddress,
-            token: params.token,
-            amount: params.paymentAmount,
-          },
-        ]
+      ? params.advancedPaymentPercentage && params.advancedPaymentPercentage > 0
+        ? [
+            {
+              milestoneId: 1,
+              recipientAddress: params.contributorAddress,
+              token: params.token,
+              amount: String(
+                Number(params.paymentAmount) * (params.advancedPaymentPercentage / 100)
+              ),
+            },
+            {
+              milestoneId: 0,
+              recipientAddress: params.contributorAddress,
+              token: params.token,
+              amount: String(
+                Number(params.paymentAmount) * ((100 - params.advancedPaymentPercentage) / 100)
+              ),
+            },
+          ]
+        : [
+            {
+              milestoneId: 0,
+              recipientAddress: params.contributorAddress,
+              token: params.token,
+              amount: params.paymentAmount,
+            },
+          ]
       : [],
+    milestones:
+      params.advancedPaymentPercentage && params.paymentAmount
+        ? [
+            {
+              id: 0,
+              title: "Payment upon approval",
+            },
+            {
+              id: 1,
+              title: "Advanced payment",
+            },
+          ]
+        : [
+            {
+              id: 0,
+              title: "Payment upon approval",
+            },
+          ],
     digest: {
       hash: "",
     },
