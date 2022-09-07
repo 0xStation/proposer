@@ -207,7 +207,7 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
               {...input}
               type="text"
               required
-              placeholder="Enter wallet or ENS address"
+              placeholder="Enter wallet"
               className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
             />
 
@@ -230,7 +230,7 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
               {...input}
               type="text"
               required
-              placeholder="Enter wallet or ENS address"
+              placeholder="Enter wallet"
               className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
             />
 
