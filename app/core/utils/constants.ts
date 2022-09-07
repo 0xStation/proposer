@@ -208,6 +208,15 @@ export const LINKS = {
     "https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook",
 }
 
+export enum FeatureFlagStatus {
+  ON = "ON",
+  OFF = "OFF",
+}
+
+export const FEATURE_FLAG_KEYS = {
+  MEMBER_DIRECTORY: "member_directory",
+}
+
 // LEGACY BELOW
 
 // LEGACY
