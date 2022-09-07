@@ -1,6 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react"
 import { trackClick } from "app/utils/amplitude"
-import { TRACKING_EVENTS } from "../utils/constants"
 import { Fragment } from "react"
 import { Image, useRouter, invoke, useSession, Routes } from "blitz"
 import Exit from "public/exit-button.svg"
@@ -8,7 +7,7 @@ import truncateString from "../utils/truncateString"
 import { useDisconnect } from "wagmi"
 import useStore from "../hooks/useStore"
 import logout from "app/session/mutations/logout"
-import { DEFAULT_PFP_URLS } from "../utils/constants"
+import { DEFAULT_PFP_URLS, TRACKING_EVENTS, LINKS } from "../utils/constants"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { canCreateStation } from "app/core/utils/permissions"
 
@@ -157,7 +156,7 @@ export const ProfileNavigationDrawer = ({ isOpen, setIsOpen }) => {
                         <LinkArrow className="fill-marble-white" />
                       </a>
                       <a
-                        href="https://6vdcjqzyfj3.typeform.com/to/F0QFs9aC"
+                        href={LINKS.TYPEFORM_WAITLIST}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center space-x-2 hover:opacity-70 cursor-pointer"

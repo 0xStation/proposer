@@ -43,11 +43,10 @@ const Home: BlitzPage = () => {
           let user = await invoke(getAccountByAddress, { address: session?.siwe?.address })
           if (user) {
             setActiveUser(user)
-            router.push(`/profile/${session?.siwe?.address}`)
           } else {
             await invoke(createAccount, { address: session?.siwe?.address, createSession: true })
-            router.push(`/profile/complete`)
           }
+          router.push(`/profile/${session?.siwe?.address}`)
         } catch (err) {
           console.error(err)
           setToastState({ isToastShowing: true, type: "error", message: "Something went wrong." })
