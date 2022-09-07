@@ -1,5 +1,6 @@
 import db from "db"
 import * as z from "zod"
+import { Ctx } from "blitz"
 import { Account } from "../types"
 import { getEmail, saveEmail } from "app/utils/privy"
 import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
@@ -18,7 +19,7 @@ const UpdateAccount = z.object({
   instagramUrl: z.string().optional(),
 })
 
-export default async function updateAccount(input: z.infer<typeof UpdateAccount>) {
+export default async function updateAccount(input: z.infer<typeof UpdateAccount>, ctx: Ctx) {
   const params = UpdateAccount.parse(input)
 
   const existingAccount = (await db.account.findUnique({
@@ -31,6 +32,8 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
     console.error("cannot update an account that does not exist")
     return null
   }
+
+  ctx.session.$authorize([], [existingAccount.id])
 
   let hasVerifiedEmail = false
   const existingEmail = await getEmail(params.address as string)

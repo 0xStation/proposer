@@ -1,6 +1,7 @@
 import { AccountTerminalMetadata } from "app/accountTerminal/types"
 import db from "db"
 import * as z from "zod"
+import { Ctx } from "blitz"
 import { Account } from "../types"
 
 const AddDiscordIdAndMergeAccount = z.object({
@@ -30,9 +31,23 @@ const AddDiscordIdAndMergeAccount = z.object({
 // when the terminal imported discord accounts and the user is connecting their account
 // for the first time. Here we need to merge the accounts and delete the imported account.
 export default async function addDiscordIdAndMergeAccount(
-  input: z.infer<typeof AddDiscordIdAndMergeAccount>
+  input: z.infer<typeof AddDiscordIdAndMergeAccount>,
+  ctx: Ctx
 ) {
   const params = AddDiscordIdAndMergeAccount.parse(input)
+
+  const existingAccount = (await db.account.findUnique({
+    where: {
+      id: params.accountId,
+    },
+  })) as Account
+
+  if (!existingAccount) {
+    console.error("cannot update an account that does not exist")
+    return null
+  }
+
+  ctx.session.$authorize([], [existingAccount.id])
 
   let importedAccount
   try {

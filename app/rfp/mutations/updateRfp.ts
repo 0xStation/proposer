@@ -1,4 +1,5 @@
 import db from "db"
+import { Ctx } from "blitz"
 import * as z from "zod"
 import { Token, TokenTag } from "types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
@@ -20,9 +21,24 @@ const UpdateRfp = z.object({
   signatureMessage: z.any().optional(),
 })
 
-export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
+export default async function updateRfp(input: z.infer<typeof UpdateRfp>, ctx: Ctx) {
+  const rfp = await db.rfp.findUnique({
+    where: {
+      id: input.rfpId,
+    },
+    include: {
+      author: true,
+    },
+  })
+
+  if (!rfp) {
+    throw new Error(`Cannot find RFP with id ${input.rfpId}`)
+  }
+
+  ctx.session.$authorize([rfp.authorAddress], [])
+
   try {
-    const rfp = await db.rfp.update({
+    const updatedRfp = await db.rfp.update({
       where: { id: input.rfpId },
       data: {
         startDate: input.startDate,
@@ -49,7 +65,7 @@ export default async function updateRfp(input: z.infer<typeof UpdateRfp>) {
       },
     })
 
-    return rfp
+    return updatedRfp
   } catch (error) {
     throw error
   }
