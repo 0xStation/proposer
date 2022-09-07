@@ -48,14 +48,18 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
   proposalCopy.payments = [] // TODO: payments doesn't exist yet, so we're leaving an empty array here
   proposalCopy.signatures = JSON.parse(JSON.stringify(proposal.signatures))
 
+  // Pinata api here: https://docs.pinata.cloud/pinata-api/pinning/pin-json
+  // see `pinJsonToIpfs` api for more details on api config structure
   const pinataProposal = {
     pinataOptions: {
-      cidVersion: 1,
+      cidVersion: 1, // https://docs.ipfs.tech/concepts/content-addressing/#cid-versions
     },
     pinataMetadata: {
-      name: proposal?.id,
+      name: proposal?.id, // optional field that help tag the file
     },
-    pinataContent: proposalCopy,
+    pinataContent: {
+      proposal: proposalCopy,
+    },
   }
 
   let ipfsResponse
@@ -76,7 +80,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       token: paymentMetadata.token,
       paymentAmount: paymentMetadata.amount,
       ipfsHash: ipfsResponse.IpfsHash,
-      pinSize: ipfsResponse.PinSize, // ipfs
+      ipfsPinSize: ipfsResponse.PinSize, // ipfs
       ipfsTimestamp: ipfsResponse.Timestamp,
     })
     return updatedProposal

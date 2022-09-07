@@ -11,7 +11,7 @@ const UpdateProposalNew = z.object({
   token: OptionalZodToken,
   paymentAmount: z.string().optional(),
   ipfsHash: z.string().optional(),
-  pinSize: z.number().optional(), // ipfs
+  ipfsPinSize: z.number().optional(), // ipfs
   ipfsTimestamp: z.string().optional(),
   paymentTermType: z.string().optional(),
   advancedPaymentPercentage: z.number().optional(),
@@ -23,10 +23,10 @@ export default async function updateProposal(input: z.infer<typeof UpdateProposa
     throw new Error("amount must be greater or equal to zero.")
   }
 
-  const { ipfsHash, pinSize, ipfsTimestamp } = params
+  const { ipfsHash, ipfsPinSize, ipfsTimestamp } = params
   const ipfsMetadata = {
     hash: ipfsHash,
-    pinSize,
+    ipfsPinSize,
     timestamp: ipfsTimestamp,
   }
 
@@ -44,7 +44,7 @@ export default async function updateProposal(input: z.infer<typeof UpdateProposa
       ? params.advancedPaymentPercentage && params.advancedPaymentPercentage > 0
         ? [
             {
-              milestoneId: 1,
+              milestoneId: 0,
               recipientAddress: params.contributorAddress,
               token: params.token,
               amount: String(
@@ -52,7 +52,7 @@ export default async function updateProposal(input: z.infer<typeof UpdateProposa
               ),
             },
             {
-              milestoneId: 0,
+              milestoneId: 1,
               recipientAddress: params.contributorAddress,
               token: params.token,
               amount: String(

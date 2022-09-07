@@ -16,7 +16,7 @@ export type ProposalNewMetadata = {
   digest: Digest
   ipfsMetadata?: {
     hash: string
-    pinSize: number
+    ipfsPinSize: number
     timestamp: Date
   }
   // below not included in digest

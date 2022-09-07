@@ -17,6 +17,7 @@ import TransactionLink from "app/core/components/TransactionLink"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import MetadataLabel from "app/core/components/MetadataLabel"
+import { LINKS } from "app/core/utils/constants"
 
 export const IpfsViewComponent = ({ ipfsHash, ipfsTimestamp }) => {
   const date = DateTime.fromISO(ipfsTimestamp)
@@ -27,7 +28,7 @@ export const IpfsViewComponent = ({ ipfsHash, ipfsTimestamp }) => {
         <div className="flex-row border-b border-concrete pb-2">
           <a
             className="inline mr-2 cursor-pointer"
-            href={`https://gateway.pinata.cloud/ipfs/${ipfsHash}`}
+            href={`${LINKS.PINATA_BASE_URL}${ipfsHash}`}
             rel="noreferrer"
           >
             <p className="inline font-bold tracking-wide uppercase text-concrete text-xs">

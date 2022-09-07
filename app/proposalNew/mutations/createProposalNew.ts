@@ -14,7 +14,7 @@ const CreateProposal = z.object({
   token: OptionalZodToken,
   paymentAmount: z.string().optional(),
   ipfsHash: z.string().optional(),
-  pinSize: z.number().optional(), // ipfs
+  ipfsPinSize: z.number().optional(), // ipfs
   ipfsTimestamp: z.date().optional(),
   paymentTermType: z.string().optional(),
   advancedPaymentPercentage: z.number().optional(),
@@ -27,13 +27,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     throw new Error("amount must be greater or equal to zero.")
   }
 
-  const { ipfsHash, pinSize, ipfsTimestamp } = params
-  const ipfsMetadata = {
-    hash: ipfsHash,
-    pinSize,
-    timestamp: ipfsTimestamp,
-  }
-
+  const { ipfsHash, ipfsPinSize, ipfsTimestamp } = params
   const metadata = {
     content: {
       title: params.contentTitle,
@@ -48,7 +42,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       ? params.advancedPaymentPercentage && params.advancedPaymentPercentage > 0
         ? [
             {
-              milestoneId: 1,
+              milestoneId: 0,
               recipientAddress: params.contributorAddress,
               token: params.token,
               amount: String(
@@ -56,7 +50,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
               ),
             },
             {
-              milestoneId: 0,
+              milestoneId: 1,
               recipientAddress: params.contributorAddress,
               token: params.token,
               amount: String(
@@ -94,7 +88,11 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     digest: {
       hash: "",
     },
-    ipfsMetadata,
+    ipfsMetadata: {
+      hash: ipfsHash,
+      ipfsPinSize,
+      timestamp: ipfsTimestamp,
+    },
   } as unknown as ProposalNewMetadata
 
   const proposal = await db.proposalNew.create({

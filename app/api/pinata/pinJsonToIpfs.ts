@@ -7,22 +7,25 @@ const PinataRequest = z.object({
 })
 
 // Pinata api here: https://docs.pinata.cloud/pinata-api/pinning/pin-json
+// CID info here: https://docs.ipfs.tech/concepts/content-addressing/
 // pass in the config
-// {
-//   pinataOptions: {
-//     cidVersion: 1
-//   },
-//   pinataMetadata: {
-//     name: testing,
-//     keyvalues: {
-//       customKey: customValue,
-//       customKey2: customValue2
-//     }
-//   },
-//   pinataContent: {
-//     somekey: somevalue
-//   }
-// }
+/*
+{
+  pinataOptions: {
+    cidVersion: 1 // can use either version 0 or 1
+  },
+  pinataMetadata: { // optional
+    name: A custom name. If not populated, defaults to name of file.
+    keyvalues: { // allows for users to provide any custom key/value pairs, can be used for tagging purposes.
+      customKey: customValue,
+      customKey2: customValue2
+    }
+  },
+  pinataContent: {
+    somekey: somevalue // ex: the proposal itself
+  }
+}
+*/
 export default async function handler(req: BlitzApiRequest, res: BlitzApiResponse) {
   let params
   try {
