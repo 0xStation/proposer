@@ -48,7 +48,9 @@ export default async function updateProposal(input: z.infer<typeof UpdateProposa
               recipientAddress: params.contributorAddress,
               token: params.token,
               amount: String(
-                Number(params.paymentAmount) * (params.advancedPaymentPercentage / 100)
+                (Number(params.paymentAmount) * (params.advancedPaymentPercentage / 100)).toFixed(
+                  params.token.decimals
+                )
               ),
             },
             {
@@ -56,7 +58,10 @@ export default async function updateProposal(input: z.infer<typeof UpdateProposa
               recipientAddress: params.contributorAddress,
               token: params.token,
               amount: String(
-                Number(params.paymentAmount) * ((100 - params.advancedPaymentPercentage) / 100)
+                (
+                  Number(params.paymentAmount) *
+                  ((100 - params.advancedPaymentPercentage) / 100)
+                ).toFixed(params.token.decimals)
               ),
             },
           ]

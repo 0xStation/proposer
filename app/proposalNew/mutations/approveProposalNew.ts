@@ -45,7 +45,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
   proposalCopy.type = proposal.type
   proposalCopy.timestamp = proposal.timestamp
   proposalCopy.roles = JSON.parse(JSON.stringify(proposal.roles))
-  proposalCopy.payments = [] // TODO: payments doesn't exist yet, so we're leaving an empty array here
+  proposalCopy.payments = Object.assign({}, proposal.payments)
   proposalCopy.signatures = JSON.parse(JSON.stringify(proposal.signatures))
 
   // Pinata api here: https://docs.pinata.cloud/pinata-api/pinning/pin-json
@@ -55,7 +55,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       cidVersion: 1, // https://docs.ipfs.tech/concepts/content-addressing/#cid-versions
     },
     pinataMetadata: {
-      name: proposal?.id, // optional field that help tag the file
+      name: proposal?.id, // optional field that helps tag the file
     },
     pinataContent: {
       proposal: proposalCopy,
