@@ -1,4 +1,5 @@
 import db from "db"
+import { Ctx } from "blitz"
 import * as z from "zod"
 
 const CreateProposalApproval = z.object({
@@ -8,8 +9,12 @@ const CreateProposalApproval = z.object({
 })
 
 export default async function createProposalApproval(
-  input: z.infer<typeof CreateProposalApproval>
+  input: z.infer<typeof CreateProposalApproval>,
+  ctx: Ctx
 ) {
+  // TODO -- FILL OUT AUTH WHEN OPTIONAL CHECKBOOK PR MERGES
+  // WAITING FOR THAT RATHER THAN WRITING THE OLD ONE BC ITLL PROBABLY BE BREAKING CHANGE
+  // ID RATHER JUST LEAVE IT
   const proposalApproval = await db.proposalApproval.create({
     data: {
       proposalId: input.proposalId,

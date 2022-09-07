@@ -38,7 +38,6 @@ const ViewProposalNew: BlitzPage = () => {
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
-  console.log("proposal", proposal)
   const RoleSignature = ({ role }) => {
     const addressHasSigned = (address: string) => {
       return signatures?.some((signature) => addressesAreEqual(address, signature.address)) || false

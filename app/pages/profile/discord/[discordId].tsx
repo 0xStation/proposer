@@ -13,7 +13,7 @@ import useLocalStorage from "app/core/hooks/useLocalStorage"
 import useStore from "app/core/hooks/useStore"
 import { Auth } from "app/auth/types"
 import { Account } from "app/account/types"
-import { DEFAULT_PFP_URLS } from "app/core/utils/constants"
+import { DEFAULT_PFP_URLS, LINKS } from "app/core/utils/constants"
 import useKeyPress from "app/core/hooks/useKeyPress"
 import { TagType } from "app/tag/types"
 
@@ -145,7 +145,7 @@ const DiscordProfileHome: BlitzPage = () => {
               to learn more or{" "}
               <a
                 className="text-magic-mint"
-                href="https://6vdcjqzyfj3.typeform.com/to/Ik09gzw6"
+                href={LINKS.TYPEFORM_WAITLIST}
                 target="_blank"
                 rel="noopener noreferrer"
               >

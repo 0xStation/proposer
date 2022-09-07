@@ -1,5 +1,8 @@
 import db from "db"
+import { Ctx } from "blitz"
 import * as z from "zod"
+import { Terminal } from "app/terminal/types"
+import { Prisma } from "@prisma/client"
 
 const UpsertTags = z.object({
   terminalId: z.number(),
@@ -13,8 +16,34 @@ const UpsertTags = z.object({
     .array(),
 })
 
-export default async function upsertTags(input: z.infer<typeof UpsertTags>) {
+export default async function upsertTags(input: z.infer<typeof UpsertTags>, ctx: Ctx) {
   const params = UpsertTags.parse(input)
+
+  const terminal = (await db.terminal.findUnique({
+    where: { id: params.terminalId },
+  })) as Terminal
+
+  if (!terminal) {
+    throw new Error("Cannot create a checkbook for a terminal that does not exist.")
+  }
+
+  const terminalAdminTags = terminal.data.permissions.adminTagIdWhitelist
+
+  if (!terminalAdminTags || terminalAdminTags.length === 0) {
+    throw new Error(
+      "No admin tags available for this terminal. Nobody is in control, so there is no way to auth."
+    )
+  }
+
+  const accountTerminalTags = await db.accountTerminalTag.findMany({
+    where: { tagId: { in: terminalAdminTags } },
+    select: { ticketAccountId: true },
+  })
+
+  ctx.session.$authorize(
+    [],
+    accountTerminalTags.map((accountTerminalTag) => accountTerminalTag.ticketAccountId)
+  )
 
   // prisma does not natively support "upsertMany"
   // so the idea here is to create a list of transaction requests, one per upsert
