@@ -45,7 +45,6 @@ const Navigation = ({ children }: { children?: any }) => {
             createSession: true,
           })
           setActiveUser(newUser)
-          router.push(`/profile/complete`)
         } else {
           setActiveUser(account)
         }

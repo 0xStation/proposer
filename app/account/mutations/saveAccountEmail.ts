@@ -2,6 +2,7 @@ import db from "db"
 import * as z from "zod"
 import { Account } from "../types"
 import { saveEmail } from "app/utils/privy"
+import { Ctx } from "blitz"
 import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
 
 const SaveAccountEmail = z.object({
@@ -9,7 +10,7 @@ const SaveAccountEmail = z.object({
   accountId: z.number(),
 })
 
-export default async function saveAccountEmail(input: z.infer<typeof SaveAccountEmail>) {
+export default async function saveAccountEmail(input: z.infer<typeof SaveAccountEmail>, ctx: Ctx) {
   const params = SaveAccountEmail.parse(input)
 
   const existingAccount = (await db.account.findUnique({
@@ -22,6 +23,8 @@ export default async function saveAccountEmail(input: z.infer<typeof SaveAccount
     console.error("cannot update an account that does not exist")
     return null
   }
+
+  ctx.session.$authorize([], [existingAccount.id])
 
   // store email with Privy so it does not live in our database to reduce leakage risk
   // not in try-catch to handle errors on client

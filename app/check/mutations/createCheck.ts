@@ -1,5 +1,6 @@
 import db from "db"
 import * as z from "zod"
+import { Ctx } from "blitz"
 import { ZERO_ADDRESS } from "app/core/utils/constants"
 import { Prisma } from "@prisma/client"
 import { fetchTokenDecimals } from "app/utils/fetchTokenDecimals"
@@ -15,7 +16,19 @@ const CreateCheck = z.object({
   tokenAmount: z.string(),
 })
 
-export default async function createCheck(input: z.infer<typeof CreateCheck>) {
+export default async function createCheck(input: z.infer<typeof CreateCheck>, ctx: Ctx) {
+  const checkbook = await db.checkbook.findUnique({
+    where: {
+      address: input.fundingAddress,
+    },
+  })
+
+  if (!checkbook) {
+    throw new Error("Cannot create check for a checkbook that does not exist.")
+  }
+
+  ctx.session.$authorize(checkbook.signers, [])
+
   // 1. clean token amount's decimal value
   // remove decimals after token's decimal precision, cleaner data saves ethers error risk later on frontend
   const tokenDecimals =

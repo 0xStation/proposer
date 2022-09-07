@@ -212,6 +212,15 @@ model CheckApproval {
   @@unique([checkId, signerAddress])
 }
 
+model FeatureFlag {
+  id          Int               @id @default(autoincrement())
+  key         String            @unique
+  title       String
+  description String?
+  status      FeatureFlagStatus @default(OFF)
+  createdAt   DateTime          @default(now())
+}
+
 model ProposalNew {
   id         String              @id @default(uuid())
   type       ProposalType
@@ -237,6 +246,11 @@ model ProposalRole {
   proposal   ProposalNew      @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   address    String
   role       ProposalRoleType
+}
+
+enum FeatureFlagStatus {
+  OFF
+  ON
 }
 
 enum ProposalType {

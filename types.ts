@@ -1,7 +1,11 @@
 import { Account } from "app/account/types"
-import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
+import { DefaultCtx, SessionContext } from "blitz"
 import { SiweMessage } from "siwe"
 import * as z from "zod"
+
+export interface AddressOrUserIdIsAuthorized {
+  ({ ctx, args }: { ctx: any; args: [addresses: string[], ids: number[]] }): boolean
+}
 
 export type Role = "ADMIN" | "USER"
 declare module "blitz" {
@@ -9,7 +13,7 @@ declare module "blitz" {
     session: SessionContext
   }
   export interface Session {
-    isAuthorized: SimpleRolesIsAuthorized<Role>
+    isAuthorized: AddressOrUserIdIsAuthorized
     PublicData: {
       userId?: number | null
       nonce?: string

@@ -1,4 +1,24 @@
-import { BlitzConfig, sessionMiddleware, simpleRolesIsAuthorized } from "blitz"
+import { BlitzConfig, sessionMiddleware } from "blitz"
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
+
+type AddressOrUserIdIsAuthorizedArgs = {
+  ctx: any
+  args: [addresses: string[], ids: number[]]
+}
+
+const addressOrUserIdIsAuthorized = ({ ctx, args }: AddressOrUserIdIsAuthorizedArgs) => {
+  const [addresses, ids] = args
+
+  // No filter applied, so everyone allowed
+  if (addresses.length + ids.length === 0) return true
+
+  const userAddress = ctx.session.$publicData.siwe.address
+  const userId = ctx.session.$publicData.userId
+
+  const addressAllowed = addresses?.some((address) => addressesAreEqual(address, userAddress))
+  const idAllowed = ids?.some((id) => id === userId)
+  return addressAllowed || idAllowed
+}
 
 const config: BlitzConfig = {
   middleware: [
@@ -9,7 +29,7 @@ const config: BlitzConfig = {
         process.env.NEXT_PUBLIC_VERCEL_URL?.replace(/[./]/g, "") || "development"
       }_session`,
 
-      isAuthorized: simpleRolesIsAuthorized,
+      isAuthorized: addressOrUserIdIsAuthorized,
     }),
   ],
   images: {
