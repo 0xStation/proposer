@@ -130,7 +130,6 @@ const RewardForm = ({
   formState,
 }) => {
   const [needFunding, setNeedFunding] = useState<boolean>(true)
-  console.log("formState", formState)
   return (
     <>
       <RadioGroup value={needFunding} onChange={setNeedFunding}>
@@ -349,8 +348,8 @@ const RewardForm = ({
             field="tokenAddress"
             set="paymentAmount"
             // need to change to field value to empty string so form field validation is triggered
-            // with new decimal number validation. The ideal state is to keep the paymentAmount amt
-            // value the same but the selectedToken decimals isn't being updated in time for the validation.
+            // with new decimal number validation. The ideal state is to keep the paymentAmount field
+            // value the same but the decimal amount isn't being update correctly for the validation.
             // Another option would be to validate on submit, although it doesn't follow the validation pattern.
             to={""}
           />

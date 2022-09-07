@@ -1,6 +1,7 @@
 import { Field } from "react-final-form"
 import { OnChange } from "react-final-form-listeners"
 
+// https://erikras.com/blog/declarative-form-rules
 export const WhenFieldChanges = ({ field, set, to }) => (
   <Field name={set} subscription={{}}>
     {(
