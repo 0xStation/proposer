@@ -1,5 +1,6 @@
 import * as z from "zod"
 import db from "db"
+import { RepresentingSignatureType } from "app/proposalSignature/types"
 
 const ApproveProposalNew = z.object({
   proposalId: z.string(),
@@ -10,14 +11,16 @@ const ApproveProposalNew = z.object({
 export default async function approveProposalNew(input: z.infer<typeof ApproveProposalNew>) {
   const params = ApproveProposalNew.parse(input)
 
-  const signature = await db.proposalSignature.create({
-    data: {
-      proposalId: params.proposalId,
-      address: params.signerAddress,
-      data: {
-        signature: params.signature,
+  const signature = await db.proposalSignature.createMany({
+    data: [
+      {
+        proposalId: params.proposalId,
+        address: params.signerAddress,
+        data: {
+          signature: params.signature,
+        },
       },
-    },
+    ],
   })
 
   return signature

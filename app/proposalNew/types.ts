@@ -1,10 +1,12 @@
-import { ProposalSignature, ProposalRole, ProposalType } from "@prisma/client"
+import { ProposalRole, ProposalType } from "@prisma/client"
+import { Account } from "app/account/types"
+import { ProposalSignature } from "app/proposalSignature/types"
 
 export type ProposalNew = {
   id: string
   type: ProposalType
   timestamp: Date // needed for public verifiability of multisig representation
-  roles: ProposalRole[]
+  roles: (ProposalRole & { account: Account })[]
   signatures: ProposalSignature[]
   data: ProposalNewMetadata
 }

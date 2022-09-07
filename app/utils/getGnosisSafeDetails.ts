@@ -28,6 +28,8 @@ export const getGnosisSafeDetails = async (chainId: number, address: string) => 
   const results = await response.json()
 
   return {
+    chainId,
+    address,
     quorum: results.threshold,
     signers: results.owners,
   }

@@ -15,7 +15,6 @@ import TransactionLink from "app/core/components/TransactionLink"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import MetadataLabel from "app/core/components/MetadataLabel"
-import { useFetchMultisigParametersBatch } from "app/contracts/multisig"
 import { AddressType } from "@prisma/client"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 
@@ -25,6 +24,7 @@ const ViewProposalNew: BlitzPage = () => {
   const [isApproveProposalModalOpen, setIsApproveProposalModalOpen] = useState<boolean>(false)
   const [isExecutePaymentModalOpen, setIsExecutePaymentModalOpen] = useState<boolean>(false)
   const [isActionPending, setIsActionPending] = useState<boolean>(false)
+  const [userHasSigningAuthority, setUserHasSigningAuthority] = useState<boolean>(false)
   const proposalId = useParam("proposalId") as string
   const [proposal] = useQuery(
     getProposalNewById,
@@ -37,8 +37,22 @@ const ViewProposalNew: BlitzPage = () => {
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
+  useEffect(() => {
+    if (
+      !userHasSigningAuthority &&
+      proposal?.roles?.some((role) =>
+        // user is a direct role on the proposal
+        addressesAreEqual(role.account.address!, activeUser?.address || "")
+      )
+    ) {
+      setUserHasSigningAuthority(true)
+    }
+  }, [proposal?.roles || []])
+
   const RoleSignature = ({ role }) => {
+    const [representedSigners, setRepresentedSigners] = useState<number>(0)
     const [quorum, setQuorum] = useState<number>(0)
+    const [signers, setSigners] = useState<string[]>([])
     const [roleHasSigned, setRoleHasSigned] = useState<boolean>(false)
 
     const isSafe = role?.account?.type === AddressType.SAFE
@@ -48,17 +62,37 @@ const ViewProposalNew: BlitzPage = () => {
         getGnosisSafeDetails(role.account.data.chainId, role.address).then((details) => {
           if (details) {
             setQuorum(details.quorum)
+            setSigners(details.signers)
           }
         })
       }
     }, [])
 
     useEffect(() => {
-      setRoleHasSigned(
-        signatures?.some((signature) => addressesAreEqual(role?.address, signature.address)) ||
-          false
+      const individualHasSigned = signatures?.some((signature) =>
+        addressesAreEqual(role?.address, signature.address)
       )
-    }, [signatures])
+
+      const numRepresentedSigners =
+        quorum === 0 || signers.length === 0
+          ? 0
+          : (signatures || [])?.filter((signature) => signers.includes(signature.address)).length
+
+      const multisigHasSigned = quorum > 0 && signers.length > 0 && numRepresentedSigners >= quorum
+
+      setRoleHasSigned(individualHasSigned || multisigHasSigned)
+      setRepresentedSigners(numRepresentedSigners)
+
+      if (
+        !userHasSigningAuthority &&
+        signers.some((signerAddress) =>
+          // user is a direct role on the proposal
+          addressesAreEqual(signerAddress, activeUser?.address || "")
+        )
+      ) {
+        setUserHasSigningAuthority(true)
+      }
+    }, [signatures, quorum, signers])
 
     return (
       <>
@@ -69,31 +103,33 @@ const ViewProposalNew: BlitzPage = () => {
               className={`h-2 w-2 rounded-full bg-${roleHasSigned ? "magic-mint" : "neon-carrot"}`}
             />
             <div className="font-bold text-xs uppercase tracking-wider">
-              {roleHasSigned ? "signed" : "pending"}
+              {roleHasSigned ? "signed" : "pending signature"}
             </div>
           </div>
         </div>
-        {isSafe && <ProgressCircleAndNumber numerator={0} denominator={quorum} />}
+        {isSafe && (
+          <ProgressCircleAndNumber
+            numerator={representedSigners > quorum ? quorum : representedSigners}
+            denominator={quorum}
+          />
+        )}
       </>
     )
   }
 
-  const userHasRole = proposal?.roles.some((role) =>
-    addressesAreEqual(activeUser?.address || "", role.address)
-  )
   const userHasSigned = signatures?.some((commitment) =>
     addressesAreEqual(activeUser?.address || "", commitment.address)
   )
-  const userIsPayer = proposal?.roles.some(
+  const userIsPayer = proposal?.roles?.some(
     (role) =>
       role.role === ProposalRoleType.CLIENT &&
-      addressesAreEqual(activeUser?.address || "", role.address)
+      addressesAreEqual(activeUser?.address || "", role.address!)
   )
-  const commitmentsComplete = (() => {
+  const signaturesComplete = (() => {
     const requiredSignatures = {}
 
-    proposal?.roles.forEach((role) => {
-      requiredSignatures[role.address] = false
+    proposal?.roles?.forEach((role) => {
+      requiredSignatures[role.address!] = false
     })
 
     signatures?.forEach((commitment) => {
@@ -105,11 +141,11 @@ const ViewProposalNew: BlitzPage = () => {
 
   const paymentComplete = !!proposal?.data?.payments?.[0]?.transactionHash
 
-  const showApproveButton = userHasRole && !userHasSigned
-  const showPayButton = commitmentsComplete && userIsPayer && !paymentComplete
+  const showApproveButton = userHasSigningAuthority && !userHasSigned
+  const showPayButton = signaturesComplete && userIsPayer && !paymentComplete
 
   const uniqueRoleAddresses = (proposal?.roles || [])
-    .map((role) => toChecksumAddress(role.address))
+    .map((role) => toChecksumAddress(role.address!))
     .filter((v, i, addresses) => addresses.indexOf(v) === i).length
   const signatureCount = signatures?.length || 0
 
@@ -170,14 +206,10 @@ const ViewProposalNew: BlitzPage = () => {
         <div className="w-[36rem] border-l border-concrete flex-col overflow-y-scroll">
           {/* STATUS */}
           <div className="border-b border-concrete p-6">
-            <h4 className="text-xs font-bold text-concrete uppercase">Proposal status</h4>
+            <MetadataLabel label="Proposal status" />
             <div className="flex flex-row space-x-2">
               <p className="mt-2 font-normal">
-                {paymentComplete
-                  ? "PAID"
-                  : commitmentsComplete
-                  ? "APPROVED"
-                  : "AWAITING SIGNATURES"}
+                {paymentComplete ? "PAID" : signaturesComplete ? "APPROVED" : "AWAITING SIGNATURES"}
               </p>
               {paymentComplete ? (
                 <TransactionLink
@@ -195,24 +227,27 @@ const ViewProposalNew: BlitzPage = () => {
           </div>
           <div className="border-b border-concrete p-6">
             {/* AUTHOR */}
-            <h4 className="text-xs font-bold text-concrete uppercase">Author</h4>
-            <RoleSignature
-              role={proposal?.roles?.find((role) => role.role === ProposalRoleType.AUTHOR)}
-            />
+            <MetadataLabel label="Author" />
+            {proposal?.roles.filter((role) => role.role === ProposalRoleType.AUTHOR) ||
+              [].map((role, i) => {
+                return <RoleSignature key={i} role={role} />
+              })}
             {/* CONTRIBUTOR */}
             <MetadataLabel label="Contributor" />
-            <RoleSignature
-              role={proposal?.roles?.find((role) => role.role === ProposalRoleType.CONTRIBUTOR)}
-            />
+            {proposal?.roles.filter((role) => role.role === ProposalRoleType.CONTRIBUTOR) ||
+              [].map((role, i) => {
+                return <RoleSignature key={i} role={role} />
+              })}
             {/* CLIENT */}
             <MetadataLabel label="Client" />
-            <RoleSignature
-              role={proposal?.roles?.find((role) => role.role === ProposalRoleType.CLIENT)}
-            />
+            {proposal?.roles.filter((role) => role.role === ProposalRoleType.CLIENT) ||
+              [].map((role, i) => {
+                return <RoleSignature key={i} role={role} />
+              })}
           </div>
           <div className="p-6">
             {/* NETWORK */}
-            <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
+            <MetadataLabel label="Network" />
             <p className="mt-2 font-normal">
               {getNetworkName(proposal?.data?.payments?.[0]?.token.chainId || 0)}
             </p>
