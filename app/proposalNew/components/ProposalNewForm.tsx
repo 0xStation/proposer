@@ -9,13 +9,19 @@ import networks from "app/utils/networks.json"
 import createProposal from "app/proposalNew/mutations/createProposalNew"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { CheckCircleIcon } from "@heroicons/react/solid"
-import { requiredField } from "app/utils/validators"
+import {
+  composeValidators,
+  isPositiveAmount,
+  maximumDecimals,
+  requiredField,
+} from "app/utils/validators"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import truncateString from "app/core/utils/truncateString"
 import { ProposalRoleType } from "@prisma/client"
 import BackArrow from "app/core/icons/BackArrow"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
 import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
+import WhenFieldChanges from "app/core/components/WhenFieldChanges"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -115,8 +121,16 @@ const ProposeForm = () => {
   )
 }
 
-const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, tokenOptions }) => {
+const RewardForm = ({
+  selectedNetworkId,
+  setSelectedNetworkId,
+  selectedToken,
+  setSelectedToken,
+  tokenOptions,
+  formState,
+}) => {
   const [needFunding, setNeedFunding] = useState<boolean>(true)
+  console.log("formState", formState)
   return (
     <>
       <RadioGroup value={needFunding} onChange={setNeedFunding}>
@@ -252,7 +266,9 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
                 <div className="custom-select-wrapper">
                   <select
                     {...input}
-                    required
+                    required={Boolean(
+                      formState.values.paymentAmount || formState.values.tokenAddress
+                    )}
                     className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
                     value={selectedNetworkId as number}
                     onChange={(e) => {
@@ -291,10 +307,21 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
                 return (
                   <div className="custom-select-wrapper">
                     <select
-                      required
+                      // if network is selected make the token address field required.
+                      required={Boolean(selectedNetworkId)}
                       {...input}
                       className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
                       value={selectedToken?.address as string}
+                      onChange={(e) => {
+                        const selectedToken = tokenOptions.find((token) =>
+                          addressesAreEqual(token.address, e.target.value)
+                        )
+                        setSelectedToken(selectedToken || {})
+                        // custom values can be compatible with react-final-form by calling
+                        // the props.input.onChange callback
+                        // https://final-form.org/docs/react-final-form/api/Field
+                        input.onChange(selectedToken?.address)
+                      }}
                     >
                       <option value="">Choose option</option>
                       {tokenOptions?.map((token) => {
@@ -314,26 +341,46 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
             </Field>
           </div>
           {/* PAYMENT AMOUNT */}
-          <label className="font-bold block mt-6">Payment Amount</label>
+          <label className="font-bold block mt-6">Payment amount</label>
           <span className="text-xs text-concrete block">
             The funds will be deployed to the one responsible for delivering the work.
           </span>
-          <Field name="paymentAmount">
-            {({ meta, input }) => (
-              <>
-                <input
-                  {...input}
-                  type="text"
-                  required
-                  placeholder="0.00"
-                  className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
-                />
-
-                {meta.touched && meta.error && (
-                  <span className="text-torch-red text-xs">{meta.error}</span>
-                )}
-              </>
-            )}
+          <WhenFieldChanges
+            field="tokenAddress"
+            set="paymentAmount"
+            // need to change to field value to empty string so form field validation is triggered
+            // with new decimal number validation. The ideal state is to keep the paymentAmount amt
+            // value the same but the selectedToken decimals isn't being updated in time for the validation.
+            // Another option would be to validate on submit, although it doesn't follow the validation pattern.
+            to={""}
+          />
+          <Field
+            name="paymentAmount"
+            validate={
+              Boolean(selectedNetworkId)
+                ? composeValidators(
+                    requiredField,
+                    isPositiveAmount,
+                    maximumDecimals(selectedToken?.decimals || 0)
+                  )
+                : () => {}
+            }
+          >
+            {({ input, meta }) => {
+              return (
+                <div>
+                  <input
+                    {...input}
+                    type="text"
+                    className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
+                    placeholder="0.00"
+                  />
+                  {meta.touched && meta.error && (
+                    <span className="text-torch-red text-xs">{meta.error}</span>
+                  )}
+                </div>
+              )
+            }}
           </Field>
           {/* PAYMENT TYPE */}
           <label className="font-bold block mt-6">Term</label>
@@ -346,7 +393,6 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
                     {...input}
                     required
                     className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
-                    value={selectedToken?.address as string}
                   >
                     <option value="">Choose option</option>
                     <option value="completion">Pay upon completion</option>
@@ -470,7 +516,6 @@ const SignForm = ({ activeUser, proposal, signatures }) => {
 export const ProposalNewForm = () => {
   const router = useRouter()
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
-  const walletModalOpen = useStore((state) => state.walletModalOpen)
   const activeUser = useStore((state) => state.activeUser)
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(0)
   const [selectedToken, setSelectedToken] = useState<any>()
@@ -496,10 +541,13 @@ export const ProposalNewForm = () => {
   }
 
   useEffect(() => {
+    // Changing the network changes the token options available to us
     if (selectedNetworkId) {
       const stablecoins = networks[selectedNetworkId]?.stablecoins || []
       setTokenOptions([ETH_METADATA, ...stablecoins])
-      setSelectedToken("")
+      // Setting the selectedToken to an empty obj to reset the
+      // selected token on network change.
+      setSelectedToken({})
     }
   }, [selectedNetworkId])
 
@@ -562,6 +610,8 @@ export const ProposalNewForm = () => {
                         selectedNetworkId={selectedNetworkId}
                         setSelectedNetworkId={setSelectedNetworkId}
                         selectedToken={selectedToken}
+                        setSelectedToken={setSelectedToken}
+                        formState={formState}
                       />
                     )}
                     {proposalStep === ProposalStep.SIGN && (
