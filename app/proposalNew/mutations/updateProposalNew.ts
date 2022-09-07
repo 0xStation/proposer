@@ -74,11 +74,11 @@ export default async function updateProposal(input: z.infer<typeof UpdateProposa
         ? [
             {
               id: 0,
-              title: "Payment upon approval",
+              title: "Advanced payment",
             },
             {
               id: 1,
-              title: "Advanced payment",
+              title: "Payment upon approval",
             },
           ]
         : [
