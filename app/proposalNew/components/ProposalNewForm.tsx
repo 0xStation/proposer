@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { RadioGroup } from "@headlessui/react"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
-import Button from "app/core/components/sds/buttons/Button"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { SUPPORTED_CHAINS, ETH_METADATA } from "app/core/utils/constants"
 import networks from "app/utils/networks.json"
 import createProposal from "app/proposalNew/mutations/createProposalNew"
@@ -15,6 +15,7 @@ import truncateString from "app/core/utils/truncateString"
 import { ProposalRoleType } from "@prisma/client"
 import BackArrow from "app/core/icons/BackArrow"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
+import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -31,17 +32,31 @@ const Stepper = ({ step }) => {
     <div className="w-full h-4 bg-neon-carrot relative">
       <div className="absolute left-[20px] top-[-4px]">
         <span className="h-6 w-6 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
-          <span className="h-3 w-1.5 bg-neon-carrot block absolute rounded-l-full top-[4px] left-[3.5px]"></span>
+          <span
+            className={`h-3 bg-neon-carrot block absolute ${
+              step === ProposalStep.PROPOSE
+                ? "w-1.5 rounded-l-full top-[4px] left-[3.5px]"
+                : "w-3 rounded-full top-[4px] left-[4px]"
+            }`}
+          ></span>
         </span>
-        <p className="font-bold mt-2">Propose</p>
+        <p className={`font-bold mt-2 ${step !== ProposalStep.PROPOSE && "text-concrete"}`}>
+          Propose
+        </p>
       </div>
       <div className="absolute left-[220px] top-[-4px]">
         <span className="h-6 w-6 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
           {step !== ProposalStep.PROPOSE && (
-            <span className="h-3 w-1.5 bg-neon-carrot block absolute rounded-l-full top-[4px] left-[3.5px]"></span>
+            <span
+              className={`h-3 bg-neon-carrot block absolute ${
+                step === ProposalStep.REWARDS
+                  ? "w-1.5 rounded-l-full top-[4px] left-[3.5px]"
+                  : "w-3 rounded-full top-[4px] left-[4px]"
+              }`}
+            ></span>
           )}
         </span>
-        <p className={`font-bold mt-2 ${step === ProposalStep.PROPOSE && "text-concrete"}`}>
+        <p className={`font-bold mt-2 ${step !== ProposalStep.REWARDS && "text-concrete"}`}>
           Define terms
         </p>
       </div>
@@ -57,29 +72,9 @@ const Stepper = ({ step }) => {
   )
 }
 
-const ProposeForm = ({ authorIsContributor, setAuthorIsContributor }) => {
+const ProposeForm = () => {
   return (
     <>
-      {/* CLIENT */}
-      <label className="font-bold block mt-6">To*</label>
-      <span className="text-xs text-concrete block">Who will be approving this proposal?</span>
-      <Field name="client">
-        {({ meta, input }) => (
-          <>
-            <input
-              {...input}
-              type="text"
-              required
-              placeholder="Enter wallet or ENS address"
-              className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
-            />
-
-            {meta.touched && meta.error && (
-              <span className="text-torch-red text-xs">{meta.error}</span>
-            )}
-          </>
-        )}
-      </Field>
       {/* TITLE */}
       <label className="font-bold block mt-6">Subject*</label>
       <Field name="title" validate={requiredField}>
@@ -116,103 +111,6 @@ const ProposeForm = ({ authorIsContributor, setAuthorIsContributor }) => {
           </div>
         )}
       </Field>
-      <RadioGroup value={authorIsContributor} onChange={setAuthorIsContributor}>
-        <RadioGroup.Label className="mt-6 block font-bold">
-          Are you the one delivering the work?
-        </RadioGroup.Label>
-
-        <div className="mt-1 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
-          <RadioGroup.Option
-            value={true}
-            className={({ checked, active }) =>
-              classNames(
-                checked ? "border-transparent" : "border-gray-300",
-                active ? "border-indigo-500 ring-2 ring-indigo-500" : "",
-                "relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none"
-              )
-            }
-          >
-            {({ checked, active }) => (
-              <>
-                <RadioGroup.Label
-                  as="span"
-                  className="block text-sm font-medium text-gray-900 mx-auto"
-                >
-                  Yes
-                </RadioGroup.Label>
-                <CheckCircleIcon
-                  className={classNames(!checked ? "invisible" : "", "h-5 w-5 text-indigo-600")}
-                  aria-hidden="true"
-                />
-                <span
-                  className={classNames(
-                    active ? "border" : "border-2",
-                    checked ? "border-indigo-500" : "border-transparent",
-                    "pointer-events-none absolute -inset-px rounded-lg"
-                  )}
-                  aria-hidden="true"
-                />
-              </>
-            )}
-          </RadioGroup.Option>
-          <RadioGroup.Option
-            value={false}
-            className={({ checked, active }) =>
-              classNames(
-                checked ? "border-transparent" : "border-gray-300",
-                active ? "border-indigo-500 ring-2 ring-indigo-500" : "",
-                "relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none"
-              )
-            }
-          >
-            {({ checked, active }) => (
-              <>
-                <RadioGroup.Label
-                  as="span"
-                  className="block text-sm font-medium text-gray-900 mx-auto"
-                >
-                  No
-                </RadioGroup.Label>
-                <CheckCircleIcon
-                  className={classNames(!checked ? "invisible" : "", "h-5 w-5 text-indigo-600")}
-                  aria-hidden="true"
-                />
-                <span
-                  className={classNames(
-                    active ? "border" : "border-2",
-                    checked ? "border-indigo-500" : "border-transparent",
-                    "pointer-events-none absolute -inset-px rounded-lg"
-                  )}
-                  aria-hidden="true"
-                />
-              </>
-            )}
-          </RadioGroup.Option>
-        </div>
-      </RadioGroup>
-      {!authorIsContributor && (
-        <>
-          {/* CONTRIBUTOR */}
-          <label className="font-bold block mt-6">Who will deliver the work?</label>
-          <Field name="contributor">
-            {({ meta, input }) => (
-              <>
-                <input
-                  {...input}
-                  type="text"
-                  required
-                  placeholder="Enter wallet or ENS address"
-                  className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
-                />
-
-                {meta.touched && meta.error && (
-                  <span className="text-torch-red text-xs">{meta.error}</span>
-                )}
-              </>
-            )}
-          </Field>
-        </>
-      )}
     </>
   )
 }
@@ -223,7 +121,7 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
     <>
       <RadioGroup value={needFunding} onChange={setNeedFunding}>
         <RadioGroup.Label className="text-base font-medium text-gray-900">
-          Do you need funding?
+          Does this proposal need funding?
         </RadioGroup.Label>
 
         <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
@@ -296,6 +194,53 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
         </div>
       </RadioGroup>
 
+      {/* CONTRIBUTOR */}
+      <label className="font-bold block mt-6">Contributor</label>
+      <span className="text-xs text-concrete block">
+        Who will be responsible for delivering the work outlined in this proposal? Paste your
+        address if this is you.
+      </span>
+      <Field name="contributor">
+        {({ meta, input }) => (
+          <>
+            <input
+              {...input}
+              type="text"
+              required
+              placeholder="Enter wallet or ENS address"
+              className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
+            />
+
+            {meta.touched && meta.error && (
+              <span className="text-torch-red text-xs">{meta.error}</span>
+            )}
+          </>
+        )}
+      </Field>
+      {/* CLIENT */}
+      <label className="font-bold block mt-6">Reviewer*</label>
+      <span className="text-xs text-concrete block">
+        Who will be responsible for reviewing and deploying the funds outlined in this proposal? See
+        the list of community addresses here.
+      </span>
+      <Field name="client">
+        {({ meta, input }) => (
+          <>
+            <input
+              {...input}
+              type="text"
+              required
+              placeholder="Enter wallet or ENS address"
+              className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
+            />
+
+            {meta.touched && meta.error && (
+              <span className="text-torch-red text-xs">{meta.error}</span>
+            )}
+          </>
+        )}
+      </Field>
+
       {needFunding && (
         <>
           {/* NETWORK */}
@@ -307,6 +252,7 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
                 <div className="custom-select-wrapper">
                   <select
                     {...input}
+                    required
                     className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
                     value={selectedNetworkId as number}
                     onChange={(e) => {
@@ -345,6 +291,7 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
                 return (
                   <div className="custom-select-wrapper">
                     <select
+                      required
                       {...input}
                       className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
                       value={selectedToken?.address as string}
@@ -388,18 +335,55 @@ const RewardForm = ({ selectedNetworkId, setSelectedNetworkId, selectedToken, to
               </>
             )}
           </Field>
+          {/* PAYMENT TYPE */}
+          <label className="font-bold block mt-6">Term</label>
+          <span className="text-xs text-concrete block">How will the funds get deployed?</span>
+          <Field name="paymentTermType">
+            {({ meta, input }) => (
+              <>
+                <div className="custom-select-wrapper">
+                  <select
+                    {...input}
+                    required
+                    className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                    value={selectedToken?.address as string}
+                  >
+                    <option value="">Choose option</option>
+                    <option value="completion">Pay upon completion</option>
+                  </select>
+                  {meta.touched && meta.error && (
+                    <span className="text-torch-red text-xs">{meta.error}</span>
+                  )}
+                </div>
+              </>
+            )}
+          </Field>
+          {/* ADVANCED PAYMENT */}
+          <label className="font-bold block mt-6">Advanced payment</label>
+          <span className="text-xs text-concrete block">As a percentage (25 = 25%, 0 = none)</span>
+          <Field name="advancedPaymentPercentage">
+            {({ meta, input }) => (
+              <>
+                <input
+                  {...input}
+                  type="text"
+                  required
+                  placeholder="0%"
+                  className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
+                />
+                {meta.touched && meta.error && (
+                  <span className="text-torch-red text-xs">{meta.error}</span>
+                )}
+              </>
+            )}
+          </Field>
         </>
       )}
     </>
   )
 }
 
-const SignForm = ({ activeUser, proposal }) => {
-  const [signatures] = useQuery(
-    getProposalNewSignaturesById,
-    { proposalId: proposal.id },
-    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
-  )
+const SignForm = ({ activeUser, proposal, signatures }) => {
   const [isApproveProposalModalOpen, setIsApproveProposalModalOpen] = useState<boolean>(false)
   const [isActionPending, setIsActionPending] = useState<boolean>(false)
 
@@ -485,13 +469,25 @@ const SignForm = ({ activeUser, proposal }) => {
 
 export const ProposalNewForm = () => {
   const router = useRouter()
+  const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  const walletModalOpen = useStore((state) => state.walletModalOpen)
   const activeUser = useStore((state) => state.activeUser)
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(0)
   const [selectedToken, setSelectedToken] = useState<any>()
   const [tokenOptions, setTokenOptions] = useState<any[]>()
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
   const [proposal, setProposal] = useState<any>()
-  const [authorIsContributor, setAuthorIsContributor] = useState<boolean>(true)
+  const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
+
+  const [signatures] = useQuery(
+    getProposalNewSignaturesById,
+    { proposalId: proposal && proposal.id },
+    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
+  )
+
+  const userHasSigned = signatures?.some((commitment) =>
+    addressesAreEqual(activeUser?.address || "", commitment.address)
+  )
 
   const HeaderCopy = {
     [ProposalStep.PROPOSE]: "Propose",
@@ -520,101 +516,130 @@ export const ProposalNewForm = () => {
   })
 
   return (
-    <div className="max-w-[580px] mx-auto mt-12">
-      <Stepper step={proposalStep} />
-      <Form
-        onSubmit={async (values: any, form) => {
-          // tokenAddress might just be null if they are not requesting funding
-          // need to check tokenAddress exists, AND it is not found before erroring
-          const token = values.tokenAddress
-            ? tokenOptions?.find((token) => addressesAreEqual(token.address, values.tokenAddress))
-            : null
+    <div>
+      <div className="max-w-[580px] mx-auto mt-12">
+        <Stepper step={proposalStep} />
+        <Form
+          onSubmit={async (values: any, form) => {
+            // tokenAddress might just be null if they are not requesting funding
+            // need to check tokenAddress exists, AND it is not found before erroring
+            const token = values.tokenAddress
+              ? tokenOptions?.find((token) => addressesAreEqual(token.address, values.tokenAddress))
+              : null
 
-          if (values.tokenAddress && !token) {
-            throw Error("token not found")
-          }
+            if (values.tokenAddress && !token) {
+              throw Error("token not found")
+            }
 
-          createProposalMutation({
-            contentTitle: values.title,
-            contentBody: values.body,
-            contributorAddress: !authorIsContributor ? values.contributor : activeUser!.address!,
-            clientAddress: values.client,
-            authorAddresses: [activeUser!.address!],
-            token: { ...token, chainId: selectedNetworkId },
-            paymentAmount: values.paymentAmount,
-          })
-        }}
-        render={({ form, handleSubmit }) => {
-          const formState = form.getState()
-          return (
-            <form onSubmit={handleSubmit} className="mt-20">
-              <div className="rounded-lg border border-concrete p-6">
-                <div className="flex flex-row justify-between items-center">
-                  <h2 className="text-marble-white text-2xl font-bold">
-                    {HeaderCopy[proposalStep]}
-                  </h2>
-                  <span className="text-xs text-light-concrete">Last updated: insert date</span>
+            createProposalMutation({
+              contentTitle: values.title,
+              contentBody: values.body,
+              contributorAddress: values.contributor,
+              clientAddress: values.client,
+              authorAddresses: [activeUser!.address!],
+              token: { ...token, chainId: selectedNetworkId },
+              paymentAmount: values.paymentAmount,
+              paymentTermType: values.paymentTermType,
+              advancedPaymentPercentage: Number(values.advancedPaymentPercentage),
+            })
+          }}
+          render={({ form, handleSubmit }) => {
+            const formState = form.getState()
+            return (
+              <form onSubmit={handleSubmit} className="mt-20">
+                <div className="rounded-lg border border-concrete p-6 h-[600px] overflow-y-scroll">
+                  <div className="flex flex-row justify-between items-center">
+                    <h2 className="text-marble-white text-2xl font-bold">
+                      {HeaderCopy[proposalStep]}
+                    </h2>
+                    <span className="text-xs text-light-concrete">Last updated: insert date</span>
+                  </div>
+                  <div className="flex flex-col col-span-2">
+                    {proposalStep === ProposalStep.PROPOSE && <ProposeForm />}
+                    {proposalStep === ProposalStep.REWARDS && (
+                      <RewardForm
+                        tokenOptions={tokenOptions}
+                        selectedNetworkId={selectedNetworkId}
+                        setSelectedNetworkId={setSelectedNetworkId}
+                        selectedToken={selectedToken}
+                      />
+                    )}
+                    {proposalStep === ProposalStep.SIGN && (
+                      <SignForm
+                        proposal={proposal}
+                        activeUser={activeUser}
+                        signatures={signatures}
+                      />
+                    )}
+                  </div>
                 </div>
-                <div className="flex flex-col col-span-2">
-                  {proposalStep === ProposalStep.PROPOSE && (
-                    <ProposeForm
-                      authorIsContributor={authorIsContributor}
-                      setAuthorIsContributor={setAuthorIsContributor}
-                    />
-                  )}
-                  {proposalStep === ProposalStep.REWARDS && (
-                    <RewardForm
-                      tokenOptions={tokenOptions}
-                      selectedNetworkId={selectedNetworkId}
-                      setSelectedNetworkId={setSelectedNetworkId}
-                      selectedToken={selectedToken}
-                    />
-                  )}
-                  {proposalStep === ProposalStep.SIGN && (
-                    <SignForm proposal={proposal} activeUser={activeUser} />
-                  )}
-                </div>
-              </div>
-              {proposalStep === ProposalStep.PROPOSE && (
-                <Button
-                  isDisabled={!formState.values.title || !formState.values.body}
-                  className="mt-6 float-right"
-                  onClick={() => {
-                    setProposalStep(ProposalStep.REWARDS)
-                  }}
-                >
-                  Next
-                </Button>
-              )}
-              {proposalStep === ProposalStep.REWARDS && (
-                <div className="flex justify-between mt-6">
-                  <span
-                    onClick={() => setProposalStep(ProposalStep.PROPOSE)}
-                    className="cursor-pointer border rounded border-marble-white p-2 self-start"
+                {proposalStep === ProposalStep.PROPOSE && (
+                  <Button
+                    isDisabled={!formState.values.title || !formState.values.body}
+                    className="mt-6 float-right"
+                    onClick={() => {
+                      setProposalStep(ProposalStep.REWARDS)
+                    }}
                   >
-                    <BackArrow className="fill-marble-white" />
-                  </span>
-                  <Button isSubmitType={true}>Save</Button>
-                </div>
-              )}
-              {proposalStep === ProposalStep.SIGN && (
-                <Button
-                  className="mt-6 float-right"
-                  onClick={() => {
-                    router.push(
-                      Routes.ViewProposalNew({
-                        proposalId: proposal.id,
-                      })
-                    )
-                  }}
-                >
-                  Done
-                </Button>
-              )}
-            </form>
-          )
-        }}
-      />
+                    Next
+                  </Button>
+                )}
+                {proposalStep === ProposalStep.REWARDS && (
+                  <div className="flex justify-between mt-6">
+                    <span
+                      onClick={() => setProposalStep(ProposalStep.PROPOSE)}
+                      className="cursor-pointer border rounded border-marble-white p-2 self-start"
+                    >
+                      <BackArrow className="fill-marble-white" />
+                    </span>
+                    {activeUser ? (
+                      <Button isSubmitType={true}>Save</Button>
+                    ) : (
+                      <Button onClick={() => toggleWalletModal(true)}>Connect</Button>
+                    )}
+                  </div>
+                )}
+                {proposalStep === ProposalStep.SIGN && (
+                  <div className="mt-6 flex justify-end">
+                    <Button
+                      className="mr-2"
+                      type={ButtonType.Secondary}
+                      onClick={() => {
+                        const path = genUrlFromRoute(
+                          Routes.ViewProposalNew({
+                            proposalId: proposal.id,
+                          })
+                        )
+
+                        navigator.clipboard
+                          .writeText(`${window.location.protocol}//${window.location.host}${path}`)
+                          .then(() => {
+                            setIsClipboardAddressCopied(true)
+                            setTimeout(() => setIsClipboardAddressCopied(false), 3000)
+                          })
+                      }}
+                    >
+                      {isClipboardAddressCopied ? "Copied!" : "Copy Link"}
+                    </Button>
+                    <Button
+                      isDisabled={!userHasSigned}
+                      onClick={() => {
+                        router.push(
+                          Routes.ViewProposalNew({
+                            proposalId: proposal.id,
+                          })
+                        )
+                      }}
+                    >
+                      Done
+                    </Button>
+                  </div>
+                )}
+              </form>
+            )
+          }}
+        />
+      </div>
     </div>
   )
 }
