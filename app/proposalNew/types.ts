@@ -14,6 +14,11 @@ export type ProposalNewMetadata = {
   payments?: Payment[]
   milestones?: Milestone[]
   digest: Digest
+  ipfsMetadata?: {
+    hash: string
+    ipfsPinSize: number
+    timestamp: Date
+  }
   // below not included in digest
 }
 

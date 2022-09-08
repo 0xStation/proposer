@@ -6,6 +6,7 @@ import approveProposalNew from "app/proposalNew/mutations/approveProposalNew"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { genProposalNewDigest } from "app/signatures/proposalNew"
+import getProposalNewById from "../queries/getProposalNewById"
 
 export const ApproveProposalNewModal = ({
   isOpen,
@@ -46,6 +47,9 @@ export const ApproveProposalNewModal = ({
         signature,
       })
       invalidateQuery(getProposalNewSignaturesById)
+      // invalidate proposal query to get ipfs hash post-approval
+      // since an ipfs has is created on proposal approval
+      invalidateQuery(getProposalNewById)
       router.replace(router.asPath)
       setIsOpen(false)
       setToastState({

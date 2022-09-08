@@ -207,6 +207,7 @@ export const LINKS = {
   CHECKBOOK:
     "https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook",
   TYPEFORM_WAITLIST: "https://6vdcjqzyfj3.typeform.com/to/G3LN1FlM",
+  PINATA_BASE_URL: "https://gateway.pinata.cloud/ipfs/", // TODO: change to use Station gateway
 }
 
 export enum FeatureFlagStatus {

@@ -1,5 +1,7 @@
 import { BlitzPage, useQuery, useParam } from "blitz"
 import { useState } from "react"
+import { ExternalLinkIcon } from "@heroicons/react/solid"
+import { DateTime } from "luxon"
 import Layout from "app/core/layouts/Layout"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
@@ -15,10 +17,40 @@ import TransactionLink from "app/core/components/TransactionLink"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import MetadataLabel from "app/core/components/MetadataLabel"
+import { LINKS } from "app/core/utils/constants"
+
+export const IpfsViewComponent = ({ ipfsHash, ipfsTimestamp }) => {
+  const date = DateTime.fromISO(ipfsTimestamp)
+  const formattedDate = date.toFormat("dd-MMM-yyyy HH:mm")
+  return (
+    <div className="absolute bottom-7 left-6 border border-concrete rounded p-4 bg-tunnel-black">
+      <div className="flex flex-col">
+        <div className="flex-row border-b border-concrete pb-2">
+          <a
+            className="inline mr-2 cursor-pointer"
+            href={`${LINKS.PINATA_BASE_URL}${ipfsHash}`}
+            rel="noreferrer"
+          >
+            <p className="inline font-bold tracking-wide uppercase text-concrete text-xs">
+              Ipfs link
+            </p>
+            <ExternalLinkIcon className="inline h-4 w-4 fill-concrete cursor-pointer" />
+          </a>
+          <p className="hidden sm:inline">{ipfsHash}</p>
+        </div>
+        <div className="flex-row mt-2">
+          <p className="inline font-bold tracking-wide uppercase text-concrete text-xs mr-2">
+            Last updated
+          </p>
+          <p className="sm:inline uppercase">{formattedDate}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const ViewProposalNew: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
-  const setToastState = useStore((state) => state.setToastState)
   const [isApproveProposalModalOpen, setIsApproveProposalModalOpen] = useState<boolean>(false)
   const [isExecutePaymentModalOpen, setIsExecutePaymentModalOpen] = useState<boolean>(false)
   const [isActionPending, setIsActionPending] = useState<boolean>(false)
@@ -145,9 +177,15 @@ const ViewProposalNew: BlitzPage = () => {
         )}
       </div>
       <div className="h-[calc(100vh-164px)] flex flex-row">
-        <div className="w-full p-6 overflow-y-scroll">
+        <div className="w-full sm:min-w-[680px] p-6 overflow-y-scroll">
           <p>{proposal?.data.content.body}</p>
         </div>
+        {proposal?.data?.ipfsMetadata?.hash && (
+          <IpfsViewComponent
+            ipfsHash={proposal?.data?.ipfsMetadata?.hash}
+            ipfsTimestamp={proposal?.data?.ipfsMetadata?.timestamp}
+          />
+        )}
         <div className="w-[36rem] border-l border-concrete flex-col overflow-y-scroll">
           {/* STATUS */}
           <div className="border-b border-concrete p-6">
