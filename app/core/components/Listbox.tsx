@@ -2,8 +2,24 @@ import { Fragment, useState } from "react"
 import { Listbox, Transition } from "@headlessui/react"
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid"
 
-export default function CustomListbox({ items, onChange, defaultValue }) {
-  const [selected, setSelected] = useState<any>(defaultValue || items[0])
+type ListboxItem = {
+  id: number
+  name: string
+}
+
+type ListboxComponentProps = {
+  items: ListboxItem[]
+  onChange: (item: ListboxItem) => void
+  defaultValue: ListboxItem | undefined
+}
+
+const defaultItem = {
+  id: -1,
+  name: "default",
+}
+
+const CustomListbox = ({ items, onChange, defaultValue }: ListboxComponentProps) => {
+  const [selected, setSelected] = useState<ListboxItem>(defaultValue || items[0] || defaultItem)
   const onChangeAndSetSelected = (item) => {
     onChange(item)
     setSelected(item)
@@ -55,3 +71,5 @@ export default function CustomListbox({ items, onChange, defaultValue }) {
     </Listbox>
   )
 }
+
+export default CustomListbox
