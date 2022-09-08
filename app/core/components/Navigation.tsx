@@ -1,20 +1,22 @@
 import StationLogo from "public/station-letters.svg"
-import { trackClick } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { Image, invoke, Routes, useQuery, useParam, useRouter, useSession } from "blitz"
 import { useAccount } from "wagmi"
 import useStore from "../hooks/useStore"
-import truncateString from "../utils/truncateString"
-import { useMemo, useState } from "react"
-import ProfileNavigationDrawer from "./ProfileNavigationDrawer"
 import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
 import { TerminalMetadata } from "app/terminal/types"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import createAccount from "app/account/mutations/createAccount"
 import { DEFAULT_PFP_URLS } from "../utils/constants"
 import ExploreImageIcon from "public/explore.svg"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import Dropdown from "app/core/components/Dropdown"
+import Listbox from "app/core/components/Listbox"
+import { useDisconnect, useNetwork, useSwitchNetwork } from "wagmi"
+import logout from "app/session/mutations/logout"
+import Button from "app/core/components/sds/buttons/Button"
+import truncateString from "app/core/utils/truncateString"
+import { ChevronDownIcon, DotsHorizontalIcon } from "@heroicons/react/solid"
 
 const {
   FEATURE: { WALLET_CONNECTION },
@@ -26,11 +28,17 @@ const Navigation = ({ children }: { children?: any }) => {
   const activeUser = useStore((state) => state.activeUser)
   const setActiveUser = useStore((state) => state.setActiveUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
-  const walletModalOpen = useStore((state) => state.walletModalOpen)
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
-  const [profileNavDrawerIsOpen, setProfileNavDrawerIsOpen] = useState<boolean>(false)
   const router = useRouter()
-  const terminalHandle = useParam("terminalHandle")
+  const { disconnect } = useDisconnect()
+  const { chain } = useNetwork()
+  const { chains, switchNetwork } = useSwitchNetwork()
+
+  const handleDisconnect = async () => {
+    setActiveUser(null)
+    await invoke(logout, {})
+    disconnect()
+  }
 
   // If the user connects + signs their wallet,
   // set the active user. The active user will be
@@ -60,46 +68,6 @@ const Navigation = ({ children }: { children?: any }) => {
     { suspense: false, enabled: !!activeUser?.id }
   )
 
-  const handlePfpClick = () => {
-    if (session?.siwe?.address) {
-      setProfileNavDrawerIsOpen(true)
-    }
-  }
-
-  // 1. if user has an active account w/Station + pfp url, render pfp url.
-  // 2. else if user has a connected address, render gradient pfp.
-  // 3. else don't render anything when user isn't connected.
-  const profilePfp =
-    session?.siwe?.address && activeUser?.data?.pfpURL ? (
-      <>
-        <div tabIndex={0} className="mx-auto">
-          <div className="h-3 w-3 border border-tunnel-black bg-magic-mint rounded-full absolute right-0 mr-1" />
-          <img
-            src={activeUser?.data.pfpURL}
-            alt="PFP"
-            className={"w-[46px] h-[46px] rounded-full cursor-pointer"}
-            onError={(e) => {
-              e.currentTarget.src = DEFAULT_PFP_URLS.USER
-            }}
-          />
-        </div>
-        <div className="text-xs text-light-concrete flex mt-1">
-          <p>@{truncateString(session?.siwe?.address, 2)}</p>
-        </div>
-      </>
-    ) : session?.siwe?.address ? (
-      <>
-        <div className="h-3 w-3 border border-tunnel-black bg-magic-mint rounded-full absolute right-0 mr-1" />
-        <div
-          tabIndex={0}
-          className="rounded-full w-[46px] h-[46px] bg-gradient-to-b from-electric-violet to-magic-mint mx-auto cursor-pointer"
-        ></div>
-        <div className="text-xs text-light-concrete flex mt-1">
-          <p>@{truncateString(session?.siwe?.address, 2)}</p>
-        </div>
-      </>
-    ) : null
-
   const terminalsView =
     usersTerminals && Array.isArray(usersTerminals) && usersTerminals?.length > 0
       ? usersTerminals?.map((terminal, idx) => (
@@ -109,56 +77,56 @@ const Navigation = ({ children }: { children?: any }) => {
 
   return (
     <>
-      <ProfileNavigationDrawer
-        isOpen={profileNavDrawerIsOpen}
-        setIsOpen={setProfileNavDrawerIsOpen}
-      />
-      {/* Need a parent element around the banner or else there's a chance for a hydration issue and the dom rearranges */}
-      <div>
-        {!session.isLoading && !session?.siwe?.address && (
-          <div className="w-full h-36 lg:h-[70px] fixed z-40 bg-wet-concrete bottom-0">
-            <div className="fixed mt-2 left-1/3 ml-[-6.65rem]">
-              <h2 className="inline-block mr-5 text-xl font-bold justify-center">
-                {!address ? "Be recognized in your community" : "Sign"}
-              </h2>
-              <p>
-                {!address
-                  ? "Connect your wallet and join the next class of emerging talent"
-                  : "Verify that it's you"}
-              </p>
-            </div>
-            <Button
-              type={!address ? ButtonType.Primary : ButtonType.Secondary}
-              onClick={() => {
-                trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BANNER_CLICKED, {
-                  pageName: window.location.href,
-                  stationHandle: terminalHandle as string,
-                })
-                toggleWalletModal(true)
-              }}
-              className="align-middle p-1 ml-28 mt-4 mr-[-2rem] mb-3 lg:mb-0 md:mr-[-6.65rem] right-1/3 fixed bottom-0 lg:bottom-auto"
-              isDisabled={walletModalOpen}
-            >
-              {!address ? "Connect wallet" : "Sign in with Ethereum"}
-            </Button>
-          </div>
-        )}
-      </div>
-      <div className="h-screen w-[70px] bg-tunnel-black border-r border-concrete fixed top-0 left-0 text-center flex flex-col">
+      <div className="w-full border-b border-concrete h-[70px] px-6 flex items-center justify-between">
         <a className="mt-1 inline-block" href="https://app.station.express">
-          <Image src={StationLogo} alt="Station logo" height={20} width={54} />
+          <Image src={StationLogo} alt="Station logo" height={30} width={80} />
         </a>
+        <div className="flex flex-row items-center space-x-4">
+          <Listbox
+            defaultValue={chain}
+            items={chains}
+            onChange={(item) => switchNetwork?.(item.id)}
+          />
+          {!address ? (
+            <Button onClick={() => toggleWalletModal(true)}>Connect</Button>
+          ) : (
+            <Dropdown
+              buttonClassName="border border-marble-white px-2 h-[35px] inline-flex w-full justify-center items-center rounded-md text-sm"
+              button={
+                <>
+                  <span className="block text-marble-white">{truncateString(address)}</span>
+                  <ChevronDownIcon className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
+                </>
+              }
+              items={[{ name: "Disconnect", onClick: () => handleDisconnect() }]}
+            />
+          )}
+          <Dropdown
+            button={
+              <DotsHorizontalIcon className="inline-block h-4 w-4 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
+            }
+            items={[
+              {
+                name: "Product manual",
+                href: "https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176",
+              },
+              { name: "Help desk", href: "https://6vdcjqzyfj3.typeform.com/to/F0QFs9aC" },
+              { name: "Newstand", href: "https://station-labs.gitbook.io/station-product-manual/" },
+              {
+                name: "Legal & Privacy",
+                href: "https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176",
+              },
+            ]}
+          />
+        </div>
+      </div>
+      <div className="h-[calc(100vh-70px)] w-[70px] bg-tunnel-black border-r border-concrete fixed top-[70px] left-0 text-center flex flex-col">
         <div className="h-full mt-4">
           <ExploreIcon />
           {terminalsView}
-          {profilePfp && (
-            <div className="fixed bottom-[10px] left-[12px]" onClick={() => handlePfpClick()}>
-              {profilePfp}
-            </div>
-          )}
         </div>
       </div>
-      <div className="h-screen ml-[70px] relative">{children}</div>
+      <div className="h-[calc(100vh-70px)] ml-[70px] relative overflow-y-scroll">{children}</div>
     </>
   )
 }
