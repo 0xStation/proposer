@@ -9,7 +9,7 @@ type ListboxItem = {
 
 type ListboxComponentProps = {
   items: ListboxItem[]
-  onChange: (item: ListboxItem) => void
+  onChange: (item: ListboxItem) => boolean
   defaultValue: ListboxItem | undefined
 }
 
@@ -21,8 +21,10 @@ const defaultItem = {
 const CustomListbox = ({ items, onChange, defaultValue }: ListboxComponentProps) => {
   const [selected, setSelected] = useState<ListboxItem>(defaultValue || items[0] || defaultItem)
   const onChangeAndSetSelected = (item) => {
-    onChange(item)
-    setSelected(item)
+    const shouldContinue = onChange(item)
+    if (shouldContinue) {
+      setSelected(item)
+    }
   }
 
   return (

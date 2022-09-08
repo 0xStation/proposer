@@ -29,10 +29,20 @@ const Navigation = ({ children }: { children?: any }) => {
   const setActiveUser = useStore((state) => state.setActiveUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
+  const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
   const { disconnect } = useDisconnect()
   const { chain } = useNetwork()
-  const { chains, switchNetwork } = useSwitchNetwork()
+  const data = useSwitchNetwork()
+  const { chains, switchNetwork, isError, error } = data
+
+  if (isError) {
+    setToastState({
+      isToastShowing: true,
+      type: "error",
+      message: error?.message,
+    })
+  }
 
   const handleDisconnect = async () => {
     setActiveUser(null)
@@ -85,7 +95,19 @@ const Navigation = ({ children }: { children?: any }) => {
           <Listbox
             defaultValue={chain}
             items={chains}
-            onChange={(item) => switchNetwork?.(item.id)}
+            onChange={(item) => {
+              if (!address) {
+                setToastState({
+                  isToastShowing: true,
+                  type: "error",
+                  message: "Must be logged in to switch network.",
+                })
+
+                return false
+              }
+              switchNetwork?.(item.id)
+              return true
+            }}
           />
           {!address ? (
             <Button onClick={() => toggleWalletModal(true)}>Connect</Button>
