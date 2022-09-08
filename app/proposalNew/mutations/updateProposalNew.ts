@@ -13,8 +13,8 @@ const UpdateProposalNew = z.object({
   ipfsHash: z.string().optional(),
   ipfsPinSize: z.number().optional(), // ipfs
   ipfsTimestamp: z.string().optional(),
-  paymentTermType: z.string().optional(),
-  advancedPaymentPercentage: z.number().optional(),
+  // paymentTermType: z.string().optional(),
+  // advancedPaymentPercentage: z.number().optional(),
 })
 
 export default async function updateProposal(input: z.infer<typeof UpdateProposalNew>) {
@@ -40,58 +40,61 @@ export default async function updateProposal(input: z.infer<typeof UpdateProposa
     // but we are doing this the quick way with minimal infra
     // if we get validation this is good idea we can improve
     // if advancedPaymentPercentage is greater than 0, we need two milestones
-    payments: params.paymentAmount
-      ? params.advancedPaymentPercentage && params.advancedPaymentPercentage > 0
-        ? [
-            {
-              milestoneId: 0,
-              recipientAddress: params.contributorAddress,
-              token: params.token,
-              amount: String(
-                (Number(params.paymentAmount) * (params.advancedPaymentPercentage / 100)).toFixed(
-                  params.token.decimals
-                )
-              ),
-            },
-            {
-              milestoneId: 1,
-              recipientAddress: params.contributorAddress,
-              token: params.token,
-              amount: String(
-                (
-                  Number(params.paymentAmount) *
-                  ((100 - params.advancedPaymentPercentage) / 100)
-                ).toFixed(params.token.decimals)
-              ),
-            },
-          ]
-        : [
-            {
-              milestoneId: 0,
-              recipientAddress: params.contributorAddress,
-              token: params.token,
-              amount: params.paymentAmount,
-            },
-          ]
-      : [],
+    payments:
+      // params.paymentAmount
+      //   ? params.advancedPaymentPercentage && params.advancedPaymentPercentage > 0
+      //     ? [
+      //         {
+      //           milestoneId: 0,
+      //           recipientAddress: params.contributorAddress,
+      //           token: params.token,
+      //           amount: String(
+      //             (Number(params.paymentAmount) * (params.advancedPaymentPercentage / 100)).toFixed(
+      //               params.token.decimals
+      //             )
+      //           ),
+      //         },
+      //         {
+      //           milestoneId: 1,
+      //           recipientAddress: params.contributorAddress,
+      //           token: params.token,
+      //           amount: String(
+      //             (
+      //               Number(params.paymentAmount) *
+      //               ((100 - params.advancedPaymentPercentage) / 100)
+      //             ).toFixed(params.token.decimals)
+      //           ),
+      //         },
+      //       ]
+      //     :
+      [
+        {
+          milestoneId: 0,
+          recipientAddress: params.contributorAddress,
+          token: params.token,
+          amount: params.paymentAmount,
+        },
+      ],
+    // : [],
     milestones:
-      params.advancedPaymentPercentage && params.paymentAmount
-        ? [
-            {
-              id: 0,
-              title: "Advanced payment",
-            },
-            {
-              id: 1,
-              title: "Payment upon approval",
-            },
-          ]
-        : [
-            {
-              id: 0,
-              title: "Payment upon approval",
-            },
-          ],
+      // params.advancedPaymentPercentage && params.paymentAmount
+      //   ? [
+      //       {
+      //         id: 0,
+      //         title: "Advanced payment",
+      //       },
+      //       {
+      //         id: 1,
+      //         title: "Payment upon approval",
+      //       },
+      //     ]
+      //   :
+      [
+        {
+          id: 0,
+          title: "Payment upon approval",
+        },
+      ],
     digest: {
       hash: "",
     },
