@@ -242,6 +242,8 @@ model ProposalNew {
   data       Json
   roles      ProposalRole[]
   signatures ProposalSignature[]
+  payments   ProposalPayment[]
+  milestones ProposalMilestone[]
 }
 
 model ProposalSignature {
@@ -273,6 +275,30 @@ model Token {
   accounts AccountToken[]
 
   @@id([address, chainId])
+}
+
+model ProposalPayment {
+  id               String            @id @default(uuid())
+  proposalId       String
+  proposal         ProposalNew       @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  milestoneIndex   Int
+  milestone        ProposalMilestone @relation(fields: [proposalId, milestoneIndex], references: [proposalId, index])
+  senderAddress    String?
+  recipientAddress String
+  amount           Decimal?          @db.Decimal(78, 18) // 78 decimal places to accomodate solidity uint256 and 18 maximum decimals for industry standard
+  tokenId          Decimal?          @db.Decimal(78, 0) // 78 decimal places to accomodate solidity uint256 and 0 decimals because only integers
+  transactionHash  String?
+  data             Json
+}
+
+model ProposalMilestone {
+  proposalId String
+  proposal   ProposalNew @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  index      Int
+  data       Json
+
+  payment ProposalPayment[]
+  @@id([proposalId, index])
 }
 
 enum TokenType {

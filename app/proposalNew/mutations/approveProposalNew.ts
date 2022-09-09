@@ -46,6 +46,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       include: {
         roles: true,
         signatures: true,
+        payments: true,
       },
     })
   } catch (err) {
@@ -83,7 +84,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
 
   try {
     // add ipfs response to proposal
-    const paymentMetadata = proposal?.data?.payments?.[0] || {}
+    const payment = proposal?.payments?.[0] || {}
     const updatedProposal = await updateProposalNew({
       proposalId: params.proposalId,
       contentTitle: proposal?.data?.content?.title,
@@ -91,8 +92,8 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       contributorAddresses: proposal.roles
         .filter((role) => role.role === ProposalRoleType.CONTRIBUTOR)
         .map((role) => role.address),
-      token: paymentMetadata.token,
-      paymentAmount: paymentMetadata.amount,
+      token: payment.data.token,
+      paymentAmount: payment.amount.toFixed(payment.data.token.decimals),
       ipfsHash: ipfsResponse.IpfsHash,
       ipfsPinSize: ipfsResponse.PinSize, // ipfs
       ipfsTimestamp: ipfsResponse.Timestamp,

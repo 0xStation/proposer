@@ -759,10 +759,21 @@ export const ProposalNewForm = () => {
               contributorAddresses: [values.contributor],
               clientAddresses: [values.client],
               authorAddresses: [activeUser?.address!],
-              token: { ...token, chainId: selectedNetworkId },
-              paymentAmount: values.paymentAmount,
-              // paymentTermType: values.paymentTermType,
-              // advancedPaymentPercentage: Number(values.advancedPaymentPercentage),
+              payments: [
+                {
+                  senderAddress: values.client,
+                  recipientAddress: values.contributor,
+                  amount: values.paymentAmount,
+                  milestoneIndex: 0,
+                  token: { ...token, chainId: selectedNetworkId },
+                },
+              ],
+              milestones: [
+                {
+                  index: 0,
+                  title: "Proposal approval",
+                },
+              ],
             })
           }}
           render={({ form, handleSubmit }) => {

@@ -60,8 +60,9 @@ const ViewProposalNew: BlitzPage = () => {
     { id: proposalId },
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
-  const proposalContainsPayment =
-    (proposal?.data.payments && proposal?.data?.payments.length > 0) || false
+
+  console.log(proposal)
+  const proposalContainsPayment = (proposal?.payments && proposal?.payments.length > 0) || false
 
   const [signatures] = useQuery(
     getProposalNewSignaturesById,
@@ -116,7 +117,7 @@ const ViewProposalNew: BlitzPage = () => {
     return Object.values(requiredSignatures).every((hasSigned) => hasSigned)
   })()
 
-  const paymentComplete = !!proposal?.data?.payments?.[0]?.transactionHash
+  const paymentComplete = !!proposal?.payments?.[0]?.transactionHash
 
   const showApproveButton = userHasRole && !userHasSigned
   const showPayButton = commitmentsComplete && userIsPayer && !paymentComplete
@@ -140,8 +141,7 @@ const ViewProposalNew: BlitzPage = () => {
         setIsOpen={setIsExecutePaymentModalOpen}
         isLoading={isActionPending}
         setIsLoading={setIsActionPending}
-        payment={proposal?.data?.payments?.[0]}
-        proposalId={proposal?.id}
+        payment={proposal?.payments?.[0]}
       />
       <div className="flex flex-row py-16 border-b border-concrete">
         <h2 className="ml-6 text-marble-white text-xl font-bold w-full">
@@ -201,8 +201,8 @@ const ViewProposalNew: BlitzPage = () => {
               {paymentComplete ? (
                 <TransactionLink
                   className="mt-3"
-                  chainId={proposal?.data?.payments?.[0]?.token.chainId}
-                  txnHash={proposal?.data?.payments?.[0]?.transactionHash}
+                  chainId={proposal?.payments?.[0]?.data?.token.chainId}
+                  txnHash={proposal?.payments?.[0]?.transactionHash}
                 />
               ) : (
                 <ProgressCircleAndNumber
@@ -234,14 +234,14 @@ const ViewProposalNew: BlitzPage = () => {
               {/* NETWORK */}
               <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
               <p className="mt-2 font-normal">
-                {getNetworkName(proposal?.data?.payments?.[0]?.token.chainId || 0)}
+                {getNetworkName(proposal?.payments?.[0]?.data?.token.chainId || 0)}
               </p>
               {/* TOKEN */}
               <MetadataLabel label="Payment token" />
-              <p className="mt-2 font-normal">{proposal?.data?.payments?.[0]?.token.symbol}</p>
+              <p className="mt-2 font-normal">{proposal?.payments?.[0]?.data?.token.symbol}</p>
               {/* PAYMENT AMOUNT */}
               <MetadataLabel label="Payment amount" />
-              <p className="mt-2 font-normal">{proposal?.data?.payments?.[0]?.amount}</p>
+              <p className="mt-2 font-normal">{proposal?.payments?.[0]?.amount}</p>
             </div>
           ) : (
             <div className="p-6">

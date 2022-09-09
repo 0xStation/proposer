@@ -13,6 +13,7 @@ export default async function getProposalNewById(params: z.infer<typeof GetPropo
     },
     include: {
       roles: true,
+      payments: true,
     },
   })
 

@@ -1,7 +1,7 @@
 import { ETH_METADATA } from "app/core/utils/constants"
 import { Interface } from "@ethersproject/abi"
 import { parseUnits } from "ethers/lib/utils"
-import { Token } from "app/proposalNew/types"
+import { Token } from "app/token/types"
 
 export const preparePaymentTransaction = (
   recipientAddress: string,
