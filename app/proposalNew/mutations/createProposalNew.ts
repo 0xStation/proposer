@@ -29,13 +29,14 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     throw new Error("amount must be greater or equal to zero.")
   }
 
+  // Create accounts for roles that do not yet have accounts
+  // Needed for FK constraint on ProposalRole table for addresses to connect to Account objects
   const roleAddresses = [
     ...params.contributorAddresses,
     ...params.clientAddresses,
     ...params.authorAddresses,
   ]
   const uniqueRoleAddresses = roleAddresses.filter((v, i, addresses) => addresses.indexOf(v) === i)
-
   const accounts = await db.account.findMany({
     where: {
       address: {
@@ -43,16 +44,15 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       },
     },
   })
-
   const addressesMissingAccounts = uniqueRoleAddresses.filter((address) =>
     accounts.some((account) => account.address !== address)
   )
-
+  // with list of missing addresses, determine their AddressType
   const addressClassificationRequests = addressesMissingAccounts.map((address) =>
     getAddressType(address)
   )
   const addressClassificationResponses = await Promise.all(addressClassificationRequests)
-
+  // create many Accounts with proper type
   await db.account.createMany({
     skipDuplicates: true, // do not create entries that already exist
     data: addressesMissingAccounts.map((address, i) => {
