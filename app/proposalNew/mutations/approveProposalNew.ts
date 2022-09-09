@@ -13,8 +13,20 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
   const params = ApproveProposalNew.parse(input)
 
   try {
-    await db.proposalSignature.create({
-      data: {
+    // made upsert to avoid failures if frontend state management makes mistake and tries to submit signature twice
+    await db.proposalSignature.upsert({
+      where: {
+        proposalId_address: {
+          proposalId: params.proposalId,
+          address: params.signerAddress,
+        },
+      },
+      update: {
+        data: {
+          signature: params.signature,
+        },
+      },
+      create: {
         proposalId: params.proposalId,
         address: params.signerAddress,
         data: {
@@ -23,7 +35,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       },
     })
   } catch (err) {
-    throw Error(`Failed to create signature in approveProposalNew: ${JSON.parse(err)}`)
+    throw Error(`Failed to create signature in approveProposalNew: ${err}`)
   }
 
   // UPLOAD TO IPFS
@@ -37,7 +49,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       },
     })
   } catch (err) {
-    throw Error(`Failed to find proposal in approveProposalNew: ${JSON.parse(err)}`)
+    throw Error(`Failed to find proposal in approveProposalNew: ${err}`)
   }
   // flattening proposal's data json object for the ipfs proposal
   let proposalCopy = JSON.parse(JSON.stringify(proposal.data))
@@ -66,7 +78,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
   try {
     ipfsResponse = await pinJsonToPinata(pinataProposal)
   } catch (err) {
-    throw Error(`Call to pinata failed with error: ${JSON.parse(err)}`)
+    throw Error(`Call to pinata failed with error: ${err}`)
   }
 
   try {
@@ -85,6 +97,6 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
     })
     return updatedProposal
   } catch (err) {
-    throw Error(`Failure updating proposal: ${JSON.parse(err)}`)
+    throw Error(`Failure updating proposal: ${err}`)
   }
 }
