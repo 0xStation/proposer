@@ -1,9 +1,11 @@
-import db from "db"
+import db, { AddressType } from "db"
 import * as z from "zod"
 import { Ctx } from "blitz"
 import { Account } from "../types"
 import { saveEmail } from "app/utils/privy"
 import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
+import { getAddressType } from "app/utils/getAddressType"
+import truncateString from "app/core/utils/truncateString"
 
 const CreateAccount = z.object({
   name: z.string().optional(),
@@ -29,10 +31,21 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
     await saveEmail(params.address as string, params.email)
   }
 
+  let addressType
+  let multisigChainId
+  if (params.address) {
+    const { type, chainId } = await getAddressType(params.address)
+    addressType = type
+    multisigChainId = chainId
+  }
+
+  const name = params.name ? params.name : truncateString(params.address || "")
+
   const payload = {
     address: params.address,
+    type: addressType,
     data: {
-      name: params.name,
+      name: name,
       bio: params.bio,
       pfpURL: params.pfpURL,
       coverURL: params.coverURL,
@@ -43,6 +56,8 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
       instagramUrl: params.instagramUrl,
       // mark email as saved for this account to not show email input modals
       hasSavedEmail: !!params.email,
+      // if this address is not a wallet, it is a smart contract so add its chainId
+      ...(addressType !== AddressType.WALLET && { chainId: multisigChainId }),
     },
   }
 

@@ -581,8 +581,8 @@ export const ProposalNewForm = () => {
             createProposalMutation({
               contentTitle: values.title,
               contentBody: values.body,
-              contributorAddress: values.contributor,
-              clientAddress: values.client,
+              contributorAddresses: [values.contributor],
+              clientAddresses: [values.client],
               authorAddresses: [activeUser!.address!],
               token: { ...token, chainId: selectedNetworkId },
               paymentAmount: values.paymentAmount,

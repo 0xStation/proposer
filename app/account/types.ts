@@ -20,6 +20,7 @@ export type AccountMetadata = {
   bio?: string
   hasSavedEmail?: boolean
   hasVerifiedEmail?: boolean
+  chainId?: number
 }
 
 export type Account = {
