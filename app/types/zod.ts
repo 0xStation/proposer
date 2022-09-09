@@ -20,6 +20,11 @@ export const OptionalZodToken = z.object({
   decimals: z.number().optional(),
 })
 
+export const ZodMilestone = z.object({
+  index: z.number(),
+  title: z.string(),
+})
+
 export const ZodPayment = z.object({
   senderAddress: z.string(),
   recipientAddress: z.string(),
@@ -27,9 +32,4 @@ export const ZodPayment = z.object({
   tokenId: z.number().optional(),
   milestoneIndex: z.number(),
   token: ZodToken,
-})
-
-export const ZodMilestone = z.object({
-  index: z.number(),
-  title: z.string(),
 })

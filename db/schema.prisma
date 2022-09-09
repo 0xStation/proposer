@@ -241,9 +241,9 @@ model ProposalNew {
   timestamp  DateTime            @default(now())
   data       Json
   roles      ProposalRole[]
-  signatures ProposalSignature[]
-  payments   ProposalPayment[]
   milestones ProposalMilestone[]
+  payments   ProposalPayment[]
+  signatures ProposalSignature[]
 }
 
 model ProposalSignature {
@@ -277,6 +277,16 @@ model Token {
   @@id([address, chainId])
 }
 
+model ProposalMilestone {
+  proposalId String
+  proposal   ProposalNew @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  index      Int
+  data       Json
+
+  payment ProposalPayment[]
+  @@id([proposalId, index])
+}
+
 model ProposalPayment {
   id               String            @id @default(uuid())
   proposalId       String
@@ -289,16 +299,6 @@ model ProposalPayment {
   tokenId          Decimal?          @db.Decimal(78, 0) // 78 decimal places to accomodate solidity uint256 and 0 decimals because only integers
   transactionHash  String?
   data             Json
-}
-
-model ProposalMilestone {
-  proposalId String
-  proposal   ProposalNew @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  index      Int
-  data       Json
-
-  payment ProposalPayment[]
-  @@id([proposalId, index])
 }
 
 enum TokenType {

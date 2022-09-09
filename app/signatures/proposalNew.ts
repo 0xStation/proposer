@@ -5,7 +5,6 @@ import { ProposalNew } from "app/proposalNew/types"
 import { parseUnits } from "@ethersproject/units"
 
 export const genProposalNewDigest = (proposal: ProposalNew) => {
-  console.log(proposal)
   return {
     domain: {
       name: "Proposal", // keep hardcoded
@@ -16,6 +15,10 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
         { name: "address", type: "address" },
         { name: "role", type: "string" },
       ],
+      Milestone: [
+        { name: "index", type: "uint256" },
+        { name: "title", type: "string" },
+      ],
       Payment: [
         { name: "milestoneIndex", type: "uint256" },
         { name: "recipientAddress", type: "address" }, // recieves the reward from the proposal
@@ -23,16 +26,12 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
         { name: "tokenAddress", type: "address" },
         { name: "amount", type: "uint256" },
       ],
-      Milestone: [
-        { name: "index", type: "uint256" },
-        { name: "title", type: "string" },
-      ],
       Proposal: [
         { name: "type", type: "string" },
         { name: "timestamp", type: "uint256" }, // UNIX timestamp
         { name: "roles", type: "Role[]" },
-        { name: "payments", type: "Payment[]" },
         { name: "milestones", type: "Milestone[]" },
+        { name: "payments", type: "Payment[]" },
         { name: "title", type: "string" },
         { name: "body", type: "string" },
       ],
@@ -45,6 +44,12 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
       roles: proposal.roles?.map((role) => {
         return { address: role.address, role: role.role }
       }),
+      milestones: proposal.milestones?.map((milestone) => {
+        return {
+          index: milestone.index,
+          title: milestone.data.title,
+        }
+      }),
       payments: proposal.payments?.map((payment) => {
         return {
           milestoneIndex: payment.milestoneIndex,
@@ -52,12 +57,6 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
           chainId: payment.data.token.chainId,
           tokenAddress: payment.data.token.address,
           amount: parseUnits(payment.amount!, payment.data.token.decimals),
-        }
-      }),
-      milestones: proposal.milestones?.map((milestone) => {
-        return {
-          index: milestone.index,
-          title: milestone.data.title,
         }
       }),
     },

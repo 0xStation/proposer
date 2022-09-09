@@ -19,8 +19,8 @@ const CreateProposal = z.object({
   ipfsHash: z.string().optional(),
   ipfsPinSize: z.number().optional(),
   ipfsTimestamp: z.date().optional(),
-  payments: ZodPayment.array(),
   milestones: ZodMilestone.array(),
+  payments: ZodPayment.array(),
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {

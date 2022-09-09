@@ -759,19 +759,19 @@ export const ProposalNewForm = () => {
               contributorAddresses: [values.contributor],
               clientAddresses: [values.client],
               authorAddresses: [activeUser?.address!],
-              payments: [
-                {
-                  senderAddress: values.client,
-                  recipientAddress: values.contributor,
-                  amount: values.paymentAmount,
-                  milestoneIndex: 0,
-                  token: { ...token, chainId: selectedNetworkId },
-                },
-              ],
+              // for now assuming a proposal with one payment on completion
               milestones: [
                 {
-                  index: 0,
-                  title: "Proposal approval",
+                  index: 1,
+                  title: "Proposal completion",
+                },
+              ],
+              payments: [
+                {
+                  milestoneIndex: 1,
+                  recipientAddress: values.contributor,
+                  amount: values.paymentAmount,
+                  token: { ...token, chainId: selectedNetworkId },
                 },
               ],
             })

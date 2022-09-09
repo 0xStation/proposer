@@ -45,8 +45,8 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       where: { id: params.proposalId },
       include: {
         roles: true,
-        signatures: true,
         payments: true,
+        signatures: true,
       },
     })
   } catch (err) {

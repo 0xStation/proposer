@@ -61,7 +61,6 @@ const ViewProposalNew: BlitzPage = () => {
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
-  console.log(proposal)
   const proposalContainsPayment = (proposal?.payments && proposal?.payments.length > 0) || false
 
   const [signatures] = useQuery(
