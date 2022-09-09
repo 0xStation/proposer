@@ -1,4 +1,4 @@
-import { AccountProposal } from "@prisma/client"
+import { AccountProposal, AddressType } from "@prisma/client"
 
 export type AccountMetadata = {
   name: string
@@ -26,6 +26,7 @@ export type Account = {
   id: number
   address?: string
   discordId?: string
+  type?: AddressType
   data: AccountMetadata
   role?: string
   points?: number

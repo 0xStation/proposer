@@ -16,9 +16,3 @@ export enum Role {
   WEEKEND_COMMUTER = "WEEKEND COMMUTER",
   VISITOR = "VISITOR",
 }
-
-export enum AddressType {
-  CHECKBOOK = "CHECKBOOK",
-  SAFE = "SAFE",
-  WALLET = "WALLET",
-}
