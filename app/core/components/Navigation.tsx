@@ -1,6 +1,6 @@
 import StationLogo from "public/station-letters.svg"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Image, invoke, Routes, useQuery, useParam, useRouter, useSession } from "blitz"
 import { useAccount } from "wagmi"
 import useStore from "../hooks/useStore"
@@ -16,7 +16,8 @@ import { useDisconnect, useNetwork, useSwitchNetwork } from "wagmi"
 import logout from "app/session/mutations/logout"
 import Button from "app/core/components/sds/buttons/Button"
 import truncateString from "app/core/utils/truncateString"
-import { ChevronDownIcon, DotsHorizontalIcon } from "@heroicons/react/solid"
+import { ChevronDownIcon, DotsHorizontalIcon, PlusIcon } from "@heroicons/react/solid"
+import NewWorkspaceModal from "app/core/components/NewWorkspaceModal"
 
 const {
   FEATURE: { WALLET_CONNECTION },
@@ -33,6 +34,7 @@ const Navigation = ({ children }: { children?: any }) => {
   const { disconnect } = useDisconnect()
   const { chain } = useNetwork()
   const { chains, switchNetwork } = useSwitchNetwork()
+  const [newWorkspaceModalOpen, setNewWorkspaceModalOpen] = useState<boolean>(false)
 
   const handleDisconnect = async () => {
     setActiveUser(null)
@@ -77,6 +79,7 @@ const Navigation = ({ children }: { children?: any }) => {
 
   return (
     <>
+      <NewWorkspaceModal isOpen={newWorkspaceModalOpen} setIsOpen={setNewWorkspaceModalOpen} />
       <div className="w-full border-b border-concrete h-[70px] px-6 flex items-center justify-between">
         <a className="mt-1 inline-block" href="https://app.station.express">
           <Image src={StationLogo} alt="Station logo" height={30} width={80} />
@@ -123,6 +126,7 @@ const Navigation = ({ children }: { children?: any }) => {
       <div className="h-[calc(100vh-70px)] w-[70px] bg-tunnel-black border-r border-concrete fixed top-[70px] left-0 text-center flex flex-col">
         <div className="h-full mt-4">
           <ExploreIcon />
+          <NewWorkspaceIcon onClick={setNewWorkspaceModalOpen} />
           {terminalsView}
         </div>
       </div>
@@ -163,6 +167,17 @@ const TerminalIcon = ({ terminal }) => {
         )}
       </button>
     </div>
+  )
+}
+
+const NewWorkspaceIcon = ({ onClick }) => {
+  return (
+    <button
+      className={`bg-wet-concrete hover:border-marble-white border-wet-concrete inline-flex overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg h-[47px] w-[47px] mb-4 items-center justify-center`}
+      onClick={() => onClick(true)}
+    >
+      <PlusIcon className="h-6 w-6" aria-hidden="true" />
+    </button>
   )
 }
 
