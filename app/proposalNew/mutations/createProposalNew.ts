@@ -128,8 +128,8 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     },
     include: {
       roles: true,
-      payments: true,
       milestones: true,
+      payments: true,
     },
   })
 

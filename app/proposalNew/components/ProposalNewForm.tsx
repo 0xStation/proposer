@@ -759,7 +759,8 @@ export const ProposalNewForm = () => {
               contributorAddresses: [values.contributor],
               clientAddresses: [values.client],
               authorAddresses: [activeUser?.address!],
-              // for now assuming a proposal with one payment on completion
+              // for now, assuming a proposal with one payment on completion
+              // will change to two-milestone system with Advanced Payment feature
               milestones: [
                 {
                   index: 1,
@@ -769,6 +770,7 @@ export const ProposalNewForm = () => {
               payments: [
                 {
                   milestoneIndex: 1,
+                  senderAddress: values.client,
                   recipientAddress: values.contributor,
                   amount: values.paymentAmount,
                   token: { ...token, chainId: selectedNetworkId },

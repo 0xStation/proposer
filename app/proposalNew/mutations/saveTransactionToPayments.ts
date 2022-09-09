@@ -1,9 +1,5 @@
 import * as z from "zod"
-import db, { ProposalStatus } from "db"
-import { AddressType } from "@prisma/client"
-import { ProposalNewMetadata } from "../types"
-import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
-import { PrivyApiError } from "@privy-io/privy-node"
+import db from "db"
 
 const SaveTransactionHashToPayments = z.object({
   paymentIds: z.string().array(),
