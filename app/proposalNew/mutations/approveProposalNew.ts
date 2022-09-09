@@ -10,12 +10,7 @@ const ApproveProposalNew = z.object({
 })
 
 export default async function approveProposalNew(input: z.infer<typeof ApproveProposalNew>) {
-  let params
-  try {
-    params = ApproveProposalNew.parse(input)
-  } catch (e) {
-    throw Error("Error parsing arguments")
-  }
+  const params = ApproveProposalNew.parse(input)
 
   try {
     // made upsert to avoid failures if frontend state management makes mistake and tries to submit signature twice
