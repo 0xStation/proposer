@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react"
+import { Fragment, useState, useEffect } from "react"
 import { Listbox, Transition } from "@headlessui/react"
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid"
 
@@ -7,10 +7,15 @@ type ListboxItem = {
   name: string
 }
 
+type ListboxError = {
+  message: string
+}
+
 type ListboxComponentProps = {
   items: ListboxItem[]
   onChange: (item: ListboxItem) => boolean
   defaultValue: ListboxItem | undefined
+  error?: ListboxError
 }
 
 const defaultItem = {
@@ -18,7 +23,7 @@ const defaultItem = {
   name: "default",
 }
 
-const CustomListbox = ({ items, onChange, defaultValue }: ListboxComponentProps) => {
+const CustomListbox = ({ items, onChange, defaultValue, error }: ListboxComponentProps) => {
   const [selected, setSelected] = useState<ListboxItem>(defaultValue || items[0] || defaultItem)
   const onChangeAndSetSelected = (item) => {
     const shouldContinue = onChange(item)
@@ -27,13 +32,32 @@ const CustomListbox = ({ items, onChange, defaultValue }: ListboxComponentProps)
     }
   }
 
+  useEffect(() => {
+    if (defaultValue) {
+      setSelected(defaultValue)
+    }
+  }, [defaultValue])
+
+  console.log(error && "3")
+
   return (
     <Listbox value={selected} onChange={onChangeAndSetSelected}>
-      <div className="relative w-[200px]">
-        <Listbox.Button className="relative w-full cursor-default rounded-md bg-tunnel-black h-[35px] pl-3 pr-10 text-left shadow-md focus:outline-none sm:text-sm border border-marble-white">
-          <span className="block truncate text-marble-white">{selected.name}</span>
+      <div
+        className={`relative w-[175px] rounded-md border ${
+          error
+            ? "border-torch-red bg-torch-red text-tunnel-black"
+            : "border-marble-white text-marble-white"
+        }`}
+      >
+        <Listbox.Button className="relative w-full cursor-default h-[35px] pl-3 pr-10 text-left shadow-md focus:outline-none sm:text-sm">
+          <span className="block truncate font-bold text-base">
+            {error ? error.message : selected.name}
+          </span>
           <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-            <ChevronDownIcon className="h-5 w-5 text-marble-white" aria-hidden="true" />
+            <ChevronDownIcon
+              className={`h-5 w-5 ${error ? "text-tunnel-black" : "text-marble-white"}`}
+              aria-hidden="true"
+            />
           </span>
         </Listbox.Button>
         <Transition
@@ -42,7 +66,7 @@ const CustomListbox = ({ items, onChange, defaultValue }: ListboxComponentProps)
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-wet-concrete py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50">
+          <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-wet-concrete py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50 text-marble-white">
             {items.map((item, itemIdx) => (
               <Listbox.Option
                 key={itemIdx}

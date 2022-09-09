@@ -206,7 +206,16 @@ export const TOKEN_SYMBOLS = {
 export const LINKS = {
   CHECKBOOK:
     "https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook",
+  PRODUCT_MANUAL: "https://station-labs.gitbook.io/station-product-manual/",
+  HELP_DESK: "https://6vdcjqzyfj3.typeform.com/to/F0QFs9aC",
+  NEWSTAND: "https://station.mirror.xyz/",
+  LEGAL: "https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176",
 }
+
+// 1 - eth
+// 4 - rinkeby
+// 5 - goerli
+export const COMPATIBLE_CHAIN_IDS = [1, 4, 5]
 
 export enum FeatureFlagStatus {
   ON = "ON",

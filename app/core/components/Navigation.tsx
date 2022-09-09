@@ -1,7 +1,6 @@
 import StationLogo from "public/station-letters.svg"
-import { TRACKING_EVENTS } from "app/core/utils/constants"
 import { useEffect, useMemo } from "react"
-import { Image, invoke, Routes, useQuery, useParam, useRouter, useSession } from "blitz"
+import { Image, invoke, Routes, useQuery, useParam, useRouter, useSession, Link } from "blitz"
 import { useAccount } from "wagmi"
 import useStore from "../hooks/useStore"
 import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
@@ -17,14 +16,13 @@ import logout from "app/session/mutations/logout"
 import Button from "app/core/components/sds/buttons/Button"
 import truncateString from "app/core/utils/truncateString"
 import { ChevronDownIcon, DotsHorizontalIcon } from "@heroicons/react/solid"
-
-const {
-  FEATURE: { WALLET_CONNECTION },
-} = TRACKING_EVENTS
+import { LINKS, COMPATIBLE_CHAIN_IDS } from "app/core/utils/constants"
+import Avatar from "app/core/components/sds/images/avatar"
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
   const accountData = useAccount()
+  const setActiveChain = useStore((state) => state.setActiveChain)
   const activeUser = useStore((state) => state.activeUser)
   const setActiveUser = useStore((state) => state.setActiveUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
@@ -33,8 +31,9 @@ const Navigation = ({ children }: { children?: any }) => {
   const router = useRouter()
   const { disconnect } = useDisconnect()
   const { chain } = useNetwork()
-  const data = useSwitchNetwork()
-  const { chains, switchNetwork, isError, error } = data
+  const { chains, switchNetwork, isError, error } = useSwitchNetwork()
+  const compatibleChains = chains.filter((chain) => COMPATIBLE_CHAIN_IDS.includes(chain.id))
+  const isChainCompatible = chain ? COMPATIBLE_CHAIN_IDS.includes(chain.id) : undefined
 
   if (isError) {
     setToastState({
@@ -88,24 +87,18 @@ const Navigation = ({ children }: { children?: any }) => {
   return (
     <>
       <div className="w-full border-b border-concrete h-[70px] px-6 flex items-center justify-between">
-        <a className="mt-1 inline-block" href="https://app.station.express">
+        <Link href={Routes.ExploreStations()}>
           <Image src={StationLogo} alt="Station logo" height={30} width={80} />
-        </a>
+        </Link>
         <div className="flex flex-row items-center space-x-4">
           <Listbox
+            error={isChainCompatible === false ? { message: "Switch network" } : undefined}
             defaultValue={chain}
-            items={chains}
+            items={compatibleChains}
             onChange={(item) => {
-              if (!address) {
-                setToastState({
-                  isToastShowing: true,
-                  type: "error",
-                  message: "Must be logged in to switch network.",
-                })
-
-                return false
-              }
               switchNetwork?.(item.id)
+              const activeChain = chains.find((chain) => chain.id === item.id)
+              setActiveChain?.(activeChain)
               return true
             }}
           />
@@ -113,12 +106,17 @@ const Navigation = ({ children }: { children?: any }) => {
             <Button onClick={() => toggleWalletModal(true)}>Connect</Button>
           ) : (
             <Dropdown
-              buttonClassName="border border-marble-white px-2 h-[35px] inline-flex w-full justify-center items-center rounded-md text-sm"
+              className="h-[35px]"
               button={
-                <>
-                  <span className="block text-marble-white">{truncateString(address)}</span>
+                <div className="border border-marble-white px-2 h-[35px] inline-flex w-full justify-center items-center rounded-md text-sm">
+                  <span className="flex flex-row space-x-2 items-center">
+                    <Avatar size="sm" />
+                    <span className="block text-marble-white text-sm">
+                      @{truncateString(address)}
+                    </span>
+                  </span>
                   <ChevronDownIcon className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
-                </>
+                </div>
               }
               items={[{ name: "Disconnect", onClick: () => handleDisconnect() }]}
             />
@@ -128,16 +126,10 @@ const Navigation = ({ children }: { children?: any }) => {
               <DotsHorizontalIcon className="inline-block h-4 w-4 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
             }
             items={[
-              {
-                name: "Product manual",
-                href: "https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176",
-              },
-              { name: "Help desk", href: "https://6vdcjqzyfj3.typeform.com/to/F0QFs9aC" },
-              { name: "Newstand", href: "https://station-labs.gitbook.io/station-product-manual/" },
-              {
-                name: "Legal & Privacy",
-                href: "https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176",
-              },
+              { name: "Product manual", href: LINKS.PRODUCT_MANUAL },
+              { name: "Help desk", href: LINKS.HELP_DESK },
+              { name: "Newstand", href: LINKS.NEWSTAND },
+              { name: "Legal & Privacy", href: LINKS.LEGAL },
             ]}
           />
         </div>

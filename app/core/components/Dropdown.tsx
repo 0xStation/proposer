@@ -6,7 +6,6 @@ interface DropdownProps {
   items: Link[]
   side?: "right" | "left"
   className?: string
-  buttonClassName?: string
 }
 interface Link {
   name: string | JSX.Element
@@ -17,12 +16,12 @@ interface Link {
 /**
  * Run of the mill dropdown.
  */
-const Dropdown = ({ button, items, side, className, buttonClassName }: DropdownProps) => {
+const Dropdown = ({ button, items, side, className }: DropdownProps) => {
   return (
     <Menu as="div" className={`relative inline-block ${className}`}>
       {({ open }) => (
         <>
-          <Menu.Button className={`text-marble-white ${buttonClassName}`}>{button}</Menu.Button>
+          <Menu.Button className={`text-marble-white`}>{button}</Menu.Button>
           <Transition
             as={Fragment}
             enter="transition ease-out duration-100"
@@ -35,7 +34,7 @@ const Dropdown = ({ button, items, side, className, buttonClassName }: DropdownP
             <Menu.Items
               className={`${
                 side && side === "left" ? `left-[10px]` : `right-[0px]`
-              } text-marble-white origin-top absolute mt-1 bg-wet-concrete border border-wet-concrete rounded whitespace-nowrap z-10 p-1 drop-shadow-lg top-[120%]`}
+              } text-marble-white origin-top absolute mt-1 bg-wet-concrete border border-wet-concrete rounded whitespace-nowrap z-10 p-1 drop-shadow-lg top-[105%]`}
             >
               {items.map((item, idx) => (
                 <Menu.Item key={idx}>
