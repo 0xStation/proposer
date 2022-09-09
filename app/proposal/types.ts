@@ -3,7 +3,7 @@ import { Account } from "app/account/types"
 import { ProposalApproval } from "app/proposalApproval/types"
 import { Check } from "@prisma/client"
 import { Rfp } from "app/rfp/types"
-import { AddressType } from "app/types"
+import { AddressType } from "@prisma/client"
 
 export enum ProposalStatus {
   DRAFT = "DRAFT",

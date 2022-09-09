@@ -18,8 +18,6 @@ export const getAddressDetails = async (
   const requests = validChainIds.map((chainId) => getGnosisSafeDetails(chainId, address))
   const responses = await Promise.all(requests)
 
-  console.log("address", address)
-
   for (let i in validChainIds) {
     if (!!responses[i]) {
       return {
