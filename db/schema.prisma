@@ -17,7 +17,7 @@ model Account {
   id                Int                @id @default(autoincrement())
   address           String?            @unique
   discordId         String?            @unique
-  type              AddressType?
+  addressType       AddressType?
   tickets           AccountTerminal[]
   data              Json?
   sessions          Session[]

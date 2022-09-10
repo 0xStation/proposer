@@ -19,6 +19,8 @@ export const getAddressType = async (address): Promise<{ type: AddressType; chai
     }
   }
 
+  // assuming if the address is not a Gnosis Safe on the supported networks, then this is a Personal Wallet
+  // this is a problematic assumption and needs to be improved
   return {
     type: AddressType.WALLET,
     chainId: 0,

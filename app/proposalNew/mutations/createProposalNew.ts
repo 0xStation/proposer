@@ -10,8 +10,11 @@ import truncateString from "app/core/utils/truncateString"
 const CreateProposal = z.object({
   contentTitle: z.string(),
   contentBody: z.string(),
+  // for initial P0 build, frontend is only supporting one contributor
   contributorAddresses: z.string().array(),
+  // for initial P0 build, frontend is only supporting one client
   clientAddresses: z.string().array(),
+  // for initial P0 build, frontend is only supporting one author
   authorAddresses: z.string().array(),
   token: OptionalZodToken,
   paymentAmount: z.string().optional(),

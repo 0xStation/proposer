@@ -20,6 +20,7 @@ export type AccountMetadata = {
   bio?: string
   hasSavedEmail?: boolean
   hasVerifiedEmail?: boolean
+  // for smart contract Accounts (e.g. multisigs), indicate the chainId of the smart contract
   chainId?: number
 }
 
@@ -27,7 +28,7 @@ export type Account = {
   id: number
   address?: string
   discordId?: string
-  type?: AddressType
+  addressType?: AddressType
   data: AccountMetadata
   role?: string
   points?: number
