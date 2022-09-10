@@ -59,13 +59,13 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
   await db.account.createMany({
     skipDuplicates: true, // do not create entries that already exist
     data: addressesMissingAccounts.map((address, i) => {
-      const { type, chainId } = addressClassificationResponses[i]!
+      const { addressType, chainId } = addressClassificationResponses[i]!
       return {
         address,
-        type,
+        addressType,
         data: {
           name: truncateString(address),
-          ...(type !== AddressType.WALLET && { chainId }),
+          ...(addressType !== AddressType.WALLET && { chainId }),
         },
       }
     }),
@@ -109,14 +109,16 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       //         },
       //       ]
       //     :
-      [
-        {
-          milestoneId: 0,
-          recipientAddress: params.contributorAddresses[0],
-          token: params.token,
-          amount: params.paymentAmount,
-        },
-      ],
+      params.paymentAmount && parseFloat(params.paymentAmount) > 0
+        ? [
+            {
+              milestoneId: 0,
+              recipientAddress: params.contributorAddresses[0],
+              token: params.token,
+              amount: params.paymentAmount,
+            },
+          ]
+        : [],
     // : [],
     milestones:
       // params.advancedPaymentPercentage && params.paymentAmount

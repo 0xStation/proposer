@@ -1,14 +1,14 @@
 import db from "db"
 import * as z from "zod"
-import { OptionalZodToken } from "app/types/zod"
+import { ZodToken } from "app/types/zod"
 import { ProposalNewMetadata } from "../types"
 
 const UpdateProposalNew = z.object({
   proposalId: z.string(),
   contentTitle: z.string(),
   contentBody: z.string(),
-  contributorAddress: z.string(),
-  token: OptionalZodToken,
+  contributorAddresses: z.string().array(),
+  token: ZodToken.optional(),
   paymentAmount: z.string().optional(),
   ipfsHash: z.string().optional(),
   ipfsPinSize: z.number().optional(), // ipfs
@@ -67,14 +67,16 @@ export default async function updateProposal(input: z.infer<typeof UpdateProposa
       //         },
       //       ]
       //     :
-      [
-        {
-          milestoneId: 0,
-          recipientAddress: params.contributorAddress,
-          token: params.token,
-          amount: params.paymentAmount,
-        },
-      ],
+      params.paymentAmount && parseFloat(params.paymentAmount) > 0
+        ? [
+            {
+              milestoneId: 0,
+              recipientAddress: params.contributorAddresses[0],
+              token: params.token,
+              amount: params.paymentAmount,
+            },
+          ]
+        : [],
     // : [],
     milestones:
       // params.advancedPaymentPercentage && params.paymentAmount

@@ -34,7 +34,7 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
   let addressType
   let multisigChainId
   if (params.address) {
-    const { type, chainId } = await getAddressType(params.address)
+    const { addressType: type, chainId } = await getAddressType(params.address)
     addressType = type
     multisigChainId = chainId
   }
@@ -43,7 +43,7 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
 
   const payload = {
     address: params.address,
-    type: addressType,
+    addressType,
     data: {
       name: name,
       bio: params.bio,
