@@ -1,7 +1,6 @@
 import StationLogo from "public/station-letters.svg"
 import { useEffect } from "react"
 import { Image, invoke, Routes, useQuery, useParam, useRouter, useSession } from "blitz"
-import { useAccount } from "wagmi"
 import useStore from "../hooks/useStore"
 import truncateString from "../utils/truncateString"
 import { useState } from "react"
@@ -18,7 +17,7 @@ const Navigation = ({ children }: { children?: any }) => {
   const activeUser = useStore((state) => state.activeUser)
   const setActiveUser = useStore((state) => state.setActiveUser)
   const [profileNavDrawerIsOpen, setProfileNavDrawerIsOpen] = useState<boolean>(false)
-  const router = useRouter()
+
   // If the user connects + signs their wallet,
   // set the active user. The active user will be
   // set to `null` if there isn't an existing account.
@@ -32,7 +31,6 @@ const Navigation = ({ children }: { children?: any }) => {
             createSession: true,
           })
           setActiveUser(newUser)
-          router.push(`/profile/complete`)
         } else {
           setActiveUser(account)
         }

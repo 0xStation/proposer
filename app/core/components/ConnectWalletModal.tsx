@@ -19,7 +19,7 @@ const {
   FEATURE: { WALLET_CONNECTION },
 } = TRACKING_EVENTS
 
-const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
+const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen, callback = () => {} }) => {
   const [connectState, setConnectState] = useState<{
     loading: boolean
     success: boolean
@@ -119,6 +119,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
       if (verificationSuccessful) {
         initializeUser(address)
         setConnectState({ error: false, success: true, loading: false })
+        callback()
       } else {
         throw Error("Unsuccessful signature.")
       }

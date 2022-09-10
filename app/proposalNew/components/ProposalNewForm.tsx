@@ -1,4 +1,4 @@
-import { Routes, useRouter, useMutation, useQuery } from "blitz"
+import { Routes, useRouter, useMutation, useQuery, invoke, useSession } from "blitz"
 import { useEffect, useState } from "react"
 import { RadioGroup } from "@headlessui/react"
 import { Field, Form } from "react-final-form"
@@ -22,6 +22,11 @@ import BackArrow from "app/core/icons/BackArrow"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
 import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 import WhenFieldChanges from "app/core/components/WhenFieldChanges"
+import { DateTime } from "luxon"
+import getFormattedDate from "app/utils/getFormattedDate"
+import ImportTokenModal from "app/core/components/ImportTokenModal"
+import getTokensByAccount from "../../token/queries/getTokensByAccount"
+import ConnectWalletModal from "app/core/components/ConnectWalletModal"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -117,6 +122,44 @@ const ProposeForm = () => {
           </div>
         )}
       </Field>
+      {/* START DATE */}
+      <label className="font-bold block mt-6">Start date*</label>
+      <Field name="startDate" validate={requiredField}>
+        {({ input, meta }) => {
+          return (
+            <div>
+              <input
+                {...input}
+                type="datetime-local"
+                min={getFormattedDate({ dateTime: DateTime.local() })}
+                className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
+              />
+              {meta.touched && meta.error && (
+                <span className="text-torch-red text-xs">{meta.error}</span>
+              )}
+            </div>
+          )
+        }}
+      </Field>
+      {/* END DATE */}
+      <label className="font-bold block mt-6">End date*</label>
+      <Field name="endDate" validate={requiredField}>
+        {({ input, meta }) => {
+          return (
+            <div>
+              <input
+                {...input}
+                type="datetime-local"
+                min={getFormattedDate({ dateTime: DateTime.local() })}
+                className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
+              />
+              {meta.touched && meta.error && (
+                <span className="text-torch-red text-xs">{meta.error}</span>
+              )}
+            </div>
+          )
+        }}
+      </Field>
     </>
   )
 }
@@ -128,10 +171,28 @@ const RewardForm = ({
   setSelectedToken,
   tokenOptions,
   formState,
+  setShouldRefetchTokens,
 }) => {
+  const session = useSession({ suspense: false })
   const [needFunding, setNeedFunding] = useState<boolean>(true)
+  const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
+  const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState<boolean>(false)
+
   return (
     <>
+      <ConnectWalletModal
+        isWalletOpen={isConnectWalletModalOpen}
+        setIsWalletOpen={setIsConnectWalletModalOpen}
+        callback={() => {
+          setIsImportTokenModalOpen(true)
+        }}
+      />
+      <ImportTokenModal
+        isOpen={isImportTokenModalOpen}
+        setIsOpen={setIsImportTokenModalOpen}
+        chainId={selectedNetworkId?.toString()}
+        callback={() => setShouldRefetchTokens(true)}
+      />
       <RadioGroup value={needFunding} onChange={setNeedFunding}>
         <RadioGroup.Label className="text-base font-medium text-gray-900">
           Does this proposal need funding?
@@ -208,10 +269,10 @@ const RewardForm = ({
       </RadioGroup>
 
       {/* CONTRIBUTOR */}
-      <label className="font-bold block mt-6">Contributor</label>
+      <label className="font-bold block mt-6">Contributor*</label>
       <span className="text-xs text-concrete block">
-        Who will be responsible for delivering the work outlined in this proposal? Paste your
-        address if this is you.
+        Who will be responsible for delivering the work outlined in this proposal?
+        <p>Paste your address if this is you.</p>
       </span>
       <Field name="contributor">
         {({ meta, input }) => (
@@ -236,6 +297,7 @@ const RewardForm = ({
         Who will be responsible for reviewing and deploying the funds outlined in this proposal? See
         the list of community addresses here.
       </span>
+      {/* TODO for post 8/14/22: add list of community addresses to copy above^ */}
       <Field name="client">
         {({ meta, input }) => (
           <>
@@ -257,7 +319,7 @@ const RewardForm = ({
       {needFunding && (
         <>
           {/* NETWORK */}
-          <label className="font-bold block mt-6">Network</label>
+          <label className="font-bold block mt-6">Network*</label>
           <span className="text-xs text-concrete block">Which network to transact on</span>
           <Field name="network">
             {({ input, meta }) => {
@@ -299,48 +361,66 @@ const RewardForm = ({
           </Field>
           {/* TOKEN */}
           <div className="flex flex-col mt-6">
-            <label className="font-bold block">Reward token</label>
-            <span className="text-xs text-concrete block">Which token to be paid with</span>
-            <Field name="tokenAddress">
-              {({ input, meta }) => {
-                return (
-                  <div className="custom-select-wrapper">
-                    <select
-                      // if network is selected make the token address field required.
-                      required={Boolean(selectedNetworkId)}
-                      {...input}
-                      className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
-                      value={selectedToken?.address as string}
-                      onChange={(e) => {
-                        const selectedToken = tokenOptions.find((token) =>
-                          addressesAreEqual(token.address, e.target.value)
-                        )
-                        setSelectedToken(selectedToken || {})
-                        // custom values can be compatible with react-final-form by calling
-                        // the props.input.onChange callback
-                        // https://final-form.org/docs/react-final-form/api/Field
-                        input.onChange(selectedToken?.address)
-                      }}
-                    >
-                      <option value="">Choose option</option>
-                      {tokenOptions?.map((token) => {
-                        return (
-                          <option key={token.address} value={token.address}>
-                            {token.symbol}
-                          </option>
-                        )
-                      })}
-                    </select>
-                    {meta.touched && meta.error && (
-                      <span className="text-torch-red text-xs">{meta.error}</span>
-                    )}
-                  </div>
-                )
-              }}
-            </Field>
+            <label className="font-bold block">Reward token*</label>
+            <span className="text-xs text-concrete block">
+              Which token to be paid with (pick a network first)
+            </span>
+          </div>
+          <Field name="tokenAddress">
+            {({ input, meta }) => {
+              return (
+                <div className="custom-select-wrapper">
+                  <select
+                    // if network is selected make the token address field required.
+                    required
+                    {...input}
+                    className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                    value={selectedToken?.address as string}
+                    onChange={(e) => {
+                      const selectedToken = tokenOptions.find((token) =>
+                        addressesAreEqual(token.address, e.target.value)
+                      )
+                      setSelectedToken(selectedToken || {})
+                      // custom values can be compatible with react-final-form by calling
+                      // the props.input.onChange callback
+                      // https://final-form.org/docs/react-final-form/api/Field
+                      input.onChange(selectedToken?.address)
+                    }}
+                  >
+                    <option value="">Choose option</option>
+                    {tokenOptions?.map((token) => {
+                      return (
+                        <option key={token.address} value={token.address}>
+                          {token.symbol}
+                        </option>
+                      )
+                    })}
+                  </select>
+                  {meta.touched && meta.error && (
+                    <span className="text-torch-red text-xs">{meta.error}</span>
+                  )}
+                </div>
+              )
+            }}
+          </Field>
+          <div className="flex flex-row justify-between">
+            <span className="text-xs text-concrete block">
+              {" "}
+              Don&apos;t see your token? Import an ERC-20 with its address.
+            </span>
+            <button
+              className="text-electric-violet cursor-pointer flex justify-start"
+              onClick={() =>
+                !session.siwe?.address
+                  ? setIsConnectWalletModalOpen(true)
+                  : setIsImportTokenModalOpen(true)
+              }
+            >
+              + Import
+            </button>
           </div>
           {/* PAYMENT AMOUNT */}
-          <label className="font-bold block mt-6">Payment amount</label>
+          <label className="font-bold block mt-6">Payment*</label>
           <span className="text-xs text-concrete block">
             The funds will be deployed to the one responsible for delivering the work.
           </span>
@@ -355,15 +435,11 @@ const RewardForm = ({
           />
           <Field
             name="paymentAmount"
-            validate={
-              Boolean(selectedNetworkId)
-                ? composeValidators(
-                    requiredField,
-                    isPositiveAmount,
-                    maximumDecimals(selectedToken?.decimals || 0)
-                  )
-                : () => {}
-            }
+            validate={composeValidators(
+              requiredField,
+              isPositiveAmount,
+              maximumDecimals(selectedToken?.decimals || 0)
+            )}
           >
             {({ input, meta }) => {
               return (
@@ -371,7 +447,7 @@ const RewardForm = ({
                   <input
                     {...input}
                     type="text"
-                    className="bg-wet-concrete border border-concrete rounded mt-1 w-full p-2"
+                    className="w-full bg-wet-concrete border border-concrete rounded mt-1 p-2"
                     placeholder="0.00"
                   />
                   {meta.touched && meta.error && (
@@ -516,7 +592,9 @@ export const ProposalNewForm = () => {
   const router = useRouter()
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const activeUser = useStore((state) => state.activeUser)
+  const session = useSession({ suspense: false })
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(0)
+  const [shouldRefetchTokens, setShouldRefetchTokens] = useState<boolean>(false)
   const [selectedToken, setSelectedToken] = useState<any>()
   const [tokenOptions, setTokenOptions] = useState<any[]>()
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
@@ -541,18 +619,30 @@ export const ProposalNewForm = () => {
 
   useEffect(() => {
     // Changing the network changes the token options available to us
-    if (selectedNetworkId) {
+    if (selectedNetworkId || shouldRefetchTokens) {
       const stablecoins = networks[selectedNetworkId]?.stablecoins || []
-      setTokenOptions([ETH_METADATA, ...stablecoins])
+      if (session?.userId) {
+        const fetchAccountTokenOptions = async () => {
+          const tokens = await invoke(getTokensByAccount, {
+            chainId: selectedNetworkId,
+            userId: session?.userId,
+          })
+          setTokenOptions([...tokens, ETH_METADATA, ...stablecoins])
+
+          setShouldRefetchTokens(false)
+        }
+        fetchAccountTokenOptions()
+      } else {
+        setTokenOptions([ETH_METADATA, ...stablecoins])
+      }
       // Setting the selectedToken to an empty obj to reset the
       // selected token on network change.
       setSelectedToken({})
     }
-  }, [selectedNetworkId])
+  }, [selectedNetworkId, shouldRefetchTokens, session?.userId])
 
   const [createProposalMutation] = useMutation(createProposal, {
     onSuccess: (data) => {
-      console.log("proposal created", data)
       setProposal(data)
       setProposalStep(ProposalStep.SIGN)
     },
@@ -611,6 +701,7 @@ export const ProposalNewForm = () => {
                         selectedToken={selectedToken}
                         setSelectedToken={setSelectedToken}
                         formState={formState}
+                        setShouldRefetchTokens={setShouldRefetchTokens}
                       />
                     )}
                     {proposalStep === ProposalStep.SIGN && (
@@ -642,7 +733,7 @@ export const ProposalNewForm = () => {
                       <BackArrow className="fill-marble-white" />
                     </span>
                     {activeUser ? (
-                      <Button isSubmitType={true}>Save</Button>
+                      <Button isSubmitType={true}>Save & continue</Button>
                     ) : (
                       <Button onClick={() => toggleWalletModal(true)}>Connect</Button>
                     )}

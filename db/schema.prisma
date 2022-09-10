@@ -33,6 +33,7 @@ model Account {
   initiatives        AccountInitiative[]
   endorsed           Endorsement[]       @relation("Endorsed")
   emailVerifications EmailVerification[]
+  tokens             AccountToken[]
 }
 
 model EmailVerification {
@@ -72,6 +73,17 @@ model AccountTerminal {
   role        Role?                @relation(fields: [terminalId, roleLocalId], references: [terminalId, localId])
 
   @@id([accountId, terminalId])
+}
+
+model AccountToken {
+  account      Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId    Int
+  token        Token   @relation(fields: [tokenAddress, chainId], references: [address, chainId])
+  tokenAddress String
+  chainId      Int
+  data         Json?
+
+  @@id([accountId, tokenAddress, chainId])
 }
 
 model Tag {
@@ -246,6 +258,25 @@ model ProposalRole {
   proposal   ProposalNew      @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   address    String
   role       ProposalRoleType
+}
+
+model Token {
+  address  String
+  type     TokenType
+  chainId  Int
+  name     String?
+  symbol   String?
+  decimals Int?
+  accounts AccountToken[]
+
+  @@id([address, chainId])
+}
+
+enum TokenType {
+  COIN // Native chain's gas token
+  ERC20
+  ERC721
+  ERC1155
 }
 
 enum FeatureFlagStatus {
