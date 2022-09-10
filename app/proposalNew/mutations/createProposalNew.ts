@@ -71,6 +71,8 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     }),
   })
 
+  const proposalHasPayment = params.paymentAmount && parseFloat(params.paymentAmount) > 0
+
   const { ipfsHash, ipfsPinSize, ipfsTimestamp } = params
   const metadata = {
     content: {
@@ -109,7 +111,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       //         },
       //       ]
       //     :
-      params.paymentAmount && parseFloat(params.paymentAmount) > 0
+      proposalHasPayment
         ? [
             {
               milestoneId: 0,
@@ -133,12 +135,14 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       //       },
       //     ]
       //   :
-      [
-        {
-          id: 0,
-          title: "Payment upon approval",
-        },
-      ],
+      proposalHasPayment
+        ? [
+            {
+              id: 0,
+              title: "Payment upon approval",
+            },
+          ]
+        : [],
     digest: {
       hash: "",
     },
