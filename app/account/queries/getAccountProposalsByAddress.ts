@@ -1,8 +1,6 @@
-import { computeProposalStatus } from "app/proposal/utils"
 import db from "db"
 import * as z from "zod"
-import { Account } from "../types"
-import { AccountProposalExtended } from "app/proposal/types"
+import { AccountProposalWithProposalPreloaded } from "app/proposal/types"
 import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
@@ -41,7 +39,7 @@ export default async function getAccountProposalsByAddress(
               : accountProposal.proposal.status,
         },
       }
-    }) as unknown as AccountProposalExtended[]
+    }) as unknown as AccountProposalWithProposalPreloaded[]
 
   return accountProposalsWithProductStatus
 }

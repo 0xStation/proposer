@@ -35,6 +35,10 @@ export type AccountProposalExtended = AccountProposal & {
   account?: Account
 }
 
+export type AccountProposalWithProposalPreloaded = AccountProposal & {
+  proposal: Proposal
+}
+
 export type Proposal = {
   id: string
   status: ProposalStatus

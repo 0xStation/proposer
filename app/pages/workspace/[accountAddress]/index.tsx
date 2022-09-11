@@ -11,21 +11,25 @@ import {
   PROPOSAL_STATUS_DISPLAY_MAP,
   PAGINATION_TAKE,
   PROPOSAL_STATUSES_FILTER_OPTIONS,
+  PROPOSAL_ROLE_FILTER_OPTIONS,
 } from "app/core/utils/constants"
 import { RfpStatus } from "app/rfp/types"
+import { ProposalRoleType } from "@prisma/client"
 
 const WorkspaceHome: BlitzPage = () => {
   const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<RfpStatus>>(
     new Set<RfpStatus>()
   )
+  const [proposalRoleFilters, setProposalRoleFilters] = useState<Set<ProposalRoleType>>(
+    new Set<ProposalRoleType>()
+  )
+  const [page, setPage] = useState<number>(0)
   const accountAddress = useParam("accountAddress", "string") as string
   const [accountProposals] = useQuery(
     getAccountProposalsByAddress,
     { address: toChecksumAddress(accountAddress) },
     { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
   )
-
-  console.log(accountProposals)
 
   return (
     <Layout>
@@ -42,19 +46,42 @@ const WorkspaceHome: BlitzPage = () => {
         </div>
         <div className="p-10 flex-1">
           <h1 className="text-2xl">Propose</h1>
-          <div className="mt-12 mb-4 border-b border-concrete pb-4">
-            <FilterPill
-              label="status"
-              filterOptions={PROPOSAL_STATUSES_FILTER_OPTIONS.map((rfpStatus) => ({
-                name: PROPOSAL_STATUS_DISPLAY_MAP[rfpStatus]?.copy?.toUpperCase(),
-                value: rfpStatus,
-              }))}
-              appliedFilters={proposalStatusFilters}
-              setAppliedFilters={setProposalStatusFilters}
-              refetchCallback={() => {
-                // setPage(0)
-                // invalidateQuery(getRfpsByTerminalId)
-              }}
+          <div className="mt-12 mb-4 border-b border-concrete pb-4 flex flex-row justify-between">
+            <div className="space-x-2 flex flex-row">
+              <FilterPill
+                label="status"
+                filterOptions={PROPOSAL_STATUSES_FILTER_OPTIONS.map((rfpStatus) => ({
+                  name: PROPOSAL_STATUS_DISPLAY_MAP[rfpStatus]?.copy?.toUpperCase(),
+                  value: rfpStatus,
+                }))}
+                appliedFilters={proposalStatusFilters}
+                setAppliedFilters={setProposalStatusFilters}
+                refetchCallback={() => {
+                  // setPage(0)
+                  // invalidateQuery(getRfpsByTerminalId)
+                }}
+              />
+              <FilterPill
+                label="My role"
+                filterOptions={PROPOSAL_ROLE_FILTER_OPTIONS.map((rfpStatus) => ({
+                  name: rfpStatus.toUpperCase(),
+                  value: rfpStatus,
+                }))}
+                appliedFilters={proposalRoleFilters}
+                setAppliedFilters={setProposalRoleFilters}
+                refetchCallback={() => {
+                  // setPage(0)
+                  // invalidateQuery(getRfpsByTerminalId)
+                }}
+              />
+            </div>
+            <Pagination
+              results={accountProposals as any[]}
+              resultsCount={(accountProposals ? accountProposals.length : 0) as number}
+              page={page}
+              setPage={setPage}
+              resultsLabel="proposals"
+              className="ml-6 sm:ml-0 text-sm self-end"
             />
           </div>
           <table className="w-full">
@@ -70,19 +97,17 @@ const WorkspaceHome: BlitzPage = () => {
             </thead>
             <tbody>
               {accountProposals &&
-                accountProposals.map((ap) => {
+                accountProposals.map((ap, idx) => {
                   return (
-                    <tr className="border-b border-concrete">
-                      <td className="text-xl py-4 font-bold">
-                        {ap?.proposal?.data?.content?.title}
-                      </td>
+                    <tr className="border-b border-concrete" key={`table-row-${idx}`}>
+                      <td className="text-xl py-4 font-bold">{ap.proposal.data.content.title}</td>
                       <td className="py-4">
                         <span className="bg-neon-carrot text-tunnel-black px-2 py-1 rounded-full text-sm uppercase">
-                          {ap?.proposal?.status}
+                          {ap.proposal.status}
                         </span>
                       </td>
                       <td className="text-xl py-4">
-                        {ap?.proposal?.data?.funding.amount} {ap?.proposal?.data?.funding.symbol}
+                        {ap?.proposal?.data?.funding.amount} {ap.proposal.data.funding.symbol}
                       </td>
                       <td className="text-xl py-4">{formatDate(ap.proposal.createdAt)}</td>
                     </tr>

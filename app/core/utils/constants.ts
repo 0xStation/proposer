@@ -3,6 +3,7 @@ import { RfpStatus } from "app/rfp/types"
 import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import networks from "app/utils/networks.json"
 import { TokenType } from "@prisma/client"
+import { ProposalRoleType } from "@prisma/client"
 
 export const CONTRACTS = {
   // Localhost, change to whatever the forge script outputs when running local anvil
@@ -86,6 +87,12 @@ export const PROPOSAL_STATUSES_FILTER_OPTIONS = [
   ProductProposalStatus.SUBMITTED,
   ProductProposalStatus.IN_REVIEW,
   ProductProposalStatus.APPROVED,
+]
+
+export const PROPOSAL_ROLE_FILTER_OPTIONS = [
+  ProposalRoleType.AUTHOR,
+  ProposalRoleType.CLIENT,
+  ProposalRoleType.CONTRIBUTOR,
 ]
 
 export const SENDGRID_TEMPLATES = {
