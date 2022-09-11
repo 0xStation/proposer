@@ -7,7 +7,7 @@ import { Rfp } from "app/rfp/types"
 import { Terminal } from "app/terminal/types"
 import { Checkbook } from "app/checkbook/types"
 import { getEmails } from "app/utils/privy"
-import { AddressType } from "app/types"
+import { AddressType } from "@prisma/client"
 
 const EmailRequest = z.object({
   proposalId: z.string(),

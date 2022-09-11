@@ -1,14 +1,16 @@
 import db from "db"
 import * as z from "zod"
-import { OptionalZodToken } from "app/types/zod"
+import { ZodToken } from "app/types/zod"
 import { ProposalNewMetadata } from "../types"
 
+// CALLOUT: I think this mutation is not fully implemented?
+// It's missing clientAddresses and authorAddresses and doesn't remove/add new roles to the proposal
 const UpdateProposalNew = z.object({
   proposalId: z.string(),
   contentTitle: z.string(),
   contentBody: z.string(),
-  contributorAddress: z.string(),
-  token: OptionalZodToken,
+  contributorAddresses: z.string().array(),
+  token: ZodToken.optional(),
   paymentAmount: z.string().optional(),
   ipfsHash: z.string().optional(),
   ipfsPinSize: z.number().optional(), // ipfs
@@ -29,6 +31,8 @@ export default async function updateProposal(input: z.infer<typeof UpdateProposa
     ipfsPinSize,
     timestamp: ipfsTimestamp,
   }
+
+  const proposalHasPayment = params.paymentAmount && parseFloat(params.paymentAmount) > 0
 
   const proposalMetadata = {
     content: {
@@ -67,14 +71,16 @@ export default async function updateProposal(input: z.infer<typeof UpdateProposa
       //         },
       //       ]
       //     :
-      [
-        {
-          milestoneId: 0,
-          recipientAddress: params.contributorAddress,
-          token: params.token,
-          amount: params.paymentAmount,
-        },
-      ],
+      proposalHasPayment
+        ? [
+            {
+              milestoneId: 0,
+              recipientAddress: params.contributorAddresses[0],
+              token: params.token,
+              amount: params.paymentAmount,
+            },
+          ]
+        : [],
     // : [],
     milestones:
       // params.advancedPaymentPercentage && params.paymentAmount
@@ -89,12 +95,14 @@ export default async function updateProposal(input: z.infer<typeof UpdateProposa
       //       },
       //     ]
       //   :
-      [
-        {
-          id: 0,
-          title: "Payment upon approval",
-        },
-      ],
+      proposalHasPayment
+        ? [
+            {
+              id: 0,
+              title: "Payment upon approval",
+            },
+          ]
+        : [],
     digest: {
       hash: "",
     },

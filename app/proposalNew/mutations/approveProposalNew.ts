@@ -1,5 +1,5 @@
 import * as z from "zod"
-import db from "db"
+import db, { ProposalRoleType } from "db"
 import pinJsonToPinata from "app/utils/pinata"
 import updateProposalNew from "./updateProposalNew"
 
@@ -88,7 +88,9 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       proposalId: params.proposalId,
       contentTitle: proposal?.data?.content?.title,
       contentBody: proposal?.data?.content?.body,
-      contributorAddress: paymentMetadata.recipientAddress,
+      contributorAddresses: proposal.roles
+        .filter((role) => role.role === ProposalRoleType.CONTRIBUTOR)
+        .map((role) => role.address),
       token: paymentMetadata.token,
       paymentAmount: paymentMetadata.amount,
       ipfsHash: ipfsResponse.IpfsHash,
