@@ -7,7 +7,7 @@ import { Token } from "app/token/types"
 export type ProposalPayment = {
   id: string
   milestoneIndex: number // value of 0 indicates upon proposal approval
-  senderAddress?: string
+  senderAddress: string
   recipientAddress: string
   amount?: string
   tokenId?: number

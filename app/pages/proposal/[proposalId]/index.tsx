@@ -18,6 +18,7 @@ import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import MetadataLabel from "app/core/components/MetadataLabel"
 import { LINKS } from "app/core/utils/constants"
+import AccountMediaObject from "app/core/components/AccountMediaObject"
 
 export const IpfsViewComponent = ({ ipfsHash, ipfsTimestamp }) => {
   const date = DateTime.fromISO(ipfsTimestamp)
@@ -76,7 +77,7 @@ const ViewProposalNew: BlitzPage = () => {
 
     return (
       <div className="flex flex-row">
-        <p className="mr-4">{truncateString(role?.address)}</p>
+        <AccountMediaObject account={role?.account} />
         <div className="flex flex-row items-center space-x-1 ml-4">
           <span
             className={`h-2 w-2 rounded-full bg-${

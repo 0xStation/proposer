@@ -6,6 +6,7 @@ import { ProposalNewMetadata } from "../types"
 import { ProposalType } from "db"
 import { getAddressType } from "app/utils/getAddressType"
 import truncateString from "app/core/utils/truncateString"
+import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
 
 const CreateProposal = z.object({
   contentTitle: z.string(),
@@ -37,40 +38,10 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     ...params.clientAddresses,
     ...params.authorAddresses,
   ]
-  const uniqueRoleAddresses = roleAddresses.filter((v, i, addresses) => addresses.indexOf(v) === i)
-  const accounts = await db.account.findMany({
-    where: {
-      address: {
-        in: uniqueRoleAddresses,
-      },
-    },
-  })
-  const addressesMissingAccounts = uniqueRoleAddresses.filter((address) =>
-    accounts.some((account) => account.address !== address)
-  )
-  // with list of missing addresses, determine their AddressType
-  const addressClassificationRequests = addressesMissingAccounts.map((address) =>
-    getAddressType(address)
-  )
-  const addressClassificationResponses = await Promise.all(addressClassificationRequests)
-  // create many Accounts with proper type
-  await db.account.createMany({
-    skipDuplicates: true, // do not create entries that already exist
-    data: addressesMissingAccounts.map((address, i) => {
-      const { addressType, chainId } = addressClassificationResponses[i]!
-      return {
-        address,
-        addressType,
-        data: {
-          name: truncateString(address),
-          ...(addressType !== AddressType.WALLET && { chainId }),
-        },
-      }
-    }),
-  })
+  await createAccountsIfNotExist(roleAddresses)
 
   const { ipfsHash, ipfsPinSize, ipfsTimestamp } = params
-  const metadata = {
+  const proposalMetadata = {
     content: {
       title: params.contentTitle,
       body: params.contentBody,
@@ -85,7 +56,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
   const proposal = await db.proposalNew.create({
     data: {
       type: ProposalType.FUNDING,
-      data: JSON.parse(JSON.stringify(metadata)),
+      data: JSON.parse(JSON.stringify(proposalMetadata)),
       roles: {
         createMany: {
           data: [
