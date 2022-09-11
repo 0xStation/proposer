@@ -283,7 +283,7 @@ model ProposalMilestone {
   index      Int
   data       Json
 
-  payment ProposalPayment[]
+  payments ProposalPayment[]
   @@id([proposalId, index])
 }
 
@@ -293,7 +293,7 @@ model ProposalPayment {
   proposal         ProposalNew       @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   milestoneIndex   Int
   milestone        ProposalMilestone @relation(fields: [proposalId, milestoneIndex], references: [proposalId, index])
-  senderAddress    String?
+  senderAddress    String
   recipientAddress String
   amount           Decimal?          @db.Decimal(78, 18) // 78 decimal places to accomodate solidity uint256 and 18 maximum decimals for industry standard
   tokenId          Decimal?          @db.Decimal(78, 0) // 78 decimal places to accomodate solidity uint256 and 0 decimals because only integers

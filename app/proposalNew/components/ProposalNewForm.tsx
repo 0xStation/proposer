@@ -753,21 +753,20 @@ export const ProposalNewForm = () => {
               throw Error("token not found")
             }
 
-            createProposalMutation({
-              contentTitle: values.title,
-              contentBody: values.body,
-              contributorAddresses: [values.contributor],
-              clientAddresses: [values.client],
-              authorAddresses: [activeUser?.address!],
+            let milestones: any[] = []
+            let payments: any[] = []
+            // if payment details are present, populate milestone and payment objects
+            // supports payment and non-payment proposals
+            if (values.paymentAmount && token && values.client && values.contributor) {
               // for now, assuming a proposal with one payment on completion
               // will change to two-milestone system with Advanced Payment feature
-              milestones: [
+              milestones = [
                 {
                   index: 1,
                   title: "Proposal completion",
                 },
-              ],
-              payments: [
+              ]
+              payments = [
                 {
                   milestoneIndex: 1,
                   senderAddress: values.client,
@@ -775,7 +774,17 @@ export const ProposalNewForm = () => {
                   amount: values.paymentAmount,
                   token: { ...token, chainId: selectedNetworkId },
                 },
-              ],
+              ]
+            }
+
+            createProposalMutation({
+              contentTitle: values.title,
+              contentBody: values.body,
+              contributorAddresses: [values.contributor],
+              clientAddresses: [values.client],
+              authorAddresses: [activeUser!.address!],
+              milestones,
+              payments,
             })
           }}
           render={({ form, handleSubmit }) => {
