@@ -1,3 +1,7 @@
+-- Delete all existing proposals data
+-- Cascades to delete all ProposalRole and ProposalSignature data
+DELETE FROM "ProposalNew";
+
 -- CreateEnum
 CREATE TYPE "AddressType" AS ENUM ('WALLET', 'SAFE', 'CHECKBOOK');
 
