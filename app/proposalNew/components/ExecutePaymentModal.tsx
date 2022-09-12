@@ -100,6 +100,10 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, isLoading, setIsLoading
       if (e.name == "ConnectorNotFoundError") {
         message = "Please reset wallet connection.\n(ConnectorNotFoundError)"
       } else if (e.message.includes("insufficient funds")) {
+        // don't have enough ETH to pay
+        message = "Insufficient wallet balance for payment."
+      } else if (e.message.includes("ERC20: transfer amount exceeds balance")) {
+        // don't have enough ERC20 to pay
         message = "Insufficient wallet balance for payment."
       }
       setToastState({
