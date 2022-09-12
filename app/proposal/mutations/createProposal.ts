@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { AddressType } from "app/types"
+import { AddressType } from "@prisma/client"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 const CreateProposal = z.object({

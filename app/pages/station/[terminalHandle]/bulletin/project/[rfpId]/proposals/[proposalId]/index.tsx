@@ -53,7 +53,7 @@ import DeleteProposalModal from "app/proposal/components/DeleteProposalModal"
 import { ProposalStatus } from "app/proposal/types"
 import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
 import SelectCheckbookModal from "app/checkbook/components/SelectCheckbookModal"
-import { AddressType } from "app/types"
+import { AddressType } from "@prisma/client"
 import { getNetworkName } from "app/core/utils/getNetworkName"
 import Button from "app/core/components/sds/buttons/Button"
 

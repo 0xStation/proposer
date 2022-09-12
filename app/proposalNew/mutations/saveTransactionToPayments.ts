@@ -1,6 +1,6 @@
 import * as z from "zod"
 import db, { ProposalStatus } from "db"
-import { AddressType } from "app/types"
+import { AddressType } from "@prisma/client"
 import { ProposalNewMetadata } from "../types"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 

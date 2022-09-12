@@ -1,4 +1,4 @@
-import { AccountProposal } from "@prisma/client"
+import { AccountProposal, AddressType } from "@prisma/client"
 
 export type AccountMetadata = {
   name: string
@@ -20,12 +20,15 @@ export type AccountMetadata = {
   bio?: string
   hasSavedEmail?: boolean
   hasVerifiedEmail?: boolean
+  // for smart contract Accounts (e.g. multisigs), indicate the chainId of the smart contract
+  chainId?: number
 }
 
 export type Account = {
   id: number
   address?: string
   discordId?: string
+  addressType?: AddressType
   data: AccountMetadata
   role?: string
   points?: number

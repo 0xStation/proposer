@@ -1,5 +1,9 @@
 import * as z from "zod"
 import axios from "axios"
+import { requireEnv } from "./requireEnv"
+
+const pinataApiEndpoint = requireEnv("NEXT_PUBLIC_PINATA_API_ENDPOINT_URL")
+const pinantaJwt = requireEnv("PINATA_JWT")
 
 const PinataRequest = z.object({
   pinataOptions: z.object({ cidVersion: z.number(), wrapWithDirectory: z.boolean().optional() }),
@@ -36,7 +40,7 @@ export const pinJsonToPinata = async (input: z.infer<typeof PinataRequest>) => {
   const config = {
     headers: {
       "Content-Type": `application/json`,
-      Authorization: `Bearer ${process.env.PINATA_JWT}`,
+      Authorization: `Bearer ${pinantaJwt}`,
     },
   }
 
@@ -44,11 +48,7 @@ export const pinJsonToPinata = async (input: z.infer<typeof PinataRequest>) => {
 
   let response
   try {
-    response = await axios.post(
-      process.env.NEXT_PUBLIC_PINATA_API_ENDPOINT_URL as string,
-      body,
-      config
-    )
+    response = await axios.post(pinataApiEndpoint, body, config)
   } catch (err) {
     console.error("Error thrown from pinata via pinJsonToIpfs. Failed with error:", err)
     return null

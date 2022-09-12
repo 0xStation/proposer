@@ -14,10 +14,11 @@ import {
   isPositiveAmount,
   maximumDecimals,
   requiredField,
+  isAddress,
 } from "app/utils/validators"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import truncateString from "app/core/utils/truncateString"
-import { ProposalRoleType } from "@prisma/client"
+import { AddressType, ProposalRoleType } from "@prisma/client"
 import BackArrow from "app/core/icons/BackArrow"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
 import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
@@ -27,6 +28,8 @@ import getFormattedDate from "app/utils/getFormattedDate"
 import ImportTokenModal from "app/core/components/ImportTokenModal"
 import getTokensByAccount from "../../token/queries/getTokensByAccount"
 import ConnectWalletModal from "app/core/components/ConnectWalletModal"
+import { isAddress as ethersIsAddress } from "@ethersproject/address"
+import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -178,6 +181,46 @@ const RewardForm = ({
   const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
   const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState<boolean>(false)
 
+  const [contributorAddressType, setContributorAddressType] = useState<AddressType>()
+  const [clientAddressType, setClientAddressType] = useState<AddressType>()
+
+  useEffect(() => {
+    const address = formState.values.contributor
+    if (selectedNetworkId !== 0 && ethersIsAddress(address)) {
+      // fetch address type
+      getGnosisSafeDetails(selectedNetworkId, address).then((data) => {
+        if (data === null) {
+          // no gnosis safe
+          setContributorAddressType(AddressType.WALLET)
+        } else {
+          // not null return => safe exists
+          setContributorAddressType(AddressType.SAFE)
+        }
+      })
+    } else {
+      // reset state
+      if (!!contributorAddressType) setContributorAddressType(undefined)
+    }
+  }, [selectedNetworkId, formState.values.contributor])
+
+  useEffect(() => {
+    const address = formState.values.client
+    if (selectedNetworkId !== 0 && ethersIsAddress(address)) {
+      // fetch address type
+      getGnosisSafeDetails(selectedNetworkId, address).then((data) => {
+        if (data === null) {
+          // no gnosis safe
+          setClientAddressType(AddressType.WALLET)
+        } else {
+          // not null return => safe exists
+          setClientAddressType(AddressType.SAFE)
+        }
+      })
+    } else {
+      // reset state
+      if (!!clientAddressType) setClientAddressType(undefined)
+    }
+  }, [selectedNetworkId, formState.values.client])
   return (
     <>
       <ConnectWalletModal
@@ -270,13 +313,53 @@ const RewardForm = ({
         </div>
       </RadioGroup>
 
+      {/* NETWORK */}
+      <label className="font-bold block mt-6">Network</label>
+      <span className="text-xs text-concrete block">Which network to transact on</span>
+      <Field name="network" validate={requiredField}>
+        {({ input, meta }) => {
+          return (
+            <div className="custom-select-wrapper">
+              <select
+                {...input}
+                required={Boolean(formState.values.paymentAmount || formState.values.tokenAddress)}
+                className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
+                value={selectedNetworkId as number}
+                onChange={(e) => {
+                  const network = SUPPORTED_CHAINS.find(
+                    (chain) => chain.id === parseInt(e.target.value)
+                  )
+                  setSelectedNetworkId(network?.id as number)
+                  // custom values can be compatible with react-final-form by calling
+                  // the props.input.onChange callback
+                  // https://final-form.org/docs/react-final-form/api/Field
+                  input.onChange(network?.id)
+                }}
+              >
+                <option value="">Choose option</option>
+                {SUPPORTED_CHAINS?.map((chain, idx) => {
+                  return (
+                    <option key={chain.id} value={chain.id}>
+                      {chain.name}
+                    </option>
+                  )
+                })}
+              </select>
+              {meta.touched && meta.error && (
+                <span className="text-torch-red text-xs">{meta.error}</span>
+              )}
+            </div>
+          )
+        }}
+      </Field>
+
       {/* CONTRIBUTOR */}
       <label className="font-bold block mt-6">Contributor*</label>
       <span className="text-xs text-concrete block">
         Who will be responsible for delivering the work outlined in this proposal?
         <p>Paste your address if this is you.</p>
       </span>
-      <Field name="contributor">
+      <Field name="contributor" validate={composeValidators(requiredField, isAddress)}>
         {({ meta, input }) => (
           <>
             <input
@@ -290,6 +373,25 @@ const RewardForm = ({
             {meta.touched && meta.error && (
               <span className="text-torch-red text-xs">{meta.error}</span>
             )}
+            {/* user feedback on address type of input */}
+            {!meta.error && input.value && !!contributorAddressType && (
+              <>
+                <span className=" text-xs text-marble-white ml-2 mt-2 block">
+                  The address inserted is a{" "}
+                  {contributorAddressType === AddressType.WALLET ? (
+                    <>
+                      <span className="font-bold">personal wallet</span>. If it is a{" "}
+                      <span className="font-bold">smart contract</span>, please insert a new address
+                      or change your network.
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-bold">Gnosis Safe</span>.
+                    </>
+                  )}
+                </span>
+              </>
+            )}
           </>
         )}
       </Field>
@@ -299,8 +401,7 @@ const RewardForm = ({
         Who will be responsible for reviewing and deploying the funds outlined in this proposal? See
         the list of community addresses here.
       </span>
-      {/* TODO for post 8/14/22: add list of community addresses to copy above^ */}
-      <Field name="client">
+      <Field name="client" validate={composeValidators(requiredField, isAddress)}>
         {({ meta, input }) => (
           <>
             <input
@@ -313,6 +414,25 @@ const RewardForm = ({
 
             {meta.touched && meta.error && (
               <span className="text-torch-red text-xs">{meta.error}</span>
+            )}
+            {/* user feedback on address type of input */}
+            {!meta.error && input.value && !!clientAddressType && (
+              <>
+                <span className=" text-xs text-marble-white ml-2 mt-2 block">
+                  The address inserted is a{" "}
+                  {clientAddressType === AddressType.WALLET ? (
+                    <>
+                      <span className="font-bold">personal wallet</span>. If it is a{" "}
+                      <span className="font-bold">smart contract</span>, please insert a new address
+                      or change your network.
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-bold">Gnosis Safe</span>.
+                    </>
+                  )}
+                </span>
+              </>
             )}
           </>
         )}
@@ -440,7 +560,7 @@ const RewardForm = ({
             validate={composeValidators(
               requiredField,
               isPositiveAmount,
-              maximumDecimals(selectedToken?.decimals || 0)
+              maximumDecimals(selectedToken?.decimals || 2)
             )}
           >
             {({ input, meta }) => {
@@ -675,9 +795,9 @@ export const ProposalNewForm = () => {
             createProposalMutation({
               contentTitle: values.title,
               contentBody: values.body,
-              contributorAddress: values.contributor,
-              clientAddress: values.client,
-              authorAddresses: [activeUser!.address!],
+              contributorAddresses: [values.contributor],
+              clientAddresses: [values.client],
+              authorAddresses: [activeUser?.address!],
               token: { ...token, chainId: selectedNetworkId },
               paymentAmount: values.paymentAmount,
               // paymentTermType: values.paymentTermType,
