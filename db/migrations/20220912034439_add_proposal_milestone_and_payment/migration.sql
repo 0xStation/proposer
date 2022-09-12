@@ -1,3 +1,7 @@
+-- Delete all existing proposals
+-- Cascades to delete all ProposalRole and ProposalSignature data
+DELETE FROM "ProposalNew";
+
 -- CreateTable
 CREATE TABLE "ProposalMilestone" (
     "proposalId" TEXT NOT NULL,
