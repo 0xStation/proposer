@@ -61,6 +61,7 @@
     "react-dom": "17.0.2",
     "react-dropzone": "11.5.1",
     "react-final-form": "6.5.7",
+    "react-final-form-listeners": "1.0.3",
     "react-select": "5.2.2",
     "remarkable": "2.0.1",
     "siwe": "1.1.6",

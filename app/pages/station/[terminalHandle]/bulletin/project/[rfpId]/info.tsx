@@ -26,7 +26,7 @@ import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 import getRfpApprovedProposalFunding from "app/rfp/queries/getRfpApprovedFunding"
 import { ZERO_ADDRESS, TRACKING_EVENTS } from "app/core/utils/constants"
 import getCheckbook from "app/checkbook/queries/getCheckbook"
-import { AddressType } from "app/types"
+import { AddressType } from "@prisma/client"
 import { getNetworkName } from "app/core/utils/getNetworkName"
 
 const {

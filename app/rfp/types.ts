@@ -2,7 +2,7 @@ import { Account } from "app/account/types"
 import { Checkbook } from "app/checkbook/types"
 import { Signature } from "app/signatures/types"
 import { TagTokenMetadata } from "app/tag/types"
-import { AddressType } from "app/types"
+import { AddressType } from "@prisma/client"
 
 // note that these statuses are different than those in the database enum
 // our RFP queries/mutations translate between the two via functions in ./utils.ts

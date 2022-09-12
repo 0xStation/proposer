@@ -27,7 +27,6 @@ import {
   composeValidators,
   isPositiveAmount,
   requiredField,
-  isAfterStartDate,
   maximumDecimals,
 } from "app/utils/validators"
 import { genRfpSignatureMessage } from "app/signatures/rfp"

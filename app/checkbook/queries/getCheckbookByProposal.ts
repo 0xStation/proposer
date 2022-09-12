@@ -1,5 +1,5 @@
 import { ProposalMetadata } from "app/proposal/types"
-import { AddressType } from "app/types"
+import { AddressType } from "@prisma/client"
 import db from "db"
 import * as z from "zod"
 import { Checkbook } from "../types"

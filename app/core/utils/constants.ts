@@ -210,6 +210,8 @@ export const LINKS = {
   HELP_DESK: "https://6vdcjqzyfj3.typeform.com/to/F0QFs9aC",
   NEWSTAND: "https://station.mirror.xyz/",
   LEGAL: "https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176",
+  TYPEFORM_WAITLIST: "https://6vdcjqzyfj3.typeform.com/to/G3LN1FlM",
+  PINATA_BASE_URL: "https://gateway.pinata.cloud/ipfs/", // TODO: change to use Station gateway
 }
 
 // 1 - eth
