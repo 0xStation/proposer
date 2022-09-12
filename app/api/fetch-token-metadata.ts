@@ -30,6 +30,17 @@ export default async function handler(req, res) {
     res.status(500).json({ response: "error", message: "missing required parameter" })
   }
 
+  // Fetchable data:
+  // ERC20:
+  //   - name
+  //   - symbol
+  //   - decimals
+  // ERC721:
+  //   - name
+  //   - symbol
+  //   - supportsInterface -> returns true if provide a unique bytes4 that represents the ERC721 id
+  // ERC1155:
+  //   - supportsInterface -> returns true if provide a unique bytes4 that represents the ERC1155 id
   const nameAbi = "function name() view returns (string name)"
   const symbolAbi = "function symbol() view returns (string symbol)"
   const decimalsAbi = "function decimals() view returns (uint8 decimals)"
@@ -55,7 +66,22 @@ export default async function handler(req, res) {
       ])
       decimals = decimalsRequest[0]?.decimals
     } catch (e) {
-      // no decimals found on token, not an ERC20
+      console.warn(e)
+      // no decimals found on token, silently fail because its not an ERC20
+      // so move on to next function call
+    }
+
+    if (decimals) {
+      // address is an ERC20, return early
+      return res.status(200).json({
+        response: "success",
+        data: {
+          name,
+          symbol,
+          decimals,
+          type: TokenType.ERC20,
+        } as TokenMetadataResponse,
+      })
     }
 
     try {
@@ -89,19 +115,13 @@ export default async function handler(req, res) {
           : tokenType[2].value || tokenType[3].value
           ? TokenType.ERC1155
           : TokenType.ERC20
-    } catch {
+    } catch (err) {
       // token is not ERC721 or ERC1155
-
-      // if decimals is null still, then token is also not an ERC20 so throw error to return "no token found"
-      if (decimals === null) {
-        throw Error("no token found")
-      }
-
-      // default to ERC20 otherwise
-      type = TokenType.ERC20
+      console.error(err)
+      throw Error("No token found.")
     }
   } catch {
-    res.status(404).json({ response: "failure", message: "no token found" })
+    res.status(404).json({ response: "failure", message: "No token found." })
     return
   }
 

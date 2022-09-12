@@ -10,7 +10,7 @@ const UpdateProposalNew = z.object({
   contentTitle: z.string(),
   contentBody: z.string(),
   contributorAddresses: z.string().array(),
-  token: ZodToken.optional(),
+  token: ZodToken.partial().optional(),
   paymentAmount: z.string().optional(),
   ipfsHash: z.string().optional(),
   ipfsPinSize: z.number().optional(), // ipfs

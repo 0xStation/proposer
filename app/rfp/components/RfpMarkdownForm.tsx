@@ -41,6 +41,7 @@ import getGroupedTagsByTerminalId from "app/tag/queries/getGroupedTagsByTerminal
 import { Tag } from "app/tag/types"
 import Button from "app/core/components/sds/buttons/Button"
 import { ButtonType } from "app/core/components/sds/buttons/Button"
+import getFormattedDateForMinDateInput from "app/utils/getFormattedDateForMinDateInput"
 
 const {
   PAGE_NAME,
@@ -52,15 +53,6 @@ const { ETH, USDC } = TOKEN_SYMBOLS
 enum RfpFormTab {
   General = "GENERAL",
   Permissions = "PERMISSIONS",
-}
-
-const getFormattedDate = ({ dateTime }: { dateTime: DateTime }) => {
-  const isoDate = DateTime.fromISO(dateTime.toString())
-
-  // min date input value needs to match the pattern nnnn-nn-nnTnn:nn
-  // but isoDate.toString() returns nnnn-nn-nnTnn:nn:nn.nnn-nn:00
-  // so we are slicing off the offset
-  return isoDate.toString().slice(0, -13)
 }
 
 const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean; rfp?: Rfp }) => {
@@ -235,9 +227,13 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
             ? {
                 title: title,
                 markdown: markdown,
-                startDate: getFormattedDate({ dateTime: DateTime.fromJSDate(rfp.startDate) }),
+                startDate: getFormattedDateForMinDateInput({
+                  dateTime: DateTime.fromJSDate(rfp.startDate),
+                }),
                 endDate: rfp?.endDate
-                  ? getFormattedDate({ dateTime: DateTime.fromJSDate(rfp?.endDate as Date) })
+                  ? getFormattedDateForMinDateInput({
+                      dateTime: DateTime.fromJSDate(rfp?.endDate as Date),
+                    })
                   : undefined,
                 fundingTokenSymbol: rfp?.data?.funding?.token?.symbol,
                 budgetAmount: rfp?.data?.funding?.budgetAmount,
@@ -601,7 +597,9 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                                   <input
                                     {...input}
                                     type="datetime-local"
-                                    min={getFormattedDate({ dateTime: DateTime.local() })}
+                                    min={getFormattedDateForMinDateInput({
+                                      dateTime: DateTime.local(),
+                                    })}
                                     className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
                                   />
                                   {(meta.touched || attemptedSubmit) && meta.error && (
@@ -623,10 +621,10 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                                     type="datetime-local"
                                     min={
                                       formState.values.startDate
-                                        ? getFormattedDate({
+                                        ? getFormattedDateForMinDateInput({
                                             dateTime: DateTime.fromISO(formState.values.startDate),
                                           })
-                                        : getFormattedDate({
+                                        : getFormattedDateForMinDateInput({
                                             dateTime: DateTime.local(),
                                           })
                                     }

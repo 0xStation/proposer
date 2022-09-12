@@ -1,7 +1,7 @@
 import db, { AddressType, ProposalRoleType } from "db"
 import * as z from "zod"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
-import { OptionalZodToken } from "app/types/zod"
+import { ZodToken } from "app/types/zod"
 import { ProposalNewMetadata } from "../types"
 import { ProposalType } from "db"
 import { getAddressType } from "app/utils/getAddressType"
@@ -16,7 +16,7 @@ const CreateProposal = z.object({
   clientAddresses: z.string().array(),
   // for initial P0 build, frontend is only supporting one author
   authorAddresses: z.string().array(),
-  token: OptionalZodToken,
+  token: ZodToken.partial(),
   paymentAmount: z.string().optional(),
   ipfsHash: z.string().optional(),
   ipfsPinSize: z.number().optional(), // ipfs
