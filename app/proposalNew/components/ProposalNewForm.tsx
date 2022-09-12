@@ -90,7 +90,7 @@ const ProposeForm = () => {
   return (
     <>
       {/* TITLE */}
-      <label className="font-bold block mt-6">Subject*</label>
+      <label className="font-bold block mt-6">Title*</label>
       <Field name="title" validate={requiredField}>
         {({ meta, input }) => (
           <>
