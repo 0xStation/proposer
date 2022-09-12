@@ -221,6 +221,7 @@ const RewardForm = ({
       if (!!clientAddressType) setClientAddressType(undefined)
     }
   }, [selectedNetworkId, formState.values.client])
+
   return (
     <>
       <ConnectWalletModal
@@ -520,7 +521,7 @@ const RewardForm = ({
             validate={composeValidators(
               requiredField,
               isPositiveAmount,
-              maximumDecimals(selectedToken?.decimals || 2)
+              maximumDecimals(selectedToken?.decimals)
             )}
           >
             {({ input, meta }) => {

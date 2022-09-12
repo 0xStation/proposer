@@ -101,17 +101,18 @@ export const ImportTokenModal = ({
 
               try {
                 const newTokens = await createAndConnectTokenToAccountMutation({
-                  tokenType: TokenType.ERC20,
-                  tokenAddress: values?.tokenAddress,
+                  type: tokenMetadata.type as TokenType,
+                  address: values?.tokenAddress,
                   chainId: parseInt(values.chainId),
-                  tokenName: tokenMetadata?.name,
-                  tokenSymbol: tokenMetadata?.symbol,
+                  name: tokenMetadata?.name,
+                  symbol: tokenMetadata?.symbol,
+                  decimals: tokenMetadata?.decimals,
                 })
                 if (newTokens) {
                   setToastState({
                     isToastShowing: true,
                     type: "success",
-                    message: "Successfully imported your token",
+                    message: `Successfully imported your token ${tokenMetadata?.symbol}`,
                   })
                   callback()
                 }

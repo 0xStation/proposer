@@ -1,22 +1,23 @@
 import db, { TokenType } from "db"
 import { Ctx } from "blitz"
 import { z } from "zod"
+import { ZodToken } from "app/types/zod"
 
-const TokenAndAccountData = z.object({
-  tokenAddress: z.string(),
-  tokenType: z.string(),
-  chainId: z.number(),
-  tokenName: z.string().optional(),
-  tokenSymbol: z.string().optional(),
-  decimals: z.number().optional(),
-})
+const TokenAndAccountData = ZodToken
 
 export const createAndConnectTokenToAccount = async (
   input: z.infer<typeof TokenAndAccountData>,
   ctx: Ctx
 ) => {
   const data = TokenAndAccountData.parse(input)
-  const { tokenAddress, tokenType, chainId, tokenName, tokenSymbol, decimals } = data
+  const {
+    address: tokenAddress,
+    type: tokenType,
+    chainId,
+    name: tokenName,
+    symbol: tokenSymbol,
+    decimals,
+  } = data
   try {
     const payload = {
       address: tokenAddress,
