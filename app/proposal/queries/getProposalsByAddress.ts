@@ -11,7 +11,6 @@ const GetProposalsByAddress = z.object({
 
 export default async function getProposalsByAddress(input: z.infer<typeof GetProposalsByAddress>) {
   const data = GetProposalsByAddress.parse(input)
-  console.log(data.statuses)
 
   const proposals = (await db.proposal.findMany({
     where: {
@@ -20,9 +19,9 @@ export default async function getProposalsByAddress(input: z.infer<typeof GetPro
           address: data.address,
         },
       },
-      status: {
-        in: data.statuses,
-      },
+      // status: {
+      //   in: data.statuses,
+      // },
     },
   })) as unknown as Proposal[]
 
