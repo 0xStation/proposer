@@ -9,7 +9,17 @@ import { useState } from "react"
 import { TokenType } from "app/proposalNew/types"
 import { composeValidators, isAddress, requiredField } from "app/utils/validators"
 
-export const ImportTokenModal = ({ isOpen, setIsOpen, chainId = "", callback = () => {} }) => {
+export const ImportTokenModal = ({
+  isOpen,
+  setIsOpen,
+  chainId = "",
+  callback = () => {},
+}: {
+  isOpen: boolean
+  setIsOpen: (open) => void
+  chainId?: string
+  callback?: () => void
+}) => {
   const session = useSession()
   const setToastState = useStore((state) => state.setToastState)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
@@ -160,7 +170,7 @@ export const ImportTokenModal = ({ isOpen, setIsOpen, chainId = "", callback = (
                               })}
                             </select>
                             {meta.touched && meta.error && (
-                              <span className="text-torch-red text-xs">{meta.error}</span>
+                              <span className="text-torch-red text-xs mt-1">{meta.error}</span>
                             )}
                           </div>
                         )
@@ -183,7 +193,7 @@ export const ImportTokenModal = ({ isOpen, setIsOpen, chainId = "", callback = (
                           />
 
                           {meta.touched && meta.error && (
-                            <span className="text-torch-red text-xs">{meta.error}</span>
+                            <span className="text-torch-red text-xs mt-1">{meta.error}</span>
                           )}
                         </>
                       )}

@@ -24,7 +24,7 @@ import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalN
 import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 import WhenFieldChanges from "app/core/components/WhenFieldChanges"
 import { DateTime } from "luxon"
-import getFormattedDate from "app/utils/getFormattedDate"
+import getFormattedDateForMinDateInput from "app/utils/getFormattedDateForMinDateInput"
 import ImportTokenModal from "app/core/components/ImportTokenModal"
 import getTokensByAccount from "../../token/queries/getTokensByAccount"
 import ConnectWalletModal from "app/core/components/ConnectWalletModal"
@@ -134,7 +134,7 @@ const ProposeForm = () => {
               <input
                 {...input}
                 type="datetime-local"
-                min={getFormattedDate({ dateTime: DateTime.local() })}
+                min={getFormattedDateForMinDateInput({ dateTime: DateTime.local() })}
                 className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
               />
               {meta.touched && meta.error && (
@@ -153,7 +153,7 @@ const ProposeForm = () => {
               <input
                 {...input}
                 type="datetime-local"
-                min={getFormattedDate({ dateTime: DateTime.local() })}
+                min={getFormattedDateForMinDateInput({ dateTime: DateTime.local() })}
                 className="bg-wet-concrete border border-concrete rounded p-1 mt-1 w-full"
               />
               {meta.touched && meta.error && (
@@ -440,47 +440,6 @@ const RewardForm = ({
 
       {needFunding && (
         <>
-          {/* NETWORK */}
-          <label className="font-bold block mt-6">Network*</label>
-          <span className="text-xs text-concrete block">Which network to transact on</span>
-          <Field name="network">
-            {({ input, meta }) => {
-              return (
-                <div className="custom-select-wrapper">
-                  <select
-                    {...input}
-                    required={Boolean(
-                      formState.values.paymentAmount || formState.values.tokenAddress
-                    )}
-                    className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
-                    value={selectedNetworkId as number}
-                    onChange={(e) => {
-                      const network = SUPPORTED_CHAINS.find(
-                        (chain) => chain.id === parseInt(e.target.value)
-                      )
-                      setSelectedNetworkId(network?.id as number)
-                      // custom values can be compatible with react-final-form by calling
-                      // the props.input.onChange callback
-                      // https://final-form.org/docs/react-final-form/api/Field
-                      input.onChange(network?.id)
-                    }}
-                  >
-                    <option value="">Choose option</option>
-                    {SUPPORTED_CHAINS?.map((chain, idx) => {
-                      return (
-                        <option key={chain.id} value={chain.id}>
-                          {chain.name}
-                        </option>
-                      )
-                    })}
-                  </select>
-                  {meta.touched && meta.error && (
-                    <span className="text-torch-red text-xs">{meta.error}</span>
-                  )}
-                </div>
-              )
-            }}
-          </Field>
           {/* TOKEN */}
           <div className="flex flex-col mt-6">
             <label className="font-bold block">Reward token*</label>
@@ -532,11 +491,12 @@ const RewardForm = ({
             </span>
             <button
               className="text-electric-violet cursor-pointer flex justify-start"
-              onClick={() =>
-                !session.siwe?.address
+              onClick={(e) => {
+                e.preventDefault()
+                return !session.siwe?.address
                   ? setIsConnectWalletModalOpen(true)
                   : setIsImportTokenModalOpen(true)
-              }
+              }}
             >
               + Import
             </button>
