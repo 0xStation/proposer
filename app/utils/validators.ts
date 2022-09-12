@@ -79,6 +79,42 @@ export const isPositiveAmount = (amount: number) => {
   return "Amount must be a number greater than or equal to zero."
 }
 
+export const isValidTokenAmount = (decimals: number) => {
+  return (preFormatAmount: string) => {
+    const amount = ((preFormatAmount || "").match(/([0-9]+\.?[0-9]*|\.[0-9]+)/) || [""])[0]
+    if (!amount) return undefined
+
+    if (amount.includes("-")) return "Only positive numbers allowed"
+
+    const decimalSplit = amount.split(".")
+    if (decimalSplit.length > 2) return "Only one decimal allowed"
+
+    let leftOfDecimal
+    let rightOfDecimal
+    if (decimalSplit.length > 0) {
+      leftOfDecimal = decimalSplit[0]!
+      rightOfDecimal = decimalSplit[1] || ""
+    } else {
+      leftOfDecimal = amount
+      rightOfDecimal = ""
+    }
+
+    if (rightOfDecimal.length > decimals) return `Cannot have more than ${decimals} decimal places.`
+    if (rightOfDecimal.includes(",")) return "No commas after decimal"
+
+    const commaSplit = leftOfDecimal.split(",")
+    if (!commaSplit.every((s, i) => i === 0 || s.length === 3)) return "Invalid comma spacing"
+
+    const nonDigits = /\D/g
+    if ((amount.match(nonDigits)?.filter((s) => s !== "." && s !== ",") || []).length > 0)
+      return "Only postive numbers allowed"
+
+    if (parseFloat(amount) * 10 ** decimals > 2 ** 256 - 1) return "Number exceeds max size"
+
+    return undefined
+  }
+}
+
 export const isAfterStartDate = (_endDate, values) => {
   if (!values.startDate || !values.endDate) return undefined
   const start = new Date(values.startDate)

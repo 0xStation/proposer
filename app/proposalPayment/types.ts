@@ -9,12 +9,12 @@ export type ProposalPayment = {
   milestoneIndex: number // value of 0 indicates upon proposal approval
   senderAddress: string
   recipientAddress: string
-  amount?: string
+  amount?: number
   tokenId?: number
   transactionHash?: string // filled in after execution
-  data: ProposalPaymentMetadataa
+  data: ProposalPaymentMetadata
 }
 
-export type ProposalPaymentMetadataa = {
+export type ProposalPaymentMetadata = {
   token: Token
 }

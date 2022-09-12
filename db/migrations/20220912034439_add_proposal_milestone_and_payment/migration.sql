@@ -14,8 +14,8 @@ CREATE TABLE "ProposalPayment" (
     "milestoneIndex" INTEGER NOT NULL,
     "senderAddress" TEXT NOT NULL,
     "recipientAddress" TEXT NOT NULL,
-    "amount" DECIMAL(78,18),
-    "tokenId" DECIMAL(78,0),
+    "amount" DOUBLE PRECISION,
+    "tokenId" DOUBLE PRECISION,
     "transactionHash" TEXT,
     "data" JSONB NOT NULL,
 

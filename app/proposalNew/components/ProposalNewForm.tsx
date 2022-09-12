@@ -11,10 +11,9 @@ import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { CheckCircleIcon } from "@heroicons/react/solid"
 import {
   composeValidators,
-  isPositiveAmount,
-  maximumDecimals,
   requiredField,
   isAddress,
+  isValidTokenAmount,
 } from "app/utils/validators"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import truncateString from "app/core/utils/truncateString"
@@ -518,11 +517,15 @@ const RewardForm = ({
           />
           <Field
             name="paymentAmount"
-            validate={composeValidators(
-              requiredField,
-              isPositiveAmount,
-              maximumDecimals(selectedToken?.decimals)
-            )}
+            format={(value: string) =>
+              // regex on floats and only keep the first match i.e. throw away non-decimal characters
+              ((value || "").match(/([0-9]+\.?[0-9]*|\.[0-9]+)/) || [""])[0]
+            }
+            validate={
+              Boolean(selectedToken?.address)
+                ? composeValidators(requiredField, isValidTokenAmount(selectedToken?.decimals || 0))
+                : () => {}
+            }
           >
             {({ input, meta }) => {
               return (
@@ -771,7 +774,7 @@ export const ProposalNewForm = () => {
                   milestoneIndex: 1,
                   senderAddress: values.client,
                   recipientAddress: values.contributor,
-                  amount: values.paymentAmount,
+                  amount: parseFloat(values.paymentAmount),
                   token: { ...token, chainId: selectedNetworkId },
                 },
               ]

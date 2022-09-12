@@ -28,7 +28,7 @@ export const ZodMilestone = z.object({
 export const ZodPayment = z.object({
   senderAddress: z.string(),
   recipientAddress: z.string(),
-  amount: z.string().optional(),
+  amount: z.number().optional(),
   tokenId: z.number().optional(),
   milestoneIndex: z.number(),
   token: ZodToken,

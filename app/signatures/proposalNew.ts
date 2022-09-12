@@ -1,8 +1,5 @@
-import { toUtf8Bytes } from "@ethersproject/strings"
-import { keccak256 } from "@ethersproject/keccak256"
-import { BigNumber } from "@ethersproject/bignumber"
 import { ProposalNew } from "app/proposalNew/types"
-import { parseUnits } from "@ethersproject/units"
+import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 
 export const genProposalNewDigest = (proposal: ProposalNew) => {
   return {
@@ -56,7 +53,7 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
           recipientAddress: payment.recipientAddress,
           chainId: payment.data.token.chainId,
           tokenAddress: payment.data.token.address,
-          amount: parseUnits(payment.amount!, payment.data.token.decimals),
+          amount: decimalToBigNumber(payment.amount!, payment.data.token.decimals || 0),
         }
       }),
     },
