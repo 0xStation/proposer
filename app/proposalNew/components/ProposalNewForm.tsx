@@ -29,6 +29,7 @@ import getTokensByAccount from "../../token/queries/getTokensByAccount"
 import ConnectWalletModal from "app/core/components/ConnectWalletModal"
 import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
+import { formatTokenAmount } from "app/utils/formatters"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -517,10 +518,7 @@ const RewardForm = ({
           />
           <Field
             name="paymentAmount"
-            format={(value: string) =>
-              // regex on floats and only keep the first match i.e. throw away non-decimal characters
-              ((value || "").match(/([0-9]+\.?[0-9]*|\.[0-9]+)/) || [""])[0]
-            }
+            format={formatTokenAmount}
             validate={
               Boolean(selectedToken?.address)
                 ? composeValidators(requiredField, isValidTokenAmount(selectedToken?.decimals || 0))

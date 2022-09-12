@@ -1,6 +1,7 @@
 import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import isURL from "validator/lib/isURL"
 import isEmail from "validator/lib/isEmail"
+import { formatTokenAmount } from "./formatters"
 
 // reducer that takes in an array of validators (functions) and returns the appropriate error
 // useful if you have a form field that has a few different validations (required field, must be number, etc)
@@ -81,7 +82,7 @@ export const isPositiveAmount = (amount: number) => {
 
 export const isValidTokenAmount = (decimals: number) => {
   return (preFormatAmount: string) => {
-    const amount = ((preFormatAmount || "").match(/([0-9]+\.?[0-9]*|\.[0-9]+)/) || [""])[0]
+    const amount = formatTokenAmount(preFormatAmount)
     if (!amount) return undefined
 
     if (amount.includes("-")) return "Only positive numbers allowed"
