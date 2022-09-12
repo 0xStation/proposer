@@ -4,7 +4,8 @@ import { multicall } from "app/utils/rpcMulticall"
 
 export type TokenMetadataResponse = {
   name: string
-  symbol: string
+  symbol?: string
+  decimals?: number
   type: TokenType
 }
 
@@ -31,11 +32,13 @@ export default async function handler(req, res) {
 
   const nameAbi = "function name() view returns (string name)"
   const symbolAbi = "function symbol() view returns (string symbol)"
+  const decimalsAbi = "function decimals() view returns (uint8 decimals)"
   const supportsInterfaceAbi = "function supportsInterface(bytes4) view returns (bool value)"
-  const abi = [nameAbi, symbolAbi, supportsInterfaceAbi]
+  const abi = [nameAbi, symbolAbi, decimalsAbi, supportsInterfaceAbi]
 
   let name
   let symbol
+  let decimals
   let type
   try {
     const metadata = await multicall(params.chainId.toString(), abi, [
@@ -45,6 +48,15 @@ export default async function handler(req, res) {
 
     name = metadata[0]?.name
     symbol = metadata[1]?.symbol
+
+    try {
+      const decimalsRequest = await multicall(params.chainId.toString(), abi, [
+        { targetAddress: params.address, functionSignature: "decimals", callParameters: [] },
+      ])
+      decimals = decimalsRequest[0]?.decimals
+    } catch (e) {
+      // no decimals found on token, not an ERC20
+    }
 
     try {
       const tokenType = await multicall(params.chainId.toString(), abi, [
@@ -78,6 +90,13 @@ export default async function handler(req, res) {
           ? TokenType.ERC1155
           : TokenType.ERC20
     } catch {
+      // token is not ERC721 or ERC1155
+
+      // if decimals is null still, then token is also not an ERC20 so throw error to return "no token found"
+      if (decimals === null) {
+        throw Error("no token found")
+      }
+
       // default to ERC20 otherwise
       type = TokenType.ERC20
     }
@@ -89,6 +108,7 @@ export default async function handler(req, res) {
   let data: TokenMetadataResponse = {
     name,
     symbol,
+    decimals,
     type,
   }
 
