@@ -84,14 +84,14 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
 
   try {
     // add ipfs response to proposal
-    const payment = proposal?.payments?.[0] || {}
     const updatedProposal = await updateProposalNewMetadata({
       proposalId: params.proposalId,
       contentTitle: proposal?.data?.content?.title,
       contentBody: proposal?.data?.content?.body,
       ipfsHash: ipfsResponse.IpfsHash,
-      ipfsPinSize: ipfsResponse.PinSize, // ipfs
+      ipfsPinSize: ipfsResponse.PinSize,
       ipfsTimestamp: ipfsResponse.Timestamp,
+      totalPayments: proposal?.data?.totalPayments,
     })
     return updatedProposal
   } catch (err) {

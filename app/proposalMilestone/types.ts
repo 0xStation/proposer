@@ -1,5 +1,5 @@
 // addition to EXECUTION utility
-// enriches application with metadata and mechanisms for acceptance critera and reviewers
+// enriches application with metadata and mechanisms for acceptance criteria and reviewers
 export type ProposalMilestone = {
   index: number // implies ordering of milestones
   data: ProposalMilestoneMetadata

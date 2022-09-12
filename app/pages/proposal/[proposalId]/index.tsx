@@ -229,19 +229,20 @@ const ViewProposalNew: BlitzPage = () => {
               role={proposal?.roles?.find((role) => role.role === ProposalRoleType.CLIENT)}
             />
           </div>
+          {/* Total payments summary */}
           {proposalContainsPayment ? (
             <div className="p-6">
               {/* NETWORK */}
               <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
               <p className="mt-2 font-normal">
-                {getNetworkName(proposal?.payments?.[0]?.data?.token.chainId || 0)}
+                {getNetworkName(proposal?.data?.totalPayments?.[0]?.token.chainId || 0)}
               </p>
               {/* TOKEN */}
               <MetadataLabel label="Payment token" />
-              <p className="mt-2 font-normal">{proposal?.payments?.[0]?.data?.token.symbol}</p>
+              <p className="mt-2 font-normal">{proposal?.data?.totalPayments?.[0]?.token.symbol}</p>
               {/* PAYMENT AMOUNT */}
               <MetadataLabel label="Payment amount" />
-              <p className="mt-2 font-normal">{proposal?.payments?.[0]?.amount}</p>
+              <p className="mt-2 font-normal">{proposal?.data?.totalPayments?.[0]?.amount}</p>
             </div>
           ) : (
             <div className="p-6">

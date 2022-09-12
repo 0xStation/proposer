@@ -1,3 +1,4 @@
+import { ZodToken } from "app/types/zod"
 import db from "db"
 import * as z from "zod"
 import { ProposalNewMetadata } from "../types"
@@ -9,6 +10,7 @@ const UpdateProposalNewMetadata = z.object({
   ipfsHash: z.string().optional(),
   ipfsPinSize: z.number().optional(), // ipfs
   ipfsTimestamp: z.string().optional(),
+  totalPayments: z.object({ token: ZodToken, amount: z.number() }).array(),
 })
 
 // Only updates the metadata of a proposal
@@ -29,6 +31,7 @@ export default async function updateProposalMetadata(
       ipfsPinSize,
       timestamp: ipfsTimestamp,
     },
+    totalPayments: params.totalPayments,
   } as unknown as ProposalNewMetadata
 
   try {

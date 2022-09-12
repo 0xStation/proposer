@@ -95,7 +95,7 @@ export const SENDGRID_TEMPLATES = {
 
 export const SUPPORTED_CHAINS = [chain.mainnet, chain.rinkeby, chain.goerli]
 
-export const ETH_METADATA = { symbol: "ETH", address: ZERO_ADDRESS, decimals: 18 }
+export const ETH_METADATA = { name: "Ether", symbol: "ETH", address: ZERO_ADDRESS, decimals: 18 }
 
 export const getStablecoinMetadataBySymbol = ({ chain = 1, symbol = "USDC" }) => {
   return networks[chain as number]?.stablecoins.find((stablecoin) => stablecoin.symbol === symbol)

@@ -5,6 +5,7 @@ import { ZodPayment, ZodMilestone } from "app/types/zod"
 import { ProposalNewMetadata } from "../types"
 import { ProposalType } from "db"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
+import { Token } from "app/token/types"
 
 const CreateProposal = z.object({
   contentTitle: z.string(),
@@ -25,9 +26,19 @@ const CreateProposal = z.object({
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
   const params = CreateProposal.parse(input)
 
-  if (!params.payments.every((payment) => payment.amount! >= 0)) {
-    throw new Error("amount must be greater or equal to zero.")
-  }
+  // validate non-negative amounts and construct totalPayments object
+  let totalPayments: Record<string, { token: Token; amount: number }> = {}
+  params.payments.forEach((payment) => {
+    if (payment.amount! < 0) {
+      throw new Error("amount must be greater or equal to zero.")
+    }
+    const key = `${payment.token.chainId}-${payment.token.address}`
+    if (!totalPayments[key]) {
+      totalPayments[key] = { token: payment.token, amount: payment.amount! }
+    } else {
+      totalPayments[key]!.amount += payment.amount!
+    }
+  })
 
   // Create accounts for roles that do not yet have accounts
   // Needed for FK constraint on ProposalRole table for addresses to connect to Account objects
@@ -49,6 +60,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       ipfsPinSize,
       timestamp: ipfsTimestamp,
     },
+    totalPayments: Object.values(totalPayments),
   } as unknown as ProposalNewMetadata
 
   const proposal = await db.proposalNew.create({
