@@ -7,6 +7,7 @@ import { Field, Form } from "react-final-form"
 import { SUPPORTED_CHAINS } from "../utils/constants"
 import { useState } from "react"
 import { TokenType } from "app/proposalNew/types"
+import { composeValidators, isAddress, requiredField } from "app/utils/validators"
 
 export const ImportTokenModal = ({ isOpen, setIsOpen, chainId = "", callback = () => {} }) => {
   const session = useSession()
@@ -34,11 +35,14 @@ export const ImportTokenModal = ({ isOpen, setIsOpen, chainId = "", callback = (
               chainId,
             }}
             onSubmit={async (values) => {
+              // user needs to be logged-in so we can save the
+              // imported token to their account
               if (!session.userId) {
                 toggleWalletModal(true)
               }
 
               setLoading(true)
+              let tokenMetadata
               try {
                 const metadataResponse = await fetch("/api/fetch-token-metadata", {
                   method: "POST",
@@ -48,7 +52,7 @@ export const ImportTokenModal = ({ isOpen, setIsOpen, chainId = "", callback = (
                   },
                   body: JSON.stringify({
                     address: values?.tokenAddress,
-                    chainId: parseInt(values.chainId) || 1,
+                    chainId: parseInt(values.chainId),
                   }),
                 })
 
@@ -64,8 +68,8 @@ export const ImportTokenModal = ({ isOpen, setIsOpen, chainId = "", callback = (
                   return
                 }
 
-                const { data: tokenMetadata } = tokenMetadataRes
-                if (tokenMetadata.type !== TokenType.ERC20) {
+                tokenMetadata = tokenMetadataRes?.data
+                if (tokenMetadata?.type !== TokenType.ERC20) {
                   setLoading(false)
                   setToastState({
                     isToastShowing: true,
@@ -75,40 +79,45 @@ export const ImportTokenModal = ({ isOpen, setIsOpen, chainId = "", callback = (
                   setIsOpen(false)
                   return
                 }
-
-                try {
-                  const newTokens = await createAndConnectTokenToAccountMutation({
-                    tokenType: TokenType.ERC20,
-                    tokenAddress: values?.tokenAddress,
-                    chainId: parseInt(values.chainId) || 1,
-                    tokenName: tokenMetadata.name,
-                    tokenSymbol: tokenMetadata.symbol,
-                  })
-                  if (newTokens) {
-                    setToastState({
-                      isToastShowing: true,
-                      type: "success",
-                      message: "Successfully imported your token",
-                    })
-                    callback()
-                  }
-
-                  setLoading(false)
-                  setIsOpen(false)
-                  return
-                } catch (e) {
-                  setLoading(false)
-                  console.error(e)
-                  setToastState({
-                    isToastShowing: true,
-                    type: "error",
-                    message: e.message,
-                  })
-                  return
-                }
               } catch (e) {
                 setLoading(false)
                 console.error(e)
+                setToastState({
+                  isToastShowing: true,
+                  type: "error",
+                  message: e.message,
+                })
+              }
+
+              try {
+                const newTokens = await createAndConnectTokenToAccountMutation({
+                  tokenType: TokenType.ERC20,
+                  tokenAddress: values?.tokenAddress,
+                  chainId: parseInt(values.chainId),
+                  tokenName: tokenMetadata?.name,
+                  tokenSymbol: tokenMetadata?.symbol,
+                })
+                if (newTokens) {
+                  setToastState({
+                    isToastShowing: true,
+                    type: "success",
+                    message: "Successfully imported your token",
+                  })
+                  callback()
+                }
+
+                setLoading(false)
+                setIsOpen(false)
+                return
+              } catch (e) {
+                setLoading(false)
+                console.error(e)
+                setToastState({
+                  isToastShowing: true,
+                  type: "error",
+                  message: e.message,
+                })
+                return
               }
             }}
             render={({ form, handleSubmit }) => {
@@ -116,27 +125,25 @@ export const ImportTokenModal = ({ isOpen, setIsOpen, chainId = "", callback = (
               return (
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-col">
+                    {/* Network */}
                     <h3 className="font-bold">Network*</h3>
                     <Field
                       name="chainId"
                       component="select"
                       className="bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
+                      validate={composeValidators(requiredField)}
                     >
                       {({ input, meta }) => {
                         return (
                           <div className="custom-select-wrapper">
                             <select
                               {...input}
-                              required={Boolean(
-                                formState.values.paymentAmount || formState.values.tokenAddress
-                              )}
+                              required
                               className="w-full bg-wet-concrete border border-concrete rounded p-1 mt-1"
-                              //value={selectedNetworkId as number}
                               onChange={(e) => {
                                 const network = SUPPORTED_CHAINS.find(
                                   (chain) => chain.id === parseInt(e.target.value)
                                 )
-                                // setSelectedNetworkId(network?.id as number)
                                 // custom values can be compatible with react-final-form by calling
                                 // the props.input.onChange callback
                                 // https://final-form.org/docs/react-final-form/api/Field
@@ -159,15 +166,28 @@ export const ImportTokenModal = ({ isOpen, setIsOpen, chainId = "", callback = (
                         )
                       }}
                     </Field>
+                    {/* Contract address */}
                     <h3 className="font-bold mt-4">Contract address*</h3>
                     <Field
                       name="tokenAddress"
-                      component="input"
-                      type="text"
-                      placeholder="0x..."
-                      className="bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
-                      // TODO!!! validation
-                    />
+                      validate={composeValidators(requiredField, isAddress)}
+                    >
+                      {({ meta, input }) => (
+                        <>
+                          <input
+                            {...input}
+                            type="text"
+                            required
+                            placeholder="0x..."
+                            className="bg-wet-concrete border border-light-concrete rounded p-2 mt-1"
+                          />
+
+                          {meta.touched && meta.error && (
+                            <span className="text-torch-red text-xs">{meta.error}</span>
+                          )}
+                        </>
+                      )}
+                    </Field>
                     <div className="mt-9 flex justify-end">
                       <Button
                         type={ButtonType.Secondary}
@@ -176,7 +196,11 @@ export const ImportTokenModal = ({ isOpen, setIsOpen, chainId = "", callback = (
                       >
                         Cancel
                       </Button>
-                      <Button isDisabled={!formState.dirty} isSubmitType={true} isLoading={loading}>
+                      <Button
+                        isDisabled={Boolean(Object.keys((formState?.errors as any) || {}).length)}
+                        isSubmitType={true}
+                        isLoading={loading}
+                      >
                         Import
                       </Button>
                     </div>

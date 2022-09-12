@@ -191,6 +191,8 @@ const RewardForm = ({
         isOpen={isImportTokenModalOpen}
         setIsOpen={setIsImportTokenModalOpen}
         chainId={selectedNetworkId?.toString()}
+        // `shouldRefetchTokens` triggers the use effect that
+        // displays the tokens in the new proposal form token dropdown
         callback={() => setShouldRefetchTokens(true)}
       />
       <RadioGroup value={needFunding} onChange={setNeedFunding}>
@@ -622,6 +624,8 @@ export const ProposalNewForm = () => {
     if (selectedNetworkId || shouldRefetchTokens) {
       const stablecoins = networks[selectedNetworkId]?.stablecoins || []
       if (session?.userId) {
+        // if user is logged-in, we can fetch the
+        // imported tokens they have saved to their account
         const fetchAccountTokenOptions = async () => {
           const tokens = await invoke(getTokensByAccount, {
             chainId: selectedNetworkId,

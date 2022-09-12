@@ -19,6 +19,9 @@ const {
   FEATURE: { WALLET_CONNECTION },
 } = TRACKING_EVENTS
 
+// This component takes in a callback which is called after the user
+// has successfully connected their wallet / siwe. It can be used for
+// actions like showing a new modal after this one has closed, etc.
 const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen, callback = () => {} }) => {
   const [connectState, setConnectState] = useState<{
     loading: boolean
