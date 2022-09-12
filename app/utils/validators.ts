@@ -82,33 +82,11 @@ export const isPositiveAmount = (amount: number) => {
 
 export const isValidTokenAmount = (decimals: number) => {
   return (preFormatAmount: string) => {
+    if (!preFormatAmount) return undefined
     const amount = formatTokenAmount(preFormatAmount)
-    if (!amount) return undefined
 
-    if (amount.includes("-")) return "Only positive numbers allowed"
-
-    const decimalSplit = amount.split(".")
-    if (decimalSplit.length > 2) return "Only one decimal allowed"
-
-    let leftOfDecimal
-    let rightOfDecimal
-    if (decimalSplit.length > 0) {
-      leftOfDecimal = decimalSplit[0]!
-      rightOfDecimal = decimalSplit[1] || ""
-    } else {
-      leftOfDecimal = amount
-      rightOfDecimal = ""
-    }
-
-    if (rightOfDecimal.length > decimals) return `Cannot have more than ${decimals} decimal places.`
-    if (rightOfDecimal.includes(",")) return "No commas after decimal"
-
-    const commaSplit = leftOfDecimal.split(",")
-    if (!commaSplit.every((s, i) => i === 0 || s.length === 3)) return "Invalid comma spacing"
-
-    const nonDigits = /\D/g
-    if ((amount.match(nonDigits)?.filter((s) => s !== "." && s !== ",") || []).length > 0)
-      return "Only postive numbers allowed"
+    if ((amount.split(".")[1]?.length || 0) > decimals)
+      return `Cannot have more than ${decimals} decimal places.`
 
     if (parseFloat(amount) * 10 ** decimals > 2 ** 256 - 1) return "Number exceeds max size"
 
