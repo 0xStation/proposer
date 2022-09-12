@@ -1,7 +1,6 @@
 import StationLogo from "public/station-letters.svg"
 import { useEffect, useMemo } from "react"
 import { Image, invoke, Routes, useQuery, useParam, useRouter, useSession, Link } from "blitz"
-import { useAccount } from "wagmi"
 import useStore from "../hooks/useStore"
 import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
 import { TerminalMetadata } from "app/terminal/types"
@@ -11,12 +10,12 @@ import { DEFAULT_PFP_URLS } from "../utils/constants"
 import ExploreImageIcon from "public/explore.svg"
 import Dropdown from "app/core/components/Dropdown"
 import Listbox from "app/core/components/Listbox"
-import { useDisconnect, useNetwork, useSwitchNetwork } from "wagmi"
+import { useDisconnect, useNetwork, useSwitchNetwork, useAccount, defaultChains } from "wagmi"
 import logout from "app/session/mutations/logout"
 import Button from "app/core/components/sds/buttons/Button"
 import truncateString from "app/core/utils/truncateString"
 import { ChevronDownIcon, DotsHorizontalIcon } from "@heroicons/react/solid"
-import { LINKS, COMPATIBLE_CHAIN_IDS } from "app/core/utils/constants"
+import { LINKS, SUPPORTED_CHAIN_IDS, Sizes } from "app/core/utils/constants"
 import Avatar from "app/core/components/sds/images/avatar"
 
 const Navigation = ({ children }: { children?: any }) => {
@@ -28,12 +27,11 @@ const Navigation = ({ children }: { children?: any }) => {
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const address = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const setToastState = useStore((state) => state.setToastState)
-  const router = useRouter()
   const { disconnect } = useDisconnect()
   const { chain } = useNetwork()
-  const { chains, switchNetwork, isError, error } = useSwitchNetwork()
-  const compatibleChains = chains.filter((chain) => COMPATIBLE_CHAIN_IDS.includes(chain.id))
-  const isChainCompatible = chain ? COMPATIBLE_CHAIN_IDS.includes(chain.id) : undefined
+  const { switchNetwork, isError, error } = useSwitchNetwork()
+  const supportedChains = defaultChains.filter((chain) => SUPPORTED_CHAIN_IDS.includes(chain.id))
+  const isChainSupported = chain ? SUPPORTED_CHAIN_IDS.includes(chain.id) : undefined
 
   if (isError) {
     setToastState({
@@ -91,25 +89,25 @@ const Navigation = ({ children }: { children?: any }) => {
         </Link>
         <div className="flex flex-row items-center space-x-4">
           <Listbox
-            error={isChainCompatible === false ? { message: "Switch network" } : undefined}
+            error={isChainSupported === false ? { message: "Switch network" } : undefined}
             defaultValue={chain}
-            items={compatibleChains}
+            items={supportedChains}
             onChange={(item) => {
               switchNetwork?.(item.id)
-              const activeChain = chains.find((chain) => chain.id === item.id)
+              const activeChain = supportedChains.find((chain) => chain.id === item.id)
               setActiveChain?.(activeChain)
               return true
             }}
           />
           {!address ? (
-            <Button onClick={() => toggleWalletModal(true)}>Connect</Button>
+            <Button onClick={() => toggleWalletModal(true)}>Connect wallet</Button>
           ) : (
             <Dropdown
               className="h-[35px]"
               button={
                 <div className="border border-marble-white px-2 h-[35px] inline-flex w-full justify-center items-center rounded-md text-sm">
                   <span className="flex flex-row space-x-2 items-center">
-                    <Avatar size="sm" />
+                    <Avatar size={Sizes.SM} />
                     <span className="block text-marble-white text-sm">
                       @{truncateString(address)}
                     </span>

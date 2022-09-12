@@ -18,13 +18,15 @@ type ListboxComponentProps = {
   error?: ListboxError
 }
 
-const defaultItem = {
+const defaultListboxItem = {
   id: -1,
-  name: "default",
+  name: "string",
 }
 
 const CustomListbox = ({ items, onChange, defaultValue, error }: ListboxComponentProps) => {
-  const [selected, setSelected] = useState<ListboxItem>(defaultValue || items[0] || defaultItem)
+  const [selected, setSelected] = useState<ListboxItem>(
+    defaultValue || items[0] || defaultListboxItem
+  )
   const onChangeAndSetSelected = (item) => {
     const shouldContinue = onChange(item)
     if (shouldContinue) {
@@ -37,8 +39,6 @@ const CustomListbox = ({ items, onChange, defaultValue, error }: ListboxComponen
       setSelected(defaultValue)
     }
   }, [defaultValue])
-
-  console.log(error && "3")
 
   return (
     <Listbox value={selected} onChange={onChangeAndSetSelected}>

@@ -217,7 +217,13 @@ export const LINKS = {
 // 1 - eth
 // 4 - rinkeby
 // 5 - goerli
-export const COMPATIBLE_CHAIN_IDS = [1, 4, 5]
+export const SUPPORTED_CHAIN_IDS = [1, 4, 5]
+
+export enum Sizes {
+  SM = "SM",
+  BASE = "BASE",
+  LG = "LG",
+}
 
 export enum FeatureFlagStatus {
   ON = "ON",
