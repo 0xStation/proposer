@@ -244,6 +244,7 @@ model ProposalNew {
   type       ProposalType
   timestamp  DateTime            @default(now())
   data       Json
+  status     ProposalStatus      @default(PUBLISHED)
   roles      ProposalRole[]
   milestones ProposalMilestone[]
   payments   ProposalPayment[]

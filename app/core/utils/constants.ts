@@ -2,7 +2,6 @@ import { chain } from "wagmi"
 import { RfpStatus } from "app/rfp/types"
 import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import networks from "app/utils/networks.json"
-import { TokenType } from "@prisma/client"
 import { ProposalRoleType } from "@prisma/client"
 import { PaymentTerm } from "app/proposalPayment/types"
 import Gradient0 from "/public/gradients/0.png"
@@ -66,6 +65,29 @@ export const RFP_STATUS_DISPLAY_MAP = {
   },
   [RfpStatus.CLOSED]: {
     copy: "closed",
+    color: "bg-torch-red",
+  },
+}
+
+export const PROPOSAL_NEW_STATUS_DISPLAY_MAP = {
+  [ProposalNewStatus.DRAFT]: {
+    copy: "draft",
+    color: "bg-concrete",
+  },
+  [ProposalNewStatus.IN_REVIEW]: {
+    copy: "in review",
+    color: "bg-neon-carrot",
+  },
+  [ProposalNewStatus.APPROVED]: {
+    copy: "approved",
+    color: "bg-magic-mint",
+  },
+  [ProposalNewStatus.PUBLISHED]: {
+    copy: "published",
+    color: "bg-marble-white",
+  },
+  [ProposalNewStatus.DELETED]: {
+    copy: "deleted",
     color: "bg-torch-red",
   },
 }

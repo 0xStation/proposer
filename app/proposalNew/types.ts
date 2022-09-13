@@ -3,6 +3,14 @@ import { ProposalMilestone } from "app/proposalMilestone/types"
 import { PaymentTerm, ProposalPayment } from "app/proposalPayment/types"
 import { Token } from "app/token/types"
 
+export enum ProposalNewStatus {
+  DRAFT = "DRAFT",
+  PUBLISHED = "PUBLISHED",
+  IN_REVIEW = "IN_REVIEW",
+  APPROVED = "APPROVED",
+  DELETED = "DELETED",
+}
+
 export type ProposalNew = {
   id: string
   type: ProposalType
@@ -12,6 +20,7 @@ export type ProposalNew = {
   payments: ProposalPayment[]
   signatures: ProposalSignature[]
   data: ProposalNewMetadata
+  status: ProposalNewStatus
 }
 
 export type ProposalNewMetadata = {

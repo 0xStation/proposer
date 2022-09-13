@@ -9,10 +9,10 @@ import getProposalNewsByAddress from "app/proposalNew/queries/getProposalNewsByA
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import Pagination from "app/core/components/Pagination"
 import {
-  PROPOSAL_STATUS_DISPLAY_MAP,
   PAGINATION_TAKE,
   PROPOSAL_STATUSES_FILTER_OPTIONS,
   PROPOSAL_ROLE_FILTER_OPTIONS,
+  PROPOSAL_NEW_STATUS_DISPLAY_MAP,
 } from "app/core/utils/constants"
 import { ProposalStatus } from "app/proposal/types"
 import { ProposalRoleType } from "@prisma/client"
@@ -104,8 +104,8 @@ const WorkspaceHome: BlitzPage = () => {
           {/* TABLE HEADERS */}
           <thead>
             <tr className="border-b border-concrete">
-              <th className="text-xs uppercase text-light-concrete pb-2 pl-4 text-left">Title</th>
-              {/* <th className="text-xs uppercase text-light-concrete pb-2 text-left">Status</th> */}
+              <th className="pl-4 text-xs uppercase text-light-concrete pb-2 text-left">Title</th>
+              <th className="text-xs uppercase text-light-concrete pb-2 text-left">Status</th>
               <th className="text-xs uppercase text-light-concrete pb-2 text-left">Payment</th>
               <th className="text-xs uppercase text-light-concrete pb-2 text-left">Submitted at</th>
             </tr>
@@ -120,15 +120,19 @@ const WorkspaceHome: BlitzPage = () => {
                     href={Routes.ViewProposalNew({ proposalId: proposal.id })}
                     key={`table-row-${idx}`}
                   >
-                    <tr className="border-b border-wet-concrete cursor-pointer hover:bg-wet-concrete">
-                      <td className="text-base py-4 pl-4 font-bold w-128">
+                    <tr className="border-b border-concrete cursor-pointer hover:bg-wet-concrete">
+                      <td className="pl-4 text-base py-4 font-bold w-128">
                         {proposal.data.content.title}
                       </td>
-                      {/* <td className="py-4">
-                        <span className="bg-neon-carrot text-tunnel-black px-2 py-1 rounded-full text-sm uppercase">
-                          {proposal.status}
+                      <td className="py-4">
+                        <span
+                          className={`${
+                            PROPOSAL_NEW_STATUS_DISPLAY_MAP[proposal.status].color
+                          } text-tunnel-black px-2 py-1 rounded-full text-sm uppercase`}
+                        >
+                          {PROPOSAL_NEW_STATUS_DISPLAY_MAP[proposal.status].copy}
                         </span>
-                      </td> */}
+                      </td>
                       <td className="text-base py-4 w-48">
                         {proposal.data.totalPayments.length > 0
                           ? `${proposal.data.totalPayments[0]?.amount} ${proposal.data.totalPayments[0]?.token.symbol}`
