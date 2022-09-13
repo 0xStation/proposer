@@ -1,7 +1,7 @@
 import * as z from "zod"
-import db, { ProposalRoleType } from "db"
+import db from "db"
 import pinJsonToPinata from "app/utils/pinata"
-import updateProposalNew from "./updateProposalNew"
+import updateProposalNewMetadata from "./updateProposalNewMetadata"
 
 const ApproveProposalNew = z.object({
   proposalId: z.string(),
@@ -45,6 +45,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       where: { id: params.proposalId },
       include: {
         roles: true,
+        payments: true,
         signatures: true,
       },
     })
@@ -83,19 +84,14 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
 
   try {
     // add ipfs response to proposal
-    const paymentMetadata = proposal?.data?.payments?.[0] || {}
-    const updatedProposal = await updateProposalNew({
+    const updatedProposal = await updateProposalNewMetadata({
       proposalId: params.proposalId,
       contentTitle: proposal?.data?.content?.title,
       contentBody: proposal?.data?.content?.body,
-      contributorAddresses: proposal.roles
-        .filter((role) => role.role === ProposalRoleType.CONTRIBUTOR)
-        .map((role) => role.address),
-      token: paymentMetadata.token,
-      paymentAmount: paymentMetadata.amount,
       ipfsHash: ipfsResponse.IpfsHash,
-      ipfsPinSize: ipfsResponse.PinSize, // ipfs
+      ipfsPinSize: ipfsResponse.PinSize,
       ipfsTimestamp: ipfsResponse.Timestamp,
+      totalPayments: proposal?.data?.totalPayments,
     })
     return updatedProposal
   } catch (err) {

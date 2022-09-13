@@ -1,6 +1,7 @@
 import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import isURL from "validator/lib/isURL"
 import isEmail from "validator/lib/isEmail"
+import { formatTokenAmount } from "./formatters"
 
 // reducer that takes in an array of validators (functions) and returns the appropriate error
 // useful if you have a form field that has a few different validations (required field, must be number, etc)
@@ -77,6 +78,20 @@ export const isPositiveAmount = (amount: number) => {
   if (typeof amount === "number") return undefined
   if (amount >= 0) return undefined // want to allow 0 amount proposals?
   return "Amount must be a number greater than or equal to zero."
+}
+
+export const isValidTokenAmount = (decimals: number) => {
+  return (preFormatAmount: string) => {
+    if (!preFormatAmount) return undefined
+    const amount = formatTokenAmount(preFormatAmount)
+
+    if ((amount.split(".")[1]?.length || 0) > decimals)
+      return `Cannot have more than ${decimals} decimal places.`
+
+    if (parseFloat(amount) * 10 ** decimals > 2 ** 256 - 1) return "Number exceeds max size"
+
+    return undefined
+  }
 }
 
 export const isAfterStartDate = (_endDate, values) => {

@@ -241,6 +241,8 @@ model ProposalNew {
   timestamp  DateTime            @default(now())
   data       Json
   roles      ProposalRole[]
+  milestones ProposalMilestone[]
+  payments   ProposalPayment[]
   signatures ProposalSignature[]
 }
 
@@ -273,6 +275,30 @@ model Token {
   accounts AccountToken[]
 
   @@id([address, chainId])
+}
+
+model ProposalMilestone {
+  proposalId String
+  proposal   ProposalNew @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  index      Int
+  data       Json
+
+  payments ProposalPayment[]
+  @@id([proposalId, index])
+}
+
+model ProposalPayment {
+  id               String            @id @default(uuid())
+  proposalId       String
+  proposal         ProposalNew       @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  milestoneIndex   Int
+  milestone        ProposalMilestone @relation(fields: [proposalId, milestoneIndex], references: [proposalId, index])
+  senderAddress    String
+  recipientAddress String
+  amount           Float? // float to support larger size numbers
+  tokenId          Float? // float to support larger size numbers
+  transactionHash  String?
+  data             Json
 }
 
 enum TokenType {

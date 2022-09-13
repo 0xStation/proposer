@@ -2,6 +2,7 @@ import { chain } from "wagmi"
 import { RfpStatus } from "app/rfp/types"
 import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import networks from "app/utils/networks.json"
+import { TokenType } from "@prisma/client"
 
 export const CONTRACTS = {
   // Localhost, change to whatever the forge script outputs when running local anvil
@@ -95,7 +96,13 @@ export const SENDGRID_TEMPLATES = {
 
 export const SUPPORTED_CHAINS = [chain.mainnet, chain.rinkeby, chain.goerli]
 
-export const ETH_METADATA = { symbol: "ETH", address: ZERO_ADDRESS, decimals: 18 }
+export const ETH_METADATA = {
+  type: TokenType.COIN,
+  name: "Ether",
+  symbol: "ETH",
+  address: ZERO_ADDRESS,
+  decimals: 18,
+}
 
 export const getStablecoinMetadataBySymbol = ({ chain = 1, symbol = "USDC" }) => {
   return networks[chain as number]?.stablecoins.find((stablecoin) => stablecoin.symbol === symbol)

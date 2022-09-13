@@ -1,11 +1,11 @@
 import db, { AddressType, ProposalRoleType } from "db"
 import * as z from "zod"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
-import { ZodToken } from "app/types/zod"
+import { ZodPayment, ZodMilestone } from "app/types/zod"
 import { ProposalNewMetadata } from "../types"
 import { ProposalType } from "db"
-import { getAddressType } from "app/utils/getAddressType"
-import truncateString from "app/core/utils/truncateString"
+import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
+import { Token } from "app/token/types"
 
 const CreateProposal = z.object({
   contentTitle: z.string(),
@@ -16,21 +16,29 @@ const CreateProposal = z.object({
   clientAddresses: z.string().array(),
   // for initial P0 build, frontend is only supporting one author
   authorAddresses: z.string().array(),
-  token: ZodToken.partial(),
-  paymentAmount: z.string().optional(),
   ipfsHash: z.string().optional(),
-  ipfsPinSize: z.number().optional(), // ipfs
+  ipfsPinSize: z.number().optional(),
   ipfsTimestamp: z.date().optional(),
-  // paymentTermType: z.string().optional(),
-  // advancedPaymentPercentage: z.number().optional(),
+  milestones: ZodMilestone.array(),
+  payments: ZodPayment.array(),
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
   const params = CreateProposal.parse(input)
 
-  if (params.paymentAmount && parseFloat(params.paymentAmount) < 0) {
-    throw new Error("amount must be greater or equal to zero.")
-  }
+  // validate non-negative amounts and construct totalPayments object
+  let totalPayments: Record<string, { token: Token; amount: number }> = {}
+  params.payments.forEach((payment) => {
+    if (payment.amount! < 0) {
+      throw new Error("amount must be greater or equal to zero.")
+    }
+    const key = `${payment.token.chainId}-${payment.token.address}`
+    if (!totalPayments[key]) {
+      totalPayments[key] = { token: payment.token, amount: payment.amount! }
+    } else {
+      totalPayments[key]!.amount += payment.amount!
+    }
+  })
 
   // Create accounts for roles that do not yet have accounts
   // Needed for FK constraint on ProposalRole table for addresses to connect to Account objects
@@ -39,124 +47,26 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     ...params.clientAddresses,
     ...params.authorAddresses,
   ]
-  const uniqueRoleAddresses = roleAddresses.filter((v, i, addresses) => addresses.indexOf(v) === i)
-  const accounts = await db.account.findMany({
-    where: {
-      address: {
-        in: uniqueRoleAddresses,
-      },
-    },
-  })
-  const addressesMissingAccounts = uniqueRoleAddresses.filter((address) =>
-    accounts.some((account) => account.address !== address)
-  )
-  // with list of missing addresses, determine their AddressType
-  const addressClassificationRequests = addressesMissingAccounts.map((address) =>
-    getAddressType(address)
-  )
-  const addressClassificationResponses = await Promise.all(addressClassificationRequests)
-  // create many Accounts with proper type
-  await db.account.createMany({
-    skipDuplicates: true, // do not create entries that already exist
-    data: addressesMissingAccounts.map((address, i) => {
-      const { addressType, chainId } = addressClassificationResponses[i]!
-      return {
-        address,
-        addressType,
-        data: {
-          name: truncateString(address),
-          ...(addressType !== AddressType.WALLET && { chainId }),
-        },
-      }
-    }),
-  })
-
-  const proposalHasPayment = params.paymentAmount && parseFloat(params.paymentAmount) > 0
+  await createAccountsIfNotExist(roleAddresses)
 
   const { ipfsHash, ipfsPinSize, ipfsTimestamp } = params
-  const metadata = {
+  const proposalMetadata = {
     content: {
       title: params.contentTitle,
       body: params.contentBody,
-    },
-    // if no payment amount we can infer that there is no payment requested
-    // it might be better to pass this through more explicitly with a flag for "no funding"
-    // but we are doing this the quick way with minimal infra
-    // if we get validation this is good idea we can improve
-    // if advancedPaymentPercentage is greater than 0, we need two milestones
-    payments:
-      // params.paymentAmount
-      //   ? params.advancedPaymentPercentage && params.advancedPaymentPercentage > 0
-      //     ? [
-      //         {
-      //           milestoneId: 0,
-      //           recipientAddress: params.contributorAddress,
-      //           token: params.token,
-      //           amount: String(
-      //             (Number(params.paymentAmount) * (params.advancedPaymentPercentage / 100)).toFixed(
-      //               params.token.decimals
-      //             )
-      //           ),
-      //         },
-      //         {
-      //           milestoneId: 1,
-      //           recipientAddress: params.contributorAddress,
-      //           token: params.token,
-      //           amount: String(
-      //             (
-      //               Number(params.paymentAmount) *
-      //               ((100 - params.advancedPaymentPercentage) / 100)
-      //             ).toFixed(params.token.decimals)
-      //           ),
-      //         },
-      //       ]
-      //     :
-      proposalHasPayment
-        ? [
-            {
-              milestoneId: 0,
-              recipientAddress: params.contributorAddresses[0],
-              token: params.token,
-              amount: params.paymentAmount,
-            },
-          ]
-        : [],
-    // : [],
-    milestones:
-      // params.advancedPaymentPercentage && params.paymentAmount
-      //   ? [
-      //       {
-      //         id: 0,
-      //         title: "Advanced payment",
-      //       },
-      //       {
-      //         id: 1,
-      //         title: "Payment upon approval",
-      //       },
-      //     ]
-      //   :
-      proposalHasPayment
-        ? [
-            {
-              id: 0,
-              title: "Payment upon approval",
-            },
-          ]
-        : [],
-    digest: {
-      hash: "",
     },
     ipfsMetadata: {
       hash: ipfsHash,
       ipfsPinSize,
       timestamp: ipfsTimestamp,
     },
+    totalPayments: Object.values(totalPayments),
   } as unknown as ProposalNewMetadata
 
   const proposal = await db.proposalNew.create({
     data: {
       type: ProposalType.FUNDING,
-      data: JSON.parse(JSON.stringify(metadata)),
+      data: JSON.parse(JSON.stringify(proposalMetadata)),
       roles: {
         createMany: {
           data: [
@@ -172,9 +82,35 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
           ],
         },
       },
+      milestones: {
+        createMany: {
+          data: params.milestones.map((milestone) => {
+            return {
+              index: milestone.index,
+              data: { title: milestone.title },
+            }
+          }),
+        },
+      },
+      payments: {
+        createMany: {
+          data: params.payments.map((payment) => {
+            return {
+              senderAddress: payment.senderAddress,
+              recipientAddress: payment.recipientAddress,
+              amount: payment.amount,
+              tokenId: payment.tokenId,
+              milestoneIndex: payment.milestoneIndex,
+              data: { token: payment.token },
+            }
+          }),
+        },
+      },
     },
     include: {
       roles: true,
+      milestones: true,
+      payments: true,
     },
   })
 

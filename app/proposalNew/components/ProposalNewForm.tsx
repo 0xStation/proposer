@@ -11,10 +11,9 @@ import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { CheckCircleIcon } from "@heroicons/react/solid"
 import {
   composeValidators,
-  isPositiveAmount,
-  maximumDecimals,
   requiredField,
   isAddress,
+  isValidTokenAmount,
 } from "app/utils/validators"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import truncateString from "app/core/utils/truncateString"
@@ -30,6 +29,7 @@ import getTokensByAccount from "../../token/queries/getTokensByAccount"
 import ConnectWalletModal from "app/core/components/ConnectWalletModal"
 import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
+import { formatTokenAmount } from "app/utils/formatters"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -518,11 +518,12 @@ const RewardForm = ({
           />
           <Field
             name="paymentAmount"
-            validate={composeValidators(
-              requiredField,
-              isPositiveAmount,
-              maximumDecimals(selectedToken?.decimals)
-            )}
+            format={formatTokenAmount}
+            validate={
+              Boolean(selectedToken?.address)
+                ? composeValidators(requiredField, isValidTokenAmount(selectedToken?.decimals || 0))
+                : () => {}
+            }
           >
             {({ input, meta }) => {
               return (
@@ -753,16 +754,38 @@ export const ProposalNewForm = () => {
               throw Error("token not found")
             }
 
+            let milestones: any[] = []
+            let payments: any[] = []
+            // if payment details are present, populate milestone and payment objects
+            // supports payment and non-payment proposals
+            if (values.paymentAmount && token && values.client && values.contributor) {
+              // for now, assuming a proposal with one payment on completion
+              // will change to two-milestone system with Advanced Payment feature
+              milestones = [
+                {
+                  index: 1,
+                  title: "Proposal completion",
+                },
+              ]
+              payments = [
+                {
+                  milestoneIndex: 1,
+                  senderAddress: values.client,
+                  recipientAddress: values.contributor,
+                  amount: parseFloat(values.paymentAmount),
+                  token: { ...token, chainId: selectedNetworkId },
+                },
+              ]
+            }
+
             createProposalMutation({
               contentTitle: values.title,
               contentBody: values.body,
               contributorAddresses: [values.contributor],
               clientAddresses: [values.client],
-              authorAddresses: [activeUser?.address!],
-              token: { ...token, chainId: selectedNetworkId },
-              paymentAmount: values.paymentAmount,
-              // paymentTermType: values.paymentTermType,
-              // advancedPaymentPercentage: Number(values.advancedPaymentPercentage),
+              authorAddresses: [activeUser!.address!],
+              milestones,
+              payments,
             })
           }}
           render={({ form, handleSubmit }) => {

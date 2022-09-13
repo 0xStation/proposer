@@ -1,8 +1,5 @@
-import { toUtf8Bytes } from "@ethersproject/strings"
-import { keccak256 } from "@ethersproject/keccak256"
-import { BigNumber } from "@ethersproject/bignumber"
 import { ProposalNew } from "app/proposalNew/types"
-import { parseUnits } from "@ethersproject/units"
+import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 
 export const genProposalNewDigest = (proposal: ProposalNew) => {
   return {
@@ -15,8 +12,12 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
         { name: "address", type: "address" },
         { name: "role", type: "string" },
       ],
+      Milestone: [
+        { name: "index", type: "uint256" },
+        { name: "title", type: "string" },
+      ],
       Payment: [
-        { name: "milestoneId", type: "uint256" },
+        { name: "milestoneIndex", type: "uint256" },
         { name: "recipientAddress", type: "address" }, // recieves the reward from the proposal
         { name: "chainId", type: "uint256" },
         { name: "tokenAddress", type: "address" },
@@ -26,6 +27,7 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
         { name: "type", type: "string" },
         { name: "timestamp", type: "uint256" }, // UNIX timestamp
         { name: "roles", type: "Role[]" },
+        { name: "milestones", type: "Milestone[]" },
         { name: "payments", type: "Payment[]" },
         { name: "title", type: "string" },
         { name: "body", type: "string" },
@@ -36,16 +38,22 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
       timestamp: proposal.timestamp.valueOf(),
       title: proposal.data.content.title,
       body: proposal.data.content.body,
-      roles: proposal.roles.map((role) => {
+      roles: proposal.roles?.map((role) => {
         return { address: role.address, role: role.role }
       }),
-      payments: proposal.data?.payments?.map((payment) => {
+      milestones: proposal.milestones?.map((milestone) => {
         return {
-          milestoneId: payment.milestoneId,
+          index: milestone.index,
+          title: milestone.data.title,
+        }
+      }),
+      payments: proposal.payments?.map((payment) => {
+        return {
+          milestoneIndex: payment.milestoneIndex,
           recipientAddress: payment.recipientAddress,
-          chainId: payment.token.chainId,
-          tokenAddress: payment.token.address,
-          amount: parseUnits(payment.amount!, payment.token.decimals),
+          chainId: payment.data.token.chainId,
+          tokenAddress: payment.data.token.address,
+          amount: decimalToBigNumber(payment.amount!, payment.data.token.decimals || 0),
         }
       }),
     },

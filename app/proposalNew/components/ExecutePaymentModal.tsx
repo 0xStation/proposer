@@ -12,14 +12,7 @@ import getProposalNewById from "../queries/getProposalNewById"
 import { preparePaymentTransaction } from "app/transaction/payments"
 import { useSendTransaction } from "wagmi"
 
-export const ExecutePaymentModal = ({
-  isOpen,
-  setIsOpen,
-  isLoading,
-  setIsLoading,
-  payment,
-  proposalId,
-}) => {
+export const ExecutePaymentModal = ({ isOpen, setIsOpen, isLoading, setIsLoading, payment }) => {
   const setToastState = useStore((state) => state.setToastState)
   const [txnHash, setTxnHash] = useState<string>()
   const [transactionPayload, setTransactionPayload] = useState<any>()
@@ -40,7 +33,7 @@ export const ExecutePaymentModal = ({
     if (payment) {
       const payload = preparePaymentTransaction(
         payment?.recipientAddress,
-        payment?.token,
+        payment?.data?.token,
         payment?.amount
       )
       setTransactionPayload(payload)
@@ -69,6 +62,15 @@ export const ExecutePaymentModal = ({
         })
       }
     },
+    onError: async (data) => {
+      setIsLoading(false)
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: "Payment execution failed.",
+      })
+      console.error(data)
+    },
   })
 
   const initiatePayment = async () => {
@@ -83,9 +85,8 @@ export const ExecutePaymentModal = ({
 
       // update payment as cashed in db
       await saveTransactionHashToPaymentsMutation({
-        proposalId: proposalId,
         transactionHash: transaction.hash,
-        paymentIds: [],
+        paymentIds: [payment.id],
       })
 
       // the `txnHash` state is required to enable the useWaitForTransaction hook in the parent page
@@ -95,19 +96,21 @@ export const ExecutePaymentModal = ({
     } catch (e) {
       setIsLoading(false)
       console.error(e)
+      let message = "Something went wrong."
       if (e.name == "ConnectorNotFoundError") {
-        setToastState({
-          isToastShowing: true,
-          type: "error",
-          message: "Please reset wallet connection.\n(ConnectorNotFoundError)",
-        })
-      } else {
-        setToastState({
-          isToastShowing: true,
-          type: "error",
-          message: "Something went wrong.",
-        })
+        message = "Please reset wallet connection.\n(ConnectorNotFoundError)"
+      } else if (e.message.includes("insufficient funds")) {
+        // don't have enough ETH to pay
+        message = "Insufficient wallet balance for payment."
+      } else if (e.message.includes("ERC20: transfer amount exceeds balance")) {
+        // don't have enough ERC20 to pay
+        message = "Insufficient wallet balance for payment."
       }
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message,
+      })
       return false
     }
   }
@@ -115,7 +118,7 @@ export const ExecutePaymentModal = ({
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        {activeChain && activeChain.id === payment?.token.chainId ? (
+        {activeChain && activeChain.id === payment?.data?.token.chainId ? (
           <>
             <h3 className="text-2xl font-bold pt-6">Execute payment</h3>
             <div className="mt-8">
@@ -125,11 +128,11 @@ export const ExecutePaymentModal = ({
               </div>
               <div className="flex justify-between items-center mt-2">
                 <span className="text-small font-bold">Network</span>
-                <span className="text-small">{getNetworkName(payment?.token.chainId)}</span>
+                <span className="text-small">{getNetworkName(payment?.data?.token.chainId)}</span>
               </div>
               <div className="flex justify-between items-center mt-2">
                 <span className="text-small font-bold">Token</span>
-                <span className="text-small">{payment?.token.symbol}</span>
+                <span className="text-small">{payment?.data?.token.symbol}</span>
               </div>
               <div className="flex justify-between items-center mt-2">
                 <span className="text-small font-bold">Amount</span>
@@ -176,7 +179,7 @@ export const ExecutePaymentModal = ({
                 type="button"
                 className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 w-[98px] rounded hover:opacity-75"
                 onClick={() => {
-                  switchNetwork?.(payment.token.chainId)
+                  switchNetwork?.(payment.data?.token.chainId)
                 }}
               >
                 Switch
