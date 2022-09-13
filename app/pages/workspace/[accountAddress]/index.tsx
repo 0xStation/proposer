@@ -188,7 +188,14 @@ const WorkspaceHome: BlitzPage = () => {
         <div className="h-full w-[288px] border-r border-concrete p-6">
           {/* Top Metadata and CTA */}
           <div className="pb-6 border-b border-concrete space-y-6">
-            <AccountMediaObject account={account} />
+            {account ? (
+              <AccountMediaObject account={account} />
+            ) : (
+              <div
+                tabIndex={0}
+                className={`flex flex-row w-full rounded-lg bg-wet-concrete shadow border-solid h-[40px] motion-safe:animate-pulse`}
+              />
+            )}
             <Link href={Routes.CreateProposalNew()}>
               <Button className="w-full">Propose</Button>
             </Link>

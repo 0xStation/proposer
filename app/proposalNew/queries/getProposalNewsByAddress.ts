@@ -22,6 +22,9 @@ export default async function getProposalNewsByAddress(
         },
       },
     },
+    orderBy: {
+      timestamp: "desc",
+    },
   })) as unknown as ProposalNew[]
 
   return proposalNews
