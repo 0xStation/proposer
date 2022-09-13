@@ -135,10 +135,10 @@ const ProfileIcon = ({ activeUser }) => {
   const profileSelected =
     typeof window !== "undefined" &&
     window?.location?.pathname ===
-      genUrlFromRoute(Routes.ProfileHome({ accountAddress: activeUser.address }))
+      genUrlFromRoute(Routes.WorkspaceHome({ accountAddress: activeUser.address }))
 
   return (
-    <Link href={Routes.ProfileHome({ accountAddress: activeUser.address })}>
+    <Link href={Routes.WorkspaceHome({ accountAddress: activeUser.address })}>
       <div className="relative flex items-center justify-center group">
         <span
           className={`${
