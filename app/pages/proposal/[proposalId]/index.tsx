@@ -102,7 +102,7 @@ const ViewProposalNew: BlitzPage = () => {
       role.role === ProposalRoleType.CLIENT &&
       addressesAreEqual(activeUser?.address || "", role.address)
   )
-  const commitmentsComplete = (() => {
+  const signaturesComplete = (() => {
     const requiredSignatures = {}
 
     proposal?.roles.forEach((role) => {
@@ -117,10 +117,10 @@ const ViewProposalNew: BlitzPage = () => {
   })()
 
   const paymentComplete = !!proposal?.payments?.[0]?.transactionHash
-  const hasPayment = (proposal?.payments.length || 0) > 0
 
   const showApproveButton = userHasRole && !userHasSigned
-  const showPayButton = hasPayment && commitmentsComplete && userIsPayer && !paymentComplete
+  const showPayButton =
+    proposalContainsPayment && signaturesComplete && userIsPayer && !paymentComplete
 
   const uniqueRoleAddresses = (proposal?.roles || [])
     .map((role) => toChecksumAddress(role.address))
@@ -192,11 +192,7 @@ const ViewProposalNew: BlitzPage = () => {
             <h4 className="text-xs font-bold text-concrete uppercase">Proposal status</h4>
             <div className="flex flex-row space-x-2">
               <p className="mt-2 font-normal">
-                {paymentComplete
-                  ? "PAID"
-                  : commitmentsComplete
-                  ? "APPROVED"
-                  : "AWAITING SIGNATURES"}
+                {paymentComplete ? "PAID" : signaturesComplete ? "APPROVED" : "AWAITING SIGNATURES"}
               </p>
               {paymentComplete ? (
                 <TransactionLink

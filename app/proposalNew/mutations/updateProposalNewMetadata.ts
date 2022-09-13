@@ -8,7 +8,7 @@ const UpdateProposalNewMetadata = z.object({
   contentTitle: z.string(),
   contentBody: z.string(),
   ipfsHash: z.string().optional(),
-  ipfsPinSize: z.number().optional(), // ipfs
+  ipfsPinSize: z.number().optional(),
   ipfsTimestamp: z.string().optional(),
   totalPayments: z.object({ token: ZodToken, amount: z.number() }).array(),
 })
