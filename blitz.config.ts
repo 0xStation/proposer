@@ -43,7 +43,7 @@ const config: BlitzConfig = {
     return [
       {
         source: "/",
-        destination: "/station/explore",
+        destination: "/explore",
         permanent: true,
       },
     ]

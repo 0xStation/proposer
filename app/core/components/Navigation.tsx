@@ -12,10 +12,11 @@ import { useDisconnect, useNetwork, useSwitchNetwork, useAccount, defaultChains 
 import logout from "app/session/mutations/logout"
 import Button from "app/core/components/sds/buttons/Button"
 import truncateString from "app/core/utils/truncateString"
-import { ChevronDownIcon, DotsHorizontalIcon } from "@heroicons/react/solid"
+import { DotsHorizontalIcon } from "@heroicons/react/solid"
 import { LINKS, SUPPORTED_CHAIN_IDS, Sizes } from "app/core/utils/constants"
 import Avatar from "app/core/components/sds/images/avatar"
 import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
+import DropdownChevronIcon from "../icons/DropdownChevronIcon"
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -70,7 +71,7 @@ const Navigation = ({ children }: { children?: any }) => {
   return (
     <>
       <div className="w-full border-b border-concrete h-[70px] px-6 flex items-center justify-between">
-        <Link href={Routes.ExploreStations()}>
+        <Link href={Routes.Explore({})}>
           <Image src={StationLogo} alt="Station logo" height={30} width={80} />
         </Link>
         <div className="flex flex-row items-center space-x-4">
@@ -91,14 +92,14 @@ const Navigation = ({ children }: { children?: any }) => {
             <Dropdown
               className="h-[35px]"
               button={
-                <div className="border border-marble-white px-2 h-[35px] inline-flex w-full justify-center items-center rounded-md text-sm">
+                <div className="px-2 h-[35px] inline-flex w-full justify-center items-center rounded-md text-sm">
                   <span className="flex flex-row space-x-2 items-center">
-                    <Avatar size={Sizes.SM} />
-                    <span className="block text-marble-white text-sm">
+                    <Avatar size={Sizes.SM} pfpURL={activeUser?.data.pfpURL} />
+                    <span className="block text-marble-white text-sm mr-12">
                       @{truncateString(address)}
                     </span>
+                    <DropdownChevronIcon />
                   </span>
-                  <ChevronDownIcon className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
                 </div>
               }
               items={[{ name: "Disconnect", onClick: () => handleDisconnect() }]}
@@ -166,8 +167,7 @@ transition-all duration-200 origin-left`}
 
 const ExploreIcon = () => {
   const exploreSelected =
-    typeof window !== "undefined" &&
-    window?.location?.pathname === Routes.ExploreStations().pathname
+    typeof window !== "undefined" && window?.location?.pathname === Routes.Explore().pathname
   const router = useRouter()
   return (
     <div className="relative flex items-center justify-center group">
@@ -182,7 +182,7 @@ transition-all duration-200 origin-left`}
         className={`${
           exploreSelected ? "border-marble-white" : "border-wet-concrete"
         } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg h-[47px] mb-4`}
-        onClick={() => router.push(Routes.ExploreStations())}
+        onClick={() => router.push(Routes.Explore())}
       >
         <Image src={ExploreImageIcon} alt="Explore icon" height={46} width={46} />
       </button>

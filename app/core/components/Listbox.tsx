@@ -1,7 +1,8 @@
 import { Fragment, useState, useEffect } from "react"
 import { Listbox, Transition } from "@headlessui/react"
-import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid"
+import { CheckIcon } from "@heroicons/react/solid"
 import NoSsr from "app/core/components/NoSsr"
+import DropdownChevronIcon from "../icons/DropdownChevronIcon"
 
 type ListboxItem = {
   id: number
@@ -56,10 +57,7 @@ const CustomListbox = ({ items, onChange, defaultValue, error }: ListboxComponen
               {error ? error.message : selected.name}
             </span>
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-              <ChevronDownIcon
-                className={`h-5 w-5 ${error ? "text-tunnel-black" : "text-marble-white"}`}
-                aria-hidden="true"
-              />
+              <DropdownChevronIcon className={error ? "text-tunnel-black" : "text-marble-white"} />
             </span>
           </Listbox.Button>
           <Transition
