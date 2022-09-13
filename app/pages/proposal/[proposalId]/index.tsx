@@ -75,18 +75,27 @@ const ViewProposalNew: BlitzPage = () => {
     }
 
     return (
-      <div className="flex flex-row">
-        <AccountMediaObject account={role?.account} />
-        <div className="flex flex-row items-center space-x-1 ml-4">
-          <span
-            className={`h-2 w-2 rounded-full bg-${
-              addressHasSigned(role?.address) ? "magic-mint" : "neon-carrot"
-            }`}
+      <div className="flex flex-row w-full items-center">
+        {role && signatures ? (
+          <>
+            <AccountMediaObject account={role?.account} />
+            <div className="flex flex-row items-center space-x-1 absolute right-10">
+              <span
+                className={`h-2 w-2 rounded-full bg-${
+                  addressHasSigned(role?.address) ? "magic-mint" : "neon-carrot"
+                }`}
+              />
+              <div className="font-bold text-xs uppercase tracking-wider">
+                {addressHasSigned(role?.address) ? "signed" : "pending"}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div
+            tabIndex={0}
+            className={`h-10 w-full flex flex-row rounded-4xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
           />
-          <div className="font-bold text-xs uppercase tracking-wider">
-            {addressHasSigned(role?.address) ? "signed" : "pending"}
-          </div>
-        </div>
+        )}
       </div>
     )
   }
@@ -143,9 +152,9 @@ const ViewProposalNew: BlitzPage = () => {
         setIsLoading={setIsActionPending}
         payment={proposal?.payments?.[0]}
       />
-      <div className="flex flex-row py-16 border-b border-concrete">
-        <h2 className="ml-6 text-marble-white text-xl font-bold w-full">
-          {proposal?.data.content.title}
+      <div className="flex flex-row pl-4 pt-12 pb-20 border-b border-concrete">
+        <h2 className="ml-6 h-10 text-marble-white text-2xl font-bold w-full">
+          {proposal?.data.content.title || " "}
         </h2>
         {showApproveButton && (
           <div className="relative self-start group mr-10">
@@ -177,7 +186,7 @@ const ViewProposalNew: BlitzPage = () => {
         )}
       </div>
       <div className="h-[calc(100vh-164px)] flex flex-row">
-        <div className="w-full sm:min-w-[680px] p-6 overflow-y-scroll">
+        <div className="w-full sm:min-w-[680px] p-12 overflow-y-scroll">
           <p>{proposal?.data.content.body}</p>
         </div>
         {proposal?.data?.ipfsMetadata?.hash && (
@@ -190,39 +199,50 @@ const ViewProposalNew: BlitzPage = () => {
           {/* STATUS */}
           <div className="border-b border-concrete p-6">
             <h4 className="text-xs font-bold text-concrete uppercase">Proposal status</h4>
-            <div className="flex flex-row space-x-2">
-              <p className="mt-2 font-normal">
-                {paymentComplete ? "PAID" : signaturesComplete ? "APPROVED" : "AWAITING SIGNATURES"}
-              </p>
-              {paymentComplete ? (
-                <TransactionLink
-                  className="mt-3"
-                  chainId={proposal?.payments?.[0]?.data?.token.chainId}
-                  txnHash={proposal?.payments?.[0]?.transactionHash}
-                />
-              ) : (
-                <ProgressCircleAndNumber
-                  numerator={signatureCount}
-                  denominator={uniqueRoleAddresses}
-                />
-              )}
-            </div>
+            {!!proposal ? (
+              <div className="flex flex-row space-x-2">
+                <p className="mt-2 font-normal">
+                  {paymentComplete
+                    ? "PAID"
+                    : signaturesComplete
+                    ? "APPROVED"
+                    : "AWAITING SIGNATURES"}
+                </p>
+                {paymentComplete ? (
+                  <TransactionLink
+                    className="mt-3"
+                    chainId={proposal?.payments?.[0]?.data?.token.chainId}
+                    txnHash={proposal?.payments?.[0]?.transactionHash}
+                  />
+                ) : (
+                  <ProgressCircleAndNumber
+                    numerator={signatureCount}
+                    denominator={uniqueRoleAddresses}
+                  />
+                )}
+              </div>
+            ) : (
+              <div
+                tabIndex={0}
+                className={`h-6 w-48 mt-2 flex flex-row rounded-lg bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+              />
+            )}
           </div>
           <div className="border-b border-concrete p-6">
-            {/* AUTHOR */}
-            <h4 className="text-xs font-bold text-concrete uppercase">Author</h4>
-            <RoleSignature
-              role={proposal?.roles?.find((role) => role.role === ProposalRoleType.AUTHOR)}
-            />
             {/* CONTRIBUTOR */}
-            <MetadataLabel label="Contributor" />
+            <h4 className="text-xs font-bold text-concrete uppercase mb-2">Contributor</h4>
             <RoleSignature
               role={proposal?.roles?.find((role) => role.role === ProposalRoleType.CONTRIBUTOR)}
             />
             {/* CLIENT */}
-            <MetadataLabel label="Client" />
+            <h4 className="text-xs font-bold text-concrete uppercase mb-2 mt-6">Reviewer</h4>
             <RoleSignature
               role={proposal?.roles?.find((role) => role.role === ProposalRoleType.CLIENT)}
+            />
+            {/* AUTHOR */}
+            <h4 className="text-xs font-bold text-concrete uppercase mb-2 mt-6">Author</h4>
+            <RoleSignature
+              role={proposal?.roles?.find((role) => role.role === ProposalRoleType.AUTHOR)}
             />
           </div>
           {/* Total payments summary */}
@@ -240,10 +260,12 @@ const ViewProposalNew: BlitzPage = () => {
               <MetadataLabel label="Payment amount" />
               <p className="mt-2 font-normal">{proposal?.data?.totalPayments?.[0]?.amount}</p>
             </div>
-          ) : (
+          ) : proposal ? (
             <div className="p-6">
               <p className="text-sm">This proposal contains no payments.</p>
             </div>
+          ) : (
+            <></>
           )}
         </div>
       </div>
