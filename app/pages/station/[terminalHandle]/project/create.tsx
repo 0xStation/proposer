@@ -22,7 +22,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req, res 
   if (!terminal) {
     return {
       redirect: {
-        destination: `/station/explore`,
+        destination: `/explore`,
         permanent: false,
       },
     }

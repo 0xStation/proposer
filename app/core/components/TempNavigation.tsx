@@ -154,8 +154,7 @@ const TerminalIcon = ({ terminal }) => {
 
 const ExploreIcon = () => {
   const exploreSelected =
-    typeof window !== "undefined" &&
-    window?.location?.pathname === Routes.ExploreStations().pathname
+    typeof window !== "undefined" && window?.location?.pathname === Routes.Explore().pathname
   const router = useRouter()
   return (
     <div className="relative flex items-center justify-center group">
@@ -170,7 +169,7 @@ transition-all duration-200 origin-left`}
         className={`${
           exploreSelected ? "border-marble-white" : "border-wet-concrete"
         } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg h-[47px] mb-4`}
-        onClick={() => router.push(Routes.ExploreStations())}
+        onClick={() => router.push(Routes.Explore())}
       >
         <Image src={ExploreImageIcon} alt="Explore icon" height={46} width={46} />
       </button>

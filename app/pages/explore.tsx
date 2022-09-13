@@ -21,7 +21,7 @@ const Explore: BlitzPage = () => {
   )
 
   return (
-    <Layout title="Explore stations">
+    <Layout title="Explore">
       <div className="h-screen">
         <div className="pt-8 px-8 pb-3 flex flex-row justify-between">
           <div>
@@ -52,7 +52,7 @@ const Explore: BlitzPage = () => {
         </div>
         {/* Table Columns */}
         <div className="border-y border-concrete pt-8 text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
-          <span className="basis-96 ml-6 mb-2 tracking-wider">Info</span>
+          <span className="basis-64 ml-6 mb-2 tracking-wider">Info</span>
           <span className="basis-[42rem] ml-9 mb-2 tracking-wider">About</span>
         </div>
         {/* Table Rows */}
@@ -70,10 +70,10 @@ const WorkspaceComponent = ({ account }) => {
   return (
     <Link href={Routes.ProfileHome({ accountAddress: account.address })}>
       <div
-        className="w-full flex flex-row border-b border-concrete cursor-pointer hover:bg-wet-concrete py-3"
+        className="basis-96 w-full flex flex-row border-b border-concrete cursor-pointer hover:bg-wet-concrete py-3"
         tabIndex={0}
       >
-        <div className="flex flex-col content-center align-middle ml-6 mr-1">
+        <div className="basis-64 flex space-x-2 ml-6">
           <AccountMediaObject account={account} />
         </div>
         <div className="basis-[42rem] ml-9 truncate self-center">{account?.data?.bio}</div>
