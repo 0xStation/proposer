@@ -213,8 +213,23 @@ export const TOKEN_SYMBOLS = {
 export const LINKS = {
   CHECKBOOK:
     "https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook",
+  PRODUCT_MANUAL: "https://station-labs.gitbook.io/station-product-manual/",
+  HELP_DESK: "https://6vdcjqzyfj3.typeform.com/to/F0QFs9aC",
+  NEWSTAND: "https://station.mirror.xyz/",
+  LEGAL: "https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176",
   TYPEFORM_WAITLIST: "https://6vdcjqzyfj3.typeform.com/to/G3LN1FlM",
   PINATA_BASE_URL: "https://gateway.pinata.cloud/ipfs/", // TODO: change to use Station gateway
+}
+
+// 1 - eth
+// 4 - rinkeby
+// 5 - goerli
+export const SUPPORTED_CHAIN_IDS = [1, 4, 5]
+
+export enum Sizes {
+  SM = "SM",
+  BASE = "BASE",
+  LG = "LG",
 }
 
 export enum FeatureFlagStatus {
