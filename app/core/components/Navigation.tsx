@@ -1,9 +1,7 @@
 import StationLogo from "public/station-letters.svg"
 import { useEffect, useMemo } from "react"
-import { Image, invoke, Routes, useQuery, useParam, useRouter, useSession, Link } from "blitz"
+import { Image, invoke, Routes, useRouter, useSession, Link } from "blitz"
 import useStore from "../hooks/useStore"
-import getTerminalsByAccount from "app/terminal/queries/getTerminalsByAccount"
-import { TerminalMetadata } from "app/terminal/types"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import createAccount from "app/account/mutations/createAccount"
 import { DEFAULT_PFP_URLS } from "../utils/constants"
@@ -68,12 +66,6 @@ const Navigation = ({ children }: { children?: any }) => {
       setActiveAccount()
     }
   }, [session?.siwe?.address])
-
-  const [usersTerminals] = useQuery(
-    getTerminalsByAccount,
-    { accountId: activeUser?.id as number },
-    { suspense: false, enabled: !!activeUser?.id }
-  )
 
   return (
     <>
