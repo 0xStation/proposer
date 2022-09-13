@@ -169,7 +169,6 @@ const WorkspaceHome: BlitzPage = () => {
                 message: "Workspace successfully updated",
               })
             }}
-            address={accountAddress}
             account={account || undefined}
             isEdit={true}
           />
