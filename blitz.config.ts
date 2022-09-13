@@ -37,6 +37,7 @@ const config: BlitzConfig = {
       "pbs.twimg.com",
       "user-images.githubusercontent.com",
       "station-images.nyc3.digitaloceanspaces.com",
+      "cdn.discordapp.com",
     ],
   },
   async redirects() {

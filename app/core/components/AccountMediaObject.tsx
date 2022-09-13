@@ -22,10 +22,12 @@ const AccountMediaObject = ({ account, className = "" }) => {
         </div>
         <div className="flex flex-col content-center">
           <div className="flex flex-row items-center space-x-1">
-            <p className="text-base text-marble-white font-bold">{account?.data?.name}</p>
+            <p className="text-base text-marble-white font-bold">
+              {account?.data?.name || truncateString(account?.address || "")}
+            </p>
           </div>
           <div className="flex flex-row text-sm text-concrete space-x-1 overflow-hidden">
-            <p className="w-max truncate leading-4">@{truncateString(account?.address)}</p>
+            <p className="w-max truncate leading-4">@{truncateString(account?.address || "")}</p>
           </div>
         </div>
       </div>
