@@ -151,7 +151,7 @@ transition-all duration-200 origin-left`}
         <button
           className={`${
             profileSelected ? "border-marble-white" : "border-wet-concrete"
-          } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg h-[47px] mb-4`}
+          } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-full h-[47px] mb-4`}
         >
           <Image
             src={activeUser?.data?.pfpURL || DEFAULT_PFP_URLS.USER}
