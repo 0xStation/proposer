@@ -41,11 +41,6 @@ const CustomListbox = ({ items, onChange, defaultValue, error }: ListboxComponen
     }
   }, [defaultValue])
 
-  const classNames = error
-    ? "border-torch-red bg-torch-red text-tunnel-black"
-    : "border-marble-white text-marble-white"
-  console.log(classNames)
-
   return (
     <NoSsr>
       <Listbox value={selected} onChange={onChangeAndSetSelected}>
