@@ -99,7 +99,9 @@ const WorkspaceHome: BlitzPage = () => {
             className="ml-6 sm:ml-0 text-sm self-end"
           />
         </div>
+        {/* PROPOSALS TABLE */}
         <table className="w-full">
+          {/* TABLE HEADERS */}
           <thead>
             <tr className="border-b border-concrete">
               <th className="w-4">{/* spacer for left indent */}</th>
@@ -109,6 +111,7 @@ const WorkspaceHome: BlitzPage = () => {
               <th className="text-xs uppercase text-light-concrete pb-2 text-left">Submitted at</th>
             </tr>
           </thead>
+          {/* TABLE BODY */}
           <tbody>
             {proposals &&
               proposals.length > 0 &&
@@ -184,24 +187,27 @@ const WorkspaceHome: BlitzPage = () => {
   return (
     <Layout>
       <div className="flex flex-row h-full">
-        {/* Left Bar */}
+        {/* LEFT SIDEBAR */}
         <div className="h-full w-[288px] border-r border-concrete p-6">
-          {/* Top Metadata and CTA */}
           <div className="pb-6 border-b border-concrete space-y-6">
+            {/* PROFILE */}
             {account ? (
               <AccountMediaObject account={account} />
             ) : (
+              // LOADING STATE
               <div
                 tabIndex={0}
                 className={`h-10 w-full rounded-4xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
               />
             )}
+            {/* CTA */}
             <Link href={Routes.CreateProposalNew()}>
               <Button className="w-full">Propose</Button>
             </Link>
           </div>
-          {/* Tabs */}
+          {/* TABS */}
           <ul className="mt-6 space-y-2">
+            {/* PROPOSALS */}
             <li
               className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
                 activeTab === Tab.PROPOSALS && "bg-wet-concrete"
@@ -211,6 +217,7 @@ const WorkspaceHome: BlitzPage = () => {
               <LightBulbIcon className="h-5 w-5 text-white cursor-pointer" />
               <span>Proposals</span>
             </li>
+            {/* SETTINGS */}
             {!!session && session.userId === account?.id && (
               <li
                 className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
@@ -224,7 +231,7 @@ const WorkspaceHome: BlitzPage = () => {
             )}
           </ul>
         </div>
-        {/* Primary Content */}
+        {/* TAB CONTENT */}
         {activeTab === Tab.PROPOSALS ? <ProposalTab /> : <SettingsTab />}
       </div>
     </Layout>

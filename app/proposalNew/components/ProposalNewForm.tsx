@@ -4,7 +4,7 @@ import { RadioGroup } from "@headlessui/react"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import { SUPPORTED_CHAINS, ETH_METADATA } from "app/core/utils/constants"
+import { SUPPORTED_CHAINS, ETH_METADATA, LINKS } from "app/core/utils/constants"
 import networks from "app/utils/networks.json"
 import createProposal from "app/proposalNew/mutations/createProposalNew"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
@@ -111,6 +111,12 @@ const ProposeForm = () => {
       </Field>
       {/* BODY */}
       <label className="font-bold block mt-6">Details*</label>
+      <span className="text-xs text-concrete block">
+        Supports markdown syntax.{" "}
+        <a href={LINKS.MARKDOWN_GUIDE}>
+          <span className="text-electric-violet"> Learn more </span>
+        </a>
+      </span>
       <Field name="body" component="textarea" validate={requiredField}>
         {({ input, meta }) => (
           <div>

@@ -18,6 +18,7 @@ import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber
 import MetadataLabel from "app/core/components/MetadataLabel"
 import { LINKS } from "app/core/utils/constants"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
+import Preview from "app/core/components/MarkdownPreview"
 
 export const IpfsViewComponent = ({ ipfsHash, ipfsTimestamp }) => {
   const date = DateTime.fromISO(ipfsTimestamp)
@@ -91,6 +92,7 @@ const ViewProposalNew: BlitzPage = () => {
             </div>
           </>
         ) : (
+          // LOADING STATE
           <div
             tabIndex={0}
             className={`h-10 w-full flex flex-row rounded-4xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
@@ -152,10 +154,13 @@ const ViewProposalNew: BlitzPage = () => {
         setIsLoading={setIsActionPending}
         payment={proposal?.payments?.[0]}
       />
+      {/* HEADER SECTION */}
       <div className="flex flex-row pl-4 pt-12 pb-20 border-b border-concrete">
+        {/* TITLE */}
         <h2 className="ml-6 h-10 text-marble-white text-2xl font-bold w-full">
           {proposal?.data.content.title || " "}
         </h2>
+        {/* APPROVE BUTTON */}
         {showApproveButton && (
           <div className="relative self-start group mr-10">
             <Button
@@ -170,6 +175,7 @@ const ViewProposalNew: BlitzPage = () => {
             </Button>
           </div>
         )}
+        {/* PAY BUTTON */}
         {showPayButton && (
           <div className="relative self-start group mr-10">
             <Button
@@ -185,16 +191,20 @@ const ViewProposalNew: BlitzPage = () => {
           </div>
         )}
       </div>
+      {/* BODY SECTION */}
       <div className="h-[calc(100vh-164px)] flex flex-row">
-        <div className="w-full sm:min-w-[680px] p-12 overflow-y-scroll">
-          <p>{proposal?.data.content.body}</p>
+        {/* BODY */}
+        <div className="p-10 w-full overflow-y-scroll">
+          <Preview markdown={proposal?.data.content.body} />
         </div>
+        {/* IPFS */}
         {proposal?.data?.ipfsMetadata?.hash && (
           <IpfsViewComponent
             ipfsHash={proposal?.data?.ipfsMetadata?.hash}
             ipfsTimestamp={proposal?.data?.ipfsMetadata?.timestamp}
           />
         )}
+        {/* RIGHT SIDEBAR */}
         <div className="w-[36rem] border-l border-concrete flex-col overflow-y-scroll">
           {/* STATUS */}
           <div className="border-b border-concrete p-6">
@@ -222,12 +232,14 @@ const ViewProposalNew: BlitzPage = () => {
                 )}
               </div>
             ) : (
+              // LOADING STATE
               <div
                 tabIndex={0}
                 className={`h-6 w-48 mt-2 flex flex-row rounded-lg bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
               />
             )}
           </div>
+          {/* ROLES */}
           <div className="border-b border-concrete p-6">
             {/* CONTRIBUTOR */}
             <h4 className="text-xs font-bold text-concrete uppercase mb-2">Contributor</h4>
@@ -245,7 +257,7 @@ const ViewProposalNew: BlitzPage = () => {
               role={proposal?.roles?.find((role) => role.role === ProposalRoleType.AUTHOR)}
             />
           </div>
-          {/* Total payments summary */}
+          {/* TOTAL PAYMENTS */}
           {proposalContainsPayment ? (
             <div className="p-6">
               {/* NETWORK */}
@@ -261,10 +273,12 @@ const ViewProposalNew: BlitzPage = () => {
               <p className="mt-2 font-normal">{proposal?.data?.totalPayments?.[0]?.amount}</p>
             </div>
           ) : proposal ? (
+            // EMPTY STATE
             <div className="p-6">
               <p className="text-sm">This proposal contains no payments.</p>
             </div>
           ) : (
+            // LOADING STATE
             <></>
           )}
         </div>
