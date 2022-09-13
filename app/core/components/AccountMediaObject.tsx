@@ -4,7 +4,7 @@ import truncateString from "app/core/utils/truncateString"
 
 const AccountMediaObject = ({ account, className = "" }) => {
   return (
-    <Link href={Routes.ProfileHome({ accountAddress: account?.address })}>
+    <Link href={Routes.WorkspaceHome({ accountAddress: account?.address })}>
       <div className={`flex flex-row rounded ${className}`}>
         <div className="flex flex-col content-center align-middle mr-3">
           {account?.data?.pfpURL ? (
