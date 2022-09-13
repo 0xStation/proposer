@@ -51,6 +51,11 @@ const Navigation = ({ children }: { children?: any }) => {
   // set the active user. The active user will be
   // set to `null` if there isn't an existing account.
   useEffect(() => {
+    // sometimes on page loads, the session object isn't populated yet
+    // protect against setting an incorrect user with short-circuit
+    if (!session?.siwe?.address) {
+      return
+    }
     if (session?.siwe?.address !== activeUser?.address) {
       const setActiveAccount = async () => {
         const account = await invoke(getAccountByAddress, { address: session?.siwe?.address })
