@@ -102,6 +102,7 @@ const WorkspaceHome: BlitzPage = () => {
         <table className="w-full">
           <thead>
             <tr className="border-b border-concrete">
+              <th className="w-4">{/* spacer for left indent */}</th>
               <th className="text-xs uppercase text-light-concrete pb-2 text-left">Title</th>
               {/* <th className="text-xs uppercase text-light-concrete pb-2 text-left">Status</th> */}
               <th className="text-xs uppercase text-light-concrete pb-2 text-left">Payment</th>
@@ -118,18 +119,21 @@ const WorkspaceHome: BlitzPage = () => {
                     key={`table-row-${idx}`}
                   >
                     <tr className="border-b border-concrete cursor-pointer hover:bg-wet-concrete">
-                      <td className="text-xl py-4 font-bold">{proposal.data.content.title}</td>
+                      <td>{/* spacer */}</td>
+                      <td className="text-base py-4 font-bold w-128">
+                        {proposal.data.content.title}
+                      </td>
                       {/* <td className="py-4">
                         <span className="bg-neon-carrot text-tunnel-black px-2 py-1 rounded-full text-sm uppercase">
                           {proposal.status}
                         </span>
                       </td> */}
-                      <td className="text-xl py-4">
+                      <td className="text-base py-4 w-48">
                         {proposal.data.totalPayments.length > 0
                           ? `${proposal.data.totalPayments[0]?.amount} ${proposal.data.totalPayments[0]?.token.symbol}`
                           : "None"}
                       </td>
-                      <td className="text-xl py-4">{formatDate(proposal.timestamp)}</td>
+                      <td className="text-base py-4">{formatDate(proposal.timestamp)}</td>
                     </tr>
                   </Link>
                 )
