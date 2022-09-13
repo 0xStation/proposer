@@ -7,6 +7,7 @@ import { formatDate } from "app/core/utils/formatDate"
 import FilterPill from "app/core/components/FilterPill"
 import GetProposalsByAddress from "app/proposal/queries/getProposalsByAddress"
 import getProposalNewsByAddress from "app/proposalNew/queries/getProposalNewsByAddress"
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import Pagination from "app/core/components/Pagination"
 import {
   PROPOSAL_STATUS_DISPLAY_MAP,
@@ -18,43 +19,11 @@ import { ProposalStatus } from "app/proposal/types"
 import { ProposalRoleType } from "@prisma/client"
 import { LightBulbIcon, CogIcon } from "@heroicons/react/solid"
 import { ProposalNew } from "app/proposalNew/types"
+import AccountMediaObject from "app/core/components/AccountMediaObject"
 
 enum Tab {
   PROPOSALS = "PROPOSALS",
   SETTINGS = "SETTINGS",
-}
-
-// loose helpers for formatting -- we could clean this up into its own module
-// or even do some processing at the data fetching layer
-// but including it here for now to prioritize shipping
-const getPaymentTotal = (proposal: ProposalNew) => {
-  const payments = proposal.data.payments
-
-  if (!payments) {
-    return 0
-  }
-
-  const total = payments.reduce((acc, payment) => {
-    if (payment.amount) {
-      return acc + parseFloat(payment.amount)
-    }
-    return acc
-  }, 0)
-
-  return total
-}
-
-// payment could be null, we need to handle that case as well
-const getPaymentTotalFormatted = (proposal: ProposalNew) => {
-  const payments = proposal.data.payments
-  console.log(payments)
-
-  if (!payments || payments.length === 0) {
-    return "No payments"
-  }
-
-  const amount = getPaymentTotal(proposal)
-  return `${amount} ${payments[0]?.token.symbol}`
 }
 
 const WorkspaceHome: BlitzPage = () => {
@@ -77,13 +46,18 @@ const WorkspaceHome: BlitzPage = () => {
     { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
   )
 
+  const [account] = useQuery(
+    getAccountByAddress,
+    { address: toChecksumAddress(accountAddress) },
+    { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
+  )
+
   return (
     <Layout>
       <div className="flex flex-row h-full">
         <div className="h-full w-[288px] border-r border-concrete p-6">
           <div className="pb-6 border-b border-concrete space-y-6">
-            {/* AccountMediaObject? */}
-            <p>pfp</p>
+            <AccountMediaObject account={account} />
             <Link href={Routes.CreateProposalNew()}>
               <Button className="w-full">Propose</Button>
             </Link>
@@ -166,16 +140,25 @@ const WorkspaceHome: BlitzPage = () => {
               {proposals &&
                 proposals.map((proposal, idx) => {
                   return (
-                    <tr className="border-b border-concrete" key={`table-row-${idx}`}>
-                      <td className="text-xl py-4 font-bold">{proposal.data.content.title}</td>
-                      {/* <td className="py-4">
+                    <Link
+                      href={Routes.ViewProposalNew({ proposalId: proposal.id })}
+                      key={`table-row-${idx}`}
+                    >
+                      <tr className="border-b border-concrete cursor-pointer hover:bg-wet-concrete">
+                        <td className="text-xl py-4 font-bold">{proposal.data.content.title}</td>
+                        {/* <td className="py-4">
                         <span className="bg-neon-carrot text-tunnel-black px-2 py-1 rounded-full text-sm uppercase">
                           {proposal.status}
                         </span>
                       </td> */}
-                      <td className="text-xl py-4">{getPaymentTotalFormatted(proposal)}</td>
-                      <td className="text-xl py-4">{formatDate(proposal.timestamp)}</td>
-                    </tr>
+                        <td className="text-xl py-4">
+                          {proposal.data.totalPayments.length > 0
+                            ? `${proposal.data.totalPayments[0]?.amount} ${proposal.data.totalPayments[0]?.token.symbol}`
+                            : "None"}
+                        </td>
+                        <td className="text-xl py-4">{formatDate(proposal.timestamp)}</td>
+                      </tr>
+                    </Link>
                   )
                 })}
             </tbody>
