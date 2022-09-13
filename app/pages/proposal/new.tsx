@@ -1,12 +1,12 @@
 import { BlitzPage } from "blitz"
-import TempLayout from "app/core/layouts/TempLayout"
+import Layout from "app/core/layouts/Layout"
 import { ProposalNewForm } from "app/proposalNew/components/ProposalNewForm"
 
 const CreateProposalNew: BlitzPage = () => {
   return (
-    <TempLayout title="New Proposal">
+    <Layout title="New Proposal">
       <ProposalNewForm />
-    </TempLayout>
+    </Layout>
   )
 }
 
