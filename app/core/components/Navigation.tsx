@@ -42,16 +42,16 @@ const Navigation = ({ children }: { children?: any }) => {
   }
 
   const handleDisconnect = async () => {
-    setActiveUser(null)
     await invoke(logout, {})
     disconnect()
+    setActiveUser(null)
   }
 
   // If the user connects + signs their wallet,
   // set the active user. The active user will be
   // set to `null` if there isn't an existing account.
   useEffect(() => {
-    if (session?.siwe?.address && !activeUser) {
+    if (session?.siwe?.address !== activeUser?.address) {
       const setActiveAccount = async () => {
         const account = await invoke(getAccountByAddress, { address: session?.siwe?.address })
         if (!account) {
@@ -88,6 +88,10 @@ const Navigation = ({ children }: { children?: any }) => {
           />
           {!address ? (
             <Button onClick={() => toggleWalletModal(true)}>Connect wallet</Button>
+          ) : !activeUser || activeUser?.address !== address ? (
+            <Button overrideWidthClassName="w-[162px]" onClick={() => toggleWalletModal(true)}>
+              Sign in
+            </Button>
           ) : (
             <Dropdown
               className="h-[35px]"
@@ -96,7 +100,7 @@ const Navigation = ({ children }: { children?: any }) => {
                   <span className="flex flex-row space-x-2 items-center">
                     <Avatar size={Sizes.SM} pfpURL={activeUser?.data.pfpURL} />
                     <span className="block text-marble-white text-sm mr-12">
-                      @{truncateString(address)}
+                      @{truncateString(activeUser?.address || "")}
                     </span>
                     <DropdownChevronIcon />
                   </span>
@@ -121,7 +125,7 @@ const Navigation = ({ children }: { children?: any }) => {
       <div className="h-[calc(100vh-70px)] w-[70px] bg-tunnel-black border-r border-concrete fixed top-[70px] left-0 text-center flex flex-col">
         <div className="h-full mt-4">
           <ExploreIcon />
-          <ProfileIcon activeUser={activeUser} />
+          {address === activeUser?.address && <ProfileIcon activeUser={activeUser} />}
         </div>
       </div>
       <div className="h-[calc(100vh-70px)] ml-[70px] relative overflow-y-scroll">{children}</div>
