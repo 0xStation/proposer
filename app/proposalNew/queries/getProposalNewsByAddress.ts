@@ -6,7 +6,7 @@ import { ProposalStatus } from "@prisma/client"
 const GetProposalNewsByAddress = z.object({
   address: z.string(),
   statuses: z.any().array().optional(),
-  roles: z.string().array().optional(),
+  roles: z.any().array().optional(),
 })
 
 export default async function getProposalNewsByAddress(
@@ -19,6 +19,12 @@ export default async function getProposalNewsByAddress(
       roles: {
         some: {
           address: data.address,
+          ...(data.roles &&
+            data.roles.length > 0 && {
+              role: {
+                in: data.roles,
+              },
+            }),
         },
       },
       ...(data.statuses &&

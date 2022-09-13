@@ -74,19 +74,19 @@ const WorkspaceHome: BlitzPage = () => {
                 invalidateQuery(getProposalNewsByAddress)
               }}
             />
-            {/* <FilterPill
-                label="My role"
-                filterOptions={PROPOSAL_ROLE_FILTER_OPTIONS.map((rfpStatus) => ({
-                  name: rfpStatus.toUpperCase(),
-                  value: rfpStatus,
-                }))}
-                appliedFilters={proposalRoleFilters}
-                setAppliedFilters={setProposalRoleFilters}
-                refetchCallback={() => {
-                  setPage(0)
-                  invalidateQuery(GetProposalsByAddress)
-                }}
-              /> */}
+            <FilterPill
+              label="My role"
+              filterOptions={PROPOSAL_ROLE_FILTER_OPTIONS.map((rfpStatus) => ({
+                name: rfpStatus.toUpperCase(),
+                value: rfpStatus,
+              }))}
+              appliedFilters={proposalRoleFilters}
+              setAppliedFilters={setProposalRoleFilters}
+              refetchCallback={() => {
+                setPage(0)
+                invalidateQuery(getProposalNewsByAddress)
+              }}
+            />
           </div>
           <Pagination
             results={proposals as any[]}
