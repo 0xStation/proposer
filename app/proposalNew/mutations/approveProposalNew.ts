@@ -92,6 +92,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       ipfsPinSize: ipfsResponse.PinSize,
       ipfsTimestamp: ipfsResponse.Timestamp,
       totalPayments: proposal?.data?.totalPayments,
+      paymentTerms: proposal?.data?.paymentTerms,
     })
     return updatedProposal
   } catch (err) {

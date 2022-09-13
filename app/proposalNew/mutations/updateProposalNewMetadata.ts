@@ -1,3 +1,4 @@
+import { PaymentTerm } from "app/proposalPayment/types"
 import { ZodToken } from "app/types/zod"
 import db from "db"
 import * as z from "zod"
@@ -11,6 +12,7 @@ const UpdateProposalNewMetadata = z.object({
   ipfsPinSize: z.number().optional(),
   ipfsTimestamp: z.string().optional(),
   totalPayments: z.object({ token: ZodToken, amount: z.number() }).array(),
+  paymentTerms: z.enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION]).optional(),
 })
 
 // Only updates the metadata of a proposal
@@ -32,6 +34,7 @@ export default async function updateProposalMetadata(
       timestamp: ipfsTimestamp,
     },
     totalPayments: params.totalPayments,
+    paymentTerms: params.paymentTerms,
   } as unknown as ProposalNewMetadata
 
   try {
