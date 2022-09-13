@@ -193,7 +193,7 @@ const WorkspaceHome: BlitzPage = () => {
             ) : (
               <div
                 tabIndex={0}
-                className={`flex flex-row w-full rounded-lg bg-wet-concrete shadow border-solid h-[40px] motion-safe:animate-pulse`}
+                className={`h-10 w-full rounded-4xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
               />
             )}
             <Link href={Routes.CreateProposalNew()}>
