@@ -112,7 +112,7 @@ const WorkspaceSettingsOverviewForm = ({
           const parameters = {
             address: account?.address!,
             name: values.name,
-            bio: values.about,
+            bio: values.bio,
             pfpURL,
             email: values.email,
           }
@@ -161,7 +161,7 @@ const WorkspaceSettingsOverviewForm = ({
             {/* ABOUT */}
             <label className="font-bold block mt-6">About</label>
             <p className="text-concrete text-sm">150 characters max.</p>
-            <Field component="textarea" name="about" validate={mustBeUnderNumCharacters(150)}>
+            <Field component="textarea" name="bio" validate={mustBeUnderNumCharacters(150)}>
               {({ input, meta }) => (
                 <div>
                   <textarea
