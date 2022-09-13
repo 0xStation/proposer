@@ -22,13 +22,9 @@ const Explore: BlitzPage = () => {
 
   return (
     <Layout title="Explore">
-      <div className="h-screen">
-        <div className="pt-8 px-8 pb-3 flex flex-row justify-between">
-          <div>
-            <h1 className="font-bold text-2xl">Explore</h1>
-          </div>
-        </div>
-        <div className="flex flex-col sm:flex-row justify-between pl-8">
+      <div className="h-[calc(100vh-240px)] p-10 flex-1">
+        <h1 className="font-bold text-2xl">Explore</h1>
+        <div className="flex flex-row mb-4 border-b border-concrete sm:flex-row justify-between">
           {/* Tabs */}
           <div className="self-end flex flex-row space-x-4">
             <span
@@ -50,17 +46,45 @@ const Explore: BlitzPage = () => {
             className="pl-6 sm:pr-6 text-sm pt-5 mb-5"
           />
         </div>
-        {/* Table Columns */}
-        <div className="border-y border-concrete pt-8 text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
-          <span className="basis-64 ml-6 mb-2 tracking-wider">Info</span>
-          <span className="basis-[42rem] ml-9 mb-2 tracking-wider">About</span>
-        </div>
-        {/* Table Rows */}
-        <div className="overflow-y-scroll h-[calc(100vh-141px)]">
-          {accounts?.map((account, i) => {
-            return <WorkspaceComponent account={account} key={i} />
-          })}
-        </div>
+        {/* Table */}
+        <table className="w-full table-auto">
+          {/* Columns */}
+          <thead>
+            <tr className="border-b border-concrete">
+              <th className="w-4">{/* spacer for left indent */}</th>
+              <th className="text-xs uppercase text-light-concrete pb-2 text-left">Info</th>
+              <th className="text-xs uppercase text-light-concrete pb-2 text-left">About</th>
+            </tr>
+          </thead>
+          {/* Rows */}
+          <tbody>
+            {accounts &&
+              accounts.map((account, idx) => {
+                return (
+                  <Link
+                    href={Routes.WorkspaceHome({ accountAddress: account.address as string })}
+                    key={`table-row-${idx}`}
+                  >
+                    <tr className="border-b border-concrete cursor-pointer hover:bg-wet-concrete">
+                      <td>{/* spacer */}</td>
+                      <td className="py-4 w-64">
+                        <AccountMediaObject account={account} />
+                      </td>
+                      <td className="text-normal py-4">{account?.data?.bio}</td>
+                    </tr>
+                  </Link>
+                )
+              })}
+          </tbody>
+        </table>
+        {!accounts &&
+          Array.from(Array(10)).map((idx) => (
+            <div
+              key={idx}
+              tabIndex={0}
+              className="h-[72px] w-full flex flex-row my-1 rounded-lg bg-wet-concrete shadow border-solid motion-safe:animate-pulse"
+            />
+          ))}
       </div>
     </Layout>
   )

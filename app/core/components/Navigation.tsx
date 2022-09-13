@@ -70,7 +70,7 @@ const Navigation = ({ children }: { children?: any }) => {
   return (
     <>
       <div className="w-full border-b border-concrete h-[70px] px-6 flex items-center justify-between">
-        <Link href={Routes.Explore()}>
+        <Link href={Routes.Explore({})}>
           <Image src={StationLogo} alt="Station logo" height={30} width={80} />
         </Link>
         <div className="flex flex-row items-center space-x-4">
