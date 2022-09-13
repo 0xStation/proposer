@@ -12,10 +12,11 @@ import { useDisconnect, useNetwork, useSwitchNetwork, useAccount, defaultChains 
 import logout from "app/session/mutations/logout"
 import Button from "app/core/components/sds/buttons/Button"
 import truncateString from "app/core/utils/truncateString"
-import { ChevronDownIcon, DotsHorizontalIcon } from "@heroicons/react/solid"
+import { DotsHorizontalIcon } from "@heroicons/react/solid"
 import { LINKS, SUPPORTED_CHAIN_IDS, Sizes } from "app/core/utils/constants"
 import Avatar from "app/core/components/sds/images/avatar"
 import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
+import DropdownChevronIcon from "../icons/DropdownChevronIcon"
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -91,14 +92,14 @@ const Navigation = ({ children }: { children?: any }) => {
             <Dropdown
               className="h-[35px]"
               button={
-                <div className="border border-marble-white px-2 h-[35px] inline-flex w-full justify-center items-center rounded-md text-sm">
+                <div className="px-2 h-[35px] inline-flex w-full justify-center items-center rounded-md text-sm">
                   <span className="flex flex-row space-x-2 items-center">
-                    <Avatar size={Sizes.SM} />
-                    <span className="block text-marble-white text-sm">
+                    <Avatar size={Sizes.SM} pfpURL={activeUser?.data.pfpURL} />
+                    <span className="block text-marble-white text-sm mr-12">
                       @{truncateString(address)}
                     </span>
+                    <DropdownChevronIcon />
                   </span>
-                  <ChevronDownIcon className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
                 </div>
               }
               items={[{ name: "Disconnect", onClick: () => handleDisconnect() }]}
