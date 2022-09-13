@@ -92,6 +92,7 @@ const ViewProposalNew: BlitzPage = () => {
             </div>
           </>
         ) : (
+          // LOADING STATE
           <div
             tabIndex={0}
             className={`h-10 w-full flex flex-row rounded-4xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
