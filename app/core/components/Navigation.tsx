@@ -17,6 +17,7 @@ import truncateString from "app/core/utils/truncateString"
 import { ChevronDownIcon, DotsHorizontalIcon } from "@heroicons/react/solid"
 import { LINKS, SUPPORTED_CHAIN_IDS, Sizes } from "app/core/utils/constants"
 import Avatar from "app/core/components/sds/images/avatar"
+import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -74,13 +75,6 @@ const Navigation = ({ children }: { children?: any }) => {
     { suspense: false, enabled: !!activeUser?.id }
   )
 
-  const terminalsView =
-    usersTerminals && Array.isArray(usersTerminals) && usersTerminals?.length > 0
-      ? usersTerminals?.map((terminal, idx) => (
-          <TerminalIcon terminal={terminal} key={`${terminal.handle}${idx}`} />
-        ))
-      : null
-
   return (
     <>
       <div className="w-full border-b border-concrete h-[70px] px-6 flex items-center justify-between">
@@ -134,7 +128,7 @@ const Navigation = ({ children }: { children?: any }) => {
       <div className="h-[calc(100vh-70px)] w-[70px] bg-tunnel-black border-r border-concrete fixed top-[70px] left-0 text-center flex flex-col">
         <div className="h-full mt-4">
           <ExploreIcon />
-          {terminalsView}
+          <ProfileIcon activeUser={activeUser} />
         </div>
       </div>
       <div className="h-[calc(100vh-70px)] ml-[70px] relative overflow-y-scroll">{children}</div>
@@ -142,38 +136,39 @@ const Navigation = ({ children }: { children?: any }) => {
   )
 }
 
-const TerminalIcon = ({ terminal }) => {
-  const terminalHandle = useParam("terminalHandle", "string") as string
-  const isTerminalSelected = terminalHandle === terminal.handle
-  const router = useRouter()
+const ProfileIcon = ({ activeUser }) => {
+  if (!activeUser) {
+    return <></>
+  }
+  const profileSelected =
+    typeof window !== "undefined" &&
+    window?.location?.pathname ===
+      genUrlFromRoute(Routes.ProfileHome({ accountAddress: activeUser.address }))
+
   return (
-    <div className="relative flex items-center justify-center group">
-      <span
-        className={`${
-          isTerminalSelected ? "scale-100" : "scale-0 group-hover:scale-75"
-        }  absolute w-[3px] h-[46px] min-w-max left-0 rounded-r-lg inline-block mr-2 mb-4
-    bg-marble-white
-    transition-all duration-200 origin-left`}
-      />
-      <button
-        className={`${
-          isTerminalSelected ? "border-marble-white" : "border-wet-concrete"
-        } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg mb-4`}
-        onClick={() => router.push(Routes.BulletinPage({ terminalHandle: terminal.handle }))}
-      >
-        {(terminal?.data as TerminalMetadata)?.pfpURL ? (
-          <img
-            className="object-fill w-[46px] h-[46px]"
-            src={(terminal?.data as TerminalMetadata)?.pfpURL}
-            onError={(e) => {
-              e.currentTarget.src = DEFAULT_PFP_URLS.TERMINAL
-            }}
+    <Link href={Routes.ProfileHome({ accountAddress: activeUser.address })}>
+      <div className="relative flex items-center justify-center group">
+        <span
+          className={`${
+            profileSelected ? "scale-100" : "scale-0 group-hover:scale-75"
+          }  absolute w-[3px] h-[46px] min-w-max left-0 rounded-r-lg inline-block mr-2 mb-4
+bg-marble-white
+transition-all duration-200 origin-left`}
+        />
+        <button
+          className={`${
+            profileSelected ? "border-marble-white" : "border-wet-concrete"
+          } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg h-[47px] mb-4`}
+        >
+          <Image
+            src={activeUser?.data?.pfpURL || DEFAULT_PFP_URLS.USER}
+            alt="Account profile picture. If no profile picture is set, there is a blue to green linear gradient."
+            height={46}
+            width={46}
           />
-        ) : (
-          <span className="w-[46px] h-[46px] bg-gradient-to-b  from-neon-blue to-torch-red block rounded-lg" />
-        )}
-      </button>
-    </div>
+        </button>
+      </div>
+    </Link>
   )
 }
 
