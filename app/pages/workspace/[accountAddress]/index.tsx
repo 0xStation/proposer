@@ -10,7 +10,7 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import Pagination from "app/core/components/Pagination"
 import {
   PAGINATION_TAKE,
-  PROPOSAL_STATUSES_FILTER_OPTIONS,
+  PROPOSAL_NEW_STATUS_FILTER_OPTIONS,
   PROPOSAL_ROLE_FILTER_OPTIONS,
   PROPOSAL_NEW_STATUS_DISPLAY_MAP,
 } from "app/core/utils/constants"
@@ -60,23 +60,21 @@ const WorkspaceHome: BlitzPage = () => {
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
         <h1 className="text-2xl font-bold">Proposals</h1>
         <div className="mt-12 mb-4 border-b border-concrete pb-4 flex flex-row justify-between">
-          {/* empty div to push the pagination to the right before filters come back in */}
-          <div></div>
-          {/* <div className="space-x-2 flex flex-row">
-              <FilterPill
-                label="status"
-                filterOptions={PROPOSAL_STATUSES_FILTER_OPTIONS.map((rfpStatus) => ({
-                  name: PROPOSAL_STATUS_DISPLAY_MAP[rfpStatus]?.copy?.toUpperCase(),
-                  value: rfpStatus,
-                }))}
-                appliedFilters={proposalStatusFilters}
-                setAppliedFilters={setProposalStatusFilters}
-                refetchCallback={() => {
-                  setPage(0)
-                  invalidateQuery(GetProposalsByAddress)
-                }}
-              />
-              <FilterPill
+          <div className="space-x-2 flex flex-row">
+            <FilterPill
+              label="status"
+              filterOptions={PROPOSAL_NEW_STATUS_FILTER_OPTIONS.map((pnStatus) => ({
+                name: PROPOSAL_NEW_STATUS_DISPLAY_MAP[pnStatus]?.copy?.toUpperCase(),
+                value: pnStatus,
+              }))}
+              appliedFilters={proposalStatusFilters}
+              setAppliedFilters={setProposalStatusFilters}
+              refetchCallback={() => {
+                setPage(0)
+                invalidateQuery(getProposalNewsByAddress)
+              }}
+            />
+            {/* <FilterPill
                 label="My role"
                 filterOptions={PROPOSAL_ROLE_FILTER_OPTIONS.map((rfpStatus) => ({
                   name: rfpStatus.toUpperCase(),
@@ -88,8 +86,8 @@ const WorkspaceHome: BlitzPage = () => {
                   setPage(0)
                   invalidateQuery(GetProposalsByAddress)
                 }}
-              />
-            </div> */}
+              /> */}
+          </div>
           <Pagination
             results={proposals as any[]}
             resultsCount={(proposals ? proposals.length : 0) as number}

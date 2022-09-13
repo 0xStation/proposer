@@ -121,6 +121,14 @@ export const PROPOSAL_STATUSES_FILTER_OPTIONS = [
   ProductProposalStatus.APPROVED,
 ]
 
+export const PROPOSAL_NEW_STATUS_FILTER_OPTIONS = [
+  ProposalNewStatus.APPROVED,
+  ProposalNewStatus.DELETED,
+  ProposalNewStatus.DRAFT,
+  ProposalNewStatus.IN_REVIEW,
+  ProposalNewStatus.PUBLISHED,
+]
+
 export const PROPOSAL_ROLE_FILTER_OPTIONS = [
   ProposalRoleType.AUTHOR,
   ProposalRoleType.CLIENT,

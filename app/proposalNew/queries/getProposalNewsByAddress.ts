@@ -21,6 +21,12 @@ export default async function getProposalNewsByAddress(
           address: data.address,
         },
       },
+      ...(data.statuses &&
+        data.statuses.length > 0 && {
+          status: {
+            in: data.statuses,
+          },
+        }),
     },
     orderBy: {
       timestamp: "desc",
