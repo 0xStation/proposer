@@ -1,13 +1,12 @@
+import { computeProposalStatus } from "app/proposal/utils"
 import db from "db"
 import * as z from "zod"
-import { AccountProposalWithProposalPreloaded } from "app/proposal/types"
+import { Account } from "../types"
 import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
 const GetAccountProposalsByAddress = z.object({
   address: z.string(),
-  statuses: z.string().array().optional(),
-  roles: z.string().array().optional(),
 })
 
 export default async function getAccountProposalsByAddress(
@@ -16,9 +15,7 @@ export default async function getAccountProposalsByAddress(
   const data = GetAccountProposalsByAddress.parse(input)
 
   const accountProposals = await db.accountProposal.findMany({
-    where: {
-      address: data.address,
-    },
+    where: { address: data.address },
     include: {
       terminal: true,
       proposal: {
@@ -43,7 +40,7 @@ export default async function getAccountProposalsByAddress(
               : accountProposal.proposal.status,
         },
       }
-    }) as unknown as AccountProposalWithProposalPreloaded[]
+    })
 
   return accountProposalsWithProductStatus
 }
