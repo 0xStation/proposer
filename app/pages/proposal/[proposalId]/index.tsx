@@ -10,7 +10,6 @@ import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import { getNetworkName } from "app/core/utils/getNetworkName"
 import { ProposalRoleType } from "@prisma/client"
-import truncateString from "app/core/utils/truncateString"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
 import ExecutePaymentModal from "app/proposalNew/components/ExecutePaymentModal"
 import TransactionLink from "app/core/components/TransactionLink"
@@ -118,9 +117,10 @@ const ViewProposalNew: BlitzPage = () => {
   })()
 
   const paymentComplete = !!proposal?.payments?.[0]?.transactionHash
+  const hasPayment = (proposal?.payments.length || 0) > 0
 
   const showApproveButton = userHasRole && !userHasSigned
-  const showPayButton = commitmentsComplete && userIsPayer && !paymentComplete
+  const showPayButton = hasPayment && commitmentsComplete && userIsPayer && !paymentComplete
 
   const uniqueRoleAddresses = (proposal?.roles || [])
     .map((role) => toChecksumAddress(role.address))

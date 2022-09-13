@@ -1,3 +1,5 @@
+import { TokenType } from "@prisma/client"
+
 // convenience metadata for application consumption, metadata is verifiable on-chain
 export type Token = {
   chainId: number
@@ -6,11 +8,4 @@ export type Token = {
   name?: string
   symbol?: string
   decimals?: number
-}
-
-export enum TokenType {
-  COIN = "COIN",
-  ERC20 = "ERC20",
-  ERC721 = "ERC721",
-  ERC1155 = "ERC1155",
 }

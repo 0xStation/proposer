@@ -26,6 +26,8 @@
     "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
     "stablecoins": [
       {
+        "type": "ERC20",
+        "name": "USD Coin",
         "symbol": "USDC",
         "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         "decimals": 6
@@ -52,6 +54,8 @@
     "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
     "stablecoins": [
       {
+        "type": "ERC20",
+        "name": "USD Coin",
         "symbol": "USDC",
         "address": "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
         "decimals": 6
@@ -73,6 +77,8 @@
     "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
     "stablecoins": [
       {
+        "type": "ERC20",
+        "name": "USD Coin",
         "symbol": "USDC",
         "address": "0x2f3A40A3db8a7e3D09B0adfEfbCe4f6F81927557",
         "decimals": 6

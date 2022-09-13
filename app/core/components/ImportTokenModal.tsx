@@ -6,7 +6,7 @@ import createAndConnectTokenToAccount from "app/token/mutations/createAndConnect
 import { Field, Form } from "react-final-form"
 import { SUPPORTED_CHAINS } from "../utils/constants"
 import { useState } from "react"
-import { TokenType } from "app/proposalNew/types"
+import { TokenType } from "@prisma/client"
 import { composeValidators, isAddress, requiredField } from "app/utils/validators"
 
 export const ImportTokenModal = ({

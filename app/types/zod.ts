@@ -1,4 +1,4 @@
-import { TokenType } from "app/token/types"
+import { TokenType } from "@prisma/client"
 import * as z from "zod"
 
 // use ZodToken.partial() for all optional fields
