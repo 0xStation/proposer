@@ -30,6 +30,8 @@ export type Account = {
   discordId?: string
   addressType?: AddressType
   data: AccountMetadata
+  createdAt?: Date
+  updatedAt?: Date
   role?: string
   points?: number
   joinedAt?: Date
