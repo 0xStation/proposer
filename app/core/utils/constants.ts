@@ -31,14 +31,6 @@ export const CONTRACTS = {
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
-export const CHAIN_IDS = {
-  ETHEREUM: 1,
-  RINKEBY: 4,
-  GOERLI: 5,
-  OPTIMISM: 10,
-  POLYGON: 137,
-}
-
 export const DEFAULT_PFP_URLS = {
   USER: "https://station-images.nyc3.digitaloceanspaces.com/pfp-gradient.png",
   TERMINAL: "https://station-images.nyc3.digitaloceanspaces.com/terminal-gradient.png",
@@ -102,16 +94,6 @@ export const SENDGRID_TEMPLATES = {
   NEW_PROPOSAL: "d-a73399b0868b4dbaae6dbff04b887f53",
   APPROVED_PROPOSAL: "d-1e84326048464c8c8277949bfde770fe",
   VERIFY: "d-9e113acf1a9f4830beaf3aa3553f9fde",
-}
-
-export const SUPPORTED_CHAINS = [chain.mainnet, chain.rinkeby, chain.goerli]
-
-export const ETH_METADATA = {
-  type: TokenType.COIN,
-  name: "Ether",
-  symbol: "ETH",
-  address: ZERO_ADDRESS,
-  decimals: 18,
 }
 
 export const getStablecoinMetadataBySymbol = ({ chain = 1, symbol = "USDC" }) => {
@@ -233,12 +215,23 @@ export const LINKS = {
     "https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax",
 }
 
-// 1 - eth
-// 4 - rinkeby
-// 5 - goerli
-// 10 - optimism
-// 137 - polygon
-export const SUPPORTED_CHAIN_IDS = [1, 4, 5, 10, 137]
+export const CHAIN_IDS = {
+  ETHEREUM: 1,
+  RINKEBY: 4,
+  GOERLI: 5,
+  OPTIMISM: 10,
+  POLYGON: 137,
+}
+
+export const SUPPORTED_CHAINS = [
+  chain.mainnet,
+  chain.rinkeby,
+  chain.goerli,
+  chain.optimism,
+  chain.polygon,
+]
+
+export const SUPPORTED_CHAIN_IDS = SUPPORTED_CHAINS.map((chain) => chain.id)
 
 export enum Sizes {
   SM = "SM",
@@ -263,6 +256,8 @@ export const PAYMENT_TERM_MAP = {
     copy: "Pay after proposal completion",
   },
 }
+
+export const txPathString = "/tx/"
 
 // LEGACY BELOW
 

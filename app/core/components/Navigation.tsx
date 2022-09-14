@@ -4,7 +4,6 @@ import { Image, invoke, Routes, useRouter, useSession, Link } from "blitz"
 import useStore from "../hooks/useStore"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import createAccount from "app/account/mutations/createAccount"
-import { DEFAULT_PFP_URLS } from "../utils/constants"
 import ExploreImageIcon from "public/explore.svg"
 import Dropdown from "app/core/components/Dropdown"
 import Listbox from "app/core/components/Listbox"
@@ -12,7 +11,7 @@ import { useDisconnect, useNetwork, useSwitchNetwork, useAccount, allChains } fr
 import logout from "app/session/mutations/logout"
 import Button from "app/core/components/sds/buttons/Button"
 import truncateString from "app/core/utils/truncateString"
-import { LINKS, SUPPORTED_CHAIN_IDS, Sizes } from "app/core/utils/constants"
+import { DEFAULT_PFP_URLS, LINKS, SUPPORTED_CHAINS, Sizes } from "app/core/utils/constants"
 import Avatar from "app/core/components/sds/images/avatar"
 import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 import DropdownChevronIcon from "../icons/DropdownChevronIcon"
@@ -31,9 +30,8 @@ const Navigation = ({ children }: { children?: any }) => {
   const { disconnect } = useDisconnect()
   const { chain } = useNetwork()
   const { switchNetwork, isError, error } = useSwitchNetwork()
-  const supportedChains = allChains.filter((chain) => SUPPORTED_CHAIN_IDS.includes(chain.id))
   // the useNetwork object weirdly doesn't have the right names, but the objects from allChains do so we convert
-  const connectedChain = supportedChains.find((supportedChain) => supportedChain.id === chain?.id)
+  const connectedChain = SUPPORTED_CHAINS.find((supportedChain) => supportedChain.id === chain?.id)
   const isChainSupported = !!connectedChain
   const [newWorkspaceModalOpen, setNewWorkspaceModalOpen] = useState<boolean>(false)
 
@@ -102,10 +100,10 @@ const Navigation = ({ children }: { children?: any }) => {
           <Listbox
             error={isChainSupported === false ? { message: "Switch network" } : undefined}
             defaultValue={connectedChain}
-            items={supportedChains}
+            items={SUPPORTED_CHAINS}
             onChange={(item) => {
               switchNetwork?.(item.id)
-              const activeChain = supportedChains.find((chain) => chain.id === item.id)
+              const activeChain = SUPPORTED_CHAINS.find((chain) => chain.id === item.id)
               setActiveChain?.(activeChain)
               return true
             }}

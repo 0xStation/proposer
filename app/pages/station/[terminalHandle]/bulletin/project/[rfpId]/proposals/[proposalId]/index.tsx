@@ -54,7 +54,7 @@ import { ProposalStatus } from "app/proposal/types"
 import SuccessProposalModal from "app/proposal/components/SuccessProposalModal"
 import SelectCheckbookModal from "app/checkbook/components/SelectCheckbookModal"
 import { AddressType } from "@prisma/client"
-import { getNetworkName } from "app/core/utils/getNetworkName"
+import { getNetworkName } from "app/core/utils/networkInfo"
 import Button from "app/core/components/sds/buttons/Button"
 
 const {
