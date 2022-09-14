@@ -234,18 +234,20 @@ const RewardForm = ({
   let abortController = new AbortController()
 
   const handleEnsAddressInputValOnKeyUp = (val, setValToCheckEns) => {
+    const fieldVal = val.trim()
     // if value is already an address, we don't need to check for ens
-    if (ethersIsAddress(val)) return
+    if (ethersIsAddress(fieldVal)) return
 
     // set state input val to update ens address
-    setValToCheckEns(val)
+    setValToCheckEns(fieldVal)
   }
 
   const handleAddressInputValOnBlur = async (val, setAddressType, ensAddress) => {
     abortController.abort() // Cancel the previous request
     abortController = new AbortController()
+    const fieldVal = val.trim()
 
-    const address = ensAddress || val
+    const address = ensAddress || fieldVal
     if (selectedNetworkId !== 0 && ethersIsAddress(address)) {
       try {
         const gnosisSafeDetails = await getGnosisSafeDetails(
@@ -791,7 +793,9 @@ export const ProposalNewForm = () => {
         <Stepper step={proposalStep} />
         <Form
           onSubmit={async (values: any, form) => {
-            const resolvedContributorAddress = await handleResolveEnsAddress(values.contributor)
+            const resolvedContributorAddress = await handleResolveEnsAddress(
+              values.contributor?.trim()
+            )
 
             if (!resolvedContributorAddress) {
               setToastState({
@@ -801,7 +805,7 @@ export const ProposalNewForm = () => {
               })
               return
             }
-            const resolvedClientAddress = await handleResolveEnsAddress(values.client)
+            const resolvedClientAddress = await handleResolveEnsAddress(values.client?.trim())
 
             if (!resolvedClientAddress) {
               setToastState({
@@ -869,17 +873,25 @@ export const ProposalNewForm = () => {
                 return
               }
             }
-
-            await createProposalMutation({
-              contentTitle: values.title,
-              contentBody: values.body,
-              contributorAddresses: [resolvedContributorAddress],
-              clientAddresses: [resolvedClientAddress],
-              authorAddresses: [activeUser!.address!],
-              milestones,
-              payments,
-              paymentTerms: values.paymentTerms,
-            })
+            try {
+              await createProposalMutation({
+                contentTitle: values.title,
+                contentBody: values.body,
+                contributorAddresses: [resolvedContributorAddress],
+                clientAddresses: [resolvedClientAddress],
+                authorAddresses: [activeUser!.address!],
+                milestones,
+                payments,
+                paymentTerms: values.paymentTerms,
+              })
+            } catch (err) {
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: err.message,
+              })
+              return
+            }
           }}
           render={({ form, handleSubmit }) => {
             const formState = form.getState()
