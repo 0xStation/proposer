@@ -4,6 +4,7 @@ import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import networks from "app/utils/networks.json"
 import { TokenType } from "@prisma/client"
 import { ProposalRoleType } from "@prisma/client"
+import { PaymentTerm } from "app/proposalPayment/types"
 
 export const CONTRACTS = {
   // Localhost, change to whatever the forge script outputs when running local anvil
@@ -34,6 +35,8 @@ export const CHAIN_IDS = {
   ETHEREUM: 1,
   RINKEBY: 4,
   GOERLI: 5,
+  OPTIMISM: 10,
+  POLYGON: 137,
 }
 
 export const DEFAULT_PFP_URLS = {
@@ -233,7 +236,9 @@ export const LINKS = {
 // 1 - eth
 // 4 - rinkeby
 // 5 - goerli
-export const SUPPORTED_CHAIN_IDS = [1, 4, 5]
+// 10 - optimism
+// 137 - polygon
+export const SUPPORTED_CHAIN_IDS = [1, 4, 5, 10, 137]
 
 export enum Sizes {
   SM = "SM",
@@ -248,6 +253,15 @@ export enum FeatureFlagStatus {
 
 export const FEATURE_FLAG_KEYS = {
   MEMBER_DIRECTORY: "member_directory",
+}
+
+export const PAYMENT_TERM_MAP = {
+  [PaymentTerm.ON_AGREEMENT]: {
+    copy: "Pay on proposal agreement",
+  },
+  [PaymentTerm.AFTER_COMPLETION]: {
+    copy: "Pay after proposal completion",
+  },
 }
 
 // LEGACY BELOW

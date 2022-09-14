@@ -6,6 +6,7 @@ import { ProposalNewMetadata } from "../types"
 import { ProposalType } from "db"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
 import { Token } from "app/token/types"
+import { PaymentTerm } from "app/proposalPayment/types"
 
 const CreateProposal = z.object({
   contentTitle: z.string(),
@@ -21,6 +22,7 @@ const CreateProposal = z.object({
   ipfsTimestamp: z.date().optional(),
   milestones: ZodMilestone.array(),
   payments: ZodPayment.array(),
+  paymentTerms: z.enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION]).optional(),
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
@@ -61,6 +63,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       timestamp: ipfsTimestamp,
     },
     totalPayments: Object.values(totalPayments),
+    paymentTerms: params.paymentTerms,
   } as unknown as ProposalNewMetadata
 
   const proposal = await db.proposalNew.create({
