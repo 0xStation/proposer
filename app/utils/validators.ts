@@ -2,6 +2,8 @@ import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import isURL from "validator/lib/isURL"
 import isEmail from "validator/lib/isEmail"
 import { formatTokenAmount } from "./formatters"
+import { getNetworkExplorer } from "app/core/utils/networkInfo"
+import { txPathString } from "app/core/utils/constants"
 
 // reducer that takes in an array of validators (functions) and returns the appropriate error
 // useful if you have a form field that has a few different validations (required field, must be number, etc)
@@ -73,11 +75,10 @@ export const isValidEmail = (email: string) => {
   return isEmail(email) ? undefined : "Invalid email"
 }
 
-export const isPositiveAmount = (amount: number) => {
+export const isPositiveAmount = (amount: string) => {
   if (!amount) return undefined
-  if (typeof amount === "number") return undefined
-  if (amount >= 0) return undefined // want to allow 0 amount proposals?
-  return "Amount must be a number greater than or equal to zero."
+  if (parseFloat(amount) > 0) return undefined // want to allow 0 amount proposals?
+  return "Amount must be greater than zero."
 }
 
 export const isValidTokenAmount = (decimals: number) => {
@@ -110,6 +111,26 @@ export const maximumDecimals = (decimals: number) => {
     if (fraction?.length > decimals) {
       return `Cannot have more than ${decimals} decimal places.`
     }
+    return undefined
+  }
+}
+
+export const isValidTransactionLink = (chainId: number) => {
+  return (link: string) => {
+    const explorerUrl = getNetworkExplorer(chainId)
+    if (!explorerUrl) return "Chain id has no verified explorer URL"
+
+    if (link.indexOf(explorerUrl) < 0)
+      return "Link does not match this chain's block explorer: " + explorerUrl
+
+    if (link.indexOf(explorerUrl + txPathString) < 0)
+      return `Link does not format to: ${explorerUrl + txPathString}`
+
+    const txHash = link.substring(explorerUrl.length + txPathString.length)
+    // regex matches for 0x.... with 64 hex characters afterwards (32 bytes)
+    const txRegex = /0x[a-fA-F0-9]{64}/
+    if (!txRegex.test(txHash)) return "Parsed transacion hash has an invalid format"
+
     return undefined
   }
 }

@@ -5,13 +5,17 @@ import { RadioGroup } from "@headlessui/react"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import { SUPPORTED_CHAINS, ETH_METADATA, LINKS, PAYMENT_TERM_MAP } from "app/core/utils/constants"
+import { SUPPORTED_CHAINS, LINKS, PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import debounce from "lodash.debounce"
-import networks from "app/utils/networks.json"
 import createProposal from "app/proposalNew/mutations/createProposalNew"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { CheckCircleIcon } from "@heroicons/react/solid"
-import { composeValidators, requiredField, isValidTokenAmount } from "app/utils/validators"
+import {
+  composeValidators,
+  requiredField,
+  isValidTokenAmount,
+  isPositiveAmount,
+} from "app/utils/validators"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import truncateString from "app/core/utils/truncateString"
 import { AddressType, ProposalRoleType } from "@prisma/client"
@@ -31,6 +35,7 @@ import { formatDate } from "app/core/utils/formatDate"
 import { useEnsAddress } from "wagmi"
 import { AddressLink } from "../../core/components/AddressLink"
 import { PaymentTerm } from "app/proposalPayment/types"
+import { getNetworkTokens } from "app/core/utils/networkInfo"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -488,7 +493,11 @@ const RewardForm = ({
             validate={
               // only validate decimals if a token is selected
               Boolean(selectedToken?.address)
-                ? composeValidators(requiredField, isValidTokenAmount(selectedToken?.decimals || 0))
+                ? composeValidators(
+                    requiredField,
+                    isPositiveAmount,
+                    isValidTokenAmount(selectedToken?.decimals || 0)
+                  )
                 : requiredField
             }
           >
@@ -757,7 +766,8 @@ export const ProposalNewForm = () => {
   useEffect(() => {
     // Changing the network changes the token options available to us
     if (selectedNetworkId || shouldRefetchTokens) {
-      const stablecoins = networks[selectedNetworkId]?.stablecoins || []
+      // array including native chain's gas coin and stablecoins
+      const networkTokens = getNetworkTokens(selectedNetworkId)
       if (session?.userId) {
         // if user is logged-in, we can fetch the
         // imported tokens they have saved to their account
@@ -766,13 +776,13 @@ export const ProposalNewForm = () => {
             chainId: selectedNetworkId,
             userId: session?.userId,
           })
-          setTokenOptions([...tokens, ETH_METADATA, ...stablecoins])
+          setTokenOptions([...tokens, ...networkTokens])
 
           setShouldRefetchTokens(false)
         }
         fetchAccountTokenOptions()
       } else {
-        setTokenOptions([ETH_METADATA, ...stablecoins])
+        setTokenOptions(networkTokens)
       }
       // Setting the selectedToken to an empty obj to reset the
       // selected token on network change.
