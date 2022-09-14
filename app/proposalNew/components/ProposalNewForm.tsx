@@ -227,9 +227,11 @@ const RewardForm = ({
 
   const { data: contributorEnsAddress } = useEnsAddress({
     name: contributorAddressInputVal,
+    chainId: 1,
   })
   const { data: clientEnsAddress } = useEnsAddress({
     name: clientAddressInputVal,
+    chainId: 1,
   })
   let abortController = new AbortController()
 
@@ -559,7 +561,7 @@ const RewardForm = ({
                   )
                   input.onBlur(e)
                 }}
-                placeholder="Enter wallet"
+                placeholder="Enter wallet or ENS name"
                 className="bg-wet-concrete rounded mt-1 w-full p-2"
               />
 
@@ -589,7 +591,7 @@ const RewardForm = ({
                 {...input}
                 type="text"
                 required
-                placeholder="Enter wallet"
+                placeholder="Enter wallet or ENS name"
                 className="bg-wet-concrete rounded mt-1 w-full p-2"
                 onKeyUp={debounce(
                   (e) => handleEnsAddressInputValOnKeyUp(e.target.value, setClientAddressInputVal),
@@ -604,10 +606,10 @@ const RewardForm = ({
                 }
               />
 
-              {clientEnsAddress && <EnsAddressMetadataText address={clientEnsAddress} />}
               {meta.touched && meta.error && (
                 <span className="text-torch-red text-xs">{meta.error}</span>
               )}
+              {clientEnsAddress && <EnsAddressMetadataText address={clientEnsAddress} />}
               {/* user feedback on address type of input */}
               {!meta.error && input.value && !!clientAddressType && (
                 <GnosisWalletTypeMetadataText addressType={clientAddressType} />
@@ -718,6 +720,9 @@ export const ProposalNewForm = () => {
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
   const [proposal, setProposal] = useState<any>()
   const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
+  // default to mainnet since we're using it to check ENS
+  // which pretty much only exists on mainnet as of right now
+  const provider = useProvider({ chainId: 1 })
 
   const [signatures] = useQuery(
     getProposalNewSignaturesById,
@@ -785,7 +790,6 @@ export const ProposalNewForm = () => {
       console.error(error)
     },
   })
-  const provider = useProvider()
 
   return (
     <div>

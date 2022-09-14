@@ -20,7 +20,7 @@ export const getGnosisSafeDetails = async (chainId: number, address: string, sig
       headers: {
         "Content-Type": "application/json",
       },
-      signal,
+      signal, // allows for the fetch api request to be aborted if triggered https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal
     })
   } catch (err) {
     console.error(err)
