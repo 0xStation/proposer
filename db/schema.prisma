@@ -244,7 +244,7 @@ model ProposalNew {
   type       ProposalType
   timestamp  DateTime            @default(now())
   data       Json
-  status     ProposalStatus      @default(PUBLISHED)
+  status     ProposalNewStatus   @default(DRAFT)
   roles      ProposalRole[]
   milestones ProposalMilestone[]
   payments   ProposalPayment[]
@@ -364,6 +364,13 @@ enum ProposalStatus {
   IN_REVIEW
   APPROVED
   DELETED
+}
+
+enum ProposalNewStatus {
+  AWAITING_APPROVAL
+  DRAFT
+  APPROVED
+  COMPLETE
 }
 
 //

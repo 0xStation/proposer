@@ -60,7 +60,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
   await db.proposalNew.update({
     where: { id: params.proposalId },
     data: {
-      status: signaturesComplete ? ProposalNewStatus.APPROVED : ProposalNewStatus.IN_REVIEW,
+      status: signaturesComplete ? ProposalNewStatus.APPROVED : ProposalNewStatus.AWAITING_APPROVAL,
     },
   })
 

@@ -21,7 +21,6 @@ import { RfpStatus } from "app/rfp/types"
 // can see a users terminals + profile info at a glance
 const ProfileHome: BlitzPage = () => {
   const accountAddress = useParam("accountAddress", "string") as string
-  const [selectedTerminal, setSelectedTerminal] = useState<Terminal | null>(null)
   const [isConnectDiscordModalOpen, setIsConnectDiscordModalOpen] = useState<boolean>(false)
   const [discordAuthToken] = useLocalStorage<Auth | undefined>(
     "dc_auth_identify guilds",

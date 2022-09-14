@@ -74,21 +74,17 @@ export const PROPOSAL_NEW_STATUS_DISPLAY_MAP = {
     copy: "draft",
     color: "bg-concrete",
   },
-  [ProposalNewStatus.IN_REVIEW]: {
-    copy: "in review",
+  [ProposalNewStatus.AWAITING_APPROVAL]: {
+    copy: "awaiting approval",
     color: "bg-neon-carrot",
   },
   [ProposalNewStatus.APPROVED]: {
     copy: "approved",
     color: "bg-magic-mint",
   },
-  [ProposalNewStatus.PUBLISHED]: {
-    copy: "published",
+  [ProposalNewStatus.COMPLETE]: {
+    copy: "complete",
     color: "bg-marble-white",
-  },
-  [ProposalNewStatus.DELETED]: {
-    copy: "deleted",
-    color: "bg-torch-red",
   },
 }
 
@@ -123,10 +119,9 @@ export const PROPOSAL_STATUSES_FILTER_OPTIONS = [
 
 export const PROPOSAL_NEW_STATUS_FILTER_OPTIONS = [
   ProposalNewStatus.APPROVED,
-  ProposalNewStatus.DELETED,
+  ProposalNewStatus.AWAITING_APPROVAL,
   ProposalNewStatus.DRAFT,
-  ProposalNewStatus.IN_REVIEW,
-  ProposalNewStatus.PUBLISHED,
+  ProposalNewStatus.COMPLETE,
 ]
 
 export const PROPOSAL_ROLE_FILTER_OPTIONS = [

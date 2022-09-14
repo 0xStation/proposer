@@ -5,10 +5,9 @@ import { Token } from "app/token/types"
 
 export enum ProposalNewStatus {
   DRAFT = "DRAFT",
-  PUBLISHED = "PUBLISHED",
-  IN_REVIEW = "IN_REVIEW",
+  AWAITING_APPROVAL = "AWAITING_APPROVAL",
   APPROVED = "APPROVED",
-  DELETED = "DELETED",
+  COMPLETE = "COMPLETE",
 }
 
 export type ProposalNew = {

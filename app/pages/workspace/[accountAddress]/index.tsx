@@ -39,15 +39,18 @@ const WorkspaceHome: BlitzPage = () => {
   )
   const [page, setPage] = useState<number>(0)
   const accountAddress = useParam("accountAddress", "string") as string
-  const [proposals] = useQuery(
+  const [response] = useQuery(
     getProposalNewsByAddress,
     {
       address: toChecksumAddress(accountAddress),
       statuses: Array.from(proposalStatusFilters),
       roles: Array.from(proposalRoleFilters),
+      page: page,
+      paginationTake: PAGINATION_TAKE,
     },
     { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
   )
+  const { count, proposals } = response || {}
 
   const [account] = useQuery(
     getAccountByAddress,
@@ -90,7 +93,7 @@ const WorkspaceHome: BlitzPage = () => {
           </div>
           <Pagination
             results={proposals as any[]}
-            resultsCount={(proposals ? proposals.length : 0) as number}
+            resultsCount={count || 0}
             page={page}
             setPage={setPage}
             resultsLabel="proposals"
@@ -125,10 +128,10 @@ const WorkspaceHome: BlitzPage = () => {
                       <td className="py-4">
                         <span
                           className={`${
-                            PROPOSAL_NEW_STATUS_DISPLAY_MAP[proposal.status].color
+                            PROPOSAL_NEW_STATUS_DISPLAY_MAP[proposal.status]?.color
                           } text-tunnel-black px-2 py-1 rounded-full text-sm uppercase`}
                         >
-                          {PROPOSAL_NEW_STATUS_DISPLAY_MAP[proposal.status].copy}
+                          {PROPOSAL_NEW_STATUS_DISPLAY_MAP[proposal.status]?.copy}
                         </span>
                       </td>
                       <td className="text-base py-4 w-48">
