@@ -19,7 +19,9 @@ export const SuccessRfpModal = ({ terminal, isOpen, setIsOpen, rfpId, isEdit = t
           <Button
             onClick={() => {
               navigator.clipboard
-                .writeText(`${genBaseUrl()}/station/${terminal?.handle}/bulletin/rfp/${rfpId}/info`)
+                .writeText(
+                  `${genBaseUrl()}/station/${terminal?.handle}/bulletin/project/${rfpId}/info`
+                )
                 .then(() => {
                   setIsUrlCopied(true)
                   setTimeout(() => setIsUrlCopied(false), 2000)
