@@ -104,8 +104,7 @@ const WorkspaceHome: BlitzPage = () => {
           {/* TABLE HEADERS */}
           <thead>
             <tr className="border-b border-concrete">
-              <th className="w-4">{/* spacer for left indent */}</th>
-              <th className="text-xs uppercase text-light-concrete pb-2 text-left">Title</th>
+              <th className="text-xs uppercase text-light-concrete pb-2 pl-4 text-left">Title</th>
               {/* <th className="text-xs uppercase text-light-concrete pb-2 text-left">Status</th> */}
               <th className="text-xs uppercase text-light-concrete pb-2 text-left">Payment</th>
               <th className="text-xs uppercase text-light-concrete pb-2 text-left">Submitted at</th>
@@ -121,9 +120,8 @@ const WorkspaceHome: BlitzPage = () => {
                     href={Routes.ViewProposalNew({ proposalId: proposal.id })}
                     key={`table-row-${idx}`}
                   >
-                    <tr className="border-b border-concrete cursor-pointer hover:bg-wet-concrete">
-                      <td>{/* spacer */}</td>
-                      <td className="text-base py-4 font-bold w-128">
+                    <tr className="border-b border-wet-concrete cursor-pointer hover:bg-wet-concrete">
+                      <td className="text-base py-4 pl-4 font-bold w-128">
                         {proposal.data.content.title}
                       </td>
                       {/* <td className="py-4">
