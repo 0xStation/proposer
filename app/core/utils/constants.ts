@@ -35,6 +35,8 @@ export const CHAIN_IDS = {
   ETHEREUM: 1,
   RINKEBY: 4,
   GOERLI: 5,
+  OPTIMISM: 10,
+  POLYGON: 137,
 }
 
 export const DEFAULT_PFP_URLS = {
@@ -234,7 +236,9 @@ export const LINKS = {
 // 1 - eth
 // 4 - rinkeby
 // 5 - goerli
-export const SUPPORTED_CHAIN_IDS = [1, 4, 5]
+// 10 - optimism
+// 137 - polygon
+export const SUPPORTED_CHAIN_IDS = [1, 4, 5, 10, 137]
 
 export enum Sizes {
   SM = "SM",
