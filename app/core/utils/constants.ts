@@ -96,19 +96,6 @@ export const SENDGRID_TEMPLATES = {
   VERIFY: "d-9e113acf1a9f4830beaf3aa3553f9fde",
 }
 
-export const COIN_METADATA = {
-  type: TokenType.COIN,
-  address: ZERO_ADDRESS,
-}
-
-export const ETH_METADATA = {
-  type: TokenType.COIN,
-  name: "Ether",
-  symbol: "ETH",
-  decimals: 18,
-  address: ZERO_ADDRESS,
-}
-
 export const getStablecoinMetadataBySymbol = ({ chain = 1, symbol = "USDC" }) => {
   return networks[chain as number]?.stablecoins.find((stablecoin) => stablecoin.symbol === symbol)
 }

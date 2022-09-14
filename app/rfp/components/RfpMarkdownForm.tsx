@@ -10,7 +10,6 @@ import useSignature from "app/core/hooks/useSignature"
 import truncateString from "app/core/utils/truncateString"
 import {
   DEFAULT_PFP_URLS,
-  ETH_METADATA,
   getStablecoinMetadataBySymbol,
   RFP_STATUS_DISPLAY_MAP,
   SUPPORTED_CHAINS,
@@ -42,6 +41,7 @@ import { Tag } from "app/tag/types"
 import Button from "app/core/components/sds/buttons/Button"
 import { ButtonType } from "app/core/components/sds/buttons/Button"
 import getFormattedDateForMinDateInput from "app/utils/getFormattedDateForMinDateInput"
+import { getNetworkCoin } from "app/core/utils/networkInfo"
 
 const {
   PAGE_NAME,
@@ -129,7 +129,9 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
 
       setImportedTokenOptions(filteredTokenOptions)
 
-      setSelectedToken(rfpFundingToken || filteredTokenOptions?.[0] || ETH_METADATA)
+      setSelectedToken(
+        rfpFundingToken || filteredTokenOptions?.[0] || getNetworkCoin(selectedNetworkId)
+      )
 
       // filter checkbooks based on selected network
       const filteredCheckbookOptions = checkbooks?.filter(
@@ -689,7 +691,7 @@ const RfpMarkdownForm = ({ isEdit = false, rfp = undefined }: { isEdit?: boolean
                                     onChange={(e) => {
                                       let fundingToken
                                       if (e.target.value === ETH) {
-                                        fundingToken = ETH_METADATA
+                                        fundingToken = getNetworkCoin(selectedNetworkId)
                                       } else if (e.target.value === USDC) {
                                         fundingToken = getStablecoinMetadataBySymbol({
                                           chain: selectedNetworkId,

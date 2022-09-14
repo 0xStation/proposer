@@ -1,6 +1,14 @@
 import networks from "app/utils/networks.json"
 import { Token } from "@prisma/client"
 
+export const getNetworkCoin = (chainId: number): Token | undefined => {
+  try {
+    return networks[chainId]?.coin
+  } catch {
+    return undefined
+  }
+}
+
 export const getNetworkTokens = (chainId: number): Token[] => {
   try {
     const networkCoin = networks[chainId]?.coin
