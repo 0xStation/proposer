@@ -39,7 +39,7 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
     multisigChainId = chainId
   }
 
-  const name = params.name ? params.name : truncateString(params.address || "")
+  const name = params.name
 
   const payload = {
     address: params.address,

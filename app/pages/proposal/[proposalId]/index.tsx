@@ -16,7 +16,7 @@ import TransactionLink from "app/core/components/TransactionLink"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import MetadataLabel from "app/core/components/MetadataLabel"
-import { LINKS } from "app/core/utils/constants"
+import { LINKS, PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 import Preview from "app/core/components/MarkdownPreview"
 
@@ -265,12 +265,22 @@ const ViewProposalNew: BlitzPage = () => {
               <p className="mt-2 font-normal">
                 {getNetworkName(proposal?.data?.totalPayments?.[0]?.token.chainId || 0)}
               </p>
-              {/* TOKEN */}
-              <MetadataLabel label="Payment token" />
-              <p className="mt-2 font-normal">{proposal?.data?.totalPayments?.[0]?.token.symbol}</p>
-              {/* PAYMENT AMOUNT */}
-              <MetadataLabel label="Payment amount" />
-              <p className="mt-2 font-normal">{proposal?.data?.totalPayments?.[0]?.amount}</p>
+              {/* PAYMENT */}
+              <MetadataLabel label="Payment" />
+              <p className="mt-2 font-normal">
+                {proposal?.data?.totalPayments?.[0]?.amount +
+                  " " +
+                  proposal?.data?.totalPayments?.[0]?.token.symbol}
+              </p>
+              {/* PAYMENT TERMS */}
+              {proposal?.data?.paymentTerms && (
+                <>
+                  <MetadataLabel label="Payment terms" />
+                  <p className="mt-2 font-normal">
+                    {PAYMENT_TERM_MAP[proposal?.data?.paymentTerms]?.copy}
+                  </p>
+                </>
+              )}
             </div>
           ) : proposal ? (
             // EMPTY STATE

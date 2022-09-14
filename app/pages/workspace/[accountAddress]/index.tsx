@@ -57,7 +57,7 @@ const WorkspaceHome: BlitzPage = () => {
 
   const ProposalTab = () => {
     return (
-      <div className="h-[calc(100vh-240px)] p-10 flex-1">
+      <div className="p-10 flex-1 max-h-screen overflow-y-auto">
         <h1 className="text-2xl font-bold">Proposals</h1>
         <div className="mt-12 mb-4 border-b border-concrete pb-4 flex flex-row justify-between">
           {/* empty div to push the pagination to the right before filters come back in */}
@@ -104,8 +104,7 @@ const WorkspaceHome: BlitzPage = () => {
           {/* TABLE HEADERS */}
           <thead>
             <tr className="border-b border-concrete">
-              <th className="w-4">{/* spacer for left indent */}</th>
-              <th className="text-xs uppercase text-light-concrete pb-2 text-left">Title</th>
+              <th className="text-xs uppercase text-light-concrete pb-2 pl-4 text-left">Title</th>
               {/* <th className="text-xs uppercase text-light-concrete pb-2 text-left">Status</th> */}
               <th className="text-xs uppercase text-light-concrete pb-2 text-left">Payment</th>
               <th className="text-xs uppercase text-light-concrete pb-2 text-left">Submitted at</th>
@@ -121,9 +120,8 @@ const WorkspaceHome: BlitzPage = () => {
                     href={Routes.ViewProposalNew({ proposalId: proposal.id })}
                     key={`table-row-${idx}`}
                   >
-                    <tr className="border-b border-concrete cursor-pointer hover:bg-wet-concrete">
-                      <td>{/* spacer */}</td>
-                      <td className="text-base py-4 font-bold w-128">
+                    <tr className="border-b border-wet-concrete cursor-pointer hover:bg-wet-concrete">
+                      <td className="text-base py-4 pl-4 font-bold w-128">
                         {proposal.data.content.title}
                       </td>
                       {/* <td className="py-4">
@@ -152,7 +150,7 @@ const WorkspaceHome: BlitzPage = () => {
             />
           ))}
         {proposals && proposals.length === 0 && (
-          <div className="w-full h-full flex items-center flex-col sm:justify-center sm:mt-0">
+          <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
             <p className="text-2xl font-bold w-[295px] text-center">
               This workspace has no proposals yet
             </p>

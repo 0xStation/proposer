@@ -8,7 +8,7 @@ import { DEFAULT_PFP_URLS } from "../utils/constants"
 import ExploreImageIcon from "public/explore.svg"
 import Dropdown from "app/core/components/Dropdown"
 import Listbox from "app/core/components/Listbox"
-import { useDisconnect, useNetwork, useSwitchNetwork, useAccount, defaultChains } from "wagmi"
+import { useDisconnect, useNetwork, useSwitchNetwork, useAccount, allChains } from "wagmi"
 import logout from "app/session/mutations/logout"
 import Button from "app/core/components/sds/buttons/Button"
 import truncateString from "app/core/utils/truncateString"
@@ -30,8 +30,10 @@ const Navigation = ({ children }: { children?: any }) => {
   const { disconnect } = useDisconnect()
   const { chain } = useNetwork()
   const { switchNetwork, isError, error } = useSwitchNetwork()
-  const supportedChains = defaultChains.filter((chain) => SUPPORTED_CHAIN_IDS.includes(chain.id))
-  const isChainSupported = chain ? SUPPORTED_CHAIN_IDS.includes(chain.id) : undefined
+  const supportedChains = allChains.filter((chain) => SUPPORTED_CHAIN_IDS.includes(chain.id))
+  // the useNetwork object weirdly doesn't have the right names, but the objects from allChains do so we convert
+  const connectedChain = supportedChains.find((supportedChain) => supportedChain.id === chain?.id)
+  const isChainSupported = !!connectedChain
 
   if (isError) {
     setToastState({
@@ -82,7 +84,7 @@ const Navigation = ({ children }: { children?: any }) => {
         <div className="flex flex-row items-center space-x-4">
           <Listbox
             error={isChainSupported === false ? { message: "Switch network" } : undefined}
-            defaultValue={chain}
+            defaultValue={connectedChain}
             items={supportedChains}
             onChange={(item) => {
               switchNetwork?.(item.id)

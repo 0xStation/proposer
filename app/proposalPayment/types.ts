@@ -18,3 +18,8 @@ export type ProposalPayment = {
 export type ProposalPaymentMetadata = {
   token: Token
 }
+
+export enum PaymentTerm {
+  ON_AGREEMENT = "ON_AGREEMENT",
+  AFTER_COMPLETION = "AFTER_COMPLETION",
+}

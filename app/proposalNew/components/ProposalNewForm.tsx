@@ -5,7 +5,7 @@ import { RadioGroup } from "@headlessui/react"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import { SUPPORTED_CHAINS, ETH_METADATA, LINKS } from "app/core/utils/constants"
+import { SUPPORTED_CHAINS, ETH_METADATA, LINKS, PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import debounce from "lodash.debounce"
 import networks from "app/utils/networks.json"
 import createProposal from "app/proposalNew/mutations/createProposalNew"
@@ -30,6 +30,7 @@ import { formatTokenAmount } from "app/utils/formatters"
 import { formatDate } from "app/core/utils/formatDate"
 import { useEnsAddress } from "wagmi"
 import { AddressLink } from "../../core/components/AddressLink"
+import { PaymentTerm } from "app/proposalPayment/types"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -43,12 +44,32 @@ function classNames(...classes) {
 
 const EnsAddressMetadataText = ({ address }) => {
   return (
-    <span className="text-xs text-concrete">
+    <span className="text-xs text-concrete mt-1">
       ENS Address is{" "}
       <AddressLink className="inline" address={address}>
         {address}
       </AddressLink>
     </span>
+  )
+}
+
+const GnosisWalletTypeMetadataText = ({ addressType }) => {
+  return (
+    <>
+      <span className=" text-xs text-marble-white ml-2 mt-2 block">
+        The address inserted is a{" "}
+        {addressType === AddressType.WALLET ? (
+          <>
+            <span className="font-bold">personal wallet</span>. If it is a smart contract, please
+            insert a new address or change your network.
+          </>
+        ) : (
+          <>
+            <span className="font-bold">Gnosis Safe</span>.
+          </>
+        )}
+      </span>
+    </>
   )
 }
 
@@ -192,9 +213,10 @@ const RewardForm = ({
   tokenOptions,
   formState,
   setShouldRefetchTokens,
+  needFunding,
+  setNeedFunding,
 }) => {
   const session = useSession({ suspense: false })
-  const [needFunding, setNeedFunding] = useState<boolean>(true)
   const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
   const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState<boolean>(false)
 
@@ -388,7 +410,7 @@ const RewardForm = ({
               Which token to be paid with (pick a network first)
             </span>
           </div>
-          <Field name="tokenAddress">
+          <Field name="tokenAddress" validate={requiredField}>
             {({ input, meta }) => {
               return (
                 <div className="custom-select-wrapper">
@@ -460,9 +482,10 @@ const RewardForm = ({
             name="paymentAmount"
             format={formatTokenAmount}
             validate={
+              // only validate decimals if a token is selected
               Boolean(selectedToken?.address)
                 ? composeValidators(requiredField, isValidTokenAmount(selectedToken?.decimals || 0))
-                : () => {}
+                : requiredField
             }
           >
             {({ input, meta }) => {
@@ -480,6 +503,29 @@ const RewardForm = ({
                 </div>
               )
             }}
+          </Field>
+          {/* PAYMENT TYPE */}
+          <label className="font-bold block mt-6">Payment terms*</label>
+          <span className="text-xs text-concrete block">When will payment be sent?</span>
+          <Field name="paymentTerms" validate={requiredField}>
+            {({ meta, input }) => (
+              <>
+                <div className="custom-select-wrapper">
+                  <select {...input} required className="w-full bg-wet-concrete rounded p-2 mt-1">
+                    <option value="">Choose option</option>
+                    <option value={PaymentTerm.ON_AGREEMENT}>
+                      {PAYMENT_TERM_MAP[PaymentTerm.ON_AGREEMENT]?.copy}
+                    </option>
+                    <option value={PaymentTerm.AFTER_COMPLETION}>
+                      {PAYMENT_TERM_MAP[PaymentTerm.AFTER_COMPLETION]?.copy}
+                    </option>
+                  </select>
+                  {meta.touched && meta.error && (
+                    <span className="text-torch-red text-xs">{meta.error}</span>
+                  )}
+                </div>
+              </>
+            )}
           </Field>
         </>
       )}
@@ -521,21 +567,7 @@ const RewardForm = ({
               {contributorEnsAddress && <EnsAddressMetadataText address={contributorEnsAddress} />}
               {/* user feedback on address type of input */}
               {!meta.error && input.value && !!contributorAddressType && (
-                <>
-                  <span className="text-xs text-marble-white ml-2 mt-2 block">
-                    The address inserted is a{" "}
-                    {contributorAddressType === AddressType.WALLET ? (
-                      <>
-                        <span className="font-bold">personal wallet</span>. If it is a smart
-                        contract, please insert a new address or change your network.
-                      </>
-                    ) : (
-                      <>
-                        <span className="font-bold">Gnosis Safe</span>.
-                      </>
-                    )}
-                  </span>
-                </>
+                <GnosisWalletTypeMetadataText addressType={contributorAddressType} />
               )}
             </>
           )
@@ -576,21 +608,7 @@ const RewardForm = ({
               )}
               {/* user feedback on address type of input */}
               {!meta.error && input.value && !!clientAddressType && (
-                <>
-                  <span className=" text-xs text-marble-white ml-2 mt-2 block">
-                    The address inserted is a{" "}
-                    {clientAddressType === AddressType.WALLET ? (
-                      <>
-                        <span className="font-bold">personal wallet</span>. If it is a smart
-                        contract, please insert a new address or change your network.
-                      </>
-                    ) : (
-                      <>
-                        <span className="font-bold">Gnosis Safe</span>.
-                      </>
-                    )}
-                  </span>
-                </>
+                <GnosisWalletTypeMetadataText addressType={clientAddressType} />
               )}
             </>
           )
@@ -693,6 +711,7 @@ export const ProposalNewForm = () => {
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(0)
   const [shouldRefetchTokens, setShouldRefetchTokens] = useState<boolean>(false)
   const [selectedToken, setSelectedToken] = useState<any>()
+  const [needFunding, setNeedFunding] = useState<boolean>(true)
   const [tokenOptions, setTokenOptions] = useState<any[]>()
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
   const [proposal, setProposal] = useState<any>()
@@ -806,24 +825,49 @@ export const ProposalNewForm = () => {
             let payments: any[] = []
             // if payment details are present, populate milestone and payment objects
             // supports payment and non-payment proposals
-            if (values.paymentAmount && token && values.client && values.contributor) {
-              // for now, assuming a proposal with one payment on completion
-              // will change to two-milestone system with Advanced Payment feature
-              milestones = [
-                {
-                  index: 1,
-                  title: "Proposal completion",
-                },
-              ]
-              payments = [
-                {
-                  milestoneIndex: 1,
-                  senderAddress: resolvedClientAddress,
-                  recipientAddress: resolvedContributorAddress,
-                  amount: parseFloat(values.paymentAmount),
-                  token: { ...token, chainId: selectedNetworkId },
-                },
-              ]
+            if (needFunding) {
+              const tokenTransferData = {
+                senderAddress: resolvedClientAddress,
+                recipientAddress: resolvedContributorAddress,
+                amount: parseFloat(values.paymentAmount),
+                token: { ...token, chainId: selectedNetworkId },
+              }
+
+              if (values.paymentTerms === PaymentTerm.ON_AGREEMENT) {
+                milestones = [
+                  {
+                    index: 0,
+                    title: "Proposal agreement",
+                  },
+                ]
+                payments = [
+                  {
+                    milestoneIndex: 0,
+                    ...tokenTransferData,
+                  },
+                ]
+              } else if (values.paymentTerms === PaymentTerm.AFTER_COMPLETION) {
+                milestones = [
+                  {
+                    index: 1,
+                    title: "Proposal completion",
+                  },
+                ]
+                payments = [
+                  {
+                    milestoneIndex: 1,
+                    ...tokenTransferData,
+                  },
+                ]
+              } else {
+                console.error("Missing complete payment information")
+                setToastState({
+                  isToastShowing: true,
+                  type: "error",
+                  message: "Missing complete payment information",
+                })
+                return
+              }
             }
 
             await createProposalMutation({
@@ -834,6 +878,7 @@ export const ProposalNewForm = () => {
               authorAddresses: [activeUser!.address!],
               milestones,
               payments,
+              paymentTerms: values.paymentTerms,
             })
           }}
           render={({ form, handleSubmit }) => {
@@ -860,6 +905,8 @@ export const ProposalNewForm = () => {
                         setSelectedToken={setSelectedToken}
                         formState={formState}
                         setShouldRefetchTokens={setShouldRefetchTokens}
+                        needFunding={needFunding}
+                        setNeedFunding={setNeedFunding}
                       />
                     )}
                     {proposalStep === ProposalStep.SIGN && (
