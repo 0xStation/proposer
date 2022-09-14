@@ -24,6 +24,11 @@
     "explorer": "https://etherscan.io",
     "start": 7929876,
     "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
+    "coin": {
+      "name": "Ether",
+      "symbol": "ETH",
+      "decimals": 18
+    },
     "stablecoins": [
       {
         "type": "ERC20",
@@ -52,6 +57,11 @@
     "explorer": "https://rinkeby.etherscan.io",
     "start": 4534725,
     "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
+    "coin": {
+      "name": "RinkebyETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
     "stablecoins": [
       {
         "type": "ERC20",
@@ -75,6 +85,11 @@
     "explorer": "https://goerli.etherscan.io",
     "start": 743550,
     "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
+    "coin": {
+      "name": "GoerliETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
     "stablecoins": [
       {
         "type": "ERC20",
@@ -96,7 +111,20 @@
     "explorer": "https://optimistic.etherscan.io",
     "start": 657806,
     "logo": "ipfs://QmfF4kwhGL8QosUXvgq2KWCmavhKBvwD6kbhs7L4p5ZAWb",
-    "stablecoins": []
+    "coin": {
+      "name": "Optimistic ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "stablecoins": [
+      {
+        "type": "ERC20",
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "address": "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+        "decimals": 6
+      }
+    ]
   },
   "100": {
     "key": "100",
@@ -136,7 +164,20 @@
     "explorer": "https://polygonscan.com",
     "start": 9834491,
     "logo": "ipfs://QmaGokGqgjknfa4xnXKnnwC5ZyXzUjQ7p6KEe4D8G5uFFE",
-    "stablecoins": []
+    "coin": {
+      "name": "Polygon",
+      "symbol": "MATIC",
+      "decimals": 18
+    },
+    "stablecoins": [
+      {
+        "type": "ERC20",
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "address": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+        "decimals": 6
+      }
+    ]
   },
   "250": {
     "key": "250",

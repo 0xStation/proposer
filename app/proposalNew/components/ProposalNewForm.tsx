@@ -33,6 +33,7 @@ import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { formatTokenAmount } from "app/utils/formatters"
 import { formatDate } from "app/core/utils/formatDate"
 import { PaymentTerm } from "app/proposalPayment/types"
+import { getNetworkTokens } from "app/core/utils/networks/getNetworkTokens"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -724,7 +725,8 @@ export const ProposalNewForm = () => {
   useEffect(() => {
     // Changing the network changes the token options available to us
     if (selectedNetworkId || shouldRefetchTokens) {
-      const stablecoins = networks[selectedNetworkId]?.stablecoins || []
+      // array including native chain's gas coin and stablecoins
+      const networkTokens = getNetworkTokens(selectedNetworkId)
       if (session?.userId) {
         // if user is logged-in, we can fetch the
         // imported tokens they have saved to their account
@@ -733,13 +735,13 @@ export const ProposalNewForm = () => {
             chainId: selectedNetworkId,
             userId: session?.userId,
           })
-          setTokenOptions([...tokens, ETH_METADATA, ...stablecoins])
+          setTokenOptions([...tokens, ...networkTokens])
 
           setShouldRefetchTokens(false)
         }
         fetchAccountTokenOptions()
       } else {
-        setTokenOptions([ETH_METADATA, ...stablecoins])
+        setTokenOptions(networkTokens)
       }
       // Setting the selectedToken to an empty obj to reset the
       // selected token on network change.
