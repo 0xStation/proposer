@@ -4,6 +4,7 @@ import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import networks from "app/utils/networks.json"
 import { TokenType } from "@prisma/client"
 import { ProposalRoleType } from "@prisma/client"
+import { PaymentTerm } from "app/proposalPayment/types"
 
 export const CONTRACTS = {
   // Localhost, change to whatever the forge script outputs when running local anvil
@@ -248,6 +249,15 @@ export enum FeatureFlagStatus {
 
 export const FEATURE_FLAG_KEYS = {
   MEMBER_DIRECTORY: "member_directory",
+}
+
+export const PAYMENT_TERM_MAP = {
+  [PaymentTerm.ON_AGREEMENT]: {
+    copy: "Pay on proposal agreement",
+  },
+  [PaymentTerm.AFTER_COMPLETION]: {
+    copy: "Pay after proposal completion",
+  },
 }
 
 // LEGACY BELOW

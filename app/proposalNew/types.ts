@@ -1,6 +1,6 @@
 import { ProposalSignature, ProposalRole, ProposalType } from "@prisma/client"
 import { ProposalMilestone } from "app/proposalMilestone/types"
-import { ProposalPayment } from "app/proposalPayment/types"
+import { PaymentTerm, ProposalPayment } from "app/proposalPayment/types"
 import { Token } from "app/token/types"
 
 export type ProposalNew = {
@@ -24,6 +24,7 @@ export type ProposalNewMetadata = {
   }
   // cache total payment amounts for rendering on list components and primary metadata view
   totalPayments: { token: Token; amount: number }[]
+  paymentTerms: PaymentTerm
 }
 
 // enables public verifiability of REPUTATION
