@@ -183,9 +183,10 @@ const RewardForm = ({
   tokenOptions,
   formState,
   setShouldRefetchTokens,
+  needFunding,
+  setNeedFunding,
 }) => {
   const session = useSession({ suspense: false })
-  const [needFunding, setNeedFunding] = useState<boolean>(true)
   const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
   const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState<boolean>(false)
 
@@ -373,7 +374,7 @@ const RewardForm = ({
               Which token to be paid with (pick a network first)
             </span>
           </div>
-          <Field name="tokenAddress">
+          <Field name="tokenAddress" validate={requiredField}>
             {({ input, meta }) => {
               return (
                 <div className="custom-select-wrapper">
@@ -445,10 +446,10 @@ const RewardForm = ({
             name="paymentAmount"
             format={formatTokenAmount}
             validate={
-              // only validate if token is selected
+              // only validate decimals if a token is selected
               Boolean(selectedToken?.address)
                 ? composeValidators(requiredField, isValidTokenAmount(selectedToken?.decimals || 0))
-                : () => {}
+                : requiredField
             }
           >
             {({ input, meta }) => {
@@ -470,13 +471,7 @@ const RewardForm = ({
           {/* PAYMENT TYPE */}
           <label className="font-bold block mt-6">Payment terms*</label>
           <span className="text-xs text-concrete block">When will payment be sent?</span>
-          <Field
-            name="paymentTerms"
-            validate={
-              // only validate if token is selected
-              Boolean(selectedToken?.address) ? requiredField : () => {}
-            }
-          >
+          <Field name="paymentTerms" validate={requiredField}>
             {({ meta, input }) => (
               <>
                 <div className="custom-select-wrapper">
@@ -694,10 +689,12 @@ export const ProposalNewForm = () => {
   const router = useRouter()
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const activeUser = useStore((state) => state.activeUser)
+  const setToastState = useStore((state) => state.setToastState)
   const session = useSession({ suspense: false })
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(0)
   const [shouldRefetchTokens, setShouldRefetchTokens] = useState<boolean>(false)
   const [selectedToken, setSelectedToken] = useState<any>()
+  const [needFunding, setNeedFunding] = useState<boolean>(true)
   const [tokenOptions, setTokenOptions] = useState<any[]>()
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
   const [proposal, setProposal] = useState<any>()
@@ -776,13 +773,7 @@ export const ProposalNewForm = () => {
             let payments: any[] = []
             // if payment details are present, populate milestone and payment objects
             // supports payment and non-payment proposals
-            if (
-              values.paymentAmount &&
-              token &&
-              values.client &&
-              values.contributor &&
-              !!values.paymentTerms
-            ) {
+            if (needFunding) {
               const tokenTransferData = {
                 senderAddress: values.client,
                 recipientAddress: values.contributor,
@@ -816,8 +807,15 @@ export const ProposalNewForm = () => {
                     ...tokenTransferData,
                   },
                 ]
+              } else {
+                console.error("Missing complete payment information")
+                setToastState({
+                  isToastShowing: true,
+                  type: "error",
+                  message: "Missing complete payment information",
+                })
+                return
               }
-              // else, terms are incomplete and no milestones or payments are saved
             }
 
             createProposalMutation({
@@ -855,6 +853,8 @@ export const ProposalNewForm = () => {
                         setSelectedToken={setSelectedToken}
                         formState={formState}
                         setShouldRefetchTokens={setShouldRefetchTokens}
+                        needFunding={needFunding}
+                        setNeedFunding={setNeedFunding}
                       />
                     )}
                     {proposalStep === ProposalStep.SIGN && (
