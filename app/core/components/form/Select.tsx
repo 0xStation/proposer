@@ -35,7 +35,17 @@ const customStyles = {
   }),
 }
 
-const Select = ({ name, options, placeholder, initialValue }) => {
+const Select = ({
+  name,
+  options,
+  placeholder,
+  initialValue,
+}: {
+  name: string
+  options: any[]
+  placeholder: string
+  initialValue?: any
+}) => {
   return (
     <Field
       name={name}
