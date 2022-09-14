@@ -7,7 +7,7 @@ const AccountMediaObject = ({ account, className = "" }) => {
   const { data: ensName } = useEnsName({
     address: account?.address,
     chainId: 1,
-    cacheTime: 5 * 60 * 1000, // (5 minutes) time (in ms) which the data should remain in the cache
+    cacheTime: 60 * 60 * 1000, // (1 hr) time (in ms) which the data should remain in the cache
   })
 
   return (
