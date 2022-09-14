@@ -11,7 +11,6 @@ import { useDisconnect, useNetwork, useSwitchNetwork, useAccount, allChains } fr
 import logout from "app/session/mutations/logout"
 import Button from "app/core/components/sds/buttons/Button"
 import truncateString from "app/core/utils/truncateString"
-import { DotsHorizontalIcon } from "@heroicons/react/solid"
 import { DEFAULT_PFP_URLS, LINKS, SUPPORTED_CHAINS, Sizes } from "app/core/utils/constants"
 import Avatar from "app/core/components/sds/images/avatar"
 import { genUrlFromRoute } from "app/utils/genUrlFromRoute"

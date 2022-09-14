@@ -4,7 +4,6 @@ import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import { getNetworkName } from "app/core/utils/getNetworkName"
 import { useNetwork, useSwitchNetwork, useWaitForTransaction } from "wagmi"
 import { useEffect, useState } from "react"
 import saveTransactionHashToPayments from "../mutations/saveTransactionToPayments"
@@ -13,7 +12,7 @@ import { preparePaymentTransaction } from "app/transaction/payments"
 import { useSendTransaction } from "wagmi"
 import { Field, Form } from "react-final-form"
 import { composeValidators, isValidTransactionLink, requiredField } from "app/utils/validators"
-import { getNetworkExplorer } from "app/core/utils/networks/getNetworkExplorer"
+import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
 
 enum Tab {
   DIRECT_PAYMENT = "DIRECT_PAYMENT",

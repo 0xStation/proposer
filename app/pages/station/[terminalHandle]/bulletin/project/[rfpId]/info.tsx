@@ -27,7 +27,7 @@ import getRfpApprovedProposalFunding from "app/rfp/queries/getRfpApprovedFunding
 import { ZERO_ADDRESS, TRACKING_EVENTS } from "app/core/utils/constants"
 import getCheckbook from "app/checkbook/queries/getCheckbook"
 import { AddressType } from "@prisma/client"
-import { getNetworkName } from "app/core/utils/getNetworkName"
+import { getNetworkName } from "app/core/utils/networkInfo"
 
 const {
   PAGE_NAME,

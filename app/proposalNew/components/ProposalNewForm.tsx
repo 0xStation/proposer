@@ -33,7 +33,7 @@ import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { formatTokenAmount } from "app/utils/formatters"
 import { formatDate } from "app/core/utils/formatDate"
 import { PaymentTerm } from "app/proposalPayment/types"
-import { getNetworkTokens } from "app/core/utils/networks/getNetworkTokens"
+import { getNetworkTokens } from "app/core/utils/networkInfo"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",

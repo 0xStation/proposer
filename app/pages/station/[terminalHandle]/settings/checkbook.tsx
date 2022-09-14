@@ -25,7 +25,7 @@ import CheckbookIndicator from "app/core/components/CheckbookIndicator"
 import hasAdminPermissionsBasedOnTags from "app/permissions/queries/hasAdminPermissionsBasedOnTags"
 import { AddFundsModal } from "app/core/components/AddFundsModal"
 import useStore from "app/core/hooks/useStore"
-import { getNetworkName } from "app/core/utils/getNetworkName"
+import { getNetworkName } from "app/core/utils/networkInfo"
 import Button from "app/core/components/sds/buttons/Button"
 import { ButtonType } from "app/core/components/sds/buttons/Button"
 
