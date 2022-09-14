@@ -1,20 +1,17 @@
 import { Routes, useRouter, useMutation, useQuery, invoke, useSession } from "blitz"
 import { useEffect, useState } from "react"
+import { useProvider } from "wagmi"
 import { RadioGroup } from "@headlessui/react"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { SUPPORTED_CHAINS, ETH_METADATA, LINKS } from "app/core/utils/constants"
+import debounce from "lodash.debounce"
 import networks from "app/utils/networks.json"
 import createProposal from "app/proposalNew/mutations/createProposalNew"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { CheckCircleIcon } from "@heroicons/react/solid"
-import {
-  composeValidators,
-  requiredField,
-  isAddress,
-  isValidTokenAmount,
-} from "app/utils/validators"
+import { composeValidators, requiredField, isValidTokenAmount } from "app/utils/validators"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import truncateString from "app/core/utils/truncateString"
 import { AddressType, ProposalRoleType } from "@prisma/client"
@@ -31,6 +28,8 @@ import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { formatTokenAmount } from "app/utils/formatters"
 import { formatDate } from "app/core/utils/formatDate"
+import { useEnsAddress } from "wagmi"
+import { AddressLink } from "../../core/components/AddressLink"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -40,6 +39,17 @@ enum ProposalStep {
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
+}
+
+const EnsAddressMetadataText = ({ address }) => {
+  return (
+    <span className="text-xs text-concrete">
+      ENS Address is{" "}
+      <AddressLink className="inline" address={address}>
+        {address}
+      </AddressLink>
+    </span>
+  )
 }
 
 const Stepper = ({ step }) => {
@@ -190,44 +200,51 @@ const RewardForm = ({
 
   const [contributorAddressType, setContributorAddressType] = useState<AddressType>()
   const [clientAddressType, setClientAddressType] = useState<AddressType>()
+  const [contributorAddressInputVal, setContributorAddressInputVal] = useState<string>()
+  const [clientAddressInputVal, setClientAddressInputVal] = useState<string>()
 
-  useEffect(() => {
-    const address = formState.values.contributor
-    if (selectedNetworkId !== 0 && ethersIsAddress(address)) {
-      // fetch address type
-      getGnosisSafeDetails(selectedNetworkId, address).then((data) => {
-        if (data === null) {
-          // no gnosis safe
-          setContributorAddressType(AddressType.WALLET)
-        } else {
-          // not null return => safe exists
-          setContributorAddressType(AddressType.SAFE)
-        }
-      })
-    } else {
-      // reset state
-      if (!!contributorAddressType) setContributorAddressType(undefined)
-    }
-  }, [selectedNetworkId, formState.values.contributor])
+  const { data: contributorEnsAddress } = useEnsAddress({
+    name: contributorAddressInputVal,
+  })
+  const { data: clientEnsAddress } = useEnsAddress({
+    name: clientAddressInputVal,
+  })
+  let abortController = new AbortController()
 
-  useEffect(() => {
-    const address = formState.values.client
+  const handleEnsAddressInputValOnKeyUp = (val, setValToCheckEns) => {
+    // if value is already an address, we don't need to check for ens
+    if (ethersIsAddress(val)) return
+
+    // set state input val to update ens address
+    setValToCheckEns(val)
+  }
+
+  const handleAddressInputValOnBlur = async (val, setAddressType, ensAddress) => {
+    abortController.abort() // Cancel the previous request
+    abortController = new AbortController()
+
+    const address = ensAddress || val
     if (selectedNetworkId !== 0 && ethersIsAddress(address)) {
-      // fetch address type
-      getGnosisSafeDetails(selectedNetworkId, address).then((data) => {
-        if (data === null) {
-          // no gnosis safe
-          setClientAddressType(AddressType.WALLET)
-        } else {
-          // not null return => safe exists
-          setClientAddressType(AddressType.SAFE)
-        }
-      })
-    } else {
-      // reset state
-      if (!!clientAddressType) setClientAddressType(undefined)
+      try {
+        const gnosisSafeDetails = await getGnosisSafeDetails(
+          selectedNetworkId,
+          address,
+          abortController.signal
+        )
+
+        // if the gnosisSafeDetails doesn't exist, assume that it's a personal wallet
+        const addressType = !gnosisSafeDetails ? AddressType.WALLET : AddressType.SAFE
+
+        setAddressType(addressType)
+        return
+      } catch (err) {
+        console.error(err)
+        // setContributorAddress to undefined
+      }
     }
-  }, [selectedNetworkId, formState.values.client])
+    setAddressType(undefined)
+    // TODO: otherwise validate address
+  }
 
   return (
     <>
@@ -324,7 +341,7 @@ const RewardForm = ({
       </RadioGroup>
 
       {/* NETWORK */}
-      <label className="font-bold block mt-6">Network</label>
+      <label className="font-bold block mt-6">Network*</label>
       <span className="text-xs text-concrete block">Which network to transact on</span>
       <Field name="network" validate={requiredField}>
         {({ input, meta }) => {
@@ -465,47 +482,6 @@ const RewardForm = ({
               )
             }}
           </Field>
-          {/* PAYMENT TYPE */}
-          {/* <label className="font-bold block mt-6">Term</label>
-          <span className="text-xs text-concrete block">How will the funds get deployed?</span>
-          <Field name="paymentTermType">
-            {({ meta, input }) => (
-              <>
-                <div className="custom-select-wrapper">
-                  <select
-                    {...input}
-                    required
-                    className="w-full bg-wet-concrete rounded p-1 mt-1"
-                  >
-                    <option value="">Choose option</option>
-                    <option value="completion">Pay upon completion</option>
-                  </select>
-                  {meta.touched && meta.error && (
-                    <span className="text-torch-red text-xs">{meta.error}</span>
-                  )}
-                </div>
-              </>
-            )}
-          </Field> */}
-          {/* ADVANCED PAYMENT */}
-          {/* <label className="font-bold block mt-6">Advanced payment</label>
-          <span className="text-xs text-concrete block">As a percentage (25 = 25%, 0 = none)</span>
-          <Field name="advancedPaymentPercentage">
-            {({ meta, input }) => (
-              <>
-                <input
-                  {...input}
-                  type="text"
-                  required
-                  placeholder="0%"
-                  className="bg-wet-concrete rounded mt-1 w-full p-2"
-                />
-                {meta.touched && meta.error && (
-                  <span className="text-torch-red text-xs">{meta.error}</span>
-                )}
-              </>
-            )}
-          </Field> */}
         </>
       )}
 
@@ -515,41 +491,57 @@ const RewardForm = ({
         Who will be responsible for delivering the work outlined in this proposal?
         <p>Paste your address if this is you.</p>
       </span>
-      <Field name="contributor" validate={composeValidators(requiredField, isAddress)}>
-        {({ meta, input }) => (
-          <>
-            <input
-              {...input}
-              type="text"
-              required
-              placeholder="Enter wallet"
-              className="bg-wet-concrete rounded mt-1 w-full p-2"
-            />
+      <Field name="contributor" validate={composeValidators(requiredField)}>
+        {({ meta, input }) => {
+          return (
+            <>
+              <input
+                {...input}
+                type="text"
+                required
+                onKeyUp={debounce(
+                  (e) =>
+                    handleEnsAddressInputValOnKeyUp(e.target.value, setContributorAddressInputVal),
+                  200
+                )}
+                onBlur={(e) => {
+                  handleAddressInputValOnBlur(
+                    e.target.value,
+                    setContributorAddressType,
+                    contributorEnsAddress
+                  )
+                  input.onBlur(e)
+                }}
+                placeholder="Enter wallet"
+                className="bg-wet-concrete rounded mt-1 w-full p-2"
+              />
 
-            {meta.touched && meta.error && (
-              <span className="text-torch-red text-xs">{meta.error}</span>
-            )}
-            {/* user feedback on address type of input */}
-            {!meta.error && input.value && !!contributorAddressType && (
-              <>
-                <span className=" text-xs text-marble-white ml-2 mt-2 block">
-                  The address inserted is a{" "}
-                  {contributorAddressType === AddressType.WALLET ? (
-                    <>
-                      <span className="font-bold">personal wallet</span>. If it is a{" "}
-                      <span className="font-bold">smart contract</span>, please insert a new address
-                      or change your network.
-                    </>
-                  ) : (
-                    <>
-                      <span className="font-bold">Gnosis Safe</span>.
-                    </>
-                  )}
-                </span>
-              </>
-            )}
-          </>
-        )}
+              {meta.touched && meta.error && (
+                <span className="text-torch-red text-xs">{meta.error}</span>
+              )}
+              {contributorEnsAddress && <EnsAddressMetadataText address={contributorEnsAddress} />}
+              {/* user feedback on address type of input */}
+              {!meta.error && input.value && !!contributorAddressType && (
+                <>
+                  <span className="text-xs text-marble-white ml-2 mt-2 block">
+                    The address inserted is a{" "}
+                    {contributorAddressType === AddressType.WALLET ? (
+                      <>
+                        <span className="font-bold">personal wallet</span>. If it is a{" "}
+                        <span className="font-bold">smart contract</span>, please insert a new
+                        address or change your network.
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-bold">Gnosis Safe</span>.
+                      </>
+                    )}
+                  </span>
+                </>
+              )}
+            </>
+          )
+        }}
       </Field>
       {/* CLIENT */}
       <label className="font-bold block mt-6">Reviewer*</label>
@@ -557,41 +549,55 @@ const RewardForm = ({
         Who will be responsible for reviewing and deploying the funds outlined in this proposal? See
         the list of community addresses here.
       </span>
-      <Field name="client" validate={composeValidators(requiredField, isAddress)}>
-        {({ meta, input }) => (
-          <>
-            <input
-              {...input}
-              type="text"
-              required
-              placeholder="Enter wallet"
-              className="bg-wet-concrete rounded mt-1 w-full p-2"
-            />
+      <Field name="client" validate={requiredField}>
+        {({ meta, input }) => {
+          return (
+            <>
+              <input
+                {...input}
+                type="text"
+                required
+                placeholder="Enter wallet"
+                className="bg-wet-concrete rounded mt-1 w-full p-2"
+                onKeyUp={debounce(
+                  (e) => handleEnsAddressInputValOnKeyUp(e.target.value, setClientAddressInputVal),
+                  200
+                )}
+                onBlur={(e) =>
+                  handleAddressInputValOnBlur(
+                    e.target.value,
+                    setClientAddressType,
+                    clientEnsAddress
+                  )
+                }
+              />
 
-            {meta.touched && meta.error && (
-              <span className="text-torch-red text-xs">{meta.error}</span>
-            )}
-            {/* user feedback on address type of input */}
-            {!meta.error && input.value && !!clientAddressType && (
-              <>
-                <span className=" text-xs text-marble-white ml-2 mt-2 block">
-                  The address inserted is a{" "}
-                  {clientAddressType === AddressType.WALLET ? (
-                    <>
-                      <span className="font-bold">personal wallet</span>. If it is a{" "}
-                      <span className="font-bold">smart contract</span>, please insert a new address
-                      or change your network.
-                    </>
-                  ) : (
-                    <>
-                      <span className="font-bold">Gnosis Safe</span>.
-                    </>
-                  )}
-                </span>
-              </>
-            )}
-          </>
-        )}
+              {clientEnsAddress && <EnsAddressMetadataText address={clientEnsAddress} />}
+              {meta.touched && meta.error && (
+                <span className="text-torch-red text-xs">{meta.error}</span>
+              )}
+              {/* user feedback on address type of input */}
+              {!meta.error && input.value && !!clientAddressType && (
+                <>
+                  <span className=" text-xs text-marble-white ml-2 mt-2 block">
+                    The address inserted is a{" "}
+                    {clientAddressType === AddressType.WALLET ? (
+                      <>
+                        <span className="font-bold">personal wallet</span>. If it is a{" "}
+                        <span className="font-bold">smart contract</span>, please insert a new
+                        address or change your network.
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-bold">Gnosis Safe</span>.
+                      </>
+                    )}
+                  </span>
+                </>
+              )}
+            </>
+          )
+        }}
       </Field>
     </>
   )
@@ -685,6 +691,7 @@ export const ProposalNewForm = () => {
   const router = useRouter()
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const activeUser = useStore((state) => state.activeUser)
+  const setToastState = useStore((state) => state.setToastState)
   const session = useSession({ suspense: false })
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(0)
   const [shouldRefetchTokens, setShouldRefetchTokens] = useState<boolean>(false)
@@ -708,6 +715,25 @@ export const ProposalNewForm = () => {
     [ProposalStep.PROPOSE]: "Propose",
     [ProposalStep.REWARDS]: "Define terms",
     [ProposalStep.SIGN]: "Sign",
+  }
+
+  const handleResolveEnsAddress = async (fieldValue) => {
+    if (ethersIsAddress(fieldValue)) {
+      return fieldValue
+    } else {
+      try {
+        const resolvedEnsAddress = await provider.resolveName(fieldValue)
+        return resolvedEnsAddress
+      } catch (err) {
+        console.warn(err)
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: "Invalid address or ENS",
+        })
+        return null
+      }
+    }
   }
 
   useEffect(() => {
@@ -746,6 +772,7 @@ export const ProposalNewForm = () => {
       console.error(error)
     },
   })
+  const provider = useProvider()
 
   return (
     <div>
@@ -753,6 +780,16 @@ export const ProposalNewForm = () => {
         <Stepper step={proposalStep} />
         <Form
           onSubmit={async (values: any, form) => {
+            const resolvedContributorAddress = await handleResolveEnsAddress(values.contributor)
+
+            if (!resolvedContributorAddress) {
+              return
+            }
+            const resolvedClientAddress = await handleResolveEnsAddress(values.client)
+
+            if (!resolvedClientAddress) {
+              return
+            }
             // tokenAddress might just be null if they are not requesting funding
             // need to check tokenAddress exists, AND it is not found before erroring
             const token = values.tokenAddress
@@ -787,7 +824,7 @@ export const ProposalNewForm = () => {
               ]
             }
 
-            createProposalMutation({
+            await createProposalMutation({
               contentTitle: values.title,
               contentBody: values.body,
               contributorAddresses: [values.contributor],
