@@ -25,8 +25,10 @@
     "start": 7929876,
     "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
     "coin": {
+      "type": "COIN",
       "name": "Ether",
       "symbol": "ETH",
+      "address": "0x0000000000000000000000000000000000000000",
       "decimals": 18
     },
     "stablecoins": [
@@ -58,8 +60,10 @@
     "start": 4534725,
     "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
     "coin": {
-      "name": "RinkebyETH",
+      "type": "COIN",
+      "name": "Rinkeby ETH",
       "symbol": "ETH",
+      "address": "0x0000000000000000000000000000000000000000",
       "decimals": 18
     },
     "stablecoins": [
@@ -86,8 +90,10 @@
     "start": 743550,
     "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
     "coin": {
-      "name": "GoerliETH",
+      "type": "COIN",
+      "name": "Goerli ETH",
       "symbol": "ETH",
+      "address": "0x0000000000000000000000000000000000000000",
       "decimals": 18
     },
     "stablecoins": [
@@ -112,8 +118,10 @@
     "start": 657806,
     "logo": "ipfs://QmfF4kwhGL8QosUXvgq2KWCmavhKBvwD6kbhs7L4p5ZAWb",
     "coin": {
+      "type": "COIN",
       "name": "Optimistic ETH",
       "symbol": "ETH",
+      "address": "0x0000000000000000000000000000000000000000",
       "decimals": 18
     },
     "stablecoins": [
@@ -165,8 +173,10 @@
     "start": 9834491,
     "logo": "ipfs://QmaGokGqgjknfa4xnXKnnwC5ZyXzUjQ7p6KEe4D8G5uFFE",
     "coin": {
+      "type": "COIN",
       "name": "Polygon",
       "symbol": "MATIC",
+      "address": "0x0000000000000000000000000000000000000000",
       "decimals": 18
     },
     "stablecoins": [
