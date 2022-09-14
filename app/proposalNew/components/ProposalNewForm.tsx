@@ -14,6 +14,7 @@ import {
   requiredField,
   isAddress,
   isValidTokenAmount,
+  isPositiveAmount,
 } from "app/utils/validators"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import truncateString from "app/core/utils/truncateString"
@@ -448,7 +449,11 @@ const RewardForm = ({
             validate={
               // only validate decimals if a token is selected
               Boolean(selectedToken?.address)
-                ? composeValidators(requiredField, isValidTokenAmount(selectedToken?.decimals || 0))
+                ? composeValidators(
+                    requiredField,
+                    isPositiveAmount,
+                    isValidTokenAmount(selectedToken?.decimals || 0)
+                  )
                 : requiredField
             }
           >
