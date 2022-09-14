@@ -243,7 +243,6 @@ const RewardForm = ({
       }
     }
     setAddressType(undefined)
-    // TODO: otherwise validate address
   }
 
   return (
