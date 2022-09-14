@@ -1,5 +1,5 @@
 import StationLogo from "public/station-letters.svg"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Image, invoke, Routes, useRouter, useSession, Link } from "blitz"
 import useStore from "../hooks/useStore"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
@@ -16,6 +16,8 @@ import { DEFAULT_PFP_URLS, LINKS, SUPPORTED_CHAINS, Sizes } from "app/core/utils
 import Avatar from "app/core/components/sds/images/avatar"
 import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 import DropdownChevronIcon from "../icons/DropdownChevronIcon"
+import { DotsHorizontalIcon, PlusIcon } from "@heroicons/react/solid"
+import NewWorkspaceModal from "app/core/components/NewWorkspaceModal"
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -32,6 +34,7 @@ const Navigation = ({ children }: { children?: any }) => {
   // the useNetwork object weirdly doesn't have the right names, but the objects from allChains do so we convert
   const connectedChain = SUPPORTED_CHAINS.find((supportedChain) => supportedChain.id === chain?.id)
   const isChainSupported = !!connectedChain
+  const [newWorkspaceModalOpen, setNewWorkspaceModalOpen] = useState<boolean>(false)
 
   if (isError) {
     setToastState({
@@ -73,8 +76,23 @@ const Navigation = ({ children }: { children?: any }) => {
     }
   }, [session?.siwe?.address])
 
+  // sets activeChain in the store in the case that the user is connected
+  // otherwise, changing the chain while logged out will auto trigger a write to the store
+  useEffect(() => {
+    if (chain) {
+      setActiveChain(chain)
+    }
+  }, [chain])
+
   return (
     <>
+      {activeUser && (
+        <NewWorkspaceModal
+          isOpen={newWorkspaceModalOpen}
+          setIsOpen={setNewWorkspaceModalOpen}
+          activeUser={activeUser}
+        />
+      )}
       <div className="w-full border-b border-concrete h-[70px] px-6 flex items-center justify-between">
         <Link href={Routes.Explore({})}>
           <Image src={StationLogo} alt="Station logo" height={30} width={80} />
@@ -130,6 +148,18 @@ const Navigation = ({ children }: { children?: any }) => {
       <div className="h-[calc(100vh-70px)] w-[70px] bg-tunnel-black border-r border-concrete fixed top-[70px] left-0 text-center flex flex-col">
         <div className="h-full mt-4">
           <ExploreIcon />
+          <NewWorkspaceIcon
+            onClick={(toggle) => {
+              if (!activeUser) {
+                setToastState({
+                  isToastShowing: true,
+                  type: "error",
+                  message: "You must have a connected wallet to add a new account.",
+                })
+              }
+              setNewWorkspaceModalOpen(toggle)
+            }}
+          />
           {address === activeUser?.address && <ProfileIcon activeUser={activeUser} />}
         </div>
       </div>
@@ -171,6 +201,17 @@ transition-all duration-200 origin-left`}
         </button>
       </div>
     </Link>
+  )
+}
+
+const NewWorkspaceIcon = ({ onClick }) => {
+  return (
+    <button
+      className={`bg-wet-concrete hover:border-marble-white border-wet-concrete inline-flex overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg h-[47px] w-[47px] mb-4 items-center justify-center`}
+      onClick={() => onClick(true)}
+    >
+      <PlusIcon className="h-6 w-6" aria-hidden="true" />
+    </button>
   )
 }
 

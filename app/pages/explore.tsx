@@ -51,8 +51,7 @@ const Explore: BlitzPage = () => {
           {/* Columns */}
           <thead>
             <tr className="border-b border-concrete">
-              <th className="w-4">{/* spacer for left indent */}</th>
-              <th className="text-xs uppercase text-light-concrete pb-2 text-left">Info</th>
+              <th className="text-xs uppercase text-light-concrete pb-2 pl-4 text-left">Info</th>
               <th className="text-xs uppercase text-light-concrete pb-2 text-left">About</th>
             </tr>
           </thead>
@@ -65,9 +64,8 @@ const Explore: BlitzPage = () => {
                     href={Routes.WorkspaceHome({ accountAddress: account.address as string })}
                     key={`table-row-${idx}`}
                   >
-                    <tr className="border-b border-concrete cursor-pointer hover:bg-wet-concrete">
-                      <td>{/* spacer */}</td>
-                      <td className="py-4 w-64">
+                    <tr className="border-b border-wet-concrete cursor-pointer hover:bg-wet-concrete">
+                      <td className="pl-4 py-4 w-64">
                         <AccountMediaObject account={account} />
                       </td>
                       <td className="text-normal py-4">{account?.data?.bio}</td>
