@@ -75,9 +75,9 @@ const Navigation = ({ children }: { children?: any }) => {
     }
   }, [session?.siwe?.address])
 
+  // sets activeChain in the store in the case that the user is connected
+  // otherwise, changing the chain while logged out will auto trigger a write to the store
   useEffect(() => {
-    // need more complicated logic for calculating the chain
-    // what happens if they are not connected
     if (chain) {
       setActiveChain(chain)
     }
@@ -85,7 +85,13 @@ const Navigation = ({ children }: { children?: any }) => {
 
   return (
     <>
-      <NewWorkspaceModal isOpen={newWorkspaceModalOpen} setIsOpen={setNewWorkspaceModalOpen} />
+      {activeUser && (
+        <NewWorkspaceModal
+          isOpen={newWorkspaceModalOpen}
+          setIsOpen={setNewWorkspaceModalOpen}
+          activeUser={activeUser}
+        />
+      )}
       <div className="w-full border-b border-concrete h-[70px] px-6 flex items-center justify-between">
         <Link href={Routes.Explore({})}>
           <Image src={StationLogo} alt="Station logo" height={30} width={80} />
@@ -141,7 +147,18 @@ const Navigation = ({ children }: { children?: any }) => {
       <div className="h-[calc(100vh-70px)] w-[70px] bg-tunnel-black border-r border-concrete fixed top-[70px] left-0 text-center flex flex-col">
         <div className="h-full mt-4">
           <ExploreIcon />
-          <NewWorkspaceIcon onClick={setNewWorkspaceModalOpen} />
+          <NewWorkspaceIcon
+            onClick={(toggle) => {
+              if (!activeUser) {
+                setToastState({
+                  isToastShowing: true,
+                  type: "error",
+                  message: "You must have a connected wallet to add a new account.",
+                })
+              }
+              setNewWorkspaceModalOpen(toggle)
+            }}
+          />
           {address === activeUser?.address && <ProfileIcon activeUser={activeUser} />}
         </div>
       </div>

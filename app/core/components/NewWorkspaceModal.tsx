@@ -6,6 +6,7 @@ import Button from "./sds/buttons/Button"
 import { Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import createAccount from "app/account/mutations/createAccount"
+import { Account } from "app/account/types"
 
 const gnosisUrlForChain = {
   1: "https://safe-transaction.gnosis.io",
@@ -13,8 +14,15 @@ const gnosisUrlForChain = {
   5: "https://safe-transaction.goerli.gnosis.io",
 }
 
-export const NewWorkspaceModal = ({ isOpen, setIsOpen }) => {
-  const activeUser = useStore((state) => state.activeUser)
+export const NewWorkspaceModal = ({
+  isOpen,
+  setIsOpen,
+  activeUser,
+}: {
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+  activeUser: Account
+}) => {
   const activeChain = useStore((state) => state.activeChain) || { id: 1 }
   const setToastState = useStore((state) => state.setToastState)
   const [safes, setSafes] = useState<string[]>([])
@@ -52,7 +60,7 @@ export const NewWorkspaceModal = ({ isOpen, setIsOpen }) => {
     if (activeUser?.address) {
       fetchSafes(activeUser.address)
     }
-  }, [activeUser])
+  }, [activeUser, activeChain])
 
   return (
     <Modal
