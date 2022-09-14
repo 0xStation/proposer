@@ -23,7 +23,7 @@ export const getNetworkExplorer = (chainId: number): string => {
   try {
     return networks[chainId].explorer
   } catch {
-    return "N/A"
+    return ""
   }
 }
 
@@ -31,6 +31,6 @@ export const getNetworkName = (chainId: number): string => {
   try {
     return networks[chainId].name
   } catch {
-    return "N/A"
+    return ""
   }
 }

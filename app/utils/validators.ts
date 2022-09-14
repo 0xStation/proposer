@@ -3,6 +3,7 @@ import isURL from "validator/lib/isURL"
 import isEmail from "validator/lib/isEmail"
 import { formatTokenAmount } from "./formatters"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
+import { txPathString } from "app/core/utils/constants"
 
 // reducer that takes in an array of validators (functions) and returns the appropriate error
 // useful if you have a form field that has a few different validations (required field, must be number, etc)
@@ -122,12 +123,11 @@ export const isValidTransactionLink = (chainId: number) => {
     if (link.indexOf(explorerUrl) < 0)
       return "Link does not match this chain's block explorer: " + explorerUrl
 
-    const txPathString = "/tx/"
-
     if (link.indexOf(explorerUrl + txPathString) < 0)
       return `Link does not format to: ${explorerUrl + txPathString}`
 
     const txHash = link.substring(explorerUrl.length + txPathString.length)
+    // regex matches for 0x.... with 64 hex characters afterwards (32 bytes)
     const txRegex = /0x[a-fA-F0-9]{64}/
     if (!txRegex.test(txHash)) return "Parsed transacion hash has an invalid format"
 

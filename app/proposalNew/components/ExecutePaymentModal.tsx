@@ -4,7 +4,7 @@ import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import { useNetwork, useSwitchNetwork, useWaitForTransaction } from "wagmi"
+import { useNetwork, useWaitForTransaction } from "wagmi"
 import { useEffect, useState } from "react"
 import saveTransactionHashToPayments from "../mutations/saveTransactionToPayments"
 import getProposalNewById from "../queries/getProposalNewById"
@@ -13,6 +13,8 @@ import { useSendTransaction } from "wagmi"
 import { Field, Form } from "react-final-form"
 import { composeValidators, isValidTransactionLink, requiredField } from "app/utils/validators"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
+import { txPathString } from "app/core/utils/constants"
+import SwitchNetworkView from "app/core/components/SwitchNetworkView"
 
 enum Tab {
   DIRECT_PAYMENT = "DIRECT_PAYMENT",
@@ -34,7 +36,6 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, isLoading, setIsLoading
   })
 
   const { chain: activeChain } = useNetwork()
-  const { switchNetwork } = useSwitchNetwork()
   const { sendTransactionAsync } = useSendTransaction({ mode: "recklesslyUnprepared" })
 
   useEffect(() => {
@@ -95,7 +96,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, isLoading, setIsLoading
     setToastState({
       isToastShowing: true,
       type: "success",
-      message: "Trasaction attachment succeeded.",
+      message: "Transaction attachment succeeded.",
     })
     setIsLoading(false)
   }
@@ -142,38 +143,6 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, isLoading, setIsLoading
     }
   }
 
-  const SwitchNetworkView = () => {
-    return (
-      <div>
-        <h3 className="text-2xl font-bold pt-6">Change network to approve</h3>
-        <p className="mt-2">
-          You are connected to the wrong network! Click below to switch networks.
-        </p>
-        <div className="mt-8">
-          <button
-            type="button"
-            className="text-electric-violet border border-electric-violet mr-2 py-1 w-[98px] rounded hover:opacity-75"
-            onClick={() => {
-              setIsOpen(false)
-              setIsLoading(false)
-            }}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            className="bg-electric-violet text-tunnel-black border border-electric-violet py-1 w-[98px] rounded hover:opacity-75"
-            onClick={() => {
-              switchNetwork?.(payment.data?.token.chainId)
-            }}
-          >
-            Switch
-          </button>
-        </div>
-      </div>
-    )
-  }
-
   const DirectPaymentTab = () => {
     return (
       <>
@@ -181,15 +150,14 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, isLoading, setIsLoading
           Next, pay the Contributor for their contribution
         </h3>
         <table className="mt-8">
-          <thead>
-            <tr>
-              <th className="w-36"></th>
-              <th></th>
-            </tr>
-          </thead>
+          <tr>
+            <th className="w-36"></th>
+            <th></th>
+          </tr>
           <tbody>
             <tr className="h-12">
               <td className="text-concrete">Pay to</td>
+              {/* TODO: ENS wrap this */}
               <td>{truncateString(payment?.recipientAddress)}</td>
             </tr>
             <tr className="h-12">
@@ -235,7 +203,6 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, isLoading, setIsLoading
         <Form
           onSubmit={async (values) => {
             const explorerUrl = getNetworkExplorer(chainId)
-            const txPathString = "/tx/"
             const transactionHash = values.transactionLink.substring(
               explorerUrl.length + txPathString.length
             )
@@ -282,7 +249,11 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, isLoading, setIsLoading
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
         {!activeChain || activeChain.id !== payment?.data?.token.chainId ? (
-          <SwitchNetworkView />
+          <SwitchNetworkView
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            chainId={payment?.data?.token.chainId}
+          />
         ) : (
           <>
             <div className="space-x-4 text-l mt-4">

@@ -257,6 +257,8 @@ export const PAYMENT_TERM_MAP = {
   },
 }
 
+export const txPathString = "/tx/"
+
 // LEGACY BELOW
 
 // LEGACY
