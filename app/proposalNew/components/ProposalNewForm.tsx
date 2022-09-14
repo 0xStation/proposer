@@ -527,9 +527,8 @@ const RewardForm = ({
                     The address inserted is a{" "}
                     {contributorAddressType === AddressType.WALLET ? (
                       <>
-                        <span className="font-bold">personal wallet</span>. If it is a{" "}
-                        <span className="font-bold">smart contract</span>, please insert a new
-                        address or change your network.
+                        <span className="font-bold">personal wallet</span>. If it is a smart
+                        contract, please insert a new address or change your network.
                       </>
                     ) : (
                       <>
@@ -583,9 +582,8 @@ const RewardForm = ({
                     The address inserted is a{" "}
                     {clientAddressType === AddressType.WALLET ? (
                       <>
-                        <span className="font-bold">personal wallet</span>. If it is a{" "}
-                        <span className="font-bold">smart contract</span>, please insert a new
-                        address or change your network.
+                        <span className="font-bold">personal wallet</span>. If it is a smart
+                        contract, please insert a new address or change your network.
                       </>
                     ) : (
                       <>
@@ -726,11 +724,6 @@ export const ProposalNewForm = () => {
         return resolvedEnsAddress
       } catch (err) {
         console.warn(err)
-        setToastState({
-          isToastShowing: true,
-          type: "error",
-          message: "Invalid address or ENS",
-        })
         return null
       }
     }
@@ -783,11 +776,21 @@ export const ProposalNewForm = () => {
             const resolvedContributorAddress = await handleResolveEnsAddress(values.contributor)
 
             if (!resolvedContributorAddress) {
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Invalid address or ENS name for contributor",
+              })
               return
             }
             const resolvedClientAddress = await handleResolveEnsAddress(values.client)
 
             if (!resolvedClientAddress) {
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Invalid address or ENS name for reviewer",
+              })
               return
             }
             // tokenAddress might just be null if they are not requesting funding
@@ -816,8 +819,8 @@ export const ProposalNewForm = () => {
               payments = [
                 {
                   milestoneIndex: 1,
-                  senderAddress: values.client,
-                  recipientAddress: values.contributor,
+                  senderAddress: resolvedClientAddress,
+                  recipientAddress: resolvedContributorAddress,
                   amount: parseFloat(values.paymentAmount),
                   token: { ...token, chainId: selectedNetworkId },
                 },
@@ -827,8 +830,8 @@ export const ProposalNewForm = () => {
             await createProposalMutation({
               contentTitle: values.title,
               contentBody: values.body,
-              contributorAddresses: [values.contributor],
-              clientAddresses: [values.client],
+              contributorAddresses: [resolvedContributorAddress],
+              clientAddresses: [resolvedClientAddress],
               authorAddresses: [activeUser!.address!],
               milestones,
               payments,
