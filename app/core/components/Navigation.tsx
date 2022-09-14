@@ -1,5 +1,5 @@
 import StationLogo from "public/station-letters.svg"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Image, invoke, Routes, useRouter, useSession, Link } from "blitz"
 import useStore from "../hooks/useStore"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
@@ -12,11 +12,12 @@ import { useDisconnect, useNetwork, useSwitchNetwork, useAccount, defaultChains 
 import logout from "app/session/mutations/logout"
 import Button from "app/core/components/sds/buttons/Button"
 import truncateString from "app/core/utils/truncateString"
-import { DotsHorizontalIcon } from "@heroicons/react/solid"
 import { LINKS, SUPPORTED_CHAIN_IDS, Sizes } from "app/core/utils/constants"
 import Avatar from "app/core/components/sds/images/avatar"
 import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 import DropdownChevronIcon from "../icons/DropdownChevronIcon"
+import { DotsHorizontalIcon, PlusIcon } from "@heroicons/react/solid"
+import NewWorkspaceModal from "app/core/components/NewWorkspaceModal"
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -32,6 +33,7 @@ const Navigation = ({ children }: { children?: any }) => {
   const { switchNetwork, isError, error } = useSwitchNetwork()
   const supportedChains = defaultChains.filter((chain) => SUPPORTED_CHAIN_IDS.includes(chain.id))
   const isChainSupported = chain ? SUPPORTED_CHAIN_IDS.includes(chain.id) : undefined
+  const [newWorkspaceModalOpen, setNewWorkspaceModalOpen] = useState<boolean>(false)
 
   if (isError) {
     setToastState({
@@ -73,8 +75,17 @@ const Navigation = ({ children }: { children?: any }) => {
     }
   }, [session?.siwe?.address])
 
+  useEffect(() => {
+    // need more complicated logic for calculating the chain
+    // what happens if they are not connected
+    if (chain) {
+      setActiveChain(chain)
+    }
+  }, [chain])
+
   return (
     <>
+      <NewWorkspaceModal isOpen={newWorkspaceModalOpen} setIsOpen={setNewWorkspaceModalOpen} />
       <div className="w-full border-b border-concrete h-[70px] px-6 flex items-center justify-between">
         <Link href={Routes.Explore({})}>
           <Image src={StationLogo} alt="Station logo" height={30} width={80} />
@@ -130,6 +141,7 @@ const Navigation = ({ children }: { children?: any }) => {
       <div className="h-[calc(100vh-70px)] w-[70px] bg-tunnel-black border-r border-concrete fixed top-[70px] left-0 text-center flex flex-col">
         <div className="h-full mt-4">
           <ExploreIcon />
+          <NewWorkspaceIcon onClick={setNewWorkspaceModalOpen} />
           {address === activeUser?.address && <ProfileIcon activeUser={activeUser} />}
         </div>
       </div>
@@ -171,6 +183,17 @@ transition-all duration-200 origin-left`}
         </button>
       </div>
     </Link>
+  )
+}
+
+const NewWorkspaceIcon = ({ onClick }) => {
+  return (
+    <button
+      className={`bg-wet-concrete hover:border-marble-white border-wet-concrete inline-flex overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg h-[47px] w-[47px] mb-4 items-center justify-center`}
+      onClick={() => onClick(true)}
+    >
+      <PlusIcon className="h-6 w-6" aria-hidden="true" />
+    </button>
   )
 }
 
