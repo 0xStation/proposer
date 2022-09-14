@@ -1,7 +1,17 @@
 import { ExternalLinkIcon } from "@heroicons/react/solid"
 import networks from "app/utils/networks.json"
 
-export const AddressLink = ({ className = "", chainId = 1, address }) => {
+export const AddressLink = ({
+  className = "",
+  chainId = 1,
+  address,
+  children,
+}: {
+  className?: string
+  chainId?: number
+  address: string
+  children?: any
+}) => {
   return (
     <a
       className={className}
@@ -9,7 +19,8 @@ export const AddressLink = ({ className = "", chainId = 1, address }) => {
       target="_blank"
       rel="noopener noreferrer"
     >
-      <ExternalLinkIcon className="h-4 w-4 hover:stroke-concrete cursor-pointer" />
+      {children}
+      <ExternalLinkIcon className="h-4 w-4 hover:stroke-concrete cursor-pointer inline" />
     </a>
   )
 }

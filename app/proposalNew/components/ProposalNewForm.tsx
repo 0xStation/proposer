@@ -1,18 +1,18 @@
 import { Routes, useRouter, useMutation, useQuery, invoke, useSession } from "blitz"
 import { useEffect, useState } from "react"
+import { useProvider } from "wagmi"
 import { RadioGroup } from "@headlessui/react"
 import { Field, Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { SUPPORTED_CHAINS, LINKS, PAYMENT_TERM_MAP } from "app/core/utils/constants"
-import networks from "app/utils/networks.json"
+import debounce from "lodash.debounce"
 import createProposal from "app/proposalNew/mutations/createProposalNew"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { CheckCircleIcon } from "@heroicons/react/solid"
 import {
   composeValidators,
   requiredField,
-  isAddress,
   isValidTokenAmount,
   isPositiveAmount,
 } from "app/utils/validators"
@@ -32,6 +32,8 @@ import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { formatTokenAmount } from "app/utils/formatters"
 import { formatDate } from "app/core/utils/formatDate"
+import { useEnsAddress } from "wagmi"
+import { AddressLink } from "../../core/components/AddressLink"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { getNetworkTokens } from "app/core/utils/networkInfo"
 
@@ -43,6 +45,37 @@ enum ProposalStep {
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
+}
+
+const EnsAddressMetadataText = ({ address }) => {
+  return (
+    <span className="text-xs text-concrete mt-1">
+      ENS Address is{" "}
+      <AddressLink className="inline" address={address}>
+        {address}
+      </AddressLink>
+    </span>
+  )
+}
+
+const GnosisWalletTypeMetadataText = ({ addressType }) => {
+  return (
+    <>
+      <span className=" text-xs text-marble-white ml-2 mt-2 block">
+        The address inserted is a{" "}
+        {addressType === AddressType.WALLET ? (
+          <>
+            <span className="font-bold">personal wallet</span>. If it is a smart contract, please
+            insert a new address or change your network.
+          </>
+        ) : (
+          <>
+            <span className="font-bold">Gnosis Safe</span>.
+          </>
+        )}
+      </span>
+    </>
+  )
 }
 
 const Stepper = ({ step }) => {
@@ -194,44 +227,54 @@ const RewardForm = ({
 
   const [contributorAddressType, setContributorAddressType] = useState<AddressType>()
   const [clientAddressType, setClientAddressType] = useState<AddressType>()
+  const [contributorAddressInputVal, setContributorAddressInputVal] = useState<string>()
+  const [clientAddressInputVal, setClientAddressInputVal] = useState<string>()
 
-  useEffect(() => {
-    const address = formState.values.contributor
-    if (selectedNetworkId !== 0 && ethersIsAddress(address)) {
-      // fetch address type
-      getGnosisSafeDetails(selectedNetworkId, address).then((data) => {
-        if (data === null) {
-          // no gnosis safe
-          setContributorAddressType(AddressType.WALLET)
-        } else {
-          // not null return => safe exists
-          setContributorAddressType(AddressType.SAFE)
-        }
-      })
-    } else {
-      // reset state
-      if (!!contributorAddressType) setContributorAddressType(undefined)
-    }
-  }, [selectedNetworkId, formState.values.contributor])
+  const { data: contributorEnsAddress } = useEnsAddress({
+    name: contributorAddressInputVal,
+    chainId: 1,
+  })
+  const { data: clientEnsAddress } = useEnsAddress({
+    name: clientAddressInputVal,
+    chainId: 1,
+  })
+  let abortController = new AbortController()
 
-  useEffect(() => {
-    const address = formState.values.client
+  const handleEnsAddressInputValOnKeyUp = (val, setValToCheckEns) => {
+    const fieldVal = val.trim()
+    // if value is already an address, we don't need to check for ens
+    if (ethersIsAddress(fieldVal)) return
+
+    // set state input val to update ens address
+    setValToCheckEns(fieldVal)
+  }
+
+  const handleAddressInputValOnBlur = async (val, setAddressType, ensAddress) => {
+    abortController.abort() // Cancel the previous request
+    abortController = new AbortController()
+    const fieldVal = val.trim()
+
+    const address = ensAddress || fieldVal
     if (selectedNetworkId !== 0 && ethersIsAddress(address)) {
-      // fetch address type
-      getGnosisSafeDetails(selectedNetworkId, address).then((data) => {
-        if (data === null) {
-          // no gnosis safe
-          setClientAddressType(AddressType.WALLET)
-        } else {
-          // not null return => safe exists
-          setClientAddressType(AddressType.SAFE)
-        }
-      })
-    } else {
-      // reset state
-      if (!!clientAddressType) setClientAddressType(undefined)
+      try {
+        const gnosisSafeDetails = await getGnosisSafeDetails(
+          selectedNetworkId,
+          address,
+          abortController.signal
+        )
+
+        // if the gnosisSafeDetails doesn't exist, assume that it's a personal wallet
+        const addressType = !gnosisSafeDetails ? AddressType.WALLET : AddressType.SAFE
+
+        setAddressType(addressType)
+        return
+      } catch (err) {
+        console.error(err)
+        // setContributorAddress to undefined
+      }
     }
-  }, [selectedNetworkId, formState.values.client])
+    setAddressType(undefined)
+  }
 
   return (
     <>
@@ -328,7 +371,7 @@ const RewardForm = ({
       </RadioGroup>
 
       {/* NETWORK */}
-      <label className="font-bold block mt-6">Network</label>
+      <label className="font-bold block mt-6">Network*</label>
       <span className="text-xs text-concrete block">Which network to transact on</span>
       <Field name="network" validate={requiredField}>
         {({ input, meta }) => {
@@ -497,25 +540,6 @@ const RewardForm = ({
               </>
             )}
           </Field>
-          {/* ADVANCED PAYMENT */}
-          {/* <label className="font-bold block mt-6">Advanced payment</label>
-          <span className="text-xs text-concrete block">As a percentage (25 = 25%, 0 = none)</span>
-          <Field name="advancedPaymentPercentage">
-            {({ meta, input }) => (
-              <>
-                <input
-                  {...input}
-                  type="text"
-                  required
-                  placeholder="0%"
-                  className="bg-wet-concrete rounded mt-1 w-full p-2"
-                />
-                {meta.touched && meta.error && (
-                  <span className="text-torch-red text-xs">{meta.error}</span>
-                )}
-              </>
-            )}
-          </Field> */}
         </>
       )}
 
@@ -525,41 +549,42 @@ const RewardForm = ({
         Who will be responsible for delivering the work outlined in this proposal?
         <p>Paste your address if this is you.</p>
       </span>
-      <Field name="contributor" validate={composeValidators(requiredField, isAddress)}>
-        {({ meta, input }) => (
-          <>
-            <input
-              {...input}
-              type="text"
-              required
-              placeholder="Enter wallet"
-              className="bg-wet-concrete rounded mt-1 w-full p-2"
-            />
+      <Field name="contributor" validate={composeValidators(requiredField)}>
+        {({ meta, input }) => {
+          return (
+            <>
+              <input
+                {...input}
+                type="text"
+                required
+                onKeyUp={debounce(
+                  (e) =>
+                    handleEnsAddressInputValOnKeyUp(e.target.value, setContributorAddressInputVal),
+                  200
+                )}
+                onBlur={(e) => {
+                  handleAddressInputValOnBlur(
+                    e.target.value,
+                    setContributorAddressType,
+                    contributorEnsAddress
+                  )
+                  input.onBlur(e)
+                }}
+                placeholder="Enter wallet or ENS name"
+                className="bg-wet-concrete rounded mt-1 w-full p-2"
+              />
 
-            {meta.touched && meta.error && (
-              <span className="text-torch-red text-xs">{meta.error}</span>
-            )}
-            {/* user feedback on address type of input */}
-            {!meta.error && input.value && !!contributorAddressType && (
-              <>
-                <span className=" text-xs text-marble-white ml-2 mt-2 block">
-                  The address inserted is a{" "}
-                  {contributorAddressType === AddressType.WALLET ? (
-                    <>
-                      <span className="font-bold">personal wallet</span>. If it is a{" "}
-                      <span className="font-bold">smart contract</span>, please insert a new address
-                      or change your network.
-                    </>
-                  ) : (
-                    <>
-                      <span className="font-bold">Gnosis Safe</span>.
-                    </>
-                  )}
-                </span>
-              </>
-            )}
-          </>
-        )}
+              {meta.touched && meta.error && (
+                <span className="text-torch-red text-xs">{meta.error}</span>
+              )}
+              {contributorEnsAddress && <EnsAddressMetadataText address={contributorEnsAddress} />}
+              {/* user feedback on address type of input */}
+              {!meta.error && input.value && !!contributorAddressType && (
+                <GnosisWalletTypeMetadataText addressType={contributorAddressType} />
+              )}
+            </>
+          )
+        }}
       </Field>
       {/* CLIENT */}
       <label className="font-bold block mt-6">Reviewer*</label>
@@ -567,41 +592,40 @@ const RewardForm = ({
         Who will be responsible for reviewing and deploying the funds outlined in this proposal? See
         the list of community addresses here.
       </span>
-      <Field name="client" validate={composeValidators(requiredField, isAddress)}>
-        {({ meta, input }) => (
-          <>
-            <input
-              {...input}
-              type="text"
-              required
-              placeholder="Enter wallet"
-              className="bg-wet-concrete rounded mt-1 w-full p-2"
-            />
+      <Field name="client" validate={requiredField}>
+        {({ meta, input }) => {
+          return (
+            <>
+              <input
+                {...input}
+                type="text"
+                required
+                placeholder="Enter wallet or ENS name"
+                className="bg-wet-concrete rounded mt-1 w-full p-2"
+                onKeyUp={debounce(
+                  (e) => handleEnsAddressInputValOnKeyUp(e.target.value, setClientAddressInputVal),
+                  200
+                )}
+                onBlur={(e) =>
+                  handleAddressInputValOnBlur(
+                    e.target.value,
+                    setClientAddressType,
+                    clientEnsAddress
+                  )
+                }
+              />
 
-            {meta.touched && meta.error && (
-              <span className="text-torch-red text-xs">{meta.error}</span>
-            )}
-            {/* user feedback on address type of input */}
-            {!meta.error && input.value && !!clientAddressType && (
-              <>
-                <span className=" text-xs text-marble-white ml-2 mt-2 block">
-                  The address inserted is a{" "}
-                  {clientAddressType === AddressType.WALLET ? (
-                    <>
-                      <span className="font-bold">personal wallet</span>. If it is a{" "}
-                      <span className="font-bold">smart contract</span>, please insert a new address
-                      or change your network.
-                    </>
-                  ) : (
-                    <>
-                      <span className="font-bold">Gnosis Safe</span>.
-                    </>
-                  )}
-                </span>
-              </>
-            )}
-          </>
-        )}
+              {meta.touched && meta.error && (
+                <span className="text-torch-red text-xs">{meta.error}</span>
+              )}
+              {clientEnsAddress && <EnsAddressMetadataText address={clientEnsAddress} />}
+              {/* user feedback on address type of input */}
+              {!meta.error && input.value && !!clientAddressType && (
+                <GnosisWalletTypeMetadataText addressType={clientAddressType} />
+              )}
+            </>
+          )
+        }}
       </Field>
     </>
   )
@@ -705,6 +729,9 @@ export const ProposalNewForm = () => {
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
   const [proposal, setProposal] = useState<any>()
   const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
+  // default to mainnet since we're using it to check ENS
+  // which pretty much only exists on mainnet as of right now
+  const provider = useProvider({ chainId: 1 })
 
   const [signatures] = useQuery(
     getProposalNewSignaturesById,
@@ -720,6 +747,20 @@ export const ProposalNewForm = () => {
     [ProposalStep.PROPOSE]: "Propose",
     [ProposalStep.REWARDS]: "Define terms",
     [ProposalStep.SIGN]: "Sign",
+  }
+
+  const handleResolveEnsAddress = async (fieldValue) => {
+    if (ethersIsAddress(fieldValue)) {
+      return fieldValue
+    } else {
+      try {
+        const resolvedEnsAddress = await provider.resolveName(fieldValue)
+        return resolvedEnsAddress
+      } catch (err) {
+        console.warn(err)
+        return null
+      }
+    }
   }
 
   useEffect(() => {
@@ -766,6 +807,28 @@ export const ProposalNewForm = () => {
         <Stepper step={proposalStep} />
         <Form
           onSubmit={async (values: any, form) => {
+            const resolvedContributorAddress = await handleResolveEnsAddress(
+              values.contributor?.trim()
+            )
+
+            if (!resolvedContributorAddress) {
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Invalid address or ENS name for contributor",
+              })
+              return
+            }
+            const resolvedClientAddress = await handleResolveEnsAddress(values.client?.trim())
+
+            if (!resolvedClientAddress) {
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Invalid address or ENS name for reviewer",
+              })
+              return
+            }
             // tokenAddress might just be null if they are not requesting funding
             // need to check tokenAddress exists, AND it is not found before erroring
             const token = values.tokenAddress
@@ -782,8 +845,8 @@ export const ProposalNewForm = () => {
             // supports payment and non-payment proposals
             if (needFunding) {
               const tokenTransferData = {
-                senderAddress: values.client,
-                recipientAddress: values.contributor,
+                senderAddress: resolvedClientAddress,
+                recipientAddress: resolvedContributorAddress,
                 amount: parseFloat(values.paymentAmount),
                 token: { ...token, chainId: selectedNetworkId },
               }
@@ -824,17 +887,25 @@ export const ProposalNewForm = () => {
                 return
               }
             }
-
-            createProposalMutation({
-              contentTitle: values.title,
-              contentBody: values.body,
-              contributorAddresses: [values.contributor],
-              clientAddresses: [values.client],
-              authorAddresses: [activeUser!.address!],
-              milestones,
-              payments,
-              paymentTerms: values.paymentTerms,
-            })
+            try {
+              await createProposalMutation({
+                contentTitle: values.title,
+                contentBody: values.body,
+                contributorAddresses: [resolvedContributorAddress],
+                clientAddresses: [resolvedClientAddress],
+                authorAddresses: [activeUser!.address!],
+                milestones,
+                payments,
+                paymentTerms: values.paymentTerms,
+              })
+            } catch (err) {
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: err.message,
+              })
+              return
+            }
           }}
           render={({ form, handleSubmit }) => {
             const formState = form.getState()
