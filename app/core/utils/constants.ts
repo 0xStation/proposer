@@ -5,6 +5,21 @@ import networks from "app/utils/networks.json"
 import { TokenType } from "@prisma/client"
 import { ProposalRoleType } from "@prisma/client"
 import { PaymentTerm } from "app/proposalPayment/types"
+import Gradient0 from "/public/gradients/0.png"
+import Gradient1 from "/public/gradients/1.png"
+import Gradient2 from "/public/gradients/2.png"
+import Gradient3 from "/public/gradients/3.png"
+import Gradient4 from "/public/gradients/4.png"
+import Gradient5 from "/public/gradients/5.png"
+
+export const gradientMap = {
+  0: Gradient0,
+  1: Gradient1,
+  2: Gradient2,
+  3: Gradient3,
+  4: Gradient4,
+  5: Gradient5,
+}
 
 export const CONTRACTS = {
   // Localhost, change to whatever the forge script outputs when running local anvil

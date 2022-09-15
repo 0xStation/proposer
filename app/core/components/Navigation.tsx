@@ -11,7 +11,7 @@ import { useDisconnect, useNetwork, useSwitchNetwork, useAccount, allChains } fr
 import logout from "app/session/mutations/logout"
 import Button from "app/core/components/sds/buttons/Button"
 import truncateString from "app/core/utils/truncateString"
-import { DEFAULT_PFP_URLS, LINKS, SUPPORTED_CHAINS, Sizes } from "app/core/utils/constants"
+import { LINKS, SUPPORTED_CHAINS, Sizes, gradientMap } from "app/core/utils/constants"
 import Avatar from "app/core/components/sds/images/avatar"
 import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 import DropdownChevronIcon from "../icons/DropdownChevronIcon"
@@ -121,7 +121,11 @@ const Navigation = ({ children }: { children?: any }) => {
               button={
                 <div className="px-2 h-[35px] inline-flex w-full justify-center items-center rounded-md text-sm">
                   <span className="flex flex-row space-x-2 items-center">
-                    <Avatar size={Sizes.SM} pfpURL={activeUser?.data.pfpURL} />
+                    <Avatar
+                      size={Sizes.SM}
+                      pfpURL={activeUser?.data.pfpURL}
+                      address={activeUser?.address}
+                    />
                     <span className="block text-marble-white text-sm mr-12">
                       @{truncateString(activeUser?.address || "")}
                     </span>
@@ -199,7 +203,7 @@ transition-all duration-200 origin-left`}
           } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-full h-[47px] mb-4`}
         >
           <Image
-            src={activeUser?.data?.pfpURL || DEFAULT_PFP_URLS.USER}
+            src={activeUser?.data?.pfpURL || gradientMap[parseInt(activeUser.address, 16) % 6]}
             alt="Account profile picture. If no profile picture is set, there is a blue to green linear gradient."
             height={46}
             width={46}
