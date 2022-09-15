@@ -590,7 +590,16 @@ const RewardForm = ({
       <label className="font-bold block mt-6">Reviewer*</label>
       <span className="text-xs text-concrete block">
         Who will be responsible for reviewing and deploying the funds outlined in this proposal? See
-        the list of community addresses here.
+        the list of community addresses{" "}
+        <a
+          href={LINKS.STATION_WORKSPACES}
+          target="_blank"
+          rel="noreferrer"
+          className="text-electric-violet"
+        >
+          here
+        </a>
+        .
       </span>
       <Field name="client" validate={requiredField}>
         {({ meta, input }) => {

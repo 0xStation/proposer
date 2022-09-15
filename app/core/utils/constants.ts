@@ -210,9 +210,11 @@ export const LINKS = {
   NEWSTAND: "https://station.mirror.xyz/",
   LEGAL: "https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176",
   TYPEFORM_WAITLIST: "https://6vdcjqzyfj3.typeform.com/to/G3LN1FlM",
-  PINATA_BASE_URL: "https://gateway.pinata.cloud/ipfs/", // TODO: change to use Station gateway
+  PINATA_BASE_URL: "https://station.mypinata.cloud/ipfs/", // TODO: change Station gateway domain
   MARKDOWN_GUIDE:
     "https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax",
+  STATION_WORKSPACES:
+    "https://0xstation.notion.site/0xstation/Station-Workspaces-8c696d92fdbd4dc0b2c7e67efc54a9a5",
 }
 
 export const CHAIN_IDS = {
