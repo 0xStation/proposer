@@ -17,6 +17,7 @@ import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 import DropdownChevronIcon from "../icons/DropdownChevronIcon"
 import { DotsHorizontalIcon, PlusIcon } from "@heroicons/react/solid"
 import NewWorkspaceModal from "app/core/components/NewWorkspaceModal"
+import { AccountAccountType } from "@prisma/client"
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -160,6 +161,12 @@ const Navigation = ({ children }: { children?: any }) => {
             }}
           />
           {address === activeUser?.address && <ProfileIcon activeUser={activeUser} />}
+          {activeUser &&
+            activeUser?.originsOf
+              .filter((aa) => aa.type === AccountAccountType.PIN_WORKSPACE)
+              .map((aa, idx) => {
+                return <ProfileIcon activeUser={aa.targetAccount} key={`profile-${idx}`} />
+              })}
         </div>
       </div>
       <div className="h-[calc(100vh-70px)] ml-[70px] relative overflow-y-scroll">{children}</div>

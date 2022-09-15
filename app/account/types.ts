@@ -39,4 +39,6 @@ export type Account = {
   tickets?: any[]
   initiatives?: any[]
   proposals?: AccountProposal[]
+  targetsOf: any[]
+  originsOf: any[]
 }

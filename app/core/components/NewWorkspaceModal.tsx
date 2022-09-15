@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
-import { useMutation, useRouter, Routes } from "blitz"
+import { useMutation, useRouter, Routes, invoke } from "blitz"
 import Modal from "./sds/overlays/modal"
 import Select from "./form/Select"
 import Button from "./sds/buttons/Button"
 import { Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
-import createAccount from "app/account/mutations/createAccount"
+import createSafe from "app/account/mutations/createSafe"
 import { Account } from "app/account/types"
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
 const gnosisUrlForChain = {
   1: "https://safe-transaction.gnosis.io",
@@ -25,13 +26,16 @@ export const NewWorkspaceModal = ({
 }) => {
   const activeChain = useStore((state) => state.activeChain) || { id: 1 }
   const setToastState = useStore((state) => state.setToastState)
+  const setActiveUser = useStore((state) => state.setActiveUser)
   const [safes, setSafes] = useState<string[]>([])
   const router = useRouter()
 
-  const [createAccountMutation, { isLoading }] = useMutation(createAccount, {
-    onSuccess: (data) => {
+  const [createSafeMutation, { isLoading }] = useMutation(createSafe, {
+    onSuccess: async (data) => {
       setIsOpen(false)
       const safeAddress = data.address as string
+      const account = await invoke(getAccountByAddress, { address: activeUser.address })
+      setActiveUser(account)
       router.push(Routes.WorkspaceHome({ accountAddress: safeAddress }))
     },
     onError: (error) => {
@@ -78,8 +82,9 @@ export const NewWorkspaceModal = ({
         <Form
           initialValues={{}}
           onSubmit={(values) => {
-            createAccountMutation({
+            createSafeMutation({
               address: values.safeAddress.value,
+              chainId: activeChain.id,
             })
           }}
           render={({ form, handleSubmit }) => {
