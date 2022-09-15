@@ -2,8 +2,7 @@ import { chain } from "wagmi"
 import { RfpStatus } from "app/rfp/types"
 import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import networks from "app/utils/networks.json"
-import { TokenType } from "@prisma/client"
-import { ProposalRoleType } from "@prisma/client"
+import { ProposalRoleType, ProposalNewStatus } from "@prisma/client"
 import { PaymentTerm } from "app/proposalPayment/types"
 import Gradient0 from "/public/gradients/0.png"
 import Gradient1 from "/public/gradients/1.png"
@@ -70,6 +69,25 @@ export const RFP_STATUS_DISPLAY_MAP = {
   },
 }
 
+export const PROPOSAL_NEW_STATUS_DISPLAY_MAP = {
+  [ProposalNewStatus.DRAFT]: {
+    copy: "draft",
+    color: "bg-concrete",
+  },
+  [ProposalNewStatus.AWAITING_APPROVAL]: {
+    copy: "awaiting approval",
+    color: "bg-neon-carrot",
+  },
+  [ProposalNewStatus.APPROVED]: {
+    copy: "approved",
+    color: "bg-magic-mint",
+  },
+  [ProposalNewStatus.COMPLETE]: {
+    copy: "complete",
+    color: "bg-marble-white",
+  },
+}
+
 export const PROPOSAL_STATUS_DISPLAY_MAP = {
   [ProductProposalStatus.SUBMITTED]: {
     copy: "submitted",
@@ -97,6 +115,13 @@ export const PROPOSAL_STATUSES_FILTER_OPTIONS = [
   ProductProposalStatus.SUBMITTED,
   ProductProposalStatus.IN_REVIEW,
   ProductProposalStatus.APPROVED,
+]
+
+export const PROPOSAL_NEW_STATUS_FILTER_OPTIONS = [
+  ProposalNewStatus.APPROVED,
+  ProposalNewStatus.AWAITING_APPROVAL,
+  ProposalNewStatus.DRAFT,
+  ProposalNewStatus.COMPLETE,
 ]
 
 export const PROPOSAL_ROLE_FILTER_OPTIONS = [

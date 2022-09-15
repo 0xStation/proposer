@@ -2,8 +2,7 @@ import { invalidateQuery, useMutation } from "blitz"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"
-import { formatDate } from "app/core/utils/formatDate"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import Button from "app/core/components/sds/buttons/Button"
 import { useNetwork, useWaitForTransaction } from "wagmi"
 import { useEffect, useState } from "react"
 import saveTransactionHashToPayments from "../mutations/saveTransactionToPayments"
@@ -12,7 +11,7 @@ import { preparePaymentTransaction } from "app/transaction/payments"
 import { useSendTransaction } from "wagmi"
 import { Field, Form } from "react-final-form"
 import { composeValidators, isValidTransactionLink, requiredField } from "app/utils/validators"
-import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
+import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import { txPathString } from "app/core/utils/constants"
 import SwitchNetworkView from "app/core/components/SwitchNetworkView"
 
@@ -20,6 +19,8 @@ enum Tab {
   DIRECT_PAYMENT = "DIRECT_PAYMENT",
   ATTACH_TRANSACTION = "ATTACH_TRANSACTION",
 }
+import updateProposalStatus from "app/proposalNew/mutations/updateProposalStatus"
+import { ProposalNewStatus } from "@prisma/client"
 
 export const ExecutePaymentModal = ({ isOpen, setIsOpen, isLoading, setIsLoading, payment }) => {
   const setToastState = useStore((state) => state.setToastState)
@@ -34,6 +35,8 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, isLoading, setIsLoading
       console.error(error)
     },
   })
+
+  const [updateProposalStatusMutation] = useMutation(updateProposalStatus)
 
   const { chain: activeChain } = useNetwork()
   const { sendTransactionAsync } = useSendTransaction({ mode: "recklesslyUnprepared" })
@@ -55,6 +58,14 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, isLoading, setIsLoading
     onSuccess: async (data) => {
       try {
         invalidateQuery(getProposalNewById)
+
+        // once the payment tx is cleared
+        // move the proposal status to complete
+        // todo: task queue to properly address payment txs
+        await updateProposalStatusMutation({
+          proposalId: payment.proposalId,
+          status: ProposalNewStatus.COMPLETE,
+        })
 
         setIsOpen(false)
         setToastState({

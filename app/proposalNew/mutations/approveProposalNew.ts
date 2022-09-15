@@ -2,6 +2,8 @@ import * as z from "zod"
 import db from "db"
 import pinJsonToPinata from "app/utils/pinata"
 import updateProposalNewMetadata from "./updateProposalNewMetadata"
+import { areSignaturesComplete } from "app/proposalNew/utils"
+import { ProposalNewStatus } from "@prisma/client"
 
 const ApproveProposalNew = z.object({
   proposalId: z.string(),
@@ -52,6 +54,23 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
   } catch (err) {
     throw Error(`Failed to find proposal in approveProposalNew: ${err}`)
   }
+
+  // update proposal status based on status of signatures
+  // if current status is the same as the pending status change
+  // skip the update
+  const signaturesComplete = areSignaturesComplete(proposal)
+  const pendingStatusChange = signaturesComplete
+    ? ProposalNewStatus.APPROVED
+    : ProposalNewStatus.AWAITING_APPROVAL
+
+  if (proposal.status !== pendingStatusChange)
+    await db.proposalNew.update({
+      where: { id: params.proposalId },
+      data: {
+        status: pendingStatusChange,
+      },
+    })
+
   // flattening proposal's data json object for the ipfs proposal
   let proposalCopy = JSON.parse(JSON.stringify(proposal.data))
 

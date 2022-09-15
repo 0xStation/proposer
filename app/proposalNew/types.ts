@@ -2,6 +2,7 @@ import { ProposalSignature, ProposalRole, ProposalType } from "@prisma/client"
 import { ProposalMilestone } from "app/proposalMilestone/types"
 import { PaymentTerm, ProposalPayment } from "app/proposalPayment/types"
 import { Token } from "app/token/types"
+import { ProposalNewStatus } from "@prisma/client"
 
 export type ProposalNew = {
   id: string
@@ -12,6 +13,7 @@ export type ProposalNew = {
   payments: ProposalPayment[]
   signatures: ProposalSignature[]
   data: ProposalNewMetadata
+  status: ProposalNewStatus
 }
 
 export type ProposalNewMetadata = {

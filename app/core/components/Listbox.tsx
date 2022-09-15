@@ -57,7 +57,7 @@ const CustomListbox = ({ items, onChange, defaultValue, error }: ListboxComponen
               {error ? error.message : selected.name}
             </span>
             <span className="pointer-events-none absolute inset-y-0 right-1 flex items-center pr-2">
-              <DropdownChevronIcon className={error ? "text-tunnel-black" : "text-marble-white"} />
+              <DropdownChevronIcon className={error ? "fill-tunnel-black" : "fill-marble-white"} />
             </span>
           </Listbox.Button>
           <Transition
