@@ -167,7 +167,7 @@ const Navigation = ({ children }: { children?: any }) => {
           {address === activeUser?.address && <ProfileIcon activeUser={activeUser} />}
           {activeUser &&
             activeUser?.originsOf
-              .filter((aa) => aa.type === AccountAccountType.PIN_WORKSPACE)
+              ?.filter((aa) => aa.type === AccountAccountType.PIN_WORKSPACE)
               .map((aa, idx) => {
                 return <ProfileIcon activeUser={aa.targetAccount} key={`profile-${idx}`} />
               })}
