@@ -1,7 +1,7 @@
 import db from "db"
 import * as z from "zod"
 import { Ctx } from "blitz"
-import { ProposalNewStatus } from "../types"
+import { ProposalNewStatus } from "@prisma/client"
 
 const UpdateProposalStatus = z.object({
   status: z.enum([

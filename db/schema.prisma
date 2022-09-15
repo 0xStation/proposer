@@ -367,8 +367,8 @@ enum ProposalStatus {
 }
 
 enum ProposalNewStatus {
-  AWAITING_APPROVAL
   DRAFT
+  AWAITING_APPROVAL
   APPROVED
   COMPLETE
 }

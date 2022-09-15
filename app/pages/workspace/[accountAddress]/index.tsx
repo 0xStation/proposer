@@ -39,7 +39,7 @@ const WorkspaceHome: BlitzPage = () => {
   )
   const [page, setPage] = useState<number>(0)
   const accountAddress = useParam("accountAddress", "string") as string
-  const [response] = useQuery(
+  const [proposalResponse] = useQuery(
     getProposalNewsByAddress,
     {
       address: toChecksumAddress(accountAddress),
@@ -50,7 +50,7 @@ const WorkspaceHome: BlitzPage = () => {
     },
     { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
   )
-  const { count, proposals } = response || {}
+  const { count, proposals } = proposalResponse || {}
 
   const [account] = useQuery(
     getAccountByAddress,
@@ -79,9 +79,9 @@ const WorkspaceHome: BlitzPage = () => {
             />
             <FilterPill
               label="My role"
-              filterOptions={PROPOSAL_ROLE_FILTER_OPTIONS.map((rfpStatus) => ({
-                name: rfpStatus.toUpperCase(),
-                value: rfpStatus,
+              filterOptions={PROPOSAL_ROLE_FILTER_OPTIONS.map((proposalRole) => ({
+                name: proposalRole.toUpperCase(),
+                value: proposalRole,
               }))}
               appliedFilters={proposalRoleFilters}
               setAppliedFilters={setProposalRoleFilters}

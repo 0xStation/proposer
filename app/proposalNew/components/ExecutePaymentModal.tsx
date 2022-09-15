@@ -20,7 +20,7 @@ enum Tab {
   ATTACH_TRANSACTION = "ATTACH_TRANSACTION",
 }
 import updateProposalStatus from "app/proposalNew/mutations/updateProposalStatus"
-import { ProposalNewStatus } from "app/proposalNew/types"
+import { ProposalNewStatus } from "@prisma/client"
 
 export const ExecutePaymentModal = ({ isOpen, setIsOpen, isLoading, setIsLoading, payment }) => {
   const setToastState = useStore((state) => state.setToastState)

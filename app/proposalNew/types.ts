@@ -2,13 +2,7 @@ import { ProposalSignature, ProposalRole, ProposalType } from "@prisma/client"
 import { ProposalMilestone } from "app/proposalMilestone/types"
 import { PaymentTerm, ProposalPayment } from "app/proposalPayment/types"
 import { Token } from "app/token/types"
-
-export enum ProposalNewStatus {
-  DRAFT = "DRAFT",
-  AWAITING_APPROVAL = "AWAITING_APPROVAL",
-  APPROVED = "APPROVED",
-  COMPLETE = "COMPLETE",
-}
+import { ProposalNewStatus } from "@prisma/client"
 
 export type ProposalNew = {
   id: string

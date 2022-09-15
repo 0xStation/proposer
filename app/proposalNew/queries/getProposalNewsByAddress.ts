@@ -16,28 +16,32 @@ export default async function getProposalNewsByAddress(
 ) {
   const data = GetProposalNewsByAddress.parse(input)
 
-  const response = (await db.$transaction([
-    db.proposalNew.count(),
-    db.proposalNew.findMany({
-      where: {
-        roles: {
-          some: {
-            address: data.address,
-            ...(data.roles &&
-              data.roles.length > 0 && {
-                role: {
-                  in: data.roles,
-                },
-              }),
-          },
+  const whereParams = {
+    where: {
+      roles: {
+        some: {
+          address: data.address,
+          ...(data.roles &&
+            data.roles.length > 0 && {
+              role: {
+                in: data.roles,
+              },
+            }),
         },
-        ...(data.statuses &&
-          data.statuses.length > 0 && {
-            status: {
-              in: data.statuses,
-            },
-          }),
       },
+      ...(data.statuses &&
+        data.statuses.length > 0 && {
+          status: {
+            in: data.statuses,
+          },
+        }),
+    },
+  }
+
+  const response = (await db.$transaction([
+    db.proposalNew.count(whereParams),
+    db.proposalNew.findMany({
+      ...whereParams,
       take: input.paginationTake,
       skip: input.page * input.paginationTake,
       orderBy: {
