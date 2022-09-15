@@ -1,18 +1,15 @@
 import { useEffect, useState } from "react"
-import { useMutation, useRouter, Routes } from "blitz"
+import { useMutation, useRouter, Routes, invoke } from "blitz"
 import Modal from "./sds/overlays/modal"
 import Select from "./form/Select"
 import Button from "./sds/buttons/Button"
 import { Form } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
-import createAccount from "app/account/mutations/createAccount"
+import createSafe from "app/account/mutations/createSafe"
 import { Account } from "app/account/types"
-
-const gnosisUrlForChain = {
-  1: "https://safe-transaction.gnosis.io",
-  4: "https://safe-transaction.rinkeby.gnosis.io",
-  5: "https://safe-transaction.goerli.gnosis.io",
-}
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import networks from "app/utils/networks.json"
 
 export const NewWorkspaceModal = ({
   isOpen,
@@ -25,16 +22,19 @@ export const NewWorkspaceModal = ({
 }) => {
   const activeChain = useStore((state) => state.activeChain) || { id: 1 }
   const setToastState = useStore((state) => state.setToastState)
+  const setActiveUser = useStore((state) => state.setActiveUser)
   const [safes, setSafes] = useState<string[]>([])
   const router = useRouter()
 
-  const [createAccountMutation, { isLoading }] = useMutation(createAccount, {
-    onSuccess: (data) => {
+  const [createSafeMutation, { isLoading }] = useMutation(createSafe, {
+    onSuccess: async (data) => {
       setIsOpen(false)
       const safeAddress = data.address as string
+      const account = await invoke(getAccountByAddress, { address: activeUser.address })
+      setActiveUser(account)
       router.push(Routes.WorkspaceHome({ accountAddress: safeAddress }))
     },
-    onError: (error) => {
+    onError: (_error) => {
       // most likely the error?
       setToastState({
         isToastShowing: true,
@@ -47,8 +47,11 @@ export const NewWorkspaceModal = ({
   useEffect(() => {
     // get multisigs for user
     const fetchSafes = async (address: string) => {
-      const gnosisApiUrl = gnosisUrlForChain[activeChain.id]
-      const response = await fetch(`${gnosisApiUrl}/api/v1/owners/${address}/safes`)
+      const network = networks[activeChain.id]?.gnosisNetwork
+      const url = `https://safe-transaction.${network}.gnosis.io/api/v1/owners/${toChecksumAddress(
+        address
+      )}/safes`
+      const response = await fetch(url)
       const data = await response.json()
       const safes = data.safes
       setSafes(
@@ -78,9 +81,19 @@ export const NewWorkspaceModal = ({
         <Form
           initialValues={{}}
           onSubmit={(values) => {
-            createAccountMutation({
-              address: values.safeAddress.value,
-            })
+            try {
+              createSafeMutation({
+                address: values.safeAddress.value,
+                chainId: activeChain.id,
+              })
+            } catch (e) {
+              console.error(e)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Something went wrong importing this safe.",
+              })
+            }
           }}
           render={({ form, handleSubmit }) => {
             const formState = form.getState()

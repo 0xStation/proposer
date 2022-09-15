@@ -38,6 +38,7 @@ const config: BlitzConfig = {
       "user-images.githubusercontent.com",
       "station-images.nyc3.digitaloceanspaces.com",
       "cdn.discordapp.com",
+      "avatar.tobi.sh",
     ],
   },
   async redirects() {

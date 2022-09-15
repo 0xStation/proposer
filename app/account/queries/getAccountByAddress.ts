@@ -24,6 +24,7 @@ export default async function getAccountByAddress(input: z.infer<typeof GetAccou
   const account = await db.account.findFirst({
     where: { address: params.address },
     include: {
+      // TODO -- deprecate when we pull out terminals
       tickets: {
         include: {
           terminal: true,
@@ -32,6 +33,11 @@ export default async function getAccountByAddress(input: z.infer<typeof GetAccou
               tag: true,
             },
           },
+        },
+      },
+      originsOf: {
+        include: {
+          targetAccount: true,
         },
       },
     },

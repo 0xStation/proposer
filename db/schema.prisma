@@ -38,6 +38,8 @@ model Account {
   endorsed           Endorsement[]       @relation("Endorsed")
   emailVerifications EmailVerification[]
   tokens             AccountToken[]
+  originsOf          AccountAccount[]    @relation("origin")
+  targetsOf          AccountAccount[]    @relation("target")
 }
 
 model EmailVerification {
@@ -301,6 +303,24 @@ model ProposalPayment {
   tokenId          Float? // float to support larger size numbers
   transactionHash  String?
   data             Json
+}
+
+model AccountAccount {
+  id            String             @id @default(uuid())
+  originAddress String
+  targetAddress String
+  originAccount Account            @relation("origin", fields: [originAddress], references: [address])
+  targetAccount Account            @relation("target", fields: [targetAddress], references: [address])
+  type          AccountAccountType
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  data          Json
+
+  @@unique([originAddress, targetAddress, type])
+}
+
+enum AccountAccountType {
+  PIN_WORKSPACE
 }
 
 enum TokenType {
