@@ -8,12 +8,8 @@ import useStore from "app/core/hooks/useStore"
 import createSafe from "app/account/mutations/createSafe"
 import { Account } from "app/account/types"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
-
-const gnosisUrlForChain = {
-  1: "https://safe-transaction.gnosis.io",
-  4: "https://safe-transaction.rinkeby.gnosis.io",
-  5: "https://safe-transaction.goerli.gnosis.io",
-}
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import networks from "app/utils/networks.json"
 
 export const NewWorkspaceModal = ({
   isOpen,
@@ -38,7 +34,7 @@ export const NewWorkspaceModal = ({
       setActiveUser(account)
       router.push(Routes.WorkspaceHome({ accountAddress: safeAddress }))
     },
-    onError: (error) => {
+    onError: (_error) => {
       // most likely the error?
       setToastState({
         isToastShowing: true,
@@ -51,8 +47,11 @@ export const NewWorkspaceModal = ({
   useEffect(() => {
     // get multisigs for user
     const fetchSafes = async (address: string) => {
-      const gnosisApiUrl = gnosisUrlForChain[activeChain.id]
-      const response = await fetch(`${gnosisApiUrl}/api/v1/owners/${address}/safes`)
+      const network = networks[activeChain.id]?.gnosisNetwork
+      const url = `https://safe-transaction.${network}.gnosis.io/api/v1/owners/${toChecksumAddress(
+        address
+      )}/safes`
+      const response = await fetch(url)
       const data = await response.json()
       const safes = data.safes
       setSafes(
@@ -82,10 +81,19 @@ export const NewWorkspaceModal = ({
         <Form
           initialValues={{}}
           onSubmit={(values) => {
-            createSafeMutation({
-              address: values.safeAddress.value,
-              chainId: activeChain.id,
-            })
+            try {
+              createSafeMutation({
+                address: values.safeAddress.value,
+                chainId: activeChain.id,
+              })
+            } catch (e) {
+              console.error(e)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Something went wrong importing this safe.",
+              })
+            }
           }}
           render={({ form, handleSubmit }) => {
             const formState = form.getState()
