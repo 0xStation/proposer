@@ -1,13 +1,20 @@
 import { ExternalLinkIcon } from "@heroicons/react/solid"
-import { DateTime } from "luxon"
+import { ProposalNew } from "app/proposalNew/types"
 import { LINKS } from "../utils/constants"
+import { convertDateStringToDateAndTime } from "../utils/convertDateStringToDateAndTime"
 
-export const IpfsHashView = ({ proposal }) => {
+export const IpfsHashView = ({
+  proposal,
+  className,
+}: {
+  proposal?: ProposalNew
+  className?: string
+}) => {
   return (
-    <div className="border border-b border-concrete rounded-2xl px-6 py-4 mt-9">
+    <div className={`border border-b border-concrete rounded-2xl px-6 py-4 mt-9 ${className}`}>
       <div className="flex-row border-b border-b-concrete">
         {proposal?.data?.ipfsMetadata?.hash ? (
-          <div className="basis-5 mb-3">
+          <div className="basis-32 mb-3">
             <a
               className="inline mr-2 cursor-pointer"
               href={`${LINKS.PINATA_BASE_URL}${proposal?.data?.ipfsMetadata?.hash}`}
@@ -21,7 +28,7 @@ export const IpfsHashView = ({ proposal }) => {
             <p className="hidden sm:inline">{proposal?.data?.ipfsMetadata?.hash}</p>
           </div>
         ) : (
-          <div className="basis-5 mb-3">
+          <div className="basis-32 mb-3">
             <p className="inline font-bold tracking-wide uppercase text-concrete text-xs mr-2">
               Ipfs link
             </p>
@@ -31,11 +38,13 @@ export const IpfsHashView = ({ proposal }) => {
       </div>
       <div className="flex-row mt-3">
         <p className="inline font-bold tracking-wide uppercase text-concrete text-xs mr-2">
-          Last updated
+          Ipfs timestamp
         </p>
         <p className="sm:inline uppercase">
-          {DateTime.fromJSDate(proposal?.timestamp as Date).toFormat("dd-MMM-yyyy")}{" "}
-          {DateTime.fromJSDate(proposal?.timestamp as Date).toLocaleString(DateTime.TIME_SIMPLE)}
+          {/* convert to dd-MON-yyyy hh:mm AM/PM */}
+          {convertDateStringToDateAndTime({
+            timestamp: proposal?.data?.ipfsMetadata?.timestamp as string,
+          })}
         </p>
       </div>
     </div>

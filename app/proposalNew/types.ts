@@ -24,7 +24,7 @@ export type ProposalNewMetadata = {
   ipfsMetadata?: {
     hash: string
     ipfsPinSize: number
-    timestamp: Date
+    timestamp: string
   }
   // cache total payment amounts for rendering on list components and primary metadata view
   totalPayments: { token: Token; amount: number }[]

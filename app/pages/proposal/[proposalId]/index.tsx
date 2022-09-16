@@ -7,11 +7,12 @@ import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
 import { LINKS } from "app/core/utils/constants"
 import { ProposalViewHeaderNavigation } from "app/proposalNew/components/viewPage/ProposalViewHeaderNavigation"
 import ReadMore from "app/core/components/ReadMore"
-import { ProposalMetadataView } from "app/proposal/components/ProposalMetadataView"
+import { TotalPaymentView } from "app/core/components/TotalPaymentView"
 import RoleSignaturesView from "app/core/components/RoleSignaturesView"
 import { ProposalNew } from "app/proposalNew/types"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
 import { IpfsHashView } from "app/core/components/IpfsHashView"
+import TimelineView from "app/core/components/TimelineView"
 
 const ViewProposalNew: BlitzPage = () => {
   const proposalApprovalModalOpen = useStore((state) => state.proposalApprovalModalOpen)
@@ -25,7 +26,7 @@ const ViewProposalNew: BlitzPage = () => {
 
   return (
     <Layout title="View Proposal">
-      <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto h-full pb-9">
+      <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto pb-9">
         <ApproveProposalNewModal
           isOpen={proposalApprovalModalOpen}
           setIsOpen={toggleProposalApprovalModalOpen}
@@ -33,9 +34,15 @@ const ViewProposalNew: BlitzPage = () => {
         />
         <ProposalViewHeaderNavigation />
         <ReadMore className="mt-9 mb-9">{proposal?.data?.content?.body}</ReadMore>
-        <ProposalMetadataView proposal={proposal!} />
+        {proposal?.startDate && (
+          <TimelineView
+            startDate={proposal?.startDate as Date}
+            endDate={proposal?.endDate as Date}
+          />
+        )}
+        <TotalPaymentView proposal={proposal!} className="mt-9" />
         <RoleSignaturesView proposal={proposal as ProposalNew | undefined} className="mt-9" />
-        <IpfsHashView proposal={proposal} />
+        <IpfsHashView proposal={proposal || undefined} />
       </div>
     </Layout>
   )
