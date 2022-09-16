@@ -14,6 +14,7 @@ import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import getProposalNewApprovalsByProposalId from "app/proposalNewApproval/queries/getProposalNewApprovalsByProposal"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
+import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.role === proposalType)
@@ -101,6 +102,11 @@ export const ProposalViewHeaderNavigation = () => {
         ) : (
           <div className="mt-6 h-10 w-42 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
         )}
+        <div className="mt-1">
+          <p className="uppercase text-xs tracking-wider text-concrete">
+            Last updated: {convertJSDateToDateAndTime({ timestamp: proposal?.timestamp as Date })}
+          </p>
+        </div>
         {/* PROPOSAL STATUS */}
         <div className="mt-6 flex flex-row justify-between">
           <div className="space-x-2 flex flex-row">
