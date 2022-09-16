@@ -23,6 +23,9 @@ const ApproveProposalNew = z.object({
 export default async function approveProposalNew(input: z.infer<typeof ApproveProposalNew>) {
   const params = ApproveProposalNew.parse(input)
 
+  // prepare to connect or create to ProposalNewApprovals for this signature
+  // connect in the case I am signing representing a multisig that already has an approval object
+  // create in the case I am signing for myself or the first person to sign for the multisig
   const connectOrCreates = params.representing.map((account) => {
     return {
       where: { proposalId_address: { proposalId: params.proposalId, address: account.address } },
@@ -42,6 +45,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
   })
 
   try {
+    // create proposal signature and connect or create links to approvals
     await db.proposalSignature.create({
       data: {
         address: params.signerAddress,
@@ -63,9 +67,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
     throw Error(`Failed to create signature in approveProposalNew: ${err}`)
   }
 
-  // for representing multisigs, query if signatures have hit quorum
-
-  // TODO
+  // TODO: for representing multisigs, query if signatures have hit quorum for it
 
   // UPLOAD TO IPFS
   let proposal

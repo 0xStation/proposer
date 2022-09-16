@@ -122,7 +122,9 @@ const ViewProposalNew: BlitzPage = () => {
 
   const userHasSigned = approvals?.some(
     (approval) =>
+      // approval exists for address -> happens in case of signing for personal wallet
       addressesAreEqual(activeUser?.address || "", approval.address) ||
+      // one of approval's signatures exists for address -> happens for case of multisig
       approval?.signatures.some((signature) =>
         addressesAreEqual(activeUser?.address || "", signature.address)
       )

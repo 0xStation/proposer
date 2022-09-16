@@ -15,6 +15,7 @@ export default async function getProposalNewApprovalsByProposalId(
       proposalId: params.proposalId,
     },
     include: {
+      // include signatures within approvals to have an easier time rendering the multisig ring progress
       signatures: true,
     },
   })

@@ -49,6 +49,7 @@ export const ApproveProposalNewModal = ({
         signerAddress: activeUser!.address!,
         message,
         signature,
+        // when implementing multisig approvals, change to parse if representing self and/or multisig
         representing: [{ address: activeUser!.address!, addressType: AddressType.WALLET }],
       })
       invalidateQuery(getProposalNewApprovalsByProposalId)

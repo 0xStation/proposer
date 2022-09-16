@@ -8,6 +8,8 @@ export type ProposalNewApprovalMetadata = {
   message?: any
 }
 
+// the type of approval mechanism for a given approval
+// future options will include snapshot-strategy-like things such as token votes
 export enum ProposalNewApprovalType {
   SELF = "SELF",
   MULTISIG_QUORUM = "MULTISIG_QUORUM",
