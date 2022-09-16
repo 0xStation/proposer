@@ -43,7 +43,7 @@ export const RoleSignaturesView = ({
     // Skeleton loading screen
     <div
       tabIndex={0}
-      className={`${className} h-[300px] w-full flex flex-row rounded-4xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+      className={`${className} h-[300px] w-full flex flex-row rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
     />
   )
 }

@@ -11,6 +11,7 @@ import { ProposalStatusPill } from "../../../core/components/ProposalStatusPill"
 import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
 import { genPathFromUrlObject } from "app/utils"
 import { CopyBtn } from "app/core/components/CopyBtn"
+import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.role === proposalType)
@@ -46,6 +47,7 @@ export const ProposalViewHeaderNavigation = () => {
     { proposalId },
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
+
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
 
   // author used to return to workspace page with proposal list view
@@ -70,25 +72,36 @@ export const ProposalViewHeaderNavigation = () => {
 
   return (
     <>
-      <div className="w-full">
-        <p className="mt-6">
+      <div className="w-full min-h-64">
+        <div className="mt-6 flex flex-row">
           <span className="text-concrete hover:text-light-concrete">
             <Link href={Routes.WorkspaceHome({ accountAddress: author?.address as string })}>
               Proposals
             </Link>{" "}
             /&nbsp;
           </span>
-          {proposal?.data?.content?.title}
-        </p>
-        <h2 className="mt-6 text-marble-white text-2xl font-bold">
-          {proposal?.data.content.title || " "}
-        </h2>
+          {proposal?.data?.content?.title || (
+            <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+          )}
+        </div>
+        {proposal?.data.content.title ? (
+          <h2 className="mt-6 text-marble-white text-2xl font-bold">
+            {proposal?.data.content.title}
+          </h2>
+        ) : (
+          <div className="mt-6 h-10 w-42 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+        )}
         {/* PROPOSAL STATUS */}
-        <div className="mt-6 flex flex-row space-x-2">
-          <ProposalStatusPill status={proposal?.status} />
-          <ProgressCircleAndNumber
-            numerator={totalSignatureCount}
-            denominator={numUniqueProposalRoleAddresses}
+        <div className="mt-6 flex flex-row justify-between">
+          <div className="space-x-2 flex flex-row">
+            <ProposalStatusPill status={proposal?.status} />
+            <ProgressCircleAndNumber
+              numerator={totalSignatureCount}
+              denominator={numUniqueProposalRoleAddresses}
+            />
+          </div>
+          <CollaboratorPfps
+            accounts={(proposal?.roles as ProposalRole[]).map((role) => role?.account)}
           />
         </div>
         {/* BUTTONS */}
