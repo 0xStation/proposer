@@ -43,7 +43,12 @@ export const ProposalViewHeaderNavigation = () => {
   const [proposal] = useQuery(
     getProposalNewById,
     { id: proposalId },
-    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
+    {
+      suspense: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      enabled: !!proposalId,
+    }
   )
   const [approvals] = useQuery(
     getProposalNewApprovalsByProposalId,

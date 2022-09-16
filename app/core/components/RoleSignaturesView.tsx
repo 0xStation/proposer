@@ -14,7 +14,12 @@ export const RoleSignaturesView = ({
   const [approvals] = useQuery(
     getProposalNewApprovalsByProposalId,
     { proposalId: proposal?.id as string },
-    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
+    {
+      suspense: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      enabled: Boolean(proposal?.id),
+    }
   )
 
   return proposal ? (
