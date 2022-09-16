@@ -18,6 +18,7 @@ import DropdownChevronIcon from "../icons/DropdownChevronIcon"
 import { DotsHorizontalIcon, PlusIcon } from "@heroicons/react/solid"
 import NewWorkspaceModal from "app/core/components/NewWorkspaceModal"
 import { AccountAccountType } from "@prisma/client"
+import { useEnsName } from "wagmi"
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -33,7 +34,7 @@ const Navigation = ({ children }: { children?: any }) => {
   const { switchNetwork, isError, error } = useSwitchNetwork()
   // the useNetwork object weirdly doesn't have the right names, but the objects from allChains do so we convert
   const connectedChain = SUPPORTED_CHAINS.find((supportedChain) => supportedChain.id === chain?.id)
-  const isChainSupported = !!connectedChain
+  const isChainSupported = chain ? !!connectedChain : undefined
   const [newWorkspaceModalOpen, setNewWorkspaceModalOpen] = useState<boolean>(false)
 
   if (isError) {
@@ -84,6 +85,13 @@ const Navigation = ({ children }: { children?: any }) => {
     }
   }, [chain])
 
+  const { data: ensName } = useEnsName({
+    address: activeUser?.address,
+    chainId: 1,
+    cacheTime: 60 * 60 * 1000, // (1 hr) time (in ms) which the data should remain in the cache
+    enabled: !!activeUser,
+  })
+
   return (
     <>
       {activeUser && (
@@ -127,7 +135,7 @@ const Navigation = ({ children }: { children?: any }) => {
                       address={activeUser?.address}
                     />
                     <span className="block text-marble-white text-sm mr-12">
-                      @{truncateString(activeUser?.address || "")}
+                      @{ensName || truncateString(activeUser?.address || "")}
                     </span>
                     <DropdownChevronIcon />
                   </span>
