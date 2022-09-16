@@ -1,7 +1,7 @@
 import { useState } from "react"
 import Preview from "app/core/components/MarkdownPreview"
 
-const MAX_CHAR_LENGTH = 1000
+const MAX_CHAR_LENGTH = 500
 
 export const ReadMore = ({
   children = "",
