@@ -52,6 +52,7 @@ export const ApproveProposalNewModal = ({
         representing: [{ address: activeUser!.address!, addressType: AddressType.WALLET }],
       })
       invalidateQuery(getProposalNewApprovalsByProposalId)
+      invalidateQuery(getProposalNewSignaturesById)
       // invalidate proposal query to get ipfs hash post-approval
       // since an ipfs has is created on proposal approval
       invalidateQuery(getProposalNewById)

@@ -65,6 +65,8 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
 
   // for representing multisigs, query if signatures have hit quorum
 
+  // TODO
+
   // UPLOAD TO IPFS
   let proposal
   try {
