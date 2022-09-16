@@ -1,5 +1,5 @@
 import { BlitzPage, useQuery, useParam } from "blitz"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ExternalLinkIcon } from "@heroicons/react/solid"
 import { DateTime } from "luxon"
 import Layout from "app/core/layouts/Layout"
@@ -19,6 +19,8 @@ import MetadataLabel from "app/core/components/MetadataLabel"
 import { LINKS, PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 import Preview from "app/core/components/MarkdownPreview"
+import getProposalNewApprovalsByProposalId from "app/proposalNewApproval/queries/getProposalNewApprovalsByProposal"
+import { areApprovalsComplete } from "app/proposalNew/utils"
 
 export const IpfsViewComponent = ({ ipfsHash, ipfsTimestamp }) => {
   const date = DateTime.fromISO(ipfsTimestamp)
@@ -55,6 +57,7 @@ const ViewProposalNew: BlitzPage = () => {
   const [isApproveProposalModalOpen, setIsApproveProposalModalOpen] = useState<boolean>(false)
   const [isExecutePaymentModalOpen, setIsExecutePaymentModalOpen] = useState<boolean>(false)
   const [isActionPending, setIsActionPending] = useState<boolean>(false)
+  const [approvalsComplete, setApprovalsComplete] = useState<boolean>(false)
   const proposalId = useParam("proposalId") as string
   const [proposal] = useQuery(
     getProposalNewById,
@@ -70,9 +73,21 @@ const ViewProposalNew: BlitzPage = () => {
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
+  const [approvals] = useQuery(
+    getProposalNewApprovalsByProposalId,
+    { proposalId },
+    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
+  )
+
+  useEffect(() => {
+    if (areApprovalsComplete(proposal?.roles, approvals)) {
+      setApprovalsComplete(true)
+    }
+  }, [proposal?.roles, approvals])
+
   const RoleSignature = ({ role }) => {
-    const addressHasSigned = (address: string) => {
-      return signatures?.some((signature) => addressesAreEqual(address, signature.address)) || false
+    const addressHasApproved = (address: string) => {
+      return approvals?.some((approval) => addressesAreEqual(address, approval.address)) || false
     }
 
     return (
@@ -83,11 +98,11 @@ const ViewProposalNew: BlitzPage = () => {
             <div className="flex flex-row items-center space-x-1 absolute right-10">
               <span
                 className={`h-2 w-2 rounded-full bg-${
-                  addressHasSigned(role?.address) ? "magic-mint" : "neon-carrot"
+                  addressHasApproved(role?.address) ? "magic-mint" : "neon-carrot"
                 }`}
               />
               <div className="font-bold text-xs uppercase tracking-wider">
-                {addressHasSigned(role?.address) ? "signed" : "pending"}
+                {addressHasApproved(role?.address) ? "approved" : "pending"}
               </div>
             </div>
           </>
@@ -113,30 +128,16 @@ const ViewProposalNew: BlitzPage = () => {
       role.role === ProposalRoleType.CLIENT &&
       addressesAreEqual(activeUser?.address || "", role.address)
   )
-  const signaturesComplete = (() => {
-    const requiredSignatures = {}
-
-    proposal?.roles.forEach((role) => {
-      requiredSignatures[role.address] = false
-    })
-
-    signatures?.forEach((commitment) => {
-      requiredSignatures[commitment.address] = true
-    })
-
-    return Object.values(requiredSignatures).every((hasSigned) => hasSigned)
-  })()
 
   const paymentComplete = !!proposal?.payments?.[0]?.transactionHash
 
   const showApproveButton = userHasRole && !userHasSigned
   const showPayButton =
-    proposalContainsPayment && signaturesComplete && userIsPayer && !paymentComplete
+    proposalContainsPayment && approvalsComplete && userIsPayer && !paymentComplete
 
   const uniqueRoleAddresses = (proposal?.roles || [])
     .map((role) => toChecksumAddress(role.address))
     .filter((v, i, addresses) => addresses.indexOf(v) === i).length
-  const signatureCount = signatures?.length || 0
 
   return (
     <Layout title="View Proposal">
@@ -214,7 +215,7 @@ const ViewProposalNew: BlitzPage = () => {
                 <p className="mt-2 font-normal">
                   {paymentComplete
                     ? "PAID"
-                    : signaturesComplete
+                    : approvalsComplete
                     ? "APPROVED"
                     : "AWAITING SIGNATURES"}
                 </p>
@@ -226,7 +227,7 @@ const ViewProposalNew: BlitzPage = () => {
                   />
                 ) : (
                   <ProgressCircleAndNumber
-                    numerator={signatureCount}
+                    numerator={approvals?.length || 0}
                     denominator={uniqueRoleAddresses}
                   />
                 )}

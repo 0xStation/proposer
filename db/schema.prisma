@@ -240,15 +240,27 @@ model FeatureFlag {
 }
 
 model ProposalNew {
-  id         String              @id @default(uuid())
+  id         String                @id @default(uuid())
   type       ProposalType
-  timestamp  DateTime            @default(now())
+  timestamp  DateTime              @default(now())
   data       Json
-  status     ProposalNewStatus   @default(DRAFT)
+  status     ProposalNewStatus     @default(DRAFT)
   roles      ProposalRole[]
   milestones ProposalMilestone[]
   payments   ProposalPayment[]
+  approvals  ProposalNewApproval[]
   signatures ProposalSignature[]
+}
+
+model ProposalNewApproval {
+  id         String      @id @default(uuid())
+  proposalId String
+  proposal   ProposalNew @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  address    String
+  createdAt  DateTime    @default(now())
+  data       Json
+
+  @@unique([proposalId, address])
 }
 
 model ProposalSignature {
