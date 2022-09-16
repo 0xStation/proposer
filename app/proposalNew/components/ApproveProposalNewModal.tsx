@@ -4,6 +4,7 @@ import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
 import approveProposalNew from "app/proposalNew/mutations/approveProposalNew"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
+import getProposalNewApprovalsByProposalId from "app/proposalNewApproval/queries/getProposalNewApprovalsByProposal"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { genProposalNewDigest } from "app/signatures/proposalNew"
 import getProposalNewById from "../queries/getProposalNewById"
@@ -50,7 +51,7 @@ export const ApproveProposalNewModal = ({
         signature,
         representing: [{ address: activeUser!.address!, addressType: AddressType.WALLET }],
       })
-      invalidateQuery(getProposalNewSignaturesById)
+      invalidateQuery(getProposalNewApprovalsByProposalId)
       // invalidate proposal query to get ipfs hash post-approval
       // since an ipfs has is created on proposal approval
       invalidateQuery(getProposalNewById)

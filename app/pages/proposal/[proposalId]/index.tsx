@@ -7,9 +7,8 @@ import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
-import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import { getNetworkName } from "app/core/utils/networkInfo"
-import { ProposalRoleType } from "@prisma/client"
+import { ProposalNewApprovalStatus, ProposalRoleType } from "@prisma/client"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
 import ExecutePaymentModal from "app/proposalNew/components/ExecutePaymentModal"
 import TransactionLink from "app/core/components/TransactionLink"
@@ -65,14 +64,6 @@ const ViewProposalNew: BlitzPage = () => {
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
-  const proposalContainsPayment = (proposal?.payments && proposal?.payments.length > 0) || false
-
-  const [signatures] = useQuery(
-    getProposalNewSignaturesById,
-    { proposalId },
-    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
-  )
-
   const [approvals] = useQuery(
     getProposalNewApprovalsByProposalId,
     { proposalId },
@@ -80,19 +71,22 @@ const ViewProposalNew: BlitzPage = () => {
   )
 
   useEffect(() => {
-    if (areApprovalsComplete(proposal?.roles, approvals)) {
+    if (proposal?.roles && approvals && areApprovalsComplete(proposal?.roles, approvals)) {
       setApprovalsComplete(true)
     }
   }, [proposal?.roles, approvals])
 
   const RoleSignature = ({ role }) => {
     const addressHasApproved = (address: string) => {
-      return approvals?.some((approval) => addressesAreEqual(address, approval.address)) || false
+      return (
+        approvals?.find((approval) => addressesAreEqual(address, approval.address))?.status ===
+        ProposalNewApprovalStatus.COMPLETE
+      )
     }
 
     return (
       <div className="flex flex-row w-full items-center">
-        {role && signatures ? (
+        {role && approvals ? (
           <>
             <AccountMediaObject account={role?.account} />
             <div className="flex flex-row items-center space-x-1 absolute right-10">
@@ -117,18 +111,24 @@ const ViewProposalNew: BlitzPage = () => {
     )
   }
 
-  const userHasRole = proposal?.roles.some((role) =>
-    addressesAreEqual(activeUser?.address || "", role.address)
-  )
-  const userHasSigned = signatures?.some((commitment) =>
-    addressesAreEqual(activeUser?.address || "", commitment.address)
-  )
   const userIsPayer = proposal?.roles.some(
     (role) =>
       role.role === ProposalRoleType.CLIENT &&
       addressesAreEqual(activeUser?.address || "", role.address)
   )
+  const userHasRole =
+    userIsPayer ||
+    proposal?.roles.some((role) => addressesAreEqual(activeUser?.address || "", role.address))
 
+  const userHasSigned = approvals?.some(
+    (approval) =>
+      addressesAreEqual(activeUser?.address || "", approval.address) ||
+      approval?.signatures.some((signature) =>
+        addressesAreEqual(activeUser?.address || "", signature.address)
+      )
+  )
+
+  const proposalContainsPayment = (proposal?.payments && proposal?.payments.length > 0) || false
   const paymentComplete = !!proposal?.payments?.[0]?.transactionHash
 
   const showApproveButton = userHasRole && !userHasSigned

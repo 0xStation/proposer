@@ -14,6 +14,9 @@ export default async function getProposalNewApprovalsByProposalId(
     where: {
       proposalId: params.proposalId,
     },
+    include: {
+      signatures: true,
+    },
   })
 
   return approvals
