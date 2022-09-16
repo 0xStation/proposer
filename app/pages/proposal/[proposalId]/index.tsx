@@ -1,5 +1,5 @@
 import { BlitzPage, useQuery, useParam } from "blitz"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { ExternalLinkIcon } from "@heroicons/react/solid"
 import { DateTime } from "luxon"
 import Layout from "app/core/layouts/Layout"
@@ -7,8 +7,9 @@ import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
+import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import { getNetworkName } from "app/core/utils/networkInfo"
-import { ProposalNewApprovalStatus, ProposalRoleType } from "@prisma/client"
+import { ProposalRoleType } from "@prisma/client"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
 import ExecutePaymentModal from "app/proposalNew/components/ExecutePaymentModal"
 import TransactionLink from "app/core/components/TransactionLink"
@@ -18,8 +19,6 @@ import MetadataLabel from "app/core/components/MetadataLabel"
 import { LINKS, PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 import Preview from "app/core/components/MarkdownPreview"
-import getProposalNewApprovalsByProposalId from "app/proposalNewApproval/queries/getProposalNewApprovalsByProposal"
-import { areApprovalsComplete } from "app/proposalNew/utils"
 
 export const IpfsViewComponent = ({ ipfsHash, ipfsTimestamp }) => {
   const date = DateTime.fromISO(ipfsTimestamp)
@@ -56,7 +55,6 @@ const ViewProposalNew: BlitzPage = () => {
   const [isApproveProposalModalOpen, setIsApproveProposalModalOpen] = useState<boolean>(false)
   const [isExecutePaymentModalOpen, setIsExecutePaymentModalOpen] = useState<boolean>(false)
   const [isActionPending, setIsActionPending] = useState<boolean>(false)
-  const [approvalsComplete, setApprovalsComplete] = useState<boolean>(false)
   const proposalId = useParam("proposalId") as string
   const [proposal] = useQuery(
     getProposalNewById,
@@ -64,39 +62,32 @@ const ViewProposalNew: BlitzPage = () => {
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
-  const [approvals] = useQuery(
-    getProposalNewApprovalsByProposalId,
+  const proposalContainsPayment = (proposal?.payments && proposal?.payments.length > 0) || false
+
+  const [signatures] = useQuery(
+    getProposalNewSignaturesById,
     { proposalId },
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
-  useEffect(() => {
-    if (proposal?.roles && approvals && areApprovalsComplete(proposal?.roles, approvals)) {
-      setApprovalsComplete(true)
-    }
-  }, [proposal?.roles, approvals])
-
   const RoleSignature = ({ role }) => {
-    const addressHasApproved = (address: string) => {
-      return (
-        approvals?.find((approval) => addressesAreEqual(address, approval.address))?.status ===
-        ProposalNewApprovalStatus.COMPLETE
-      )
+    const addressHasSigned = (address: string) => {
+      return signatures?.some((signature) => addressesAreEqual(address, signature.address)) || false
     }
 
     return (
       <div className="flex flex-row w-full items-center">
-        {role && approvals ? (
+        {role && signatures ? (
           <>
             <AccountMediaObject account={role?.account} />
             <div className="flex flex-row items-center space-x-1 absolute right-10">
               <span
                 className={`h-2 w-2 rounded-full bg-${
-                  addressHasApproved(role?.address) ? "magic-mint" : "neon-carrot"
+                  addressHasSigned(role?.address) ? "magic-mint" : "neon-carrot"
                 }`}
               />
               <div className="font-bold text-xs uppercase tracking-wider">
-                {addressHasApproved(role?.address) ? "approved" : "pending"}
+                {addressHasSigned(role?.address) ? "signed" : "pending"}
               </div>
             </div>
           </>
@@ -111,35 +102,40 @@ const ViewProposalNew: BlitzPage = () => {
     )
   }
 
+  const userHasRole = proposal?.roles.some((role) =>
+    addressesAreEqual(activeUser?.address || "", role.address)
+  )
+  const userHasSigned = signatures?.some((commitment) =>
+    addressesAreEqual(activeUser?.address || "", commitment.address)
+  )
   const userIsPayer = proposal?.roles.some(
     (role) =>
       role.role === ProposalRoleType.CLIENT &&
       addressesAreEqual(activeUser?.address || "", role.address)
   )
-  const userHasRole =
-    userIsPayer ||
-    proposal?.roles.some((role) => addressesAreEqual(activeUser?.address || "", role.address))
+  const signaturesComplete = (() => {
+    const requiredSignatures = {}
 
-  const userHasSigned = approvals?.some(
-    (approval) =>
-      // approval exists for address -> happens in case of signing for personal wallet
-      addressesAreEqual(activeUser?.address || "", approval.address) ||
-      // one of approval's signatures exists for address -> happens for case of multisig
-      approval?.signatures.some((signature) =>
-        addressesAreEqual(activeUser?.address || "", signature.address)
-      )
-  )
+    proposal?.roles.forEach((role) => {
+      requiredSignatures[role.address] = false
+    })
 
-  const proposalContainsPayment = (proposal?.payments && proposal?.payments.length > 0) || false
+    signatures?.forEach((commitment) => {
+      requiredSignatures[commitment.address] = true
+    })
+    return Object.values(requiredSignatures).every((hasSigned) => hasSigned)
+  })()
+
   const paymentComplete = !!proposal?.payments?.[0]?.transactionHash
 
   const showApproveButton = userHasRole && !userHasSigned
   const showPayButton =
-    proposalContainsPayment && approvalsComplete && userIsPayer && !paymentComplete
+    proposalContainsPayment && signaturesComplete && userIsPayer && !paymentComplete
 
   const uniqueRoleAddresses = (proposal?.roles || [])
     .map((role) => toChecksumAddress(role.address))
     .filter((v, i, addresses) => addresses.indexOf(v) === i).length
+  const signatureCount = signatures?.length || 0
 
   return (
     <Layout title="View Proposal">
@@ -217,7 +213,7 @@ const ViewProposalNew: BlitzPage = () => {
                 <p className="mt-2 font-normal">
                   {paymentComplete
                     ? "PAID"
-                    : approvalsComplete
+                    : signaturesComplete
                     ? "APPROVED"
                     : "AWAITING SIGNATURES"}
                 </p>
@@ -229,7 +225,7 @@ const ViewProposalNew: BlitzPage = () => {
                   />
                 ) : (
                   <ProgressCircleAndNumber
-                    numerator={approvals?.length || 0}
+                    numerator={signatureCount}
                     denominator={uniqueRoleAddresses}
                   />
                 )}
