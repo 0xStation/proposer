@@ -28,7 +28,7 @@ export const TotalPaymentView = ({
       </div>
       <div className="mt-6">
         <h4 className="text-xs font-bold text-concrete uppercase">Payment Terms</h4>
-        <p className="mt-2">{PAYMENT_TERM_MAP[proposal?.data?.paymentTerms].copy}</p>
+        <p className="mt-2">{PAYMENT_TERM_MAP[proposal?.data?.paymentTerms]?.copy}</p>
       </div>
     </div>
   ) : (
