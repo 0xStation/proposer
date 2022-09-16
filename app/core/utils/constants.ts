@@ -79,7 +79,7 @@ export const PROPOSAL_NEW_STATUS_DISPLAY_MAP = {
     color: "bg-neon-carrot",
   },
   [ProposalNewStatus.APPROVED]: {
-    copy: "signed",
+    copy: "approved",
     color: "bg-magic-mint",
   },
   [ProposalNewStatus.COMPLETE]: {

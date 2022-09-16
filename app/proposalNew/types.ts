@@ -1,4 +1,5 @@
-import { ProposalSignature, ProposalRole, ProposalType } from "@prisma/client"
+import { ProposalSignature, ProposalType } from "@prisma/client"
+import { ProposalRole } from "app/proposalRole/types"
 import { ProposalMilestone } from "app/proposalMilestone/types"
 import { PaymentTerm, ProposalPayment } from "app/proposalPayment/types"
 import { Token } from "app/token/types"

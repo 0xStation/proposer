@@ -1,22 +1,33 @@
+import { ProposalNewApprovalStatus } from "@prisma/client"
 import useStore from "../hooks/useStore"
 import { addressesAreEqual } from "../utils/addressesAreEqual"
 import AccountMediaObject from "./AccountMediaObject"
-import { activeUserMeetsCriteria } from "../utils/activeUserMeetsCriteria"
 
-export const RoleSignature = ({ role, signatures }) => {
+export const RoleSignature = ({ role, approvals }) => {
   const activeUser = useStore((state) => state.activeUser)
-  const addressHasSigned = (address: string) => {
-    return signatures?.some((signature) => addressesAreEqual(address, signature.address)) || false
+  const addressHasApproved = (address: string) => {
+    return (
+      approvals?.find((approval) => addressesAreEqual(address, approval.address))?.status ===
+      ProposalNewApprovalStatus.COMPLETE
+    )
   }
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
-  const activeUserHasSigned = activeUserMeetsCriteria(activeUser, signatures)
+  const activeUserHasSigned = approvals?.some(
+    (approval) =>
+      // approval exists for address -> happens in case of signing for personal wallet
+      addressesAreEqual(activeUser?.address || "", approval.address) ||
+      // one of approval's signatures exists for address -> happens for case of multisig
+      approval?.signatures.some((signature) =>
+        addressesAreEqual(activeUser?.address || "", signature.address)
+      )
+  )
   const activeUserHasAProposalRole = addressesAreEqual(activeUser?.address || "", role?.address)
 
   const showSignButton = activeUserHasAProposalRole && !activeUserHasSigned
 
   return (
     <div className="flex flex-row w-full items-center justify-between">
-      {role && signatures ? (
+      {role && approvals ? (
         <>
           <AccountMediaObject account={role?.account} />
           <div className="flex flex-row items-center space-x-1">
@@ -31,12 +42,12 @@ export const RoleSignature = ({ role, signatures }) => {
               <div className="flex flex-row items-center space-x-1 ml-4">
                 <span
                   className={`h-2 w-2 rounded-full bg-${
-                    addressHasSigned(role?.address) ? "magic-mint" : "neon-carrot"
+                    addressHasApproved(role?.address) ? "magic-mint" : "neon-carrot"
                   }`}
                 />
 
                 <div className="font-bold text-xs uppercase tracking-wider">
-                  {addressHasSigned(role?.address) ? "signed" : "pending"}
+                  {addressHasApproved(role?.address) ? "approved" : "pending"}
                 </div>
               </div>
             )}

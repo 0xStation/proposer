@@ -42,9 +42,13 @@ export const IpfsHashView = ({
         </p>
         <p className="sm:inline uppercase">
           {/* convert to dd-MON-yyyy hh:mm AM/PM */}
-          {convertDateStringToDateAndTime({
-            timestamp: proposal?.data?.ipfsMetadata?.timestamp as string,
-          })}
+          {proposal?.data?.ipfsMetadata?.timestamp ? (
+            convertDateStringToDateAndTime({
+              timestamp: proposal?.data?.ipfsMetadata?.timestamp as string,
+            })
+          ) : (
+            <span className="text-concrete">N/A</span>
+          )}
         </p>
       </div>
     </div>

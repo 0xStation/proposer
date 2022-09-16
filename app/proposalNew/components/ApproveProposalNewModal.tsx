@@ -5,9 +5,11 @@ import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
 import approveProposalNew from "app/proposalNew/mutations/approveProposalNew"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
+import getProposalNewApprovalsByProposalId from "app/proposalNewApproval/queries/getProposalNewApprovalsByProposal"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { genProposalNewDigest } from "app/signatures/proposalNew"
 import getProposalNewById from "../queries/getProposalNewById"
+import { AddressType } from "@prisma/client"
 
 export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
   const router = useRouter()
@@ -28,7 +30,8 @@ export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
       })
     }
 
-    const signature = await signMessage(genProposalNewDigest(proposal))
+    const message = genProposalNewDigest(proposal)
+    const signature = await signMessage(message)
 
     // no signature - user must have denied signature
     if (!signature) {
@@ -40,8 +43,12 @@ export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
       await approveProposalMutation({
         proposalId: proposal?.id,
         signerAddress: activeUser!.address!,
+        message,
         signature,
+        // when implementing multisig approvals, change to parse if representing self and/or multisig
+        representing: [{ address: activeUser!.address!, addressType: AddressType.WALLET }],
       })
+      invalidateQuery(getProposalNewApprovalsByProposalId)
       invalidateQuery(getProposalNewSignaturesById)
       // invalidate proposal query to get ipfs hash post-approval
       // since an ipfs has is created on proposal approval
