@@ -17,10 +17,10 @@ import {
 import { ProposalStatus } from "app/proposal/types"
 import { ProposalRoleType } from "@prisma/client"
 import { LightBulbIcon, CogIcon } from "@heroicons/react/solid"
-import { ProposalNew } from "app/proposalNew/types"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 import WorkspaceSettingsOverviewForm from "app/account/components/WorkspaceSettingsOverviewForm"
 import useStore from "app/core/hooks/useStore"
+import ProposalStatusPill from "app/core/components/ProposalStatusPill"
 
 enum Tab {
   PROPOSALS = "PROPOSALS",
@@ -126,13 +126,7 @@ const WorkspaceHome: BlitzPage = () => {
                         {proposal.data.content.title}
                       </td>
                       <td className="py-4">
-                        <span
-                          className={`${
-                            PROPOSAL_NEW_STATUS_DISPLAY_MAP[proposal.status]?.color
-                          } text-tunnel-black px-2 py-1 rounded-full text-sm uppercase`}
-                        >
-                          {PROPOSAL_NEW_STATUS_DISPLAY_MAP[proposal.status]?.copy}
-                        </span>
+                        <ProposalStatusPill status={proposal?.status} />
                       </td>
                       <td className="text-base py-4 w-48">
                         {proposal.data.totalPayments.length > 0

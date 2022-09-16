@@ -36,6 +36,7 @@ import { useEnsAddress } from "wagmi"
 import { AddressLink } from "../../core/components/AddressLink"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { getNetworkTokens } from "app/core/utils/networkInfo"
+import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -642,14 +643,11 @@ const RewardForm = ({
 
 const SignForm = ({ activeUser, proposal, signatures }) => {
   const [isApproveProposalModalOpen, setIsApproveProposalModalOpen] = useState<boolean>(false)
-  const [isActionPending, setIsActionPending] = useState<boolean>(false)
 
   const RoleSignature = ({ role }) => {
     const userHasRole = addressesAreEqual(activeUser?.address || "", role.address)
 
-    const userHasSigned = signatures?.some((commitment) =>
-      addressesAreEqual(activeUser?.address || "", commitment.address)
-    )
+    const userHasSigned = activeUserMeetsCriteria(activeUser, signatures)
 
     const showSignButton = userHasRole && !userHasSigned
 
@@ -705,8 +703,6 @@ const SignForm = ({ activeUser, proposal, signatures }) => {
         isOpen={isApproveProposalModalOpen}
         setIsOpen={setIsApproveProposalModalOpen}
         proposal={proposal}
-        isSigning={isActionPending}
-        setIsSigning={setIsActionPending}
       />
       <p>All signatures are required to activate the agreement.</p>
       <div className="space-y-4 mt-6">
@@ -906,6 +902,13 @@ export const ProposalNewForm = () => {
                 milestones,
                 payments,
                 paymentTerms: values.paymentTerms,
+                // convert luxon's `DateTime` obj to UTC to store in db
+                startDate: values.startDate
+                  ? DateTime.fromISO(values.startDate).toUTC().toJSDate()
+                  : undefined,
+                endDate: values.endDate
+                  ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
+                  : undefined,
               })
             } catch (err) {
               setToastState({

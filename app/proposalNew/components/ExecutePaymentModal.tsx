@@ -22,9 +22,10 @@ enum Tab {
 import updateProposalStatus from "app/proposalNew/mutations/updateProposalStatus"
 import { ProposalNewStatus } from "@prisma/client"
 
-export const ExecutePaymentModal = ({ isOpen, setIsOpen, isLoading, setIsLoading, payment }) => {
+export const ExecutePaymentModal = ({ isOpen, setIsOpen, payment }) => {
   const setToastState = useStore((state) => state.setToastState)
   const [selectedTab, setSelectedTab] = useState<Tab>(Tab.DIRECT_PAYMENT)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [txnHash, setTxnHash] = useState<string>()
   const [transactionPayload, setTransactionPayload] = useState<any>()
   const [saveTransactionHashToPaymentsMutation] = useMutation(saveTransactionHashToPayments, {
