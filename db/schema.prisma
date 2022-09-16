@@ -245,6 +245,8 @@ model ProposalNew {
   timestamp  DateTime            @default(now())
   data       Json
   status     ProposalNewStatus   @default(DRAFT)
+  startDate  DateTime?
+  endDate    DateTime?
   roles      ProposalRole[]
   milestones ProposalMilestone[]
   payments   ProposalPayment[]

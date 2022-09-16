@@ -1,4 +1,5 @@
 import { useMutation, useRouter, invalidateQuery } from "blitz"
+import { useState } from "react"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
@@ -8,19 +9,14 @@ import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { genProposalNewDigest } from "app/signatures/proposalNew"
 import getProposalNewById from "../queries/getProposalNewById"
 
-export const ApproveProposalNewModal = ({
-  isOpen,
-  setIsOpen,
-  isSigning,
-  setIsSigning,
-  proposal,
-}) => {
+export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const [approveProposalMutation] = useMutation(approveProposalNew)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  let { signMessage } = useSignature()
+  const { signMessage } = useSignature()
 
   const initiateSignature = async () => {
     if (!activeUser || !activeUser?.address) {
@@ -36,7 +32,7 @@ export const ApproveProposalNewModal = ({
 
     // no signature - user must have denied signature
     if (!signature) {
-      setIsSigning(false)
+      setIsLoading(false)
       return
     }
 
@@ -61,7 +57,7 @@ export const ApproveProposalNewModal = ({
       console.error(e)
     }
 
-    setIsSigning(false)
+    setIsLoading(false)
   }
 
   return (
@@ -78,7 +74,7 @@ export const ApproveProposalNewModal = ({
             className="mr-2"
             type={ButtonType.Secondary}
             onClick={() => {
-              setIsSigning(false)
+              setIsLoading(false)
               setIsOpen(false)
             }}
           >
@@ -86,10 +82,10 @@ export const ApproveProposalNewModal = ({
           </Button>
           <Button
             isSubmitType={true}
-            isLoading={isSigning}
-            isDisabled={isSigning}
+            isLoading={isLoading}
+            isDisabled={isLoading}
             onClick={() => {
-              setIsSigning(true)
+              setIsLoading(true)
               initiateSignature()
             }}
           >

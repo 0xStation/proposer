@@ -14,6 +14,8 @@ export type ProposalNew = {
   signatures: ProposalSignature[]
   data: ProposalNewMetadata
   status: ProposalNewStatus
+  startDate: Date
+  endDate: Date
 }
 
 export type ProposalNewMetadata = {
