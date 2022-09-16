@@ -48,7 +48,7 @@ export const ProposalPayments: BlitzPage = () => {
   )
   const paymentComplete = !!proposal?.payments?.[0]?.transactionHash
 
-  const showPayInformation = proposalContainsPayment && approvalsComplete && userIsPayer
+  const showPayInformation = proposalContainsPayment && approvalsComplete
   // && !paymentComplete
 
   return (
@@ -62,6 +62,15 @@ export const ProposalPayments: BlitzPage = () => {
         <ProposalViewHeaderNavigation />
         {showPayInformation ? (
           <div className={` mt-9 border border-b border-concrete rounded-2xl px-6 py-9`}>
+            <span
+              className={`${
+                paymentComplete ? "bg-magic-mint" : "bg-neon-carrot"
+              } rounded-full px-2 py-1 flex items-center space-x-1 w-fit mb-4`}
+            >
+              <span className="text-xs uppercase text-tunnel-black font-bold">
+                {paymentComplete ? "PAID" : "PENDING"}
+              </span>
+            </span>
             <div className=" text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
               <span className="basis-32 mb-2 tracking-wider">From</span>
               <span className="basis-32 ml-6 mb-2 tracking-wider">To</span>
@@ -82,24 +91,25 @@ export const ProposalPayments: BlitzPage = () => {
                 <span className="basis-28 ml-6 mb-2 tracking-wider">{payments?.amount}</span>
               </div>
             ))}
-            {!paymentComplete ? (
-              <Button
-                overrideWidthClassName="w-full"
-                className="mt-4"
-                type={ButtonType.Secondary}
-                onClick={() => setIsExecutePaymentModalOpen(true)}
-              >
-                Pay
-              </Button>
-            ) : (
-              <button
-                className="mt-4 mb-2 sm:mb-0 border rounded w-[300px] sm:w-[400px] md:w-[614px] h-[35px] mr-3 opacity-70 bg-electric-violet border-electric-violet text-tunnel-black cursor-not-allowed"
-                disabled
-              >
-                <CheckCircleIcon className="h-5 w-5 inline mb-1 mr-2" />
-                Paid
-              </button>
-            )}
+            {userIsPayer &&
+              (!paymentComplete ? (
+                <Button
+                  overrideWidthClassName="w-full"
+                  className="mt-4"
+                  type={ButtonType.Secondary}
+                  onClick={() => setIsExecutePaymentModalOpen(true)}
+                >
+                  Pay
+                </Button>
+              ) : (
+                <button
+                  className="mt-4 mb-2 sm:mb-0 border rounded w-[300px] sm:w-[400px] md:w-[614px] h-[35px] mr-3 opacity-70 bg-electric-violet border-electric-violet text-tunnel-black cursor-not-allowed"
+                  disabled
+                >
+                  <CheckCircleIcon className="h-5 w-5 inline mb-1 mr-2" />
+                  Paid
+                </button>
+              ))}
           </div>
         ) : Boolean(proposal?.roles) && Boolean(approvals) ? (
           <div className="w-full h-full flex items-center flex-col sm:mt-0">
