@@ -6,13 +6,14 @@ import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
 import { ProposalRoleType } from "@prisma/client"
 import { ProposalRole } from "app/proposalRole/types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
-import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import useStore from "app/core/hooks/useStore"
 import { ProposalStatusPill } from "../../../core/components/ProposalStatusPill"
 import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
 import { genPathFromUrlObject } from "app/utils"
 import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
+import getProposalNewApprovalsByProposalId from "app/proposalNewApproval/queries/getProposalNewApprovalsByProposal"
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.role === proposalType)
@@ -43,8 +44,8 @@ export const ProposalViewHeaderNavigation = () => {
     { id: proposalId },
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
-  const [signatures] = useQuery(
-    getProposalNewSignaturesById,
+  const [approvals] = useQuery(
+    getProposalNewApprovalsByProposalId,
     { proposalId },
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
@@ -54,13 +55,21 @@ export const ProposalViewHeaderNavigation = () => {
   // author used to return to workspace page with proposal list view
   const author = findProposalRoleByRoleType(proposal?.roles, ProposalRoleType.AUTHOR)
   // numerator for the progress circle
-  const totalSignatureCount = signatures?.length || 0
+  const totalApprovalCount = approvals?.length || 0
   // denominator for the progress circle
   const numUniqueProposalRoleAddresses = genNumOfUniqueAddysFromProposalRoles(proposal?.roles || [])
 
   // activeUser's view permissions
   const activeUserHasProposalRole = activeUserMeetsCriteria(activeUser, proposal?.roles)
-  const activeUserHasSigned = activeUserMeetsCriteria(activeUser, signatures)
+  const activeUserHasSigned = approvals?.some(
+    (approval) =>
+      // approval exists for address -> happens in case of signing for personal wallet
+      addressesAreEqual(activeUser?.address || "", approval.address) ||
+      // one of approval's signatures exists for address -> happens for case of multisig
+      approval?.signatures.some((signature) =>
+        addressesAreEqual(activeUser?.address || "", signature.address)
+      )
+  )
 
   const currentPageUrl =
     typeof window !== "undefined"
@@ -97,7 +106,7 @@ export const ProposalViewHeaderNavigation = () => {
           <div className="space-x-2 flex flex-row">
             <ProposalStatusPill status={proposal?.status} />
             <ProgressCircleAndNumber
-              numerator={totalSignatureCount}
+              numerator={totalApprovalCount}
               denominator={numUniqueProposalRoleAddresses}
             />
           </div>
