@@ -27,7 +27,8 @@ const ProgressIndicator = ({ percent, twsize, cutoff }) => {
           r={`${size / 2 - size / 10}`}
           // strokeLinecap="round"
           fill="transparent"
-          stroke="#63EBAF"
+          // "#63EBAF" = magic mint, "#FF9956" = neon carrot
+          stroke={percent === 1 ? "#63EBAF" : "#FF9956"}
           strokeWidth={`${size / 10}`}
           strokeDasharray={MAX_CIRCUMFERENCE}
           strokeDashoffset={!isNaN(strokeDashoffset) ? strokeDashoffset : 0}

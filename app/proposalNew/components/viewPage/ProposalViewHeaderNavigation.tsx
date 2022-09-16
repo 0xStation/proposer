@@ -101,7 +101,12 @@ export const ProposalViewHeaderNavigation = () => {
             />
           </div>
           <CollaboratorPfps
-            accounts={(proposal?.roles as ProposalRole[]).map((role) => role?.account)}
+            // unique accounts
+            accounts={(proposal?.roles as ProposalRole[])
+              ?.map((role) => role?.account)
+              ?.filter((account, idx, accounts) => {
+                return accounts?.findIndex((acc) => acc?.address === account?.address) === idx
+              })}
           />
         </div>
         {/* BUTTONS */}
