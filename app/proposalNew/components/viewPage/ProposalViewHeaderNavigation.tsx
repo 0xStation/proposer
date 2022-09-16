@@ -108,9 +108,14 @@ export const ProposalViewHeaderNavigation = () => {
           <div className="mt-6 h-10 w-42 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
         )}
         <div className="mt-1">
-          <p className="uppercase text-xs tracking-wider text-concrete">
-            Last updated: {convertJSDateToDateAndTime({ timestamp: proposal?.timestamp as Date })}
-          </p>
+          <div className="uppercase text-xs tracking-wider text-concrete flex flex-row">
+            <p className="inline mr-1"> Last updated: </p>
+            {proposal?.timestamp ? (
+              <p>{convertJSDateToDateAndTime({ timestamp: proposal?.timestamp as Date })}</p>
+            ) : (
+              <div className="h-4 w-32 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+            )}
+          </div>
         </div>
         {/* PROPOSAL STATUS */}
         <div className="mt-6 flex flex-row justify-between">
@@ -165,8 +170,14 @@ export const ProposalViewHeaderNavigation = () => {
                 Signed
               </button>
             )
+          ) : !proposal ? (
+            // BUTTONS LOADING STATE
+            <div className="flex flex-row justify-between">
+              <span className="h-10 w-[614px] rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+              <CopyBtn textToWrite={currentPageUrl} />
+            </div>
           ) : null}
-          <CopyBtn textToWrite={currentPageUrl} />
+          {proposal && <CopyBtn textToWrite={currentPageUrl} />}
         </div>
         {/* TABS */}
         <div className="mt-12 self-end flex flex-row space-x-4 border-b border-concrete">
