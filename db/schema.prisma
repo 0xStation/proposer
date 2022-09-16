@@ -240,25 +240,43 @@ model FeatureFlag {
 }
 
 model ProposalNew {
-  id         String              @id @default(uuid())
-  type       ProposalType
-  timestamp  DateTime            @default(now())
-  data       Json
-  status     ProposalNewStatus   @default(DRAFT)
+  id        String            @id @default(uuid())
+  type      ProposalType
+  timestamp DateTime          @default(now())
+  data      Json
+  status    ProposalNewStatus @default(DRAFT)
+
   roles      ProposalRole[]
   milestones ProposalMilestone[]
   payments   ProposalPayment[]
+  approvals  ProposalNewApproval[]
   signatures ProposalSignature[]
 }
 
+model ProposalNewApproval {
+  id         String                    @id @default(uuid())
+  proposalId String
+  proposal   ProposalNew               @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  address    String
+  createdAt  DateTime                  @default(now())
+  status     ProposalNewApprovalStatus @default(INCOMPLETE)
+  data       Json
+
+  // m-n relation to signatures this approval relies on
+  signatures ProposalSignature[] @relation("ApprovalSignature")
+  @@unique([proposalId, address])
+}
+
 model ProposalSignature {
+  id         String      @id @default(uuid())
   proposalId String
   proposal   ProposalNew @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   address    String
   timestamp  DateTime    @default(now())
   data       Json
 
-  @@id([proposalId, address])
+  // m-n relation to approvals this signature is used for
+  approvals ProposalNewApproval[] @relation("ApprovalSignature")
 }
 
 model ProposalRole {
@@ -318,6 +336,11 @@ model AccountAccount {
   data          Json
 
   @@unique([originAddress, targetAddress, type])
+}
+
+enum ProposalNewApprovalStatus {
+  INCOMPLETE // approval is incomplete and accruing more signatures
+  COMPLETE // approval is complete and has all the signatures it needs
 }
 
 enum AccountAccountType {
