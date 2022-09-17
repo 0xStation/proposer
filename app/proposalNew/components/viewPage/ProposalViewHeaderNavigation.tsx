@@ -13,6 +13,7 @@ import { genPathFromUrlObject } from "app/utils"
 import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import getProposalNewApprovalsByProposalId from "app/proposalNewApproval/queries/getProposalNewApprovalsByProposal"
+import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
 
@@ -38,6 +39,8 @@ const Tab = ({ router, route, children }) => {
 
 export const ProposalViewHeaderNavigation = () => {
   const proposalId = useParam("proposalId") as string
+  const proposalApprovalModalOpen = useStore((state) => state.proposalApprovalModalOpen)
+  const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
   const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
   const [proposal] = useQuery(
@@ -55,8 +58,6 @@ export const ProposalViewHeaderNavigation = () => {
     { proposalId },
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
-
-  const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
 
   // author used to return to workspace page with proposal list view
   const author = findProposalRoleByRoleType(proposal?.roles, ProposalRoleType.AUTHOR)
@@ -88,6 +89,11 @@ export const ProposalViewHeaderNavigation = () => {
 
   return (
     <>
+      <ApproveProposalNewModal
+        isOpen={proposalApprovalModalOpen}
+        setIsOpen={toggleProposalApprovalModalOpen}
+        proposal={proposal}
+      />
       <div className="w-full min-h-64">
         <div className="mt-6 flex flex-row">
           <span className="text-concrete hover:text-light-concrete">
@@ -105,7 +111,7 @@ export const ProposalViewHeaderNavigation = () => {
             {proposal?.data.content.title}
           </h2>
         ) : (
-          <div className="mt-6 h-10 w-42 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+          <div className="mt-6 h-8 w-42 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
         )}
         <div className="mt-1">
           <p className="uppercase text-xs tracking-wider text-concrete">
