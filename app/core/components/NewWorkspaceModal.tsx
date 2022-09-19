@@ -104,7 +104,11 @@ export const NewWorkspaceModal = ({
                   Options displayed are the multi-sig addresses that you’re a current admin of and
                   doesn’t govern any existing workspace.
                 </span>
-                <Select name="safeAddress" options={safes} placeholder="Select one" />
+                <Select
+                  name="safeAddress"
+                  options={[...safes, ...safes, ...safes]}
+                  placeholder="Select one"
+                />
                 <div className="mt-6 flex justify-end">
                   <div className="flex flex-col">
                     <Button

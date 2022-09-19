@@ -63,7 +63,7 @@ const FilterPill = ({
                     open
                       ? "bg-marble-white text-tunnel-black  border-marble-white"
                       : "hover:bg-marble-white hover:text-tunnel-black border-concrete hover:border-marble-white"
-                  } capitalize group rounded-full border w-max px-2 py-1 flex flex-center items-center cursor-pointer `}
+                  } capitalize group rounded-full border w-max px-[18px] py-[6px] flex flex-center items-center cursor-pointer `}
                 >
                   {label} {appliedFilters && appliedFilters.size ? `(${appliedFilters.size})` : ""}
                   <div className="ml-3">
