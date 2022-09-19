@@ -14,6 +14,11 @@ export const CopyBtn = ({
     <div className={`${className} group inline`}>
       <button
         onClick={() => {
+          // @ts-ignore
+          merlin.send({
+            event_name: "test",
+            event_type: "click",
+          })
           navigator.clipboard.writeText(textToWrite)
           setIsTextCopied(true)
           setTimeout(() => setIsTextCopied(false), 1500)
