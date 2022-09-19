@@ -1,15 +1,6 @@
+import { ProposalRole as PrismaProposalRole } from "@prisma/client"
 import { Account } from "app/account/types"
 
-export enum ProposalRoleType {
-  AUTHOR = "AUTHOR",
-  CONTRIBUTOR = "CONTRIBUTOR",
-  CLIENT = "CLIENT",
-}
-
-export type ProposalRole = {
-  id: string
-  proposalId: string
-  address: string
-  role: ProposalRoleType
+export type ProposalRole = PrismaProposalRole & {
   account?: Account
 }

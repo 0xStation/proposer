@@ -251,22 +251,7 @@ model ProposalNew {
   roles      ProposalRole[]
   milestones ProposalMilestone[]
   payments   ProposalPayment[]
-  approvals  ProposalNewApproval[]
   signatures ProposalSignature[]
-}
-
-model ProposalNewApproval {
-  id         String                    @id @default(uuid())
-  proposalId String
-  proposal   ProposalNew               @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  address    String
-  createdAt  DateTime                  @default(now())
-  status     ProposalNewApprovalStatus @default(INCOMPLETE)
-  data       Json
-
-  // m-n relation to signatures this approval relies on
-  signatures ProposalSignature[] @relation("ApprovalSignature")
-  @@unique([proposalId, address])
 }
 
 model ProposalSignature {
@@ -277,17 +262,21 @@ model ProposalSignature {
   timestamp  DateTime    @default(now())
   data       Json
 
-  // m-n relation to approvals this signature is used for
-  approvals ProposalNewApproval[] @relation("ApprovalSignature")
+  // m-n relation to signatures this approval relies on
+  roles ProposalRole[] @relation("RoleApprovalSignature")
 }
 
 model ProposalRole {
-  id         String           @id @default(uuid())
-  proposalId String
-  proposal   ProposalNew      @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  address    String
-  account    Account          @relation(fields: [address], references: [address])
-  role       ProposalRoleType
+  id             String                     @id @default(uuid())
+  proposalId     String
+  proposal       ProposalNew                @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  address        String
+  approvalStatus ProposalRoleApprovalStatus @default(INCOMPLETE)
+  account        Account                    @relation(fields: [address], references: [address])
+  role           ProposalRoleType
+
+  // m-n relation to signatures this approval relies on
+  signatures ProposalSignature[] @relation("RoleApprovalSignature")
 }
 
 model Token {
@@ -340,7 +329,7 @@ model AccountAccount {
   @@unique([originAddress, targetAddress, type])
 }
 
-enum ProposalNewApprovalStatus {
+enum ProposalRoleApprovalStatus {
   INCOMPLETE // approval is incomplete and accruing more signatures
   COMPLETE // approval is complete and has all the signatures it needs
 }

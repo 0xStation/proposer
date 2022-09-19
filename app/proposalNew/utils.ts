@@ -1,18 +1,8 @@
-import { ProposalNewApprovalStatus } from "@prisma/client"
+import { ProposalRoleApprovalStatus } from "@prisma/client"
 
-// returns true if all signatures are complete for a given proposal
-export const areApprovalsComplete = (proposalRoles, proposalApprovals) => {
-  const requiredApprovals = {}
-
-  proposalRoles?.forEach((role) => {
-    requiredApprovals[role.address] = false
+// returns true if all signatures are complete for a given proposal to be approved
+export const areApprovalsComplete = (proposalRoles) => {
+  return proposalRoles?.every((role) => {
+    role.approvalStats === ProposalRoleApprovalStatus.COMPLETE
   })
-
-  proposalApprovals?.forEach((approval) => {
-    if (approval.status === ProposalNewApprovalStatus.COMPLETE) {
-      requiredApprovals[approval.address] = true
-    }
-  })
-
-  return Object.values(requiredApprovals).every((hasApproved) => hasApproved)
 }

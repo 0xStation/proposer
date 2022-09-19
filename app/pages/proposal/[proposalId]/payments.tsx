@@ -7,7 +7,6 @@ import { ProposalRoleType } from "@prisma/client"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import useStore from "app/core/hooks/useStore"
 import { areApprovalsComplete } from "app/proposalNew/utils"
-import getProposalNewApprovalsByProposalId from "app/proposalNewApproval/queries/getProposalNewApprovalsByProposal"
 import truncateString from "app/core/utils/truncateString"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import ExecutePaymentModal from "app/proposalNew/components/ExecutePaymentModal"
@@ -23,22 +22,12 @@ export const ProposalPayments: BlitzPage = () => {
     { id: proposalId },
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
-  const [approvals] = useQuery(
-    getProposalNewApprovalsByProposalId,
-    { proposalId: proposal?.id as string },
-    {
-      suspense: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      enabled: Boolean(proposal?.id),
-    }
-  )
 
   useEffect(() => {
-    if (proposal?.roles && approvals && areApprovalsComplete(proposal?.roles, approvals)) {
+    if (proposal?.roles && areApprovalsComplete(proposal?.roles)) {
       setApprovalsComplete(true)
     }
-  }, [proposal?.roles, approvals])
+  }, [proposal?.roles])
 
   const proposalContainsPayment = (proposal?.payments && proposal?.payments.length > 0) || false
   const userIsPayer = proposal?.roles.some(
@@ -111,7 +100,7 @@ export const ProposalPayments: BlitzPage = () => {
                 </button>
               ))}
           </div>
-        ) : Boolean(proposal?.roles) && Boolean(approvals) ? (
+        ) : Boolean(proposal?.roles) && approvalsComplete ? (
           <div className="w-full h-full flex items-center flex-col sm:mt-0">
             <h1 className="text-2xl font-bold w-[295px] text-center mt-44">No payments queued</h1>
             <p className="text-base w-[320px] text-center mt-2.5">

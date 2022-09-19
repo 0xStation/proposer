@@ -3,66 +3,58 @@ import db from "db"
 import pinJsonToPinata from "app/utils/pinata"
 import updateProposalNewMetadata from "./updateProposalNewMetadata"
 import { areApprovalsComplete } from "app/proposalNew/utils"
-import { AddressType, ProposalNewApprovalStatus, ProposalNewStatus } from "@prisma/client"
-import { ProposalNewApprovalType } from "app/proposalNewApproval/types"
+import { ProposalNewStatus, ProposalRoleApprovalStatus } from "@prisma/client"
 
 const ApproveProposalNew = z.object({
   proposalId: z.string(),
   signerAddress: z.string(),
   message: z.any(),
   signature: z.string(),
-  representing: z
-    .object({
-      address: z.string(),
-      addressType: z.enum([AddressType.WALLET, AddressType.SAFE]),
-      chainId: z.number().optional(),
-    })
-    .array(),
+  representingRoles: z.string().array(), // array of role ids
 })
 
 export default async function approveProposalNew(input: z.infer<typeof ApproveProposalNew>) {
   const params = ApproveProposalNew.parse(input)
 
-  // prepare to connect or create to ProposalNewApprovals for this signature
-  // connect in the case I am signing representing a multisig that already has an approval object
-  // create in the case I am signing for myself or the first person to sign for the multisig
-  const connectOrCreates = params.representing.map((account) => {
-    return {
-      where: { proposalId_address: { proposalId: params.proposalId, address: account.address } },
-      create: {
-        proposalId: params.proposalId,
-        address: account.address,
-        status:
-          account.addressType === AddressType.WALLET
-            ? ProposalNewApprovalStatus.COMPLETE
-            : ProposalNewApprovalStatus.INCOMPLETE,
-        data: {
-          message: params.message,
-          signature: params.signature,
-        },
-      },
-    }
-  })
-
   try {
-    // create proposal signature and connect or create links to approvals
-    await db.proposalSignature.create({
-      data: {
-        address: params.signerAddress,
+    // create proposal signature connected to proposalRole
+    // update linked proposalRoles to be of status complete
+    // once we support multisigs, check if quorum is met first before updating
+    await db.$transaction([
+      db.proposalSignature.create({
         data: {
-          message: params.message,
-          signature: params.signature,
-        },
-        proposal: {
-          connect: {
-            id: params.proposalId,
+          address: params.signerAddress,
+          data: {
+            message: params.message,
+            signature: params.signature,
+            representingRoles: params.representingRoles,
+          },
+          proposal: {
+            connect: {
+              id: params.proposalId,
+            },
+          },
+          roles: {
+            connect: params.representingRoles.map((roleId) => {
+              return {
+                id: roleId,
+              }
+            }),
           },
         },
-        approvals: {
-          connectOrCreate: connectOrCreates,
-        },
-      },
-    })
+      }),
+      // update role with complete status
+      ...params.representingRoles.map((roleId) => {
+        return db.proposalRole.update({
+          where: {
+            id: roleId,
+          },
+          data: {
+            approvalStatus: ProposalRoleApprovalStatus.COMPLETE,
+          },
+        })
+      }),
+    ])
   } catch (err) {
     throw Error(`Failed to create signature in approveProposalNew: ${err}`)
   }
@@ -77,7 +69,6 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       include: {
         roles: true,
         payments: true,
-        approvals: true,
         signatures: true,
       },
     })
@@ -88,7 +79,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
   // update proposal status based on status of signatures
   // if current status is the same as the pending status change
   // skip the update
-  const approvalsComplete = areApprovalsComplete(proposal?.roles, proposal?.approvals)
+  const approvalsComplete = areApprovalsComplete(proposal?.roles)
   const pendingStatusChange = approvalsComplete
     ? ProposalNewStatus.APPROVED
     : ProposalNewStatus.AWAITING_APPROVAL

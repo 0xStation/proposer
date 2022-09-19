@@ -1,25 +1,15 @@
-import { ProposalNewApprovalStatus } from "@prisma/client"
+import { ProposalRoleApprovalStatus } from "@prisma/client"
 import useStore from "../hooks/useStore"
 import { addressesAreEqual } from "../utils/addressesAreEqual"
 import AccountMediaObject from "./AccountMediaObject"
 
-export const RoleSignature = ({ role, approvals }) => {
+export const RoleSignature = ({ role, signatures }) => {
   const activeUser = useStore((state) => state.activeUser)
-  const addressHasApproved = (address: string) => {
-    return (
-      approvals?.find((approval) => addressesAreEqual(address, approval.address))?.status ===
-      ProposalNewApprovalStatus.COMPLETE
-    )
-  }
+
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
-  const activeUserHasSigned = approvals?.some(
-    (approval) =>
-      // approval exists for address -> happens in case of signing for personal wallet
-      addressesAreEqual(activeUser?.address || "", approval.address) ||
-      // one of approval's signatures exists for address -> happens for case of multisig
-      approval?.signatures.some((signature) =>
-        addressesAreEqual(activeUser?.address || "", signature.address)
-      )
+  const activeUserHasSigned = signatures?.some((signature) =>
+    // signature exists for address -> happens in case of signing for personal wallet
+    addressesAreEqual(activeUser?.address || "", signature.address)
   )
   const activeUserHasAProposalRole = addressesAreEqual(activeUser?.address || "", role?.address)
 
@@ -27,7 +17,7 @@ export const RoleSignature = ({ role, approvals }) => {
 
   return (
     <div className="flex flex-row w-full items-center justify-between">
-      {role && approvals ? (
+      {role && signatures ? (
         <>
           <AccountMediaObject account={role?.account} />
           <div className="flex flex-row items-center space-x-1">
@@ -42,12 +32,16 @@ export const RoleSignature = ({ role, approvals }) => {
               <div className="flex flex-row items-center space-x-1 ml-4">
                 <span
                   className={`h-2 w-2 rounded-full bg-${
-                    addressHasApproved(role?.address) ? "magic-mint" : "neon-carrot"
+                    role?.approvalStatus === ProposalRoleApprovalStatus.COMPLETE
+                      ? "magic-mint"
+                      : "neon-carrot"
                   }`}
                 />
 
                 <div className="font-bold text-xs uppercase tracking-wider">
-                  {addressHasApproved(role?.address) ? "approved" : "pending"}
+                  {role?.approvalStatus === ProposalRoleApprovalStatus.COMPLETE
+                    ? "approved"
+                    : "pending"}
                 </div>
               </div>
             )}
