@@ -5,6 +5,14 @@
   - You are about to drop the `_ApprovalSignature` table. If the table is not empty, all the data it contains will be lost.
 
 */
+
+/*
+DATA MIGRATION:
+-- Delete all existing proposals
+-- Cascades to delete all ProposalRole and ProposalSignature data
+*/
+DELETE FROM "ProposalNew";
+
 -- CreateEnum
 CREATE TYPE "ProposalRoleApprovalStatus" AS ENUM ('INCOMPLETE', 'COMPLETE');
 
