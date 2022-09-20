@@ -3,7 +3,7 @@ import { CheckCircleIcon } from "@heroicons/react/solid"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
-import { ProposalRoleType } from "@prisma/client"
+import { ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
 import { ProposalRole } from "app/proposalRole/types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import useStore from "app/core/hooks/useStore"
@@ -12,10 +12,10 @@ import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
 import { genPathFromUrlObject } from "app/utils"
 import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
-import getProposalNewApprovalsByProposalId from "app/proposalNewApproval/queries/getProposalNewApprovalsByProposal"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
+import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.role === proposalType)
@@ -53,29 +53,29 @@ export const ProposalViewHeaderNavigation = () => {
       enabled: !!proposalId,
     }
   )
-  const [approvals] = useQuery(
-    getProposalNewApprovalsByProposalId,
-    { proposalId },
-    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
+  const [signatures] = useQuery(
+    getProposalNewSignaturesById,
+    { proposalId: proposalId },
+    {
+      suspense: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      enabled: !!proposalId,
+    }
   )
 
   // author used to return to workspace page with proposal list view
   const author = findProposalRoleByRoleType(proposal?.roles, ProposalRoleType.AUTHOR)
   // numerator for the progress circle
-  const totalApprovalCount = approvals?.length || 0
-  // denominator for the progress circle
-  const numUniqueProposalRoleAddresses = genNumOfUniqueAddysFromProposalRoles(proposal?.roles || [])
+  const totalApprovalCount =
+    proposal?.roles?.filter((role) => role.approvalStatus === ProposalRoleApprovalStatus.COMPLETE)
+      .length || 0
 
   // activeUser's view permissions
   const activeUserHasProposalRole = activeUserMeetsCriteria(activeUser, proposal?.roles)
-  const activeUserHasSigned = approvals?.some(
-    (approval) =>
-      // approval exists for address -> happens in case of signing for personal wallet
-      addressesAreEqual(activeUser?.address || "", approval.address) ||
-      // one of approval's signatures exists for address -> happens for case of multisig
-      approval?.signatures.some((signature) =>
-        addressesAreEqual(activeUser?.address || "", signature.address)
-      )
+  const activeUserHasSigned = signatures?.some((signature) =>
+    // signature exists for address -> happens in case of signing for personal wallet
+    addressesAreEqual(activeUser?.address || "", signature.address)
   )
 
   const currentPageUrl =
@@ -129,7 +129,7 @@ export const ProposalViewHeaderNavigation = () => {
             <ProposalStatusPill status={proposal?.status} />
             <ProgressCircleAndNumber
               numerator={totalApprovalCount}
-              denominator={numUniqueProposalRoleAddresses}
+              denominator={proposal?.roles?.length || 0}
             />
           </div>
           <CollaboratorPfps
