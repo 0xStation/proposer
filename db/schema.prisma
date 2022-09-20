@@ -243,7 +243,7 @@ model ProposalNew {
   id                    String            @id @default(uuid())
   type                  ProposalType
   timestamp             DateTime          @default(now())
-  currentMilestoneIndex Int               @default(0)
+  currentMilestoneIndex Int               @default(-1) // no current milestone, gets set to 0 after proposal is approved
   data                  Json
   status                ProposalNewStatus @default(DRAFT)
   startDate             DateTime?
@@ -307,12 +307,11 @@ model ProposalMilestone {
 }
 
 model ProposalPayment {
-  id               String                @id @default(uuid())
+  id               String            @id @default(uuid())
   proposalId       String
-  proposal         ProposalNew           @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  status           ProposalPaymentStatus
+  proposal         ProposalNew       @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   milestoneIndex   Int
-  milestone        ProposalMilestone     @relation(fields: [proposalId, milestoneIndex], references: [proposalId, index])
+  milestone        ProposalMilestone @relation(fields: [proposalId, milestoneIndex], references: [proposalId, index])
   senderAddress    String
   recipientAddress String
   amount           Float? // float to support larger size numbers

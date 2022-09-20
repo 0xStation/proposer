@@ -18,7 +18,7 @@ import {
 } from "app/utils/validators"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import truncateString from "app/core/utils/truncateString"
-import { AddressType, ProposalPaymentStatus, ProposalRoleType } from "@prisma/client"
+import { AddressType, ProposalRoleType } from "@prisma/client"
 import BackArrow from "app/core/icons/BackArrow"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
 import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
@@ -865,7 +865,6 @@ export const ProposalNewForm = () => {
                 ]
                 payments = [
                   {
-                    status: ProposalPaymentStatus.PENDING,
                     milestoneIndex: 0,
                     ...tokenTransferData,
                   },
@@ -879,7 +878,6 @@ export const ProposalNewForm = () => {
                 ]
                 payments = [
                   {
-                    status: ProposalPaymentStatus.SCHEDULED,
                     milestoneIndex: 1,
                     ...tokenTransferData,
                   },

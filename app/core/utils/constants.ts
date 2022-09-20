@@ -2,12 +2,7 @@ import { chain } from "wagmi"
 import { RfpStatus } from "app/rfp/types"
 import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import networks from "app/utils/networks.json"
-import {
-  ProposalRoleType,
-  ProposalNewStatus,
-  ProposalRoleApprovalStatus,
-  ProposalPaymentStatus,
-} from "@prisma/client"
+import { ProposalRoleType, ProposalNewStatus, ProposalRoleApprovalStatus } from "@prisma/client"
 import { PaymentTerm } from "app/proposalPayment/types"
 import Gradient0 from "/public/gradients/0.png"
 import Gradient1 from "/public/gradients/1.png"
@@ -15,6 +10,7 @@ import Gradient2 from "/public/gradients/2.png"
 import Gradient3 from "/public/gradients/3.png"
 import Gradient4 from "/public/gradients/4.png"
 import Gradient5 from "/public/gradients/5.png"
+import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
 
 export const gradientMap = {
   0: Gradient0,
@@ -119,18 +115,18 @@ export const PROPOSAL_ROLE_APPROVAL_STATUS_MAP = {
   },
 }
 
-export const PROPOSAL_PAYMENT_STATUS_MAP = {
-  [ProposalPaymentStatus.SCHEDULED]: {
+export const PROPOSAL_MILESTONE_STATUS_MAP = {
+  [ProposalMilestoneStatus.SCHEDULED]: {
     copy: "scheduled",
     color: "bg-concrete",
   },
-  [ProposalPaymentStatus.PENDING]: {
-    copy: "pending",
+  [ProposalMilestoneStatus.IN_PROGRESS]: {
+    copy: "in progress",
     color: "bg-neon-carrot",
   },
-  [ProposalPaymentStatus.PAID]: {
-    copy: "paid",
-    color: "bg-magic-mint",
+  [ProposalMilestoneStatus.COMPLETE]: {
+    copy: "complete",
+    color: "bg-marble-white",
   },
 }
 

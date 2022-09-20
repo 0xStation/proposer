@@ -93,7 +93,8 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       where: { id: params.proposalId },
       data: {
         status: pendingStatusChange,
-        currentMilestoneIndex: 1, // move milestone from 0 (default) to 1
+        // if approving, move milestone from -1 (default) to 0 (proposal approved)
+        ...(pendingStatusChange === ProposalNewStatus.APPROVED && { currentMilestoneIndex: 0 }),
       },
     })
   }
