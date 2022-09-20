@@ -71,6 +71,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       where: { id: params.proposalId },
       include: {
         roles: true,
+        milestones: true,
         payments: true,
         signatures: true,
       },
@@ -94,7 +95,13 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       data: {
         status: pendingStatusChange,
         // if approving, move milestone from -1 (default) to 0 (proposal approved)
-        ...(pendingStatusChange === ProposalNewStatus.APPROVED && { currentMilestoneIndex: 0 }),
+        ...(pendingStatusChange === ProposalNewStatus.APPROVED && {
+          // take milestone with lowest index
+          // in case payment terms are on proposal approval, sets current miletstone to 0
+          // in case payment terms are on proposal completion, sets current milestone to 1
+          currentMilestoneIndex: proposal.milestones.sort((a, b) => (a.index > b.index ? 1 : -1))[0]
+            .index,
+        }),
       },
     })
   }

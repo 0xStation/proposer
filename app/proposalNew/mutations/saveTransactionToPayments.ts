@@ -3,7 +3,7 @@ import db from "db"
 
 const SaveTransactionHashToPayments = z.object({
   proposalId: z.string(),
-  paymentIds: z.string().array(),
+  milestoneIndex: z.number(),
   transactionHash: z.string(),
 })
 
@@ -18,25 +18,26 @@ export default async function saveTransactionHashToPayments(
       where: { id: params.proposalId },
     })
 
-    if (!proposal) throw Error("no proposal found")
+    if (!proposal) throw Error("proposal not found")
+    if (proposal.currentMilestoneIndex !== params.milestoneIndex)
+      throw Error("proposal is not on milestone: " + params.milestoneIndex)
 
-    const nextMilestoneIndex = proposal.currentMilestoneIndex + 1
+    // update payments with transaction hash
+    await db.proposalPayment.updateMany({
+      where: {
+        proposalId: params.proposalId,
+        milestoneIndex: params.milestoneIndex,
+      },
+      data: {
+        transactionHash: params.transactionHash,
+      },
+    })
 
     // increment proposal's milestone
     await db.proposalNew.update({
       where: { id: params.proposalId },
       data: {
-        currentMilestoneIndex: nextMilestoneIndex,
-      },
-    })
-
-    // update payments with transaction hash
-    await db.proposalPayment.updateMany({
-      where: {
-        id: { in: params.paymentIds },
-      },
-      data: {
-        transactionHash: params.transactionHash,
+        currentMilestoneIndex: params.milestoneIndex + 1,
       },
     })
   })

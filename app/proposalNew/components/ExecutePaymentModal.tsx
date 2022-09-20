@@ -22,7 +22,7 @@ enum Tab {
 import updateProposalStatus from "app/proposalNew/mutations/updateProposalStatus"
 import { ProposalNewStatus } from "@prisma/client"
 
-export const ExecutePaymentModal = ({ isOpen, setIsOpen, proposal, payment }) => {
+export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
   const setToastState = useStore((state) => state.setToastState)
   const [selectedTab, setSelectedTab] = useState<Tab>(Tab.DIRECT_PAYMENT)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -41,6 +41,10 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, proposal, payment }) =>
 
   const { chain: activeChain } = useNetwork()
   const { sendTransactionAsync } = useSendTransaction({ mode: "recklesslyUnprepared" })
+
+  // for now, only one payment per milestone
+  // once we support splits, this logic will need to support multiple payments and bundle execution to multicall contract
+  const payment = milestone?.payments[0]
 
   useEffect(() => {
     if (payment) {
@@ -98,9 +102,9 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, proposal, payment }) =>
     setIsLoading(true)
     // update payment as cashed in db
     await saveTransactionHashToPaymentsMutation({
-      proposalId: proposal?.id,
+      proposalId: milestone.proposalId,
+      milestoneIndex: milestone.index,
       transactionHash,
-      paymentIds: [payment.id],
     })
 
     invalidateQuery(getProposalNewById)
@@ -126,9 +130,9 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, proposal, payment }) =>
 
       // update payment as cashed in db
       await saveTransactionHashToPaymentsMutation({
-        proposalId: proposal.id,
+        proposalId: milestone.proposalId,
+        milestoneIndex: milestone.index,
         transactionHash: transaction.hash,
-        paymentIds: [payment.id],
       })
 
       // the `txnHash` state is required to enable the useWaitForTransaction hook in the parent page

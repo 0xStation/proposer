@@ -56,8 +56,7 @@ export const ProposalPayments: BlitzPage = () => {
       <ExecutePaymentModal
         isOpen={isExecutePaymentModalOpen}
         setIsOpen={setIsExecutePaymentModalOpen}
-        proposal={proposal}
-        payment={proposal?.payments?.[0]}
+        milestone={milestones?.[0]}
       />
       <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto h-full">
         <ProposalViewHeaderNavigation />

@@ -16,6 +16,9 @@ export default async function getMilestonesByProposal(
     include: {
       payments: true,
     },
+    orderBy: {
+      index: "asc", // sort from first to last index
+    },
   })
 
   return milestones as unknown as ProposalMilestone[]
