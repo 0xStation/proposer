@@ -1,4 +1,4 @@
-import { TokenType } from "@prisma/client"
+import { ProposalPaymentStatus, TokenType } from "@prisma/client"
 import * as z from "zod"
 
 // use ZodToken.partial() for all optional fields
@@ -24,4 +24,9 @@ export const ZodPayment = z.object({
   tokenId: z.number().optional(),
   milestoneIndex: z.number(),
   token: ZodToken,
+  status: z.enum([
+    ProposalPaymentStatus.SCHEDULED,
+    ProposalPaymentStatus.PENDING,
+    ProposalPaymentStatus.PAID,
+  ]),
 })

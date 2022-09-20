@@ -240,13 +240,14 @@ model FeatureFlag {
 }
 
 model ProposalNew {
-  id        String            @id @default(uuid())
-  type      ProposalType
-  timestamp DateTime          @default(now())
-  data      Json
-  status    ProposalNewStatus @default(DRAFT)
-  startDate DateTime?
-  endDate   DateTime?
+  id                    String            @id @default(uuid())
+  type                  ProposalType
+  timestamp             DateTime          @default(now())
+  currentMilestoneIndex Int               @default(0)
+  data                  Json
+  status                ProposalNewStatus @default(DRAFT)
+  startDate             DateTime?
+  endDate               DateTime?
 
   roles      ProposalRole[]
   milestones ProposalMilestone[]
@@ -306,11 +307,12 @@ model ProposalMilestone {
 }
 
 model ProposalPayment {
-  id               String            @id @default(uuid())
+  id               String                @id @default(uuid())
   proposalId       String
-  proposal         ProposalNew       @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  proposal         ProposalNew           @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  status           ProposalPaymentStatus
   milestoneIndex   Int
-  milestone        ProposalMilestone @relation(fields: [proposalId, milestoneIndex], references: [proposalId, index])
+  milestone        ProposalMilestone     @relation(fields: [proposalId, milestoneIndex], references: [proposalId, index])
   senderAddress    String
   recipientAddress String
   amount           Float? // float to support larger size numbers
@@ -331,6 +333,13 @@ model AccountAccount {
   data          Json
 
   @@unique([originAddress, targetAddress, type])
+}
+
+enum ProposalPaymentStatus {
+  SCHEDULED
+  PENDING
+  PAID
+  // DELAYED -- for eventual use when contributor has not received payment past expected deadline
 }
 
 enum ProposalRoleApprovalStatus {

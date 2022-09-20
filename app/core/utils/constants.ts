@@ -2,7 +2,12 @@ import { chain } from "wagmi"
 import { RfpStatus } from "app/rfp/types"
 import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import networks from "app/utils/networks.json"
-import { ProposalRoleType, ProposalNewStatus, ProposalRoleApprovalStatus } from "@prisma/client"
+import {
+  ProposalRoleType,
+  ProposalNewStatus,
+  ProposalRoleApprovalStatus,
+  ProposalPaymentStatus,
+} from "@prisma/client"
 import { PaymentTerm } from "app/proposalPayment/types"
 import Gradient0 from "/public/gradients/0.png"
 import Gradient1 from "/public/gradients/1.png"
@@ -110,6 +115,21 @@ export const PROPOSAL_ROLE_APPROVAL_STATUS_MAP = {
   },
   [ProposalRoleApprovalStatus.COMPLETE]: {
     copy: "approved",
+    color: "bg-magic-mint",
+  },
+}
+
+export const PROPOSAL_PAYMENT_STATUS_MAP = {
+  [ProposalPaymentStatus.SCHEDULED]: {
+    copy: "scheduled",
+    color: "bg-concrete",
+  },
+  [ProposalPaymentStatus.PENDING]: {
+    copy: "pending",
+    color: "bg-neon-carrot",
+  },
+  [ProposalPaymentStatus.PAID]: {
+    copy: "paid",
     color: "bg-magic-mint",
   },
 }

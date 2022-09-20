@@ -1,5 +1,5 @@
 import * as z from "zod"
-import db from "db"
+import db, { ProposalPaymentStatus } from "db"
 
 const SaveTransactionHashToPayments = z.object({
   paymentIds: z.string().array(),
@@ -16,6 +16,7 @@ export default async function saveTransactionHashToPayments(
       id: { in: params.paymentIds },
     },
     data: {
+      status: ProposalPaymentStatus.PAID,
       transactionHash: params.transactionHash,
     },
   })

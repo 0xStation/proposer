@@ -10,6 +10,7 @@ import truncateString from "app/core/utils/truncateString"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import ExecutePaymentModal from "app/proposalNew/components/ExecutePaymentModal"
 import { CheckCircleIcon } from "@heroicons/react/solid"
+import { PROPOSAL_PAYMENT_STATUS_MAP } from "app/core/utils/constants"
 
 export const ProposalPayments: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
@@ -32,12 +33,14 @@ export const ProposalPayments: BlitzPage = () => {
   const showPayInformation =
     proposalContainsPayment && proposal?.status === ProposalNewStatus.APPROVED
 
+  const payment = proposal?.payments?.[0]
+
   return (
     <Layout title="View Payments">
       <ExecutePaymentModal
         isOpen={isExecutePaymentModalOpen}
         setIsOpen={setIsExecutePaymentModalOpen}
-        payment={proposal?.payments?.[0]}
+        payment={payment}
       />
       <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto h-full">
         <ProposalViewHeaderNavigation />
@@ -45,11 +48,11 @@ export const ProposalPayments: BlitzPage = () => {
           <div className={` mt-9 border border-b border-concrete rounded-2xl px-6 py-9`}>
             <span
               className={`${
-                paymentComplete ? "bg-magic-mint" : "bg-neon-carrot"
+                PROPOSAL_PAYMENT_STATUS_MAP[payment?.status || ""]?.color
               } rounded-full px-2 py-1 flex items-center space-x-1 w-fit mb-4`}
             >
               <span className="text-xs uppercase text-tunnel-black font-bold">
-                {paymentComplete ? "PAID" : "PENDING"}
+                {PROPOSAL_PAYMENT_STATUS_MAP[payment?.status || ""]?.copy}
               </span>
             </span>
             <div className=" text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
