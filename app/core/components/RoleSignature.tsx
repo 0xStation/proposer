@@ -1,6 +1,7 @@
 import { ProposalRoleApprovalStatus } from "@prisma/client"
 import useStore from "../hooks/useStore"
 import { addressesAreEqual } from "../utils/addressesAreEqual"
+import { PROPOSAL_ROLE_APPROVAL_STATUS_MAP } from "../utils/constants"
 import AccountMediaObject from "./AccountMediaObject"
 
 export const RoleSignature = ({ role, signatures }) => {
@@ -31,17 +32,13 @@ export const RoleSignature = ({ role, signatures }) => {
             ) : (
               <div className="flex flex-row items-center space-x-1 ml-4">
                 <span
-                  className={`h-2 w-2 rounded-full bg-${
-                    role?.approvalStatus === ProposalRoleApprovalStatus.COMPLETE
-                      ? "magic-mint"
-                      : "neon-carrot"
+                  className={`h-2 w-2 rounded-full ${
+                    PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role?.approvalStatus]?.color
                   }`}
                 />
 
                 <div className="font-bold text-xs uppercase tracking-wider">
-                  {role?.approvalStatus === ProposalRoleApprovalStatus.COMPLETE
-                    ? "approved"
-                    : "pending"}
+                  {PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role?.approvalStatus]?.copy}
                 </div>
               </div>
             )}

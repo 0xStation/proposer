@@ -262,7 +262,9 @@ model ProposalSignature {
   timestamp  DateTime    @default(now())
   data       Json
 
-  // m-n relation to signatures this approval relies on
+  // m-n relation to support one signature being utilized for many roles
+  // for example, I can have the AUTHOR and CONTRIBUTOR role simultaneously
+  // another example, I can be a AUTHOR and represent a CLIENT as a signer of its multisig
   roles ProposalRole[] @relation("RoleApprovalSignature")
 }
 
@@ -275,7 +277,9 @@ model ProposalRole {
   account        Account                    @relation(fields: [address], references: [address])
   role           ProposalRoleType
 
-  // m-n relation to signatures this approval relies on
+  // m-n relation to support one role containing multiple supporting signatures to reach COMPLETE approval status
+  // for example, a multisig needs Q (quorum) signatures to approve by default
+  // another example, a DAO using token voting needs a majority vote of at least Q (quorum) votes to approve
   signatures ProposalSignature[] @relation("RoleApprovalSignature")
 }
 

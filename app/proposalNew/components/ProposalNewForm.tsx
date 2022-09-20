@@ -703,11 +703,6 @@ const SignForm = ({ activeUser, proposal, signatures }) => {
         isOpen={isApproveProposalModalOpen}
         setIsOpen={setIsApproveProposalModalOpen}
         proposal={proposal}
-        representingRoles={
-          proposal?.roles?.filter((role) =>
-            addressesAreEqual(role.address, activeUser?.address!)
-          ) || []
-        }
       />
       <p>All signatures are required to activate the agreement.</p>
       <div className="space-y-4 mt-6">

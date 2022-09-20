@@ -8,8 +8,9 @@ import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNew
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { genProposalNewDigest } from "app/signatures/proposalNew"
 import getProposalNewById from "../queries/getProposalNewById"
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
-export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal, representingRoles }) => {
+export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
@@ -28,16 +29,6 @@ export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal, represent
       })
     }
 
-    // don't expect this to trigger due to conditional button showing, but just in case
-    if (!representingRoles || representingRoles.length === 0) {
-      setIsOpen(false)
-      setToastState({
-        isToastShowing: true,
-        type: "error",
-        message: "Your connected wallet hold a role to approve.",
-      })
-    }
-
     const message = genProposalNewDigest(proposal)
     const signature = await signMessage(message)
 
@@ -53,9 +44,11 @@ export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal, represent
         signerAddress: activeUser!.address!,
         message,
         signature,
-        representingRoles: representingRoles?.map((role) => role.id),
+        representingRoles:
+          proposal?.roles
+            ?.filter((role) => addressesAreEqual(role.address, activeUser?.address!))
+            ?.map((role) => role.id) || [],
       })
-      // invalidateQuery(getProposalNewApprovalsByProposalId)
       invalidateQuery(getProposalNewSignaturesById)
       // invalidate proposal query to get ipfs hash post-approval
       // since an ipfs has is created on proposal approval

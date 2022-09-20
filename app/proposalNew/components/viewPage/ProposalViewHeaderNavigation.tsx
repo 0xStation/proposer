@@ -93,11 +93,6 @@ export const ProposalViewHeaderNavigation = () => {
         isOpen={proposalApprovalModalOpen}
         setIsOpen={toggleProposalApprovalModalOpen}
         proposal={proposal}
-        representingRoles={
-          proposal?.roles?.filter((role) =>
-            addressesAreEqual(role.address, activeUser?.address!)
-          ) || []
-        }
       />
       <div className="w-full min-h-64">
         <div className="mt-6 flex flex-row">

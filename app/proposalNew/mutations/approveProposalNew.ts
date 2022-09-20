@@ -2,7 +2,6 @@ import * as z from "zod"
 import db from "db"
 import pinJsonToPinata from "app/utils/pinata"
 import updateProposalNewMetadata from "./updateProposalNewMetadata"
-import { areApprovalsComplete } from "app/proposalNew/utils"
 import { ProposalNewStatus, ProposalRoleApprovalStatus } from "@prisma/client"
 
 const ApproveProposalNew = z.object({
@@ -15,6 +14,10 @@ const ApproveProposalNew = z.object({
 
 export default async function approveProposalNew(input: z.infer<typeof ApproveProposalNew>) {
   const params = ApproveProposalNew.parse(input)
+
+  if (params.representingRoles.length === 0) {
+    throw Error("missing representing roles ids")
+  }
 
   try {
     // create proposal signature connected to proposalRole
@@ -79,18 +82,20 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
   // update proposal status based on status of signatures
   // if current status is the same as the pending status change
   // skip the update
-  const approvalsComplete = areApprovalsComplete(proposal?.roles)
-  const pendingStatusChange = approvalsComplete
+  const pendingStatusChange = proposal.roles.every(
+    (role) => role.approvalStatus === ProposalRoleApprovalStatus.COMPLETE
+  )
     ? ProposalNewStatus.APPROVED
     : ProposalNewStatus.AWAITING_APPROVAL
 
-  if (proposal.status !== pendingStatusChange)
+  if (proposal.status !== pendingStatusChange) {
     await db.proposalNew.update({
       where: { id: params.proposalId },
       data: {
         status: pendingStatusChange,
       },
     })
+  }
 
   // flattening proposal's data json object for the ipfs proposal
   let proposalCopy = JSON.parse(JSON.stringify(proposal.data))
