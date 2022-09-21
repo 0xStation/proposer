@@ -89,11 +89,13 @@ export const ProposalViewHeaderNavigation = () => {
 
   return (
     <>
-      <ApproveProposalNewModal
-        isOpen={proposalApprovalModalOpen}
-        setIsOpen={toggleProposalApprovalModalOpen}
-        proposal={proposal}
-      />
+      {proposal && (
+        <ApproveProposalNewModal
+          isOpen={proposalApprovalModalOpen}
+          setIsOpen={toggleProposalApprovalModalOpen}
+          proposal={proposal}
+        />
+      )}
       <div className="w-full min-h-64">
         <div className="mt-6 flex flex-row">
           <span className="text-concrete hover:text-light-concrete">
@@ -143,10 +145,10 @@ export const ProposalViewHeaderNavigation = () => {
         </div>
         {/* BUTTONS */}
         <div className="w-full mt-6 box-border">
-          {/* 
-          - if activeUser has a role on the proposal, check if they've signed already, 
-          - if they haven't signed, show the sign button, if they have signed, show the "signed" button 
-          - if they don't have a role, just show the copy icon 
+          {/*
+          - if activeUser has a role on the proposal, check if they've signed already,
+          - if they haven't signed, show the sign button, if they have signed, show the "signed" button
+          - if they don't have a role, just show the copy icon
           */}
           {activeUserHasProposalRole ? (
             !activeUserHasSigned ? (

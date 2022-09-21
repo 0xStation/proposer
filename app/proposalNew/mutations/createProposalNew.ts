@@ -1,4 +1,4 @@
-import db, { AddressType, ProposalRoleType } from "db"
+import db, { ProposalRoleType } from "db"
 import * as z from "zod"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { ZodPayment, ZodMilestone } from "app/types/zod"

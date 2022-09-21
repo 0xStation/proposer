@@ -1,7 +1,6 @@
 import { Routes, Link } from "blitz"
 import { useEnsName } from "wagmi"
 import truncateString from "app/core/utils/truncateString"
-import { gradientMap } from "app/core/utils/constants"
 import Avatar from "app/core/components/sds/images/avatar"
 
 const AccountMediaObject = ({ account, className = "" }) => {

@@ -9,8 +9,19 @@ import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { genProposalNewDigest } from "app/signatures/proposalNew"
 import getProposalNewById from "../queries/getProposalNewById"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
+import { ProposalNew } from "app/proposalNew/types"
 
-export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
+export const ApproveProposalNewModal = ({
+  isOpen,
+  setIsOpen,
+  proposal,
+  additionalRoles,
+}: {
+  isOpen: boolean
+  setIsOpen: (isOpen: boolean) => void
+  proposal: ProposalNew
+  additionalRoles?: { roleId: string; complete: boolean }[]
+}) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
@@ -38,16 +49,23 @@ export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
       return
     }
 
+    const implicitRoles =
+      proposal?.roles
+        ?.filter((role) => addressesAreEqual(role.address, activeUser?.address!))
+        ?.map((role) => {
+          return { roleId: role.id, complete: true }
+        }) || []
+    const representingRoles = additionalRoles
+      ? implicitRoles.concat(additionalRoles)
+      : implicitRoles
+
     try {
       await approveProposalMutation({
         proposalId: proposal?.id,
         signerAddress: activeUser!.address!,
         message,
         signature,
-        representingRoles:
-          proposal?.roles
-            ?.filter((role) => addressesAreEqual(role.address, activeUser?.address!))
-            ?.map((role) => role.id) || [],
+        representingRoles,
       })
       invalidateQuery(getProposalNewSignaturesById)
       // invalidate proposal query to get ipfs hash post-approval
