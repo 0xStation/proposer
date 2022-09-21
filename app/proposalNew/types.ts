@@ -3,20 +3,14 @@ import { ProposalRole } from "app/proposalRole/types"
 import { ProposalMilestone } from "app/proposalMilestone/types"
 import { PaymentTerm, ProposalPayment } from "app/proposalPayment/types"
 import { Token } from "app/token/types"
-import { ProposalNewStatus } from "@prisma/client"
+import { ProposalNewStatus, ProposalNew as PrismaProposalNew } from "@prisma/client"
 
-export type ProposalNew = {
-  id: string
-  type: ProposalType
-  timestamp: Date // needed for public verifiability of multisig representation
+export type ProposalNew = PrismaProposalNew & {
   roles: ProposalRole[]
   milestones: ProposalMilestone[]
   payments: ProposalPayment[]
   signatures: ProposalSignature[]
   data: ProposalNewMetadata
-  status: ProposalNewStatus
-  startDate: Date
-  endDate: Date
 }
 
 export type ProposalNewMetadata = {

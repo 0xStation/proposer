@@ -10,6 +10,7 @@ import Gradient2 from "/public/gradients/2.png"
 import Gradient3 from "/public/gradients/3.png"
 import Gradient4 from "/public/gradients/4.png"
 import Gradient5 from "/public/gradients/5.png"
+import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
 
 export const gradientMap = {
   0: Gradient0,
@@ -111,6 +112,21 @@ export const PROPOSAL_ROLE_APPROVAL_STATUS_MAP = {
   [ProposalRoleApprovalStatus.COMPLETE]: {
     copy: "approved",
     color: "bg-magic-mint",
+  },
+}
+
+export const PROPOSAL_MILESTONE_STATUS_MAP = {
+  [ProposalMilestoneStatus.SCHEDULED]: {
+    copy: "scheduled",
+    color: "bg-concrete",
+  },
+  [ProposalMilestoneStatus.IN_PROGRESS]: {
+    copy: "in progress",
+    color: "bg-neon-carrot",
+  },
+  [ProposalMilestoneStatus.COMPLETE]: {
+    copy: "complete",
+    color: "bg-marble-white",
   },
 }
 

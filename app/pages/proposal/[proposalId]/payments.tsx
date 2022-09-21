@@ -3,13 +3,17 @@ import { useEffect, useState } from "react"
 import { ProposalViewHeaderNavigation } from "app/proposalNew/components/viewPage/ProposalViewHeaderNavigation"
 import Layout from "app/core/layouts/Layout"
 import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
-import { ProposalNewStatus, ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
+import { ProposalNewStatus, ProposalRoleType } from "@prisma/client"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import ExecutePaymentModal from "app/proposalNew/components/ExecutePaymentModal"
 import { CheckCircleIcon } from "@heroicons/react/solid"
+import { PROPOSAL_MILESTONE_STATUS_MAP } from "app/core/utils/constants"
+import { getMilestoneStatus } from "app/proposalMilestone/utils"
+import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
+import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
 
 export const ProposalPayments: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
@@ -18,7 +22,22 @@ export const ProposalPayments: BlitzPage = () => {
   const [proposal] = useQuery(
     getProposalNewById,
     { id: proposalId },
-    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
+    {
+      suspense: false,
+      enabled: !!proposalId,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }
+  )
+  const [milestones] = useQuery(
+    getMilestonesByProposal,
+    { proposalId: proposalId },
+    {
+      suspense: false,
+      enabled: !!proposalId,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }
   )
 
   const proposalContainsPayment = (proposal?.payments && proposal?.payments.length > 0) || false
@@ -37,7 +56,7 @@ export const ProposalPayments: BlitzPage = () => {
       <ExecutePaymentModal
         isOpen={isExecutePaymentModalOpen}
         setIsOpen={setIsExecutePaymentModalOpen}
-        payment={proposal?.payments?.[0]}
+        milestone={milestones?.[0]}
       />
       <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto h-full">
         <ProposalViewHeaderNavigation />
@@ -45,11 +64,15 @@ export const ProposalPayments: BlitzPage = () => {
           <div className={` mt-9 border border-b border-concrete rounded-2xl px-6 py-9`}>
             <span
               className={`${
-                paymentComplete ? "bg-magic-mint" : "bg-neon-carrot"
+                PROPOSAL_MILESTONE_STATUS_MAP[getMilestoneStatus(proposal, milestones?.[0]) || ""]
+                  ?.color
               } rounded-full px-2 py-1 flex items-center space-x-1 w-fit mb-4`}
             >
               <span className="text-xs uppercase text-tunnel-black font-bold">
-                {paymentComplete ? "PAID" : "PENDING"}
+                {
+                  PROPOSAL_MILESTONE_STATUS_MAP[getMilestoneStatus(proposal, milestones?.[0]) || ""]
+                    ?.copy
+                }
               </span>
             </span>
             <div className=" text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
@@ -58,7 +81,8 @@ export const ProposalPayments: BlitzPage = () => {
               <span className="basis-28 ml-6 mb-2 tracking-wider">Token</span>
               <span className="basis-28 ml-6 mb-2 tracking-wider">Amount</span>
             </div>
-            {proposal?.payments?.map((payments) => (
+            {/* show all payments within milestone block */}
+            {milestones?.[0]?.payments?.map((payments) => (
               <div className="w-full flex flex-row items-end" key={payments?.id}>
                 <span className="basis-32 mb-2 tracking-wider">
                   {truncateString(payments?.senderAddress)}
@@ -73,6 +97,9 @@ export const ProposalPayments: BlitzPage = () => {
               </div>
             ))}
             {userIsPayer &&
+              // proactive logic for when we have multiple milestone payment blocks -> only the current milestone should be payable
+              getMilestoneStatus(proposal, milestones?.[0]) ===
+                ProposalMilestoneStatus.IN_PROGRESS &&
               (!paymentComplete ? (
                 <Button
                   overrideWidthClassName="w-full"

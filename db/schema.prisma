@@ -240,13 +240,14 @@ model FeatureFlag {
 }
 
 model ProposalNew {
-  id        String            @id @default(uuid())
-  type      ProposalType
-  timestamp DateTime          @default(now())
-  data      Json
-  status    ProposalNewStatus @default(DRAFT)
-  startDate DateTime?
-  endDate   DateTime?
+  id                    String            @id @default(uuid())
+  type                  ProposalType
+  timestamp             DateTime          @default(now())
+  currentMilestoneIndex Int               @default(-1) // no current milestone, gets set to 0 after proposal is approved
+  data                  Json
+  status                ProposalNewStatus @default(DRAFT)
+  startDate             DateTime?
+  endDate               DateTime?
 
   roles      ProposalRole[]
   milestones ProposalMilestone[]
