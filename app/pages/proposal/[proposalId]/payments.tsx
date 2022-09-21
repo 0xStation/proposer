@@ -97,6 +97,7 @@ export const ProposalPayments: BlitzPage = () => {
               </div>
             ))}
             {userIsPayer &&
+              // proactive logic for when we have multiple milestone payment blocks -> only the current milestone should be payable
               getMilestoneStatus(proposal, milestones?.[0]) ===
                 ProposalMilestoneStatus.IN_PROGRESS &&
               (!paymentComplete ? (
