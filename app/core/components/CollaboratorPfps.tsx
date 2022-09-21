@@ -8,7 +8,8 @@ export const CollaboratorPfps = ({ accounts }) => {
     <div className="flex flex-row">
       {accounts?.length
         ? accounts.map(({ address, data: { pfpURL } }, idx) => {
-            const pfpStyling = "h-6 w-6 rounded-full border block border-wet-concrete"
+            const pfpStyling =
+              "h-6 w-6 rounded-full border block border-wet-concrete hover:opacity-90"
             const nestedStyling = idx ? "ml-[-8px]" : ""
 
             return (

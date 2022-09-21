@@ -179,8 +179,7 @@ export const ProposalViewHeaderNavigation = () => {
           ) : !proposal ? (
             // BUTTONS LOADING STATE
             <div className="flex flex-row justify-between">
-              <span className="h-10 w-[614px] rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
-              <CopyBtn textToWrite={currentPageUrl} />
+              <span className="h-[35px] w-[680px] rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
             </div>
           ) : null}
           {proposal && <CopyBtn textToWrite={currentPageUrl} />}
