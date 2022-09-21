@@ -45,7 +45,7 @@ const config: BlitzConfig = {
     return [
       {
         source: "/",
-        destination: "/explore",
+        destination: "/proposal/new",
         permanent: true,
       },
     ]
