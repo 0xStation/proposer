@@ -76,7 +76,7 @@ export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
           by all parties, its terms will be official and uploaded to decentralized storage!
         </p>
 
-        <div className="mt-8">
+        <div className="mt-8 flex items-center">
           <Button
             className="mr-2"
             type={ButtonType.Secondary}
