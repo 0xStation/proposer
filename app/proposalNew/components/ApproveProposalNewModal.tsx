@@ -1,21 +1,20 @@
-import { useMutation, useRouter, invalidateQuery } from "blitz"
+import { useMutation, useRouter, invalidateQuery, useQuery } from "blitz"
 import { useState } from "react"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
 import approveProposalNew from "app/proposalNew/mutations/approveProposalNew"
-import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { genProposalNewDigest } from "app/signatures/proposalNew"
 import getProposalNewById from "../queries/getProposalNewById"
-import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { ProposalNew } from "app/proposalNew/types"
+import useGetRolesForProposalApprover from "app/core/hooks/useGetRolesForProposalApprover"
+import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 
 export const ApproveProposalNewModal = ({
   isOpen,
   setIsOpen,
   proposal,
-  additionalRoles,
 }: {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
@@ -27,6 +26,19 @@ export const ApproveProposalNewModal = ({
   const setToastState = useStore((state) => state.setToastState)
   const [approveProposalMutation] = useMutation(approveProposalNew)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const [signatures] = useQuery(
+    getProposalNewSignaturesById,
+    { proposalId: proposal.id },
+    {
+      suspense: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      enabled: !!proposal.id,
+    }
+  )
+
+  const [roles, _error, getRolesIsLoading] = useGetRolesForProposalApprover(proposal, signatures)
 
   const { signMessage } = useSignature()
 
@@ -49,15 +61,12 @@ export const ApproveProposalNewModal = ({
       return
     }
 
-    const implicitRoles =
-      proposal?.roles
-        ?.filter((role) => addressesAreEqual(role.address, activeUser?.address!))
-        ?.map((role) => {
-          return { roleId: role.id, complete: true }
-        }) || []
-    const representingRoles = additionalRoles
-      ? implicitRoles.concat(additionalRoles)
-      : implicitRoles
+    const representingRoles = roles.map((role) => {
+      return {
+        roleId: role.roleId,
+        complete: role.willBeComplete,
+      }
+    })
 
     try {
       await approveProposalMutation({
@@ -108,7 +117,7 @@ export const ApproveProposalNewModal = ({
           <Button
             isSubmitType={true}
             isLoading={isLoading}
-            isDisabled={isLoading}
+            isDisabled={isLoading || getRolesIsLoading}
             onClick={() => {
               setIsLoading(true)
               initiateSignature()

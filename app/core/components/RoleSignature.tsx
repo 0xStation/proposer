@@ -47,9 +47,6 @@ const SafeRole = ({ role, signatures, proposal }) => {
         isOpen={approveProposalModalOpen}
         setIsOpen={setApproveProposalModalOpen}
         proposal={proposal}
-        additionalRoles={[
-          { roleId: role.id, complete: totalSafeSignersSigned == safeDetails?.quorum - 1 },
-        ]}
       />
       <div className="flex flex-row w-full items-center justify-between">
         {role && signatures ? (

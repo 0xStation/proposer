@@ -5,25 +5,18 @@ import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber
 import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
 import { ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
 import { ProposalRole } from "app/proposalRole/types"
-import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import useStore from "app/core/hooks/useStore"
 import { ProposalStatusPill } from "../../../core/components/ProposalStatusPill"
-import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
 import { genPathFromUrlObject } from "app/utils"
 import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
-import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
+import useGetRolesForProposalApprover from "app/core/hooks/useGetRolesForProposalApprover"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.role === proposalType)
-
-const genNumOfUniqueAddysFromProposalRoles = (roles: ProposalRole[]) =>
-  roles
-    ?.map((role) => toChecksumAddress(role?.address))
-    ?.filter((v, i, addresses) => addresses?.indexOf(v) === i)?.length
 
 const Tab = ({ router, route, children }) => {
   return (
@@ -64,6 +57,8 @@ export const ProposalViewHeaderNavigation = () => {
     }
   )
 
+  const [roles, _error, loading] = useGetRolesForProposalApprover(proposal, signatures)
+
   // author used to return to workspace page with proposal list view
   const author = findProposalRoleByRoleType(proposal?.roles, ProposalRoleType.AUTHOR)
   // numerator for the progress circle
@@ -72,11 +67,8 @@ export const ProposalViewHeaderNavigation = () => {
       .length || 0
 
   // activeUser's view permissions
-  const activeUserHasProposalRole = activeUserMeetsCriteria(activeUser, proposal?.roles)
-  const activeUserHasSigned = signatures?.some((signature) =>
-    // signature exists for address -> happens in case of signing for personal wallet
-    addressesAreEqual(activeUser?.address || "", signature.address)
-  )
+  const activeUserHasProposalRole = roles.length > 0
+  const activeUserHasSigned = roles.length === 0
 
   const currentPageUrl =
     typeof window !== "undefined"
@@ -150,7 +142,7 @@ export const ProposalViewHeaderNavigation = () => {
           - if they haven't signed, show the sign button, if they have signed, show the "signed" button
           - if they don't have a role, just show the copy icon
           */}
-          {activeUserHasProposalRole ? (
+          {activeUserHasProposalRole && !loading ? (
             !activeUserHasSigned ? (
               <>
                 <Button
@@ -178,7 +170,7 @@ export const ProposalViewHeaderNavigation = () => {
                 Signed
               </button>
             )
-          ) : !proposal ? (
+          ) : !proposal || loading ? (
             // BUTTONS LOADING STATE
             <div className="flex flex-row justify-between">
               <span className="h-[35px] w-[680px] rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />

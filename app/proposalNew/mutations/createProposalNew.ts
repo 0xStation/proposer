@@ -121,7 +121,11 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       },
     },
     include: {
-      roles: true,
+      roles: {
+        include: {
+          account: true,
+        },
+      },
       milestones: true,
       payments: true,
     },
