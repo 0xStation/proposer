@@ -1,7 +1,7 @@
 import db, { AddressType, ProposalRoleType } from "db"
 import * as z from "zod"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
-import { ZodPayment, ZodMilestone } from "app/types/zod"
+import { ZodMilestoneWithPayments } from "app/types/zod"
 import { ProposalNewMetadata } from "../types"
 import { ProposalType } from "db"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
@@ -20,8 +20,7 @@ const CreateProposal = z.object({
   ipfsHash: z.string().optional(),
   ipfsPinSize: z.number().optional(),
   ipfsTimestamp: z.date().optional(),
-  milestones: ZodMilestone.array(),
-  payments: ZodPayment.array(),
+  milestones: ZodMilestoneWithPayments.array(),
   paymentTerms: z.enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION]).optional(),
   startDate: z.date().optional(),
   endDate: z.date().optional(),
@@ -96,29 +95,48 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
         },
       },
       milestones: {
-        createMany: {
-          data: params.milestones.map((milestone) => {
-            return {
-              index: milestone.index,
-              data: { title: milestone.title },
-            }
-          }),
-        },
+        create: params.milestones.map((milestone) => {
+          return {
+            index: milestone.index,
+            data: { title: milestone.title },
+            // payments: {
+            //   create: milestone.payments.map((payment) => {
+            //     return {
+            //       senderAddress: payment.senderAddress,
+            //       recipientAddress: payment.recipientAddress,
+            //       amount: payment.amount,
+            //       tokenId: payment.tokenId,
+            //       token: payment.token,
+            //     }
+            //   }),
+            // },
+          }
+        }),
       },
-      payments: {
-        createMany: {
-          data: params.payments.map((payment) => {
-            return {
-              senderAddress: payment.senderAddress,
-              recipientAddress: payment.recipientAddress,
-              amount: payment.amount,
-              tokenId: payment.tokenId,
-              milestoneIndex: payment.milestoneIndex,
-              data: { token: payment.token },
-            }
-          }),
-        },
-      },
+      // milestones: {
+      //   createMany: {
+      //     data: params.milestones.map((milestone) => {
+      //       return {
+      //         index: milestone.index,
+      //         data: { title: milestone.title },
+      //       }
+      //     }),
+      //   },
+      // },
+      // payments: {
+      //   createMany: {
+      //     data: params.payments.map((payment) => {
+      //       return {
+      //         senderAddress: payment.senderAddress,
+      //         recipientAddress: payment.recipientAddress,
+      //         amount: payment.amount,
+      //         tokenId: payment.tokenId,
+      //         milestoneIndex: payment.milestoneIndex,
+      //         data: { token: payment.token },
+      //       }
+      //     }),
+      //   },
+      // },
     },
     include: {
       roles: true,

@@ -297,21 +297,22 @@ model Token {
 }
 
 model ProposalMilestone {
+  id         String      @id @default(uuid())
   proposalId String
   proposal   ProposalNew @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   index      Int
   data       Json
 
   payments ProposalPayment[]
-  @@id([proposalId, index])
+  @@unique([proposalId, index])
 }
 
 model ProposalPayment {
   id               String            @id @default(uuid())
   proposalId       String
   proposal         ProposalNew       @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  milestoneIndex   Int
-  milestone        ProposalMilestone @relation(fields: [proposalId, milestoneIndex], references: [proposalId, index])
+  milestoneId      String
+  milestone        ProposalMilestone @relation(fields: [milestoneId], references: [id])
   senderAddress    String
   recipientAddress String
   amount           Float? // float to support larger size numbers
