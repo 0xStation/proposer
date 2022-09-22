@@ -71,24 +71,32 @@ const WorkspaceSettingsOverviewForm = ({
 }) => {
   const [pfpURL, setPfpURL] = useState<string | undefined>()
   const [emailVerificationSent, setEmailVerificationSent] = useState<boolean>(false)
+  const activeUser = useStore((state) => state.activeUser)
   const setActiveUser = useStore((state) => state.setActiveUser)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const [createAccountMutation] = useMutation(createAccount, {
     onSuccess: (data) => {
       onSuccess()
+      setIsLoading(false)
       setActiveUser(data)
     },
     onError: (error) => {
       console.error(error)
+      setIsLoading(false)
     },
   })
 
   const [updateAccountMutation] = useMutation(updateAccount, {
     onSuccess: (data) => {
       onSuccess()
-      setActiveUser(data)
+      setIsLoading(false)
+      if (activeUser?.address === data?.address) {
+        setActiveUser(data)
+      }
     },
     onError: (error) => {
+      setIsLoading(false)
       console.error(error)
     },
   })
@@ -108,6 +116,7 @@ const WorkspaceSettingsOverviewForm = ({
     <Form
       initialValues={account?.data || {}}
       onSubmit={async (values) => {
+        setIsLoading(true)
         try {
           const parameters = {
             address: account?.address!,
@@ -129,6 +138,7 @@ const WorkspaceSettingsOverviewForm = ({
         } catch (error) {
           console.error(`Error updating account: ${error}`)
           alert("Error saving information.")
+          setIsLoading(false)
         }
       }}
       render={({ handleSubmit }) => (
@@ -141,7 +151,7 @@ const WorkspaceSettingsOverviewForm = ({
               component="input"
               name="name"
               placeholder="Name"
-              validate={composeValidators(requiredField, mustBeUnderNumCharacters(50))}
+              validate={composeValidators(mustBeUnderNumCharacters(50))}
             >
               {({ input, meta }) => (
                 <div>
@@ -223,7 +233,12 @@ const WorkspaceSettingsOverviewForm = ({
               )}
             </Field>
           </div>
-          <Button className="mt-12" isSubmitType={true}>
+          <Button
+            className="mt-12"
+            isSubmitType={true}
+            isLoading={isLoading}
+            isDisabled={isLoading}
+          >
             {isEdit ? "Save" : "Next"}
           </Button>
         </form>

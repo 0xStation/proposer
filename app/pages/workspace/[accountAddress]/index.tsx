@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { BlitzPage, useParam, useQuery, invalidateQuery, Routes, Link, useSession } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import Button from "app/core/components/sds/buttons/Button"
@@ -15,12 +15,14 @@ import {
   PROPOSAL_NEW_STATUS_DISPLAY_MAP,
 } from "app/core/utils/constants"
 import { ProposalStatus } from "app/proposal/types"
-import { ProposalRoleType } from "@prisma/client"
+import { AddressType, ProposalRoleType } from "@prisma/client"
 import { LightBulbIcon, CogIcon } from "@heroicons/react/solid"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 import WorkspaceSettingsOverviewForm from "app/account/components/WorkspaceSettingsOverviewForm"
 import useStore from "app/core/hooks/useStore"
 import ProposalStatusPill from "app/core/components/ProposalStatusPill"
+import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
+import { useAccount } from "wagmi"
 
 enum Tab {
   PROPOSALS = "PROPOSALS",
@@ -30,7 +32,12 @@ enum Tab {
 const WorkspaceHome: BlitzPage = () => {
   const session = useSession({ suspense: false })
   const setToastState = useStore((state) => state.setToastState)
+  const activeUser = useStore((state) => state.activeUser)
+  const accountData = useAccount()
+  const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [activeTab, setActiveTab] = useState<Tab>(Tab.PROPOSALS)
+  const [canViewSettings, setCanViewSettings] = useState<boolean>(false)
+  const [safeSigners, setSafeSigners] = useState<string[]>([])
   const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
     new Set<ProposalStatus>()
   )
@@ -55,8 +62,48 @@ const WorkspaceHome: BlitzPage = () => {
   const [account] = useQuery(
     getAccountByAddress,
     { address: toChecksumAddress(accountAddress) },
-    { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
+    {
+      enabled: !!accountAddress,
+      suspense: false,
+      refetchOnWindowFocus: false,
+      onSuccess: async (account) => {
+        // console.log("success", account)
+        if (account?.addressType === AddressType.SAFE) {
+          console.log("safe", account)
+          const safeDetails = await getGnosisSafeDetails(account.data.chainId!, account.address!)
+
+          setSafeSigners(safeDetails?.signers || [])
+        }
+      },
+    }
   )
+
+  useEffect(() => {
+    if (accountAddress === activeUser?.address && accountAddress === connectedAddress) {
+      // if (!!session && session.userId === account?.id) {
+      setCanViewSettings(true)
+    } else {
+      setCanViewSettings(false)
+      if (activeTab === Tab.SETTINGS) {
+        setActiveTab(Tab.PROPOSALS)
+      }
+    }
+  }, [activeUser, connectedAddress, accountAddress])
+
+  useEffect(() => {
+    if (
+      safeSigners.includes(activeUser?.address || "") &&
+      safeSigners.includes(connectedAddress || "")
+    ) {
+      setCanViewSettings(true)
+    } else {
+      console.log("nani?")
+      setCanViewSettings(false)
+      if (activeTab === Tab.SETTINGS) {
+        setActiveTab(Tab.PROPOSALS)
+      }
+    }
+  }, [activeUser, connectedAddress, safeSigners])
 
   const ProposalTab = () => {
     return (
@@ -215,7 +262,7 @@ const WorkspaceHome: BlitzPage = () => {
               <span>Proposals</span>
             </li>
             {/* SETTINGS */}
-            {!!session && session.userId === account?.id && (
+            {canViewSettings && (
               <li
                 className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
                   activeTab === Tab.SETTINGS && "bg-wet-concrete"
