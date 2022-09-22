@@ -924,17 +924,18 @@ export const ProposalNewForm = () => {
                   : undefined,
               })
 
+              // TODO!!: if the signature + pinning proposal fails,
+              // the proposal already exists so we need to prevent submit again
+
               // prompt author to sign proposal to prove they are the author of the content
               const message = genProposalNewDigest(proposal)
               const signature = await signMessage(message)
-              console.log("signature", signature)
 
               const updatedProposal = await pinProposalMutation({
                 proposalId: proposal?.id,
                 signature: signature as string,
                 signatureMessage: message,
               })
-              console.log("updatedProposal", updatedProposal)
             } catch (err) {
               setToastState({
                 isToastShowing: true,

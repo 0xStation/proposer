@@ -18,7 +18,7 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
       ],
       Payment: [
         { name: "milestoneIndex", type: "uint256" },
-        { name: "recipientAddress", type: "address" }, // recieves the reward from the proposal
+        { name: "recipientAddress", type: "address" }, // receives the reward from the proposal
         { name: "chainId", type: "uint256" },
         { name: "tokenAddress", type: "address" },
         { name: "amount", type: "uint256" },
@@ -34,7 +34,7 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
         { name: "app", type: "string" },
       ],
     },
-    message: {
+    value: {
       type: proposal.type,
       timestamp: proposal.timestamp.valueOf(),
       title: proposal.data.content.title,

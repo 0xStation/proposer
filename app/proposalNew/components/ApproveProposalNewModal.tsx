@@ -6,9 +6,9 @@ import useSignature from "app/core/hooks/useSignature"
 import approveProposalNew from "app/proposalNew/mutations/approveProposalNew"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import { genProposalNewDigest } from "app/signatures/proposalNew"
 import getProposalNewById from "../queries/getProposalNewById"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
+import { genProposalNewApprovalDigest } from "app/signatures/proposalSignature"
 
 export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
   const router = useRouter()
@@ -29,7 +29,10 @@ export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
       })
     }
 
-    const message = genProposalNewDigest(proposal)
+    const message = genProposalNewApprovalDigest({
+      signerAddress: activeUser?.address,
+      proposalHash: proposal?.data?.ipfsMetadata?.hash,
+    })
     const signature = await signMessage(message)
 
     // no signature - user must have denied signature

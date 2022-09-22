@@ -1,8 +1,7 @@
 import * as z from "zod"
 import db from "db"
-import pinJsonToPinata from "app/utils/pinata"
-import updateProposalNewMetadata from "./updateProposalNewMetadata"
 import { ProposalNewStatus, ProposalRoleApprovalStatus } from "@prisma/client"
+import pinProposalSignature from "app/proposalSignature/mutations/pinProposalSignature"
 
 const ApproveProposalNew = z.object({
   proposalId: z.string(),
@@ -19,11 +18,12 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
     throw Error("missing representing roles ids")
   }
 
+  let proposalSignature
   try {
     // create proposal signature connected to proposalRole
     // update linked proposalRoles to be of status complete
     // once we support multisigs, check if quorum is met first before updating
-    await db.$transaction([
+    const [proposalSig] = await db.$transaction([
       db.proposalSignature.create({
         data: {
           address: params.signerAddress,
@@ -58,13 +58,24 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
         })
       }),
     ])
+    proposalSignature = proposalSig
   } catch (err) {
     throw Error(`Failed to create signature in approveProposalNew: ${err}`)
   }
 
+  try {
+    const updateProposalSignature = await pinProposalSignature({
+      proposalSignatureId: proposalSignature?.id,
+      signature: params?.signature,
+      signatureMessage: params?.message,
+    })
+    console.log("updateProposalSignature", updateProposalSignature)
+  } catch (err) {
+    throw Error(`Failed to pin proposal signature to ipfs in approveProposalNew: ${err}`)
+  }
+
   // TODO: for representing multisigs, query if signatures have hit quorum for it
 
-  // UPLOAD TO IPFS
   let proposal
   try {
     proposal = await db.proposalNew.findUnique({
@@ -89,8 +100,10 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
     ? ProposalNewStatus.APPROVED
     : ProposalNewStatus.AWAITING_APPROVAL
 
-  if (proposal.status !== pendingStatusChange) {
-    await db.proposalNew.update({
+  if (proposal.status === pendingStatusChange) {
+    return proposal
+  } else {
+    const updatedProposal = await db.proposalNew.update({
       where: { id: params.proposalId },
       data: {
         status: pendingStatusChange,
@@ -103,53 +116,14 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
             .index,
         }),
       },
+      include: {
+        roles: true,
+        milestones: true,
+        payments: true,
+        signatures: true,
+      },
     })
-  }
 
-  // flattening proposal's data json object for the ipfs proposal
-  let proposalCopy = JSON.parse(JSON.stringify(proposal.data))
-
-  proposalCopy.type = proposal.type
-  proposalCopy.timestamp = proposal.timestamp
-  proposalCopy.roles = JSON.parse(JSON.stringify(proposal.roles))
-  proposalCopy.payments = Object.assign({}, proposal.payments)
-  proposalCopy.signatures = JSON.parse(JSON.stringify(proposal.signatures))
-
-  // Pinata api here: https://docs.pinata.cloud/pinata-api/pinning/pin-json
-  // see `pinJsonToIpfs` api for more details on api config structure
-  const pinataProposal = {
-    pinataOptions: {
-      cidVersion: 1, // https://docs.ipfs.tech/concepts/content-addressing/#cid-versions
-    },
-    pinataMetadata: {
-      name: proposal?.id, // optional field that helps tag the file
-    },
-    pinataContent: {
-      proposal: proposalCopy,
-    },
-  }
-
-  let ipfsResponse
-  try {
-    ipfsResponse = await pinJsonToPinata(pinataProposal)
-  } catch (err) {
-    throw Error(`Call to pinata failed with error: ${err}`)
-  }
-
-  try {
-    // add ipfs response to proposal
-    const updatedProposal = await updateProposalNewMetadata({
-      proposalId: params.proposalId,
-      contentTitle: proposal?.data?.content?.title,
-      contentBody: proposal?.data?.content?.body,
-      ipfsHash: ipfsResponse.IpfsHash,
-      ipfsPinSize: ipfsResponse.PinSize,
-      ipfsTimestamp: ipfsResponse.Timestamp,
-      totalPayments: proposal?.data?.totalPayments,
-      paymentTerms: proposal?.data?.paymentTerms,
-    })
     return updatedProposal
-  } catch (err) {
-    throw Error(`Failure updating proposal: ${err}`)
   }
 }
