@@ -35,11 +35,13 @@ const SafeRole = ({ role, signatures, proposal }) => {
     getGnosisDetails()
   }, [role])
 
-  const totalSafeSignersSigned = signatures.filter((signature) => {
-    return signers.some((signer) => {
-      return addressesAreEqual(signature.address, signer)
-    })
-  }).length
+  const totalSafeSignersSigned =
+    signatures &&
+    signatures.filter((signature) => {
+      return signers.some((signer) => {
+        return addressesAreEqual(signature.address, signer)
+      })
+    }).length
 
   return (
     <>

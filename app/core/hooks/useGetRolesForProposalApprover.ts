@@ -76,6 +76,7 @@ const useGetRolesForProposalApprover = (proposal: ProposalNew | undefined | null
         return addressesAreEqual(signature.address, activeUser?.address || "")
       })
       if (hasActiveUserSigned) {
+        setRoles([])
         setLoading(false)
       } else if (proposal && activeUser) {
         getRoles(proposal, activeUser)
