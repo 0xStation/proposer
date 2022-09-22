@@ -23,6 +23,7 @@ import useStore from "app/core/hooks/useStore"
 import ProposalStatusPill from "app/core/components/ProposalStatusPill"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { useAccount } from "wagmi"
+import getSafeMetadata from "app/account/queries/getSafeMetadata"
 
 enum Tab {
   PROPOSALS = "PROPOSALS",
@@ -66,44 +67,36 @@ const WorkspaceHome: BlitzPage = () => {
       enabled: !!accountAddress,
       suspense: false,
       refetchOnWindowFocus: false,
-      onSuccess: async (account) => {
-        // console.log("success", account)
-        if (account?.addressType === AddressType.SAFE) {
-          console.log("safe", account)
-          const safeDetails = await getGnosisSafeDetails(account.data.chainId!, account.address!)
+    }
+  )
 
-          setSafeSigners(safeDetails?.signers || [])
-        }
-      },
+  const [safeMetadata] = useQuery(
+    getSafeMetadata,
+    { chainId: account?.data?.chainId!, address: account?.address! },
+    {
+      enabled: !!account && account.addressType === AddressType.SAFE,
+      suspense: false,
+      refetchOnWindowFocus: false,
+      cacheTime: 1000 * 60 * 5, // 5 minutes
     }
   )
 
   useEffect(() => {
-    if (accountAddress === activeUser?.address && accountAddress === connectedAddress) {
-      // if (!!session && session.userId === account?.id) {
-      setCanViewSettings(true)
-    } else {
-      setCanViewSettings(false)
-      if (activeTab === Tab.SETTINGS) {
-        setActiveTab(Tab.PROPOSALS)
-      }
-    }
-  }, [activeUser, connectedAddress, accountAddress])
+    const userIsWorkspace =
+      accountAddress === activeUser?.address && accountAddress === connectedAddress
+    const userIsWorkspaceSigner =
+      safeMetadata?.signers.includes(activeUser?.address || "") &&
+      safeMetadata?.signers.includes(connectedAddress || "")
 
-  useEffect(() => {
-    if (
-      safeSigners.includes(activeUser?.address || "") &&
-      safeSigners.includes(connectedAddress || "")
-    ) {
+    if (userIsWorkspace || userIsWorkspaceSigner) {
       setCanViewSettings(true)
     } else {
-      console.log("nani?")
       setCanViewSettings(false)
       if (activeTab === Tab.SETTINGS) {
         setActiveTab(Tab.PROPOSALS)
       }
     }
-  }, [activeUser, connectedAddress, safeSigners])
+  }, [activeUser, connectedAddress, accountAddress, safeMetadata])
 
   const ProposalTab = () => {
     return (
