@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { useProvider } from "wagmi"
 import { RadioGroup } from "@headlessui/react"
 import { Field, Form } from "react-final-form"
+import useSignature from "app/core/hooks/useSignature"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { SUPPORTED_CHAINS, LINKS, PAYMENT_TERM_MAP } from "app/core/utils/constants"
@@ -37,6 +38,8 @@ import { AddressLink } from "../../core/components/AddressLink"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { getNetworkTokens } from "app/core/utils/networkInfo"
 import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
+import { genProposalNewDigest } from "app/signatures/proposalNew"
+import pinProposalNew from "../mutations/pinProposalNew"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -738,6 +741,8 @@ export const ProposalNewForm = () => {
   // which pretty much only exists on mainnet as of right now
   const provider = useProvider({ chainId: 1 })
 
+  const { signMessage } = useSignature()
+
   const [signatures] = useQuery(
     getProposalNewSignaturesById,
     { proposalId: proposal && proposal.id },
@@ -798,10 +803,18 @@ export const ProposalNewForm = () => {
   const [createProposalMutation] = useMutation(createProposal, {
     onSuccess: (data) => {
       setProposal(data)
-      setProposalStep(ProposalStep.SIGN)
     },
     onError: (error: Error) => {
       console.log("we are erroring")
+      console.error(error)
+    },
+  })
+  const [pinProposalMutation] = useMutation(pinProposalNew, {
+    onSuccess: (data) => {
+      setProposal(data)
+      setProposalStep(ProposalStep.SIGN)
+    },
+    onError: (error: Error) => {
       console.error(error)
     },
   })
@@ -893,7 +906,7 @@ export const ProposalNewForm = () => {
               }
             }
             try {
-              await createProposalMutation({
+              const proposal = await createProposalMutation({
                 contentTitle: values.title,
                 contentBody: values.body,
                 contributorAddresses: [resolvedContributorAddress],
@@ -910,6 +923,18 @@ export const ProposalNewForm = () => {
                   ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
                   : undefined,
               })
+
+              // prompt author to sign proposal to prove they are the author of the content
+              const message = genProposalNewDigest(proposal)
+              const signature = await signMessage(message)
+              console.log("signature", signature)
+
+              const updatedProposal = await pinProposalMutation({
+                proposalId: proposal?.id,
+                signature: signature as string,
+                signatureMessage: message,
+              })
+              console.log("updatedProposal", updatedProposal)
             } catch (err) {
               setToastState({
                 isToastShowing: true,

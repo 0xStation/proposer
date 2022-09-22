@@ -4,8 +4,8 @@ import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 export const genProposalNewDigest = (proposal: ProposalNew) => {
   return {
     domain: {
-      name: "Proposal", // keep hardcoded
-      version: "1", // keep hardcoded
+      name: "Station", // keep hardcoded
+      version: "1.0.0", // keep hardcoded
     },
     types: {
       Role: [
@@ -31,13 +31,15 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
         { name: "payments", type: "Payment[]" },
         { name: "title", type: "string" },
         { name: "body", type: "string" },
+        { name: "app", type: "string" },
       ],
     },
-    value: {
+    message: {
       type: proposal.type,
       timestamp: proposal.timestamp.valueOf(),
       title: proposal.data.content.title,
       body: proposal.data.content.body,
+      app: "Station",
       roles: proposal.roles?.map((role) => {
         return { address: role.address, role: role.role }
       }),
