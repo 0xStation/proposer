@@ -35,8 +35,10 @@ export default async function createSafe(input: z.infer<typeof CreateSafe>, ctx:
   const { owners } = await response.json()
 
   // create or connect each owner
-  const account = await db.account.create({
-    data: {
+  const account = await db.account.upsert({
+    where: { address: params.address },
+    update: {},
+    create: {
       address: params.address,
       addressType,
       data: {

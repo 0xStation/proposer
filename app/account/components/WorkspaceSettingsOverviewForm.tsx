@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useMutation, Image } from "blitz"
+import { useMutation, invoke } from "blitz"
 import { Field, Form } from "react-final-form"
 import updateAccount from "../mutations/updateAccount"
 import createAccount from "../mutations/createAccount"
@@ -15,6 +15,7 @@ import {
 } from "app/utils/validators"
 import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
 import Button from "app/core/components/sds/buttons/Button"
+import getAccountByAddress from "../queries/getAccountByAddress"
 
 const PfpInput = ({ pfpURL, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
@@ -88,9 +89,11 @@ const WorkspaceSettingsOverviewForm = ({
   })
 
   const [updateAccountMutation] = useMutation(updateAccount, {
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       onSuccess()
       setIsLoading(false)
+      const account = await invoke(getAccountByAddress, { address: activeUser?.address })
+      setActiveUser(account)
       // if updating a multisig account, active user should stay as current
       if (activeUser?.address === data?.address) {
         setActiveUser(data)
