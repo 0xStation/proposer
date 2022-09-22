@@ -172,14 +172,17 @@ const Navigation = ({ children }: { children?: any }) => {
               setNewWorkspaceModalOpen(toggle)
             }}
           />
-          {address === activeUser?.address && <ProfileIcon activeUser={activeUser} />}
-          {activeUser &&
-            address === activeUser?.address &&
-            activeUser?.originsOf
-              ?.filter((aa) => aa.type === AccountAccountType.PIN_WORKSPACE)
-              ?.map((aa, idx) => {
-                return <ProfileIcon activeUser={aa.targetAccount} key={`profile-${idx}`} />
-              })}
+          {/* if connected wallet changes from activeUser (from SIWE session), hide left nav options */}
+          {activeUser && address === activeUser?.address && (
+            <>
+              <ProfileIcon activeUser={activeUser} />
+              {activeUser?.originsOf
+                ?.filter((aa) => aa.type === AccountAccountType.PIN_WORKSPACE)
+                ?.map((aa, idx) => {
+                  return <ProfileIcon activeUser={aa.targetAccount} key={`profile-${idx}`} />
+                })}
+            </>
+          )}
         </div>
       </div>
       <div className="h-[calc(100vh-70px)] ml-[70px] relative overflow-y-scroll">{children}</div>

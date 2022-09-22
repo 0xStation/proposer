@@ -71,8 +71,8 @@ const WorkspaceSettingsOverviewForm = ({
 }) => {
   const [pfpURL, setPfpURL] = useState<string | undefined>()
   const [emailVerificationSent, setEmailVerificationSent] = useState<boolean>(false)
-  const activeUser = useStore((state) => state.activeUser)
   const setActiveUser = useStore((state) => state.setActiveUser)
+  const activeUser = useStore((state) => state.activeUser)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const [createAccountMutation] = useMutation(createAccount, {
@@ -91,6 +91,7 @@ const WorkspaceSettingsOverviewForm = ({
     onSuccess: (data) => {
       onSuccess()
       setIsLoading(false)
+      // if updating a multisig account, active user should stay as current
       if (activeUser?.address === data?.address) {
         setActiveUser(data)
       }

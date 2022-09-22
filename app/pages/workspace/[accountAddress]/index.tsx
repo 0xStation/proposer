@@ -21,7 +21,6 @@ import AccountMediaObject from "app/core/components/AccountMediaObject"
 import WorkspaceSettingsOverviewForm from "app/account/components/WorkspaceSettingsOverviewForm"
 import useStore from "app/core/hooks/useStore"
 import ProposalStatusPill from "app/core/components/ProposalStatusPill"
-import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { useAccount } from "wagmi"
 import getSafeMetadata from "app/account/queries/getSafeMetadata"
 
@@ -31,14 +30,12 @@ enum Tab {
 }
 
 const WorkspaceHome: BlitzPage = () => {
-  const session = useSession({ suspense: false })
   const setToastState = useStore((state) => state.setToastState)
   const activeUser = useStore((state) => state.activeUser)
   const accountData = useAccount()
   const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
-  const [activeTab, setActiveTab] = useState<Tab>(Tab.PROPOSALS)
   const [canViewSettings, setCanViewSettings] = useState<boolean>(false)
-  const [safeSigners, setSafeSigners] = useState<string[]>([])
+  const [activeTab, setActiveTab] = useState<Tab>(Tab.PROPOSALS)
   const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
     new Set<ProposalStatus>()
   )
@@ -81,6 +78,7 @@ const WorkspaceHome: BlitzPage = () => {
     }
   )
 
+  // if activeUser is the workspace address or is a signer for it, show settings tab
   useEffect(() => {
     const userIsWorkspace =
       accountAddress === activeUser?.address && accountAddress === connectedAddress

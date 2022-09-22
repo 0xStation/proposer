@@ -34,6 +34,7 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
     return null
   }
 
+  // if account is SAFE, add signer addresses as valid authorization
   let validAddresses = []
   if (existingAccount.addressType === AddressType.SAFE) {
     const safeDetails = await getGnosisSafeDetails(
@@ -63,6 +64,8 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
   const payload = {
     address: params.address,
     data: {
+      // save existing account data with overwrites below
+      // without this, chainId for multisig accounts gets wiped
       ...existingAccount.data,
       name: params.name,
       bio: params.bio,
