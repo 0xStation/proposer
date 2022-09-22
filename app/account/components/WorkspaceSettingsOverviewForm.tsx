@@ -92,6 +92,7 @@ const WorkspaceSettingsOverviewForm = ({
     onSuccess: async (data) => {
       onSuccess()
       setIsLoading(false)
+      // refetch activeUser's account to get updated pfps on pinned workspaces
       const account = await invoke(getAccountByAddress, { address: activeUser?.address })
       setActiveUser(account)
       // if updating a multisig account, active user should stay as current
