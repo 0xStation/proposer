@@ -8,7 +8,7 @@ import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { genProposalNewDigest } from "app/signatures/proposalNew"
 import getProposalNewById from "../queries/getProposalNewById"
 import { ProposalNew } from "app/proposalNew/types"
-import useGetRolesForProposalApprover from "app/core/hooks/useGetRolesForProposalApprover"
+import useGetUsersRemainingRolesToSignFor from "app/core/hooks/useGetUsersRemainingRolesToSignFor"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 
 export const ApproveProposalNewModal = ({
@@ -38,7 +38,10 @@ export const ApproveProposalNewModal = ({
     }
   )
 
-  const [roles, _error, getRolesIsLoading] = useGetRolesForProposalApprover(proposal, signatures)
+  const [remainingRoles, _error, getRolesIsLoading] = useGetUsersRemainingRolesToSignFor(
+    proposal,
+    signatures
+  )
 
   const { signMessage } = useSignature()
 
@@ -61,10 +64,10 @@ export const ApproveProposalNewModal = ({
       return
     }
 
-    const representingRoles = roles.map((role) => {
+    const representingRoles = remainingRoles.map((role) => {
       return {
         roleId: role.roleId,
-        complete: role.willBeComplete,
+        complete: role.oneSignerNeededToComplete,
       }
     })
 

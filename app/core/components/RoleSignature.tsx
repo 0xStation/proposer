@@ -6,23 +6,17 @@ import AccountMediaObject from "./AccountMediaObject"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import truncateString from "app/core/utils/truncateString"
-import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
+import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
 
-const SafeRole = ({ role, signatures, proposal }) => {
+const SafeRole = ({ role, signatures }) => {
   const activeUser = useStore((state) => state.activeUser)
   const [safeDetails, setSafeDetails] = useState<any | null>({})
   const [signers, setSigners] = useState<string[]>([])
   const [toggleSigners, setToggleSigners] = useState<boolean>(false)
-  const [approveProposalModalOpen, setApproveProposalModalOpen] = useState<boolean>(false)
+  const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
 
-  const activeUserHasSigned = signatures?.some((signature) =>
-    // signature exists for address -> happens in case of signing for personal wallet
-    addressesAreEqual(activeUser?.address || "", signature.address)
-  )
-  const activeUserHasAProposalRole = signers.some((signer) => {
-    return addressesAreEqual(activeUser?.address || "", signer)
-  })
-
+  const activeUserHasSigned = activeUserMeetsCriteria(activeUser, signatures)
+  const activeUserHasAProposalRole = activeUserMeetsCriteria(activeUser, signers)
   const showSignButton = activeUserHasAProposalRole && !activeUserHasSigned
 
   useEffect(() => {
@@ -45,11 +39,6 @@ const SafeRole = ({ role, signatures, proposal }) => {
 
   return (
     <>
-      <ApproveProposalNewModal
-        isOpen={approveProposalModalOpen}
-        setIsOpen={setApproveProposalModalOpen}
-        proposal={proposal}
-      />
       <div className="flex flex-row w-full items-center justify-between">
         {role && signatures ? (
           <div className="flex flex-col w-full">
@@ -59,7 +48,7 @@ const SafeRole = ({ role, signatures, proposal }) => {
                 {showSignButton ? (
                   <span
                     className="text-electric-violet cursor-pointer"
-                    onClick={() => setApproveProposalModalOpen(true)}
+                    onClick={() => toggleProposalApprovalModalOpen(true)}
                   >
                     Sign
                   </span>
@@ -112,14 +101,11 @@ const SafeRole = ({ role, signatures, proposal }) => {
   )
 }
 
-const WalletRole = ({ role, signatures, proposal }) => {
+const WalletRole = ({ role, signatures }) => {
   const activeUser = useStore((state) => state.activeUser)
 
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
-  const activeUserHasSigned = signatures?.some((signature) =>
-    // signature exists for address -> happens in case of signing for personal wallet
-    addressesAreEqual(activeUser?.address || "", signature.address)
-  )
+  const activeUserHasSigned = activeUserMeetsCriteria(activeUser, signatures)
   const activeUserHasAProposalRole = addressesAreEqual(activeUser?.address || "", role?.address)
 
   const showSignButton = activeUserHasAProposalRole && !activeUserHasSigned
@@ -163,15 +149,15 @@ const WalletRole = ({ role, signatures, proposal }) => {
   )
 }
 
-export const RoleSignature = ({ role, signatures, proposal }) => {
+export const RoleSignature = ({ role, signatures }) => {
   const isSafe = role.account.addressType === "SAFE"
 
   return (
     <>
       {isSafe ? (
-        <SafeRole role={role} signatures={signatures} proposal={proposal} />
+        <SafeRole role={role} signatures={signatures} />
       ) : (
-        <WalletRole role={role} signatures={signatures} proposal={proposal} />
+        <WalletRole role={role} signatures={signatures} />
       )}
     </>
   )

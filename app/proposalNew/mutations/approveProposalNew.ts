@@ -53,6 +53,8 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       }),
       // update role with complete status
       // if signature is a multisig, we don't want to mark as complete unless it has met quorum
+      // so we filter for roles that are 'complete'.
+      // complete is a type passed from the front-end indiciating that it is ready to be pushed to status complete
       ...params.representingRoles
         .filter((role) => {
           return role.complete

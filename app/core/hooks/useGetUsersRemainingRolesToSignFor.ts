@@ -3,13 +3,16 @@ import { ProposalNew } from "app/proposalNew/types"
 import { ProposalSignature } from "@prisma/client"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
+import { AddressType } from "@prisma/client"
 import useStore from "./useStore"
 
-interface RoleType {
+interface ProposalRoleType {
   roleType: string
   roleId: string
   address: string
-  willBeComplete: boolean // if signing for this role will push the role's status to "complete"
+  // roles have a status representing if the role is completely signed for (multi-sigs need many signatures)
+  // this boolean flag represents if the next signer is the signer that pushes the role into 'complete' status
+  oneSignerNeededToComplete: boolean
 }
 
 /**
@@ -19,7 +22,7 @@ interface RoleType {
  * (undefined or null bc we need to be able to call the hook before this data resolves from query)
  * @param signatures: Signature[] | undefined | null
  * (undefined or null bc we need to be able to call the hook before this data resolves from query)
- * @returns [roles, error, loading]: [RoleType[], any, boolean]
+ * @returns [remainingRoles, error, loading]: [RoleType[], any, boolean]
  *
  * the RoleType array response is a list of the remaining roles an active user still needs to sign for. Once those
  * roles are signed for this hook will not return them anymore. This is useful for determining if we should show the
@@ -31,33 +34,33 @@ interface RoleType {
  * This might be useful if we have UI that requires we show which roles a particular user has signed for, after they
  * have signed. However, there are currently not UI elements that require that, so this leaner hook should be fine.
  */
-const useGetRolesForProposalApprover = (
+const useGetUsersRemainingRolesToSignFor = (
   proposal: ProposalNew | undefined | null,
   signatures: ProposalSignature[] | undefined
 ) => {
   const activeUser = useStore((state) => state.activeUser)
-  const [roles, setRoles] = useState<RoleType[]>([])
+  const [remainingRoles, setRemainingRoles] = useState<ProposalRoleType[]>([])
   const [error, setError] = useState<any>(null)
   const [loading, setLoading] = useState<boolean>(true)
 
   const getRoles = async (proposal: ProposalNew, signatures: ProposalSignature[], activeUser) => {
     try {
       setLoading(true)
-      const signers: RoleType[] = await Promise.all(
+      const signers: ProposalRoleType[] = await Promise.all(
         proposal.roles.map(async (role) => {
           // role is type wallet (single signer)
           // AND role's address is the active user
           if (
-            role.account?.addressType === "WALLET" &&
+            role.account?.addressType === AddressType.WALLET &&
             addressesAreEqual(role.address, activeUser?.address || "")
           ) {
             return {
               roleType: role.role,
               roleId: role.id,
               address: role.address,
-              willBeComplete: true, // always true for unsigned single signer
+              oneSignerNeededToComplete: true, // always true for unsigned single signer
             }
-          } else if (role.account?.addressType === "SAFE") {
+          } else if (role.account?.addressType === AddressType.SAFE) {
             const gnosisSafeDetails = await getGnosisSafeDetails(
               role.account.data.chainId || 1,
               role.address
@@ -77,7 +80,8 @@ const useGetRolesForProposalApprover = (
                   roleType: role.role,
                   roleId: role.id,
                   address: activeUser.address,
-                  willBeComplete: totalSafeSignersSigned == gnosisSafeDetails?.quorum - 1, // last signer sets true
+                  oneSignerNeededToComplete:
+                    totalSafeSignersSigned === gnosisSafeDetails?.quorum - 1, // last signer sets true
                 }
               }
             })
@@ -90,7 +94,7 @@ const useGetRolesForProposalApprover = (
       // So, the list is mapped over, which means some are null, and some are nested.
       // Mapping over the signers leaves a nested array like [x, x, [x, x]] so flat turns it into [x, x, x, x]
       // the filter((a) => a) is shorthand to remove nulls
-      setRoles(signers.flat().filter((a) => a))
+      setRemainingRoles(signers.flat().filter((a) => a))
     } catch (e) {
       setError(e)
     } finally {
@@ -107,7 +111,7 @@ const useGetRolesForProposalApprover = (
       // So we set the roles remaining to empty and loading to false.
       // see post comment at the bottom of the file.
       if (hasActiveUserSigned) {
-        setRoles([])
+        setRemainingRoles([])
         setLoading(false)
       } else if (proposal && activeUser) {
         getRoles(proposal, signatures, activeUser)
@@ -115,10 +119,10 @@ const useGetRolesForProposalApprover = (
     }
   }, [proposal, signatures, activeUser])
 
-  return [roles, error, loading] as [RoleType[], any, boolean]
+  return [remainingRoles, error, loading] as [ProposalRoleType[], any, boolean]
 }
 
-export default useGetRolesForProposalApprover
+export default useGetUsersRemainingRolesToSignFor
 
 /**
  * POST COMMENTS
@@ -129,4 +133,9 @@ export default useGetRolesForProposalApprover
  * For our system, it is true almost all of the time, but it doesn't mean it's impossible to have a role that is
  * status - incomplete with address xyz while xyz has already genereated a signature.
  * Even though our code won't allow it, its a valid state in the database.
+ *
+ * a better solution might be to look at the relationship between signatures and roles.
+ * That way we would be able to tell which roles a user is accountable for, and if the signature of the user has been
+ * linked to that particular role. It would allow a cleaner determination of if the user signing really means they have
+ * signed each role.
  */

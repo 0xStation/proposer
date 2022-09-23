@@ -13,7 +13,7 @@ import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
 import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
-import useGetRolesForProposalApprover from "app/core/hooks/useGetRolesForProposalApprover"
+import useGetUsersRemainingRolesToSignFor from "app/core/hooks/useGetUsersRemainingRolesToSignFor"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.role === proposalType)
@@ -34,7 +34,6 @@ export const ProposalViewHeaderNavigation = () => {
   const proposalId = useParam("proposalId") as string
   const proposalApprovalModalOpen = useStore((state) => state.proposalApprovalModalOpen)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
-  const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
   const [proposal] = useQuery(
     getProposalNewById,
@@ -57,7 +56,7 @@ export const ProposalViewHeaderNavigation = () => {
     }
   )
 
-  const [roles, _error, loading] = useGetRolesForProposalApprover(proposal, signatures)
+  const [remainingRoles, _error, loading] = useGetUsersRemainingRolesToSignFor(proposal, signatures)
 
   // author used to return to workspace page with proposal list view
   const author = findProposalRoleByRoleType(proposal?.roles, ProposalRoleType.AUTHOR)
@@ -67,8 +66,8 @@ export const ProposalViewHeaderNavigation = () => {
       .length || 0
 
   // activeUser's view permissions
-  const activeUserHasProposalRole = roles.length > 0
-  const activeUserHasSigned = roles.length === 0
+  const activeUserHasProposalRole = remainingRoles.length > 0
+  const activeUserHasRolesToSign = remainingRoles.length === 0
 
   const currentPageUrl =
     typeof window !== "undefined"
@@ -143,7 +142,7 @@ export const ProposalViewHeaderNavigation = () => {
           - if they don't have a role, just show the copy icon
           */}
           {activeUserHasProposalRole && !loading ? (
-            !activeUserHasSigned ? (
+            !activeUserHasRolesToSign ? (
               <>
                 <Button
                   overrideWidthClassName="w-[300px]"
