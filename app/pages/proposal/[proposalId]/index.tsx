@@ -22,15 +22,16 @@ const ViewProposalNew: BlitzPage = () => {
       <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto pb-9">
         <ProposalViewHeaderNavigation />
         <ReadMore className="mt-9 mb-9">{proposal?.data?.content?.body}</ReadMore>
+        <RoleSignaturesView proposal={proposal as ProposalNew | undefined} className="mt-9" />
+        {(proposal?.data.totalPayments || []).length > 0 && (
+          <TotalPaymentView proposal={proposal!} className="mt-9" />
+        )}
         {proposal?.startDate && (
           <TimelineView
             startDate={proposal?.startDate as Date}
             endDate={proposal?.endDate as Date}
           />
         )}
-        <TotalPaymentView proposal={proposal!} className="mt-9" />
-        <RoleSignaturesView proposal={proposal as ProposalNew | undefined} className="mt-9" />
-        <IpfsHashView proposal={proposal || undefined} />
       </div>
     </Layout>
   )

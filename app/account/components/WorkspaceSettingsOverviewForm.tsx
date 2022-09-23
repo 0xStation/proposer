@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useMutation, Image } from "blitz"
+import { useMutation, invoke } from "blitz"
 import { Field, Form } from "react-final-form"
 import updateAccount from "../mutations/updateAccount"
 import createAccount from "../mutations/createAccount"
@@ -15,6 +15,7 @@ import {
 } from "app/utils/validators"
 import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
 import Button from "app/core/components/sds/buttons/Button"
+import getAccountByAddress from "../queries/getAccountByAddress"
 
 const PfpInput = ({ pfpURL, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
@@ -72,23 +73,31 @@ const WorkspaceSettingsOverviewForm = ({
   const [pfpURL, setPfpURL] = useState<string | undefined>()
   const [emailVerificationSent, setEmailVerificationSent] = useState<boolean>(false)
   const setActiveUser = useStore((state) => state.setActiveUser)
+  const activeUser = useStore((state) => state.activeUser)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const [createAccountMutation] = useMutation(createAccount, {
     onSuccess: (data) => {
       onSuccess()
+      setIsLoading(false)
       setActiveUser(data)
     },
     onError: (error) => {
       console.error(error)
+      setIsLoading(false)
     },
   })
 
   const [updateAccountMutation] = useMutation(updateAccount, {
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       onSuccess()
-      setActiveUser(data)
+      setIsLoading(false)
+      // refetch activeUser's account to get updated pfps on pinned workspaces
+      const account = await invoke(getAccountByAddress, { address: activeUser?.address })
+      setActiveUser(account)
     },
     onError: (error) => {
+      setIsLoading(false)
       console.error(error)
     },
   })
@@ -108,6 +117,7 @@ const WorkspaceSettingsOverviewForm = ({
     <Form
       initialValues={account?.data || {}}
       onSubmit={async (values) => {
+        setIsLoading(true)
         try {
           const parameters = {
             address: account?.address!,
@@ -129,19 +139,20 @@ const WorkspaceSettingsOverviewForm = ({
         } catch (error) {
           console.error(`Error updating account: ${error}`)
           alert("Error saving information.")
+          setIsLoading(false)
         }
       }}
       render={({ handleSubmit }) => (
         <form onSubmit={handleSubmit}>
           <div className="max-w-lg mr-5 sm:mr-0">
             {/* NAME */}
-            <label className="font-bold block">Name*</label>
+            <label className="font-bold block">Name</label>
             <p className="text-concrete text-sm">50 character max.</p>
             <Field
               component="input"
               name="name"
               placeholder="Name"
-              validate={composeValidators(requiredField, mustBeUnderNumCharacters(50))}
+              validate={composeValidators(mustBeUnderNumCharacters(50))}
             >
               {({ input, meta }) => (
                 <div>
@@ -223,7 +234,12 @@ const WorkspaceSettingsOverviewForm = ({
               )}
             </Field>
           </div>
-          <Button className="mt-12" isSubmitType={true}>
+          <Button
+            className="mt-12"
+            isSubmitType={true}
+            isLoading={isLoading}
+            isDisabled={isLoading}
+          >
             {isEdit ? "Save" : "Next"}
           </Button>
         </form>

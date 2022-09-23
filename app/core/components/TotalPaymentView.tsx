@@ -2,6 +2,7 @@ import { DateTime } from "luxon"
 import { getNetworkName } from "app/core/utils/networkInfo"
 import { ProposalNew } from "app/proposalNew/types"
 import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
+import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 
 export const TotalPaymentView = ({
   proposal,
@@ -21,7 +22,7 @@ export const TotalPaymentView = ({
       <div className="mt-6">
         <h4 className="text-xs font-bold text-concrete uppercase">Payment</h4>
         <p className="mt-2">
-          {proposal?.data?.totalPayments?.[0]?.amount +
+          {formatCurrencyAmount(proposal?.data?.totalPayments?.[0]?.amount.toString()) +
             " " +
             proposal?.data?.totalPayments?.[0]?.token.symbol}
         </p>

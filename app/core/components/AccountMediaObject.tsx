@@ -2,8 +2,9 @@ import { Routes, Link } from "blitz"
 import { useEnsName } from "wagmi"
 import truncateString from "app/core/utils/truncateString"
 import Avatar from "app/core/components/sds/images/avatar"
+import CopyToClipboard from "./CopyToClipboard"
 
-const AccountMediaObject = ({ account, className = "" }) => {
+const AccountMediaObject = ({ account, className = "", showActionIcons = false }) => {
   const { data: ensName } = useEnsName({
     address: account?.address,
     chainId: 1,
@@ -26,6 +27,7 @@ const AccountMediaObject = ({ account, className = "" }) => {
             <p className="w-max truncate leading-4">
               @{ensName || truncateString(account?.address || "")}
             </p>
+            {showActionIcons && <CopyToClipboard text={account?.address || ""} />}
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { BlitzPage, useParam, useQuery, invalidateQuery, Routes, Link, useSession } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import Button from "app/core/components/sds/buttons/Button"
@@ -13,14 +13,27 @@ import {
   PROPOSAL_NEW_STATUS_FILTER_OPTIONS,
   PROPOSAL_ROLE_FILTER_OPTIONS,
   PROPOSAL_NEW_STATUS_DISPLAY_MAP,
+  Sizes,
 } from "app/core/utils/constants"
 import { ProposalStatus } from "app/proposal/types"
-import { ProposalRoleType } from "@prisma/client"
+import {
+  AddressType,
+  ProposalNewStatus,
+  ProposalRoleApprovalStatus,
+  ProposalRoleType,
+} from "@prisma/client"
 import { LightBulbIcon, CogIcon } from "@heroicons/react/solid"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 import WorkspaceSettingsOverviewForm from "app/account/components/WorkspaceSettingsOverviewForm"
 import useStore from "app/core/hooks/useStore"
 import ProposalStatusPill from "app/core/components/ProposalStatusPill"
+import { useAccount } from "wagmi"
+import getSafeMetadata from "app/account/queries/getSafeMetadata"
+import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
+import { ProposalRole } from "app/proposalRole/types"
+import Avatar from "app/core/components/sds/images/avatar"
+import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
+import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 
 enum Tab {
   PROPOSALS = "PROPOSALS",
@@ -28,8 +41,11 @@ enum Tab {
 }
 
 const WorkspaceHome: BlitzPage = () => {
-  const session = useSession({ suspense: false })
   const setToastState = useStore((state) => state.setToastState)
+  const activeUser = useStore((state) => state.activeUser)
+  const accountData = useAccount()
+  const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
+  const [canViewSettings, setCanViewSettings] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<Tab>(Tab.PROPOSALS)
   const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
     new Set<ProposalStatus>()
@@ -55,8 +71,41 @@ const WorkspaceHome: BlitzPage = () => {
   const [account] = useQuery(
     getAccountByAddress,
     { address: toChecksumAddress(accountAddress) },
-    { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
+    {
+      enabled: !!accountAddress,
+      suspense: false,
+      refetchOnWindowFocus: false,
+    }
   )
+
+  const [safeMetadata] = useQuery(
+    getSafeMetadata,
+    { chainId: account?.data?.chainId!, address: account?.address! },
+    {
+      enabled: !!account && account.addressType === AddressType.SAFE,
+      suspense: false,
+      refetchOnWindowFocus: false,
+      cacheTime: 1000 * 60 * 5, // 5 minutes
+    }
+  )
+
+  // if activeUser is the workspace address or is a signer for it, show settings tab
+  useEffect(() => {
+    const userIsWorkspace =
+      accountAddress === activeUser?.address && accountAddress === connectedAddress
+    const userIsWorkspaceSigner =
+      safeMetadata?.signers.includes(activeUser?.address || "") &&
+      safeMetadata?.signers.includes(connectedAddress || "")
+
+    if (userIsWorkspace || userIsWorkspaceSigner) {
+      setCanViewSettings(true)
+    } else {
+      setCanViewSettings(false)
+      if (activeTab === Tab.SETTINGS) {
+        setActiveTab(Tab.PROPOSALS)
+      }
+    }
+  }, [activeUser, connectedAddress, accountAddress, safeMetadata])
 
   const ProposalTab = () => {
     return (
@@ -105,10 +154,20 @@ const WorkspaceHome: BlitzPage = () => {
           {/* TABLE HEADERS */}
           <thead>
             <tr className="border-b border-concrete">
-              <th className="pl-4 text-xs uppercase text-light-concrete pb-2 text-left">Title</th>
-              <th className="text-xs uppercase text-light-concrete pb-2 text-left">Status</th>
-              <th className="text-xs uppercase text-light-concrete pb-2 text-left">Payment</th>
-              <th className="text-xs uppercase text-light-concrete pb-2 text-left">Submitted at</th>
+              <th className="pl-4 w-96 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
+                Title
+              </th>
+              <th className="w-64 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
+                Proposal status
+              </th>
+              <th className="w-40 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
+                Payment
+              </th>
+              <th className="text-xs tracking-wide uppercase text-concrete pb-2 text-left">
+                Last updated
+              </th>
+              {/* title-less header for role pfps */}
+              <th />
             </tr>
           </thead>
           {/* TABLE BODY */}
@@ -116,24 +175,60 @@ const WorkspaceHome: BlitzPage = () => {
             {proposals &&
               proposals.length > 0 &&
               proposals.map((proposal, idx) => {
+                const uniqueRoleAccounts = (proposal?.roles as ProposalRole[])
+                  ?.map((role) => role?.account!)
+                  ?.filter((account, idx, accounts) => {
+                    return accounts?.findIndex((acc) => acc?.address === account?.address) === idx
+                  })
                 return (
                   <Link
                     href={Routes.ViewProposalNew({ proposalId: proposal.id })}
                     key={`table-row-${idx}`}
                   >
                     <tr className="border-b border-concrete cursor-pointer hover:bg-wet-concrete">
-                      <td className="pl-4 text-base py-4 font-bold w-128">
-                        {proposal.data.content.title}
+                      {/* TITLE */}
+                      <td className="pl-4 text-base py-4 font-bold">
+                        {proposal.data.content.title.length > 44
+                          ? proposal.data.content.title.substr(0, 44) + "..."
+                          : proposal.data.content.title}
                       </td>
+                      {/* PROPOSAL STATUS */}
                       <td className="py-4">
-                        <ProposalStatusPill status={proposal?.status} />
+                        <div className="flex flex-row space-x-2">
+                          <ProposalStatusPill status={proposal?.status} />
+                          {proposal?.status === ProposalNewStatus.AWAITING_APPROVAL && (
+                            <ProgressCircleAndNumber
+                              numerator={
+                                proposal?.roles.filter(
+                                  (role) =>
+                                    role.approvalStatus === ProposalRoleApprovalStatus.COMPLETE
+                                ).length
+                              }
+                              denominator={3}
+                            />
+                          )}
+                        </div>
                       </td>
-                      <td className="text-base py-4 w-48">
+                      {/* PAYMENT */}
+                      <td className="text-base py-4">
                         {proposal.data.totalPayments.length > 0
-                          ? `${proposal.data.totalPayments[0]?.amount} ${proposal.data.totalPayments[0]?.token.symbol}`
+                          ? `${formatCurrencyAmount(
+                              proposal.data.totalPayments[0]?.amount.toString()
+                            )} ${proposal.data.totalPayments[0]?.token.symbol}`
                           : "None"}
                       </td>
+                      {/* LAST UPDATED */}
                       <td className="text-base py-4">{formatDate(proposal.timestamp)}</td>
+                      {/* COLLABORATORS */}
+                      <td className="pr-12">
+                        <div className="flex">
+                          {uniqueRoleAccounts?.length > 0 ? (
+                            <CollaboratorPfps accounts={uniqueRoleAccounts} size={Sizes.BASE} />
+                          ) : (
+                            ""
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   </Link>
                 )
@@ -189,7 +284,7 @@ const WorkspaceHome: BlitzPage = () => {
           <div className="pb-6 border-b border-concrete space-y-6">
             {/* PROFILE */}
             {account ? (
-              <AccountMediaObject account={account} />
+              <AccountMediaObject account={account} showActionIcons={true} />
             ) : (
               // LOADING STATE
               <div
@@ -215,7 +310,7 @@ const WorkspaceHome: BlitzPage = () => {
               <span>Proposals</span>
             </li>
             {/* SETTINGS */}
-            {!!session && session.userId === account?.id && (
+            {canViewSettings && (
               <li
                 className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
                   activeTab === Tab.SETTINGS && "bg-wet-concrete"

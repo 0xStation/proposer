@@ -14,6 +14,7 @@ import { useConnect, useAccount, useNetwork } from "wagmi"
 import generateNonce from "app/session/queries/generateNonce"
 import { SiweMessage } from "siwe"
 import verify from "app/session/mutations/verify"
+import Button from "./sds/buttons/Button"
 
 const {
   FEATURE: { WALLET_CONNECTION },
@@ -178,19 +179,13 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen, callback = () => {}
             </div>
           ) : null}
           <div className="m-6 text-center">
-            <button
-              className="border border-tunnel-black bg-electric-violet text-tunnel-black rounded-md content-center hover:opacity-70 cursor:pointer w-36 h-[35px]"
+            <Button
               onClick={handleSignInWithEthereum}
-              disabled={connectState.loading}
+              isDisabled={connectState.loading}
+              isLoading={connectState.loading}
             >
-              {connectState.loading ? (
-                <div className="flex justify-center items-center">
-                  <Spinner fill="black" />
-                </div>
-              ) : (
-                "Sign"
-              )}
-            </button>
+              Sign
+            </Button>
           </div>
         </>
       ) : (

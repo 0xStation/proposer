@@ -14,6 +14,8 @@ import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalN
 import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import useGetUsersRemainingRolesToSignFor from "app/core/hooks/useGetUsersRemainingRolesToSignFor"
+import LinkArrow from "app/core/icons/LinkArrow"
+import { LINKS } from "app/core/utils/constants"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.role === proposalType)
@@ -106,16 +108,30 @@ export const ProposalViewHeaderNavigation = () => {
         ) : (
           <div className="mt-6 h-8 w-42 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
         )}
-        <div className="mt-1">
-          <div className="uppercase text-xs tracking-wider text-concrete flex flex-row">
-            <p className="inline mr-1"> Last updated: </p>
-            {proposal?.timestamp ? (
-              <p>{convertJSDateToDateAndTime({ timestamp: proposal?.timestamp as Date })}</p>
-            ) : (
-              <div className="h-4 w-32 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+        {/* IPFS and LAST UPDATED */}
+        {!proposal ? (
+          <div className="mt-6 h-4 w-96 rounded-l bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+        ) : (
+          <div className="mt-6 flex flex-row items-center space-x-6 h-4">
+            {proposal?.data?.ipfsMetadata?.hash && (
+              <a
+                href={`${LINKS.PINATA_BASE_URL}${proposal?.data?.ipfsMetadata?.hash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-row uppercase text-xs text-electric-violet items-center"
+              >
+                <p className="inline mr-1"> View on ipfs </p>
+                <LinkArrow className="fill-electric-violet" />
+              </a>
+            )}
+            {proposal?.timestamp && (
+              <div className="uppercase text-xs text-concrete flex flex-row">
+                <p className="inline mr-1"> Last updated: </p>
+                <p>{convertJSDateToDateAndTime({ timestamp: proposal?.timestamp as Date })}</p>
+              </div>
             )}
           </div>
-        </div>
+        )}
         {/* PROPOSAL STATUS */}
         <div className="mt-6 flex flex-row justify-between">
           <div className="space-x-2 flex flex-row">
@@ -183,9 +199,11 @@ export const ProposalViewHeaderNavigation = () => {
             <Tab router={router} route={Routes.ViewProposalNew({ proposalId })}>
               Proposal
             </Tab>
-            <Tab router={router} route={Routes.ProposalPayments({ proposalId })}>
-              Payments
-            </Tab>
+            {(proposal?.payments || []).length > 0 && (
+              <Tab router={router} route={Routes.ProposalPayments({ proposalId })}>
+                Payments
+              </Tab>
+            )}
           </ul>
         </div>
       </div>
