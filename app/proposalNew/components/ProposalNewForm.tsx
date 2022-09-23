@@ -181,19 +181,10 @@ const ProposeForm = ({ selectedNetworkId }) => {
     <>
       {/* CLIENT */}
       <label className="font-bold block mt-6">Client*</label>
-      {/* <span className="text-xs text-concrete block">
+      <span className="text-xs text-concrete block">
         Who will be responsible for reviewing and deploying the funds outlined in this proposal? See
-        the list of community addresses{" "}
-        <a
-          href={LINKS.STATION_WORKSPACES}
-          target="_blank"
-          rel="noreferrer"
-          className="text-electric-violet"
-        >
-          here
-        </a>
-        .
-      </span> */}
+        the list of community addresses <TextLink url={LINKS.STATION_WORKSPACES}>here</TextLink>.
+      </span>
       <Field name="client" validate={requiredField}>
         {({ meta, input }) => {
           return (
@@ -231,10 +222,10 @@ const ProposeForm = ({ selectedNetworkId }) => {
       </Field>
       {/* CONTRIBUTOR */}
       <label className="font-bold block mt-6">Contributor*</label>
-      {/* <span className="text-xs text-concrete block">
+      <span className="text-xs text-concrete block">
         Who will be responsible for delivering the work outlined in this proposal?
         <p>Paste your address if this is you.</p>
-      </span> */}
+      </span>
       <Field name="contributor" validate={composeValidators(requiredField)}>
         {({ meta, input }) => {
           return (
