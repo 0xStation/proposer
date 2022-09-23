@@ -37,6 +37,7 @@ import { AddressLink } from "../../core/components/AddressLink"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { getNetworkTokens } from "app/core/utils/networkInfo"
 import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
+import TextLink from "app/core/components/TextLink"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -81,8 +82,8 @@ const GnosisWalletTypeMetadataText = ({ addressType }) => {
 
 const Stepper = ({ step }) => {
   return (
-    <div className="w-full h-4 bg-neon-carrot relative">
-      <div className="absolute left-[20px] top-[-4px]">
+    <div className="w-full h-2 bg-neon-carrot relative">
+      <div className="absolute left-[20px] top-[-8px]">
         <span className="h-6 w-6 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
           <span
             className={`h-3 bg-neon-carrot block absolute ${
@@ -96,7 +97,7 @@ const Stepper = ({ step }) => {
           Propose
         </p>
       </div>
-      <div className="absolute left-[220px] top-[-4px]">
+      <div className="absolute left-[220px] top-[-8px]">
         <span className="h-6 w-6 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
           {step !== ProposalStep.PROPOSE && (
             <span
@@ -112,7 +113,7 @@ const Stepper = ({ step }) => {
           Define terms
         </p>
       </div>
-      <div className="absolute left-[420px] top-[-4px]">
+      <div className="absolute left-[420px] top-[-8px]">
         <span className="h-6 w-6 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
           {step === ProposalStep.SIGN && (
             <span className="h-3 w-1.5 bg-neon-carrot block absolute rounded-l-full top-[4px] left-[3.5px]"></span>
@@ -124,108 +125,7 @@ const Stepper = ({ step }) => {
   )
 }
 
-const ProposeForm = () => {
-  return (
-    <>
-      {/* TITLE */}
-      <label className="font-bold block mt-6">Title*</label>
-      <Field name="title" validate={requiredField}>
-        {({ meta, input }) => (
-          <>
-            <input
-              {...input}
-              type="text"
-              required
-              placeholder="Add a title for your idea"
-              className="bg-wet-concrete rounded mt-1 w-full p-2"
-            />
-
-            {meta.touched && meta.error && (
-              <span className="text-torch-red text-xs">{meta.error}</span>
-            )}
-          </>
-        )}
-      </Field>
-      {/* BODY */}
-      <label className="font-bold block mt-6">Details*</label>
-      <span className="text-xs text-concrete block">
-        Supports markdown syntax.{" "}
-        <a href={LINKS.MARKDOWN_GUIDE}>
-          <span className="text-electric-violet"> Learn more </span>
-        </a>
-      </span>
-      <Field name="body" component="textarea" validate={requiredField}>
-        {({ input, meta }) => (
-          <div>
-            <textarea
-              {...input}
-              placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
-              className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[236px] w-full"
-            />
-            {/* this error shows up when the user focuses the field (meta.touched) */}
-            {meta.error && meta.touched && (
-              <span className=" text-xs text-torch-red block">{meta.error}</span>
-            )}
-          </div>
-        )}
-      </Field>
-      {/* START DATE */}
-      <label className="font-bold block mt-6">Start</label>
-      <Field name="startDate">
-        {({ input, meta }) => {
-          return (
-            <div>
-              <input
-                {...input}
-                type="datetime-local"
-                min={getFormattedDateForMinDateInput({ dateTime: DateTime.local() })}
-                className="bg-wet-concrete rounded p-2 mt-1 w-full"
-              />
-              {meta.touched && meta.error && (
-                <span className="text-torch-red text-xs">{meta.error}</span>
-              )}
-            </div>
-          )
-        }}
-      </Field>
-      {/* END DATE */}
-      <label className="font-bold block mt-6">End</label>
-      <Field name="endDate">
-        {({ input, meta }) => {
-          return (
-            <div>
-              <input
-                {...input}
-                type="datetime-local"
-                min={getFormattedDateForMinDateInput({ dateTime: DateTime.local() })}
-                className="bg-wet-concrete rounded p-2 mt-1 w-full"
-              />
-              {meta.touched && meta.error && (
-                <span className="text-torch-red text-xs">{meta.error}</span>
-              )}
-            </div>
-          )
-        }}
-      </Field>
-    </>
-  )
-}
-
-const RewardForm = ({
-  selectedNetworkId,
-  setSelectedNetworkId,
-  selectedToken,
-  setSelectedToken,
-  tokenOptions,
-  formState,
-  setShouldRefetchTokens,
-  needFunding,
-  setNeedFunding,
-}) => {
-  const session = useSession({ suspense: false })
-  const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
-  const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState<boolean>(false)
-
+const ProposeForm = ({ selectedNetworkId }) => {
   const [contributorAddressType, setContributorAddressType] = useState<AddressType>()
   const [clientAddressType, setClientAddressType] = useState<AddressType>()
   const [contributorAddressInputVal, setContributorAddressInputVal] = useState<string>()
@@ -276,6 +176,159 @@ const RewardForm = ({
     }
     setAddressType(undefined)
   }
+
+  return (
+    <>
+      {/* CLIENT */}
+      <label className="font-bold block mt-6">Client*</label>
+      {/* <span className="text-xs text-concrete block">
+        Who will be responsible for reviewing and deploying the funds outlined in this proposal? See
+        the list of community addresses{" "}
+        <a
+          href={LINKS.STATION_WORKSPACES}
+          target="_blank"
+          rel="noreferrer"
+          className="text-electric-violet"
+        >
+          here
+        </a>
+        .
+      </span> */}
+      <Field name="client" validate={requiredField}>
+        {({ meta, input }) => {
+          return (
+            <>
+              <input
+                {...input}
+                type="text"
+                required
+                placeholder="Enter ENS name or wallet address"
+                className="bg-wet-concrete rounded mt-1 w-full p-2"
+                onKeyUp={debounce(
+                  (e) => handleEnsAddressInputValOnKeyUp(e.target.value, setClientAddressInputVal),
+                  200
+                )}
+                onBlur={(e) =>
+                  handleAddressInputValOnBlur(
+                    e.target.value,
+                    setClientAddressType,
+                    clientEnsAddress
+                  )
+                }
+              />
+
+              {meta.touched && meta.error && (
+                <span className="text-torch-red text-xs">{meta.error}</span>
+              )}
+              {/* {clientEnsAddress && <EnsAddressMetadataText address={clientEnsAddress} />} */}
+              {/* user feedback on address type of input */}
+              {!meta.error && input.value && !!clientAddressType && (
+                <GnosisWalletTypeMetadataText addressType={clientAddressType} />
+              )}
+            </>
+          )
+        }}
+      </Field>
+      {/* CONTRIBUTOR */}
+      <label className="font-bold block mt-6">Contributor*</label>
+      {/* <span className="text-xs text-concrete block">
+        Who will be responsible for delivering the work outlined in this proposal?
+        <p>Paste your address if this is you.</p>
+      </span> */}
+      <Field name="contributor" validate={composeValidators(requiredField)}>
+        {({ meta, input }) => {
+          return (
+            <>
+              <input
+                {...input}
+                type="text"
+                required
+                onKeyUp={debounce(
+                  (e) =>
+                    handleEnsAddressInputValOnKeyUp(e.target.value, setContributorAddressInputVal),
+                  200
+                )}
+                onBlur={(e) => {
+                  handleAddressInputValOnBlur(
+                    e.target.value,
+                    setContributorAddressType,
+                    contributorEnsAddress
+                  )
+                  input.onBlur(e)
+                }}
+                placeholder="Enter ENS name or wallet address"
+                className="bg-wet-concrete rounded mt-1 w-full p-2"
+              />
+
+              {meta.touched && meta.error && (
+                <span className="text-torch-red text-xs">{meta.error}</span>
+              )}
+              {/* {contributorEnsAddress && <EnsAddressMetadataText address={contributorEnsAddress} />} */}
+              {/* user feedback on address type of input */}
+              {!meta.error && input.value && !!contributorAddressType && (
+                <GnosisWalletTypeMetadataText addressType={contributorAddressType} />
+              )}
+            </>
+          )
+        }}
+      </Field>
+      {/* TITLE */}
+      <label className="font-bold block mt-6">Title*</label>
+      <Field name="title" validate={requiredField}>
+        {({ meta, input }) => (
+          <>
+            <input
+              {...input}
+              type="text"
+              required
+              placeholder="Add a title for your idea"
+              className="bg-wet-concrete rounded mt-1 w-full p-2"
+            />
+
+            {meta.touched && meta.error && (
+              <span className="text-torch-red text-xs">{meta.error}</span>
+            )}
+          </>
+        )}
+      </Field>
+      {/* BODY */}
+      <label className="font-bold block mt-6">Details*</label>
+      <span className="text-xs text-concrete block">
+        Supports markdown syntax. <TextLink url={LINKS.MARKDOWN_GUIDE}>Learn more</TextLink>
+      </span>
+      <Field name="body" component="textarea" validate={requiredField}>
+        {({ input, meta }) => (
+          <div>
+            <textarea
+              {...input}
+              placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
+              className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[236px] w-full"
+            />
+            {/* this error shows up when the user focuses the field (meta.touched) */}
+            {meta.error && meta.touched && (
+              <span className=" text-xs text-torch-red block">{meta.error}</span>
+            )}
+          </div>
+        )}
+      </Field>
+    </>
+  )
+}
+
+const RewardForm = ({
+  selectedNetworkId,
+  setSelectedNetworkId,
+  selectedToken,
+  setSelectedToken,
+  tokenOptions,
+  formState,
+  setShouldRefetchTokens,
+  needFunding,
+  setNeedFunding,
+}) => {
+  const session = useSession({ suspense: false })
+  const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
+  const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState<boolean>(false)
 
   return (
     <>
@@ -544,96 +597,41 @@ const RewardForm = ({
         </>
       )}
 
-      {/* CONTRIBUTOR */}
-      <label className="font-bold block mt-6">Contributor*</label>
-      <span className="text-xs text-concrete block">
-        Who will be responsible for delivering the work outlined in this proposal?
-        <p>Paste your address if this is you.</p>
-      </span>
-      <Field name="contributor" validate={composeValidators(requiredField)}>
-        {({ meta, input }) => {
+      {/* START DATE */}
+      <label className="font-bold block mt-6">Start</label>
+      <Field name="startDate">
+        {({ input, meta }) => {
           return (
-            <>
+            <div>
               <input
                 {...input}
-                type="text"
-                required
-                onKeyUp={debounce(
-                  (e) =>
-                    handleEnsAddressInputValOnKeyUp(e.target.value, setContributorAddressInputVal),
-                  200
-                )}
-                onBlur={(e) => {
-                  handleAddressInputValOnBlur(
-                    e.target.value,
-                    setContributorAddressType,
-                    contributorEnsAddress
-                  )
-                  input.onBlur(e)
-                }}
-                placeholder="Enter wallet or ENS name"
-                className="bg-wet-concrete rounded mt-1 w-full p-2"
+                type="datetime-local"
+                min={getFormattedDateForMinDateInput({ dateTime: DateTime.local() })}
+                className="bg-wet-concrete rounded p-2 mt-1 w-full"
               />
-
               {meta.touched && meta.error && (
                 <span className="text-torch-red text-xs">{meta.error}</span>
               )}
-              {contributorEnsAddress && <EnsAddressMetadataText address={contributorEnsAddress} />}
-              {/* user feedback on address type of input */}
-              {!meta.error && input.value && !!contributorAddressType && (
-                <GnosisWalletTypeMetadataText addressType={contributorAddressType} />
-              )}
-            </>
+            </div>
           )
         }}
       </Field>
-      {/* CLIENT */}
-      <label className="font-bold block mt-6">Reviewer*</label>
-      <span className="text-xs text-concrete block">
-        Who will be responsible for reviewing and deploying the funds outlined in this proposal? See
-        the list of community addresses{" "}
-        <a
-          href={LINKS.STATION_WORKSPACES}
-          target="_blank"
-          rel="noreferrer"
-          className="text-electric-violet"
-        >
-          here
-        </a>
-        .
-      </span>
-      <Field name="client" validate={requiredField}>
-        {({ meta, input }) => {
+      {/* END DATE */}
+      <label className="font-bold block mt-6">End</label>
+      <Field name="endDate">
+        {({ input, meta }) => {
           return (
-            <>
+            <div>
               <input
                 {...input}
-                type="text"
-                required
-                placeholder="Enter wallet or ENS name"
-                className="bg-wet-concrete rounded mt-1 w-full p-2"
-                onKeyUp={debounce(
-                  (e) => handleEnsAddressInputValOnKeyUp(e.target.value, setClientAddressInputVal),
-                  200
-                )}
-                onBlur={(e) =>
-                  handleAddressInputValOnBlur(
-                    e.target.value,
-                    setClientAddressType,
-                    clientEnsAddress
-                  )
-                }
+                type="datetime-local"
+                min={getFormattedDateForMinDateInput({ dateTime: DateTime.local() })}
+                className="bg-wet-concrete rounded p-2 mt-1 w-full"
               />
-
               {meta.touched && meta.error && (
                 <span className="text-torch-red text-xs">{meta.error}</span>
               )}
-              {clientEnsAddress && <EnsAddressMetadataText address={clientEnsAddress} />}
-              {/* user feedback on address type of input */}
-              {!meta.error && input.value && !!clientAddressType && (
-                <GnosisWalletTypeMetadataText addressType={clientAddressType} />
-              )}
-            </>
+            </div>
           )
         }}
       </Field>
@@ -933,7 +931,9 @@ export const ProposalNewForm = () => {
                     </span>
                   </div>
                   <div className="flex flex-col col-span-2">
-                    {proposalStep === ProposalStep.PROPOSE && <ProposeForm />}
+                    {proposalStep === ProposalStep.PROPOSE && (
+                      <ProposeForm selectedNetworkId={selectedNetworkId} />
+                    )}
                     {proposalStep === ProposalStep.REWARDS && (
                       <RewardForm
                         tokenOptions={tokenOptions}
