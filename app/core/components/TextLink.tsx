@@ -1,5 +1,4 @@
 export const TextLink = ({
-  className = "",
   url,
   children,
 }: {
@@ -8,8 +7,8 @@ export const TextLink = ({
   children?: any
 }) => {
   return (
-    <a className={className} href={url} target="_blank" rel="noopener noreferrer">
-      <span className="text-electric-violet">{children}</span>
+    <a href={url} target="_blank" rel="noopener noreferrer" className="text-electric-violet">
+      {children}
     </a>
   )
 }
