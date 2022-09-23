@@ -821,6 +821,17 @@ export const ProposalNewForm = () => {
               })
               return
             }
+
+            if (addressesAreEqual(resolvedContributorAddress, resolvedClientAddress)) {
+              setIsLoading(false)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Cannot use same address for Client and Contributor",
+              })
+              return
+            }
+
             // tokenAddress might just be null if they are not requesting funding
             // need to check tokenAddress exists, AND it is not found before erroring
             const token = values.tokenAddress
@@ -968,7 +979,12 @@ export const ProposalNewForm = () => {
                 </div>
                 {proposalStep === ProposalStep.PROPOSE && (
                   <Button
-                    isDisabled={!formState.values.title || !formState.values.body}
+                    isDisabled={
+                      !formState.values.client ||
+                      !formState.values.contributor ||
+                      !formState.values.title ||
+                      !formState.values.body
+                    }
                     className="mt-6 float-right"
                     onClick={() => {
                       setProposalStep(ProposalStep.REWARDS)

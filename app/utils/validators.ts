@@ -74,7 +74,7 @@ export const isAddressOrENS = (text: string) => {
   if (!text) return undefined
   console.log(text.slice(-4))
   if (text.slice(-4) === ".eth" || text.slice(-4) === ".xyz") return undefined
-  return ethersIsAddress(text) ? undefined : "Not a valid address or ENS name."
+  return ethersIsAddress(text) ? undefined : "Not a valid ENS name or address."
 }
 
 export const isValidEmail = (email: string) => {
