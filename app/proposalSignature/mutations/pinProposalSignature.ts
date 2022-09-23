@@ -9,10 +9,11 @@ const PinProposalSignature = z.object({
   signatureMessage: z.any(),
 })
 
+// pins a signature to ipfs using pinata and updates the signature's metadata to have the ipfs metadata
 export default async function pinProposalSignature(input: z.infer<typeof PinProposalSignature>) {
   const params = PinProposalSignature.parse(input)
 
-  // UPLOAD TO IPFS
+  // find proposal signature by passed-in signature id
   let proposalSignature
   try {
     proposalSignature = await db.proposalSignature.findUnique({
@@ -25,14 +26,17 @@ export default async function pinProposalSignature(input: z.infer<typeof PinProp
     throw Error(`Failed to find proposal Signature in "pinProposalSignature": ${err}`)
   }
 
+  // create the payload for ipfs
   // Pinata api here: https://docs.pinata.cloud/pinata-api/pinning/pin-json
   // see `pinJsonToIpfs` api for more details on api config structure
   const pinataProposalSignature = {
     pinataOptions: {
-      cidVersion: 1, // https://docs.ipfs.tech/concepts/content-addressing/#cid-versions
+      cidVersion: 1, // more info on cid version:  https://docs.ipfs.tech/concepts/content-addressing/#cid-versions
     },
+    // `pinataMetadata` is specific to pinata and not ipfs
+    // it contains optional field that helps index the file
     pinataMetadata: {
-      name: proposalSignature?.id, // optional field that helps tag the file
+      name: proposalSignature?.id,
       proposalId: proposalSignature?.proposal?.id,
     },
     pinataContent: {
@@ -52,7 +56,7 @@ export default async function pinProposalSignature(input: z.infer<typeof PinProp
   }
 
   try {
-    // add ipfs response to proposal
+    // add ipfs response to proposal signature metadata
     const updatedProposalSignature = await updateProposalSignatureMetadata({
       proposalSignatureId: params.proposalSignatureId,
       signature: params.signature,

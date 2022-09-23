@@ -5,7 +5,7 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
   return {
     domain: {
       name: "Station", // keep hardcoded
-      version: "1.0.0", // keep hardcoded
+      version: "1.0.0", // references the web app's version
     },
     types: {
       Role: [
@@ -39,6 +39,8 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
       timestamp: proposal.timestamp.valueOf(),
       title: proposal.data.content.title,
       body: proposal.data.content.body,
+      // Hardcoding our app name. Other frontend app's can change this type
+      // to reference where the data was generated down the road.
       app: "Station",
       roles: proposal.roles?.map((role) => {
         return { address: role.address, role: role.role }

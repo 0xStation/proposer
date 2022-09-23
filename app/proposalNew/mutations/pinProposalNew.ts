@@ -10,10 +10,11 @@ const PinProposalNew = z.object({
   signatureMessage: z.any(),
 })
 
+// pins a proposal to ipfs using pinata and updates the signature's metadata to have the ipfs metadata
 export default async function pinProposalNew(input: z.infer<typeof PinProposalNew>, ctx: Ctx) {
   const params = PinProposalNew.parse(input)
 
-  // UPLOAD TO IPFS
+  // fnd proposal given the passed-in proposal id
   let proposal
   try {
     proposal = await db.proposalNew.findUnique({
@@ -37,14 +38,17 @@ export default async function pinProposalNew(input: z.infer<typeof PinProposalNe
   proposalCopy.roles = JSON.parse(JSON.stringify(proposal.roles))
   proposalCopy.payments = Object.assign({}, proposal.payments)
 
-  // Pinata api here: https://docs.pinata.cloud/pinata-api/pinning/pin-json
+  // create the pinata payload:
+  // Pinata api specifications: https://docs.pinata.cloud/pinata-api/pinning/pin-json
   // see `pinJsonToIpfs` api for more details on api config structure
   const pinataProposal = {
     pinataOptions: {
-      cidVersion: 1, // https://docs.ipfs.tech/concepts/content-addressing/#cid-versions
+      cidVersion: 1, // more info on version: https://docs.ipfs.tech/concepts/content-addressing/#cid-versions
     },
+    // `pinataMetadata` is specific to pinata and not ipfs
+    // it contains optional field that helps index the file
     pinataMetadata: {
-      name: proposal?.id, // optional field that helps tag the file
+      name: proposal?.id,
     },
     pinataContent: {
       address: ctx.session.siwe?.address,
@@ -63,7 +67,7 @@ export default async function pinProposalNew(input: z.infer<typeof PinProposalNe
   }
 
   try {
-    // add ipfs response to proposal
+    // add ipfs response to proposal's metadata
     const updatedProposal = await updateProposalNewMetadata({
       proposalId: params.proposalId,
       contentTitle: proposal?.data?.content?.title,

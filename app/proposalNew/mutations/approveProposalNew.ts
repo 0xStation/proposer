@@ -64,12 +64,11 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
   }
 
   try {
-    const updateProposalSignature = await pinProposalSignature({
+    await pinProposalSignature({
       proposalSignatureId: proposalSignature?.id,
       signature: params?.signature,
       signatureMessage: params?.message,
     })
-    console.log("updateProposalSignature", updateProposalSignature)
   } catch (err) {
     throw Error(`Failed to pin proposal signature to ipfs in approveProposalNew: ${err}`)
   }

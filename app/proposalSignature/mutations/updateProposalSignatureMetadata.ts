@@ -13,8 +13,9 @@ const UpdateProposalSignatureMetadata = z.object({
   ipfsTimestamp: z.string().optional(),
 })
 
-// Only updates the metadata of a proposal
-// to update the roles, milestones, or payments of a proposal, use/make their specific mutations
+// Updates the json metadata of a signature
+// This function currently serves the purpose of adding
+// decentralized storage to the metadata.
 export default async function updateProposalSignatureMetadata(
   input: z.infer<typeof UpdateProposalSignatureMetadata>
 ) {
