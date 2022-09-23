@@ -817,6 +817,9 @@ export const ProposalNewForm = () => {
         <Stepper step={proposalStep} />
         <Form
           onSubmit={async (values: any, form) => {
+            // an author needs to sign the proposal to upload the content to ipfs.
+            // if they decline the signature, but submit again, we don't want to
+            // create the same proposal, rather we want to skip to the signature step.
             let proposal
             if (!createdProposal) {
               const resolvedContributorAddress = await handleResolveEnsAddress(
@@ -949,37 +952,37 @@ export const ProposalNewForm = () => {
               }
             }
 
-            if (createdProposal || proposal) {
-              try {
-                // TODO!!: if the signature + pinning proposal fails,
-                // the proposal already exists so we need to prevent submit again
+            // see comment at the top of the submit function
+            // this condition is here if the user needs to re-click the submit to generate a signature
+            // for the proposal and pin to ipfs, but they've already created a proposal.
+            try {
+              // prompt author to sign proposal to prove they are the author of the content
+              const message = genProposalNewDigest((createdProposal as ProposalNew) || proposal)
+              const signature = await signMessage(message)
 
-                // prompt author to sign proposal to prove they are the author of the content
-                const message = genProposalNewDigest((createdProposal as ProposalNew) || proposal)
-                const signature = await signMessage(message)
-
-                if (signature) {
-                  const updatedProposal = await pinProposalMutation({
-                    proposalId: (createdProposal?.id || proposal?.id) as string,
-                    signature: signature as string,
-                    signatureMessage: message,
-                  })
-
-                  if (updatedProposal) {
-                    setIsLoading(false)
-                    setProposalStep(ProposalStep.APPROVE)
-                  }
-                }
-              } catch (err) {
-                console.log("err", err)
-                setIsLoading(false)
-                setToastState({
-                  isToastShowing: true,
-                  type: "error",
-                  message: err.message,
+              if (signature) {
+                const updatedProposal = await pinProposalMutation({
+                  proposalId: (createdProposal?.id || proposal?.id) as string,
+                  signature: signature as string,
+                  signatureMessage: message,
                 })
-                return
+
+                if (updatedProposal) {
+                  setIsLoading(false)
+                  setProposalStep(ProposalStep.APPROVE)
+                }
+              } else {
+                throw Error("Unsuccessful signature.")
               }
+            } catch (err) {
+              setIsLoading(false)
+              console.error(err)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: err.message,
+              })
+              return
             }
           }}
           render={({ form, handleSubmit }) => {
@@ -1041,7 +1044,16 @@ export const ProposalNewForm = () => {
                     </>
                   ) : (
                     <div className="flex flex-col justify-center items-center mt-48">
-                      <p className="text-concrete tracking-wide">Creating proposal...</p>
+                      <p className="text-concrete tracking-wide">
+                        {createdProposal
+                          ? "Sign to prove your authorship."
+                          : "Creating proposal..."}
+                      </p>
+                      {createdProposal && (
+                        <p className="text-concrete tracking-wide">
+                          Check your wallet for your next action.
+                        </p>
+                      )}
                       <div className="h-4 w-4 mt-6">
                         <Spinner fill="white" />
                       </div>
