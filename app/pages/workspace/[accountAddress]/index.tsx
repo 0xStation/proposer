@@ -13,9 +13,15 @@ import {
   PROPOSAL_NEW_STATUS_FILTER_OPTIONS,
   PROPOSAL_ROLE_FILTER_OPTIONS,
   PROPOSAL_NEW_STATUS_DISPLAY_MAP,
+  Sizes,
 } from "app/core/utils/constants"
 import { ProposalStatus } from "app/proposal/types"
-import { AddressType, ProposalRoleType } from "@prisma/client"
+import {
+  AddressType,
+  ProposalNewStatus,
+  ProposalRoleApprovalStatus,
+  ProposalRoleType,
+} from "@prisma/client"
 import { LightBulbIcon, CogIcon } from "@heroicons/react/solid"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 import WorkspaceSettingsOverviewForm from "app/account/components/WorkspaceSettingsOverviewForm"
@@ -23,6 +29,11 @@ import useStore from "app/core/hooks/useStore"
 import ProposalStatusPill from "app/core/components/ProposalStatusPill"
 import { useAccount } from "wagmi"
 import getSafeMetadata from "app/account/queries/getSafeMetadata"
+import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
+import { ProposalRole } from "app/proposalRole/types"
+import Avatar from "app/core/components/sds/images/avatar"
+import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
+import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 
 enum Tab {
   PROPOSALS = "PROPOSALS",
@@ -143,10 +154,20 @@ const WorkspaceHome: BlitzPage = () => {
           {/* TABLE HEADERS */}
           <thead>
             <tr className="border-b border-concrete">
-              <th className="pl-4 text-xs uppercase text-light-concrete pb-2 text-left">Title</th>
-              <th className="text-xs uppercase text-light-concrete pb-2 text-left">Status</th>
-              <th className="text-xs uppercase text-light-concrete pb-2 text-left">Payment</th>
-              <th className="text-xs uppercase text-light-concrete pb-2 text-left">Submitted at</th>
+              <th className="pl-4 w-96 text-xs font-thin uppercase text-light-concrete pb-2 text-left">
+                Title
+              </th>
+              <th className="w-64 text-xs font-thin uppercase text-light-concrete pb-2 text-left">
+                Proposal status
+              </th>
+              <th className="w-40 text-xs font-thin uppercase text-light-concrete pb-2 text-left">
+                Payment
+              </th>
+              <th className="text-xs font-thin uppercase text-light-concrete pb-2 text-left">
+                Last updated
+              </th>
+              {/* title-less header for role pfps */}
+              <th />
             </tr>
           </thead>
           {/* TABLE BODY */}
@@ -154,24 +175,71 @@ const WorkspaceHome: BlitzPage = () => {
             {proposals &&
               proposals.length > 0 &&
               proposals.map((proposal, idx) => {
+                const uniqueRoleAccounts = (proposal?.roles as ProposalRole[])
+                  ?.map((role) => role?.account!)
+                  ?.filter((account, idx, accounts) => {
+                    return accounts?.findIndex((acc) => acc?.address === account?.address) === idx
+                  })
                 return (
                   <Link
                     href={Routes.ViewProposalNew({ proposalId: proposal.id })}
                     key={`table-row-${idx}`}
                   >
                     <tr className="border-b border-concrete cursor-pointer hover:bg-wet-concrete">
-                      <td className="pl-4 text-base py-4 font-bold w-128">
-                        {proposal.data.content.title}
+                      {/* TITLE */}
+                      <td className="pl-4 text-base py-4 font-bold">
+                        {proposal.data.content.title.length > 44
+                          ? proposal.data.content.title.substr(0, 44) + "..."
+                          : proposal.data.content.title}
                       </td>
+                      {/* PROPOSAL STATUS */}
                       <td className="py-4">
-                        <ProposalStatusPill status={proposal?.status} />
+                        <div className="flex flex-row space-x-2">
+                          <ProposalStatusPill status={proposal?.status} />
+                          {proposal?.status === ProposalNewStatus.AWAITING_APPROVAL && (
+                            <ProgressCircleAndNumber
+                              numerator={
+                                proposal?.roles.filter(
+                                  (role) =>
+                                    role.approvalStatus === ProposalRoleApprovalStatus.COMPLETE
+                                ).length
+                              }
+                              denominator={3}
+                            />
+                          )}
+                        </div>
                       </td>
-                      <td className="text-base py-4 w-48">
+                      {/* PAYMENT */}
+                      <td className="text-base py-4">
                         {proposal.data.totalPayments.length > 0
-                          ? `${proposal.data.totalPayments[0]?.amount} ${proposal.data.totalPayments[0]?.token.symbol}`
+                          ? `${formatCurrencyAmount(
+                              proposal.data.totalPayments[0]?.amount.toString()
+                            )} ${proposal.data.totalPayments[0]?.token.symbol}`
                           : "None"}
                       </td>
+                      {/* LAST UPDATED */}
                       <td className="text-base py-4">{formatDate(proposal.timestamp)}</td>
+                      {/* COLLABORATORS */}
+                      <td className="pr-12">
+                        {/* can someone help me left-adjust the bubbles pls? */}
+                        <div className="flex flex-row-reverse">
+                          {uniqueRoleAccounts?.length > 0
+                            ? uniqueRoleAccounts.map(({ address, data: { pfpURL } }, idx) => {
+                                const pfpStyling = "h-10 w-10"
+                                const nestedStyling = idx ? "mr-[-20px]" : ""
+
+                                return (
+                                  <div
+                                    className={`bg-contain bg-clip-padding ${pfpStyling} ${nestedStyling}`}
+                                    key={address}
+                                  >
+                                    <Avatar size={Sizes.BASE} pfpURL={pfpURL} address={address} />
+                                  </div>
+                                )
+                              })
+                            : ""}
+                        </div>
+                      </td>
                     </tr>
                   </Link>
                 )

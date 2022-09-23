@@ -47,6 +47,13 @@ export default async function getProposalNewsByAddress(
       orderBy: {
         timestamp: "desc",
       },
+      include: {
+        roles: {
+          include: {
+            account: true,
+          },
+        },
+      },
     }),
   ])) as unknown as [number, ProposalNew[]]
 
