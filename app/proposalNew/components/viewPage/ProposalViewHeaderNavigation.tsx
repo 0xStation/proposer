@@ -190,9 +190,11 @@ export const ProposalViewHeaderNavigation = () => {
             <Tab router={router} route={Routes.ViewProposalNew({ proposalId })}>
               Proposal
             </Tab>
-            <Tab router={router} route={Routes.ProposalPayments({ proposalId })}>
-              Payments
-            </Tab>
+            {(proposal?.payments || []).length > 0 && (
+              <Tab router={router} route={Routes.ProposalPayments({ proposalId })}>
+                Payments
+              </Tab>
+            )}
           </ul>
         </div>
       </div>

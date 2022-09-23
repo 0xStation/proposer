@@ -15,9 +15,7 @@ const CreateSafe = z.object({
 export default async function createSafe(input: z.infer<typeof CreateSafe>, ctx: Ctx) {
   const params = CreateSafe.parse(input)
 
-  const addressType = AddressType.SAFE
   const multisigChainId = params.chainId
-  const name = truncateString(params.address)
   const network = networks[params.chainId]?.gnosisNetwork
 
   const url = `https://safe-transaction.${network}.gnosis.io/api/v1/safes/${toChecksumAddress(
@@ -35,12 +33,14 @@ export default async function createSafe(input: z.infer<typeof CreateSafe>, ctx:
   const { owners } = await response.json()
 
   // create or connect each owner
-  const account = await db.account.create({
-    data: {
+  // upsert to prevent throwing if safe already exists
+  const account = await db.account.upsert({
+    where: { address: params.address },
+    update: {},
+    create: {
       address: params.address,
-      addressType,
+      addressType: AddressType.SAFE,
       data: {
-        name: name,
         chainId: multisigChainId,
       },
       targetsOf: {

@@ -28,7 +28,9 @@ const ViewProposalNew: BlitzPage = () => {
             endDate={proposal?.endDate as Date}
           />
         )}
-        <TotalPaymentView proposal={proposal!} className="mt-9" />
+        {(proposal?.data.totalPayments || []).length > 0 && (
+          <TotalPaymentView proposal={proposal!} className="mt-9" />
+        )}
         <RoleSignaturesView proposal={proposal as ProposalNew | undefined} className="mt-9" />
         <IpfsHashView proposal={proposal || undefined} />
       </div>

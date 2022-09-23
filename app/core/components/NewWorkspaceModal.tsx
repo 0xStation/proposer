@@ -35,11 +35,11 @@ export const NewWorkspaceModal = ({
       router.push(Routes.WorkspaceHome({ accountAddress: safeAddress }))
     },
     onError: (_error) => {
-      // most likely the error?
+      // mutation is upsert and shouldn't throw, not sure why an error would happen
       setToastState({
         isToastShowing: true,
         type: "error",
-        message: "Workspace already exists for this address.",
+        message: "Error occurred, please try again.",
       })
     },
   })
