@@ -1,9 +1,35 @@
-import { Head, BlitzLayout } from "blitz"
+import { Head, BlitzLayout, invoke, useSession } from "blitz"
+import { useEffect } from "react"
+import { useAccount, useDisconnect } from "wagmi"
 import Navigation from "../components/Navigation"
 import ModalContainer from "../components/ModalContainer"
 import ToastContainer from "../components/ToastContainer"
+import useStore from "../hooks/useStore"
+import logout from "app/session/mutations/logout"
 
 const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
+  const session = useSession({ suspense: false })
+  const setActiveUser = useStore((state) => state.setActiveUser)
+  const { address: connectedAddress } = useAccount()
+  const { disconnect } = useDisconnect()
+
+  useEffect(() => {
+    // log user out / disconnect them if they
+    // programatically disconnect from their wallet extension
+    // or if they switch accounts within their own wallet.
+    const handleDisconnect = async () => {
+      if (
+        (session?.siwe?.address && !connectedAddress) ||
+        (session?.siwe?.address && session?.siwe?.address !== connectedAddress)
+      ) {
+        setActiveUser(null)
+        await invoke(logout, {})
+        disconnect()
+      }
+    }
+    handleDisconnect()
+  }, [connectedAddress])
+
   return (
     <>
       <Head>
