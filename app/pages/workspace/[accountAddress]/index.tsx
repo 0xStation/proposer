@@ -227,7 +227,7 @@ const WorkspaceHome: BlitzPage = () => {
           <div className="pb-6 border-b border-concrete space-y-6">
             {/* PROFILE */}
             {account ? (
-              <AccountMediaObject account={account} />
+              <AccountMediaObject account={account} showActionIcons={true} />
             ) : (
               // LOADING STATE
               <div
