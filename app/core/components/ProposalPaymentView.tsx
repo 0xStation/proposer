@@ -12,6 +12,7 @@ import { ProposalRoleType } from "@prisma/client"
 import { addressesAreEqual } from "../utils/addressesAreEqual"
 import useStore from "../hooks/useStore"
 import { ProposalNew } from "app/proposalNew/types"
+import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 
 export const ProposalPaymentView = ({
   proposal,
@@ -78,7 +79,9 @@ export const ProposalPaymentView = ({
             <span className="basis-28 ml-6 mb-2 tracking-wider">
               {payments?.data?.token?.symbol}
             </span>
-            <span className="basis-28 ml-6 mb-2 tracking-wider">{payments?.amount}</span>
+            <span className="basis-28 ml-6 mb-2 tracking-wider">
+              {formatCurrencyAmount(payments?.amount?.toString())}
+            </span>
           </div>
         ))}
         {userIsPayer &&
