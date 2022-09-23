@@ -3,7 +3,7 @@ import { CheckCircleIcon } from "@heroicons/react/solid"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
-import { ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
+import { ProposalNewStatus, ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
 import { ProposalRole } from "app/proposalRole/types"
 import useStore from "app/core/hooks/useStore"
 import { ProposalStatusPill } from "../../../core/components/ProposalStatusPill"
@@ -16,6 +16,8 @@ import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNew
 import useGetUsersRemainingRolesToSignFor from "app/core/hooks/useGetUsersRemainingRolesToSignFor"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { LINKS } from "app/core/utils/constants"
+import { useState } from "react"
+import PublishProposalNewModal from "../PublishProposalNewModal"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.role === proposalType)
@@ -36,6 +38,7 @@ export const ProposalViewHeaderNavigation = () => {
   const proposalId = useParam("proposalId") as string
   const proposalApprovalModalOpen = useStore((state) => state.proposalApprovalModalOpen)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
+  const [isPublishModalOpen, setPublishModalOpen] = useState<boolean>(false)
   const router = useRouter()
   const [proposal] = useQuery(
     getProposalNewById,
@@ -82,6 +85,11 @@ export const ProposalViewHeaderNavigation = () => {
 
   return (
     <>
+      <PublishProposalNewModal
+        isOpen={isPublishModalOpen}
+        setIsOpen={setPublishModalOpen}
+        proposal={proposal}
+      />
       {proposal && (
         <ApproveProposalNewModal
           isOpen={proposalApprovalModalOpen}
@@ -160,13 +168,23 @@ export const ProposalViewHeaderNavigation = () => {
           {activeUserHasProposalRole && !loading ? (
             !activeUserHasRolesToSign ? (
               <>
-                <Button
-                  overrideWidthClassName="w-[300px]"
-                  className="mr-3"
-                  onClick={() => toggleProposalApprovalModalOpen(true)}
-                >
-                  Sign
-                </Button>
+                {proposal?.status !== ProposalNewStatus?.DRAFT ? (
+                  <Button
+                    overrideWidthClassName="w-[300px]"
+                    className="mr-3"
+                    onClick={() => toggleProposalApprovalModalOpen(true)}
+                  >
+                    Sign
+                  </Button>
+                ) : (
+                  <Button
+                    overrideWidthClassName="w-[300px]"
+                    className="mr-3"
+                    onClick={() => setPublishModalOpen(true)}
+                  >
+                    Publish
+                  </Button>
+                )}
                 <Button
                   overrideWidthClassName="w-[300px]"
                   className="mr-2"
