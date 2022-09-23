@@ -70,10 +70,13 @@ export const isAddress = (address: string) => {
   return ethersIsAddress(address) ? undefined : "Not a valid address."
 }
 
-export const isAddressOrENS = (text: string) => {
+export const isEnsOrAddress = (text: string) => {
   if (!text) return undefined
-  console.log(text.slice(-4))
-  if (text.slice(-4) === ".eth" || text.slice(-4) === ".xyz") return undefined
+  if (text.includes(".")) {
+    const validEnsDomains = ["eth", "xyz"]
+    const domain = text.split(".").slice(-1)[0] // grab last substring after period
+    if (domain && validEnsDomains.includes(domain)) return undefined
+  }
   return ethersIsAddress(text) ? undefined : "Not a valid ENS name or address."
 }
 

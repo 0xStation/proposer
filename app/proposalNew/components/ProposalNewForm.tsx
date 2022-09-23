@@ -15,7 +15,7 @@ import {
   requiredField,
   isValidTokenAmount,
   isPositiveAmount,
-  isAddressOrENS,
+  isEnsOrAddress,
 } from "app/utils/validators"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import truncateString from "app/core/utils/truncateString"
@@ -186,7 +186,7 @@ const ProposeForm = ({ selectedNetworkId }) => {
         Who will be responsible for reviewing and deploying the funds outlined in this proposal? See
         the list of community addresses <TextLink url={LINKS.STATION_WORKSPACES}>here</TextLink>.
       </span>
-      <Field name="client" validate={composeValidators(requiredField, isAddressOrENS)}>
+      <Field name="client" validate={composeValidators(requiredField, isEnsOrAddress)}>
         {({ meta, input }) => {
           return (
             <>
@@ -200,13 +200,14 @@ const ProposeForm = ({ selectedNetworkId }) => {
                   (e) => handleEnsAddressInputValOnKeyUp(e.target.value, setClientAddressInputVal),
                   200
                 )}
-                onBlur={(e) =>
+                onBlur={(e) => {
                   handleAddressInputValOnBlur(
                     e.target.value,
                     setClientAddressType,
                     clientEnsAddress
                   )
-                }
+                  input.onBlur(e)
+                }}
               />
 
               {meta.touched && meta.error && (
@@ -227,7 +228,7 @@ const ProposeForm = ({ selectedNetworkId }) => {
         Who will be responsible for delivering the work outlined in this proposal?
         <p>Paste your address if this is you.</p>
       </span>
-      <Field name="contributor" validate={composeValidators(requiredField, isAddressOrENS)}>
+      <Field name="contributor" validate={composeValidators(requiredField, isEnsOrAddress)}>
         {({ meta, input }) => {
           return (
             <>
@@ -235,6 +236,8 @@ const ProposeForm = ({ selectedNetworkId }) => {
                 {...input}
                 type="text"
                 required
+                placeholder="Enter ENS name or wallet address"
+                className="bg-wet-concrete rounded mt-1 w-full p-2"
                 onKeyUp={debounce(
                   (e) =>
                     handleEnsAddressInputValOnKeyUp(e.target.value, setContributorAddressInputVal),
@@ -248,8 +251,6 @@ const ProposeForm = ({ selectedNetworkId }) => {
                   )
                   input.onBlur(e)
                 }}
-                placeholder="Enter ENS name or wallet address"
-                className="bg-wet-concrete rounded mt-1 w-full p-2"
               />
 
               {meta.touched && meta.error && (
@@ -827,7 +828,7 @@ export const ProposalNewForm = () => {
               setToastState({
                 isToastShowing: true,
                 type: "error",
-                message: "Cannot use same address for Client and Contributor",
+                message: "Cannot use same address for Client and Contributor.",
               })
               return
             }
