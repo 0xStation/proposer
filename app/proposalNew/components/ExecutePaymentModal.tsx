@@ -21,6 +21,7 @@ enum Tab {
 }
 import updateProposalStatus from "app/proposalNew/mutations/updateProposalStatus"
 import { ProposalNewStatus } from "@prisma/client"
+import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 
 export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
   const setToastState = useStore((state) => state.setToastState)
@@ -184,7 +185,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
             </tr>
             <tr className="h-12">
               <td className="text-concrete">Amount</td>
-              <td>{payment?.amount}</td>
+              <td>{formatCurrencyAmount(payment?.amount.toString())}</td>
             </tr>
           </tbody>
         </table>
