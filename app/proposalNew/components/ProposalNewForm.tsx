@@ -818,7 +818,7 @@ export const ProposalNewForm = () => {
               setToastState({
                 isToastShowing: true,
                 type: "error",
-                message: "Invalid address or ENS name for contributor",
+                message: "Invalid address or ENS name for Contributor",
               })
               return
             }
@@ -828,7 +828,7 @@ export const ProposalNewForm = () => {
               setToastState({
                 isToastShowing: true,
                 type: "error",
-                message: "Invalid address or ENS name for reviewer",
+                message: "Invalid address or ENS name for Client",
               })
               return
             }
