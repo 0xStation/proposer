@@ -95,10 +95,6 @@ const WorkspaceSettingsOverviewForm = ({
       // refetch activeUser's account to get updated pfps on pinned workspaces
       const account = await invoke(getAccountByAddress, { address: activeUser?.address })
       setActiveUser(account)
-      // if updating a multisig account, active user should stay as current
-      if (activeUser?.address === data?.address) {
-        setActiveUser(data)
-      }
     },
     onError: (error) => {
       setIsLoading(false)
@@ -150,7 +146,7 @@ const WorkspaceSettingsOverviewForm = ({
         <form onSubmit={handleSubmit}>
           <div className="max-w-lg mr-5 sm:mr-0">
             {/* NAME */}
-            <label className="font-bold block">Name*</label>
+            <label className="font-bold block">Name</label>
             <p className="text-concrete text-sm">50 character max.</p>
             <Field
               component="input"
