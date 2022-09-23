@@ -154,16 +154,16 @@ const WorkspaceHome: BlitzPage = () => {
           {/* TABLE HEADERS */}
           <thead>
             <tr className="border-b border-concrete">
-              <th className="pl-4 w-96 text-xs font-thin uppercase text-light-concrete pb-2 text-left">
+              <th className="pl-4 w-96 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
                 Title
               </th>
-              <th className="w-64 text-xs font-thin uppercase text-light-concrete pb-2 text-left">
+              <th className="w-64 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
                 Proposal status
               </th>
-              <th className="w-40 text-xs font-thin uppercase text-light-concrete pb-2 text-left">
+              <th className="w-40 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
                 Payment
               </th>
-              <th className="text-xs font-thin uppercase text-light-concrete pb-2 text-left">
+              <th className="text-xs tracking-wide uppercase text-concrete pb-2 text-left">
                 Last updated
               </th>
               {/* title-less header for role pfps */}
@@ -221,23 +221,12 @@ const WorkspaceHome: BlitzPage = () => {
                       <td className="text-base py-4">{formatDate(proposal.timestamp)}</td>
                       {/* COLLABORATORS */}
                       <td className="pr-12">
-                        {/* can someone help me left-adjust the bubbles pls? */}
-                        <div className="flex flex-row-reverse">
-                          {uniqueRoleAccounts?.length > 0
-                            ? uniqueRoleAccounts.map(({ address, data: { pfpURL } }, idx) => {
-                                const pfpStyling = "h-10 w-10"
-                                const nestedStyling = idx ? "mr-[-20px]" : ""
-
-                                return (
-                                  <div
-                                    className={`bg-contain bg-clip-padding ${pfpStyling} ${nestedStyling}`}
-                                    key={address}
-                                  >
-                                    <Avatar size={Sizes.BASE} pfpURL={pfpURL} address={address} />
-                                  </div>
-                                )
-                              })
-                            : ""}
+                        <div className="flex">
+                          {uniqueRoleAccounts?.length > 0 ? (
+                            <CollaboratorPfps accounts={uniqueRoleAccounts} size={Sizes.BASE} />
+                          ) : (
+                            ""
+                          )}
                         </div>
                       </td>
                     </tr>
