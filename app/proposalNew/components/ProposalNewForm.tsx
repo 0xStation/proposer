@@ -86,13 +86,13 @@ const GnosisWalletTypeMetadataText = ({ addressType }) => {
 const Stepper = ({ step }) => {
   return (
     <div className="w-full h-2 bg-neon-carrot relative">
-      <div className="absolute left-[20px] top-[-8px]">
-        <span className="h-6 w-6 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
+      <div className="absolute left-[20px] top-[-4px]">
+        <span className="h-4 w-4 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
           <span
-            className={`h-3 bg-neon-carrot block absolute ${
+            className={`h-2 bg-neon-carrot block absolute ${
               step === ProposalStep.PROPOSE
-                ? "w-1.5 rounded-l-full top-[4px] left-[3.5px]"
-                : "w-3 rounded-full top-[4px] left-[4px]"
+                ? "w-1 rounded-l-full top-[1.75px] left-[2px]"
+                : "w-2 rounded-full top-[1.75px] left-[2px]"
             }`}
           ></span>
         </span>
@@ -100,14 +100,14 @@ const Stepper = ({ step }) => {
           Propose
         </p>
       </div>
-      <div className="absolute left-[220px] top-[-8px]">
-        <span className="h-6 w-6 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
+      <div className="absolute left-[220px] top-[-4px]">
+        <span className="h-4 w-4 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
           {step !== ProposalStep.PROPOSE && (
             <span
-              className={`h-3 bg-neon-carrot block absolute ${
+              className={`h-2 bg-neon-carrot block absolute ${
                 step === ProposalStep.REWARDS
-                  ? "w-1.5 rounded-l-full top-[4px] left-[3.5px]"
-                  : "w-3 rounded-full top-[4px] left-[4px]"
+                  ? "w-1 rounded-l-full top-[1.75px] left-[2px]"
+                  : "w-2 rounded-full top-[1.75px] left-[2px]"
               }`}
             ></span>
           )}
@@ -116,10 +116,10 @@ const Stepper = ({ step }) => {
           Define terms
         </p>
       </div>
-      <div className="absolute left-[420px] top-[-8px]">
-        <span className="h-6 w-6 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
+      <div className="absolute left-[420px] top-[-4px]">
+        <span className="h-4 w-4 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
           {step === ProposalStep.SIGN && (
-            <span className="h-3 w-1.5 bg-neon-carrot block absolute rounded-l-full top-[4px] left-[3.5px]"></span>
+            <span className="h-2 w-1 bg-neon-carrot block absolute rounded-l-full top-[1.75px] left-[2px]"></span>
           )}
         </span>
         <p className={`font-bold mt-2 ${step !== ProposalStep.SIGN && "text-concrete"}`}>Sign</p>
@@ -315,24 +315,17 @@ const RewardForm = ({
   selectedToken,
   setSelectedToken,
   tokenOptions,
-  formState,
   setShouldRefetchTokens,
   needFunding,
   setNeedFunding,
+  setIsConnectWalletModalOpen,
+  isImportTokenModalOpen,
+  setIsImportTokenModalOpen,
 }) => {
   const session = useSession({ suspense: false })
-  const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
-  const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState<boolean>(false)
 
   return (
     <>
-      <ConnectWalletModal
-        isWalletOpen={isConnectWalletModalOpen}
-        setIsWalletOpen={setIsConnectWalletModalOpen}
-        callback={() => {
-          setIsImportTokenModalOpen(true)
-        }}
-      />
       <ImportTokenModal
         isOpen={isImportTokenModalOpen}
         setIsOpen={setIsImportTokenModalOpen}
@@ -427,7 +420,6 @@ const RewardForm = ({
             <div className="custom-select-wrapper">
               <select
                 {...input}
-                required={Boolean(formState.values.paymentAmount || formState.values.tokenAddress)}
                 className="w-full bg-wet-concrete rounded p-2 mt-1"
                 value={selectedNetworkId as number}
                 onChange={(e) => {
@@ -714,7 +706,6 @@ const SignForm = ({ activeUser, proposal, signatures }) => {
 
 export const ProposalNewForm = () => {
   const router = useRouter()
-  const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const session = useSession({ suspense: false })
@@ -726,6 +717,10 @@ export const ProposalNewForm = () => {
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
   const [proposal, setProposal] = useState<any>()
   const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
+  const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
+  const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState<boolean>(false)
+  const [shouldHandleSubmit, setShouldHandleSubmit] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   // default to mainnet since we're using it to check ENS
   // which pretty much only exists on mainnet as of right now
   const provider = useProvider({ chainId: 1 })
@@ -819,6 +814,7 @@ export const ProposalNewForm = () => {
             )
 
             if (!resolvedContributorAddress) {
+              setIsLoading(false)
               setToastState({
                 isToastShowing: true,
                 type: "error",
@@ -829,6 +825,7 @@ export const ProposalNewForm = () => {
             const resolvedClientAddress = await handleResolveEnsAddress(values.client?.trim())
 
             if (!resolvedClientAddress) {
+              setIsLoading(false)
               setToastState({
                 isToastShowing: true,
                 type: "error",
@@ -843,6 +840,7 @@ export const ProposalNewForm = () => {
               : null
 
             if (values.tokenAddress && !token) {
+              setIsLoading(false)
               throw Error("token not found")
             }
 
@@ -885,6 +883,7 @@ export const ProposalNewForm = () => {
                   },
                 ]
               } else {
+                setIsLoading(false)
                 console.error("Missing complete payment information")
                 setToastState({
                   isToastShowing: true,
@@ -900,7 +899,7 @@ export const ProposalNewForm = () => {
                 contentBody: values.body,
                 contributorAddresses: [resolvedContributorAddress],
                 clientAddresses: [resolvedClientAddress],
-                authorAddresses: [activeUser!.address!],
+                authorAddresses: [activeUser?.address as string],
                 milestones,
                 payments,
                 paymentTerms: values.paymentTerms,
@@ -925,7 +924,10 @@ export const ProposalNewForm = () => {
                 signature: signature as string,
                 signatureMessage: message,
               })
+              setIsLoading(false)
             } catch (err) {
+              setIsLoading(false)
+              console.error("ahhhhhh")
               setToastState({
                 isToastShowing: true,
                 type: "error",
@@ -938,6 +940,20 @@ export const ProposalNewForm = () => {
             const formState = form.getState()
             return (
               <form onSubmit={handleSubmit} className="mt-20">
+                <ConnectWalletModal
+                  isWalletOpen={isConnectWalletModalOpen}
+                  setIsWalletOpen={setIsConnectWalletModalOpen}
+                  callback={() => {
+                    if (shouldHandleSubmit) {
+                      // add set timeout to allow activeUser to be set
+                      setTimeout(() => {
+                        handleSubmit()
+                      }, 500)
+                    } else {
+                      setIsImportTokenModalOpen(true)
+                    }
+                  }}
+                />
                 <div className="rounded-2xl border border-concrete p-6 h-[560px] overflow-y-scroll">
                   <div className="mt-2 flex flex-row justify-between items-center">
                     <h2 className="text-marble-white text-xl font-bold">
@@ -958,10 +974,12 @@ export const ProposalNewForm = () => {
                         setSelectedNetworkId={setSelectedNetworkId}
                         selectedToken={selectedToken}
                         setSelectedToken={setSelectedToken}
-                        formState={formState}
                         setShouldRefetchTokens={setShouldRefetchTokens}
                         needFunding={needFunding}
                         setNeedFunding={setNeedFunding}
+                        setIsConnectWalletModalOpen={setIsConnectWalletModalOpen}
+                        isImportTokenModalOpen={isImportTokenModalOpen}
+                        setIsImportTokenModalOpen={setIsImportTokenModalOpen}
                       />
                     )}
                     {proposalStep === ProposalStep.SIGN && (
@@ -992,11 +1010,22 @@ export const ProposalNewForm = () => {
                     >
                       <BackArrow className="fill-marble-white" />
                     </span>
-                    {activeUser ? (
-                      <Button isSubmitType={true}>Save & continue</Button>
-                    ) : (
-                      <Button onClick={() => toggleWalletModal(true)}>Connect</Button>
-                    )}
+                    <Button
+                      isDisabled={isLoading}
+                      isLoading={isLoading}
+                      onClick={(e) => {
+                        setIsLoading(true)
+                        e.preventDefault()
+                        if (session.siwe?.address) {
+                          handleSubmit()
+                        } else {
+                          setShouldHandleSubmit(true)
+                          setIsConnectWalletModalOpen(true)
+                        }
+                      }}
+                    >
+                      Create & continue
+                    </Button>
                   </div>
                 )}
                 {proposalStep === ProposalStep.SIGN && (
