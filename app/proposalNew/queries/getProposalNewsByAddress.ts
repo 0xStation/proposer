@@ -1,7 +1,8 @@
-import db from "db"
+import db, { ProposalNewStatus, ProposalRoleType } from "db"
 import * as z from "zod"
 import { ProposalNew } from "app/proposalNew/types"
 import { PAGINATION_TAKE } from "app/core/utils/constants"
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
 const GetProposalNewsByAddress = z.object({
   address: z.string(),
@@ -62,6 +63,12 @@ export default async function getProposalNewsByAddress(
 
   return {
     count,
-    proposals,
+    proposals: proposals.filter((proposal) => {
+      if (proposal?.status === ProposalNewStatus.DRAFT) {
+        const authorRole = proposal?.roles?.find((role) => role.role === ProposalRoleType.AUTHOR)
+        return addressesAreEqual(data.address, authorRole?.address as string)
+      }
+      return true
+    }),
   }
 }
