@@ -1,21 +1,47 @@
-import { useMutation, useRouter, invalidateQuery } from "blitz"
+import { useMutation, useRouter, invalidateQuery, useQuery } from "blitz"
 import { useState } from "react"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
 import approveProposalNew from "app/proposalNew/mutations/approveProposalNew"
-import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { genProposalNewDigest } from "app/signatures/proposalNew"
 import getProposalNewById from "../queries/getProposalNewById"
-import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
+import { ProposalNew } from "app/proposalNew/types"
+import useGetUsersRemainingRolesToSignFor from "app/core/hooks/useGetUsersRemainingRolesToSignFor"
+import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 
-export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
+export const ApproveProposalNewModal = ({
+  isOpen,
+  setIsOpen,
+  proposal,
+}: {
+  isOpen: boolean
+  setIsOpen: (isOpen: boolean) => void
+  proposal: ProposalNew
+  additionalRoles?: { roleId: string; complete: boolean }[]
+}) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const [approveProposalMutation] = useMutation(approveProposalNew)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const [signatures] = useQuery(
+    getProposalNewSignaturesById,
+    { proposalId: proposal.id },
+    {
+      suspense: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      enabled: !!proposal.id,
+    }
+  )
+
+  const [remainingRoles, _error, getRolesIsLoading] = useGetUsersRemainingRolesToSignFor(
+    proposal,
+    signatures
+  )
 
   const { signMessage } = useSignature()
 
@@ -38,16 +64,20 @@ export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
       return
     }
 
+    const representingRoles = remainingRoles.map((role) => {
+      return {
+        roleId: role.roleId,
+        complete: role.oneSignerNeededToComplete,
+      }
+    })
+
     try {
       await approveProposalMutation({
         proposalId: proposal?.id,
         signerAddress: activeUser!.address!,
         message,
         signature,
-        representingRoles:
-          proposal?.roles
-            ?.filter((role) => addressesAreEqual(role.address, activeUser?.address!))
-            ?.map((role) => role.id) || [],
+        representingRoles,
       })
       invalidateQuery(getProposalNewSignaturesById)
       // invalidate proposal query to get ipfs hash post-approval
@@ -90,7 +120,7 @@ export const ApproveProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
           <Button
             isSubmitType={true}
             isLoading={isLoading}
-            isDisabled={isLoading}
+            isDisabled={isLoading || getRolesIsLoading}
             onClick={() => {
               setIsLoading(true)
               initiateSignature()

@@ -9,7 +9,12 @@ const ApproveProposalNew = z.object({
   signerAddress: z.string(),
   message: z.any(),
   signature: z.string(),
-  representingRoles: z.string().array(), // array of role ids
+  representingRoles: z
+    .object({
+      roleId: z.string(),
+      complete: z.boolean(),
+    })
+    .array(), // array of type role
 })
 
 export default async function approveProposalNew(input: z.infer<typeof ApproveProposalNew>) {
@@ -38,25 +43,32 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
             },
           },
           roles: {
-            connect: params.representingRoles.map((roleId) => {
+            connect: params.representingRoles.map((role) => {
               return {
-                id: roleId,
+                id: role.roleId,
               }
             }),
           },
         },
       }),
       // update role with complete status
-      ...params.representingRoles.map((roleId) => {
-        return db.proposalRole.update({
-          where: {
-            id: roleId,
-          },
-          data: {
-            approvalStatus: ProposalRoleApprovalStatus.COMPLETE,
-          },
+      // if signature is a multisig, we don't want to mark as complete unless it has met quorum
+      // so we filter for roles that are 'complete'.
+      // complete is a type passed from the front-end indiciating that it is ready to be pushed to status complete
+      ...params.representingRoles
+        .filter((role) => {
+          return role.complete
         })
-      }),
+        .map((role) => {
+          return db.proposalRole.update({
+            where: {
+              id: role.roleId,
+            },
+            data: {
+              approvalStatus: ProposalRoleApprovalStatus.COMPLETE,
+            },
+          })
+        }),
     ])
   } catch (err) {
     throw Error(`Failed to create signature in approveProposalNew: ${err}`)
