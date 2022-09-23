@@ -960,19 +960,18 @@ export const ProposalNewForm = () => {
               const message = genProposalNewDigest((createdProposal as ProposalNew) || proposal)
               const signature = await signMessage(message)
 
-              if (signature) {
-                const updatedProposal = await pinProposalMutation({
-                  proposalId: (createdProposal?.id || proposal?.id) as string,
-                  signature: signature as string,
-                  signatureMessage: message,
-                })
-
-                if (updatedProposal) {
-                  setIsLoading(false)
-                  setProposalStep(ProposalStep.APPROVE)
-                }
-              } else {
+              if (!signature) {
                 throw Error("Unsuccessful signature.")
+              }
+              const updatedProposal = await pinProposalMutation({
+                proposalId: (createdProposal?.id || proposal?.id) as string,
+                signature: signature as string,
+                signatureMessage: message,
+              })
+
+              if (updatedProposal) {
+                setIsLoading(false)
+                setProposalStep(ProposalStep.APPROVE)
               }
             } catch (err) {
               setIsLoading(false)
@@ -1098,7 +1097,7 @@ export const ProposalNewForm = () => {
                         }
                       }}
                     >
-                      Create & continue
+                      {createdProposal ? "Publish & continue" : "Create & continue"}
                     </Button>
                   </div>
                 )}
