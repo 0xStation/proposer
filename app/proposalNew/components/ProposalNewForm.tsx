@@ -15,6 +15,7 @@ import {
   requiredField,
   isValidTokenAmount,
   isPositiveAmount,
+  isAddressOrENS,
 } from "app/utils/validators"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
 import truncateString from "app/core/utils/truncateString"
@@ -185,7 +186,7 @@ const ProposeForm = ({ selectedNetworkId }) => {
         Who will be responsible for reviewing and deploying the funds outlined in this proposal? See
         the list of community addresses <TextLink url={LINKS.STATION_WORKSPACES}>here</TextLink>.
       </span>
-      <Field name="client" validate={requiredField}>
+      <Field name="client" validate={composeValidators(requiredField, isAddressOrENS)}>
         {({ meta, input }) => {
           return (
             <>
@@ -226,7 +227,7 @@ const ProposeForm = ({ selectedNetworkId }) => {
         Who will be responsible for delivering the work outlined in this proposal?
         <p>Paste your address if this is you.</p>
       </span>
-      <Field name="contributor" validate={composeValidators(requiredField)}>
+      <Field name="contributor" validate={composeValidators(requiredField, isAddressOrENS)}>
         {({ meta, input }) => {
           return (
             <>
