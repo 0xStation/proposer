@@ -70,6 +70,16 @@ export const isAddress = (address: string) => {
   return ethersIsAddress(address) ? undefined : "Not a valid address."
 }
 
+export const isEnsOrAddress = (text: string) => {
+  if (!text) return undefined
+  if (text.includes(".")) {
+    const validEnsDomains = ["eth", "xyz"]
+    const domain = text.split(".").slice(-1)[0] // grab last substring after period
+    if (domain && validEnsDomains.includes(domain)) return undefined
+  }
+  return ethersIsAddress(text) ? undefined : "Not a valid ENS name or address."
+}
+
 export const isValidEmail = (email: string) => {
   if (!email) return undefined // prevent empty strings from triggering validator for optional form inputs
   return isEmail(email) ? undefined : "Invalid email"
