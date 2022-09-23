@@ -1,5 +1,5 @@
 import * as z from "zod"
-import db from "db"
+import db, { ProposalNewStatus } from "db"
 import { Ctx } from "blitz"
 import pinJsonToPinata from "app/utils/pinata"
 import updateProposalNewMetadata from "./updateProposalNewMetadata"
@@ -67,8 +67,9 @@ export default async function pinProposalNew(input: z.infer<typeof PinProposalNe
   }
 
   try {
+    let updatedProposal
     // add ipfs response to proposal's metadata
-    const updatedProposal = await updateProposalNewMetadata({
+    updatedProposal = await updateProposalNewMetadata({
       proposalId: params.proposalId,
       contentTitle: proposal?.data?.content?.title,
       contentBody: proposal?.data?.content?.body,
@@ -78,6 +79,17 @@ export default async function pinProposalNew(input: z.infer<typeof PinProposalNe
       totalPayments: proposal?.data?.totalPayments,
       paymentTerms: proposal?.data?.paymentTerms,
     })
+
+    if (updatedProposal && updatedProposal.status === ProposalNewStatus.DRAFT) {
+      updatedProposal = await db.proposalNew.update({
+        where: {
+          id: params.proposalId,
+        },
+        data: {
+          status: ProposalNewStatus.AWAITING_APPROVAL,
+        },
+      })
+    }
     return updatedProposal
   } catch (err) {
     throw Error(`Failure updating proposal: ${err}`)
