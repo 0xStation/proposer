@@ -33,7 +33,7 @@ const Explore: BlitzPage = () => {
               } cursor-pointer`}
               onClick={() => setTab(Tab.WORKSPACES)}
             >
-              Workspaces
+              Directory
             </span>
           </div>
 
