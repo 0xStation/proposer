@@ -1,4 +1,4 @@
-import db, { AddressType, ProposalRoleType } from "db"
+import db, { ProposalRoleType } from "db"
 import * as z from "zod"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { ZodPayment, ZodMilestone } from "app/types/zod"
@@ -121,7 +121,11 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       },
     },
     include: {
-      roles: true,
+      roles: {
+        include: {
+          account: true,
+        },
+      },
       milestones: true,
       payments: true,
     },

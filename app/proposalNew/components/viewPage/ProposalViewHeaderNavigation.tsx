@@ -5,25 +5,20 @@ import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber
 import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
 import { ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
 import { ProposalRole } from "app/proposalRole/types"
-import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import useStore from "app/core/hooks/useStore"
 import { ProposalStatusPill } from "../../../core/components/ProposalStatusPill"
-import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
 import { genPathFromUrlObject } from "app/utils"
 import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
-import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
+import useGetUsersRemainingRolesToSignFor from "app/core/hooks/useGetUsersRemainingRolesToSignFor"
+import LinkArrow from "app/core/icons/LinkArrow"
+import { LINKS } from "app/core/utils/constants"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.role === proposalType)
-
-const genNumOfUniqueAddysFromProposalRoles = (roles: ProposalRole[]) =>
-  roles
-    ?.map((role) => toChecksumAddress(role?.address))
-    ?.filter((v, i, addresses) => addresses?.indexOf(v) === i)?.length
 
 const Tab = ({ router, route, children }) => {
   return (
@@ -41,7 +36,6 @@ export const ProposalViewHeaderNavigation = () => {
   const proposalId = useParam("proposalId") as string
   const proposalApprovalModalOpen = useStore((state) => state.proposalApprovalModalOpen)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
-  const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
   const [proposal] = useQuery(
     getProposalNewById,
@@ -64,6 +58,8 @@ export const ProposalViewHeaderNavigation = () => {
     }
   )
 
+  const [remainingRoles, _error, loading] = useGetUsersRemainingRolesToSignFor(proposal, signatures)
+
   // author used to return to workspace page with proposal list view
   const author = findProposalRoleByRoleType(proposal?.roles, ProposalRoleType.AUTHOR)
   // numerator for the progress circle
@@ -72,11 +68,8 @@ export const ProposalViewHeaderNavigation = () => {
       .length || 0
 
   // activeUser's view permissions
-  const activeUserHasProposalRole = activeUserMeetsCriteria(activeUser, proposal?.roles)
-  const activeUserHasSigned = signatures?.some((signature) =>
-    // signature exists for address -> happens in case of signing for personal wallet
-    addressesAreEqual(activeUser?.address || "", signature.address)
-  )
+  const activeUserHasProposalRole = remainingRoles.length > 0
+  const activeUserHasRolesToSign = remainingRoles.length === 0
 
   const currentPageUrl =
     typeof window !== "undefined"
@@ -89,11 +82,13 @@ export const ProposalViewHeaderNavigation = () => {
 
   return (
     <>
-      <ApproveProposalNewModal
-        isOpen={proposalApprovalModalOpen}
-        setIsOpen={toggleProposalApprovalModalOpen}
-        proposal={proposal}
-      />
+      {proposal && (
+        <ApproveProposalNewModal
+          isOpen={proposalApprovalModalOpen}
+          setIsOpen={toggleProposalApprovalModalOpen}
+          proposal={proposal}
+        />
+      )}
       <div className="w-full min-h-64">
         <div className="mt-6 flex flex-row">
           <span className="text-concrete hover:text-light-concrete">
@@ -113,16 +108,30 @@ export const ProposalViewHeaderNavigation = () => {
         ) : (
           <div className="mt-6 h-8 w-42 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
         )}
-        <div className="mt-1">
-          <div className="uppercase text-xs tracking-wider text-concrete flex flex-row">
-            <p className="inline mr-1"> Last updated: </p>
-            {proposal?.timestamp ? (
-              <p>{convertJSDateToDateAndTime({ timestamp: proposal?.timestamp as Date })}</p>
-            ) : (
-              <div className="h-4 w-32 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+        {/* IPFS and LAST UPDATED */}
+        {!proposal ? (
+          <div className="mt-6 h-4 w-96 rounded-l bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+        ) : (
+          <div className="mt-6 flex flex-row items-center space-x-6 h-4">
+            {proposal?.data?.ipfsMetadata?.hash && (
+              <a
+                href={`${LINKS.PINATA_BASE_URL}${proposal?.data?.ipfsMetadata?.hash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-row uppercase text-xs text-electric-violet items-center"
+              >
+                <p className="inline mr-1"> View on ipfs </p>
+                <LinkArrow className="fill-electric-violet" />
+              </a>
+            )}
+            {proposal?.timestamp && (
+              <div className="uppercase text-xs text-concrete flex flex-row">
+                <p className="inline mr-1"> Last updated: </p>
+                <p>{convertJSDateToDateAndTime({ timestamp: proposal?.timestamp as Date })}</p>
+              </div>
             )}
           </div>
-        </div>
+        )}
         {/* PROPOSAL STATUS */}
         <div className="mt-6 flex flex-row justify-between">
           <div className="space-x-2 flex flex-row">
@@ -143,13 +152,13 @@ export const ProposalViewHeaderNavigation = () => {
         </div>
         {/* BUTTONS */}
         <div className="w-full mt-6 box-border">
-          {/* 
-          - if activeUser has a role on the proposal, check if they've signed already, 
-          - if they haven't signed, show the sign button, if they have signed, show the "signed" button 
-          - if they don't have a role, just show the copy icon 
+          {/*
+          - if activeUser has a role on the proposal, check if they've signed already,
+          - if they haven't signed, show the sign button, if they have signed, show the "signed" button
+          - if they don't have a role, just show the copy icon
           */}
-          {activeUserHasProposalRole ? (
-            !activeUserHasSigned ? (
+          {activeUserHasProposalRole && !loading ? (
+            !activeUserHasRolesToSign ? (
               <>
                 <Button
                   overrideWidthClassName="w-[300px]"
@@ -176,7 +185,7 @@ export const ProposalViewHeaderNavigation = () => {
                 Signed
               </button>
             )
-          ) : !proposal ? (
+          ) : !proposal || loading ? (
             // BUTTONS LOADING STATE
             <div className="flex flex-row justify-between">
               <span className="h-[35px] w-[680px] rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
