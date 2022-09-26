@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { useProvider } from "wagmi"
 import { RadioGroup } from "@headlessui/react"
 import { Field, Form } from "react-final-form"
+import useSignature from "app/core/hooks/useSignature"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { SUPPORTED_CHAINS, LINKS, PAYMENT_TERM_MAP } from "app/core/utils/constants"
@@ -38,12 +39,17 @@ import { AddressLink } from "../../core/components/AddressLink"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { getNetworkTokens } from "app/core/utils/networkInfo"
 import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
+import { genProposalNewDigest } from "app/signatures/proposalNew"
+import pinProposalNew from "../mutations/pinProposalNew"
 import TextLink from "app/core/components/TextLink"
+import { Spinner } from "app/core/components/Spinner"
+import { ProposalNew } from "../types"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
   REWARDS = "REWARDS",
   SIGN = "SIGN",
+  APPROVE = "APPROVE",
 }
 
 function classNames(...classes) {
@@ -116,11 +122,13 @@ const Stepper = ({ step }) => {
       </div>
       <div className="absolute left-[420px] top-[-4px]">
         <span className="h-4 w-4 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
-          {step === ProposalStep.SIGN && (
+          {step === ProposalStep.APPROVE && (
             <span className="h-2 w-1 bg-neon-carrot block absolute rounded-l-full top-[1.75px] left-[2px]"></span>
           )}
         </span>
-        <p className={`font-bold mt-2 ${step !== ProposalStep.SIGN && "text-concrete"}`}>Sign</p>
+        <p className={`font-bold mt-2 ${step !== ProposalStep.APPROVE && "text-concrete"}`}>
+          Approve
+        </p>
       </div>
     </div>
   )
@@ -628,14 +636,16 @@ const SignForm = ({ activeUser, proposal, signatures }) => {
   const [isApproveProposalModalOpen, setIsApproveProposalModalOpen] = useState<boolean>(false)
 
   const RoleSignature = ({ role }) => {
-    const userHasRole = addressesAreEqual(activeUser?.address || "", role.address)
+    const userHasRole = addressesAreEqual(activeUser?.address || "", role?.address)
 
     const userHasSigned = activeUserMeetsCriteria(activeUser, signatures)
 
     const showSignButton = userHasRole && !userHasSigned
 
     const addressHasSigned = (address: string) => {
-      return signatures?.some((signature) => addressesAreEqual(address, signature.address)) || false
+      return (
+        signatures?.some((signature) => addressesAreEqual(address, signature?.address)) || false
+      )
     }
 
     const responsiblityCopy = {
@@ -651,10 +661,10 @@ const SignForm = ({ activeUser, proposal, signatures }) => {
           <div className="flex flex-row space-x-2">
             <p className="mr-4">{truncateString(role?.address)}</p>
             <span className="uppercase text-xs px-2 py-1 bg-wet-concrete rounded-full">
-              {role.role}
+              {role?.role}
             </span>
           </div>
-          <p className="mt-1 text-xs text-light-concrete">{responsiblityCopy[role.role]}</p>
+          <p className="mt-1 text-xs text-light-concrete">{responsiblityCopy[role?.role]}</p>
         </div>
         {showSignButton ? (
           <span
@@ -720,14 +730,22 @@ export const ProposalNewForm = () => {
   const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState<boolean>(false)
   const [shouldHandleSubmit, setShouldHandleSubmit] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [createdProposal, setCreatedProposal] = useState<ProposalNew | null>(null)
   // default to mainnet since we're using it to check ENS
   // which pretty much only exists on mainnet as of right now
   const provider = useProvider({ chainId: 1 })
 
+  const { signMessage } = useSignature()
+
   const [signatures] = useQuery(
     getProposalNewSignaturesById,
-    { proposalId: proposal && proposal.id },
-    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
+    { proposalId: proposal && proposal?.id },
+    {
+      suspense: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      enabled: Boolean(proposal?.id),
+    }
   )
 
   const userHasSigned = signatures?.some((commitment) =>
@@ -737,7 +755,7 @@ export const ProposalNewForm = () => {
   const HeaderCopy = {
     [ProposalStep.PROPOSE]: "Propose",
     [ProposalStep.REWARDS]: "Define terms",
-    [ProposalStep.SIGN]: "Sign",
+    [ProposalStep.APPROVE]: "Approve",
   }
 
   const handleResolveEnsAddress = async (fieldValue) => {
@@ -784,10 +802,18 @@ export const ProposalNewForm = () => {
   const [createProposalMutation] = useMutation(createProposal, {
     onSuccess: (data) => {
       setProposal(data)
-      setProposalStep(ProposalStep.SIGN)
     },
     onError: (error: Error) => {
       console.log("we are erroring")
+      console.error(error)
+    },
+  })
+  const [pinProposalMutation] = useMutation(pinProposalNew, {
+    onSuccess: (data) => {
+      setProposal(data)
+      setProposalStep(ProposalStep.APPROVE)
+    },
+    onError: (error: Error) => {
       console.error(error)
     },
   })
@@ -798,123 +824,165 @@ export const ProposalNewForm = () => {
         <Stepper step={proposalStep} />
         <Form
           onSubmit={async (values: any, form) => {
-            const resolvedContributorAddress = await handleResolveEnsAddress(
-              values.contributor?.trim()
-            )
+            // an author needs to sign the proposal to upload the content to ipfs.
+            // if they decline the signature, but submit again, we don't want to
+            // create the same proposal, rather we want to skip to the signature step.
+            let proposal
+            if (!createdProposal) {
+              const resolvedContributorAddress = await handleResolveEnsAddress(
+                values.contributor?.trim()
+              )
 
-            if (!resolvedContributorAddress) {
-              setIsLoading(false)
-              setToastState({
-                isToastShowing: true,
-                type: "error",
-                message: "Invalid address or ENS name for Contributor",
-              })
-              return
-            }
-            const resolvedClientAddress = await handleResolveEnsAddress(values.client?.trim())
-
-            if (!resolvedClientAddress) {
-              setIsLoading(false)
-              setToastState({
-                isToastShowing: true,
-                type: "error",
-                message: "Invalid address or ENS name for Client",
-              })
-              return
-            }
-
-            if (addressesAreEqual(resolvedContributorAddress, resolvedClientAddress)) {
-              setIsLoading(false)
-              setToastState({
-                isToastShowing: true,
-                type: "error",
-                message: "Cannot use same address for Client and Contributor.",
-              })
-              return
-            }
-
-            // tokenAddress might just be null if they are not requesting funding
-            // need to check tokenAddress exists, AND it is not found before erroring
-            const token = values.tokenAddress
-              ? tokenOptions?.find((token) => addressesAreEqual(token.address, values.tokenAddress))
-              : null
-
-            if (values.tokenAddress && !token) {
-              setIsLoading(false)
-              throw Error("token not found")
-            }
-
-            let milestones: any[] = []
-            let payments: any[] = []
-            // if payment details are present, populate milestone and payment objects
-            // supports payment and non-payment proposals
-            if (needFunding) {
-              const tokenTransferData = {
-                senderAddress: resolvedClientAddress,
-                recipientAddress: resolvedContributorAddress,
-                amount: parseFloat(values.paymentAmount),
-                token: { ...token, chainId: selectedNetworkId },
-              }
-
-              if (values.paymentTerms === PaymentTerm.ON_AGREEMENT) {
-                milestones = [
-                  {
-                    index: 0,
-                    title: "Proposal agreement",
-                  },
-                ]
-                payments = [
-                  {
-                    milestoneIndex: 0,
-                    ...tokenTransferData,
-                  },
-                ]
-              } else if (values.paymentTerms === PaymentTerm.AFTER_COMPLETION) {
-                milestones = [
-                  {
-                    index: 1,
-                    title: "Proposal completion",
-                  },
-                ]
-                payments = [
-                  {
-                    milestoneIndex: 1,
-                    ...tokenTransferData,
-                  },
-                ]
-              } else {
+              if (!resolvedContributorAddress) {
                 setIsLoading(false)
-                console.error("Missing complete payment information")
                 setToastState({
                   isToastShowing: true,
                   type: "error",
-                  message: "Missing complete payment information",
+                  message: "Invalid address or ENS name for Contributor",
+                })
+                return
+              }
+              const resolvedClientAddress = await handleResolveEnsAddress(values.client?.trim())
+
+              if (!resolvedClientAddress) {
+                setIsLoading(false)
+                setToastState({
+                  isToastShowing: true,
+                  type: "error",
+                  message: "Invalid address or ENS name for Client",
+                })
+                return
+              }
+
+              if (addressesAreEqual(resolvedContributorAddress, resolvedClientAddress)) {
+                setIsLoading(false)
+                setToastState({
+                  isToastShowing: true,
+                  type: "error",
+                  message: "Cannot use same address for Client and Contributor.",
+                })
+                return
+              }
+
+              // tokenAddress might just be null if they are not requesting funding
+              // need to check tokenAddress exists, AND it is not found before erroring
+              const token = values.tokenAddress
+                ? tokenOptions?.find((token) =>
+                    addressesAreEqual(token.address, values.tokenAddress)
+                  )
+                : null
+
+              if (values.tokenAddress && !token) {
+                setIsLoading(false)
+                throw Error("token not found")
+              }
+
+              let milestones: any[] = []
+              let payments: any[] = []
+              // if payment details are present, populate milestone and payment objects
+              // supports payment and non-payment proposals
+              if (needFunding) {
+                const tokenTransferData = {
+                  senderAddress: resolvedClientAddress,
+                  recipientAddress: resolvedContributorAddress,
+                  amount: parseFloat(values.paymentAmount),
+                  token: { ...token, chainId: selectedNetworkId },
+                }
+
+                if (values.paymentTerms === PaymentTerm.ON_AGREEMENT) {
+                  milestones = [
+                    {
+                      index: 0,
+                      title: "Proposal agreement",
+                    },
+                  ]
+                  payments = [
+                    {
+                      milestoneIndex: 0,
+                      ...tokenTransferData,
+                    },
+                  ]
+                } else if (values.paymentTerms === PaymentTerm.AFTER_COMPLETION) {
+                  milestones = [
+                    {
+                      index: 1,
+                      title: "Proposal completion",
+                    },
+                  ]
+                  payments = [
+                    {
+                      milestoneIndex: 1,
+                      ...tokenTransferData,
+                    },
+                  ]
+                } else {
+                  setIsLoading(false)
+                  console.error("Missing complete payment information")
+                  setToastState({
+                    isToastShowing: true,
+                    type: "error",
+                    message: "Missing complete payment information",
+                  })
+                  return
+                }
+              }
+              try {
+                proposal = await createProposalMutation({
+                  contentTitle: values.title,
+                  contentBody: values.body,
+                  contributorAddresses: [resolvedContributorAddress],
+                  clientAddresses: [resolvedClientAddress],
+                  authorAddresses: [activeUser?.address as string],
+                  milestones,
+                  payments,
+                  paymentTerms: values.paymentTerms,
+                  // convert luxon's `DateTime` obj to UTC to store in db
+                  startDate: values.startDate
+                    ? DateTime.fromISO(values.startDate).toUTC().toJSDate()
+                    : undefined,
+                  endDate: values.endDate
+                    ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
+                    : undefined,
+                })
+
+                if (proposal) {
+                  setCreatedProposal(proposal)
+                }
+              } catch (err) {
+                setIsLoading(false)
+                setToastState({
+                  isToastShowing: true,
+                  type: "error",
+                  message: err.message,
                 })
                 return
               }
             }
+
+            // see comment at the top of the submit function
+            // this condition is here if the user needs to re-click the submit to generate a signature
+            // for the proposal and pin to ipfs, but they've already created a proposal.
             try {
-              await createProposalMutation({
-                contentTitle: values.title,
-                contentBody: values.body,
-                contributorAddresses: [resolvedContributorAddress],
-                clientAddresses: [resolvedClientAddress],
-                authorAddresses: [activeUser?.address as string],
-                milestones,
-                payments,
-                paymentTerms: values.paymentTerms,
-                // convert luxon's `DateTime` obj to UTC to store in db
-                startDate: values.startDate
-                  ? DateTime.fromISO(values.startDate).toUTC().toJSDate()
-                  : undefined,
-                endDate: values.endDate
-                  ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
-                  : undefined,
+              // prompt author to sign proposal to prove they are the author of the content
+              const message = genProposalNewDigest((createdProposal as ProposalNew) || proposal)
+              const signature = await signMessage(message)
+
+              if (!signature) {
+                throw Error("Unsuccessful signature.")
+              }
+              const updatedProposal = await pinProposalMutation({
+                proposalId: (createdProposal?.id || proposal?.id) as string,
+                signature: signature as string,
+                signatureMessage: message,
               })
-              setIsLoading(false)
+
+              if (updatedProposal) {
+                setIsLoading(false)
+                setProposalStep(ProposalStep.APPROVE)
+              }
             } catch (err) {
               setIsLoading(false)
-              console.error("ahhhhhh")
+              console.error(err)
               setToastState({
                 isToastShowing: true,
                 type: "error",
@@ -942,41 +1010,61 @@ export const ProposalNewForm = () => {
                   }}
                 />
                 <div className="rounded-2xl border border-concrete p-6 h-[560px] overflow-y-scroll">
-                  <div className="mt-2 flex flex-row justify-between items-center">
-                    <h2 className="text-marble-white text-xl font-bold">
-                      {HeaderCopy[proposalStep]}
-                    </h2>
-                    <span className="text-xs text-concrete uppercase">
-                      Last updated: {formatDate(new Date())}
-                    </span>
-                  </div>
-                  <div className="flex flex-col col-span-2">
-                    {proposalStep === ProposalStep.PROPOSE && (
-                      <ProposeForm selectedNetworkId={selectedNetworkId} />
-                    )}
-                    {proposalStep === ProposalStep.REWARDS && (
-                      <RewardForm
-                        tokenOptions={tokenOptions}
-                        selectedNetworkId={selectedNetworkId}
-                        setSelectedNetworkId={setSelectedNetworkId}
-                        selectedToken={selectedToken}
-                        setSelectedToken={setSelectedToken}
-                        setShouldRefetchTokens={setShouldRefetchTokens}
-                        needFunding={needFunding}
-                        setNeedFunding={setNeedFunding}
-                        setIsConnectWalletModalOpen={setIsConnectWalletModalOpen}
-                        isImportTokenModalOpen={isImportTokenModalOpen}
-                        setIsImportTokenModalOpen={setIsImportTokenModalOpen}
-                      />
-                    )}
-                    {proposalStep === ProposalStep.SIGN && (
-                      <SignForm
-                        proposal={proposal}
-                        activeUser={activeUser}
-                        signatures={signatures}
-                      />
-                    )}
-                  </div>
+                  {!isLoading ? (
+                    <>
+                      <div className="mt-2 flex flex-row justify-between items-center">
+                        <h2 className="text-marble-white text-xl font-bold">
+                          {HeaderCopy[proposalStep]}
+                        </h2>
+                        <span className="text-xs text-concrete uppercase">
+                          Last updated: {formatDate(new Date())}
+                        </span>
+                      </div>
+                      <div className="flex flex-col col-span-2">
+                        {proposalStep === ProposalStep.PROPOSE && (
+                          <ProposeForm selectedNetworkId={selectedNetworkId} />
+                        )}
+                        {proposalStep === ProposalStep.REWARDS && (
+                          <RewardForm
+                            tokenOptions={tokenOptions}
+                            selectedNetworkId={selectedNetworkId}
+                            setSelectedNetworkId={setSelectedNetworkId}
+                            selectedToken={selectedToken}
+                            setSelectedToken={setSelectedToken}
+                            setShouldRefetchTokens={setShouldRefetchTokens}
+                            needFunding={needFunding}
+                            setNeedFunding={setNeedFunding}
+                            setIsConnectWalletModalOpen={setIsConnectWalletModalOpen}
+                            isImportTokenModalOpen={isImportTokenModalOpen}
+                            setIsImportTokenModalOpen={setIsImportTokenModalOpen}
+                          />
+                        )}
+                        {proposalStep === ProposalStep.APPROVE && (
+                          <SignForm
+                            proposal={proposal}
+                            activeUser={activeUser}
+                            signatures={signatures}
+                          />
+                        )}
+                      </div>{" "}
+                    </>
+                  ) : (
+                    <div className="flex flex-col justify-center items-center mt-48">
+                      <p className="text-concrete tracking-wide">
+                        {createdProposal
+                          ? "Sign to prove your authorship."
+                          : "Creating proposal..."}
+                      </p>
+                      {createdProposal && (
+                        <p className="text-concrete tracking-wide">
+                          Check your wallet for your next action.
+                        </p>
+                      )}
+                      <div className="h-4 w-4 mt-6">
+                        <Spinner fill="white" />
+                      </div>
+                    </div>
+                  )}
                 </div>
                 {proposalStep === ProposalStep.PROPOSE && (
                   <Button
@@ -1016,11 +1104,11 @@ export const ProposalNewForm = () => {
                         }
                       }}
                     >
-                      Create & continue
+                      {createdProposal ? "Publish & continue" : "Create & continue"}
                     </Button>
                   </div>
                 )}
-                {proposalStep === ProposalStep.SIGN && (
+                {proposalStep === ProposalStep.APPROVE && (
                   <div className="mt-6 flex justify-end">
                     <Button
                       className="mr-2"

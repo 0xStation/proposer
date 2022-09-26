@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react"
+import { useQuery } from "blitz"
 import { ProposalNew } from "app/proposalNew/types"
 import { ProposalSignature } from "@prisma/client"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { AddressType } from "@prisma/client"
 import useStore from "./useStore"
+import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
+import { ProposalRole } from "app/proposalRole/types"
 
 interface ProposalRoleType {
   roleType: string
@@ -42,28 +45,33 @@ const useGetUsersRemainingRolesToSignFor = (
   const [remainingRoles, setRemainingRoles] = useState<ProposalRoleType[]>([])
   const [error, setError] = useState<any>(null)
   const [loading, setLoading] = useState<boolean>(true)
+  const [roles] = useQuery(
+    getRolesByProposalId,
+    { proposalId: proposal?.id as string },
+    { suspense: false, enabled: Boolean(proposal?.id) }
+  )
 
-  const getRoles = async (proposal: ProposalNew, signatures: ProposalSignature[], activeUser) => {
+  const getRoles = async (roles: ProposalRole[], signatures: ProposalSignature[], activeUser) => {
     try {
       setLoading(true)
       const signers: ProposalRoleType[] = await Promise.all(
-        proposal.roles.map(async (role) => {
+        roles?.map(async (role) => {
           // role is type wallet (single signer)
           // AND role's address is the active user
           if (
-            role.account?.addressType === AddressType.WALLET &&
-            addressesAreEqual(role.address, activeUser?.address || "")
+            role?.account?.addressType === AddressType.WALLET &&
+            addressesAreEqual(role?.address, activeUser?.address || "")
           ) {
             return {
-              roleType: role.role,
-              roleId: role.id,
-              address: role.address,
+              roleType: role?.role,
+              roleId: role?.id,
+              address: role?.address,
               oneSignerNeededToComplete: true, // always true for unsigned single signer
             }
-          } else if (role.account?.addressType === AddressType.SAFE) {
+          } else if (role?.account?.addressType === AddressType.SAFE) {
             const gnosisSafeDetails = await getGnosisSafeDetails(
-              role.account.data.chainId || 1,
-              role.address
+              role?.account.data.chainId || 1,
+              role?.address
             )
 
             const totalSafeSignersSigned = signatures.filter((signature) => {
@@ -77,8 +85,8 @@ const useGetUsersRemainingRolesToSignFor = (
             return gnosisSafeDetails?.signers.map((signer) => {
               if (addressesAreEqual(signer, activeUser?.address || "")) {
                 return {
-                  roleType: role.role,
-                  roleId: role.id,
+                  roleType: role?.role,
+                  roleId: role?.id,
                   address: activeUser.address,
                   oneSignerNeededToComplete:
                     totalSafeSignersSigned === gnosisSafeDetails?.quorum - 1, // last signer sets true
@@ -103,7 +111,7 @@ const useGetUsersRemainingRolesToSignFor = (
   }
 
   useEffect(() => {
-    if (signatures && activeUser) {
+    if (signatures && roles && activeUser) {
       const hasActiveUserSigned = signatures.some((signature) => {
         return addressesAreEqual(signature.address, activeUser?.address || "")
       })
@@ -114,10 +122,10 @@ const useGetUsersRemainingRolesToSignFor = (
         setRemainingRoles([])
         setLoading(false)
       } else if (proposal && activeUser) {
-        getRoles(proposal, signatures, activeUser)
+        getRoles(roles as ProposalRole[], signatures, activeUser)
       }
     }
-  }, [proposal, signatures, activeUser])
+  }, [proposal, signatures, activeUser, roles])
 
   return [remainingRoles, error, loading] as [ProposalRoleType[], any, boolean]
 }

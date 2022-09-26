@@ -5,8 +5,8 @@ import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
 import approveProposalNew from "app/proposalNew/mutations/approveProposalNew"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import { genProposalNewDigest } from "app/signatures/proposalNew"
 import getProposalNewById from "../queries/getProposalNewById"
+import { genProposalNewApprovalDigest } from "app/signatures/proposalSignature"
 import { ProposalNew } from "app/proposalNew/types"
 import useGetUsersRemainingRolesToSignFor from "app/core/hooks/useGetUsersRemainingRolesToSignFor"
 import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
@@ -55,7 +55,11 @@ export const ApproveProposalNewModal = ({
       })
     }
 
-    const message = genProposalNewDigest(proposal)
+    const message = genProposalNewApprovalDigest({
+      signerAddress: activeUser?.address,
+      proposalHash: proposal?.data?.ipfsMetadata?.hash,
+      proposalId: proposal?.id as string,
+    })
     const signature = await signMessage(message)
 
     // no signature - user must have denied signature

@@ -2,7 +2,7 @@ import db, { ProposalRoleType } from "db"
 import * as z from "zod"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { ZodPayment, ZodMilestone } from "app/types/zod"
-import { ProposalNewMetadata } from "../types"
+import { ProposalNew, ProposalNewMetadata } from "../types"
 import { ProposalType } from "db"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
 import { Token } from "app/token/types"
@@ -131,5 +131,5 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     },
   })
 
-  return proposal
+  return proposal as ProposalNew
 }

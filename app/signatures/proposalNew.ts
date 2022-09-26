@@ -4,8 +4,13 @@ import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 export const genProposalNewDigest = (proposal: ProposalNew) => {
   return {
     domain: {
-      name: "Proposal", // keep hardcoded
-      version: "1", // keep hardcoded
+      // name aka feature name -
+      // we're using schema-based versioning here.
+      // The idea is everything that should have its own api + versioning
+      // should have a domain. Keep hardcoded
+      name: "Proposal",
+      // use semver versioning https://semver.org/
+      version: "0.0.1",
     },
     types: {
       Role: [
@@ -18,7 +23,7 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
       ],
       Payment: [
         { name: "milestoneIndex", type: "uint256" },
-        { name: "recipientAddress", type: "address" }, // recieves the reward from the proposal
+        { name: "recipientAddress", type: "address" }, // receives the reward from the proposal
         { name: "chainId", type: "uint256" },
         { name: "tokenAddress", type: "address" },
         { name: "amount", type: "uint256" },
@@ -31,6 +36,10 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
         { name: "payments", type: "Payment[]" },
         { name: "title", type: "string" },
         { name: "body", type: "string" },
+        // We're hardcoding "Station" to document where data is generated.
+        // In the future, the idea is that other frontends would be
+        // generating proposals with the same specifications as ours.
+        { name: "app", type: "string" },
       ],
     },
     value: {
@@ -38,6 +47,9 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
       timestamp: proposal.timestamp.valueOf(),
       title: proposal.data.content.title,
       body: proposal.data.content.body,
+      // Hardcoding our app name. Other frontend app's can change this type
+      // to reference where the data was generated down the road.
+      app: "Station",
       roles: proposal.roles?.map((role) => {
         return { address: role.address, role: role.role }
       }),
