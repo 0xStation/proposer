@@ -15,7 +15,7 @@ export const genProposalNewApprovalDigest = ({ signerAddress, proposalHash, prop
         { name: "proposalHash", type: "string" },
         { name: "timestamp", type: "uint256" }, // UNIX timestamp
         { name: "signerAddress", type: "address" },
-        { name: "proposalUUID", type: "string" },
+        { name: "proposalId", type: "string" }, // uuid
         // We're hardcoding "Station" to document where data is generated.
         // In the future, the idea is that other frontends would be
         // generating proposals with the same specifications as ours.
@@ -26,7 +26,7 @@ export const genProposalNewApprovalDigest = ({ signerAddress, proposalHash, prop
       proposalHash,
       timestamp: Date.now(),
       signerAddress,
-      proposalUUID: proposalId,
+      proposalId: proposalId,
       // Hardcoding our app name. Other frontend app's can change this type
       // to reference where the data was generated down the road.
       app: "Station",
