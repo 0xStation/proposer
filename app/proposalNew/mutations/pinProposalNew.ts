@@ -30,14 +30,6 @@ export default async function pinProposalNew(input: z.infer<typeof PinProposalNe
     throw Error(`Failed to find proposal in pinProposalNew: ${err}`)
   }
 
-  // flattening proposal's data json object for the ipfs proposal
-  let proposalCopy = JSON.parse(JSON.stringify(proposal.data))
-
-  proposalCopy.type = proposal.type
-  proposalCopy.timestamp = proposal.timestamp
-  proposalCopy.roles = JSON.parse(JSON.stringify(proposal.roles))
-  proposalCopy.payments = Object.assign({}, proposal.payments)
-
   // create the pinata payload:
   // Pinata api specifications: https://docs.pinata.cloud/pinata-api/pinning/pin-json
   // see `pinJsonToIpfs` api for more details on api config structure
@@ -48,7 +40,12 @@ export default async function pinProposalNew(input: z.infer<typeof PinProposalNe
     // `pinataMetadata` is specific to pinata and not ipfs
     // it contains optional field that helps index the file
     pinataMetadata: {
+      // `name` always exists on pinataMetadata
       name: proposal?.id,
+      // customizable fields that we (station) set are stored under pinata's `keyvalues`
+      keyvalues: {
+        proposalId: proposal?.id,
+      },
     },
     pinataContent: {
       address: ctx.session.siwe?.address,

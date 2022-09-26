@@ -4,8 +4,13 @@ import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 export const genProposalNewDigest = (proposal: ProposalNew) => {
   return {
     domain: {
-      name: "Station", // keep hardcoded
-      version: "1.0.0", // references the web app's version
+      // name aka feature name -
+      // we're using schema-based versioning here.
+      // The idea is everything that should have its own api + versioning
+      // should have a domain. Keep hardcoded
+      name: "Proposal",
+      // use semver versioning https://semver.org/
+      version: "0.0.1",
     },
     types: {
       Role: [
@@ -31,6 +36,9 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
         { name: "payments", type: "Payment[]" },
         { name: "title", type: "string" },
         { name: "body", type: "string" },
+        // We're hardcoding "Station" to document where data is generated.
+        // In the future, the idea is that other frontends would be
+        // generating proposals with the same specifications as ours.
         { name: "app", type: "string" },
       ],
     },

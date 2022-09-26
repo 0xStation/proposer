@@ -36,8 +36,13 @@ export default async function pinProposalSignature(input: z.infer<typeof PinProp
     // `pinataMetadata` is specific to pinata and not ipfs
     // it contains optional field that helps index the file
     pinataMetadata: {
+      // `name` always exists on pinataMetadata
       name: proposalSignature?.id,
-      proposalId: proposalSignature?.proposal?.id,
+      // customizable fields that we (station) set are stored under pinata's `keyvalues` property
+      keyvalues: {
+        proposalId: proposalSignature?.proposal?.id,
+        signerAddress: proposalSignature?.address,
+      },
     },
     pinataContent: {
       address: proposalSignature?.address,

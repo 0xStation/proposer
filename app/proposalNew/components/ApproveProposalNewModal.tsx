@@ -58,6 +58,7 @@ export const ApproveProposalNewModal = ({
     const message = genProposalNewApprovalDigest({
       signerAddress: activeUser?.address,
       proposalHash: proposal?.data?.ipfsMetadata?.hash,
+      proposalId: proposal?.id as string,
     })
     const signature = await signMessage(message)
 

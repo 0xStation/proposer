@@ -19,7 +19,7 @@ export const PublishProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
       setToastState({
         isToastShowing: true,
         type: "success",
-        message: "Successfully published proposal",
+        message: "Successfully published proposal.",
       })
       setIsOpen(false)
     },
