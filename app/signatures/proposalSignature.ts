@@ -10,12 +10,10 @@ export const genProposalNewApprovalDigest = ({ signerAddress, proposalHash, prop
     },
     types: {
       ProposalApproval: [
-        // TODO: @symmetry change `proposalHash` to be a keccak256
-        // `proposalHash` is currently referencing an IPFS CID
-        { name: "proposalHash", type: "string" },
+        { name: "proposalId", type: "string" }, // uuid
+        { name: "proposalHash", type: "string" }, // typed data hash as defined by EIP712, implemented with ether's _TypedDataEncoder
         { name: "timestamp", type: "uint256" }, // UNIX timestamp
         { name: "signerAddress", type: "address" },
-        { name: "proposalId", type: "string" }, // uuid
         // We're hardcoding "Station" to document where data is generated.
         // In the future, the idea is that other frontends would be
         // generating proposals with the same specifications as ours.
