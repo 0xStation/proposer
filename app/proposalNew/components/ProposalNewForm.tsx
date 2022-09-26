@@ -878,24 +878,10 @@ export const ProposalNewForm = () => {
               }
 
               let milestones: any[] = []
+              let payments: any[] = []
               // if payment details are present, populate milestone and payment objects
               // supports payment and non-payment proposals
               if (needFunding) {
-                milestones = [
-                  {
-                    index: 0,
-                    title: "Pay contributor",
-                    payments: [
-                      {
-                        senderAddress: resolvedClientAddress,
-                        recipientAddress: resolvedContributorAddress,
-                        amount: parseFloat(values.paymentAmount),
-                        token: { ...token, chainId: selectedNetworkId },
-                      },
-                    ],
-                  },
-                ]
-
                 if (
                   values.paymentTerms !== PaymentTerm.ON_AGREEMENT &&
                   values.paymentTerms !== PaymentTerm.AFTER_COMPLETION
@@ -910,6 +896,23 @@ export const ProposalNewForm = () => {
                   return
                 }
               }
+
+              milestones = [
+                {
+                  index: 0,
+                  title: "Pay contributor",
+                },
+              ]
+              payments = [
+                {
+                  milestoneIndex: 0,
+                  senderAddress: resolvedClientAddress,
+                  recipientAddress: resolvedContributorAddress,
+                  amount: parseFloat(values.paymentAmount),
+                  token: { ...token, chainId: selectedNetworkId },
+                },
+              ]
+
               try {
                 proposal = await createProposalMutation({
                   contentTitle: values.title,
@@ -918,6 +921,7 @@ export const ProposalNewForm = () => {
                   clientAddresses: [resolvedClientAddress],
                   authorAddresses: [activeUser?.address as string],
                   milestones,
+                  payments,
                   paymentTerms: values.paymentTerms,
                   // convert luxon's `DateTime` obj to UTC to store in db
                   startDate: values.startDate

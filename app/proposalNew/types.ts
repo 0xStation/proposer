@@ -6,11 +6,11 @@ import { Token } from "app/token/types"
 import { ProposalNew as PrismaProposalNew } from "@prisma/client"
 
 export type ProposalNew = PrismaProposalNew & {
-  roles: ProposalRole[]
-  milestones: ProposalMilestone[]
-  payments: ProposalPayment[]
-  signatures: ProposalSignature[]
   data: ProposalNewMetadata
+  roles?: ProposalRole[]
+  milestones?: ProposalMilestone[]
+  payments?: ProposalPayment[]
+  signatures?: ProposalSignature[]
 }
 
 export type ProposalNewMetadata = {

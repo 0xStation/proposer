@@ -2,25 +2,9 @@ import { ProposalNew } from "app/proposalNew/types"
 import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 
 export const genProposalNewDigest = (proposal: ProposalNew) => {
-  const milestones: any[] = []
-  const payments: any[] = []
-
-  proposal.milestones.forEach((milestone) => {
-    milestones.push({
-      index: milestone.index,
-      title: milestone.data.title,
-    })
-    if (milestone.payments) {
-      milestone.payments.forEach((payment) => {
-        payments.push({
-          milestoneIndex: milestone.index,
-          recipientAddress: payment.recipientAddress,
-          chainId: payment.data.token.chainId,
-          tokenAddress: payment.data.token.address,
-          amount: decimalToBigNumber(payment.amount!, payment.data.token.decimals || 0),
-        })
-      })
-    }
+  const milestoneIdToIndex = {}
+  proposal.milestones?.forEach((milestone) => {
+    milestoneIdToIndex[milestone.id] = milestone.index
   })
 
   return {
@@ -74,8 +58,21 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
       roles: proposal.roles?.map((role) => {
         return { address: role.address, role: role.role }
       }),
-      milestones,
-      payments,
+      milestones: proposal.milestones?.map((milestone) => {
+        return {
+          index: milestone.index,
+          title: milestone.data.title,
+        }
+      }),
+      payments: proposal.payments?.map((payment) => {
+        return {
+          milestoneIndex: milestoneIdToIndex[payment.milestoneId],
+          recipientAddress: payment.recipientAddress,
+          chainId: payment.data.token.chainId,
+          tokenAddress: payment.data.token.address,
+          amount: decimalToBigNumber(payment.amount!, payment.data.token.decimals || 0),
+        }
+      }),
     },
   }
 }

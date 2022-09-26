@@ -34,7 +34,7 @@ export const ProposalPaymentView = ({
     }
   )
 
-  const userIsPayer = proposal?.roles.some(
+  const userIsPayer = proposal?.roles?.some(
     (role) =>
       role.role === ProposalRoleType.CLIENT &&
       addressesAreEqual(activeUser?.address || "", role.address)
