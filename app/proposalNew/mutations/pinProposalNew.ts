@@ -88,6 +88,12 @@ export default async function pinProposalNew(input: z.infer<typeof PinProposalNe
         data: {
           status: ProposalNewStatus.AWAITING_APPROVAL,
         },
+        include: {
+          roles: true,
+          milestones: true,
+          payments: true,
+          signatures: true,
+        },
       })
     }
     return updatedProposal

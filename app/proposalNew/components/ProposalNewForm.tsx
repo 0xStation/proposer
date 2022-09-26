@@ -636,14 +636,16 @@ const SignForm = ({ activeUser, proposal, signatures }) => {
   const [isApproveProposalModalOpen, setIsApproveProposalModalOpen] = useState<boolean>(false)
 
   const RoleSignature = ({ role }) => {
-    const userHasRole = addressesAreEqual(activeUser?.address || "", role.address)
+    const userHasRole = addressesAreEqual(activeUser?.address || "", role?.address)
 
     const userHasSigned = activeUserMeetsCriteria(activeUser, signatures)
 
     const showSignButton = userHasRole && !userHasSigned
 
     const addressHasSigned = (address: string) => {
-      return signatures?.some((signature) => addressesAreEqual(address, signature.address)) || false
+      return (
+        signatures?.some((signature) => addressesAreEqual(address, signature?.address)) || false
+      )
     }
 
     const responsiblityCopy = {
@@ -659,10 +661,10 @@ const SignForm = ({ activeUser, proposal, signatures }) => {
           <div className="flex flex-row space-x-2">
             <p className="mr-4">{truncateString(role?.address)}</p>
             <span className="uppercase text-xs px-2 py-1 bg-wet-concrete rounded-full">
-              {role.role}
+              {role?.role}
             </span>
           </div>
-          <p className="mt-1 text-xs text-light-concrete">{responsiblityCopy[role.role]}</p>
+          <p className="mt-1 text-xs text-light-concrete">{responsiblityCopy[role?.role]}</p>
         </div>
         {showSignButton ? (
           <span
@@ -737,9 +739,16 @@ export const ProposalNewForm = () => {
 
   const [signatures] = useQuery(
     getProposalNewSignaturesById,
-    { proposalId: proposal && proposal.id },
-    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
+    { proposalId: proposal && proposal?.id },
+    {
+      suspense: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      enabled: Boolean(proposal?.id),
+    }
   )
+
+  console.log("signatures", signatures, proposal)
 
   const userHasSigned = signatures?.some((commitment) =>
     addressesAreEqual(activeUser?.address || "", commitment.address)
