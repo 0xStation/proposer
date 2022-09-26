@@ -104,7 +104,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
     // update payment as cashed in db
     await saveTransactionHashToPaymentsMutation({
       proposalId: milestone.proposalId,
-      milestoneIndex: milestone.index,
+      milestoneId: milestone.id,
       transactionHash,
     })
 
@@ -132,7 +132,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
       // update payment as cashed in db
       await saveTransactionHashToPaymentsMutation({
         proposalId: milestone.proposalId,
-        milestoneIndex: milestone.index,
+        milestoneId: milestone.id,
         transactionHash: transaction.hash,
       })
 

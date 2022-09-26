@@ -1,9 +1,9 @@
-import { ProposalSignature, ProposalType } from "@prisma/client"
+import { ProposalSignature } from "@prisma/client"
 import { ProposalRole } from "app/proposalRole/types"
 import { ProposalMilestone } from "app/proposalMilestone/types"
 import { PaymentTerm, ProposalPayment } from "app/proposalPayment/types"
 import { Token } from "app/token/types"
-import { ProposalNewStatus, ProposalNew as PrismaProposalNew } from "@prisma/client"
+import { ProposalNew as PrismaProposalNew } from "@prisma/client"
 
 export type ProposalNew = PrismaProposalNew & {
   roles: ProposalRole[]

@@ -878,44 +878,28 @@ export const ProposalNewForm = () => {
               }
 
               let milestones: any[] = []
-              let payments: any[] = []
               // if payment details are present, populate milestone and payment objects
               // supports payment and non-payment proposals
               if (needFunding) {
-                const tokenTransferData = {
-                  senderAddress: resolvedClientAddress,
-                  recipientAddress: resolvedContributorAddress,
-                  amount: parseFloat(values.paymentAmount),
-                  token: { ...token, chainId: selectedNetworkId },
-                }
+                milestones = [
+                  {
+                    index: 0,
+                    title: "Pay contributor",
+                    payments: [
+                      {
+                        senderAddress: resolvedClientAddress,
+                        recipientAddress: resolvedContributorAddress,
+                        amount: parseFloat(values.paymentAmount),
+                        token: { ...token, chainId: selectedNetworkId },
+                      },
+                    ],
+                  },
+                ]
 
-                if (values.paymentTerms === PaymentTerm.ON_AGREEMENT) {
-                  milestones = [
-                    {
-                      index: 0,
-                      title: "Proposal agreement",
-                    },
-                  ]
-                  payments = [
-                    {
-                      milestoneIndex: 0,
-                      ...tokenTransferData,
-                    },
-                  ]
-                } else if (values.paymentTerms === PaymentTerm.AFTER_COMPLETION) {
-                  milestones = [
-                    {
-                      index: 1,
-                      title: "Proposal completion",
-                    },
-                  ]
-                  payments = [
-                    {
-                      milestoneIndex: 1,
-                      ...tokenTransferData,
-                    },
-                  ]
-                } else {
+                if (
+                  values.paymentTerms !== PaymentTerm.ON_AGREEMENT &&
+                  values.paymentTerms !== PaymentTerm.AFTER_COMPLETION
+                ) {
                   setIsLoading(false)
                   console.error("Missing complete payment information")
                   setToastState({
@@ -934,7 +918,6 @@ export const ProposalNewForm = () => {
                   clientAddresses: [resolvedClientAddress],
                   authorAddresses: [activeUser?.address as string],
                   milestones,
-                  payments,
                   paymentTerms: values.paymentTerms,
                   // convert luxon's `DateTime` obj to UTC to store in db
                   startDate: values.startDate
@@ -975,6 +958,10 @@ export const ProposalNewForm = () => {
                 signature: signature as string,
                 signatureMessage: message,
               })
+
+              if (proposal) {
+                setCreatedProposal(proposal)
+              }
 
               if (updatedProposal) {
                 setIsLoading(false)

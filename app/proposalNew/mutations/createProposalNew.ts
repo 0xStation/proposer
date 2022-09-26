@@ -1,8 +1,8 @@
 import db, { ProposalRoleType } from "db"
 import * as z from "zod"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
-import { ZodPayment, ZodMilestone } from "app/types/zod"
 import { ProposalNew, ProposalNewMetadata } from "../types"
+import { ZodMilestoneWithPayments } from "app/types/zod"
 import { ProposalType } from "db"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
 import { Token } from "app/token/types"
@@ -20,8 +20,7 @@ const CreateProposal = z.object({
   ipfsHash: z.string().optional(),
   ipfsPinSize: z.number().optional(),
   ipfsTimestamp: z.date().optional(),
-  milestones: ZodMilestone.array(),
-  payments: ZodPayment.array(),
+  milestones: ZodMilestoneWithPayments.array(),
   paymentTerms: z.enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION]).optional(),
   startDate: z.date().optional(),
   endDate: z.date().optional(),
@@ -38,16 +37,18 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
 
   // validate non-negative amounts and construct totalPayments object
   let totalPayments: Record<string, { token: Token; amount: number }> = {}
-  params.payments.forEach((payment) => {
-    if (payment.amount! < 0) {
-      throw new Error("amount must be greater or equal to zero.")
-    }
-    const key = `${payment.token.chainId}-${payment.token.address}`
-    if (!totalPayments[key]) {
-      totalPayments[key] = { token: payment.token, amount: payment.amount! }
-    } else {
-      totalPayments[key]!.amount += payment.amount!
-    }
+  params.milestones.forEach((milestone) => {
+    milestone.payments.forEach((payment) => {
+      if (payment.amount! < 0) {
+        throw new Error("amount must be greater or equal to zero.")
+      }
+      const key = `${payment.token.chainId}-${payment.token.address}`
+      if (!totalPayments[key]) {
+        totalPayments[key] = { token: payment.token, amount: payment.amount! }
+      } else {
+        totalPayments[key]!.amount += payment.amount!
+      }
+    })
   })
 
   // Create accounts for roles that do not yet have accounts
@@ -100,21 +101,22 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
           data: params.milestones.map((milestone) => {
             return {
               index: milestone.index,
-              data: { title: milestone.title },
-            }
-          }),
-        },
-      },
-      payments: {
-        createMany: {
-          data: params.payments.map((payment) => {
-            return {
-              senderAddress: payment.senderAddress,
-              recipientAddress: payment.recipientAddress,
-              amount: payment.amount,
-              tokenId: payment.tokenId,
-              milestoneIndex: payment.milestoneIndex,
-              data: { token: payment.token },
+              data: {
+                title: milestone.title,
+                payments: {
+                  createMany: {
+                    data: milestone.payments.map((payment) => {
+                      return {
+                        senderAddress: payment.senderAddress,
+                        recipientAddress: payment.recipientAddress,
+                        amount: payment.amount,
+                        tokenId: payment.tokenId,
+                        data: { token: payment.token },
+                      }
+                    }),
+                  },
+                },
+              },
             }
           }),
         },
