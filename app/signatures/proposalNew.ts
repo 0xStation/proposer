@@ -74,21 +74,8 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
       roles: proposal.roles?.map((role) => {
         return { address: role.address, role: role.role }
       }),
-      milestones: milestones.map((milestone) => {
-        return {
-          index: milestone.index,
-          title: milestone.data.title,
-        }
-      }),
-      payments: payments.map((payment) => {
-        return {
-          milestoneIndex: payment.milestone.index,
-          recipientAddress: payment.recipientAddress,
-          chainId: payment.data.token.chainId,
-          tokenAddress: payment.data.token.address,
-          amount: decimalToBigNumber(payment.amount!, payment.data.token.decimals || 0),
-        }
-      }),
+      milestones,
+      payments,
     },
   }
 }
