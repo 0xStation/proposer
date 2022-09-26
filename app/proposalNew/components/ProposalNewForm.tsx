@@ -713,6 +713,20 @@ const SignForm = ({ activeUser, proposal, signatures }) => {
   )
 }
 
+const ProposalCreationLoadingScreen = ({ createdProposal }) => (
+  <div className="flex flex-col justify-center items-center mt-48">
+    <p className="text-concrete tracking-wide">
+      {createdProposal ? "Sign to prove your authorship." : "Creating proposal..."}
+    </p>
+    {createdProposal && (
+      <p className="text-concrete tracking-wide">Check your wallet for your next action.</p>
+    )}
+    <div className="h-4 w-4 mt-6">
+      <Spinner fill="white" />
+    </div>
+  </div>
+)
+
 export const ProposalNewForm = () => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
@@ -963,6 +977,13 @@ export const ProposalNewForm = () => {
             // this condition is here if the user needs to re-click the submit to generate a signature
             // for the proposal and pin to ipfs, but they've already created a proposal.
             try {
+              const authorRole = proposal?.roles?.find(
+                (role) => role.role === ProposalRoleType.AUTHOR
+              )
+              // if user disconnects and logs in as another user, we need to check if they are the author
+              if (authorRole?.address !== session?.siwe?.address) {
+                throw Error("Current address doesn't match author's address.")
+              }
               // prompt author to sign proposal to prove they are the author of the content
               const message = genProposalNewDigest((createdProposal as ProposalNew) || proposal)
               const signature = await signMessage(message)
@@ -1049,21 +1070,7 @@ export const ProposalNewForm = () => {
                       </div>{" "}
                     </>
                   ) : (
-                    <div className="flex flex-col justify-center items-center mt-48">
-                      <p className="text-concrete tracking-wide">
-                        {createdProposal
-                          ? "Sign to prove your authorship."
-                          : "Creating proposal..."}
-                      </p>
-                      {createdProposal && (
-                        <p className="text-concrete tracking-wide">
-                          Check your wallet for your next action.
-                        </p>
-                      )}
-                      <div className="h-4 w-4 mt-6">
-                        <Spinner fill="white" />
-                      </div>
-                    </div>
+                    <ProposalCreationLoadingScreen createdProposal={createdProposal} />
                   )}
                 </div>
                 {proposalStep === ProposalStep.PROPOSE && (
