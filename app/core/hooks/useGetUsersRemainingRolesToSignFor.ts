@@ -111,7 +111,7 @@ const useGetUsersRemainingRolesToSignFor = (
   }
 
   useEffect(() => {
-    if (signatures && activeUser) {
+    if (signatures && roles && activeUser) {
       const hasActiveUserSigned = signatures.some((signature) => {
         return addressesAreEqual(signature.address, activeUser?.address || "")
       })
@@ -125,7 +125,7 @@ const useGetUsersRemainingRolesToSignFor = (
         getRoles(roles as ProposalRole[], signatures, activeUser)
       }
     }
-  }, [proposal, signatures, activeUser])
+  }, [proposal, signatures, activeUser, roles])
 
   return [remainingRoles, error, loading] as [ProposalRoleType[], any, boolean]
 }

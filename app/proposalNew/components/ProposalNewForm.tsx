@@ -748,8 +748,6 @@ export const ProposalNewForm = () => {
     }
   )
 
-  console.log("signatures", signatures, proposal)
-
   const userHasSigned = signatures?.some((commitment) =>
     addressesAreEqual(activeUser?.address || "", commitment.address)
   )
