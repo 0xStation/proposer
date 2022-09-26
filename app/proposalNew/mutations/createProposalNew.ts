@@ -103,18 +103,18 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
               index: milestone.index,
               data: {
                 title: milestone.title,
-                payments: {
-                  createMany: {
-                    data: milestone.payments.map((payment) => {
-                      return {
-                        senderAddress: payment.senderAddress,
-                        recipientAddress: payment.recipientAddress,
-                        amount: payment.amount,
-                        tokenId: payment.tokenId,
-                        data: { token: payment.token },
-                      }
-                    }),
-                  },
+              },
+              payments: {
+                createMany: {
+                  data: milestone.payments.map((payment) => {
+                    return {
+                      senderAddress: payment.senderAddress,
+                      recipientAddress: payment.recipientAddress,
+                      amount: payment.amount,
+                      tokenId: payment.tokenId,
+                      data: { token: payment.token },
+                    }
+                  }),
                 },
               },
             }

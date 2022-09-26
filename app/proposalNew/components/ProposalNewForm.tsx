@@ -959,10 +959,6 @@ export const ProposalNewForm = () => {
                 signatureMessage: message,
               })
 
-              if (proposal) {
-                setCreatedProposal(proposal)
-              }
-
               if (updatedProposal) {
                 setIsLoading(false)
                 setProposalStep(ProposalStep.APPROVE)
