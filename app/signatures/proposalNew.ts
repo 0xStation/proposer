@@ -36,9 +36,9 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
         { name: "chainId", type: "uint256" },
         { name: "address", type: "address" },
         { name: "type", type: "string" },
-        { name: "name", type: "string" },
-        { name: "symbol", type: "string" },
-        { name: "decimals", type: "uint8" },
+        { name: "name", type: "string" }, // optional, ERC1155 does not support
+        { name: "symbol", type: "string" }, // optional, ERC1155 does not support
+        { name: "decimals", type: "uint8" }, // optional, ERC721 and ERC1155 do not support
       ],
       Proposal: [
         { name: "type", type: "string" },
@@ -85,9 +85,9 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
             chainId: token.chainId,
             address: token.address,
             type: token.type,
-            name: token.name || "",
-            symbol: token.symbol || "",
-            decimals: token.decimals || 0,
+            name: token?.name || "",
+            symbol: token?.symbol || "",
+            decimals: token?.decimals || 0,
           },
         }
       }),
