@@ -2,7 +2,7 @@ import db, { ProposalRoleType } from "db"
 import * as z from "zod"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { ProposalNew, ProposalNewMetadata } from "../types"
-import { ZodMilestone, ZodMilestoneWithPayments, ZodPayment } from "app/types/zod"
+import { ZodMilestone, ZodPayment } from "app/types/zod"
 import { ProposalType } from "db"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
 import { Token } from "app/token/types"
@@ -22,7 +22,6 @@ const CreateProposal = z.object({
   ipfsTimestamp: z.date().optional(),
   milestones: ZodMilestone.array(),
   payments: ZodPayment.array(),
-  // milestones: ZodMilestoneWithPayments.array(),
   paymentTerms: z.enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION]).optional(),
   startDate: z.date().optional(),
   endDate: z.date().optional(),
@@ -101,20 +100,13 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
           data: params.milestones.map((milestone) => {
             return {
               index: milestone.index,
-              data: {
-                title: milestone.title,
-              },
+              data: { title: milestone.title },
             }
           }),
         },
       },
     },
     include: {
-      roles: {
-        include: {
-          account: true,
-        },
-      },
       milestones: true,
     },
   })
@@ -145,7 +137,11 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       },
     },
     include: {
-      roles: true,
+      roles: {
+        include: {
+          account: true,
+        },
+      },
       milestones: true,
       payments: true,
     },
