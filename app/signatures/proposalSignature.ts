@@ -6,7 +6,7 @@ export const genProposalNewApprovalDigest = ({ signerAddress, proposalHash, prop
       // The idea is everything that should have its own api + versioning
       // should have a domain. Keep hardcoded
       name: "ProposalSignature", // keep hardcoded
-      version: "1.0.0", // references the web app's version
+      version: "0.0.1", // references the web app's version
     },
     types: {
       ProposalApproval: [
