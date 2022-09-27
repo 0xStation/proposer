@@ -1,23 +1,23 @@
 import * as z from "zod"
-import db, { ProposalNewStatus } from "db"
+import db, { ProposalStatus } from "db"
 import { Ctx } from "blitz"
 import pinJsonToPinata from "app/utils/pinata"
-import updateProposalNewMetadata from "./updateProposalNewMetadata"
+import updateProposalMetadata from "./updateProposalMetadata"
 
-const PinProposalNew = z.object({
+const PinProposal = z.object({
   proposalId: z.string(),
   signature: z.string(),
   signatureMessage: z.any(),
 })
 
 // pins a proposal to ipfs using pinata and updates the signature's metadata to have the ipfs metadata
-export default async function pinProposalNew(input: z.infer<typeof PinProposalNew>, ctx: Ctx) {
-  const params = PinProposalNew.parse(input)
+export default async function pinProposal(input: z.infer<typeof PinProposal>, ctx: Ctx) {
+  const params = PinProposal.parse(input)
 
   // fnd proposal given the passed-in proposal id
   let proposal
   try {
-    proposal = await db.proposalNew.findUnique({
+    proposal = await db.proposal.findUnique({
       where: { id: params.proposalId },
       include: {
         roles: true,
@@ -27,7 +27,7 @@ export default async function pinProposalNew(input: z.infer<typeof PinProposalNe
       },
     })
   } catch (err) {
-    throw Error(`Failed to find proposal in pinProposalNew: ${err}`)
+    throw Error(`Failed to find proposal in pinProposal: ${err}`)
   }
 
   // create the pinata payload:
@@ -66,7 +66,7 @@ export default async function pinProposalNew(input: z.infer<typeof PinProposalNe
   try {
     let updatedProposal
     // add ipfs response to proposal's metadata
-    updatedProposal = await updateProposalNewMetadata({
+    updatedProposal = await updateProposalMetadata({
       proposalId: params.proposalId,
       contentTitle: proposal?.data?.content?.title,
       contentBody: proposal?.data?.content?.body,
@@ -77,13 +77,13 @@ export default async function pinProposalNew(input: z.infer<typeof PinProposalNe
       paymentTerms: proposal?.data?.paymentTerms,
     })
 
-    if (updatedProposal && updatedProposal.status === ProposalNewStatus.DRAFT) {
-      updatedProposal = await db.proposalNew.update({
+    if (updatedProposal && updatedProposal.status === ProposalStatus.DRAFT) {
+      updatedProposal = await db.proposal.update({
         where: {
           id: params.proposalId,
         },
         data: {
-          status: ProposalNewStatus.AWAITING_APPROVAL,
+          status: ProposalStatus.AWAITING_APPROVAL,
         },
         include: {
           roles: true,

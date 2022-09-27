@@ -1,16 +1,16 @@
 import { useParam, useQuery, BlitzPage } from "blitz"
-import { ProposalViewHeaderNavigation } from "app/proposalNew/components/viewPage/ProposalViewHeaderNavigation"
+import { ProposalViewHeaderNavigation } from "app/proposal/components/viewPage/ProposalViewHeaderNavigation"
 import Layout from "app/core/layouts/Layout"
-import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
-import { ProposalNewStatus } from "@prisma/client"
+import getProposalById from "app/proposal/queries/getProposalById"
+import { ProposalStatus } from "@prisma/client"
 import ProposalMilestonePaymentBox from "app/core/components/ProposalMilestonePaymentBox"
-import { ProposalNew } from "app/proposalNew/types"
+import { Proposal } from "app/proposal/types"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
 
 export const ProposalPayments: BlitzPage = () => {
   const proposalId = useParam("proposalId") as string
   const [proposal] = useQuery(
-    getProposalNewById,
+    getProposalById,
     { id: proposalId },
     {
       suspense: false,
@@ -35,7 +35,7 @@ export const ProposalPayments: BlitzPage = () => {
 
   const showPayInformation =
     proposalContainsPayment &&
-    (proposal?.status === ProposalNewStatus.APPROVED || ProposalNewStatus.COMPLETE)
+    (proposal?.status === ProposalStatus.APPROVED || ProposalStatus.COMPLETE)
 
   return (
     <Layout title="View Payments">
@@ -45,7 +45,7 @@ export const ProposalPayments: BlitzPage = () => {
           milestones.map((milestone, i) => (
             <ProposalMilestonePaymentBox
               key={i}
-              proposal={proposal as ProposalNew}
+              proposal={proposal as Proposal}
               milestone={milestone}
               className="mt-9"
             />

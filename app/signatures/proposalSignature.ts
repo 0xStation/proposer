@@ -1,4 +1,4 @@
-export const genProposalNewApprovalDigest = ({ signerAddress, proposalHash, proposalId }) => {
+export const genProposalApprovalDigest = ({ signerAddress, proposalHash, proposalId }) => {
   return {
     domain: {
       // name aka feature name -

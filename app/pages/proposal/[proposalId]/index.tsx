@@ -1,18 +1,18 @@
 import { BlitzPage, useQuery, useParam } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
-import { ProposalViewHeaderNavigation } from "app/proposalNew/components/viewPage/ProposalViewHeaderNavigation"
+import getProposalById from "app/proposal/queries/getProposalById"
+import { ProposalViewHeaderNavigation } from "app/proposal/components/viewPage/ProposalViewHeaderNavigation"
 import ReadMore from "app/core/components/ReadMore"
 import { TotalPaymentView } from "app/core/components/TotalPaymentView"
 import RoleSignaturesView from "app/core/components/RoleSignaturesView"
-import { ProposalNew } from "app/proposalNew/types"
+import { Proposal } from "app/proposal/types"
 import { IpfsHashView } from "app/core/components/IpfsHashView"
 import TimelineView from "app/core/components/TimelineView"
 
-const ViewProposalNew: BlitzPage = () => {
+const ViewProposal: BlitzPage = () => {
   const proposalId = useParam("proposalId") as string
   const [proposal] = useQuery(
-    getProposalNewById,
+    getProposalById,
     { id: proposalId },
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
@@ -22,7 +22,7 @@ const ViewProposalNew: BlitzPage = () => {
       <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto pb-9">
         <ProposalViewHeaderNavigation />
         <ReadMore className="mt-9 mb-9">{proposal?.data?.content?.body}</ReadMore>
-        <RoleSignaturesView proposal={proposal as ProposalNew | undefined} className="mt-9" />
+        <RoleSignaturesView proposal={proposal as Proposal | undefined} className="mt-9" />
         {(proposal?.data.totalPayments || []).length > 0 && (
           <TotalPaymentView proposal={proposal!} className="mt-9" />
         )}
@@ -37,6 +37,6 @@ const ViewProposalNew: BlitzPage = () => {
   )
 }
 
-ViewProposalNew.suppressFirstRenderFlicker = true
+ViewProposal.suppressFirstRenderFlicker = true
 
-export default ViewProposalNew
+export default ViewProposal

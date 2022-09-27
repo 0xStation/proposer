@@ -1,7 +1,7 @@
-import { ProposalNew } from "app/proposalNew/types"
+import { Proposal } from "app/proposal/types"
 import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 
-export const genProposalNewDigest = (proposal: ProposalNew) => {
+export const genProposalDigest = (proposal: Proposal) => {
   const milestoneIdToIndex = {}
   proposal.milestones?.forEach((milestone) => {
     milestoneIdToIndex[milestone.id] = milestone.index

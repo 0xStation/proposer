@@ -2,22 +2,22 @@ import { Link, Routes, useParam, useQuery, useRouter } from "blitz"
 import { CheckCircleIcon } from "@heroicons/react/solid"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
-import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
-import { ProposalNewStatus, ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
+import getProposalById from "app/proposal/queries/getProposalById"
+import { ProposalStatus, ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
 import { ProposalRole } from "app/proposalRole/types"
 import useStore from "app/core/hooks/useStore"
 import { ProposalStatusPill } from "../../../core/components/ProposalStatusPill"
 import { genPathFromUrlObject } from "app/utils"
 import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
-import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
+import ApproveProposalModal from "app/proposal/components/ApproveProposalModal"
 import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
-import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
+import getProposalSignaturesById from "app/proposal/queries/getProposalSignaturesById"
 import useGetUsersRemainingRolesToSignFor from "app/core/hooks/useGetUsersRemainingRolesToSignFor"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { LINKS } from "app/core/utils/constants"
 import { useState } from "react"
-import PublishProposalNewModal from "../PublishProposalNewModal"
+import PublishProposalModal from "../PublishProposalModal"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.role === proposalType)
@@ -41,7 +41,7 @@ export const ProposalViewHeaderNavigation = () => {
   const [isPublishModalOpen, setPublishModalOpen] = useState<boolean>(false)
   const router = useRouter()
   const [proposal] = useQuery(
-    getProposalNewById,
+    getProposalById,
     { id: proposalId },
     {
       suspense: false,
@@ -51,7 +51,7 @@ export const ProposalViewHeaderNavigation = () => {
     }
   )
   const [signatures] = useQuery(
-    getProposalNewSignaturesById,
+    getProposalSignaturesById,
     { proposalId: proposalId },
     {
       suspense: false,
@@ -77,7 +77,7 @@ export const ProposalViewHeaderNavigation = () => {
   const currentPageUrl =
     typeof window !== "undefined"
       ? genPathFromUrlObject(
-          Routes.ViewProposalNew({
+          Routes.ViewProposal({
             proposalId,
           })
         )
@@ -85,13 +85,13 @@ export const ProposalViewHeaderNavigation = () => {
 
   return (
     <>
-      <PublishProposalNewModal
+      <PublishProposalModal
         isOpen={isPublishModalOpen}
         setIsOpen={setPublishModalOpen}
         proposal={proposal}
       />
       {proposal && (
-        <ApproveProposalNewModal
+        <ApproveProposalModal
           isOpen={proposalApprovalModalOpen}
           setIsOpen={toggleProposalApprovalModalOpen}
           proposal={proposal}
@@ -168,7 +168,7 @@ export const ProposalViewHeaderNavigation = () => {
           {activeUserHasProposalRole && !loading ? (
             !activeUserHasRolesToSign ? (
               <>
-                {proposal?.status !== ProposalNewStatus?.DRAFT ? (
+                {proposal?.status !== ProposalStatus?.DRAFT ? (
                   <Button
                     overrideWidthClassName="w-[300px]"
                     className="mr-3"
@@ -214,7 +214,7 @@ export const ProposalViewHeaderNavigation = () => {
         {/* TABS */}
         <div className="mt-12 self-end flex flex-row space-x-4 border-b border-concrete">
           <ul className="flex flex-row">
-            <Tab router={router} route={Routes.ViewProposalNew({ proposalId })}>
+            <Tab router={router} route={Routes.ViewProposal({ proposalId })}>
               Proposal
             </Tab>
             {(proposal?.payments || []).length > 0 && (

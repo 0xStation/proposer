@@ -1,18 +1,18 @@
 import { ProposalRoleType } from "@prisma/client"
 import { useQuery } from "blitz"
-import { ProposalNew } from "app/proposalNew/types"
+import { Proposal } from "app/proposal/types"
 import { RoleSignature } from "./RoleSignature"
-import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
+import getProposalSignaturesById from "app/proposal/queries/getProposalSignaturesById"
 
 export const RoleSignaturesView = ({
   proposal,
   className,
 }: {
-  proposal?: ProposalNew
+  proposal?: Proposal
   className?: string
 }) => {
   const [signatures] = useQuery(
-    getProposalNewSignaturesById,
+    getProposalSignaturesById,
     { proposalId: proposal?.id as string },
     {
       suspense: false,

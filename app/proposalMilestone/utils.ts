@@ -1,8 +1,8 @@
-import { ProposalNew } from "app/proposalNew/types"
+import { Proposal } from "app/proposal/types"
 import { ProposalMilestone, ProposalMilestoneStatus } from "./types"
 
 export const getMilestoneStatus = (
-  proposal: ProposalNew | null | undefined,
+  proposal: Proposal | null | undefined,
   milestone: ProposalMilestone | null | undefined
 ): ProposalMilestoneStatus | undefined => {
   if (!milestone || !proposal) {

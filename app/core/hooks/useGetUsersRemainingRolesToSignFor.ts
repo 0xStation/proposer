@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useQuery } from "blitz"
-import { ProposalNew } from "app/proposalNew/types"
+import { Proposal } from "app/proposal/types"
 import { ProposalSignature } from "@prisma/client"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
@@ -21,7 +21,7 @@ interface ProposalRoleType {
 /**
  * Hook for fetching the roles a user still needs to sign for given a proposal and the associated signatures.
  *
- * @param proposal: ProposalNew | undefined | null
+ * @param proposal: Proposal | undefined | null
  * (undefined or null bc we need to be able to call the hook before this data resolves from query)
  * @param signatures: Signature[] | undefined | null
  * (undefined or null bc we need to be able to call the hook before this data resolves from query)
@@ -38,7 +38,7 @@ interface ProposalRoleType {
  * have signed. However, there are currently not UI elements that require that, so this leaner hook should be fine.
  */
 const useGetUsersRemainingRolesToSignFor = (
-  proposal: ProposalNew | undefined | null,
+  proposal: Proposal | undefined | null,
   signatures: ProposalSignature[] | undefined
 ) => {
   const activeUser = useStore((state) => state.activeUser)

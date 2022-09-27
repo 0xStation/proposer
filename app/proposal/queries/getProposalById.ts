@@ -1,13 +1,13 @@
 import db from "db"
 import * as z from "zod"
-import { ProposalNew } from "../types"
+import { Proposal } from "../types"
 
-const GetProposalNewById = z.object({
+const GetProposalById = z.object({
   id: z.string(),
 })
 
-export default async function getProposalNewById(params: z.infer<typeof GetProposalNewById>) {
-  const proposal = await db.proposalNew.findUnique({
+export default async function getProposalById(params: z.infer<typeof GetProposalById>) {
+  const proposal = await db.proposal.findUnique({
     where: {
       id: params.id,
     },
@@ -26,5 +26,5 @@ export default async function getProposalNewById(params: z.infer<typeof GetPropo
     return null
   }
 
-  return proposal as unknown as ProposalNew
+  return proposal as unknown as Proposal
 }

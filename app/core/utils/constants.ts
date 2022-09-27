@@ -1,6 +1,6 @@
 import { chain } from "wagmi"
 import networks from "app/utils/networks.json"
-import { ProposalRoleType, ProposalNewStatus, ProposalRoleApprovalStatus } from "@prisma/client"
+import { ProposalRoleType, ProposalStatus, ProposalRoleApprovalStatus } from "@prisma/client"
 import { PaymentTerm } from "app/proposalPayment/types"
 import Gradient0 from "/public/gradients/0.png"
 import Gradient1 from "/public/gradients/1.png"
@@ -50,19 +50,19 @@ export const DEFAULT_PFP_URLS = {
 }
 
 export const PROPOSAL_NEW_STATUS_DISPLAY_MAP = {
-  [ProposalNewStatus.DRAFT]: {
+  [ProposalStatus.DRAFT]: {
     copy: "draft",
     color: "bg-concrete",
   },
-  [ProposalNewStatus.AWAITING_APPROVAL]: {
+  [ProposalStatus.AWAITING_APPROVAL]: {
     copy: "awaiting approval",
     color: "bg-neon-carrot",
   },
-  [ProposalNewStatus.APPROVED]: {
+  [ProposalStatus.APPROVED]: {
     copy: "approved",
     color: "bg-magic-mint",
   },
-  [ProposalNewStatus.COMPLETE]: {
+  [ProposalStatus.COMPLETE]: {
     copy: "complete",
     color: "bg-marble-white",
   },
@@ -97,10 +97,10 @@ export const PROPOSAL_MILESTONE_STATUS_MAP = {
 export const PAGINATION_TAKE = 50
 
 export const PROPOSAL_NEW_STATUS_FILTER_OPTIONS = [
-  ProposalNewStatus.APPROVED,
-  ProposalNewStatus.AWAITING_APPROVAL,
-  ProposalNewStatus.DRAFT,
-  ProposalNewStatus.COMPLETE,
+  ProposalStatus.APPROVED,
+  ProposalStatus.AWAITING_APPROVAL,
+  ProposalStatus.DRAFT,
+  ProposalStatus.COMPLETE,
 ]
 
 export const PROPOSAL_ROLE_FILTER_OPTIONS = [

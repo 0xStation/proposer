@@ -1,14 +1,14 @@
 import db from "db"
 import * as z from "zod"
 import { Ctx } from "blitz"
-import { ProposalNewStatus } from "@prisma/client"
+import { ProposalStatus } from "@prisma/client"
 
 const UpdateProposalStatus = z.object({
   status: z.enum([
-    ProposalNewStatus.APPROVED,
-    ProposalNewStatus.AWAITING_APPROVAL,
-    ProposalNewStatus.COMPLETE,
-    ProposalNewStatus.DRAFT,
+    ProposalStatus.APPROVED,
+    ProposalStatus.AWAITING_APPROVAL,
+    ProposalStatus.COMPLETE,
+    ProposalStatus.DRAFT,
   ]),
   proposalId: z.string(),
 })
@@ -19,7 +19,7 @@ export default async function updateProposalStatus(
 ) {
   const params = UpdateProposalStatus.parse(input)
 
-  const existingProposalNew = await db.proposalNew.findUnique({
+  const existingProposal = await db.proposal.findUnique({
     where: {
       id: params.proposalId,
     },
@@ -28,17 +28,17 @@ export default async function updateProposalStatus(
     },
   })
 
-  if (!existingProposalNew) {
+  if (!existingProposal) {
     console.error("cannot update the status of a proposal that does not exist")
     return null
   }
 
   ctx.session.$authorize(
-    existingProposalNew.roles.map((role) => role.address),
+    existingProposal.roles.map((role) => role.address),
     []
   )
 
-  const proposalNew = await db.proposalNew.update({
+  const proposal = await db.proposal.update({
     where: {
       id: params.proposalId,
     },
@@ -47,5 +47,5 @@ export default async function updateProposalStatus(
     },
   })
 
-  return proposalNew
+  return proposal
 }

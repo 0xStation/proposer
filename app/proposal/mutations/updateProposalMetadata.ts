@@ -2,9 +2,9 @@ import { PaymentTerm } from "app/proposalPayment/types"
 import { ZodToken } from "app/types/zod"
 import db from "db"
 import * as z from "zod"
-import { ProposalNewMetadata } from "../types"
+import { ProposalMetadata } from "../types"
 
-const UpdateProposalNewMetadata = z.object({
+const UpdateProposalMetadata = z.object({
   proposalId: z.string(),
   contentTitle: z.string(),
   contentBody: z.string(),
@@ -18,9 +18,9 @@ const UpdateProposalNewMetadata = z.object({
 // Only updates the metadata of a proposal
 // to update the roles, milestones, or payments of a proposal, use/make their specific mutations
 export default async function updateProposalMetadata(
-  input: z.infer<typeof UpdateProposalNewMetadata>
+  input: z.infer<typeof UpdateProposalMetadata>
 ) {
-  const params = UpdateProposalNewMetadata.parse(input)
+  const params = UpdateProposalMetadata.parse(input)
 
   const { ipfsHash, ipfsPinSize, ipfsTimestamp } = params
   const proposalMetadata = {
@@ -35,10 +35,10 @@ export default async function updateProposalMetadata(
     },
     totalPayments: params.totalPayments,
     paymentTerms: params.paymentTerms,
-  } as unknown as ProposalNewMetadata
+  } as unknown as ProposalMetadata
 
   try {
-    const proposal = await db.proposalNew.update({
+    const proposal = await db.proposal.update({
       where: { id: params.proposalId },
       data: {
         data: JSON.parse(JSON.stringify(proposalMetadata)),

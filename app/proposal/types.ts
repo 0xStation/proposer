@@ -3,17 +3,17 @@ import { ProposalRole } from "app/proposalRole/types"
 import { ProposalMilestone } from "app/proposalMilestone/types"
 import { PaymentTerm, ProposalPayment } from "app/proposalPayment/types"
 import { Token } from "app/token/types"
-import { ProposalNew as PrismaProposalNew } from "@prisma/client"
+import { Proposal as PrismaProposal } from "@prisma/client"
 
-export type ProposalNew = PrismaProposalNew & {
-  data: ProposalNewMetadata
+export type Proposal = PrismaProposal & {
+  data: ProposalMetadata
   roles?: ProposalRole[]
   milestones?: ProposalMilestone[]
   payments?: ProposalPayment[]
   signatures?: ProposalSignature[]
 }
 
-export type ProposalNewMetadata = {
+export type ProposalMetadata = {
   content: { title: string; body: string }
   digest?: Digest
   ipfsMetadata?: {
