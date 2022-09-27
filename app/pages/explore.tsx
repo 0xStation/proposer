@@ -88,21 +88,5 @@ const Explore: BlitzPage = () => {
   )
 }
 
-const WorkspaceComponent = ({ account }) => {
-  return (
-    <Link href={Routes.ProfileHome({ accountAddress: account.address })}>
-      <div
-        className="basis-96 w-full flex flex-row border-b border-concrete cursor-pointer hover:bg-wet-concrete py-3"
-        tabIndex={0}
-      >
-        <div className="basis-64 flex space-x-2 ml-6">
-          <AccountMediaObject account={account} />
-        </div>
-        <div className="basis-[42rem] ml-9 truncate self-center">{account?.data?.bio}</div>
-      </div>
-    </Link>
-  )
-}
-
 Explore.suppressFirstRenderFlicker = true
 export default Explore
