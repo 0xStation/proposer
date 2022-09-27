@@ -41,7 +41,6 @@ export const genProposalDigest = (proposal: Proposal) => {
         { name: "decimals", type: "uint8" }, // optional, ERC721 and ERC1155 do not support
       ],
       Proposal: [
-        { name: "type", type: "string" },
         { name: "timestamp", type: "uint256" }, // UNIX timestamp
         { name: "roles", type: "Role[]" },
         { name: "milestones", type: "Milestone[]" },
@@ -55,7 +54,6 @@ export const genProposalDigest = (proposal: Proposal) => {
       ],
     },
     value: {
-      type: proposal.type,
       timestamp: proposal.timestamp.valueOf(),
       title: proposal.data.content.title,
       body: proposal.data.content.body,

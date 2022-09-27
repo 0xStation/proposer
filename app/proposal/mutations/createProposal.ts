@@ -3,7 +3,6 @@ import * as z from "zod"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { Proposal, ProposalMetadata } from "../types"
 import { ZodMilestone, ZodPayment } from "app/types/zod"
-import { ProposalType } from "db"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
 import { Token } from "app/token/types"
 import { PaymentTerm } from "app/proposalPayment/types"
@@ -76,7 +75,6 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
 
   const proposal = await db.proposal.create({
     data: {
-      type: ProposalType.FUNDING,
       data: JSON.parse(JSON.stringify(proposalMetadata)),
       ...(params.startDate && { startDate: params.startDate }),
       ...(params.endDate && { endDate: params.endDate }),

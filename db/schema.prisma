@@ -57,7 +57,6 @@ enum AccountAccountType {
 
 model Proposal {
   id                    String         @id @default(uuid())
-  type                  ProposalType
   status                ProposalStatus @default(DRAFT)
   timestamp             DateTime       @default(now())
   currentMilestoneIndex Int            @default(-1) // no current milestone, gets set to 0 after proposal is approved
@@ -69,10 +68,6 @@ model Proposal {
   milestones ProposalMilestone[]
   payments   ProposalPayment[]
   signatures ProposalSignature[]
-}
-
-enum ProposalType {
-  FUNDING
 }
 
 enum ProposalStatus {
