@@ -2,6 +2,11 @@ import { ProposalNew } from "app/proposalNew/types"
 import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 
 export const genProposalNewDigest = (proposal: ProposalNew) => {
+  const milestoneIdToIndex = {}
+  proposal.milestones?.forEach((milestone) => {
+    milestoneIdToIndex[milestone.id] = milestone.index
+  })
+
   return {
     domain: {
       // name aka feature name -
@@ -61,7 +66,7 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
       }),
       payments: proposal.payments?.map((payment) => {
         return {
-          milestoneIndex: payment.milestoneIndex,
+          milestoneIndex: milestoneIdToIndex[payment.milestoneId],
           recipientAddress: payment.recipientAddress,
           chainId: payment.data.token.chainId,
           tokenAddress: payment.data.token.address,

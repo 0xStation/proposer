@@ -896,40 +896,10 @@ export const ProposalNewForm = () => {
               // if payment details are present, populate milestone and payment objects
               // supports payment and non-payment proposals
               if (needFunding) {
-                const tokenTransferData = {
-                  senderAddress: resolvedClientAddress,
-                  recipientAddress: resolvedContributorAddress,
-                  amount: parseFloat(values.paymentAmount),
-                  token: { ...token, chainId: selectedNetworkId },
-                }
-
-                if (values.paymentTerms === PaymentTerm.ON_AGREEMENT) {
-                  milestones = [
-                    {
-                      index: 0,
-                      title: "Proposal agreement",
-                    },
-                  ]
-                  payments = [
-                    {
-                      milestoneIndex: 0,
-                      ...tokenTransferData,
-                    },
-                  ]
-                } else if (values.paymentTerms === PaymentTerm.AFTER_COMPLETION) {
-                  milestones = [
-                    {
-                      index: 1,
-                      title: "Proposal completion",
-                    },
-                  ]
-                  payments = [
-                    {
-                      milestoneIndex: 1,
-                      ...tokenTransferData,
-                    },
-                  ]
-                } else {
+                if (
+                  values.paymentTerms !== PaymentTerm.ON_AGREEMENT &&
+                  values.paymentTerms !== PaymentTerm.AFTER_COMPLETION
+                ) {
                   setIsLoading(false)
                   console.error("Missing complete payment information")
                   setToastState({
@@ -939,7 +909,24 @@ export const ProposalNewForm = () => {
                   })
                   return
                 }
+
+                milestones = [
+                  {
+                    index: 0,
+                    title: "Pay contributor",
+                  },
+                ]
+                payments = [
+                  {
+                    milestoneIndex: 0,
+                    senderAddress: resolvedClientAddress,
+                    recipientAddress: resolvedContributorAddress,
+                    amount: parseFloat(values.paymentAmount),
+                    token: { ...token, chainId: selectedNetworkId },
+                  },
+                ]
               }
+
               try {
                 proposal = await createProposalMutation({
                   contentTitle: values.title,

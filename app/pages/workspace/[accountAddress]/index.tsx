@@ -199,7 +199,7 @@ const WorkspaceHome: BlitzPage = () => {
                           {proposal?.status === ProposalNewStatus.AWAITING_APPROVAL && (
                             <ProgressCircleAndNumber
                               numerator={
-                                proposal?.roles.filter(
+                                proposal?.roles?.filter(
                                   (role) =>
                                     role.approvalStatus === ProposalRoleApprovalStatus.COMPLETE
                                 ).length
