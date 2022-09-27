@@ -10,8 +10,8 @@ const UpdateAccount = z.object({
   address: z.string(),
   name: z.string().optional(),
   bio: z.string().optional(),
-  email: z.string().optional(),
   pfpUrl: z.string().optional(),
+  email: z.string().optional(),
 })
 
 export default async function updateAccount(input: z.infer<typeof UpdateAccount>, ctx: Ctx) {
