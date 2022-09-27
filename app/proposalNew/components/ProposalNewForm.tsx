@@ -895,23 +895,23 @@ export const ProposalNewForm = () => {
                   })
                   return
                 }
-              }
 
-              milestones = [
-                {
-                  index: 0,
-                  title: "Pay contributor",
-                },
-              ]
-              payments = [
-                {
-                  milestoneIndex: 0,
-                  senderAddress: resolvedClientAddress,
-                  recipientAddress: resolvedContributorAddress,
-                  amount: parseFloat(values.paymentAmount),
-                  token: { ...token, chainId: selectedNetworkId },
-                },
-              ]
+                milestones = [
+                  {
+                    index: 0,
+                    title: "Pay contributor",
+                  },
+                ]
+                payments = [
+                  {
+                    milestoneIndex: 0,
+                    senderAddress: resolvedClientAddress,
+                    recipientAddress: resolvedContributorAddress,
+                    amount: parseFloat(values.paymentAmount),
+                    token: { ...token, chainId: selectedNetworkId },
+                  },
+                ]
+              }
 
               try {
                 proposal = await createProposalMutation({
