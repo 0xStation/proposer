@@ -1,10 +1,4 @@
 /*
-DATA MIGRATION:
--- Delete all existing proposals
--- Cascades to delete all ProposalRole and ProposalSignature data
-*/
-DELETE FROM "ProposalNew";
-/*
   Warnings:
 
   - The primary key for the `ProposalMilestone` table will be changed. If it partially fails, the table could be left without primary key constraint.
@@ -14,6 +8,14 @@ DELETE FROM "ProposalNew";
   - Added the required column `milestoneId` to the `ProposalPayment` table without a default value. This is not possible if the table is not empty.
 
 */
+
+/*
+DATA MIGRATION:
+-- Delete all existing proposals
+-- Cascades to delete all ProposalRole and ProposalSignature data
+*/
+DELETE FROM "ProposalNew";
+
 -- DropForeignKey
 ALTER TABLE "ProposalPayment" DROP CONSTRAINT "ProposalPayment_proposalId_milestoneIndex_fkey";
 

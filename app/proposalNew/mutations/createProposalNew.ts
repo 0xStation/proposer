@@ -28,7 +28,6 @@ const CreateProposal = z.object({
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
-  console.log(input)
   const params = CreateProposal.parse(input)
 
   if (params.endDate && params.startDate) {
