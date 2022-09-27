@@ -7,7 +7,7 @@ interface AvatarProps {
   /**
    * Optional pfp url
    */
-  pfpURL?: string
+  pfpUrl?: string
   size?: string
   address?: string
 }
@@ -15,11 +15,11 @@ interface AvatarProps {
 /**
  * thumbnail representation of an account
  */
-const Avatar = ({ pfpURL, size = Sizes.BASE, address, ...props }: AvatarProps) => {
+const Avatar = ({ pfpUrl, size = Sizes.BASE, address, ...props }: AvatarProps) => {
   const gradient = address ? gradientMap[parseInt(address, 16) % 6].src : gradientMap[0].src
   return (
     <Image
-      src={pfpURL || gradient}
+      src={pfpUrl || gradient}
       alt="Account profile picture. If no profile picture is set, there is a linear gradient."
       height={size === Sizes.SM ? 24 : size === Sizes.BASE ? 42 : 60}
       width={size === Sizes.SM ? 24 : size === Sizes.BASE ? 42 : 60}

@@ -8,7 +8,7 @@ export const CollaboratorPfps = ({ accounts, size = Sizes.SM }) => {
   return (
     <div className="flex flex-row">
       {accounts?.length
-        ? accounts.map(({ address, data: { pfpURL } }, idx) => {
+        ? accounts.map(({ address, data: { pfpUrl } }, idx) => {
             const pfpStyling = `${pfpHeight} rounded-full border block border-wet-concrete hover:opacity-90`
             const nestedStyling = idx
               ? size === Sizes.SM
@@ -24,7 +24,7 @@ export const CollaboratorPfps = ({ accounts, size = Sizes.SM }) => {
                 key={address}
                 onClick={() => router.push(Routes.WorkspaceHome({ accountAddress: address }))}
               >
-                <Avatar size={size} pfpURL={pfpURL} address={address} />
+                <Avatar size={size} pfpUrl={pfpUrl} address={address} />
               </button>
             )
           })

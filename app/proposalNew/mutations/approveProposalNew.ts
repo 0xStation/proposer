@@ -85,8 +85,6 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
     throw Error(`Failed to pin proposal signature to ipfs in approveProposalNew: ${err}`)
   }
 
-  // TODO: for representing multisigs, query if signatures have hit quorum for it
-
   let proposal
   try {
     proposal = await db.proposalNew.findUnique({

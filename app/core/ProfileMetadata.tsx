@@ -4,7 +4,7 @@ import { truncateString } from "app/core/utils/truncateString"
 
 type ProfileMetadataProps = {
   address: string
-  pfpURL?: string
+  pfpUrl?: string
   name?: string
   handle?: string
   ens?: string
@@ -15,7 +15,7 @@ type ProfileMetadataProps = {
 }
 
 export const ProfileMetadata = ({
-  pfpURL,
+  pfpUrl,
   name,
   ens,
   address,
@@ -26,10 +26,10 @@ export const ProfileMetadata = ({
 }: ProfileMetadataProps) => {
   const pfpSize = large ? "h-[52px] w-[52px]" : "h-[40px] w-[40px]"
 
-  const profileImage = pfpURL ? (
+  const profileImage = pfpUrl ? (
     <div className="flex-2/5 m-auto">
       <img
-        src={pfpURL}
+        src={pfpUrl}
         alt="PFP"
         className={`${pfpSize} border border-marble-white rounded-full`}
       />

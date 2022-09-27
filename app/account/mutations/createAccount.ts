@@ -12,7 +12,7 @@ const CreateAccount = z.object({
   address: z.string().optional(),
   bio: z.string().optional(),
   email: z.string().optional(),
-  pfpURL: z.string().optional(),
+  pfpUrl: z.string().optional(),
   coverURL: z.string().optional(),
   contactURL: z.string().optional(),
   twitterUrl: z.string().optional(),
@@ -47,7 +47,7 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
     data: {
       name: name,
       bio: params.bio,
-      pfpURL: params.pfpURL,
+      pfpUrl: params.pfpUrl,
       coverURL: params.coverURL,
       contactURL: params.contactURL,
       twitterUrl: params.twitterUrl,

@@ -86,7 +86,7 @@ const Navigation = ({ children }: { children?: any }) => {
   }, [chain])
 
   const { data: ensName } = useEnsName({
-    address: activeUser?.address,
+    address: activeUser?.address || undefined,
     chainId: 1,
     cacheTime: 60 * 60 * 1000, // (1 hr) time (in ms) which the data should remain in the cache
     enabled: !!activeUser,
@@ -131,7 +131,7 @@ const Navigation = ({ children }: { children?: any }) => {
                   <span className="flex flex-row space-x-2 items-center">
                     <Avatar
                       size={Sizes.SM}
-                      pfpURL={activeUser?.data.pfpURL}
+                      pfpUrl={activeUser?.data.pfpUrl}
                       address={activeUser?.address}
                     />
                     <span className="block text-marble-white text-sm mr-12">
@@ -215,7 +215,7 @@ transition-all duration-200 origin-left`}
           } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-full h-[47px] mb-4`}
         >
           <Image
-            src={activeUser?.data?.pfpURL || gradientMap[parseInt(activeUser.address, 16) % 6]}
+            src={activeUser?.data?.pfpUrl || gradientMap[parseInt(activeUser.address, 16) % 6]}
             alt="Account profile picture. If no profile picture is set, there is a blue to green linear gradient."
             height={46}
             width={46}

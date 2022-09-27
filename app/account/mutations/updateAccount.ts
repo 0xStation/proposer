@@ -11,7 +11,7 @@ const UpdateAccount = z.object({
   address: z.string().optional(),
   bio: z.string().optional(),
   email: z.string().optional(),
-  pfpURL: z.string().optional(),
+  pfpUrl: z.string().optional(),
   coverURL: z.string().optional(),
   contactURL: z.string().optional(),
   twitterUrl: z.string().optional(),
@@ -66,10 +66,10 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
     data: {
       // save existing account data with overwrites below
       // without this, chainId for multisig accounts gets wiped
-      ...existingAccount.data,
+      ...Object(existingAccount.data),
       name: params.name,
       bio: params.bio,
-      pfpURL: params.pfpURL,
+      pfpUrl: params.pfpUrl,
       coverURL: params.coverURL,
       contactURL: params.contactURL,
       twitterUrl: params.twitterUrl,
