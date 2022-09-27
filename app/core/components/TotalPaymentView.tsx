@@ -1,6 +1,6 @@
 import { DateTime } from "luxon"
 import { getNetworkName } from "app/core/utils/networkInfo"
-import { ProposalNew } from "app/proposalNew/types"
+import { Proposal } from "app/proposal/types"
 import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 
@@ -8,7 +8,7 @@ export const TotalPaymentView = ({
   proposal,
   className,
 }: {
-  proposal?: ProposalNew
+  proposal?: Proposal
   className?: string
 }) => {
   return proposal ? (

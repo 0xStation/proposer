@@ -3,19 +3,19 @@ import { useState } from "react"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import { genProposalNewDigest } from "app/signatures/proposalNew"
+import { genProposalDigest } from "app/signatures/proposal"
 import useSignature from "app/core/hooks/useSignature"
-import pinProposalNew from "../mutations/pinProposalNew"
-import getProposalNewById from "../queries/getProposalNewById"
+import pinProposal from "../mutations/pinProposal"
+import getProposalById from "../queries/getProposalById"
 
-export const PublishProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
+export const PublishProposalModal = ({ isOpen, setIsOpen, proposal }) => {
   const setToastState = useStore((state) => state.setToastState)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const { signMessage } = useSignature()
-  const [pinProposalMutation] = useMutation(pinProposalNew, {
+  const [pinProposalMutation] = useMutation(pinProposal, {
     onSuccess: (data) => {
       setIsLoading(false)
-      invalidateQuery(getProposalNewById)
+      invalidateQuery(getProposalById)
       setToastState({
         isToastShowing: true,
         type: "success",
@@ -55,7 +55,7 @@ export const PublishProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
             setIsLoading(true)
             try {
               // prompt author to sign proposal to prove they are the author of the content
-              const message = genProposalNewDigest(proposal)
+              const message = genProposalDigest(proposal)
               const signature = await signMessage(message)
 
               if (!signature) {
@@ -86,4 +86,4 @@ export const PublishProposalNewModal = ({ isOpen, setIsOpen, proposal }) => {
   )
 }
 
-export default PublishProposalNewModal
+export default PublishProposalModal

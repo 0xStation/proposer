@@ -14,7 +14,7 @@ export default async function saveTransactionHashToPayments(
 
   // batch operate proposal milestone incrementing and payment transaction saving for ACID guarantees
   await db.$transaction(async (db) => {
-    const proposal = await db.proposalNew.findUnique({
+    const proposal = await db.proposal.findUnique({
       where: { id: params.proposalId },
     })
 
@@ -39,7 +39,7 @@ export default async function saveTransactionHashToPayments(
     })
 
     // increment proposal's milestone
-    await db.proposalNew.update({
+    await db.proposal.update({
       where: { id: params.proposalId },
       data: {
         currentMilestoneIndex: milestone.index + 1,

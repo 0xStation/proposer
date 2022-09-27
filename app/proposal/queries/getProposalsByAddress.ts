@@ -1,10 +1,10 @@
-import db, { ProposalNewStatus, ProposalRoleType } from "db"
+import db, { ProposalStatus, ProposalRoleType } from "db"
 import * as z from "zod"
-import { ProposalNew } from "app/proposalNew/types"
+import { Proposal } from "app/proposal/types"
 import { PAGINATION_TAKE } from "app/core/utils/constants"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
-const GetProposalNewsByAddress = z.object({
+const GetProposalsByAddress = z.object({
   address: z.string(),
   statuses: z.any().array().optional(),
   roles: z.any().array().optional(),
@@ -12,10 +12,8 @@ const GetProposalNewsByAddress = z.object({
   paginationTake: z.number().optional().default(PAGINATION_TAKE),
 })
 
-export default async function getProposalNewsByAddress(
-  input: z.infer<typeof GetProposalNewsByAddress>
-) {
-  const data = GetProposalNewsByAddress.parse(input)
+export default async function getProposalsByAddress(input: z.infer<typeof GetProposalsByAddress>) {
+  const data = GetProposalsByAddress.parse(input)
 
   const whereParams = {
     where: {
@@ -40,8 +38,8 @@ export default async function getProposalNewsByAddress(
   }
 
   const response = (await db.$transaction([
-    db.proposalNew.count(whereParams),
-    db.proposalNew.findMany({
+    db.proposal.count(whereParams),
+    db.proposal.findMany({
       ...whereParams,
       take: input.paginationTake,
       skip: input.page * input.paginationTake,
@@ -56,7 +54,7 @@ export default async function getProposalNewsByAddress(
         },
       },
     }),
-  ])) as unknown as [number, ProposalNew[]]
+  ])) as unknown as [number, Proposal[]]
 
   let count = response[0]
   let proposals = response[1]
@@ -64,7 +62,7 @@ export default async function getProposalNewsByAddress(
   return {
     count,
     proposals: proposals.filter((proposal) => {
-      if (proposal?.status === ProposalNewStatus.DRAFT) {
+      if (proposal?.status === ProposalStatus.DRAFT) {
         const authorRole = proposal?.roles?.find((role) => role.role === ProposalRoleType.AUTHOR)
         return addressesAreEqual(data.address, authorRole?.address as string)
       }

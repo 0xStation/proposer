@@ -6,7 +6,7 @@ import Button from "app/core/components/sds/buttons/Button"
 import { useNetwork, useWaitForTransaction } from "wagmi"
 import { useEffect, useState } from "react"
 import saveTransactionHashToPayments from "../mutations/saveTransactionToPayments"
-import getProposalNewById from "../queries/getProposalNewById"
+import getProposalById from "../queries/getProposalById"
 import { preparePaymentTransaction } from "app/transaction/payments"
 import { useSendTransaction } from "wagmi"
 import { Field, Form } from "react-final-form"
@@ -19,8 +19,8 @@ enum Tab {
   DIRECT_PAYMENT = "DIRECT_PAYMENT",
   ATTACH_TRANSACTION = "ATTACH_TRANSACTION",
 }
-import updateProposalStatus from "app/proposalNew/mutations/updateProposalStatus"
-import { ProposalNewStatus } from "@prisma/client"
+import updateProposalStatus from "app/proposal/mutations/updateProposalStatus"
+import { ProposalStatus } from "@prisma/client"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 
 export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
@@ -63,14 +63,14 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
     hash: txnHash as string,
     onSuccess: async (data) => {
       try {
-        invalidateQuery(getProposalNewById)
+        invalidateQuery(getProposalById)
 
         // once the payment tx is cleared
         // move the proposal status to complete
         // todo: task queue to properly address payment txs
         await updateProposalStatusMutation({
           proposalId: payment.proposalId,
-          status: ProposalNewStatus.COMPLETE,
+          status: ProposalStatus.COMPLETE,
         })
 
         setIsOpen(false)
@@ -108,7 +108,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
       transactionHash,
     })
 
-    invalidateQuery(getProposalNewById)
+    invalidateQuery(getProposalById)
 
     setIsOpen(false)
     setToastState({

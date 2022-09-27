@@ -1,9 +1,9 @@
 import * as z from "zod"
 import db from "db"
-import { ProposalNewStatus, ProposalRoleApprovalStatus } from "@prisma/client"
+import { ProposalStatus, ProposalRoleApprovalStatus } from "@prisma/client"
 import pinProposalSignature from "app/proposalSignature/mutations/pinProposalSignature"
 
-const ApproveProposalNew = z.object({
+const ApproveProposal = z.object({
   proposalId: z.string(),
   signerAddress: z.string(),
   message: z.any(),
@@ -16,8 +16,8 @@ const ApproveProposalNew = z.object({
     .array(), // array of type role
 })
 
-export default async function approveProposalNew(input: z.infer<typeof ApproveProposalNew>) {
-  const params = ApproveProposalNew.parse(input)
+export default async function approveProposal(input: z.infer<typeof ApproveProposal>) {
+  const params = ApproveProposal.parse(input)
 
   if (params.representingRoles.length === 0) {
     throw Error("missing representing roles ids")
@@ -72,7 +72,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
     ])
     proposalSignature = proposalSig
   } catch (err) {
-    throw Error(`Failed to create signature in approveProposalNew: ${err}`)
+    throw Error(`Failed to create signature in approveProposal: ${err}`)
   }
 
   try {
@@ -82,12 +82,12 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       signatureMessage: params?.message,
     })
   } catch (err) {
-    throw Error(`Failed to pin proposal signature to ipfs in approveProposalNew: ${err}`)
+    throw Error(`Failed to pin proposal signature to ipfs in approveProposal: ${err}`)
   }
 
   let proposal
   try {
-    proposal = await db.proposalNew.findUnique({
+    proposal = await db.proposal.findUnique({
       where: { id: params.proposalId },
       include: {
         roles: true,
@@ -97,7 +97,7 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
       },
     })
   } catch (err) {
-    throw Error(`Failed to find proposal in approveProposalNew: ${err}`)
+    throw Error(`Failed to find proposal in approveProposal: ${err}`)
   }
 
   // update proposal status based on status of signatures
@@ -106,18 +106,18 @@ export default async function approveProposalNew(input: z.infer<typeof ApprovePr
   const pendingStatusChange = proposal.roles.every(
     (role) => role.approvalStatus === ProposalRoleApprovalStatus.COMPLETE
   )
-    ? ProposalNewStatus.APPROVED
-    : ProposalNewStatus.AWAITING_APPROVAL
+    ? ProposalStatus.APPROVED
+    : ProposalStatus.AWAITING_APPROVAL
 
   if (proposal.status === pendingStatusChange) {
     return proposal
   } else {
-    const updatedProposal = await db.proposalNew.update({
+    const updatedProposal = await db.proposal.update({
       where: { id: params.proposalId },
       data: {
         status: pendingStatusChange,
         // if approving, move milestone from -1 (default) to 0 (proposal approved)
-        ...(pendingStatusChange === ProposalNewStatus.APPROVED &&
+        ...(pendingStatusChange === ProposalStatus.APPROVED &&
           // only set milestone index if there are milestones
           proposal.milestones.length > 0 && {
             // take milestone with lowest index

@@ -2,7 +2,7 @@ import { useQuery } from "blitz"
 import { useState } from "react"
 import { CheckCircleIcon } from "@heroicons/react/solid"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
-import ExecutePaymentModal from "app/proposalNew/components/ExecutePaymentModal"
+import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
 import { ProposalMilestone, ProposalMilestoneStatus } from "app/proposalMilestone/types"
 import { getMilestoneStatus } from "app/proposalMilestone/utils"
 import { PROPOSAL_MILESTONE_STATUS_MAP } from "../utils/constants"
@@ -11,7 +11,7 @@ import Button, { ButtonType } from "./sds/buttons/Button"
 import { ProposalRoleType } from "@prisma/client"
 import { addressesAreEqual } from "../utils/addressesAreEqual"
 import useStore from "../hooks/useStore"
-import { ProposalNew } from "app/proposalNew/types"
+import { Proposal } from "app/proposal/types"
 import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 
 export const ProposalMilestonePaymentBox = ({
@@ -19,7 +19,7 @@ export const ProposalMilestonePaymentBox = ({
   milestone,
   className,
 }: {
-  proposal: ProposalNew
+  proposal: Proposal
   milestone: ProposalMilestone
   className?: string
 }) => {

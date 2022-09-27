@@ -1,5 +1,5 @@
 import { ExternalLinkIcon } from "@heroicons/react/solid"
-import { ProposalNew } from "app/proposalNew/types"
+import { Proposal } from "app/proposal/types"
 import { LINKS } from "../utils/constants"
 import { convertDateStringToDateAndTime } from "../utils/convertDateStringToDateAndTime"
 
@@ -7,7 +7,7 @@ export const IpfsHashView = ({
   proposal,
   className,
 }: {
-  proposal?: ProposalNew
+  proposal?: Proposal
   className?: string
 }) => {
   return (

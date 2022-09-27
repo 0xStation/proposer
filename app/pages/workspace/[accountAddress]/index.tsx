@@ -5,7 +5,7 @@ import Button from "app/core/components/sds/buttons/Button"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { formatDate } from "app/core/utils/formatDate"
 import FilterPill from "app/core/components/FilterPill"
-import getProposalNewsByAddress from "app/proposalNew/queries/getProposalNewsByAddress"
+import getProposalsByAddress from "app/proposal/queries/getProposalsByAddress"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import Pagination from "app/core/components/Pagination"
 import {
@@ -17,7 +17,7 @@ import {
 } from "app/core/utils/constants"
 import {
   AddressType,
-  ProposalNewStatus,
+  ProposalStatus,
   ProposalRoleApprovalStatus,
   ProposalRoleType,
 } from "@prisma/client"
@@ -46,8 +46,8 @@ const WorkspaceHome: BlitzPage = () => {
   const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [canViewSettings, setCanViewSettings] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<Tab>(Tab.PROPOSALS)
-  const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalNewStatus>>(
-    new Set<ProposalNewStatus>()
+  const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
+    new Set<ProposalStatus>()
   )
   const [proposalRoleFilters, setProposalRoleFilters] = useState<Set<ProposalRoleType>>(
     new Set<ProposalRoleType>()
@@ -55,7 +55,7 @@ const WorkspaceHome: BlitzPage = () => {
   const [page, setPage] = useState<number>(0)
   const accountAddress = useParam("accountAddress", "string") as string
   const [proposalResponse] = useQuery(
-    getProposalNewsByAddress,
+    getProposalsByAddress,
     {
       address: toChecksumAddress(accountAddress),
       statuses: Array.from(proposalStatusFilters),
@@ -122,7 +122,7 @@ const WorkspaceHome: BlitzPage = () => {
               setAppliedFilters={setProposalStatusFilters}
               refetchCallback={() => {
                 setPage(0)
-                invalidateQuery(getProposalNewsByAddress)
+                invalidateQuery(getProposalsByAddress)
               }}
             />
             <FilterPill
@@ -135,7 +135,7 @@ const WorkspaceHome: BlitzPage = () => {
               setAppliedFilters={setProposalRoleFilters}
               refetchCallback={() => {
                 setPage(0)
-                invalidateQuery(getProposalNewsByAddress)
+                invalidateQuery(getProposalsByAddress)
               }}
             />
           </div>
@@ -181,7 +181,7 @@ const WorkspaceHome: BlitzPage = () => {
                   })
                 return (
                   <Link
-                    href={Routes.ViewProposalNew({ proposalId: proposal.id })}
+                    href={Routes.ViewProposal({ proposalId: proposal.id })}
                     key={`table-row-${idx}`}
                   >
                     <tr className="border-b border-concrete cursor-pointer hover:bg-wet-concrete">
@@ -195,7 +195,7 @@ const WorkspaceHome: BlitzPage = () => {
                       <td className="py-4">
                         <div className="flex flex-row space-x-2">
                           <ProposalStatusPill status={proposal?.status} />
-                          {proposal?.status === ProposalNewStatus.AWAITING_APPROVAL && (
+                          {proposal?.status === ProposalStatus.AWAITING_APPROVAL && (
                             <ProgressCircleAndNumber
                               numerator={
                                 proposal?.roles?.filter(
@@ -292,7 +292,7 @@ const WorkspaceHome: BlitzPage = () => {
               />
             )}
             {/* CTA */}
-            <Link href={Routes.CreateProposalNew()}>
+            <Link href={Routes.CreateProposal()}>
               <Button className="w-full">Propose</Button>
             </Link>
           </div>

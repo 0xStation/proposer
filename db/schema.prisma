@@ -68,13 +68,13 @@ model FeatureFlag {
   createdAt   DateTime          @default(now())
 }
 
-model ProposalNew {
-  id                    String            @id @default(uuid())
+model Proposal {
+  id                    String         @id @default(uuid())
   type                  ProposalType
-  timestamp             DateTime          @default(now())
-  currentMilestoneIndex Int               @default(-1) // no current milestone, gets set to 0 after proposal is approved
+  status                ProposalStatus @default(DRAFT)
+  timestamp             DateTime       @default(now())
+  currentMilestoneIndex Int            @default(-1) // no current milestone, gets set to 0 after proposal is approved
   data                  Json
-  status                ProposalNewStatus @default(DRAFT)
   startDate             DateTime?
   endDate               DateTime?
 
@@ -85,11 +85,11 @@ model ProposalNew {
 }
 
 model ProposalSignature {
-  id         String      @id @default(uuid())
+  id         String   @id @default(uuid())
   proposalId String
-  proposal   ProposalNew @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  proposal   Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   address    String
-  timestamp  DateTime    @default(now())
+  timestamp  DateTime @default(now())
   data       Json
 
   // m-n relation to support one signature being utilized for many roles
@@ -101,7 +101,7 @@ model ProposalSignature {
 model ProposalRole {
   id             String                     @id @default(uuid())
   proposalId     String
-  proposal       ProposalNew                @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  proposal       Proposal                   @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   address        String
   approvalStatus ProposalRoleApprovalStatus @default(INCOMPLETE)
   account        Account                    @relation(fields: [address], references: [address])
@@ -126,9 +126,9 @@ model Token {
 }
 
 model ProposalMilestone {
-  id         String      @id @default(uuid())
+  id         String   @id @default(uuid())
   proposalId String
-  proposal   ProposalNew @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  proposal   Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   index      Int
   data       Json
 
@@ -139,7 +139,7 @@ model ProposalMilestone {
 model ProposalPayment {
   id               String            @id @default(uuid())
   proposalId       String
-  proposal         ProposalNew       @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  proposal         Proposal          @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   milestoneId      String
   milestone        ProposalMilestone @relation(fields: [milestoneId], references: [id])
   senderAddress    String
@@ -202,14 +202,6 @@ enum ProposalRoleType {
 }
 
 enum ProposalStatus {
-  DRAFT
-  PUBLISHED
-  IN_REVIEW
-  APPROVED
-  DELETED
-}
-
-enum ProposalNewStatus {
   DRAFT
   AWAITING_APPROVAL
   APPROVED

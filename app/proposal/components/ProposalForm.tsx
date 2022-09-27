@@ -8,7 +8,7 @@ import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { SUPPORTED_CHAINS, LINKS, PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import debounce from "lodash.debounce"
-import createProposal from "app/proposalNew/mutations/createProposalNew"
+import createProposal from "app/proposal/mutations/createProposal"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { CheckCircleIcon } from "@heroicons/react/solid"
 import {
@@ -18,11 +18,11 @@ import {
   isPositiveAmount,
   isEnsOrAddress,
 } from "app/utils/validators"
-import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
+import getProposalSignaturesById from "app/proposal/queries/getProposalSignaturesById"
 import truncateString from "app/core/utils/truncateString"
 import { AddressType, ProposalRoleType } from "@prisma/client"
 import BackArrow from "app/core/icons/BackArrow"
-import ApproveProposalNewModal from "app/proposalNew/components/ApproveProposalNewModal"
+import ApproveProposalModal from "app/proposal/components/ApproveProposalModal"
 import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 import WhenFieldChanges from "app/core/components/WhenFieldChanges"
 import { DateTime } from "luxon"
@@ -39,11 +39,11 @@ import { AddressLink } from "../../core/components/AddressLink"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { getNetworkTokens } from "app/core/utils/networkInfo"
 import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
-import { genProposalNewDigest } from "app/signatures/proposalNew"
-import pinProposalNew from "../mutations/pinProposalNew"
+import { genProposalDigest } from "app/signatures/proposal"
+import pinProposal from "../mutations/pinProposal"
 import TextLink from "app/core/components/TextLink"
 import { Spinner } from "app/core/components/Spinner"
-import { ProposalNew } from "../types"
+import { Proposal } from "../types"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -692,7 +692,7 @@ const SignForm = ({ activeUser, proposal, signatures }) => {
 
   return (
     <div className="mt-6">
-      <ApproveProposalNewModal
+      <ApproveProposalModal
         isOpen={isApproveProposalModalOpen}
         setIsOpen={setIsApproveProposalModalOpen}
         proposal={proposal}
@@ -727,7 +727,7 @@ const ProposalCreationLoadingScreen = ({ createdProposal }) => (
   </div>
 )
 
-export const ProposalNewForm = () => {
+export const ProposalForm = () => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
@@ -744,7 +744,7 @@ export const ProposalNewForm = () => {
   const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState<boolean>(false)
   const [shouldHandleSubmit, setShouldHandleSubmit] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [createdProposal, setCreatedProposal] = useState<ProposalNew | null>(null)
+  const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
   // default to mainnet since we're using it to check ENS
   // which pretty much only exists on mainnet as of right now
   const provider = useProvider({ chainId: 1 })
@@ -752,7 +752,7 @@ export const ProposalNewForm = () => {
   const { signMessage } = useSignature()
 
   const [signatures] = useQuery(
-    getProposalNewSignaturesById,
+    getProposalSignaturesById,
     { proposalId: proposal && proposal?.id },
     {
       suspense: false,
@@ -822,7 +822,7 @@ export const ProposalNewForm = () => {
       console.error(error)
     },
   })
-  const [pinProposalMutation] = useMutation(pinProposalNew, {
+  const [pinProposalMutation] = useMutation(pinProposal, {
     onSuccess: (data) => {
       setProposal(data)
       setProposalStep(ProposalStep.APPROVE)
@@ -972,7 +972,7 @@ export const ProposalNewForm = () => {
                 throw Error("Current address doesn't match author's address.")
               }
               // prompt author to sign proposal to prove they are the author of the content
-              const message = genProposalNewDigest((createdProposal as ProposalNew) || proposal)
+              const message = genProposalDigest((createdProposal as Proposal) || proposal)
               const signature = await signMessage(message)
 
               if (!signature) {
@@ -1109,7 +1109,7 @@ export const ProposalNewForm = () => {
                       type={ButtonType.Secondary}
                       onClick={() => {
                         const path = genUrlFromRoute(
-                          Routes.ViewProposalNew({
+                          Routes.ViewProposal({
                             proposalId: proposal.id,
                           })
                         )
@@ -1128,7 +1128,7 @@ export const ProposalNewForm = () => {
                       isDisabled={!userHasSigned}
                       onClick={() => {
                         router.push(
-                          Routes.ViewProposalNew({
+                          Routes.ViewProposal({
                             proposalId: proposal.id,
                           })
                         )
@@ -1147,6 +1147,6 @@ export const ProposalNewForm = () => {
   )
 }
 
-ProposalNewForm.suppressFirstRenderFlicker = true
+ProposalForm.suppressFirstRenderFlicker = true
 
-export default ProposalNewForm
+export default ProposalForm

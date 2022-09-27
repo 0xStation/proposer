@@ -3,34 +3,34 @@ import { useState } from "react"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import useSignature from "app/core/hooks/useSignature"
-import approveProposalNew from "app/proposalNew/mutations/approveProposalNew"
+import approveProposal from "app/proposal/mutations/approveProposal"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import getProposalNewById from "../queries/getProposalNewById"
-import { genProposalNewApprovalDigest } from "app/signatures/proposalSignature"
-import { ProposalNew } from "app/proposalNew/types"
+import getProposalById from "../queries/getProposalById"
+import { genProposalApprovalDigest } from "app/signatures/proposalSignature"
+import { Proposal } from "app/proposal/types"
 import useGetUsersRemainingRolesToSignFor from "app/core/hooks/useGetUsersRemainingRolesToSignFor"
-import getProposalNewSignaturesById from "app/proposalNew/queries/getProposalNewSignaturesById"
-import { genProposalNewDigest } from "app/signatures/proposalNew"
+import getProposalSignaturesById from "app/proposal/queries/getProposalSignaturesById"
+import { genProposalDigest } from "app/signatures/proposal"
 import { getHash } from "app/signatures/utils"
 
-export const ApproveProposalNewModal = ({
+export const ApproveProposalModal = ({
   isOpen,
   setIsOpen,
   proposal,
 }: {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
-  proposal: ProposalNew
+  proposal: Proposal
   additionalRoles?: { roleId: string; complete: boolean }[]
 }) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
-  const [approveProposalMutation] = useMutation(approveProposalNew)
+  const [approveProposalMutation] = useMutation(approveProposal)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const [signatures] = useQuery(
-    getProposalNewSignaturesById,
+    getProposalSignaturesById,
     { proposalId: proposal.id },
     {
       suspense: false,
@@ -57,10 +57,10 @@ export const ApproveProposalNewModal = ({
       })
     }
 
-    const { domain, types, value } = genProposalNewDigest(proposal)
+    const { domain, types, value } = genProposalDigest(proposal)
     const proposalHash = getHash(domain, types, value)
 
-    const message = genProposalNewApprovalDigest({
+    const message = genProposalApprovalDigest({
       signerAddress: activeUser?.address,
       proposalHash: proposalHash,
       proposalId: proposal?.id as string,
@@ -88,10 +88,10 @@ export const ApproveProposalNewModal = ({
         signature,
         representingRoles,
       })
-      invalidateQuery(getProposalNewSignaturesById)
+      invalidateQuery(getProposalSignaturesById)
       // invalidate proposal query to get ipfs hash post-approval
       // since an ipfs has is created on proposal approval
-      invalidateQuery(getProposalNewById)
+      invalidateQuery(getProposalById)
       router.replace(router.asPath)
       setIsOpen(false)
       setToastState({
@@ -143,4 +143,4 @@ export const ApproveProposalNewModal = ({
   )
 }
 
-export default ApproveProposalNewModal
+export default ApproveProposalModal

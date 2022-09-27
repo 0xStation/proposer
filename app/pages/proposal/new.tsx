@@ -1,15 +1,15 @@
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import { ProposalNewForm } from "app/proposalNew/components/ProposalNewForm"
+import { ProposalForm } from "app/proposal/components/ProposalForm"
 
-const CreateProposalNew: BlitzPage = () => {
+const CreateProposal: BlitzPage = () => {
   return (
     <Layout title="New Proposal">
-      <ProposalNewForm />
+      <ProposalForm />
     </Layout>
   )
 }
 
-CreateProposalNew.suppressFirstRenderFlicker = true
+CreateProposal.suppressFirstRenderFlicker = true
 
-export default CreateProposalNew
+export default CreateProposal

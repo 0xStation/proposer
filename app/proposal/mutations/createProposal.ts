@@ -1,7 +1,7 @@
 import db, { ProposalRoleType } from "db"
 import * as z from "zod"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
-import { ProposalNew, ProposalNewMetadata } from "../types"
+import { Proposal, ProposalMetadata } from "../types"
 import { ZodMilestone, ZodPayment } from "app/types/zod"
 import { ProposalType } from "db"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
@@ -72,9 +72,9 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     },
     totalPayments: Object.values(totalPayments),
     paymentTerms: params.paymentTerms,
-  } as unknown as ProposalNewMetadata
+  } as unknown as ProposalMetadata
 
-  const proposal = await db.proposalNew.create({
+  const proposal = await db.proposal.create({
     data: {
       type: ProposalType.FUNDING,
       data: JSON.parse(JSON.stringify(proposalMetadata)),
@@ -116,7 +116,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     milestoneIndexToId[milestone.index] = milestone.id
   })
 
-  const proposalWithPayments = db.proposalNew.update({
+  const proposalWithPayments = db.proposal.update({
     where: {
       id: proposal.id,
     },
@@ -147,5 +147,5 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     },
   })
 
-  return proposalWithPayments as unknown as ProposalNew
+  return proposalWithPayments as unknown as Proposal
 }
