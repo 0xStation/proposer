@@ -69,11 +69,11 @@ export const PROPOSAL_NEW_STATUS_DISPLAY_MAP = {
 }
 
 export const PROPOSAL_ROLE_APPROVAL_STATUS_MAP = {
-  [ProposalRoleApprovalStatus.INCOMPLETE]: {
+  [ProposalRoleApprovalStatus.PENDING]: {
     copy: "pending",
     color: "bg-neon-carrot",
   },
-  [ProposalRoleApprovalStatus.COMPLETE]: {
+  [ProposalRoleApprovalStatus.APPROVED]: {
     copy: "approved",
     color: "bg-magic-mint",
   },

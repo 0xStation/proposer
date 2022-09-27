@@ -67,7 +67,7 @@ export const ProposalViewHeaderNavigation = () => {
   const author = findProposalRoleByRoleType(proposal?.roles, ProposalRoleType.AUTHOR)
   // numerator for the progress circle
   const totalApprovalCount =
-    proposal?.roles?.filter((role) => role.approvalStatus === ProposalRoleApprovalStatus.COMPLETE)
+    proposal?.roles?.filter((role) => role.approvalStatus === ProposalRoleApprovalStatus.APPROVED)
       .length || 0
 
   // activeUser's view permissions

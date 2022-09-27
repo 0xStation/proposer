@@ -103,7 +103,7 @@ model ProposalRole {
   proposalId     String
   proposal       Proposal                   @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   address        String
-  approvalStatus ProposalRoleApprovalStatus @default(INCOMPLETE)
+  approvalStatus ProposalRoleApprovalStatus @default(PENDING)
   account        Account                    @relation(fields: [address], references: [address])
   role           ProposalRoleType
 
@@ -165,8 +165,9 @@ model AccountAccount {
 }
 
 enum ProposalRoleApprovalStatus {
-  INCOMPLETE // approval is incomplete and accruing more signatures
-  COMPLETE // approval is complete and has all the signatures it needs
+  PENDING // role is pending approval
+  APPROVED // role has approved
+  // DENY -- future for denying proposals
 }
 
 enum AccountAccountType {
@@ -188,7 +189,6 @@ enum FeatureFlagStatus {
 enum AddressType {
   WALLET
   SAFE
-  CHECKBOOK
 }
 
 enum ProposalType {

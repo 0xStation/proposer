@@ -65,7 +65,7 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
               id: role.roleId,
             },
             data: {
-              approvalStatus: ProposalRoleApprovalStatus.COMPLETE,
+              approvalStatus: ProposalRoleApprovalStatus.APPROVED,
             },
           })
         }),
@@ -104,7 +104,7 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
   // if current status is the same as the pending status change
   // skip the update
   const pendingStatusChange = proposal.roles.every(
-    (role) => role.approvalStatus === ProposalRoleApprovalStatus.COMPLETE
+    (role) => role.approvalStatus === ProposalRoleApprovalStatus.APPROVED
   )
     ? ProposalStatus.APPROVED
     : ProposalStatus.AWAITING_APPROVAL

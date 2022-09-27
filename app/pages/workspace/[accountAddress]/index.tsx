@@ -200,7 +200,7 @@ const WorkspaceHome: BlitzPage = () => {
                               numerator={
                                 proposal?.roles?.filter(
                                   (role) =>
-                                    role.approvalStatus === ProposalRoleApprovalStatus.COMPLETE
+                                    role.approvalStatus === ProposalRoleApprovalStatus.APPROVED
                                 ).length
                               }
                               denominator={3}
