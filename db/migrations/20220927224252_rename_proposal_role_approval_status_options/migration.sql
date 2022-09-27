@@ -5,14 +5,6 @@
   - The values [INCOMPLETE,COMPLETE] on the enum `ProposalRoleApprovalStatus` will be removed. If these variants are still used in the database, this will fail.
 
 */
-
-/*
-DATA MIGRATION:
--- Delete all existing proposals
--- Cascades to delete all ProposalRole and ProposalSignature data
-*/
-DELETE FROM "ProposalNew";
-
 -- AlterEnum
 BEGIN;
 CREATE TYPE "AddressType_new" AS ENUM ('WALLET', 'SAFE');
@@ -35,6 +27,3 @@ COMMIT;
 
 -- AlterTable
 ALTER TABLE "ProposalRole" ALTER COLUMN "approvalStatus" SET DEFAULT E'PENDING';
-
--- DropEnum
-DROP TYPE "RfpStatus";
