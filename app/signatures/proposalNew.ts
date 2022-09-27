@@ -84,7 +84,7 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
           token: {
             chainId: token.chainId,
             address: token.address,
-            type: token.type,
+            type: token?.type || "",
             name: token?.name || "",
             symbol: token?.symbol || "",
             decimals: token?.decimals || 0,
