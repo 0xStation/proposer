@@ -7,17 +7,11 @@ import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 
 const UpdateAccount = z.object({
+  address: z.string(),
   name: z.string().optional(),
-  address: z.string().optional(),
   bio: z.string().optional(),
   email: z.string().optional(),
   pfpUrl: z.string().optional(),
-  coverURL: z.string().optional(),
-  contactURL: z.string().optional(),
-  twitterUrl: z.string().optional(),
-  githubUrl: z.string().optional(),
-  tiktokUrl: z.string().optional(),
-  instagramUrl: z.string().optional(),
 })
 
 export default async function updateAccount(input: z.infer<typeof UpdateAccount>, ctx: Ctx) {
@@ -63,6 +57,7 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
 
   const payload = {
     address: params.address,
+    addressType: existingAccount.addressType,
     data: {
       // save existing account data with overwrites below
       // without this, chainId for multisig accounts gets wiped
@@ -70,12 +65,6 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
       name: params.name,
       bio: params.bio,
       pfpUrl: params.pfpUrl,
-      coverURL: params.coverURL,
-      contactURL: params.contactURL,
-      twitterUrl: params.twitterUrl,
-      githubUrl: params.githubUrl,
-      tiktokUrl: params.tiktokUrl,
-      instagramUrl: params.instagramUrl,
       // mark email as saved for this account to not show email input modals
       hasSavedEmail: !!params.email,
       hasVerifiedEmail,

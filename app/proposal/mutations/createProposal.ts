@@ -84,13 +84,13 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
         createMany: {
           data: [
             ...params.contributorAddresses.map((a) => {
-              return { address: toChecksumAddress(a), role: ProposalRoleType.CONTRIBUTOR }
+              return { address: toChecksumAddress(a), type: ProposalRoleType.CONTRIBUTOR }
             }),
             ...params.clientAddresses.map((a) => {
-              return { address: toChecksumAddress(a), role: ProposalRoleType.CLIENT }
+              return { address: toChecksumAddress(a), type: ProposalRoleType.CLIENT }
             }),
             ...params.authorAddresses.map((a) => {
-              return { address: toChecksumAddress(a), role: ProposalRoleType.AUTHOR }
+              return { address: toChecksumAddress(a), type: ProposalRoleType.AUTHOR }
             }),
           ],
         },

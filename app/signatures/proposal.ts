@@ -63,7 +63,7 @@ export const genProposalDigest = (proposal: Proposal) => {
       // to reference where the data was generated down the road.
       app: "Station",
       roles: proposal.roles?.map((role) => {
-        return { address: role.address, role: role.role }
+        return { address: role.address, role: role.type }
       }),
       milestones: proposal.milestones?.map((milestone) => {
         return {

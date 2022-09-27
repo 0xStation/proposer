@@ -63,7 +63,7 @@ export default async function getProposalsByAddress(input: z.infer<typeof GetPro
     count,
     proposals: proposals.filter((proposal) => {
       if (proposal?.status === ProposalStatus.DRAFT) {
-        const authorRole = proposal?.roles?.find((role) => role.role === ProposalRoleType.AUTHOR)
+        const authorRole = proposal?.roles?.find((role) => role.type === ProposalRoleType.AUTHOR)
         return addressesAreEqual(data.address, authorRole?.address as string)
       }
       return true

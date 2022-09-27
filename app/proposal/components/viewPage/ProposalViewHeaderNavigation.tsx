@@ -20,7 +20,7 @@ import { useState } from "react"
 import PublishProposalModal from "../PublishProposalModal"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
-  roles?.find((role) => role.role === proposalType)
+  roles?.find((role) => role.type === proposalType)
 
 const Tab = ({ router, route, children }) => {
   return (

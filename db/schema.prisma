@@ -11,62 +11,49 @@ generator client {
   previewFeatures = ["interactiveTransactions"]
 }
 
+// ACCOUNT SYSTEM
+
 model Account {
-  id          Int          @id @default(autoincrement())
-  address     String?      @unique
-  discordId   String?      @unique
-  addressType AddressType?
-  data        Json?
-  createdAt   DateTime?    @default(now())
-  updatedAt   DateTime?    @updatedAt
+  id          Int         @id @default(autoincrement())
+  address     String      @unique
+  addressType AddressType
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  data        Json
 
-  sessions          Session[]
-  proposalNews      ProposalRole[]
-  tokens            AccountToken[]
-  originsOf         AccountAccount[]    @relation("origin")
-  targetsOf         AccountAccount[]    @relation("target")
-  EmailVerification EmailVerification[]
+  sessions           Session[]
+  proposals          ProposalRole[]
+  tokens             AccountToken[]
+  originsOf          AccountAccount[]    @relation("origin")
+  targetsOf          AccountAccount[]    @relation("target")
+  verificationEmails EmailVerification[]
 }
 
-model EmailVerification {
-  code      String  @id @default(uuid())
-  accountId Int
-  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+enum AddressType {
+  WALLET
+  SAFE
 }
 
-model AccountToken {
-  account      Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  accountId    Int
-  token        Token   @relation(fields: [tokenAddress, chainId], references: [address, chainId])
-  tokenAddress String
-  chainId      Int
-  data         Json?
+model AccountAccount {
+  id            String             @id @default(uuid())
+  originAddress String
+  targetAddress String
+  type          AccountAccountType
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  data          Json
 
-  @@id([accountId, tokenAddress, chainId])
+  originAccount Account @relation("origin", fields: [originAddress], references: [address], onDelete: Cascade)
+  targetAccount Account @relation("target", fields: [targetAddress], references: [address], onDelete: Cascade)
+
+  @@unique([originAddress, targetAddress, type])
 }
 
-model Session {
-  id                 Int       @id @default(autoincrement())
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  expiresAt          DateTime?
-  handle             String    @unique
-  hashedSessionToken String?
-  antiCSRFToken      String?
-  publicData         String?
-  privateData        String?
-  userId             Int?
-  user               Account?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+enum AccountAccountType {
+  PIN_WORKSPACE
 }
 
-model FeatureFlag {
-  id          Int               @id @default(autoincrement())
-  key         String            @unique
-  title       String
-  description String?
-  status      FeatureFlagStatus @default(OFF)
-  createdAt   DateTime          @default(now())
-}
+// PROPOSAL SYSTEM
 
 model Proposal {
   id                    String         @id @default(uuid())
@@ -84,84 +71,38 @@ model Proposal {
   signatures ProposalSignature[]
 }
 
-model ProposalSignature {
-  id         String   @id @default(uuid())
-  proposalId String
-  proposal   Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  address    String
-  timestamp  DateTime @default(now())
-  data       Json
-
-  // m-n relation to support one signature being utilized for many roles
-  // for example, I can have the AUTHOR and CONTRIBUTOR role simultaneously
-  // another example, I can be a AUTHOR and represent a CLIENT as a signer of its multisig
-  roles ProposalRole[] @relation("RoleApprovalSignature")
+enum ProposalType {
+  FUNDING
 }
+
+enum ProposalStatus {
+  DRAFT
+  AWAITING_APPROVAL
+  APPROVED
+  COMPLETE
+}
+
+// PROPOSAL ROLES
 
 model ProposalRole {
   id             String                     @id @default(uuid())
   proposalId     String
-  proposal       Proposal                   @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   address        String
+  type           ProposalRoleType
   approvalStatus ProposalRoleApprovalStatus @default(PENDING)
-  account        Account                    @relation(fields: [address], references: [address])
-  role           ProposalRoleType
 
+  account    Account             @relation(fields: [address], references: [address], onDelete: Cascade)
+  proposal   Proposal            @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   // m-n relation to support one role containing multiple supporting signatures to reach COMPLETE approval status
   // for example, a multisig needs Q (quorum) signatures to approve by default
   // another example, a DAO using token voting needs a majority vote of at least Q (quorum) votes to approve
   signatures ProposalSignature[] @relation("RoleApprovalSignature")
 }
 
-model Token {
-  address  String
-  type     TokenType
-  chainId  Int
-  name     String?
-  symbol   String?
-  decimals Int?
-  accounts AccountToken[]
-
-  @@id([address, chainId])
-}
-
-model ProposalMilestone {
-  id         String   @id @default(uuid())
-  proposalId String
-  proposal   Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  index      Int
-  data       Json
-
-  payments ProposalPayment[]
-  @@unique([proposalId, index])
-}
-
-model ProposalPayment {
-  id               String            @id @default(uuid())
-  proposalId       String
-  proposal         Proposal          @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  milestoneId      String
-  milestone        ProposalMilestone @relation(fields: [milestoneId], references: [id])
-  senderAddress    String
-  recipientAddress String
-  amount           Float? // float to support larger size numbers
-  tokenId          Float? // float to support larger size numbers
-  transactionHash  String?
-  data             Json
-}
-
-model AccountAccount {
-  id            String             @id @default(uuid())
-  originAddress String
-  targetAddress String
-  originAccount Account            @relation("origin", fields: [originAddress], references: [address])
-  targetAccount Account            @relation("target", fields: [targetAddress], references: [address])
-  type          AccountAccountType
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  data          Json
-
-  @@unique([originAddress, targetAddress, type])
+enum ProposalRoleType {
+  AUTHOR
+  CONTRIBUTOR
+  CLIENT
 }
 
 enum ProposalRoleApprovalStatus {
@@ -170,8 +111,77 @@ enum ProposalRoleApprovalStatus {
   // DENY -- future for denying proposals
 }
 
-enum AccountAccountType {
-  PIN_WORKSPACE
+model ProposalSignature {
+  id         String   @id @default(uuid())
+  proposalId String
+  address    String
+  timestamp  DateTime @default(now())
+  data       Json
+
+  proposal Proposal       @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  // m-n relation to support one signature being utilized for many roles
+  // for example, I can have the AUTHOR and CONTRIBUTOR role simultaneously
+  // another example, I can be a AUTHOR and represent a CLIENT as a signer of its multisig
+  roles    ProposalRole[] @relation("RoleApprovalSignature")
+}
+
+// PROPOSAL MILESTONES AND EXPECTATIONS
+
+model ProposalMilestone {
+  id         String @id @default(uuid())
+  proposalId String
+  index      Int
+  data       Json
+
+  proposal Proposal          @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  payments ProposalPayment[]
+  @@unique([proposalId, index])
+}
+
+model ProposalPayment {
+  id               String  @id @default(uuid())
+  proposalId       String
+  milestoneId      String
+  senderAddress    String
+  recipientAddress String
+  amount           Float? // float to support larger size numbers
+  tokenId          Float? // float to support larger size numbers
+  transactionHash  String?
+  data             Json
+
+  proposal  Proposal          @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  milestone ProposalMilestone @relation(fields: [milestoneId], references: [id])
+}
+
+// SESSION MANAGEMENT
+
+model Session {
+  id                 Int       @id @default(autoincrement())
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  expiresAt          DateTime?
+  handle             String    @unique
+  hashedSessionToken String?
+  antiCSRFToken      String?
+  publicData         String?
+  privateData        String?
+  userId             Int?
+
+  user Account? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// TOKENS
+
+model Token {
+  address  String
+  type     TokenType
+  chainId  Int
+  name     String?
+  symbol   String?
+  decimals Int?
+
+  accounts AccountToken[]
+  @@id([address, chainId])
 }
 
 enum TokenType {
@@ -181,29 +191,38 @@ enum TokenType {
   ERC1155
 }
 
+model AccountToken {
+  accountId    Int
+  tokenAddress String
+  chainId      Int
+  data         Json?
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  token   Token   @relation(fields: [tokenAddress, chainId], references: [address, chainId])
+  @@id([accountId, tokenAddress, chainId])
+}
+
+// FEATURE FLAGS
+
+model FeatureFlag {
+  id          Int               @id @default(autoincrement())
+  key         String            @unique
+  title       String
+  description String?
+  status      FeatureFlagStatus @default(OFF)
+  createdAt   DateTime          @default(now())
+}
+
 enum FeatureFlagStatus {
   OFF
   ON
 }
 
-enum AddressType {
-  WALLET
-  SAFE
-}
+// EMAIL
 
-enum ProposalType {
-  FUNDING
-}
+model EmailVerification {
+  code      String @id @default(uuid())
+  accountId Int
 
-enum ProposalRoleType {
-  AUTHOR
-  CONTRIBUTOR
-  CLIENT
-}
-
-enum ProposalStatus {
-  DRAFT
-  AWAITING_APPROVAL
-  APPROVED
-  COMPLETE
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 }

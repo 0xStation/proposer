@@ -13,9 +13,6 @@ export default async function getAllAccounts(input: z.infer<typeof GetAllAccount
   const params = GetAllAccounts.parse(input)
 
   const accounts = await db.account.findMany({
-    where: {
-      address: { not: null },
-    },
     ...(params.sortUpdatedAt && {
       orderBy: {
         updatedAt: "desc",
