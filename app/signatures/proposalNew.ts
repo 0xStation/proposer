@@ -29,9 +29,16 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
       Payment: [
         { name: "milestoneIndex", type: "uint256" },
         { name: "recipientAddress", type: "address" }, // receives the reward from the proposal
-        { name: "chainId", type: "uint256" },
-        { name: "tokenAddress", type: "address" },
         { name: "amount", type: "uint256" },
+        { name: "token", type: "Token" },
+      ],
+      Token: [
+        { name: "chainId", type: "uint256" },
+        { name: "address", type: "address" },
+        { name: "type", type: "string" },
+        { name: "name", type: "string" }, // optional, ERC1155 does not support
+        { name: "symbol", type: "string" }, // optional, ERC1155 does not support
+        { name: "decimals", type: "uint8" }, // optional, ERC721 and ERC1155 do not support
       ],
       Proposal: [
         { name: "type", type: "string" },
@@ -65,12 +72,23 @@ export const genProposalNewDigest = (proposal: ProposalNew) => {
         }
       }),
       payments: proposal.payments?.map((payment) => {
+        const token = payment.data.token
         return {
           milestoneIndex: milestoneIdToIndex[payment.milestoneId],
           recipientAddress: payment.recipientAddress,
-          chainId: payment.data.token.chainId,
-          tokenAddress: payment.data.token.address,
-          amount: decimalToBigNumber(payment.amount!, payment.data.token.decimals || 0),
+          // uint256 has max integer size of 2^256 - 1, but js/ts can only handle 2^53 so we need a more scalable representation
+          // ether's BigNumber is great for this, but looks funny when placing within a JSON file so we opt for the string representation
+          // strings are more interoperable because they are language agnostic and human readable
+          // wagmi can also parse strings just fine into the uint256 representation needed for EIP712 signatures
+          amount: decimalToBigNumber(payment.amount!, token.decimals || 0).toString(),
+          token: {
+            chainId: token.chainId,
+            address: token.address,
+            type: token?.type || "",
+            name: token?.name || "",
+            symbol: token?.symbol || "",
+            decimals: token?.decimals || 0,
+          },
         }
       }),
     },
