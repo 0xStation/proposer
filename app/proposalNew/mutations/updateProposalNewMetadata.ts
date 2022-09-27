@@ -40,9 +40,6 @@ export default async function updateProposalMetadata(
   try {
     const proposal = await db.proposalNew.update({
       where: { id: params.proposalId },
-      // TODO: as of 9/1 we currently only support proposals of type "FUNDING"
-      // but in the future we need to figure out how to void a funding proposal
-      // and change it to a different type and vice versa.
       data: {
         data: JSON.parse(JSON.stringify(proposalMetadata)),
       },

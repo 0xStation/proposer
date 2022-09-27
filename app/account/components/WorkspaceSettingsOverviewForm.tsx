@@ -17,7 +17,7 @@ import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
 import Button from "app/core/components/sds/buttons/Button"
 import getAccountByAddress from "../queries/getAccountByAddress"
 
-const PfpInput = ({ pfpURL, onUpload }) => {
+const PfpInput = ({ pfpUrl, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
     const formData = new FormData()
     formData.append("file", acceptedFiles[0])
@@ -43,10 +43,10 @@ const PfpInput = ({ pfpURL, onUpload }) => {
         {...getRootProps()}
       >
         <>
-          {pfpURL && (
+          {pfpUrl && (
             <img
               alt="Profile picture uploaded by the user."
-              src={pfpURL}
+              src={pfpUrl}
               className="w-full h-full rounded-full"
             />
           )}
@@ -70,7 +70,7 @@ const WorkspaceSettingsOverviewForm = ({
   account?: Account
   isEdit: boolean
 }) => {
-  const [pfpURL, setPfpURL] = useState<string | undefined>()
+  const [pfpUrl, setPfpURL] = useState<string | undefined>()
   const [emailVerificationSent, setEmailVerificationSent] = useState<boolean>(false)
   const setActiveUser = useStore((state) => state.setActiveUser)
   const activeUser = useStore((state) => state.activeUser)
@@ -110,8 +110,8 @@ const WorkspaceSettingsOverviewForm = ({
 
   useEffect(() => {
     // initialize pfpInput with user's pre-existing images
-    setPfpURL(account?.data?.pfpURL)
-  }, [account?.data?.pfpURL])
+    setPfpURL(account?.data?.pfpUrl)
+  }, [account?.data?.pfpUrl])
 
   return (
     <Form
@@ -123,7 +123,7 @@ const WorkspaceSettingsOverviewForm = ({
             address: account?.address!,
             name: values.name,
             bio: values.bio,
-            pfpURL,
+            pfpUrl,
             email: values.email,
           }
           if (isEdit) {
@@ -189,7 +189,7 @@ const WorkspaceSettingsOverviewForm = ({
             </Field>
             {/* PFP */}
             <div className="flex flex-col mt-6">
-              <PfpInput pfpURL={pfpURL} onUpload={(url) => setPfpURL(url)} />
+              <PfpInput pfpUrl={pfpUrl} onUpload={(url) => setPfpURL(url)} />
             </div>
             {/* EMAIL */}
             <label className="font-bold block mt-6">Email</label>
