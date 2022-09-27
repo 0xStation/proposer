@@ -1,6 +1,4 @@
 import { chain } from "wagmi"
-import { RfpStatus } from "app/rfp/types"
-import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import networks from "app/utils/networks.json"
 import { ProposalRoleType, ProposalNewStatus, ProposalRoleApprovalStatus } from "@prisma/client"
 import { PaymentTerm } from "app/proposalPayment/types"
@@ -51,25 +49,6 @@ export const DEFAULT_PFP_URLS = {
   TERMINAL: "https://station-images.nyc3.digitaloceanspaces.com/terminal-gradient.png",
 }
 
-export const RFP_STATUS_DISPLAY_MAP = {
-  [RfpStatus.DRAFT]: {
-    copy: "draft",
-    color: "bg-concrete",
-  },
-  [RfpStatus.STARTING_SOON]: {
-    copy: "open for submissions soon",
-    color: "bg-neon-carrot",
-  },
-  [RfpStatus.OPEN_FOR_SUBMISSIONS]: {
-    copy: "open for submissions",
-    color: "bg-magic-mint",
-  },
-  [RfpStatus.CLOSED]: {
-    copy: "closed",
-    color: "bg-torch-red",
-  },
-}
-
 export const PROPOSAL_NEW_STATUS_DISPLAY_MAP = {
   [ProposalNewStatus.DRAFT]: {
     copy: "draft",
@@ -86,21 +65,6 @@ export const PROPOSAL_NEW_STATUS_DISPLAY_MAP = {
   [ProposalNewStatus.COMPLETE]: {
     copy: "complete",
     color: "bg-marble-white",
-  },
-}
-
-export const PROPOSAL_STATUS_DISPLAY_MAP = {
-  [ProductProposalStatus.SUBMITTED]: {
-    copy: "submitted",
-    color: "bg-marble-white",
-  },
-  [ProductProposalStatus.IN_REVIEW]: {
-    copy: "in review",
-    color: "bg-neon-carrot",
-  },
-  [ProductProposalStatus.APPROVED]: {
-    copy: "approved",
-    color: "bg-magic-mint",
   },
 }
 
@@ -131,18 +95,6 @@ export const PROPOSAL_MILESTONE_STATUS_MAP = {
 }
 
 export const PAGINATION_TAKE = 50
-
-export const RFP_STATUSES_FILTER_OPTIONS = [
-  RfpStatus.STARTING_SOON,
-  RfpStatus.OPEN_FOR_SUBMISSIONS,
-  RfpStatus.CLOSED,
-]
-
-export const PROPOSAL_STATUSES_FILTER_OPTIONS = [
-  ProductProposalStatus.SUBMITTED,
-  ProductProposalStatus.IN_REVIEW,
-  ProductProposalStatus.APPROVED,
-]
 
 export const PROPOSAL_NEW_STATUS_FILTER_OPTIONS = [
   ProposalNewStatus.APPROVED,

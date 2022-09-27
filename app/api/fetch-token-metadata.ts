@@ -1,6 +1,11 @@
 import * as z from "zod"
-import { TokenType } from "app/tag/types"
 import { multicall } from "app/utils/rpcMulticall"
+
+export enum TokenType {
+  ERC20 = "ERC20",
+  ERC721 = "ERC721",
+  ERC1155 = "ERC1155",
+}
 
 export type TokenMetadataResponse = {
   name: string
