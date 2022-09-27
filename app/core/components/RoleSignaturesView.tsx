@@ -28,19 +28,19 @@ export const RoleSignaturesView = ({
       {/* CONTRIBUTOR */}
       <h4 className="text-xs font-bold text-concrete uppercase mt-6 mb-2">Contributor</h4>
       <RoleSignature
-        role={proposal?.roles?.find((role) => role.role === ProposalRoleType.CONTRIBUTOR)}
+        role={proposal?.roles?.find((role) => role.type === ProposalRoleType.CONTRIBUTOR)}
         signatures={signatures}
       />
       {/* CLIENT */}
       <h4 className="text-xs font-bold text-concrete uppercase mb-2 mt-6">Reviewer</h4>
       <RoleSignature
-        role={proposal?.roles?.find((role) => role.role === ProposalRoleType.CLIENT)}
+        role={proposal?.roles?.find((role) => role.type === ProposalRoleType.CLIENT)}
         signatures={signatures}
       />
       {/* AUTHOR */}
       <h4 className="text-xs font-bold text-concrete uppercase mb-2 mt-6">Author</h4>
       <RoleSignature
-        role={proposal?.roles?.find((role) => role.role === ProposalRoleType.AUTHOR)}
+        role={proposal?.roles?.find((role) => role.type === ProposalRoleType.AUTHOR)}
         signatures={signatures}
       />
     </div>

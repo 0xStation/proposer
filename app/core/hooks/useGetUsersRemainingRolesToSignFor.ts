@@ -63,7 +63,7 @@ const useGetUsersRemainingRolesToSignFor = (
             addressesAreEqual(role?.address, activeUser?.address || "")
           ) {
             return {
-              roleType: role?.role,
+              roleType: role?.type,
               roleId: role?.id,
               address: role?.address,
               oneSignerNeededToComplete: true, // always true for unsigned single signer
@@ -85,7 +85,7 @@ const useGetUsersRemainingRolesToSignFor = (
             return gnosisSafeDetails?.signers.map((signer) => {
               if (addressesAreEqual(signer, activeUser?.address || "")) {
                 return {
-                  roleType: role?.role,
+                  roleType: role?.type,
                   roleId: role?.id,
                   address: activeUser.address,
                   oneSignerNeededToComplete:

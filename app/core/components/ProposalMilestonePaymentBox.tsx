@@ -28,7 +28,7 @@ export const ProposalMilestonePaymentBox = ({
 
   const userIsPayer = proposal?.roles?.some(
     (role) =>
-      role.role === ProposalRoleType.CLIENT &&
+      role.type === ProposalRoleType.CLIENT &&
       addressesAreEqual(activeUser?.address || "", role.address)
   )
   const paymentComplete = !!milestone?.payments?.[0]?.transactionHash

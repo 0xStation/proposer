@@ -8,17 +8,11 @@ import { getAddressType } from "app/utils/getAddressType"
 import truncateString from "app/core/utils/truncateString"
 
 const CreateAccount = z.object({
+  address: z.string(),
   name: z.string().optional(),
-  address: z.string().optional(),
   bio: z.string().optional(),
   email: z.string().optional(),
   pfpUrl: z.string().optional(),
-  coverURL: z.string().optional(),
-  contactURL: z.string().optional(),
-  twitterUrl: z.string().optional(),
-  githubUrl: z.string().optional(),
-  tiktokUrl: z.string().optional(),
-  instagramUrl: z.string().optional(),
   createSession: z.boolean().optional(),
 })
 
@@ -48,12 +42,6 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
       name: name,
       bio: params.bio,
       pfpUrl: params.pfpUrl,
-      coverURL: params.coverURL,
-      contactURL: params.contactURL,
-      twitterUrl: params.twitterUrl,
-      githubUrl: params.githubUrl,
-      tiktokUrl: params.tiktokUrl,
-      instagramUrl: params.instagramUrl,
       // mark email as saved for this account to not show email input modals
       hasSavedEmail: !!params.email,
       // if this address is not a wallet, it is a smart contract so add its chainId

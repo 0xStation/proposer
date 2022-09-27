@@ -661,10 +661,10 @@ const SignForm = ({ activeUser, proposal, signatures }) => {
           <div className="flex flex-row space-x-2">
             <p className="mr-4">{truncateString(role?.address)}</p>
             <span className="uppercase text-xs px-2 py-1 bg-wet-concrete rounded-full">
-              {role?.role}
+              {role?.type}
             </span>
           </div>
-          <p className="mt-1 text-xs text-light-concrete">{responsiblityCopy[role?.role]}</p>
+          <p className="mt-1 text-xs text-light-concrete">{responsiblityCopy[role?.type]}</p>
         </div>
         {showSignButton ? (
           <span
@@ -700,13 +700,13 @@ const SignForm = ({ activeUser, proposal, signatures }) => {
       <p>All signatures are required to activate the agreement.</p>
       <div className="space-y-4 mt-6">
         <RoleSignature
-          role={proposal?.roles?.find((role) => role.role === ProposalRoleType.CONTRIBUTOR)}
+          role={proposal?.roles?.find((role) => role.type === ProposalRoleType.CONTRIBUTOR)}
         />
         <RoleSignature
-          role={proposal?.roles?.find((role) => role.role === ProposalRoleType.CLIENT)}
+          role={proposal?.roles?.find((role) => role.type === ProposalRoleType.CLIENT)}
         />
         <RoleSignature
-          role={proposal?.roles?.find((role) => role.role === ProposalRoleType.AUTHOR)}
+          role={proposal?.roles?.find((role) => role.type === ProposalRoleType.AUTHOR)}
         />
       </div>
     </div>
@@ -965,7 +965,7 @@ export const ProposalForm = () => {
             // for the proposal and pin to ipfs, but they've already created a proposal.
             try {
               const authorRole = proposal?.roles?.find(
-                (role) => role.role === ProposalRoleType.AUTHOR
+                (role) => role.type === ProposalRoleType.AUTHOR
               )
               // if user disconnects and logs in as another user, we need to check if they are the author
               if (authorRole?.address !== session?.siwe?.address) {
