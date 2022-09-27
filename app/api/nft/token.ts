@@ -37,9 +37,8 @@ export default async function handler(req: BlitzApiRequest, res: BlitzApiRespons
   let payload = {
     name: acctName,
     description: "Check us out at https://station.express",
-    // TODO: add link to contributor's public profile page to description once complete
     external_url: "https://station.express",
-    image: "",
+    image: "https://station-images.nyc3.digitaloceanspaces.com/station.jpeg",
     attributes: [],
   }
 
