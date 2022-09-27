@@ -3,8 +3,9 @@ import { ProposalViewHeaderNavigation } from "app/proposalNew/components/viewPag
 import Layout from "app/core/layouts/Layout"
 import getProposalNewById from "app/proposalNew/queries/getProposalNewById"
 import { ProposalNewStatus } from "@prisma/client"
-import ProposalPaymentView from "app/core/components/ProposalPaymentView"
+import ProposalMilestonePaymentBox from "app/core/components/ProposalMilestonePaymentBox"
 import { ProposalNew } from "app/proposalNew/types"
+import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
 
 export const ProposalPayments: BlitzPage = () => {
   const proposalId = useParam("proposalId") as string
@@ -14,6 +15,17 @@ export const ProposalPayments: BlitzPage = () => {
     {
       suspense: false,
       enabled: !!proposalId,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }
+  )
+
+  const [milestones] = useQuery(
+    getMilestonesByProposal,
+    { proposalId: proposalId },
+    {
+      suspense: false,
+      enabled: !!proposal?.id,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
     }
@@ -29,8 +41,15 @@ export const ProposalPayments: BlitzPage = () => {
     <Layout title="View Payments">
       <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto h-full">
         <ProposalViewHeaderNavigation />
-        {showPayInformation ? (
-          <ProposalPaymentView proposal={proposal as ProposalNew} className="mt-9" />
+        {showPayInformation && milestones ? (
+          milestones.map((milestone, i) => (
+            <ProposalMilestonePaymentBox
+              key={i}
+              proposal={proposal as ProposalNew}
+              milestone={milestone}
+              className="mt-9"
+            />
+          ))
         ) : Boolean(proposal?.roles) ? (
           <div className="w-full h-full flex items-center flex-col sm:mt-0">
             <h1 className="text-2xl font-bold w-[295px] text-center mt-44">No payments queued</h1>
