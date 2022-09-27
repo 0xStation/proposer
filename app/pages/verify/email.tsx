@@ -105,7 +105,7 @@ const EmailVerification: BlitzPage = ({
       subheading: "You'll now receive updates about your proposals.",
       ctaTitle: "Go to your profile",
       cta: () =>
-        router.push(Routes.ProfileHome({ accountAddress: session?.siwe?.address as string })),
+        router.push(Routes.WorkspaceHome({ accountAddress: session?.siwe?.address as string })),
     },
     [VERIFICATION_SENT]: {
       heading: "Verification sent",

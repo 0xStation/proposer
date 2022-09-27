@@ -1,6 +1,6 @@
 import * as z from "zod"
-import { TokenType } from "app/tag/types"
 import { multicall } from "app/utils/rpcMulticall"
+import { TokenType } from "@prisma/client"
 
 export type TokenMetadataResponse = {
   name: string

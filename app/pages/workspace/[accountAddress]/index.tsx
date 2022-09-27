@@ -15,7 +15,6 @@ import {
   PROPOSAL_NEW_STATUS_DISPLAY_MAP,
   Sizes,
 } from "app/core/utils/constants"
-import { ProposalStatus } from "app/proposal/types"
 import {
   AddressType,
   ProposalNewStatus,
@@ -47,8 +46,8 @@ const WorkspaceHome: BlitzPage = () => {
   const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [canViewSettings, setCanViewSettings] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<Tab>(Tab.PROPOSALS)
-  const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
-    new Set<ProposalStatus>()
+  const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalNewStatus>>(
+    new Set<ProposalNewStatus>()
   )
   const [proposalRoleFilters, setProposalRoleFilters] = useState<Set<ProposalRoleType>>(
     new Set<ProposalRoleType>()
