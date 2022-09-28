@@ -12,8 +12,7 @@ import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import ApproveProposalModal from "app/proposal/components/ApproveProposalModal"
 import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
-import getProposalSignaturesById from "app/proposal/queries/getProposalSignaturesById"
-import useGetUsersRemainingRolesToSignFor from "app/core/hooks/useGetUsersRemainingRolesToSignFor"
+import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { LINKS } from "app/core/utils/constants"
 import { useState } from "react"
@@ -50,18 +49,8 @@ export const ProposalViewHeaderNavigation = () => {
       enabled: !!proposalId,
     }
   )
-  const [signatures] = useQuery(
-    getProposalSignaturesById,
-    { proposalId: proposalId },
-    {
-      suspense: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      enabled: !!proposalId,
-    }
-  )
 
-  const [remainingRoles, _error, loading] = useGetUsersRemainingRolesToSignFor(proposal, signatures)
+  const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(proposal)
 
   // author used to return to workspace page with proposal list view
   const author = findProposalRoleByRoleType(proposal?.roles, ProposalRoleType.AUTHOR)
@@ -71,8 +60,8 @@ export const ProposalViewHeaderNavigation = () => {
       .length || 0
 
   // activeUser's view permissions
-  const activeUserHasProposalRole = remainingRoles.length > 0
-  const activeUserHasRolesToSign = remainingRoles.length === 0
+  const activeUserIsSigner = signedRoles.length + remainingRoles.length > 0
+  const activeUserHasRolesToSign = remainingRoles.length > 0
 
   const currentPageUrl =
     typeof window !== "undefined"
@@ -165,8 +154,8 @@ export const ProposalViewHeaderNavigation = () => {
           - if they haven't signed, show the sign button, if they have signed, show the "signed" button
           - if they don't have a role, just show the copy icon
           */}
-          {activeUserHasProposalRole && !loading ? (
-            !activeUserHasRolesToSign ? (
+          {activeUserIsSigner && !loading ? (
+            activeUserHasRolesToSign ? (
               <>
                 {proposal?.status !== ProposalStatus?.DRAFT ? (
                   <Button

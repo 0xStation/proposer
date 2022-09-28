@@ -66,7 +66,11 @@ const SafeRole = ({ role, signatures }) => {
                   </div>
                 )}
                 <ProgressCircleAndNumber
-                  numerator={totalSafeSignersSigned}
+                  numerator={
+                    totalSafeSignersSigned > safeDetails?.quorum
+                      ? safeDetails?.quorum
+                      : totalSafeSignersSigned
+                  }
                   denominator={safeDetails?.quorum}
                 />
               </div>
