@@ -40,7 +40,7 @@ interface ProposalRoleType {
  * This might be useful if we have UI that requires we show which roles a particular user has signed for, after they
  * have signed. However, there are currently not UI elements that require that, so this leaner hook should be fine.
  */
-const useGetUsersRemainingRolesToSignFor = (
+const useGetUsersRolesToSignFor = (
   proposal: Proposal | undefined | null,
   signatures: ProposalSignature[] | undefined
 ) => {
@@ -129,4 +129,4 @@ const useGetUsersRemainingRolesToSignFor = (
   ]
 }
 
-export default useGetUsersRemainingRolesToSignFor
+export default useGetUsersRolesToSignFor

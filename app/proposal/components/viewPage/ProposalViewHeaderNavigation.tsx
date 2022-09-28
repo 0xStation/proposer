@@ -13,7 +13,7 @@ import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import ApproveProposalModal from "app/proposal/components/ApproveProposalModal"
 import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
 import getProposalSignaturesById from "app/proposal/queries/getProposalSignaturesById"
-import useGetUsersRemainingRolesToSignFor from "app/core/hooks/useGetUsersRemainingRolesToSignFor"
+import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { LINKS } from "app/core/utils/constants"
 import { useState } from "react"
@@ -61,7 +61,7 @@ export const ProposalViewHeaderNavigation = () => {
     }
   )
 
-  const [remainingRoles, signedRoles, _error, loading] = useGetUsersRemainingRolesToSignFor(
+  const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(
     proposal,
     signatures
   )

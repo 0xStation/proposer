@@ -8,7 +8,7 @@ import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import getProposalById from "../queries/getProposalById"
 import { genProposalApprovalDigest } from "app/signatures/proposalSignature"
 import { Proposal } from "app/proposal/types"
-import useGetUsersRemainingRolesToSignFor from "app/core/hooks/useGetUsersRemainingRolesToSignFor"
+import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import getProposalSignaturesById from "app/proposal/queries/getProposalSignaturesById"
 import { genProposalDigest } from "app/signatures/proposal"
 import { getHash } from "app/signatures/utils"
@@ -40,8 +40,10 @@ export const ApproveProposalModal = ({
     }
   )
 
-  const [remainingRoles, signedRoles, _error, getRolesIsLoading] =
-    useGetUsersRemainingRolesToSignFor(proposal, signatures)
+  const [remainingRoles, _signedRoles, _error, getRolesIsLoading] = useGetUsersRolesToSignFor(
+    proposal,
+    signatures
+  )
 
   const { signMessage } = useSignature()
 
