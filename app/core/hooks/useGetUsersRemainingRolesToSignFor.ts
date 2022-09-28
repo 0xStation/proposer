@@ -70,7 +70,7 @@ const useGetUsersRemainingRolesToSignFor = (
             signed.push(role)
           } else {
             remaining.push({
-              roleType: role?.role,
+              roleType: role?.type,
               roleId: role?.id,
               address: role?.address,
               oneSignerNeededToComplete: true, // always true for unsigned single signer
@@ -96,7 +96,7 @@ const useGetUsersRemainingRolesToSignFor = (
                 break
               }
               remaining.push({
-                roleType: role?.role,
+                roleType: role?.type,
                 roleId: role?.id,
                 address: activeUser.address,
                 oneSignerNeededToComplete: totalSafeSignersSigned === gnosisSafeDetails?.quorum - 1, // last signer sets true
