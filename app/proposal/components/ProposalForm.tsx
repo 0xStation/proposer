@@ -965,8 +965,8 @@ export const ProposalForm = () => {
             // this condition is here if the user needs to re-click the submit to generate a signature
             // for the proposal and pin to ipfs, but they've already created a proposal.
             try {
-              const prpsal = (createdProposal as Proposal) || proposal
-              const authorRole = prpsal?.roles?.find(
+              const proposalToRequestSignature = (createdProposal as Proposal) || proposal
+              const authorRole = proposalToRequestSignature?.roles?.find(
                 (role) => role.type === ProposalRoleType.AUTHOR
               )
 
@@ -975,7 +975,7 @@ export const ProposalForm = () => {
                 throw Error("Current address doesn't match author's address.")
               }
               // prompt author to sign proposal to prove they are the author of the content
-              const message = genProposalDigest(prpsal)
+              const message = genProposalDigest(proposalToRequestSignature)
               const signature = await signMessage(message)
 
               if (!signature) {
@@ -985,14 +985,14 @@ export const ProposalForm = () => {
               const proposalHash = getHash(domain, types, value)
 
               const updatedProposal = await updateProposalMetadataMutation({
-                proposalId: prpsal?.id as string,
+                proposalId: proposalToRequestSignature?.id as string,
                 authorSignature: signature as string,
                 signatureMessage: message,
                 proposalHash,
-                contentTitle: prpsal?.data?.content?.title,
-                contentBody: prpsal?.data?.content?.body,
-                totalPayments: prpsal?.data?.totalPayments,
-                paymentTerms: prpsal?.data?.paymentTerms,
+                contentTitle: proposalToRequestSignature?.data?.content?.title,
+                contentBody: proposalToRequestSignature?.data?.content?.body,
+                totalPayments: proposalToRequestSignature?.data?.totalPayments,
+                paymentTerms: proposalToRequestSignature?.data?.paymentTerms,
               })
 
               if (updatedProposal) {

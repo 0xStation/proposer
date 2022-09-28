@@ -143,9 +143,8 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
       console.error("Failed to update proposal status in `approveProposal`", err)
       throw Error(err)
     }
-    console.log("proposal status", pendingStatusChange)
+
     if (pendingStatusChange === ProposalStatus.APPROVED) {
-      console.log("approved status", proposal.status)
       try {
         updatedProposal = await invoke(pinProposal, { proposalId: proposal?.id as string })
       } catch (err) {
