@@ -12,6 +12,7 @@ import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import getProposalSignaturesById from "app/proposal/queries/getProposalSignaturesById"
 import { genProposalDigest } from "app/signatures/proposal"
 import { getHash } from "app/signatures/utils"
+import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 
 export const ApproveProposalModal = ({
   isOpen,
@@ -76,6 +77,7 @@ export const ApproveProposalModal = ({
         representingRoles,
       })
       invalidateQuery(getProposalSignaturesById)
+      invalidateQuery(getRolesByProposalId)
       // invalidate proposal query to get ipfs hash post-approval
       // since an ipfs has is created on proposal approval
       invalidateQuery(getProposalById)
