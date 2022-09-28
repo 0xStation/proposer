@@ -421,7 +421,7 @@ const RewardForm = ({
 
       {/* NETWORK */}
       <label className="font-bold block mt-6">Network*</label>
-      <span className="text-xs text-concrete block">Which network to transact on</span>
+      <span className="text-xs text-concrete block">Which network would the funds get transacted on?</span>
       <Field name="network" validate={requiredField}>
         {({ input, meta }) => {
           return (
