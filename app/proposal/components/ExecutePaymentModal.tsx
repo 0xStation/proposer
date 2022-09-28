@@ -5,23 +5,26 @@ import truncateString from "app/core/utils/truncateString"
 import Button from "app/core/components/sds/buttons/Button"
 import { useNetwork, useWaitForTransaction } from "wagmi"
 import { useEffect, useState } from "react"
+import { ProposalStatus } from "@prisma/client"
+import { useSendTransaction } from "wagmi"
+import { Field, Form } from "react-final-form"
 import saveTransactionHashToPayments from "../mutations/saveTransactionToPayments"
 import getProposalById from "../queries/getProposalById"
 import { preparePaymentTransaction } from "app/transaction/payments"
-import { useSendTransaction } from "wagmi"
-import { Field, Form } from "react-final-form"
 import { composeValidators, isValidTransactionLink, requiredField } from "app/utils/validators"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import { txPathString } from "app/core/utils/constants"
 import SwitchNetworkView from "app/core/components/SwitchNetworkView"
+import updateProposalStatus from "app/proposal/mutations/updateProposalStatus"
+import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
+import { ProposalPayment } from "app/proposalPayment/types"
+import { genProposalPaymentDigest } from "../../signatures/proposalPayment"
+import useSignature from "app/core/hooks/useSignature"
 
 enum Tab {
   DIRECT_PAYMENT = "DIRECT_PAYMENT",
   ATTACH_TRANSACTION = "ATTACH_TRANSACTION",
 }
-import updateProposalStatus from "app/proposal/mutations/updateProposalStatus"
-import { ProposalStatus } from "@prisma/client"
-import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 
 export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
   const setToastState = useStore((state) => state.setToastState)
@@ -37,6 +40,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
       console.error(error)
     },
   })
+  const { signMessage } = useSignature()
 
   const [updateProposalStatusMutation] = useMutation(updateProposalStatus)
 
@@ -102,10 +106,22 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
   const saveTransactionHashToPayment = async (transactionHash: string) => {
     setIsLoading(true)
     // update payment as cashed in db
-    await saveTransactionHashToPaymentsMutation({
+    const updatedPayments = await saveTransactionHashToPaymentsMutation({
       proposalId: milestone.proposalId,
       milestoneId: milestone.id,
       transactionHash,
+    })
+
+    const message = genProposalPaymentDigest(updatedPayments[0] as ProposalPayment)
+    const signature = await signMessage(message)
+
+    if (!signature) {
+      throw Error("Unsuccessful signature.")
+    }
+
+    await updateProposalStatusMutation({
+      proposalId: payment.proposalId,
+      status: ProposalStatus.COMPLETE,
     })
 
     invalidateQuery(getProposalById)
@@ -130,7 +146,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
       })
 
       // update payment as cashed in db
-      await saveTransactionHashToPaymentsMutation({
+      const updatedPayment = await saveTransactionHashToPaymentsMutation({
         proposalId: milestone.proposalId,
         milestoneId: milestone.id,
         transactionHash: transaction.hash,
@@ -225,7 +241,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
             const transactionHash = values.transactionLink.substring(
               explorerUrl.length + txPathString.length
             )
-            saveTransactionHashToPayment(transactionHash)
+            await saveTransactionHashToPayment(transactionHash)
           }}
           render={({ handleSubmit }) => {
             return (

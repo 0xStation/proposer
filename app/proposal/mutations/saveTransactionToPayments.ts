@@ -1,5 +1,6 @@
 import * as z from "zod"
 import db from "db"
+import { ProposalPayment } from "app/proposalPayment/types"
 
 const SaveTransactionHashToPayments = z.object({
   milestoneId: z.string(),
@@ -13,7 +14,7 @@ export default async function saveTransactionHashToPayments(
   const params = SaveTransactionHashToPayments.parse(input)
 
   // batch operate proposal milestone incrementing and payment transaction saving for ACID guarantees
-  await db.$transaction(async (db) => {
+  const updatedPayment = await db.$transaction(async (db) => {
     const proposal = await db.proposal.findUnique({
       where: { id: params.proposalId },
     })
@@ -38,14 +39,14 @@ export default async function saveTransactionHashToPayments(
       },
     })
 
-    // increment proposal's milestone
-    await db.proposal.update({
-      where: { id: params.proposalId },
-      data: {
-        currentMilestoneIndex: milestone.index + 1,
+    const updatedPayments = await db.proposalPayment.findMany({
+      where: {
+        milestoneId: params.milestoneId,
       },
     })
+
+    return updatedPayments
   })
 
-  return true
+  return updatedPayment
 }

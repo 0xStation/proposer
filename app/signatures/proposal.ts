@@ -27,6 +27,7 @@ export const genProposalDigest = (proposal: Proposal) => {
         { name: "title", type: "string" },
       ],
       Payment: [
+        { name: "paymentId", type: "string" }, // UUID
         { name: "milestoneIndex", type: "uint256" },
         { name: "recipientAddress", type: "address" }, // receives the reward from the proposal
         { name: "amount", type: "uint256" },
@@ -47,6 +48,7 @@ export const genProposalDigest = (proposal: Proposal) => {
         { name: "payments", type: "Payment[]" },
         { name: "title", type: "string" },
         { name: "body", type: "string" },
+        { name: "proposalId", type: "string" }, // UUID
         // We're hardcoding "Station" to document where data is generated.
         // In the future, the idea is that other frontends would be
         // generating proposals with the same specifications as ours.
@@ -57,6 +59,7 @@ export const genProposalDigest = (proposal: Proposal) => {
       timestamp: proposal.timestamp.valueOf(),
       title: proposal.data.content.title,
       body: proposal.data.content.body,
+      proposalId: proposal.id,
       // Hardcoding our app name. Other frontend app's can change this type
       // to reference where the data was generated down the road.
       app: "Station",
@@ -72,6 +75,7 @@ export const genProposalDigest = (proposal: Proposal) => {
       payments: proposal.payments?.map((payment) => {
         const token = payment.data.token
         return {
+          paymentId: payment.id,
           milestoneIndex: milestoneIdToIndex[payment.milestoneId],
           recipientAddress: payment.recipientAddress,
           // uint256 has max integer size of 2^256 - 1, but js/ts can only handle 2^53 so we need a more scalable representation
