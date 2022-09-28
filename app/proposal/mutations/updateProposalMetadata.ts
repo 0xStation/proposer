@@ -51,6 +51,9 @@ export default async function updateProposalMetadata(
       },
       include: {
         roles: true,
+        milestones: true,
+        payments: true,
+        signatures: true,
       },
     })
 

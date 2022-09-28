@@ -934,7 +934,7 @@ export const ProposalForm = () => {
                   contentBody: values.body,
                   contributorAddresses: [resolvedContributorAddress],
                   clientAddresses: [resolvedClientAddress],
-                  authorAddresses: [activeUser?.address as string],
+                  authorAddresses: [session?.siwe?.address as string],
                   milestones,
                   payments,
                   paymentTerms: values.paymentTerms,

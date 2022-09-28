@@ -1,7 +1,9 @@
 import * as z from "zod"
 import db from "db"
+import { invoke } from "blitz"
 import { ProposalStatus, ProposalRoleApprovalStatus } from "@prisma/client"
 import pinProposalSignature from "app/proposalSignature/mutations/pinProposalSignature"
+import pinProposal from "./pinProposal"
 
 const ApproveProposal = z.object({
   proposalId: z.string(),
@@ -112,29 +114,45 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
   if (proposal.status === pendingStatusChange) {
     return proposal
   } else {
-    const updatedProposal = await db.proposal.update({
-      where: { id: params.proposalId },
-      data: {
-        status: pendingStatusChange,
-        // if approving, move milestone from -1 (default) to 0 (proposal approved)
-        ...(pendingStatusChange === ProposalStatus.APPROVED &&
-          // only set milestone index if there are milestones
-          proposal.milestones.length > 0 && {
-            // take milestone with lowest index
-            // in case payment terms are on proposal approval, sets current milestone to 0
-            // in case payment terms are on proposal completion, sets current milestone to 1
-            currentMilestoneIndex: proposal.milestones.sort((a, b) =>
-              a.index > b.index ? 1 : -1
-            )[0].index,
-          }),
-      },
-      include: {
-        roles: true,
-        milestones: true,
-        payments: true,
-        signatures: true,
-      },
-    })
+    let updatedProposal
+    try {
+      updatedProposal = await db.proposal.update({
+        where: { id: params.proposalId },
+        data: {
+          status: pendingStatusChange,
+          // if approving, move milestone from -1 (default) to 0 (proposal approved)
+          ...(pendingStatusChange === ProposalStatus.APPROVED &&
+            // only set milestone index if there are milestones
+            proposal.milestones.length > 0 && {
+              // take milestone with lowest index
+              // in case payment terms are on proposal approval, sets current milestone to 0
+              // in case payment terms are on proposal completion, sets current milestone to 1
+              currentMilestoneIndex: proposal.milestones.sort((a, b) =>
+                a.index > b.index ? 1 : -1
+              )[0].index,
+            }),
+        },
+        include: {
+          roles: true,
+          milestones: true,
+          payments: true,
+          signatures: true,
+        },
+      })
+    } catch (err) {
+      console.error("Failed to update proposal status in `approveProposal`", err)
+      throw Error(err)
+    }
+    console.log("proposal status", pendingStatusChange)
+    if (pendingStatusChange === ProposalStatus.APPROVED) {
+      console.log("approved status", proposal.status)
+      try {
+        updatedProposal = await invoke(pinProposal, { proposalId: proposal?.id as string })
+      } catch (err) {
+        console.error("Failed to pin proposal in `approveProposal`", err)
+        throw Error(err)
+      }
+    }
 
     return updatedProposal
   }

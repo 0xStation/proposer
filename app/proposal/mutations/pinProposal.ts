@@ -1,5 +1,5 @@
 import * as z from "zod"
-import db from "db"
+import db, { ProposalRoleType } from "db"
 import { Ctx } from "blitz"
 import pinJsonToPinata from "app/utils/pinata"
 import updateProposalMetadata from "./updateProposalMetadata"
@@ -28,6 +28,8 @@ export default async function pinProposal(input: z.infer<typeof PinProposal>, ct
     throw Error(`Failed to find proposal in pinProposal: ${err}`)
   }
 
+  const authorRole = proposal?.roles?.find((role) => role.type === ProposalRoleType.AUTHOR)
+
   // create the pinata payload:
   // Pinata api specifications: https://docs.pinata.cloud/pinata-api/pinning/pin-json
   // see `pinJsonToIpfs` api for more details on api config structure
@@ -46,7 +48,7 @@ export default async function pinProposal(input: z.infer<typeof PinProposal>, ct
       },
     },
     pinataContent: {
-      address: ctx.session.siwe?.address,
+      address: authorRole?.address,
       sig: proposal?.data?.authorSignature,
       data: {
         ...proposal?.data?.signatureMessage,
