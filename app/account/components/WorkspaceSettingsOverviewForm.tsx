@@ -191,7 +191,7 @@ const WorkspaceSettingsOverviewForm = ({
             <div className="flex flex-col mt-6">
               <PfpInput pfpUrl={pfpUrl} onUpload={(url) => setPfpURL(url)} />
             </div>
-            {/* EMAIL */}
+            {/* EMAIL
             <label className="font-bold block mt-6">Email</label>
             <p className="text-concrete text-sm">
               Connect and verify your email to receive notifications from Station.
@@ -227,12 +227,12 @@ const WorkspaceSettingsOverviewForm = ({
                     </p>
                   )}
                   {/* this error shows up when the user focuses the field (meta.touched) */}
-                  {meta.error && meta.touched && (
+            {/* {meta.error && meta.touched && (
                     <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
                   )}
                 </div>
               )}
-            </Field>
+            </Field> */}
           </div>
           <Button
             className="mt-12"
