@@ -27,6 +27,7 @@ const ViewProposal: BlitzPage = () => {
         )}
         {proposal?.startDate && (
           <TimelineView
+            className="mt-9"
             startDate={proposal?.startDate as Date}
             endDate={proposal?.endDate as Date}
           />
