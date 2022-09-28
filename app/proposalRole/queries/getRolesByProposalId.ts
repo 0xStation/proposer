@@ -1,6 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { ProposalRole } from "../types"
+import { ProposalRoleWithSignatures } from "../types"
 
 const GetRolesByProposalId = z.object({
   proposalId: z.string(),
@@ -15,13 +15,14 @@ export default async function getRolesByProposalId(input: z.infer<typeof GetRole
       },
       include: {
         account: true,
+        signatures: true,
       },
     })
 
     if (!proposalRoles) {
       return []
     }
-    return proposalRoles as ProposalRole[]
+    return proposalRoles as unknown as ProposalRoleWithSignatures[]
   } catch (err) {
     console.error(`Failed to fetch proposal roles in "getProposalRolesById": ${err}`)
   }

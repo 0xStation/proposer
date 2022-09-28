@@ -8,8 +8,9 @@ import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import getProposalById from "../queries/getProposalById"
 import { genProposalApprovalDigest } from "app/signatures/proposalSignature"
 import { Proposal } from "app/proposal/types"
-import useGetUsersRemainingRolesToSignFor from "app/core/hooks/useGetUsersRemainingRolesToSignFor"
+import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import getProposalSignaturesById from "app/proposal/queries/getProposalSignaturesById"
+import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 
 export const ApproveProposalModal = ({
   isOpen,
@@ -27,21 +28,8 @@ export const ApproveProposalModal = ({
   const [approveProposalMutation] = useMutation(approveProposal)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  const [signatures] = useQuery(
-    getProposalSignaturesById,
-    { proposalId: proposal.id },
-    {
-      suspense: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      enabled: !!proposal.id,
-    }
-  )
-
-  const [remainingRoles, _error, getRolesIsLoading] = useGetUsersRemainingRolesToSignFor(
-    proposal,
-    signatures
-  )
+  const [remainingRoles, _signedRoles, _error, getRolesIsLoading] =
+    useGetUsersRolesToSignFor(proposal)
 
   const { signMessage } = useSignature()
 
@@ -84,6 +72,7 @@ export const ApproveProposalModal = ({
         representingRoles,
       })
       invalidateQuery(getProposalSignaturesById)
+      invalidateQuery(getRolesByProposalId)
       // invalidate proposal query to get ipfs hash post-approval
       // since an ipfs has is created on proposal approval
       invalidateQuery(getProposalById)
