@@ -110,6 +110,8 @@ const useGetUsersRolesToSignFor = (proposal: Proposal | undefined | null) => {
   }
 
   useEffect(() => {
+    setRemainingRoles([])
+    setSignedRoles([])
     if (roles && activeUser) {
       getRoles(roles, activeUser)
     } else if (!activeUser) {
