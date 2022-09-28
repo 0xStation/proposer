@@ -101,11 +101,6 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
         transactionHash,
       })
 
-      await updateProposalStatusMutation({
-        proposalId: payment.proposalId,
-        status: ProposalStatus.COMPLETE,
-      })
-
       invalidateQuery(getProposalById)
 
       setIsOpen(false)
