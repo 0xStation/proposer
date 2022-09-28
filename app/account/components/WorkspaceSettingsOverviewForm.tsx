@@ -16,6 +16,8 @@ import {
 import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
 import Button from "app/core/components/sds/buttons/Button"
 import getAccountByAddress from "../queries/getAccountByAddress"
+import { useEnsName } from "wagmi"
+import truncateString from "app/core/utils/truncateString"
 
 const PfpInput = ({ pfpUrl, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
@@ -76,6 +78,12 @@ const WorkspaceSettingsOverviewForm = ({
   const activeUser = useStore((state) => state.activeUser)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
+  const { data: ensName } = useEnsName({
+    address: account?.address as string,
+    chainId: 1,
+    cacheTime: 60 * 60 * 1000, // (1 hr) time (in ms) which the data should remain in the cache
+  })
+
   const [createAccountMutation] = useMutation(createAccount, {
     onSuccess: (data) => {
       onSuccess()
@@ -115,7 +123,10 @@ const WorkspaceSettingsOverviewForm = ({
 
   return (
     <Form
-      initialValues={account?.data || {}}
+      initialValues={{
+        ...Object(account?.data),
+        name: account?.data?.name || ensName || truncateString(account?.address || ""),
+      }}
       onSubmit={async (values) => {
         setIsLoading(true)
         try {
