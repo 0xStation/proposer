@@ -1,88 +1,158 @@
 import * as z from "zod"
-import db, { ProposalStatus } from "db"
-import { AddressType } from "app/types"
-import { ProposalMetadata } from "../types"
+import db from "db"
+import { invoke } from "blitz"
+import { ProposalStatus, ProposalRoleApprovalStatus } from "@prisma/client"
+import pinProposalSignature from "app/proposalSignature/mutations/pinProposalSignature"
+import pinProposal from "./pinProposal"
 
 const ApproveProposal = z.object({
-  checkId: z.string(),
   proposalId: z.string(),
   signerAddress: z.string(),
+  message: z.any(),
   signature: z.string(),
-  signatureMessage: z.any(),
+  representingRoles: z
+    .object({
+      roleId: z.string(),
+      complete: z.boolean(),
+    })
+    .array(), // array of type role
 })
 
 export default async function approveProposal(input: z.infer<typeof ApproveProposal>) {
   const params = ApproveProposal.parse(input)
-  // use a transaction to apply many database writes at once
-  // creates proposal approval, check approval
-  // also updates proposal status if moving from SUBMITTED->IN_REVIEW (first approval) or IN_REVIEW->APPROVED (quorum approval)
-  const results = await db.$transaction(async (db) => {
-    const proposal = await db.proposal.findUnique({
+
+  if (params.representingRoles.length === 0) {
+    throw Error("missing representing roles ids")
+  }
+
+  let proposalSignature
+  try {
+    // create proposal signature connected to proposalRole
+    // update linked proposalRoles to be of status complete
+    // once we support multisigs, check if quorum is met first before updating
+    const [proposalSig] = await db.$transaction([
+      db.proposalSignature.create({
+        data: {
+          address: params.signerAddress,
+          data: {
+            message: params.message,
+            signature: params.signature,
+            representingRoles: params.representingRoles,
+          },
+          proposal: {
+            connect: {
+              id: params.proposalId,
+            },
+          },
+          roles: {
+            connect: params.representingRoles.map((role) => {
+              return {
+                id: role.roleId,
+              }
+            }),
+          },
+        },
+      }),
+      // update role with complete status
+      // if signature is a multisig, we don't want to mark as complete unless it has met quorum
+      // so we filter for roles that are 'complete'.
+      // complete is a type passed from the front-end indiciating that it is ready to be pushed to status complete
+      ...params.representingRoles
+        .filter((role) => {
+          return role.complete
+        })
+        .map((role) => {
+          return db.proposalRole.update({
+            where: {
+              id: role.roleId,
+            },
+            data: {
+              approvalStatus: ProposalRoleApprovalStatus.APPROVED,
+            },
+          })
+        }),
+    ])
+    proposalSignature = proposalSig
+  } catch (err) {
+    throw Error(`Failed to create signature in approveProposal: ${err}`)
+  }
+
+  try {
+    await pinProposalSignature({
+      proposalSignatureId: proposalSignature?.id,
+      signature: params?.signature,
+      signatureMessage: params?.message,
+    })
+  } catch (err) {
+    throw Error(`Failed to pin proposal signature to ipfs in approveProposal: ${err}`)
+  }
+
+  let proposal
+  try {
+    proposal = await db.proposal.findUnique({
       where: { id: params.proposalId },
       include: {
-        approvals: true,
+        roles: true,
+        milestones: true,
+        payments: true,
+        signatures: true,
       },
     })
+  } catch (err) {
+    throw Error(`Failed to find proposal in approveProposal: ${err}`)
+  }
 
-    if (!proposal) {
-      throw Error("Proposal not found")
-    }
+  // update proposal status based on status of signatures
+  // if current status is the same as the pending status change
+  // skip the update
+  const pendingStatusChange = proposal.roles.every(
+    (role) => role.approvalStatus === ProposalRoleApprovalStatus.APPROVED
+  )
+    ? ProposalStatus.APPROVED
+    : ProposalStatus.AWAITING_APPROVAL
 
-    // create approval objects, throws if creating duplicate
-    await db.proposalApproval.create({
-      data: {
-        proposalId: params.proposalId,
-        signerAddress: params.signerAddress,
+  if (proposal.status === pendingStatusChange) {
+    return proposal
+  } else {
+    let updatedProposal
+    try {
+      updatedProposal = await db.proposal.update({
+        where: { id: params.proposalId },
         data: {
-          signature: params.signature,
-          signatureMessage: params.signatureMessage,
+          status: pendingStatusChange,
+          // if approving, move milestone from -1 (default) to 0 (proposal approved)
+          ...(pendingStatusChange === ProposalStatus.APPROVED &&
+            // only set milestone index if there are milestones
+            proposal.milestones.length > 0 && {
+              // take milestone with lowest index
+              // in case payment terms are on proposal approval, sets current milestone to 0
+              // in case payment terms are on proposal completion, sets current milestone to 1
+              currentMilestoneIndex: proposal.milestones.sort((a, b) =>
+                a.index > b.index ? 1 : -1
+              )[0].index,
+            }),
         },
-      },
-    })
-
-    await db.checkApproval.create({
-      data: {
-        checkId: params.checkId,
-        signerAddress: params.signerAddress,
-        data: {
-          signature: params.signature,
-          signatureMessage: params.signatureMessage,
+        include: {
+          roles: true,
+          milestones: true,
+          payments: true,
+          signatures: true,
         },
-      },
-    })
-
-    // Fetch proposal and update status if needed
-
-    const metadata = proposal.data as unknown as ProposalMetadata
-    if (metadata.funding.senderType === AddressType.CHECKBOOK && metadata.funding.senderAddress) {
-      const checkbook = await db.checkbook.findUnique({
-        where: { address: metadata.funding.senderAddress },
       })
+    } catch (err) {
+      console.error("Failed to update proposal status in `approveProposal`", err)
+      throw Error(err)
+    }
 
-      // determine new status for proposal
-      let newStatus
-      if (
-        proposal.approvals.length + 1 >= (checkbook?.quorum || 0) &&
-        proposal.status !== ProposalStatus.APPROVED
-      ) {
-        newStatus = ProposalStatus.APPROVED
-      } else if (
-        proposal.approvals.length + 1 < (checkbook?.quorum || 0) &&
-        proposal.status !== ProposalStatus.IN_REVIEW
-      ) {
-        newStatus = ProposalStatus.IN_REVIEW
-      }
-      // if there is a new status to set, apply update
-      if (newStatus) {
-        await db.proposal.update({
-          where: { id: params.proposalId },
-          data: {
-            status: newStatus,
-          },
-        })
+    if (pendingStatusChange === ProposalStatus.APPROVED) {
+      try {
+        updatedProposal = await invoke(pinProposal, { proposalId: proposal?.id as string })
+      } catch (err) {
+        console.error("Failed to pin proposal in `approveProposal`", err)
+        throw Error(err)
       }
     }
-  })
 
-  return results
+    return updatedProposal
+  }
 }

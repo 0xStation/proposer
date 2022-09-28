@@ -30,13 +30,17 @@ interface ButtonProps {
    */
   isLoading?: boolean
   /**
+   * Override default 96px and dynamic width for buttons by providing an alternative className
+   */
+  overrideWidthClassName?: string
+  /**
    * Any additional classNames
    */
   className?: string
   /**
    * Optional click handler
    */
-  onClick?: () => void
+  onClick?: (e: any) => void
   /**
    * Button contents
    */
@@ -51,6 +55,7 @@ const Button = ({
   isSubmitType = false,
   isDisabled = false,
   isLoading = false,
+  overrideWidthClassName = undefined,
   className,
   children,
   ...props
@@ -61,14 +66,18 @@ const Button = ({
       disabled={isDisabled}
       className={classNames(
         `border rounded h-[35px] font-bold cursor-pointer ${className}`,
-        isDisabled && "opacity-50 cursor-default",
+        isDisabled && "opacity-70 cursor-default",
         type === ButtonType.Primary &&
           "bg-electric-violet border-electric-violet text-tunnel-black hover:bg-electric-violet/80 hover:border-transparent",
         type === ButtonType.Secondary &&
           "text-electric-violet border-electric-violet bg-tunnel-black hover:bg-wet-concrete",
         type === ButtonType.Unemphasized &&
           "text-marble-white border-marble-white bg-tunnel-black hover:bg-wet-concrete",
-        children.length <= 5 || isLoading ? "w-[98px]" : "px-6"
+        overrideWidthClassName
+          ? overrideWidthClassName
+          : children.length <= 5 || isLoading
+          ? "w-[98px]"
+          : "px-6"
       )}
       {...props}
     >

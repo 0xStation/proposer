@@ -1,61 +1,149 @@
-import db from "db"
+import db, { ProposalRoleType } from "db"
 import * as z from "zod"
-import { AddressType } from "app/types"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import { Proposal, ProposalMetadata } from "../types"
+import { ZodMilestone, ZodPayment } from "app/types/zod"
+import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
+import { Token } from "app/token/types"
+import { PaymentTerm } from "app/proposalPayment/types"
 
 const CreateProposal = z.object({
-  terminalId: z.number(),
-  rfpId: z.string(),
-  chainId: z.number(),
-  token: z.string(),
-  amount: z.string(),
-  symbol: z.string().optional(),
-  recipientAddress: z.string(),
   contentTitle: z.string(),
   contentBody: z.string(),
-  collaborators: z.array(z.string()),
-  signature: z.string(),
-  signatureMessage: z.any(),
-  senderAddress: z.string().optional(),
-  senderType: z.enum([AddressType.CHECKBOOK, AddressType.SAFE, AddressType.WALLET]).optional(),
+  // for initial P0 build, frontend is only supporting one contributor
+  contributorAddresses: z.string().array(),
+  // for initial P0 build, frontend is only supporting one client
+  clientAddresses: z.string().array(),
+  // for initial P0 build, frontend is only supporting one author
+  authorAddresses: z.string().array(),
+  ipfsHash: z.string().optional(),
+  ipfsPinSize: z.number().optional(),
+  ipfsTimestamp: z.date().optional(),
+  milestones: ZodMilestone.array(),
+  payments: ZodPayment.array(),
+  paymentTerms: z.enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION]).optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
-  if (parseFloat(input.amount) < 0) {
-    throw new Error("amount must be greater or equal to zero.")
+  const params = CreateProposal.parse(input)
+
+  if (params.endDate && params.startDate) {
+    if (params.startDate > params.endDate) {
+      throw new Error("end date cannot come before start date")
+    }
   }
+
+  // validate non-negative amounts and construct totalPayments object
+  let totalPayments: Record<string, { token: Token; amount: number }> = {}
+  params.payments.forEach((payment) => {
+    if (payment.amount! < 0) {
+      throw new Error("amount must be greater or equal to zero.")
+    }
+    const key = `${payment.token.chainId}-${payment.token.address}`
+    if (!totalPayments[key]) {
+      totalPayments[key] = { token: payment.token, amount: payment.amount! }
+    } else {
+      totalPayments[key]!.amount += payment.amount!
+    }
+  })
+
+  // Create accounts for roles that do not yet have accounts
+  // Needed for FK constraint on ProposalRole table for addresses to connect to Account objects
+  const roleAddresses = [
+    ...params.contributorAddresses,
+    ...params.clientAddresses,
+    ...params.authorAddresses,
+  ]
+  await createAccountsIfNotExist(roleAddresses)
+
+  const { ipfsHash, ipfsPinSize, ipfsTimestamp } = params
+  const proposalMetadata = {
+    content: {
+      title: params.contentTitle,
+      body: params.contentBody,
+    },
+    ipfsMetadata: {
+      hash: ipfsHash,
+      ipfsPinSize,
+      timestamp: ipfsTimestamp,
+    },
+    totalPayments: Object.values(totalPayments),
+    paymentTerms: params.paymentTerms,
+  } as unknown as ProposalMetadata
 
   const proposal = await db.proposal.create({
     data: {
-      rfpId: input.rfpId,
-      data: {
-        signature: input.signature,
-        signatureMessage: input.signatureMessage,
-        content: {
-          title: input.contentTitle,
-          body: input.contentBody,
-        },
-        funding: {
-          senderAddress: input.senderAddress ? toChecksumAddress(input.senderAddress) : undefined,
-          senderType: input.senderType,
-          chainId: input.chainId,
-          recipientAddress: input.recipientAddress,
-          token: input.token,
-          amount: input.amount,
-          symbol: input.symbol,
+      data: JSON.parse(JSON.stringify(proposalMetadata)),
+      ...(params.startDate && { startDate: params.startDate }),
+      ...(params.endDate && { endDate: params.endDate }),
+      roles: {
+        createMany: {
+          data: [
+            ...params.contributorAddresses.map((a) => {
+              return { address: toChecksumAddress(a), type: ProposalRoleType.CONTRIBUTOR }
+            }),
+            ...params.clientAddresses.map((a) => {
+              return { address: toChecksumAddress(a), type: ProposalRoleType.CLIENT }
+            }),
+            ...params.authorAddresses.map((a) => {
+              return { address: toChecksumAddress(a), type: ProposalRoleType.AUTHOR }
+            }),
+          ],
         },
       },
-      collaborators: {
+      milestones: {
         createMany: {
-          data: input.collaborators.map((collaborator) => {
+          data: params.milestones.map((milestone) => {
             return {
-              address: collaborator,
-              terminalId: input.terminalId,
+              index: milestone.index,
+              data: { title: milestone.title },
             }
           }),
         },
       },
     },
+    include: {
+      milestones: true,
+    },
   })
-  return proposal
+
+  const milestoneIndexToId = {}
+  proposal.milestones.forEach((milestone) => {
+    milestoneIndexToId[milestone.index] = milestone.id
+  })
+
+  const proposalWithPayments = db.proposal.update({
+    where: {
+      id: proposal.id,
+    },
+    data: {
+      payments: {
+        createMany: {
+          data: params.payments.map((payment) => {
+            return {
+              milestoneId: milestoneIndexToId[payment.milestoneIndex],
+              senderAddress: payment.senderAddress,
+              recipientAddress: payment.recipientAddress,
+              amount: payment.amount,
+              tokenId: payment.tokenId,
+              data: { token: payment.token as Token },
+            }
+          }),
+        },
+      },
+    },
+    include: {
+      roles: {
+        include: {
+          account: true,
+        },
+      },
+      milestones: true,
+      payments: true,
+    },
+  })
+
+  return proposalWithPayments as unknown as Proposal
 }

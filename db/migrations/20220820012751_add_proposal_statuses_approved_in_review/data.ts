@@ -1,5 +1,5 @@
-import db from "../../index"
-import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
+// import db from "../../index"
+// import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 
 // Note: Data migration scripts need to be commented out after they are used to prevent 
 // typescript errors due to schema conflicts between current and when a script was run
@@ -39,5 +39,6 @@ import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
 //   const res = await db.$transaction(proposalUpdates)
 //   console.log("proposal status update transaction complete", res.length)
 // }
+const seed = () => {}
 
-// export default seed
+export default seed

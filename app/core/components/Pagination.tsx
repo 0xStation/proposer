@@ -21,7 +21,10 @@ export const Pagination = ({
   return (
     <div className={className}>
       Showing
-      <span className="text-electric-violet font-bold"> {page * PAGINATION_TAKE + 1} </span>
+      <span className="text-electric-violet font-bold">
+        {" "}
+        {resultsCount === 0 ? 0 : page * PAGINATION_TAKE + 1}{" "}
+      </span>
       to
       <span className="text-electric-violet font-bold">
         {" "}

@@ -1,7 +1,6 @@
 import db from "db"
 import * as z from "zod"
-import { ProposalStatus as PrismaProposalStatus } from "@prisma/client"
-import { Proposal, ProposalStatus as ProductProposalStatus } from "../types"
+import { Proposal } from "../types"
 
 const GetProposalById = z.object({
   id: z.string(),
@@ -13,22 +12,13 @@ export default async function getProposalById(params: z.infer<typeof GetProposal
       id: params.id,
     },
     include: {
-      collaborators: {
+      roles: {
         include: {
           account: true,
         },
       },
-      checks: {
-        include: {
-          approvals: true,
-          checkbook: true,
-        },
-      },
-      approvals: {
-        include: {
-          signerAccount: true,
-        },
-      },
+      milestones: true,
+      payments: true,
     },
   })
 
@@ -36,11 +26,5 @@ export default async function getProposalById(params: z.infer<typeof GetProposal
     return null
   }
 
-  return {
-    ...proposal,
-    status:
-      proposal.status === PrismaProposalStatus.PUBLISHED
-        ? ProductProposalStatus.SUBMITTED
-        : proposal.status,
-  } as unknown as Proposal
+  return proposal as unknown as Proposal
 }

@@ -4,6 +4,7 @@
     "name": "Ethereum",
     "chainId": 1,
     "network": "homestead",
+    "gnosisNetwork": "mainnet",
     "multicall": "0xeefba1e63905ef1d7acba5a8513c70307c1ce441",
     "ensResolver": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
     "rpc": [
@@ -23,8 +24,17 @@
     "explorer": "https://etherscan.io",
     "start": 7929876,
     "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
+    "coin": {
+      "type": "COIN",
+      "name": "Ether",
+      "symbol": "ETH",
+      "address": "0x0000000000000000000000000000000000000000",
+      "decimals": 18
+    },
     "stablecoins": [
       {
+        "type": "ERC20",
+        "name": "USD Coin",
         "symbol": "USDC",
         "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         "decimals": 6
@@ -37,6 +47,7 @@
     "shortName": "Rinkeby",
     "chainId": 4,
     "network": "rinkeby",
+    "gnosisNetwork": "rinkeby",
     "testnet": true,
     "multicall": "0x42ad527de7d4e9d9d011ac45b31d8551f8fe9821",
     "ensResolver": "0xf6305c19e814d2a75429fd637d01f7ee0e77d615",
@@ -48,8 +59,17 @@
     "explorer": "https://rinkeby.etherscan.io",
     "start": 4534725,
     "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
+    "coin": {
+      "type": "COIN",
+      "name": "Rinkeby ETH",
+      "symbol": "ETH",
+      "address": "0x0000000000000000000000000000000000000000",
+      "decimals": 18
+    },
     "stablecoins": [
       {
+        "type": "ERC20",
+        "name": "USD Coin",
         "symbol": "USDC",
         "address": "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
         "decimals": 6
@@ -62,14 +82,24 @@
     "shortName": "Goerli",
     "chainId": 5,
     "network": "goerli",
+    "gnosisNetwork": "goerli",
     "testnet": true,
     "multicall": "0x77dca2c955b15e9de4dbbcf1246b4b85b651e50e",
     "rpc": ["https://eth-goerli.alchemyapi.io/v2/v4nqH_J-J3STit45Mm07TxuYexMHQsYZ"],
     "explorer": "https://goerli.etherscan.io",
     "start": 743550,
     "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
+    "coin": {
+      "type": "COIN",
+      "name": "Goerli ETH",
+      "symbol": "ETH",
+      "address": "0x0000000000000000000000000000000000000000",
+      "decimals": 18
+    },
     "stablecoins": [
       {
+        "type": "ERC20",
+        "name": "USD Coin",
         "symbol": "USDC",
         "address": "0x2f3A40A3db8a7e3D09B0adfEfbCe4f6F81927557",
         "decimals": 6
@@ -81,17 +111,34 @@
     "name": "Optimism",
     "chainId": 10,
     "network": "Optimism mainnet",
+    "gnosisNetwork": "optimism",
     "multicall": "0x35A6Cdb2C9AD4a45112df4a04147EB07dFA01aB7",
     "rpc": ["https://opt-mainnet.g.alchemy.com/v2/JzmIL4Q3jBj7it2duxLFeuCa9Wobmm7D"],
     "explorer": "https://optimistic.etherscan.io",
     "start": 657806,
     "logo": "ipfs://QmfF4kwhGL8QosUXvgq2KWCmavhKBvwD6kbhs7L4p5ZAWb",
-    "stablecoins": []
+    "coin": {
+      "type": "COIN",
+      "name": "Optimistic ETH",
+      "symbol": "ETH",
+      "address": "0x0000000000000000000000000000000000000000",
+      "decimals": 18
+    },
+    "stablecoins": [
+      {
+        "type": "ERC20",
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "address": "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+        "decimals": 6
+      }
+    ]
   },
   "100": {
     "key": "100",
     "name": "Gnosis Chain",
     "shortName": "xDAI",
+    "gnosisNetwork": "xdai",
     "chainId": 100,
     "network": "mainnet",
     "multicall": "0xb5b692a88bdfc81ca69dcb1d924f59f0413a602a",
@@ -112,6 +159,7 @@
     "key": "137",
     "name": "Polygon Mainnet",
     "shortName": "Polygon",
+    "gnosisNetwork": "polygon",
     "chainId": 137,
     "network": "mainnet",
     "multicall": "0xCBca837161be50EfA5925bB9Cc77406468e76751",
@@ -124,7 +172,22 @@
     "explorer": "https://polygonscan.com",
     "start": 9834491,
     "logo": "ipfs://QmaGokGqgjknfa4xnXKnnwC5ZyXzUjQ7p6KEe4D8G5uFFE",
-    "stablecoins": []
+    "coin": {
+      "type": "COIN",
+      "name": "Polygon",
+      "symbol": "MATIC",
+      "address": "0x0000000000000000000000000000000000000000",
+      "decimals": 18
+    },
+    "stablecoins": [
+      {
+        "type": "ERC20",
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "address": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+        "decimals": 6
+      }
+    ]
   },
   "250": {
     "key": "250",
@@ -144,6 +207,7 @@
     "name": "Arbitrum",
     "chainId": 42161,
     "network": "Arbitrum mainnet",
+    "gnosisNetwork": "arbitrum",
     "multicall": "0x7A7443F8c577d537f1d8cD4a629d40a3148Dd7ee",
     "rpc": [
       "https://arb-mainnet.g.alchemy.com/v2/JDvtNGwnHhTltIwfnxQocKwKkCTKA1DL",
@@ -182,6 +246,7 @@
     "name": "Avalanche",
     "chainId": 43114,
     "network": "mainnet",
+    "gnosisNetwork": "avalanche",
     "multicall": "0x7E9985aE4C8248fdB07607648406a48C76e9e7eD",
     "rpc": [
       "https://nd-784-543-849.p2pify.com/aa7b29fc5fed65b34f0ee6b8de33f8c0/ext/bc/C/rpc",

@@ -1,7 +1,23 @@
 import { chain } from "wagmi"
-import { RfpStatus } from "app/rfp/types"
-import { ProposalStatus as ProductProposalStatus } from "app/proposal/types"
 import networks from "app/utils/networks.json"
+import { ProposalRoleType, ProposalStatus, ProposalRoleApprovalStatus } from "@prisma/client"
+import { PaymentTerm } from "app/proposalPayment/types"
+import Gradient0 from "/public/gradients/0.png"
+import Gradient1 from "/public/gradients/1.png"
+import Gradient2 from "/public/gradients/2.png"
+import Gradient3 from "/public/gradients/3.png"
+import Gradient4 from "/public/gradients/4.png"
+import Gradient5 from "/public/gradients/5.png"
+import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
+
+export const gradientMap = {
+  0: Gradient0,
+  1: Gradient1,
+  2: Gradient2,
+  3: Gradient3,
+  4: Gradient4,
+  5: Gradient5,
+}
 
 export const CONTRACTS = {
   // Localhost, change to whatever the forge script outputs when running local anvil
@@ -28,63 +44,69 @@ export const CONTRACTS = {
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
-export const CHAIN_IDS = {
-  ETHEREUM: 1,
-  RINKEBY: 4,
-  GOERLI: 5,
-}
-
 export const DEFAULT_PFP_URLS = {
   USER: "https://station-images.nyc3.digitaloceanspaces.com/pfp-gradient.png",
   TERMINAL: "https://station-images.nyc3.digitaloceanspaces.com/terminal-gradient.png",
 }
 
-export const RFP_STATUS_DISPLAY_MAP = {
-  [RfpStatus.DRAFT]: {
+export const PROPOSAL_NEW_STATUS_DISPLAY_MAP = {
+  [ProposalStatus.DRAFT]: {
     copy: "draft",
     color: "bg-concrete",
   },
-  [RfpStatus.STARTING_SOON]: {
-    copy: "open for submissions soon",
+  [ProposalStatus.AWAITING_APPROVAL]: {
+    copy: "awaiting approval",
     color: "bg-neon-carrot",
   },
-  [RfpStatus.OPEN_FOR_SUBMISSIONS]: {
-    copy: "open for submissions",
+  [ProposalStatus.APPROVED]: {
+    copy: "approved",
     color: "bg-magic-mint",
   },
-  [RfpStatus.CLOSED]: {
-    copy: "closed",
-    color: "bg-torch-red",
+  [ProposalStatus.COMPLETE]: {
+    copy: "complete",
+    color: "bg-marble-white",
   },
 }
 
-export const PROPOSAL_STATUS_DISPLAY_MAP = {
-  [ProductProposalStatus.SUBMITTED]: {
-    copy: "submitted",
-    color: "bg-marble-white",
-  },
-  [ProductProposalStatus.IN_REVIEW]: {
-    copy: "in review",
+export const PROPOSAL_ROLE_APPROVAL_STATUS_MAP = {
+  [ProposalRoleApprovalStatus.PENDING]: {
+    copy: "pending",
     color: "bg-neon-carrot",
   },
-  [ProductProposalStatus.APPROVED]: {
+  [ProposalRoleApprovalStatus.APPROVED]: {
     copy: "approved",
     color: "bg-magic-mint",
   },
 }
 
+export const PROPOSAL_MILESTONE_STATUS_MAP = {
+  [ProposalMilestoneStatus.SCHEDULED]: {
+    copy: "scheduled",
+    color: "bg-concrete",
+  },
+  [ProposalMilestoneStatus.IN_PROGRESS]: {
+    copy: "in progress",
+    color: "bg-neon-carrot",
+  },
+  [ProposalMilestoneStatus.COMPLETE]: {
+    copy: "complete",
+    color: "bg-marble-white",
+  },
+}
+
 export const PAGINATION_TAKE = 50
 
-export const RFP_STATUSES_FILTER_OPTIONS = [
-  RfpStatus.STARTING_SOON,
-  RfpStatus.OPEN_FOR_SUBMISSIONS,
-  RfpStatus.CLOSED,
+export const PROPOSAL_NEW_STATUS_FILTER_OPTIONS = [
+  ProposalStatus.APPROVED,
+  ProposalStatus.AWAITING_APPROVAL,
+  ProposalStatus.DRAFT,
+  ProposalStatus.COMPLETE,
 ]
 
-export const PROPOSAL_STATUSES_FILTER_OPTIONS = [
-  ProductProposalStatus.SUBMITTED,
-  ProductProposalStatus.IN_REVIEW,
-  ProductProposalStatus.APPROVED,
+export const PROPOSAL_ROLE_FILTER_OPTIONS = [
+  ProposalRoleType.AUTHOR,
+  ProposalRoleType.CLIENT,
+  ProposalRoleType.CONTRIBUTOR,
 ]
 
 export const SENDGRID_TEMPLATES = {
@@ -92,10 +114,6 @@ export const SENDGRID_TEMPLATES = {
   APPROVED_PROPOSAL: "d-1e84326048464c8c8277949bfde770fe",
   VERIFY: "d-9e113acf1a9f4830beaf3aa3553f9fde",
 }
-
-export const SUPPORTED_CHAINS = [chain.mainnet, chain.rinkeby, chain.goerli]
-
-export const ETH_METADATA = { symbol: "ETH", address: ZERO_ADDRESS, decimals: 18 }
 
 export const getStablecoinMetadataBySymbol = ({ chain = 1, symbol = "USDC" }) => {
   return networks[chain as number]?.stablecoins.find((stablecoin) => stablecoin.symbol === symbol)
@@ -206,7 +224,40 @@ export const TOKEN_SYMBOLS = {
 export const LINKS = {
   CHECKBOOK:
     "https://station-labs.gitbook.io/station-product-manual/for-daos-communities/checkbook",
+  PRODUCT_MANUAL: "https://station-labs.gitbook.io/station-product-manual/",
+  HELP_DESK: "https://6vdcjqzyfj3.typeform.com/to/F0QFs9aC",
+  NEWSTAND: "https://station.mirror.xyz/",
+  LEGAL: "https://www.notion.so/0xstation/Legal-Privacy-a3b8da1a13034d1eb5f81482ec637176",
   TYPEFORM_WAITLIST: "https://6vdcjqzyfj3.typeform.com/to/G3LN1FlM",
+  PINATA_BASE_URL: "https://station.mypinata.cloud/ipfs/", // TODO: change Station gateway domain
+  MARKDOWN_GUIDE:
+    "https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax",
+  STATION_WORKSPACES:
+    "https://0xstation.notion.site/0xstation/Station-Workspaces-8c696d92fdbd4dc0b2c7e67efc54a9a5",
+}
+
+export const CHAIN_IDS = {
+  ETHEREUM: 1,
+  RINKEBY: 4,
+  GOERLI: 5,
+  OPTIMISM: 10,
+  POLYGON: 137,
+}
+
+export const SUPPORTED_CHAINS = [
+  chain.mainnet,
+  chain.rinkeby,
+  chain.goerli,
+  chain.optimism,
+  chain.polygon,
+]
+
+export const SUPPORTED_CHAIN_IDS = SUPPORTED_CHAINS.map((chain) => chain.id)
+
+export enum Sizes {
+  SM = "SM",
+  BASE = "BASE",
+  LG = "LG",
 }
 
 export enum FeatureFlagStatus {
@@ -217,6 +268,17 @@ export enum FeatureFlagStatus {
 export const FEATURE_FLAG_KEYS = {
   MEMBER_DIRECTORY: "member_directory",
 }
+
+export const PAYMENT_TERM_MAP = {
+  [PaymentTerm.ON_AGREEMENT]: {
+    copy: "Pay on proposal agreement",
+  },
+  [PaymentTerm.AFTER_COMPLETION]: {
+    copy: "Pay after proposal completion",
+  },
+}
+
+export const txPathString = "/tx/"
 
 // LEGACY BELOW
 

@@ -5,6 +5,10 @@ import { Field } from "react-final-form"
 // convenience wrapper over the react-final-form form and react select select.
 
 const customStyles = {
+  container: (provided, _state) => ({
+    ...provided,
+    marginBottom: "20px",
+  }),
   control: (provided, _state) => ({
     ...provided,
     backgroundColor: "#2E2E2E", // wet-concrete
@@ -35,7 +39,17 @@ const customStyles = {
   }),
 }
 
-const Select = ({ name, options, placeholder, initialValue }) => {
+const Select = ({
+  name,
+  options,
+  placeholder,
+  initialValue,
+}: {
+  name: string
+  options: any[]
+  placeholder: string
+  initialValue?: any
+}) => {
   return (
     <Field
       name={name}

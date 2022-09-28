@@ -35,7 +35,7 @@ export default async function saveAccountEmail(input: z.infer<typeof SaveAccount
     where: { id: params.accountId },
     data: {
       data: {
-        ...existingAccount.data,
+        ...Object(existingAccount.data),
         hasSavedEmail: true,
         hasVerifiedEmail: false,
       },

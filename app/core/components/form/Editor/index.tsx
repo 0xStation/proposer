@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { createEditor, Descendant, BaseEditor } from "slate"
 import { Slate, Editable, withReact, ReactEditor } from "slate-react"
-import { CustomElement, CustomText } from "app/deprecated/v1/initiative/types"
+import { CustomElement, CustomText } from "../types"
 import Toolbar from "./components/Toolbar"
 import Paragraph from "./elements/Paragraph"
 import Link from "./elements/Link"

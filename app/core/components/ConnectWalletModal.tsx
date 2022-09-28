@@ -14,12 +14,16 @@ import { useConnect, useAccount, useNetwork } from "wagmi"
 import generateNonce from "app/session/queries/generateNonce"
 import { SiweMessage } from "siwe"
 import verify from "app/session/mutations/verify"
+import Button from "./sds/buttons/Button"
 
 const {
   FEATURE: { WALLET_CONNECTION },
 } = TRACKING_EVENTS
 
-const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
+// This component takes in a callback which is called after the user
+// has successfully connected their wallet / siwe. It can be used for
+// actions like showing a new modal after this one has closed, etc.
+const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen, callback = () => {} }) => {
   const [connectState, setConnectState] = useState<{
     loading: boolean
     success: boolean
@@ -119,6 +123,7 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
       if (verificationSuccessful) {
         initializeUser(address)
         setConnectState({ error: false, success: true, loading: false })
+        callback()
       } else {
         throw Error("Unsuccessful signature.")
       }
@@ -174,19 +179,13 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
             </div>
           ) : null}
           <div className="m-6 text-center">
-            <button
-              className="border border-tunnel-black bg-electric-violet text-tunnel-black rounded-md content-center hover:opacity-70 cursor:pointer w-36 h-[35px]"
+            <Button
               onClick={handleSignInWithEthereum}
-              disabled={connectState.loading}
+              isDisabled={connectState.loading}
+              isLoading={connectState.loading}
             >
-              {connectState.loading ? (
-                <div className="flex justify-center items-center">
-                  <Spinner fill="black" />
-                </div>
-              ) : (
-                "Sign"
-              )}
-            </button>
+              Sign
+            </Button>
           </div>
         </>
       ) : (

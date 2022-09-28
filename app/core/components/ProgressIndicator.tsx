@@ -1,6 +1,6 @@
 const ProgressIndicator = ({ percent, twsize, cutoff }) => {
   const size = twsize * 4
-  const MAX_CIRCUMFERENCE = 2 * (size / 2 - size / 10) * Math.PI * ((360 - cutoff) / 360)
+  const MAX_CIRCUMFERENCE = 2 * (size / 2 - size / 6) * Math.PI * ((360 - cutoff) / 360)
   const strokeDashoffset = MAX_CIRCUMFERENCE - MAX_CIRCUMFERENCE * percent
 
   return (
@@ -10,10 +10,10 @@ const ProgressIndicator = ({ percent, twsize, cutoff }) => {
         <circle
           cx={`${size / 2}`}
           cy={`${size / 2}`}
-          r={`${size / 2 - size / 10}`}
+          r={`${size / 2 - size / 6}`}
           fill="transparent"
           stroke="#646464"
-          strokeWidth={`${size / 10}`}
+          strokeWidth={`${size / 6}`}
           strokeDasharray={MAX_CIRCUMFERENCE}
           strokeDashoffset="0"
           transform={`rotate(${90 + cutoff / 2}, ${size / 2}, ${size / 2})`}
@@ -24,11 +24,12 @@ const ProgressIndicator = ({ percent, twsize, cutoff }) => {
         <circle
           cx={`${size / 2}`}
           cy={`${size / 2}`}
-          r={`${size / 2 - size / 10}`}
+          r={`${size / 2 - size / 6}`}
           // strokeLinecap="round"
           fill="transparent"
-          stroke="#63EBAF"
-          strokeWidth={`${size / 10}`}
+          // "#63EBAF" = magic mint, "#FF9956" = neon carrot
+          stroke={percent === 1 ? "#63EBAF" : "#FF9956"}
+          strokeWidth={`${size / 6}`}
           strokeDasharray={MAX_CIRCUMFERENCE}
           strokeDashoffset={!isNaN(strokeDashoffset) ? strokeDashoffset : 0}
           transform={`rotate(${90 + cutoff / 2}, ${size / 2}, ${size / 2})`}

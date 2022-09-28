@@ -1,29 +1,41 @@
 import create from "zustand"
 import { Account } from "../../account/types"
+import { Chain } from "wagmi"
 
 interface StoreState {
   activeUser: undefined | Account | null
   walletModalOpen: boolean
   accountModalOpen: boolean
+  proposalApprovalModalOpen: boolean
   toastState: {
     isToastShowing: boolean
     message: string
     type: "success" | "error"
   }
+  activeChain: Chain | undefined
   toggleWalletModal: (boolean) => void
   toggleAccountModal: (boolean) => void
+  toggleProposalApprovalModalOpen: (boolean) => void
   setToastState: (toastState: any) => void
   setActiveUser: (user: undefined | Account | null) => void
+  setActiveChain: (chain: Chain | undefined) => void
 }
 
 const useStore = create<StoreState>((set) => ({
   activeUser: undefined, // undefined on start, Account if found, null if not found
   walletModalOpen: false,
   accountModalOpen: false,
+  proposalApprovalModalOpen: false,
+  activeChain: undefined,
   toastState: {
     isToastShowing: false,
     message: "",
     type: "success",
+  },
+  setActiveChain: (state) => {
+    set(() => {
+      return { activeChain: state }
+    })
   },
   toggleWalletModal: (state) => {
     set(() => {
@@ -33,6 +45,11 @@ const useStore = create<StoreState>((set) => ({
   toggleAccountModal: (state) => {
     set(() => {
       return { accountModalOpen: state }
+    })
+  },
+  toggleProposalApprovalModalOpen: (state) => {
+    set(() => {
+      return { proposalApprovalModalOpen: state }
     })
   },
   setToastState: (toastState) =>

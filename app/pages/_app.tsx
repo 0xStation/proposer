@@ -1,17 +1,17 @@
 import { AppProps } from "blitz"
 import trackerInit from "app/utils/amplitude"
 import "app/core/styles/index.css"
-import { WagmiConfig, defaultChains, createClient, configureChains } from "wagmi"
+import { WagmiConfig, createClient, configureChains, allChains } from "wagmi"
 import { MetaMaskConnector } from "wagmi/connectors/metaMask"
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect"
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet"
 import { alchemyProvider } from "wagmi/providers/alchemy"
 import { publicProvider } from "wagmi/providers/public"
 
-const { chains, provider } = configureChains(defaultChains, [
-  alchemyProvider({ apiKey: process.env.ALCHEMY_API_KEY }),
-  publicProvider(),
-])
+const { chains, provider } = configureChains(
+  [...allChains],
+  [alchemyProvider({ apiKey: process.env.ALCHEMY_API_KEY }), publicProvider()]
+)
 
 // // Set up connectors
 const connectors = () => {
