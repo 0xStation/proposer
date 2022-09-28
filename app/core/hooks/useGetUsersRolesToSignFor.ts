@@ -8,7 +8,7 @@ import useStore from "./useStore"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import { ProposalRoleWithSignatures } from "app/proposalRole/types"
 
-interface ProposalRoleType {
+interface RoleWithSignerCompletionStatus {
   roleType: string
   roleId: string
   address: string
@@ -39,7 +39,7 @@ interface ProposalRoleType {
  */
 const useGetUsersRolesToSignFor = (proposal: Proposal | undefined | null) => {
   const activeUser = useStore((state) => state.activeUser)
-  const [remainingRoles, setRemainingRoles] = useState<ProposalRoleType[]>([])
+  const [remainingRoles, setRemainingRoles] = useState<RoleWithSignerCompletionStatus[]>([])
   const [signedRoles, setSignedRoles] = useState<ProposalRoleWithSignatures[]>([])
   const [error, setError] = useState<any>(null)
   const [loading, setLoading] = useState<boolean>(true)
@@ -52,7 +52,7 @@ const useGetUsersRolesToSignFor = (proposal: Proposal | undefined | null) => {
   const getRoles = async (roles: ProposalRoleWithSignatures[], activeUser) => {
     try {
       setLoading(true)
-      const remaining: ProposalRoleType[] = []
+      const remaining: RoleWithSignerCompletionStatus[] = []
       const signed: ProposalRoleWithSignatures[] = []
 
       for (const role of roles) {
@@ -89,12 +89,15 @@ const useGetUsersRolesToSignFor = (proposal: Proposal | undefined | null) => {
                 signed.push(role)
                 break
               }
-              remaining.push({
-                roleType: role?.type,
-                roleId: role?.id,
-                address: activeUser.address,
-                oneSignerNeededToComplete: totalSafeSignersSigned === gnosisSafeDetails?.quorum - 1, // last signer sets true
-              })
+              if (totalSafeSignersSigned < gnosisSafeDetails?.quorum) {
+                remaining.push({
+                  roleType: role?.type,
+                  roleId: role?.id,
+                  address: activeUser.address,
+                  oneSignerNeededToComplete:
+                    totalSafeSignersSigned === gnosisSafeDetails?.quorum - 1, // last signer sets true
+                })
+              }
             }
           }
         }
@@ -120,7 +123,7 @@ const useGetUsersRolesToSignFor = (proposal: Proposal | undefined | null) => {
   }, [roles, activeUser])
 
   return [remainingRoles, signedRoles, error, loading] as [
-    ProposalRoleType[],
+    RoleWithSignerCompletionStatus[],
     ProposalRoleWithSignatures[],
     any,
     boolean

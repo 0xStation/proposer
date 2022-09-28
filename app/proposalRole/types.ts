@@ -1,11 +1,11 @@
 import { ProposalRole as PrismaProposalRole } from "@prisma/client"
 import { Account } from "app/account/types"
-import { Signature } from "app/signatures/types"
+import { ProposalSignature } from "app/proposalSignature/types"
 
 export type ProposalRole = PrismaProposalRole & {
   account?: Account
 }
 
 export type ProposalRoleWithSignatures = ProposalRole & {
-  signatures: Signature[]
+  signatures: ProposalSignature[]
 }
