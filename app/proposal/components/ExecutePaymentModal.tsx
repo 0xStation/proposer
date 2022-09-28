@@ -92,23 +92,38 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
   })
 
   const saveTransactionHashToPayment = async (transactionHash: string) => {
-    setIsLoading(true)
-    // update payment as cashed in db
-    await saveTransactionHashToPaymentsMutation({
-      proposalId: milestone.proposalId,
-      milestoneId: milestone.id,
-      transactionHash,
-    })
+    try {
+      setIsLoading(true)
+      // update payment as cashed in db
+      await saveTransactionHashToPaymentsMutation({
+        proposalId: milestone.proposalId,
+        milestoneId: milestone.id,
+        transactionHash,
+      })
 
-    invalidateQuery(getProposalById)
+      await updateProposalStatusMutation({
+        proposalId: payment.proposalId,
+        status: ProposalStatus.COMPLETE,
+      })
 
-    setIsOpen(false)
-    setToastState({
-      isToastShowing: true,
-      type: "success",
-      message: "Transaction attachment succeeded.",
-    })
-    setIsLoading(false)
+      invalidateQuery(getProposalById)
+
+      setIsOpen(false)
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Transaction attachment succeeded.",
+      })
+      setIsLoading(false)
+    } catch (e) {
+      console.error("Failed to save transaction hash", e)
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: e.message,
+      })
+      setIsLoading(false)
+    }
   }
 
   const initiatePayment = async () => {

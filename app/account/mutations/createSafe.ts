@@ -30,7 +30,13 @@ export default async function createSafe(input: z.infer<typeof CreateSafe>, ctx:
     throw new Error("something went wrong!")
   }
 
-  const { owners } = await response.json()
+  const { owners }: { owners: string[] } = await response.json()
+
+  const ownerAccounts = await db.account.findMany({
+    where: {
+      address: { in: owners },
+    },
+  })
 
   // create or connect each owner
   // upsert to prevent throwing if safe already exists
@@ -44,16 +50,26 @@ export default async function createSafe(input: z.infer<typeof CreateSafe>, ctx:
         chainId: multisigChainId,
       },
       targetsOf: {
-        create: owners.map((owner) => {
+        // Only create assocations with existing accounts.
+        // cannot create new accounts here because would require determining the type of each
+        // newly created account which is too high latency of an operation, especially if you
+        // consider nesting of multisig signers.
+        // Instead, we need to devise a way for accounts created after this multisig to automatically pin
+        // the workspace if they are a signer.
+        connectOrCreate: ownerAccounts.map((owner) => {
           return {
-            originAccount: {
-              connectOrCreate: {
-                where: { address: owner },
-                create: { address: owner },
+            where: {
+              originAddress_targetAddress_type: {
+                originAddress: owner.address,
+                targetAddress: params.address,
+                type: AccountAccountType.PIN_WORKSPACE,
               },
             },
-            type: AccountAccountType.PIN_WORKSPACE,
-            data: {},
+            create: {
+              originAddress: owner.address,
+              type: AccountAccountType.PIN_WORKSPACE,
+              data: {},
+            },
           }
         }),
       },
