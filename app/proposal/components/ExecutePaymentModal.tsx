@@ -65,14 +65,6 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
       try {
         invalidateQuery(getProposalById)
 
-        // once the payment tx is cleared
-        // move the proposal status to complete
-        // todo: task queue to properly address payment txs
-        await updateProposalStatusMutation({
-          proposalId: payment.proposalId,
-          status: ProposalStatus.COMPLETE,
-        })
-
         setIsOpen(false)
         setToastState({
           isToastShowing: true,
@@ -107,11 +99,6 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
         proposalId: milestone.proposalId,
         milestoneId: milestone.id,
         transactionHash,
-      })
-
-      await updateProposalStatusMutation({
-        proposalId: payment.proposalId,
-        status: ProposalStatus.COMPLETE,
       })
 
       invalidateQuery(getProposalById)
