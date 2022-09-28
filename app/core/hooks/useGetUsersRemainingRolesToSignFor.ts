@@ -7,7 +7,7 @@ import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { AddressType } from "@prisma/client"
 import useStore from "./useStore"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
-import { ProposalRole } from "app/proposalRole/types"
+import { ProposalRoleWithSignatures } from "app/proposalRole/types"
 
 interface ProposalRoleType {
   roleType: string
@@ -25,11 +25,14 @@ interface ProposalRoleType {
  * (undefined or null bc we need to be able to call the hook before this data resolves from query)
  * @param signatures: Signature[] | undefined | null
  * (undefined or null bc we need to be able to call the hook before this data resolves from query)
- * @returns [remainingRoles, error, loading]: [RoleType[], any, boolean]
+ * @returns [remainingRoles, signedRoles, error, loading]: [RoleType[], any, boolean]
  *
- * the RoleType array response is a list of the remaining roles an active user still needs to sign for. Once those
+ * the remainingRoles array response is a list of the remaining roles an active user still needs to sign for. Once those
  * roles are signed for this hook will not return them anymore. This is useful for determining if we should show the
  * user a sign button or not.
+ *
+ * the signedRoles array response is a list of roles that an active user has already signed for. This is useful for
+ * determining if a user is a signer, but has already signed.
  *
  * A possible extension would pull the logic for determining if the user should sign or not into this hook, and extend
  * the return value to include "remaining roles" vs "signed roles".
@@ -43,6 +46,7 @@ const useGetUsersRemainingRolesToSignFor = (
 ) => {
   const activeUser = useStore((state) => state.activeUser)
   const [remainingRoles, setRemainingRoles] = useState<ProposalRoleType[]>([])
+  const [signedRoles, setSignedRoles] = useState<ProposalRoleWithSignatures[]>([])
   const [error, setError] = useState<any>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [roles] = useQuery(
@@ -51,58 +55,59 @@ const useGetUsersRemainingRolesToSignFor = (
     { suspense: false, enabled: Boolean(proposal?.id) }
   )
 
-  const getRoles = async (roles: ProposalRole[], signatures: ProposalSignature[], activeUser) => {
+  const getRoles = async (roles: ProposalRoleWithSignatures[], activeUser) => {
     try {
       setLoading(true)
-      const signers: ProposalRoleType[] = await Promise.all(
-        roles?.map(async (role) => {
-          // role is type wallet (single signer)
-          // AND role's address is the active user
-          if (
-            role?.account?.addressType === AddressType.WALLET &&
-            addressesAreEqual(role?.address, activeUser?.address || "")
-          ) {
-            return {
-              roleType: role?.type,
+      const remaining: ProposalRoleType[] = []
+      const signed: ProposalRoleWithSignatures[] = []
+
+      for (const role of roles) {
+        if (
+          role?.account?.addressType === AddressType.WALLET &&
+          addressesAreEqual(role?.address, activeUser?.address || "")
+        ) {
+          if (role.approvalStatus === "APPROVED") {
+            signed.push(role)
+          } else {
+            remaining.push({
+              roleType: role?.role,
               roleId: role?.id,
               address: role?.address,
               oneSignerNeededToComplete: true, // always true for unsigned single signer
-            }
-          } else if (role?.account?.addressType === AddressType.SAFE) {
-            const gnosisSafeDetails = await getGnosisSafeDetails(
-              role?.account.data.chainId || 1,
-              role?.address
-            )
-
-            const totalSafeSignersSigned = signatures.filter((signature) => {
-              return gnosisSafeDetails?.signers.some((signer) => {
-                return addressesAreEqual(signature.address, signer)
-              })
-            }).length
-
-            // for each signer on the safe
-            // if the signer's address is the active user's address
-            return gnosisSafeDetails?.signers.map((signer) => {
-              if (addressesAreEqual(signer, activeUser?.address || "")) {
-                return {
-                  roleType: role?.type,
-                  roleId: role?.id,
-                  address: activeUser.address,
-                  oneSignerNeededToComplete:
-                    totalSafeSignersSigned === gnosisSafeDetails?.quorum - 1, // last signer sets true
-                }
-              }
             })
           }
-        })
-      )
+          continue
+        } else if (role?.account?.addressType === AddressType.SAFE) {
+          const gnosisSafeDetails = await getGnosisSafeDetails(
+            role?.account.data.chainId || 1,
+            role?.address
+          )
 
-      // I wanted to write this as a reducer so I could build up the list of roles
-      // but I couldn't figure out how to run async / await calls to gnosis in a reduce function
-      // So, the list is mapped over, which means some are null, and some are nested.
-      // Mapping over the signers leaves a nested array like [x, x, [x, x]] so flat turns it into [x, x, x, x]
-      // the filter((a) => a) is shorthand to remove nulls
-      setRemainingRoles(signers.flat().filter((a) => a))
+          const totalSafeSignersSigned = role.signatures.length
+
+          for (const signer of gnosisSafeDetails?.signers) {
+            if (addressesAreEqual(signer, activeUser?.address || "")) {
+              if (
+                role.signatures.some((signature) => {
+                  return addressesAreEqual(signature.address, activeUser?.address || "")
+                })
+              ) {
+                signed.push(role)
+                break
+              }
+              remaining.push({
+                roleType: role?.role,
+                roleId: role?.id,
+                address: activeUser.address,
+                oneSignerNeededToComplete: totalSafeSignersSigned === gnosisSafeDetails?.quorum - 1, // last signer sets true
+              })
+            }
+          }
+        }
+      }
+
+      setRemainingRoles(remaining)
+      setSignedRoles(signed)
     } catch (e) {
       setError(e)
     } finally {
@@ -112,38 +117,16 @@ const useGetUsersRemainingRolesToSignFor = (
 
   useEffect(() => {
     if (signatures && roles && activeUser) {
-      const hasActiveUserSigned = signatures.some((signature) => {
-        return addressesAreEqual(signature.address, activeUser?.address || "")
-      })
-      // If the active user has generated a signature, there is no reason to sign again.
-      // So we set the roles remaining to empty and loading to false.
-      // see post comment at the bottom of the file.
-      if (hasActiveUserSigned) {
-        setRemainingRoles([])
-        setLoading(false)
-      } else if (proposal && activeUser) {
-        getRoles(roles as ProposalRole[], signatures, activeUser)
-      }
+      getRoles(roles, activeUser)
     }
-  }, [proposal, signatures, activeUser, roles])
+  }, [signatures, activeUser, roles])
 
-  return [remainingRoles, error, loading] as [ProposalRoleType[], any, boolean]
+  return [remainingRoles, signedRoles, error, loading] as [
+    ProposalRoleType[],
+    ProposalRoleWithSignatures[],
+    any,
+    boolean
+  ]
 }
 
 export default useGetUsersRemainingRolesToSignFor
-
-/**
- * POST COMMENTS
- *
- * 1.
- * This is my biggest complaint about this code, because it relies on the assumption that the existance of a
- * signature implies the existance of a role having been accounted for. But this is not necessarily true.
- * For our system, it is true almost all of the time, but it doesn't mean it's impossible to have a role that is
- * status - incomplete with address xyz while xyz has already genereated a signature.
- * Even though our code won't allow it, its a valid state in the database.
- *
- * a better solution might be to look at the relationship between signatures and roles.
- * That way we would be able to tell which roles a user is accountable for, and if the signature of the user has been
- * linked to that particular role. It would allow a cleaner determination of if the user signing really means they have
- * signed each role.
- */

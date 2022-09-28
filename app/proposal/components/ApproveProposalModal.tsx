@@ -40,10 +40,8 @@ export const ApproveProposalModal = ({
     }
   )
 
-  const [remainingRoles, _error, getRolesIsLoading] = useGetUsersRemainingRolesToSignFor(
-    proposal,
-    signatures
-  )
+  const [remainingRoles, signedRoles, _error, getRolesIsLoading] =
+    useGetUsersRemainingRolesToSignFor(proposal, signatures)
 
   const { signMessage } = useSignature()
 

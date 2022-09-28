@@ -6,7 +6,6 @@ import ReadMore from "app/core/components/ReadMore"
 import { TotalPaymentView } from "app/core/components/TotalPaymentView"
 import RoleSignaturesView from "app/core/components/RoleSignaturesView"
 import { Proposal } from "app/proposal/types"
-import { IpfsHashView } from "app/core/components/IpfsHashView"
 import TimelineView from "app/core/components/TimelineView"
 
 const ViewProposal: BlitzPage = () => {

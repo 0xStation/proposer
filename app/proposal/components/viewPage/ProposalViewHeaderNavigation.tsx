@@ -61,7 +61,10 @@ export const ProposalViewHeaderNavigation = () => {
     }
   )
 
-  const [remainingRoles, _error, loading] = useGetUsersRemainingRolesToSignFor(proposal, signatures)
+  const [remainingRoles, signedRoles, _error, loading] = useGetUsersRemainingRolesToSignFor(
+    proposal,
+    signatures
+  )
 
   // author used to return to workspace page with proposal list view
   const author = findProposalRoleByRoleType(proposal?.roles, ProposalRoleType.AUTHOR)
@@ -71,8 +74,8 @@ export const ProposalViewHeaderNavigation = () => {
       .length || 0
 
   // activeUser's view permissions
-  const activeUserHasProposalRole = remainingRoles.length > 0
-  const activeUserHasRolesToSign = remainingRoles.length === 0
+  const activeUserIsSigner = signedRoles.length + remainingRoles.length > 0
+  const activeUserHasRolesToSign = remainingRoles.length > 0
 
   const currentPageUrl =
     typeof window !== "undefined"
@@ -165,8 +168,8 @@ export const ProposalViewHeaderNavigation = () => {
           - if they haven't signed, show the sign button, if they have signed, show the "signed" button
           - if they don't have a role, just show the copy icon
           */}
-          {activeUserHasProposalRole && !loading ? (
-            !activeUserHasRolesToSign ? (
+          {activeUserIsSigner && !loading ? (
+            activeUserHasRolesToSign ? (
               <>
                 {proposal?.status !== ProposalStatus?.DRAFT ? (
                   <Button
