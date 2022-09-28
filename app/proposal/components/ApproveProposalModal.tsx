@@ -10,8 +10,6 @@ import { genProposalApprovalDigest } from "app/signatures/proposalSignature"
 import { Proposal } from "app/proposal/types"
 import useGetUsersRemainingRolesToSignFor from "app/core/hooks/useGetUsersRemainingRolesToSignFor"
 import getProposalSignaturesById from "app/proposal/queries/getProposalSignaturesById"
-import { genProposalDigest } from "app/signatures/proposal"
-import { getHash } from "app/signatures/utils"
 
 export const ApproveProposalModal = ({
   isOpen,
@@ -57,12 +55,9 @@ export const ApproveProposalModal = ({
       })
     }
 
-    const { domain, types, value } = genProposalDigest(proposal)
-    const proposalHash = getHash(domain, types, value)
-
     const message = genProposalApprovalDigest({
       signerAddress: activeUser?.address,
-      proposalHash: proposalHash,
+      proposalHash: proposal.data.proposalHash,
       proposalId: proposal?.id as string,
     })
     const signature = await signMessage(message)

@@ -128,7 +128,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
               recipientAddress: payment.recipientAddress,
               amount: payment.amount,
               tokenId: payment.tokenId,
-              data: { token: payment.token },
+              data: { token: payment.token as Token },
             }
           }),
         },

@@ -67,7 +67,7 @@ export default async function pinProposalSignature(input: z.infer<typeof PinProp
       signature: params.signature,
       message: proposalSignature?.message,
       representingRoles: proposalSignature?.representingRoles,
-      proposalHash: proposalSignature?.proposal?.data?.ipfsMetadata?.hash,
+      proposalHash: proposalSignature?.proposal?.data?.proposalHash,
       ipfsHash: ipfsResponse.IpfsHash,
       ipfsPinSize: ipfsResponse.PinSize,
       ipfsTimestamp: ipfsResponse.Timestamp,

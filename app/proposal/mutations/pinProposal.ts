@@ -1,13 +1,11 @@
 import * as z from "zod"
-import db, { ProposalStatus } from "db"
+import db from "db"
 import { Ctx } from "blitz"
 import pinJsonToPinata from "app/utils/pinata"
 import updateProposalMetadata from "./updateProposalMetadata"
 
 const PinProposal = z.object({
   proposalId: z.string(),
-  signature: z.string(),
-  signatureMessage: z.any(),
 })
 
 // pins a proposal to ipfs using pinata and updates the signature's metadata to have the ipfs metadata
@@ -49,9 +47,9 @@ export default async function pinProposal(input: z.infer<typeof PinProposal>, ct
     },
     pinataContent: {
       address: ctx.session.siwe?.address,
-      sig: params.signature,
+      sig: proposal?.data?.authorSignature,
       data: {
-        ...params.signatureMessage,
+        ...proposal?.data?.signatureMessage,
       },
     },
   }
@@ -70,6 +68,9 @@ export default async function pinProposal(input: z.infer<typeof PinProposal>, ct
       proposalId: params.proposalId,
       contentTitle: proposal?.data?.content?.title,
       contentBody: proposal?.data?.content?.body,
+      authorSignature: proposal?.data?.authorSignature,
+      signatureMessage: proposal?.data?.signatureMessage,
+      proposalHash: proposal?.data?.proposalHash,
       ipfsHash: ipfsResponse.IpfsHash,
       ipfsPinSize: ipfsResponse.PinSize,
       ipfsTimestamp: ipfsResponse.Timestamp,
@@ -77,22 +78,6 @@ export default async function pinProposal(input: z.infer<typeof PinProposal>, ct
       paymentTerms: proposal?.data?.paymentTerms,
     })
 
-    if (updatedProposal && updatedProposal.status === ProposalStatus.DRAFT) {
-      updatedProposal = await db.proposal.update({
-        where: {
-          id: params.proposalId,
-        },
-        data: {
-          status: ProposalStatus.AWAITING_APPROVAL,
-        },
-        include: {
-          roles: true,
-          milestones: true,
-          payments: true,
-          signatures: true,
-        },
-      })
-    }
     return updatedProposal
   } catch (err) {
     throw Error(`Failure updating proposal: ${err}`)
