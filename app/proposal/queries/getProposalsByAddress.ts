@@ -22,7 +22,7 @@ export default async function getProposalsByAddress(input: z.infer<typeof GetPro
           address: data.address,
           ...(data.roles &&
             data.roles.length > 0 && {
-              role: {
+              type: {
                 in: data.roles,
               },
             }),
