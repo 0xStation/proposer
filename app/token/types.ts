@@ -4,7 +4,7 @@ import { TokenType } from "@prisma/client"
 export type Token = {
   chainId: number
   address: string
-  type?: TokenType
+  type: TokenType
   name?: string
   symbol?: string
   decimals?: number

@@ -3,10 +3,10 @@ import { multicall } from "app/utils/rpcMulticall"
 import { TokenType } from "@prisma/client"
 
 export type TokenMetadataResponse = {
+  type: TokenType
   name: string
   symbol?: string
   decimals?: number
-  type: TokenType
 }
 
 const TokenMetadataRequest = z.object({
@@ -126,10 +126,10 @@ export default async function handler(req, res) {
   }
 
   let data: TokenMetadataResponse = {
+    type,
     name,
     symbol,
     decimals,
-    type,
   }
 
   res.status(200).json({ response: "success", data })
