@@ -1,18 +1,21 @@
-import { invalidateQuery, useMutation } from "blitz"
+import { invalidateQuery, useMutation, useSession } from "blitz"
 import { useState } from "react"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { genProposalDigest } from "app/signatures/proposal"
 import useSignature from "app/core/hooks/useSignature"
-import pinProposal from "../mutations/pinProposal"
 import getProposalById from "../queries/getProposalById"
+import updateProposalMetadata from "../mutations/updateProposalMetadata"
+import { ProposalRoleType } from "@prisma/client"
+import { getHash } from "app/signatures/utils"
 
 export const PublishProposalModal = ({ isOpen, setIsOpen, proposal }) => {
   const setToastState = useStore((state) => state.setToastState)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const session = useSession({ suspense: false })
   const { signMessage } = useSignature()
-  const [pinProposalMutation] = useMutation(pinProposal, {
+  const [updateProposalMetadataMutation] = useMutation(updateProposalMetadata, {
     onSuccess: (data) => {
       setIsLoading(false)
       invalidateQuery(getProposalById)
@@ -54,6 +57,13 @@ export const PublishProposalModal = ({ isOpen, setIsOpen, proposal }) => {
           onClick={async () => {
             setIsLoading(true)
             try {
+              const authorRole = proposal?.roles?.find(
+                (role) => role.type === ProposalRoleType.AUTHOR
+              )
+              // if user disconnects and logs in as another user, we need to check if they are the author
+              if (authorRole?.address !== session?.siwe?.address) {
+                throw Error("Current address doesn't match author's address.")
+              }
               // prompt author to sign proposal to prove they are the author of the content
               const message = genProposalDigest(proposal)
               const signature = await signMessage(message)
@@ -62,10 +72,18 @@ export const PublishProposalModal = ({ isOpen, setIsOpen, proposal }) => {
                 throw Error("Unsuccessful signature.")
               }
 
-              await pinProposalMutation({
+              const { domain, types, value } = message
+              const proposalHash = getHash(domain, types, value)
+
+              await updateProposalMetadataMutation({
                 proposalId: proposal?.id as string,
-                signature: signature as string,
+                authorSignature: signature as string,
                 signatureMessage: message,
+                proposalHash: proposalHash,
+                contentTitle: proposal?.data?.content?.title,
+                contentBody: proposal?.data?.content?.body,
+                totalPayments: proposal?.data?.totalPayments,
+                paymentTerms: proposal?.data?.paymentTerms,
               })
             } catch (err) {
               setIsLoading(false)

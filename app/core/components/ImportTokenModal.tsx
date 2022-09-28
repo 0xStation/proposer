@@ -20,7 +20,7 @@ export const ImportTokenModal = ({
   chainId?: string
   callback?: () => void
 }) => {
-  const session = useSession()
+  const session = useSession({ suspense: false })
   const setToastState = useStore((state) => state.setToastState)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const [loading, setLoading] = useState<boolean>(false)

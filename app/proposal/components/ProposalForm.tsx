@@ -40,10 +40,11 @@ import { PaymentTerm } from "app/proposalPayment/types"
 import { getNetworkTokens } from "app/core/utils/networkInfo"
 import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
 import { genProposalDigest } from "app/signatures/proposal"
-import pinProposal from "../mutations/pinProposal"
 import TextLink from "app/core/components/TextLink"
 import { Spinner } from "app/core/components/Spinner"
 import { Proposal } from "../types"
+import updateProposalMetadata from "../mutations/updateProposalMetadata"
+import { getHash } from "app/signatures/utils"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -822,7 +823,7 @@ export const ProposalForm = () => {
       console.error(error)
     },
   })
-  const [pinProposalMutation] = useMutation(pinProposal, {
+  const [updateProposalMetadataMutation] = useMutation(updateProposalMetadata, {
     onSuccess: (data) => {
       setProposal(data)
       setProposalStep(ProposalStep.APPROVE)
@@ -933,7 +934,7 @@ export const ProposalForm = () => {
                   contentBody: values.body,
                   contributorAddresses: [resolvedContributorAddress],
                   clientAddresses: [resolvedClientAddress],
-                  authorAddresses: [activeUser?.address as string],
+                  authorAddresses: [session?.siwe?.address as string],
                   milestones,
                   payments,
                   paymentTerms: values.paymentTerms,
@@ -964,24 +965,34 @@ export const ProposalForm = () => {
             // this condition is here if the user needs to re-click the submit to generate a signature
             // for the proposal and pin to ipfs, but they've already created a proposal.
             try {
-              const authorRole = proposal?.roles?.find(
+              const proposalToRequestSignature = (createdProposal as Proposal) || proposal
+              const authorRole = proposalToRequestSignature?.roles?.find(
                 (role) => role.type === ProposalRoleType.AUTHOR
               )
+
               // if user disconnects and logs in as another user, we need to check if they are the author
               if (authorRole?.address !== session?.siwe?.address) {
                 throw Error("Current address doesn't match author's address.")
               }
               // prompt author to sign proposal to prove they are the author of the content
-              const message = genProposalDigest((createdProposal as Proposal) || proposal)
+              const message = genProposalDigest(proposalToRequestSignature)
               const signature = await signMessage(message)
 
               if (!signature) {
                 throw Error("Unsuccessful signature.")
               }
-              const updatedProposal = await pinProposalMutation({
-                proposalId: (createdProposal?.id || proposal?.id) as string,
-                signature: signature as string,
+              const { domain, types, value } = message
+              const proposalHash = getHash(domain, types, value)
+
+              const updatedProposal = await updateProposalMetadataMutation({
+                proposalId: proposalToRequestSignature?.id as string,
+                authorSignature: signature as string,
                 signatureMessage: message,
+                proposalHash,
+                contentTitle: proposalToRequestSignature?.data?.content?.title,
+                contentBody: proposalToRequestSignature?.data?.content?.body,
+                totalPayments: proposalToRequestSignature?.data?.totalPayments,
+                paymentTerms: proposalToRequestSignature?.data?.paymentTerms,
               })
 
               if (updatedProposal) {
