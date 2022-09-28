@@ -47,6 +47,7 @@ export const genProposalDigest = (proposal: Proposal) => {
         { name: "payments", type: "Payment[]" },
         { name: "title", type: "string" },
         { name: "body", type: "string" },
+        { name: "proposalId", type: "string" }, // UUID
         // We're hardcoding "Station" to document where data is generated.
         // In the future, the idea is that other frontends would be
         // generating proposals with the same specifications as ours.
@@ -57,6 +58,7 @@ export const genProposalDigest = (proposal: Proposal) => {
       timestamp: proposal.timestamp.valueOf(),
       title: proposal.data.content.title,
       body: proposal.data.content.body,
+      proposalId: proposal.id,
       // Hardcoding our app name. Other frontend app's can change this type
       // to reference where the data was generated down the road.
       app: "Station",
