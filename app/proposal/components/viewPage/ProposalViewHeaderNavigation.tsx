@@ -159,7 +159,7 @@ export const ProposalViewHeaderNavigation = () => {
               <>
                 {proposal?.status !== ProposalStatus?.DRAFT ? (
                   <Button
-                    overrideWidthClassName="w-[300px]"
+                    overrideWidthClassName="w-[300px] sm:w-[400px] md:w-[614px]"
                     className="mr-3"
                     onClick={() => toggleProposalApprovalModalOpen(true)}
                   >
@@ -167,20 +167,13 @@ export const ProposalViewHeaderNavigation = () => {
                   </Button>
                 ) : (
                   <Button
-                    overrideWidthClassName="w-[300px]"
+                    overrideWidthClassName="w-[300px] sm:w-[400px] md:w-[614px]"
                     className="mr-3"
                     onClick={() => setPublishModalOpen(true)}
                   >
                     Publish
                   </Button>
                 )}
-                <Button
-                  overrideWidthClassName="w-[300px]"
-                  className="mr-2"
-                  type={ButtonType.Secondary}
-                >
-                  Edit
-                </Button>{" "}
               </>
             ) : (
               // TODO: add icons to sds buttons, currently can't use unemphasized with icon
@@ -195,7 +188,7 @@ export const ProposalViewHeaderNavigation = () => {
           ) : !proposal || loading ? (
             // BUTTONS LOADING STATE
             <div className="flex flex-row justify-between">
-              <span className="h-[35px] w-[680px] rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+              <span className="h-[35px] w-[670px] rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
             </div>
           ) : null}
           {proposal && <CopyBtn textToWrite={currentPageUrl} />}
