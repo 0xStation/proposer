@@ -50,21 +50,8 @@ export const ProposalViewHeaderNavigation = () => {
       enabled: !!proposalId,
     }
   )
-  const [signatures] = useQuery(
-    getProposalSignaturesById,
-    { proposalId: proposalId },
-    {
-      suspense: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      enabled: !!proposalId,
-    }
-  )
 
-  const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(
-    proposal,
-    signatures
-  )
+  const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(proposal)
 
   // author used to return to workspace page with proposal list view
   const author = findProposalRoleByRoleType(proposal?.roles, ProposalRoleType.AUTHOR)

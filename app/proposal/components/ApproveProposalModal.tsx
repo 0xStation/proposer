@@ -29,21 +29,8 @@ export const ApproveProposalModal = ({
   const [approveProposalMutation] = useMutation(approveProposal)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  const [signatures] = useQuery(
-    getProposalSignaturesById,
-    { proposalId: proposal.id },
-    {
-      suspense: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      enabled: !!proposal.id,
-    }
-  )
-
-  const [remainingRoles, _signedRoles, _error, getRolesIsLoading] = useGetUsersRolesToSignFor(
-    proposal,
-    signatures
-  )
+  const [remainingRoles, _signedRoles, _error, getRolesIsLoading] =
+    useGetUsersRolesToSignFor(proposal)
 
   const { signMessage } = useSignature()
 

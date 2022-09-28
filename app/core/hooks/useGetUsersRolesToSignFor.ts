@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { useQuery } from "blitz"
 import { Proposal } from "app/proposal/types"
-import { ProposalSignature } from "@prisma/client"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { AddressType } from "@prisma/client"
@@ -23,8 +22,6 @@ interface ProposalRoleType {
  *
  * @param proposal: Proposal | undefined | null
  * (undefined or null bc we need to be able to call the hook before this data resolves from query)
- * @param signatures: Signature[] | undefined | null
- * (undefined or null bc we need to be able to call the hook before this data resolves from query)
  * @returns [remainingRoles, signedRoles, error, loading]: [RoleType[], any, boolean]
  *
  * the remainingRoles array response is a list of the remaining roles an active user still needs to sign for. Once those
@@ -40,10 +37,7 @@ interface ProposalRoleType {
  * This might be useful if we have UI that requires we show which roles a particular user has signed for, after they
  * have signed. However, there are currently not UI elements that require that, so this leaner hook should be fine.
  */
-const useGetUsersRolesToSignFor = (
-  proposal: Proposal | undefined | null,
-  signatures: ProposalSignature[] | undefined
-) => {
+const useGetUsersRolesToSignFor = (proposal: Proposal | undefined | null) => {
   const activeUser = useStore((state) => state.activeUser)
   const [remainingRoles, setRemainingRoles] = useState<ProposalRoleType[]>([])
   const [signedRoles, setSignedRoles] = useState<ProposalRoleWithSignatures[]>([])
@@ -116,10 +110,12 @@ const useGetUsersRolesToSignFor = (
   }
 
   useEffect(() => {
-    if (signatures && roles && activeUser) {
+    if (roles && activeUser) {
       getRoles(roles, activeUser)
+    } else if (!activeUser) {
+      setLoading(false)
     }
-  }, [signatures, activeUser, roles])
+  }, [roles, activeUser])
 
   return [remainingRoles, signedRoles, error, loading] as [
     ProposalRoleType[],
