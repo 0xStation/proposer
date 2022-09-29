@@ -6,7 +6,12 @@ import { Field, Form } from "react-final-form"
 import useSignature from "app/core/hooks/useSignature"
 import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import { SUPPORTED_CHAINS, LINKS, PAYMENT_TERM_MAP } from "app/core/utils/constants"
+import {
+  SUPPORTED_CHAINS,
+  LINKS,
+  PAYMENT_TERM_MAP,
+  PROPOSING_AS_ROLE_MAP,
+} from "app/core/utils/constants"
 import debounce from "lodash.debounce"
 import createProposal from "app/proposal/mutations/createProposal"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
@@ -135,7 +140,7 @@ const Stepper = ({ step }) => {
   )
 }
 
-const ProposeForm = ({ selectedNetworkId }) => {
+const ProposeForm = ({ selectedNetworkId, proposingAs, setProposingAs }) => {
   const [contributorAddressType, setContributorAddressType] = useState<AddressType>()
   const [clientAddressType, setClientAddressType] = useState<AddressType>()
   const [contributorAddressInputVal, setContributorAddressInputVal] = useState<string>()
@@ -189,129 +194,191 @@ const ProposeForm = ({ selectedNetworkId }) => {
 
   return (
     <>
-      {/* CLIENT */}
-      <label className="font-bold block mt-6">Client*</label>
-      <span className="text-xs text-concrete block">
-        Who will be responsible for reviewing and deploying the funds outlined in this proposal? See
-        the list of featured addresses <TextLink url={LINKS.STATION_WORKSPACES}>here</TextLink>.
-      </span>
-      <Field name="client" validate={composeValidators(requiredField, isEnsOrAddress)}>
-        {({ meta, input }) => {
+      {/* PROPOSING AS */}
+      <label className="font-bold block mt-6">I&apos;m proposing as...*</label>
+      <Field name="proposingAs" validate={requiredField}>
+        {({ input, meta }) => {
           return (
-            <>
-              <input
+            <div className="custom-select-wrapper">
+              <select
                 {...input}
-                type="text"
-                required
-                placeholder="Enter ENS name or wallet address"
-                className="bg-wet-concrete rounded mt-1 w-full p-2"
-                onKeyUp={debounce(
-                  (e) => handleEnsAddressInputValOnKeyUp(e.target.value, setClientAddressInputVal),
-                  200
-                )}
-                onBlur={(e) => {
-                  handleAddressInputValOnBlur(
-                    e.target.value,
-                    setClientAddressType,
-                    clientEnsAddress
-                  )
-                  input.onBlur(e)
-                }}
-              />
+                className="w-full bg-wet-concrete rounded p-2 mt-1"
+                value={proposingAs}
+                onChange={(e) => {
+                  setProposingAs(e.target.value)
 
+                  // custom values can be compatible with react-final-form by calling
+                  // the props.input.onChange callback
+                  // https://final-form.org/docs/react-final-form/api/Field
+                  input.onChange(e.target.value)
+                }}
+              >
+                <option value="">Select option</option>
+                {[
+                  ProposalRoleType.CONTRIBUTOR,
+                  ProposalRoleType.CLIENT,
+                  ProposalRoleType.AUTHOR,
+                ].map((roleType, idx) => {
+                  return (
+                    <option key={roleType} value={roleType}>
+                      {PROPOSING_AS_ROLE_MAP[roleType]?.copy || ""}
+                    </option>
+                  )
+                })}
+              </select>
               {meta.touched && meta.error && (
                 <span className="text-torch-red text-xs">{meta.error}</span>
               )}
-              {/* {clientEnsAddress && <EnsAddressMetadataText address={clientEnsAddress} />} */}
-              {/* user feedback on address type of input */}
-              {!meta.error && input.value && !!clientAddressType && (
-                <GnosisWalletTypeMetadataText addressType={clientAddressType} />
-              )}
-            </>
+            </div>
           )
         }}
       </Field>
-      {/* CONTRIBUTOR */}
-      <label className="font-bold block mt-6">Contributor*</label>
-      <span className="text-xs text-concrete block">
-        Who will be responsible for delivering the work outlined in this proposal? Paste your address if this is you.
-      </span>
-      <Field name="contributor" validate={composeValidators(requiredField, isEnsOrAddress)}>
-        {({ meta, input }) => {
-          return (
+      {/* only show rest of step if proposingAs is selected  */}
+      {!!proposingAs && (
+        <>
+          {proposingAs !== ProposalRoleType.CLIENT && (
             <>
-              <input
-                {...input}
-                type="text"
-                required
-                placeholder="Enter ENS name or wallet address"
-                className="bg-wet-concrete rounded mt-1 w-full p-2"
-                onKeyUp={debounce(
-                  (e) =>
-                    handleEnsAddressInputValOnKeyUp(e.target.value, setContributorAddressInputVal),
-                  200
-                )}
-                onBlur={(e) => {
-                  handleAddressInputValOnBlur(
-                    e.target.value,
-                    setContributorAddressType,
-                    contributorEnsAddress
+              {/* CLIENT */}
+              <label className="font-bold block mt-6">
+                Who will be reviewing and approving the work?*
+              </label>
+              <span className="text-xs text-concrete block">
+                Find the <TextLink url={LINKS.STATION_WORKSPACES}>addresses</TextLink> of featured
+                communities and individuals.
+              </span>
+              <Field name="client" validate={composeValidators(requiredField, isEnsOrAddress)}>
+                {({ meta, input }) => {
+                  return (
+                    <>
+                      <input
+                        {...input}
+                        type="text"
+                        required
+                        placeholder="Enter ENS name or wallet address"
+                        className="bg-wet-concrete rounded mt-1 w-full p-2"
+                        onKeyUp={debounce(
+                          (e) =>
+                            handleEnsAddressInputValOnKeyUp(
+                              e.target.value,
+                              setClientAddressInputVal
+                            ),
+                          200
+                        )}
+                        onBlur={(e) => {
+                          handleAddressInputValOnBlur(
+                            e.target.value,
+                            setClientAddressType,
+                            clientEnsAddress
+                          )
+                          input.onBlur(e)
+                        }}
+                      />
+
+                      {meta.touched && meta.error && (
+                        <span className="text-torch-red text-xs">{meta.error}</span>
+                      )}
+                      {/* {clientEnsAddress && <EnsAddressMetadataText address={clientEnsAddress} />} */}
+                      {/* user feedback on address type of input */}
+                      {!meta.error && input.value && !!clientAddressType && (
+                        <GnosisWalletTypeMetadataText addressType={clientAddressType} />
+                      )}
+                    </>
                   )
-                  input.onBlur(e)
                 }}
-              />
-
-              {meta.touched && meta.error && (
-                <span className="text-torch-red text-xs">{meta.error}</span>
-              )}
-              {/* {contributorEnsAddress && <EnsAddressMetadataText address={contributorEnsAddress} />} */}
-              {/* user feedback on address type of input */}
-              {!meta.error && input.value && !!contributorAddressType && (
-                <GnosisWalletTypeMetadataText addressType={contributorAddressType} />
-              )}
+              </Field>
             </>
-          )
-        }}
-      </Field>
-      {/* TITLE */}
-      <label className="font-bold block mt-6">Title*</label>
-      <Field name="title" validate={requiredField}>
-        {({ meta, input }) => (
-          <>
-            <input
-              {...input}
-              type="text"
-              required
-              placeholder="Add a title for your idea"
-              className="bg-wet-concrete rounded mt-1 w-full p-2"
-            />
+          )}
+          {proposingAs !== ProposalRoleType.CONTRIBUTOR && (
+            <>
+              {/* CONTRIBUTOR */}
+              <label className="font-bold block mt-6">Who will be delivering the work?*</label>
+              <span className="text-xs text-concrete block">
+                Find the <TextLink url={LINKS.STATION_WORKSPACES}>addresses</TextLink> of featured
+                communities and individuals.
+              </span>
+              <Field name="contributor" validate={composeValidators(requiredField, isEnsOrAddress)}>
+                {({ meta, input }) => {
+                  return (
+                    <>
+                      <input
+                        {...input}
+                        type="text"
+                        required
+                        placeholder="Enter ENS name or wallet address"
+                        className="bg-wet-concrete rounded mt-1 w-full p-2"
+                        onKeyUp={debounce(
+                          (e) =>
+                            handleEnsAddressInputValOnKeyUp(
+                              e.target.value,
+                              setContributorAddressInputVal
+                            ),
+                          200
+                        )}
+                        onBlur={(e) => {
+                          handleAddressInputValOnBlur(
+                            e.target.value,
+                            setContributorAddressType,
+                            contributorEnsAddress
+                          )
+                          input.onBlur(e)
+                        }}
+                      />
 
-            {meta.touched && meta.error && (
-              <span className="text-torch-red text-xs">{meta.error}</span>
+                      {meta.touched && meta.error && (
+                        <span className="text-torch-red text-xs">{meta.error}</span>
+                      )}
+                      {/* {contributorEnsAddress && <EnsAddressMetadataText address={contributorEnsAddress} />} */}
+                      {/* user feedback on address type of input */}
+                      {!meta.error && input.value && !!contributorAddressType && (
+                        <GnosisWalletTypeMetadataText addressType={contributorAddressType} />
+                      )}
+                    </>
+                  )
+                }}
+              </Field>
+            </>
+          )}
+          {/* TITLE */}
+          <label className="font-bold block mt-6">Title*</label>
+          <Field name="title" validate={requiredField}>
+            {({ meta, input }) => (
+              <>
+                <input
+                  {...input}
+                  type="text"
+                  required
+                  placeholder="Add a title for your idea"
+                  className="bg-wet-concrete rounded mt-1 w-full p-2"
+                />
+
+                {meta.touched && meta.error && (
+                  <span className="text-torch-red text-xs">{meta.error}</span>
+                )}
+              </>
             )}
-          </>
-        )}
-      </Field>
-      {/* BODY */}
-      <label className="font-bold block mt-6">Details*</label>
-      <span className="text-xs text-concrete block">
-        Supports markdown syntax. <TextLink url={LINKS.MARKDOWN_GUIDE}>Learn more</TextLink>
-      </span>
-      <Field name="body" component="textarea" validate={requiredField}>
-        {({ input, meta }) => (
-          <div>
-            <textarea
-              {...input}
-              placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
-              className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[236px] w-full"
-            />
-            {/* this error shows up when the user focuses the field (meta.touched) */}
-            {meta.error && meta.touched && (
-              <span className=" text-xs text-torch-red block">{meta.error}</span>
+          </Field>
+          {/* BODY */}
+          <label className="font-bold block mt-6">Details*</label>
+          <span className="text-xs text-concrete block">
+            Supports markdown syntax. <TextLink url={LINKS.MARKDOWN_GUIDE}>Learn more</TextLink>
+          </span>
+          <Field name="body" component="textarea" validate={requiredField}>
+            {({ input, meta }) => (
+              <div>
+                <textarea
+                  {...input}
+                  placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
+                  className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[236px] w-full"
+                />
+                {/* this error shows up when the user focuses the field (meta.touched) */}
+                {meta.error && meta.touched && (
+                  <span className=" text-xs text-torch-red block">{meta.error}</span>
+                )}
+              </div>
             )}
-          </div>
-        )}
-      </Field>
+          </Field>
+        </>
+      )}
     </>
   )
 }
@@ -420,7 +487,9 @@ const RewardForm = ({
 
       {/* NETWORK */}
       <label className="font-bold block mt-6">Network*</label>
-      <span className="text-xs text-concrete block">Which network would the funds get transacted on?</span>
+      <span className="text-xs text-concrete block">
+        Which network would the funds get transacted on?
+      </span>
       <Field name="network" validate={requiredField}>
         {({ input, meta }) => {
           return (
@@ -566,7 +635,9 @@ const RewardForm = ({
           </Field>
           {/* PAYMENT TYPE */}
           <label className="font-bold block mt-6">Payment terms*</label>
-          <span className="text-xs text-concrete block">When is the payment expected to be sent to contributors?</span>
+          <span className="text-xs text-concrete block">
+            When is the payment expected to be sent to contributors?
+          </span>
           <Field name="paymentTerms" validate={requiredField}>
             {({ meta, input }) => (
               <>
@@ -745,6 +816,7 @@ export const ProposalForm = () => {
   const [shouldHandleSubmit, setShouldHandleSubmit] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
+  const [proposingAs, setProposingAs] = useState<string>("")
   // default to mainnet since we're using it to check ENS
   // which pretty much only exists on mainnet as of right now
   const provider = useProvider({ chainId: 1 })
@@ -843,37 +915,63 @@ export const ProposalForm = () => {
             // create the same proposal, rather we want to skip to the signature step.
             let proposal
             if (!createdProposal) {
-              const resolvedContributorAddress = await handleResolveEnsAddress(
-                values.contributor?.trim()
-              )
+              let contributorAddress
+              let clientAddress
 
-              if (!resolvedContributorAddress) {
+              if (proposingAs === ProposalRoleType.CONTRIBUTOR) {
+                contributorAddress = activeUser?.address
+              } else {
+                contributorAddress = await handleResolveEnsAddress(values.contributor?.trim())
+              }
+
+              if (proposingAs === ProposalRoleType.CLIENT) {
+                clientAddress = activeUser?.address
+              } else {
+                clientAddress = await handleResolveEnsAddress(values.client?.trim())
+              }
+
+              if (!contributorAddress) {
+                let message
+                if (proposingAs === ProposalRoleType.CONTRIBUTOR) {
+                  message = "Not signed in, please connect wallet and sign in."
+                } else {
+                  message = "Invalid ENS name or wallet address provided."
+                }
                 setIsLoading(false)
                 setToastState({
                   isToastShowing: true,
                   type: "error",
-                  message: "Invalid address or ENS name for Contributor",
+                  message,
                 })
                 return
               }
-              const resolvedClientAddress = await handleResolveEnsAddress(values.client?.trim())
-
-              if (!resolvedClientAddress) {
+              if (!clientAddress) {
+                let message
+                if (proposingAs === ProposalRoleType.CLIENT) {
+                  message = "Not signed in, please connect wallet and sign in."
+                } else {
+                  message = "Invalid ENS name or wallet address provided."
+                }
                 setIsLoading(false)
                 setToastState({
                   isToastShowing: true,
                   type: "error",
-                  message: "Invalid address or ENS name for Client",
+                  message,
                 })
                 return
               }
-
-              if (addressesAreEqual(resolvedContributorAddress, resolvedClientAddress)) {
+              if (addressesAreEqual(contributorAddress, clientAddress)) {
+                let message
+                if (proposingAs !== ProposalRoleType.AUTHOR) {
+                  message = "Cannot propose to yourself, please propose to another address."
+                } else {
+                  message = "Same address cannot deliver and review work, please change addresses."
+                }
                 setIsLoading(false)
                 setToastState({
                   isToastShowing: true,
                   type: "error",
-                  message: "Cannot use same address for Client and Contributor.",
+                  message,
                 })
                 return
               }
@@ -919,8 +1017,8 @@ export const ProposalForm = () => {
                 payments = [
                   {
                     milestoneIndex: 0,
-                    senderAddress: resolvedClientAddress,
-                    recipientAddress: resolvedContributorAddress,
+                    senderAddress: clientAddress,
+                    recipientAddress: contributorAddress,
                     amount: parseFloat(values.paymentAmount),
                     token: { ...token, chainId: selectedNetworkId },
                   },
@@ -931,8 +1029,8 @@ export const ProposalForm = () => {
                 proposal = await createProposalMutation({
                   contentTitle: values.title,
                   contentBody: values.body,
-                  contributorAddresses: [resolvedContributorAddress],
-                  clientAddresses: [resolvedClientAddress],
+                  contributorAddresses: [contributorAddress],
+                  clientAddresses: [clientAddress],
                   authorAddresses: [session?.siwe?.address as string],
                   milestones,
                   payments,
@@ -1040,7 +1138,11 @@ export const ProposalForm = () => {
                       </div>
                       <div className="flex flex-col col-span-2">
                         {proposalStep === ProposalStep.PROPOSE && (
-                          <ProposeForm selectedNetworkId={selectedNetworkId} />
+                          <ProposeForm
+                            selectedNetworkId={selectedNetworkId}
+                            proposingAs={proposingAs}
+                            setProposingAs={setProposingAs}
+                          />
                         )}
                         {proposalStep === ProposalStep.REWARDS && (
                           <RewardForm
@@ -1073,8 +1175,15 @@ export const ProposalForm = () => {
                 {proposalStep === ProposalStep.PROPOSE && (
                   <Button
                     isDisabled={
-                      !formState.values.client ||
-                      !formState.values.contributor ||
+                      // has not selected who user is proposing as
+                      !formState.values.proposingAs ||
+                      // proposing as author or client but has not filled in contributor
+                      (formState.values.proposingAs !== ProposalRoleType.CONTRIBUTOR &&
+                        !formState.values.contributor) ||
+                      // proposing as author or contributor but has not filled in client
+                      (formState.values.proposingAs !== ProposalRoleType.CLIENT &&
+                        !formState.values.client) ||
+                      // has not filled in title or body
                       !formState.values.title ||
                       !formState.values.body
                     }

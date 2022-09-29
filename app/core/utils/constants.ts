@@ -278,6 +278,18 @@ export const PAYMENT_TERM_MAP = {
   },
 }
 
+export const PROPOSING_AS_ROLE_MAP = {
+  [ProposalRoleType.CONTRIBUTOR]: {
+    copy: "A contributor (I'm delivering the work)",
+  },
+  [ProposalRoleType.CLIENT]: {
+    copy: "A client (I'm reviewing and approving the work)",
+  },
+  [ProposalRoleType.AUTHOR]: {
+    copy: "An author (I'm writing the proposal as a third party)",
+  },
+}
+
 export const txPathString = "/tx/"
 
 // LEGACY BELOW
