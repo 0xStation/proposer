@@ -76,7 +76,7 @@ export const ProposalMilestonePaymentBox = ({
                 <a
                   className="text-sm text-electric-violet"
                   target="_blank"
-                  href={`${getNetworkExplorer[payment.data.token.chainId].explorer}/tx/${
+                  href={`${getNetworkExplorer(payment.data.token.chainId)}/tx/${
                     payment.transactionHash
                   }`}
                   rel="noreferrer"
