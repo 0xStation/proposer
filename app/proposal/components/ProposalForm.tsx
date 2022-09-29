@@ -651,19 +651,22 @@ const ConfirmForm = () => {
   )
 }
 
-const ProposalCreationLoadingScreen = ({ createdProposal, isSendLater }) => (
-  <div className="flex flex-col justify-center items-center mt-48">
-    <p className="text-concrete tracking-wide">
-      {createdProposal && !isSendLater ? "Sign to prove your authorship." : "Creating proposal..."}
-    </p>
-    {createdProposal && (
-      <p className="text-concrete tracking-wide">Check your wallet for your next action.</p>
-    )}
-    <div className="h-4 w-4 mt-6">
-      <Spinner fill="white" />
+const ProposalCreationLoadingScreen = ({ createdProposal, proposalShouldSendLater }) => {
+  const sendNowLoadingState = createdProposal && !proposalShouldSendLater
+  return (
+    <div className="flex flex-col justify-center items-center mt-48">
+      <p className="text-concrete tracking-wide">
+        {sendNowLoadingState ? "Sign to prove your authorship." : "Creating proposal..."}
+      </p>
+      {sendNowLoadingState && (
+        <p className="text-concrete tracking-wide">Check your wallet for your next action.</p>
+      )}
+      <div className="h-4 w-4 mt-6">
+        <Spinner fill="white" />
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 export const ProposalForm = () => {
   const router = useRouter()
@@ -678,11 +681,14 @@ export const ProposalForm = () => {
   const [needFunding, setNeedFunding] = useState<boolean>(true)
   const [tokenOptions, setTokenOptions] = useState<any[]>()
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
-  const [isSendLater, setIsSendLater] = useState<boolean>(false)
+  const [proposalShouldSendLater, setProposalShouldSendLater] = useState<boolean>(false)
   const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
-  const [shouldAskAuthorToSign, setShouldAskAuthorToSign] = useState<boolean>(false)
+  const [
+    shouldHandlePostProposalCreationProcessing,
+    setShouldHandlePostProposalCreationProcessing,
+  ] = useState<boolean>(false)
   // default to mainnet since we're using it to check ENS
   // which pretty much only exists on mainnet as of right now
   const provider = useProvider({ chainId: 1 })
@@ -734,7 +740,7 @@ export const ProposalForm = () => {
         )
       }
     } catch (err) {
-      setShouldAskAuthorToSign(false)
+      setShouldHandlePostProposalCreationProcessing(false)
       setIsLoading(false)
       console.error(err)
       setToastState({
@@ -753,10 +759,10 @@ export const ProposalForm = () => {
   }, [walletModalOpen])
 
   useEffect(() => {
-    // `shouldAskAuthorToSign` is used to retrigger this `useEffect` hook
+    // `shouldHandlePostProposalCreationProcessing` is used to retrigger this `useEffect` hook
     // if the user declines to sign the message verifying their authorship.
-    if (createdProposal && shouldAskAuthorToSign) {
-      if (!isSendLater) {
+    if (createdProposal && shouldHandlePostProposalCreationProcessing) {
+      if (!proposalShouldSendLater) {
         confirmAuthorship({ proposal: createdProposal })
       } else {
         router.push(
@@ -766,7 +772,7 @@ export const ProposalForm = () => {
         )
       }
     }
-  }, [createdProposal, isSendLater, shouldAskAuthorToSign])
+  }, [createdProposal, proposalShouldSendLater, shouldHandlePostProposalCreationProcessing])
 
   const handleResolveEnsAddress = async (fieldValue) => {
     if (ethersIsAddress(fieldValue)) {
@@ -812,7 +818,7 @@ export const ProposalForm = () => {
   const [createProposalMutation] = useMutation(createProposal, {
     onSuccess: (data) => {
       setCreatedProposal(data)
-      setShouldAskAuthorToSign(true)
+      setShouldHandlePostProposalCreationProcessing(true)
     },
     onError: (error: Error) => {
       console.log("we are erroring")
@@ -996,7 +1002,7 @@ export const ProposalForm = () => {
                   ) : (
                     <ProposalCreationLoadingScreen
                       createdProposal={createdProposal}
-                      isSendLater={isSendLater}
+                      proposalShouldSendLater={proposalShouldSendLater}
                     />
                   )}
                 </div>
@@ -1053,11 +1059,10 @@ export const ProposalForm = () => {
                         type={ButtonType.Secondary}
                         className="mr-2"
                         isDisabled={isLoading}
-                        isLoading={isSendLater && isLoading}
+                        isLoading={proposalShouldSendLater && isLoading}
                         onClick={async (e) => {
                           e.preventDefault()
-                          setIsSendLater(true)
-
+                          setProposalShouldSendLater(true)
                           setIsLoading(true)
                           if (session.siwe?.address) {
                             await handleSubmit()
@@ -1070,13 +1075,13 @@ export const ProposalForm = () => {
                       </Button>
                       <Button
                         isDisabled={isLoading}
-                        isLoading={!isSendLater && isLoading}
+                        isLoading={!proposalShouldSendLater && isLoading}
                         onClick={async (e) => {
                           e.preventDefault()
                           setIsLoading(true)
                           if (session.siwe?.address) {
                             if (createdProposal) {
-                              setShouldAskAuthorToSign(true)
+                              setShouldHandlePostProposalCreationProcessing(true)
                             } else {
                               await handleSubmit()
                             }
