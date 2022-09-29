@@ -200,7 +200,7 @@ const ProposeForm = ({ selectedNetworkId, proposingAs, setProposingAs }) => {
                 <select
                   {...input}
                   className="w-full bg-wet-concrete rounded p-2 mt-1"
-                  value={proposingAs}
+                  // value={proposingAs}
                   onChange={(e) => {
                     setProposingAs(e.target.value)
 
@@ -360,7 +360,9 @@ const ProposeForm = ({ selectedNetworkId, proposingAs, setProposingAs }) => {
           {/* BODY */}
           <label className="font-bold block mt-6">Details*</label>
           <span className="text-xs text-concrete block">
-            Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown syntax</TextLink>. Need inspirations? Check out <TextLink url={LINKS.PROPOSAL_TEMPLATE}>proposal templates</TextLink>. 
+            Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown syntax</TextLink>. Need
+            inspirations? Check out{" "}
+            <TextLink url={LINKS.PROPOSAL_TEMPLATE}>proposal templates</TextLink>.
           </span>
           <Field name="body" component="textarea" validate={requiredField}>
             {({ input, meta }) => (
@@ -882,6 +884,7 @@ export const ProposalForm = ({
         <Stepper step={proposalStep} />
         <Form
           initialValues={{
+            proposingAs: proposingAs || "",
             client: prefillClients?.[0] || "",
             contributor: prefillContributors?.[0] || "",
             // proposingAs default set in useState initialization
