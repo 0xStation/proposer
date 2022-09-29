@@ -22,18 +22,10 @@ const CreateProposal = z.object({
   milestones: ZodMilestone.array(),
   payments: ZodPayment.array(),
   paymentTerms: z.enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION]).optional(),
-  startDate: z.date().optional(),
-  endDate: z.date().optional(),
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
   const params = CreateProposal.parse(input)
-
-  if (params.endDate && params.startDate) {
-    if (params.startDate > params.endDate) {
-      throw new Error("end date cannot come before start date")
-    }
-  }
 
   // validate non-negative amounts and construct totalPayments object
   let totalPayments: Record<string, { token: Token; amount: number }> = {}
@@ -76,8 +68,6 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
   const proposal = await db.proposal.create({
     data: {
       data: JSON.parse(JSON.stringify(proposalMetadata)),
-      ...(params.startDate && { startDate: params.startDate }),
-      ...(params.endDate && { endDate: params.endDate }),
       roles: {
         createMany: {
           data: [
