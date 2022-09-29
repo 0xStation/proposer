@@ -236,6 +236,7 @@ const ProposeForm = ({ selectedNetworkId, proposingAs, setProposingAs }) => {
       {/* only show rest of step if proposingAs is selected  */}
       {!!proposingAs && (
         <>
+          {/* if proposing as contributor or author, show client field */}
           {proposingAs !== ProposalRoleType.CLIENT && (
             <>
               {/* CLIENT */}
@@ -288,6 +289,7 @@ const ProposeForm = ({ selectedNetworkId, proposingAs, setProposingAs }) => {
               </Field>
             </>
           )}
+          {/* if proposing as client or author, show contributor field */}
           {proposingAs !== ProposalRoleType.CONTRIBUTOR && (
             <>
               {/* CONTRIBUTOR */}
@@ -917,13 +919,15 @@ export const ProposalForm = () => {
             if (!createdProposal) {
               let contributorAddress
               let clientAddress
-
+              // if proposing as contributor, take active user address
+              // otherwise, resolve input ENS or address
               if (proposingAs === ProposalRoleType.CONTRIBUTOR) {
                 contributorAddress = activeUser?.address
               } else {
                 contributorAddress = await handleResolveEnsAddress(values.contributor?.trim())
               }
-
+              // if proposing as client, take active user address
+              // otherwise, resolve input ENS or address
               if (proposingAs === ProposalRoleType.CLIENT) {
                 clientAddress = activeUser?.address
               } else {
@@ -965,7 +969,8 @@ export const ProposalForm = () => {
                 if (proposingAs !== ProposalRoleType.AUTHOR) {
                   message = "Cannot propose to yourself, please propose to another address."
                 } else {
-                  message = "Same address cannot deliver and review work, please change addresses."
+                  message =
+                    "Same address cannot deliver and review work, please change either address."
                 }
                 setIsLoading(false)
                 setToastState({
