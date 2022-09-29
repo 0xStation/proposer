@@ -75,7 +75,7 @@ export const NewWorkspaceModal = ({
       }}
     >
       <div className="p-6">
-        <h1 className="text-2xl font-bold">New group workspace</h1>
+        <h1 className="text-2xl font-bold">Create a new workspace</h1>
         <p className="text-base mt-6">
           Select a <TextLink url={LINKS.GNOSIS_SAFE}>Gnosis Safe </TextLink>
           address that you would like to govern the workspace. If you are looking to create a
