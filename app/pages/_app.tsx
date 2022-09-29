@@ -1,4 +1,4 @@
-import { AppProps } from "blitz"
+import { AppProps, Script } from "blitz"
 import trackerInit from "app/utils/amplitude"
 import "app/core/styles/index.css"
 import { WagmiConfig, createClient, configureChains, allChains } from "wagmi"
@@ -44,5 +44,21 @@ trackerInit()
 export default function App({ Component, pageProps }: AppProps) {
   const getLayout = Component.getLayout || ((page) => page)
 
-  return <WagmiConfig client={client}>{getLayout(<Component {...pageProps} />)}</WagmiConfig>
+  return (
+    <WagmiConfig client={client}>
+      <Script
+        dangerouslySetInnerHTML={{
+          __html: `(function(h,o,t,j,a,r){
+            h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+            h._hjSettings={hjid:3177300,hjsv:6};
+            a=o.getElementsByTagName('head')[0];
+            r=o.createElement('script');r.async=1;
+            r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+            a.appendChild(r);
+        })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');`,
+        }}
+      />
+      {getLayout(<Component {...pageProps} />)}
+    </WagmiConfig>
+  )
 }
