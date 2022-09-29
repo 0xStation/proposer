@@ -1145,8 +1145,15 @@ export const ProposalForm = () => {
                     </span>
                     <Button
                       isDisabled={
-                        !formState.values.client ||
-                        !formState.values.contributor ||
+                        // has not selected who user is proposing as
+                        !formState.values.proposingAs ||
+                        // proposing as author or client but has not filled in contributor
+                        (formState.values.proposingAs !== ProposalRoleType.CONTRIBUTOR &&
+                          !formState.values.contributor) ||
+                        // proposing as author or contributor but has not filled in client
+                        (formState.values.proposingAs !== ProposalRoleType.CLIENT &&
+                          !formState.values.client) ||
+                        // has not filled in title or body
                         !formState.values.title ||
                         !formState.values.body
                       }
