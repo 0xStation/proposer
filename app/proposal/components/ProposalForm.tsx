@@ -193,7 +193,7 @@ const ProposeForm = ({ selectedNetworkId }) => {
       <label className="font-bold block mt-6">Client*</label>
       <span className="text-xs text-concrete block">
         Who will be responsible for reviewing and deploying the funds outlined in this proposal? See
-        the list of community addresses <TextLink url={LINKS.STATION_WORKSPACES}>here</TextLink>.
+        the list of featured addresses <TextLink url={LINKS.STATION_WORKSPACES}>here</TextLink>.
       </span>
       <Field name="client" validate={composeValidators(requiredField, isEnsOrAddress)}>
         {({ meta, input }) => {
@@ -234,8 +234,7 @@ const ProposeForm = ({ selectedNetworkId }) => {
       {/* CONTRIBUTOR */}
       <label className="font-bold block mt-6">Contributor*</label>
       <span className="text-xs text-concrete block">
-        Who will be responsible for delivering the work outlined in this proposal?
-        <p>Paste your address if this is you.</p>
+        Who will be responsible for delivering the work outlined in this proposal? Paste your address if this is you.
       </span>
       <Field name="contributor" validate={composeValidators(requiredField, isEnsOrAddress)}>
         {({ meta, input }) => {
@@ -464,7 +463,7 @@ const RewardForm = ({
           <div className="flex flex-col mt-6">
             <label className="font-bold block">Reward token*</label>
             <span className="text-xs text-concrete block">
-              Which token to be paid with (pick a network first)
+              Please select a network before you select a token.
             </span>
           </div>
           <Field name="tokenAddress" validate={requiredField}>
@@ -524,7 +523,7 @@ const RewardForm = ({
           {/* PAYMENT AMOUNT */}
           <label className="font-bold block mt-6">Payment*</label>
           <span className="text-xs text-concrete block">
-            The funds will be deployed to the one responsible for delivering the work.
+            The funds will be deployed to contributors.
           </span>
           <WhenFieldChanges
             field="tokenAddress"
@@ -567,7 +566,7 @@ const RewardForm = ({
           </Field>
           {/* PAYMENT TYPE */}
           <label className="font-bold block mt-6">Payment terms*</label>
-          <span className="text-xs text-concrete block">When will payment be sent?</span>
+          <span className="text-xs text-concrete block">When is the payment expected to be sent to contributors?</span>
           <Field name="paymentTerms" validate={requiredField}>
             {({ meta, input }) => (
               <>
