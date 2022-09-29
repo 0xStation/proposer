@@ -640,7 +640,7 @@ const RewardForm = ({
   )
 }
 
-const SignForm = ({ activeUser, proposal, signatures }) => {
+const ConfirmForm = () => {
   return (
     <div className="flex flex-col justify-center items-center mt-10">
       <p>
@@ -678,7 +678,6 @@ export const ProposalForm = () => {
   const [needFunding, setNeedFunding] = useState<boolean>(true)
   const [tokenOptions, setTokenOptions] = useState<any[]>()
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
-  const [proposal, setProposal] = useState<any>()
   const [isSendLater, setIsSendLater] = useState<boolean>(false)
   const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -690,21 +689,11 @@ export const ProposalForm = () => {
 
   const { signMessage } = useSignature()
 
-  const [signatures] = useQuery(
-    getProposalSignaturesById,
-    { proposalId: proposal && proposal?.id },
-    {
-      suspense: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      enabled: Boolean(proposal?.id),
-    }
-  )
-
   const confirmAuthorship = async ({ proposal }) => {
-    // see comment at the top of the submit function
-    // this condition is here if the user needs to re-click the submit to generate a signature
-    // for the proposal and pin to ipfs, but they've already created a proposal.
+    // confirming authorship occurs after a proposal has been created and is triggered in a `useEffect`.
+    // By confirming authorship, the user signs a generated message containing the proposal's contents.
+    // The signature then acts as a verification / acknowledgement from the author that they were the one
+    // to create the proposal.
     try {
       const proposalToRequestSignature = proposal
       const authorRole = proposalToRequestSignature?.roles?.find(
@@ -737,6 +726,7 @@ export const ProposalForm = () => {
       })
 
       if (updatedProposal) {
+        // redirect to the proposal's view page
         router.push(
           Routes.ViewProposal({
             proposalId: proposal.id,
@@ -763,13 +753,15 @@ export const ProposalForm = () => {
   }, [walletModalOpen])
 
   useEffect(() => {
+    // `shouldAskAuthorToSign` is used to retrigger this `useEffect` hook
+    // if the user declines to sign the message verifying their authorship.
     if (createdProposal && shouldAskAuthorToSign) {
       if (!isSendLater) {
         confirmAuthorship({ proposal: createdProposal })
       } else {
         router.push(
           Routes.ViewProposal({
-            proposalId: proposal.id,
+            proposalId: createdProposal.id,
           })
         )
       }
@@ -819,7 +811,8 @@ export const ProposalForm = () => {
 
   const [createProposalMutation] = useMutation(createProposal, {
     onSuccess: (data) => {
-      setProposal(data)
+      setCreatedProposal(data)
+      setShouldAskAuthorToSign(true)
     },
     onError: (error: Error) => {
       console.log("we are erroring")
@@ -828,7 +821,6 @@ export const ProposalForm = () => {
   })
   const [updateProposalMetadataMutation] = useMutation(updateProposalMetadata, {
     onSuccess: (data) => {
-      setProposal(data)
       setProposalStep(ProposalStep.CONFIRM)
     },
     onError: (error: Error) => {
@@ -845,8 +837,13 @@ export const ProposalForm = () => {
             // an author needs to sign the proposal to upload the content to ipfs.
             // if they decline the signature, but submit again, we don't want to
             // create the same proposal, rather we want to skip to the signature step.
-            let proposal
-            if (!createdProposal) {
+            if (createdProposal) {
+              router.push(
+                Routes.ViewProposal({
+                  proposalId: createdProposal.id,
+                })
+              )
+            } else {
               const resolvedContributorAddress = await handleResolveEnsAddress(
                 values.contributor?.trim()
               )
@@ -932,7 +929,7 @@ export const ProposalForm = () => {
               }
 
               try {
-                proposal = await createProposalMutation({
+                await createProposalMutation({
                   contentTitle: values.title,
                   contentBody: values.body,
                   contributorAddresses: [resolvedContributorAddress],
@@ -949,11 +946,6 @@ export const ProposalForm = () => {
                     ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
                     : undefined,
                 })
-
-                if (proposal) {
-                  setCreatedProposal(proposal)
-                  setShouldAskAuthorToSign(true)
-                }
               } catch (err) {
                 setIsLoading(false)
                 setToastState({
@@ -998,14 +990,8 @@ export const ProposalForm = () => {
                             setIsImportTokenModalOpen={setIsImportTokenModalOpen}
                           />
                         )}
-                        {proposalStep === ProposalStep.CONFIRM && (
-                          <SignForm
-                            proposal={proposal}
-                            activeUser={activeUser}
-                            signatures={signatures}
-                          />
-                        )}
-                      </div>{" "}
+                        {proposalStep === ProposalStep.CONFIRM && <ConfirmForm />}
+                      </div>
                     </>
                   ) : (
                     <ProposalCreationLoadingScreen
