@@ -1,6 +1,5 @@
 import { Proposal } from "app/proposal/types"
 import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
-import { timeModule } from "./modules/time"
 import { locationModule } from "./modules/location"
 import { roleModule } from "./modules/role"
 import { contentModule } from "./modules/content"
@@ -31,7 +30,6 @@ export const genProposalDigest = (proposal: Proposal) => {
         { name: "array", type: "bool" },
       ],
       // module schemas
-      ...timeModule,
       ...locationModule,
       ...roleModule,
       ...contentModule,
@@ -45,7 +43,6 @@ export const genProposalDigest = (proposal: Proposal) => {
         { name: "type", type: "Type" },
         { name: "modules", type: "Module[]" },
         // module fields
-        { name: "time", type: "Time" }, // when
         { name: "location", type: "Location" }, // where
         { name: "roles", type: "Role[]" }, // who
         { name: "content", type: "Content" }, // what
@@ -64,12 +61,6 @@ export const genProposalDigest = (proposal: Proposal) => {
         version: "1.0",
       },
       modules: [
-        {
-          key: "time",
-          version: "1.0",
-          name: "time",
-          array: false,
-        },
         {
           key: "location",
           version: "1.0",

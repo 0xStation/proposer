@@ -61,8 +61,6 @@ model Proposal {
   timestamp             DateTime       @default(now())
   currentMilestoneIndex Int            @default(-1) // no current milestone, gets set to 0 after proposal is approved
   data                  Json
-  startDate             DateTime?
-  endDate               DateTime?
 
   roles      ProposalRole[]
   milestones ProposalMilestone[]
