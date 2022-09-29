@@ -234,7 +234,8 @@ const ProposeForm = ({ selectedNetworkId }) => {
       {/* CONTRIBUTOR */}
       <label className="font-bold block mt-6">Contributor*</label>
       <span className="text-xs text-concrete block">
-        Who will be responsible for delivering the work outlined in this proposal? Paste your address if this is you.
+        Who will be responsible for delivering the work outlined in this proposal? Paste your
+        address if this is you.
       </span>
       <Field name="contributor" validate={composeValidators(requiredField, isEnsOrAddress)}>
         {({ meta, input }) => {
@@ -420,7 +421,9 @@ const RewardForm = ({
 
       {/* NETWORK */}
       <label className="font-bold block mt-6">Network*</label>
-      <span className="text-xs text-concrete block">Which network would the funds get transacted on?</span>
+      <span className="text-xs text-concrete block">
+        Which network would the funds get transacted on?
+      </span>
       <Field name="network" validate={requiredField}>
         {({ input, meta }) => {
           return (
@@ -566,7 +569,9 @@ const RewardForm = ({
           </Field>
           {/* PAYMENT TYPE */}
           <label className="font-bold block mt-6">Payment terms*</label>
-          <span className="text-xs text-concrete block">When is the payment expected to be sent to contributors?</span>
+          <span className="text-xs text-concrete block">
+            When is the payment expected to be sent to contributors?
+          </span>
           <Field name="paymentTerms" validate={requiredField}>
             {({ meta, input }) => (
               <>
@@ -1034,9 +1039,10 @@ export const ProposalForm = () => {
                         <h2 className="text-marble-white text-xl font-bold">
                           {HeaderCopy[proposalStep]}
                         </h2>
-                        <span className="text-xs text-concrete uppercase">
+                        {/* TODO: bring back "Last updated" with editing functionality */}
+                        {/* <span className="text-xs text-concrete uppercase">
                           Last updated: {formatDate(new Date())}
-                        </span>
+                        </span> */}
                       </div>
                       <div className="flex flex-col col-span-2">
                         {proposalStep === ProposalStep.PROPOSE && (
