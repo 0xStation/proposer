@@ -49,8 +49,13 @@ import { getHash } from "app/signatures/utils"
 enum ProposalStep {
   PROPOSE = "PROPOSE",
   REWARDS = "REWARDS",
-  SIGN = "SIGN",
-  APPROVE = "APPROVE",
+  CONFIRM = "CONFIRM",
+}
+
+const HeaderCopy = {
+  [ProposalStep.PROPOSE]: "Propose",
+  [ProposalStep.REWARDS]: "Define terms",
+  [ProposalStep.CONFIRM]: "Confirm",
 }
 
 function classNames(...classes) {
@@ -123,12 +128,12 @@ const Stepper = ({ step }) => {
       </div>
       <div className="absolute left-[420px] top-[-4px]">
         <span className="h-4 w-4 rounded-full border-2 border-neon-carrot bg-tunnel-black block relative">
-          {step === ProposalStep.APPROVE && (
+          {step === ProposalStep.CONFIRM && (
             <span className="h-2 w-1 bg-neon-carrot block absolute rounded-l-full top-[1.75px] left-[2px]"></span>
           )}
         </span>
-        <p className={`font-bold mt-2 ${step !== ProposalStep.APPROVE && "text-concrete"}`}>
-          Approve
+        <p className={`font-bold mt-2 ${step !== ProposalStep.CONFIRM && "text-concrete"}`}>
+          {HeaderCopy[ProposalStep.CONFIRM]}
         </p>
       </div>
     </div>
@@ -326,11 +331,11 @@ const RewardForm = ({
   setShouldRefetchTokens,
   needFunding,
   setNeedFunding,
-  setIsConnectWalletModalOpen,
   isImportTokenModalOpen,
   setIsImportTokenModalOpen,
 }) => {
   const session = useSession({ suspense: false })
+  const toggleWalletModal = useStore((state) => state.toggleWalletModal)
 
   return (
     <>
@@ -421,7 +426,9 @@ const RewardForm = ({
 
       {/* NETWORK */}
       <label className="font-bold block mt-6">Network*</label>
-      <span className="text-xs text-concrete block">Which network would the funds get transacted on?</span>
+      <span className="text-xs text-concrete block">
+        Which network would the funds get transacted on?
+      </span>
       <Field name="network" validate={requiredField}>
         {({ input, meta }) => {
           return (
@@ -514,7 +521,7 @@ const RewardForm = ({
               onClick={(e) => {
                 e.preventDefault()
                 return !session.siwe?.address
-                  ? setIsConnectWalletModalOpen(true)
+                  ? toggleWalletModal(true)
                   : setIsImportTokenModalOpen(true)
               }}
             >
@@ -634,90 +641,20 @@ const RewardForm = ({
 }
 
 const SignForm = ({ activeUser, proposal, signatures }) => {
-  const [isApproveProposalModalOpen, setIsApproveProposalModalOpen] = useState<boolean>(false)
-
-  const RoleSignature = ({ role }) => {
-    const userHasRole = addressesAreEqual(activeUser?.address || "", role?.address)
-
-    const userHasSigned = activeUserMeetsCriteria(activeUser, signatures)
-
-    const showSignButton = userHasRole && !userHasSigned
-
-    const addressHasSigned = (address: string) => {
-      return (
-        signatures?.some((signature) => addressesAreEqual(address, signature?.address)) || false
-      )
-    }
-
-    const responsiblityCopy = {
-      [ProposalRoleType.CONTRIBUTOR]:
-        "Responsible for delivering the work outlined in this proposal.",
-      [ProposalRoleType.CLIENT]: "Responsible for deploying the funds outlined in this proposal.",
-      [ProposalRoleType.AUTHOR]: "Facilitated the creation of this proposal.",
-    }
-
-    return (
-      <div className="flex flex-row w-full justify-between">
-        <div className="flex flex-col">
-          <div className="flex flex-row space-x-2">
-            <p className="mr-4">{truncateString(role?.address)}</p>
-            <span className="uppercase text-xs px-2 py-1 bg-wet-concrete rounded-full">
-              {role?.type}
-            </span>
-          </div>
-          <p className="mt-1 text-xs text-light-concrete">{responsiblityCopy[role?.type]}</p>
-        </div>
-        {showSignButton ? (
-          <span
-            className="text-electric-violet cursor-pointer"
-            onClick={() => setIsApproveProposalModalOpen(true)}
-          >
-            Sign
-          </span>
-        ) : (
-          <div className="flex flex-row items-center space-x-1 ml-4">
-            <span
-              className={`h-2 w-2 rounded-full bg-${
-                addressHasSigned(role?.address) ? "magic-mint" : "neon-carrot"
-              }`}
-            />
-
-            <div className="font-bold text-xs uppercase tracking-wider">
-              {addressHasSigned(role?.address) ? "signed" : "pending"}
-            </div>
-          </div>
-        )}
-      </div>
-    )
-  }
-
   return (
-    <div className="mt-6">
-      <ApproveProposalModal
-        isOpen={isApproveProposalModalOpen}
-        setIsOpen={setIsApproveProposalModalOpen}
-        proposal={proposal}
-      />
-      <p>All signatures are required to activate the agreement.</p>
-      <div className="space-y-4 mt-6">
-        <RoleSignature
-          role={proposal?.roles?.find((role) => role.type === ProposalRoleType.CONTRIBUTOR)}
-        />
-        <RoleSignature
-          role={proposal?.roles?.find((role) => role.type === ProposalRoleType.CLIENT)}
-        />
-        <RoleSignature
-          role={proposal?.roles?.find((role) => role.type === ProposalRoleType.AUTHOR)}
-        />
-      </div>
+    <div className="flex flex-col justify-center items-center mt-10">
+      <p>
+        Upon confirmation, the proposal will be sent to all parties included in the proposal. You
+        also have the option to send the proposal later.
+      </p>
     </div>
   )
 }
 
-const ProposalCreationLoadingScreen = ({ createdProposal }) => (
+const ProposalCreationLoadingScreen = ({ createdProposal, isSendLater }) => (
   <div className="flex flex-col justify-center items-center mt-48">
     <p className="text-concrete tracking-wide">
-      {createdProposal ? "Sign to prove your authorship." : "Creating proposal..."}
+      {createdProposal && !isSendLater ? "Sign to prove your authorship." : "Creating proposal..."}
     </p>
     {createdProposal && (
       <p className="text-concrete tracking-wide">Check your wallet for your next action.</p>
@@ -732,6 +669,8 @@ export const ProposalForm = () => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
+  const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  const walletModalOpen = useStore((state) => state.walletModalOpen)
   const session = useSession({ suspense: false })
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(0)
   const [shouldRefetchTokens, setShouldRefetchTokens] = useState<boolean>(false)
@@ -740,12 +679,11 @@ export const ProposalForm = () => {
   const [tokenOptions, setTokenOptions] = useState<any[]>()
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
   const [proposal, setProposal] = useState<any>()
-  const [isClipboardAddressCopied, setIsClipboardAddressCopied] = useState<boolean>(false)
+  const [isSendLater, setIsSendLater] = useState<boolean>(false)
   const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
-  const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState<boolean>(false)
-  const [shouldHandleSubmit, setShouldHandleSubmit] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
+  const [shouldAskAuthorToSign, setShouldAskAuthorToSign] = useState<boolean>(false)
   // default to mainnet since we're using it to check ENS
   // which pretty much only exists on mainnet as of right now
   const provider = useProvider({ chainId: 1 })
@@ -763,15 +701,80 @@ export const ProposalForm = () => {
     }
   )
 
-  const userHasSigned = signatures?.some((commitment) =>
-    addressesAreEqual(activeUser?.address || "", commitment.address)
-  )
+  const confirmAuthorship = async ({ proposal }) => {
+    // see comment at the top of the submit function
+    // this condition is here if the user needs to re-click the submit to generate a signature
+    // for the proposal and pin to ipfs, but they've already created a proposal.
+    try {
+      const proposalToRequestSignature = proposal
+      const authorRole = proposalToRequestSignature?.roles?.find(
+        (role) => role.type === ProposalRoleType.AUTHOR
+      )
 
-  const HeaderCopy = {
-    [ProposalStep.PROPOSE]: "Propose",
-    [ProposalStep.REWARDS]: "Define terms",
-    [ProposalStep.APPROVE]: "Approve",
+      // if user disconnects and logs in as another user, we need to check if they are the author
+      if (authorRole?.address !== session?.siwe?.address) {
+        throw Error("Current address doesn't match author's address.")
+      }
+      // prompt author to sign proposal to prove they are the author of the content
+      const message = genProposalDigest(proposalToRequestSignature)
+      const signature = await signMessage(message)
+
+      if (!signature) {
+        throw Error("Unsuccessful signature.")
+      }
+      const { domain, types, value } = message
+      const proposalHash = getHash(domain, types, value)
+
+      const updatedProposal = await updateProposalMetadataMutation({
+        proposalId: proposalToRequestSignature?.id as string,
+        authorSignature: signature as string,
+        signatureMessage: message,
+        proposalHash,
+        contentTitle: proposalToRequestSignature?.data?.content?.title,
+        contentBody: proposalToRequestSignature?.data?.content?.body,
+        totalPayments: proposalToRequestSignature?.data?.totalPayments,
+        paymentTerms: proposalToRequestSignature?.data?.paymentTerms,
+      })
+
+      if (updatedProposal) {
+        router.push(
+          Routes.ViewProposal({
+            proposalId: proposal.id,
+          })
+        )
+      }
+    } catch (err) {
+      setShouldAskAuthorToSign(false)
+      setIsLoading(false)
+      console.error(err)
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: err.message,
+      })
+      return
+    }
   }
+
+  useEffect(() => {
+    if (!walletModalOpen && isLoading) {
+      setIsLoading(false)
+    }
+  }, [walletModalOpen])
+
+  useEffect(() => {
+    if (createdProposal && shouldAskAuthorToSign) {
+      if (!isSendLater) {
+        confirmAuthorship({ proposal: createdProposal })
+      } else {
+        router.push(
+          Routes.ViewProposal({
+            proposalId: proposal.id,
+          })
+        )
+      }
+    }
+  }, [createdProposal, isSendLater, shouldAskAuthorToSign])
 
   const handleResolveEnsAddress = async (fieldValue) => {
     if (ethersIsAddress(fieldValue)) {
@@ -826,7 +829,7 @@ export const ProposalForm = () => {
   const [updateProposalMetadataMutation] = useMutation(updateProposalMetadata, {
     onSuccess: (data) => {
       setProposal(data)
-      setProposalStep(ProposalStep.APPROVE)
+      setProposalStep(ProposalStep.CONFIRM)
     },
     onError: (error: Error) => {
       console.error(error)
@@ -949,6 +952,7 @@ export const ProposalForm = () => {
 
                 if (proposal) {
                   setCreatedProposal(proposal)
+                  setShouldAskAuthorToSign(true)
                 }
               } catch (err) {
                 setIsLoading(false)
@@ -960,74 +964,11 @@ export const ProposalForm = () => {
                 return
               }
             }
-
-            // see comment at the top of the submit function
-            // this condition is here if the user needs to re-click the submit to generate a signature
-            // for the proposal and pin to ipfs, but they've already created a proposal.
-            try {
-              const proposalToRequestSignature = (createdProposal as Proposal) || proposal
-              const authorRole = proposalToRequestSignature?.roles?.find(
-                (role) => role.type === ProposalRoleType.AUTHOR
-              )
-
-              // if user disconnects and logs in as another user, we need to check if they are the author
-              if (authorRole?.address !== session?.siwe?.address) {
-                throw Error("Current address doesn't match author's address.")
-              }
-              // prompt author to sign proposal to prove they are the author of the content
-              const message = genProposalDigest(proposalToRequestSignature)
-              const signature = await signMessage(message)
-
-              if (!signature) {
-                throw Error("Unsuccessful signature.")
-              }
-              const { domain, types, value } = message
-              const proposalHash = getHash(domain, types, value)
-
-              const updatedProposal = await updateProposalMetadataMutation({
-                proposalId: proposalToRequestSignature?.id as string,
-                authorSignature: signature as string,
-                signatureMessage: message,
-                proposalHash,
-                contentTitle: proposalToRequestSignature?.data?.content?.title,
-                contentBody: proposalToRequestSignature?.data?.content?.body,
-                totalPayments: proposalToRequestSignature?.data?.totalPayments,
-                paymentTerms: proposalToRequestSignature?.data?.paymentTerms,
-              })
-
-              if (updatedProposal) {
-                setIsLoading(false)
-                setProposalStep(ProposalStep.APPROVE)
-              }
-            } catch (err) {
-              setIsLoading(false)
-              console.error(err)
-              setToastState({
-                isToastShowing: true,
-                type: "error",
-                message: err.message,
-              })
-              return
-            }
           }}
           render={({ form, handleSubmit }) => {
             const formState = form.getState()
             return (
               <form onSubmit={handleSubmit} className="mt-20">
-                <ConnectWalletModal
-                  isWalletOpen={isConnectWalletModalOpen}
-                  setIsWalletOpen={setIsConnectWalletModalOpen}
-                  callback={() => {
-                    if (shouldHandleSubmit) {
-                      // add set timeout to allow activeUser to be set
-                      setTimeout(() => {
-                        handleSubmit()
-                      }, 500)
-                    } else {
-                      setIsImportTokenModalOpen(true)
-                    }
-                  }}
-                />
                 <div className="rounded-2xl border border-concrete p-6 h-[560px] overflow-y-scroll">
                   {!isLoading ? (
                     <>
@@ -1053,12 +994,11 @@ export const ProposalForm = () => {
                             setShouldRefetchTokens={setShouldRefetchTokens}
                             needFunding={needFunding}
                             setNeedFunding={setNeedFunding}
-                            setIsConnectWalletModalOpen={setIsConnectWalletModalOpen}
                             isImportTokenModalOpen={isImportTokenModalOpen}
                             setIsImportTokenModalOpen={setIsImportTokenModalOpen}
                           />
                         )}
-                        {proposalStep === ProposalStep.APPROVE && (
+                        {proposalStep === ProposalStep.CONFIRM && (
                           <SignForm
                             proposal={proposal}
                             activeUser={activeUser}
@@ -1068,7 +1008,10 @@ export const ProposalForm = () => {
                       </div>{" "}
                     </>
                   ) : (
-                    <ProposalCreationLoadingScreen createdProposal={createdProposal} />
+                    <ProposalCreationLoadingScreen
+                      createdProposal={createdProposal}
+                      isSendLater={isSendLater}
+                    />
                   )}
                 </div>
                 {proposalStep === ProposalStep.PROPOSE && (
@@ -1096,57 +1039,69 @@ export const ProposalForm = () => {
                       <BackArrow className="fill-marble-white" />
                     </span>
                     <Button
-                      isDisabled={isLoading}
-                      isLoading={isLoading}
-                      onClick={(e) => {
-                        setIsLoading(true)
-                        e.preventDefault()
-                        if (session.siwe?.address) {
-                          handleSubmit()
-                        } else {
-                          setShouldHandleSubmit(true)
-                          setIsConnectWalletModalOpen(true)
-                        }
+                      isDisabled={
+                        !formState.values.client ||
+                        !formState.values.contributor ||
+                        !formState.values.title ||
+                        !formState.values.body
+                      }
+                      className="float-right"
+                      onClick={() => {
+                        setProposalStep(ProposalStep.CONFIRM)
                       }}
                     >
-                      {createdProposal ? "Publish & continue" : "Create & continue"}
+                      Next
                     </Button>
                   </div>
                 )}
-                {proposalStep === ProposalStep.APPROVE && (
-                  <div className="mt-6 flex justify-end">
-                    <Button
-                      className="mr-2"
-                      type={ButtonType.Secondary}
-                      onClick={() => {
-                        const path = genUrlFromRoute(
-                          Routes.ViewProposal({
-                            proposalId: proposal.id,
-                          })
-                        )
+                {proposalStep === ProposalStep.CONFIRM && (
+                  <div className="flex justify-between mt-6">
+                    <span
+                      onClick={() => setProposalStep(ProposalStep.REWARDS)}
+                      className="cursor-pointer border rounded border-marble-white p-2 self-start"
+                    >
+                      <BackArrow className="fill-marble-white" />
+                    </span>
+                    <div>
+                      <Button
+                        type={ButtonType.Secondary}
+                        className="mr-2"
+                        isDisabled={isLoading}
+                        isLoading={isSendLater && isLoading}
+                        onClick={async (e) => {
+                          e.preventDefault()
+                          setIsSendLater(true)
 
-                        navigator.clipboard
-                          .writeText(`${window.location.protocol}//${window.location.host}${path}`)
-                          .then(() => {
-                            setIsClipboardAddressCopied(true)
-                            setTimeout(() => setIsClipboardAddressCopied(false), 3000)
-                          })
-                      }}
-                    >
-                      {isClipboardAddressCopied ? "Copied!" : "Copy Link"}
-                    </Button>
-                    <Button
-                      isDisabled={!userHasSigned}
-                      onClick={() => {
-                        router.push(
-                          Routes.ViewProposal({
-                            proposalId: proposal.id,
-                          })
-                        )
-                      }}
-                    >
-                      Done
-                    </Button>
+                          setIsLoading(true)
+                          if (session.siwe?.address) {
+                            await handleSubmit()
+                          } else {
+                            toggleWalletModal(true)
+                          }
+                        }}
+                      >
+                        Send later
+                      </Button>
+                      <Button
+                        isDisabled={isLoading}
+                        isLoading={!isSendLater && isLoading}
+                        onClick={async (e) => {
+                          e.preventDefault()
+                          setIsLoading(true)
+                          if (session.siwe?.address) {
+                            if (createdProposal) {
+                              setShouldAskAuthorToSign(true)
+                            } else {
+                              await handleSubmit()
+                            }
+                          } else {
+                            toggleWalletModal(true)
+                          }
+                        }}
+                      >
+                        Send proposal
+                      </Button>
+                    </div>
                   </div>
                 )}
               </form>
