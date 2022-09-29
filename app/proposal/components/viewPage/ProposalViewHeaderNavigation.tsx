@@ -182,7 +182,7 @@ export const ProposalViewHeaderNavigation = () => {
                 disabled
               >
                 <CheckCircleIcon className="h-5 w-5 inline mb-1 mr-2" />
-                Signed
+                Approved
               </button>
             )
           ) : !proposal || loading ? (
