@@ -26,8 +26,6 @@ import {
 import { AddressType, ProposalRoleType } from "@prisma/client"
 import BackArrow from "app/core/icons/BackArrow"
 import WhenFieldChanges from "app/core/components/WhenFieldChanges"
-import { DateTime } from "luxon"
-import getFormattedDateForMinDateInput from "app/utils/getFormattedDateForMinDateInput"
 import ImportTokenModal from "app/core/components/ImportTokenModal"
 import getTokensByAccount from "../../token/queries/getTokensByAccount"
 import { isAddress as ethersIsAddress } from "@ethersproject/address"
