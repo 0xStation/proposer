@@ -33,10 +33,10 @@ export const PublishProposalModal = ({ isOpen, setIsOpen, proposal }) => {
 
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
-      <h3 className="text-2xl font-bold pt-6">Publish your proposal</h3>
+      <h3 className="text-2xl font-bold pt-6">Send your proposal</h3>
       <p className="mt-4">
-        Sign to prove your authorship and increase the verifiability of your proposal. Publishing
-        your proposal will post your content to decentralized storage.
+        Send this proposal to the workspace of all mentioned parties. Sign with your wallet to
+        complete this action.
       </p>
 
       <div className="mt-8 flex items-center">
@@ -97,7 +97,7 @@ export const PublishProposalModal = ({ isOpen, setIsOpen, proposal }) => {
             }
           }}
         >
-          Publish
+          Send
         </Button>
       </div>
     </Modal>
