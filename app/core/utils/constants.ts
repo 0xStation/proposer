@@ -235,6 +235,7 @@ export const LINKS = {
   STATION_WORKSPACES:
     "https://0xstation.notion.site/0xstation/Station-Workspaces-8c696d92fdbd4dc0b2c7e67efc54a9a5",
   GNOSIS_SAFE: "https://gnosis-safe.io/",
+  PROPOSAL_TEMPLATE: "https://www.station.express/product/proposer#proposal-templates",
 }
 
 export const CHAIN_IDS = {
