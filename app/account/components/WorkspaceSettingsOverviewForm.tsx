@@ -156,8 +156,8 @@ const WorkspaceSettingsOverviewForm = ({
       render={({ handleSubmit }) => (
         <form onSubmit={handleSubmit}>
           <div className="max-w-lg mr-5 sm:mr-0">
-            {/* NAME */}
-            <label className="font-bold block">Name</label>
+            {/* DISPLAY NAME */}
+            <label className="font-bold block">Display name</label>
             <p className="text-concrete text-sm">50 character max.</p>
             <Field
               component="input"
