@@ -163,7 +163,7 @@ export const ProposalViewHeaderNavigation = () => {
                     className="mr-3"
                     onClick={() => toggleProposalApprovalModalOpen(true)}
                   >
-                    Sign
+                    Approve
                   </Button>
                 ) : (
                   <Button
