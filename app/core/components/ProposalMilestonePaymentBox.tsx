@@ -12,6 +12,7 @@ import useStore from "../hooks/useStore"
 import { Proposal } from "app/proposal/types"
 import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
+import QueueGnosisTransactionModal from "app/proposalPayment/components/QueueGnosisTransactionModal"
 
 export const ProposalMilestonePaymentBox = ({
   proposal,
@@ -24,6 +25,8 @@ export const ProposalMilestonePaymentBox = ({
 }) => {
   const activeUser = useStore((state) => state.activeUser)
   const [isExecutePaymentModalOpen, setIsExecutePaymentModalOpen] = useState<boolean>(false)
+  const [queueGnosisTransactionModalOpen, setQueueGnosisTransactionModalOpen] =
+    useState<boolean>(false)
 
   const userIsPayer = proposal?.roles?.some(
     (role) =>
@@ -39,16 +42,34 @@ export const ProposalMilestonePaymentBox = ({
         setIsOpen={setIsExecutePaymentModalOpen}
         milestone={milestone}
       />
+      <QueueGnosisTransactionModal
+        milestone={milestone}
+        isOpen={queueGnosisTransactionModalOpen}
+        setIsOpen={setQueueGnosisTransactionModalOpen}
+      />
       <div className={`border border-b border-concrete rounded-2xl px-6 py-9 ${className}`}>
-        <span
-          className={`${
-            PROPOSAL_MILESTONE_STATUS_MAP[getMilestoneStatus(proposal, milestone) || ""]?.color
-          } rounded-full px-2 py-1 flex items-center space-x-1 w-fit mb-4`}
-        >
-          <span className="text-xs uppercase text-tunnel-black font-bold">
-            {PROPOSAL_MILESTONE_STATUS_MAP[getMilestoneStatus(proposal, milestone) || ""]?.copy}
+        <div className="flex flex-row items-center mb-4">
+          <span
+            className={`${
+              PROPOSAL_MILESTONE_STATUS_MAP[getMilestoneStatus(proposal, milestone) || ""]?.color
+            } rounded-full px-2 py-1 flex items-center space-x-1 w-fit mr-4`}
+          >
+            <span className="text-xs uppercase text-tunnel-black font-bold">
+              {PROPOSAL_MILESTONE_STATUS_MAP[getMilestoneStatus(proposal, milestone) || ""]?.copy}
+            </span>
           </span>
-        </span>
+          {/* check if gnosis safe and active user is signer */}
+          {getMilestoneStatus(proposal, milestone) === ProposalMilestoneStatus.IN_PROGRESS && (
+            <span
+              className="text-electric-violet text-sm underline"
+              onClick={() => {
+                setQueueGnosisTransactionModalOpen(true)
+              }}
+            >
+              Queue Gnosis transaction
+            </span>
+          )}
+        </div>
         <div className=" text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
           <span className="basis-32 mb-2 tracking-wider">From</span>
           <span className="basis-32 ml-6 mb-2 tracking-wider">To</span>
