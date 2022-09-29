@@ -734,7 +734,13 @@ const ProposalCreationLoadingScreen = ({ createdProposal, proposalShouldSendLate
   )
 }
 
-export const ProposalForm = () => {
+export const ProposalForm = ({
+  prefillClients,
+  prefillContributors,
+}: {
+  prefillClients: string[]
+  prefillContributors: string[]
+}) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
@@ -751,7 +757,16 @@ export const ProposalForm = () => {
   const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
-  const [proposingAs, setProposingAs] = useState<string>("")
+  const [proposingAs, setProposingAs] = useState<string>(
+    // set default proposingAs depending on prefilled clients and contributors
+    prefillClients.length > 0
+      ? prefillContributors.length > 0
+        ? ProposalRoleType.AUTHOR
+        : ProposalRoleType.CONTRIBUTOR
+      : prefillContributors.length > 0
+      ? ProposalRoleType.CLIENT
+      : ""
+  )
   const [
     shouldHandlePostProposalCreationProcessing,
     setShouldHandlePostProposalCreationProcessing,
@@ -907,6 +922,11 @@ export const ProposalForm = () => {
       <div className="max-w-[580px] mx-auto mt-12">
         <Stepper step={proposalStep} />
         <Form
+          initialValues={{
+            client: prefillClients?.[0] || "",
+            contributor: prefillContributors?.[0] || "",
+            // proposingAs default set in useState initialization
+          }}
           onSubmit={async (values: any, form) => {
             // an author needs to sign the proposal to upload the content to ipfs.
             // if they decline the signature, but submit again, we don't want to
