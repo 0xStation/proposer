@@ -44,7 +44,6 @@ export const ApproveProposalModal = ({
     }
 
     const message = genProposalApprovalDigest({
-      signerAddress: activeUser?.address,
       proposalHash: proposal.data.proposalHash,
       proposalId: proposal?.id as string,
     })
