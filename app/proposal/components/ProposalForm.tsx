@@ -1,4 +1,4 @@
-import { Routes, useRouter, useMutation, useQuery, invoke, useSession } from "blitz"
+import { Routes, useRouter, useMutation, invoke, useSession } from "blitz"
 import { useEffect, useState } from "react"
 import { useProvider } from "wagmi"
 import { RadioGroup } from "@headlessui/react"
@@ -23,27 +23,20 @@ import {
   isPositiveAmount,
   isEnsOrAddress,
 } from "app/utils/validators"
-import getProposalSignaturesById from "app/proposal/queries/getProposalSignaturesById"
-import truncateString from "app/core/utils/truncateString"
 import { AddressType, ProposalRoleType } from "@prisma/client"
 import BackArrow from "app/core/icons/BackArrow"
-import ApproveProposalModal from "app/proposal/components/ApproveProposalModal"
-import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 import WhenFieldChanges from "app/core/components/WhenFieldChanges"
 import { DateTime } from "luxon"
 import getFormattedDateForMinDateInput from "app/utils/getFormattedDateForMinDateInput"
 import ImportTokenModal from "app/core/components/ImportTokenModal"
 import getTokensByAccount from "../../token/queries/getTokensByAccount"
-import ConnectWalletModal from "app/core/components/ConnectWalletModal"
 import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { formatTokenAmount } from "app/utils/formatters"
-import { formatDate } from "app/core/utils/formatDate"
 import { useEnsAddress } from "wagmi"
 import { AddressLink } from "../../core/components/AddressLink"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { getNetworkTokens } from "app/core/utils/networkInfo"
-import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
 import { genProposalDigest } from "app/signatures/proposal"
 import TextLink from "app/core/components/TextLink"
 import { Spinner } from "app/core/components/Spinner"
@@ -204,37 +197,39 @@ const ProposeForm = ({ selectedNetworkId, proposingAs, setProposingAs }) => {
       <Field name="proposingAs" validate={requiredField}>
         {({ input, meta }) => {
           return (
-            <div className="custom-select-wrapper">
-              <select
-                {...input}
-                className="w-full bg-wet-concrete rounded p-2 mt-1"
-                value={proposingAs}
-                onChange={(e) => {
-                  setProposingAs(e.target.value)
+            <>
+              <div className="custom-select-wrapper">
+                <select
+                  {...input}
+                  className="w-full bg-wet-concrete rounded p-2 mt-1"
+                  value={proposingAs}
+                  onChange={(e) => {
+                    setProposingAs(e.target.value)
 
-                  // custom values can be compatible with react-final-form by calling
-                  // the props.input.onChange callback
-                  // https://final-form.org/docs/react-final-form/api/Field
-                  input.onChange(e.target.value)
-                }}
-              >
-                <option value="">Select option</option>
-                {[
-                  ProposalRoleType.CONTRIBUTOR,
-                  ProposalRoleType.CLIENT,
-                  ProposalRoleType.AUTHOR,
-                ].map((roleType, idx) => {
-                  return (
-                    <option key={roleType} value={roleType}>
-                      {PROPOSING_AS_ROLE_MAP[roleType]?.copy || ""}
-                    </option>
-                  )
-                })}
-              </select>
+                    // custom values can be compatible with react-final-form by calling
+                    // the props.input.onChange callback
+                    // https://final-form.org/docs/react-final-form/api/Field
+                    input.onChange(e.target.value)
+                  }}
+                >
+                  <option value="">Select option</option>
+                  {[
+                    ProposalRoleType.CONTRIBUTOR,
+                    ProposalRoleType.CLIENT,
+                    ProposalRoleType.AUTHOR,
+                  ].map((roleType, idx) => {
+                    return (
+                      <option key={roleType} value={roleType}>
+                        {PROPOSING_AS_ROLE_MAP[roleType]?.copy || ""}
+                      </option>
+                    )
+                  })}
+                </select>
+              </div>
               {meta.touched && meta.error && (
                 <span className="text-torch-red text-xs">{meta.error}</span>
               )}
-            </div>
+            </>
           )
         }}
       </Field>
@@ -500,35 +495,37 @@ const RewardForm = ({
       <Field name="network" validate={requiredField}>
         {({ input, meta }) => {
           return (
-            <div className="custom-select-wrapper">
-              <select
-                {...input}
-                className="w-full bg-wet-concrete rounded p-2 mt-1"
-                value={selectedNetworkId as number}
-                onChange={(e) => {
-                  const network = SUPPORTED_CHAINS.find(
-                    (chain) => chain.id === parseInt(e.target.value)
-                  )
-                  setSelectedNetworkId(network?.id as number)
-                  // custom values can be compatible with react-final-form by calling
-                  // the props.input.onChange callback
-                  // https://final-form.org/docs/react-final-form/api/Field
-                  input.onChange(network?.id)
-                }}
-              >
-                <option value="">Choose option</option>
-                {SUPPORTED_CHAINS?.map((chain, idx) => {
-                  return (
-                    <option key={chain.id} value={chain.id}>
-                      {chain.name}
-                    </option>
-                  )
-                })}
-              </select>
+            <>
+              <div className="custom-select-wrapper">
+                <select
+                  {...input}
+                  className="w-full bg-wet-concrete rounded p-2 mt-1"
+                  value={selectedNetworkId as number}
+                  onChange={(e) => {
+                    const network = SUPPORTED_CHAINS.find(
+                      (chain) => chain.id === parseInt(e.target.value)
+                    )
+                    setSelectedNetworkId(network?.id as number)
+                    // custom values can be compatible with react-final-form by calling
+                    // the props.input.onChange callback
+                    // https://final-form.org/docs/react-final-form/api/Field
+                    input.onChange(network?.id)
+                  }}
+                >
+                  <option value="">Choose option</option>
+                  {SUPPORTED_CHAINS?.map((chain, idx) => {
+                    return (
+                      <option key={chain.id} value={chain.id}>
+                        {chain.name}
+                      </option>
+                    )
+                  })}
+                </select>
+              </div>
               {meta.touched && meta.error && (
                 <span className="text-torch-red text-xs">{meta.error}</span>
               )}
-            </div>
+            </>
           )
         }}
       </Field>
@@ -545,37 +542,39 @@ const RewardForm = ({
           <Field name="tokenAddress" validate={requiredField}>
             {({ input, meta }) => {
               return (
-                <div className="custom-select-wrapper">
-                  <select
-                    // if network is selected make the token address field required.
-                    required
-                    {...input}
-                    className="w-full bg-wet-concrete rounded p-2 mt-1"
-                    value={selectedToken?.address as string}
-                    onChange={(e) => {
-                      const selectedToken = tokenOptions.find((token) =>
-                        addressesAreEqual(token.address, e.target.value)
-                      )
-                      setSelectedToken(selectedToken || {})
-                      // custom values can be compatible with react-final-form by calling
-                      // the props.input.onChange callback
-                      // https://final-form.org/docs/react-final-form/api/Field
-                      input.onChange(selectedToken?.address)
-                    }}
-                  >
-                    <option value="">Choose option</option>
-                    {tokenOptions?.map((token) => {
-                      return (
-                        <option key={token.address} value={token.address}>
-                          {token.symbol}
-                        </option>
-                      )
-                    })}
-                  </select>
+                <>
+                  <div className="custom-select-wrapper">
+                    <select
+                      // if network is selected make the token address field required.
+                      required
+                      {...input}
+                      className="w-full bg-wet-concrete rounded p-2 mt-1"
+                      value={selectedToken?.address as string}
+                      onChange={(e) => {
+                        const selectedToken = tokenOptions.find((token) =>
+                          addressesAreEqual(token.address, e.target.value)
+                        )
+                        setSelectedToken(selectedToken || {})
+                        // custom values can be compatible with react-final-form by calling
+                        // the props.input.onChange callback
+                        // https://final-form.org/docs/react-final-form/api/Field
+                        input.onChange(selectedToken?.address)
+                      }}
+                    >
+                      <option value="">Choose option</option>
+                      {tokenOptions?.map((token) => {
+                        return (
+                          <option key={token.address} value={token.address}>
+                            {token.symbol}
+                          </option>
+                        )
+                      })}
+                    </select>
+                  </div>
                   {meta.touched && meta.error && (
                     <span className="text-torch-red text-xs">{meta.error}</span>
                   )}
-                </div>
+                </>
               )
             }}
           </Field>
@@ -658,9 +657,6 @@ const RewardForm = ({
                       {PAYMENT_TERM_MAP[PaymentTerm.AFTER_COMPLETION]?.copy}
                     </option>
                   </select>
-                  {meta.touched && meta.error && (
-                    <span className="text-torch-red text-xs">{meta.error}</span>
-                  )}
                 </div>
               </>
             )}
