@@ -1,4 +1,4 @@
-import { Head, BlitzLayout, invoke, useSession } from "blitz"
+import { Head, BlitzLayout, invoke, useSession, Script } from "blitz"
 import { useEffect } from "react"
 import { useAccount, useDisconnect } from "wagmi"
 import Navigation from "../components/Navigation"
@@ -44,7 +44,23 @@ const Layout: BlitzLayout<{ title?: string }> = ({ title, children }) => {
           content="Toolkit for digital orgs to curate and reward the best people and projects."
         />
         <link rel="apple-touch-icon" href="/station-logo-favicon.ico" />
+        {/* Google tag (gtag.js)  */}
+        <script
+          async
+          src={`<script async src="https://www.googletagmanager.com/gtag/js?id=G-2Y0MMXXM0Y"></script>`}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-2Y0MMXXM0Y');
+          `,
+          }}
+        />
       </Head>
+
       <ModalContainer />
       <ToastContainer />
       <Navigation>{children}</Navigation>
