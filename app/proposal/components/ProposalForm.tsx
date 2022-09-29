@@ -1137,6 +1137,7 @@ export const ProposalForm = () => {
                     </span>
                     <Button
                       isDisabled={
+                        // CHECK CONTENT ON PROPOSE STEP
                         // has not selected who user is proposing as
                         !formState.values.proposingAs ||
                         // proposing as author or client but has not filled in contributor
@@ -1147,7 +1148,16 @@ export const ProposalForm = () => {
                           !formState.values.client) ||
                         // has not filled in title or body
                         !formState.values.title ||
-                        !formState.values.body
+                        !formState.values.body ||
+                        // CHECK CONTENT ON DETAILS STEP
+                        !formState.values.network ||
+                        (needFunding
+                          ? !(
+                              formState.values.tokenAddress &&
+                              formState.values.paymentAmount &&
+                              formState.values.paymentTerms
+                            )
+                          : false)
                       }
                       className="float-right"
                       onClick={() => {
