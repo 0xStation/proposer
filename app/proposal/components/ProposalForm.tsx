@@ -362,7 +362,7 @@ const ProposeForm = ({ selectedNetworkId, proposingAs, setProposingAs }) => {
           {/* BODY */}
           <label className="font-bold block mt-6">Details*</label>
           <span className="text-xs text-concrete block">
-            Supports markdown syntax. <TextLink url={LINKS.MARKDOWN_GUIDE}>Learn more</TextLink>
+            Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown syntax</TextLink>. Need inspirations? Check out <TextLink url={LINKS.PROPOSAL_TEMPLATE}>proposal templates</TextLink>. 
           </span>
           <Field name="body" component="textarea" validate={requiredField}>
             {({ input, meta }) => (
