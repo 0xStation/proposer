@@ -663,45 +663,6 @@ const RewardForm = ({
           </Field>
         </>
       )}
-
-      {/* START DATE */}
-      <label className="font-bold block mt-6">Start</label>
-      <Field name="startDate">
-        {({ input, meta }) => {
-          return (
-            <div>
-              <input
-                {...input}
-                type="datetime-local"
-                min={getFormattedDateForMinDateInput({ dateTime: DateTime.local() })}
-                className="bg-wet-concrete rounded p-2 mt-1 w-full"
-              />
-              {meta.touched && meta.error && (
-                <span className="text-torch-red text-xs">{meta.error}</span>
-              )}
-            </div>
-          )
-        }}
-      </Field>
-      {/* END DATE */}
-      <label className="font-bold block mt-6">End</label>
-      <Field name="endDate">
-        {({ input, meta }) => {
-          return (
-            <div>
-              <input
-                {...input}
-                type="datetime-local"
-                min={getFormattedDateForMinDateInput({ dateTime: DateTime.local() })}
-                className="bg-wet-concrete rounded p-2 mt-1 w-full"
-              />
-              {meta.touched && meta.error && (
-                <span className="text-torch-red text-xs">{meta.error}</span>
-              )}
-            </div>
-          )
-        }}
-      </Field>
     </>
   )
 }
@@ -1033,13 +994,6 @@ export const ProposalForm = () => {
                   milestones,
                   payments,
                   paymentTerms: values.paymentTerms,
-                  // convert luxon's `DateTime` obj to UTC to store in db
-                  startDate: values.startDate
-                    ? DateTime.fromISO(values.startDate).toUTC().toJSDate()
-                    : undefined,
-                  endDate: values.endDate
-                    ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
-                    : undefined,
                 })
               } catch (err) {
                 setIsLoading(false)

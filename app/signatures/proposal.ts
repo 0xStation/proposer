@@ -108,10 +108,6 @@ export const genProposalDigest = (proposal: Proposal) => {
         },
       ],
       // module fields
-      time: {
-        startDate: proposal.startDate?.valueOf() || 0,
-        endDate: proposal.endDate?.valueOf() || 0,
-      },
       location: {
         // Hardcoding our app name. Other frontend app's can change this type
         // to reference where the data was generated down the road.

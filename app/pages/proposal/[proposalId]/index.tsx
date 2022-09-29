@@ -6,7 +6,6 @@ import ReadMore from "app/core/components/ReadMore"
 import { TotalPaymentView } from "app/core/components/TotalPaymentView"
 import RoleSignaturesView from "app/core/components/RoleSignaturesView"
 import { Proposal } from "app/proposal/types"
-import TimelineView from "app/core/components/TimelineView"
 
 const ViewProposal: BlitzPage = () => {
   const proposalId = useParam("proposalId") as string
@@ -24,13 +23,6 @@ const ViewProposal: BlitzPage = () => {
         <RoleSignaturesView proposal={proposal as Proposal | undefined} className="mt-9" />
         {(proposal?.data.totalPayments || []).length > 0 && (
           <TotalPaymentView proposal={proposal!} className="mt-9" />
-        )}
-        {proposal?.startDate && (
-          <TimelineView
-            className="mt-9"
-            startDate={proposal?.startDate as Date}
-            endDate={proposal?.endDate as Date}
-          />
         )}
       </div>
     </Layout>
