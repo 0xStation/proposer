@@ -234,6 +234,7 @@ export const LINKS = {
     "https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax",
   STATION_WORKSPACES:
     "https://0xstation.notion.site/0xstation/Station-Workspaces-8c696d92fdbd4dc0b2c7e67efc54a9a5",
+  GNOSIS_SAFE: "https://gnosis-safe.io/",
 }
 
 export const CHAIN_IDS = {

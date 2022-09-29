@@ -10,6 +10,8 @@ import { Account } from "app/account/types"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import networks from "app/utils/networks.json"
+import TextLink from "./TextLink"
+import { LINKS } from "../utils/constants"
 
 export const NewWorkspaceModal = ({
   isOpen,
@@ -73,10 +75,12 @@ export const NewWorkspaceModal = ({
       }}
     >
       <div className="p-6">
-        <h1 className="text-2xl font-bold">New workspace</h1>
+        <h1 className="text-2xl font-bold">New group workspace</h1>
         <p className="text-base mt-6">
-          Select a multi-sig address that you would like to govern the workspace. The admins of the
-          selected multi-sig will be the default admins of the workspace.
+          Select a <TextLink url={LINKS.GNOSIS_SAFE}>Gnosis Safe </TextLink>
+          address that you would like to govern the workspace. If you are looking to create a
+          workspace with another personal wallet, connect your wallet to a new address and sign in
+          again.
         </p>
         <Form
           initialValues={{}}
@@ -99,10 +103,11 @@ export const NewWorkspaceModal = ({
             const formState = form.getState()
             return (
               <form onSubmit={handleSubmit}>
-                <label className="font-bold block mt-6">Multi-sig address*</label>
+                <label className="font-bold block mt-6">Gnosis Safe address*</label>
                 <span className="text-xs text-light-concrete block mb-2">
-                  Options displayed are the multi-sig addresses that you’re a current admin of and
-                  doesn’t govern any existing workspace.
+                  Listed options are the Gnosis Safes that you are a current admin of on the
+                  selected network. Change your network in the upper-right corner of this page to
+                  the left of your profile.
                 </span>
                 <Select name="safeAddress" options={safes} placeholder="Select one" />
                 <div className="mt-6 flex justify-end">
