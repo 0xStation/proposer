@@ -171,7 +171,7 @@ export const ProposalViewHeaderNavigation = () => {
                     className="mr-3"
                     onClick={() => setPublishModalOpen(true)}
                   >
-                    Publish
+                    Send proposal
                   </Button>
                 )}
               </>
