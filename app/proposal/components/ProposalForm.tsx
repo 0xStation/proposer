@@ -200,7 +200,6 @@ const ProposeForm = ({ selectedNetworkId, proposingAs, setProposingAs }) => {
                 <select
                   {...input}
                   className="w-full bg-wet-concrete rounded p-2 mt-1"
-                  // value={proposingAs}
                   onChange={(e) => {
                     setProposingAs(e.target.value)
 
