@@ -1,7 +1,5 @@
-import { useQuery } from "blitz"
 import { useState } from "react"
 import { CheckCircleIcon } from "@heroicons/react/solid"
-import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
 import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
 import { ProposalMilestone, ProposalMilestoneStatus } from "app/proposalMilestone/types"
 import { getMilestoneStatus } from "app/proposalMilestone/utils"
@@ -13,6 +11,7 @@ import { addressesAreEqual } from "../utils/addressesAreEqual"
 import useStore from "../hooks/useStore"
 import { Proposal } from "app/proposal/types"
 import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
+import { getNetworkExplorer } from "app/core/utils/networkInfo"
 
 export const ProposalMilestonePaymentBox = ({
   proposal,
@@ -55,21 +54,36 @@ export const ProposalMilestonePaymentBox = ({
           <span className="basis-32 ml-6 mb-2 tracking-wider">To</span>
           <span className="basis-28 ml-6 mb-2 tracking-wider">Token</span>
           <span className="basis-28 ml-6 mb-2 tracking-wider">Amount</span>
+          <span className="basis-28"></span>
         </div>
         {/* show all payments within milestone block */}
-        {milestone?.payments?.map((payments) => (
-          <div className="w-full flex flex-row items-end" key={payments?.id}>
+        {milestone?.payments?.map((payment) => (
+          <div className="w-full flex flex-row items-end" key={payment?.id}>
             <span className="basis-32 mb-2 tracking-wider">
-              {truncateString(payments?.senderAddress)}
+              {truncateString(payment?.senderAddress)}
             </span>
             <span className="basis-32 ml-6 mb-2 tracking-wider">
-              {truncateString(payments?.recipientAddress)}
+              {truncateString(payment?.recipientAddress)}
             </span>
             <span className="basis-28 ml-6 mb-2 tracking-wider">
-              {payments?.data?.token?.symbol}
+              {payment?.data?.token?.symbol}
             </span>
             <span className="basis-28 ml-6 mb-2 tracking-wider">
-              {formatCurrencyAmount(payments?.amount?.toString())}
+              {formatCurrencyAmount(payment?.amount?.toString())}
+            </span>
+            <span className="basis-28 mb-2">
+              {payment.transactionHash && (
+                <a
+                  className="text-sm text-electric-violet"
+                  target="_blank"
+                  href={`${getNetworkExplorer(payment.data.token.chainId)}/tx/${
+                    payment.transactionHash
+                  }`}
+                  rel="noreferrer"
+                >
+                  See transaction
+                </a>
+              )}
             </span>
           </div>
         ))}

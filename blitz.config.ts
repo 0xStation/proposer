@@ -1,5 +1,6 @@
 import { BlitzConfig, sessionMiddleware } from "blitz"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
+import { isProd, isStaging } from "app/utils"
 
 type AddressOrUserIdIsAuthorizedArgs = {
   ctx: any
@@ -25,9 +26,7 @@ const config: BlitzConfig = {
     sessionMiddleware({
       // vercel_url guarantees uniqueness per preview environment
       // remove '/' and '.' from url as cookie only allows '-' and '_'
-      cookiePrefix: `${
-        process.env.NEXT_PUBLIC_VERCEL_URL?.replace(/[./]/g, "") || "development"
-      }_session`,
+      cookiePrefix: `${isProd() ? "production" : isStaging() ? "staging" : "development"}_session`,
 
       isAuthorized: addressOrUserIdIsAuthorized,
     }),

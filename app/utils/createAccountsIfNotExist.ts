@@ -31,7 +31,6 @@ export async function createAccountsIfNotExist(addresses: string[]) {
         address,
         addressType,
         data: {
-          name: truncateString(address),
           ...(addressType !== AddressType.WALLET && { chainId }),
         },
       }
