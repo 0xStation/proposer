@@ -92,10 +92,9 @@ export const ApproveProposalModal = ({
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        <h3 className="text-2xl font-bold pt-6">Sign to affirm</h3>
+        <h3 className="text-2xl font-bold pt-6">Approve</h3>
         <p className="mt-2">
-          Your signature moves this proposal closer to agreement. Once this approval has been signed
-          by all parties, its terms will be official and uploaded to decentralized storage!
+        Sign to approve the proposal. Once all parties, including the author, have approved, the proposal will be activated and uploaded onto IPFS. 
         </p>
 
         <div className="mt-8 flex items-center">
