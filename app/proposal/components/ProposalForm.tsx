@@ -755,6 +755,7 @@ export const ProposalForm = () => {
   useEffect(() => {
     if (!walletModalOpen && isLoading) {
       setIsLoading(false)
+      setProposalShouldSendLater(false)
     }
   }, [walletModalOpen])
 
