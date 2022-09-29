@@ -940,48 +940,38 @@ export const ProposalForm = () => {
               }
 
               if (!contributorAddress) {
-                let message
-                if (proposingAs === ProposalRoleType.CONTRIBUTOR) {
-                  message = "Not signed in, please connect wallet and sign in."
-                } else {
-                  message = "Invalid ENS name or wallet address provided."
-                }
                 setIsLoading(false)
                 setToastState({
                   isToastShowing: true,
                   type: "error",
-                  message,
+                  message:
+                    proposingAs === ProposalRoleType.CONTRIBUTOR
+                      ? "Not signed in, please connect wallet and sign in."
+                      : "Invalid ENS name or wallet address provided.",
                 })
                 return
               }
               if (!clientAddress) {
-                let message
-                if (proposingAs === ProposalRoleType.CLIENT) {
-                  message = "Not signed in, please connect wallet and sign in."
-                } else {
-                  message = "Invalid ENS name or wallet address provided."
-                }
                 setIsLoading(false)
                 setToastState({
                   isToastShowing: true,
                   type: "error",
-                  message,
+                  message:
+                    proposingAs === ProposalRoleType.CLIENT
+                      ? "Not signed in, please connect wallet and sign in."
+                      : "Invalid ENS name or wallet address provided.",
                 })
                 return
               }
               if (addressesAreEqual(contributorAddress, clientAddress)) {
-                let message
-                if (proposingAs !== ProposalRoleType.AUTHOR) {
-                  message = "Cannot propose to yourself, please propose to another address."
-                } else {
-                  message =
-                    "Same address cannot deliver and review work, please change either address."
-                }
                 setIsLoading(false)
                 setToastState({
                   isToastShowing: true,
                   type: "error",
-                  message,
+                  message:
+                    proposingAs !== ProposalRoleType.AUTHOR
+                      ? "Cannot propose to yourself, please propose to another address."
+                      : "Same address cannot deliver and review work, please change either address.",
                 })
                 return
               }
@@ -1009,11 +999,13 @@ export const ProposalForm = () => {
                   values.paymentTerms !== PaymentTerm.AFTER_COMPLETION
                 ) {
                   setIsLoading(false)
-                  console.error("Missing complete payment information")
+                  console.error(
+                    "Missing payment terms, please select an option on the previous page."
+                  )
                   setToastState({
                     isToastShowing: true,
                     type: "error",
-                    message: "Missing complete payment information",
+                    message: "Missing payment terms, please select an option on the previous page.",
                   })
                   return
                 }
