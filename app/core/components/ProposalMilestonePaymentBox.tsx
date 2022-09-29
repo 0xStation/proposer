@@ -31,7 +31,6 @@ export const ProposalMilestonePaymentBox = ({
       addressesAreEqual(activeUser?.address || "", role.address)
   )
   const paymentComplete = !!milestone?.payments?.[0]?.transactionHash
-  console.log(milestone.payments)
 
   return (
     <>
