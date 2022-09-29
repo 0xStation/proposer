@@ -11,7 +11,7 @@ import { addressesAreEqual } from "../utils/addressesAreEqual"
 import useStore from "../hooks/useStore"
 import { Proposal } from "app/proposal/types"
 import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
-import networks from "app/utils/networks.json"
+import { getNetworkExplorer } from "app/core/utils/networkInfo"
 
 export const ProposalMilestonePaymentBox = ({
   proposal,
@@ -72,16 +72,20 @@ export const ProposalMilestonePaymentBox = ({
             <span className="basis-28 ml-6 mb-2 tracking-wider">
               {formatCurrencyAmount(payment?.amount?.toString())}
             </span>
-            <a
-              className="basis-28 mb-2 text-sm text-electric-violet"
-              target="_blank"
-              href={`${networks[payment.data.token.chainId].explorer}/tx/${
-                payment.transactionHash
-              }`}
-              rel="noreferrer"
-            >
-              See transaction
-            </a>
+            <span className="basis-28 mb-2">
+              {payment.transactionHash && (
+                <a
+                  className="text-sm text-electric-violet"
+                  target="_blank"
+                  href={`${getNetworkExplorer[payment.data.token.chainId].explorer}/tx/${
+                    payment.transactionHash
+                  }`}
+                  rel="noreferrer"
+                >
+                  See transaction
+                </a>
+              )}
+            </span>
           </div>
         ))}
         {userIsPayer &&
