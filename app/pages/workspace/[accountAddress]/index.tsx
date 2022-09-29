@@ -26,7 +26,7 @@ import AccountMediaObject from "app/core/components/AccountMediaObject"
 import WorkspaceSettingsOverviewForm from "app/account/components/WorkspaceSettingsOverviewForm"
 import useStore from "app/core/hooks/useStore"
 import ProposalStatusPill from "app/core/components/ProposalStatusPill"
-import { useAccount } from "wagmi"
+import { useAccount, useEnsName } from "wagmi"
 import getSafeMetadata from "app/account/queries/getSafeMetadata"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import { ProposalRole } from "app/proposalRole/types"
@@ -53,7 +53,14 @@ const WorkspaceHome: BlitzPage = () => {
     new Set<ProposalRoleType>()
   )
   const [page, setPage] = useState<number>(0)
+
   const accountAddress = useParam("accountAddress", "string") as string
+  const { data: accountEnsName } = useEnsName({
+    address: accountAddress,
+    chainId: 1,
+    cacheTime: 10 * 60 * 1000, // 10 minutes (time in ms) which the data should remain in the cache
+  })
+
   const [proposalResponse] = useQuery(
     getProposalsByAddress,
     {
@@ -292,7 +299,7 @@ const WorkspaceHome: BlitzPage = () => {
               />
             )}
             {/* CTA */}
-            <Link href={Routes.CreateProposal()}>
+            <Link href={Routes.CreateProposal({ clients: accountEnsName || accountAddress })}>
               <Button className="w-full">Propose</Button>
             </Link>
           </div>
