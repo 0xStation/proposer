@@ -7,8 +7,9 @@ import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import truncateString from "app/core/utils/truncateString"
 import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
+import { ProposalStatus } from "@prisma/client"
 
-const SafeRole = ({ role, signatures }) => {
+const SafeRole = ({ role, signatures, proposalStatus }) => {
   const activeUser = useStore((state) => state.activeUser)
   const [safeDetails, setSafeDetails] = useState<any | null>({})
   const [signers, setSigners] = useState<string[]>([])
@@ -17,7 +18,8 @@ const SafeRole = ({ role, signatures }) => {
 
   const activeUserHasSigned = activeUserMeetsCriteria(activeUser, signatures)
   const activeUserHasAProposalRole = activeUserMeetsCriteria(activeUser, signers)
-  const showSignButton = activeUserHasAProposalRole && !activeUserHasSigned
+  const showSignButton =
+    proposalStatus !== ProposalStatus.DRAFT && activeUserHasAProposalRole && !activeUserHasSigned
 
   useEffect(() => {
     const getGnosisDetails = async () => {
@@ -105,14 +107,15 @@ const SafeRole = ({ role, signatures }) => {
   )
 }
 
-const WalletRole = ({ role, signatures }) => {
+const WalletRole = ({ role, signatures, proposalStatus }) => {
   const activeUser = useStore((state) => state.activeUser)
 
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
   const activeUserHasSigned = activeUserMeetsCriteria(activeUser, signatures)
   const activeUserHasAProposalRole = addressesAreEqual(activeUser?.address || "", role?.address)
 
-  const showSignButton = activeUserHasAProposalRole && !activeUserHasSigned
+  const showSignButton =
+    proposalStatus !== ProposalStatus.DRAFT && activeUserHasAProposalRole && !activeUserHasSigned
 
   return (
     <div className="flex flex-row w-full items-center justify-between">
@@ -153,15 +156,15 @@ const WalletRole = ({ role, signatures }) => {
   )
 }
 
-export const RoleSignature = ({ role, signatures }) => {
+export const RoleSignature = ({ role, signatures, proposalStatus }) => {
   const isSafe = role.account.addressType === "SAFE"
 
   return (
     <>
       {isSafe ? (
-        <SafeRole role={role} signatures={signatures} />
+        <SafeRole role={role} signatures={signatures} proposalStatus={proposalStatus} />
       ) : (
-        <WalletRole role={role} signatures={signatures} />
+        <WalletRole role={role} signatures={signatures} proposalStatus={proposalStatus} />
       )}
     </>
   )
