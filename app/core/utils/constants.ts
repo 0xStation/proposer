@@ -287,7 +287,7 @@ export const PROPOSING_AS_ROLE_MAP = {
     copy: "A client (responsible for reviewing and approving work)",
   },
   [ProposalRoleType.AUTHOR]: {
-    copy: "An author (responsible for drafting proposal for a 3rd party)",
+    copy: "An author (responsible for drafting the proposal as a third party)",
   },
 }
 
