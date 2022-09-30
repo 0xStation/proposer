@@ -37,7 +37,8 @@ export const ProposalViewHeaderNavigation = () => {
   const proposalId = useParam("proposalId") as string
   const proposalApprovalModalOpen = useStore((state) => state.proposalApprovalModalOpen)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
-  const [isPublishModalOpen, setPublishModalOpen] = useState<boolean>(false)
+  const sendProposalModalOpen = useStore((state) => state.sendProposalModalOpen)
+  const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
   const router = useRouter()
   const [proposal] = useQuery(
     getProposalById,
@@ -56,8 +57,11 @@ export const ProposalViewHeaderNavigation = () => {
   const author = findProposalRoleByRoleType(proposal?.roles, ProposalRoleType.AUTHOR)
   // numerator for the progress circle
   const totalApprovalCount =
-    proposal?.roles?.filter((role) => role.approvalStatus === ProposalRoleApprovalStatus.APPROVED)
-      .length || 0
+    proposal?.roles?.filter(
+      (role) =>
+        role.approvalStatus === ProposalRoleApprovalStatus.APPROVED ||
+        role.approvalStatus === ProposalRoleApprovalStatus.SENT
+    ).length || 0
 
   // activeUser's view permissions
   const activeUserIsSigner = signedRoles.length + remainingRoles.length > 0
@@ -75,8 +79,8 @@ export const ProposalViewHeaderNavigation = () => {
   return (
     <>
       <PublishProposalModal
-        isOpen={isPublishModalOpen}
-        setIsOpen={setPublishModalOpen}
+        isOpen={sendProposalModalOpen}
+        setIsOpen={toggleSendProposalModalOpen}
         proposal={proposal}
       />
       {proposal && (
@@ -169,7 +173,7 @@ export const ProposalViewHeaderNavigation = () => {
                   <Button
                     overrideWidthClassName="w-[300px] sm:w-[400px] md:w-[614px]"
                     className="mr-3"
-                    onClick={() => setPublishModalOpen(true)}
+                    onClick={() => toggleSendProposalModalOpen(true)}
                   >
                     Send proposal
                   </Button>

@@ -77,6 +77,14 @@ export const PROPOSAL_ROLE_APPROVAL_STATUS_MAP = {
     copy: "approved",
     color: "bg-magic-mint",
   },
+  [ProposalRoleApprovalStatus.SENT]: {
+    copy: "sent",
+    color: "bg-magic-mint",
+  },
+  [ProposalRoleApprovalStatus.AWAITING_AUTHOR]: {
+    copy: "awaiting author",
+    color: "bg-concrete",
+  },
 }
 
 export const PROPOSAL_MILESTONE_STATUS_MAP = {

@@ -1,4 +1,4 @@
-import { ProposalRole as PrismaProposalRole } from "@prisma/client"
+import { ProposalRole as PrismaProposalRole, ProposalRoleApprovalStatus } from "@prisma/client"
 import { Account } from "app/account/types"
 import { ProposalSignature } from "app/proposalSignature/types"
 

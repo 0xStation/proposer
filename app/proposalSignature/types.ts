@@ -7,7 +7,7 @@ export type ProposalSignature = PrismaProposalSignature & {
 export type ProposalSignatureMetadata = {
   message: any
   signature: string
-  representingRoles: string[]
+  representingRoles?: string[]
   proposalHash: string
   ipfsMetadata?: {
     hash: string

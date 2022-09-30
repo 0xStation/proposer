@@ -101,21 +101,29 @@ enum ProposalRoleType {
 enum ProposalRoleApprovalStatus {
   PENDING // role is pending approval
   APPROVED // role has approved
+  SENT // signed by author to send to recipientsgena
+  AWAITING_AUTHOR // NOT used in db, just here for the enum option on frontend because you cannot inherit/extend an enum
   // DENY -- future for denying proposals
 }
 
 model ProposalSignature {
-  id         String   @id @default(uuid())
+  id         String                @id @default(uuid())
   proposalId String
   address    String
-  timestamp  DateTime @default(now())
+  timestamp  DateTime              @default(now())
   data       Json
+  type       ProposalSignatureType @default(APPROVE)
 
   proposal Proposal       @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   // m-n relation to support one signature being utilized for many roles
   // for example, I can have the AUTHOR and CONTRIBUTOR role simultaneously
   // another example, I can be a AUTHOR and represent a CLIENT as a signer of its multisig
   roles    ProposalRole[] @relation("RoleApprovalSignature")
+}
+
+enum ProposalSignatureType {
+  APPROVE // approving the proposal
+  SEND // send the proposal to other roles as an author
 }
 
 // PROPOSAL MILESTONES AND EXPECTATIONS
