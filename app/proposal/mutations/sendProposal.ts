@@ -50,6 +50,7 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
 
   const proposalMetadata: ProposalMetadata = {
     ...existingMetadata,
+    authorAddress: params.authorAddress,
     authorSignature: params.authorSignature,
     signatureMessage: params.signatureMessage,
     proposalHash: params.proposalHash,
@@ -60,7 +61,6 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
       // UPDATE PROPOSAL
 
       // saves author signature and sets status to AWAITING_APPROVAL
-      // note that this can be used both for moving from DRAFT and for restarting an approval process if you want to change something
       await db.proposal.update({
         where: {
           id: params.proposalId,
@@ -77,17 +77,8 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
         },
       })
 
-      // WIPE EXISTING APPROVALS
-
-      // delete old signatures
-      await db.proposalSignature.deleteMany({
-        where: {
-          proposalId: params.proposalId,
-        },
-      })
-      // set old roles to PENDING
-
-      // TODO:
+      // Note: existing proposal signatures and role approvals for this proposal
+      // should have already been wiped if an author made edits and wants to re-send the proposal
 
       const authorSignatureMetadata: ProposalSignatureMetadata = {
         signature: params.authorSignature,
