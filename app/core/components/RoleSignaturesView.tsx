@@ -24,7 +24,6 @@ export const RoleSignaturesView = ({
 
   return proposal ? (
     <div className={`border border-b border-concrete rounded-2xl px-6 py-9 ${className}`}>
-      <h2 className="font-bold text-xl">Collaborators</h2>
       {/* CONTRIBUTOR */}
       <h4 className="text-xs font-bold text-concrete uppercase mt-6 mb-2">Contributor</h4>
       <RoleSignature

@@ -13,7 +13,6 @@ export const TotalPaymentView = ({
 }) => {
   return proposal ? (
     <div className={`${className} border border-b border-concrete rounded-2xl px-6 py-9`}>
-      <h2 className="font-bold text-xl">Total Payment</h2>
       {/* NETWORK */}
       <h4 className="text-xs font-bold text-concrete uppercase mt-6">Network</h4>
       <p className="mt-2">
