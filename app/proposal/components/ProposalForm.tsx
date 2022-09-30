@@ -718,11 +718,9 @@ export const ProposalForm = ({
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
   const [proposingAs, setProposingAs] = useState<string>(
-    // set default proposingAs depending on prefilled clients and contributors
+    // set default proposingAs to prefilled values, choosing contributor if both provided for product bias
     prefillClients.length > 0
-      ? prefillContributors.length > 0
-        ? ProposalRoleType.AUTHOR
-        : ProposalRoleType.CONTRIBUTOR
+      ? ProposalRoleType.CONTRIBUTOR
       : prefillContributors.length > 0
       ? ProposalRoleType.CLIENT
       : ""
