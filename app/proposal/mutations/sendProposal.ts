@@ -6,7 +6,7 @@ import * as z from "zod"
 import { ProposalMetadata } from "../types"
 import { Ctx } from "blitz"
 
-const PublishProposal = z.object({
+const SendProposal = z.object({
   proposalId: z.string(),
   authorAddress: z.string(),
   authorSignature: z.string(), // should be optional in draft form
@@ -14,10 +14,11 @@ const PublishProposal = z.object({
   proposalHash: z.string(), // should be optional in draft form
 })
 
-// Only updates the metadata of a proposal
+// Sends a proposal to labeled roles
+// Updates the proposal's status, deletes existing signatures
 // to update the roles, milestones, or payments of a proposal, use/make their specific mutations
-export default async function publishProposal(input: z.infer<typeof PublishProposal>, ctx: Ctx) {
-  const params = PublishProposal.parse(input)
+export default async function sendProposal(input: z.infer<typeof SendProposal>, ctx: Ctx) {
+  const params = SendProposal.parse(input)
 
   const proposal = await db.proposal.findUnique({
     where: {
@@ -56,6 +57,10 @@ export default async function publishProposal(input: z.infer<typeof PublishPropo
 
   try {
     const res = await db.$transaction(async (db) => {
+      // UPDATE PROPOSAL
+
+      // saves author signature and sets status to AWAITING_APPROVAL
+      // note that this can be used both for moving from DRAFT and for restarting an approval process if you want to change something
       await db.proposal.update({
         where: {
           id: params.proposalId,
@@ -72,12 +77,17 @@ export default async function publishProposal(input: z.infer<typeof PublishPropo
         },
       })
 
-      // if the update works properly, continue to remove all previous signatures
+      // WIPE EXISTING APPROVALS
+
+      // delete old signatures
       await db.proposalSignature.deleteMany({
         where: {
           proposalId: params.proposalId,
         },
       })
+      // set old roles to PENDING
+
+      // TODO:
 
       const authorSignatureMetadata: ProposalSignatureMetadata = {
         signature: params.authorSignature,
@@ -85,6 +95,9 @@ export default async function publishProposal(input: z.infer<typeof PublishPropo
         proposalHash: params.proposalHash,
       }
 
+      // SAVE AUTHOR SIGNATURE
+
+      // create new signature and connect to proposal and author role
       await db.proposalSignature.create({
         data: {
           type: ProposalSignatureType.SEND,
@@ -104,7 +117,7 @@ export default async function publishProposal(input: z.infer<typeof PublishPropo
           },
         },
       })
-
+      // update author role to SENT approvalStatus to mark as done
       await db.proposalRole.update({
         where: {
           id: associatedAuthorRole.id,
@@ -117,6 +130,6 @@ export default async function publishProposal(input: z.infer<typeof PublishPropo
 
     return proposal
   } catch (err) {
-    throw Error(`Error updating proposal, failed with error: ${err.message}`)
+    throw Error(`Error sending proposal, failed with error: ${err.message}`)
   }
 }

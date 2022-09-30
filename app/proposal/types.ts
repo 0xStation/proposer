@@ -26,7 +26,7 @@ export type ProposalMetadata = {
   signatureMessage?: any
   // cache total payment amounts for rendering on list components and primary metadata view
   totalPayments: { token: Token; amount: number }[]
-  paymentTerms?: PaymentTerm
+  paymentTerms: PaymentTerm
 }
 
 // enables public verifiability of REPUTATION

@@ -1,5 +1,4 @@
 import { TokenType } from "@prisma/client"
-import { PaymentTerm } from "app/proposalPayment/types"
 import * as z from "zod"
 
 // use ZodToken.partial() for all optional fields

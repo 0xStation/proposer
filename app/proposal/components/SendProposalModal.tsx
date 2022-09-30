@@ -6,35 +6,18 @@ import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { genProposalDigest } from "app/signatures/proposal"
 import useSignature from "app/core/hooks/useSignature"
 import getProposalById from "../queries/getProposalById"
-import updateProposalMetadata from "../mutations/updateProposalMetadata"
 import { ProposalRoleType } from "@prisma/client"
 import { getHash } from "app/signatures/utils"
-import publishProposal from "../mutations/publishProposal"
+import sendProposal from "../mutations/sendProposal"
 import getProposalSignaturesById from "../queries/getProposalSignaturesById"
 
-export const PublishProposalModal = ({ isOpen, setIsOpen, proposal }) => {
+export const SendProposallModal = ({ isOpen, setIsOpen, proposal }) => {
   const setToastState = useStore((state) => state.setToastState)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const session = useSession({ suspense: false })
   const { signMessage } = useSignature()
 
-  const [updateProposalMetadataMutation] = useMutation(updateProposalMetadata, {
-    onSuccess: (data) => {
-      setIsLoading(false)
-      invalidateQuery(getProposalById)
-      setToastState({
-        isToastShowing: true,
-        type: "success",
-        message: "Successfully published proposal.",
-      })
-      setIsOpen(false)
-    },
-    onError: (error: Error) => {
-      console.error(error)
-    },
-  })
-
-  const [publishProposalMutation] = useMutation(publishProposal, {
+  const [sendProposalMutation] = useMutation(sendProposal, {
     onSuccess: (data) => {
       setIsLoading(false)
       invalidateQuery(getProposalById)
@@ -95,24 +78,13 @@ export const PublishProposalModal = ({ isOpen, setIsOpen, proposal }) => {
               const { domain, types, value } = message
               const proposalHash = getHash(domain, types, value)
 
-              await publishProposalMutation({
+              await sendProposalMutation({
                 proposalId: proposal?.id as string,
                 authorAddress: session?.siwe?.address as string,
                 authorSignature: signature as string,
                 signatureMessage: message,
                 proposalHash: proposalHash,
               })
-
-              // await updateProposalMetadataMutation({
-              //   proposalId: proposal?.id as string,
-              //   authorSignature: signature as string,
-              //   signatureMessage: message,
-              //   proposalHash: proposalHash,
-              //   contentTitle: proposal?.data?.content?.title,
-              //   contentBody: proposal?.data?.content?.body,
-              //   totalPayments: proposal?.data?.totalPayments,
-              //   paymentTerms: proposal?.data?.paymentTerms,
-              // })
             } catch (err) {
               setIsLoading(false)
               console.error(err)
@@ -132,4 +104,4 @@ export const PublishProposalModal = ({ isOpen, setIsOpen, proposal }) => {
   )
 }
 
-export default PublishProposalModal
+export default SendProposallModal

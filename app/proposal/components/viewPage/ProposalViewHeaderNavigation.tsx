@@ -16,7 +16,7 @@ import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { LINKS } from "app/core/utils/constants"
 import { useState } from "react"
-import PublishProposalModal from "../PublishProposalModal"
+import SendProposalModal from "../SendProposalModal"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.type === proposalType)
@@ -60,7 +60,7 @@ export const ProposalViewHeaderNavigation = () => {
     proposal?.roles?.filter(
       (role) =>
         role.approvalStatus === ProposalRoleApprovalStatus.APPROVED ||
-        role.approvalStatus === ProposalRoleApprovalStatus.SENT
+        role.approvalStatus === ProposalRoleApprovalStatus.SENT // include author's SEND signature in net count too
     ).length || 0
 
   // activeUser's view permissions
@@ -78,7 +78,7 @@ export const ProposalViewHeaderNavigation = () => {
 
   return (
     <>
-      <PublishProposalModal
+      <SendProposalModal
         isOpen={sendProposalModalOpen}
         setIsOpen={toggleSendProposalModalOpen}
         proposal={proposal}

@@ -42,11 +42,14 @@ const SafeRole = ({ role, signatures, proposalStatus }) => {
       return signers.some((signer) => {
         return (
           addressesAreEqual(signature.address, signer) &&
-          signature.type === ProposalSignatureType.APPROVE
+          signature.type === ProposalSignatureType.APPROVE // only count APPROVE signatures to ignore author's SEND signature
         )
       })
     }).length
 
+  // if proposal is DRAFT and user is not author, approval status is AWAITING_AUTHOR to convey that they do not have an action to take and are waiting
+  // if proposal is DRAFT and user is author, approval status is PENDING to highlight that author has action pending
+  // if proposal is not DRAFT, approval status is the role's natural approval status
   const approvalStatus =
     proposalStatus === ProposalStatus.DRAFT
       ? role.type !== ProposalRoleType.AUTHOR
@@ -138,8 +141,11 @@ const WalletRole = ({ role, signatures, proposalStatus }) => {
     proposalStatus !== ProposalStatus.DRAFT &&
     activeUserHasAProposalRole &&
     !activeUserHasApproved &&
-    role.type !== ProposalRoleType.AUTHOR
+    role.type !== ProposalRoleType.AUTHOR // only show sign option if user is not author
 
+  // if proposal is DRAFT and user is not author, approval status is AWAITING_AUTHOR to convey that they do not have an action to take and are waiting
+  // if proposal is DRAFT and user is author, approval status is PENDING to highlight that author has action pending
+  // if proposal is not DRAFT, approval status is the role's natural approval status
   const approvalStatus =
     proposalStatus === ProposalStatus.DRAFT
       ? role.type !== ProposalRoleType.AUTHOR
@@ -153,6 +159,7 @@ const WalletRole = ({ role, signatures, proposalStatus }) => {
         <>
           <AccountMediaObject account={role?.account} />
           <div className="flex flex-col items-end space-y-1">
+            {/* show send button, or show sign button, or show approval status */}
             {showSendButton ? (
               <span
                 className="text-electric-violet cursor-pointer"
