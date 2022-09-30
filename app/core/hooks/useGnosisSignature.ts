@@ -6,6 +6,7 @@ import { genGnosisTransactionDigest } from "app/signatures/gnosisTransaction"
 import networks from "app/utils/networks.json"
 
 const useGnosisSignature = (payment) => {
+  const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   let { signTypedDataAsync } = useSignTypedData()
 
@@ -52,7 +53,7 @@ const useGnosisSignature = (payment) => {
         body: JSON.stringify({
           signature: signature,
           safeTxHash: getHash(transactionData.domain, transactionData.types, transactionData.value),
-          sender: "0x8b028c3a755C663Ed7E08D6A93581B8FEc389cd2",
+          sender: activeUser?.address,
           ...transactionData.value,
         }),
       })

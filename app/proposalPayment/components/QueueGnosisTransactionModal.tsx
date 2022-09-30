@@ -34,6 +34,7 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
             onClick={async () => {
               setIsLoading(true)
               const response = await signGnosis()
+              console.log(response)
               setIsLoading(false)
               setIsOpen(false)
             }}
