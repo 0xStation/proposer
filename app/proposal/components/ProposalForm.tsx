@@ -1,4 +1,4 @@
-import { Routes, useRouter, useMutation, invoke, useSession } from "blitz"
+import { Routes, useRouter, useMutation, invoke, useSession, useQuery } from "blitz"
 import { useEffect, useState } from "react"
 import { useProvider } from "wagmi"
 import { RadioGroup } from "@headlessui/react"
@@ -390,7 +390,7 @@ const RewardForm = ({
   selectedToken,
   setSelectedToken,
   tokenOptions,
-  setShouldRefetchTokens,
+  refetchTokens,
   needFunding,
   setNeedFunding,
   isImportTokenModalOpen,
@@ -405,9 +405,8 @@ const RewardForm = ({
         isOpen={isImportTokenModalOpen}
         setIsOpen={setIsImportTokenModalOpen}
         chainId={selectedNetworkId?.toString()}
-        // `shouldRefetchTokens` triggers the use effect that
-        // displays the tokens in the new proposal form token dropdown
-        callback={() => setShouldRefetchTokens(true)}
+        // refetches the tokens in the new proposal form token dropdown
+        callback={() => refetchTokens(true)}
       />
       <RadioGroup value={needFunding} onChange={setNeedFunding}>
         <div className="mt-6">
@@ -695,11 +694,13 @@ const ProposalCreationLoadingScreen = ({ createdProposal, proposalShouldSendLate
 }
 
 export const ProposalForm = ({
-  prefillClients,
-  prefillContributors,
+  isEdit = false,
+  proposalToEdit,
+  initialValues,
 }: {
-  prefillClients: string[]
-  prefillContributors: string[]
+  isEdit?: boolean
+  proposalToEdit?: Proposal
+  initialValues?: any
 }) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
@@ -707,9 +708,8 @@ export const ProposalForm = ({
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const walletModalOpen = useStore((state) => state.walletModalOpen)
   const session = useSession({ suspense: false })
-  const [selectedNetworkId, setSelectedNetworkId] = useState<number>(0)
-  const [shouldRefetchTokens, setShouldRefetchTokens] = useState<boolean>(false)
-  const [selectedToken, setSelectedToken] = useState<any>()
+  const [selectedNetworkId, setSelectedNetworkId] = useState<number>(initialValues?.network || 0)
+  const [selectedToken, setSelectedToken] = useState<any>(initialValues?.selectedToken)
   const [needFunding, setNeedFunding] = useState<boolean>(true)
   const [tokenOptions, setTokenOptions] = useState<any[]>()
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
@@ -719,11 +719,11 @@ export const ProposalForm = ({
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
   const [proposingAs, setProposingAs] = useState<string>(
     // set default proposingAs depending on prefilled clients and contributors
-    prefillClients.length > 0
-      ? prefillContributors.length > 0
+    initialValues?.client?.length > 0
+      ? initialValues?.contributor?.length > 0
         ? ProposalRoleType.AUTHOR
         : ProposalRoleType.CONTRIBUTOR
-      : prefillContributors.length > 0
+      : initialValues?.contributor?.length > 0
       ? ProposalRoleType.CLIENT
       : ""
   )
@@ -736,6 +736,22 @@ export const ProposalForm = ({
   const provider = useProvider({ chainId: 1 })
 
   const { signMessage } = useSignature()
+
+  const [savedUserTokens, { refetch: refetchTokens }] = useQuery(
+    getTokensByAccount,
+    {
+      chainId: selectedNetworkId,
+      userId: session?.userId as number,
+    },
+    { enabled: Boolean(selectedNetworkId && session?.userId) }
+  )
+
+  useEffect(() => {
+    if (selectedNetworkId) {
+      const networkTokens = getNetworkTokens(selectedNetworkId)
+      setTokenOptions([...networkTokens, ...(savedUserTokens || [])])
+    }
+  }, [savedUserTokens])
 
   const confirmAuthorship = async ({ proposal }) => {
     // confirming authorship occurs after a proposal has been created and is triggered in a `useEffect`.
@@ -831,33 +847,6 @@ export const ProposalForm = ({
     }
   }
 
-  useEffect(() => {
-    // Changing the network changes the token options available to us
-    if (selectedNetworkId || shouldRefetchTokens) {
-      // array including native chain's gas coin and stablecoins
-      const networkTokens = getNetworkTokens(selectedNetworkId)
-      if (session?.userId) {
-        // if user is logged-in, we can fetch the
-        // imported tokens they have saved to their account
-        const fetchAccountTokenOptions = async () => {
-          const tokens = await invoke(getTokensByAccount, {
-            chainId: selectedNetworkId,
-            userId: session?.userId,
-          })
-          setTokenOptions([...tokens, ...networkTokens])
-
-          setShouldRefetchTokens(false)
-        }
-        fetchAccountTokenOptions()
-      } else {
-        setTokenOptions(networkTokens)
-      }
-      // Setting the selectedToken to an empty obj to reset the
-      // selected token on network change.
-      setSelectedToken({})
-    }
-  }, [selectedNetworkId, shouldRefetchTokens, session?.userId])
-
   const [createProposalMutation] = useMutation(createProposal, {
     onSuccess: (data) => {
       setCreatedProposal(data)
@@ -884,8 +873,10 @@ export const ProposalForm = ({
         <Form
           initialValues={{
             proposingAs: proposingAs || "",
-            client: prefillClients?.[0] || "",
-            contributor: prefillContributors?.[0] || "",
+            ...initialValues,
+            tokenAddress: initialValues?.selectedToken?.address,
+            client: initialValues?.client?.[0] || "",
+            contributor: initialValues?.contributor?.[0] || "",
             // proposingAs default set in useState initialization
           }}
           onSubmit={async (values: any, form) => {
@@ -1057,7 +1048,7 @@ export const ProposalForm = ({
                             setSelectedNetworkId={setSelectedNetworkId}
                             selectedToken={selectedToken}
                             setSelectedToken={setSelectedToken}
-                            setShouldRefetchTokens={setShouldRefetchTokens}
+                            refetchTokens={refetchTokens}
                             needFunding={needFunding}
                             setNeedFunding={setNeedFunding}
                             isImportTokenModalOpen={isImportTokenModalOpen}

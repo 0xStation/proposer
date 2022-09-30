@@ -9,7 +9,12 @@ const CreateProposal: BlitzPage = () => {
 
   return (
     <Layout title="New Proposal">
-      <ProposalForm prefillClients={clients} prefillContributors={contributors} />
+      <ProposalForm
+        initialValues={{
+          client: clients?.[0] || "",
+          contributor: contributors?.[0] || "",
+        }}
+      />
     </Layout>
   )
 }
