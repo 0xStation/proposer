@@ -33,10 +33,12 @@ import { ProposalRole } from "app/proposalRole/types"
 import Avatar from "app/core/components/sds/images/avatar"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
+import ProposalForm from "app/proposal/components/ProposalForm"
 
 enum Tab {
   PROPOSALS = "PROPOSALS",
   SETTINGS = "SETTINGS",
+  PROPOSAL_FORM = "PROPOSAL_FORM",
 }
 
 const WorkspaceHome: BlitzPage = () => {
@@ -282,6 +284,19 @@ const WorkspaceHome: BlitzPage = () => {
     )
   }
 
+  const Tabs = {
+    [Tab.PROPOSALS]: <ProposalTab />,
+    [Tab.SETTINGS]: <SettingsTab />,
+    [Tab.PROPOSAL_FORM]: (
+      <div className="w-full">
+        <ProposalForm
+          prefillClients={[accountEnsName || accountAddress]}
+          prefillContributors={[]}
+        />
+      </div>
+    ),
+  }
+
   return (
     <Layout>
       <div className="flex flex-row h-full">
@@ -299,9 +314,11 @@ const WorkspaceHome: BlitzPage = () => {
               />
             )}
             {/* CTA */}
-            <Link href={Routes.CreateProposal({ clients: accountEnsName || accountAddress })}>
-              <Button className="w-full">Propose</Button>
-            </Link>
+            {/* <Link href={Routes.CreateProposal({ clients: accountEnsName || accountAddress })}> */}
+            <Button className="w-full" onClick={() => setActiveTab(Tab.PROPOSAL_FORM)}>
+              Propose
+            </Button>
+            {/* </Link> */}
           </div>
           {/* TABS */}
           <ul className="mt-6 space-y-2">
@@ -330,7 +347,7 @@ const WorkspaceHome: BlitzPage = () => {
           </ul>
         </div>
         {/* TAB CONTENT */}
-        {activeTab === Tab.PROPOSALS ? <ProposalTab /> : <SettingsTab />}
+        {Tabs[activeTab]}
       </div>
     </Layout>
   )
