@@ -1,4 +1,3 @@
-import { DateTime } from "luxon"
 import { getNetworkName } from "app/core/utils/networkInfo"
 import { Proposal } from "app/proposal/types"
 import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
@@ -12,10 +11,9 @@ export const TotalPaymentView = ({
   className?: string
 }) => {
   return proposal ? (
-    <div className={`${className} border border-b border-concrete rounded-2xl px-6 py-9`}>
-      <h2 className="font-bold text-xl">Total Payment</h2>
+    <div className={`${className} border border-b border-concrete rounded-2xl px-6 py-6`}>
       {/* NETWORK */}
-      <h4 className="text-xs font-bold text-concrete uppercase mt-6">Network</h4>
+      <h4 className="text-xs font-bold text-concrete uppercase mt-2">Network</h4>
       <p className="mt-2">
         {getNetworkName(proposal?.data?.totalPayments?.[0]?.token.chainId || 0)}
       </p>

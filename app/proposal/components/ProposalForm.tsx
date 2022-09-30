@@ -720,10 +720,10 @@ export const ProposalForm = ({
   const [proposingAs, setProposingAs] = useState<string>(
     // set default proposingAs depending on prefilled clients and contributors
     initialValues?.client?.length > 0
-      ? initialValues?.contributor?.length > 0
-        ? ProposalRoleType.AUTHOR
-        : ProposalRoleType.CONTRIBUTOR
-      : initialValues?.contributor?.length > 0
+      ? ProposalRoleType.CONTRIBUTOR
+      : initialValues?.contributor.length > 0
+      ? ProposalRoleType.CLIENT
+      : ""
       ? ProposalRoleType.CLIENT
       : ""
   )

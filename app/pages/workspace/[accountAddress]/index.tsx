@@ -299,7 +299,13 @@ const WorkspaceHome: BlitzPage = () => {
               />
             )}
             {/* CTA */}
-            <Link href={Routes.CreateProposal({ clients: accountEnsName || accountAddress })}>
+            <Link
+              href={Routes.CreateProposal({
+                // pre-fill for both so that if user changes toggle to reverse roles, the input address is still there
+                clients: accountEnsName || accountAddress,
+                contributors: accountEnsName || accountAddress,
+              })}
+            >
               <Button className="w-full">Propose</Button>
             </Link>
           </div>

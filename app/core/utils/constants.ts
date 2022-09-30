@@ -282,13 +282,13 @@ export const PAYMENT_TERM_MAP = {
 
 export const PROPOSING_AS_ROLE_MAP = {
   [ProposalRoleType.CONTRIBUTOR]: {
-    copy: "A contributor (responsible for the delivery the work)",
+    copy: "A contributor (responsible for delivering work)",
   },
   [ProposalRoleType.CLIENT]: {
-    copy: "A client (responsible for the review and funding of work)",
+    copy: "A client (responsible for reviewing and approving work)",
   },
   [ProposalRoleType.AUTHOR]: {
-    copy: "An author (responsible for drafting the proposal for a 3rd party)",
+    copy: "An author (responsible for drafting the proposal as a third party)",
   },
 }
 
