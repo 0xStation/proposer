@@ -23,9 +23,9 @@ export const RoleSignaturesView = ({
   )
 
   return proposal ? (
-    <div className={`border border-b border-concrete rounded-2xl px-6 py-9 ${className}`}>
+    <div className={`border border-b border-concrete rounded-2xl px-6 py-6 ${className}`}>
       {/* CONTRIBUTOR */}
-      <h4 className="text-xs font-bold text-concrete uppercase mt-6 mb-2">Contributor</h4>
+      <h4 className="text-xs font-bold text-concrete uppercase mt-2 mb-2">Contributor</h4>
       <RoleSignature
         role={proposal?.roles?.find((role) => role.type === ProposalRoleType.CONTRIBUTOR)}
         signatures={signatures}
