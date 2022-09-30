@@ -1,68 +1,12 @@
-import { useState, useEffect } from "react"
-import { useMutation } from "blitz"
+import { useState } from "react"
 import Modal from "app/core/components/Modal"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import createGnosisSignature from "app/proposalPayment/mutations/createGnosisTransaction"
-import useStore from "app/core/hooks/useStore"
-import { useSignMessage } from "wagmi"
+import useGnosisSignature from "app/core/hooks/useGnosisSignature"
 
 export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) => {
-  const [txHash, setTxHash] = useState<string>("")
-  const activeUser = useStore((state) => state.activeUser)
-  const [createGnosisSignatureMutation] = useMutation(createGnosisSignature, {
-    onSuccess: (data) => {
-      setTxHash(data)
-    },
-    onError: (error) => {
-      console.log(error)
-    },
-  })
-
-  useEffect(() => {
-    if (!txHash) {
-      if (!activeUser) {
-        // todo: throw toast
-        return
-      }
-
-      createGnosisSignatureMutation({
-        senderAddress: activeUser?.address,
-        sendTo: activePayment.recipientAddress,
-        sendAmount: activePayment.amount,
-        safeAddress: activePayment.senderAddress,
-        chainId: activePayment.data.token.chainId,
-      })
-    }
-  }, [txHash, activeUser])
-
-  const {
-    data: signature,
-    isLoading: isSignatureLoading,
-    signMessage,
-  } = useSignMessage({
-    message: txHash,
-  })
-
-  useEffect(() => {
-    if (signature) {
-      if (!activeUser) {
-        // todo: throw toast
-        return
-      }
-      createGnosisSignatureMutation({
-        senderAddress: activeUser?.address,
-        sendTo: activePayment.recipientAddress,
-        sendAmount: activePayment.amount,
-        safeAddress: activePayment.senderAddress,
-        chainId: activePayment.data.token.chainId,
-        txHash: txHash,
-        signature: signature,
-      })
-    }
-  }, [signature, activeUser])
-
   const activePayment = milestone.payments[0]
 
+  const { signMessage: signGnosis } = useGnosisSignature(activePayment)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
@@ -85,10 +29,13 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
           </Button>
           <Button
             isSubmitType={true}
-            isLoading={isSignatureLoading}
-            isDisabled={!txHash}
-            onClick={() => {
-              signMessage()
+            isLoading={isLoading}
+            isDisabled={false}
+            onClick={async () => {
+              setIsLoading(true)
+              const response = await signGnosis()
+              setIsLoading(false)
+              setIsOpen(false)
             }}
           >
             Sign
