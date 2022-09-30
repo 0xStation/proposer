@@ -119,7 +119,7 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
       })
     })
 
-    return proposal
+    return true
   } catch (err) {
     throw Error(`Error sending proposal, failed with error: ${err.message}`)
   }

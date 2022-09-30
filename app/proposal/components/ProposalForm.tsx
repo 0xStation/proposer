@@ -41,6 +41,7 @@ import { Spinner } from "app/core/components/Spinner"
 import { Proposal } from "../types"
 import updateProposalMetadata from "../mutations/updateProposalMetadata"
 import { getHash } from "app/signatures/utils"
+import sendProposal from "../mutations/sendProposal"
 
 enum ProposalStep {
   PROPOSE = "PROPOSE",
@@ -741,17 +742,14 @@ export const ProposalForm = ({
     // The signature then acts as a verification / acknowledgement from the author that they were the one
     // to create the proposal.
     try {
-      const proposalToRequestSignature = proposal
-      const authorRole = proposalToRequestSignature?.roles?.find(
-        (role) => role.type === ProposalRoleType.AUTHOR
-      )
+      const authorRole = proposal?.roles?.find((role) => role.type === ProposalRoleType.AUTHOR)
 
       // if user disconnects and logs in as another user, we need to check if they are the author
       if (authorRole?.address !== session?.siwe?.address) {
         throw Error("Current address doesn't match author's address.")
       }
       // prompt author to sign proposal to prove they are the author of the content
-      const message = genProposalDigest(proposalToRequestSignature)
+      const message = genProposalDigest(proposal)
       const signature = await signMessage(message)
 
       if (!signature) {
@@ -760,18 +758,15 @@ export const ProposalForm = ({
       const { domain, types, value } = message
       const proposalHash = getHash(domain, types, value)
 
-      const updatedProposal = await updateProposalMetadataMutation({
-        proposalId: proposalToRequestSignature?.id as string,
+      const sendProposalSuccess = await sendProposalMutation({
+        proposalId: proposal?.id as string,
+        authorAddress: session?.siwe?.address as string,
         authorSignature: signature as string,
         signatureMessage: message,
         proposalHash,
-        contentTitle: proposalToRequestSignature?.data?.content?.title,
-        contentBody: proposalToRequestSignature?.data?.content?.body,
-        totalPayments: proposalToRequestSignature?.data?.totalPayments,
-        paymentTerms: proposalToRequestSignature?.data?.paymentTerms,
       })
 
-      if (updatedProposal) {
+      if (sendProposalSuccess) {
         // redirect to the proposal's view page
         router.push(
           Routes.ViewProposal({
@@ -866,7 +861,7 @@ export const ProposalForm = ({
       console.error(error)
     },
   })
-  const [updateProposalMetadataMutation] = useMutation(updateProposalMetadata, {
+  const [sendProposalMutation] = useMutation(sendProposal, {
     onSuccess: (data) => {
       setProposalStep(ProposalStep.CONFIRM)
     },
