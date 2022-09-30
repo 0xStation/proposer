@@ -135,7 +135,9 @@ const WalletRole = ({ role, signatures, proposalStatus }) => {
   const activeUserHasAProposalRole = addressesAreEqual(activeUser?.address || "", role?.address)
 
   const showSendButton =
-    proposalStatus === ProposalStatus.DRAFT && role.type === ProposalRoleType.AUTHOR
+    proposalStatus === ProposalStatus.DRAFT &&
+    role.type === ProposalRoleType.AUTHOR &&
+    activeUserHasAProposalRole
 
   const showSignButton =
     proposalStatus !== ProposalStatus.DRAFT &&
