@@ -697,9 +697,11 @@ const ProposalCreationLoadingScreen = ({ createdProposal, proposalShouldSendLate
 export const ProposalForm = ({
   prefillClients,
   prefillContributors,
+  isModalView = false,
 }: {
   prefillClients: string[]
   prefillContributors: string[]
+  isModalView?: boolean
 }) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
@@ -1029,8 +1031,12 @@ export const ProposalForm = ({
           render={({ form, handleSubmit }) => {
             const formState = form.getState()
             return (
-              <form onSubmit={handleSubmit} className="mt-20">
-                <div className="rounded-2xl border border-concrete p-6 h-[560px] overflow-y-scroll">
+              <form onSubmit={handleSubmit} className={`${isModalView ? "mt-14" : "mt-20"}`}>
+                <div
+                  className={`rounded-2xl ${
+                    isModalView ? "p-4" : "border border-concrete p-6"
+                  }  h-[560px] overflow-y-scroll`}
+                >
                   {!isLoading ? (
                     <>
                       <div className="mt-2 flex flex-row justify-between items-center">

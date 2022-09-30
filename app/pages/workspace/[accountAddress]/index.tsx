@@ -290,6 +290,7 @@ const WorkspaceHome: BlitzPage = () => {
         <ProposalForm
           prefillClients={[accountEnsName || accountAddress]}
           prefillContributors={[]}
+          isModalView={true}
         />
       </Modal>
       <div className="flex flex-row h-full">
