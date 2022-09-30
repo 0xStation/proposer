@@ -30,9 +30,10 @@ import { useAccount, useEnsName } from "wagmi"
 import getSafeMetadata from "app/account/queries/getSafeMetadata"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import { ProposalRole } from "app/proposalRole/types"
-import Avatar from "app/core/components/sds/images/avatar"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
+import Modal from "app/core/components/Modal"
+import ProposalForm from "app/proposal/components/ProposalForm"
 
 enum Tab {
   PROPOSALS = "PROPOSALS",
@@ -53,6 +54,7 @@ const WorkspaceHome: BlitzPage = () => {
     new Set<ProposalRoleType>()
   )
   const [page, setPage] = useState<number>(0)
+  const [isOpen, setIsOpen] = useState<boolean>(false)
 
   const accountAddress = useParam("accountAddress", "string") as string
   const { data: accountEnsName } = useEnsName({
@@ -284,6 +286,12 @@ const WorkspaceHome: BlitzPage = () => {
 
   return (
     <Layout>
+      <Modal toggle={() => setIsOpen(!isOpen)} open={isOpen}>
+        <ProposalForm
+          prefillClients={[accountEnsName || accountAddress]}
+          prefillContributors={[]}
+        />
+      </Modal>
       <div className="flex flex-row h-full">
         {/* LEFT SIDEBAR */}
         <div className="h-full w-[288px] border-r border-concrete p-6">
@@ -299,9 +307,11 @@ const WorkspaceHome: BlitzPage = () => {
               />
             )}
             {/* CTA */}
-            <Link href={Routes.CreateProposal({ clients: accountEnsName || accountAddress })}>
-              <Button className="w-full">Propose</Button>
-            </Link>
+            {/* <Link href={Routes.CreateProposal({ clients: accountEnsName || accountAddress })}> */}
+            <Button className="w-full" onClick={() => setIsOpen(true)}>
+              Propose
+            </Button>
+            {/* </Link> */}
           </div>
           {/* TABS */}
           <ul className="mt-6 space-y-2">
