@@ -33,6 +33,7 @@ import { ProposalRole } from "app/proposalRole/types"
 import Avatar from "app/core/components/sds/images/avatar"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
+import { Account } from "app/account/types"
 
 enum Tab {
   PROPOSALS = "PROPOSALS",
@@ -265,18 +266,7 @@ const WorkspaceHome: BlitzPage = () => {
       <div className="h-[calc(100vh-240px)] p-10 flex-1">
         <h1 className="text-2xl font-bold">Settings</h1>
         <div className="mt-12">
-          <WorkspaceSettingsOverviewForm
-            onSuccess={() => {
-              invalidateQuery(getAccountByAddress)
-              setToastState({
-                isToastShowing: true,
-                type: "success",
-                message: "Workspace successfully updated",
-              })
-            }}
-            account={account || undefined}
-            isEdit={true}
-          />
+          <WorkspaceSettingsOverviewForm account={account as Account} isEdit={true} />
         </div>
       </div>
     )

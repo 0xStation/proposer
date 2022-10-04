@@ -6,6 +6,8 @@ import { ZodMilestone, ZodPayment } from "app/types/zod"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
 import { Token } from "app/token/types"
 import { PaymentTerm } from "app/proposalPayment/types"
+import { sendNewProposalEmail } from "app/utils/email"
+import { getEmails } from "app/utils/privy"
 
 const CreateProposal = z.object({
   contentTitle: z.string(),
@@ -26,6 +28,10 @@ const CreateProposal = z.object({
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
   const params = CreateProposal.parse(input)
+
+  if (params.authorAddresses.length === 0) {
+    throw Error("cannot have zero authors")
+  }
 
   // validate non-negative amounts and construct totalPayments object
   let totalPayments: Record<string, { token: Token; amount: number }> = {}
@@ -104,7 +110,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     milestoneIndexToId[milestone.index] = milestone.id
   })
 
-  const proposalWithPayments = db.proposal.update({
+  const proposalWithPayments = await db.proposal.update({
     where: {
       id: proposal.id,
     },
@@ -134,6 +140,28 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       payments: true,
     },
   })
+
+  try {
+    // send notification emails
+    const author = proposalWithPayments.roles.find(
+      (role) => role.type === ProposalRoleType.AUTHOR
+    )?.account
+
+    const emails = await getEmails(
+      proposalWithPayments.roles
+        .filter((role) => role.type !== ProposalRoleType.AUTHOR && role.address !== author?.address)
+        .map((role) => role.address)
+    )
+
+    await sendNewProposalEmail({
+      recipients: emails,
+      account: author,
+      proposal: proposalWithPayments,
+    })
+  } catch (e) {
+    // silently fail
+    console.warn("Failed to send notification emails in `createProposal`", e)
+  }
 
   return proposalWithPayments as unknown as Proposal
 }

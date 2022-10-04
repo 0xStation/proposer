@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react"
-import { useMutation, invoke } from "blitz"
+import { useMutation, invoke, invalidateQuery, useQuery, useParam } from "blitz"
 import { Field, Form } from "react-final-form"
 import updateAccount from "../mutations/updateAccount"
 import createAccount from "../mutations/createAccount"
 import useStore from "app/core/hooks/useStore"
 import { useDropzone } from "react-dropzone"
 import UploadIcon from "app/core/icons/UploadIcon"
-import { Account } from "app/account/types"
+import { Account, AccountMetadata } from "app/account/types"
 import {
   requiredField,
   composeValidators,
@@ -18,6 +18,8 @@ import Button from "app/core/components/sds/buttons/Button"
 import getAccountByAddress from "../queries/getAccountByAddress"
 import { useEnsName } from "wagmi"
 import truncateString from "app/core/utils/truncateString"
+import getAccountEmail from "../queries/getAccountEmail"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 const PfpInput = ({ pfpUrl, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
@@ -64,19 +66,19 @@ const PfpInput = ({ pfpUrl, onUpload }) => {
 }
 
 const WorkspaceSettingsOverviewForm = ({
-  onSuccess,
   account,
   isEdit,
 }: {
-  onSuccess: () => void
   account?: Account
   isEdit: boolean
 }) => {
+  const setToastState = useStore((state) => state.setToastState)
   const [pfpUrl, setPfpURL] = useState<string | undefined>()
   const [emailVerificationSent, setEmailVerificationSent] = useState<boolean>(false)
   const setActiveUser = useStore((state) => state.setActiveUser)
   const activeUser = useStore((state) => state.activeUser)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const accountAddress = useParam("accountAddress", "string") as string
 
   const { data: ensName } = useEnsName({
     address: account?.address as string,
@@ -86,9 +88,14 @@ const WorkspaceSettingsOverviewForm = ({
 
   const [createAccountMutation] = useMutation(createAccount, {
     onSuccess: (data) => {
-      onSuccess()
-      setIsLoading(false)
       setActiveUser(data)
+      invalidateQuery(getAccountByAddress)
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Workspace successfully updated",
+      })
+      setIsLoading(false)
     },
     onError: (error) => {
       console.error(error)
@@ -98,17 +105,33 @@ const WorkspaceSettingsOverviewForm = ({
 
   const [updateAccountMutation] = useMutation(updateAccount, {
     onSuccess: async (data) => {
-      onSuccess()
-      setIsLoading(false)
       // refetch activeUser's account to get updated pfps on pinned workspaces
       const account = await invoke(getAccountByAddress, { address: activeUser?.address })
-      setActiveUser(account)
+      setActiveUser(account) // refresh active user for side navigation pfps updates
+      invalidateQuery(getAccountByAddress) // refresh workspace account for metadata updates
+      invalidateQuery(getAccountEmail) // refresh email for settings form
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Workspace successfully updated",
+      })
+      setIsLoading(false)
     },
     onError: (error) => {
       setIsLoading(false)
       console.error(error)
     },
   })
+
+  const [accountEmail, { isLoading: isAccountEmailLoading }] = useQuery(
+    getAccountEmail,
+    { address: toChecksumAddress(accountAddress) },
+    {
+      enabled: !!accountAddress,
+      suspense: false,
+      refetchOnWindowFocus: false,
+    }
+  )
 
   const [sendVerificationEmailMutation] = useMutation(sendVerificationEmail, {
     onError: (error) => {
@@ -126,6 +149,7 @@ const WorkspaceSettingsOverviewForm = ({
       initialValues={{
         ...Object(account?.data),
         name: account?.data?.name || ensName || truncateString(account?.address || ""),
+        email: accountEmail,
       }}
       onSubmit={async (values) => {
         setIsLoading(true)
@@ -202,7 +226,7 @@ const WorkspaceSettingsOverviewForm = ({
             <div className="flex flex-col mt-6">
               <PfpInput pfpUrl={pfpUrl} onUpload={(url) => setPfpURL(url)} />
             </div>
-            {/* EMAIL
+            {/* EMAIL */}
             <label className="font-bold block mt-6">Email</label>
             <p className="text-concrete text-sm">
               Connect and verify your email to receive notifications from Station.
@@ -210,40 +234,44 @@ const WorkspaceSettingsOverviewForm = ({
                 <span className="text-electric-violet"> Learn more</span>
               </a>
             </p>
-            <Field component="input" name="email" validate={isValidEmail}>
-              {({ input, meta }) => (
-                <div>
-                  <input
-                    {...input}
-                    type="text"
-                    placeholder="e.g. member@dao.xyz"
-                    className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 rounded w-full"
-                  />
-                  {account?.data.hasSavedEmail && !account?.data.hasVerifiedEmail && (
-                    <p className="text-concrete text-xs pt-1">
-                      Check your inbox to verify your email. Don&apos;t see an email from us?{" "}
-                      <button
-                        className="text-electric-violet font-bold"
-                        disabled={emailVerificationSent}
-                        onClick={async (e) => {
-                          e.preventDefault()
-                          setEmailVerificationSent(true)
-                          await sendVerificationEmailMutation({
-                            accountId: account?.id as number,
-                          })
-                        }}
-                      >
-                        {!emailVerificationSent ? "Resend" : "Sent!"}
-                      </button>
-                    </p>
-                  )}
-                  {/* this error shows up when the user focuses the field (meta.touched) */}
-            {/* {meta.error && meta.touched && (
-                    <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
-                  )}
-                </div>
-              )}
-            </Field> */}
+            {isAccountEmailLoading ? (
+              <div className="flex flex-row w-full my-1 rounded-lg bg-wet-concrete shadow border-solid h-[38px] motion-safe:animate-pulse" />
+            ) : (
+              <Field component="input" name="email" validate={isValidEmail}>
+                {({ input, meta }) => (
+                  <div>
+                    <input
+                      {...input}
+                      type="text"
+                      placeholder="e.g. member@dao.xyz"
+                      className="mt-1 border border-concrete bg-wet-concrete text-marble-white p-2 rounded w-full"
+                    />
+                    {account?.data.hasSavedEmail && !account?.data.hasVerifiedEmail && (
+                      <p className="text-concrete text-xs pt-1">
+                        Check your inbox to verify your email. Don&apos;t see an email from us?{" "}
+                        <button
+                          className="text-electric-violet font-bold"
+                          disabled={emailVerificationSent}
+                          onClick={async (e) => {
+                            e.preventDefault()
+                            setEmailVerificationSent(true)
+                            await sendVerificationEmailMutation({
+                              accountId: account?.id as number,
+                            })
+                          }}
+                        >
+                          {!emailVerificationSent ? "Resend" : "Sent!"}
+                        </button>
+                      </p>
+                    )}
+                    {/* this error shows up when the user focuses the field (meta.touched) */}
+                    {meta.error && meta.touched && (
+                      <span className=" text-xs text-torch-red mb-2 block">{meta.error}</span>
+                    )}
+                  </div>
+                )}
+              </Field>
+            )}
           </div>
           <Button
             className="mt-12"
