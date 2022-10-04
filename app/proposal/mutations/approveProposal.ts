@@ -149,15 +149,18 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
     if (pendingStatusChange === ProposalStatus.APPROVED) {
       try {
         updatedProposal = await invoke(pinProposal, { proposalId: proposal?.id as string })
-
-        // send fully approved email
-
-        const recipientEmails = await getEmails(proposal.roles.map((role) => role.address))
-
-        await sendProposalApprovedEmail({ recipients: recipientEmails, proposal })
       } catch (err) {
         console.error("Failed to pin proposal in `approveProposal`", err)
         throw Error(err)
+      }
+
+      try {
+        // send fully approved email
+        const recipientEmails = await getEmails(proposal.roles.map((role) => role.address))
+        await sendProposalApprovedEmail({ recipients: recipientEmails, proposal })
+      } catch (e) {
+        // silently fail
+        console.warn("Failed to send notification emails in `approveProposal`", e)
       }
     }
 
