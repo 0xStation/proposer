@@ -104,9 +104,10 @@ const WorkspaceSettingsOverviewForm = ({
   })
 
   const [updateAccountMutation] = useMutation(updateAccount, {
-    onSuccess: async (account) => {
+    onSuccess: async (data) => {
       invalidateQuery(getAccountEmail)
       // refetch activeUser's account to get updated pfps on pinned workspaces
+      const account = await invoke(getAccountByAddress, { address: activeUser?.address })
       setActiveUser(account)
       invalidateQuery(getAccountByAddress)
       setToastState({
