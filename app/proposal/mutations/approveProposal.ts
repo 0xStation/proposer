@@ -4,6 +4,8 @@ import { invoke } from "blitz"
 import { ProposalStatus, ProposalRoleApprovalStatus } from "@prisma/client"
 import pinProposalSignature from "app/proposalSignature/mutations/pinProposalSignature"
 import pinProposal from "./pinProposal"
+import { sendProposalApprovedEmail } from "app/utils/email"
+import { getEmails } from "app/utils/privy"
 
 const ApproveProposal = z.object({
   proposalId: z.string(),
@@ -147,6 +149,12 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
     if (pendingStatusChange === ProposalStatus.APPROVED) {
       try {
         updatedProposal = await invoke(pinProposal, { proposalId: proposal?.id as string })
+
+        // send fully approved email
+
+        const recipientEmails = await getEmails(proposal.roles.map((role) => role.address))
+
+        await sendProposalApprovedEmail({ recipients: recipientEmails, proposal })
       } catch (err) {
         console.error("Failed to pin proposal in `approveProposal`", err)
         throw Error(err)

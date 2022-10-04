@@ -51,13 +51,14 @@ const sendNewProposalEmail = async ({ recipients, account, proposal }) => {
   await email(recipients, SENDGRID_TEMPLATES.NEW_PROPOSAL, dynamicTemplateData)
 }
 
-// const sendApprovedProposalEmail = async ({ recipients, proposal, rfp, terminal }: ProposalArgs) => {
-//   const dynamicTemplateData = {
-//     proposalUrl: `${hostname}/station/${terminal?.handle}/bulletin/project/${rfp?.id}/proposals/${proposal?.id}`,
-//   }
+const sendProposalApprovedEmail = async ({ recipients, proposal }) => {
+  const dynamicTemplateData = {
+    proposalUrl: `${hostname}/proposal/${proposal?.id}`,
+    proposalTitle: proposal?.data?.content?.title || "[Proposal Title Not Found]",
+  }
 
-//   await email(recipients, SENDGRID_TEMPLATES.APPROVED_PROPOSAL, dynamicTemplateData)
-// }
+  await email(recipients, SENDGRID_TEMPLATES.APPROVED_PROPOSAL, dynamicTemplateData)
+}
 
 const sendVerificationEmail = async ({ recipients, verificationCode }: VerificationEmailArgs) => {
   const dynamicTemplateData = {
@@ -67,4 +68,4 @@ const sendVerificationEmail = async ({ recipients, verificationCode }: Verificat
   await email(recipients, SENDGRID_TEMPLATES.VERIFY, dynamicTemplateData)
 }
 
-export { sendVerificationEmail, sendNewProposalEmail }
+export { sendVerificationEmail, sendNewProposalEmail, sendProposalApprovedEmail }
