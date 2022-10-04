@@ -2,6 +2,7 @@ import { requireEnv } from "./requireEnv"
 import { MailService as SendGrid } from "@sendgrid/mail"
 import { SENDGRID_TEMPLATES } from "app/core/utils/constants"
 import { getUrlHost } from "app/utils/getUrlHost"
+import truncateString from "app/core/utils/truncateString"
 
 const sendgrid = new SendGrid()
 sendgrid.setApiKey(requireEnv("SENDGRID_API_KEY"))
@@ -39,23 +40,16 @@ const email = async (recipients: string[], templateId: string, dynamicTemplateDa
   }
 }
 
-// const sendNewProposalEmail = async ({
-//   recipients,
-//   account,
-//   proposal,
-//   rfp,
-//   terminal,
-// }: ProposalArgs) => {
-//   const dynamicTemplateData = {
-//     proposerProfileUrl: `${hostname}/profile/${account?.address}`,
-//     proposerName: account?.data?.name || truncateString(account?.address),
-//     proposalUrl: `${hostname}/station/${terminal?.handle}/bulletin/project/${rfp?.id}/proposals/${proposal?.id}`,
-//     proposalTitle: proposal?.data?.content.title,
-//     rfpTitle: rfp?.data?.content.title,
-//   }
+const sendNewProposalEmail = async ({ recipients, account, proposal }) => {
+  const dynamicTemplateData = {
+    proposerProfileUrl: `${hostname}/workspace/${account?.address}`,
+    proposerName: account?.data?.name || truncateString(account?.address),
+    proposalUrl: `${hostname}/proposal/${proposal?.id}`,
+    proposalTitle: proposal?.data?.content.title,
+  }
 
-//   await email(recipients, SENDGRID_TEMPLATES.NEW_PROPOSAL, dynamicTemplateData)
-// }
+  await email(recipients, SENDGRID_TEMPLATES.NEW_PROPOSAL, dynamicTemplateData)
+}
 
 // const sendApprovedProposalEmail = async ({ recipients, proposal, rfp, terminal }: ProposalArgs) => {
 //   const dynamicTemplateData = {
@@ -73,4 +67,4 @@ const sendVerificationEmail = async ({ recipients, verificationCode }: Verificat
   await email(recipients, SENDGRID_TEMPLATES.VERIFY, dynamicTemplateData)
 }
 
-export { sendVerificationEmail }
+export { sendVerificationEmail, sendNewProposalEmail }

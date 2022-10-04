@@ -27,7 +27,7 @@ export const getGnosisSafeDetails = async (chainId: number, address: string, sig
     return null
   }
 
-  if (response.status === 404) {
+  if (response.status > 299 || response.status < 200) {
     // assume it's a personal wallet
     return null
   }
