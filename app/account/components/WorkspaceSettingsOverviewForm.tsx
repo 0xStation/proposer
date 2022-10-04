@@ -105,11 +105,11 @@ const WorkspaceSettingsOverviewForm = ({
 
   const [updateAccountMutation] = useMutation(updateAccount, {
     onSuccess: async (data) => {
-      invalidateQuery(getAccountEmail)
       // refetch activeUser's account to get updated pfps on pinned workspaces
       const account = await invoke(getAccountByAddress, { address: activeUser?.address })
-      setActiveUser(account)
-      invalidateQuery(getAccountByAddress)
+      setActiveUser(account) // refresh active user for side navigation pfps updates
+      invalidateQuery(getAccountByAddress) // refresh workspace account for metadata updates
+      invalidateQuery(getAccountEmail) // refresh email for settings form
       setToastState({
         isToastShowing: true,
         type: "success",
@@ -162,7 +162,7 @@ const WorkspaceSettingsOverviewForm = ({
             email: values.email,
           }
           if (isEdit) {
-            const account = await updateAccountMutation({
+            await updateAccountMutation({
               ...parameters,
             })
           } else {
