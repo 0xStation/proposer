@@ -11,6 +11,10 @@ export type ProposalPayment = PrismaProposalPayment & {
 
 export type ProposalPaymentMetadata = {
   token: Token
+  gnosis?: {
+    safeAddress: string
+    txId: string
+  }
 }
 
 export enum PaymentTerm {

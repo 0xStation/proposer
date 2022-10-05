@@ -1,13 +1,23 @@
 import { useState } from "react"
+import { useMutation, invalidateQuery } from "blitz"
 import Modal from "app/core/components/Modal"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useGnosisSignature from "app/core/hooks/useGnosisSignature"
+import updatePayment from "app/proposalPayment/mutations/updatePayment"
+import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
 
 export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) => {
   const activePayment = milestone.payments[0]
 
   const { signMessage: signGnosis } = useGnosisSignature(activePayment)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const [updatePaymentMutation] = useMutation(updatePayment, {
+    onSuccess: (data) => {},
+    onError: (error) => {
+      console.error(error)
+    },
+  })
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
@@ -33,10 +43,21 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
             isDisabled={false}
             onClick={async () => {
               setIsLoading(true)
-              const response = await signGnosis()
-              console.log(response)
-              setIsLoading(false)
-              setIsOpen(false)
+              try {
+                const response = await signGnosis()
+                await updatePaymentMutation({
+                  gnosisTxData: {
+                    txId: response.txId,
+                    safeAddress: response.safeAddress,
+                  },
+                  paymentId: activePayment.id,
+                })
+                invalidateQuery(getMilestonesByProposal)
+                setIsLoading(false)
+                setIsOpen(false)
+              } catch (e) {
+                console.error(e)
+              }
             }}
           >
             Sign
