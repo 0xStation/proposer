@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { CheckCircleIcon } from "@heroicons/react/solid"
 import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
 import { ProposalMilestone, ProposalMilestoneStatus } from "app/proposalMilestone/types"
@@ -14,6 +14,102 @@ import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import QueueGnosisTransactionModal from "app/proposalPayment/components/QueueGnosisTransactionModal"
 import { getNetworkGnosisUrl } from "app/core/utils/networkInfo"
+import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
+import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
+
+const PaymentRow = ({ payment, setQueueGnosisTransactionModalOpen, proposal, milestone }) => {
+  const setToastState = useStore((state) => state.setToastState)
+  const activeUser = useStore((state) => state.activeUser)
+  const [safeDetails, setSafeDetails] = useState<any>()
+  useEffect(() => {
+    const getSafeDetails = async () => {
+      // how do we know senderAddress is a safe, I guess if we get a null response back
+      // const details = await getGnosisSafeDetails(payment.data.token.chainId, payment.senderAddress)
+      try {
+        const details = await getGnosisSafeDetails(
+          payment.data.token.chainId,
+          payment.senderAddress
+        )
+        // undefined if the gnosis api returns null, aka not a safe (likely 404)
+        details ? setSafeDetails(details) : setSafeDetails(undefined)
+      } catch (e) {
+        console.error(e)
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: e.message,
+        })
+      }
+    }
+    getSafeDetails()
+  }, [payment])
+
+  const userIsSigner =
+    safeDetails && activeUser
+      ? safeDetails.signers?.some((signer) => {
+          return addressesAreEqual(activeUser.address, signer)
+        })
+      : false
+
+  return (
+    <>
+      <div className="w-full flex flex-row items-end" key={payment?.id}>
+        <span className="basis-32 mb-2 tracking-wider">
+          {truncateString(payment?.senderAddress)}
+        </span>
+        <span className="basis-32 ml-6 mb-2 tracking-wider">
+          {truncateString(payment?.recipientAddress)}
+        </span>
+        <span className="basis-28 ml-6 mb-2 tracking-wider">{payment?.data?.token?.symbol}</span>
+        <span className="basis-28 ml-6 mb-2 tracking-wider">
+          {formatCurrencyAmount(payment?.amount?.toString())}
+        </span>
+        <span className="basis-28 mb-2">
+          {payment.transactionHash && (
+            <a
+              className="text-sm text-electric-violet"
+              target="_blank"
+              href={`${getNetworkExplorer(payment.data.token.chainId)}/tx/${
+                payment.transactionHash
+              }`}
+              rel="noreferrer"
+            >
+              See transaction
+            </a>
+          )}
+        </span>
+      </div>
+      {/* check if gnosis safe and active user is signer */}
+      {getMilestoneStatus(proposal, milestone) === ProposalMilestoneStatus.IN_PROGRESS &&
+        userIsSigner &&
+        (!payment.data.gnosis ? (
+          <Button
+            overrideWidthClassName="w-full"
+            className="mt-4"
+            type={ButtonType.Secondary}
+            onClick={() => {
+              setQueueGnosisTransactionModalOpen(true)
+            }}
+          >
+            Queue Gnosis transaction
+          </Button>
+        ) : (
+          <a
+            href={`${getNetworkGnosisUrl(payment.data.token.chainId)}:${
+              payment.data.gnosis.safeAddress
+            }/transactions/queue`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <button className="mt-4 mb-2 sm:mb-0 border rounded w-[300px] sm:w-[400px] md:w-[614px] h-[35px] bg-electric-violet border-electric-violet text-tunnel-black">
+              <CheckCircleIcon className="h-5 w-5 inline mb-1 mr-2" />
+              View Gnosis queue
+            </button>
+          </a>
+        ))}
+    </>
+  )
+}
 
 export const ProposalMilestonePaymentBox = ({
   proposal,
@@ -29,14 +125,16 @@ export const ProposalMilestonePaymentBox = ({
   const [queueGnosisTransactionModalOpen, setQueueGnosisTransactionModalOpen] =
     useState<boolean>(false)
 
+  useEffect(() => {
+    // getGnosisSafeDetails
+  }, [])
+
   const userIsPayer = proposal?.roles?.some(
     (role) =>
       role.type === ProposalRoleType.CLIENT &&
       addressesAreEqual(activeUser?.address || "", role.address)
   )
   const paymentComplete = !!milestone?.payments?.[0]?.transactionHash
-
-  console.log(milestone)
 
   return (
     <>
@@ -70,64 +168,14 @@ export const ProposalMilestonePaymentBox = ({
           <span className="basis-28"></span>
         </div>
         {/* show all payments within milestone block */}
-        {milestone?.payments?.map((payment) => (
-          <>
-            <div className="w-full flex flex-row items-end" key={payment?.id}>
-              <span className="basis-32 mb-2 tracking-wider">
-                {truncateString(payment?.senderAddress)}
-              </span>
-              <span className="basis-32 ml-6 mb-2 tracking-wider">
-                {truncateString(payment?.recipientAddress)}
-              </span>
-              <span className="basis-28 ml-6 mb-2 tracking-wider">
-                {payment?.data?.token?.symbol}
-              </span>
-              <span className="basis-28 ml-6 mb-2 tracking-wider">
-                {formatCurrencyAmount(payment?.amount?.toString())}
-              </span>
-              <span className="basis-28 mb-2">
-                {payment.transactionHash && (
-                  <a
-                    className="text-sm text-electric-violet"
-                    target="_blank"
-                    href={`${getNetworkExplorer(payment.data.token.chainId)}/tx/${
-                      payment.transactionHash
-                    }`}
-                    rel="noreferrer"
-                  >
-                    See transaction
-                  </a>
-                )}
-              </span>
-            </div>
-            {/* check if gnosis safe and active user is signer */}
-            {getMilestoneStatus(proposal, milestone) === ProposalMilestoneStatus.IN_PROGRESS &&
-              (!payment.data.gnosis ? (
-                <Button
-                  overrideWidthClassName="w-full"
-                  className="mt-4"
-                  type={ButtonType.Secondary}
-                  onClick={() => {
-                    setQueueGnosisTransactionModalOpen(true)
-                  }}
-                >
-                  Queue Gnosis transaction
-                </Button>
-              ) : (
-                <a
-                  href={`${getNetworkGnosisUrl(payment.data.token.chainId)}:${
-                    payment.data.gnosis.safeAddress
-                  }/transactions/queue`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <button className="mt-4 mb-2 sm:mb-0 border rounded w-[300px] sm:w-[400px] md:w-[614px] h-[35px] bg-electric-violet border-electric-violet text-tunnel-black">
-                    <CheckCircleIcon className="h-5 w-5 inline mb-1 mr-2" />
-                    View Gnosis queue
-                  </button>
-                </a>
-              ))}
-          </>
+        {milestone?.payments?.map((payment, idx) => (
+          <PaymentRow
+            key={`payment-row-${idx}`}
+            payment={payment}
+            setQueueGnosisTransactionModalOpen={setQueueGnosisTransactionModalOpen}
+            proposal={proposal}
+            milestone={milestone}
+          />
         ))}
 
         {userIsPayer &&

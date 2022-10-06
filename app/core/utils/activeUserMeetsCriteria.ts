@@ -1,6 +1,7 @@
 import { addressesAreEqual } from "./addressesAreEqual"
 
-export const activeUserMeetsCriteria = (activeUser, criteriaObjArray) =>
-  criteriaObjArray?.some((criteriaObj) =>
-    addressesAreEqual(activeUser?.address || "", criteriaObj.address)
-  )
+export const activeUserMeetsCriteria = (activeUser, criteriaObjArray) => {
+  return criteriaObjArray?.some((criteriaObj) => {
+    return addressesAreEqual(activeUser?.address || "", criteriaObj.address)
+  })
+}
