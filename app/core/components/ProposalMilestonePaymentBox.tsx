@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { CheckCircleIcon } from "@heroicons/react/solid"
+import { ArrowRightIcon, CheckCircleIcon } from "@heroicons/react/solid"
 import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
 import { ProposalMilestone, ProposalMilestoneStatus } from "app/proposalMilestone/types"
 import { getMilestoneStatus } from "app/proposalMilestone/utils"
@@ -113,8 +113,8 @@ const PaymentRow = ({
             rel="noreferrer"
           >
             <button className="mt-4 mb-2 sm:mb-0 border rounded w-[300px] sm:w-[400px] md:w-[614px] h-[35px] bg-electric-violet border-electric-violet text-tunnel-black">
-              <CheckCircleIcon className="h-5 w-5 inline mb-1 mr-2" />
-              View Gnosis queue
+              Execute on Gnosis
+              <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
             </button>
           </a>
         ))}
