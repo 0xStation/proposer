@@ -4,7 +4,7 @@ import { requireEnv } from "./requireEnv"
 export const marbleConnector = new MarbleWalletConnector({
   options: {
     // Custom connector options
-    clientKey: process.env.NEXT_PUBLIC_MARBLE_CLIENT_KEY,
+    clientKey: requireEnv("NEXT_PUBLIC_MARBLE_CLIENT_KEY"),
     config: {
       customConfig: {
         appName: "Station",

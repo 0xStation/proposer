@@ -43,12 +43,10 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   const { connectors, connectAsync, data: connectData, pendingConnector } = useConnect()
   const [metamaskWallet, walletConnect, coinbaseWallet] = connectors
 
-  const handleLogUserIn = async () => {
-    return await marbleConnector.loginWithEmailPassword()
-  }
-
   const handleMarbleLogin = async () => {
-    const result = await handleLogUserIn()
+    // Marble needs to log the user in first. Once the user is logged in,
+    // the wallet can be "connected".
+    const result = await marbleConnector.loginWithEmailPassword()
     if (result.loginState === LoginResultState.SUCCESS) {
       await handleWalletConnection(marbleConnector)
     }
