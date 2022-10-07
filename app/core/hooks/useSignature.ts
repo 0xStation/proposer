@@ -16,6 +16,13 @@ const useSignature = () => {
       if (e.name === "ConnectorNotFoundError") {
         message = "Wallet connection error, please disconnect and reconnect your wallet."
       }
+      if (e.name === "ChainMismatchError") {
+        let regexPattern = /".*?"/g
+        let stringsInQuotes = regexPattern.exec(e.message) as RegExpExecArray
+        let correctChain = stringsInQuotes[0] as string
+        let correctChainCleaned = correctChain.replace(/['"]+/g, "")
+        message = `Incorrect chain, please switch to the ${correctChainCleaned}.`
+      }
       setToastState({
         isToastShowing: true,
         type: "error",

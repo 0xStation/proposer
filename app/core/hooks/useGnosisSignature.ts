@@ -1,26 +1,26 @@
 import useStore from "app/core/hooks/useStore"
-import { useSignTypedData } from "wagmi"
 import { getHash } from "app/signatures/utils"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { genGnosisTransactionDigest } from "app/signatures/gnosisTransaction"
 import networks from "app/utils/networks.json"
+import useSignature from "app/core/hooks/useSignature"
 
 const useGnosisSignature = (payment) => {
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
-  let { signTypedDataAsync } = useSignTypedData()
-
+  const { signMessage: signMessageHook } = useSignature()
   const signMessage = async () => {
     // prompt the Metamask signature modal
     try {
       const nonce = await getNonce()
       const transactionData = genGnosisTransactionDigest(payment, nonce)
-      const signature = await signTypedDataAsync(transactionData)
+
+      const signature = signMessageHook(transactionData)
       const data = await createTransaction(signature, transactionData)
       setToastState({
         isToastShowing: true,
         type: "success",
-        message: "Gnosis tx queued",
+        message: "Transaction queued to your Gnosis Safe",
       })
       return data
     } catch (e) {

@@ -1,14 +1,33 @@
+import { ZERO_ADDRESS } from "app/core/utils/constants"
+import { preparePaymentTransaction } from "app/transaction/payments"
+
 export const genGnosisTransactionDigest = (activePayment, nonce) => {
   const sendTo = activePayment.recipientAddress
   const sendAmount = activePayment.amount
   const safeAddress = activePayment.senderAddress
   const chainId = activePayment.data.token.chainId
 
+  /**
+   * value is the amount of ETH being sent in the function call and is only non-zero if we are
+   * transferring ETH specifically. We have a utility preparePaymentTransaction to handle this logic.
+   */
+  const { value } = preparePaymentTransaction(sendTo, activePayment.data.token, sendAmount)
+
   return {
     domain: {
       verifyingContract: safeAddress,
       chainId: chainId,
     },
+    /// @param to Destination address.
+    /// @param value Ether value.
+    /// @param data Data payload.
+    /// @param operation Operation type.
+    /// @param safeTxGas Fas that should be used for the safe transaction.
+    /// @param baseGas Gas costs for data used to trigger the safe transaction.
+    /// @param gasPrice Maximum gas price that should be used for this transaction.
+    /// @param gasToken Token address (or 0 if ETH) that is used for the payment.
+    /// @param refundReceiver Address of receiver of gas payment (or 0 if tx.origin).
+    /// @param nonce Transaction nonce.
     types: {
       SafeTx: [
         { name: "to", type: "address" },
@@ -25,14 +44,14 @@ export const genGnosisTransactionDigest = (activePayment, nonce) => {
     },
     value: {
       to: sendTo,
-      value: String(sendAmount * 10e18),
+      value: String(value),
       data: "0x",
       operation: 0,
       safeTxGas: "0",
       baseGas: "0",
       gasPrice: "0",
-      gasToken: "0x0000000000000000000000000000000000000000",
-      refundReceiver: "0x0000000000000000000000000000000000000000",
+      gasToken: ZERO_ADDRESS,
+      refundReceiver: ZERO_ADDRESS,
       nonce: String(nonce),
     },
   }

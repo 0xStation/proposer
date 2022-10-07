@@ -1,4 +1,4 @@
-import db from "db"
+import db, { AddressType } from "db"
 import * as z from "zod"
 import { Ctx } from "blitz"
 
@@ -22,10 +22,11 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
     return null
   }
 
-  // should do some auth on this, but its pretty annoying rn for gnosis safes
+  // fairly annoying to do a proper auth check
   // you'd have to look at the proposal from the proposal payment
   // check the client, realize its a gnosis safe, then fetch the signers on the safe
-  // ctx.session.$authorize([], [])
+  // for now we are calling auth with empty lists to at least require that session exists
+  ctx.session.$authorize([], [])
 
   const payment = await db.proposalPayment.update({
     where: { id: params.paymentId },
@@ -33,9 +34,10 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
       data: {
         ...(existingPayment.data as {}),
         ...(params.gnosisTxData && {
-          gnosis: {
-            safeAddress: params.gnosisTxData.safeAddress,
-            txId: params.gnosisTxData.txId,
+          multisigTransaction: {
+            type: AddressType.SAFE,
+            address: params.gnosisTxData.safeAddress,
+            transactionId: params.gnosisTxData.txId,
           },
         }),
       },

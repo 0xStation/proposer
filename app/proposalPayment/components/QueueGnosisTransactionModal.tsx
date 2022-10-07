@@ -5,8 +5,10 @@ import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useGnosisSignature from "app/core/hooks/useGnosisSignature"
 import updatePayment from "app/proposalPayment/mutations/updatePayment"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
+import useStore from "app/core/hooks/useStore"
 
 export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) => {
+  const setToastState = useStore((state) => state.setToastState)
   const activePayment = milestone.payments[0]
 
   const { signMessage: signGnosis } = useGnosisSignature(activePayment)
@@ -45,6 +47,9 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
               setIsLoading(true)
               try {
                 const response = await signGnosis()
+                if (!response) {
+                  throw new Error("Signature Failed")
+                }
                 await updatePaymentMutation({
                   gnosisTxData: {
                     txId: response.txId,
@@ -56,6 +61,11 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
                 setIsLoading(false)
                 setIsOpen(false)
               } catch (e) {
+                setToastState({
+                  isToastShowing: true,
+                  type: "error",
+                  message: "Signature failed.",
+                })
                 console.error(e)
               }
             }}

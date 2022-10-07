@@ -24,7 +24,12 @@ const PaymentRow = ({
 }) => {
   const setToastState = useStore((state) => state.setToastState)
   const activeUser = useStore((state) => state.activeUser)
-  const [safeDetails, setSafeDetails] = useState<any>()
+  const [safeDetails, setSafeDetails] = useState<{
+    chainId: number
+    address: string
+    quorum: any
+    signers: any
+  }>()
 
   // going to be running this no matter what type of address is payer
   // possible improvement would be to store the type of address on a payment and only run on safe
@@ -93,7 +98,7 @@ const PaymentRow = ({
       {/* check if gnosis safe and active user is signer */}
       {getMilestoneStatus(proposal, milestone) === ProposalMilestoneStatus.IN_PROGRESS &&
         userIsSigner &&
-        (!payment.data.gnosis ? (
+        (!payment.data.multisigTransaction ? (
           <Button
             overrideWidthClassName="w-full"
             className="mt-4"
