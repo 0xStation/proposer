@@ -486,51 +486,50 @@ const RewardForm = ({
         </div>
       </RadioGroup>
 
-      {/* NETWORK */}
-      <label className="font-bold block mt-6">Network*</label>
-      <span className="text-xs text-concrete block">
-        Which network would the funds get transacted on?
-      </span>
-      <Field name="network" validate={requiredField}>
-        {({ input, meta }) => {
-          return (
-            <>
-              <div className="custom-select-wrapper">
-                <select
-                  {...input}
-                  className="w-full bg-wet-concrete rounded p-2 mt-1"
-                  value={selectedNetworkId as number}
-                  onChange={(e) => {
-                    const network = SUPPORTED_CHAINS.find(
-                      (chain) => chain.id === parseInt(e.target.value)
-                    )
-                    setSelectedNetworkId(network?.id as number)
-                    // custom values can be compatible with react-final-form by calling
-                    // the props.input.onChange callback
-                    // https://final-form.org/docs/react-final-form/api/Field
-                    input.onChange(network?.id)
-                  }}
-                >
-                  <option value="">Choose option</option>
-                  {SUPPORTED_CHAINS?.map((chain, idx) => {
-                    return (
-                      <option key={chain.id} value={chain.id}>
-                        {chain.name}
-                      </option>
-                    )
-                  })}
-                </select>
-              </div>
-              {meta.touched && meta.error && (
-                <span className="text-torch-red text-xs">{meta.error}</span>
-              )}
-            </>
-          )
-        }}
-      </Field>
-
       {needFunding && (
         <>
+          {/* NETWORK */}
+          <label className="font-bold block mt-6">Network*</label>
+          <span className="text-xs text-concrete block">
+            Which network would the funds get transacted on?
+          </span>
+          <Field name="network" validate={requiredField}>
+            {({ input, meta }) => {
+              return (
+                <>
+                  <div className="custom-select-wrapper">
+                    <select
+                      {...input}
+                      className="w-full bg-wet-concrete rounded p-2 mt-1"
+                      value={selectedNetworkId as number}
+                      onChange={(e) => {
+                        const network = SUPPORTED_CHAINS.find(
+                          (chain) => chain.id === parseInt(e.target.value)
+                        )
+                        setSelectedNetworkId(network?.id as number)
+                        // custom values can be compatible with react-final-form by calling
+                        // the props.input.onChange callback
+                        // https://final-form.org/docs/react-final-form/api/Field
+                        input.onChange(network?.id)
+                      }}
+                    >
+                      <option value="">Choose option</option>
+                      {SUPPORTED_CHAINS?.map((chain, idx) => {
+                        return (
+                          <option key={chain.id} value={chain.id}>
+                            {chain.name}
+                          </option>
+                        )
+                      })}
+                    </select>
+                  </div>
+                  {meta.touched && meta.error && (
+                    <span className="text-torch-red text-xs">{meta.error}</span>
+                  )}
+                </>
+              )
+            }}
+          </Field>
           {/* TOKEN */}
           <div className="flex flex-col mt-6">
             <label className="font-bold block">Reward token*</label>
