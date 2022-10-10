@@ -24,9 +24,10 @@ model Account {
   sessions           Session[]
   proposals          ProposalRole[]
   tokens             AccountToken[]
-  originsOf          AccountAccount[]    @relation("origin")
-  targetsOf          AccountAccount[]    @relation("target")
+  originsOf          AccountAccount[]      @relation("origin")
+  targetsOf          AccountAccount[]      @relation("target")
   verificationEmails EmailVerification[]
+  transactions       ProposalTransaction[] @relation("ProposalTransactionExecutor")
 }
 
 enum AddressType {
@@ -62,10 +63,11 @@ model Proposal {
   currentMilestoneIndex Int            @default(-1) // no current milestone, gets set to 0 after proposal is approved
   data                  Json
 
-  roles      ProposalRole[]
-  milestones ProposalMilestone[]
-  payments   ProposalPayment[]
-  signatures ProposalSignature[]
+  roles        ProposalRole[]
+  signatures   ProposalSignature[]
+  milestones   ProposalMilestone[]
+  payments     ProposalPayment[]
+  transactions ProposalTransaction[]
 }
 
 enum ProposalStatus {
@@ -120,17 +122,21 @@ model ProposalSignature {
 
 // PROPOSAL MILESTONES AND EXPECTATIONS
 
+// TODO: rename ProposalStep
 model ProposalMilestone {
   id         String @id @default(uuid())
   proposalId String
   index      Int
   data       Json
 
-  proposal Proposal          @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  payments ProposalPayment[]
+  proposal     Proposal              @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  payments     ProposalPayment[]
+  transactions ProposalTransaction[]
+
   @@unique([proposalId, index])
 }
 
+// TODO: rename ProposalTokenTransfer
 model ProposalPayment {
   id               String  @id @default(uuid())
   proposalId       String
@@ -144,6 +150,31 @@ model ProposalPayment {
 
   proposal  Proposal          @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   milestone ProposalMilestone @relation(fields: [milestoneId], references: [id])
+}
+
+model ProposalTransaction {
+  id              String                    @id @default(uuid())
+  proposalId      String
+  milestoneId     String
+  chainId         Int
+  toAddress       String
+  value           Float                     @default(0) // amount of ETH sent in transaction to toAddress, float to support larger size numbers
+  data            Json
+  status          ProposalTransactionStatus @default(PENDING)
+  transactionHash String?
+
+  proposal  Proposal          @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  milestone ProposalMilestone @relation(fields: [milestoneId], references: [id])
+  // m-n relation to support multiple accounts being able to execute a transaction and accounts to execute many transactions
+  // for example, a transaction could let 3 different people call the contract
+  // another example, a user will execute many transactions in their lifetime
+  executors Account[]         @relation("ProposalTransactionExecutor")
+}
+
+enum ProposalTransactionStatus {
+  PENDING
+  FAILURE
+  SUCCESS
 }
 
 // SESSION MANAGEMENT
