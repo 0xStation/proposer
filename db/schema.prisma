@@ -61,6 +61,7 @@ model Proposal {
   status                ProposalStatus @default(DRAFT)
   timestamp             DateTime       @default(now())
   currentMilestoneIndex Int            @default(-1) // no current milestone, gets set to 0 after proposal is approved
+  type                  ProposalType   @default(FUNDING) // TODO: remove post-migration, needed to backfill values for old proposals
   data                  Json
 
   roles        ProposalRole[]
@@ -75,6 +76,12 @@ enum ProposalStatus {
   AWAITING_APPROVAL
   APPROVED
   COMPLETE
+}
+
+enum ProposalType {
+  FUNDING
+  MESSAGE
+  CUSTOM
 }
 
 // PROPOSAL ROLES
