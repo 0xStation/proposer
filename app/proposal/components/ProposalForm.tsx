@@ -562,8 +562,8 @@ const RewardForm = ({
                       <option value="">Choose option</option>
                       {tokenOptions?.map((token) => {
                         return (
-                          <option key={token.address} value={token.address}>
-                            {token.symbol}
+                          <option key={token?.address} value={token?.address}>
+                            {token?.symbol}
                           </option>
                         )
                       })}
@@ -835,17 +835,15 @@ export const ProposalForm = ({
     },
     { enabled: Boolean(selectedNetworkId && session?.userId) }
   )
-  console.log("tokenOptions", tokenOptions)
 
   useEffect(() => {
-    console.log("savedUserTokens", savedUserTokens)
-    console.log("selectedNetworkId", selectedNetworkId)
     if (selectedNetworkId) {
       const networkTokens = getNetworkTokens(selectedNetworkId)
-      console.log("networkTokens", networkTokens)
+      // sets options for reward token dropdown. includes default tokens and
+      // tokens that the user has imported to their account
       setTokenOptions([...networkTokens, ...(savedUserTokens || [])])
     }
-  }, [savedUserTokens])
+  }, [savedUserTokens, selectedNetworkId])
 
   const [createProposalMutation] = useMutation(createProposal, {
     onSuccess: (data) => {
