@@ -839,8 +839,10 @@ export const ProposalForm = ({
 
   useEffect(() => {
     console.log("savedUserTokens", savedUserTokens)
+    console.log("selectedNetworkId", selectedNetworkId)
     if (selectedNetworkId) {
       const networkTokens = getNetworkTokens(selectedNetworkId)
+      console.log("networkTokens", networkTokens)
       setTokenOptions([...networkTokens, ...(savedUserTokens || [])])
     }
   }, [savedUserTokens])
