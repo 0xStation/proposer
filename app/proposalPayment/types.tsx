@@ -21,10 +21,6 @@ type AddressType = {
 
 export type ProposalPaymentMetadata = {
   token: Token
-  gnosis?: {
-    safeAddress: string
-    txId: string
-  }
   multisigTransaction?: {
     type: AddressType["SAFE"]
     address: string
