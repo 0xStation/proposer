@@ -4,9 +4,9 @@ import { Ctx } from "blitz"
 
 const UpdatePayment = z.object({
   paymentId: z.string(),
-  gnosisTxData: z.object({
-    safeAddress: z.string().optional(),
-    txId: z.string().optional(),
+  multisigTransaction: z.object({
+    address: z.string().optional(),
+    transactionId: z.string().optional(),
   }),
 })
 
@@ -33,11 +33,11 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
     data: {
       data: {
         ...(existingPayment.data as {}),
-        ...(params.gnosisTxData && {
+        ...(params.multisigTransaction && {
           multisigTransaction: {
             type: AddressType.SAFE,
-            address: params.gnosisTxData.safeAddress,
-            transactionId: params.gnosisTxData.txId,
+            address: params.multisigTransaction.address,
+            transactionId: params.multisigTransaction.transactionId,
           },
         }),
       },

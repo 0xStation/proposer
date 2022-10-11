@@ -50,13 +50,14 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
                 if (!response) {
                   throw new Error("Signature Failed")
                 }
-                await updatePaymentMutation({
-                  gnosisTxData: {
-                    txId: response.txId,
-                    safeAddress: response.safeAddress,
+                const s = await updatePaymentMutation({
+                  multisigTransaction: {
+                    transactionId: response.txId,
+                    address: response.safeAddress,
                   },
                   paymentId: activePayment.id,
                 })
+                console.log(s)
                 invalidateQuery(getMilestonesByProposal)
                 setIsLoading(false)
                 setIsOpen(false)

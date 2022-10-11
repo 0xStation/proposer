@@ -15,7 +15,7 @@ const useGnosisSignature = (payment) => {
       const nonce = await getNonce()
       const transactionData = genGnosisTransactionDigest(payment, nonce)
 
-      const signature = signMessageHook(transactionData)
+      const signature = await signMessageHook(transactionData)
       const data = await createTransaction(signature, transactionData)
       setToastState({
         isToastShowing: true,
@@ -23,15 +23,15 @@ const useGnosisSignature = (payment) => {
         message: "Transaction queued to your Gnosis Safe",
       })
       return data
-    } catch (e) {
-      console.log(e)
+    } catch (err) {
+      console.log(err)
       let message = "Signature failed"
-      if (e.name === "ConnectorNotFoundError") {
+      if (err.name === "ConnectorNotFoundError") {
         message = "Wallet connection error, please disconnect and reconnect your wallet."
       }
-      if (e.name === "ChainMismatchError") {
+      if (err.name === "ChainMismatchError") {
         let regexPattern = /".*?"/g
-        let stringsInQuotes = regexPattern.exec(e.message) as RegExpExecArray
+        let stringsInQuotes = regexPattern.exec(err.message) as RegExpExecArray
         let correctChain = stringsInQuotes[0] as string
         let correctChainCleaned = correctChain.replace(/['"]+/g, "")
         message = `Incorrect chain, please switch to the ${correctChainCleaned}.`
@@ -72,14 +72,6 @@ const useGnosisSignature = (payment) => {
     }
   }
 
-  /**
-   * get nonce returns the active nonce for the safe
-   * We actually need to get the pending transactions as well.
-   *
-   * If we have a safe with a current nonce of 5, if there is already a tx with a nonce of 5
-   * It will not be overwritten. So, if we want a totally new fresh tx on the queue, we need
-   * to get the current nonce + the number of actively queued txs to get the next new nonce
-   */
   const getNonce = async () => {
     const network = networks[payment.data.token.chainId]?.gnosisNetwork
     if (!network) {
@@ -87,7 +79,7 @@ const useGnosisSignature = (payment) => {
     }
     const url = `https://safe-transaction.${network}.gnosis.io/api/v1/safes/${toChecksumAddress(
       payment.senderAddress
-    )}/`
+    )}/multisig-transactions/`
 
     let response
     try {
@@ -98,7 +90,7 @@ const useGnosisSignature = (payment) => {
         },
       })
       const data = await response.json()
-      return data.nonce
+      return data.countUniqueNonce
     } catch (err) {
       console.error(err)
       return null
