@@ -1,5 +1,14 @@
 import { useEffect, useState, useMemo } from "react"
-import { BlitzPage, useParam, useQuery, invalidateQuery, Routes, Link, useSession } from "blitz"
+import {
+  BlitzPage,
+  useParam,
+  useQuery,
+  invalidateQuery,
+  Routes,
+  Link,
+  GetServerSideProps,
+  invoke,
+} from "blitz"
 import Layout from "app/core/layouts/Layout"
 import Button from "app/core/components/sds/buttons/Button"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
@@ -30,18 +39,41 @@ import { useAccount, useEnsName } from "wagmi"
 import getSafeMetadata from "app/account/queries/getSafeMetadata"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import { ProposalRole } from "app/proposalRole/types"
-import Avatar from "app/core/components/sds/images/avatar"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import { Account } from "app/account/types"
+import { isAddress } from "ethers/lib/utils"
 
 enum Tab {
   PROPOSALS = "PROPOSALS",
   SETTINGS = "SETTINGS",
 }
 
+export const getServerSideProps: GetServerSideProps = async ({ params = {} }) => {
+  const { accountAddress } = params
+
+  if (!accountAddress || !isAddress(accountAddress as string)) {
+    return {
+      notFound: true,
+    }
+  }
+
+  const account = await invoke(getAccountByAddress, {
+    address: toChecksumAddress(accountAddress as string),
+  })
+
+  if (!account) {
+    return {
+      notFound: true,
+    }
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
+
 const WorkspaceHome: BlitzPage = () => {
-  const setToastState = useStore((state) => state.setToastState)
   const activeUser = useStore((state) => state.activeUser)
   const accountData = useAccount()
   const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
