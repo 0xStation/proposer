@@ -102,7 +102,7 @@ enum ProposalRoleApprovalStatus {
   PENDING // role is pending approval
   APPROVED // role has approved
   SENT // signed by author to send to recipientsgena
-  // DENY -- future for denying proposals
+  // DENY - future for denying proposals
 }
 
 model ProposalSignature {
