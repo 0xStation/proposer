@@ -1,4 +1,4 @@
-import { Routes, useRouter, useMutation, invoke, useSession } from "blitz"
+import { Routes, useRouter, useMutation, useQuery, useSession } from "blitz"
 import { useEffect, useState } from "react"
 import { useProvider } from "wagmi"
 import { RadioGroup } from "@headlessui/react"
@@ -390,7 +390,7 @@ const RewardForm = ({
   selectedToken,
   setSelectedToken,
   tokenOptions,
-  setShouldRefetchTokens,
+  refetchTokens,
   needFunding,
   setNeedFunding,
   isImportTokenModalOpen,
@@ -405,9 +405,8 @@ const RewardForm = ({
         isOpen={isImportTokenModalOpen}
         setIsOpen={setIsImportTokenModalOpen}
         chainId={selectedNetworkId?.toString()}
-        // `shouldRefetchTokens` triggers the use effect that
-        // displays the tokens in the new proposal form token dropdown
-        callback={() => setShouldRefetchTokens(true)}
+        // refetches the tokens in the new proposal form token dropdown
+        callback={() => refetchTokens(true)}
       />
       <RadioGroup value={needFunding} onChange={setNeedFunding}>
         <div className="mt-6">
@@ -563,8 +562,8 @@ const RewardForm = ({
                       <option value="">Choose option</option>
                       {tokenOptions?.map((token) => {
                         return (
-                          <option key={token.address} value={token.address}>
-                            {token.symbol}
+                          <option key={token?.address} value={token?.address}>
+                            {token?.symbol}
                           </option>
                         )
                       })}
@@ -708,7 +707,6 @@ export const ProposalForm = ({
   const walletModalOpen = useStore((state) => state.walletModalOpen)
   const session = useSession({ suspense: false })
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(0)
-  const [shouldRefetchTokens, setShouldRefetchTokens] = useState<boolean>(false)
   const [selectedToken, setSelectedToken] = useState<any>()
   const [needFunding, setNeedFunding] = useState<boolean>(true)
   const [tokenOptions, setTokenOptions] = useState<any[]>()
@@ -829,32 +827,23 @@ export const ProposalForm = ({
     }
   }
 
-  useEffect(() => {
-    // Changing the network changes the token options available to us
-    if (selectedNetworkId || shouldRefetchTokens) {
-      // array including native chain's gas coin and stablecoins
-      const networkTokens = getNetworkTokens(selectedNetworkId)
-      if (session?.userId) {
-        // if user is logged-in, we can fetch the
-        // imported tokens they have saved to their account
-        const fetchAccountTokenOptions = async () => {
-          const tokens = await invoke(getTokensByAccount, {
-            chainId: selectedNetworkId,
-            userId: session?.userId,
-          })
-          setTokenOptions([...tokens, ...networkTokens])
+  const [savedUserTokens, { refetch: refetchTokens }] = useQuery(
+    getTokensByAccount,
+    {
+      chainId: selectedNetworkId,
+      userId: session?.userId as number,
+    },
+    { enabled: Boolean(selectedNetworkId && session?.userId) }
+  )
 
-          setShouldRefetchTokens(false)
-        }
-        fetchAccountTokenOptions()
-      } else {
-        setTokenOptions(networkTokens)
-      }
-      // Setting the selectedToken to an empty obj to reset the
-      // selected token on network change.
-      setSelectedToken({})
+  useEffect(() => {
+    if (selectedNetworkId) {
+      const networkTokens = getNetworkTokens(selectedNetworkId)
+      // sets options for reward token dropdown. includes default tokens and
+      // tokens that the user has imported to their account
+      setTokenOptions([...networkTokens, ...(savedUserTokens || [])])
     }
-  }, [selectedNetworkId, shouldRefetchTokens, session?.userId])
+  }, [savedUserTokens, selectedNetworkId])
 
   const [createProposalMutation] = useMutation(createProposal, {
     onSuccess: (data) => {
@@ -1055,7 +1044,7 @@ export const ProposalForm = ({
                             setSelectedNetworkId={setSelectedNetworkId}
                             selectedToken={selectedToken}
                             setSelectedToken={setSelectedToken}
-                            setShouldRefetchTokens={setShouldRefetchTokens}
+                            refetchTokens={refetchTokens}
                             needFunding={needFunding}
                             setNeedFunding={setNeedFunding}
                             isImportTokenModalOpen={isImportTokenModalOpen}
