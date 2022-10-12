@@ -6,8 +6,6 @@ import { ZodMilestone, ZodPayment } from "app/types/zod"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
 import { Token } from "app/token/types"
 import { PaymentTerm } from "app/proposalPayment/types"
-import { sendNewProposalEmail } from "app/utils/email"
-import { getEmails } from "app/utils/privy"
 
 const CreateProposal = z.object({
   contentTitle: z.string(),
@@ -140,28 +138,6 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       payments: true,
     },
   })
-
-  try {
-    // send notification emails
-    const author = proposalWithPayments.roles.find(
-      (role) => role.type === ProposalRoleType.AUTHOR
-    )?.account
-
-    const emails = await getEmails(
-      proposalWithPayments.roles
-        .filter((role) => role.type !== ProposalRoleType.AUTHOR && role.address !== author?.address)
-        .map((role) => role.address)
-    )
-
-    await sendNewProposalEmail({
-      recipients: emails,
-      account: author,
-      proposal: proposalWithPayments,
-    })
-  } catch (e) {
-    // silently fail
-    console.warn("Failed to send notification emails in `createProposal`", e)
-  }
 
   return proposalWithPayments as unknown as Proposal
 }

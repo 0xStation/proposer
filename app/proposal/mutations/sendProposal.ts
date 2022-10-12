@@ -5,6 +5,8 @@ import db, { ProposalStatus } from "db"
 import * as z from "zod"
 import { ProposalMetadata } from "../types"
 import { Ctx } from "blitz"
+import { getEmails } from "app/utils/privy"
+import { sendNewProposalEmail } from "app/utils/email"
 
 const SendProposal = z.object({
   proposalId: z.string(),
@@ -25,7 +27,11 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
       id: params.proposalId,
     },
     include: {
-      roles: true,
+      roles: {
+        include: {
+          account: true,
+        },
+      },
     },
   })
 
@@ -68,12 +74,6 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
         data: {
           data: JSON.parse(JSON.stringify(proposalMetadata)),
           status: ProposalStatus.AWAITING_APPROVAL,
-        },
-        include: {
-          roles: true,
-          milestones: true,
-          payments: true,
-          signatures: true,
         },
       })
 
@@ -118,6 +118,28 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
         },
       })
     })
+
+    try {
+      // send notification emails
+      const author = proposal.roles.find((role) => role.type === ProposalRoleType.AUTHOR)?.account
+
+      const emails = await getEmails(
+        proposal.roles
+          .filter(
+            (role) => role.type !== ProposalRoleType.AUTHOR && role.address !== author?.address
+          )
+          .map((role) => role.address)
+      )
+
+      await sendNewProposalEmail({
+        recipients: emails,
+        account: author,
+        proposal: proposal,
+      })
+    } catch (e) {
+      // silently fail
+      console.warn("Failed to send notification emails in `createProposal`", e)
+    }
 
     return true
   } catch (err) {
