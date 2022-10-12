@@ -7,7 +7,12 @@ import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import truncateString from "app/core/utils/truncateString"
 import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
-import { ProposalStatus } from "@prisma/client"
+import {
+  ProposalRoleApprovalStatus,
+  ProposalRoleType,
+  ProposalSignatureType,
+  ProposalStatus,
+} from "@prisma/client"
 
 const SafeRole = ({ role, signatures, proposalStatus }) => {
   const activeUser = useStore((state) => state.activeUser)
@@ -35,9 +40,15 @@ const SafeRole = ({ role, signatures, proposalStatus }) => {
     signatures &&
     signatures.filter((signature) => {
       return signers.some((signer) => {
-        return addressesAreEqual(signature.address, signer)
+        return (
+          addressesAreEqual(signature.address, signer) &&
+          signature.type === ProposalSignatureType.APPROVE // only count APPROVE signatures to ignore author's SEND signature
+        )
       })
     }).length
+
+  const showStatus =
+    proposalStatus !== ProposalStatus.DRAFT || role.type === ProposalRoleType.AUTHOR
 
   return (
     <>
@@ -52,9 +63,9 @@ const SafeRole = ({ role, signatures, proposalStatus }) => {
                     className="text-electric-violet cursor-pointer"
                     onClick={() => toggleProposalApprovalModalOpen(true)}
                   >
-                    Sign
+                    Approve
                   </span>
-                ) : (
+                ) : showStatus ? (
                   <div className="flex flex-row items-center space-x-1">
                     <span
                       className={`h-2 w-2 rounded-full ${
@@ -66,6 +77,8 @@ const SafeRole = ({ role, signatures, proposalStatus }) => {
                       {PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role?.approvalStatus]?.copy}
                     </div>
                   </div>
+                ) : (
+                  <></>
                 )}
                 <ProgressCircleAndNumber
                   numerator={
@@ -109,13 +122,28 @@ const SafeRole = ({ role, signatures, proposalStatus }) => {
 
 const WalletRole = ({ role, signatures, proposalStatus }) => {
   const activeUser = useStore((state) => state.activeUser)
-
+  const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
-  const activeUserHasSigned = activeUserMeetsCriteria(activeUser, signatures)
+  const activeUserHasApproved = signatures?.some(
+    (signature) =>
+      addressesAreEqual(activeUser?.address || "", signature.address) &&
+      signature.type === ProposalSignatureType.APPROVE
+  )
   const activeUserHasAProposalRole = addressesAreEqual(activeUser?.address || "", role?.address)
 
+  const showSendButton =
+    proposalStatus === ProposalStatus.DRAFT &&
+    role.type === ProposalRoleType.AUTHOR &&
+    activeUserHasAProposalRole
+
   const showSignButton =
-    proposalStatus !== ProposalStatus.DRAFT && activeUserHasAProposalRole && !activeUserHasSigned
+    proposalStatus !== ProposalStatus.DRAFT &&
+    activeUserHasAProposalRole &&
+    !activeUserHasApproved &&
+    role.type !== ProposalRoleType.AUTHOR // only show sign option if user is not author
+
+  const showStatus =
+    proposalStatus !== ProposalStatus.DRAFT || role.type === ProposalRoleType.AUTHOR
 
   return (
     <div className="flex flex-row w-full items-center justify-between">
@@ -123,14 +151,22 @@ const WalletRole = ({ role, signatures, proposalStatus }) => {
         <>
           <AccountMediaObject account={role?.account} />
           <div className="flex flex-col items-end space-y-1">
-            {showSignButton ? (
+            {/* show send button, or show sign button, or show approval status */}
+            {showSendButton ? (
+              <span
+                className="text-electric-violet cursor-pointer"
+                onClick={() => toggleSendProposalModalOpen(true)}
+              >
+                Send
+              </span>
+            ) : showSignButton ? (
               <span
                 className="text-electric-violet cursor-pointer"
                 onClick={() => toggleProposalApprovalModalOpen(true)}
               >
-                Sign
+                Approve
               </span>
-            ) : (
+            ) : showStatus ? (
               <div className="flex flex-row items-center space-x-1">
                 <span
                   className={`h-2 w-2 rounded-full ${
@@ -142,6 +178,8 @@ const WalletRole = ({ role, signatures, proposalStatus }) => {
                   {PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role?.approvalStatus]?.copy}
                 </div>
               </div>
+            ) : (
+              <></>
             )}
           </div>
         </>

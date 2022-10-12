@@ -7,6 +7,7 @@ interface StoreState {
   walletModalOpen: boolean
   accountModalOpen: boolean
   proposalApprovalModalOpen: boolean
+  sendProposalModalOpen: boolean
   toastState: {
     isToastShowing: boolean
     message: string
@@ -16,6 +17,7 @@ interface StoreState {
   toggleWalletModal: (boolean) => void
   toggleAccountModal: (boolean) => void
   toggleProposalApprovalModalOpen: (boolean) => void
+  toggleSendProposalModalOpen: (boolean) => void
   setToastState: (toastState: any) => void
   setActiveUser: (user: undefined | Account | null) => void
   setActiveChain: (chain: Chain | undefined) => void
@@ -26,6 +28,7 @@ const useStore = create<StoreState>((set) => ({
   walletModalOpen: false,
   accountModalOpen: false,
   proposalApprovalModalOpen: false,
+  sendProposalModalOpen: false,
   activeChain: undefined,
   toastState: {
     isToastShowing: false,
@@ -50,6 +53,11 @@ const useStore = create<StoreState>((set) => ({
   toggleProposalApprovalModalOpen: (state) => {
     set(() => {
       return { proposalApprovalModalOpen: state }
+    })
+  },
+  toggleSendProposalModalOpen: (state) => {
+    set(() => {
+      return { sendProposalModalOpen: state }
     })
   },
   setToastState: (toastState) =>
