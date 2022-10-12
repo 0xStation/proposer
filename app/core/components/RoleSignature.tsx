@@ -47,15 +47,8 @@ const SafeRole = ({ role, signatures, proposalStatus }) => {
       })
     }).length
 
-  // if proposal is DRAFT and user is not author, approval status is AWAITING_AUTHOR to convey that they do not have an action to take and are waiting
-  // if proposal is DRAFT and user is author, approval status is PENDING to highlight that author has action pending
-  // if proposal is not DRAFT, approval status is the role's natural approval status
-  const approvalStatus =
-    proposalStatus === ProposalStatus.DRAFT
-      ? role.type !== ProposalRoleType.AUTHOR
-        ? ProposalRoleApprovalStatus.AWAITING_AUTHOR
-        : ProposalRoleApprovalStatus.PENDING
-      : role?.approvalStatus
+  const showStatus =
+    proposalStatus !== ProposalStatus.DRAFT || role.type === ProposalRoleType.AUTHOR
 
   return (
     <>
@@ -70,18 +63,22 @@ const SafeRole = ({ role, signatures, proposalStatus }) => {
                     className="text-electric-violet cursor-pointer"
                     onClick={() => toggleProposalApprovalModalOpen(true)}
                   >
-                    Sign
+                    Approve
                   </span>
-                ) : (
+                ) : showStatus ? (
                   <div className="flex flex-row items-center space-x-1">
                     <span
-                      className={`h-2 w-2 rounded-full ${PROPOSAL_ROLE_APPROVAL_STATUS_MAP[approvalStatus]?.color}`}
+                      className={`h-2 w-2 rounded-full ${
+                        PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role?.approvalStatus]?.color
+                      }`}
                     />
 
                     <div className="font-bold text-xs uppercase tracking-wider">
-                      {PROPOSAL_ROLE_APPROVAL_STATUS_MAP[approvalStatus]?.copy}
+                      {PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role?.approvalStatus]?.copy}
                     </div>
                   </div>
+                ) : (
+                  <></>
                 )}
                 <ProgressCircleAndNumber
                   numerator={
@@ -145,15 +142,8 @@ const WalletRole = ({ role, signatures, proposalStatus }) => {
     !activeUserHasApproved &&
     role.type !== ProposalRoleType.AUTHOR // only show sign option if user is not author
 
-  // if proposal is DRAFT and user is not author, approval status is AWAITING_AUTHOR to convey that they do not have an action to take and are waiting
-  // if proposal is DRAFT and user is author, approval status is PENDING to highlight that author has action pending
-  // if proposal is not DRAFT, approval status is the role's natural approval status
-  const approvalStatus =
-    proposalStatus === ProposalStatus.DRAFT
-      ? role.type !== ProposalRoleType.AUTHOR
-        ? ProposalRoleApprovalStatus.AWAITING_AUTHOR
-        : ProposalRoleApprovalStatus.PENDING
-      : role?.approvalStatus
+  const showStatus =
+    proposalStatus !== ProposalStatus.DRAFT || role.type === ProposalRoleType.AUTHOR
 
   return (
     <div className="flex flex-row w-full items-center justify-between">
@@ -174,18 +164,22 @@ const WalletRole = ({ role, signatures, proposalStatus }) => {
                 className="text-electric-violet cursor-pointer"
                 onClick={() => toggleProposalApprovalModalOpen(true)}
               >
-                Sign
+                Approve
               </span>
-            ) : (
+            ) : showStatus ? (
               <div className="flex flex-row items-center space-x-1">
                 <span
-                  className={`h-2 w-2 rounded-full ${PROPOSAL_ROLE_APPROVAL_STATUS_MAP[approvalStatus]?.color}`}
+                  className={`h-2 w-2 rounded-full ${
+                    PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role?.approvalStatus]?.color
+                  }`}
                 />
 
                 <div className="font-bold text-xs uppercase tracking-wider">
-                  {PROPOSAL_ROLE_APPROVAL_STATUS_MAP[approvalStatus]?.copy}
+                  {PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role?.approvalStatus]?.copy}
                 </div>
               </div>
+            ) : (
+              <></>
             )}
           </div>
         </>

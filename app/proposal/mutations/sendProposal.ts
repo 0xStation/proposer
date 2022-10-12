@@ -67,7 +67,7 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
         },
         data: {
           data: JSON.parse(JSON.stringify(proposalMetadata)),
-          status: ProposalStatus.AWAITING_APPROVAL, // resets the need to collect signatures
+          status: ProposalStatus.AWAITING_APPROVAL,
         },
         include: {
           roles: true,

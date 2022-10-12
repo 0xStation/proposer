@@ -102,7 +102,6 @@ enum ProposalRoleApprovalStatus {
   PENDING // role is pending approval
   APPROVED // role has approved
   SENT // signed by author to send to recipientsgena
-  AWAITING_AUTHOR // NOT used in db, just here for the enum option on frontend because you cannot inherit/extend an enum
   // DENY -- future for denying proposals
 }
 
