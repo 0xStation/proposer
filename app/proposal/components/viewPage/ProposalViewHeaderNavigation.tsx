@@ -190,12 +190,13 @@ export const ProposalViewHeaderNavigation = () => {
               </button>
             )
           ) : !proposal || loading ? (
-            // BUTTONS LOADING STATE
+            // BUTTONS EMPTY STATE
+            // Note: empty state intentionally chosen over loading for less visual jar on load
             <div className="flex flex-row justify-between">
-              <span className="h-[35px] w-[670px] rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+              <span className="h-[35px] w-[670px]" />
             </div>
           ) : null}
-          {proposal && <CopyBtn textToWrite={currentPageUrl} />}
+          {proposal && !loading && <CopyBtn textToWrite={currentPageUrl} />}
         </div>
         {/* TABS */}
         <div className="mt-12 self-end flex flex-row space-x-4 border-b border-concrete">
