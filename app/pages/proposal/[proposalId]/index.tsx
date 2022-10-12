@@ -6,6 +6,38 @@ import ReadMore from "app/core/components/ReadMore"
 import { TotalPaymentView } from "app/core/components/TotalPaymentView"
 import RoleSignaturesView from "app/core/components/RoleSignaturesView"
 import { Proposal } from "app/proposal/types"
+import Stepper from "app/proposal/components/Stepper"
+
+const steps = [
+  {
+    description: "Author sends proposal",
+    status: "complete",
+    action: {
+      title: "Send",
+      behavior: () => console.log("sending"),
+    },
+  },
+  {
+    description: "Client, contributor, and author approve the proposal",
+    status: "current",
+    action: {
+      title: "Approve",
+      behavior: () => console.log("sending"),
+    },
+  },
+  {
+    description: "Client processes advanced payment",
+    status: "upcoming",
+  },
+  {
+    description: "Client reviews deliverables and proposal",
+    status: "upcoming",
+  },
+  {
+    description: "Client processes the final payment",
+    status: "upcoming",
+  },
+]
 
 export const getServerSideProps: GetServerSideProps = async ({ params = {} }) => {
   const { proposalId } = params
@@ -45,7 +77,8 @@ const ViewProposal: BlitzPage = () => {
 
   return (
     <Layout title="View Proposal">
-      <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto pb-9">
+      <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto pb-9 relative">
+        <Stepper steps={steps} className="absolute right-[-340px] top-0" />
         <ProposalViewHeaderNavigation />
         <ReadMore className="mt-9 mb-9">{proposal?.data?.content?.body}</ReadMore>
         <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" />
