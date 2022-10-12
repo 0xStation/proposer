@@ -112,7 +112,7 @@ const PaymentRow = ({
         ) : (
           <a
             href={`${getNetworkGnosisUrl(payment.data.token.chainId)}:${
-              payment.data.multisigTransaction.safeAddress
+              payment.data.multisigTransaction.address
             }/transactions/queue`}
             target="_blank"
             rel="noreferrer"
