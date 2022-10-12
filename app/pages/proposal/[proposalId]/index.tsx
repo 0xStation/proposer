@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { BlitzPage, useQuery, useParam, GetServerSideProps, invoke } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import getProposalById from "app/proposal/queries/getProposalById"
@@ -11,7 +12,10 @@ import Stepper from "app/proposal/components/Stepper"
 const steps = [
   {
     description: "Author sends proposal",
-    status: "complete",
+    getStatus: (proposal) => {
+      return proposal.status === "DRAFT" ? "current" : "complete"
+    },
+    valid: (_proposal) => true,
     action: {
       title: "Send",
       behavior: () => console.log("sending"),
@@ -19,7 +23,14 @@ const steps = [
   },
   {
     description: "Client, contributor, and author approve the proposal",
-    status: "current",
+    valid: (_proposal) => true,
+    getStatus: (proposal) => {
+      return proposal.status === "APPROVED"
+        ? "complete"
+        : proposal.status === "DRAFT"
+        ? "upcoming"
+        : "current"
+    },
     action: {
       title: "Approve",
       behavior: () => console.log("sending"),
@@ -27,15 +38,24 @@ const steps = [
   },
   {
     description: "Client processes advanced payment",
-    status: "upcoming",
+    getStatus: (proposal) => {
+      return "upcoming"
+    },
+    valid: (_proposal) => false,
   },
   {
     description: "Client reviews deliverables and proposal",
-    status: "upcoming",
+    getStatus: (proposal) => {
+      return "upcoming"
+    },
+    valid: (_proposal) => false,
   },
   {
     description: "Client processes the final payment",
-    status: "upcoming",
+    getStatus: (proposal) => {
+      return "upcoming"
+    },
+    valid: (_proposal) => false,
   },
 ]
 
@@ -74,11 +94,30 @@ const ViewProposal: BlitzPage = () => {
     { id: proposalId },
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
+  const [stepperSteps, setStepperSteps] = useState<any>([])
+  useEffect(() => {
+    if (proposal) {
+      const filteredSteps = steps
+        .filter((step) => {
+          return step.valid(proposal)
+        })
+        .map((step) => {
+          return {
+            ...step,
+            status: step.getStatus(proposal),
+          }
+        })
+
+      setStepperSteps(filteredSteps)
+    }
+  }, [proposal])
+
+  console.log(proposal)
 
   return (
     <Layout title="View Proposal">
       <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto pb-9 relative">
-        <Stepper steps={steps} className="absolute right-[-340px] top-0" />
+        <Stepper steps={stepperSteps} className="absolute right-[-340px] top-0" />
         <ProposalViewHeaderNavigation />
         <ReadMore className="mt-9 mb-9">{proposal?.data?.content?.body}</ReadMore>
         <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" />
