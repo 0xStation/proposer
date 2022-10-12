@@ -6,8 +6,6 @@ import { ZodMilestone, ZodPayment } from "app/types/zod"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
 import { Token } from "app/token/types"
 import { PaymentTerm } from "app/proposalPayment/types"
-import { sendNewProposalEmail } from "app/utils/email"
-import { getEmails } from "app/utils/privy"
 
 const CreateProposal = z.object({
   contentTitle: z.string(),
