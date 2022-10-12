@@ -17,6 +17,7 @@ export default async function getProposalsByAddress(input: z.infer<typeof GetPro
 
   const whereParams = {
     where: {
+      suppress: false,
       roles: {
         some: {
           address: data.address,
