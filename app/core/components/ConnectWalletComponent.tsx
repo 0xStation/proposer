@@ -120,6 +120,7 @@ export const ConnectWalletComponent = () => {
       trackError(WALLET_CONNECTION.EVENT_NAME.SIGN_IN_WITH_ETHEREUM_ERROR, {
         pageName: window.location.href,
         stationHandle: terminalHandle as string,
+        userAddress: accountData?.address,
         errorMsg,
       })
       setConnectState({ error: true, loading: false })
