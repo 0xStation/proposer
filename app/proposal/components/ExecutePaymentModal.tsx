@@ -20,7 +20,6 @@ enum Tab {
   ATTACH_TRANSACTION = "ATTACH_TRANSACTION",
 }
 import updateProposalStatus from "app/proposal/mutations/updateProposalStatus"
-import { ProposalStatus } from "@prisma/client"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 
 export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
