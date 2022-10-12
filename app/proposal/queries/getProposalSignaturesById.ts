@@ -11,6 +11,9 @@ export default async function getProposalSignaturesById(
   const signatures = await db.proposalSignature.findMany({
     where: {
       proposalId: params.proposalId,
+      proposal: {
+        suppress: false,
+      },
     },
   })
 
