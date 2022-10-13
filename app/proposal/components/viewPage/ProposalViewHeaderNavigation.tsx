@@ -10,7 +10,6 @@ import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import ApproveProposalModal from "app/proposal/components/ApproveProposalModal"
 import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
-import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { LINKS } from "app/core/utils/constants"
 import SendProposalModal from "../SendProposalModal"
@@ -62,8 +61,6 @@ export const ProposalViewHeaderNavigation = () => {
     }
   )
 
-  const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(proposal)
-
   // author used to return to workspace page with proposal list view
   const author = findProposalRoleByRoleType(roles, ProposalRoleType.AUTHOR)
   // numerator for the progress circle
@@ -73,10 +70,6 @@ export const ProposalViewHeaderNavigation = () => {
         role.approvalStatus === ProposalRoleApprovalStatus.APPROVED ||
         role.approvalStatus === ProposalRoleApprovalStatus.SENT // include author's SEND signature in net count too
     ).length || 0
-
-  // activeUser's view permissions
-  const activeUserIsSigner = signedRoles.length + remainingRoles.length > 0
-  const activeUserHasRolesToSign = remainingRoles.length > 0
 
   const currentPageUrl =
     typeof window !== "undefined"
@@ -167,7 +160,7 @@ export const ProposalViewHeaderNavigation = () => {
         </div>
         {/* BUTTONS */}
         <div className="w-full mt-6 box-border">
-          {proposal && !loading && <CopyBtn textToWrite={currentPageUrl} />}
+          {proposal && <CopyBtn textToWrite={currentPageUrl} />}
         </div>
         {/* TABS */}
         <div className="mt-12 self-end flex flex-row space-x-4 border-b border-concrete">

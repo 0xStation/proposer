@@ -1,7 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
 import { Image } from "blitz"
-import Exit from "/public/exit-button.svg"
 
 const checkBanner = (picture) => {
   if (picture) {

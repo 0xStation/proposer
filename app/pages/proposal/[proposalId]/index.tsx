@@ -7,10 +7,11 @@ import ReadMore from "app/core/components/ReadMore"
 import { TotalPaymentView } from "app/core/components/TotalPaymentView"
 import RoleSignaturesView from "app/core/components/RoleSignaturesView"
 import { Proposal } from "app/proposal/types"
-import Stepper from "app/proposal/components/Stepper"
+import ProposalStepper from "app/proposal/components/Stepper"
 import useStore from "app/core/hooks/useStore"
 import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import Button from "app/core/components/sds/buttons/Button"
+import { ProposalRoleType } from "@prisma/client"
 
 export const getServerSideProps: GetServerSideProps = async ({ params = {} }) => {
   const { proposalId } = params
@@ -55,17 +56,22 @@ const ViewProposal: BlitzPage = () => {
   const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(proposal)
   const activeUserIsSigner = signedRoles.length + remainingRoles.length > 0
   const activeUserHasRolesToSign = remainingRoles.length > 0
+  const usersRoles = [...remainingRoles, ...signedRoles].map(
+    (role) => role.type
+  ) as ProposalRoleType[]
 
   const rawSteps = [
     {
       description: "Author sends proposal",
       status: proposal ? (proposal.status === "DRAFT" ? "current" : "complete") : "loading",
-      valid: (_proposal) => true,
-      button: <Button onClick={toggleSendProposalModalOpen}>Send</Button>,
+      actions: {
+        [ProposalRoleType.AUTHOR]: (
+          <Button onClick={() => toggleSendProposalModalOpen(true)}>Send</Button>
+        ),
+      },
     },
     {
       description: "Client, contributor, and author approve the proposal",
-      valid: (_proposal) => true,
       status: proposal
         ? proposal.status === "APPROVED"
           ? "complete"
@@ -73,47 +79,35 @@ const ViewProposal: BlitzPage = () => {
           ? "upcoming"
           : "current"
         : "loading",
-      ...(activeUserIsSigner && {
-        button: activeUserHasRolesToSign ? (
-          <Button onClick={toggleProposalApprovalModalOpen}>Approve</Button>
+      actions: {
+        [ProposalRoleType.CLIENT]: activeUserHasRolesToSign ? (
+          <Button onClick={() => toggleProposalApprovalModalOpen(true)}>Approve</Button>
         ) : (
           <Button isDisabled={true}>Approved</Button>
         ),
-      }),
-    },
-    {
-      description: "Client processes advanced payment",
-      status: "upcoming",
-      valid: (_proposal) => false,
-    },
-    {
-      description: "Client reviews deliverables and proposal",
-      status: "upcoming",
-      valid: (_proposal) => false,
-    },
-    {
-      description: "Client processes the final payment",
-      status: "upcoming",
-      valid: (_proposal) => false,
+        [ProposalRoleType.CONTRIBUTOR]: activeUserHasRolesToSign ? (
+          <Button onClick={() => toggleProposalApprovalModalOpen(true)}>Approve</Button>
+        ) : (
+          <Button isDisabled={true}>Approved</Button>
+        ),
+      },
     },
   ]
 
   useEffect(() => {
     if (proposal) {
-      const filteredSteps = rawSteps.filter((step) => {
-        return step.valid(proposal)
-      })
-
-      setStepperSteps(filteredSteps)
+      setStepperSteps(rawSteps)
     }
   }, [proposal, activeUserHasRolesToSign, activeUserIsSigner])
-
-  console.log(proposal)
 
   return (
     <Layout title="View Proposal">
       <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto pb-9 relative">
-        <Stepper steps={stepperSteps} className="absolute right-[-340px] top-0" />
+        <ProposalStepper
+          roles={usersRoles}
+          steps={stepperSteps}
+          className="absolute right-[-340px] top-0"
+        />
         <ProposalViewHeaderNavigation />
         <ReadMore className="mt-9 mb-9">{proposal?.data?.content?.body}</ReadMore>
         <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" />

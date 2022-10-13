@@ -9,7 +9,7 @@ import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import { ProposalRoleWithSignatures } from "app/proposalRole/types"
 
 interface RoleWithSignerCompletionStatus {
-  roleType: string
+  type: string
   roleId: string
   address: string
   // roles have a status representing if the role is completely signed for (multi-sigs need many signatures)
@@ -72,7 +72,7 @@ const useGetUsersRolesToSignFor = (proposal: Proposal | undefined | null) => {
             // only ask for a signature on this role if it is not an author
             // without this check, the author's indicator for "SENT" will get overriden with "APPROVE"
             remaining.push({
-              roleType: role?.type,
+              type: role?.type,
               roleId: role?.id,
               address: role?.address,
               oneSignerNeededToComplete: true, // always true for unsigned single signer
@@ -99,7 +99,7 @@ const useGetUsersRolesToSignFor = (proposal: Proposal | undefined | null) => {
               }
               if (totalSafeSignersSigned < gnosisSafeDetails?.quorum) {
                 remaining.push({
-                  roleType: role?.type,
+                  type: role?.type,
                   roleId: role?.id,
                   address: activeUser.address,
                   oneSignerNeededToComplete:
