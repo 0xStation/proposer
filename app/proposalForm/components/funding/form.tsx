@@ -314,7 +314,6 @@ export const ProposalFundingForm = ({
                   isDisabled={unFilledProposalFields}
                   className="my-6 float-right"
                   onClick={async () => {
-                    // TODO: add validation before clicking next
                     let contributorAddress
                     let clientAddress
                     // if proposing as contributor, take active user address
