@@ -22,6 +22,7 @@ import {
   isValidTokenAmount,
   isPositiveAmount,
   isEnsOrAddress,
+  isValidAdvancedPaymentPercentage,
 } from "app/utils/validators"
 import { AddressType, ProposalRoleType } from "@prisma/client"
 import BackArrow from "app/core/icons/BackArrow"
@@ -30,7 +31,7 @@ import ImportTokenModal from "app/core/components/ImportTokenModal"
 import getTokensByAccount from "../../token/queries/getTokensByAccount"
 import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
-import { formatTokenAmount } from "app/utils/formatters"
+import { formatPercentValue, formatTokenAmount } from "app/utils/formatters"
 import { useEnsAddress } from "wagmi"
 import { AddressLink } from "../../core/components/AddressLink"
 import { PaymentTerm } from "app/proposalPayment/types"
@@ -639,7 +640,7 @@ const RewardForm = ({
               )
             }}
           </Field>
-          {/* PAYMENT TYPE */}
+          {/* PAYMENT TERMS */}
           <label className="font-bold block mt-6">Payment terms*</label>
           <span className="text-xs text-concrete block">
             When is the payment expected to be sent to contributors?
@@ -684,20 +685,21 @@ const RewardForm = ({
               <Field
                 name="advancedPaymentPercentage"
                 defaultValue={"0"}
-                // format={formatTokenAmount}
-                validate={composeValidators(requiredField)}
+                format={formatPercentValue}
+                validate={composeValidators(requiredField, isValidAdvancedPaymentPercentage)}
               >
                 {({ input, meta }) => {
                   return (
-                    <div>
+                    <div className="h-10 w-full border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
                       <input
                         {...input}
                         type="text"
-                        className="w-full bg-wet-concrete rounded mt-1 p-2"
                         placeholder="0"
+                        className="h-full p-2 inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white"
                       />
-                      {meta.touched && meta.error && (
-                        <span className="text-torch-red text-xs">{meta.error}</span>
+                      <div className="py-2 px-4 w-[2%] inline h-full">%</div>
+                      {meta.error && meta.touched && (
+                        <span className="text-xs text-torch-red mt-2 block">{meta.error}</span>
                       )}
                     </div>
                   )

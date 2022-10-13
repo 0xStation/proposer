@@ -10,3 +10,19 @@ export const formatTokenAmount = (amount: string): string => {
   // only keep the first match i.e. throw away non-matching characters/sequences
   return regexMatches[0]!
 }
+
+export const formatPercentValue = (value: string): string => {
+  const decimalRegex = /([0-9]+\.?[0-9]*|\.[0-9]+)/
+  const regexMatches = (value || "").match(decimalRegex) || [""]
+  const parsedValue = regexMatches[0]!
+
+  const [integer, decimal] = parsedValue.split(".")
+  const decimalCapped =
+    decimal !== undefined
+      ? parseInt(integer || "0")?.toLocaleString("en-US") +
+          "." +
+          decimal?.substring(0, Math.min(decimal.length, 2)) || ""
+      : integer || ""
+
+  return decimalCapped
+}

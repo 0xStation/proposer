@@ -1,7 +1,7 @@
 import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import isURL from "validator/lib/isURL"
 import isEmail from "validator/lib/isEmail"
-import { formatTokenAmount } from "./formatters"
+import { formatPercentValue, formatTokenAmount } from "./formatters"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import { txPathString } from "app/core/utils/constants"
 
@@ -143,4 +143,10 @@ export const isValidTransactionLink = (chainId: number) => {
 
     return undefined
   }
+}
+
+export const isValidAdvancedPaymentPercentage = (value: string) => {
+  const parsedValue = parseFloat(formatPercentValue(value))
+  if (parsedValue >= 100) return "Advanced payment must be less than 100%"
+  if (parsedValue === 0) return "Advanced payment must be more than 0%"
 }
