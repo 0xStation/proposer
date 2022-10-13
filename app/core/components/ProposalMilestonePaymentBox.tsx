@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { ArrowRightIcon, CheckCircleIcon } from "@heroicons/react/solid"
 import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
+import AttachTransactionModal from "app/proposal/components/AttachTransactionModal"
 import { ProposalMilestone, ProposalMilestoneStatus } from "app/proposalMilestone/types"
 import { getMilestoneStatus } from "app/proposalMilestone/utils"
 import { PROPOSAL_MILESTONE_STATUS_MAP } from "../utils/constants"
@@ -21,6 +22,7 @@ const PaymentRow = ({
   milestone,
   setQueueGnosisTransactionModalOpen,
   setIsExecutePaymentModalOpen,
+  setIsAttachtxModalOpen,
 }) => {
   const setToastState = useStore((state) => state.setToastState)
   const activeUser = useStore((state) => state.activeUser)
@@ -110,18 +112,28 @@ const PaymentRow = ({
             Queue Gnosis transaction
           </Button>
         ) : (
-          <a
-            href={`${getNetworkGnosisUrl(payment.data.token.chainId)}:${
-              payment.data.multisigTransaction.address
-            }/transactions/queue`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <button className="mt-4 mb-2 sm:mb-0 border rounded w-[300px] sm:w-[400px] md:w-[614px] h-[35px] bg-electric-violet border-electric-violet text-tunnel-black">
-              Execute on Gnosis
-              <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
-            </button>
-          </a>
+          <>
+            <a
+              href={`${getNetworkGnosisUrl(payment.data.token.chainId)}:${
+                payment.data.multisigTransaction.address
+              }/transactions/queue`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <button className="mt-4 mb-2 sm:mb-0 border rounded w-[300px] sm:w-[400px] md:w-[614px] h-[35px] bg-electric-violet border-electric-violet text-tunnel-black">
+                Execute on Gnosis
+                <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
+              </button>
+            </a>
+            <span
+              className="text-electric-violet text-xs mt-2 cursor-pointer"
+              onClick={() => {
+                setIsAttachtxModalOpen(true)
+              }}
+            >
+              Paste a transaction link
+            </span>
+          </>
         ))}
       {userIsPayer &&
         // proactive logic for when we have multiple milestone payment blocks -> only the current milestone should be payable
@@ -158,6 +170,7 @@ export const ProposalMilestonePaymentBox = ({
   className?: string
 }) => {
   const [isExecutePaymentModalOpen, setIsExecutePaymentModalOpen] = useState<boolean>(false)
+  const [isAttachtxModalOpen, setIsAttachtxModalOpen] = useState<boolean>(false)
   const [queueGnosisTransactionModalOpen, setQueueGnosisTransactionModalOpen] =
     useState<boolean>(false)
 
@@ -172,6 +185,11 @@ export const ProposalMilestonePaymentBox = ({
         milestone={milestone}
         isOpen={queueGnosisTransactionModalOpen}
         setIsOpen={setQueueGnosisTransactionModalOpen}
+      />
+      <AttachTransactionModal
+        milestone={milestone}
+        isOpen={isAttachtxModalOpen}
+        setIsOpen={setIsAttachtxModalOpen}
       />
       <div className={`border border-b border-concrete rounded-2xl px-6 py-9 ${className}`}>
         <div className="flex flex-row items-center mb-4">
@@ -199,6 +217,7 @@ export const ProposalMilestonePaymentBox = ({
             payment={payment}
             setQueueGnosisTransactionModalOpen={setQueueGnosisTransactionModalOpen}
             setIsExecutePaymentModalOpen={setIsExecutePaymentModalOpen}
+            setIsAttachtxModalOpen={setIsAttachtxModalOpen}
             proposal={proposal}
             milestone={milestone}
           />
