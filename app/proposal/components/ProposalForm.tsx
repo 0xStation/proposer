@@ -691,7 +691,7 @@ const RewardForm = ({
               >
                 {({ input, meta }) => {
                   return (
-                    <div className="h-10 w-full border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
+                    <div className="h-10 mt-1 w-full border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
                       <input
                         {...input}
                         type="text"
@@ -1031,17 +1031,20 @@ export const ProposalForm = ({
                   milestones = [
                     {
                       index: 0,
-                      title: "Advanced payment",
+                      title: "Advance payment",
                     },
                     {
                       index: 1,
                       title: "Completion payment",
                     },
                   ]
+
                   const advancedPayment =
                     (parseFloat(values.paymentAmount) *
                       parseFloat(values.advancedPaymentPercentage)) /
                     100
+                  const completionPayment = parseFloat(values.paymentAmount) - advancedPayment
+
                   payments = [
                     {
                       ...tokenTransferBase,
@@ -1051,7 +1054,7 @@ export const ProposalForm = ({
                     {
                       ...tokenTransferBase,
                       milestoneIndex: 1,
-                      amount: parseFloat(values.paymentAmount) - advancedPayment,
+                      amount: completionPayment,
                     },
                   ]
                 } else {

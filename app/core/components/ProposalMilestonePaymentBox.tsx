@@ -192,16 +192,21 @@ export const ProposalMilestonePaymentBox = ({
         setIsOpen={setIsAttachtxModalOpen}
       />
       <div className={`border border-b border-concrete rounded-2xl px-6 py-9 ${className}`}>
-        <div className="flex flex-row items-center mb-4">
-          <span
-            className={`${
-              PROPOSAL_MILESTONE_STATUS_MAP[getMilestoneStatus(proposal, milestone) || ""]?.color
-            } rounded-full px-2 py-1 flex items-center space-x-1 w-fit mr-4`}
-          >
-            <span className="text-xs uppercase text-tunnel-black font-bold">
-              {PROPOSAL_MILESTONE_STATUS_MAP[getMilestoneStatus(proposal, milestone) || ""]?.copy}
-            </span>
-          </span>
+        <div className="flex flex-row items-center justify-between mb-4">
+          <span>{milestone?.data?.title || "title"}</span>
+          <div className="flex flex-col items-end space-y-1">
+            <div className="flex flex-row items-center space-x-1">
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  PROPOSAL_MILESTONE_STATUS_MAP[getMilestoneStatus(proposal, milestone) || ""]
+                    ?.color
+                }`}
+              />
+              <div className="font-bold text-xs uppercase tracking-wider">
+                {PROPOSAL_MILESTONE_STATUS_MAP[getMilestoneStatus(proposal, milestone) || ""]?.copy}
+              </div>
+            </div>
+          </div>
         </div>
         <div className=" text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
           <span className="basis-32 mb-2 tracking-wider">From</span>

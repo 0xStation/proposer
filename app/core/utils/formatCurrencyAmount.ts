@@ -1,5 +1,5 @@
 // formateDate to XXX,XXX.XX, e.g. 12,345.67
-export const formatCurrencyAmount = (amount: any | undefined): string => {
+export const formatCurrencyAmount = (amount: string | undefined): string => {
   if (!amount) {
     return "0.00"
   }
