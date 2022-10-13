@@ -27,6 +27,14 @@ export const getNetworkExplorer = (chainId: number): string => {
   }
 }
 
+export const getNetworkGnosisUrl = (chainId: number): string => {
+  try {
+    return networks[chainId].gnosisUrl
+  } catch {
+    return ""
+  }
+}
+
 export const getNetworkName = (chainId: number): string => {
   try {
     return networks[chainId].name

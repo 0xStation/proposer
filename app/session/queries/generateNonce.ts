@@ -8,6 +8,6 @@ export default async function getNonce(_: any, ctx: Ctx) {
     return ctx.session.nonce
   } catch (err) {
     console.error("Failed to generate and retrieve nonce with error: ", err)
-    return ""
+    throw Error(err)
   }
 }

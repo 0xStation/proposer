@@ -3,7 +3,7 @@ import { useQuery } from "blitz"
 import { Proposal } from "app/proposal/types"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
-import { AddressType } from "@prisma/client"
+import { AddressType, ProposalRoleType } from "@prisma/client"
 import useStore from "./useStore"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import { ProposalRoleWithSignatures } from "app/proposalRole/types"
@@ -62,7 +62,9 @@ const useGetUsersRolesToSignFor = (proposal: Proposal | undefined | null) => {
         ) {
           if (role.approvalStatus === "APPROVED") {
             signed.push(role)
-          } else {
+          } else if (role.type !== ProposalRoleType.AUTHOR) {
+            // only ask for a signature on this role if it is not an author
+            // without this check, the author's indicator for "SENT" will get overriden with "APPROVE"
             remaining.push({
               roleType: role?.type,
               roleId: role?.id,

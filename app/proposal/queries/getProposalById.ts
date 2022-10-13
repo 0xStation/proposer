@@ -7,9 +7,10 @@ const GetProposalById = z.object({
 })
 
 export default async function getProposalById(params: z.infer<typeof GetProposalById>) {
-  const proposal = await db.proposal.findUnique({
+  const proposal = await db.proposal.findFirst({
     where: {
       id: params.id,
+      suppress: false,
     },
     include: {
       roles: {

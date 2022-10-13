@@ -9,8 +9,23 @@ export type ProposalPayment = PrismaProposalPayment & {
   data: ProposalPaymentMetadata
 }
 
+// TS being extremely annoying and making me fight the compiler
+// saying namespace not recognized if I try to import AddressType from prisma client
+// like I usually would. Including these here just so it is typescript "flavored"
+// but really this is just to satisfy the compiler and no better than hardcoding
+// "SAFE" on line 29 (type: AddressType["SAFE"])
+type AddressType = {
+  WALLET: "WALLET"
+  SAFE: "SAFE"
+}
+
 export type ProposalPaymentMetadata = {
   token: Token
+  multisigTransaction?: {
+    type: AddressType["SAFE"]
+    address: string
+    transactionId: string
+  }
 }
 
 export enum PaymentTerm {

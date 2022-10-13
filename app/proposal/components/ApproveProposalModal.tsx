@@ -11,6 +11,8 @@ import { Proposal } from "app/proposal/types"
 import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import getProposalSignaturesById from "app/proposal/queries/getProposalSignaturesById"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
+import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
+import networks from "app/utils/networks.json"
 
 export const ApproveProposalModal = ({
   isOpen,
@@ -92,12 +94,46 @@ export const ApproveProposalModal = ({
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        <h3 className="text-2xl font-bold pt-6">Approve</h3>
+        <h3 className="text-2xl font-bold pt-6">Confirm your approval</h3>
         <p className="mt-2">
-        Sign to approve the proposal. Once all parties, including the author, have approved, the proposal will be activated and uploaded onto IPFS. 
+          Approval represents your agreement to the terms outlined in this proposal. Please review
+          the payment terms below carefully before approving.
         </p>
+        {
+          // if no payments exist for this proposal, doesn't make sense to show any of the following metadata
+          proposal.data.totalPayments && proposal.data.totalPayments?.length > 0 && (
+            <div className="mt-8 mb-4 space-y-2 flex flex-col">
+              <div className="grid grid-cols-4">
+                <span className="text-concrete col-span-1">Payment</span>
+                <span className="col-span-3">
+                  {proposal.data.totalPayments?.map((payment, idx) => {
+                    return (
+                      <span key={`payment-${idx}`}>
+                        {payment.amount} {payment.token.symbol}
+                      </span>
+                    )
+                  })}
+                </span>
+              </div>
+              <div className="grid grid-cols-4">
+                <span className="text-concrete col-span-1">Terms</span>
+                <span className="col-span-3">
+                  {PAYMENT_TERM_MAP[proposal.data.paymentTerms || ""].copy}
+                </span>
+              </div>
+              <div className="grid grid-cols-4">
+                <span className="text-concrete col-span-1">Network</span>
+                <span className="col-span-3">
+                  {proposal.data.totalPayments?.[0]?.token.chainId
+                    ? networks[proposal.data.totalPayments?.[0]?.token.chainId].name
+                    : "Not recognized"}
+                </span>
+              </div>
+            </div>
+          )
+        }
 
-        <div className="mt-8 flex items-center">
+        <div className="mt-8 flex items-center justify-end">
           <Button
             className="mr-2"
             type={ButtonType.Secondary}
@@ -117,7 +153,7 @@ export const ApproveProposalModal = ({
               initiateSignature()
             }}
           >
-            Sign
+            Confirm
           </Button>
         </div>
       </div>

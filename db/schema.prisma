@@ -61,6 +61,7 @@ model Proposal {
   timestamp             DateTime       @default(now())
   currentMilestoneIndex Int            @default(-1) // no current milestone, gets set to 0 after proposal is approved
   data                  Json
+  suppress              Boolean        @default(false)
 
   roles      ProposalRole[]
   milestones ProposalMilestone[]
@@ -101,21 +102,28 @@ enum ProposalRoleType {
 enum ProposalRoleApprovalStatus {
   PENDING // role is pending approval
   APPROVED // role has approved
-  // DENY -- future for denying proposals
+  SENT // signed by author to send to recipientsgena
+  // DENY - future for denying proposals
 }
 
 model ProposalSignature {
-  id         String   @id @default(uuid())
+  id         String                @id @default(uuid())
   proposalId String
   address    String
-  timestamp  DateTime @default(now())
+  timestamp  DateTime              @default(now())
   data       Json
+  type       ProposalSignatureType @default(APPROVE)
 
   proposal Proposal       @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   // m-n relation to support one signature being utilized for many roles
   // for example, I can have the AUTHOR and CONTRIBUTOR role simultaneously
   // another example, I can be a AUTHOR and represent a CLIENT as a signer of its multisig
   roles    ProposalRole[] @relation("RoleApprovalSignature")
+}
+
+enum ProposalSignatureType {
+  APPROVE // approving the proposal
+  SEND // send the proposal to other roles as an author
 }
 
 // PROPOSAL MILESTONES AND EXPECTATIONS
