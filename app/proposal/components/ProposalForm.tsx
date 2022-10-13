@@ -399,6 +399,7 @@ const RewardForm = ({
 }) => {
   const session = useSession({ suspense: false })
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  const [selectedPaymentTerms, setSelectedPaymentTerms] = useState<string>("")
 
   return (
     <>
@@ -647,7 +648,19 @@ const RewardForm = ({
             {({ meta, input }) => (
               <>
                 <div className="custom-select-wrapper">
-                  <select {...input} required className="w-full bg-wet-concrete rounded p-2 mt-1">
+                  <select
+                    {...input}
+                    required
+                    className="w-full bg-wet-concrete rounded p-2 mt-1"
+                    value={selectedPaymentTerms}
+                    onChange={(e) => {
+                      setSelectedPaymentTerms(e.target.value)
+                      // custom values can be compatible with react-final-form by calling
+                      // the props.input.onChange callback
+                      // https://final-form.org/docs/react-final-form/api/Field
+                      input.onChange(e.target.value)
+                    }}
+                  >
                     <option value="">Choose option</option>
                     <option value={PaymentTerm.ON_AGREEMENT}>
                       {PAYMENT_TERM_MAP[PaymentTerm.ON_AGREEMENT]?.copy}
@@ -660,6 +673,38 @@ const RewardForm = ({
               </>
             )}
           </Field>
+          {selectedPaymentTerms === PaymentTerm.AFTER_COMPLETION && (
+            <>
+              {/* ADVANCED PAYMENT */}
+              <label className="font-bold block mt-6">Advanced payment*</label>
+              <span className="text-xs text-concrete block">
+                How much of the payment amount should the contributors expect to receive at proposal
+                approval to kickstart their project?
+              </span>
+              <Field
+                name="advancedPaymentPercentage"
+                defaultValue={"0"}
+                // format={formatTokenAmount}
+                validate={composeValidators(requiredField)}
+              >
+                {({ input, meta }) => {
+                  return (
+                    <div>
+                      <input
+                        {...input}
+                        type="text"
+                        className="w-full bg-wet-concrete rounded mt-1 p-2"
+                        placeholder="0"
+                      />
+                      {meta.touched && meta.error && (
+                        <span className="text-torch-red text-xs">{meta.error}</span>
+                      )}
+                    </div>
+                  )
+                }}
+              </Field>
+            </>
+          )}
         </>
       )}
     </>
@@ -969,21 +1014,57 @@ export const ProposalForm = ({
                   return
                 }
 
-                milestones = [
-                  {
-                    index: 0,
-                    title: "Pay contributor",
-                  },
-                ]
-                payments = [
-                  {
-                    milestoneIndex: 0,
-                    senderAddress: clientAddress,
-                    recipientAddress: contributorAddress,
-                    amount: parseFloat(values.paymentAmount),
-                    token: { ...token, chainId: selectedNetworkId },
-                  },
-                ]
+                const tokenTransferBase = {
+                  senderAddress: clientAddress,
+                  recipientAddress: contributorAddress,
+                  token: { ...token, chainId: selectedNetworkId },
+                }
+
+                if (
+                  values.paymentTerms === PaymentTerm.AFTER_COMPLETION &&
+                  parseFloat(values.advancedPaymentPercentage) > 0
+                ) {
+                  milestones = [
+                    {
+                      index: 0,
+                      title: "Advanced payment",
+                    },
+                    {
+                      index: 1,
+                      title: "Completion payment",
+                    },
+                  ]
+                  const advancedPayment =
+                    (parseFloat(values.paymentAmount) *
+                      parseFloat(values.advancedPaymentPercentage)) /
+                    100
+                  payments = [
+                    {
+                      ...tokenTransferBase,
+                      milestoneIndex: 0,
+                      amount: advancedPayment,
+                    },
+                    {
+                      ...tokenTransferBase,
+                      milestoneIndex: 1,
+                      amount: parseFloat(values.paymentAmount) - advancedPayment,
+                    },
+                  ]
+                } else {
+                  milestones = [
+                    {
+                      index: 0,
+                      title: "Upfront payment",
+                    },
+                  ]
+                  payments = [
+                    {
+                      ...tokenTransferBase,
+                      milestoneIndex: 0,
+                      amount: parseFloat(values.paymentAmount),
+                    },
+                  ]
+                }
               }
 
               try {
