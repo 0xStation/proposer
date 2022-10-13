@@ -23,9 +23,15 @@ export const RoleSignaturesView = ({
   )
   const isFundingProposal = proposal?.payments && Boolean(proposal?.payments?.length)
 
+  // This check is needed for old non-funding proposals that have author, contributor, and client
+  // instead of just author and client
+  const hasContributorRole = proposal?.roles?.find(
+    (role) => role.type === ProposalRoleType.CONTRIBUTOR
+  )
+
   return proposal ? (
     <div className={`border border-b border-concrete rounded-2xl px-6 py-6 ${className}`}>
-      {isFundingProposal && (
+      {(isFundingProposal || hasContributorRole) && (
         <>
           {/* CONTRIBUTOR */}
           <h4 className="text-xs font-bold text-concrete uppercase mt-2 mb-2">Contributor</h4>
