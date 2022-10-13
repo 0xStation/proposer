@@ -20,7 +20,7 @@ const ViewProposal: BlitzPage = () => {
       <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto pb-9">
         <ProposalViewHeaderNavigation />
         <ReadMore className="mt-9 mb-9">{proposal?.data?.content?.body}</ReadMore>
-        <RoleSignaturesView proposal={proposal as Proposal | undefined} className="mt-9" />
+        <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" />
         {(proposal?.data.totalPayments || []).length > 0 && (
           <TotalPaymentView proposal={proposal!} className="mt-9" />
         )}

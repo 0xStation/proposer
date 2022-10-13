@@ -14,7 +14,7 @@ const UpdateProposalMetadata = z.object({
   ipfsHash: z.string().optional(),
   ipfsPinSize: z.number().optional(),
   ipfsTimestamp: z.string().optional(),
-  totalPayments: z.object({ token: ZodToken, amount: z.number() }).array(),
+  totalPayments: z.object({ token: ZodToken, amount: z.number() }).array().optional(),
   paymentTerms: z.enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION]).optional(),
 })
 
