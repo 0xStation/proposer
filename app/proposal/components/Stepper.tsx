@@ -1,15 +1,9 @@
 import { CheckIcon } from "@heroicons/react/solid"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 
-type Action = {
-  title: string
-  behavior: () => void
-}
-
-type Step = {
+export type Step = {
   description: string
   status: string
-  action?: Action
+  button?: JSX.Element
 }
 
 function classNames(...classes) {
@@ -60,9 +54,12 @@ const Stepper = ({ steps, className }: { steps: Step[]; className?: string }) =>
                   </span>
                   <div className="flex flex-col space-y-2 ml-4 min-w-0">
                     <span className="text-sm text-marble-white">{step.description}</span>
-                    {step.action && (
-                      <Button type={ButtonType.Secondary}>{step.action?.title}</Button>
-                    )}
+                    {step.button && step.button}
+                    {/* {step.action && (
+                      <Button type={ButtonType.Secondary} onClick={step.action?.behavior}>
+                        {step.action?.title}
+                      </Button>
+                    )} */}
                   </div>
                 </span>
               </>

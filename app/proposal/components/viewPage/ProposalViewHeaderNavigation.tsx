@@ -1,6 +1,6 @@
 import { Link, Routes, useParam, useQuery, useRouter } from "blitz"
 import { CheckCircleIcon } from "@heroicons/react/solid"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import Button from "app/core/components/sds/buttons/Button"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import getProposalById from "app/proposal/queries/getProposalById"
 import { ProposalStatus, ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
@@ -15,7 +15,6 @@ import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTim
 import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { LINKS } from "app/core/utils/constants"
-import { useState } from "react"
 import SendProposalModal from "../SendProposalModal"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 
