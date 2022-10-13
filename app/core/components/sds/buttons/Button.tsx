@@ -66,7 +66,7 @@ const Button = ({
       disabled={isDisabled}
       className={classNames(
         `border rounded h-[35px] font-bold cursor-pointer ${className}`,
-        isDisabled && "opacity-70 cursor-default",
+        isDisabled && "opacity-70 cursor-not-allowed",
         type === ButtonType.Primary &&
           "bg-electric-violet border-electric-violet text-tunnel-black hover:bg-electric-violet/80 hover:border-transparent",
         type === ButtonType.Secondary &&

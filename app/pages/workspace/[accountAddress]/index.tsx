@@ -251,10 +251,10 @@ const WorkspaceHome: BlitzPage = () => {
                       </td>
                       {/* PAYMENT */}
                       <td className="text-base py-4">
-                        {proposal.data.totalPayments?.length > 0
+                        {proposal.data.totalPayments && proposal.data?.totalPayments?.length > 0
                           ? `${formatCurrencyAmount(
-                              proposal.data.totalPayments[0]?.amount.toString()
-                            )} ${proposal.data.totalPayments[0]?.token.symbol}`
+                              proposal.data?.totalPayments[0]?.amount?.toString()
+                            )} ${proposal.data?.totalPayments[0]?.token?.symbol}`
                           : "None"}
                       </td>
                       {/* LAST UPDATED */}
@@ -323,7 +323,7 @@ const WorkspaceHome: BlitzPage = () => {
             )}
             {/* CTA */}
             <Link
-              href={Routes.CreateProposal({
+              href={Routes.ProposalTypeSelection({
                 // pre-fill for both so that if user changes toggle to reverse roles, the input address is still there
                 clients: accountEnsName || accountAddress,
                 contributors: accountEnsName || accountAddress,

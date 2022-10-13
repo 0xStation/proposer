@@ -195,7 +195,7 @@ const WalletRole = ({ role, signatures, proposalStatus }) => {
 }
 
 export const RoleSignature = ({ role, signatures, proposalStatus }) => {
-  const isSafe = role.account.addressType === "SAFE"
+  const isSafe = role?.account?.addressType === "SAFE"
 
   return (
     <>
