@@ -26,6 +26,7 @@ const HeaderCopy = {
 
 export const ProposalNonFundingForm = ({ prefillClients }: { prefillClients: string[] }) => {
   const router = useRouter()
+  const walletModalOpen = useStore((state) => state.walletModalOpen)
   const setToastState = useStore((state) => state.setToastState)
   const activeUser = useStore((state) => state.activeUser)
   const [proposalStep, setProposalStep] = useState<FundingProposalStep>(FundingProposalStep.PROPOSE)
@@ -69,6 +70,13 @@ export const ProposalNonFundingForm = ({ prefillClients }: { prefillClients: str
       })
     },
   })
+
+  useEffect(() => {
+    if (!walletModalOpen && isLoading) {
+      setIsLoading(false)
+      setProposalShouldSendLater(false)
+    }
+  }, [walletModalOpen])
 
   useEffect(() => {
     // `shouldHandlePostProposalCreationProcessing` is used to retrigger this `useEffect` hook

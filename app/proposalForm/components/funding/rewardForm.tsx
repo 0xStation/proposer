@@ -1,9 +1,8 @@
 import { useSession } from "blitz"
-import { RadioGroup } from "@headlessui/react"
+import { useEffect } from "react"
 import ImportTokenModal from "app/core/components/ImportTokenModal"
 import useStore from "app/core/hooks/useStore"
-import { CheckCircleIcon } from "@heroicons/react/solid"
-import { PAYMENT_TERM_MAP, SUPPORTED_CHAINS } from "app/core/utils/constants"
+import { FundingProposalStep, PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import { Field } from "react-final-form"
 import {
   composeValidators,
@@ -28,9 +27,20 @@ export const RewardForm = ({
   refetchTokens,
   isImportTokenModalOpen,
   setIsImportTokenModalOpen,
+  setProposalStep,
 }) => {
   const session = useSession({ suspense: false })
+  const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+
+  useEffect(() => {
+    // if user's wallet isn't connected redirect back to the first step
+    // the reward form relies on the active chain to determine which tokens
+    // to pull from
+    if (!activeUser?.address) {
+      setProposalStep(FundingProposalStep.PROPOSE)
+    }
+  }, [activeUser?.address])
 
   return (
     <>

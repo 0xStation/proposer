@@ -19,12 +19,7 @@ import { PaymentTerm } from "app/proposalPayment/types"
 import createProposal from "app/proposal/mutations/createProposal"
 import { useResolveEnsAddress } from "app/proposalForm/hooks/useResolveEnsAddress"
 import { useConfirmAuthorship } from "app/proposalForm/hooks/useConfirmAuthorship"
-
-enum FundingProposalStep {
-  PROPOSE = "PROPOSE",
-  REWARDS = "REWARDS",
-  CONFIRM = "CONFIRM",
-}
+import { FundingProposalStep } from "app/core/utils/constants"
 
 const HeaderCopy = {
   [FundingProposalStep.PROPOSE]: "Propose",
@@ -41,6 +36,7 @@ export const ProposalFundingForm = ({
 }) => {
   const setToastState = useStore((state) => state.setToastState)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  const walletModalOpen = useStore((state) => state.walletModalOpen)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [proposalStep, setProposalStep] = useState<FundingProposalStep>(FundingProposalStep.PROPOSE)
   const [proposingAs, setProposingAs] = useState<string>(
@@ -64,7 +60,14 @@ export const ProposalFundingForm = ({
   const router = useRouter()
   const { resolveEnsAddress } = useResolveEnsAddress()
 
-  const { chain, chains } = useNetwork()
+  const { chain } = useNetwork()
+
+  useEffect(() => {
+    if (!walletModalOpen && isLoading) {
+      setIsLoading(false)
+      setProposalShouldSendLater(false)
+    }
+  }, [walletModalOpen])
 
   const { confirmAuthorship } = useConfirmAuthorship({
     onSuccess: (updatedProposal) => {
@@ -303,6 +306,7 @@ export const ProposalFundingForm = ({
                         setIsImportTokenModalOpen={setIsImportTokenModalOpen}
                         selectedToken={selectedToken}
                         setSelectedToken={setSelectedToken}
+                        setProposalStep={setProposalStep}
                       />
                     )}
                     {proposalStep === FundingProposalStep.CONFIRM && <ConfirmForm />}
@@ -385,18 +389,7 @@ export const ProposalFundingForm = ({
                   </span>
                   <Button
                     isDisabled={
-                      // CHECK CONTENT ON PROPOSE STEP
-                      // has not selected who user is proposing as
-                      !formState.values.proposingAs ||
-                      // proposing as author or client but has not filled in contributor
-                      (formState.values.proposingAs !== ProposalRoleType.CONTRIBUTOR &&
-                        !formState.values.contributor) ||
-                      // proposing as author or contributor but has not filled in client
-                      (formState.values.proposingAs !== ProposalRoleType.CLIENT &&
-                        !formState.values.client) ||
-                      // has not filled in title or body
-                      !formState.values.title ||
-                      !formState.values.body ||
+                      unFilledProposalFields ||
                       !(
                         formState.values.tokenAddress &&
                         formState.values.paymentAmount &&
