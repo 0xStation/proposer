@@ -1181,5 +1181,3 @@ export const ProposalForm = ({
 ProposalForm.suppressFirstRenderFlicker = true
 
 export default ProposalForm
-
-// {"token":{"name":"Rinkeby ETH","type":"COIN","symbol":"ETH","address":"0x0000000000000000000000000000000000000000","chainId":4,"decimals":18}}
