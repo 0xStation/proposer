@@ -4,7 +4,6 @@ import Modal from "app/core/components/Modal"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useGnosisSignature from "app/core/hooks/useGnosisSignature"
 import updatePayment from "app/proposalPayment/mutations/updatePayment"
-import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
 import useStore from "app/core/hooks/useStore"
 import { Field, Form } from "react-final-form"
 import { composeValidators, isValidTransactionLink, requiredField } from "app/utils/validators"
@@ -12,6 +11,7 @@ import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import getProposalById from "app/proposal/queries/getProposalById"
 import { txPathString } from "app/core/utils/constants"
 import saveTransactionHashToPayments from "app/proposal/mutations/saveTransactionToPayments"
+import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
 
 enum Tab {
   QUEUE_PAYMENT = "QUEUE_PAYMENT",
@@ -53,7 +53,7 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
         transactionHash,
       })
 
-      invalidateQuery(getProposalById)
+      invalidateQuery(getMilestonesByProposal)
 
       setIsOpen(false)
       setToastState({
@@ -128,6 +128,18 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
             Sign
           </Button>
         </div>
+        <p className="text-xs mt-2">You’ll be redirected to a transaction page to confirm.</p>
+        <p className="text-xs">
+          Already paid?{" "}
+          <button
+            onClick={() => {
+              setSelectedTab(Tab.ATTACH_TRANSACTION)
+            }}
+          >
+            <span className="text-electric-violet">Paste a transaction link</span>
+          </button>
+          .
+        </p>
       </>
     )
   }

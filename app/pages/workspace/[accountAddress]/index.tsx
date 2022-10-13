@@ -251,7 +251,7 @@ const WorkspaceHome: BlitzPage = () => {
                       </td>
                       {/* PAYMENT */}
                       <td className="text-base py-4">
-                        {proposal.data.totalPayments.length > 0
+                        {proposal.data.totalPayments?.length > 0
                           ? `${formatCurrencyAmount(
                               proposal.data.totalPayments[0]?.amount.toString()
                             )} ${proposal.data.totalPayments[0]?.token.symbol}`
