@@ -1061,7 +1061,10 @@ export const ProposalForm = ({
                   milestones = [
                     {
                       index: 0,
-                      title: "Upfront payment",
+                      title:
+                        values.paymentTerms === PaymentTerm.ON_AGREEMENT
+                          ? "Advance payment"
+                          : "Completion payment", // if terms are not ON_ARGEEMENT, they are AFTER_COMPLETION and we have zero advance payment
                     },
                   ]
                   payments = [
