@@ -16,6 +16,7 @@ const useGnosisSignature = (payment) => {
       const transactionData = genGnosisTransactionDigest(payment, nonce)
 
       const signature = await signMessageHook(transactionData)
+      console.log(signature)
       const data = await createTransaction(signature, transactionData)
       setToastState({
         isToastShowing: true,

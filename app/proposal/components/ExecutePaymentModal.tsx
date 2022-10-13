@@ -37,8 +37,6 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
     },
   })
 
-  const [updateProposalStatusMutation] = useMutation(updateProposalStatus)
-
   const { chain: activeChain } = useNetwork()
   const { sendTransactionAsync } = useSendTransaction({ mode: "recklesslyUnprepared" })
 
