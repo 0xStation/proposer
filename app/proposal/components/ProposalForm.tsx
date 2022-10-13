@@ -395,12 +395,13 @@ const RewardForm = ({
   refetchTokens,
   needFunding,
   setNeedFunding,
+  selectedPaymentTerms,
+  setSelectedPaymentTerms,
   isImportTokenModalOpen,
   setIsImportTokenModalOpen,
 }) => {
   const session = useSession({ suspense: false })
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
-  const [selectedPaymentTerms, setSelectedPaymentTerms] = useState<string>("")
 
   return (
     <>
@@ -757,6 +758,7 @@ export const ProposalForm = ({
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(0)
   const [selectedToken, setSelectedToken] = useState<any>()
   const [needFunding, setNeedFunding] = useState<boolean>(true)
+  const [selectedPaymentTerms, setSelectedPaymentTerms] = useState<string>("")
   const [tokenOptions, setTokenOptions] = useState<any[]>()
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
   const [proposalShouldSendLater, setProposalShouldSendLater] = useState<boolean>(false)
@@ -1125,6 +1127,8 @@ export const ProposalForm = ({
                             refetchTokens={refetchTokens}
                             needFunding={needFunding}
                             setNeedFunding={setNeedFunding}
+                            selectedPaymentTerms={selectedPaymentTerms}
+                            setSelectedPaymentTerms={setSelectedPaymentTerms}
                             isImportTokenModalOpen={isImportTokenModalOpen}
                             setIsImportTokenModalOpen={setIsImportTokenModalOpen}
                           />
@@ -1190,7 +1194,11 @@ export const ProposalForm = ({
                           ? !(
                               formState.values.tokenAddress &&
                               formState.values.paymentAmount &&
-                              formState.values.paymentTerms
+                              formState.values.paymentTerms &&
+                              (formState.values.paymentTerms !== PaymentTerm.AFTER_COMPLETION ||
+                                !isValidAdvancedPaymentPercentage(
+                                  formState.values.advancedPaymentPercentage
+                                ))
                             )
                           : false)
                       }

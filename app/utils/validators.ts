@@ -146,7 +146,9 @@ export const isValidTransactionLink = (chainId: number) => {
 }
 
 export const isValidAdvancedPaymentPercentage = (value: string) => {
+  if (!value) return "No percentage value provided"
   const parsedValue = parseFloat(formatPercentValue(value))
   if (parsedValue >= 100) return "Advanced payment must be less than 100%"
   if (parsedValue === 0) return "Advanced payment must be more than 0%"
+  return undefined
 }
