@@ -9,7 +9,7 @@ const CreateNonFundingProposal: BlitzPage = () => {
 
   return (
     <Layout title="New Proposal">
-      <ProposalNonFundingForm prefillClients={clients} prefillContributors={contributors} />
+      <ProposalNonFundingForm prefillClients={clients} />
     </Layout>
   )
 }
