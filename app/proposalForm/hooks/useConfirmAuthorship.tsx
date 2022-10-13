@@ -4,6 +4,7 @@ import useSignature from "app/core/hooks/useSignature"
 import { genProposalDigest } from "app/signatures/proposal"
 import { getHash } from "app/signatures/utils"
 import updateProposalMetadata from "app/proposal/mutations/updateProposalMetadata"
+import sendProposal from "app/proposal/mutations/sendProposal"
 
 export const useConfirmAuthorship = ({
   onSuccess,
@@ -14,7 +15,7 @@ export const useConfirmAuthorship = ({
 }) => {
   const { signMessage } = useSignature()
   const session = useSession({ suspense: false })
-  const [updateProposalMetadataMutation] = useMutation(updateProposalMetadata)
+  const [sendProposalMutation] = useMutation(sendProposal)
 
   const confirmAuthorship = async ({ proposal }) => {
     try {
@@ -34,19 +35,17 @@ export const useConfirmAuthorship = ({
       const { domain, types, value } = message
       const proposalHash = getHash(domain, types, value)
 
-      const updatedProposal = await updateProposalMetadataMutation({
+      const sendProposalSuccess = await sendProposalMutation({
         proposalId: proposal?.id as string,
+        authorAddress: session?.siwe?.address as string,
         authorSignature: signature as string,
         signatureMessage: message,
         proposalHash,
-        contentTitle: proposal?.data?.content?.title,
-        contentBody: proposal?.data?.content?.body,
-        totalPayments: proposal?.data?.totalPayments,
-        paymentTerms: proposal?.data?.paymentTerms,
       })
 
-      if (updatedProposal) {
-        onSuccess(updatedProposal)
+      if (sendProposalSuccess) {
+        // redirect to the proposal's view page
+        onSuccess(proposal)
       }
     } catch (err) {
       onError(err)
