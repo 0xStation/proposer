@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { CheckIcon } from "@heroicons/react/solid"
 import { ProposalRoleType } from "@prisma/client"
 import { PROPOSAL_ROLE_MAP } from "app/core/utils/constants"
@@ -26,8 +26,19 @@ const ProposalStepper = ({
   roles: ProposalRoleType[]
   className?: string
 }) => {
-  const [activeRole, setActiveRole] = useState<ProposalRoleType>(roles[0] as ProposalRoleType)
+  const [activeRole, setActiveRole] = useState<ProposalRoleType | undefined>()
   const [showInfo, setShowInfo] = useState<boolean>(false)
+
+  useEffect(() => {
+    setActiveRole(roles[0])
+  }, [roles])
+
+  if (roles.length === 0) {
+    return (
+      <div className={`animate-pulse h-40 bg-wet-concrete w-[300px] rounded-lg ${className}`}></div>
+    )
+  }
+
   return (
     <nav aria-label="Progress" className={`bg-wet-concrete rounded-lg w-[300px] p-4 ${className}`}>
       <h3>Proposal Progress</h3>
@@ -100,7 +111,7 @@ const ProposalStepper = ({
                   </span>
                   <div className="flex flex-col space-y-2 ml-4 min-w-0">
                     <span className="text-sm text-marble-white">{step.description}</span>
-                    {step.actions[activeRole] && step.actions[activeRole]}
+                    {activeRole && step.actions[activeRole] && step.actions[activeRole]}
                   </div>
                 </span>
               </>
