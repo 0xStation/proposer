@@ -28,6 +28,7 @@ const useSignature = () => {
         type: "error",
         message,
       })
+      throw Error(message)
     }
   }
 
