@@ -112,14 +112,14 @@ export const genProposalDigest = (proposal: Proposal) => {
         oneLiner: "", // placeholder for now, may be used by our app in future, but common pattern for other apps
         body: proposal.data.content.body,
       },
-      milestones: proposal.milestones?.map((milestone) => {
+      milestones: (proposal.milestones || []).map((milestone) => {
         return {
           milestoneId: milestone.id,
           index: milestone.index,
           title: milestone.data.title,
         }
       }),
-      payments: proposal.payments?.map((payment) => {
+      payments: (proposal.payments || []).map((payment) => {
         const token = payment.data.token
         return {
           paymentId: payment.id,
@@ -134,7 +134,7 @@ export const genProposalDigest = (proposal: Proposal) => {
           tokenAddress: token.address,
         }
       }),
-      tokens: proposal.payments
+      tokens: (proposal.payments || [])
         ?.map((payment) => {
           const token = payment.data.token
           return {

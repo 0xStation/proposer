@@ -21,18 +21,29 @@ export const RoleSignaturesView = ({
       enabled: Boolean(proposal?.id),
     }
   )
+  const isFundingProposal = proposal?.payments && Boolean(proposal?.payments?.length)
 
   return proposal ? (
     <div className={`border border-b border-concrete rounded-2xl px-6 py-6 ${className}`}>
-      {/* CONTRIBUTOR */}
-      <h4 className="text-xs font-bold text-concrete uppercase mt-2 mb-2">Contributor</h4>
-      <RoleSignature
-        role={proposal?.roles?.find((role) => role.type === ProposalRoleType.CONTRIBUTOR)}
-        signatures={signatures}
-        proposalStatus={proposal?.status}
-      />
+      {isFundingProposal && (
+        <>
+          {/* CONTRIBUTOR */}
+          <h4 className="text-xs font-bold text-concrete uppercase mt-2 mb-2">Contributor</h4>
+          <RoleSignature
+            role={proposal?.roles?.find((role) => role.type === ProposalRoleType.CONTRIBUTOR)}
+            signatures={signatures}
+            proposalStatus={proposal?.status}
+          />
+        </>
+      )}
       {/* CLIENT */}
-      <h4 className="text-xs font-bold text-concrete uppercase mb-2 mt-6">Client</h4>
+      <h4
+        className={`text-xs font-bold text-concrete uppercase mb-2 ${
+          isFundingProposal ? "mt-6" : "mt-2"
+        }`}
+      >
+        Client
+      </h4>
       <RoleSignature
         role={proposal?.roles?.find((role) => role.type === ProposalRoleType.CLIENT)}
         signatures={signatures}

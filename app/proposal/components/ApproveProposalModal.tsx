@@ -29,6 +29,7 @@ export const ApproveProposalModal = ({
   const setToastState = useStore((state) => state.setToastState)
   const [approveProposalMutation] = useMutation(approveProposal)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const isPaymentProposal = proposal.data.totalPayments && proposal.data.totalPayments?.length > 0
 
   const [remainingRoles, _signedRoles, _error, getRolesIsLoading] =
     useGetUsersRolesToSignFor(proposal)
@@ -95,18 +96,22 @@ export const ApproveProposalModal = ({
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
         <h3 className="text-2xl font-bold pt-6">Confirm your approval</h3>
-        <p className="mt-2">
-          Approval represents your agreement to the terms outlined in this proposal. Please review
-          the payment terms below carefully before approving.
-        </p>
+        {isPaymentProposal ? (
+          <p className="mt-2">
+            Approval represents your agreement to the terms outlined in this proposal. Please review
+            the payment terms below carefully before approving.
+          </p>
+        ) : (
+          <p className="mt-2">Signal your acceptance of this proposal </p>
+        )}
         {
           // if no payments exist for this proposal, doesn't make sense to show any of the following metadata
-          proposal.data.totalPayments.length > 0 && (
+          isPaymentProposal && (
             <div className="mt-8 mb-4 space-y-2 flex flex-col">
               <div className="grid grid-cols-4">
                 <span className="text-concrete col-span-1">Payment</span>
                 <span className="col-span-3">
-                  {proposal.data.totalPayments.map((payment, idx) => {
+                  {proposal.data.totalPayments?.map((payment, idx) => {
                     return (
                       <span key={`payment-${idx}`}>
                         {payment.amount} {payment.token.symbol}
@@ -118,14 +123,14 @@ export const ApproveProposalModal = ({
               <div className="grid grid-cols-4">
                 <span className="text-concrete col-span-1">Terms</span>
                 <span className="col-span-3">
-                  {PAYMENT_TERM_MAP[proposal.data.paymentTerms].copy}
+                  {PAYMENT_TERM_MAP[proposal.data.paymentTerms || ""].copy}
                 </span>
               </div>
               <div className="grid grid-cols-4">
                 <span className="text-concrete col-span-1">Network</span>
                 <span className="col-span-3">
-                  {proposal.data.totalPayments[0]?.token.chainId
-                    ? networks[proposal.data.totalPayments[0]?.token.chainId].name
+                  {proposal.data.totalPayments?.[0]?.token.chainId
+                    ? networks[proposal.data.totalPayments?.[0]?.token.chainId].name
                     : "Not recognized"}
                 </span>
               </div>

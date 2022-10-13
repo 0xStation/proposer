@@ -10,6 +10,12 @@ import Gradient4 from "/public/gradients/4.png"
 import Gradient5 from "/public/gradients/5.png"
 import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
 
+export enum FundingProposalStep {
+  PROPOSE = "PROPOSE",
+  REWARDS = "REWARDS",
+  CONFIRM = "CONFIRM",
+}
+
 export const gradientMap = {
   0: Gradient0,
   1: Gradient1,

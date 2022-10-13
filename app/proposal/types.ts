@@ -22,8 +22,8 @@ export type ProposalMetadata = {
     timestamp: string
   }
   // cache total payment amounts for rendering on list components and primary metadata view
-  totalPayments: { token: Token; amount: number }[]
-  paymentTerms: PaymentTerm
+  totalPayments?: { token: Token; amount: number }[]
+  paymentTerms?: PaymentTerm
   // record keeping for proposal sending signature and versioning
   authorAddress?: string
   authorSignature?: string
