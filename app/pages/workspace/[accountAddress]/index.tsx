@@ -323,7 +323,7 @@ const WorkspaceHome: BlitzPage = () => {
             )}
             {/* CTA */}
             <Link
-              href={Routes.CreateProposal({
+              href={Routes.ProposalTypeSelection({
                 // pre-fill for both so that if user changes toggle to reverse roles, the input address is still there
                 clients: accountEnsName || accountAddress,
                 contributors: accountEnsName || accountAddress,

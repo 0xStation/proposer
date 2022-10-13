@@ -27,6 +27,7 @@ const HeaderCopy = {
 export const ProposalNonFundingForm = ({ prefillClients }: { prefillClients: string[] }) => {
   const router = useRouter()
   const setToastState = useStore((state) => state.setToastState)
+  const activeUser = useStore((state) => state.activeUser)
   const [proposalStep, setProposalStep] = useState<FundingProposalStep>(FundingProposalStep.PROPOSE)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -177,7 +178,10 @@ export const ProposalNonFundingForm = ({ prefillClients }: { prefillClients: str
                       return
                     }
 
-                    if (addressesAreEqual(toAddress, session?.siwe?.address as string)) {
+                    if (
+                      addressesAreEqual(toAddress, activeUser?.address as string) ||
+                      addressesAreEqual(toAddress, session?.siwe?.address as string)
+                    ) {
                       setIsLoading(false)
                       setToastState({
                         isToastShowing: true,
