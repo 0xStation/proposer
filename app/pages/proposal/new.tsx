@@ -10,7 +10,7 @@ const ProposalTypeSelection: BlitzPage = () => {
 
   return (
     <Layout title="New Proposal">
-      <div className="mx-2 sm:mx-28 h-full">
+      <div className="w-full mx-auto max-w-fit">
         <h1 className="text-2xl font-bold pt-9 mx-4 mb-6">Select a proposal type</h1>
         <div className="pt-4 mx-4 flex flex-col sm:flex-row">
           <Link
