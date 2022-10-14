@@ -198,8 +198,8 @@ export const RewardForm = ({
       </Field>
       {selectedPaymentTerms === PaymentTerm.AFTER_COMPLETION && (
         <>
-          {/* ADVANCED PAYMENT */}
-          <label className="font-bold block mt-6">Advanced payment*</label>
+          {/* ADVANCE PAYMENT */}
+          <label className="font-bold block mt-6">Advance payment*</label>
           <span className="text-xs text-concrete block">
             How much of the payment amount should the contributors expect to receive at proposal
             approval to kickstart their project?

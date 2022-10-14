@@ -22,7 +22,6 @@ import {
   isValidTokenAmount,
   isPositiveAmount,
   isEnsOrAddress,
-  isValidAdvancedPaymentPercentage,
 } from "app/utils/validators"
 import { AddressType, ProposalRoleType } from "@prisma/client"
 import BackArrow from "app/core/icons/BackArrow"
@@ -31,7 +30,7 @@ import ImportTokenModal from "app/core/components/ImportTokenModal"
 import getTokensByAccount from "../../token/queries/getTokensByAccount"
 import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
-import { formatPercentValue, formatTokenAmount } from "app/utils/formatters"
+import { formatTokenAmount } from "app/utils/formatters"
 import { useEnsAddress } from "wagmi"
 import { AddressLink } from "../../core/components/AddressLink"
 import { PaymentTerm } from "app/proposalPayment/types"
@@ -395,8 +394,6 @@ const RewardForm = ({
   refetchTokens,
   needFunding,
   setNeedFunding,
-  selectedPaymentTerms,
-  setSelectedPaymentTerms,
   isImportTokenModalOpen,
   setIsImportTokenModalOpen,
 }) => {
@@ -641,7 +638,7 @@ const RewardForm = ({
               )
             }}
           </Field>
-          {/* PAYMENT TERMS */}
+          {/* PAYMENT TYPE */}
           <label className="font-bold block mt-6">Payment terms*</label>
           <span className="text-xs text-concrete block">
             When is the payment expected to be sent to contributors?
@@ -650,19 +647,7 @@ const RewardForm = ({
             {({ meta, input }) => (
               <>
                 <div className="custom-select-wrapper">
-                  <select
-                    {...input}
-                    required
-                    className="w-full bg-wet-concrete rounded p-2 mt-1"
-                    value={selectedPaymentTerms}
-                    onChange={(e) => {
-                      setSelectedPaymentTerms(e.target.value)
-                      // custom values can be compatible with react-final-form by calling
-                      // the props.input.onChange callback
-                      // https://final-form.org/docs/react-final-form/api/Field
-                      input.onChange(e.target.value)
-                    }}
-                  >
+                  <select {...input} required className="w-full bg-wet-concrete rounded p-2 mt-1">
                     <option value="">Choose option</option>
                     <option value={PaymentTerm.ON_AGREEMENT}>
                       {PAYMENT_TERM_MAP[PaymentTerm.ON_AGREEMENT]?.copy}
@@ -675,39 +660,6 @@ const RewardForm = ({
               </>
             )}
           </Field>
-          {selectedPaymentTerms === PaymentTerm.AFTER_COMPLETION && (
-            <>
-              {/* ADVANCED PAYMENT */}
-              <label className="font-bold block mt-6">Advanced payment*</label>
-              <span className="text-xs text-concrete block">
-                How much of the payment amount should the contributors expect to receive at proposal
-                approval to kickstart their project?
-              </span>
-              <Field
-                name="advancedPaymentPercentage"
-                defaultValue={"0"}
-                format={formatPercentValue}
-                validate={composeValidators(requiredField, isValidAdvancedPaymentPercentage)}
-              >
-                {({ input, meta }) => {
-                  return (
-                    <div className="h-10 mt-1 w-full border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
-                      <input
-                        {...input}
-                        type="text"
-                        placeholder="0"
-                        className="h-full p-2 inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white"
-                      />
-                      <div className="py-2 px-4 w-[2%] inline h-full">%</div>
-                      {meta.error && meta.touched && (
-                        <span className="text-xs text-torch-red mt-2 block">{meta.error}</span>
-                      )}
-                    </div>
-                  )
-                }}
-              </Field>
-            </>
-          )}
         </>
       )}
     </>
@@ -758,7 +710,6 @@ export const ProposalForm = ({
   const [selectedNetworkId, setSelectedNetworkId] = useState<number>(0)
   const [selectedToken, setSelectedToken] = useState<any>()
   const [needFunding, setNeedFunding] = useState<boolean>(true)
-  const [selectedPaymentTerms, setSelectedPaymentTerms] = useState<string>("")
   const [tokenOptions, setTokenOptions] = useState<any[]>()
   const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
   const [proposalShouldSendLater, setProposalShouldSendLater] = useState<boolean>(false)
@@ -1018,63 +969,21 @@ export const ProposalForm = ({
                   return
                 }
 
-                const tokenTransferBase = {
-                  senderAddress: clientAddress,
-                  recipientAddress: contributorAddress,
-                  token: { ...token, chainId: selectedNetworkId },
-                }
-
-                if (
-                  values.paymentTerms === PaymentTerm.AFTER_COMPLETION &&
-                  parseFloat(values.advancedPaymentPercentage) > 0
-                ) {
-                  milestones = [
-                    {
-                      index: 0,
-                      title: "Advance payment",
-                    },
-                    {
-                      index: 1,
-                      title: "Completion payment",
-                    },
-                  ]
-
-                  const advancedPayment =
-                    (parseFloat(values.paymentAmount) *
-                      parseFloat(values.advancedPaymentPercentage)) /
-                    100
-                  const completionPayment = parseFloat(values.paymentAmount) - advancedPayment
-
-                  payments = [
-                    {
-                      ...tokenTransferBase,
-                      milestoneIndex: 0,
-                      amount: advancedPayment,
-                    },
-                    {
-                      ...tokenTransferBase,
-                      milestoneIndex: 1,
-                      amount: completionPayment,
-                    },
-                  ]
-                } else {
-                  milestones = [
-                    {
-                      index: 0,
-                      title:
-                        values.paymentTerms === PaymentTerm.ON_AGREEMENT
-                          ? "Advance payment"
-                          : "Completion payment", // if terms are not ON_ARGEEMENT, they are AFTER_COMPLETION and we have zero advance payment
-                    },
-                  ]
-                  payments = [
-                    {
-                      ...tokenTransferBase,
-                      milestoneIndex: 0,
-                      amount: parseFloat(values.paymentAmount),
-                    },
-                  ]
-                }
+                milestones = [
+                  {
+                    index: 0,
+                    title: "Pay contributor",
+                  },
+                ]
+                payments = [
+                  {
+                    milestoneIndex: 0,
+                    senderAddress: clientAddress,
+                    recipientAddress: contributorAddress,
+                    amount: parseFloat(values.paymentAmount),
+                    token: { ...token, chainId: selectedNetworkId },
+                  },
+                ]
               }
 
               try {
@@ -1133,8 +1042,6 @@ export const ProposalForm = ({
                             refetchTokens={refetchTokens}
                             needFunding={needFunding}
                             setNeedFunding={setNeedFunding}
-                            selectedPaymentTerms={selectedPaymentTerms}
-                            setSelectedPaymentTerms={setSelectedPaymentTerms}
                             isImportTokenModalOpen={isImportTokenModalOpen}
                             setIsImportTokenModalOpen={setIsImportTokenModalOpen}
                           />
@@ -1200,11 +1107,7 @@ export const ProposalForm = ({
                           ? !(
                               formState.values.tokenAddress &&
                               formState.values.paymentAmount &&
-                              formState.values.paymentTerms &&
-                              (formState.values.paymentTerms !== PaymentTerm.AFTER_COMPLETION ||
-                                !isValidAdvancedPaymentPercentage(
-                                  formState.values.advancedPaymentPercentage
-                                ))
+                              formState.values.paymentTerms
                             )
                           : false)
                       }
