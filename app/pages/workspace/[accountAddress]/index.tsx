@@ -244,7 +244,7 @@ const WorkspaceHome: BlitzPage = () => {
                                     role.approvalStatus === ProposalRoleApprovalStatus.SENT
                                 ).length
                               }
-                              denominator={3}
+                              denominator={proposal?.roles?.length}
                             />
                           )}
                         </div>
