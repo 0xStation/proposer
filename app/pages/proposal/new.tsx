@@ -22,15 +22,15 @@ const ProposalTypeSelection: BlitzPage = () => {
             <div className="max-w-[325px] mb-3 sm:mr-3 rounded-md overflow-hidden bg-wet-concrete cursor-pointer hover:border hover:border-marble-white">
               <Image src={RequestImage} height={550} />
               <h2 className="text-xl font-bold px-4 pt-4">Request funding</h2>
-              <p className="pb-4 px-4 pt-3">Request funding in ETH or any ERC-20s.</p>
+              <p className="pb-4 px-4 pt-3">Request funding in ETH, USDC, or any ERC-20</p>
             </div>
           </Link>
           <Link href={Routes.CreateNonFundingProposal({ clients: queryParams?.clients })}>
             <div className="max-w-[325px] mb-3 sm:mr-3 rounded-md overflow-hidden bg-wet-concrete cursor-pointer hover:border hover:border-marble-white">
               <Image src={ShareImage} height={550} />
-              <h2 className="text-xl font-bold px-4 pt-4">Submit feedback</h2>
+              <h2 className="text-xl font-bold px-4 pt-4">Share an idea</h2>
               <p className="pb-4 px-4 pt-3">
-                Submit feedback, feature requests and half-baked ideas.
+                Share ideas, submit feedback, and request features
               </p>
             </div>
           </Link>
@@ -39,7 +39,7 @@ const ProposalTypeSelection: BlitzPage = () => {
             <Image src={CustomImage} height={550} className="opacity-50" />
             <h2 className="text-xl font-bold px-4 pt-4 opacity-50">Custom</h2>
             <p className="pb-4 px-4 pt-3 opacity-50">
-              Customize execution using any smart contracts.
+              Customize execution using any smart contracts
             </p>
           </div>
         </div>
