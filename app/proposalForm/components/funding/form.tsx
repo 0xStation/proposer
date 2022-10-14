@@ -20,6 +20,7 @@ import createProposal from "app/proposal/mutations/createProposal"
 import { useResolveEnsAddress } from "app/proposalForm/hooks/useResolveEnsAddress"
 import { useConfirmAuthorship } from "app/proposalForm/hooks/useConfirmAuthorship"
 import { FundingProposalStep } from "app/core/utils/constants"
+import { isValidAdvancedPaymentPercentage } from "app/utils/validators"
 
 const HeaderCopy = {
   [FundingProposalStep.PROPOSE]: "Propose",
@@ -50,6 +51,7 @@ export const ProposalFundingForm = ({
   const [tokenOptions, setTokenOptions] = useState<any[]>()
   const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
   const [selectedToken, setSelectedToken] = useState<any>()
+  const [selectedPaymentTerms, setSelectedPaymentTerms] = useState<string>("")
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
   const [proposalShouldSendLater, setProposalShouldSendLater] = useState<boolean>(false)
   const [
@@ -228,21 +230,62 @@ export const ProposalFundingForm = ({
               return
             }
 
-            milestones = [
-              {
-                index: 0,
-                title: "Pay contributor",
-              },
-            ]
-            payments = [
-              {
-                milestoneIndex: 0,
-                senderAddress: clientAddress,
-                recipientAddress: contributorAddress,
-                amount: parseFloat(values.paymentAmount),
-                token: { ...token, chainId: chain?.id || 1 },
-              },
-            ]
+            const tokenTransferBase = {
+              senderAddress: clientAddress,
+              recipientAddress: contributorAddress,
+              token: { ...token, chainId: chain?.id || 1 },
+            }
+
+            if (
+              values.paymentTerms === PaymentTerm.AFTER_COMPLETION &&
+              parseFloat(values.advancedPaymentPercentage) > 0
+            ) {
+              milestones = [
+                {
+                  index: 0,
+                  title: "Advance payment",
+                },
+                {
+                  index: 1,
+                  title: "Completion payment",
+                },
+              ]
+
+              const advancedPayment =
+                (parseFloat(values.paymentAmount) * parseFloat(values.advancedPaymentPercentage)) /
+                100
+              const completionPayment = parseFloat(values.paymentAmount) - advancedPayment
+
+              payments = [
+                {
+                  ...tokenTransferBase,
+                  milestoneIndex: 0,
+                  amount: advancedPayment,
+                },
+                {
+                  ...tokenTransferBase,
+                  milestoneIndex: 1,
+                  amount: completionPayment,
+                },
+              ]
+            } else {
+              milestones = [
+                {
+                  index: 0,
+                  title:
+                    values.paymentTerms === PaymentTerm.ON_AGREEMENT
+                      ? "Advance payment"
+                      : "Completion payment", // if terms are not ON_ARGEEMENT, they are AFTER_COMPLETION and we have zero advance payment
+                },
+              ]
+              payments = [
+                {
+                  ...tokenTransferBase,
+                  milestoneIndex: 0,
+                  amount: parseFloat(values.paymentAmount),
+                },
+              ]
+            }
 
             try {
               await createProposalMutation({
@@ -305,6 +348,8 @@ export const ProposalFundingForm = ({
                         isImportTokenModalOpen={isImportTokenModalOpen}
                         setIsImportTokenModalOpen={setIsImportTokenModalOpen}
                         selectedToken={selectedToken}
+                        selectedPaymentTerms={selectedPaymentTerms}
+                        setSelectedPaymentTerms={setSelectedPaymentTerms}
                         setSelectedToken={setSelectedToken}
                         setProposalStep={setProposalStep}
                       />
@@ -393,7 +438,12 @@ export const ProposalFundingForm = ({
                       !(
                         formState.values.tokenAddress &&
                         formState.values.paymentAmount &&
-                        formState.values.paymentTerms
+                        formState.values.paymentTerms &&
+                        // terms are ON_AGREEMENT or they are AFTER_COMPLETION && advanced percentage value is valid
+                        (formState.values.paymentTerms !== PaymentTerm.AFTER_COMPLETION ||
+                          !isValidAdvancedPaymentPercentage(
+                            formState.values.advancedPaymentPercentage
+                          ))
                       )
                     }
                     className="float-right"
