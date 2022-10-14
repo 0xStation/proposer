@@ -193,7 +193,9 @@ export const ProposalMilestonePaymentBox = ({
       />
       <div className={`border border-b border-concrete rounded-2xl px-6 py-9 ${className}`}>
         <div className="flex flex-row items-center justify-between mb-4">
+          {/* TITLE */}
           <span>{milestone?.data?.title || "title"}</span>
+          {/* STATUS */}
           <div className="flex flex-col items-end space-y-1">
             <div className="flex flex-row items-center space-x-1">
               <span
@@ -208,6 +210,7 @@ export const ProposalMilestonePaymentBox = ({
             </div>
           </div>
         </div>
+        {/* TABLE HEADER */}
         <div className=" text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
           <span className="basis-32 mb-2 tracking-wider">From</span>
           <span className="basis-32 ml-6 mb-2 tracking-wider">To</span>
@@ -215,7 +218,7 @@ export const ProposalMilestonePaymentBox = ({
           <span className="basis-28 ml-6 mb-2 tracking-wider">Amount</span>
           <span className="basis-28"></span>
         </div>
-        {/* show all payments within milestone block */}
+        {/* MILESTONE PAYMENTS */}
         {milestone?.payments?.map((payment, idx) => (
           <PaymentRow
             key={`payment-row-${idx}`}

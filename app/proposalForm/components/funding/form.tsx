@@ -236,10 +236,13 @@ export const ProposalFundingForm = ({
               token: { ...token, chainId: chain?.id || 1 },
             }
 
+            // set up milestones and payments conditional on payment terms inputs
+
             if (
               values.paymentTerms === PaymentTerm.AFTER_COMPLETION &&
               parseFloat(values.advancedPaymentPercentage) > 0
             ) {
+              // if pay on proposal completion and non-zero advance payment, set up two milestones and two payments
               milestones = [
                 {
                   index: 0,
@@ -269,6 +272,7 @@ export const ProposalFundingForm = ({
                 },
               ]
             } else {
+              // there is only one payment, conditional on whether message is Advance or Completion
               milestones = [
                 {
                   index: 0,
