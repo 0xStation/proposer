@@ -22,6 +22,7 @@ model Account {
   data        Json
 
   sessions           Session[]
+  rfps               Rfp[]
   proposals          ProposalRole[]
   tokens             AccountToken[]
   originsOf          AccountAccount[]    @relation("origin")
@@ -51,6 +52,16 @@ model AccountAccount {
 
 enum AccountAccountType {
   PIN_WORKSPACE
+}
+
+// REQUESTS FOR PROPOSALS
+
+model Rfp {
+  id             String @id @default(uuid())
+  accountAddress String
+  data           Json
+
+  account Account @relation(fields: [accountAddress], references: [address], onDelete: Cascade)
 }
 
 // PROPOSAL SYSTEM
