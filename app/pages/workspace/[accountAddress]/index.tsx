@@ -43,9 +43,11 @@ import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import { Account } from "app/account/types"
 import { isAddress } from "ethers/lib/utils"
+import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 
 enum Tab {
   PROPOSALS = "PROPOSALS",
+  RFPS = "RFPS",
   SETTINGS = "SETTINGS",
 }
 
@@ -106,6 +108,14 @@ const WorkspaceHome: BlitzPage = () => {
     { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
   )
   const { count, proposals } = proposalResponse || {}
+
+  const [rfps] = useQuery(
+    getRfpsForAccount,
+    {
+      address: toChecksumAddress(accountAddress),
+    },
+    { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
+  )
 
   const [account] = useQuery(
     getAccountByAddress,
@@ -294,6 +304,60 @@ const WorkspaceHome: BlitzPage = () => {
     )
   }
 
+  const RfpTab = () => {
+    return (
+      <div className="p-10 flex-1 max-h-screen overflow-y-auto">
+        <h1 className="text-2xl font-bold">Rfps</h1>
+        <div className="mt-12 mb-4 border-b border-concrete pb-4 flex flex-row justify-between h-12"></div>
+        {/* RFPS TABLE */}
+        <table className="w-full">
+          {/* TABLE HEADERS */}
+          <thead>
+            <tr className="border-b border-concrete">
+              <th className="pl-4 w-96 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
+                Title
+              </th>
+            </tr>
+          </thead>
+          {/* TABLE BODY */}
+          <tbody>
+            {rfps &&
+              rfps.length > 0 &&
+              rfps.map((rfp, idx) => {
+                return (
+                  <Link href={Routes.RfpDetail({ rfpId: rfp.id })} key={`table-row-${idx}`}>
+                    <tr className="border-b border-concrete cursor-pointer hover:bg-wet-concrete">
+                      {/* TITLE */}
+                      <td className="pl-4 text-base py-4 font-bold">
+                        {rfp?.data?.content?.title?.length > 44
+                          ? rfp.data.content.title.substr(0, 44) + "..."
+                          : rfp.data.content.title}
+                      </td>
+                    </tr>
+                  </Link>
+                )
+              })}
+          </tbody>
+        </table>
+        {!rfps &&
+          Array.from(Array(10)).map((idx) => (
+            <div
+              key={idx}
+              tabIndex={0}
+              className={`flex flex-row w-full my-1 rounded-lg bg-wet-concrete shadow border-solid h-[48px] motion-safe:animate-pulse`}
+            />
+          ))}
+        {rfps && rfps.length === 0 && (
+          <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
+            <p className="text-2xl font-bold w-[295px] text-center">
+              This workspace has no RFPs yet
+            </p>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   const SettingsTab = () => {
     return (
       <div className="h-[calc(100vh-240px)] p-10 flex-1">
@@ -344,6 +408,16 @@ const WorkspaceHome: BlitzPage = () => {
               <LightBulbIcon className="h-5 w-5 text-white cursor-pointer" />
               <span>Proposals</span>
             </li>
+            {/* RFPS */}
+            <li
+              className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
+                activeTab === Tab.RFPS && "bg-wet-concrete"
+              }`}
+              onClick={() => setActiveTab(Tab.RFPS)}
+            >
+              <LightBulbIcon className="h-5 w-5 text-white cursor-pointer" />
+              <span>RFPs</span>
+            </li>
             {/* SETTINGS */}
             {canViewSettings && (
               <li
@@ -359,7 +433,9 @@ const WorkspaceHome: BlitzPage = () => {
           </ul>
         </div>
         {/* TAB CONTENT */}
-        {activeTab === Tab.PROPOSALS ? <ProposalTab /> : <SettingsTab />}
+        {activeTab === Tab.PROPOSALS && <ProposalTab />}
+        {activeTab === Tab.RFPS && <RfpTab />}
+        {activeTab === Tab.SETTINGS && <SettingsTab />}
       </div>
     </Layout>
   )

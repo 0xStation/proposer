@@ -1,7 +1,7 @@
 import db from "../index"
+import { foxesAddress } from "app/core/utils/constants"
 
 const seed = async () => {
-  const foxesAddress = "0x332557dE221d09AD5b164a665c585fca0200b4B1"
   const terms = [
     "Harmony",
     // tbd
@@ -16,15 +16,17 @@ const seed = async () => {
       return {
         accountAddress: foxesAddress,
         data: {
-          title: term,
-          body: "",
-          oneLiner: "",
+          content: {
+            title: term,
+            body: "",
+            oneLiner: "",
+          },
         },
       }
     }),
   })
 
-  console.log(rfps.count + "rfps created for foxes")
+  console.log(rfps.count + " rfps created for foxes")
 }
 
 export default seed

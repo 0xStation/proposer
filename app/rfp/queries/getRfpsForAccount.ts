@@ -15,5 +15,5 @@ export default async function getRfpsForAccount(input: z.infer<typeof GetRfpsFor
     },
   })
 
-  return rfps as unknown as Rfp
+  return rfps as unknown as Rfp[]
 }

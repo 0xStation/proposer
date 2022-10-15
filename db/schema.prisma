@@ -57,22 +57,29 @@ enum AccountAccountType {
 // REQUESTS FOR PROPOSALS
 
 model Rfp {
-  id             String @id @default(uuid())
+  id             String   @id @default(uuid())
   accountAddress String
   data           Json
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   account Account @relation(fields: [accountAddress], references: [address], onDelete: Cascade)
+
+  proposals Proposal[]
 }
 
 // PROPOSAL SYSTEM
 
 model Proposal {
   id                    String         @id @default(uuid())
+  rfpId                 String?
   status                ProposalStatus @default(DRAFT)
   timestamp             DateTime       @default(now())
   currentMilestoneIndex Int            @default(-1) // no current milestone, gets set to 0 after proposal is approved
   data                  Json
   suppress              Boolean        @default(false)
+
+  rfp Rfp? @relation(fields: [rfpId], references: [id], onDelete: Cascade)
 
   roles      ProposalRole[]
   milestones ProposalMilestone[]
