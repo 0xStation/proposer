@@ -314,8 +314,9 @@ export const PROPOSING_AS_ROLE_MAP = {
 
 export const txPathString = "/tx/"
 
-// export const foxesAddress = "0x332557dE221d09AD5b164a665c585fca0200b4B1"
-export const foxesAddress = "0x016562aA41A8697720ce0943F003141f5dEAe006"
+export const foxesAddress = "0x332557dE221d09AD5b164a665c585fca0200b4B1"
+// export const foxesAddress = "0x016562aA41A8697720ce0943F003141f5dEAe006"
+// export const foxesAddress = "0xc517c83f417b73dA98647dad0FCB80af9f3b9531"
 
 // LEGACY BELOW
 

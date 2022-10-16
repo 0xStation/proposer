@@ -14,7 +14,7 @@ import { LINKS } from "app/core/utils/constants"
 import { useQuery, useRouterQuery } from "blitz"
 import getRfpById from "app/rfp/queries/getRfpById"
 
-export const FoxesProposeFirstStep = () => {
+export const FoxesProposeFirstStep = ({ minNumWords }) => {
   const queryParams = useRouterQuery()
   const rfpId = queryParams?.rfpId as string
   const [rfp] = useQuery(
@@ -26,9 +26,6 @@ export const FoxesProposeFirstStep = () => {
       enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
-      onSuccess: () => {
-        console.log("rfp fetched", rfp)
-      },
       cacheTime: 60 * 1000, // 1 minute in milliseconds
     }
   )
@@ -55,7 +52,7 @@ export const FoxesProposeFirstStep = () => {
       <Field
         name="body"
         component="textarea"
-        validate={composeValidators(requiredField, mustBeAboveNumWords(125))}
+        validate={composeValidators(requiredField, mustBeAboveNumWords(minNumWords))}
       >
         {({ input, meta }) => (
           <div>

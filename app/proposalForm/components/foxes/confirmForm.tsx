@@ -15,9 +15,6 @@ export const FoxesConfirmForm = ({ body }) => {
       enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
-      onSuccess: () => {
-        console.log("rfp fetched", rfp)
-      },
       cacheTime: 60 * 1000, // 1 minute in milliseconds
     }
   )

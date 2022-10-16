@@ -25,6 +25,9 @@ import createProposalToFoxesRfp from "app/proposal/mutations/createProposalToFox
 import deleteProposalById from "app/proposal/mutations/deleteProposalById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { FoxesConfirmForm } from "./confirmForm"
+import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
+import { AddressType, ProposalRoleType } from "@prisma/client"
+import { mustBeAboveNumWords } from "app/utils/validators"
 
 enum FundingProposalStep {
   PROPOSE = "PROPOSE",
@@ -64,9 +67,6 @@ export const FoxesProposalForm = () => {
       enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
-      onSuccess: () => {
-        console.log("rfp fetched", rfp)
-      },
       cacheTime: 60 * 1000, // 1 minute in milliseconds
     }
   )
@@ -127,8 +127,21 @@ export const FoxesProposalForm = () => {
     // if the user declines to sign the message verifying their authorship.
     if (createdProposal && shouldHandlePostProposalCreationProcessing) {
       if (!proposalShouldSendLater) {
-        console.log("confirmAuthorship triggered")
-        confirmAuthorship({ proposal: createdProposal })
+        const representingRoles = createdProposal.roles
+          ?.filter(
+            (role) =>
+              addressesAreEqual(role.address, session.siwe?.address || "") &&
+              role.type !== ProposalRoleType.AUTHOR
+          )
+          .map((role) => {
+            return {
+              roleId: role.id,
+              // if role's account is WALLET, then one signature is left
+              // if role's account is SAFE, then we don't to trigger an approval on send to let the multisig decide, we should revisit this and I am willing to change mind here
+              complete: role.account?.addressType === AddressType.WALLET,
+            }
+          })
+        confirmAuthorship({ proposal: createdProposal, representingRoles })
       } else {
         router.push(
           Routes.ViewProposal({
@@ -159,6 +172,7 @@ export const FoxesProposalForm = () => {
               })
             )
           } else {
+            // User not signed in
             if (!session?.siwe?.address) {
               setIsLoading(false)
               setToastState({
@@ -166,8 +180,9 @@ export const FoxesProposalForm = () => {
                 type: "error",
                 message: "Not signed in, please connect wallet and sign in.",
               })
+              return
             }
-
+            // RFP missing for uknown reason
             if (!rfp) {
               setIsLoading(false)
               setToastState({
@@ -175,6 +190,19 @@ export const FoxesProposalForm = () => {
                 type: "error",
                 message: "No RFP found.",
               })
+              return
+            }
+            // User proposing to their own RFP
+            if (
+              addressesAreEqual(session?.siwe?.address as string, rfp?.accountAddress as string)
+            ) {
+              setIsLoading(false)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "Cannot propose to your own RFP.",
+              })
+              return
             }
 
             try {
@@ -198,7 +226,11 @@ export const FoxesProposalForm = () => {
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
 
-          const unFilledProposalFields = !formState.values.body // has not selected who user is proposing as
+          const FOXES_MIN_NUM_WORDS = 125
+
+          const unFilledProposalFields =
+            !formState.values.body ||
+            !!mustBeAboveNumWords(FOXES_MIN_NUM_WORDS)(formState.values.body)
 
           return (
             <form onSubmit={handleSubmit} className="mt-20">
@@ -213,7 +245,9 @@ export const FoxesProposalForm = () => {
                     <h2 className="text-marble-white text-xl font-bold">
                       {HeaderCopy[proposalStep]}
                     </h2>
-                    {proposalStep === FundingProposalStep.PROPOSE && <FoxesProposeFirstStep />}
+                    {proposalStep === FundingProposalStep.PROPOSE && (
+                      <FoxesProposeFirstStep minNumWords={FOXES_MIN_NUM_WORDS} />
+                    )}
                     {proposalStep === FundingProposalStep.CONFIRM && (
                       <FoxesConfirmForm body={formState.values.body} />
                     )}

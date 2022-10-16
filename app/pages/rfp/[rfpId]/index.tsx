@@ -130,11 +130,19 @@ const RfpDetail: BlitzPage = () => {
               // LOADING STATE
               <div
                 tabIndex={0}
-                className={`h-10 w-full rounded-4xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+                className={`h-8 w-full rounded-lg flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
               />
             )}
             {/* STATUS PILL */}
-            <RfpStatusPill status={rfp?.status} />
+            {rfp ? (
+              <RfpStatusPill status={rfp?.status} />
+            ) : (
+              // LOADING STATE
+              <div
+                tabIndex={0}
+                className={`h-6 w-1/3 rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+              />
+            )}
             {/* CTA */}
             {rfp?.status === RfpStatus.OPEN && (
               <Link href={Routes.CreateFoxesProposal({ rfpId })}>
@@ -158,7 +166,7 @@ const RfpDetail: BlitzPage = () => {
         </div>
         <div className="p-10 flex-1 max-h-screen overflow-y-auto">
           {/* <h1 className="text-2xl font-bold">Proposals</h1> */}
-          <div className="mb-4 border-b border-concrete pb-4 flex flex-row justify-end">
+          <div className="mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-end">
             {/* <div className="space-x-2 flex flex-row">
               <FilterPill
                 label="status"
@@ -201,7 +209,7 @@ const RfpDetail: BlitzPage = () => {
           <table className="w-full">
             {/* TABLE HEADERS */}
             <thead>
-              <tr className="border-b border-concrete">
+              <tr className="border-b border-wet-concrete">
                 <th className="pl-4 w-96 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
                   Title
                 </th>

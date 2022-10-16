@@ -84,6 +84,7 @@ export const SendProposallModal = ({ isOpen, setIsOpen, proposal }) => {
                 authorSignature: signature as string,
                 signatureMessage: message,
                 proposalHash: proposalHash,
+                representingRoles: [],
               })
             } catch (err) {
               setIsLoading(false)

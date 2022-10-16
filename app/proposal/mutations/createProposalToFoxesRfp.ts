@@ -22,6 +22,10 @@ export default async function createProposalToFoxesRfp(
   const contributorAddresses = [params.authorAddress]
   const clientAddresses = [foxesAddress]
   const authorAddresses = [params.authorAddress]
+  if (params.authorAddress === foxesAddress) {
+    throw Error("Contributor and client cannot be the same")
+  }
+
   const milestones = [
     {
       title: "Contributor payment",
