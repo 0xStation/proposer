@@ -154,11 +154,11 @@ const RfpDetail: BlitzPage = () => {
             {/* NETWORK */}
             <div className="mt-6 pt-6">
               <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
-              <p className="mt-2">{getNetworkName(getPaymentToken(rfp?.data.template).chainId)}</p>
+              <p className="mt-2">{getNetworkName(getPaymentToken(rfp?.data.template)?.chainId)}</p>
             </div>
             <div className="mt-6">
               <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
-              <p className="mt-2">{getPaymentToken(rfp?.data.template).symbol}</p>
+              <p className="mt-2">{getPaymentToken(rfp?.data.template)?.symbol}</p>
             </div>
             <div className="mt-6">
               <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
