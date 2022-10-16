@@ -49,13 +49,13 @@ export const FoxesConfirmForm = ({ body }) => {
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Network</span>
         <span className="items-end">
-          {getNetworkName(getPaymentToken(rfp?.data.template).chainId)}
+          {getNetworkName(getPaymentToken(rfp?.data.template)?.chainId)}
         </span>
       </div>
       {/* PAYMENT TOKEN */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Payment token</span>
-        <span className="items-end">{getPaymentToken(rfp?.data.template).symbol}</span>
+        <span className="items-end">{getPaymentToken(rfp?.data.template)?.symbol}</span>
       </div>
       {/* PAYMENT AMOUNT */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
