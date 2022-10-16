@@ -24,6 +24,7 @@ import { FoxesProposeFirstStep } from "./proposeForm"
 import createProposalToFoxesRfp from "app/proposal/mutations/createProposalToFoxesRfp"
 import deleteProposalById from "app/proposal/mutations/deleteProposalById"
 import getRfpById from "app/rfp/queries/getRfpById"
+import { FoxesConfirmForm } from "./confirmForm"
 
 enum FundingProposalStep {
   PROPOSE = "PROPOSE",
@@ -126,6 +127,7 @@ export const FoxesProposalForm = () => {
     // if the user declines to sign the message verifying their authorship.
     if (createdProposal && shouldHandlePostProposalCreationProcessing) {
       if (!proposalShouldSendLater) {
+        console.log("confirmAuthorship triggered")
         confirmAuthorship({ proposal: createdProposal })
       } else {
         router.push(
@@ -212,7 +214,9 @@ export const FoxesProposalForm = () => {
                       {HeaderCopy[proposalStep]}
                     </h2>
                     {proposalStep === FundingProposalStep.PROPOSE && <FoxesProposeFirstStep />}
-                    {proposalStep === FundingProposalStep.CONFIRM && <ConfirmForm />}
+                    {proposalStep === FundingProposalStep.CONFIRM && (
+                      <FoxesConfirmForm body={formState.values.body} />
+                    )}
                   </>
                 )}
               </div>

@@ -2,7 +2,12 @@ import { Field } from "react-final-form"
 import debounce from "lodash.debounce"
 import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import useEnsInput from "app/proposalForm/hooks/useEnsInput"
-import { composeValidators, isEnsOrAddress, requiredField } from "app/utils/validators"
+import {
+  composeValidators,
+  isEnsOrAddress,
+  mustBeAboveNumWords,
+  requiredField,
+} from "app/utils/validators"
 import { EnsAddressMetadataText } from "../EnsAddressMetadataText"
 import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
@@ -45,14 +50,18 @@ export const FoxesProposeFirstStep = () => {
       {/* BODY */}
       <label className="font-bold block mt-6">Details*</label>
       <span className="text-xs text-concrete block">
-        Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown syntax</TextLink>. Need inspirations?
-        Check out <TextLink url={LINKS.PROPOSAL_TEMPLATE}>proposal templates</TextLink>.
+        125 words min. Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown syntax</TextLink>.
       </span>
-      <Field name="body" component="textarea" validate={requiredField}>
+      <Field
+        name="body"
+        component="textarea"
+        validate={composeValidators(requiredField, mustBeAboveNumWords(125))}
+      >
         {({ input, meta }) => (
           <div>
             <textarea
               {...input}
+              rows={10}
               placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
               className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[180px] w-full"
             />
