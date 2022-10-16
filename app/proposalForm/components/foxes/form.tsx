@@ -135,6 +135,7 @@ export const FoxesProposalForm = () => {
         const representingRoles = createdProposal.roles
           ?.filter(
             (role) =>
+              // IMPORTANT: filters out multisigs to enable signers to submit proposals without auto-approving
               addressesAreEqual(role.address, session.siwe?.address || "") &&
               role.type !== ProposalRoleType.AUTHOR
           )

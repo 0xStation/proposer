@@ -57,7 +57,7 @@ const seed = async () => {
   ]
 
   // wipe old rfps
-  // await db.rfp.deleteMany({})
+  await db.rfp.deleteMany({})
 
   // create new rfps
   const metadatas = terms.map((term) => {
@@ -67,19 +67,19 @@ const seed = async () => {
         body: "",
         oneLiner: "",
       },
-      template: TEMPLATES.FOXES.TERM,
+      template: TEMPLATES.STATION.TERM,
     } as RfpMetadata
   })
   const rfps = await db.rfp.createMany({
     data: metadatas.map((metadata) => {
       return {
-        accountAddress: PARTNERS.FOXES.ADDRESS,
+        accountAddress: PARTNERS.STATION.ADDRESS,
         data: metadata,
       }
     }),
   })
 
-  console.log(rfps.count + " rfps created for Foxes")
+  console.log(rfps.count + " rfps created for Station")
 }
 
 export default seed

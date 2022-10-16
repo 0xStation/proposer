@@ -77,10 +77,6 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
       proposalHash: params.proposalHash,
     }
 
-    const completingOtherRoles = params.representingRoles.filter((role) => {
-      return role.complete
-    })
-
     const res = await db.$transaction([
       // saves author signature and sets status to AWAITING_APPROVAL
       db.proposal.update({
@@ -129,7 +125,7 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
           },
           // connect to the other roles held by author
           roles: {
-            connect: completingOtherRoles.map((role) => {
+            connect: params.representingRoles.map((role) => {
               return { id: role.roleId }
             }),
           },
@@ -148,16 +144,20 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
       // if signature is a multisig, we don't want to mark as complete unless it has met quorum
       // so we filter for roles that are 'complete'.
       // complete is a type passed from the front-end indiciating that it is ready to be pushed to status complete
-      ...completingOtherRoles.map((role) => {
-        return db.proposalRole.update({
-          where: {
-            id: role.roleId,
-          },
-          data: {
-            approvalStatus: ProposalRoleApprovalStatus.APPROVED,
-          },
+      ...params.representingRoles
+        .filter((role) => {
+          return role.complete
         })
-      }),
+        .map((role) => {
+          return db.proposalRole.update({
+            where: {
+              id: role.roleId,
+            },
+            data: {
+              approvalStatus: ProposalRoleApprovalStatus.APPROVED,
+            },
+          })
+        }),
     ])
 
     try {
