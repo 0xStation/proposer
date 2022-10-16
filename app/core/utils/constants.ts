@@ -256,13 +256,7 @@ export const CHAIN_IDS = {
   POLYGON: 137,
 }
 
-export const SUPPORTED_CHAINS = [
-  chain.mainnet,
-  chain.rinkeby,
-  chain.goerli,
-  chain.optimism,
-  chain.polygon,
-]
+export const SUPPORTED_CHAINS = [chain.mainnet, chain.goerli, chain.optimism, chain.polygon]
 
 export const SUPPORTED_CHAIN_IDS = SUPPORTED_CHAINS.map((chain) => chain.id)
 
