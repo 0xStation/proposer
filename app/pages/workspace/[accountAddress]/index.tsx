@@ -164,7 +164,7 @@ const WorkspaceHome: BlitzPage = () => {
     return (
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
         <h1 className="text-2xl font-bold">Proposals</h1>
-        <div className="mt-12 mb-4 border-b border-concrete pb-4 flex flex-row justify-between">
+        <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">
           <div className="space-x-2 flex flex-row">
             <FilterPill
               label="status"
@@ -206,7 +206,7 @@ const WorkspaceHome: BlitzPage = () => {
         <table className="w-full">
           {/* TABLE HEADERS */}
           <thead>
-            <tr className="border-b border-concrete">
+            <tr className="border-b border-wet-concrete">
               <th className="pl-4 w-96 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
                 Title
               </th>
@@ -332,7 +332,7 @@ const WorkspaceHome: BlitzPage = () => {
     return (
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
         <h1 className="text-2xl font-bold">RFPs</h1>
-        <div className="mt-12 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between h-14"></div>
+        <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between h-14"></div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:gap-2 md:gap-4 lg:gap-6 gap-1">
           {/* RFP CARDS */}
           {rfps &&
@@ -378,7 +378,7 @@ const WorkspaceHome: BlitzPage = () => {
       <div className="flex flex-row h-full">
         {/* LEFT SIDEBAR */}
         <div className="h-full w-[288px] border-r border-concrete p-6">
-          <div className="pb-6 border-b border-concrete space-y-6">
+          <div className="pb-6 border-b border-wet-concrete space-y-6">
             {/* PROFILE */}
             {account ? (
               <AccountMediaObject account={account} showActionIcons={true} />
