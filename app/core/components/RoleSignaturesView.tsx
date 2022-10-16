@@ -2,7 +2,7 @@ import { ProposalRoleType } from "@prisma/client"
 import { useQuery } from "blitz"
 import { Proposal } from "app/proposal/types"
 import { RoleSignature } from "./RoleSignature"
-import getProposalSignaturesById from "app/proposal/queries/getProposalSignaturesById"
+import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 
 export const RoleSignaturesView = ({
   proposal,
@@ -11,33 +11,31 @@ export const RoleSignaturesView = ({
   proposal?: Proposal
   className?: string
 }) => {
-  const [signatures] = useQuery(
-    getProposalSignaturesById,
+  const [roles] = useQuery(
+    getRolesByProposalId,
     { proposalId: proposal?.id as string },
     {
       suspense: false,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       enabled: Boolean(proposal?.id),
+      cacheTime: 60 * 1000, // one minute in milliseconds
     }
   )
   const isFundingProposal = proposal?.payments && Boolean(proposal?.payments?.length)
 
   // This check is needed for old non-funding proposals that have author, contributor, and client
   // instead of just author and client
-  const hasContributorRole = proposal?.roles?.find(
-    (role) => role.type === ProposalRoleType.CONTRIBUTOR
-  )
+  const hasContributorRole = roles?.find((role) => role.type === ProposalRoleType.CONTRIBUTOR)
 
-  return proposal ? (
+  return roles ? (
     <div className={`border border-b border-concrete rounded-2xl px-6 py-6 ${className}`}>
       {(isFundingProposal || hasContributorRole) && (
         <>
           {/* CONTRIBUTOR */}
           <h4 className="text-xs font-bold text-concrete uppercase mt-2 mb-2">Contributor</h4>
           <RoleSignature
-            role={proposal?.roles?.find((role) => role.type === ProposalRoleType.CONTRIBUTOR)}
-            signatures={signatures}
+            role={roles?.find((role) => role.type === ProposalRoleType.CONTRIBUTOR)}
             proposalStatus={proposal?.status}
           />
         </>
@@ -51,15 +49,13 @@ export const RoleSignaturesView = ({
         Client
       </h4>
       <RoleSignature
-        role={proposal?.roles?.find((role) => role.type === ProposalRoleType.CLIENT)}
-        signatures={signatures}
+        role={roles?.find((role) => role.type === ProposalRoleType.CLIENT)}
         proposalStatus={proposal?.status}
       />
       {/* AUTHOR */}
       <h4 className="text-xs font-bold text-concrete uppercase mb-2 mt-6">Author</h4>
       <RoleSignature
-        role={proposal?.roles?.find((role) => role.type === ProposalRoleType.AUTHOR)}
-        signatures={signatures}
+        role={roles?.find((role) => role.type === ProposalRoleType.AUTHOR)}
         proposalStatus={proposal?.status}
       />
     </div>

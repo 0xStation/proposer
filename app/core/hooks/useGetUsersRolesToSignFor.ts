@@ -46,7 +46,13 @@ const useGetUsersRolesToSignFor = (proposal: Proposal | undefined | null) => {
   const [roles] = useQuery(
     getRolesByProposalId,
     { proposalId: proposal?.id as string },
-    { suspense: false, enabled: Boolean(proposal?.id) }
+    {
+      suspense: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      enabled: Boolean(proposal?.id),
+      cacheTime: 60 * 1000, // one minute in milliseconds
+    }
   )
 
   const getRoles = async (roles: ProposalRoleWithSignatures[], activeUser) => {

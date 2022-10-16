@@ -9,7 +9,7 @@ import getProposalById from "../queries/getProposalById"
 import { ProposalRoleType } from "@prisma/client"
 import { getHash } from "app/signatures/utils"
 import sendProposal from "../mutations/sendProposal"
-import getProposalSignaturesById from "../queries/getProposalSignaturesById"
+import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 
 export const SendProposallModal = ({ isOpen, setIsOpen, proposal }) => {
   const setToastState = useStore((state) => state.setToastState)
@@ -21,7 +21,7 @@ export const SendProposallModal = ({ isOpen, setIsOpen, proposal }) => {
     onSuccess: (data) => {
       setIsLoading(false)
       invalidateQuery(getProposalById)
-      invalidateQuery(getProposalSignaturesById)
+      invalidateQuery(getRolesByProposalId)
       setToastState({
         isToastShowing: true,
         type: "success",
