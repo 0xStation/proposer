@@ -311,68 +311,46 @@ const WorkspaceHome: BlitzPage = () => {
   const RfpTab = () => {
     const [isFoxesProposalModalOpen, setIsFoxesProposalModalOpen] = useState<boolean>(false)
 
+    const RfpCard = ({ rfp }) => {
+      return (
+        <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
+          <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden bg-charcoal cursor-pointer border border-wet-concrete hover:bg-wet-concrete">
+            <RfpStatusPill status={rfp.status} />
+            <h2 className="text-xl font-bold mt-4">{rfp?.data?.content.title || ""}</h2>
+            {rfp?.status === RfpStatus.OPEN && (
+              <Link href={Routes.CreateFoxesProposal({ rfpId: rfp?.id })}>
+                <Button className="mt-4 w-full bg-charcoal" type={ButtonType.Secondary}>
+                  Propose
+                </Button>
+              </Link>
+            )}
+          </div>
+        </Link>
+      )
+    }
+
     return (
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
         <h1 className="text-2xl font-bold">RFPs</h1>
-        <div className="mt-12 mb-4 border-b border-concrete pb-4 flex flex-row justify-between h-14"></div>
-        {/* RFPS TABLE */}
-        <table className="w-full">
-          {/* TABLE HEADERS */}
-          <thead>
-            <tr className="border-b border-concrete">
-              <th className="pl-4 w-96 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
-                Title
-              </th>
-              <th className="w-24 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
-                Status
-              </th>
-              {/* empty column for PROPOSE button */}
-              <th className=""></th>
-            </tr>
-          </thead>
-          {/* TABLE BODY */}
-          <tbody>
-            {rfps &&
-              rfps.length > 0 &&
-              rfps.map((rfp, idx) => {
-                return (
-                  <tr
-                    className="border-b border-concrete cursor-pointer hover:bg-wet-concrete"
-                    key={`table-row-${idx}`}
-                  >
-                    {/* TITLE */}
-                    <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
-                      <td className="pl-4 text-base py-4 font-bold">
-                        {rfp?.data?.content?.title?.length > 44
-                          ? rfp.data.content.title.substr(0, 44) + "..."
-                          : rfp.data.content.title}
-                      </td>
-                    </Link>
-                    <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
-                      <td>
-                        <RfpStatusPill status={rfp.status} />
-                      </td>
-                    </Link>
-                    <td className="text-right pr-4">
-                      {rfp?.status === RfpStatus.OPEN && (
-                        <Link href={Routes.CreateFoxesProposal({ rfpId: rfp?.id })}>
-                          <Button type={ButtonType.Secondary}>Propose</Button>
-                        </Link>
-                      )}
-                    </td>
-                  </tr>
-                )
-              })}
-          </tbody>
-        </table>
-        {!rfps &&
-          Array.from(Array(10)).map((idx) => (
-            <div
-              key={idx}
-              tabIndex={0}
-              className={`flex flex-row w-full my-1 rounded-lg bg-wet-concrete shadow border-solid h-[48px] motion-safe:animate-pulse`}
-            />
-          ))}
+        <div className="mt-12 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between h-14"></div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:gap-2 md:gap-4 lg:gap-6 gap-1">
+          {/* RFP CARDS */}
+          {rfps &&
+            rfps?.length > 0 &&
+            rfps?.map((rfp, idx) => {
+              return <RfpCard key={idx} rfp={rfp} />
+            })}
+          {/* RFP LOADING */}
+          {!rfps &&
+            Array.from(Array(9)).map((idx) => (
+              <div
+                key={idx}
+                tabIndex={0}
+                className="h-36 rounded-md overflow-hidden bg-wet-concrete shadow border-solid motion-safe:animate-pulse"
+              />
+            ))}
+        </div>
+        {/* RFP EMPTY */}
         {rfps && rfps.length === 0 && (
           <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
             <p className="text-2xl font-bold w-[295px] text-center">
