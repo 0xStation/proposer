@@ -10,6 +10,7 @@ import {
   invoke,
   Router,
   useRouter,
+  Image,
 } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import Button from "app/core/components/sds/buttons/Button"
@@ -31,6 +32,7 @@ import {
   ProposalStatus,
   ProposalRoleApprovalStatus,
   ProposalRoleType,
+  RfpStatus,
 } from "@prisma/client"
 import { LightBulbIcon, CogIcon } from "@heroicons/react/solid"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
@@ -48,6 +50,8 @@ import { isAddress } from "ethers/lib/utils"
 import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 import getRfpById from "app/rfp/queries/getRfpById"
 import getProposalsByRfpId from "app/proposal/queries/getProposalsByRfpId"
+import RfpStatusPill from "app/rfp/components/RfpStatusPill"
+import BackIcon from "/public/back-icon.svg"
 
 export const getServerSideProps: GetServerSideProps = async ({ params = {} }) => {
   const { rfpId } = params
@@ -110,10 +114,18 @@ const RfpDetail: BlitzPage = () => {
       <div className="flex flex-row h-full">
         {/* LEFT SIDEBAR */}
         <div className="h-full w-[288px] border-r border-concrete p-6">
-          <div className="pb-6 border-b border-concrete space-y-6">
+          <div className="flex flex-col pb-6 space-y-6">
+            {/* BACK */}
+            <Link href={Routes.WorkspaceHome({ accountAddress: rfp?.accountAddress as string })}>
+              <div className="h-[16px] w-[16px]">
+                <Image src={BackIcon} alt="Back icon" />
+              </div>
+            </Link>
             {/* TITLE */}
             {rfp ? (
-              <span className="text-xl text-marble-white">{rfp?.data.content.title}</span>
+              <span className="mt-6 text-2xl font-bold text-marble-white">
+                {rfp?.data.content.title}
+              </span>
             ) : (
               // LOADING STATE
               <div
@@ -121,16 +133,33 @@ const RfpDetail: BlitzPage = () => {
                 className={`h-10 w-full rounded-4xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
               />
             )}
+            {/* STATUS PILL */}
+            <RfpStatusPill status={rfp?.status} />
             {/* CTA */}
-            <Link href={Routes.CreateFoxesProposal({ rfpId })}>
-              <Button className="w-full">Propose</Button>
-            </Link>
+            {rfp?.status === RfpStatus.OPEN && (
+              <Link href={Routes.CreateFoxesProposal({ rfpId })}>
+                <Button className="w-full">Propose</Button>
+              </Link>
+            )}
+            {/* NETWORK */}
+            <div className="mt-6 pt-6">
+              <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
+              <p className="mt-2">Ethereum</p>
+            </div>
+            <div className="mt-6">
+              <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
+              <p className="mt-2">ETH</p>
+            </div>
+            <div className="mt-6">
+              <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
+              <p className="mt-2">0.01</p>
+            </div>
           </div>
         </div>
         <div className="p-10 flex-1 max-h-screen overflow-y-auto">
-          <h1 className="text-2xl font-bold">Proposals</h1>
-          <div className="mt-12 mb-4 border-b border-concrete pb-4 flex flex-row justify-between">
-            <div className="space-x-2 flex flex-row">
+          {/* <h1 className="text-2xl font-bold">Proposals</h1> */}
+          <div className="mb-4 border-b border-concrete pb-4 flex flex-row justify-end">
+            {/* <div className="space-x-2 flex flex-row">
               <FilterPill
                 label="status"
                 filterOptions={PROPOSAL_NEW_STATUS_FILTER_OPTIONS.map((pnStatus) => ({
@@ -157,7 +186,7 @@ const RfpDetail: BlitzPage = () => {
                   invalidateQuery(getProposalsByAddress)
                 }}
               />
-            </div>
+            </div> */}
             <Pagination
               results={proposals as any[]}
               // TODO: make specific query for count

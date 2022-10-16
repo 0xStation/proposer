@@ -29,8 +29,9 @@ import {
   ProposalStatus,
   ProposalRoleApprovalStatus,
   ProposalRoleType,
+  RfpStatus,
 } from "@prisma/client"
-import { LightBulbIcon, CogIcon } from "@heroicons/react/solid"
+import { LightBulbIcon, CogIcon, NewspaperIcon } from "@heroicons/react/solid"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 import WorkspaceSettingsOverviewForm from "app/account/components/WorkspaceSettingsOverviewForm"
 import useStore from "app/core/hooks/useStore"
@@ -45,6 +46,7 @@ import { Account } from "app/account/types"
 import { isAddress } from "ethers/lib/utils"
 import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 import { Rfp } from "app/rfp/types"
+import RfpStatusPill from "app/rfp/components/RfpStatusPill"
 
 enum Tab {
   PROPOSALS = "PROPOSALS",
@@ -311,8 +313,8 @@ const WorkspaceHome: BlitzPage = () => {
 
     return (
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
-        <h1 className="text-2xl font-bold">Rfps</h1>
-        <div className="mt-12 mb-4 border-b border-concrete pb-4 flex flex-row justify-between h-12"></div>
+        <h1 className="text-2xl font-bold">RFPs</h1>
+        <div className="mt-12 mb-4 border-b border-concrete pb-4 flex flex-row justify-between h-14"></div>
         {/* RFPS TABLE */}
         <table className="w-full">
           {/* TABLE HEADERS */}
@@ -320,6 +322,9 @@ const WorkspaceHome: BlitzPage = () => {
             <tr className="border-b border-concrete">
               <th className="pl-4 w-96 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
                 Title
+              </th>
+              <th className="w-24 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
+                Status
               </th>
               {/* empty column for PROPOSE button */}
               <th className=""></th>
@@ -343,10 +348,17 @@ const WorkspaceHome: BlitzPage = () => {
                           : rfp.data.content.title}
                       </td>
                     </Link>
+                    <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
+                      <td>
+                        <RfpStatusPill status={rfp.status} />
+                      </td>
+                    </Link>
                     <td className="text-right pr-4">
-                      <Link href={Routes.CreateFoxesProposal({ rfpId: rfp.id })}>
-                        <Button type={ButtonType.Secondary}>Propose</Button>
-                      </Link>
+                      {rfp?.status === RfpStatus.OPEN && (
+                        <Link href={Routes.CreateFoxesProposal({ rfpId: rfp?.id })}>
+                          <Button type={ButtonType.Secondary}>Propose</Button>
+                        </Link>
+                      )}
                     </td>
                   </tr>
                 )
@@ -429,7 +441,7 @@ const WorkspaceHome: BlitzPage = () => {
               }`}
               onClick={() => setActiveTab(Tab.RFPS)}
             >
-              <LightBulbIcon className="h-5 w-5 text-white cursor-pointer" />
+              <NewspaperIcon className="h-5 w-5 text-white cursor-pointer" />
               <span>RFPs</span>
             </li>
             {/* SETTINGS */}

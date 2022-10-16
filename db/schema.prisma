@@ -57,15 +57,23 @@ enum AccountAccountType {
 // REQUESTS FOR PROPOSALS
 
 model Rfp {
-  id             String   @id @default(uuid())
+  id             String    @id @default(uuid())
   accountAddress String
   data           Json
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  status         RfpStatus @default(OPEN)
 
   account Account @relation(fields: [accountAddress], references: [address], onDelete: Cascade)
 
   proposals Proposal[]
+}
+
+// used to manually open and close rfps
+enum RfpStatus {
+  OPEN
+  CLOSED
+  // TIME_DEPENDENT -- will be used to indicate rely on start/end times to render status
 }
 
 // PROPOSAL SYSTEM
