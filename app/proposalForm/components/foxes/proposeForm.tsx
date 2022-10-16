@@ -13,6 +13,9 @@ import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
 import { useQuery, useRouterQuery } from "blitz"
 import getRfpById from "app/rfp/queries/getRfpById"
+import { getClientAddress } from "app/template/utils"
+import { useEnsName } from "wagmi"
+import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 
 export const FoxesProposeFirstStep = ({ minNumWords }) => {
   const queryParams = useRouterQuery()
@@ -30,11 +33,13 @@ export const FoxesProposeFirstStep = ({ minNumWords }) => {
     }
   )
 
+  const displayAddress = useDisplayAddress(getClientAddress(rfp?.data.template))
+
   return (
     <>
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">To</span>
-        <span className="items-end">@philosophicalfoxes.eth</span>
+        <span className="items-end">{displayAddress}</span>
       </div>
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">RFP</span>

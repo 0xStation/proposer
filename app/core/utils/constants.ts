@@ -14,6 +14,8 @@ import Gradient3 from "/public/gradients/3.png"
 import Gradient4 from "/public/gradients/4.png"
 import Gradient5 from "/public/gradients/5.png"
 import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
+import { getNetworkCoin } from "./networkInfo"
+import { RESERVED_KEYS, TemplateFieldType } from "app/template/types"
 
 export enum FundingProposalStep {
   PROPOSE = "PROPOSE",
@@ -314,20 +316,73 @@ export const PROPOSING_AS_ROLE_MAP = {
 
 export const txPathString = "/tx/"
 
-export const foxesAddress = "0x332557dE221d09AD5b164a665c585fca0200b4B1"
-// export const foxesAddress = "0x016562aA41A8697720ce0943F003141f5dEAe006"
-// export const foxesAddress = "0xc517c83f417b73dA98647dad0FCB80af9f3b9531"
+export const PARTNERS = {
+  FOXES: {
+    ADDRESS: "0x332557dE221d09AD5b164a665c585fca0200b4B1",
+    // ADDRESS: "0x016562aA41A8697720ce0943F003141f5dEAe006",
+  },
+}
 
-// LEGACY BELOW
+export const TEMPLATES = {
+  FOXES: {
+    TERM: [
+      {
+        key: RESERVED_KEYS.CONTRIBUTORS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [],
+        fieldType: TemplateFieldType.OPEN,
+      },
+      {
+        key: RESERVED_KEYS.AUTHORS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [],
+        fieldType: TemplateFieldType.OPEN,
+      },
+      {
+        key: RESERVED_KEYS.CLIENTS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [{ address: PARTNERS.FOXES.ADDRESS, type: ProposalRoleType.CLIENT }],
+        fieldType: TemplateFieldType.PRESELECT,
+      },
+      {
+        key: RESERVED_KEYS.MILESTONES,
+        mapsTo: RESERVED_KEYS.MILESTONES,
+        value: [
+          {
+            title: "Contributor payment",
+            index: 0,
+          },
+        ],
+        fieldType: TemplateFieldType.PRESELECT,
+      },
+      {
+        key: RESERVED_KEYS.PAYMENTS,
+        mapsTo: RESERVED_KEYS.PAYMENTS,
+        value: [
+          {
+            milestoneIndex: 0,
+            senderAddress: PARTNERS.FOXES.ADDRESS,
+            recipientAddress: undefined,
+            token: { chainId: 1, ...getNetworkCoin(1) },
+            amount: 0.01,
+          },
+        ],
+        fieldType: TemplateFieldType.PREFILL,
+      },
+      {
+        key: RESERVED_KEYS.PAYMENT_TERMS,
+        mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
+        value: PaymentTerm.ON_AGREEMENT,
+        fieldType: TemplateFieldType.PRESELECT,
+      },
+    ],
+  },
+}
 
 // LEGACY
+// kept to support Station Labs NFT through the /nft/token api route
 export enum AccountInitiativeStatus {
   INTERESTED = "INTERESTED",
   CONTRIBUTING = "CONTRIBUTING",
   PREVIOUSLY_CONTRIBUTED = "PREVIOUSLY_CONTRIBUTED",
 }
-// LEGACY
-export const defaultTicketImageUrl: string =
-  "https://station-images.nyc3.digitaloceanspaces.com/e0ed554e-b0b7-4e03-90f4-221708b159e0.svg"
-
-// THIS IS THE LEGACY SECTION

@@ -52,6 +52,8 @@ import getRfpById from "app/rfp/queries/getRfpById"
 import getProposalsByRfpId from "app/proposal/queries/getProposalsByRfpId"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
 import BackIcon from "/public/back-icon.svg"
+import { getPaymentAmount, getPaymentToken } from "app/template/utils"
+import { getNetworkName } from "app/core/utils/networkInfo"
 
 export const getServerSideProps: GetServerSideProps = async ({ params = {} }) => {
   const { rfpId } = params
@@ -152,15 +154,15 @@ const RfpDetail: BlitzPage = () => {
             {/* NETWORK */}
             <div className="mt-6 pt-6">
               <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
-              <p className="mt-2">Ethereum</p>
+              <p className="mt-2">{getNetworkName(getPaymentToken(rfp?.data.template).chainId)}</p>
             </div>
             <div className="mt-6">
               <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
-              <p className="mt-2">ETH</p>
+              <p className="mt-2">{getPaymentToken(rfp?.data.template).symbol}</p>
             </div>
             <div className="mt-6">
               <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-              <p className="mt-2">0.01</p>
+              <p className="mt-2">{getPaymentAmount(rfp?.data.template)}</p>
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import db from "../index"
-import { foxesAddress } from "app/core/utils/constants"
+import { PARTNERS, TEMPLATES } from "app/core/utils/constants"
+import { RfpMetadata } from "app/rfp/types"
 
 const seed = async () => {
   const terms = [
@@ -59,17 +60,21 @@ const seed = async () => {
   await db.rfp.deleteMany({})
 
   // create new rfps
+  const metadatas = terms.map((term) => {
+    return {
+      content: {
+        title: term.name,
+        body: "",
+        oneLiner: "",
+      },
+      template: TEMPLATES.FOXES.TERM,
+    } as RfpMetadata
+  })
   const rfps = await db.rfp.createMany({
-    data: terms.map((term) => {
+    data: metadatas.map((metadata) => {
       return {
-        accountAddress: foxesAddress,
-        data: {
-          content: {
-            title: term.name,
-            body: "",
-            oneLiner: "",
-          },
-        },
+        accountAddress: PARTNERS.FOXES.ADDRESS,
+        data: metadata,
       }
     }),
   })

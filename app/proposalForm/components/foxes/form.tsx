@@ -21,13 +21,18 @@ import createProposal from "app/proposal/mutations/createProposal"
 import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
 import { ConfirmForm } from "../ConfirmForm"
 import { FoxesProposeFirstStep } from "./proposeForm"
-import createProposalToFoxesRfp from "app/proposal/mutations/createProposalToFoxesRfp"
 import deleteProposalById from "app/proposal/mutations/deleteProposalById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { FoxesConfirmForm } from "./confirmForm"
 import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import { AddressType, ProposalRoleType } from "@prisma/client"
 import { mustBeAboveNumWords } from "app/utils/validators"
+import {
+  addAddressAsRecipientToPayments,
+  getClientAddress,
+  getFieldValue,
+} from "app/template/utils"
+import { RESERVED_KEYS } from "app/template/types"
 
 enum FundingProposalStep {
   PROPOSE = "PROPOSE",
@@ -71,7 +76,7 @@ export const FoxesProposalForm = () => {
     }
   )
 
-  const [createProposalToFoxesRfpMutation] = useMutation(createProposalToFoxesRfp, {
+  const [createProposalMutation] = useMutation(createProposal, {
     onSuccess: (data) => {
       setCreatedProposal(data)
       setShouldHandlePostProposalCreationProcessing(true)
@@ -206,12 +211,20 @@ export const FoxesProposalForm = () => {
             }
 
             try {
-              await createProposalToFoxesRfpMutation({
+              const contributorAddress = session?.siwe?.address as string
+
+              await createProposalMutation({
                 rfpId,
                 contentTitle: `${rfp?.data.content.title} submission`,
                 contentBody: values.body,
-                authorAddress: session?.siwe?.address as string,
+                authorAddresses: [contributorAddress],
+                contributorAddresses: [contributorAddress],
+                clientAddresses: [getClientAddress(rfp?.data.template)],
+                milestones: getFieldValue(rfp?.data.template, RESERVED_KEYS.MILESTONES),
+                payments: addAddressAsRecipientToPayments(rfp?.data.template, contributorAddress),
+                paymentTerms: getFieldValue(rfp?.data.template, RESERVED_KEYS.PAYMENT_TERMS),
               })
+              // {rfp?.data.template.find((field) => field.key === "clients")?.value?.[0]?.address}
             } catch (err) {
               setIsLoading(false)
               setToastState({
