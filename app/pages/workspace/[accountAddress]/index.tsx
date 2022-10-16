@@ -345,9 +345,7 @@ const WorkspaceHome: BlitzPage = () => {
                     </Link>
                     <td className="text-right pr-4">
                       <Link href={Routes.CreateFoxesProposal({ rfpId: rfp.id })}>
-                        <Button className="w-full" type={ButtonType.Secondary}>
-                          Propose
-                        </Button>
+                        <Button type={ButtonType.Secondary}>Propose</Button>
                       </Link>
                     </td>
                   </tr>

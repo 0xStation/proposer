@@ -122,7 +122,7 @@ const RfpDetail: BlitzPage = () => {
               />
             )}
             {/* CTA */}
-            <Link href={Routes.CreateFoxesProposal()}>
+            <Link href={Routes.CreateFoxesProposal({ rfpId })}>
               <Button className="w-full">Propose</Button>
             </Link>
           </div>

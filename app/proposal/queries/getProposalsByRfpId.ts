@@ -19,6 +19,9 @@ export default async function getProposalsByRfpId(params: z.infer<typeof GetProp
         },
       },
     },
+    orderBy: {
+      timestamp: "desc",
+    },
   })
 
   console.log(proposals)
