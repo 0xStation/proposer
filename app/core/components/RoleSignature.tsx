@@ -14,14 +14,14 @@ import {
   ProposalStatus,
 } from "@prisma/client"
 
-const SafeRole = ({ role, signatures, proposalStatus }) => {
+const SafeRole = ({ role, proposalStatus }) => {
   const activeUser = useStore((state) => state.activeUser)
   const [safeDetails, setSafeDetails] = useState<any | null>({})
   const [signers, setSigners] = useState<string[]>([])
   const [toggleSigners, setToggleSigners] = useState<boolean>(false)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
 
-  const activeUserHasSigned = activeUserMeetsCriteria(activeUser, signatures)
+  const activeUserHasSigned = activeUserMeetsCriteria(activeUser, role.signatures)
   const activeUserHasAProposalRole = activeUserMeetsCriteria(activeUser, signers)
   const showSignButton =
     proposalStatus !== ProposalStatus.DRAFT && activeUserHasAProposalRole && !activeUserHasSigned
@@ -37,8 +37,8 @@ const SafeRole = ({ role, signatures, proposalStatus }) => {
   }, [role])
 
   const totalSafeSignersSigned =
-    signatures &&
-    signatures.filter((signature) => {
+    role.signatures &&
+    role.signatures.filter((signature) => {
       return signers.some((signer) => {
         return (
           addressesAreEqual(signature.address, signer) &&
@@ -53,7 +53,7 @@ const SafeRole = ({ role, signatures, proposalStatus }) => {
   return (
     <>
       <div className="flex flex-row w-full items-center justify-between">
-        {role && signatures ? (
+        {role ? (
           <div className="flex flex-col w-full">
             <div className="flex flex-row w-full items-center justify-between">
               <AccountMediaObject account={role?.account} />
@@ -120,11 +120,12 @@ const SafeRole = ({ role, signatures, proposalStatus }) => {
   )
 }
 
-const WalletRole = ({ role, signatures, proposalStatus }) => {
+const WalletRole = ({ role, proposalStatus }) => {
   const activeUser = useStore((state) => state.activeUser)
   const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
-  const activeUserHasApproved = signatures?.some(
+  console.log("role", role)
+  const activeUserHasApproved = role.signatures?.some(
     (signature) =>
       addressesAreEqual(activeUser?.address || "", signature.address) &&
       signature.type === ProposalSignatureType.APPROVE
@@ -147,7 +148,7 @@ const WalletRole = ({ role, signatures, proposalStatus }) => {
 
   return (
     <div className="flex flex-row w-full items-center justify-between">
-      {role && signatures ? (
+      {role ? (
         <>
           <AccountMediaObject account={role?.account} />
           <div className="flex flex-col items-end space-y-1">
@@ -194,15 +195,15 @@ const WalletRole = ({ role, signatures, proposalStatus }) => {
   )
 }
 
-export const RoleSignature = ({ role, signatures, proposalStatus }) => {
+export const RoleSignature = ({ role, proposalStatus }) => {
   const isSafe = role?.account?.addressType === "SAFE"
 
   return (
     <>
       {isSafe ? (
-        <SafeRole role={role} signatures={signatures} proposalStatus={proposalStatus} />
+        <SafeRole role={role} proposalStatus={proposalStatus} />
       ) : (
-        <WalletRole role={role} signatures={signatures} proposalStatus={proposalStatus} />
+        <WalletRole role={role} proposalStatus={proposalStatus} />
       )}
     </>
   )
