@@ -8,6 +8,8 @@ import {
   Link,
   GetServerSideProps,
   invoke,
+  Router,
+  useRouter,
 } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import Button from "app/core/components/sds/buttons/Button"
@@ -76,6 +78,7 @@ const RfpDetail: BlitzPage = () => {
   const accountData = useAccount()
   const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [canViewSettings, setCanViewSettings] = useState<boolean>(false)
+  const [isFoxesProposalModalOpen, setIsFoxesProposalModalOpen] = useState<boolean>(false)
   const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
     new Set<ProposalStatus>()
   )
@@ -84,6 +87,7 @@ const RfpDetail: BlitzPage = () => {
   )
   const [page, setPage] = useState<number>(0)
   const rfpId = useParam("rfpId", "string") as string
+  const router = useRouter()
 
   const [rfp] = useQuery(
     getRfpById,
@@ -118,15 +122,9 @@ const RfpDetail: BlitzPage = () => {
               />
             )}
             {/* CTA */}
-            {/* <Link
-              href={Routes.ProposalTypeSelection({
-                // pre-fill for both so that if user changes toggle to reverse roles, the input address is still there
-                clients: accountEnsName || accountAddress,
-                contributors: accountEnsName || accountAddress,
-              })}
-            >
+            <Link href={Routes.CreateFoxesProposal()}>
               <Button className="w-full">Propose</Button>
-            </Link> */}
+            </Link>
           </div>
         </div>
         <div className="p-10 flex-1 max-h-screen overflow-y-auto">

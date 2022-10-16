@@ -10,7 +10,7 @@ import {
   invoke,
 } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import Button from "app/core/components/sds/buttons/Button"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { formatDate } from "app/core/utils/formatDate"
 import FilterPill from "app/core/components/FilterPill"
@@ -44,6 +44,7 @@ import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber
 import { Account } from "app/account/types"
 import { isAddress } from "ethers/lib/utils"
 import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
+import { Rfp } from "app/rfp/types"
 
 enum Tab {
   PROPOSALS = "PROPOSALS",
@@ -81,6 +82,7 @@ const WorkspaceHome: BlitzPage = () => {
   const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [canViewSettings, setCanViewSettings] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<Tab>(Tab.PROPOSALS)
+  const [activeRfp, setActiveRfp] = useState<Rfp>()
   const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
     new Set<ProposalStatus>()
   )
@@ -305,6 +307,8 @@ const WorkspaceHome: BlitzPage = () => {
   }
 
   const RfpTab = () => {
+    const [isFoxesProposalModalOpen, setIsFoxesProposalModalOpen] = useState<boolean>(false)
+
     return (
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
         <h1 className="text-2xl font-bold">Rfps</h1>
@@ -317,6 +321,8 @@ const WorkspaceHome: BlitzPage = () => {
               <th className="pl-4 w-96 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
                 Title
               </th>
+              {/* empty column for PROPOSE button */}
+              <th className=""></th>
             </tr>
           </thead>
           {/* TABLE BODY */}
@@ -325,16 +331,26 @@ const WorkspaceHome: BlitzPage = () => {
               rfps.length > 0 &&
               rfps.map((rfp, idx) => {
                 return (
-                  <Link href={Routes.RfpDetail({ rfpId: rfp.id })} key={`table-row-${idx}`}>
-                    <tr className="border-b border-concrete cursor-pointer hover:bg-wet-concrete">
-                      {/* TITLE */}
+                  <tr
+                    className="border-b border-concrete cursor-pointer hover:bg-wet-concrete"
+                    key={`table-row-${idx}`}
+                  >
+                    {/* TITLE */}
+                    <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
                       <td className="pl-4 text-base py-4 font-bold">
                         {rfp?.data?.content?.title?.length > 44
                           ? rfp.data.content.title.substr(0, 44) + "..."
                           : rfp.data.content.title}
                       </td>
-                    </tr>
-                  </Link>
+                    </Link>
+                    <td className="text-right pr-4">
+                      <Link href={Routes.CreateFoxesProposal({ rfpId: rfp.id })}>
+                        <Button className="w-full" type={ButtonType.Secondary}>
+                          Propose
+                        </Button>
+                      </Link>
+                    </td>
+                  </tr>
                 )
               })}
           </tbody>

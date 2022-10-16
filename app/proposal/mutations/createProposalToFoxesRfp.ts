@@ -28,12 +28,13 @@ export default async function createProposalToFoxesRfp(
       index: 0,
     },
   ]
+  const chainId = 1 // mainnet
   const payments = [
     {
       milestoneIndex: 0,
       senderAddress: foxesAddress,
       recipientAddress: params.authorAddress,
-      token: getNetworkCoin(1),
+      token: { ...getNetworkCoin(chainId), chainId },
       amount: 0.01,
     },
   ]
