@@ -36,16 +36,14 @@ const SafeRole = ({ role, proposalStatus }) => {
     getGnosisDetails()
   }, [role])
 
-  const totalSafeSignersSigned =
-    role.signatures &&
-    role.signatures.filter((signature) => {
-      return signers.some((signer) => {
-        return (
-          addressesAreEqual(signature.address, signer) &&
-          signature.type === ProposalSignatureType.APPROVE // only count APPROVE signatures to ignore author's SEND signature
-        )
-      })
-    }).length
+  const totalSafeSignersSigned = role.signatures.filter((signature) => {
+    return signers.some((signer) => {
+      return (
+        addressesAreEqual(signature.address, signer) &&
+        signature.type === ProposalSignatureType.APPROVE // only count APPROVE signatures to ignore author's SEND signature
+      )
+    })
+  }).length
 
   const showStatus =
     proposalStatus !== ProposalStatus.DRAFT || role.type === ProposalRoleType.AUTHOR
@@ -124,7 +122,6 @@ const WalletRole = ({ role, proposalStatus }) => {
   const activeUser = useStore((state) => state.activeUser)
   const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
-  console.log("role", role)
   const activeUserHasApproved = role.signatures?.some(
     (signature) =>
       addressesAreEqual(activeUser?.address || "", signature.address) &&
