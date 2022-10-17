@@ -47,6 +47,7 @@ import { isAddress } from "ethers/lib/utils"
 import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 import { Rfp } from "app/rfp/types"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
+import getAccountHasToken from "app/token/queries/getAccountHasToken"
 
 enum Tab {
   PROPOSALS = "PROPOSALS",
@@ -309,20 +310,41 @@ const WorkspaceHome: BlitzPage = () => {
   }
 
   const RfpTab = () => {
-    const [isFoxesProposalModalOpen, setIsFoxesProposalModalOpen] = useState<boolean>(false)
-
     const RfpCard = ({ rfp }) => {
+      const [userHasRequiredToken] = useQuery(
+        getAccountHasToken,
+        {
+          chainId: rfp?.data?.singleTokenGate?.token?.chainId as number,
+          tokenAddress: rfp?.data?.singleTokenGate?.token?.address as string,
+          accountAddress: activeUser?.address as string,
+          minBalance: rfp?.data?.singleTokenGate?.minBalance || "1",
+        },
+        {
+          enabled: !!activeUser?.address && !!rfp?.data?.singleTokenGate,
+          suspense: false,
+          refetchOnWindowFocus: false,
+          cacheTime: 60 * 1000, // 1 minute
+        }
+      )
+
       return (
         <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
           <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden bg-charcoal cursor-pointer border border-wet-concrete hover:bg-wet-concrete">
             <RfpStatusPill status={rfp.status} />
             <h2 className="text-xl font-bold mt-4">{rfp?.data?.content.title || ""}</h2>
-            {rfp?.status === RfpStatus.OPEN && (
-              <Link href={Routes.CreateFoxesProposal({ rfpId: rfp?.id })}>
-                <Button className="mt-4 w-full bg-charcoal" type={ButtonType.Secondary}>
-                  Propose
-                </Button>
-              </Link>
+            <Link href={Routes.CreateFoxesProposal({ rfpId: rfp?.id })}>
+              <Button
+                className="mt-4 w-full bg-charcoal"
+                type={ButtonType.Secondary}
+                isDisabled={rfp?.status === RfpStatus.CLOSED || !userHasRequiredToken}
+              >
+                Propose
+              </Button>
+            </Link>
+            {!userHasRequiredToken && (
+              <span className="text-xs text-concrete">
+                Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this RFP.
+              </span>
             )}
           </div>
         </Link>

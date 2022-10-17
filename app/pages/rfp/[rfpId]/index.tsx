@@ -54,6 +54,7 @@ import RfpStatusPill from "app/rfp/components/RfpStatusPill"
 import BackIcon from "/public/back-icon.svg"
 import { getPaymentAmount, getPaymentToken } from "app/template/utils"
 import { getNetworkName } from "app/core/utils/networkInfo"
+import getAccountHasToken from "app/token/queries/getAccountHasToken"
 
 export const getServerSideProps: GetServerSideProps = async ({ params = {} }) => {
   const { rfpId } = params
@@ -111,6 +112,22 @@ const RfpDetail: BlitzPage = () => {
     { enabled: !!rfpId, suspense: false, refetchOnWindowFocus: false }
   )
 
+  const [userHasRequiredToken] = useQuery(
+    getAccountHasToken,
+    {
+      chainId: rfp?.data?.singleTokenGate?.token?.chainId as number,
+      tokenAddress: rfp?.data?.singleTokenGate?.token?.address as string,
+      accountAddress: activeUser?.address as string,
+      minBalance: rfp?.data?.singleTokenGate?.minBalance || "1",
+    },
+    {
+      enabled: !!activeUser?.address && !!rfp?.data?.singleTokenGate,
+      suspense: false,
+      refetchOnWindowFocus: false,
+      cacheTime: 60 * 1000, // 1 minute
+    }
+  )
+
   return (
     <Layout>
       <div className="flex flex-row h-full">
@@ -146,11 +163,21 @@ const RfpDetail: BlitzPage = () => {
               />
             )}
             {/* CTA */}
-            {rfp?.status === RfpStatus.OPEN && (
+            <div>
               <Link href={Routes.CreateFoxesProposal({ rfpId })}>
-                <Button className="w-full">Propose</Button>
+                <Button
+                  className="w-full"
+                  isDisabled={rfp?.status === RfpStatus.CLOSED || !userHasRequiredToken}
+                >
+                  Propose
+                </Button>
               </Link>
-            )}
+              {!userHasRequiredToken && (
+                <span className="text-xs text-concrete">
+                  Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this RFP.
+                </span>
+              )}
+            </div>
             {/* NETWORK */}
             <div className="mt-6 pt-6">
               <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>

@@ -1,6 +1,7 @@
 import db from "../index"
 import { PARTNERS, TEMPLATES } from "app/core/utils/constants"
 import { RfpMetadata } from "app/rfp/types"
+import { TokenType } from "@prisma/client"
 
 const seed = async () => {
   const terms = [
@@ -68,8 +69,24 @@ const seed = async () => {
         oneLiner: "",
       },
       template: TEMPLATES.FOXES.TERM,
+      singleTokenGate: {
+        token: {
+          chainId: 1,
+          address: "0x55256178aFE74082c4f9aFEF7E40fec949c1b499",
+          type: TokenType.ERC721,
+          name: "Philosophical Foxes",
+          symbol: "FOX",
+        },
+      },
     } as RfpMetadata
   })
+  // chainId: number
+  // address: string
+  // type: TokenType
+  // name?: string
+  // symbol?: string
+  // decimals?: number
+
   const rfps = await db.rfp.createMany({
     data: metadatas.map((metadata) => {
       return {
