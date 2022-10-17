@@ -1,5 +1,5 @@
 import { useSession } from "blitz"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import ImportTokenModal from "app/core/components/ImportTokenModal"
 import useStore from "app/core/hooks/useStore"
 import { FundingProposalStep, PAYMENT_TERM_MAP } from "app/core/utils/constants"
@@ -24,9 +24,9 @@ export const RewardForm = ({
   chainId,
   selectedToken,
   setSelectedToken,
-  tokenOptions,
   selectedPaymentTerms,
   setSelectedPaymentTerms,
+  tokenOptions,
   refetchTokens,
   isImportTokenModalOpen,
   setIsImportTokenModalOpen,

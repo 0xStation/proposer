@@ -145,10 +145,11 @@ export const isValidTransactionLink = (chainId: number) => {
   }
 }
 
-// TODO: if we wanted to get really really smart, we should make this conditional on the payment value
-// in cases where the amount is very small we can only support a subset of percentage values
-// for example, if absolute uint256 amount is 100, we cannot support decimals in the value
-// another example, if absolute uint256 amount is 3, we can only support 0, 33.33, 66.66, and 100
+// TODO: potential problem with rounding for smaller values when the number can't be divided further
+// for example, if absolute uint256 amount is 100, how do we support percentage decimals?
+// another example, if absolute uint256 amount is 3, where does 50% round to: 1 or 2?
+// if we wanted to get really really smart, we should make this conditional on the payment value
+// in cases where the amount is very small we can only support a subset of percentage values and communicate that to the user
 export const isValidAdvancedPaymentPercentage = (value: string) => {
   if (!value) return "No percentage value provided"
   const parsedValue = parseFloat(formatPercentValue(value))

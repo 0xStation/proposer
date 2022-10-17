@@ -51,6 +51,7 @@ export const ProposalFundingForm = ({
   const [tokenOptions, setTokenOptions] = useState<any[]>()
   const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
   const [selectedToken, setSelectedToken] = useState<any>()
+  // payment terms in parent form state because it gets reset when flipping through steps if put in the rewards form
   const [selectedPaymentTerms, setSelectedPaymentTerms] = useState<string>("")
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
   const [proposalShouldSendLater, setProposalShouldSendLater] = useState<boolean>(false)
@@ -237,6 +238,10 @@ export const ProposalFundingForm = ({
             }
 
             // set up milestones and payments conditional on payment terms inputs
+            const MILESTONE_COPY = {
+              ADVANCE_PAYMENT: "Advance payment",
+              COMPLETION_PAYMENT: "Completion payment",
+            }
 
             if (
               values.paymentTerms === PaymentTerm.AFTER_COMPLETION &&
@@ -246,11 +251,11 @@ export const ProposalFundingForm = ({
               milestones = [
                 {
                   index: 0,
-                  title: "Advance payment",
+                  title: MILESTONE_COPY.ADVANCE_PAYMENT,
                 },
                 {
                   index: 1,
-                  title: "Completion payment",
+                  title: MILESTONE_COPY.COMPLETION_PAYMENT,
                 },
               ]
 
@@ -278,8 +283,8 @@ export const ProposalFundingForm = ({
                   index: 0,
                   title:
                     values.paymentTerms === PaymentTerm.ON_AGREEMENT
-                      ? "Advance payment"
-                      : "Completion payment", // if terms are not ON_ARGEEMENT, they are AFTER_COMPLETION and we have zero advance payment
+                      ? MILESTONE_COPY.ADVANCE_PAYMENT
+                      : MILESTONE_COPY.COMPLETION_PAYMENT, // if terms are not ON_ARGEEMENT, they are AFTER_COMPLETION and we have zero advance payment
                 },
               ]
               payments = [
@@ -352,9 +357,9 @@ export const ProposalFundingForm = ({
                         isImportTokenModalOpen={isImportTokenModalOpen}
                         setIsImportTokenModalOpen={setIsImportTokenModalOpen}
                         selectedToken={selectedToken}
+                        setSelectedToken={setSelectedToken}
                         selectedPaymentTerms={selectedPaymentTerms}
                         setSelectedPaymentTerms={setSelectedPaymentTerms}
-                        setSelectedToken={setSelectedToken}
                         setProposalStep={setProposalStep}
                       />
                     )}
