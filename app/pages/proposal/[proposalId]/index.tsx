@@ -52,6 +52,7 @@ const ViewProposal: BlitzPage = () => {
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
   const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
   const [stepperSteps, setStepperSteps] = useState<any>([])
+  const [stepperLoading, setStepperLoading] = useState<boolean>(true)
 
   const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(proposal)
   const activeUserIsSigner = signedRoles.length + remainingRoles.length > 0
@@ -97,6 +98,7 @@ const ViewProposal: BlitzPage = () => {
   useEffect(() => {
     if (proposal) {
       setStepperSteps(rawSteps)
+      setStepperLoading(false)
     }
   }, [proposal, activeUserHasRolesToSign, activeUserIsSigner])
 
@@ -104,6 +106,7 @@ const ViewProposal: BlitzPage = () => {
     <Layout title="View Proposal">
       <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto pb-9 relative">
         <ProposalStepper
+          loading={stepperLoading}
           roles={usersRoles}
           steps={stepperSteps}
           className="absolute right-[-340px] top-0"
