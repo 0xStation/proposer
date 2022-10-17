@@ -150,10 +150,13 @@ export const ProposalViewHeaderNavigation = () => {
         <div className="mt-6 flex flex-row justify-between">
           <div className="space-x-2 flex flex-row">
             <ProposalStatusPill status={proposal?.status} />
-            <ProgressCircleAndNumber
-              numerator={totalApprovalCount}
-              denominator={proposal?.roles?.length || 0}
-            />
+            {(proposal?.status === ProposalStatus.AWAITING_APPROVAL ||
+              proposal?.status === ProposalStatus.APPROVED) && (
+              <ProgressCircleAndNumber
+                numerator={totalApprovalCount}
+                denominator={proposal?.roles?.length || 0}
+              />
+            )}
           </div>
           <CollaboratorPfps
             // unique accounts
