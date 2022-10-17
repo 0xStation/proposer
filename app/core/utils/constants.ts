@@ -318,8 +318,11 @@ export const txPathString = "/tx/"
 
 export const PARTNERS = {
   FOXES: {
-    ADDRESS: "0x332557dE221d09AD5b164a665c585fca0200b4B1",
-    CHAIN_ID: 1,
+    ADDRESS: "0xC3c74B36A7F7c3395c6D59086F5a49540ed180ED",
+    CHAIN_ID: 5,
+    // switch to this for official release
+    // ADDRESS: "0x332557dE221d09AD5b164a665c585fca0200b4B1",
+    // CHAIN_ID: 1,
   },
   STATION: {
     ADDRESS: "0x91d38BB4f803b64e94baFa8fce4e02d86C8380aB",
