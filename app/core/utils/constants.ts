@@ -282,6 +282,9 @@ export const PAYMENT_TERM_MAP = {
   [PaymentTerm.AFTER_COMPLETION]: {
     copy: "Pay after proposal completion",
   },
+  [PaymentTerm.ADVANCE_PAYMENT]: {
+    copy: "Pay advance payment now and final payment on completion",
+  },
 }
 
 export const PROPOSING_AS_ROLE_MAP = {
