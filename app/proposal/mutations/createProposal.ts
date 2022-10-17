@@ -22,6 +22,7 @@ const CreateProposal = z.object({
   milestones: ZodMilestone.array().optional(),
   payments: ZodPayment.array().optional(),
   paymentTerms: z.enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION]).optional(),
+  advancePaymentPercentage: z.number().optional(),
 })
 
 export default async function createProposal(input: z.infer<typeof CreateProposal>) {
@@ -49,6 +50,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     paymentsProposalMetadata = {
       totalPayments: Object.values(totalPayments),
       paymentTerms: params.paymentTerms,
+      advancePaymentPercentage: params.advancePaymentPercentage,
     }
   }
 

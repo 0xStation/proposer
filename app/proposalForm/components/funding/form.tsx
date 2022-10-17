@@ -306,6 +306,9 @@ export const ProposalFundingForm = ({
                 milestones,
                 payments,
                 paymentTerms: values.paymentTerms,
+                ...(parseFloat(values.advancedPaymentPercentage) > 0 && {
+                  advancePaymentPercentage: parseFloat(values.advancedPaymentPercentage),
+                }),
               })
             } catch (err) {
               setIsLoading(false)

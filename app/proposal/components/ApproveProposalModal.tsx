@@ -37,59 +37,69 @@ export const ApproveProposalModal = ({
   const { signMessage } = useSignature()
 
   const initiateSignature = async () => {
-    if (!activeUser || !activeUser?.address) {
-      setIsOpen(false)
+    try {
+      if (!activeUser || !activeUser?.address) {
+        setIsOpen(false)
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: "You must connect your wallet.",
+        })
+      }
+
+      const message = genProposalApprovalDigest({
+        proposalHash: proposal.data.proposalHash,
+        proposalId: proposal?.id as string,
+      })
+      const signature = await signMessage(message)
+
+      // no signature - user must have denied signature
+      if (!signature) {
+        setIsLoading(false)
+        return
+      }
+
+      const representingRoles = remainingRoles.map((role) => {
+        return {
+          roleId: role.roleId,
+          complete: role.oneSignerNeededToComplete,
+        }
+      })
+
+      try {
+        await approveProposalMutation({
+          proposalId: proposal?.id,
+          signerAddress: activeUser!.address!,
+          message,
+          signature,
+          representingRoles,
+        })
+        invalidateQuery(getProposalSignaturesById)
+        invalidateQuery(getRolesByProposalId)
+        // invalidate proposal query to get ipfs hash post-approval
+        // since an ipfs has is created on proposal approval
+        invalidateQuery(getProposalById)
+        router.replace(router.asPath)
+        setIsOpen(false)
+        setToastState({
+          isToastShowing: true,
+          type: "success",
+          message: "Your signature has been saved.",
+        })
+      } catch (e) {
+        console.error(e)
+      }
+
+      setIsLoading(false)
+    } catch (e) {
+      setIsLoading(false)
+      console.error(e)
       setToastState({
         isToastShowing: true,
         type: "error",
-        message: "You must connect your wallet.",
+        message: e.message,
       })
     }
-
-    const message = genProposalApprovalDigest({
-      proposalHash: proposal.data.proposalHash,
-      proposalId: proposal?.id as string,
-    })
-    const signature = await signMessage(message)
-
-    // no signature - user must have denied signature
-    if (!signature) {
-      setIsLoading(false)
-      return
-    }
-
-    const representingRoles = remainingRoles.map((role) => {
-      return {
-        roleId: role.roleId,
-        complete: role.oneSignerNeededToComplete,
-      }
-    })
-
-    try {
-      await approveProposalMutation({
-        proposalId: proposal?.id,
-        signerAddress: activeUser!.address!,
-        message,
-        signature,
-        representingRoles,
-      })
-      invalidateQuery(getProposalSignaturesById)
-      invalidateQuery(getRolesByProposalId)
-      // invalidate proposal query to get ipfs hash post-approval
-      // since an ipfs has is created on proposal approval
-      invalidateQuery(getProposalById)
-      router.replace(router.asPath)
-      setIsOpen(false)
-      setToastState({
-        isToastShowing: true,
-        type: "success",
-        message: "Your signature has been saved.",
-      })
-    } catch (e) {
-      console.error(e)
-    }
-
-    setIsLoading(false)
   }
 
   return (

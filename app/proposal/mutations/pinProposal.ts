@@ -78,6 +78,7 @@ export default async function pinProposal(input: z.infer<typeof PinProposal>, ct
       ipfsTimestamp: ipfsResponse.Timestamp,
       totalPayments: proposal?.data?.totalPayments,
       paymentTerms: proposal?.data?.paymentTerms,
+      advancePaymentPercentage: proposal?.data?.advancePaymentPercentage,
     })
 
     return updatedProposal
