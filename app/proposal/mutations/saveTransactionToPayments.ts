@@ -1,5 +1,5 @@
 import * as z from "zod"
-import db from "db"
+import db, { ProposalStatus } from "db"
 
 const SaveTransactionHashToPayments = z.object({
   milestoneId: z.string(),
@@ -16,6 +16,9 @@ export default async function saveTransactionHashToPayments(
   await db.$transaction(async (db) => {
     const proposal = await db.proposal.findUnique({
       where: { id: params.proposalId },
+      include: {
+        milestones: true,
+      },
     })
 
     const milestone = await db.proposalMilestone.findUnique({
@@ -42,6 +45,9 @@ export default async function saveTransactionHashToPayments(
     await db.proposal.update({
       where: { id: params.proposalId },
       data: {
+        ...(milestone.index + 1 >= proposal.milestones.length && {
+          status: ProposalStatus.COMPLETE,
+        }),
         currentMilestoneIndex: milestone.index + 1,
       },
     })

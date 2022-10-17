@@ -70,7 +70,7 @@ export const PROPOSAL_NEW_STATUS_DISPLAY_MAP = {
   },
   [ProposalStatus.COMPLETE]: {
     copy: "complete",
-    color: "bg-marble-white",
+    color: "bg-neon-blue",
   },
 }
 
@@ -95,12 +95,12 @@ export const PROPOSAL_MILESTONE_STATUS_MAP = {
     color: "bg-concrete",
   },
   [ProposalMilestoneStatus.IN_PROGRESS]: {
-    copy: "in progress",
+    copy: "pending",
     color: "bg-neon-carrot",
   },
   [ProposalMilestoneStatus.COMPLETE]: {
-    copy: "complete",
-    color: "bg-marble-white",
+    copy: "paid",
+    color: "bg-magic-mint",
   },
 }
 
@@ -256,13 +256,7 @@ export const CHAIN_IDS = {
   POLYGON: 137,
 }
 
-export const SUPPORTED_CHAINS = [
-  chain.mainnet,
-  chain.rinkeby,
-  chain.goerli,
-  chain.optimism,
-  chain.polygon,
-]
+export const SUPPORTED_CHAINS = [chain.mainnet, chain.goerli, chain.optimism, chain.polygon]
 
 export const SUPPORTED_CHAIN_IDS = SUPPORTED_CHAINS.map((chain) => chain.id)
 

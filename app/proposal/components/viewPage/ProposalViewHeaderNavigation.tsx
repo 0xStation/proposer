@@ -17,6 +17,7 @@ import LinkArrow from "app/core/icons/LinkArrow"
 import { LINKS } from "app/core/utils/constants"
 import { useState } from "react"
 import SendProposalModal from "../SendProposalModal"
+import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.type === proposalType)
@@ -34,6 +35,7 @@ const Tab = ({ router, route, children }) => {
 }
 
 export const ProposalViewHeaderNavigation = () => {
+  const activeUser = useStore((state) => state.activeUser)
   const proposalId = useParam("proposalId") as string
   const proposalApprovalModalOpen = useStore((state) => state.proposalApprovalModalOpen)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
@@ -50,11 +52,22 @@ export const ProposalViewHeaderNavigation = () => {
       enabled: !!proposalId,
     }
   )
+  const [roles] = useQuery(
+    getRolesByProposalId,
+    { proposalId: proposal?.id as string },
+    {
+      suspense: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      enabled: Boolean(proposal?.id),
+      cacheTime: 60 * 1000, // one minute in milliseconds
+    }
+  )
 
   const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(proposal)
 
   // author used to return to workspace page with proposal list view
-  const author = findProposalRoleByRoleType(proposal?.roles, ProposalRoleType.AUTHOR)
+  const author = findProposalRoleByRoleType(roles, ProposalRoleType.AUTHOR)
   // numerator for the progress circle
   const totalApprovalCount =
     proposal?.roles?.filter(
@@ -137,10 +150,13 @@ export const ProposalViewHeaderNavigation = () => {
         <div className="mt-6 flex flex-row justify-between">
           <div className="space-x-2 flex flex-row">
             <ProposalStatusPill status={proposal?.status} />
-            <ProgressCircleAndNumber
-              numerator={totalApprovalCount}
-              denominator={proposal?.roles?.length || 0}
-            />
+            {(proposal?.status === ProposalStatus.AWAITING_APPROVAL ||
+              proposal?.status === ProposalStatus.APPROVED) && (
+              <ProgressCircleAndNumber
+                numerator={totalApprovalCount}
+                denominator={proposal?.roles?.length || 0}
+              />
+            )}
           </div>
           <CollaboratorPfps
             // unique accounts
@@ -158,24 +174,28 @@ export const ProposalViewHeaderNavigation = () => {
           - if they haven't signed, show the sign button, if they have signed, show the "signed" button
           - if they don't have a role, just show the copy icon
           */}
+          {!loading &&
+            proposal &&
+            proposal.status === ProposalStatus.DRAFT &&
+            activeUser?.address === author.address && (
+              <Button
+                overrideWidthClassName="w-[300px] sm:w-[400px] md:w-[614px]"
+                className="mr-3"
+                onClick={() => toggleSendProposalModalOpen(true)}
+              >
+                Send proposal
+              </Button>
+            )}
           {activeUserIsSigner && !loading ? (
             activeUserHasRolesToSign ? (
               <>
-                {proposal?.status !== ProposalStatus?.DRAFT ? (
+                {proposal?.status !== ProposalStatus?.DRAFT && (
                   <Button
                     overrideWidthClassName="w-[300px] sm:w-[400px] md:w-[614px]"
                     className="mr-3"
                     onClick={() => toggleProposalApprovalModalOpen(true)}
                   >
                     Approve
-                  </Button>
-                ) : (
-                  <Button
-                    overrideWidthClassName="w-[300px] sm:w-[400px] md:w-[614px]"
-                    className="mr-3"
-                    onClick={() => toggleSendProposalModalOpen(true)}
-                  >
-                    Send proposal
                   </Button>
                 )}
               </>

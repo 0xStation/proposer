@@ -9,7 +9,6 @@ import getProposalById from "../queries/getProposalById"
 import { genProposalApprovalDigest } from "app/signatures/proposalSignature"
 import { Proposal } from "app/proposal/types"
 import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
-import getProposalSignaturesById from "app/proposal/queries/getProposalSignaturesById"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import networks from "app/utils/networks.json"
@@ -74,7 +73,6 @@ export const ApproveProposalModal = ({
           signature,
           representingRoles,
         })
-        invalidateQuery(getProposalSignaturesById)
         invalidateQuery(getRolesByProposalId)
         // invalidate proposal query to get ipfs hash post-approval
         // since an ipfs has is created on proposal approval
@@ -89,7 +87,6 @@ export const ApproveProposalModal = ({
       } catch (e) {
         console.error(e)
       }
-
       setIsLoading(false)
     } catch (e) {
       setIsLoading(false)
