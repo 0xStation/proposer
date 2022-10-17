@@ -1,5 +1,5 @@
 import { useSession } from "blitz"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import ImportTokenModal from "app/core/components/ImportTokenModal"
 import useStore from "app/core/hooks/useStore"
 import { FundingProposalStep, PAYMENT_TERM_MAP } from "app/core/utils/constants"
@@ -7,11 +7,12 @@ import { Field } from "react-final-form"
 import {
   composeValidators,
   isPositiveAmount,
+  isValidAdvancedPaymentPercentage,
   isValidTokenAmount,
   requiredField,
 } from "app/utils/validators"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
-import { formatTokenAmount } from "app/utils/formatters"
+import { formatPercentValue, formatTokenAmount } from "app/utils/formatters"
 import { PaymentTerm } from "app/proposalPayment/types"
 import WhenFieldChanges from "app/core/components/WhenFieldChanges"
 
@@ -23,6 +24,8 @@ export const RewardForm = ({
   chainId,
   selectedToken,
   setSelectedToken,
+  selectedPaymentTerms,
+  setSelectedPaymentTerms,
   tokenOptions,
   refetchTokens,
   isImportTokenModalOpen,
@@ -159,7 +162,7 @@ export const RewardForm = ({
           )
         }}
       </Field>
-      {/* PAYMENT TYPE */}
+      {/* PAYMENT TERMS */}
       <label className="font-bold block mt-6">Payment terms*</label>
       <span className="text-xs text-concrete block">
         When is the payment expected to be sent to contributors?
@@ -168,7 +171,19 @@ export const RewardForm = ({
         {({ meta, input }) => (
           <>
             <div className="custom-select-wrapper">
-              <select {...input} required className="w-full bg-wet-concrete rounded p-2 mt-1">
+              <select
+                {...input}
+                required
+                className="w-full bg-wet-concrete rounded p-2 mt-1"
+                value={selectedPaymentTerms}
+                onChange={(e) => {
+                  setSelectedPaymentTerms(e.target.value)
+                  // custom values can be compatible with react-final-form by calling
+                  // the props.input.onChange callback
+                  // https://final-form.org/docs/react-final-form/api/Field
+                  input.onChange(e.target.value)
+                }}
+              >
                 <option value="">Choose option</option>
                 <option value={PaymentTerm.ON_AGREEMENT}>
                   {PAYMENT_TERM_MAP[PaymentTerm.ON_AGREEMENT]?.copy}
@@ -181,6 +196,39 @@ export const RewardForm = ({
           </>
         )}
       </Field>
+      {selectedPaymentTerms === PaymentTerm.AFTER_COMPLETION && (
+        <>
+          {/* ADVANCE PAYMENT */}
+          <label className="font-bold block mt-6">Advance payment*</label>
+          <span className="text-xs text-concrete block">
+            How much of the payment amount should the contributors expect to receive at proposal
+            approval to kickstart their project?
+          </span>
+          <Field
+            name="advancedPaymentPercentage"
+            defaultValue={"0"}
+            format={formatPercentValue}
+            validate={composeValidators(requiredField, isValidAdvancedPaymentPercentage)}
+          >
+            {({ input, meta }) => {
+              return (
+                <div className="h-10 mt-1 w-full border border-concrete bg-wet-concrete text-marble-white mb-5 rounded">
+                  <input
+                    {...input}
+                    type="text"
+                    placeholder="0"
+                    className="h-full p-2 inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white"
+                  />
+                  <div className="py-2 px-4 w-[2%] inline h-full">%</div>
+                  {meta.error && meta.touched && (
+                    <span className="text-xs text-torch-red mt-2 block">{meta.error}</span>
+                  )}
+                </div>
+              )
+            }}
+          </Field>
+        </>
+      )}
     </>
   )
 }

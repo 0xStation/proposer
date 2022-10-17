@@ -18,16 +18,22 @@ export const TotalPaymentView = ({
         {getNetworkName(proposal?.data?.totalPayments?.[0]?.token.chainId || 0)}
       </p>
       <div className="mt-6">
-        <h4 className="text-xs font-bold text-concrete uppercase">Payment</h4>
+        <h4 className="text-xs font-bold text-concrete uppercase">Payment terms</h4>
+        <p className="mt-2">{PAYMENT_TERM_MAP[proposal?.data?.paymentTerms || ""]?.copy}</p>
+      </div>
+      {proposal?.data.advancePaymentPercentage && (
+        <div className="mt-6">
+          <h4 className="text-xs font-bold text-concrete uppercase">Advance payment</h4>
+          <p className="mt-2">{proposal?.data.advancePaymentPercentage.toString() + "%"}</p>
+        </div>
+      )}
+      <div className="mt-6">
+        <h4 className="text-xs font-bold text-concrete uppercase">Total payment</h4>
         <p className="mt-2">
           {formatCurrencyAmount(proposal?.data?.totalPayments?.[0]?.amount.toString()) +
             " " +
             proposal?.data?.totalPayments?.[0]?.token.symbol}
         </p>
-      </div>
-      <div className="mt-6">
-        <h4 className="text-xs font-bold text-concrete uppercase">Payment Terms</h4>
-        <p className="mt-2">{PAYMENT_TERM_MAP[proposal?.data?.paymentTerms || ""]?.copy}</p>
       </div>
     </div>
   ) : (

@@ -16,6 +16,7 @@ const UpdateProposalMetadata = z.object({
   ipfsTimestamp: z.string().optional(),
   totalPayments: z.object({ token: ZodToken, amount: z.number() }).array().optional(),
   paymentTerms: z.enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION]).optional(),
+  advancePaymentPercentage: z.number().optional(),
 })
 
 // Only updates the metadata of a proposal
@@ -41,6 +42,7 @@ export default async function updateProposalMetadata(
     signatureMessage: params.signatureMessage,
     totalPayments: params.totalPayments,
     paymentTerms: params.paymentTerms,
+    advancePaymentPercentage: params.advancePaymentPercentage,
   } as unknown as ProposalMetadata
 
   try {

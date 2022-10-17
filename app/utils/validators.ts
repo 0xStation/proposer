@@ -1,7 +1,7 @@
 import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import isURL from "validator/lib/isURL"
 import isEmail from "validator/lib/isEmail"
-import { formatTokenAmount } from "./formatters"
+import { formatPercentValue, formatTokenAmount } from "./formatters"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import { txPathString } from "app/core/utils/constants"
 
@@ -143,4 +143,16 @@ export const isValidTransactionLink = (chainId: number) => {
 
     return undefined
   }
+}
+
+// TODO: potential problem with rounding for smaller values when the number can't be divided further
+// for example, if absolute uint256 amount is 100, how do we support percentage decimals?
+// another example, if absolute uint256 amount is 3, where does 50% round to: 1 or 2?
+// if we wanted to get really really smart, we should make this conditional on the payment value
+// in cases where the amount is very small we can only support a subset of percentage values and communicate that to the user
+export const isValidAdvancedPaymentPercentage = (value: string) => {
+  if (!value) return "No percentage value provided"
+  const parsedValue = parseFloat(formatPercentValue(value))
+  if (parsedValue >= 100) return "Advanced payment must be less than 100%"
+  return undefined
 }
