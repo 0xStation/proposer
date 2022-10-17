@@ -70,7 +70,7 @@ export const PROPOSAL_NEW_STATUS_DISPLAY_MAP = {
   },
   [ProposalStatus.COMPLETE]: {
     copy: "complete",
-    color: "bg-marble-white",
+    color: "bg-neon-blue",
   },
 }
 
@@ -95,12 +95,12 @@ export const PROPOSAL_MILESTONE_STATUS_MAP = {
     color: "bg-concrete",
   },
   [ProposalMilestoneStatus.IN_PROGRESS]: {
-    copy: "in progress",
+    copy: "pending",
     color: "bg-neon-carrot",
   },
   [ProposalMilestoneStatus.COMPLETE]: {
-    copy: "complete",
-    color: "bg-marble-white",
+    copy: "paid",
+    color: "bg-magic-mint",
   },
 }
 
