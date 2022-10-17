@@ -10,31 +10,53 @@ const seed = async () => {
     },
   })
 
-  const count = await db.$transaction(
-    rfps.map((rfp) =>
-      db.rfp.update({
-        where: {
-          id: rfp.id,
-        },
+  await rfps.forEach(async (rfp) => {
+    await db.rfp.update({
+      where: {
+        id: rfp.id,
+      },
+      data: {
         data: {
-          data: {
-            ...Object(rfp.data),
-            singleTokenGate: {
-              token: {
-                chainId: 1,
-                address: "0x55256178aFE74082c4f9aFEF7E40fec949c1b499",
-                type: TokenType.ERC721,
-                name: "Philosophical Foxes",
-                symbol: "FOX",
-              },
+          ...Object(rfp.data),
+          singleTokenGate: {
+            token: {
+              chainId: 1,
+              address: "0x55256178aFE74082c4f9aFEF7E40fec949c1b499",
+              type: TokenType.ERC721,
+              name: "Philosophical Foxes",
+              symbol: "FOX",
             },
           },
         },
-      })
-    )
-  )
+      },
+    })
+  })
 
-  console.log(count + " rfps updated for Foxes")
+  // const count = await db.$transaction(
+  //   rfps.map((rfp) =>
+  //     db.rfp.update({
+  //       where: {
+  //         id: rfp.id,
+  //       },
+  //       data: {
+  //         data: {
+  //           ...Object(rfp.data),
+  //           singleTokenGate: {
+  //             token: {
+  //               chainId: 1,
+  //               address: "0x55256178aFE74082c4f9aFEF7E40fec949c1b499",
+  //               type: TokenType.ERC721,
+  //               name: "Philosophical Foxes",
+  //               symbol: "FOX",
+  //             },
+  //           },
+  //         },
+  //       },
+  //     })
+  //   )
+  // )
+
+  console.log(rfps.length + " rfps updated for Foxes")
 }
 
 export default seed

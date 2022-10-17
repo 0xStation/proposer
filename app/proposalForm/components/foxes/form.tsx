@@ -33,6 +33,7 @@ import {
   getFieldValue,
 } from "app/template/utils"
 import { RESERVED_KEYS } from "app/template/types"
+import getAccountHasToken from "app/token/queries/getAccountHasToken"
 
 enum FundingProposalStep {
   PROPOSE = "PROPOSE",
@@ -73,6 +74,25 @@ export const FoxesProposalForm = () => {
       suspense: false,
       refetchOnWindowFocus: false,
       cacheTime: 60 * 1000, // 1 minute in milliseconds
+    }
+  )
+
+  const [
+    userHasRequiredToken,
+    { isLoading: isTokenGatingCheckLoading, isSuccess: isTokenGatingCheckComplete },
+  ] = useQuery(
+    getAccountHasToken,
+    {
+      chainId: rfp?.data?.singleTokenGate?.token?.chainId as number,
+      tokenAddress: rfp?.data?.singleTokenGate?.token?.address as string,
+      accountAddress: activeUser?.address as string,
+      minBalance: rfp?.data?.singleTokenGate?.minBalance || "1",
+    },
+    {
+      enabled: !!activeUser?.address && !!rfp?.data?.singleTokenGate,
+      suspense: false,
+      refetchOnWindowFocus: false,
+      cacheTime: 60 * 1000, // 1 minute
     }
   )
 
@@ -269,15 +289,37 @@ export const FoxesProposalForm = () => {
                 )}
               </div>
               {proposalStep === FundingProposalStep.PROPOSE && (
-                <Button
-                  isDisabled={unFilledProposalFields}
-                  className="my-6 float-right"
-                  onClick={async () => {
-                    setProposalStep(FundingProposalStep.CONFIRM)
-                  }}
-                >
-                  Next
-                </Button>
+                <div className="my-6 float-right flex flex-col space-y-1 items-end">
+                  <Button
+                    isDisabled={
+                      unFilledProposalFields ||
+                      isTokenGatingCheckLoading ||
+                      (isTokenGatingCheckComplete && !userHasRequiredToken)
+                    }
+                    isLoading={isTokenGatingCheckLoading}
+                    onClick={async () => {
+                      if (!session.siwe?.address) {
+                        toggleWalletModal(true)
+                      } else if (session.siwe?.address && userHasRequiredToken) {
+                        setProposalStep(FundingProposalStep.CONFIRM)
+                      } else if (session.siwe?.address && !userHasRequiredToken) {
+                        setToastState({
+                          isToastShowing: true,
+                          type: "error",
+                          message: "You do not own the required tokens to submit to this RFP.",
+                        })
+                      }
+                    }}
+                  >
+                    Next
+                  </Button>
+                  {isTokenGatingCheckComplete && !userHasRequiredToken && (
+                    <span className="text-xs text-concrete">
+                      Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
+                      RFP.
+                    </span>
+                  )}
+                </div>
               )}
               {proposalStep === FundingProposalStep.CONFIRM && (
                 <div className="flex justify-between mt-6">
@@ -287,26 +329,45 @@ export const FoxesProposalForm = () => {
                   >
                     <BackArrow className="fill-marble-white" />
                   </span>
-                  <div>
+                  <div className="flex flex-col space-y-1 items-end">
                     <Button
-                      isDisabled={isLoading}
-                      isLoading={!proposalShouldSendLater && isLoading}
+                      isDisabled={
+                        isLoading ||
+                        unFilledProposalFields ||
+                        isTokenGatingCheckLoading ||
+                        (isTokenGatingCheckComplete && !userHasRequiredToken)
+                      }
+                      isLoading={
+                        isTokenGatingCheckLoading || (!proposalShouldSendLater && isLoading)
+                      }
                       onClick={async (e) => {
                         e.preventDefault()
                         setIsLoading(true)
-                        if (session.siwe?.address) {
+                        if (!session.siwe?.address) {
+                          toggleWalletModal(true)
+                        } else if (session.siwe?.address && userHasRequiredToken) {
                           if (createdProposal) {
                             setShouldHandlePostProposalCreationProcessing(true)
                           } else {
                             await handleSubmit()
                           }
-                        } else {
-                          toggleWalletModal(true)
+                        } else if (session.siwe?.address && !userHasRequiredToken) {
+                          setToastState({
+                            isToastShowing: true,
+                            type: "error",
+                            message: "You do not own the required tokens to submit to this RFP.",
+                          })
                         }
                       }}
                     >
                       Send proposal
                     </Button>
+                    {isTokenGatingCheckComplete && !userHasRequiredToken && (
+                      <span className="text-xs text-concrete">
+                        Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
+                        RFP.
+                      </span>
+                    )}
                   </div>
                 </div>
               )}

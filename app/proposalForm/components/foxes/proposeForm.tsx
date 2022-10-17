@@ -16,6 +16,7 @@ import getRfpById from "app/rfp/queries/getRfpById"
 import { getClientAddress } from "app/template/utils"
 import { useEnsName } from "wagmi"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
+import { getNetworkExplorer } from "app/core/utils/networkInfo"
 
 export const FoxesProposeFirstStep = ({ minNumWords }) => {
   const queryParams = useRouterQuery()
@@ -41,10 +42,23 @@ export const FoxesProposeFirstStep = ({ minNumWords }) => {
         <span className="font-bold">To</span>
         <span className="items-end">{displayAddress}</span>
       </div>
-      <div className="mt-4 flex flex-row w-full items-center justify-between">
-        <span className="font-bold">RFP</span>
-        <span className="items-end">{rfp?.data.content.title}</span>
-      </div>
+      {!!rfp?.data?.singleTokenGate && (
+        <div className="mt-4 flex flex-row w-full items-center justify-between">
+          <span className="font-bold">Token requirement</span>
+          <div className="items-end">
+            {`≥${rfp?.data?.singleTokenGate.minBalance || 1} `}
+            <TextLink
+              url={
+                getNetworkExplorer(rfp?.data?.singleTokenGate.token.chainId) +
+                "/token/" +
+                rfp?.data?.singleTokenGate.token.address
+              }
+            >
+              {rfp?.data?.singleTokenGate.token.name}
+            </TextLink>
+          </div>
+        </div>
+      )}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Title</span>
         <span className="items-end">{`${rfp?.data.content.title || ""} submission`}</span>
