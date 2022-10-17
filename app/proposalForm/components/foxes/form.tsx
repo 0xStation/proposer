@@ -1,30 +1,19 @@
 import React, { useState, useEffect } from "react"
 import { Form } from "react-final-form"
-import {
-  useRouter,
-  useSession,
-  Routes,
-  useMutation,
-  useParam,
-  useQuery,
-  useRouterQuery,
-} from "blitz"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import { useRouter, useSession, Routes, useMutation, useQuery, useRouterQuery } from "blitz"
+import Button from "app/core/components/sds/buttons/Button"
 import Stepper from "../Stepper"
 import BackArrow from "app/core/icons/BackArrow"
 import useStore from "app/core/hooks/useStore"
 import { Proposal } from "app/proposal/types"
 import { useConfirmAuthorship } from "app/proposalForm/hooks/useConfirmAuthorship"
-import { useResolveEnsAddress } from "app/proposalForm/hooks/useResolveEnsAddress"
 import { addressesAreEqual } from "../../../core/utils/addressesAreEqual"
 import createProposal from "app/proposal/mutations/createProposal"
 import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
-import { ConfirmForm } from "../ConfirmForm"
 import { FoxesProposeFirstStep } from "./proposeForm"
 import deleteProposalById from "app/proposal/mutations/deleteProposalById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { FoxesConfirmForm } from "./confirmForm"
-import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import { AddressType, ProposalRoleType } from "@prisma/client"
 import { mustBeAboveNumWords } from "app/utils/validators"
 import {
@@ -34,6 +23,7 @@ import {
 } from "app/template/utils"
 import { RESERVED_KEYS } from "app/template/types"
 import getAccountHasToken from "app/token/queries/getAccountHasToken"
+import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
 
 enum FundingProposalStep {
   PROPOSE = "PROPOSE",
@@ -60,7 +50,11 @@ export const FoxesProposalForm = () => {
     shouldHandlePostProposalCreationProcessing,
     setShouldHandlePostProposalCreationProcessing,
   ] = useState<boolean>(false)
-  const { resolveEnsAddress } = useResolveEnsAddress()
+  const [unsavedChanges, setUnsavedChanges] = useState<boolean>(true)
+
+  useWarnIfUnsavedChanges(unsavedChanges, () => {
+    return confirm("Warning! You have unsaved changes.")
+  })
 
   const queryParams = useRouterQuery()
   const rfpId = queryParams?.rfpId as string
@@ -99,6 +93,7 @@ export const FoxesProposalForm = () => {
   const [createProposalMutation] = useMutation(createProposal, {
     onSuccess: (data) => {
       setCreatedProposal(data)
+      setUnsavedChanges(false)
       setShouldHandlePostProposalCreationProcessing(true)
     },
     onError: (error: Error) => {

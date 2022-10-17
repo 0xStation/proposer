@@ -5,7 +5,6 @@ import getRfpById from "app/rfp/queries/getRfpById"
 import BackIcon from "/public/back-icon.svg"
 import { getNetworkName } from "app/core/utils/networkInfo"
 import { getPaymentAmount, getPaymentToken } from "app/template/utils"
-import Preview from "app/core/components/MarkdownPreview"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
 import ReadMore from "app/core/components/ReadMore"
 
