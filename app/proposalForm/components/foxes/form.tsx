@@ -179,7 +179,7 @@ export const FoxesProposalForm = () => {
   }, [createdProposal, proposalShouldSendLater, shouldHandlePostProposalCreationProcessing])
 
   return (
-    <div className="max-w-[580px] h-full mx-auto">
+    <div className="max-w-[580px] min-w-[580px] h-full mx-auto">
       <Stepper
         activeStep={HeaderCopy[proposalStep]}
         steps={["Propose", "Confirm"]}
@@ -293,21 +293,26 @@ export const FoxesProposalForm = () => {
                   <Button
                     isDisabled={
                       unFilledProposalFields ||
-                      isTokenGatingCheckLoading ||
-                      (isTokenGatingCheckComplete && !userHasRequiredToken)
+                      (!!rfp?.data?.singleTokenGate &&
+                        (isTokenGatingCheckLoading ||
+                          (isTokenGatingCheckComplete && !userHasRequiredToken)))
                     }
                     isLoading={isTokenGatingCheckLoading}
                     onClick={async () => {
                       if (!session.siwe?.address) {
                         toggleWalletModal(true)
-                      } else if (session.siwe?.address && userHasRequiredToken) {
-                        setProposalStep(FundingProposalStep.CONFIRM)
-                      } else if (session.siwe?.address && !userHasRequiredToken) {
+                      } else if (
+                        session.siwe?.address &&
+                        !!rfp?.data?.singleTokenGate &&
+                        !userHasRequiredToken
+                      ) {
                         setToastState({
                           isToastShowing: true,
                           type: "error",
                           message: "You do not own the required tokens to submit to this RFP.",
                         })
+                      } else if (session.siwe?.address) {
+                        setProposalStep(FundingProposalStep.CONFIRM)
                       }
                     }}
                   >
@@ -334,8 +339,9 @@ export const FoxesProposalForm = () => {
                       isDisabled={
                         isLoading ||
                         unFilledProposalFields ||
-                        isTokenGatingCheckLoading ||
-                        (isTokenGatingCheckComplete && !userHasRequiredToken)
+                        (!!rfp?.data?.singleTokenGate &&
+                          (isTokenGatingCheckLoading ||
+                            (isTokenGatingCheckComplete && !userHasRequiredToken)))
                       }
                       isLoading={
                         isTokenGatingCheckLoading || (!proposalShouldSendLater && isLoading)
@@ -345,18 +351,22 @@ export const FoxesProposalForm = () => {
                         setIsLoading(true)
                         if (!session.siwe?.address) {
                           toggleWalletModal(true)
-                        } else if (session.siwe?.address && userHasRequiredToken) {
-                          if (createdProposal) {
-                            setShouldHandlePostProposalCreationProcessing(true)
-                          } else {
-                            await handleSubmit()
-                          }
-                        } else if (session.siwe?.address && !userHasRequiredToken) {
+                        } else if (
+                          session.siwe?.address &&
+                          !!rfp?.data?.singleTokenGate &&
+                          !userHasRequiredToken
+                        ) {
                           setToastState({
                             isToastShowing: true,
                             type: "error",
                             message: "You do not own the required tokens to submit to this RFP.",
                           })
+                        } else if (session.siwe?.address) {
+                          if (createdProposal) {
+                            setShouldHandlePostProposalCreationProcessing(true)
+                          } else {
+                            await handleSubmit()
+                          }
                         }
                       }}
                     >

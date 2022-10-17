@@ -55,6 +55,8 @@ import BackIcon from "/public/back-icon.svg"
 import { getPaymentAmount, getPaymentToken } from "app/template/utils"
 import { getNetworkName } from "app/core/utils/networkInfo"
 import getAccountHasToken from "app/token/queries/getAccountHasToken"
+import ReadMore from "app/core/components/ReadMore"
+import { WorkspaceTab } from "app/pages/workspace/[accountAddress]"
 
 export const getServerSideProps: GetServerSideProps = async ({ params = {} }) => {
   const { rfpId } = params
@@ -130,12 +132,18 @@ const RfpDetail: BlitzPage = () => {
 
   return (
     <Layout>
+      {/* LEFT SIDEBAR | PROPOSALS */}
       <div className="flex flex-row h-full">
         {/* LEFT SIDEBAR */}
-        <div className="h-full w-[288px] border-r border-concrete p-6">
+        <div className="h-full w-[288px] overflow-y-scroll p-6 border-r border-concrete">
           <div className="flex flex-col pb-6 space-y-6">
             {/* BACK */}
-            <Link href={Routes.WorkspaceHome({ accountAddress: rfp?.accountAddress as string })}>
+            <Link
+              href={Routes.WorkspaceHome({
+                accountAddress: rfp?.accountAddress as string,
+                tab: WorkspaceTab.RFPS,
+              })}
+            >
               <div className="h-[16px] w-[16px]">
                 <Image src={BackIcon} alt="Back icon" />
               </div>
@@ -167,29 +175,51 @@ const RfpDetail: BlitzPage = () => {
               <Link href={Routes.CreateFoxesProposal({ rfpId })}>
                 <Button
                   className="w-full"
-                  isDisabled={rfp?.status === RfpStatus.CLOSED || !userHasRequiredToken}
+                  isDisabled={
+                    rfp?.status === RfpStatus.CLOSED ||
+                    (!!rfp?.data?.singleTokenGate && !userHasRequiredToken)
+                  }
                 >
                   Propose
                 </Button>
               </Link>
-              {!userHasRequiredToken && (
+              {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
                 <span className="text-xs text-concrete">
                   Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this RFP.
                 </span>
               )}
             </div>
-            {/* NETWORK */}
-            <div className="mt-6 pt-6">
-              <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
-              <p className="mt-2">{getNetworkName(getPaymentToken(rfp?.data.template)?.chainId)}</p>
-            </div>
-            <div className="mt-6">
-              <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
-              <p className="mt-2">{getPaymentToken(rfp?.data.template)?.symbol}</p>
-            </div>
-            <div className="mt-6">
-              <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-              <p className="mt-2">{getPaymentAmount(rfp?.data.template)}</p>
+            {/* METADATA */}
+            <div className="mt-12 pt-6 flex flex-col space-y-6">
+              {/* SUBMISSION GUIDELINES */}
+              {rfp?.data?.content.submissionGuideline && (
+                <div>
+                  <h4 className="text-xs font-bold text-concrete uppercase">
+                    Submission guidelines
+                  </h4>
+                  <ReadMore maxCharLength={75}>{rfp?.data?.content.submissionGuideline}</ReadMore>
+                  {/* <div className="mt-2">
+                    <Preview markdown={rfp?.data?.content.submissionGuideline} />
+                  </div> */}
+                </div>
+              )}
+              {/* NETWORK */}
+              <div>
+                <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
+                <p className="mt-2">
+                  {getNetworkName(getPaymentToken(rfp?.data.template)?.chainId)}
+                </p>
+              </div>
+              {/* PAYMENT TOKEN */}
+              <div>
+                <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
+                <p className="mt-2">{getPaymentToken(rfp?.data.template)?.symbol}</p>
+              </div>
+              {/* PAYMENT AMOUNT */}
+              <div>
+                <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
+                <p className="mt-2">{getPaymentAmount(rfp?.data.template)}</p>
+              </div>
             </div>
           </div>
         </div>

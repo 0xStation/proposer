@@ -11,6 +11,7 @@ export type RfpMetadata = {
     title: string
     body: string
     oneLiner: string
+    submissionGuideline?: string
   }
   template: Template
   singleTokenGate: {

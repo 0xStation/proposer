@@ -15,6 +15,8 @@ const seed = async () => {
         title: term.name,
         body: "",
         oneLiner: "",
+        submissionGuideline:
+          "Please make sure your submission is 125+ words, and double check for typos.\n\nSubmissions should be fully aligned with, and inclusive of, already established Philosophical Foxes lore. The best entries will connect to other entries in a way that expands the known lore and creates new connections that were previously unknown. Entries should be written in the voice of fox historians in the future. This means that they can be opinionated and inclusive of knowledge not yet known to our current generation of foxes.",
       },
       template: TEMPLATES.STATION.TERM,
     } as RfpMetadata

@@ -8,6 +8,7 @@ import {
   Link,
   GetServerSideProps,
   invoke,
+  useRouterQuery,
 } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
@@ -49,10 +50,10 @@ import { Rfp } from "app/rfp/types"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
 import getAccountHasToken from "app/token/queries/getAccountHasToken"
 
-enum Tab {
-  PROPOSALS = "PROPOSALS",
-  RFPS = "RFPS",
-  SETTINGS = "SETTINGS",
+export enum WorkspaceTab {
+  PROPOSALS = "proposals",
+  RFPS = "rfps",
+  SETTINGS = "settings",
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ params = {} }) => {
@@ -80,11 +81,17 @@ export const getServerSideProps: GetServerSideProps = async ({ params = {} }) =>
 }
 
 const WorkspaceHome: BlitzPage = () => {
+  const accountAddress = useParam("accountAddress", "string") as string
+  const queryParams = useRouterQuery()
+  const tab = queryParams?.tab as string
+
   const activeUser = useStore((state) => state.activeUser)
   const accountData = useAccount()
   const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
   const [canViewSettings, setCanViewSettings] = useState<boolean>(false)
-  const [activeTab, setActiveTab] = useState<Tab>(Tab.PROPOSALS)
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>(
+    (tab as WorkspaceTab) || WorkspaceTab.PROPOSALS
+  )
   const [activeRfp, setActiveRfp] = useState<Rfp>()
   const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
     new Set<ProposalStatus>()
@@ -94,7 +101,6 @@ const WorkspaceHome: BlitzPage = () => {
   )
   const [page, setPage] = useState<number>(0)
 
-  const accountAddress = useParam("accountAddress", "string") as string
   const { data: accountEnsName } = useEnsName({
     address: accountAddress,
     chainId: 1,
@@ -155,8 +161,8 @@ const WorkspaceHome: BlitzPage = () => {
       setCanViewSettings(true)
     } else {
       setCanViewSettings(false)
-      if (activeTab === Tab.SETTINGS) {
-        setActiveTab(Tab.PROPOSALS)
+      if (activeTab === WorkspaceTab.SETTINGS) {
+        setActiveTab(WorkspaceTab.PROPOSALS)
       }
     }
   }, [activeUser, connectedAddress, accountAddress, safeMetadata])
@@ -336,12 +342,15 @@ const WorkspaceHome: BlitzPage = () => {
               <Button
                 className="mt-4 w-full bg-charcoal"
                 type={ButtonType.Secondary}
-                isDisabled={rfp?.status === RfpStatus.CLOSED || !userHasRequiredToken}
+                isDisabled={
+                  rfp?.status === RfpStatus.CLOSED ||
+                  (!!rfp?.data?.singleTokenGate && !userHasRequiredToken)
+                }
               >
                 Propose
               </Button>
             </Link>
-            {!userHasRequiredToken && (
+            {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
               <span className="text-xs text-concrete">
                 Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this RFP.
               </span>
@@ -427,9 +436,9 @@ const WorkspaceHome: BlitzPage = () => {
             {/* PROPOSALS */}
             <li
               className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
-                activeTab === Tab.PROPOSALS && "bg-wet-concrete"
+                activeTab === WorkspaceTab.PROPOSALS && "bg-wet-concrete"
               }`}
-              onClick={() => setActiveTab(Tab.PROPOSALS)}
+              onClick={() => setActiveTab(WorkspaceTab.PROPOSALS)}
             >
               <LightBulbIcon className="h-5 w-5 text-white cursor-pointer" />
               <span>Proposals</span>
@@ -437,9 +446,9 @@ const WorkspaceHome: BlitzPage = () => {
             {/* RFPS */}
             <li
               className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
-                activeTab === Tab.RFPS && "bg-wet-concrete"
+                activeTab === WorkspaceTab.RFPS && "bg-wet-concrete"
               }`}
-              onClick={() => setActiveTab(Tab.RFPS)}
+              onClick={() => setActiveTab(WorkspaceTab.RFPS)}
             >
               <NewspaperIcon className="h-5 w-5 text-white cursor-pointer" />
               <span>RFPs</span>
@@ -448,9 +457,9 @@ const WorkspaceHome: BlitzPage = () => {
             {canViewSettings && (
               <li
                 className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
-                  activeTab === Tab.SETTINGS && "bg-wet-concrete"
+                  activeTab === WorkspaceTab.SETTINGS && "bg-wet-concrete"
                 }`}
-                onClick={() => setActiveTab(Tab.SETTINGS)}
+                onClick={() => setActiveTab(WorkspaceTab.SETTINGS)}
               >
                 <CogIcon className="h-5 w-5 text-white cursor-pointer" />
                 <span>Settings</span>
@@ -459,9 +468,9 @@ const WorkspaceHome: BlitzPage = () => {
           </ul>
         </div>
         {/* TAB CONTENT */}
-        {activeTab === Tab.PROPOSALS && <ProposalTab />}
-        {activeTab === Tab.RFPS && <RfpTab />}
-        {activeTab === Tab.SETTINGS && <SettingsTab />}
+        {activeTab === WorkspaceTab.PROPOSALS && <ProposalTab />}
+        {activeTab === WorkspaceTab.RFPS && <RfpTab />}
+        {activeTab === WorkspaceTab.SETTINGS && <SettingsTab />}
       </div>
     </Layout>
   )
