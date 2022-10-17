@@ -191,12 +191,15 @@ export const RewardForm = ({
                 <option value={PaymentTerm.AFTER_COMPLETION}>
                   {PAYMENT_TERM_MAP[PaymentTerm.AFTER_COMPLETION]?.copy}
                 </option>
+                <option value={PaymentTerm.ADVANCE_PAYMENT}>
+                  {PAYMENT_TERM_MAP[PaymentTerm.ADVANCE_PAYMENT]?.copy}
+                </option>
               </select>
             </div>
           </>
         )}
       </Field>
-      {selectedPaymentTerms === PaymentTerm.AFTER_COMPLETION && (
+      {selectedPaymentTerms === PaymentTerm.ADVANCE_PAYMENT && (
         <>
           {/* ADVANCE PAYMENT */}
           <label className="font-bold block mt-6">Advance payment*</label>
@@ -206,7 +209,6 @@ export const RewardForm = ({
           </span>
           <Field
             name="advancedPaymentPercentage"
-            defaultValue={"0"}
             format={formatPercentValue}
             validate={composeValidators(requiredField, isValidAdvancedPaymentPercentage)}
           >
