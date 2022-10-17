@@ -218,8 +218,11 @@ export const ProposalFundingForm = ({
             // if payment details are present, populate milestone and payment objects
             // supports payment and non-payment proposals
             if (
-              values.paymentTerms !== PaymentTerm.ON_AGREEMENT &&
-              values.paymentTerms !== PaymentTerm.AFTER_COMPLETION
+              ![
+                PaymentTerm.ON_AGREEMENT,
+                PaymentTerm.AFTER_COMPLETION,
+                PaymentTerm.ADVANCE_PAYMENT,
+              ].some((term) => term === values.paymentTerms)
             ) {
               setIsLoading(false)
               console.error("Missing payment terms, please select an option on the previous page.")
@@ -239,14 +242,12 @@ export const ProposalFundingForm = ({
 
             // set up milestones and payments conditional on payment terms inputs
             const MILESTONE_COPY = {
+              UPFRONT_PAYMENT: "Upfront payment",
               ADVANCE_PAYMENT: "Advance payment",
               COMPLETION_PAYMENT: "Completion payment",
             }
 
-            if (
-              values.paymentTerms === PaymentTerm.AFTER_COMPLETION &&
-              parseFloat(values.advancedPaymentPercentage) > 0
-            ) {
+            if (values.paymentTerms === PaymentTerm.ADVANCE_PAYMENT) {
               // if pay on proposal completion and non-zero advance payment, set up two milestones and two payments
               milestones = [
                 {
@@ -283,8 +284,8 @@ export const ProposalFundingForm = ({
                   index: 0,
                   title:
                     values.paymentTerms === PaymentTerm.ON_AGREEMENT
-                      ? MILESTONE_COPY.ADVANCE_PAYMENT
-                      : MILESTONE_COPY.COMPLETION_PAYMENT, // if terms are not ON_ARGEEMENT, they are AFTER_COMPLETION and we have zero advance payment
+                      ? MILESTONE_COPY.UPFRONT_PAYMENT
+                      : MILESTONE_COPY.COMPLETION_PAYMENT, // if terms are not ON_ARGEEMENT, they are AFTER_COMPLETION
                 },
               ]
               payments = [
@@ -452,7 +453,7 @@ export const ProposalFundingForm = ({
                         formState.values.paymentAmount &&
                         formState.values.paymentTerms &&
                         // terms are ON_AGREEMENT or they are AFTER_COMPLETION && advanced percentage value is valid
-                        (formState.values.paymentTerms !== PaymentTerm.AFTER_COMPLETION ||
+                        (formState.values.paymentTerms !== PaymentTerm.ADVANCE_PAYMENT ||
                           !isValidAdvancedPaymentPercentage(
                             formState.values.advancedPaymentPercentage
                           ))

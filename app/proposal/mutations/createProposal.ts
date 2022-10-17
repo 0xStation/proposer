@@ -22,7 +22,9 @@ const CreateProposal = z.object({
   ipfsTimestamp: z.date().optional(),
   milestones: ZodMilestone.array().optional(),
   payments: ZodPayment.array().optional(),
-  paymentTerms: z.enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION]).optional(),
+  paymentTerms: z
+    .enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION, PaymentTerm.ADVANCE_PAYMENT])
+    .optional(),
   advancePaymentPercentage: z.number().optional(),
 })
 
