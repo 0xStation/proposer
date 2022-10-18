@@ -295,7 +295,9 @@ const RfpDetail: BlitzPage = () => {
                     })
                   return (
                     <Link
-                      href={Routes.ViewProposal({ proposalId: proposal.id })}
+                      href={Routes.ViewProposal({
+                        proposalId: proposal.id,
+                      })}
                       key={`table-row-${idx}`}
                     >
                       <tr className="border-b border-concrete cursor-pointer hover:bg-wet-concrete">
