@@ -215,7 +215,7 @@ export const ProposalViewHeaderNavigation = () => {
               </Button>
             )}
           {activeUserIsSigner && !loading ? (
-            activeUserHasRolesToSign ? (
+            activeUserHasRolesToSign && (
               <>
                 {proposal?.status !== ProposalStatus?.DRAFT && (
                   <Button
@@ -227,15 +227,6 @@ export const ProposalViewHeaderNavigation = () => {
                   </Button>
                 )}
               </>
-            ) : (
-              // TODO: add icons to sds buttons, currently can't use unemphasized with icon
-              <button
-                className="mb-2 sm:mb-0 border rounded w-[300px] sm:w-[400px] md:w-[614px] h-[35px] mr-3 opacity-70 bg-electric-violet border-electric-violet text-tunnel-black cursor-not-allowed"
-                disabled
-              >
-                <CheckCircleIcon className="h-5 w-5 inline mb-1 mr-2" />
-                Approved
-              </button>
             )
           ) : !proposal || loading ? (
             // BUTTONS EMPTY STATE
