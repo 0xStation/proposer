@@ -334,29 +334,33 @@ const WorkspaceHome: BlitzPage = () => {
       )
 
       return (
-        <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
-          <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden bg-charcoal cursor-pointer border border-wet-concrete hover:bg-wet-concrete">
-            <RfpStatusPill status={rfp.status} />
-            <h2 className="text-xl font-bold mt-4">{rfp?.data?.content.title || ""}</h2>
-            <Link href={Routes.CreateFoxesProposal({ rfpId: rfp?.id })}>
-              <Button
-                className="mt-4 w-full bg-charcoal"
-                type={ButtonType.Secondary}
-                isDisabled={
-                  rfp?.status === RfpStatus.CLOSED ||
-                  (!!rfp?.data?.singleTokenGate && !userHasRequiredToken)
-                }
-              >
-                Propose
-              </Button>
-            </Link>
-            {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
-              <span className="text-xs text-concrete">
-                Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this RFP.
-              </span>
-            )}
-          </div>
-        </Link>
+        <div className="relative">
+          <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
+            <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden bg-charcoal cursor-pointer border border-wet-concrete hover:bg-wet-concrete">
+              <RfpStatusPill status={rfp.status} />
+              <h2 className="text-xl font-bold mt-4">{rfp?.data?.content.title || ""}</h2>
+              <div className="group">
+                <Link href={Routes.CreateFoxesProposal({ rfpId: rfp?.id })}>
+                  <Button
+                    className="mt-4 w-full bg-charcoal"
+                    type={ButtonType.Secondary}
+                    isDisabled={
+                      rfp?.status === RfpStatus.CLOSED ||
+                      (!!rfp?.data?.singleTokenGate && !userHasRequiredToken)
+                    }
+                  >
+                    Propose
+                  </Button>
+                </Link>
+                {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
+                  <div className="group-hover:block hidden text-xs text-marble-white rounded bg-wet-concrete absolute p-3 w-[150px] z-10">
+                    Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this RFP.
+                  </div>
+                )}
+              </div>
+            </div>
+          </Link>
+        </div>
       )
     }
 

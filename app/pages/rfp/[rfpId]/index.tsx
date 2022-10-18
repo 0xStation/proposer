@@ -169,7 +169,7 @@ const RfpDetail: BlitzPage = () => {
               />
             )}
             {/* CTA */}
-            <div>
+            <div className="mb-10">
               <Link href={Routes.CreateFoxesProposal({ rfpId })}>
                 <Button
                   className="w-full"
@@ -182,13 +182,13 @@ const RfpDetail: BlitzPage = () => {
                 </Button>
               </Link>
               {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
-                <span className="text-xs text-concrete">
+                <div className="text-xs text-marble-white bg-wet-concrete rounded p-3 mt-2 -mb-5">
                   Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this RFP.
-                </span>
+                </div>
               )}
             </div>
             {/* METADATA */}
-            <div className="mt-12 pt-6 flex flex-col space-y-6">
+            <div className="pt-6 flex flex-col space-y-6">
               {/* SUBMISSION GUIDELINES */}
               {rfp?.data?.content.submissionGuideline && (
                 <div>
