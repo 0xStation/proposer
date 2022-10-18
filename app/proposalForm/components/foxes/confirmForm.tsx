@@ -28,7 +28,7 @@ export const FoxesConfirmForm = ({ body }) => {
   return (
     <>
       <div className="flex flex-col mt-6 pb-6 border-b border-wet-concrete">
-        <p>Upon confirmation, the proposal will be sent to Philosophical Foxes.</p>
+        <p>Upon confirmation, the proposal will be sent to Philosophical Foxes for review.</p>
       </div>
       {/* TO */}
       <div className="mt-6 flex flex-row w-full items-center justify-between">
