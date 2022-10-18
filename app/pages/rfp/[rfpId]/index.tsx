@@ -3,12 +3,10 @@ import {
   BlitzPage,
   useParam,
   useQuery,
-  invalidateQuery,
   Routes,
   Link,
   GetServerSideProps,
   invoke,
-  Router,
   useRouter,
   Image,
 } from "blitz"
@@ -144,7 +142,7 @@ const RfpDetail: BlitzPage = () => {
                 tab: WorkspaceTab.RFPS,
               })}
             >
-              <div className="h-[16px] w-[16px]">
+              <div className="h-[16px] w-[16px] cursor-pointer">
                 <Image src={BackIcon} alt="Back icon" />
               </div>
             </Link>
