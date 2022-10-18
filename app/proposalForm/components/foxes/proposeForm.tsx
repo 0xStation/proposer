@@ -54,23 +54,20 @@ export const FoxesProposeFirstStep = ({ minNumWords }) => {
           mustBeAboveNumWords(minNumWords)
         )}
       >
-        {({ input, meta }) => {
-          console.log(meta)
-          return (
-            <div>
-              <textarea
-                {...input}
-                rows={10}
-                placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
-                className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[180px] w-full"
-              />
-              {/* this error shows up when the user focuses the field (meta.touched) */}
-              {meta.error && meta.touched && (
-                <span className=" text-xs text-torch-red block">{meta.error}</span>
-              )}
-            </div>
-          )
-        }}
+        {({ input, meta }) => (
+          <div>
+            <textarea
+              {...input}
+              rows={10}
+              placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
+              className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[180px] w-full"
+            />
+            {/* this error shows up when the user focuses the field (meta.touched) */}
+            {meta.error && meta.touched && (
+              <span className=" text-xs text-torch-red block">{meta.error}</span>
+            )}
+          </div>
+        )}
       </Field>
     </>
   )
