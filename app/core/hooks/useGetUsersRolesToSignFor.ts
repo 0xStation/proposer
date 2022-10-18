@@ -129,7 +129,7 @@ const useGetUsersRolesToSignFor = (proposal: Proposal | undefined | null) => {
     } else if (!activeUser) {
       setLoading(false)
     }
-  }, [roles?.length, activeUser])
+  }, [JSON.stringify(roles), activeUser])
 
   return [remainingRoles, signedRoles, error, loading] as [
     RoleWithSignerCompletionStatus[],
