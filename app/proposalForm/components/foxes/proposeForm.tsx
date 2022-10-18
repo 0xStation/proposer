@@ -1,20 +1,15 @@
 import { Field } from "react-final-form"
-import debounce from "lodash.debounce"
-import { isAddress as ethersIsAddress } from "@ethersproject/address"
-import useEnsInput from "app/proposalForm/hooks/useEnsInput"
 import {
   composeValidators,
-  isEnsOrAddress,
   mustBeAboveNumWords,
   requiredField,
+  mustOmitLongWords,
 } from "app/utils/validators"
-import { EnsAddressMetadataText } from "../EnsAddressMetadataText"
 import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
 import { useQuery, useRouterQuery } from "blitz"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { getClientAddress } from "app/template/utils"
-import { useEnsName } from "wagmi"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 
 export const FoxesProposeFirstStep = ({ minNumWords }) => {
@@ -53,22 +48,29 @@ export const FoxesProposeFirstStep = ({ minNumWords }) => {
       <Field
         name="body"
         component="textarea"
-        validate={composeValidators(requiredField, mustBeAboveNumWords(minNumWords))}
-      >
-        {({ input, meta }) => (
-          <div>
-            <textarea
-              {...input}
-              rows={10}
-              placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
-              className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[180px] w-full"
-            />
-            {/* this error shows up when the user focuses the field (meta.touched) */}
-            {meta.error && meta.touched && (
-              <span className=" text-xs text-torch-red block">{meta.error}</span>
-            )}
-          </div>
+        validate={composeValidators(
+          requiredField,
+          mustOmitLongWords(50),
+          mustBeAboveNumWords(minNumWords)
         )}
+      >
+        {({ input, meta }) => {
+          console.log(meta)
+          return (
+            <div>
+              <textarea
+                {...input}
+                rows={10}
+                placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
+                className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[180px] w-full"
+              />
+              {/* this error shows up when the user focuses the field (meta.touched) */}
+              {meta.error && meta.touched && (
+                <span className=" text-xs text-torch-red block">{meta.error}</span>
+              )}
+            </div>
+          )
+        }}
       </Field>
     </>
   )
