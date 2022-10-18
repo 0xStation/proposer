@@ -8,7 +8,7 @@ const useDisplayAddress = (address) => {
     cacheTime: 60 * 60 * 1000, // (1 hr) time (in ms) which the data should remain in the cache
   })
 
-  return "@" + (ensName || truncateString(address))
+  return ensName ? { text: ensName, isEns: true } : { text: truncateString(address), isEns: false }
 }
 
 export default useDisplayAddress

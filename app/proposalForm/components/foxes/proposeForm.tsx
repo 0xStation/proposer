@@ -34,13 +34,13 @@ export const FoxesProposeFirstStep = ({ minNumWords }) => {
     }
   )
 
-  const displayAddress = useDisplayAddress(getClientAddress(rfp?.data.template))
+  const { text: displayAddress } = useDisplayAddress(getClientAddress(rfp?.data.template))
 
   return (
     <>
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">To</span>
-        <span className="items-end">{displayAddress}</span>
+        <span className="items-end">{"@" + displayAddress}</span>
       </div>
       {!!rfp?.data?.singleTokenGate && (
         <div className="mt-4 flex flex-row w-full items-center justify-between">

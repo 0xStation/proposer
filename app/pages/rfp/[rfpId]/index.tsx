@@ -52,7 +52,7 @@ import RfpStatusPill from "app/rfp/components/RfpStatusPill"
 import BackIcon from "/public/back-icon.svg"
 import { getPaymentAmount, getPaymentToken } from "app/template/utils"
 import { getNetworkName } from "app/core/utils/networkInfo"
-import getAccountHasToken from "app/token/queries/getAccountHasToken"
+import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinTokenBalance"
 import ReadMore from "app/core/components/ReadMore"
 import { WorkspaceTab } from "app/pages/workspace/[accountAddress]"
 
@@ -113,12 +113,12 @@ const RfpDetail: BlitzPage = () => {
   )
 
   const [userHasRequiredToken] = useQuery(
-    getAccountHasToken,
+    getAccountHasMinTokenBalance,
     {
       chainId: rfp?.data?.singleTokenGate?.token?.chainId as number,
       tokenAddress: rfp?.data?.singleTokenGate?.token?.address as string,
       accountAddress: activeUser?.address as string,
-      minBalance: rfp?.data?.singleTokenGate?.minBalance || "1",
+      minBalance: rfp?.data?.singleTokenGate?.minBalance || "1", // string to pass directly into BigNumber.from in logic check
     },
     {
       enabled: !!activeUser?.address && !!rfp?.data?.singleTokenGate,

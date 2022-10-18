@@ -49,7 +49,7 @@ import { isAddress } from "ethers/lib/utils"
 import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 import { Rfp } from "app/rfp/types"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
-import getAccountHasToken from "app/token/queries/getAccountHasToken"
+import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinTokenBalance"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
@@ -320,12 +320,12 @@ const WorkspaceHome: BlitzPage = () => {
     const router = useRouter()
     const RfpCard = ({ rfp }) => {
       const [userHasRequiredToken] = useQuery(
-        getAccountHasToken,
+        getAccountHasMinTokenBalance,
         {
           chainId: rfp?.data?.singleTokenGate?.token?.chainId as number,
           tokenAddress: rfp?.data?.singleTokenGate?.token?.address as string,
           accountAddress: activeUser?.address as string,
-          minBalance: rfp?.data?.singleTokenGate?.minBalance || "1",
+          minBalance: rfp?.data?.singleTokenGate?.minBalance || "1", // string to pass directly into BigNumber.from in logic check
         },
         {
           enabled: !!activeUser?.address && !!rfp?.data?.singleTokenGate,

@@ -23,7 +23,7 @@ export const FoxesConfirmForm = ({ body }) => {
     }
   )
 
-  const displayAddress = useDisplayAddress(getClientAddress(rfp?.data.template))
+  const { text: displayAddress } = useDisplayAddress(getClientAddress(rfp?.data.template))
 
   return (
     <>
@@ -33,7 +33,7 @@ export const FoxesConfirmForm = ({ body }) => {
       {/* TO */}
       <div className="mt-6 flex flex-row w-full items-center justify-between">
         <span className="font-bold">To</span>
-        <span className="items-end">{displayAddress}</span>
+        <span className="items-end">{"@" + displayAddress}</span>
       </div>
       {/* RFP */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">

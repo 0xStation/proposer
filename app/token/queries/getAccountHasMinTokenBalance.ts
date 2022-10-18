@@ -6,17 +6,19 @@ import { Contract } from "@ethersproject/contracts"
 import { requireEnv } from "app/utils/requireEnv"
 import { BigNumber } from "ethers"
 
-const GetAccountHasToken = z.object({
+const GetAccountHasMinTokenBalance = z.object({
   chainId: z.number(),
   tokenAddress: z.string(),
   accountAddress: z.string(),
-  minBalance: z.string(),
+  minBalance: z.string(), // string to pass directly into BigNumber.from in logic check
 })
 
 // Designed to only support ERC20 and ERC721 tokens right now
 // TODO: add ERC1155 support
-export default async function getAccountHasToken(input: z.infer<typeof GetAccountHasToken>) {
-  const params = GetAccountHasToken.parse(input)
+export default async function getAccountHasMinTokenBalance(
+  input: z.infer<typeof GetAccountHasMinTokenBalance>
+) {
+  const params = GetAccountHasMinTokenBalance.parse(input)
 
   // node provider for making calls to smart contracts
   const provider = new AlchemyProvider(
@@ -31,10 +33,9 @@ export default async function getAccountHasToken(input: z.infer<typeof GetAccoun
   try {
     // res has return values as array in-order, balanceOf is first (and only) value
     const [balance] = await contract.functions.balanceOf!(params.accountAddress)
-    console.log(balance)
     return (balance as BigNumber).gte(BigNumber.from(params.minBalance))
   } catch (e) {
     console.log(e)
-    return Promise.reject(e)
+    throw Error(`Error checking token gating: ${e.message}`)
   }
 }

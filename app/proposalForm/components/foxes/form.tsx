@@ -22,8 +22,8 @@ import {
   getFieldValue,
 } from "app/template/utils"
 import { RESERVED_KEYS } from "app/template/types"
-import getAccountHasToken from "app/token/queries/getAccountHasToken"
 import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
+import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinTokenBalance"
 
 enum FundingProposalStep {
   PROPOSE = "PROPOSE",
@@ -75,12 +75,12 @@ export const FoxesProposalForm = () => {
     userHasRequiredToken,
     { isLoading: isTokenGatingCheckLoading, isSuccess: isTokenGatingCheckComplete },
   ] = useQuery(
-    getAccountHasToken,
+    getAccountHasMinTokenBalance,
     {
       chainId: rfp?.data?.singleTokenGate?.token?.chainId as number,
       tokenAddress: rfp?.data?.singleTokenGate?.token?.address as string,
       accountAddress: activeUser?.address as string,
-      minBalance: rfp?.data?.singleTokenGate?.minBalance || "1",
+      minBalance: rfp?.data?.singleTokenGate?.minBalance || "1", // string to pass directly into BigNumber.from in logic check
     },
     {
       enabled: !!activeUser?.address && !!rfp?.data?.singleTokenGate,
@@ -296,11 +296,7 @@ export const FoxesProposalForm = () => {
                     onClick={async () => {
                       if (!session.siwe?.address) {
                         toggleWalletModal(true)
-                      } else if (
-                        session.siwe?.address &&
-                        !!rfp?.data?.singleTokenGate &&
-                        !userHasRequiredToken
-                      ) {
+                      } else if (!!rfp?.data?.singleTokenGate && !userHasRequiredToken) {
                         setToastState({
                           isToastShowing: true,
                           type: "error",
@@ -346,11 +342,7 @@ export const FoxesProposalForm = () => {
                         setIsLoading(true)
                         if (!session.siwe?.address) {
                           toggleWalletModal(true)
-                        } else if (
-                          session.siwe?.address &&
-                          !!rfp?.data?.singleTokenGate &&
-                          !userHasRequiredToken
-                        ) {
+                        } else if (!!rfp?.data?.singleTokenGate && !userHasRequiredToken) {
                           setToastState({
                             isToastShowing: true,
                             type: "error",
