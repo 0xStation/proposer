@@ -60,7 +60,7 @@ export const ProposalViewHeaderNavigation = () => {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       enabled: Boolean(proposal?.id),
-      cacheTime: 60 * 1000, // one minute in milliseconds
+      staleTime: 60 * 1000, // one minute in milliseconds
     }
   )
 

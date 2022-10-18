@@ -51,7 +51,7 @@ const useGetUsersRolesToSignFor = (proposal: Proposal | undefined | null) => {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       enabled: Boolean(proposal?.id),
-      cacheTime: 60 * 1000, // one minute in milliseconds
+      cacheTime: 60 * 10000, // ten minutes in milliseconds
     }
   )
 
@@ -123,12 +123,13 @@ const useGetUsersRolesToSignFor = (proposal: Proposal | undefined | null) => {
   useEffect(() => {
     setRemainingRoles([])
     setSignedRoles([])
+
     if (roles && activeUser) {
       getRoles(roles, activeUser)
     } else if (!activeUser) {
       setLoading(false)
     }
-  }, [roles, activeUser])
+  }, [roles?.length, activeUser])
 
   return [remainingRoles, signedRoles, error, loading] as [
     RoleWithSignerCompletionStatus[],

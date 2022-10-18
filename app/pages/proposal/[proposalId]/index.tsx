@@ -1,11 +1,11 @@
 import { BlitzPage, useQuery, useParam, GetServerSideProps, invoke } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import getProposalById from "app/proposal/queries/getProposalById"
-import { ProposalViewHeaderNavigation } from "app/proposal/components/viewPage/ProposalViewHeaderNavigation"
 import ReadMore from "app/core/components/ReadMore"
 import { TotalPaymentView } from "app/core/components/TotalPaymentView"
 import RoleSignaturesView from "app/core/components/RoleSignaturesView"
 import { Proposal } from "app/proposal/types"
+import { ProposalNestedLayout } from "../../../core/components/ProposalNestedLayout"
 
 export const getServerSideProps: GetServerSideProps = async ({ params = {} }) => {
   const { proposalId } = params
@@ -40,19 +40,30 @@ const ViewProposal: BlitzPage = () => {
   const [proposal] = useQuery(
     getProposalById,
     { id: proposalId },
-    { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
+    {
+      suspense: false,
+      enabled: !!proposalId,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }
   )
 
   return (
+    <>
+      <ReadMore className="mt-9 mb-9">{proposal?.data?.content?.body}</ReadMore>
+      <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" />
+      {(proposal?.data.totalPayments || []).length > 0 && (
+        <TotalPaymentView proposal={proposal!} className="mt-9" />
+      )}
+    </>
+  )
+}
+
+ViewProposal.getLayout = function getLayout(page) {
+  // persist layout between pages https://nextjs.org/docs/basic-features/layouts
+  return (
     <Layout title="View Proposal">
-      <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto pb-9">
-        <ProposalViewHeaderNavigation />
-        <ReadMore className="mt-9 mb-9">{proposal?.data?.content?.body}</ReadMore>
-        <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" />
-        {(proposal?.data.totalPayments || []).length > 0 && (
-          <TotalPaymentView proposal={proposal!} className="mt-9" />
-        )}
-      </div>
+      <ProposalNestedLayout>{page}</ProposalNestedLayout>
     </Layout>
   )
 }
