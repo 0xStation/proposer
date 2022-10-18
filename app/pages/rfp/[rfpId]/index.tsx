@@ -169,7 +169,7 @@ const RfpDetail: BlitzPage = () => {
               />
             )}
             {/* CTA */}
-            <div className="mb-10">
+            <div className="mb-10 relative group">
               <Link href={Routes.CreateFoxesProposal({ rfpId })}>
                 <Button
                   className="w-full"
@@ -182,7 +182,7 @@ const RfpDetail: BlitzPage = () => {
                 </Button>
               </Link>
               {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
-                <div className="text-xs text-marble-white bg-wet-concrete rounded p-3 mt-2 -mb-5">
+                <div className="absolute group-hover:block hidden text-xs text-marble-white bg-wet-concrete rounded p-3 mt-2 -mb-5">
                   Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this RFP.
                 </div>
               )}
