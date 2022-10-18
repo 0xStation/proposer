@@ -3,10 +3,11 @@ import Layout from "app/core/layouts/Layout"
 import FoxesProposalForm from "app/proposalForm/components/foxes/form"
 import getRfpById from "app/rfp/queries/getRfpById"
 import BackIcon from "/public/back-icon.svg"
-import { getNetworkName } from "app/core/utils/networkInfo"
+import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
 import { getPaymentAmount, getPaymentToken } from "app/template/utils"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
 import ReadMore from "app/core/components/ReadMore"
+import TextLink from "app/core/components/TextLink"
 
 const CreateFoxesProposal: BlitzPage = () => {
   const queryParams = useRouterQuery()
@@ -68,6 +69,26 @@ const CreateFoxesProposal: BlitzPage = () => {
                     Submission guidelines
                   </h4>
                   <ReadMore maxCharLength={75}>{rfp?.data?.content.submissionGuideline}</ReadMore>
+                </div>
+              )}
+              {/* SUBMISSION REQUIREMENT */}
+              {!!rfp?.data?.singleTokenGate && (
+                <div>
+                  <h4 className="text-xs font-bold text-concrete uppercase">
+                    Submission requirement
+                  </h4>
+                  <div>
+                    {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
+                    <TextLink
+                      url={
+                        getNetworkExplorer(rfp?.data?.singleTokenGate.token.chainId) +
+                        "/token/" +
+                        rfp?.data?.singleTokenGate.token.address
+                      }
+                    >
+                      {rfp?.data?.singleTokenGate.token.name}
+                    </TextLink>
+                  </div>
                 </div>
               )}
               {/* NETWORK */}
