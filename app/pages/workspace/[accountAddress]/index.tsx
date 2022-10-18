@@ -9,6 +9,7 @@ import {
   GetServerSideProps,
   invoke,
   useRouterQuery,
+  useRouter,
 } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
@@ -316,6 +317,7 @@ const WorkspaceHome: BlitzPage = () => {
   }
 
   const RfpTab = () => {
+    const router = useRouter()
     const RfpCard = ({ rfp }) => {
       const [userHasRequiredToken] = useQuery(
         getAccountHasToken,
@@ -335,31 +337,41 @@ const WorkspaceHome: BlitzPage = () => {
 
       return (
         <div className="relative">
-          <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
-            <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden bg-charcoal cursor-pointer border border-wet-concrete hover:bg-wet-concrete">
-              <RfpStatusPill status={rfp.status} />
-              <h2 className="text-xl font-bold mt-4">{rfp?.data?.content.title || ""}</h2>
-              <div className="group">
-                <Link href={Routes.CreateFoxesProposal({ rfpId: rfp?.id })}>
-                  <Button
-                    className="mt-4 w-full bg-charcoal"
-                    type={ButtonType.Secondary}
-                    isDisabled={
-                      rfp?.status === RfpStatus.CLOSED ||
-                      (!!rfp?.data?.singleTokenGate && !userHasRequiredToken)
-                    }
-                  >
-                    Propose
-                  </Button>
-                </Link>
+          <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden bg-charcoal border border-wet-concrete">
+            <RfpStatusPill status={rfp.status} />
+            <h2 className="text-xl font-bold mt-4">{rfp?.data?.content.title || ""}</h2>
+            <div className="flex flex-row mt-4 justify-between">
+              <Button
+                onClick={() => {
+                  router.push(Routes.RfpDetail({ rfpId: rfp.id }))
+                }}
+                type={ButtonType.Secondary}
+                className="mr-2 bg-charcoal"
+                overrideWidthClassName="w-1/2"
+              >
+                View
+              </Button>
+              <div className="group w-1/2">
+                <Button
+                  onClick={() => router.push(Routes.CreateFoxesProposal({ rfpId: rfp?.id }))}
+                  className="bg-charcoal"
+                  overrideWidthClassName="w-full"
+                  type={ButtonType.Secondary}
+                  isDisabled={
+                    rfp?.status === RfpStatus.CLOSED ||
+                    (!!rfp?.data?.singleTokenGate && !userHasRequiredToken)
+                  }
+                >
+                  Propose
+                </Button>
                 {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
-                  <div className="group-hover:block hidden text-xs text-marble-white rounded bg-wet-concrete absolute p-3 w-[150px] z-10">
+                  <div className="group-hover:block hidden text-xs text-marble-white rounded bg-wet-concrete absolute p-3 mt-2 w-[150px] z-10">
                     Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this RFP.
                   </div>
                 )}
               </div>
             </div>
-          </Link>
+          </div>
         </div>
       )
     }
