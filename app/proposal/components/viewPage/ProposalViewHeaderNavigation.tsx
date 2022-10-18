@@ -1,6 +1,6 @@
 import { Link, Routes, useParam, useQuery, useRouter } from "blitz"
 import { CheckCircleIcon } from "@heroicons/react/solid"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import Button from "app/core/components/sds/buttons/Button"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import getProposalById from "app/proposal/queries/getProposalById"
 import { ProposalStatus, ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
@@ -15,9 +15,9 @@ import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTim
 import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { LINKS } from "app/core/utils/constants"
-import { useState } from "react"
 import SendProposalModal from "../SendProposalModal"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
+import getRfpByProposalId from "app/rfp/queries/getRfpByProposalId"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.type === proposalType)
@@ -60,7 +60,18 @@ export const ProposalViewHeaderNavigation = () => {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       enabled: Boolean(proposal?.id),
-      staleTime: 60 * 1000, // one minute in milliseconds
+      cacheTime: 60 * 10000, // ten minutes in milliseconds
+    }
+  )
+  const [rfp] = useQuery(
+    getRfpByProposalId,
+    { proposalId: proposalId },
+    {
+      suspense: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      enabled: !!proposalId,
+      cacheTime: 60 * 10000, // ten minutes in milliseconds
     }
   )
 
@@ -105,14 +116,31 @@ export const ProposalViewHeaderNavigation = () => {
       )}
       <div className="w-full min-h-64">
         <div className="mt-6 flex flex-row">
-          <span className="text-concrete hover:text-light-concrete">
-            <Link href={Routes.WorkspaceHome({ accountAddress: author?.address as string })}>
-              Proposals
-            </Link>{" "}
-            /&nbsp;
-          </span>
-          {proposal?.data?.content?.title || (
-            <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+          {rfp ? (
+            <>
+              <span className="text-concrete hover:text-light-concrete">
+                <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>Rfps</Link> /&nbsp;
+              </span>
+
+              {rfp?.data?.content?.title ? (
+                <span className="text-marble-white">{rfp?.data?.content?.title}</span>
+              ) : (
+                <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+              )}
+            </>
+          ) : (
+            <>
+              {" "}
+              <span className="text-concrete hover:text-light-concrete">
+                <Link href={Routes.WorkspaceHome({ accountAddress: author?.address as string })}>
+                  Proposals
+                </Link>{" "}
+                /&nbsp;
+              </span>
+              {proposal?.data?.content?.title || (
+                <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+              )}
+            </>
           )}
         </div>
         {proposal?.data.content.title ? (
