@@ -27,8 +27,6 @@ export default async function getProposalsByRfpId(params: z.infer<typeof GetProp
     },
   })
 
-  console.log(proposals)
-
   if (!proposals) return []
 
   return proposals as unknown as Proposal[]

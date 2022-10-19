@@ -9,10 +9,9 @@ import {
   GetServerSideProps,
   invoke,
   useRouterQuery,
-  useRouter,
 } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import Button from "app/core/components/sds/buttons/Button"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { formatDate } from "app/core/utils/formatDate"
 import FilterPill from "app/core/components/FilterPill"
@@ -49,7 +48,8 @@ import { isAddress } from "ethers/lib/utils"
 import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 import { Rfp } from "app/rfp/types"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
-import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinTokenBalance"
+import { getPaymentAmount, getPaymentToken } from "app/template/utils"
+import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpId"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
@@ -317,62 +317,34 @@ const WorkspaceHome: BlitzPage = () => {
   }
 
   const RfpTab = () => {
-    const router = useRouter()
     const RfpCard = ({ rfp }) => {
-      const [userHasRequiredToken] = useQuery(
-        getAccountHasMinTokenBalance,
+      const [proposalCount] = useQuery(
+        getProposalCountByRfpId,
         {
-          chainId: rfp?.data?.singleTokenGate?.token?.chainId as number,
-          tokenAddress: rfp?.data?.singleTokenGate?.token?.address as string,
-          accountAddress: activeUser?.address as string,
-          minBalance: rfp?.data?.singleTokenGate?.minBalance || "1", // string to pass directly into BigNumber.from in logic check
+          rfpId: rfp?.id as string,
         },
         {
-          enabled: !!activeUser?.address && !!rfp?.data?.singleTokenGate,
+          enabled: !!rfp?.id,
           suspense: false,
           refetchOnWindowFocus: false,
-          cacheTime: 60 * 1000, // 1 minute
         }
       )
 
       return (
-        <div className="relative">
-          <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden bg-charcoal border border-wet-concrete">
+        <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
+          <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer">
             <RfpStatusPill status={rfp.status} />
             <h2 className="text-xl font-bold mt-4">{rfp?.data?.content.title || ""}</h2>
             <div className="flex flex-row mt-4 justify-between">
-              <Button
-                onClick={() => {
-                  router.push(Routes.RfpDetail({ rfpId: rfp.id }))
-                }}
-                type={ButtonType.Secondary}
-                className="mr-2 bg-charcoal"
-                overrideWidthClassName="w-1/2"
-              >
-                View
-              </Button>
-              <div className="group w-1/2">
-                <Button
-                  onClick={() => router.push(Routes.CreateFoxesProposal({ rfpId: rfp?.id }))}
-                  className="bg-charcoal"
-                  overrideWidthClassName="w-full"
-                  type={ButtonType.Secondary}
-                  isDisabled={
-                    rfp?.status === RfpStatus.CLOSED ||
-                    (!!rfp?.data?.singleTokenGate && !userHasRequiredToken)
-                  }
-                >
-                  Propose
-                </Button>
-                {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
-                  <div className="group-hover:block hidden text-xs text-marble-white rounded bg-wet-concrete absolute p-3 mt-2 w-[150px] z-10">
-                    Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this RFP.
-                  </div>
-                )}
-              </div>
+              <span>
+                {" "}
+                <p className="inline">{getPaymentAmount(rfp?.data.template)} </p>
+                <p className="inline">{getPaymentToken(rfp?.data.template)?.symbol}</p>
+              </span>
+              <span>{proposalCount} proposals</span>
             </div>
           </div>
-        </div>
+        </Link>
       )
     }
 
