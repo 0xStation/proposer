@@ -14,6 +14,7 @@ import getProposalsByRfpId from "app/proposal/queries/getProposalsByRfpId"
 import { RfpSidebar } from "app/rfp/components/RfpSidebar"
 import { Sizes } from "app/core/utils/constants"
 import { RfpNavigator } from "app/rfp/components/RfpNavigator"
+import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpId"
 
 export const getServerSideProps: GetServerSideProps = async ({ params = {} }) => {
   const { rfpId } = params
@@ -59,6 +60,18 @@ const RfpDetail: BlitzPage = () => {
     { enabled: !!rfpId, suspense: false, refetchOnWindowFocus: false }
   )
 
+  const [proposalCount] = useQuery(
+    getProposalCountByRfpId,
+    {
+      rfpId: rfpId as string,
+    },
+    {
+      enabled: !!rfpId,
+      suspense: false,
+      refetchOnWindowFocus: false,
+    }
+  )
+
   return (
     <Layout>
       {/* LEFT SIDEBAR | PROPOSALS */}
@@ -70,8 +83,7 @@ const RfpDetail: BlitzPage = () => {
           <div className="mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-end">
             <Pagination
               results={proposals as any[]}
-              // TODO: make specific query for count
-              resultsCount={proposals?.length || 0}
+              resultsCount={proposalCount || 0}
               page={page}
               setPage={setPage}
               resultsLabel="proposals"

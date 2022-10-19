@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Form } from "react-final-form"
+import { Form, FormSpy } from "react-final-form"
 import { useRouter, useSession, Routes, useMutation, useQuery, useRouterQuery } from "blitz"
 import Button from "app/core/components/sds/buttons/Button"
 import Stepper from "../Stepper"
@@ -50,7 +50,7 @@ export const FoxesProposalForm = () => {
     shouldHandlePostProposalCreationProcessing,
     setShouldHandlePostProposalCreationProcessing,
   ] = useState<boolean>(false)
-  const [unsavedChanges, setUnsavedChanges] = useState<boolean>(true)
+  const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false)
 
   useWarnIfUnsavedChanges(unsavedChanges, () => {
     return confirm("Warning! You have unsaved changes.")
@@ -263,6 +263,30 @@ export const FoxesProposalForm = () => {
 
           return (
             <form onSubmit={handleSubmit} className="mt-20">
+              <FormSpy
+                subscription={{ dirty: true }}
+                onChange={({ dirty }) => {
+                  // purpose of this logic is to show the on page leave pop-up
+                  // if user has unsaved changes and the form is dirty
+                  if (isTokenGatingCheckComplete && !userHasRequiredToken) {
+                    // don't show pop up alert if user can't propose in the first place
+                    // given they don't have the permissions
+                    return
+                  }
+                  // The presence of the createdProposal means their form data is already saved
+                  if (!createdProposal) {
+                    if (dirty && !unsavedChanges) {
+                      setUnsavedChanges(true)
+                    } else if (proposalStep === FundingProposalStep.CONFIRM) {
+                      // currently there are no fields on the form so formspy indicates
+                      // that the form is pristine when it's not rendered
+                      setUnsavedChanges(true)
+                    } else if (!dirty && unsavedChanges) {
+                      setUnsavedChanges(false)
+                    }
+                  }
+                }}
+              />
               <div className="rounded-2xl border border-concrete p-6 h-[560px] overflow-y-scroll">
                 {isLoading ? (
                   <ProposalCreationLoadingScreen
