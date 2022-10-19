@@ -12,7 +12,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   if (session?.siwe?.address) {
     return {
       redirect: {
-        destination: `/profile/${session?.siwe?.address}`,
+        destination: `/workspace/${session?.siwe?.address}`,
         permanent: false,
       },
     }
@@ -36,7 +36,7 @@ const Home: BlitzPage = () => {
     }
 
     if (activeUser) {
-      router.push(`/profile/${session?.siwe?.address}`)
+      router.push(`/workspace/${session?.siwe?.address}`)
     } else {
       ;(async () => {
         try {
@@ -46,7 +46,7 @@ const Home: BlitzPage = () => {
           } else {
             await invoke(createAccount, { address: session?.siwe?.address, createSession: true })
           }
-          router.push(`/profile/${session?.siwe?.address}`)
+          router.push(`/workspace/${session?.siwe?.address}`)
         } catch (err) {
           console.error(err)
           setToastState({ isToastShowing: true, type: "error", message: "Something went wrong." })
