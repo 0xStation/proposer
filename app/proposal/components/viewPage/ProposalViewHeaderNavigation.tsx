@@ -3,7 +3,12 @@ import { CheckCircleIcon } from "@heroicons/react/solid"
 import Button from "app/core/components/sds/buttons/Button"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import getProposalById from "app/proposal/queries/getProposalById"
-import { ProposalStatus, ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
+import {
+  ProposalStatus,
+  ProposalRoleApprovalStatus,
+  ProposalRoleType,
+  RfpStatus,
+} from "@prisma/client"
 import { ProposalRole } from "app/proposalRole/types"
 import useStore from "app/core/hooks/useStore"
 import { ProposalStatusPill } from "../../../core/components/ProposalStatusPill"
@@ -119,7 +124,7 @@ export const ProposalViewHeaderNavigation = () => {
           {rfp ? (
             <>
               <span className="text-concrete hover:text-light-concrete">
-                <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>Rfps</Link> /&nbsp;
+                <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>RFPs</Link> /&nbsp;
               </span>
 
               {rfp?.data?.content?.title ? (
@@ -197,6 +202,16 @@ export const ProposalViewHeaderNavigation = () => {
         </div>
         {/* BUTTONS */}
         <div className="w-full mt-6 box-border">
+          {Boolean(rfp && rfp?.status === RfpStatus?.CLOSED) && (
+            <div className="rounded bg-neon-carrot text-tunnel-black text-center p-2 mb-3 font-bold">
+              <p className="inline">
+                This RFP is currently closed, but is still open for viewing.{" "}
+              </p>
+              <p className="inline underline underline-offset-2">
+                <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>View RFP</Link>
+              </p>
+            </div>
+          )}
           {/*
           - if activeUser has a role on the proposal, check if they've signed already,
           - if they haven't signed, show the sign button, if they have signed, show the "signed" button
@@ -222,6 +237,7 @@ export const ProposalViewHeaderNavigation = () => {
                     overrideWidthClassName="w-[300px] sm:w-[400px] md:w-[614px]"
                     className="mr-3"
                     onClick={() => toggleProposalApprovalModalOpen(true)}
+                    isDisabled={Boolean(rfp && rfp?.status === RfpStatus?.CLOSED)}
                   >
                     Approve
                   </Button>

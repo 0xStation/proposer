@@ -331,6 +331,10 @@ export const PARTNERS = {
     ADDRESS: "0x91d38BB4f803b64e94baFa8fce4e02d86C8380aB",
     CHAIN_ID: 5,
   },
+  UNISWAP: {
+    ADDRESS: "0x0b74007a73ca49c96C833ba0E38Aa929ba71c40f",
+    CHAIN_ID: 5,
+  },
 }
 
 export const TEMPLATES = {
@@ -405,6 +409,62 @@ export const TEMPLATES = {
         key: RESERVED_KEYS.CLIENTS,
         mapsTo: RESERVED_KEYS.ROLES,
         value: [{ address: PARTNERS.STATION.ADDRESS, type: ProposalRoleType.CLIENT }],
+        fieldType: TemplateFieldType.PRESELECT,
+      },
+      {
+        key: RESERVED_KEYS.MILESTONES,
+        mapsTo: RESERVED_KEYS.MILESTONES,
+        value: [
+          {
+            title: "Contributor payment",
+            index: 0,
+          },
+        ],
+        fieldType: TemplateFieldType.PRESELECT,
+      },
+      {
+        key: RESERVED_KEYS.PAYMENTS,
+        mapsTo: RESERVED_KEYS.PAYMENTS,
+        value: [
+          {
+            milestoneIndex: 0,
+            senderAddress: PARTNERS.STATION.ADDRESS,
+            recipientAddress: undefined,
+            token: {
+              chainId: PARTNERS.STATION.CHAIN_ID,
+              ...getNetworkCoin(PARTNERS.STATION.CHAIN_ID),
+            },
+            amount: 0.01,
+          },
+        ],
+        fieldType: TemplateFieldType.PREFILL,
+      },
+      {
+        key: RESERVED_KEYS.PAYMENT_TERMS,
+        mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
+        value: PaymentTerm.ON_AGREEMENT,
+        fieldType: TemplateFieldType.PRESELECT,
+      },
+    ],
+  },
+  UNISWAP: {
+    TERM: [
+      {
+        key: RESERVED_KEYS.CONTRIBUTORS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [],
+        fieldType: TemplateFieldType.OPEN,
+      },
+      {
+        key: RESERVED_KEYS.AUTHORS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [],
+        fieldType: TemplateFieldType.OPEN,
+      },
+      {
+        key: RESERVED_KEYS.CLIENTS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [{ address: PARTNERS.UNISWAP.ADDRESS, type: ProposalRoleType.CLIENT }],
         fieldType: TemplateFieldType.PRESELECT,
       },
       {

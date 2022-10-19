@@ -20,7 +20,7 @@ export const ReadMore = ({
     <div className={className}>
       <Preview markdown={isReadMore && isOverflow ? text?.slice(0, maxCharLength) + "..." : text} />
       {isOverflow && (
-        <button onClick={toggleReadMore} className="font-bold text-electric-violet">
+        <button onClick={toggleReadMore} className="font-bold text-electric-violet mt-1">
           {isReadMore ? "Read more" : "Show less"}
         </button>
       )}

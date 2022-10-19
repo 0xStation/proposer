@@ -32,6 +32,13 @@ export const mustBeAboveNumWords = (minNumWords) => (value) =>
       : `Must be more than ${minNumWords} words`
     : undefined
 
+export const mustOmitLongWords = (charCount) => (value) =>
+  value
+    ? value.split(" ").some((word) => word.length > charCount)
+      ? `No words can be longer than ${charCount} characters`
+      : undefined
+    : undefined
+
 export const mustBeUrl = (value) => {
   if (!value) {
     return undefined

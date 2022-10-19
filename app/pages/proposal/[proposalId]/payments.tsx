@@ -64,7 +64,7 @@ export const ProposalPayments: BlitzPage = () => {
 
   const showPayInformation =
     proposalContainsPayment &&
-    (proposal?.status === ProposalStatus.APPROVED || ProposalStatus.COMPLETE)
+    (proposal?.status === ProposalStatus.APPROVED || proposal?.status === ProposalStatus.COMPLETE)
 
   return (
     <>

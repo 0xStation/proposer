@@ -1,9 +1,16 @@
-import { Rfp as PrismaRfp } from "@prisma/client"
+import { Rfp as PrismaRfp, RfpStatus } from "@prisma/client"
+import { Account } from "app/account/types"
 import { Template } from "app/template/types"
 import { Token } from "app/token/types"
 
-export type Rfp = PrismaRfp & {
+export type Rfp = {
+  id: string
+  accountAddress: string
+  createdAt: Date
+  updatedAt: Date
+  status: RfpStatus
   data: RfpMetadata
+  account: Account
 }
 
 export type RfpMetadata = {
