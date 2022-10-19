@@ -277,10 +277,10 @@ export const FEATURE_FLAG_KEYS = {
 
 export const PAYMENT_TERM_MAP = {
   [PaymentTerm.ON_AGREEMENT]: {
-    copy: "Pay in full now",
+    copy: "Pay in full upon proposal agreement",
   },
   [PaymentTerm.AFTER_COMPLETION]: {
-    copy: "Pay in full upon completion",
+    copy: "Pay in full after project completion",
   },
   [PaymentTerm.ADVANCE_PAYMENT]: {
     copy: "Advance payment",
