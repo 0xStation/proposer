@@ -242,8 +242,7 @@ export const LINKS = {
   PINATA_BASE_URL: "https://station.mypinata.cloud/ipfs/", // TODO: change Station gateway domain
   MARKDOWN_GUIDE:
     "https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax",
-  STATION_WORKSPACES:
-    "https://0xstation.notion.site/0xstation/Station-Workspaces-8c696d92fdbd4dc0b2c7e67efc54a9a5",
+  STATION_WORKSPACES: "https://www.station.express/tools/directory",
   GNOSIS_SAFE: "https://gnosis-safe.io/",
   PROPOSAL_TEMPLATE: "https://www.station.express/product/proposer#proposal-templates",
 }
