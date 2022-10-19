@@ -251,12 +251,12 @@ export const ProposalViewHeaderNavigation = () => {
                               >
                                 Approve
                               </Button>
-                              {
+                              {rfp && rfp?.status === RfpStatus?.CLOSED && (
                                 <div className="absolute group-hover:block hidden left-32 text-xs text-marble-white bg-wet-concrete rounded p-3 mt-2 -mb-5">
                                   This RFP needs to be open for submissions to approve this
                                   proposal.
                                 </div>
-                              }
+                              )}
                             </div>
                             {proposal && (
                               <CopyBtn className="inline" textToWrite={currentPageUrl} />
