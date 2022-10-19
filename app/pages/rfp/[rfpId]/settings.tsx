@@ -9,7 +9,6 @@ import {
 } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import getRfpById from "app/rfp/queries/getRfpById"
-import getProposalsByRfpId from "app/proposal/queries/getProposalsByRfpId"
 import { RfpSidebar } from "app/rfp/components/RfpSidebar"
 import { RfpNavigator } from "app/rfp/components/RfpNavigator"
 import { useUserIsWorkspaceOrSigner } from "app/core/hooks/useUserIsWorkspaceOrSigner"
@@ -17,6 +16,7 @@ import Button from "../../../core/components/sds/buttons/Button"
 import { RfpStatus } from "@prisma/client"
 import updateRfpStatus from "app/rfp/mutations/updateRfpStatus"
 import useStore from "app/core/hooks/useStore"
+import { RfpDetailsForm } from "app/rfp/components/RfpDetailsForm"
 
 const RfpSettings: BlitzPage = () => {
   const rfpId = useParam("rfpId", "string") as string
@@ -39,13 +39,54 @@ const RfpSettings: BlitzPage = () => {
     onSuccess: (data) => {},
     onError: (error) => {
       console.error(error)
-      setToastState({
-        isToastShowing: true,
-        type: "success",
-        message: "Workspace successfully updated",
-      })
     },
   })
+
+  const handleCloseRfp = async () => {
+    try {
+      const updatedStatus = await updateRfpStatusMutation({
+        rfpId: rfp?.id as string,
+        status: RfpStatus.CLOSED,
+      })
+      if (updatedStatus) {
+        setToastState({
+          isToastShowing: true,
+          type: "success",
+          message: "Successfully closed RFP.",
+        })
+      }
+      invalidateQuery(getRfpById)
+    } catch (err) {
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: "Error closing RFP.",
+      })
+    }
+  }
+
+  const handleOpenRfp = async () => {
+    try {
+      const updatedStatus = await updateRfpStatusMutation({
+        rfpId: rfp?.id as string,
+        status: RfpStatus.OPEN,
+      })
+      if (updatedStatus) {
+        setToastState({
+          isToastShowing: true,
+          type: "success",
+          message: "Successfully opened RFP.",
+        })
+      }
+      invalidateQuery(getRfpById)
+    } catch (err) {
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: "Error opening RFP.",
+      })
+    }
+  }
 
   const NoAccessView = () => (
     <div className="flex flex-col justify-center text-center align-middle h-full w-full">
@@ -70,65 +111,21 @@ const RfpSettings: BlitzPage = () => {
           {userIsWorkspace || userIsWorkspaceSigner ? (
             <>
               <RfpNavigator />
-              <div className="mt-8 w-1/2">
-                <h1>Current status</h1>
-                <div className="flex flex-row mt-3 items-center justify-between">
-                  <p>Open for submission</p>
-                  {rfp?.status === RfpStatus.OPEN ? (
-                    <Button
-                      onClick={async () => {
-                        try {
-                          const updatedStatus = await updateRfpStatusMutation({
-                            rfpId: rfp?.id as string,
-                            status: RfpStatus.CLOSED,
-                          })
-                          if (updatedStatus) {
-                            setToastState({
-                              isToastShowing: true,
-                              type: "success",
-                              message: "Successfully closed RFP.",
-                            })
-                          }
-                          invalidateQuery(getRfpById)
-                        } catch (err) {
-                          setToastState({
-                            isToastShowing: true,
-                            type: "error",
-                            message: "Error closing RFP.",
-                          })
-                        }
-                      }}
-                    >
-                      Close this RFP
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={async () => {
-                        try {
-                          const updatedStatus = await updateRfpStatusMutation({
-                            rfpId: rfp?.id as string,
-                            status: RfpStatus.OPEN,
-                          })
-                          if (updatedStatus) {
-                            setToastState({
-                              isToastShowing: true,
-                              type: "success",
-                              message: "Successfully opened RFP.",
-                            })
-                          }
-                          invalidateQuery(getRfpById)
-                        } catch (err) {
-                          setToastState({
-                            isToastShowing: true,
-                            type: "error",
-                            message: "Error opening RFP.",
-                          })
-                        }
-                      }}
-                    >
-                      Open this RFP
-                    </Button>
-                  )}
+              <div className="mt-8 lg:w-3/5 w-full">
+                <RfpDetailsForm rfp={rfp} />
+                <h1 className="font-bold mt-7">Current status</h1>
+                <div className="flex flex-col mt-3">
+                  <p>Open for submissions</p>
+                  <Button
+                    className="max-w-fit mt-3"
+                    onClick={async () =>
+                      rfp?.status === RfpStatus.OPEN
+                        ? await handleCloseRfp()
+                        : await handleOpenRfp()
+                    }
+                  >
+                    {rfp?.status === RfpStatus.OPEN ? "Close this RFP" : "Open this RFP"}
+                  </Button>
                 </div>
               </div>
             </>
