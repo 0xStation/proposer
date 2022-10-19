@@ -27,6 +27,10 @@ export const ProposeFirstStep = () => {
     <>
       {/* CLIENT */}
       <label className="font-bold block mt-6">To*</label>
+      <span className="text-xs text-concrete block">
+        Find the <TextLink url={LINKS.STATION_WORKSPACES}>addresses</TextLink> of featured
+        communities and individuals.
+      </span>
       <Field name="toAddress" validate={composeValidators(requiredField, isEnsOrAddress)}>
         {({ meta, input }) => {
           return (

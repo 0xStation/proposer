@@ -260,8 +260,7 @@ export const LINKS = {
   PINATA_BASE_URL: "https://station.mypinata.cloud/ipfs/", // TODO: change Station gateway domain
   MARKDOWN_GUIDE:
     "https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax",
-  STATION_WORKSPACES:
-    "https://0xstation.notion.site/0xstation/Station-Workspaces-8c696d92fdbd4dc0b2c7e67efc54a9a5",
+  STATION_WORKSPACES: "https://www.station.express/tools/directory",
   GNOSIS_SAFE: "https://gnosis-safe.io/",
   PROPOSAL_TEMPLATE: "https://www.station.express/product/proposer#proposal-templates",
 }
@@ -295,10 +294,10 @@ export const FEATURE_FLAG_KEYS = {
 
 export const PAYMENT_TERM_MAP = {
   [PaymentTerm.ON_AGREEMENT]: {
-    copy: "Pay in full now",
+    copy: "Pay in full upon proposal agreement",
   },
   [PaymentTerm.AFTER_COMPLETION]: {
-    copy: "Pay in full upon completion",
+    copy: "Pay in full after project completion",
   },
   [PaymentTerm.ADVANCE_PAYMENT]: {
     copy: "Advance payment",
