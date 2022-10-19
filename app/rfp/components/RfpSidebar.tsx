@@ -7,28 +7,9 @@ import { WorkspaceTab } from "app/pages/workspace/[accountAddress]"
 import { getPaymentToken, getPaymentAmount } from "app/template/utils"
 import RfpStatusPill from "./RfpStatusPill"
 import Button from "app/core/components/sds/buttons/Button"
-import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinTokenBalance"
-import useStore from "app/core/hooks/useStore"
 import ReadMore from "app/core/components/ReadMore"
 
 export const RfpSidebar = ({ rfp }) => {
-  const rfpId = useParam("rfpId", "string") as string
-  const activeUser = useStore((state) => state.activeUser)
-  const [userHasRequiredToken] = useQuery(
-    getAccountHasMinTokenBalance,
-    {
-      chainId: rfp?.data?.singleTokenGate?.token?.chainId as number,
-      tokenAddress: rfp?.data?.singleTokenGate?.token?.address as string,
-      accountAddress: activeUser?.address as string,
-      minBalance: rfp?.data?.singleTokenGate?.minBalance || "1", // string to pass directly into BigNumber.from in logic check
-    },
-    {
-      enabled: !!activeUser?.address && !!rfp?.data?.singleTokenGate,
-      suspense: false,
-      refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute
-    }
-  )
   return (
     <div className="h-full w-[288px] overflow-y-scroll p-6 border-r border-concrete">
       <div className="flex flex-col pb-6 space-y-6">
@@ -67,11 +48,16 @@ export const RfpSidebar = ({ rfp }) => {
         )}
         {/* CTA */}
         <div className="mb-10 relative group">
-          <Link href={Routes.CreateFoxesProposal({ rfpId })}>
+          <Link href={Routes.CreateFoxesProposal({ rfpId: rfp?.id as string })}>
             <Button className="w-full" isDisabled={rfp?.status === RfpStatus.CLOSED}>
               Propose
             </Button>
           </Link>
+          {rfp?.status === RfpStatus.CLOSED && (
+            <div className="absolute group-hover:block hidden text-xs text-marble-white bg-wet-concrete rounded p-3 mt-2 -mb-5">
+              This RFP is currently not accepting submissions.
+            </div>
+          )}
         </div>
         {/* METADATA */}
         <div className="pt-6 flex flex-col space-y-6">
