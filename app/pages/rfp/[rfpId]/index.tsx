@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react"
+import { useState } from "react"
 import {
   BlitzPage,
   useParam,
@@ -7,45 +7,20 @@ import {
   Link,
   GetServerSideProps,
   invoke,
-  useRouter,
   Image,
 } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import Button from "app/core/components/sds/buttons/Button"
-import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { formatDate } from "app/core/utils/formatDate"
-import FilterPill from "app/core/components/FilterPill"
-import getProposalsByAddress from "app/proposal/queries/getProposalsByAddress"
-import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import Pagination from "app/core/components/Pagination"
-import {
-  PAGINATION_TAKE,
-  PROPOSAL_NEW_STATUS_FILTER_OPTIONS,
-  PROPOSAL_ROLE_FILTER_OPTIONS,
-  PROPOSAL_NEW_STATUS_DISPLAY_MAP,
-  Sizes,
-} from "app/core/utils/constants"
-import {
-  AddressType,
-  ProposalStatus,
-  ProposalRoleApprovalStatus,
-  ProposalRoleType,
-  RfpStatus,
-} from "@prisma/client"
-import { LightBulbIcon, CogIcon } from "@heroicons/react/solid"
-import AccountMediaObject from "app/core/components/AccountMediaObject"
-import WorkspaceSettingsOverviewForm from "app/account/components/WorkspaceSettingsOverviewForm"
+import { Sizes } from "app/core/utils/constants"
+import { ProposalStatus, ProposalRoleApprovalStatus, RfpStatus } from "@prisma/client"
 import useStore from "app/core/hooks/useStore"
 import ProposalStatusPill from "app/core/components/ProposalStatusPill"
-import { useAccount, useEnsName } from "wagmi"
-import getSafeMetadata from "app/account/queries/getSafeMetadata"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import { ProposalRole } from "app/proposalRole/types"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
-import { Account } from "app/account/types"
-import { isAddress } from "ethers/lib/utils"
-import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 import getRfpById from "app/rfp/queries/getRfpById"
 import getProposalsByRfpId from "app/proposal/queries/getProposalsByRfpId"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
@@ -83,19 +58,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params = {} }) =>
 
 const RfpDetail: BlitzPage = () => {
   const activeUser = useStore((state) => state.activeUser)
-  const accountData = useAccount()
-  const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
-  const [canViewSettings, setCanViewSettings] = useState<boolean>(false)
-  const [isFoxesProposalModalOpen, setIsFoxesProposalModalOpen] = useState<boolean>(false)
-  const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
-    new Set<ProposalStatus>()
-  )
-  const [proposalRoleFilters, setProposalRoleFilters] = useState<Set<ProposalRoleType>>(
-    new Set<ProposalRoleType>()
-  )
   const [page, setPage] = useState<number>(0)
   const rfpId = useParam("rfpId", "string") as string
-  const router = useRouter()
 
   const [rfp] = useQuery(
     getRfpById,
@@ -193,7 +157,7 @@ const RfpDetail: BlitzPage = () => {
               {/* SUBMISSION GUIDELINES */}
               {rfp?.data?.content.submissionGuideline && (
                 <div>
-                  <h4 className="text-xs font-bold text-concrete uppercase">
+                  <h4 className="text-xs font-bold text-concrete uppercase mb-1.5">
                     Submission guidelines
                   </h4>
                   <ReadMore maxCharLength={75}>{rfp?.data?.content.submissionGuideline}</ReadMore>
@@ -205,7 +169,7 @@ const RfpDetail: BlitzPage = () => {
               {/* SUBMISSION REQUIREMENT */}
               {!!rfp?.data?.singleTokenGate && (
                 <div>
-                  <h4 className="text-xs font-bold text-concrete uppercase">
+                  <h4 className="text-xs font-bold text-concrete uppercase mb-1.5">
                     Submission requirement
                   </h4>
                   <div>
@@ -225,19 +189,19 @@ const RfpDetail: BlitzPage = () => {
               {/* NETWORK */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
-                <p className="mt-2">
+                <p className="mt-1.5">
                   {getNetworkName(getPaymentToken(rfp?.data.template)?.chainId)}
                 </p>
               </div>
               {/* PAYMENT TOKEN */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
-                <p className="mt-2">{getPaymentToken(rfp?.data.template)?.symbol}</p>
+                <p className="mt-1.5">{getPaymentToken(rfp?.data.template)?.symbol}</p>
               </div>
               {/* PAYMENT AMOUNT */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-                <p className="mt-2">{getPaymentAmount(rfp?.data.template)}</p>
+                <p className="mt-1.5">{getPaymentAmount(rfp?.data.template)}</p>
               </div>
             </div>
           </div>
