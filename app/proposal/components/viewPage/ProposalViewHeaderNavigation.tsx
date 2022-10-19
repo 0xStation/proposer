@@ -201,7 +201,7 @@ export const ProposalViewHeaderNavigation = () => {
           />
         </div>
         {/* BUTTONS */}
-        <div className="w-full mt-6 box-border">
+        <div className="w-full mt-6">
           {Boolean(rfp && rfp?.status === RfpStatus?.CLOSED) && (
             <div className="rounded bg-neon-carrot text-tunnel-black text-center p-2 mb-3 font-bold">
               <p className="inline">
@@ -212,46 +212,63 @@ export const ProposalViewHeaderNavigation = () => {
               </p>
             </div>
           )}
-          {/*
-          - if activeUser has a role on the proposal, check if they've signed already,
-          - if they haven't signed, show the sign button, if they have signed, show the "signed" button
-          - if they don't have a role, just show the copy icon
-          */}
-          {!loading &&
-            proposal &&
-            proposal.status === ProposalStatus.DRAFT &&
-            activeUser?.address === author.address && (
-              <Button
-                overrideWidthClassName="w-[300px] sm:w-[400px] md:w-[614px]"
-                className="mr-3"
-                onClick={() => toggleSendProposalModalOpen(true)}
-              >
-                Send proposal
-              </Button>
-            )}
-          {activeUserIsSigner && !loading ? (
-            activeUserHasRolesToSign && (
+          <div className="relative">
+            {loading ? (
+              <div className="flex flex-row">
+                <span className="h-[35px] w-[670px] bg-wet-concrete shadow border-solid motion-safe:animate-pulse rounded" />
+              </div>
+            ) : (
               <>
-                {proposal?.status !== ProposalStatus?.DRAFT && (
-                  <Button
-                    overrideWidthClassName="w-[300px] sm:w-[400px] md:w-[614px]"
-                    className="mr-3"
-                    onClick={() => toggleProposalApprovalModalOpen(true)}
-                    isDisabled={Boolean(rfp && rfp?.status === RfpStatus?.CLOSED)}
-                  >
-                    Approve
-                  </Button>
-                )}
+                {/*
+                  - if activeUser has a role on the proposal, check if they've signed already,
+                  - if they haven't signed, show the sign button, if they have signed, show the "signed" button
+                  - if they don't have a role, just show the copy icon
+                */}
+                {proposal &&
+                  proposal.status === ProposalStatus.DRAFT &&
+                  activeUser?.address === author?.address && (
+                    <div className="flex flex-row">
+                      <Button
+                        className="mr-3 w-full"
+                        onClick={() => toggleSendProposalModalOpen(true)}
+                      >
+                        Send proposal
+                      </Button>
+                      {proposal && <CopyBtn className="inline" textToWrite={currentPageUrl} />}
+                    </div>
+                  )}
+                {activeUserIsSigner
+                  ? activeUserHasRolesToSign && (
+                      <div className="flex flex-row">
+                        {proposal?.status !== ProposalStatus?.DRAFT && (
+                          <>
+                            <div className="relative group w-full mr-2">
+                              <Button
+                                overrideWidthClassName="inline w-full"
+                                className="mr-3"
+                                onClick={() => toggleProposalApprovalModalOpen(true)}
+                                isDisabled={Boolean(rfp && rfp?.status === RfpStatus?.CLOSED)}
+                              >
+                                Approve
+                              </Button>
+                              {rfp && rfp?.status === RfpStatus?.CLOSED && (
+                                <div className="absolute group-hover:block hidden left-32 text-xs text-marble-white bg-wet-concrete rounded p-3 mt-2 -mb-5">
+                                  This RFP needs to be open for submissions to approve this
+                                  proposal.
+                                </div>
+                              )}
+                            </div>
+                            {proposal && (
+                              <CopyBtn className="inline" textToWrite={currentPageUrl} />
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )
+                  : null}
               </>
-            )
-          ) : !proposal || loading ? (
-            // BUTTONS EMPTY STATE
-            // Note: empty state intentionally chosen over loading for less visual jar on load
-            <div className="flex flex-row justify-between">
-              <span className="h-[35px] w-[670px]" />
-            </div>
-          ) : null}
-          {proposal && !loading && <CopyBtn textToWrite={currentPageUrl} />}
+            )}
+          </div>
         </div>
         {/* TABS */}
         <div className="mt-12 self-end flex flex-row space-x-4 border-b border-concrete">
