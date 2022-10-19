@@ -11,11 +11,14 @@ export default async function getRfpById(params: z.infer<typeof GetRfpById>) {
     where: {
       id: params.id,
     },
+    include: {
+      account: true,
+    },
   })
 
   if (!rfp) {
     return null
   }
 
-  return rfp as unknown as Rfp
+  return rfp as Rfp
 }
