@@ -25,3 +25,12 @@ export const ZodPayment = z.object({
   milestoneIndex: z.number(),
   token: ZodToken,
 })
+
+export const ZodTemplate = z
+  .object({
+    key: z.string(),
+    mapsTo: z.string(),
+    value: z.any(),
+    fieldType: z.string(),
+  })
+  .array()
