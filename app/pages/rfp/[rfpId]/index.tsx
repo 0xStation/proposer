@@ -1,21 +1,10 @@
-import { useState, useMemo } from "react"
-import {
-  BlitzPage,
-  useParam,
-  useQuery,
-  Routes,
-  Link,
-  GetServerSideProps,
-  invoke,
-  useRouter,
-} from "blitz"
+import { useState } from "react"
+import { BlitzPage, useParam, useQuery, Routes, Link, GetServerSideProps, invoke } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import { formatDate } from "app/core/utils/formatDate"
 import Pagination from "app/core/components/Pagination"
-import { ProposalStatus, ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
-import useStore from "app/core/hooks/useStore"
+import { ProposalStatus, ProposalRoleApprovalStatus } from "@prisma/client"
 import ProposalStatusPill from "app/core/components/ProposalStatusPill"
-import { useAccount } from "wagmi"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import { ProposalRole } from "app/proposalRole/types"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
@@ -51,10 +40,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params = {} }) =>
 }
 
 const RfpDetail: BlitzPage = () => {
-  const accountData = useAccount()
   const [page, setPage] = useState<number>(0)
   const rfpId = useParam("rfpId", "string") as string
-  const router = useRouter()
 
   const [rfp] = useQuery(
     getRfpById,
