@@ -21,7 +21,6 @@ const ProposalTemplateForm: BlitzPage = () => {
       enabled: !!templateId,
       suspense: false,
       refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute in milliseconds
     }
   )
   const [rfp] = useQuery(
@@ -33,7 +32,6 @@ const ProposalTemplateForm: BlitzPage = () => {
       enabled: !!templateId,
       suspense: false,
       refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute in milliseconds
     }
   )
   const templateIdToForm = {

@@ -66,7 +66,6 @@ export const FoxesProposalForm = () => {
       enabled: !!templateId,
       suspense: false,
       refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute in milliseconds
     }
   )
 
@@ -85,7 +84,6 @@ export const FoxesProposalForm = () => {
       enabled: !!activeUser?.address && !!rfp?.data?.singleTokenGate,
       suspense: false,
       refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute
     }
   )
 

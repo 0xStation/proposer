@@ -21,7 +21,6 @@ const CreateFoxesProposal: BlitzPage = () => {
       enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute in milliseconds
     }
   )
 

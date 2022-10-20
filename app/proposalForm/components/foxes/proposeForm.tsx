@@ -23,7 +23,6 @@ export const FoxesProposeFirstStep = ({ minNumWords }) => {
       enabled: !!templateId,
       suspense: false,
       refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute in milliseconds
     }
   )
 

@@ -146,7 +146,6 @@ const WorkspaceHome: BlitzPage = () => {
       enabled: !!account && account.addressType === AddressType.SAFE,
       suspense: false,
       refetchOnWindowFocus: false,
-      cacheTime: 1000 * 60 * 5, // 5 minutes
     }
   )
 
