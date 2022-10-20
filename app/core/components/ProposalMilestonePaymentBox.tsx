@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useQuery } from "blitz"
 import { ArrowRightIcon, CheckCircleIcon } from "@heroicons/react/solid"
 import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
 import AttachTransactionModal from "app/proposal/components/AttachTransactionModal"
@@ -15,6 +16,7 @@ import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import QueueGnosisTransactionModal from "app/proposalPayment/components/QueueGnosisTransactionModal"
 import { getNetworkGnosisUrl } from "app/core/utils/networkInfo"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
+import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 
 const PaymentRow = ({
   payment,
@@ -173,6 +175,21 @@ export const ProposalMilestonePaymentBox = ({
   const [isAttachtxModalOpen, setIsAttachtxModalOpen] = useState<boolean>(false)
   const [queueGnosisTransactionModalOpen, setQueueGnosisTransactionModalOpen] =
     useState<boolean>(false)
+
+  const [txStatus] = useQuery(
+    getGnosisTxStatus,
+    {
+      chainId: 5,
+      transactionHash: "0x02663fcf782550159a2446d3fb37f043840dcc7ee51f53e59fbe833f1491e061",
+      proposalId: proposal.id,
+      milestoneId: milestone.id,
+    },
+    {
+      refetchInterval: 60 * 1000, // 1 minute
+    }
+  )
+
+  console.log("txStatus", txStatus)
 
   return (
     <>
