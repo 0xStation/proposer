@@ -1,4 +1,4 @@
-import Button from "app/core/components/sds/buttons/Button"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
 import { mustOmitLongWords } from "app/utils/validators"
 import { invalidateQuery, useMutation } from "blitz"
@@ -96,7 +96,12 @@ export const RfpDetailsForm = ({ rfp }) => {
                 </div>
               )}
             </Field>
-            <Button isSubmitType={true} isDisabled={formState.pristine} className="mt-7">
+            <Button
+              type={ButtonType.Secondary}
+              isSubmitType={true}
+              isDisabled={formState.pristine}
+              className="mt-7"
+            >
               Save
             </Button>
           </form>
