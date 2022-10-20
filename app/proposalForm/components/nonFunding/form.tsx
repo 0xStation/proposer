@@ -13,15 +13,11 @@ import createProposal from "app/proposal/mutations/createProposal"
 import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
 import { ConfirmForm } from "../ConfirmForm"
 import { ProposeFirstStep } from "./proposeForm"
-
-enum FundingProposalStep {
-  PROPOSE = "PROPOSE",
-  CONFIRM = "CONFIRM",
-}
+import { ProposalStep } from "app/core/utils/constants"
 
 const HeaderCopy = {
-  [FundingProposalStep.PROPOSE]: "Propose",
-  [FundingProposalStep.CONFIRM]: "Confirm",
+  [ProposalStep.PROPOSE]: "Propose",
+  [ProposalStep.CONFIRM]: "Confirm",
 }
 
 export const ProposalNonFundingForm = ({ prefillClients }: { prefillClients: string[] }) => {
@@ -29,7 +25,7 @@ export const ProposalNonFundingForm = ({ prefillClients }: { prefillClients: str
   const walletModalOpen = useStore((state) => state.walletModalOpen)
   const setToastState = useStore((state) => state.setToastState)
   const activeUser = useStore((state) => state.activeUser)
-  const [proposalStep, setProposalStep] = useState<FundingProposalStep>(FundingProposalStep.PROPOSE)
+  const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [proposalShouldSendLater, setProposalShouldSendLater] = useState<boolean>(false)
@@ -164,12 +160,12 @@ export const ProposalNonFundingForm = ({ prefillClients }: { prefillClients: str
                     <h2 className="text-marble-white text-xl font-bold">
                       {HeaderCopy[proposalStep]}
                     </h2>
-                    {proposalStep === FundingProposalStep.PROPOSE && <ProposeFirstStep />}
-                    {proposalStep === FundingProposalStep.CONFIRM && <ConfirmForm />}
+                    {proposalStep === ProposalStep.PROPOSE && <ProposeFirstStep />}
+                    {proposalStep === ProposalStep.CONFIRM && <ConfirmForm />}
                   </>
                 )}
               </div>
-              {proposalStep === FundingProposalStep.PROPOSE && (
+              {proposalStep === ProposalStep.PROPOSE && (
                 <Button
                   isDisabled={unFilledProposalFields}
                   className="my-6 float-right"
@@ -198,16 +194,16 @@ export const ProposalNonFundingForm = ({ prefillClients }: { prefillClients: str
                       })
                       return
                     }
-                    setProposalStep(FundingProposalStep.CONFIRM)
+                    setProposalStep(ProposalStep.CONFIRM)
                   }}
                 >
                   Next
                 </Button>
               )}
-              {proposalStep === FundingProposalStep.CONFIRM && (
+              {proposalStep === ProposalStep.CONFIRM && (
                 <div className="flex justify-between mt-6">
                   <span
-                    onClick={() => setProposalStep(FundingProposalStep.PROPOSE)}
+                    onClick={() => setProposalStep(ProposalStep.PROPOSE)}
                     className="cursor-pointer border rounded border-marble-white p-2 self-start"
                   >
                     <BackArrow className="fill-marble-white" />

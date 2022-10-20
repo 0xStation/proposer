@@ -19,13 +19,13 @@ import { PaymentTerm } from "app/proposalPayment/types"
 import createProposal from "app/proposal/mutations/createProposal"
 import { useResolveEnsAddress } from "app/proposalForm/hooks/useResolveEnsAddress"
 import { useConfirmAuthorship } from "app/proposalForm/hooks/useConfirmAuthorship"
-import { FundingProposalStep } from "app/core/utils/constants"
+import { ProposalStep } from "app/core/utils/constants"
 import { isValidAdvancedPaymentPercentage } from "app/utils/validators"
 
 const HeaderCopy = {
-  [FundingProposalStep.PROPOSE]: "Propose",
-  [FundingProposalStep.REWARDS]: "Define terms",
-  [FundingProposalStep.CONFIRM]: "Confirm",
+  [ProposalStep.PROPOSE]: "Propose",
+  [ProposalStep.REWARDS]: "Define terms",
+  [ProposalStep.CONFIRM]: "Confirm",
 }
 
 export const ProposalFundingForm = ({
@@ -39,7 +39,7 @@ export const ProposalFundingForm = ({
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const walletModalOpen = useStore((state) => state.walletModalOpen)
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [proposalStep, setProposalStep] = useState<FundingProposalStep>(FundingProposalStep.PROPOSE)
+  const [proposalStep, setProposalStep] = useState<ProposalStep>(ProposalStep.PROPOSE)
   const [proposingAs, setProposingAs] = useState<string>(
     // set default proposingAs to prefilled values, choosing contributor if both provided for product bias
     prefillClients.length > 0
@@ -350,10 +350,10 @@ export const ProposalFundingForm = ({
                     <h2 className="text-marble-white text-xl font-bold">
                       {HeaderCopy[proposalStep]}
                     </h2>
-                    {proposalStep === FundingProposalStep.PROPOSE && (
+                    {proposalStep === ProposalStep.PROPOSE && (
                       <ProposeForm proposingAs={proposingAs} setProposingAs={setProposingAs} />
                     )}
-                    {proposalStep === FundingProposalStep.REWARDS && (
+                    {proposalStep === ProposalStep.REWARDS && (
                       <RewardForm
                         chainId={(chain?.id as number) || 1}
                         tokenOptions={tokenOptions}
@@ -367,11 +367,11 @@ export const ProposalFundingForm = ({
                         setProposalStep={setProposalStep}
                       />
                     )}
-                    {proposalStep === FundingProposalStep.CONFIRM && <ConfirmForm />}
+                    {proposalStep === ProposalStep.CONFIRM && <ConfirmForm />}
                   </>
                 )}
               </div>
-              {proposalStep === FundingProposalStep.PROPOSE && (
+              {proposalStep === ProposalStep.PROPOSE && (
                 <Button
                   isDisabled={unFilledProposalFields}
                   className="my-6 float-right"
@@ -431,16 +431,16 @@ export const ProposalFundingForm = ({
                       })
                       return
                     }
-                    setProposalStep(FundingProposalStep.REWARDS)
+                    setProposalStep(ProposalStep.REWARDS)
                   }}
                 >
                   Next
                 </Button>
               )}
-              {proposalStep === FundingProposalStep.REWARDS && (
+              {proposalStep === ProposalStep.REWARDS && (
                 <div className="flex justify-between mt-6">
                   <span
-                    onClick={() => setProposalStep(FundingProposalStep.PROPOSE)}
+                    onClick={() => setProposalStep(ProposalStep.PROPOSE)}
                     className="cursor-pointer border rounded border-marble-white p-2 self-start"
                   >
                     <BackArrow className="fill-marble-white" />
@@ -461,17 +461,17 @@ export const ProposalFundingForm = ({
                     }
                     className="float-right"
                     onClick={() => {
-                      setProposalStep(FundingProposalStep.CONFIRM)
+                      setProposalStep(ProposalStep.CONFIRM)
                     }}
                   >
                     Next
                   </Button>
                 </div>
               )}
-              {proposalStep === FundingProposalStep.CONFIRM && (
+              {proposalStep === ProposalStep.CONFIRM && (
                 <div className="flex justify-between mt-6">
                   <span
-                    onClick={() => setProposalStep(FundingProposalStep.REWARDS)}
+                    onClick={() => setProposalStep(ProposalStep.REWARDS)}
                     className="cursor-pointer border rounded border-marble-white p-2 self-start"
                   >
                     <BackArrow className="fill-marble-white" />

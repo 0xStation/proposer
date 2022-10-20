@@ -26,11 +26,56 @@ export const gradientMap = {
   5: Gradient5,
 }
 
-export enum FundingProposalStep {
+export enum ProposalStep {
   PROPOSE = "PROPOSE",
   REWARDS = "REWARDS",
   CONFIRM = "CONFIRM",
 }
+
+export const ProposalFormHeaderCopy = {
+  [ProposalStep.PROPOSE]: "Propose",
+  [ProposalStep.REWARDS]: "Define terms",
+  [ProposalStep.CONFIRM]: "Confirm",
+}
+
+export const FORM_PAGE = {
+  [ProposalStep.PROPOSE]: [
+    RESERVED_KEYS.ROLES,
+    RESERVED_KEYS.CLIENTS,
+    RESERVED_KEYS.CONTRIBUTORS,
+    RESERVED_KEYS.AUTHORS,
+    RESERVED_KEYS.TITLE,
+    RESERVED_KEYS.ONE_LINER,
+    RESERVED_KEYS.BODY,
+  ],
+  [ProposalStep.REWARDS]: [
+    RESERVED_KEYS.MILESTONES,
+    RESERVED_KEYS.PAYMENTS,
+    RESERVED_KEYS.PAYMENT_TERMS,
+  ],
+}
+
+export const FUNDING_PROPOSAL = [
+  RESERVED_KEYS.ROLES,
+  RESERVED_KEYS.CLIENTS,
+  RESERVED_KEYS.CONTRIBUTORS,
+  RESERVED_KEYS.AUTHORS,
+  RESERVED_KEYS.TITLE,
+  RESERVED_KEYS.ONE_LINER,
+  RESERVED_KEYS.BODY,
+  RESERVED_KEYS.MILESTONES,
+  RESERVED_KEYS.PAYMENTS,
+  RESERVED_KEYS.PAYMENT_TERMS,
+]
+
+export const NON_FUNDING_PROPOSAL = [
+  RESERVED_KEYS.ROLES,
+  RESERVED_KEYS.AUTHORS,
+  RESERVED_KEYS.CLIENTS, // co-signer?
+  RESERVED_KEYS.TITLE,
+  RESERVED_KEYS.BODY,
+  RESERVED_KEYS.ONE_LINER,
+]
 
 export const CONTRACTS = {
   // Localhost, change to whatever the forge script outputs when running local anvil
@@ -395,20 +440,35 @@ export const TEMPLATES = {
       {
         key: RESERVED_KEYS.CONTRIBUTORS,
         mapsTo: RESERVED_KEYS.ROLES,
-        value: [],
-        fieldType: TemplateFieldType.OPEN,
+        // undefined to indicate this is filled with proposer's address
+        value: [{ address: undefined, type: ProposalRoleType.CONTRIBUTOR }],
+        fieldType: TemplateFieldType.PRESELECT,
+        label: "",
+        description: "",
       },
       {
         key: RESERVED_KEYS.AUTHORS,
         mapsTo: RESERVED_KEYS.ROLES,
         value: [],
         fieldType: TemplateFieldType.OPEN,
+        label: "",
+        description: "",
       },
       {
         key: RESERVED_KEYS.CLIENTS,
         mapsTo: RESERVED_KEYS.ROLES,
         value: [{ address: PARTNERS.STATION.ADDRESS, type: ProposalRoleType.CLIENT }],
         fieldType: TemplateFieldType.PRESELECT,
+        label: "To",
+        description: "",
+      },
+      {
+        key: RESERVED_KEYS.TITLE,
+        mapsTo: RESERVED_KEYS.TITLE,
+        value: [],
+        fieldType: TemplateFieldType.OPEN,
+        label: "T",
+        description: "",
       },
       {
         key: RESERVED_KEYS.MILESTONES,
@@ -501,6 +561,186 @@ export const TEMPLATES = {
         fieldType: TemplateFieldType.PRESELECT,
       },
     ],
+  },
+}
+
+const FOXES_TEMPLATE_EXAMPLE = {
+  title: "foxes example",
+  pages: [ProposalStep.PROPOSE, ProposalStep.CONFIRM],
+  fields: {
+    [ProposalStep.PROPOSE]: [
+      {
+        element: "address",
+        name: "author",
+        label: "Author",
+        description: "",
+        value: null, // if address field is null and prefill is true, default to siwe address
+        isRequired: true,
+        prefill: true,
+        readOnly: true,
+        validators: [], // isEnsOrAddress validation comes with address element type
+        hide: true,
+      },
+      {
+        element: "address",
+        name: "contributor",
+        label: "Contributor",
+        description: "",
+        value: null, // if address field is null and prefill is true, default to siwe address
+        isRequired: true,
+        prefill: true,
+        readOnly: true,
+        validators: [], // isEnsOrAddress validation comes with address element type
+        hide: true,
+      },
+      {
+        element: "address",
+        name: "client",
+        label: "Client",
+        description: "",
+        value: "0xC3c74B36A7F7c3395c6D59086F5a49540ed180ED",
+        isRequired: true,
+        prefill: true,
+        readOnly: true,
+        validators: [], // isEnsOrAddress validation comes with address element type
+        hide: false,
+      },
+      {
+        element: "text",
+        name: "title",
+        label: "Title",
+        description: "",
+        value: "",
+        isRequired: true,
+        prefill: false,
+        readOnly: false,
+        validators: [{ name: "mustBeAboveNumWords", args: [50] }],
+        hide: false,
+      },
+      {
+        element: "textarea",
+        name: "body",
+        label: "Details",
+        description: "how do we add links in here?",
+        value: "",
+        isRequired: true,
+        readOnly: false,
+        validators: [{ name: "mustBeAboveNumWords", args: [50] }],
+        hide: false,
+      },
+    ],
+    [ProposalStep.CONFIRM]: [], // Confirm page is usually a summary of the field values
+  },
+}
+
+const FUNDING_TEMPLATE_EXAMPLE = {
+  title: "funding example",
+  pages: [ProposalStep.PROPOSE, ProposalStep.REWARDS, ProposalStep.CONFIRM],
+  fields: {
+    [ProposalStep.PROPOSE]: [
+      {
+        element: "address",
+        name: "author",
+        label: "Author",
+        description: "",
+        value: null, // if address field is null and prefill is true, default to siwe address
+        isRequired: true,
+        prefill: true,
+        readOnly: true,
+        validators: [], // isEnsOrAddress validation comes with address element type
+        hide: true,
+      },
+      {
+        element: "address",
+        name: "client",
+        label: "Client",
+        description: "",
+        value: "",
+        isRequired: true,
+        prefill: false,
+        readOnly: false,
+        validators: [], // isEnsOrAddress comes with address element type
+      },
+      {
+        element: "address",
+        name: "contributor",
+        label: "Contributor",
+        description: "",
+        value: "",
+        isRequired: true,
+        prefill: false,
+        readOnly: false,
+        validators: [], // isEnsOrAddress comes with address element type
+      },
+      {
+        element: "text",
+        name: "title",
+        label: "Title",
+        description: "",
+        value: "",
+        isRequired: true,
+        prefill: false,
+        readOnly: false,
+        validators: [],
+      },
+      {
+        element: "textarea",
+        name: "body",
+        label: "Details",
+        description: "how do we add links in here?",
+        value: "",
+        isRequired: true,
+        readOnly: false,
+        validators: [{ name: "mustBeAboveNumWords", args: [50] }],
+      },
+    ],
+    [ProposalStep.REWARDS]: [
+      {
+        element: "tokenAddress",
+        name: "tokenAddress",
+        label: "Reward token",
+        description: "Please select a network before you select a token.",
+        value: "",
+        isRequired: true,
+        prefill: false,
+        readOnly: false,
+        validators: [], // isEnsOrAddress comes with address element type
+      },
+      {
+        element: "paymentAmount", // custom input since it's dealing with state
+        name: "paymentAmount",
+        label: "Payment",
+        description: "The funds will be deployed to contributors.",
+        value: "",
+        isRequired: true,
+        prefill: false,
+        readOnly: false,
+        validators: [],
+      },
+      {
+        element: "paymentTerms",
+        name: "paymentTerms",
+        label: "Payment terms",
+        description: "When is the payment expected to be sent to contributors?",
+        value: "",
+        isRequired: true,
+        readOnly: false,
+        validators: [],
+      },
+      {
+        prerequisiteFields: ["paymentTerms"],
+        element: "advancedPaymentPercentage",
+        name: "advancedPaymentPercentage",
+        label: "Payment terms",
+        description:
+          "How much of the payment amount should the contributors expect to receive at proposal approval to kickstart their project?",
+        value: "",
+        isRequired: true,
+        readOnly: false,
+        validators: [],
+      },
+    ],
+    [ProposalStep.CONFIRM]: [],
   },
 }
 

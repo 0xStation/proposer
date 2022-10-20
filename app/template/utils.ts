@@ -1,5 +1,4 @@
 import { Token } from "app/token/types"
-import { getFieldDef } from "graphql/execution/execute"
 import { RESERVED_KEYS, Template } from "./types"
 
 export const getFieldValue = (template: Template | undefined, key: RESERVED_KEYS) => {
@@ -7,7 +6,6 @@ export const getFieldValue = (template: Template | undefined, key: RESERVED_KEYS
 }
 
 export const getClientAddress = (template: Template | undefined): string => {
-  const fieldVal = getFieldValue(template, RESERVED_KEYS.CLIENTS)
   return getFieldValue(template, RESERVED_KEYS.CLIENTS)?.[0]?.address
 }
 

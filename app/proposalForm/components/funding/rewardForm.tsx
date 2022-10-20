@@ -2,7 +2,7 @@ import { useSession } from "blitz"
 import { useEffect, useState } from "react"
 import ImportTokenModal from "app/core/components/ImportTokenModal"
 import useStore from "app/core/hooks/useStore"
-import { FundingProposalStep, PAYMENT_TERM_MAP } from "app/core/utils/constants"
+import { ProposalStep, PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import { Field } from "react-final-form"
 import {
   composeValidators,
@@ -41,7 +41,7 @@ export const RewardForm = ({
     // the reward form relies on the active chain to determine which tokens
     // to pull from
     if (!activeUser?.address) {
-      setProposalStep(FundingProposalStep.PROPOSE)
+      setProposalStep(ProposalStep.PROPOSE)
     }
   }, [activeUser?.address])
 

@@ -12,6 +12,9 @@ export enum TemplateFieldType {
 }
 
 export enum RESERVED_KEYS {
+  TITLE = "title",
+  BODY = "body",
+  ONE_LINER = "oneLiner",
   ROLES = "roles",
   CLIENTS = "clients",
   CONTRIBUTORS = "contributors",
