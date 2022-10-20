@@ -12,6 +12,12 @@ const GetGnosisTxStatus = z.object({
 export default async function getGnosisTxStatus(params: z.infer<typeof GetGnosisTxStatus>) {
   const input = GetGnosisTxStatus.parse(params)
 
+  // thinking we could first check if the proposalCurrentMilestone is on the milestone that is being passed in
+  // to see if we should even be checking the gnosis tx status is processed or not.
+  // but then we are running extra db calls for nothing.
+  // so right now we are calling the gnosis API needlessly if the tx is already processed, which is bad too.
+  // really it would be great if we had a background queue so we could only call the gnosis API when we need to.
+
   const apiHost = networks[input.chainId]?.gnosisApi
   if (!apiHost) {
     throw Error("chainId not available on Gnosis")
@@ -46,6 +52,8 @@ export default async function getGnosisTxStatus(params: z.infer<typeof GetGnosis
       })
     } catch (e) {
       // if we are catching because we have already processed this milestone -- return true
+      // we probably don't need this entire chain of trues and falses though
+      // we are not even consuming the response from this function right now
       if (e.message.includes("proposal is not on milestone:")) {
         return true
       }
