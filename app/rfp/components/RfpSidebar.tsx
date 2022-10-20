@@ -8,8 +8,19 @@ import { getPaymentToken, getPaymentAmount } from "app/template/utils"
 import RfpStatusPill from "./RfpStatusPill"
 import Button from "app/core/components/sds/buttons/Button"
 import ReadMore from "app/core/components/ReadMore"
+import getTemplateByRfpId from "app/template/queries/getTemplateByRfpId"
 
 export const RfpSidebar = ({ rfp }) => {
+  const [template] = useQuery(
+    getTemplateByRfpId,
+    { rfpId: rfp?.id as string },
+    {
+      suspense: false,
+      enabled: Boolean(rfp?.id),
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }
+  )
   return (
     <div className="h-full w-[288px] overflow-y-scroll p-6 border-r border-concrete">
       <div className="flex flex-col pb-6 space-y-6">
@@ -48,7 +59,12 @@ export const RfpSidebar = ({ rfp }) => {
         )}
         {/* CTA */}
         <div className="mb-10 relative group">
-          <Link href={Routes.CreateFoxesProposal({ rfpId: rfp?.id as string })}>
+          <Link
+            href={Routes.ProposalTemplateForm({
+              templateId: template?.id as string,
+              rfpId: rfp?.id as string,
+            })}
+          >
             <Button className="w-full" isDisabled={rfp?.status === RfpStatus.CLOSED}>
               Propose
             </Button>
@@ -89,17 +105,19 @@ export const RfpSidebar = ({ rfp }) => {
           {/* NETWORK */}
           <div>
             <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
-            <p className="mt-2">{getNetworkName(getPaymentToken(rfp?.data.template)?.chainId)}</p>
+            <p className="mt-2">
+              {getNetworkName(getPaymentToken(template?.data?.fields)?.chainId)}
+            </p>
           </div>
           {/* PAYMENT TOKEN */}
           <div>
             <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
-            <p className="mt-2">{getPaymentToken(rfp?.data.template)?.symbol}</p>
+            <p className="mt-2">{getPaymentToken(template?.data?.fields)?.symbol}</p>
           </div>
           {/* PAYMENT AMOUNT */}
           <div>
             <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-            <p className="mt-2">{getPaymentAmount(rfp?.data.template)}</p>
+            <p className="mt-2">{getPaymentAmount(template?.data?.fields)}</p>
           </div>
         </div>
       </div>

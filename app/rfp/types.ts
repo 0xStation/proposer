@@ -1,16 +1,11 @@
-import { Rfp as PrismaRfp, RfpStatus } from "@prisma/client"
+import { Rfp as PrismaRfp, ProposalTemplate as PrismaProposalTemplate } from "@prisma/client"
 import { Account } from "app/account/types"
-import { Template } from "app/template/types"
 import { Token } from "app/token/types"
 
-export type Rfp = {
-  id: string
-  accountAddress: string
-  createdAt: Date
-  updatedAt: Date
-  status: RfpStatus
+export type Rfp = PrismaRfp & {
   data: RfpMetadata
-  account: Account
+  account?: Account
+  template?: PrismaProposalTemplate
 }
 
 export type RfpMetadata = {
@@ -20,7 +15,6 @@ export type RfpMetadata = {
     oneLiner: string
     submissionGuideline?: string
   }
-  template: Template
   singleTokenGate: {
     token: Token
     minBalance?: string // string to pass directly into BigNumber.from in logic check

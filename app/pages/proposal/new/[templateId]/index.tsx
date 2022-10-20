@@ -1,29 +1,65 @@
-import { BlitzPage, Image, Link, Routes, useQuery, useRouterQuery } from "blitz"
+import {
+  BlitzPage,
+  Image,
+  Link,
+  Routes,
+  useQuery,
+  useParam,
+  useRouterQuery,
+  useRouter,
+} from "blitz"
 import Layout from "app/core/layouts/Layout"
 import FoxesProposalForm from "app/proposalForm/components/foxes/form"
-import getRfpById from "app/rfp/queries/getRfpById"
 import BackIcon from "/public/back-icon.svg"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
 import { getPaymentAmount, getPaymentToken } from "app/template/utils"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
 import ReadMore from "app/core/components/ReadMore"
 import TextLink from "app/core/components/TextLink"
+import getTemplateById from "app/template/queries/getTemplateById"
+import getRfpById from "app/rfp/queries/getRfpById"
 
-const CreateFoxesProposal: BlitzPage = () => {
-  const queryParams = useRouterQuery()
-  const rfpId = queryParams?.rfpId as string
+const ProposalTemplateForm: BlitzPage = () => {
+  const templateId = useParam("templateId") as string
+  const { rfpId } = useRouterQuery()
+  const router = useRouter()
+  const [template] = useQuery(
+    getTemplateById,
+    {
+      id: templateId,
+    },
+    {
+      enabled: !!templateId,
+      suspense: false,
+      refetchOnWindowFocus: false,
+    }
+  )
   const [rfp] = useQuery(
     getRfpById,
     {
-      id: rfpId,
+      id: rfpId as string,
     },
     {
       enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute in milliseconds
+      onSuccess: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
+      onError: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
     }
   )
+  const templateIdToForm = {
+    ["835ef848-91c1-46da-bdf9-4b0a277fe808"]: <FoxesProposalForm />, // foxes template id
+    ["cd28828c-e51a-4796-80f5-e39d4cc43fab"]: <FoxesProposalForm />, // station template id
+    ["96058a8b-b1f5-4ba5-811d-e3415eccb3ce"]: <FoxesProposalForm />, // uniswap template id
+  }
 
   return (
     <Layout title="New Proposal">
@@ -33,7 +69,7 @@ const CreateFoxesProposal: BlitzPage = () => {
         <div className="h-full w-[288px] overflow-y-scroll border-r border-concrete p-6">
           <div className="flex flex-col pb-6 space-y-6">
             {/* BACK */}
-            <Link href={Routes.RfpDetail({ rfpId })}>
+            <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>
               <div className="h-[16px] w-[16px]">
                 <Image src={BackIcon} alt="Back icon" />
               </div>
@@ -95,28 +131,28 @@ const CreateFoxesProposal: BlitzPage = () => {
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
                 <p className="mt-2">
-                  {getNetworkName(getPaymentToken(rfp?.data.template)?.chainId)}
+                  {getNetworkName(getPaymentToken(template?.data?.fields)?.chainId)}
                 </p>
               </div>
               {/* PAYMENT TOKEN */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
-                <p className="mt-2">{getPaymentToken(rfp?.data.template)?.symbol}</p>
+                <p className="mt-2">{getPaymentToken(template?.data?.fields)?.symbol}</p>
               </div>
               {/* PAYMENT AMOUNT */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-                <p className="mt-2">{getPaymentAmount(rfp?.data.template)}</p>
+                <p className="mt-2">{getPaymentAmount(template?.data?.fields)}</p>
               </div>
             </div>
           </div>
         </div>
-        <FoxesProposalForm />
+        {templateIdToForm[templateId as string] || <FoxesProposalForm />}
       </div>
     </Layout>
   )
 }
 
-CreateFoxesProposal.suppressFirstRenderFlicker = true
+ProposalTemplateForm.suppressFirstRenderFlicker = true
 
-export default CreateFoxesProposal
+export default ProposalTemplateForm

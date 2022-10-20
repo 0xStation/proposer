@@ -1,29 +1,49 @@
-import { useQuery, useRouterQuery } from "blitz"
-import getRfpById from "app/rfp/queries/getRfpById"
-import ReadMore from "app/core/components/ReadMore"
+import { useQuery, useParam, useRouterQuery, useRouter, Routes } from "blitz"
 import Preview from "app/core/components/MarkdownPreview"
 import { getClientAddress, getPaymentAmount, getPaymentToken } from "app/template/utils"
 import { getNetworkName } from "app/core/utils/networkInfo"
-import { useEnsName } from "wagmi"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
+import getTemplateById from "app/template/queries/getTemplateById"
+import getRfpById from "app/rfp/queries/getRfpById"
 
 export const FoxesConfirmForm = ({ body }) => {
-  const queryParams = useRouterQuery()
-  const rfpId = queryParams?.rfpId as string
+  const templateId = useParam("templateId") as string
+  const { rfpId } = useRouterQuery()
+  const router = useRouter()
+  const [template] = useQuery(
+    getTemplateById,
+    {
+      id: templateId as string,
+    },
+    {
+      enabled: !!templateId,
+      suspense: false,
+      refetchOnWindowFocus: false,
+    }
+  )
   const [rfp] = useQuery(
     getRfpById,
     {
-      id: rfpId,
+      id: rfpId as string,
     },
     {
       enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute in milliseconds
+      onSuccess: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
+      onError: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
     }
   )
 
-  const { text: displayAddress } = useDisplayAddress(getClientAddress(rfp?.data.template))
+  const { text: displayAddress } = useDisplayAddress(getClientAddress(template?.data?.fields))
 
   return (
     <>
@@ -49,18 +69,18 @@ export const FoxesConfirmForm = ({ body }) => {
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Network</span>
         <span className="items-end">
-          {getNetworkName(getPaymentToken(rfp?.data.template)?.chainId)}
+          {getNetworkName(getPaymentToken(template?.data?.fields)?.chainId)}
         </span>
       </div>
       {/* PAYMENT TOKEN */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Payment token</span>
-        <span className="items-end">{getPaymentToken(rfp?.data.template)?.symbol}</span>
+        <span className="items-end">{getPaymentToken(template?.data?.fields)?.symbol}</span>
       </div>
       {/* PAYMENT AMOUNT */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Payment amount</span>
-        <span className="items-end">{getPaymentAmount(rfp?.data.template)}</span>
+        <span className="items-end">{getPaymentAmount(template?.data?.fields)}</span>
       </div>
       {/* DETAILS */}
       <div className="mt-4 flex flex-col w-full">

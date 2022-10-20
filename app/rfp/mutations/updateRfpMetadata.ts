@@ -1,7 +1,7 @@
 import * as z from "zod"
 import db from "db"
 import { Rfp } from "../types"
-import { ZodToken, ZodTemplate } from "../../types/zod"
+import { ZodToken } from "../../types/zod"
 
 const UpdateRfpMetadata = z.object({
   rfpId: z.string(),
@@ -10,7 +10,6 @@ const UpdateRfpMetadata = z.object({
   body: z.string(),
   oneLiner: z.string(),
   submissionGuideline: z.string().optional(),
-  template: ZodTemplate,
   token: ZodToken,
   minBalance: z.string().optional(), // string to pass directly into BigNumber.from in logic check
 })
@@ -28,7 +27,6 @@ export default async function updateRfpMetadata(input: z.infer<typeof UpdateRfpM
             oneLiner: params.oneLiner,
             submissionGuideline: params.submissionGuideline,
           },
-          template: JSON.parse(JSON.stringify(params.template)),
           singleTokenGate: {
             token: params.token,
             minBalance: params.minBalance, // string to pass directly into BigNumber.from in logic check

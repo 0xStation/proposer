@@ -9,7 +9,7 @@ import {
 import { PaymentTerm } from "app/proposalPayment/types"
 import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
 import { getNetworkCoin } from "./networkInfo"
-import { RESERVED_KEYS, TemplateFieldType } from "app/template/types"
+import { RESERVED_KEYS, ProposalTemplateFieldType } from "app/template/types"
 import Gradient0 from "/public/gradients/0.png"
 import Gradient1 from "/public/gradients/1.png"
 import Gradient2 from "/public/gradients/2.png"
@@ -343,19 +343,19 @@ export const TEMPLATES = {
         key: RESERVED_KEYS.CONTRIBUTORS,
         mapsTo: RESERVED_KEYS.ROLES,
         value: [],
-        fieldType: TemplateFieldType.OPEN,
+        fieldType: ProposalTemplateFieldType.OPEN,
       },
       {
         key: RESERVED_KEYS.AUTHORS,
         mapsTo: RESERVED_KEYS.ROLES,
         value: [],
-        fieldType: TemplateFieldType.OPEN,
+        fieldType: ProposalTemplateFieldType.OPEN,
       },
       {
         key: RESERVED_KEYS.CLIENTS,
         mapsTo: RESERVED_KEYS.ROLES,
         value: [{ address: PARTNERS.FOXES.ADDRESS, type: ProposalRoleType.CLIENT }],
-        fieldType: TemplateFieldType.PRESELECT,
+        fieldType: ProposalTemplateFieldType.PRESELECT,
       },
       {
         key: RESERVED_KEYS.MILESTONES,
@@ -366,7 +366,7 @@ export const TEMPLATES = {
             index: 0,
           },
         ],
-        fieldType: TemplateFieldType.PRESELECT,
+        fieldType: ProposalTemplateFieldType.PRESELECT,
       },
       {
         key: RESERVED_KEYS.PAYMENTS,
@@ -380,13 +380,13 @@ export const TEMPLATES = {
             amount: 0.01,
           },
         ],
-        fieldType: TemplateFieldType.PREFILL,
+        fieldType: ProposalTemplateFieldType.PREFILL,
       },
       {
         key: RESERVED_KEYS.PAYMENT_TERMS,
         mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
         value: PaymentTerm.ON_AGREEMENT,
-        fieldType: TemplateFieldType.PRESELECT,
+        fieldType: ProposalTemplateFieldType.PRESELECT,
       },
     ],
   },
@@ -396,19 +396,19 @@ export const TEMPLATES = {
         key: RESERVED_KEYS.CONTRIBUTORS,
         mapsTo: RESERVED_KEYS.ROLES,
         value: [],
-        fieldType: TemplateFieldType.OPEN,
+        fieldType: ProposalTemplateFieldType.OPEN,
       },
       {
         key: RESERVED_KEYS.AUTHORS,
         mapsTo: RESERVED_KEYS.ROLES,
         value: [],
-        fieldType: TemplateFieldType.OPEN,
+        fieldType: ProposalTemplateFieldType.OPEN,
       },
       {
         key: RESERVED_KEYS.CLIENTS,
         mapsTo: RESERVED_KEYS.ROLES,
         value: [{ address: PARTNERS.STATION.ADDRESS, type: ProposalRoleType.CLIENT }],
-        fieldType: TemplateFieldType.PRESELECT,
+        fieldType: ProposalTemplateFieldType.PRESELECT,
       },
       {
         key: RESERVED_KEYS.MILESTONES,
@@ -419,7 +419,7 @@ export const TEMPLATES = {
             index: 0,
           },
         ],
-        fieldType: TemplateFieldType.PRESELECT,
+        fieldType: ProposalTemplateFieldType.PRESELECT,
       },
       {
         key: RESERVED_KEYS.PAYMENTS,
@@ -436,13 +436,13 @@ export const TEMPLATES = {
             amount: 0.01,
           },
         ],
-        fieldType: TemplateFieldType.PREFILL,
+        fieldType: ProposalTemplateFieldType.PREFILL,
       },
       {
         key: RESERVED_KEYS.PAYMENT_TERMS,
         mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
         value: PaymentTerm.ON_AGREEMENT,
-        fieldType: TemplateFieldType.PRESELECT,
+        fieldType: ProposalTemplateFieldType.PRESELECT,
       },
     ],
   },
@@ -452,19 +452,19 @@ export const TEMPLATES = {
         key: RESERVED_KEYS.CONTRIBUTORS,
         mapsTo: RESERVED_KEYS.ROLES,
         value: [],
-        fieldType: TemplateFieldType.OPEN,
+        fieldType: ProposalTemplateFieldType.OPEN,
       },
       {
         key: RESERVED_KEYS.AUTHORS,
         mapsTo: RESERVED_KEYS.ROLES,
         value: [],
-        fieldType: TemplateFieldType.OPEN,
+        fieldType: ProposalTemplateFieldType.OPEN,
       },
       {
         key: RESERVED_KEYS.CLIENTS,
         mapsTo: RESERVED_KEYS.ROLES,
         value: [{ address: PARTNERS.UNISWAP.ADDRESS, type: ProposalRoleType.CLIENT }],
-        fieldType: TemplateFieldType.PRESELECT,
+        fieldType: ProposalTemplateFieldType.PRESELECT,
       },
       {
         key: RESERVED_KEYS.MILESTONES,
@@ -475,7 +475,7 @@ export const TEMPLATES = {
             index: 0,
           },
         ],
-        fieldType: TemplateFieldType.PRESELECT,
+        fieldType: ProposalTemplateFieldType.PRESELECT,
       },
       {
         key: RESERVED_KEYS.PAYMENTS,
@@ -492,13 +492,13 @@ export const TEMPLATES = {
             amount: 0.01,
           },
         ],
-        fieldType: TemplateFieldType.PREFILL,
+        fieldType: ProposalTemplateFieldType.PREFILL,
       },
       {
         key: RESERVED_KEYS.PAYMENT_TERMS,
         mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
         value: PaymentTerm.ON_AGREEMENT,
-        fieldType: TemplateFieldType.PRESELECT,
+        fieldType: ProposalTemplateFieldType.PRESELECT,
       },
     ],
   },

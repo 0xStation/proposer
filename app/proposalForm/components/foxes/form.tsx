@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react"
 import { Form, FormSpy } from "react-final-form"
-import { useRouter, useSession, Routes, useMutation, useQuery, useRouterQuery } from "blitz"
+import {
+  useRouter,
+  useSession,
+  Routes,
+  useMutation,
+  useQuery,
+  useParam,
+  useRouterQuery,
+} from "blitz"
 import Button from "app/core/components/sds/buttons/Button"
 import Stepper from "../Stepper"
 import BackArrow from "app/core/icons/BackArrow"
@@ -12,7 +20,6 @@ import createProposal from "app/proposal/mutations/createProposal"
 import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
 import { FoxesProposeFirstStep } from "./proposeForm"
 import deleteProposalById from "app/proposal/mutations/deleteProposalById"
-import getRfpById from "app/rfp/queries/getRfpById"
 import { FoxesConfirmForm } from "./confirmForm"
 import { AddressType, ProposalRoleType } from "@prisma/client"
 import { mustBeAboveNumWords } from "app/utils/validators"
@@ -21,9 +28,11 @@ import {
   getClientAddress,
   getFieldValue,
 } from "app/template/utils"
-import { RESERVED_KEYS } from "app/template/types"
+import { RESERVED_KEYS, ProposalTemplateField } from "app/template/types"
 import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
 import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinTokenBalance"
+import getTemplateById from "app/template/queries/getTemplateById"
+import getRfpById from "app/rfp/queries/getRfpById"
 
 enum FundingProposalStep {
   PROPOSE = "PROPOSE",
@@ -56,18 +65,38 @@ export const FoxesProposalForm = () => {
     return confirm("Warning! You have unsaved changes.")
   })
 
-  const queryParams = useRouterQuery()
-  const rfpId = queryParams?.rfpId as string
+  const templateId = useParam("templateId") as string
+  const { rfpId } = useRouterQuery()
+  const [template] = useQuery(
+    getTemplateById,
+    {
+      id: templateId as string,
+    },
+    {
+      enabled: !!templateId,
+      suspense: false,
+      refetchOnWindowFocus: false,
+    }
+  )
   const [rfp] = useQuery(
     getRfpById,
     {
-      id: rfpId,
+      id: rfpId as string,
     },
     {
       enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute in milliseconds
+      onSuccess: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
+      onError: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
     }
   )
 
@@ -86,7 +115,6 @@ export const FoxesProposalForm = () => {
       enabled: !!activeUser?.address && !!rfp?.data?.singleTokenGate,
       suspense: false,
       refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute
     }
   )
 
@@ -230,17 +258,19 @@ export const FoxesProposalForm = () => {
               const contributorAddress = session?.siwe?.address as string
 
               await createProposalMutation({
-                rfpId,
+                rfpId: rfp?.id,
                 contentTitle: `${rfp?.data.content.title} submission`,
                 contentBody: values.body,
                 authorAddresses: [contributorAddress],
                 contributorAddresses: [contributorAddress],
-                clientAddresses: [getClientAddress(rfp?.data.template)],
-                milestones: getFieldValue(rfp?.data.template, RESERVED_KEYS.MILESTONES),
-                payments: addAddressAsRecipientToPayments(rfp?.data.template, contributorAddress),
-                paymentTerms: getFieldValue(rfp?.data.template, RESERVED_KEYS.PAYMENT_TERMS),
+                clientAddresses: [getClientAddress(template?.data?.fields)],
+                milestones: getFieldValue(template?.data?.fields, RESERVED_KEYS.MILESTONES),
+                payments: addAddressAsRecipientToPayments(
+                  template?.data?.fields as ProposalTemplateField[],
+                  contributorAddress
+                ),
+                paymentTerms: getFieldValue(template?.data?.fields, RESERVED_KEYS.PAYMENT_TERMS),
               })
-              // {rfp?.data.template.find((field) => field.key === "clients")?.value?.[0]?.address}
             } catch (err) {
               setIsLoading(false)
               setToastState({

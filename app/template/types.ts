@@ -1,11 +1,23 @@
-export type Template = {
+import { Account } from "app/account/types"
+import { ProposalTemplate as PrismaProposalTemplate } from "@prisma/client"
+
+export type ProposalTemplate = PrismaProposalTemplate & {
+  account?: Account
+  data: ProposalTemplateMetadata
+}
+
+export type ProposalTemplateMetadata = {
+  title: string
+  fields: ProposalTemplateField[]
+}
+export type ProposalTemplateField = {
   key: string
   mapsTo: string
   value: any
-  fieldType: TemplateFieldType
-}[]
+  fieldType: ProposalTemplateFieldType
+}
 
-export enum TemplateFieldType {
+export enum ProposalTemplateFieldType {
   PRESELECT = "PRESELECT",
   PREFILL = "PREFILL",
   OPEN = "OPEN",

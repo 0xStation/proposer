@@ -1,4 +1,5 @@
 import { Field } from "react-final-form"
+import { useQuery, useParam, useRouterQuery, useRouter, Routes } from "blitz"
 import {
   composeValidators,
   mustBeAboveNumWords,
@@ -7,28 +8,49 @@ import {
 } from "app/utils/validators"
 import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
-import { useQuery, useRouterQuery } from "blitz"
-import getRfpById from "app/rfp/queries/getRfpById"
 import { getClientAddress } from "app/template/utils"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
+import getTemplateById from "app/template/queries/getTemplateById"
+import getRfpById from "app/rfp/queries/getRfpById"
 
 export const FoxesProposeFirstStep = ({ minNumWords }) => {
-  const queryParams = useRouterQuery()
-  const rfpId = queryParams?.rfpId as string
+  const templateId = useParam("templateId") as string
+  const { rfpId } = useRouterQuery()
+  const router = useRouter()
   const [rfp] = useQuery(
     getRfpById,
     {
-      id: rfpId,
+      id: rfpId as string,
     },
     {
       enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute in milliseconds
+      onSuccess: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
+      onError: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
+    }
+  )
+  const [template] = useQuery(
+    getTemplateById,
+    {
+      id: templateId as string,
+    },
+    {
+      enabled: !!templateId,
+      suspense: false,
+      refetchOnWindowFocus: false,
     }
   )
 
-  const { text: displayAddress } = useDisplayAddress(getClientAddress(rfp?.data.template))
+  const { text: displayAddress } = useDisplayAddress(getClientAddress(template?.data?.fields))
 
   return (
     <>

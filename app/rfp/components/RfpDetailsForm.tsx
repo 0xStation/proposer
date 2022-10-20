@@ -43,7 +43,6 @@ export const RfpDetailsForm = ({ rfp }) => {
             title: values?.title,
             body: rfp?.data?.content?.body,
             oneLiner: rfp?.data?.content?.oneLiner,
-            template: rfp?.data?.template && JSON.parse(JSON.stringify(rfp?.data?.template)),
             token:
               rfp?.data?.singleTokenGate?.token &&
               JSON.parse(JSON.stringify(rfp?.data?.singleTokenGate?.token)),

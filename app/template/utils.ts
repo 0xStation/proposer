@@ -1,17 +1,23 @@
 import { Token } from "app/token/types"
 import { getFieldDef } from "graphql/execution/execute"
-import { RESERVED_KEYS, Template } from "./types"
+import { RESERVED_KEYS, ProposalTemplateField } from "./types"
 
-export const getFieldValue = (template: Template | undefined, key: RESERVED_KEYS) => {
+export const getFieldValue = (
+  template: ProposalTemplateField[] | undefined,
+  key: RESERVED_KEYS
+) => {
   return template ? template.find((field) => field.key === key)?.value : null
 }
 
-export const getClientAddress = (template: Template | undefined): string => {
+export const getClientAddress = (template: ProposalTemplateField[] | undefined): string => {
   const fieldVal = getFieldValue(template, RESERVED_KEYS.CLIENTS)
   return getFieldValue(template, RESERVED_KEYS.CLIENTS)?.[0]?.address
 }
 
-export const addAddressAsRecipientToPayments = (template: Template, address: string) => {
+export const addAddressAsRecipientToPayments = (
+  template: ProposalTemplateField[],
+  address: string
+) => {
   const payments = getFieldValue(template, RESERVED_KEYS.PAYMENTS)
   return payments.map((payment) => {
     return {
@@ -21,10 +27,10 @@ export const addAddressAsRecipientToPayments = (template: Template, address: str
   })
 }
 
-export const getPaymentToken = (template: Template | undefined): Token => {
+export const getPaymentToken = (template: ProposalTemplateField[] | undefined): Token => {
   return getFieldValue(template, RESERVED_KEYS.PAYMENTS)?.[0]?.token
 }
 
-export const getPaymentAmount = (template: Template | undefined): number => {
+export const getPaymentAmount = (template: ProposalTemplateField[] | undefined): number => {
   return getFieldValue(template, RESERVED_KEYS.PAYMENTS)?.[0]?.amount
 }

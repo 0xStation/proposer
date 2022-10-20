@@ -70,7 +70,6 @@ const seed = async () => {
         submissionGuideline:
           "Please make sure your submission is 125+ words, and double check for typos.\n\nSubmissions should be fully aligned with, and inclusive of, already established Philosophical Foxes lore. The best entries will connect to other entries in a way that expands the known lore and creates new connections that were previously unknown. Entries should be written in the voice of fox historians in the future. This means that they can be opinionated and inclusive of knowledge not yet known to our current generation of foxes.",
       },
-      template: TEMPLATES.FOXES.TERM,
       singleTokenGate: {
         token: {
           chainId: 1,
@@ -79,6 +78,7 @@ const seed = async () => {
           name: "Philosophical Foxes",
           symbol: "FOX",
         },
+        minBalance: "1",
       },
     } as RfpMetadata
   })
@@ -93,6 +93,7 @@ const seed = async () => {
     data: metadatas.map((metadata) => {
       return {
         accountAddress: PARTNERS.FOXES.ADDRESS,
+        templateId: "835ef848-91c1-46da-bdf9-4b0a277fe808" as string,
         data: metadata,
       }
     }),
