@@ -47,15 +47,11 @@ const ProposalStepper = ({ proposal }) => {
           : StepStatus.current
         : StepStatus.loading,
       actions: {
-        [ProposalRoleType.CLIENT]: activeUserHasRolesToSign ? (
+        [ProposalRoleType.CLIENT]: activeUserHasRolesToSign && (
           <Button onClick={() => toggleProposalApprovalModalOpen(true)}>Approve</Button>
-        ) : (
-          <Button isDisabled={true}>Approved</Button>
         ),
-        [ProposalRoleType.CONTRIBUTOR]: activeUserHasRolesToSign ? (
+        [ProposalRoleType.CONTRIBUTOR]: activeUserHasRolesToSign && (
           <Button onClick={() => toggleProposalApprovalModalOpen(true)}>Approve</Button>
-        ) : (
-          <Button isDisabled={true}>Approved</Button>
         ),
       },
     },
