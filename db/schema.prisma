@@ -28,6 +28,7 @@ model Account {
   originsOf          AccountAccount[]    @relation("origin")
   targetsOf          AccountAccount[]    @relation("target")
   verificationEmails EmailVerification[]
+  ProposalTemplate   ProposalTemplate[]
 }
 
 enum AddressType {
@@ -56,13 +57,15 @@ enum AccountAccountType {
 
 // TEMPLATE
 
-model Template {
-  id          String   @id @default(uuid())
-  chainId     Int?
-  createdAt   DateTime @default(now())
-  lastUpdated DateTime @default(now())
-  data        Json
-  Rfp         Rfp[]
+model ProposalTemplate {
+  id             String   @id @default(uuid())
+  accountAddress String
+  chainId        Int?
+  createdAt      DateTime @default(now())
+  lastUpdated    DateTime @default(now())
+  data           Json
+  rfps           Rfp[]
+  account        Account  @relation(fields: [accountAddress], references: [address])
 }
 
 // REQUESTS FOR PROPOSALS
@@ -78,8 +81,8 @@ model Rfp {
 
   account Account @relation(fields: [accountAddress], references: [address], onDelete: Cascade)
 
-  proposals Proposal[]
-  Template  Template?  @relation(fields: [templateId], references: [id])
+  proposals         Proposal[]
+  proposalTemplates ProposalTemplate? @relation(fields: [templateId], references: [id])
 }
 
 // used to manually open and close rfps

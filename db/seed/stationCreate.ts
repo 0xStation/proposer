@@ -26,7 +26,7 @@ const seed = async () => {
     data: metadatas.map((metadata) => {
       return {
         accountAddress: PARTNERS.STATION.ADDRESS,
-        templateId: "835ef848-91c1-46da-bdf9-4b0a277fe808",
+        templateId: "cd28828c-e51a-4796-80f5-e39d4cc43fab",
         data: metadata,
       }
     }),

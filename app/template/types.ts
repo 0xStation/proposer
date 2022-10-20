@@ -1,3 +1,16 @@
+import { Account } from "app/account/types"
+import { ProposalTemplate as PrismaProposalTemplate } from "@prisma/client"
+
+export type ProposalTemplate = PrismaProposalTemplate & {
+  account?: Account
+  data: ProposalTemplateMetadata
+}
+
+export type ProposalTemplateMetadata = {
+  title: string
+  fields: Template
+}
+
 export type Template = {
   key: string
   mapsTo: string

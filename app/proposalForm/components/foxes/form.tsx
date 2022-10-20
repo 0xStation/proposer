@@ -12,7 +12,6 @@ import createProposal from "app/proposal/mutations/createProposal"
 import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
 import { FoxesProposeFirstStep } from "./proposeForm"
 import deleteProposalById from "app/proposal/mutations/deleteProposalById"
-import getRfpById from "app/rfp/queries/getRfpById"
 import { FoxesConfirmForm } from "./confirmForm"
 import { AddressType, ProposalRoleType } from "@prisma/client"
 import { mustBeAboveNumWords } from "app/utils/validators"
@@ -24,6 +23,7 @@ import {
 import { RESERVED_KEYS } from "app/template/types"
 import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
 import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinTokenBalance"
+import getRfpByTemplateId from "app/rfp/queries/getRfpByTemplateId"
 
 enum FundingProposalStep {
   PROPOSE = "PROPOSE",
@@ -56,14 +56,14 @@ export const FoxesProposalForm = () => {
     return confirm("Warning! You have unsaved changes.")
   })
 
-  const rfpId = useParam("rfpId") as string
+  const templateId = useParam("templateId") as string
   const [rfp] = useQuery(
-    getRfpById,
+    getRfpByTemplateId,
     {
-      id: rfpId,
+      templateId: templateId,
     },
     {
-      enabled: !!rfpId,
+      enabled: !!templateId,
       suspense: false,
       refetchOnWindowFocus: false,
       cacheTime: 60 * 1000, // 1 minute in milliseconds
@@ -229,7 +229,7 @@ export const FoxesProposalForm = () => {
               const contributorAddress = session?.siwe?.address as string
 
               await createProposalMutation({
-                rfpId,
+                rfpId: rfp?.id,
                 contentTitle: `${rfp?.data.content.title} submission`,
                 contentBody: values.body,
                 authorAddresses: [contributorAddress],

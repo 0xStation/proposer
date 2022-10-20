@@ -3,15 +3,10 @@ import { Account } from "app/account/types"
 import { Template } from "app/template/types"
 import { Token } from "app/token/types"
 
-export type Rfp = {
-  id: string
-  accountAddress: string
-  templateId: string
-  createdAt: Date
-  updatedAt: Date
-  status: RfpStatus
+export type Rfp = PrismaRfp & {
   data: RfpMetadata
-  account: Account
+  account?: Account
+  template?: Template
 }
 
 export type RfpMetadata = {

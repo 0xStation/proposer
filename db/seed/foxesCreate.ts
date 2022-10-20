@@ -89,21 +89,11 @@ const seed = async () => {
   // symbol?: string
   // decimals?: number
 
-  const template = await db.template.create({
-    data: {
-      chainId: 5, // change to 1 when on production
-      data: {
-        title: "Foxes Template",
-        fields: TEMPLATES.STATION.TERM,
-      },
-    },
-  })
-
   const rfps = await db.rfp.createMany({
     data: metadatas.map((metadata) => {
       return {
         accountAddress: PARTNERS.FOXES.ADDRESS,
-        templateId: template?.id as string,
+        templateId: "835ef848-91c1-46da-bdf9-4b0a277fe808" as string,
         data: metadata,
       }
     }),

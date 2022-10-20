@@ -1,13 +1,14 @@
-import { TEMPLATES } from "app/core/utils/constants"
+import { PARTNERS, TEMPLATES } from "app/core/utils/constants"
 import db from "db"
 
 const seed = async () => {
-  const stationTemplateId = "835ef848-91c1-46da-bdf9-4b0a277fe808"
+  const stationTemplateId = "cd28828c-e51a-4796-80f5-e39d4cc43fab"
 
-  const template = await db.template.create({
+  const template = await db.proposalTemplate.create({
     data: {
       id: stationTemplateId,
       chainId: 5, // change to 1 when on production
+      accountAddress: PARTNERS.STATION.ADDRESS,
       data: {
         title: "Station Template",
         fields: TEMPLATES.STATION.TERM,
@@ -15,7 +16,7 @@ const seed = async () => {
     },
   })
 
-  console.log(`template ${template}`)
+  console.log(`template id ${template?.id}`)
 }
 
 export default seed

@@ -8,19 +8,19 @@ import {
 } from "app/utils/validators"
 import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
-import getRfpById from "app/rfp/queries/getRfpById"
 import { getClientAddress } from "app/template/utils"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
+import getRfpByTemplateId from "app/rfp/queries/getRfpByTemplateId"
 
 export const FoxesProposeFirstStep = ({ minNumWords }) => {
-  const rfpId = useParam("rfpId") as string
+  const templateId = useParam("templateId") as string
   const [rfp] = useQuery(
-    getRfpById,
+    getRfpByTemplateId,
     {
-      id: rfpId,
+      templateId: templateId,
     },
     {
-      enabled: !!rfpId,
+      enabled: !!templateId,
       suspense: false,
       refetchOnWindowFocus: false,
       cacheTime: 60 * 1000, // 1 minute in milliseconds

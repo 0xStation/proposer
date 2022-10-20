@@ -1,19 +1,19 @@
 import { useQuery, useParam } from "blitz"
-import getRfpById from "app/rfp/queries/getRfpById"
 import Preview from "app/core/components/MarkdownPreview"
 import { getClientAddress, getPaymentAmount, getPaymentToken } from "app/template/utils"
 import { getNetworkName } from "app/core/utils/networkInfo"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
+import getRfpByTemplateId from "../../../rfp/queries/getRfpByTemplateId"
 
 export const FoxesConfirmForm = ({ body }) => {
-  const rfpId = useParam("rfpId") as string
+  const templateId = useParam("templateId") as string
   const [rfp] = useQuery(
-    getRfpById,
+    getRfpByTemplateId,
     {
-      id: rfpId,
+      templateId: templateId,
     },
     {
-      enabled: !!rfpId,
+      enabled: !!templateId,
       suspense: false,
       refetchOnWindowFocus: false,
       cacheTime: 60 * 1000, // 1 minute in milliseconds

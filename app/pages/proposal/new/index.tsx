@@ -29,9 +29,7 @@ const ProposalTypeSelection: BlitzPage = () => {
             <div className="max-w-[325px] mb-3 sm:mr-3 rounded-md overflow-hidden bg-wet-concrete cursor-pointer hover:border hover:border-marble-white">
               <Image src={ShareImage} height={550} />
               <h2 className="text-xl font-bold px-4 pt-4">Share an idea</h2>
-              <p className="pb-4 px-4 pt-3">
-                Share ideas, submit feedback, and request features
-              </p>
+              <p className="pb-4 px-4 pt-3">Share ideas, submit feedback, and request features</p>
             </div>
           </Link>
           <div className="max-w-[325px] mb-3 sm:mr-3 rounded-md overflow-hidden bg-wet-concrete cursor-not-allowed">
