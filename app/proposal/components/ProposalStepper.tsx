@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import useStore from "app/core/hooks/useStore"
 import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import Button from "app/core/components/sds/buttons/Button"
-import { ProposalRoleType } from "@prisma/client"
+import { ProposalRoleType, ProposalStatus } from "@prisma/client"
 import Stepper, { StepStatus } from "app/core/components/Stepper"
 
 const ProposalStepper = ({ proposal }) => {
