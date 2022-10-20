@@ -14,12 +14,10 @@ import { composeValidators, isValidTransactionLink, requiredField } from "app/ut
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import { txPathString } from "app/core/utils/constants"
 import SwitchNetworkView from "app/core/components/SwitchNetworkView"
-
 enum Tab {
   DIRECT_PAYMENT = "DIRECT_PAYMENT",
   ATTACH_TRANSACTION = "ATTACH_TRANSACTION",
 }
-import updateProposalStatus from "app/proposal/mutations/updateProposalStatus"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 
 export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {

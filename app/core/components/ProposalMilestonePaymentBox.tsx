@@ -176,11 +176,12 @@ export const ProposalMilestonePaymentBox = ({
   const [queueGnosisTransactionModalOpen, setQueueGnosisTransactionModalOpen] =
     useState<boolean>(false)
 
-  const [txStatus] = useQuery(
+  useQuery(
     getGnosisTxStatus,
     {
-      chainId: 5,
-      transactionHash: "0x02663fcf782550159a2446d3fb37f043840dcc7ee51f53e59fbe833f1491e061",
+      chainId: (milestone.payments && milestone.payments[0]?.data.token.chainId) || 1,
+      transactionHash:
+        (milestone.payments && milestone.payments[0]?.data.multisigTransaction?.safeTxHash) || "",
       proposalId: proposal.id,
       milestoneId: milestone.id,
     },
@@ -188,8 +189,6 @@ export const ProposalMilestonePaymentBox = ({
       refetchInterval: 60 * 1000, // 1 minute
     }
   )
-
-  console.log("txStatus", txStatus)
 
   return (
     <>

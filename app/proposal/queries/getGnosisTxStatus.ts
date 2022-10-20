@@ -17,7 +17,6 @@ export default async function getGnosisTxStatus(params: z.infer<typeof GetGnosis
     throw Error("chainId not available on Gnosis")
   }
 
-  // goerli url looks different?
   const url = `${apiHost}/api/v1/multisig-transactions/${input.transactionHash}/`
 
   let response
@@ -33,6 +32,10 @@ export default async function getGnosisTxStatus(params: z.infer<typeof GetGnosis
     return null
   }
 
+  // even if the tx is declined it returns true for isExecuted and isSuccessful
+  // honestly not sure how to tell if it was "declined" based on the API response
+  // need to dig more, but want to start by focusing on the success case since thats
+  // almost certainly more likely.
   const results = await response.json()
   if (results.isExecuted) {
     try {
