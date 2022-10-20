@@ -1,9 +1,7 @@
 import { Link, Routes, useParam, useQuery, useRouter } from "blitz"
-import { CheckCircleIcon } from "@heroicons/react/solid"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import getProposalById from "app/proposal/queries/getProposalById"
-import { ProposalStatus, ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
+import { ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
 import { ProposalRole } from "app/proposalRole/types"
 import useStore from "app/core/hooks/useStore"
 import { ProposalStatusPill } from "../../../core/components/ProposalStatusPill"
@@ -12,12 +10,12 @@ import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import ApproveProposalModal from "app/proposal/components/ApproveProposalModal"
 import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
-import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { LINKS } from "app/core/utils/constants"
-import { useState } from "react"
 import SendProposalModal from "../SendProposalModal"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
+import { ProposalStatus } from "@prisma/client"
+import ProposalStepper from "../ProposalStepper"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.type === proposalType)
@@ -35,13 +33,13 @@ const Tab = ({ router, route, children }) => {
 }
 
 export const ProposalViewHeaderNavigation = () => {
-  const activeUser = useStore((state) => state.activeUser)
   const proposalId = useParam("proposalId") as string
   const proposalApprovalModalOpen = useStore((state) => state.proposalApprovalModalOpen)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
   const sendProposalModalOpen = useStore((state) => state.sendProposalModalOpen)
   const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
   const router = useRouter()
+
   const [proposal] = useQuery(
     getProposalById,
     { id: proposalId },
@@ -64,8 +62,6 @@ export const ProposalViewHeaderNavigation = () => {
     }
   )
 
-  const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(proposal)
-
   // author used to return to workspace page with proposal list view
   const author = findProposalRoleByRoleType(roles, ProposalRoleType.AUTHOR)
   // numerator for the progress circle
@@ -75,10 +71,6 @@ export const ProposalViewHeaderNavigation = () => {
         role.approvalStatus === ProposalRoleApprovalStatus.APPROVED ||
         role.approvalStatus === ProposalRoleApprovalStatus.SENT // include author's SEND signature in net count too
     ).length || 0
-
-  // activeUser's view permissions
-  const activeUserIsSigner = signedRoles.length + remainingRoles.length > 0
-  const activeUserHasRolesToSign = remainingRoles.length > 0
 
   const currentPageUrl =
     typeof window !== "undefined"
@@ -103,7 +95,7 @@ export const ProposalViewHeaderNavigation = () => {
           proposal={proposal}
         />
       )}
-      <div className="w-full min-h-64">
+      <div className="w-full min-h-64 relative">
         <div className="mt-6 flex flex-row">
           <span className="text-concrete hover:text-light-concrete">
             <Link href={Routes.WorkspaceHome({ accountAddress: author?.address as string })}>
@@ -169,54 +161,7 @@ export const ProposalViewHeaderNavigation = () => {
         </div>
         {/* BUTTONS */}
         <div className="w-full mt-6 box-border">
-          {/*
-          - if activeUser has a role on the proposal, check if they've signed already,
-          - if they haven't signed, show the sign button, if they have signed, show the "signed" button
-          - if they don't have a role, just show the copy icon
-          */}
-          {!loading &&
-            proposal &&
-            proposal.status === ProposalStatus.DRAFT &&
-            activeUser?.address === author.address && (
-              <Button
-                overrideWidthClassName="w-[300px] sm:w-[400px] md:w-[614px]"
-                className="mr-3"
-                onClick={() => toggleSendProposalModalOpen(true)}
-              >
-                Send proposal
-              </Button>
-            )}
-          {activeUserIsSigner && !loading ? (
-            activeUserHasRolesToSign ? (
-              <>
-                {proposal?.status !== ProposalStatus?.DRAFT && (
-                  <Button
-                    overrideWidthClassName="w-[300px] sm:w-[400px] md:w-[614px]"
-                    className="mr-3"
-                    onClick={() => toggleProposalApprovalModalOpen(true)}
-                  >
-                    Approve
-                  </Button>
-                )}
-              </>
-            ) : (
-              // TODO: add icons to sds buttons, currently can't use unemphasized with icon
-              <button
-                className="mb-2 sm:mb-0 border rounded w-[300px] sm:w-[400px] md:w-[614px] h-[35px] mr-3 opacity-70 bg-electric-violet border-electric-violet text-tunnel-black cursor-not-allowed"
-                disabled
-              >
-                <CheckCircleIcon className="h-5 w-5 inline mb-1 mr-2" />
-                Approved
-              </button>
-            )
-          ) : !proposal || loading ? (
-            // BUTTONS EMPTY STATE
-            // Note: empty state intentionally chosen over loading for less visual jar on load
-            <div className="flex flex-row justify-between">
-              <span className="h-[35px] w-[670px]" />
-            </div>
-          ) : null}
-          {proposal && !loading && <CopyBtn textToWrite={currentPageUrl} />}
+          {proposal && <CopyBtn textToWrite={currentPageUrl} />}
         </div>
         {/* TABS */}
         <div className="mt-12 self-end flex flex-row space-x-4 border-b border-concrete">
@@ -231,6 +176,7 @@ export const ProposalViewHeaderNavigation = () => {
             )}
           </ul>
         </div>
+        <ProposalStepper proposal={proposal} />
       </div>
     </>
   )

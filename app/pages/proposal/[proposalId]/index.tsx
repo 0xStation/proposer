@@ -45,7 +45,7 @@ const ViewProposal: BlitzPage = () => {
 
   return (
     <Layout title="View Proposal">
-      <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto pb-9">
+      <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto pb-9 relative">
         <ProposalViewHeaderNavigation />
         <ReadMore className="mt-9 mb-9">{proposal?.data?.content?.body}</ReadMore>
         <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" />

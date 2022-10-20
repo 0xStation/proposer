@@ -70,7 +70,7 @@ const Button = ({
         type === ButtonType.Primary &&
           "bg-electric-violet border-electric-violet text-tunnel-black hover:bg-electric-violet/80 hover:border-transparent",
         type === ButtonType.Secondary &&
-          "text-electric-violet border-electric-violet bg-tunnel-black hover:bg-wet-concrete",
+          "text-electric-violet border-electric-violet bg-transparent hover:opacity-70",
         type === ButtonType.Unemphasized &&
           "text-marble-white border-marble-white bg-tunnel-black hover:bg-wet-concrete",
         overrideWidthClassName
