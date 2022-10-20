@@ -266,7 +266,7 @@ export const FoxesProposalForm = () => {
                 clientAddresses: [getClientAddress(template?.data?.fields)],
                 milestones: getFieldValue(template?.data?.fields, RESERVED_KEYS.MILESTONES),
                 payments: addAddressAsRecipientToPayments(
-                  template?.data?.fields as ProposalTemplateField,
+                  template?.data?.fields as ProposalTemplateField[],
                   contributorAddress
                 ),
                 paymentTerms: getFieldValue(template?.data?.fields, RESERVED_KEYS.PAYMENT_TERMS),

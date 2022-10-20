@@ -8,14 +8,14 @@ export type ProposalTemplate = PrismaProposalTemplate & {
 
 export type ProposalTemplateMetadata = {
   title: string
-  fields: ProposalTemplateField
+  fields: ProposalTemplateField[]
 }
 export type ProposalTemplateField = {
   key: string
   mapsTo: string
   value: any
   fieldType: ProposalTemplateFieldType
-}[]
+}
 
 export enum ProposalTemplateFieldType {
   PRESELECT = "PRESELECT",
