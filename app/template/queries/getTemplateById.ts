@@ -9,7 +9,7 @@ const GetTemplateById = z.object({
 export default async function getTemplateById(input: z.infer<typeof GetTemplateById>) {
   try {
     const params = GetTemplateById.parse(input)
-    const template = await db.proposalTemplate.findFirst({
+    const template = await db.proposalTemplate.findUnique({
       where: {
         id: params.id,
       },

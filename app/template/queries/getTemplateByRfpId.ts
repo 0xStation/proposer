@@ -9,22 +9,19 @@ const GetTemplateByRfpId = z.object({
 export default async function getTemplateByRfpId(input: z.infer<typeof GetTemplateByRfpId>) {
   try {
     const params = GetTemplateByRfpId.parse(input)
-    const template = await db.proposalTemplate.findFirst({
+    const rfp = await db.rfp.findUnique({
       where: {
-        rfps: {
-          some: {
-            id: {
-              equals: params.rfpId,
-            },
-          },
-        },
+        id: params.rfpId,
+      },
+      include: {
+        template: true,
       },
     })
 
-    if (!template) {
+    if (!rfp?.template) {
       return null
     }
-    return template as ProposalTemplate
+    return rfp.template as ProposalTemplate
   } catch (err) {
     console.error(`Failed to fetch proposal roles in "getTemplateByRfpId": ${err}`)
   }
