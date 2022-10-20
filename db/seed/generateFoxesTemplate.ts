@@ -8,7 +8,7 @@ const seed = async () => {
     data: {
       id: foxesTemplateId,
       chainId: 5, // change to 1 when on production
-      accountAddress: PARTNERS.FOXES.ADDRESS,
+      accountAddress: PARTNERS.FOXES.ADDRESS, // change when seeding production
       data: {
         title: "Foxes Template",
         fields: TEMPLATES.FOXES.TERM,

@@ -1,5 +1,5 @@
 import { Field } from "react-final-form"
-import { useQuery, useParam } from "blitz"
+import { useQuery, useParam, useRouterQuery, useRouter, Routes } from "blitz"
 import {
   composeValidators,
   mustBeAboveNumWords,
@@ -10,20 +10,32 @@ import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
 import { getClientAddress } from "app/template/utils"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
-import getRfpByTemplateId from "app/rfp/queries/getRfpByTemplateId"
 import getTemplateById from "app/template/queries/getTemplateById"
+import getRfpById from "app/rfp/queries/getRfpById"
 
 export const FoxesProposeFirstStep = ({ minNumWords }) => {
   const templateId = useParam("templateId") as string
+  const { rfpId } = useRouterQuery()
+  const router = useRouter()
   const [rfp] = useQuery(
-    getRfpByTemplateId,
+    getRfpById,
     {
-      templateId: templateId,
+      id: rfpId as string,
     },
     {
-      enabled: !!templateId,
+      enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
+      onError: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
     }
   )
   const [template] = useQuery(

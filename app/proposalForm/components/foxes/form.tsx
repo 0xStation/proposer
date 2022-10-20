@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react"
 import { Form, FormSpy } from "react-final-form"
-import { useRouter, useSession, Routes, useMutation, useQuery, useParam } from "blitz"
+import {
+  useRouter,
+  useSession,
+  Routes,
+  useMutation,
+  useQuery,
+  useParam,
+  useRouterQuery,
+} from "blitz"
 import Button from "app/core/components/sds/buttons/Button"
 import Stepper from "../Stepper"
 import BackArrow from "app/core/icons/BackArrow"
@@ -20,11 +28,11 @@ import {
   getClientAddress,
   getFieldValue,
 } from "app/template/utils"
-import { RESERVED_KEYS, Template } from "app/template/types"
+import { RESERVED_KEYS, ProposalTemplateField } from "app/template/types"
 import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
 import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinTokenBalance"
-import getRfpByTemplateId from "app/rfp/queries/getRfpByTemplateId"
 import getTemplateById from "app/template/queries/getTemplateById"
+import getRfpById from "app/rfp/queries/getRfpById"
 
 enum FundingProposalStep {
   PROPOSE = "PROPOSE",
@@ -58,6 +66,7 @@ export const FoxesProposalForm = () => {
   })
 
   const templateId = useParam("templateId") as string
+  const { rfpId } = useRouterQuery()
   const [template] = useQuery(
     getTemplateById,
     {
@@ -70,18 +79,26 @@ export const FoxesProposalForm = () => {
     }
   )
   const [rfp] = useQuery(
-    getRfpByTemplateId,
+    getRfpById,
     {
-      templateId: templateId,
+      id: rfpId as string,
     },
     {
-      enabled: !!templateId,
+      enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
+      onError: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
     }
   )
-
-  console.log(rfp?.data)
 
   const [
     userHasRequiredToken,
@@ -249,7 +266,7 @@ export const FoxesProposalForm = () => {
                 clientAddresses: [getClientAddress(template?.data?.fields)],
                 milestones: getFieldValue(template?.data?.fields, RESERVED_KEYS.MILESTONES),
                 payments: addAddressAsRecipientToPayments(
-                  template?.data?.fields as Template,
+                  template?.data?.fields as ProposalTemplateField,
                   contributorAddress
                 ),
                 paymentTerms: getFieldValue(template?.data?.fields, RESERVED_KEYS.PAYMENT_TERMS),

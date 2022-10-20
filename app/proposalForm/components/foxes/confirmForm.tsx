@@ -1,13 +1,15 @@
-import { useQuery, useParam } from "blitz"
+import { useQuery, useParam, useRouterQuery, useRouter, Routes } from "blitz"
 import Preview from "app/core/components/MarkdownPreview"
 import { getClientAddress, getPaymentAmount, getPaymentToken } from "app/template/utils"
 import { getNetworkName } from "app/core/utils/networkInfo"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
-import getRfpByTemplateId from "../../../rfp/queries/getRfpByTemplateId"
 import getTemplateById from "app/template/queries/getTemplateById"
+import getRfpById from "app/rfp/queries/getRfpById"
 
 export const FoxesConfirmForm = ({ body }) => {
   const templateId = useParam("templateId") as string
+  const { rfpId } = useRouterQuery()
+  const router = useRouter()
   const [template] = useQuery(
     getTemplateById,
     {
@@ -20,14 +22,24 @@ export const FoxesConfirmForm = ({ body }) => {
     }
   )
   const [rfp] = useQuery(
-    getRfpByTemplateId,
+    getRfpById,
     {
-      templateId: templateId,
+      id: rfpId as string,
     },
     {
-      enabled: !!templateId,
+      enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
+      onError: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
     }
   )
 

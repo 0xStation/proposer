@@ -7,7 +7,7 @@ CREATE TABLE "ProposalTemplate" (
     "accountAddress" TEXT NOT NULL,
     "chainId" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "lastUpdated" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "data" JSONB NOT NULL,
 
     CONSTRAINT "ProposalTemplate_pkey" PRIMARY KEY ("id")

@@ -8,7 +8,7 @@ const seed = async () => {
     data: {
       id: stationTemplateId,
       chainId: 5, // change to 1 when on production
-      accountAddress: PARTNERS.STATION.ADDRESS,
+      accountAddress: PARTNERS.STATION.ADDRESS, // change on production
       data: {
         title: "Station Template",
         fields: TEMPLATES.STATION.TERM,

@@ -7,18 +7,23 @@ const GetRfpById = z.object({
 })
 
 export default async function getRfpById(params: z.infer<typeof GetRfpById>) {
-  const rfp = await db.rfp.findUnique({
-    where: {
-      id: params.id,
-    },
-    include: {
-      account: true,
-    },
-  })
+  try {
+    const rfp = await db.rfp.findUnique({
+      where: {
+        id: params.id,
+      },
+      include: {
+        account: true,
+      },
+    })
 
-  if (!rfp) {
+    if (!rfp) {
+      return null
+    }
+
+    return rfp as Rfp
+  } catch (err) {
+    console.error("Error in `getRfpById`", err)
     return null
   }
-
-  return rfp as Rfp
 }

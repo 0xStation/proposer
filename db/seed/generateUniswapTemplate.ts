@@ -8,7 +8,7 @@ const seed = async () => {
     data: {
       id: uniswapTemplateId,
       chainId: 5, // change to 1 when on production
-      accountAddress: PARTNERS.UNISWAP.ADDRESS,
+      accountAddress: PARTNERS.UNISWAP.ADDRESS, // change on production
       data: {
         title: "Uniswap Template",
         fields: TEMPLATES.UNISWAP.TERM,

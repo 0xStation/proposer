@@ -59,7 +59,12 @@ export const RfpSidebar = ({ rfp }) => {
         )}
         {/* CTA */}
         <div className="mb-10 relative group">
-          <Link href={Routes.ProposalTemplateForm({ templateId: template?.id as string })}>
+          <Link
+            href={Routes.ProposalTemplateForm({
+              templateId: template?.id as string,
+              rfpId: rfp?.id as string,
+            })}
+          >
             <Button className="w-full" isDisabled={rfp?.status === RfpStatus.CLOSED}>
               Propose
             </Button>

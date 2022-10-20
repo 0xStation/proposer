@@ -1,4 +1,13 @@
-import { BlitzPage, Image, Link, Routes, useQuery, useParam } from "blitz"
+import {
+  BlitzPage,
+  Image,
+  Link,
+  Routes,
+  useQuery,
+  useParam,
+  useRouterQuery,
+  useRouter,
+} from "blitz"
 import Layout from "app/core/layouts/Layout"
 import FoxesProposalForm from "app/proposalForm/components/foxes/form"
 import BackIcon from "/public/back-icon.svg"
@@ -7,11 +16,13 @@ import { getPaymentAmount, getPaymentToken } from "app/template/utils"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
 import ReadMore from "app/core/components/ReadMore"
 import TextLink from "app/core/components/TextLink"
-import getRfpByTemplateId from "app/rfp/queries/getRfpByTemplateId"
 import getTemplateById from "app/template/queries/getTemplateById"
+import getRfpById from "app/rfp/queries/getRfpById"
 
 const ProposalTemplateForm: BlitzPage = () => {
   const templateId = useParam("templateId") as string
+  const { rfpId } = useRouterQuery()
+  const router = useRouter()
   const [template] = useQuery(
     getTemplateById,
     {
@@ -24,14 +35,24 @@ const ProposalTemplateForm: BlitzPage = () => {
     }
   )
   const [rfp] = useQuery(
-    getRfpByTemplateId,
+    getRfpById,
     {
-      templateId: templateId,
+      id: rfpId as string,
     },
     {
-      enabled: !!templateId,
+      enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
+      onError: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
     }
   )
   const templateIdToForm = {

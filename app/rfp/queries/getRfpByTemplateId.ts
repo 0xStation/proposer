@@ -6,12 +6,12 @@ const GetRfpByTemplateId = z.object({
   templateId: z.string(),
 })
 
-export default async function getRfpByTemplateId(input: z.infer<typeof GetRfpByTemplateId>) {
+export default async function getRfpsByTemplateId(input: z.infer<typeof GetRfpByTemplateId>) {
   try {
     const params = GetRfpByTemplateId.parse(input)
-    const rfp = await db.rfp.findFirst({
+    const rfp = await db.rfp.findMany({
       where: {
-        proposalTemplates: {
+        template: {
           id: {
             equals: params.templateId,
           },
