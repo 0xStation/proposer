@@ -16,7 +16,6 @@ export type RfpMetadata = {
     oneLiner: string
     submissionGuideline?: string
   }
-  template: Template
   singleTokenGate: {
     token: Token
     minBalance?: string // string to pass directly into BigNumber.from in logic check

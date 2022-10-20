@@ -11,6 +11,7 @@ import { LINKS } from "app/core/utils/constants"
 import { getClientAddress } from "app/template/utils"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import getRfpByTemplateId from "app/rfp/queries/getRfpByTemplateId"
+import getTemplateById from "app/template/queries/getTemplateById"
 
 export const FoxesProposeFirstStep = ({ minNumWords }) => {
   const templateId = useParam("templateId") as string
@@ -25,8 +26,19 @@ export const FoxesProposeFirstStep = ({ minNumWords }) => {
       refetchOnWindowFocus: false,
     }
   )
+  const [template] = useQuery(
+    getTemplateById,
+    {
+      id: templateId as string,
+    },
+    {
+      enabled: !!templateId,
+      suspense: false,
+      refetchOnWindowFocus: false,
+    }
+  )
 
-  const { text: displayAddress } = useDisplayAddress(getClientAddress(rfp?.data.template))
+  const { text: displayAddress } = useDisplayAddress(getClientAddress(template?.data?.fields))
 
   return (
     <>

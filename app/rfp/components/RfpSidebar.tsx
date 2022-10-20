@@ -100,17 +100,19 @@ export const RfpSidebar = ({ rfp }) => {
           {/* NETWORK */}
           <div>
             <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
-            <p className="mt-2">{getNetworkName(getPaymentToken(rfp?.data.template)?.chainId)}</p>
+            <p className="mt-2">
+              {getNetworkName(getPaymentToken(template?.data?.fields)?.chainId)}
+            </p>
           </div>
           {/* PAYMENT TOKEN */}
           <div>
             <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
-            <p className="mt-2">{getPaymentToken(rfp?.data.template)?.symbol}</p>
+            <p className="mt-2">{getPaymentToken(template?.data?.fields)?.symbol}</p>
           </div>
           {/* PAYMENT AMOUNT */}
           <div>
             <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-            <p className="mt-2">{getPaymentAmount(rfp?.data.template)}</p>
+            <p className="mt-2">{getPaymentAmount(template?.data?.fields)}</p>
           </div>
         </div>
       </div>

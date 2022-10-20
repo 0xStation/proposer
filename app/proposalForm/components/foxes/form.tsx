@@ -20,10 +20,11 @@ import {
   getClientAddress,
   getFieldValue,
 } from "app/template/utils"
-import { RESERVED_KEYS } from "app/template/types"
+import { RESERVED_KEYS, Template } from "app/template/types"
 import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
 import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinTokenBalance"
 import getRfpByTemplateId from "app/rfp/queries/getRfpByTemplateId"
+import getTemplateById from "app/template/queries/getTemplateById"
 
 enum FundingProposalStep {
   PROPOSE = "PROPOSE",
@@ -57,6 +58,17 @@ export const FoxesProposalForm = () => {
   })
 
   const templateId = useParam("templateId") as string
+  const [template] = useQuery(
+    getTemplateById,
+    {
+      id: templateId as string,
+    },
+    {
+      enabled: !!templateId,
+      suspense: false,
+      refetchOnWindowFocus: false,
+    }
+  )
   const [rfp] = useQuery(
     getRfpByTemplateId,
     {
@@ -68,6 +80,8 @@ export const FoxesProposalForm = () => {
       refetchOnWindowFocus: false,
     }
   )
+
+  console.log(rfp?.data)
 
   const [
     userHasRequiredToken,
@@ -232,12 +246,14 @@ export const FoxesProposalForm = () => {
                 contentBody: values.body,
                 authorAddresses: [contributorAddress],
                 contributorAddresses: [contributorAddress],
-                clientAddresses: [getClientAddress(rfp?.data.template)],
-                milestones: getFieldValue(rfp?.data.template, RESERVED_KEYS.MILESTONES),
-                payments: addAddressAsRecipientToPayments(rfp?.data.template, contributorAddress),
-                paymentTerms: getFieldValue(rfp?.data.template, RESERVED_KEYS.PAYMENT_TERMS),
+                clientAddresses: [getClientAddress(template?.data?.fields)],
+                milestones: getFieldValue(template?.data?.fields, RESERVED_KEYS.MILESTONES),
+                payments: addAddressAsRecipientToPayments(
+                  template?.data?.fields as Template,
+                  contributorAddress
+                ),
+                paymentTerms: getFieldValue(template?.data?.fields, RESERVED_KEYS.PAYMENT_TERMS),
               })
-              // {rfp?.data.template.find((field) => field.key === "clients")?.value?.[0]?.address}
             } catch (err) {
               setIsLoading(false)
               setToastState({

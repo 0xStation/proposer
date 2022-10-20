@@ -18,13 +18,13 @@ const seed = async () => {
         submissionGuideline:
           "Uniswap Foundation looks to support projects that fall into one of the following categories:\n\nProtocol Growth, including a decentralized volatility oracle, and a data analysis tool that extracts data from the Uniswap subgraph into a CSV file\n\nCommunity Growth, including a Uniswap v3 development course and events in Latin America, Africa, and Canada\n\nGovernance Stewardship, including a deep dive into the state of Uniswap delegation, which will be translated into a series of recommendations to improve governance.",
       },
-      template: TEMPLATES.UNISWAP.TERM,
     } as RfpMetadata
   })
   const rfps = await db.rfp.createMany({
     data: metadatas.map((metadata) => {
       return {
         accountAddress: PARTNERS.UNISWAP.ADDRESS,
+        templateId: "96058a8b-b1f5-4ba5-811d-e3415eccb3ce",
         data: metadata,
       }
     }),

@@ -50,6 +50,7 @@ import { Rfp } from "app/rfp/types"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
 import { getPaymentAmount, getPaymentToken } from "app/template/utils"
 import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpId"
+import getTemplateByRfpId from "app/template/queries/getTemplateByRfpId"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
@@ -328,6 +329,11 @@ const WorkspaceHome: BlitzPage = () => {
           refetchOnWindowFocus: false,
         }
       )
+      const [template] = useQuery(
+        getTemplateByRfpId,
+        { rfpId: rfp?.id as string },
+        { suspense: false, enabled: Boolean(rfp?.id), refetchOnWindowFocus: false, staleTime: 1000 }
+      )
 
       return (
         <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
@@ -337,8 +343,8 @@ const WorkspaceHome: BlitzPage = () => {
             <div className="flex flex-row mt-4 justify-between">
               <span>
                 {" "}
-                <p className="inline">{getPaymentAmount(rfp?.data.template)} </p>
-                <p className="inline">{getPaymentToken(rfp?.data.template)?.symbol}</p>
+                <p className="inline">{getPaymentAmount(template?.data?.fields)} </p>
+                <p className="inline">{getPaymentToken(template?.data?.fields)?.symbol}</p>
               </span>
               <span>{proposalCount} proposals</span>
             </div>
