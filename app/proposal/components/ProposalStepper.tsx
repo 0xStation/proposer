@@ -27,7 +27,7 @@ const ProposalStepper = ({ proposal }) => {
     {
       description: "Author sends proposal",
       status: proposal
-        ? proposal.status === "DRAFT"
+        ? proposal.status === ProposalStatus.DRAFT
           ? StepStatus.current
           : StepStatus.complete
         : StepStatus.loading,
