@@ -21,10 +21,12 @@ const seed = async () => {
       template: TEMPLATES.STATION.TERM,
     } as RfpMetadata
   })
+
   const rfps = await db.rfp.createMany({
     data: metadatas.map((metadata) => {
       return {
         accountAddress: PARTNERS.STATION.ADDRESS,
+        templateId: "835ef848-91c1-46da-bdf9-4b0a277fe808",
         data: metadata,
       }
     }),

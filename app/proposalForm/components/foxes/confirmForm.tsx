@@ -1,15 +1,12 @@
-import { useQuery, useRouterQuery } from "blitz"
+import { useQuery, useParam } from "blitz"
 import getRfpById from "app/rfp/queries/getRfpById"
-import ReadMore from "app/core/components/ReadMore"
 import Preview from "app/core/components/MarkdownPreview"
 import { getClientAddress, getPaymentAmount, getPaymentToken } from "app/template/utils"
 import { getNetworkName } from "app/core/utils/networkInfo"
-import { useEnsName } from "wagmi"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 
 export const FoxesConfirmForm = ({ body }) => {
-  const queryParams = useRouterQuery()
-  const rfpId = queryParams?.rfpId as string
+  const rfpId = useParam("rfpId") as string
   const [rfp] = useQuery(
     getRfpById,
     {

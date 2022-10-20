@@ -1,4 +1,5 @@
 import { Field } from "react-final-form"
+import { useQuery, useParam } from "blitz"
 import {
   composeValidators,
   mustBeAboveNumWords,
@@ -7,14 +8,12 @@ import {
 } from "app/utils/validators"
 import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
-import { useQuery, useRouterQuery } from "blitz"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { getClientAddress } from "app/template/utils"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 
 export const FoxesProposeFirstStep = ({ minNumWords }) => {
-  const queryParams = useRouterQuery()
-  const rfpId = queryParams?.rfpId as string
+  const rfpId = useParam("rfpId") as string
   const [rfp] = useQuery(
     getRfpById,
     {

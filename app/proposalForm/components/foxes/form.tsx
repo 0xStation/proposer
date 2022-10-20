@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { Form, FormSpy } from "react-final-form"
-import { useRouter, useSession, Routes, useMutation, useQuery, useRouterQuery } from "blitz"
+import { useRouter, useSession, Routes, useMutation, useQuery, useParam } from "blitz"
 import Button from "app/core/components/sds/buttons/Button"
 import Stepper from "../Stepper"
 import BackArrow from "app/core/icons/BackArrow"
@@ -56,8 +56,7 @@ export const FoxesProposalForm = () => {
     return confirm("Warning! You have unsaved changes.")
   })
 
-  const queryParams = useRouterQuery()
-  const rfpId = queryParams?.rfpId as string
+  const rfpId = useParam("rfpId") as string
   const [rfp] = useQuery(
     getRfpById,
     {

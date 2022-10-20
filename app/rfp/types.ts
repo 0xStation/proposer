@@ -6,6 +6,7 @@ import { Token } from "app/token/types"
 export type Rfp = {
   id: string
   accountAddress: string
+  templateId: string
   createdAt: Date
   updatedAt: Date
   status: RfpStatus
