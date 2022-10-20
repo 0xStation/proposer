@@ -12,7 +12,7 @@ import getRfpById from "app/rfp/queries/getRfpById"
 import { RfpSidebar } from "app/rfp/components/RfpSidebar"
 import { RfpNavigator } from "app/rfp/components/RfpNavigator"
 import { useUserIsWorkspaceOrSigner } from "app/core/hooks/useUserIsWorkspaceOrSigner"
-import Button from "../../../core/components/sds/buttons/Button"
+import Button, { ButtonType } from "../../../core/components/sds/buttons/Button"
 import { RfpStatus } from "@prisma/client"
 import updateRfpStatus from "app/rfp/mutations/updateRfpStatus"
 import useStore from "app/core/hooks/useStore"
@@ -113,19 +113,22 @@ const RfpSettings: BlitzPage = () => {
               <RfpNavigator />
               <div className="mt-8 lg:w-3/5 w-full">
                 <RfpDetailsForm rfp={rfp} />
-                <h1 className="font-bold mt-7">Current status</h1>
-                <div className="flex flex-col mt-3">
-                  <p>Open for submissions</p>
-                  <Button
-                    className="max-w-fit mt-3"
-                    onClick={async () =>
-                      rfp?.status === RfpStatus.OPEN
-                        ? await handleCloseRfp()
-                        : await handleOpenRfp()
-                    }
-                  >
-                    {rfp?.status === RfpStatus.OPEN ? "Close this RFP" : "Open this RFP"}
-                  </Button>
+                <div className="mt-7 border-t border-t-concrete">
+                  <h1 className="font-bold mt-5">Current status</h1>
+                  <div className="flex flex-col mt-3">
+                    <p>Open for submissions</p>
+                    <Button
+                      type={ButtonType.Secondary}
+                      className="max-w-fit mt-3"
+                      onClick={async () =>
+                        rfp?.status === RfpStatus.OPEN
+                          ? await handleCloseRfp()
+                          : await handleOpenRfp()
+                      }
+                    >
+                      {rfp?.status === RfpStatus.OPEN ? "Close this RFP" : "Open this RFP"}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </>
