@@ -40,9 +40,9 @@ const ProposalStepper = ({ proposal }) => {
     {
       description: "Client, contributor, and author approve the proposal",
       status: proposal
-        ? proposal.status === "APPROVED"
+        ? proposal.status === ProposalStatus.APPROVED
           ? StepStatus.complete
-          : proposal.status === "DRAFT"
+          : proposal.status === ProposalStatus.DRAFT
           ? StepStatus.upcoming
           : StepStatus.current
         : StepStatus.loading,
