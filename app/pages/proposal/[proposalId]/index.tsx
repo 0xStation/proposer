@@ -49,6 +49,7 @@ const ViewProposal: BlitzPage = () => {
     { suspense: false, refetchOnWindowFocus: false, refetchOnReconnect: false }
   )
 
+  const activeUser = useStore((state) => state.activeUser)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
   const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
   const [stepperSteps, setStepperSteps] = useState<any>([])
@@ -57,7 +58,13 @@ const ViewProposal: BlitzPage = () => {
   const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(proposal)
   const activeUserIsSigner = signedRoles.length + remainingRoles.length > 0
   const activeUserHasRolesToSign = remainingRoles.length > 0
-  const usersRoles = [...remainingRoles, ...signedRoles].map(
+
+  const authorRoles =
+    proposal?.roles?.filter((role) => {
+      return role.type === ProposalRoleType.AUTHOR && role.address === activeUser?.address
+    }) || []
+
+  const usersRoles = [...remainingRoles, ...signedRoles, ...authorRoles].map(
     (role) => role.type
   ) as ProposalRoleType[]
 

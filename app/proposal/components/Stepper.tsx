@@ -29,7 +29,7 @@ const ProposalStepper = ({
   loading: boolean
 }) => {
   const [activeRole, setActiveRole] = useState<ProposalRoleType | undefined>()
-  const [showInfo, setShowInfo] = useState<boolean>(false)
+  const [showInfo, setShowInfo] = useState<boolean>(true)
 
   useEffect(() => {
     setActiveRole(roles[0])
