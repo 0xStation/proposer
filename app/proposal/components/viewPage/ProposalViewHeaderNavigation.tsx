@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { Link, Routes, useParam, useQuery, useRouter } from "blitz"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import getProposalById from "app/proposal/queries/getProposalById"
@@ -15,6 +16,9 @@ import { LINKS } from "app/core/utils/constants"
 import SendProposalModal from "../SendProposalModal"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import { ProposalStatus } from "@prisma/client"
+import ProposalStepper from "app/proposal/components/Stepper"
+import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
+import Button from "app/core/components/sds/buttons/Button"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.type === proposalType)
@@ -39,6 +43,10 @@ export const ProposalViewHeaderNavigation = () => {
   const sendProposalModalOpen = useStore((state) => state.sendProposalModalOpen)
   const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
   const router = useRouter()
+
+  const [stepperSteps, setStepperSteps] = useState<any>([])
+  const [stepperLoading, setStepperLoading] = useState<boolean>(true)
+
   const [proposal] = useQuery(
     getProposalById,
     { id: proposalId },
@@ -80,6 +88,59 @@ export const ProposalViewHeaderNavigation = () => {
         )
       : ""
 
+  const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(proposal)
+  const activeUserIsSigner = signedRoles.length + remainingRoles.length > 0
+  const activeUserHasRolesToSign = remainingRoles.length > 0
+  const authorRoles =
+    proposal?.roles?.filter((role) => {
+      return role.type === ProposalRoleType.AUTHOR && role.address === activeUser?.address
+    }) || []
+
+  const usersRoles = [...remainingRoles, ...signedRoles, ...authorRoles].map(
+    (role) => role.type
+  ) as ProposalRoleType[]
+
+  const rawSteps = [
+    {
+      description: "Author sends proposal",
+      status: proposal ? (proposal.status === "DRAFT" ? "current" : "complete") : "loading",
+      actions: {
+        [ProposalRoleType.AUTHOR]: (
+          <Button onClick={() => toggleSendProposalModalOpen(true)}>Send</Button>
+        ),
+      },
+    },
+    {
+      description: "Client, contributor, and author approve the proposal",
+      status: proposal
+        ? proposal.status === "APPROVED"
+          ? "complete"
+          : proposal.status === "DRAFT"
+          ? "upcoming"
+          : "current"
+        : "loading",
+      actions: {
+        [ProposalRoleType.CLIENT]: activeUserHasRolesToSign ? (
+          <Button onClick={() => toggleProposalApprovalModalOpen(true)}>Approve</Button>
+        ) : (
+          <Button isDisabled={true}>Approved</Button>
+        ),
+        [ProposalRoleType.CONTRIBUTOR]: activeUserHasRolesToSign ? (
+          <Button onClick={() => toggleProposalApprovalModalOpen(true)}>Approve</Button>
+        ) : (
+          <Button isDisabled={true}>Approved</Button>
+        ),
+      },
+    },
+  ]
+
+  useEffect(() => {
+    if (proposal) {
+      setStepperSteps(rawSteps)
+      setStepperLoading(false)
+    }
+  }, [proposal, activeUserHasRolesToSign, activeUserIsSigner])
+
   return (
     <>
       <SendProposalModal
@@ -94,7 +155,7 @@ export const ProposalViewHeaderNavigation = () => {
           proposal={proposal}
         />
       )}
-      <div className="w-full min-h-64">
+      <div className="w-full min-h-64 relative">
         <div className="mt-6 flex flex-row">
           <span className="text-concrete hover:text-light-concrete">
             <Link href={Routes.WorkspaceHome({ accountAddress: author?.address as string })}>
@@ -175,6 +236,12 @@ export const ProposalViewHeaderNavigation = () => {
             )}
           </ul>
         </div>
+        <ProposalStepper
+          loading={stepperLoading}
+          roles={usersRoles}
+          steps={stepperSteps}
+          className="absolute right-[-340px] top-0"
+        />
       </div>
     </>
   )
