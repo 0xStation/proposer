@@ -3,7 +3,7 @@ import useStore from "app/core/hooks/useStore"
 import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import Button from "app/core/components/sds/buttons/Button"
 import { ProposalRoleType } from "@prisma/client"
-import Stepper from "app/core/components/Stepper"
+import Stepper, { StepStatus } from "app/core/components/Stepper"
 
 const ProposalStepper = ({ proposal }) => {
   const activeUser = useStore((state) => state.activeUser)
@@ -26,7 +26,11 @@ const ProposalStepper = ({ proposal }) => {
   const rawSteps = [
     {
       description: "Author sends proposal",
-      status: proposal ? (proposal.status === "DRAFT" ? "current" : "complete") : "loading",
+      status: proposal
+        ? proposal.status === "DRAFT"
+          ? StepStatus.current
+          : StepStatus.complete
+        : StepStatus.loading,
       actions: {
         [ProposalRoleType.AUTHOR]: (
           <Button onClick={() => toggleSendProposalModalOpen(true)}>Send</Button>
@@ -37,11 +41,11 @@ const ProposalStepper = ({ proposal }) => {
       description: "Client, contributor, and author approve the proposal",
       status: proposal
         ? proposal.status === "APPROVED"
-          ? "complete"
+          ? StepStatus.complete
           : proposal.status === "DRAFT"
-          ? "upcoming"
-          : "current"
-        : "loading",
+          ? StepStatus.upcoming
+          : StepStatus.current
+        : StepStatus.loading,
       actions: {
         [ProposalRoleType.CLIENT]: activeUserHasRolesToSign ? (
           <Button onClick={() => toggleProposalApprovalModalOpen(true)}>Approve</Button>

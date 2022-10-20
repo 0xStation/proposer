@@ -3,9 +3,15 @@ import { ProposalRoleType } from "@prisma/client"
 import { PROPOSAL_ROLE_MAP } from "app/core/utils/constants"
 import { InformationCircleIcon, CheckIcon } from "@heroicons/react/solid"
 
+export enum StepStatus {
+  complete = "complete",
+  current = "current",
+  upcoming = "upcoming",
+  loading = "loading",
+}
 export type Step = {
   description: string
-  status: string
+  status: StepStatus
   actions: {
     [key: string]: JSX.Element
   }
@@ -81,7 +87,7 @@ const Stepper = ({
             key={`step-${stepIdx}`}
             className={classNames(stepIdx !== steps.length - 1 ? "pb-5" : "", "relative")}
           >
-            {step.status === "complete" ? (
+            {step.status === StepStatus.complete ? (
               <>
                 {stepIdx !== steps.length - 1 ? (
                   <div
@@ -100,7 +106,7 @@ const Stepper = ({
                   </span>
                 </span>
               </>
-            ) : step.status === "current" ? (
+            ) : step.status === StepStatus.current ? (
               <>
                 {stepIdx !== steps.length - 1 ? (
                   <div
