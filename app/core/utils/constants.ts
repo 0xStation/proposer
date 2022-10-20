@@ -304,6 +304,12 @@ export const PAYMENT_TERM_MAP = {
   },
 }
 
+export const PROPOSAL_ROLE_MAP = {
+  [ProposalRoleType.CONTRIBUTOR]: "Contributor",
+  [ProposalRoleType.CLIENT]: "Client",
+  [ProposalRoleType.AUTHOR]: "Author",
+}
+
 export const PROPOSING_AS_ROLE_MAP = {
   [ProposalRoleType.CONTRIBUTOR]: {
     copy: "A contributor (responsible for delivering work)",

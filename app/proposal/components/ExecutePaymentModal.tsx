@@ -14,12 +14,12 @@ import { composeValidators, isValidTransactionLink, requiredField } from "app/ut
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import { txPathString } from "app/core/utils/constants"
 import SwitchNetworkView from "app/core/components/SwitchNetworkView"
+import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
+
 enum Tab {
   DIRECT_PAYMENT = "DIRECT_PAYMENT",
   ATTACH_TRANSACTION = "ATTACH_TRANSACTION",
 }
-import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
-
 export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
   const setToastState = useStore((state) => state.setToastState)
   const [selectedTab, setSelectedTab] = useState<Tab>(Tab.DIRECT_PAYMENT)

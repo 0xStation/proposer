@@ -1,6 +1,4 @@
 import { Link, Routes, useParam, useQuery, useRouter } from "blitz"
-import { CheckCircleIcon } from "@heroicons/react/solid"
-import Button from "app/core/components/sds/buttons/Button"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import getProposalById from "app/proposal/queries/getProposalById"
 import {
@@ -17,7 +15,6 @@ import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import ApproveProposalModal from "app/proposal/components/ApproveProposalModal"
 import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
-import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import LinkArrow from "app/core/icons/LinkArrow"
 import { LINKS } from "app/core/utils/constants"
 import SendProposalModal from "../SendProposalModal"
@@ -40,13 +37,13 @@ const Tab = ({ router, route, children }) => {
 }
 
 export const ProposalViewHeaderNavigation = () => {
-  const activeUser = useStore((state) => state.activeUser)
   const proposalId = useParam("proposalId") as string
   const proposalApprovalModalOpen = useStore((state) => state.proposalApprovalModalOpen)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
   const sendProposalModalOpen = useStore((state) => state.sendProposalModalOpen)
   const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
   const router = useRouter()
+
   const [proposal] = useQuery(
     getProposalById,
     { id: proposalId },
@@ -80,8 +77,6 @@ export const ProposalViewHeaderNavigation = () => {
     }
   )
 
-  const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(proposal)
-
   // author used to return to workspace page with proposal list view
   const author = findProposalRoleByRoleType(roles, ProposalRoleType.AUTHOR)
   // numerator for the progress circle
@@ -91,10 +86,6 @@ export const ProposalViewHeaderNavigation = () => {
         role.approvalStatus === ProposalRoleApprovalStatus.APPROVED ||
         role.approvalStatus === ProposalRoleApprovalStatus.SENT // include author's SEND signature in net count too
     ).length || 0
-
-  // activeUser's view permissions
-  const activeUserIsSigner = signedRoles.length + remainingRoles.length > 0
-  const activeUserHasRolesToSign = remainingRoles.length > 0
 
   const currentPageUrl =
     typeof window !== "undefined"
@@ -119,7 +110,7 @@ export const ProposalViewHeaderNavigation = () => {
           proposal={proposal}
         />
       )}
-      <div className="w-full min-h-64">
+      <div className="w-full min-h-64 relative">
         <div className="mt-6 flex flex-row">
           {rfp ? (
             <>
@@ -201,7 +192,7 @@ export const ProposalViewHeaderNavigation = () => {
           />
         </div>
         {/* BUTTONS */}
-        <div className="w-full mt-6">
+        <div className="w-full mt-6 box-border">
           {Boolean(rfp && rfp?.status === RfpStatus?.CLOSED) && (
             <div className="rounded bg-neon-carrot text-tunnel-black text-center p-2 mb-3 font-bold">
               <p className="inline">
@@ -212,63 +203,7 @@ export const ProposalViewHeaderNavigation = () => {
               </p>
             </div>
           )}
-          <div className="relative">
-            {loading ? (
-              <div className="flex flex-row">
-                <span className="h-[35px] w-[670px] bg-wet-concrete shadow border-solid motion-safe:animate-pulse rounded" />
-              </div>
-            ) : (
-              <>
-                {/*
-                  - if activeUser has a role on the proposal, check if they've signed already,
-                  - if they haven't signed, show the sign button, if they have signed, show the "signed" button
-                  - if they don't have a role, just show the copy icon
-                */}
-                {proposal &&
-                  proposal.status === ProposalStatus.DRAFT &&
-                  activeUser?.address === author?.address && (
-                    <div className="flex flex-row">
-                      <Button
-                        className="mr-3 w-full"
-                        onClick={() => toggleSendProposalModalOpen(true)}
-                      >
-                        Send proposal
-                      </Button>
-                      {proposal && <CopyBtn className="inline" textToWrite={currentPageUrl} />}
-                    </div>
-                  )}
-                {activeUserIsSigner
-                  ? activeUserHasRolesToSign && (
-                      <div className="flex flex-row">
-                        {proposal?.status !== ProposalStatus?.DRAFT && (
-                          <>
-                            <div className="relative group w-full mr-2">
-                              <Button
-                                overrideWidthClassName="inline w-full"
-                                className="mr-3"
-                                onClick={() => toggleProposalApprovalModalOpen(true)}
-                                isDisabled={Boolean(rfp && rfp?.status === RfpStatus?.CLOSED)}
-                              >
-                                Approve
-                              </Button>
-                              {rfp && rfp?.status === RfpStatus?.CLOSED && (
-                                <div className="absolute group-hover:block hidden left-32 text-xs text-marble-white bg-wet-concrete rounded p-3 mt-2 -mb-5">
-                                  This RFP needs to be open for submissions to approve this
-                                  proposal.
-                                </div>
-                              )}
-                            </div>
-                            {proposal && (
-                              <CopyBtn className="inline" textToWrite={currentPageUrl} />
-                            )}
-                          </>
-                        )}
-                      </div>
-                    )
-                  : null}
-              </>
-            )}
-          </div>
+          {proposal && <CopyBtn textToWrite={currentPageUrl} />}
         </div>
         {/* TABS */}
         <div className="mt-12 self-end flex flex-row space-x-4 border-b border-concrete">
