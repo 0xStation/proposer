@@ -16,7 +16,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-const ProposalStepper = ({
+const Stepper = ({
   steps,
   roles,
   className,
@@ -147,4 +147,4 @@ const ProposalStepper = ({
   )
 }
 
-export default ProposalStepper
+export default Stepper
