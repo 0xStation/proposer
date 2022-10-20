@@ -18,6 +18,72 @@ import { getNetworkGnosisUrl } from "app/core/utils/networkInfo"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 
+const PaymentInProgressStatus = ({ milestone, proposal }) => {
+  useQuery(
+    getGnosisTxStatus,
+    {
+      chainId: (milestone.payments && milestone.payments[0]?.data.token.chainId) || 1,
+      transactionHash:
+        (milestone.payments && milestone.payments[0]?.data.multisigTransaction?.safeTxHash) || "",
+      proposalId: proposal.id,
+      milestoneId: milestone.id,
+    },
+    {
+      refetchInterval: 60 * 1000, // 1 minute
+    }
+  )
+
+  return (
+    <PaymentStatus
+      color={PROPOSAL_MILESTONE_STATUS_MAP[ProposalMilestoneStatus.IN_PROGRESS].color}
+      copy={PROPOSAL_MILESTONE_STATUS_MAP[ProposalMilestoneStatus.IN_PROGRESS].copy}
+    />
+  )
+}
+
+const PaymentScheduledStatus = ({ milestone, proposal }) => {
+  useQuery(
+    getGnosisTxStatus,
+    {
+      chainId: (milestone.payments && milestone.payments[0]?.data.token.chainId) || 1,
+      transactionHash:
+        (milestone.payments && milestone.payments[0]?.data.multisigTransaction?.safeTxHash) || "",
+      proposalId: proposal.id,
+      milestoneId: milestone.id,
+    },
+    {
+      refetchInterval: 60 * 1000, // 1 minute
+    }
+  )
+
+  return (
+    <PaymentStatus
+      color={PROPOSAL_MILESTONE_STATUS_MAP[ProposalMilestoneStatus.SCHEDULED].color}
+      copy={PROPOSAL_MILESTONE_STATUS_MAP[ProposalMilestoneStatus.SCHEDULED].copy}
+    />
+  )
+}
+
+const PaymentPaidStatus = () => {
+  return (
+    <PaymentStatus
+      color={PROPOSAL_MILESTONE_STATUS_MAP[ProposalMilestoneStatus.COMPLETE].color}
+      copy={PROPOSAL_MILESTONE_STATUS_MAP[ProposalMilestoneStatus.COMPLETE].copy}
+    />
+  )
+}
+
+const PaymentStatus = ({ color, copy }) => {
+  return (
+    <div className="flex flex-col items-end space-y-1">
+      <div className="flex flex-row items-center space-x-1">
+        <span className={`h-2 w-2 rounded-full ${color}`} />
+        <div className="font-bold text-xs uppercase tracking-wider">{copy}</div>
+      </div>
+    </div>
+  )
+}
+
 const PaymentRow = ({
   payment,
   proposal,
@@ -176,19 +242,7 @@ export const ProposalMilestonePaymentBox = ({
   const [queueGnosisTransactionModalOpen, setQueueGnosisTransactionModalOpen] =
     useState<boolean>(false)
 
-  useQuery(
-    getGnosisTxStatus,
-    {
-      chainId: (milestone.payments && milestone.payments[0]?.data.token.chainId) || 1,
-      transactionHash:
-        (milestone.payments && milestone.payments[0]?.data.multisigTransaction?.safeTxHash) || "",
-      proposalId: proposal.id,
-      milestoneId: milestone.id,
-    },
-    {
-      refetchInterval: 60 * 1000, // 1 minute
-    }
-  )
+  const milestoneStatus = getMilestoneStatus(proposal, milestone)
 
   return (
     <>
@@ -212,19 +266,13 @@ export const ProposalMilestonePaymentBox = ({
           {/* TITLE */}
           <span>{milestone?.data?.title || "title"}</span>
           {/* STATUS */}
-          <div className="flex flex-col items-end space-y-1">
-            <div className="flex flex-row items-center space-x-1">
-              <span
-                className={`h-2 w-2 rounded-full ${
-                  PROPOSAL_MILESTONE_STATUS_MAP[getMilestoneStatus(proposal, milestone) || ""]
-                    ?.color
-                }`}
-              />
-              <div className="font-bold text-xs uppercase tracking-wider">
-                {PROPOSAL_MILESTONE_STATUS_MAP[getMilestoneStatus(proposal, milestone) || ""]?.copy}
-              </div>
-            </div>
-          </div>
+          {milestoneStatus === ProposalMilestoneStatus.COMPLETE && <PaymentPaidStatus />}
+          {milestoneStatus === ProposalMilestoneStatus.IN_PROGRESS && (
+            <PaymentInProgressStatus proposal={proposal} milestone={milestone} />
+          )}
+          {milestoneStatus === ProposalMilestoneStatus.SCHEDULED && (
+            <PaymentScheduledStatus proposal={proposal} milestone={milestone} />
+          )}
         </div>
         {/* TABLE HEADER */}
         <div className=" text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
