@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useQuery } from "blitz"
+import { invalidateQuery, useQuery } from "blitz"
 import { ArrowRightIcon, CheckCircleIcon } from "@heroicons/react/solid"
 import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
 import AttachTransactionModal from "app/proposal/components/AttachTransactionModal"
@@ -17,72 +17,8 @@ import QueueGnosisTransactionModal from "app/proposalPayment/components/QueueGno
 import { getNetworkGnosisUrl } from "app/core/utils/networkInfo"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
-
-const PaymentInProgressStatus = ({ milestone, proposal }) => {
-  useQuery(
-    getGnosisTxStatus,
-    {
-      chainId: (milestone.payments && milestone.payments[0]?.data.token.chainId) || 1,
-      transactionHash:
-        (milestone.payments && milestone.payments[0]?.data.multisigTransaction?.safeTxHash) || "",
-      proposalId: proposal.id,
-      milestoneId: milestone.id,
-    },
-    {
-      refetchInterval: 60 * 1000, // 1 minute
-    }
-  )
-
-  return (
-    <PaymentStatus
-      color={PROPOSAL_MILESTONE_STATUS_MAP[ProposalMilestoneStatus.IN_PROGRESS].color}
-      copy={PROPOSAL_MILESTONE_STATUS_MAP[ProposalMilestoneStatus.IN_PROGRESS].copy}
-    />
-  )
-}
-
-const PaymentScheduledStatus = ({ milestone, proposal }) => {
-  useQuery(
-    getGnosisTxStatus,
-    {
-      chainId: (milestone.payments && milestone.payments[0]?.data.token.chainId) || 1,
-      transactionHash:
-        (milestone.payments && milestone.payments[0]?.data.multisigTransaction?.safeTxHash) || "",
-      proposalId: proposal.id,
-      milestoneId: milestone.id,
-    },
-    {
-      refetchInterval: 60 * 1000, // 1 minute
-    }
-  )
-
-  return (
-    <PaymentStatus
-      color={PROPOSAL_MILESTONE_STATUS_MAP[ProposalMilestoneStatus.SCHEDULED].color}
-      copy={PROPOSAL_MILESTONE_STATUS_MAP[ProposalMilestoneStatus.SCHEDULED].copy}
-    />
-  )
-}
-
-const PaymentPaidStatus = () => {
-  return (
-    <PaymentStatus
-      color={PROPOSAL_MILESTONE_STATUS_MAP[ProposalMilestoneStatus.COMPLETE].color}
-      copy={PROPOSAL_MILESTONE_STATUS_MAP[ProposalMilestoneStatus.COMPLETE].copy}
-    />
-  )
-}
-
-const PaymentStatus = ({ color, copy }) => {
-  return (
-    <div className="flex flex-col items-end space-y-1">
-      <div className="flex flex-row items-center space-x-1">
-        <span className={`h-2 w-2 rounded-full ${color}`} />
-        <div className="font-bold text-xs uppercase tracking-wider">{copy}</div>
-      </div>
-    </div>
-  )
-}
+import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
+import getProposalById from "app/proposal/queries/getProposalById"
 
 const PaymentRow = ({
   payment,
@@ -100,6 +36,36 @@ const PaymentRow = ({
     quorum: any
     signers: any
   }>()
+
+  // if a payment is queued to gnosis, continually check if it is complete
+  useQuery(
+    getGnosisTxStatus,
+    {
+      chainId: payment.data.token.chainId || 1,
+      transactionHash: payment.data.multisigTransaction?.safeTxHash || "",
+      proposalId: proposal.id,
+      milestoneId: milestone.id,
+    },
+    {
+      suspense: false,
+      // refetchOnWindowFocus defaults to true so switching tabs will re-trigger query for immediate response feel
+      refetchInterval: 30 * 1000, // 30 seconds, background refresh rate in-case user doesn't switch around tabs
+      enabled:
+        // milestone is in progress
+        getMilestoneStatus(proposal, milestone) === ProposalMilestoneStatus.IN_PROGRESS &&
+        // payment is still pending
+        !payment.transtransactionHash &&
+        // payment has been queued to Gnosis
+        !!payment.data.multisigTransaction?.safeTxHash,
+      onSuccess: (markedTransactionAsComplete) => {
+        if (markedTransactionAsComplete) {
+          // invalidate milestones query to refresh data in milestone box componenets
+          invalidateQuery(getMilestonesByProposal)
+          invalidateQuery(getProposalById)
+        }
+      },
+    }
+  )
 
   // going to be running this no matter what type of address is payer
   // possible improvement would be to store the type of address on a payment and only run on safe
@@ -242,7 +208,7 @@ export const ProposalMilestonePaymentBox = ({
   const [queueGnosisTransactionModalOpen, setQueueGnosisTransactionModalOpen] =
     useState<boolean>(false)
 
-  const milestoneStatus = getMilestoneStatus(proposal, milestone)
+  const milestoneStatus = getMilestoneStatus(proposal, milestone) || ""
 
   return (
     <>
@@ -266,13 +232,16 @@ export const ProposalMilestonePaymentBox = ({
           {/* TITLE */}
           <span>{milestone?.data?.title || "title"}</span>
           {/* STATUS */}
-          {milestoneStatus === ProposalMilestoneStatus.COMPLETE && <PaymentPaidStatus />}
-          {milestoneStatus === ProposalMilestoneStatus.IN_PROGRESS && (
-            <PaymentInProgressStatus proposal={proposal} milestone={milestone} />
-          )}
-          {milestoneStatus === ProposalMilestoneStatus.SCHEDULED && (
-            <PaymentScheduledStatus proposal={proposal} milestone={milestone} />
-          )}
+          <div className="flex flex-col items-end space-y-1">
+            <div className="flex flex-row items-center space-x-1">
+              <span
+                className={`h-2 w-2 rounded-full ${PROPOSAL_MILESTONE_STATUS_MAP[milestoneStatus]?.color}`}
+              />
+              <div className="font-bold text-xs uppercase tracking-wider">
+                {PROPOSAL_MILESTONE_STATUS_MAP[milestoneStatus]?.copy}
+              </div>
+            </div>
+          </div>
         </div>
         {/* TABLE HEADER */}
         <div className=" text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">

@@ -43,6 +43,7 @@ export default async function getGnosisTxStatus(params: z.infer<typeof GetGnosis
   // need to dig more, but want to start by focusing on the success case since thats
   // almost certainly more likely.
   const results = await response.json()
+
   if (results.isExecuted) {
     try {
       await SaveTransactionHashToPayments({
