@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react"
-import { CheckIcon } from "@heroicons/react/solid"
 import { ProposalRoleType } from "@prisma/client"
 import { PROPOSAL_ROLE_MAP } from "app/core/utils/constants"
-import { InformationCircleIcon } from "@heroicons/react/solid"
+import { InformationCircleIcon, CheckIcon } from "@heroicons/react/solid"
 
 export type Step = {
   description: string
@@ -111,8 +110,8 @@ const ProposalStepper = ({
                 ) : null}
                 <span className="group relative flex items-start" aria-current="step">
                   <span className="flex h-6 items-center" aria-hidden="true">
-                    <span className="relative z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 border-electric-violet bg-marble-white">
-                      <span className="h-2 w-2 rounded-full bg-electric-violet" />
+                    <span className="relative z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 bg-marble-white">
+                      <CheckIcon className="h-3 w-3 text-concrete" aria-hidden="true" />
                     </span>
                   </span>
                   <div className="flex flex-col space-y-2 ml-4 min-w-0">
@@ -131,8 +130,8 @@ const ProposalStepper = ({
                 ) : null}
                 <span className="group relative flex items-start">
                   <span className="flex h-6 items-center" aria-hidden="true">
-                    <span className="relative z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 border-concrete bg-wet-concrete group-hover:border-gray-400">
-                      <span className="h-2 w-2 rounded-full bg-transparent group-hover:bg-concrete" />
+                    <span className="relative z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 border-concrete bg-concrete group-hover:border-gray-400">
+                      <CheckIcon className="h-3 w-3 text-wet-concrete" aria-hidden="true" />
                     </span>
                   </span>
                   <span className="ml-4 min-w-0">
