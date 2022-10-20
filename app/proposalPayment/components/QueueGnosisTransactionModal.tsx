@@ -8,7 +8,6 @@ import useStore from "app/core/hooks/useStore"
 import { Field, Form } from "react-final-form"
 import { composeValidators, isValidTransactionLink, requiredField } from "app/utils/validators"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
-import getProposalById from "app/proposal/queries/getProposalById"
 import { txPathString } from "app/core/utils/constants"
 import saveTransactionHashToPayments from "app/proposal/mutations/saveTransactionToPayments"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
@@ -107,6 +106,7 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
                 const s = await updatePaymentMutation({
                   multisigTransaction: {
                     transactionId: response.txId,
+                    safeTxHash: response.detailedExecutionInfo.safeTxHash,
                     address: response.safeAddress,
                   },
                   paymentId: activePayment.id,
