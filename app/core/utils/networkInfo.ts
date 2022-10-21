@@ -42,3 +42,8 @@ export const getNetworkName = (chainId: number): string => {
     return ""
   }
 }
+
+export const getNetworkUsdc = (chainId: number): Token => {
+  const stablecoins = networks[chainId]?.stablecoins || []
+  return stablecoins.find((token) => token.symbol === "USDC")
+}

@@ -1,5 +1,5 @@
 import { PARTNERS } from "app/core/utils/constants"
-import db from "../index"
+import db from "db"
 import { TokenType } from "@prisma/client"
 import { Rfp } from "app/rfp/types"
 

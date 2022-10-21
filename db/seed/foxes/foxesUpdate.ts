@@ -1,5 +1,5 @@
 import { PARTNERS } from "app/core/utils/constants"
-import db, { TokenType } from "../index"
+import db, { TokenType } from "db"
 import { Rfp } from "app/rfp/types"
 
 const seed = async () => {
