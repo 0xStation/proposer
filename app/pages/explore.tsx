@@ -5,19 +5,36 @@ import Pagination from "app/core/components/Pagination"
 import { PAGINATION_TAKE } from "app/core/utils/constants"
 import getAllAccounts from "app/account/queries/getAllAccounts"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
+import { AddressType } from "@prisma/client"
 
 enum Tab {
-  WORKSPACES = "WORKSPACES",
+  ORGANIZATIONS = "ORGANIZATIONS",
+  INDIVIDUALS = "INDIVIDUALS",
 }
 
 const Explore: BlitzPage = () => {
   const [page, setPage] = useState<number>(0)
-  const [tab, setTab] = useState<Tab>(Tab.WORKSPACES)
+  const [tab, setTab] = useState<Tab>(Tab.ORGANIZATIONS)
 
   const [accounts] = useQuery(
     getAllAccounts,
-    { page: page, paginationTake: PAGINATION_TAKE, sortUpdatedAt: true },
-    { suspense: false, refetchOnReconnect: false, refetchOnWindowFocus: false }
+    {
+      page: page,
+      paginationTake: PAGINATION_TAKE,
+      sortUpdatedAt: true,
+      filterAddressType:
+        tab === Tab.ORGANIZATIONS
+          ? AddressType.SAFE
+          : tab === Tab.INDIVIDUALS
+          ? AddressType.WALLET
+          : undefined,
+    },
+    {
+      suspense: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
+      cacheTime: 60 * 1000, // 1 minute
+    }
   )
 
   return (
@@ -29,11 +46,19 @@ const Explore: BlitzPage = () => {
           <div className="self-end flex flex-row space-x-4">
             <span
               className={`${
-                tab === Tab.WORKSPACES && "border-b mb-[-1px] font-bold"
+                tab === Tab.ORGANIZATIONS && "border-b mb-[-1px] font-bold"
               } cursor-pointer`}
-              onClick={() => setTab(Tab.WORKSPACES)}
+              onClick={() => setTab(Tab.ORGANIZATIONS)}
             >
-              Directory
+              Organizations
+            </span>
+            <span
+              className={`${
+                tab === Tab.INDIVIDUALS && "border-b mb-[-1px] font-bold"
+              } cursor-pointer`}
+              onClick={() => setTab(Tab.INDIVIDUALS)}
+            >
+              Individuals
             </span>
           </div>
 
@@ -42,7 +67,7 @@ const Explore: BlitzPage = () => {
             resultsCount={accounts?.length as number}
             page={page}
             setPage={setPage}
-            resultsLabel={Tab.WORKSPACES.toString().toLowerCase()}
+            resultsLabel={tab.toString().toLowerCase()}
             className="pl-6 sm:pr-6 text-sm pt-5 mb-5"
           />
         </div>
