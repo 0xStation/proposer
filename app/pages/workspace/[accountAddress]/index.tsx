@@ -24,6 +24,8 @@ import {
   PROPOSAL_ROLE_FILTER_OPTIONS,
   PROPOSAL_NEW_STATUS_DISPLAY_MAP,
   Sizes,
+  RFP_STATUS_FILTER_OPTIONS,
+  RFP_STATUS_DISPLAY_MAP,
 } from "app/core/utils/constants"
 import {
   AddressType,
@@ -315,6 +317,7 @@ const WorkspaceHome: BlitzPage = () => {
   const RfpTab = () => {
     const RFP_PAGINATION_TAKE = 25
     const [rfpPage, setRfpPage] = useState<number>(0)
+    const [rfpStatusFilters, setRfpStatusFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
 
     const [rfps] = useQuery(
       getRfpsForAccount,
@@ -322,6 +325,7 @@ const WorkspaceHome: BlitzPage = () => {
         address: toChecksumAddress(accountAddress),
         page: rfpPage,
         paginationTake: RFP_PAGINATION_TAKE,
+        statuses: Array.from(rfpStatusFilters),
       },
       { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
     )
@@ -376,7 +380,22 @@ const WorkspaceHome: BlitzPage = () => {
         {/* FILTERS & PAGINATION */}
         <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">
           {/* FILTERS */}
-          <div className="h-10"></div>
+          <div className="space-x-2 flex flex-row">
+            <FilterPill
+              label="status"
+              filterOptions={RFP_STATUS_FILTER_OPTIONS.map((status) => ({
+                name: RFP_STATUS_DISPLAY_MAP[status]?.copy?.toUpperCase(),
+                value: status,
+              }))}
+              appliedFilters={rfpStatusFilters}
+              setAppliedFilters={setRfpStatusFilters}
+              refetchCallback={() => {
+                setRfpPage(0)
+                invalidateQuery(getRfpsForAccount)
+                invalidateQuery(getRfpCountForAccount)
+              }}
+            />
+          </div>
           {/* PAGINATION */}
           <Pagination
             results={rfps as any[]}
