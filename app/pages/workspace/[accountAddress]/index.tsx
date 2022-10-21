@@ -112,6 +112,7 @@ const WorkspaceHome: BlitzPage = () => {
       enabled: !!accountAddress,
       suspense: false,
       refetchOnWindowFocus: false,
+      cacheTime: 60 * 1000, // 1 minute
     }
   )
 
@@ -122,6 +123,7 @@ const WorkspaceHome: BlitzPage = () => {
       enabled: !!account && account.addressType === AddressType.SAFE,
       suspense: false,
       refetchOnWindowFocus: false,
+      cacheTime: 60 * 1000, // 1 minute
     }
   )
 
@@ -161,7 +163,12 @@ const WorkspaceHome: BlitzPage = () => {
         page: proposalPage,
         paginationTake: PAGINATION_TAKE,
       },
-      { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
+      {
+        enabled: !!accountAddress,
+        suspense: false,
+        refetchOnWindowFocus: false,
+        cacheTime: 60 * 1000, // 1 minute
+      }
     )
 
     const [proposalCount] = useQuery(
@@ -171,7 +178,12 @@ const WorkspaceHome: BlitzPage = () => {
         statuses: Array.from(proposalStatusFilters),
         roles: Array.from(proposalRoleFilters),
       },
-      { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
+      {
+        enabled: !!accountAddress,
+        suspense: false,
+        refetchOnWindowFocus: false,
+        cacheTime: 60 * 1000, // 1 minute
+      }
     )
 
     return (
@@ -337,7 +349,12 @@ const WorkspaceHome: BlitzPage = () => {
         paginationTake: RFP_PAGINATION_TAKE,
         statuses: Array.from(rfpStatusFilters),
       },
-      { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
+      {
+        enabled: !!accountAddress,
+        suspense: false,
+        refetchOnWindowFocus: false,
+        cacheTime: 60 * 1000, // 1 minute
+      }
     )
 
     const [rfpCount] = useQuery(
@@ -346,7 +363,12 @@ const WorkspaceHome: BlitzPage = () => {
         address: toChecksumAddress(accountAddress),
         statuses: Array.from(rfpStatusFilters),
       },
-      { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
+      {
+        enabled: !!accountAddress,
+        suspense: false,
+        refetchOnWindowFocus: false,
+        cacheTime: 60 * 1000, // 1 minute
+      }
     )
 
     const RfpCard = ({ rfp }) => {
