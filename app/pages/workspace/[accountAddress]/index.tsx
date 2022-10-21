@@ -11,7 +11,7 @@ import {
   useRouterQuery,
 } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import Button from "app/core/components/sds/buttons/Button"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { formatDate } from "app/core/utils/formatDate"
 import FilterPill from "app/core/components/FilterPill"
@@ -455,9 +455,19 @@ const WorkspaceHome: BlitzPage = () => {
             </div>
           ) : (
             <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-              <p className="text-2xl font-bold w-[295px] text-center">
-                This workspace has no proposals yet
+              <p className="text-2xl font-bold w-1/3 text-center">
+                Unlock this feature by sending a proposal to Station Helpdesk.
               </p>
+              <Link
+                href={Routes.CreateNonFundingProposal({
+                  clients: "station-helpdesk.eth",
+                  title: "Requesting RFP access for " + accountAddress,
+                })}
+              >
+                <Button className="mt-8 w-48" type={ButtonType.Secondary}>
+                  Request access
+                </Button>
+              </Link>
             </div>
           ))}
       </div>
