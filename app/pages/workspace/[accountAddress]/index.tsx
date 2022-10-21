@@ -54,6 +54,7 @@ import { getPaymentAmount, getPaymentToken } from "app/template/utils"
 import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpId"
 import getTemplateByRfpId from "app/template/queries/getTemplateByRfpId"
 import getRfpCountForAccount from "app/rfp/queries/getRfpCountForAccount"
+import getProposalCountForAccount from "app/proposal/queries/getProposalCountForAccount"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
@@ -151,7 +152,7 @@ const WorkspaceHome: BlitzPage = () => {
     )
     const [proposalPage, setProposalPage] = useState<number>(0)
 
-    const [proposalResponse] = useQuery(
+    const [proposals] = useQuery(
       getProposalsByAddress,
       {
         address: toChecksumAddress(accountAddress),
@@ -162,7 +163,15 @@ const WorkspaceHome: BlitzPage = () => {
       },
       { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
     )
-    const { count, proposals } = proposalResponse || {}
+
+    const [proposalCount] = useQuery(
+      getProposalCountForAccount,
+      {
+        address: toChecksumAddress(accountAddress),
+        statuses: Array.from(proposalStatusFilters),
+      },
+      { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
+    )
 
     return (
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
@@ -201,7 +210,7 @@ const WorkspaceHome: BlitzPage = () => {
           {/* PAGINATION */}
           <Pagination
             results={proposals as any[]}
-            resultsCount={count || 0}
+            resultsCount={proposalCount || 0}
             page={proposalPage}
             setPage={setProposalPage}
             resultsLabel="proposals"

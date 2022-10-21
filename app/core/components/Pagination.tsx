@@ -30,9 +30,7 @@ export const Pagination = ({
       to
       <span className="text-electric-violet font-bold">
         {" "}
-        {(page + 1) * paginationTake >= resultsCount!
-          ? results?.length + page * paginationTake
-          : (page + 1) * paginationTake}{" "}
+        {page * paginationTake + (results ? results?.length : paginationTake)}{" "}
       </span>
       of
       <span className="font-bold"> {resultsCount} </span>

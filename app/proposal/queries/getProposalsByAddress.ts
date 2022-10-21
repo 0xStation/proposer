@@ -13,61 +13,52 @@ const GetProposalsByAddress = z.object({
 })
 
 export default async function getProposalsByAddress(input: z.infer<typeof GetProposalsByAddress>) {
-  const data = GetProposalsByAddress.parse(input)
+  const params = GetProposalsByAddress.parse(input)
 
   const whereParams = {
     where: {
       suppress: false,
       roles: {
         some: {
-          address: data.address,
-          ...(data.roles &&
-            data.roles.length > 0 && {
+          address: params.address,
+          ...(params.roles &&
+            params.roles.length > 0 && {
               type: {
-                in: data.roles,
+                in: params.roles,
               },
             }),
         },
       },
-      ...(data.statuses &&
-        data.statuses.length > 0 && {
+      ...(params.statuses &&
+        params.statuses.length > 0 && {
           status: {
-            in: data.statuses,
+            in: params.statuses,
           },
         }),
     },
   }
 
-  const response = (await db.$transaction([
-    db.proposal.count(whereParams),
-    db.proposal.findMany({
-      ...whereParams,
-      take: input.paginationTake,
-      skip: input.page * input.paginationTake,
-      orderBy: {
-        timestamp: "desc",
-      },
-      include: {
-        roles: {
-          include: {
-            account: true,
-          },
+  const proposals = (await db.proposal.findMany({
+    ...whereParams,
+    take: input.paginationTake,
+    skip: input.page * input.paginationTake,
+    orderBy: {
+      timestamp: "desc",
+    },
+    include: {
+      roles: {
+        include: {
+          account: true,
         },
       },
-    }),
-  ])) as unknown as [number, Proposal[]]
+    },
+  })) as unknown as Proposal[]
 
-  let count = response[0]
-  let proposals = response[1]
-
-  return {
-    count,
-    proposals: proposals.filter((proposal) => {
-      if (proposal?.status === ProposalStatus.DRAFT) {
-        const authorRole = proposal?.roles?.find((role) => role.type === ProposalRoleType.AUTHOR)
-        return addressesAreEqual(data.address, authorRole?.address as string)
-      }
-      return true
-    }),
-  }
+  return proposals.filter((proposal) => {
+    if (proposal?.status === ProposalStatus.DRAFT) {
+      const authorRole = proposal?.roles?.find((role) => role.type === ProposalRoleType.AUTHOR)
+      return addressesAreEqual(params.address, authorRole?.address as string)
+    }
+    return true
+  })
 }
