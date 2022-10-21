@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useParam, useQuery } from "blitz"
 import useStore from "app/core/hooks/useStore"
 import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
-import Button from "app/core/components/sds/buttons/Button"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { ProposalRoleType, ProposalStatus, RfpStatus } from "@prisma/client"
 import Stepper, { StepStatus } from "app/core/components/Stepper"
 import getProposalById from "../queries/getProposalById"
@@ -39,7 +39,7 @@ const ProposalStepper = () => {
 
   const rawSteps = [
     {
-      description: "Author sends proposal",
+      description: "Proposal sent",
       status: proposal
         ? proposal.status === ProposalStatus.DRAFT
           ? StepStatus.current
@@ -57,7 +57,7 @@ const ProposalStepper = () => {
       },
     },
     {
-      description: "Client, contributor, and author approve the proposal",
+      description: "Proposal approved by signers",
       status: proposal
         ? proposal.status === ProposalStatus.APPROVED
           ? StepStatus.complete
@@ -68,6 +68,7 @@ const ProposalStepper = () => {
       actions: {
         [ProposalRoleType.CLIENT]: activeUserHasRolesToSign && (
           <Button
+            type={ButtonType.Secondary}
             isDisabled={Boolean(rfp && rfp?.status === RfpStatus.CLOSED)}
             onClick={() => toggleProposalApprovalModalOpen(true)}
           >
@@ -76,6 +77,7 @@ const ProposalStepper = () => {
         ),
         [ProposalRoleType.CONTRIBUTOR]: activeUserHasRolesToSign && (
           <Button
+            type={ButtonType.Secondary}
             isDisabled={Boolean(rfp && rfp?.status === RfpStatus.CLOSED)}
             onClick={() => toggleProposalApprovalModalOpen(true)}
           >
