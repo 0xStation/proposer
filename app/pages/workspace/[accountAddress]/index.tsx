@@ -334,6 +334,7 @@ const WorkspaceHome: BlitzPage = () => {
       getRfpCountForAccount,
       {
         address: toChecksumAddress(accountAddress),
+        statuses: Array.from(rfpStatusFilters),
       },
       { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
     )
