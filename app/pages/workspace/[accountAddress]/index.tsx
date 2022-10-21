@@ -325,13 +325,19 @@ const WorkspaceHome: BlitzPage = () => {
               className={`flex flex-row w-full my-1 rounded-lg bg-wet-concrete shadow border-solid h-[48px] motion-safe:animate-pulse`}
             />
           ))}
-        {proposals && proposals.length === 0 && (
-          <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-            <p className="text-2xl font-bold w-[295px] text-center">
-              This workspace has no proposals yet
-            </p>
-          </div>
-        )}
+        {proposals &&
+          proposals.length === 0 &&
+          (proposalStatusFilters.size || proposalRoleFilters.size ? (
+            <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
+              <p className="text-2xl font-bold w-[295px] text-center">No matches.</p>
+            </div>
+          ) : (
+            <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
+              <p className="text-2xl font-bold w-[295px] text-center">
+                This workspace has no proposals yet
+              </p>
+            </div>
+          ))}
       </div>
     )
   }
@@ -441,13 +447,19 @@ const WorkspaceHome: BlitzPage = () => {
             ))}
         </div>
         {/* RFP EMPTY */}
-        {rfps && rfps.length === 0 && (
-          <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-            <p className="text-2xl font-bold w-[295px] text-center">
-              This workspace has no RFPs yet
-            </p>
-          </div>
-        )}
+        {rfps &&
+          rfps.length === 0 &&
+          (rfpStatusFilters.size ? (
+            <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
+              <p className="text-2xl font-bold w-[295px] text-center">No matches.</p>
+            </div>
+          ) : (
+            <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
+              <p className="text-2xl font-bold w-[295px] text-center">
+                This workspace has no proposals yet
+              </p>
+            </div>
+          ))}
       </div>
     )
   }
