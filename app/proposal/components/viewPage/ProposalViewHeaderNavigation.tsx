@@ -96,6 +96,12 @@ export const ProposalViewHeaderNavigation = () => {
         )
       : ""
 
+  const proposalContainsPayment = (proposal?.payments && proposal?.payments.length > 0) || false
+
+  const showPayInformation =
+    proposalContainsPayment &&
+    (proposal?.status === ProposalStatus.APPROVED || proposal?.status === ProposalStatus.COMPLETE)
+
   return (
     <>
       <SendProposalModal
@@ -213,7 +219,16 @@ export const ProposalViewHeaderNavigation = () => {
             </Tab>
             {(proposal?.payments || []).length > 0 && (
               <Tab router={router} route={Routes.ProposalPayments({ proposalId })}>
-                Payments
+                {showPayInformation ? (
+                  <span className="flex flex-row space-x-1 items-center">
+                    <span>Payments</span>
+                    <span className="bg-neon-carrot rounded-full flex items-center justify-center h-4 w-4">
+                      <span className="text-xs">{(proposal?.payments || []).length}</span>
+                    </span>
+                  </span>
+                ) : (
+                  "Payments"
+                )}
               </Tab>
             )}
           </ul>
