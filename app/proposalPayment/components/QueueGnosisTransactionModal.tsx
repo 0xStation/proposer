@@ -77,7 +77,7 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
       <>
         <h3 className="text-2xl font-bold mt-4">Queue transaction</h3>
         <p className="mt-2">
-          Sign to queue this transaction On Gnosis. Afterwards, you will be able to view this
+          Sign to queue this transaction on Gnosis. Afterwards, you and other signers will be able to view and execute this
           transaction on the Gnosis app.
         </p>
         <div className="mt-8 flex items-center">
