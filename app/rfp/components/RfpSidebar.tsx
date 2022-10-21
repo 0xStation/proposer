@@ -81,14 +81,16 @@ export const RfpSidebar = ({ rfp }) => {
           {rfp?.data?.content.submissionGuideline && (
             <div>
               <h4 className="text-xs font-bold text-concrete uppercase">Submission guidelines</h4>
-              <ReadMore maxCharLength={75}>{rfp?.data?.content.submissionGuideline}</ReadMore>
+              <ReadMore className="mt-2" maxCharLength={75}>
+                {rfp?.data?.content.submissionGuideline}
+              </ReadMore>
             </div>
           )}
           {/* SUBMISSION REQUIREMENT */}
           {!!rfp?.data?.singleTokenGate && (
             <div>
               <h4 className="text-xs font-bold text-concrete uppercase">Submission requirement</h4>
-              <div>
+              <div className="mt-2">
                 {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
                 <TextLink
                   url={

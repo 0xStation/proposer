@@ -330,15 +330,17 @@ export const txPathString = "/tx/"
 
 export const PARTNERS = {
   FOXES: {
-    ADDRESS: "0xC3c74B36A7F7c3395c6D59086F5a49540ed180ED",
-    CHAIN_ID: 5,
+    // ADDRESS: "0xC3c74B36A7F7c3395c6D59086F5a49540ed180ED",
+    // CHAIN_ID: 5,
     // switch to this for official release
-    // ADDRESS: "0x332557dE221d09AD5b164a665c585fca0200b4B1",
-    // CHAIN_ID: 1,
+    ADDRESS: "0x332557dE221d09AD5b164a665c585fca0200b4B1",
+    CHAIN_ID: 1,
   },
   STATION: {
-    ADDRESS: "0x91d38BB4f803b64e94baFa8fce4e02d86C8380aB",
-    CHAIN_ID: 5,
+    // ADDRESS: "0x91d38BB4f803b64e94baFa8fce4e02d86C8380aB",
+    // CHAIN_ID: 5,
+    ADDRESS: "0xc517c83f417b73dA98647dad0FCB80af9f3b9531",
+    CHAIN_ID: 1,
   },
   UNISWAP: {
     ADDRESS: "0x0b74007a73ca49c96C833ba0E38Aa929ba71c40f",
@@ -383,7 +385,7 @@ export const TEMPLATES = {
         mapsTo: RESERVED_KEYS.MILESTONES,
         value: [
           {
-            title: "Contributor payment",
+            title: "Upfront payment",
             index: 0,
           },
         ],
@@ -436,7 +438,7 @@ export const TEMPLATES = {
         mapsTo: RESERVED_KEYS.MILESTONES,
         value: [
           {
-            title: "Contributor payment",
+            title: "Upfront payment",
             index: 0,
           },
         ],
@@ -492,7 +494,7 @@ export const TEMPLATES = {
         mapsTo: RESERVED_KEYS.MILESTONES,
         value: [
           {
-            title: "Contributor payment",
+            title: "Upfront payment",
             index: 0,
           },
         ],
