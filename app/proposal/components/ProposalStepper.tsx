@@ -39,7 +39,7 @@ const ProposalStepper = () => {
 
   const rawSteps = [
     {
-      description: "Proposal sent",
+      description: "Send proposal",
       status: proposal
         ? proposal.status === ProposalStatus.DRAFT
           ? StepStatus.current
@@ -57,7 +57,7 @@ const ProposalStepper = () => {
       },
     },
     {
-      description: "Proposal approved by signers",
+      description: "Signers approve proposal",
       status: proposal
         ? proposal.status === ProposalStatus.APPROVED
           ? StepStatus.complete
