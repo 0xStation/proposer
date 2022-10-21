@@ -96,11 +96,10 @@ export const ProposalViewHeaderNavigation = () => {
         )
       : ""
 
-  const proposalContainsPayment = (proposal?.payments && proposal?.payments.length > 0) || false
+  const = currentMilestone = proposal?.milestones.find(milestone => milestone.index === proposal.currentMilestoneIndex)
+  const currentMilestoneContainsPendingPayment = (proposal?.payments?.filter(payment => !payment.transactionHash && payment.milestoneId === currentMilestone?.id).length > 0) || false
 
-  const showPayInformation =
-    proposalContainsPayment &&
-    (proposal?.status === ProposalStatus.APPROVED || proposal?.status === ProposalStatus.COMPLETE)
+  const showPayInformation = !!currentMilestone && currentMilestoneContainsPendingPayment
 
   return (
     <>
