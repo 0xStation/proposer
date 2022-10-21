@@ -13,8 +13,18 @@ export type ProposalTemplateMetadata = {
 export type ProposalTemplateField = {
   key: string
   mapsTo: string
-  value: any
   fieldType: ProposalTemplateFieldType
+  value?: any
+  validation?: ProposalTemplateFieldValidation[]
+}
+
+export type ProposalTemplateFieldValidation = {
+  name: ProposalTemplateFieldValidationName
+  args: any[]
+}
+
+export enum ProposalTemplateFieldValidationName {
+  MIN_WORDS = "mustBeAboveNumWords",
 }
 
 export enum ProposalTemplateFieldType {
@@ -27,6 +37,7 @@ export enum RESERVED_KEYS {
   ROLES = "roles",
   CLIENTS = "clients",
   CONTRIBUTORS = "contributors",
+  BODY = "body",
   AUTHORS = "authors",
   MILESTONES = "milestones",
   PAYMENTS = "payments",

@@ -17,6 +17,7 @@ const seed = async () => {
           id: rfp.id,
         },
         data: {
+          templateId: "cd28828c-e51a-4796-80f5-e39d4cc43fab",
           data: {
             ...Object(rfp.data),
             content: {

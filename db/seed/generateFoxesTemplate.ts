@@ -4,13 +4,25 @@ import db from "db"
 const seed = async () => {
   const foxesTemplateId = "835ef848-91c1-46da-bdf9-4b0a277fe808"
 
-  const template = await db.proposalTemplate.create({
-    data: {
+  const template = await db.proposalTemplate.upsert({
+    where: {
       id: foxesTemplateId,
-      chainId: 5, // change to 1 when on production
+    },
+    create: {
+      id: foxesTemplateId,
+      chainId: PARTNERS.FOXES.CHAIN_ID, // change to 1 when on production
       accountAddress: PARTNERS.FOXES.ADDRESS, // change when seeding production
       data: {
-        title: "Foxes Template",
+        title: "Foxes Phase 1",
+        fields: TEMPLATES.FOXES.TERM,
+      },
+    },
+    update: {
+      id: foxesTemplateId,
+      chainId: PARTNERS.FOXES.CHAIN_ID, // change to 1 when on production
+      accountAddress: PARTNERS.FOXES.ADDRESS, // change when seeding production
+      data: {
+        title: "Foxes Phase 1",
         fields: TEMPLATES.FOXES.TERM,
       },
     },

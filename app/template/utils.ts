@@ -2,6 +2,10 @@ import { Token } from "app/token/types"
 import { getFieldDef } from "graphql/execution/execute"
 import { RESERVED_KEYS, ProposalTemplateField } from "./types"
 
+export const getField = (template: ProposalTemplateField[] | undefined, key: RESERVED_KEYS) => {
+  return template ? template.find((field) => field.key === key) : null
+}
+
 export const getFieldValue = (
   template: ProposalTemplateField[] | undefined,
   key: RESERVED_KEYS
@@ -33,4 +37,8 @@ export const getPaymentToken = (template: ProposalTemplateField[] | undefined): 
 
 export const getPaymentAmount = (template: ProposalTemplateField[] | undefined): number => {
   return getFieldValue(template, RESERVED_KEYS.PAYMENTS)?.[0]?.amount
+}
+
+export const getMinNumWords = (template: ProposalTemplateField[] | undefined): number => {
+  return getField(template, RESERVED_KEYS.BODY)?.validation?.[0]?.args[0] || 0
 }

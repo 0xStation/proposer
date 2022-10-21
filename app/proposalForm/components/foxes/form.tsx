@@ -27,6 +27,7 @@ import {
   addAddressAsRecipientToPayments,
   getClientAddress,
   getFieldValue,
+  getMinNumWords,
 } from "app/template/utils"
 import { RESERVED_KEYS, ProposalTemplateField } from "app/template/types"
 import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
@@ -285,11 +286,10 @@ export const FoxesProposalForm = () => {
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
 
-          const FOXES_MIN_NUM_WORDS = 125
+          const minNumWords = getMinNumWords(template?.data?.fields)
 
           const unFilledProposalFields =
-            !formState.values.body ||
-            !!mustBeAboveNumWords(FOXES_MIN_NUM_WORDS)(formState.values.body)
+            !formState.values.body || !!mustBeAboveNumWords(minNumWords)(formState.values.body)
 
           return (
             <form onSubmit={handleSubmit} className="mt-20">
@@ -328,9 +328,7 @@ export const FoxesProposalForm = () => {
                     <h2 className="text-marble-white text-xl font-bold">
                       {HeaderCopy[proposalStep]}
                     </h2>
-                    {proposalStep === FundingProposalStep.PROPOSE && (
-                      <FoxesProposeFirstStep minNumWords={FOXES_MIN_NUM_WORDS} />
-                    )}
+                    {proposalStep === FundingProposalStep.PROPOSE && <FoxesProposeFirstStep />}
                     {proposalStep === FundingProposalStep.CONFIRM && (
                       <FoxesConfirmForm body={formState.values.body} />
                     )}
