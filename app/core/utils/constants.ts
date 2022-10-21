@@ -480,59 +480,58 @@ export const TEMPLATES = {
       id: "96058a8b-b1f5-4ba5-811d-e3415eccb3ce",
       title: "Design Uniswap’s POAP",
       fields: [
-        [
-          {
-            key: RESERVED_KEYS.CONTRIBUTORS,
-            mapsTo: RESERVED_KEYS.ROLES,
-            value: [],
-            fieldType: ProposalTemplateFieldType.OPEN,
-          },
-          {
-            key: RESERVED_KEYS.AUTHORS,
-            mapsTo: RESERVED_KEYS.ROLES,
-            value: [],
-            fieldType: ProposalTemplateFieldType.OPEN,
-          },
-          {
-            key: RESERVED_KEYS.CLIENTS,
-            mapsTo: RESERVED_KEYS.ROLES,
-            value: [{ address: PARTNERS.UNISWAP.ADDRESS, type: ProposalRoleType.CLIENT }],
-            fieldType: ProposalTemplateFieldType.PRESELECT,
-          },
-          {
-            key: RESERVED_KEYS.MILESTONES,
-            mapsTo: RESERVED_KEYS.MILESTONES,
-            value: [
-              {
-                title: "Upfront payment",
-                index: 0,
+        {
+          key: RESERVED_KEYS.CONTRIBUTORS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.OPEN,
+        },
+        {
+          key: RESERVED_KEYS.AUTHORS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.OPEN,
+        },
+        {
+          key: RESERVED_KEYS.CLIENTS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [{ address: PARTNERS.UNISWAP.ADDRESS, type: ProposalRoleType.CLIENT }],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.MILESTONES,
+          mapsTo: RESERVED_KEYS.MILESTONES,
+          value: [
+            {
+              title: "Upfront payment",
+              index: 0,
+            },
+          ],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.PAYMENTS,
+          mapsTo: RESERVED_KEYS.PAYMENTS,
+          value: [
+            {
+              milestoneIndex: 0,
+              senderAddress: PARTNERS.UNISWAP.ADDRESS,
+              recipientAddress: undefined,
+              token: {
+                ...getNetworkUsdc(PARTNERS.UNISWAP.CHAIN_ID),
+                chainId: PARTNERS.UNISWAP.CHAIN_ID,
               },
-            ],
-            fieldType: ProposalTemplateFieldType.PRESELECT,
-          },
-          {
-            key: RESERVED_KEYS.PAYMENTS,
-            mapsTo: RESERVED_KEYS.PAYMENTS,
-            value: [
-              {
-                milestoneIndex: 0,
-                senderAddress: PARTNERS.UNISWAP.ADDRESS,
-                recipientAddress: undefined,
-                token: {
-                  ...getNetworkUsdc(PARTNERS.UNISWAP.CHAIN_ID),
-                },
-                amount: 50,
-              },
-            ],
-            fieldType: ProposalTemplateFieldType.PREFILL,
-          },
-          {
-            key: RESERVED_KEYS.PAYMENT_TERMS,
-            mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
-            value: PaymentTerm.ON_AGREEMENT,
-            fieldType: ProposalTemplateFieldType.PRESELECT,
-          },
-        ],
+              amount: 50,
+            },
+          ],
+          fieldType: ProposalTemplateFieldType.PREFILL,
+        },
+        {
+          key: RESERVED_KEYS.PAYMENT_TERMS,
+          mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
+          value: PaymentTerm.ON_AGREEMENT,
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
       ],
     },
     COMMUNITY_NEWSLETTER: {
@@ -578,6 +577,7 @@ export const TEMPLATES = {
               recipientAddress: undefined,
               token: {
                 ...getNetworkUsdc(PARTNERS.UNISWAP.CHAIN_ID),
+                chainId: PARTNERS.UNISWAP.CHAIN_ID,
               },
               amount: 1000,
             },

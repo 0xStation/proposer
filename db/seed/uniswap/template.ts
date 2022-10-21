@@ -10,7 +10,7 @@ const seed = async () => {
         id: template.id,
       },
       create: {
-        id: TEMPLATES.UNISWAP.POAP_DESIGN.id,
+        id: template.id,
         chainId: PARTNERS.UNISWAP.CHAIN_ID,
         accountAddress: PARTNERS.UNISWAP.ADDRESS,
         data: {
