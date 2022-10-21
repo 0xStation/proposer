@@ -9,7 +9,11 @@ import {
 import { PaymentTerm } from "app/proposalPayment/types"
 import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
 import { getNetworkCoin } from "./networkInfo"
-import { RESERVED_KEYS, ProposalTemplateFieldType } from "app/template/types"
+import {
+  RESERVED_KEYS,
+  ProposalTemplateFieldType,
+  ProposalTemplateFieldValidationName,
+} from "app/template/types"
 import Gradient0 from "/public/gradients/0.png"
 import Gradient1 from "/public/gradients/1.png"
 import Gradient2 from "/public/gradients/2.png"
@@ -362,6 +366,17 @@ export const TEMPLATES = {
         mapsTo: RESERVED_KEYS.ROLES,
         value: [{ address: PARTNERS.FOXES.ADDRESS, type: ProposalRoleType.CLIENT }],
         fieldType: ProposalTemplateFieldType.PRESELECT,
+      },
+      {
+        key: RESERVED_KEYS.BODY,
+        mapsTo: RESERVED_KEYS.BODY,
+        fieldType: ProposalTemplateFieldType.OPEN,
+        validation: [
+          {
+            name: ProposalTemplateFieldValidationName.MIN_WORDS,
+            args: [125],
+          },
+        ],
       },
       {
         key: RESERVED_KEYS.MILESTONES,

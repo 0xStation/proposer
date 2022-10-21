@@ -8,12 +8,12 @@ import {
 } from "app/utils/validators"
 import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
-import { getClientAddress } from "app/template/utils"
+import { getClientAddress, getFieldValue, getMinNumWords } from "app/template/utils"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 
-export const FoxesProposeFirstStep = ({ minNumWords }) => {
+export const FoxesProposeFirstStep = () => {
   const templateId = useParam("templateId") as string
   const { rfpId } = useRouterQuery()
   const router = useRouter()
@@ -65,7 +65,10 @@ export const FoxesProposeFirstStep = ({ minNumWords }) => {
       {/* BODY */}
       <label className="font-bold block mt-6">Details*</label>
       <span className="text-xs text-concrete block">
-        125 words min. Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown syntax</TextLink>.
+        {getMinNumWords(template?.data.fields) > 0
+          ? `${getMinNumWords(template?.data.fields)} words minimum.`
+          : ""}{" "}
+        Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown syntax</TextLink>.
       </span>
       <Field
         name="body"
@@ -73,7 +76,7 @@ export const FoxesProposeFirstStep = ({ minNumWords }) => {
         validate={composeValidators(
           requiredField,
           mustOmitLongWords(50),
-          mustBeAboveNumWords(minNumWords)
+          mustBeAboveNumWords(getMinNumWords(template?.data.fields))
         )}
       >
         {({ input, meta }) => (

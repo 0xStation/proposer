@@ -24,6 +24,17 @@ const seed = async () => {
             submissionGuideline:
               "Please make sure your submission is 125+ words, and double check for typos.\n\nSubmissions should be fully aligned with, and inclusive of, already established Philosophical Foxes lore. The best entries will connect to other entries in a way that expands the known lore and creates new connections that were previously unknown. Entries should be written in the voice of fox historians in the future. This means that they can be opinionated and inclusive of knowledge not yet known to our current generation of foxes.",
           },
+          singleTokenGate: null,
+          // {
+          //   token: {
+          //     chainId: 1,
+          //     address: "0x55256178aFE74082c4f9aFEF7E40fec949c1b499",
+          //     type: TokenType.ERC721,
+          //     name: "Philosophical Foxes",
+          //     symbol: "FOX",
+          //   },
+          //   minBalance: "1",
+          // },
         },
       },
     })
