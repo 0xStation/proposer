@@ -14,6 +14,7 @@ const ProposalTypeSelection: BlitzPage = () => {
         <h1 className="text-2xl font-bold pt-9 mx-4 mb-6">Select a proposal type</h1>
         <div className="pt-4 mx-4 flex flex-col sm:flex-row">
           <Link
+            shallow={true}
             href={Routes.CreateFundingProposal({
               clients: queryParams?.clients,
               contributors: queryParams?.contributors,
@@ -25,7 +26,10 @@ const ProposalTypeSelection: BlitzPage = () => {
               <p className="pb-4 px-4 pt-3">Request funding in ETH, USDC, or any ERC-20</p>
             </div>
           </Link>
-          <Link href={Routes.CreateNonFundingProposal({ clients: queryParams?.clients })}>
+          <Link
+            shallow={true}
+            href={Routes.CreateNonFundingProposal({ clients: queryParams?.clients })}
+          >
             <div className="max-w-[325px] mb-3 sm:mr-3 rounded-md overflow-hidden bg-wet-concrete cursor-pointer hover:border hover:border-marble-white">
               <Image src={ShareImage} height={550} />
               <h2 className="text-xl font-bold px-4 pt-4">Share an idea</h2>

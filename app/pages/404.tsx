@@ -21,7 +21,10 @@ export default function Page404() {
           <div>
             <h1 className="text-4xl font-bold">{statusCode}</h1>
             <p className="mt-3">{title}</p>
-            <Button className="mt-10 max-w-fit" onClick={() => router.push(Routes.Explore())}>
+            <Button
+              className="mt-10 max-w-fit"
+              onClick={() => router.push(Routes.Explore(), undefined, { shallow: true })}
+            >
               Find workspaces on Station
             </Button>
           </div>
