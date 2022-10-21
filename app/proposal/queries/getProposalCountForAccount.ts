@@ -1,5 +1,5 @@
 import { PROPOSAL_NEW_STATUS_FILTER_OPTIONS } from "app/core/utils/constants"
-import db, { ProposalStatus, RfpStatus } from "db"
+import db, { ProposalRoleType, ProposalStatus, RfpStatus } from "db"
 import * as z from "zod"
 
 const GetProposalCountForAccount = z.object({
@@ -13,7 +13,10 @@ const GetProposalCountForAccount = z.object({
     ])
     .array()
     .optional(),
-  roles: z.any().array().optional(),
+  roles: z
+    .enum([ProposalRoleType.AUTHOR, ProposalRoleType.CONTRIBUTOR, ProposalRoleType.CLIENT])
+    .array()
+    .optional(),
 })
 
 export default async function getProposalCountForAccount(

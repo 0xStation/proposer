@@ -169,6 +169,7 @@ const WorkspaceHome: BlitzPage = () => {
       {
         address: toChecksumAddress(accountAddress),
         statuses: Array.from(proposalStatusFilters),
+        roles: Array.from(proposalRoleFilters),
       },
       { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
     )
