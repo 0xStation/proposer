@@ -348,6 +348,10 @@ export const PARTNERS = {
     // ADDRESS: "0x0b74007a73ca49c96C833ba0E38Aa929ba71c40f",
     // CHAIN_ID: 5,
   },
+  RADICLE: {
+    ADDRESS: "0x60A22232D40486c8E6A7699d02Bdc01f37ACb22f",
+    CHAIN_ID: 1,
+  },
 }
 
 export const TEMPLATES = {
@@ -584,6 +588,50 @@ export const TEMPLATES = {
           key: RESERVED_KEYS.PAYMENT_TERMS,
           mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
           value: PaymentTerm.ON_AGREEMENT,
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+      ],
+    },
+  },
+  RADICLE: {
+    GIVETH_IDEAS: {
+      id: "163dabe4-20f7-4384-87e5-d6678249c229",
+      title: "Contribute ideas to the Radicle x Giveth partnership",
+      fields: [
+        {
+          key: RESERVED_KEYS.CONTRIBUTORS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.OPEN,
+        },
+        {
+          key: RESERVED_KEYS.AUTHORS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.OPEN,
+        },
+        {
+          key: RESERVED_KEYS.CLIENTS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [{ address: PARTNERS.RADICLE.ADDRESS, type: ProposalRoleType.CLIENT }],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.MILESTONES,
+          mapsTo: RESERVED_KEYS.MILESTONES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.PAYMENTS,
+          mapsTo: RESERVED_KEYS.PAYMENTS,
+          value: [],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.PAYMENT_TERMS,
+          mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
+          value: undefined,
           fieldType: ProposalTemplateFieldType.PRESELECT,
         },
       ],
