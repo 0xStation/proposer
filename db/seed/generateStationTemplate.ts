@@ -10,7 +10,7 @@ const seed = async () => {
     },
     create: {
       id: stationTemplateId,
-      chainId: 5, // change to 1 when on production
+      chainId: PARTNERS.STATION.CHAIN_ID, // change to 1 when on production
       accountAddress: PARTNERS.STATION.ADDRESS, // change on production
       data: {
         title: "Partnerships",
@@ -19,7 +19,7 @@ const seed = async () => {
     },
     update: {
       id: stationTemplateId,
-      chainId: 5, // change to 1 when on production
+      chainId: PARTNERS.STATION.CHAIN_ID, // change to 1 when on production
       accountAddress: PARTNERS.STATION.ADDRESS, // change on production
       data: {
         title: "Partnerships",
