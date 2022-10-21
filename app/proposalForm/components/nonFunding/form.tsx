@@ -24,7 +24,13 @@ const HeaderCopy = {
   [FundingProposalStep.CONFIRM]: "Confirm",
 }
 
-export const ProposalNonFundingForm = ({ prefillClients }: { prefillClients: string[] }) => {
+export const ProposalNonFundingForm = ({
+  prefillClients,
+  prefillTitle,
+}: {
+  prefillClients: string[]
+  prefillTitle: string
+}) => {
   const router = useRouter()
   const walletModalOpen = useStore((state) => state.walletModalOpen)
   const setToastState = useStore((state) => state.setToastState)
@@ -104,6 +110,7 @@ export const ProposalNonFundingForm = ({ prefillClients }: { prefillClients: str
       <Form
         initialValues={{
           toAddress: prefillClients?.[0] || "",
+          title: prefillTitle || "",
         }}
         onSubmit={async (values: any, form) => {
           // an author needs to sign the proposal to upload the content to ipfs.

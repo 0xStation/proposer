@@ -5,10 +5,11 @@ import ProposalNonFundingForm from "app/proposalForm/components/nonFunding/form"
 const CreateNonFundingProposal: BlitzPage = () => {
   const queryParams = useRouterQuery()
   const clients = (queryParams?.clients as string)?.split(",").filter((s) => !!s) || []
+  const title = queryParams?.title as string
 
   return (
     <Layout title="New Proposal">
-      <ProposalNonFundingForm prefillClients={clients} />
+      <ProposalNonFundingForm prefillClients={clients} prefillTitle={title} />
     </Layout>
   )
 }
