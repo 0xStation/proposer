@@ -22,11 +22,13 @@ model Account {
   data        Json
 
   sessions           Session[]
+  rfps               Rfp[]
   proposals          ProposalRole[]
   tokens             AccountToken[]
   originsOf          AccountAccount[]    @relation("origin")
   targetsOf          AccountAccount[]    @relation("target")
   verificationEmails EmailVerification[]
+  proposalTemplates  ProposalTemplate[]
 }
 
 enum AddressType {
@@ -53,15 +55,55 @@ enum AccountAccountType {
   PIN_WORKSPACE
 }
 
+// TEMPLATE
+
+model ProposalTemplate {
+  id             String   @id @default(uuid())
+  accountAddress String
+  chainId        Int? // used to query templates on the same chain
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  data           Json
+  rfps           Rfp[]
+  account        Account  @relation(fields: [accountAddress], references: [address])
+}
+
+// REQUESTS FOR PROPOSALS
+
+model Rfp {
+  id             String    @id @default(uuid())
+  accountAddress String
+  templateId     String?
+  data           Json
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  status         RfpStatus @default(OPEN)
+
+  account Account @relation(fields: [accountAddress], references: [address], onDelete: Cascade)
+
+  proposals Proposal[]
+  template  ProposalTemplate? @relation(fields: [templateId], references: [id])
+}
+
+// used to manually open and close rfps
+enum RfpStatus {
+  OPEN
+  CLOSED
+  // TIME_DEPENDENT -- will be used to indicate rely on start/end times to render status
+}
+
 // PROPOSAL SYSTEM
 
 model Proposal {
   id                    String         @id @default(uuid())
+  rfpId                 String?
   status                ProposalStatus @default(DRAFT)
   timestamp             DateTime       @default(now())
   currentMilestoneIndex Int            @default(-1) // no current milestone, gets set to 0 after proposal is approved
   data                  Json
   suppress              Boolean        @default(false)
+
+  rfp Rfp? @relation(fields: [rfpId], references: [id], onDelete: Cascade)
 
   roles      ProposalRole[]
   milestones ProposalMilestone[]

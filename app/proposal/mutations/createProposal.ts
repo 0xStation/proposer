@@ -8,6 +8,7 @@ import { Token } from "app/token/types"
 import { PaymentTerm } from "app/proposalPayment/types"
 
 const CreateProposal = z.object({
+  rfpId: z.string().optional(),
   contentTitle: z.string(),
   contentBody: z.string(),
   // for initial P0 build, frontend is only supporting one contributor
@@ -81,6 +82,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
 
   let proposal = await db.proposal.create({
     data: {
+      ...(params.rfpId && { rfpId: params.rfpId }),
       data: JSON.parse(JSON.stringify(proposalMetadata)),
       roles: {
         createMany: {

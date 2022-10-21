@@ -5,6 +5,7 @@ import { genProposalDigest } from "app/signatures/proposal"
 import { getHash } from "app/signatures/utils"
 import updateProposalMetadata from "app/proposal/mutations/updateProposalMetadata"
 import sendProposal from "app/proposal/mutations/sendProposal"
+import { Proposal } from "app/proposal/types"
 
 export const useConfirmAuthorship = ({
   onSuccess,
@@ -17,7 +18,13 @@ export const useConfirmAuthorship = ({
   const session = useSession({ suspense: false })
   const [sendProposalMutation] = useMutation(sendProposal)
 
-  const confirmAuthorship = async ({ proposal }) => {
+  const confirmAuthorship = async ({
+    proposal,
+    representingRoles = [],
+  }: {
+    proposal: Proposal
+    representingRoles: { roleId: string; complete: boolean }[] | undefined
+  }) => {
     try {
       const authorRole = proposal?.roles?.find((role) => role.type === ProposalRoleType.AUTHOR)
 
@@ -41,6 +48,7 @@ export const useConfirmAuthorship = ({
         authorSignature: signature as string,
         signatureMessage: message,
         proposalHash,
+        representingRoles,
       })
 
       if (sendProposalSuccess) {

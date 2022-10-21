@@ -14,6 +14,14 @@ const SendProposal = z.object({
   authorSignature: z.string(), // should be optional in draft form
   signatureMessage: z.any(), //should be optional in draft form
   proposalHash: z.string(), // should be optional in draft form
+  representingRoles: z
+    .object({
+      roleId: z.string(),
+      complete: z.boolean(),
+    })
+    .array()
+    .optional()
+    .default([]), // array of type role
 })
 
 // Sends a proposal to labeled roles
@@ -63,11 +71,15 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
   }
 
   try {
-    const res = await db.$transaction(async (db) => {
-      // UPDATE PROPOSAL
+    const authorSignatureMetadata: ProposalSignatureMetadata = {
+      signature: params.authorSignature,
+      message: params.signatureMessage,
+      proposalHash: params.proposalHash,
+    }
 
+    const res = await db.$transaction([
       // saves author signature and sets status to AWAITING_APPROVAL
-      await db.proposal.update({
+      db.proposal.update({
         where: {
           id: params.proposalId,
         },
@@ -75,21 +87,12 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
           data: JSON.parse(JSON.stringify(proposalMetadata)),
           status: ProposalStatus.AWAITING_APPROVAL,
         },
-      })
-
+      }),
       // Note: existing proposal signatures and role approvals for this proposal
       // should have already been wiped if an author made edits and wants to re-send the proposal
 
-      const authorSignatureMetadata: ProposalSignatureMetadata = {
-        signature: params.authorSignature,
-        message: params.signatureMessage,
-        proposalHash: params.proposalHash,
-      }
-
-      // SAVE AUTHOR SIGNATURE
-
       // create new signature and connect to proposal and author role
-      await db.proposalSignature.create({
+      db.proposalSignature.create({
         data: {
           type: ProposalSignatureType.SEND,
           address: params.authorAddress,
@@ -107,17 +110,55 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
             },
           },
         },
-      })
+      }),
+      // create new signature and connect to proposal and author role
+      db.proposalSignature.create({
+        data: {
+          type: ProposalSignatureType.APPROVE,
+          address: params.authorAddress,
+          data: authorSignatureMetadata,
+          // connect to this proposal
+          proposal: {
+            connect: {
+              id: params.proposalId,
+            },
+          },
+          // connect to the other roles held by author
+          roles: {
+            connect: params.representingRoles.map((role) => {
+              return { id: role.roleId }
+            }),
+          },
+        },
+      }),
       // update author role to SENT approvalStatus to mark as done
-      await db.proposalRole.update({
+      db.proposalRole.update({
         where: {
           id: associatedAuthorRole.id,
         },
         data: {
           approvalStatus: ProposalRoleApprovalStatus.SENT,
         },
-      })
-    })
+      }),
+      // update non-author roles with complete status
+      // if signature is a multisig, we don't want to mark as complete unless it has met quorum
+      // so we filter for roles that are 'complete'.
+      // complete is a type passed from the front-end indiciating that it is ready to be pushed to status complete
+      ...params.representingRoles
+        .filter((role) => {
+          return role.complete
+        })
+        .map((role) => {
+          return db.proposalRole.update({
+            where: {
+              id: role.roleId,
+            },
+            data: {
+              approvalStatus: ProposalRoleApprovalStatus.APPROVED,
+            },
+          })
+        }),
+    ])
 
     try {
       // send notification emails

@@ -6,6 +6,7 @@ import getProposalById from "app/proposal/queries/getProposalById"
 import ProposalMilestonePaymentBox from "app/core/components/ProposalMilestonePaymentBox"
 import { Proposal } from "app/proposal/types"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
+import { ProposalNestedLayout } from "app/core/components/ProposalNestedLayout"
 
 export const getServerSideProps: GetServerSideProps = async ({ params = {} }) => {
   const { proposalId } = params
@@ -63,33 +64,39 @@ export const ProposalPayments: BlitzPage = () => {
 
   const showPayInformation =
     proposalContainsPayment &&
-    (proposal?.status === ProposalStatus.APPROVED || ProposalStatus.COMPLETE)
+    (proposal?.status === ProposalStatus.APPROVED || proposal?.status === ProposalStatus.COMPLETE)
 
   return (
-    <Layout title="View Payments">
-      <div className="w-full md:min-w-1/2 md:max-w-2xl mx-auto h-full">
-        <ProposalViewHeaderNavigation />
-        {showPayInformation && milestones ? (
-          milestones.map((milestone, i) => (
-            <ProposalMilestonePaymentBox
-              key={i}
-              proposal={proposal as Proposal}
-              milestone={milestone}
-              className="mt-9"
-            />
-          ))
-        ) : Boolean(proposal?.roles) ? (
-          <div className="w-full h-full flex items-center flex-col sm:mt-0">
-            <h1 className="text-2xl font-bold w-[295px] text-center mt-44">No payments queued</h1>
-            <p className="text-base w-[320px] text-center mt-2.5">
-              Payments queue and history will be displayed here after the proposal has been signed
-              by all collaborators.
-            </p>
-          </div>
-        ) : (
-          <div className="mt-9 h-[260px] w-full flex flex-row rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
-        )}
-      </div>
+    <>
+      {showPayInformation && milestones ? (
+        milestones.map((milestone, i) => (
+          <ProposalMilestonePaymentBox
+            key={i}
+            proposal={proposal as Proposal}
+            milestone={milestone}
+            className="mt-9"
+          />
+        ))
+      ) : Boolean(proposal?.roles) ? (
+        <div className="w-full h-full flex items-center flex-col sm:mt-0">
+          <h1 className="text-2xl font-bold w-[295px] text-center mt-44">No payments queued</h1>
+          <p className="text-base w-[320px] text-center mt-2.5">
+            Payments queue and history will be displayed here after the proposal has been signed by
+            all collaborators.
+          </p>
+        </div>
+      ) : (
+        <div className="mt-9 h-[260px] w-full flex flex-row rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+      )}
+    </>
+  )
+}
+
+ProposalPayments.getLayout = function getLayout(page) {
+  // persist layout between pages https://nextjs.org/docs/basic-features/layouts
+  return (
+    <Layout title="Proposal Payments">
+      <ProposalNestedLayout>{page}</ProposalNestedLayout>
     </Layout>
   )
 }

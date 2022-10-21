@@ -83,7 +83,7 @@ export const ProposalNonFundingForm = ({ prefillClients }: { prefillClients: str
     // if the user declines to sign the message verifying their authorship.
     if (createdProposal && shouldHandlePostProposalCreationProcessing) {
       if (!proposalShouldSendLater) {
-        confirmAuthorship({ proposal: createdProposal })
+        confirmAuthorship({ proposal: createdProposal, representingRoles: [] })
       } else {
         router.push(
           Routes.ViewProposal({

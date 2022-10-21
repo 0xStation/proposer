@@ -762,6 +762,7 @@ export const ProposalForm = ({
         authorSignature: signature as string,
         signatureMessage: message,
         proposalHash,
+        representingRoles: [],
       })
 
       if (sendProposalSuccess) {

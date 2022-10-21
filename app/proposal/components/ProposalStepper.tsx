@@ -1,11 +1,25 @@
 import { useState, useEffect } from "react"
+import { useParam, useQuery } from "blitz"
 import useStore from "app/core/hooks/useStore"
 import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 import Button from "app/core/components/sds/buttons/Button"
-import { ProposalRoleType, ProposalStatus } from "@prisma/client"
+import { ProposalRoleType, ProposalStatus, RfpStatus } from "@prisma/client"
 import Stepper, { StepStatus } from "app/core/components/Stepper"
+import getProposalById from "../queries/getProposalById"
+import getRfpByProposalId from "app/rfp/queries/getRfpByProposalId"
 
-const ProposalStepper = ({ proposal }) => {
+const ProposalStepper = () => {
+  const proposalId = useParam("proposalId") as string
+  const [proposal] = useQuery(
+    getProposalById,
+    { id: proposalId },
+    { suspense: false, refetchOnWindowFocus: false, enabled: Boolean(proposalId), staleTime: 500 }
+  )
+  const [rfp] = useQuery(
+    getRfpByProposalId,
+    { proposalId: proposalId as string },
+    { suspense: false, refetchOnWindowFocus: false, enabled: Boolean(proposalId), staleTime: 500 }
+  )
   const activeUser = useStore((state) => state.activeUser)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
   const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
@@ -33,7 +47,12 @@ const ProposalStepper = ({ proposal }) => {
         : StepStatus.loading,
       actions: {
         [ProposalRoleType.AUTHOR]: (
-          <Button onClick={() => toggleSendProposalModalOpen(true)}>Send</Button>
+          <Button
+            isDisabled={Boolean(rfp && rfp?.status === RfpStatus.CLOSED)}
+            onClick={() => toggleSendProposalModalOpen(true)}
+          >
+            Send
+          </Button>
         ),
       },
     },
@@ -48,10 +67,20 @@ const ProposalStepper = ({ proposal }) => {
         : StepStatus.loading,
       actions: {
         [ProposalRoleType.CLIENT]: activeUserHasRolesToSign && (
-          <Button onClick={() => toggleProposalApprovalModalOpen(true)}>Approve</Button>
+          <Button
+            isDisabled={Boolean(rfp && rfp?.status === RfpStatus.CLOSED)}
+            onClick={() => toggleProposalApprovalModalOpen(true)}
+          >
+            Approve
+          </Button>
         ),
         [ProposalRoleType.CONTRIBUTOR]: activeUserHasRolesToSign && (
-          <Button onClick={() => toggleProposalApprovalModalOpen(true)}>Approve</Button>
+          <Button
+            isDisabled={Boolean(rfp && rfp?.status === RfpStatus.CLOSED)}
+            onClick={() => toggleProposalApprovalModalOpen(true)}
+          >
+            Approve
+          </Button>
         ),
       },
     },

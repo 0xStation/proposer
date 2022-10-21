@@ -1,7 +1,12 @@
 import { Link, Routes, useParam, useQuery, useRouter } from "blitz"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import getProposalById from "app/proposal/queries/getProposalById"
-import { ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
+import {
+  ProposalStatus,
+  ProposalRoleApprovalStatus,
+  ProposalRoleType,
+  RfpStatus,
+} from "@prisma/client"
 import { ProposalRole } from "app/proposalRole/types"
 import useStore from "app/core/hooks/useStore"
 import { ProposalStatusPill } from "../../../core/components/ProposalStatusPill"
@@ -14,8 +19,7 @@ import LinkArrow from "app/core/icons/LinkArrow"
 import { LINKS } from "app/core/utils/constants"
 import SendProposalModal from "../SendProposalModal"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
-import { ProposalStatus } from "@prisma/client"
-import ProposalStepper from "../ProposalStepper"
+import getRfpByProposalId from "app/rfp/queries/getRfpByProposalId"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.type === proposalType)
@@ -58,7 +62,18 @@ export const ProposalViewHeaderNavigation = () => {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       enabled: Boolean(proposal?.id),
-      cacheTime: 60 * 1000, // one minute in milliseconds
+      cacheTime: 60 * 10000, // ten minutes in milliseconds
+    }
+  )
+  const [rfp] = useQuery(
+    getRfpByProposalId,
+    { proposalId: proposalId },
+    {
+      suspense: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      enabled: !!proposalId,
+      cacheTime: 60 * 10000, // ten minutes in milliseconds
     }
   )
 
@@ -97,14 +112,31 @@ export const ProposalViewHeaderNavigation = () => {
       )}
       <div className="w-full min-h-64 relative">
         <div className="mt-6 flex flex-row">
-          <span className="text-concrete hover:text-light-concrete">
-            <Link href={Routes.WorkspaceHome({ accountAddress: author?.address as string })}>
-              Proposals
-            </Link>{" "}
-            /&nbsp;
-          </span>
-          {proposal?.data?.content?.title || (
-            <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+          {rfp ? (
+            <>
+              <span className="text-concrete hover:text-light-concrete">
+                <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>RFPs</Link> /&nbsp;
+              </span>
+
+              {rfp?.data?.content?.title ? (
+                <span className="text-marble-white">{rfp?.data?.content?.title}</span>
+              ) : (
+                <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+              )}
+            </>
+          ) : (
+            <>
+              {" "}
+              <span className="text-concrete hover:text-light-concrete">
+                <Link href={Routes.WorkspaceHome({ accountAddress: author?.address as string })}>
+                  Proposals
+                </Link>{" "}
+                /&nbsp;
+              </span>
+              {proposal?.data?.content?.title || (
+                <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+              )}
+            </>
           )}
         </div>
         {proposal?.data.content.title ? (
@@ -161,6 +193,16 @@ export const ProposalViewHeaderNavigation = () => {
         </div>
         {/* BUTTONS */}
         <div className="w-full mt-6 box-border">
+          {Boolean(rfp && rfp?.status === RfpStatus?.CLOSED) && (
+            <div className="rounded bg-neon-carrot text-tunnel-black text-center p-2 mb-3 font-bold">
+              <p className="inline">
+                This RFP is currently closed, but is still open for viewing.{" "}
+              </p>
+              <p className="inline underline underline-offset-2">
+                <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>View RFP</Link>
+              </p>
+            </div>
+          )}
           {proposal && <CopyBtn textToWrite={currentPageUrl} />}
         </div>
         {/* TABS */}
@@ -176,7 +218,6 @@ export const ProposalViewHeaderNavigation = () => {
             )}
           </ul>
         </div>
-        <ProposalStepper proposal={proposal} />
       </div>
     </>
   )

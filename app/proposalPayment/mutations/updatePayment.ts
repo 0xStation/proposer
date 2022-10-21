@@ -6,6 +6,7 @@ const UpdatePayment = z.object({
   paymentId: z.string(),
   multisigTransaction: z.object({
     address: z.string().optional(),
+    safeTxHash: z.string().optional(),
     transactionId: z.string().optional(),
   }),
 })
@@ -37,6 +38,7 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
           multisigTransaction: {
             type: AddressType.SAFE,
             address: params.multisigTransaction.address,
+            safeTxHash: params.multisigTransaction.safeTxHash,
             transactionId: params.multisigTransaction.transactionId,
           },
         }),

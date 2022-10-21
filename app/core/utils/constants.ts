@@ -1,20 +1,25 @@
 import { chain } from "wagmi"
 import networks from "app/utils/networks.json"
-import { ProposalRoleType, ProposalStatus, ProposalRoleApprovalStatus } from "@prisma/client"
+import {
+  ProposalRoleType,
+  ProposalStatus,
+  ProposalRoleApprovalStatus,
+  RfpStatus,
+} from "@prisma/client"
 import { PaymentTerm } from "app/proposalPayment/types"
+import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
+import { getNetworkCoin } from "./networkInfo"
+import {
+  RESERVED_KEYS,
+  ProposalTemplateFieldType,
+  ProposalTemplateFieldValidationName,
+} from "app/template/types"
 import Gradient0 from "/public/gradients/0.png"
 import Gradient1 from "/public/gradients/1.png"
 import Gradient2 from "/public/gradients/2.png"
 import Gradient3 from "/public/gradients/3.png"
 import Gradient4 from "/public/gradients/4.png"
 import Gradient5 from "/public/gradients/5.png"
-import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
-
-export enum FundingProposalStep {
-  PROPOSE = "PROPOSE",
-  REWARDS = "REWARDS",
-  CONFIRM = "CONFIRM",
-}
 
 export const gradientMap = {
   0: Gradient0,
@@ -23,6 +28,12 @@ export const gradientMap = {
   3: Gradient3,
   4: Gradient4,
   5: Gradient5,
+}
+
+export enum FundingProposalStep {
+  PROPOSE = "PROPOSE",
+  REWARDS = "REWARDS",
+  CONFIRM = "CONFIRM",
 }
 
 export const CONTRACTS = {
@@ -71,6 +82,17 @@ export const PROPOSAL_NEW_STATUS_DISPLAY_MAP = {
   [ProposalStatus.COMPLETE]: {
     copy: "complete",
     color: "bg-neon-blue",
+  },
+}
+
+export const RFP_STATUS_DISPLAY_MAP = {
+  [RfpStatus.OPEN]: {
+    copy: "open",
+    color: "bg-magic-mint",
+  },
+  [RfpStatus.CLOSED]: {
+    copy: "closed",
+    color: "bg-concrete",
   },
 }
 
@@ -306,16 +328,207 @@ export const PROPOSING_AS_ROLE_MAP = {
 
 export const txPathString = "/tx/"
 
-// LEGACY BELOW
+export const PARTNERS = {
+  FOXES: {
+    ADDRESS: "0xC3c74B36A7F7c3395c6D59086F5a49540ed180ED",
+    CHAIN_ID: 5,
+    // switch to this for official release
+    // ADDRESS: "0x332557dE221d09AD5b164a665c585fca0200b4B1",
+    // CHAIN_ID: 1,
+  },
+  STATION: {
+    ADDRESS: "0x91d38BB4f803b64e94baFa8fce4e02d86C8380aB",
+    CHAIN_ID: 5,
+  },
+  UNISWAP: {
+    ADDRESS: "0x0b74007a73ca49c96C833ba0E38Aa929ba71c40f",
+    CHAIN_ID: 5,
+  },
+}
+
+export const TEMPLATES = {
+  FOXES: {
+    TERM: [
+      {
+        key: RESERVED_KEYS.CONTRIBUTORS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [],
+        fieldType: ProposalTemplateFieldType.OPEN,
+      },
+      {
+        key: RESERVED_KEYS.AUTHORS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [],
+        fieldType: ProposalTemplateFieldType.OPEN,
+      },
+      {
+        key: RESERVED_KEYS.CLIENTS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [{ address: PARTNERS.FOXES.ADDRESS, type: ProposalRoleType.CLIENT }],
+        fieldType: ProposalTemplateFieldType.PRESELECT,
+      },
+      {
+        key: RESERVED_KEYS.BODY,
+        mapsTo: RESERVED_KEYS.BODY,
+        fieldType: ProposalTemplateFieldType.OPEN,
+        validation: [
+          {
+            name: ProposalTemplateFieldValidationName.MIN_WORDS,
+            args: [125],
+          },
+        ],
+      },
+      {
+        key: RESERVED_KEYS.MILESTONES,
+        mapsTo: RESERVED_KEYS.MILESTONES,
+        value: [
+          {
+            title: "Contributor payment",
+            index: 0,
+          },
+        ],
+        fieldType: ProposalTemplateFieldType.PRESELECT,
+      },
+      {
+        key: RESERVED_KEYS.PAYMENTS,
+        mapsTo: RESERVED_KEYS.PAYMENTS,
+        value: [
+          {
+            milestoneIndex: 0,
+            senderAddress: PARTNERS.FOXES.ADDRESS,
+            recipientAddress: undefined,
+            token: { chainId: PARTNERS.FOXES.CHAIN_ID, ...getNetworkCoin(PARTNERS.FOXES.CHAIN_ID) },
+            amount: 0.01,
+          },
+        ],
+        fieldType: ProposalTemplateFieldType.PREFILL,
+      },
+      {
+        key: RESERVED_KEYS.PAYMENT_TERMS,
+        mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
+        value: PaymentTerm.ON_AGREEMENT,
+        fieldType: ProposalTemplateFieldType.PRESELECT,
+      },
+    ],
+  },
+  STATION: {
+    TERM: [
+      {
+        key: RESERVED_KEYS.CONTRIBUTORS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [],
+        fieldType: ProposalTemplateFieldType.OPEN,
+      },
+      {
+        key: RESERVED_KEYS.AUTHORS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [],
+        fieldType: ProposalTemplateFieldType.OPEN,
+      },
+      {
+        key: RESERVED_KEYS.CLIENTS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [{ address: PARTNERS.STATION.ADDRESS, type: ProposalRoleType.CLIENT }],
+        fieldType: ProposalTemplateFieldType.PRESELECT,
+      },
+      {
+        key: RESERVED_KEYS.MILESTONES,
+        mapsTo: RESERVED_KEYS.MILESTONES,
+        value: [
+          {
+            title: "Contributor payment",
+            index: 0,
+          },
+        ],
+        fieldType: ProposalTemplateFieldType.PRESELECT,
+      },
+      {
+        key: RESERVED_KEYS.PAYMENTS,
+        mapsTo: RESERVED_KEYS.PAYMENTS,
+        value: [
+          {
+            milestoneIndex: 0,
+            senderAddress: PARTNERS.STATION.ADDRESS,
+            recipientAddress: undefined,
+            token: {
+              chainId: PARTNERS.STATION.CHAIN_ID,
+              ...getNetworkCoin(PARTNERS.STATION.CHAIN_ID),
+            },
+            amount: 0.01,
+          },
+        ],
+        fieldType: ProposalTemplateFieldType.PREFILL,
+      },
+      {
+        key: RESERVED_KEYS.PAYMENT_TERMS,
+        mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
+        value: PaymentTerm.ON_AGREEMENT,
+        fieldType: ProposalTemplateFieldType.PRESELECT,
+      },
+    ],
+  },
+  UNISWAP: {
+    TERM: [
+      {
+        key: RESERVED_KEYS.CONTRIBUTORS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [],
+        fieldType: ProposalTemplateFieldType.OPEN,
+      },
+      {
+        key: RESERVED_KEYS.AUTHORS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [],
+        fieldType: ProposalTemplateFieldType.OPEN,
+      },
+      {
+        key: RESERVED_KEYS.CLIENTS,
+        mapsTo: RESERVED_KEYS.ROLES,
+        value: [{ address: PARTNERS.UNISWAP.ADDRESS, type: ProposalRoleType.CLIENT }],
+        fieldType: ProposalTemplateFieldType.PRESELECT,
+      },
+      {
+        key: RESERVED_KEYS.MILESTONES,
+        mapsTo: RESERVED_KEYS.MILESTONES,
+        value: [
+          {
+            title: "Contributor payment",
+            index: 0,
+          },
+        ],
+        fieldType: ProposalTemplateFieldType.PRESELECT,
+      },
+      {
+        key: RESERVED_KEYS.PAYMENTS,
+        mapsTo: RESERVED_KEYS.PAYMENTS,
+        value: [
+          {
+            milestoneIndex: 0,
+            senderAddress: PARTNERS.STATION.ADDRESS,
+            recipientAddress: undefined,
+            token: {
+              chainId: PARTNERS.STATION.CHAIN_ID,
+              ...getNetworkCoin(PARTNERS.STATION.CHAIN_ID),
+            },
+            amount: 0.01,
+          },
+        ],
+        fieldType: ProposalTemplateFieldType.PREFILL,
+      },
+      {
+        key: RESERVED_KEYS.PAYMENT_TERMS,
+        mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
+        value: PaymentTerm.ON_AGREEMENT,
+        fieldType: ProposalTemplateFieldType.PRESELECT,
+      },
+    ],
+  },
+}
 
 // LEGACY
+// kept to support Station Labs NFT through the /nft/token api route
 export enum AccountInitiativeStatus {
   INTERESTED = "INTERESTED",
   CONTRIBUTING = "CONTRIBUTING",
   PREVIOUSLY_CONTRIBUTED = "PREVIOUSLY_CONTRIBUTED",
 }
-// LEGACY
-export const defaultTicketImageUrl: string =
-  "https://station-images.nyc3.digitaloceanspaces.com/e0ed554e-b0b7-4e03-90f4-221708b159e0.svg"
-
-// THIS IS THE LEGACY SECTION

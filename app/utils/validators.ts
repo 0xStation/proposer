@@ -25,6 +25,20 @@ export const mustBeUnderNumCharacters =
         : `Must be less than ${maxNumCharacters} characters`
       : undefined
 
+export const mustBeAboveNumWords = (minNumWords) => (value) =>
+  value
+    ? value.split(" ").filter((word) => !!word).length >= minNumWords
+      ? undefined
+      : `Must be more than ${minNumWords} words`
+    : undefined
+
+export const mustOmitLongWords = (charCount) => (value) =>
+  value
+    ? value.split(" ").some((word) => word.length > charCount)
+      ? `No words can be longer than ${charCount} characters`
+      : undefined
+    : undefined
+
 export const mustBeUrl = (value) => {
   if (!value) {
     return undefined
