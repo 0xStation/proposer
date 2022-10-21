@@ -9,6 +9,7 @@ export const Pagination = ({
   results,
   resultsCount,
   resultsLabel,
+  paginationTake = PAGINATION_TAKE,
   className = "",
 }: {
   page: number
@@ -16,6 +17,7 @@ export const Pagination = ({
   results: any[]
   resultsCount: number
   resultsLabel: string
+  paginationTake?: number
   className?: string
 }) => {
   return (
@@ -23,14 +25,14 @@ export const Pagination = ({
       Showing
       <span className="text-electric-violet font-bold">
         {" "}
-        {resultsCount === 0 ? 0 : page * PAGINATION_TAKE + 1}{" "}
+        {resultsCount === 0 ? 0 : page * paginationTake + 1}{" "}
       </span>
       to
       <span className="text-electric-violet font-bold">
         {" "}
-        {(page + 1) * PAGINATION_TAKE > resultsCount!
-          ? results?.length
-          : (page + 1) * PAGINATION_TAKE}{" "}
+        {(page + 1) * paginationTake >= resultsCount!
+          ? results?.length + page * paginationTake
+          : (page + 1) * paginationTake}{" "}
       </span>
       of
       <span className="font-bold"> {resultsCount} </span>
@@ -38,10 +40,15 @@ export const Pagination = ({
       <button className="w-6 ml-2" disabled={page === 0} onClick={() => setPage(page - 1)}>
         <BackArrow className={`${page === 0 ? "fill-concrete" : "fill-marble-white"}`} />
       </button>
-      <button disabled={results?.length! < PAGINATION_TAKE} onClick={() => setPage(page + 1)}>
+      <button
+        disabled={results?.length! + page * paginationTake >= resultsCount}
+        onClick={() => setPage(page + 1)}
+      >
         <ForwardArrow
           className={`${
-            results?.length! < PAGINATION_TAKE ? "fill-concrete" : "fill-marble-white"
+            results?.length! + page * paginationTake >= resultsCount
+              ? "fill-concrete"
+              : "fill-marble-white"
           }`}
         />
       </button>
