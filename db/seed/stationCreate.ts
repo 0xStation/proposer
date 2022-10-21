@@ -15,18 +15,7 @@ const seed = async () => {
         title: term.name,
         body: "",
         oneLiner: "",
-        submissionGuideline:
-          "Please make sure your submission is 125+ words, and double check for typos.\n\nSubmissions should be fully aligned with, and inclusive of, already established Philosophical Foxes lore. The best entries will connect to other entries in a way that expands the known lore and creates new connections that were previously unknown. Entries should be written in the voice of fox historians in the future. This means that they can be opinionated and inclusive of knowledge not yet known to our current generation of foxes.",
-      },
-      singleTokenGate: {
-        token: {
-          chainId: 1,
-          address: "0xBa767D65a7164E151783e42994Bd475509F256Dd",
-          type: TokenType.ERC721,
-          name: "Station Labs Passport",
-          symbol: "STATION",
-        },
-        minBalance: "1",
+        submissionGuideline: "Submit your interest to contribute to the Station Network!",
       },
     } as RfpMetadata
   })
