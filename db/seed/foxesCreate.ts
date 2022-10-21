@@ -58,7 +58,7 @@ const seed = async () => {
   ]
 
   // wipe old rfps
-  await db.rfp.deleteMany({})
+  // await db.rfp.deleteMany({})
 
   // create new rfps
   const metadatas = terms.map((term) => {
