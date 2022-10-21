@@ -14,7 +14,6 @@ export const getFieldValue = (
 }
 
 export const getClientAddress = (template: ProposalTemplateField[] | undefined): string => {
-  const fieldVal = getFieldValue(template, RESERVED_KEYS.CLIENTS)
   return getFieldValue(template, RESERVED_KEYS.CLIENTS)?.[0]?.address
 }
 
@@ -31,12 +30,16 @@ export const addAddressAsRecipientToPayments = (
   })
 }
 
+export const getPayments = (template: ProposalTemplateField[] | undefined) => {
+  return getFieldValue(template, RESERVED_KEYS.PAYMENTS)
+}
+
 export const getPaymentToken = (template: ProposalTemplateField[] | undefined): Token => {
-  return getFieldValue(template, RESERVED_KEYS.PAYMENTS)?.[0]?.token
+  return getPayments(template)?.[0]?.token
 }
 
 export const getPaymentAmount = (template: ProposalTemplateField[] | undefined): number => {
-  return getFieldValue(template, RESERVED_KEYS.PAYMENTS)?.[0]?.amount
+  return getPayments(template)?.[0]?.amount
 }
 
 export const getMinNumWords = (template: ProposalTemplateField[] | undefined): number => {

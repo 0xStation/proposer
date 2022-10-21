@@ -1,4 +1,4 @@
-import db from "../index"
+import db from "db"
 import { PARTNERS, TEMPLATES } from "app/core/utils/constants"
 import { RfpMetadata } from "app/rfp/types"
 import { TokenType } from "@prisma/client"

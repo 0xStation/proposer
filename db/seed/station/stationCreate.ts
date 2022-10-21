@@ -1,4 +1,4 @@
-import db, { TokenType } from "../index"
+import db, { TokenType } from "db"
 import { PARTNERS, TEMPLATES } from "app/core/utils/constants"
 import { RfpMetadata } from "app/rfp/types"
 

@@ -8,7 +8,7 @@ import {
 } from "@prisma/client"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
-import { getNetworkCoin } from "./networkInfo"
+import { getNetworkCoin, getNetworkUsdc } from "./networkInfo"
 import {
   RESERVED_KEYS,
   ProposalTemplateFieldType,
@@ -345,8 +345,14 @@ export const PARTNERS = {
     CHAIN_ID: 1,
   },
   UNISWAP: {
-    ADDRESS: "0x0b74007a73ca49c96C833ba0E38Aa929ba71c40f",
-    CHAIN_ID: 5,
+    ADDRESS: "0x59079bbd7b318b39ebB64f486106F87cE3277f40",
+    CHAIN_ID: 1,
+    // ADDRESS: "0x0b74007a73ca49c96C833ba0E38Aa929ba71c40f",
+    // CHAIN_ID: 5,
+  },
+  RADICLE: {
+    ADDRESS: "0x60A22232D40486c8E6A7699d02Bdc01f37ACb22f",
+    CHAIN_ID: 1,
   },
 }
 
@@ -472,60 +478,166 @@ export const TEMPLATES = {
     ],
   },
   UNISWAP: {
-    TERM: [
-      {
-        key: RESERVED_KEYS.CONTRIBUTORS,
-        mapsTo: RESERVED_KEYS.ROLES,
-        value: [],
-        fieldType: ProposalTemplateFieldType.OPEN,
-      },
-      {
-        key: RESERVED_KEYS.AUTHORS,
-        mapsTo: RESERVED_KEYS.ROLES,
-        value: [],
-        fieldType: ProposalTemplateFieldType.OPEN,
-      },
-      {
-        key: RESERVED_KEYS.CLIENTS,
-        mapsTo: RESERVED_KEYS.ROLES,
-        value: [{ address: PARTNERS.UNISWAP.ADDRESS, type: ProposalRoleType.CLIENT }],
-        fieldType: ProposalTemplateFieldType.PRESELECT,
-      },
-      {
-        key: RESERVED_KEYS.MILESTONES,
-        mapsTo: RESERVED_KEYS.MILESTONES,
-        value: [
-          {
-            title: "Upfront payment",
-            index: 0,
-          },
-        ],
-        fieldType: ProposalTemplateFieldType.PRESELECT,
-      },
-      {
-        key: RESERVED_KEYS.PAYMENTS,
-        mapsTo: RESERVED_KEYS.PAYMENTS,
-        value: [
-          {
-            milestoneIndex: 0,
-            senderAddress: PARTNERS.STATION.ADDRESS,
-            recipientAddress: undefined,
-            token: {
-              chainId: PARTNERS.STATION.CHAIN_ID,
-              ...getNetworkCoin(PARTNERS.STATION.CHAIN_ID),
+    POAP_DESIGN: {
+      id: "96058a8b-b1f5-4ba5-811d-e3415eccb3ce",
+      title: "Design Uniswap’s POAP",
+      fields: [
+        {
+          key: RESERVED_KEYS.CONTRIBUTORS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.OPEN,
+        },
+        {
+          key: RESERVED_KEYS.AUTHORS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.OPEN,
+        },
+        {
+          key: RESERVED_KEYS.CLIENTS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [{ address: PARTNERS.UNISWAP.ADDRESS, type: ProposalRoleType.CLIENT }],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.MILESTONES,
+          mapsTo: RESERVED_KEYS.MILESTONES,
+          value: [
+            {
+              title: "Upfront payment",
+              index: 0,
             },
-            amount: 0.01,
-          },
-        ],
-        fieldType: ProposalTemplateFieldType.PREFILL,
-      },
-      {
-        key: RESERVED_KEYS.PAYMENT_TERMS,
-        mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
-        value: PaymentTerm.ON_AGREEMENT,
-        fieldType: ProposalTemplateFieldType.PRESELECT,
-      },
-    ],
+          ],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.PAYMENTS,
+          mapsTo: RESERVED_KEYS.PAYMENTS,
+          value: [
+            {
+              milestoneIndex: 0,
+              senderAddress: PARTNERS.UNISWAP.ADDRESS,
+              recipientAddress: undefined,
+              token: {
+                ...getNetworkUsdc(PARTNERS.UNISWAP.CHAIN_ID),
+                chainId: PARTNERS.UNISWAP.CHAIN_ID,
+              },
+              amount: 50,
+            },
+          ],
+          fieldType: ProposalTemplateFieldType.PREFILL,
+        },
+        {
+          key: RESERVED_KEYS.PAYMENT_TERMS,
+          mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
+          value: PaymentTerm.ON_AGREEMENT,
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+      ],
+    },
+    COMMUNITY_NEWSLETTER: {
+      id: "12304dbb-7f19-4924-8619-129d16021adf",
+      title: "Draft Uniswap community newsletter",
+      fields: [
+        {
+          key: RESERVED_KEYS.CONTRIBUTORS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.OPEN,
+        },
+        {
+          key: RESERVED_KEYS.AUTHORS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.OPEN,
+        },
+        {
+          key: RESERVED_KEYS.CLIENTS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [{ address: PARTNERS.UNISWAP.ADDRESS, type: ProposalRoleType.CLIENT }],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.MILESTONES,
+          mapsTo: RESERVED_KEYS.MILESTONES,
+          value: [
+            {
+              title: "Upfront payment",
+              index: 0,
+            },
+          ],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.PAYMENTS,
+          mapsTo: RESERVED_KEYS.PAYMENTS,
+          value: [
+            {
+              milestoneIndex: 0,
+              senderAddress: PARTNERS.STATION.ADDRESS,
+              recipientAddress: undefined,
+              token: {
+                ...getNetworkUsdc(PARTNERS.UNISWAP.CHAIN_ID),
+                chainId: PARTNERS.UNISWAP.CHAIN_ID,
+              },
+              amount: 1000,
+            },
+          ],
+          fieldType: ProposalTemplateFieldType.PREFILL,
+        },
+        {
+          key: RESERVED_KEYS.PAYMENT_TERMS,
+          mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
+          value: PaymentTerm.ON_AGREEMENT,
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+      ],
+    },
+  },
+  RADICLE: {
+    GIVETH_IDEAS: {
+      id: "163dabe4-20f7-4384-87e5-d6678249c229",
+      title: "Contribute ideas to the Radicle x Giveth partnership",
+      fields: [
+        {
+          key: RESERVED_KEYS.CONTRIBUTORS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.OPEN,
+        },
+        {
+          key: RESERVED_KEYS.AUTHORS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.OPEN,
+        },
+        {
+          key: RESERVED_KEYS.CLIENTS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [{ address: PARTNERS.RADICLE.ADDRESS, type: ProposalRoleType.CLIENT }],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.MILESTONES,
+          mapsTo: RESERVED_KEYS.MILESTONES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.PAYMENTS,
+          mapsTo: RESERVED_KEYS.PAYMENTS,
+          value: [],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.PAYMENT_TERMS,
+          mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
+          value: undefined,
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+      ],
+    },
   },
 }
 
