@@ -91,7 +91,7 @@ export const RfpSidebar = ({ rfp }) => {
             <div>
               <h4 className="text-xs font-bold text-concrete uppercase">Submission requirement</h4>
               <div className="mt-2">
-                {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
+                {`Hold at least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
                 <TextLink
                   url={
                     getNetworkExplorer(rfp?.data?.singleTokenGate.token.chainId) +
