@@ -339,23 +339,6 @@ const WorkspaceHome: BlitzPage = () => {
     )
 
     const RfpCard = ({ rfp }) => {
-      const [proposalCount] = useQuery(
-        getProposalCountByRfpId,
-        {
-          rfpId: rfp?.id as string,
-        },
-        {
-          enabled: !!rfp?.id,
-          suspense: false,
-          refetchOnWindowFocus: false,
-        }
-      )
-      const [template] = useQuery(
-        getTemplateByRfpId,
-        { rfpId: rfp?.id as string },
-        { suspense: false, enabled: Boolean(rfp?.id), refetchOnWindowFocus: false, staleTime: 1000 }
-      )
-
       return (
         <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
           <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer">
@@ -364,10 +347,10 @@ const WorkspaceHome: BlitzPage = () => {
             <div className="flex flex-row mt-4 justify-between">
               <span>
                 {" "}
-                <p className="inline">{getPaymentAmount(template?.data?.fields)} </p>
-                <p className="inline">{getPaymentToken(template?.data?.fields)?.symbol}</p>
+                <p className="inline">{getPaymentAmount(rfp?.template?.data?.fields)} </p>
+                <p className="inline">{getPaymentToken(rfp?.template?.data?.fields)?.symbol}</p>
               </span>
-              <span>{proposalCount} proposals</span>
+              <span>{rfp?._count.proposals} proposals</span>
             </div>
           </div>
         </Link>

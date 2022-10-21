@@ -22,6 +22,12 @@ export default async function getRfpsForAccount(input: z.infer<typeof GetRfpsFor
           },
         }),
     },
+    include: {
+      template: true,
+      _count: {
+        select: { proposals: true },
+      },
+    },
     take: input.paginationTake,
     skip: input.page * input.paginationTake,
   })
