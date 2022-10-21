@@ -24,6 +24,8 @@ import {
   PROPOSAL_ROLE_FILTER_OPTIONS,
   PROPOSAL_NEW_STATUS_DISPLAY_MAP,
   Sizes,
+  RFP_STATUS_FILTER_OPTIONS,
+  RFP_STATUS_DISPLAY_MAP,
 } from "app/core/utils/constants"
 import {
   AddressType,
@@ -51,6 +53,8 @@ import RfpStatusPill from "app/rfp/components/RfpStatusPill"
 import { getPaymentAmount, getPaymentToken } from "app/template/utils"
 import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpId"
 import getTemplateByRfpId from "app/template/queries/getTemplateByRfpId"
+import getRfpCountForAccount from "app/rfp/queries/getRfpCountForAccount"
+import getProposalCountForAccount from "app/proposal/queries/getProposalCountForAccount"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
@@ -94,41 +98,12 @@ const WorkspaceHome: BlitzPage = () => {
   const [activeTab, setActiveTab] = useState<WorkspaceTab>(
     (tab as WorkspaceTab) || WorkspaceTab.PROPOSALS
   )
-  const [activeRfp, setActiveRfp] = useState<Rfp>()
-  const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
-    new Set<ProposalStatus>()
-  )
-  const [proposalRoleFilters, setProposalRoleFilters] = useState<Set<ProposalRoleType>>(
-    new Set<ProposalRoleType>()
-  )
-  const [page, setPage] = useState<number>(0)
 
   const { data: accountEnsName } = useEnsName({
     address: accountAddress,
     chainId: 1,
     cacheTime: 10 * 60 * 1000, // 10 minutes (time in ms) which the data should remain in the cache
   })
-
-  const [proposalResponse] = useQuery(
-    getProposalsByAddress,
-    {
-      address: toChecksumAddress(accountAddress),
-      statuses: Array.from(proposalStatusFilters),
-      roles: Array.from(proposalRoleFilters),
-      page: page,
-      paginationTake: PAGINATION_TAKE,
-    },
-    { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
-  )
-  const { count, proposals } = proposalResponse || {}
-
-  const [rfps] = useQuery(
-    getRfpsForAccount,
-    {
-      address: toChecksumAddress(accountAddress),
-    },
-    { enabled: !!accountAddress, suspense: false, refetchOnWindowFocus: false }
-  )
 
   const [account] = useQuery(
     getAccountByAddress,
@@ -137,6 +112,7 @@ const WorkspaceHome: BlitzPage = () => {
       enabled: !!accountAddress,
       suspense: false,
       refetchOnWindowFocus: false,
+      cacheTime: 60 * 1000, // 1 minute
     }
   )
 
@@ -147,6 +123,7 @@ const WorkspaceHome: BlitzPage = () => {
       enabled: !!account && account.addressType === AddressType.SAFE,
       suspense: false,
       refetchOnWindowFocus: false,
+      cacheTime: 60 * 1000, // 1 minute
     }
   )
 
@@ -169,10 +146,52 @@ const WorkspaceHome: BlitzPage = () => {
   }, [activeUser, connectedAddress, accountAddress, safeMetadata])
 
   const ProposalTab = () => {
+    const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
+      new Set<ProposalStatus>()
+    )
+    const [proposalRoleFilters, setProposalRoleFilters] = useState<Set<ProposalRoleType>>(
+      new Set<ProposalRoleType>()
+    )
+    const [proposalPage, setProposalPage] = useState<number>(0)
+
+    const [proposals] = useQuery(
+      getProposalsByAddress,
+      {
+        address: toChecksumAddress(accountAddress),
+        statuses: Array.from(proposalStatusFilters),
+        roles: Array.from(proposalRoleFilters),
+        page: proposalPage,
+        paginationTake: PAGINATION_TAKE,
+      },
+      {
+        enabled: !!accountAddress,
+        suspense: false,
+        refetchOnWindowFocus: false,
+        cacheTime: 60 * 1000, // 1 minute
+      }
+    )
+
+    const [proposalCount] = useQuery(
+      getProposalCountForAccount,
+      {
+        address: toChecksumAddress(accountAddress),
+        statuses: Array.from(proposalStatusFilters),
+        roles: Array.from(proposalRoleFilters),
+      },
+      {
+        enabled: !!accountAddress,
+        suspense: false,
+        refetchOnWindowFocus: false,
+        cacheTime: 60 * 1000, // 1 minute
+      }
+    )
+
     return (
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
         <h1 className="text-2xl font-bold">Proposals</h1>
+        {/* FILTERS & PAGINATION */}
         <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">
+          {/* FILTERS */}
           <div className="space-x-2 flex flex-row">
             <FilterPill
               label="status"
@@ -183,7 +202,7 @@ const WorkspaceHome: BlitzPage = () => {
               appliedFilters={proposalStatusFilters}
               setAppliedFilters={setProposalStatusFilters}
               refetchCallback={() => {
-                setPage(0)
+                setProposalPage(0)
                 invalidateQuery(getProposalsByAddress)
               }}
             />
@@ -196,16 +215,17 @@ const WorkspaceHome: BlitzPage = () => {
               appliedFilters={proposalRoleFilters}
               setAppliedFilters={setProposalRoleFilters}
               refetchCallback={() => {
-                setPage(0)
+                setProposalPage(0)
                 invalidateQuery(getProposalsByAddress)
               }}
             />
           </div>
+          {/* PAGINATION */}
           <Pagination
             results={proposals as any[]}
-            resultsCount={count || 0}
-            page={page}
-            setPage={setPage}
+            resultsCount={proposalCount || 0}
+            page={proposalPage}
+            setPage={setProposalPage}
             resultsLabel="proposals"
             className="ml-6 sm:ml-0 text-sm self-end"
           />
@@ -305,36 +325,59 @@ const WorkspaceHome: BlitzPage = () => {
               className={`flex flex-row w-full my-1 rounded-lg bg-wet-concrete shadow border-solid h-[48px] motion-safe:animate-pulse`}
             />
           ))}
-        {proposals && proposals.length === 0 && (
-          <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-            <p className="text-2xl font-bold w-[295px] text-center">
-              This workspace has no proposals yet
-            </p>
-          </div>
-        )}
+        {proposals &&
+          proposals.length === 0 &&
+          (proposalStatusFilters.size || proposalRoleFilters.size ? (
+            <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
+              <p className="text-2xl font-bold w-[295px] text-center">No matches.</p>
+            </div>
+          ) : (
+            <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
+              <p className="text-2xl font-bold w-[295px] text-center">
+                This workspace has no proposals yet
+              </p>
+            </div>
+          ))}
       </div>
     )
   }
 
   const RfpTab = () => {
-    const RfpCard = ({ rfp }) => {
-      const [proposalCount] = useQuery(
-        getProposalCountByRfpId,
-        {
-          rfpId: rfp?.id as string,
-        },
-        {
-          enabled: !!rfp?.id,
-          suspense: false,
-          refetchOnWindowFocus: false,
-        }
-      )
-      const [template] = useQuery(
-        getTemplateByRfpId,
-        { rfpId: rfp?.id as string },
-        { suspense: false, enabled: Boolean(rfp?.id), refetchOnWindowFocus: false, staleTime: 1000 }
-      )
+    const RFP_PAGINATION_TAKE = 25
+    const [rfpPage, setRfpPage] = useState<number>(0)
+    const [rfpStatusFilters, setRfpStatusFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
 
+    const [rfps] = useQuery(
+      getRfpsForAccount,
+      {
+        address: toChecksumAddress(accountAddress),
+        page: rfpPage,
+        paginationTake: RFP_PAGINATION_TAKE,
+        statuses: Array.from(rfpStatusFilters),
+      },
+      {
+        enabled: !!accountAddress,
+        suspense: false,
+        refetchOnWindowFocus: false,
+        cacheTime: 60 * 1000, // 1 minute
+      }
+    )
+
+    const [rfpCount] = useQuery(
+      getRfpCountForAccount,
+      {
+        address: toChecksumAddress(accountAddress),
+        statuses: Array.from(rfpStatusFilters),
+      },
+      {
+        enabled: !!accountAddress,
+        suspense: false,
+        refetchOnWindowFocus: false,
+        cacheTime: 60 * 1000, // 1 minute
+      }
+    )
+
+    const RfpCard = ({ rfp }) => {
       return (
         <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
           <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer">
@@ -343,10 +386,10 @@ const WorkspaceHome: BlitzPage = () => {
             <div className="flex flex-row mt-4 justify-between">
               <span>
                 {" "}
-                <p className="inline">{getPaymentAmount(template?.data?.fields)} </p>
-                <p className="inline">{getPaymentToken(template?.data?.fields)?.symbol}</p>
+                <p className="inline">{getPaymentAmount(rfp?.template?.data?.fields)} </p>
+                <p className="inline">{getPaymentToken(rfp?.template?.data?.fields)?.symbol}</p>
               </span>
-              <span>{proposalCount} proposals</span>
+              <span>{rfp?._count.proposals} proposals</span>
             </div>
           </div>
         </Link>
@@ -356,9 +399,38 @@ const WorkspaceHome: BlitzPage = () => {
     return (
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
         <h1 className="text-2xl font-bold">RFPs</h1>
-        <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between h-14"></div>
+        {/* FILTERS & PAGINATION */}
+        <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">
+          {/* FILTERS */}
+          <div className="space-x-2 flex flex-row">
+            <FilterPill
+              label="status"
+              filterOptions={RFP_STATUS_FILTER_OPTIONS.map((status) => ({
+                name: RFP_STATUS_DISPLAY_MAP[status]?.copy?.toUpperCase(),
+                value: status,
+              }))}
+              appliedFilters={rfpStatusFilters}
+              setAppliedFilters={setRfpStatusFilters}
+              refetchCallback={() => {
+                setRfpPage(0)
+                invalidateQuery(getRfpsForAccount)
+                invalidateQuery(getRfpCountForAccount)
+              }}
+            />
+          </div>
+          {/* PAGINATION */}
+          <Pagination
+            results={rfps as any[]}
+            resultsCount={rfpCount || 0}
+            page={rfpPage}
+            setPage={setRfpPage}
+            resultsLabel="rfps"
+            paginationTake={RFP_PAGINATION_TAKE}
+            className="ml-6 sm:ml-0 text-sm self-end"
+          />
+        </div>
+        {/* RFP CARDS */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:gap-2 md:gap-4 lg:gap-6 gap-1">
-          {/* RFP CARDS */}
           {rfps &&
             rfps?.length > 0 &&
             rfps?.map((rfp, idx) => {
@@ -375,13 +447,19 @@ const WorkspaceHome: BlitzPage = () => {
             ))}
         </div>
         {/* RFP EMPTY */}
-        {rfps && rfps.length === 0 && (
-          <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-            <p className="text-2xl font-bold w-[295px] text-center">
-              This workspace has no RFPs yet
-            </p>
-          </div>
-        )}
+        {rfps &&
+          rfps.length === 0 &&
+          (rfpStatusFilters.size ? (
+            <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
+              <p className="text-2xl font-bold w-[295px] text-center">No matches.</p>
+            </div>
+          ) : (
+            <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
+              <p className="text-2xl font-bold w-[295px] text-center">
+                This workspace has no proposals yet
+              </p>
+            </div>
+          ))}
       </div>
     )
   }
@@ -414,7 +492,8 @@ const WorkspaceHome: BlitzPage = () => {
               />
             )}
             {/* CTA */}
-            {activeTab !== WorkspaceTab.RFPS && (
+            {
+              // activeTab !== WorkspaceTab.RFPS &&
               <Link
                 href={Routes.ProposalTypeSelection({
                   // pre-fill for both so that if user changes toggle to reverse roles, the input address is still there
@@ -424,7 +503,7 @@ const WorkspaceHome: BlitzPage = () => {
               >
                 <Button className="w-full">Propose</Button>
               </Link>
-            )}
+            }
           </div>
           {/* TABS */}
           <ul className="mt-6 space-y-2">
