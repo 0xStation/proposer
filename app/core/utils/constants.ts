@@ -385,7 +385,7 @@ export const TEMPLATES = {
         mapsTo: RESERVED_KEYS.MILESTONES,
         value: [
           {
-            title: "Contributor payment",
+            title: "Upfront payment",
             index: 0,
           },
         ],
@@ -438,7 +438,7 @@ export const TEMPLATES = {
         mapsTo: RESERVED_KEYS.MILESTONES,
         value: [
           {
-            title: "Contributor payment",
+            title: "Upfront payment",
             index: 0,
           },
         ],
@@ -494,7 +494,7 @@ export const TEMPLATES = {
         mapsTo: RESERVED_KEYS.MILESTONES,
         value: [
           {
-            title: "Contributor payment",
+            title: "Upfront payment",
             index: 0,
           },
         ],
