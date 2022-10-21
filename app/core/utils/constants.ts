@@ -358,124 +358,135 @@ export const PARTNERS = {
 
 export const TEMPLATES = {
   FOXES: {
-    TERM: [
-      {
-        key: RESERVED_KEYS.CONTRIBUTORS,
-        mapsTo: RESERVED_KEYS.ROLES,
-        value: [],
-        fieldType: ProposalTemplateFieldType.OPEN,
-      },
-      {
-        key: RESERVED_KEYS.AUTHORS,
-        mapsTo: RESERVED_KEYS.ROLES,
-        value: [],
-        fieldType: ProposalTemplateFieldType.OPEN,
-      },
-      {
-        key: RESERVED_KEYS.CLIENTS,
-        mapsTo: RESERVED_KEYS.ROLES,
-        value: [{ address: PARTNERS.FOXES.ADDRESS, type: ProposalRoleType.CLIENT }],
-        fieldType: ProposalTemplateFieldType.PRESELECT,
-      },
-      {
-        key: RESERVED_KEYS.BODY,
-        mapsTo: RESERVED_KEYS.BODY,
-        fieldType: ProposalTemplateFieldType.OPEN,
-        validation: [
-          {
-            name: ProposalTemplateFieldValidationName.MIN_WORDS,
-            args: [125],
-          },
-        ],
-      },
-      {
-        key: RESERVED_KEYS.MILESTONES,
-        mapsTo: RESERVED_KEYS.MILESTONES,
-        value: [
-          {
-            title: "Upfront payment",
-            index: 0,
-          },
-        ],
-        fieldType: ProposalTemplateFieldType.PRESELECT,
-      },
-      {
-        key: RESERVED_KEYS.PAYMENTS,
-        mapsTo: RESERVED_KEYS.PAYMENTS,
-        value: [
-          {
-            milestoneIndex: 0,
-            senderAddress: PARTNERS.FOXES.ADDRESS,
-            recipientAddress: undefined,
-            token: { chainId: PARTNERS.FOXES.CHAIN_ID, ...getNetworkCoin(PARTNERS.FOXES.CHAIN_ID) },
-            amount: 0.01,
-          },
-        ],
-        fieldType: ProposalTemplateFieldType.PREFILL,
-      },
-      {
-        key: RESERVED_KEYS.PAYMENT_TERMS,
-        mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
-        value: PaymentTerm.ON_AGREEMENT,
-        fieldType: ProposalTemplateFieldType.PRESELECT,
-      },
-    ],
+    TERMS: {
+      id: "835ef848-91c1-46da-bdf9-4b0a277fe808",
+      title: "Phase 1 -- Terms",
+      fields: [
+        {
+          key: RESERVED_KEYS.CONTRIBUTORS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.OPEN,
+        },
+        {
+          key: RESERVED_KEYS.AUTHORS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.OPEN,
+        },
+        {
+          key: RESERVED_KEYS.CLIENTS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [{ address: PARTNERS.FOXES.ADDRESS, type: ProposalRoleType.CLIENT }],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.BODY,
+          mapsTo: RESERVED_KEYS.BODY,
+          fieldType: ProposalTemplateFieldType.OPEN,
+          validation: [
+            {
+              name: ProposalTemplateFieldValidationName.MIN_WORDS,
+              args: [125],
+            },
+          ],
+        },
+        {
+          key: RESERVED_KEYS.MILESTONES,
+          mapsTo: RESERVED_KEYS.MILESTONES,
+          value: [
+            {
+              title: "Upfront payment",
+              index: 0,
+            },
+          ],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.PAYMENTS,
+          mapsTo: RESERVED_KEYS.PAYMENTS,
+          value: [
+            {
+              milestoneIndex: 0,
+              senderAddress: PARTNERS.FOXES.ADDRESS,
+              recipientAddress: undefined,
+              token: {
+                chainId: PARTNERS.FOXES.CHAIN_ID,
+                ...getNetworkCoin(PARTNERS.FOXES.CHAIN_ID),
+              },
+              amount: 0.01,
+            },
+          ],
+          fieldType: ProposalTemplateFieldType.PREFILL,
+        },
+        {
+          key: RESERVED_KEYS.PAYMENT_TERMS,
+          mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
+          value: PaymentTerm.ON_AGREEMENT,
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+      ],
+    },
   },
   STATION: {
-    TERM: [
-      {
-        key: RESERVED_KEYS.CONTRIBUTORS,
-        mapsTo: RESERVED_KEYS.ROLES,
-        value: [],
-        fieldType: ProposalTemplateFieldType.OPEN,
-      },
-      {
-        key: RESERVED_KEYS.AUTHORS,
-        mapsTo: RESERVED_KEYS.ROLES,
-        value: [],
-        fieldType: ProposalTemplateFieldType.OPEN,
-      },
-      {
-        key: RESERVED_KEYS.CLIENTS,
-        mapsTo: RESERVED_KEYS.ROLES,
-        value: [{ address: PARTNERS.STATION.ADDRESS, type: ProposalRoleType.CLIENT }],
-        fieldType: ProposalTemplateFieldType.PRESELECT,
-      },
-      {
-        key: RESERVED_KEYS.MILESTONES,
-        mapsTo: RESERVED_KEYS.MILESTONES,
-        value: [
-          {
-            title: "Upfront payment",
-            index: 0,
-          },
-        ],
-        fieldType: ProposalTemplateFieldType.PRESELECT,
-      },
-      {
-        key: RESERVED_KEYS.PAYMENTS,
-        mapsTo: RESERVED_KEYS.PAYMENTS,
-        value: [
-          {
-            milestoneIndex: 0,
-            senderAddress: PARTNERS.STATION.ADDRESS,
-            recipientAddress: undefined,
-            token: {
-              chainId: PARTNERS.STATION.CHAIN_ID,
-              ...getNetworkCoin(PARTNERS.STATION.CHAIN_ID),
+    PARTNERSHIPS: {
+      id: "cd28828c-e51a-4796-80f5-e39d4cc43fab",
+      title: "Partnerships",
+      fields: [
+        {
+          key: RESERVED_KEYS.CONTRIBUTORS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.OPEN,
+        },
+        {
+          key: RESERVED_KEYS.AUTHORS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [],
+          fieldType: ProposalTemplateFieldType.OPEN,
+        },
+        {
+          key: RESERVED_KEYS.CLIENTS,
+          mapsTo: RESERVED_KEYS.ROLES,
+          value: [{ address: PARTNERS.STATION.ADDRESS, type: ProposalRoleType.CLIENT }],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.MILESTONES,
+          mapsTo: RESERVED_KEYS.MILESTONES,
+          value: [
+            {
+              title: "Upfront payment",
+              index: 0,
             },
-            amount: 0.01,
-          },
-        ],
-        fieldType: ProposalTemplateFieldType.PREFILL,
-      },
-      {
-        key: RESERVED_KEYS.PAYMENT_TERMS,
-        mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
-        value: PaymentTerm.ON_AGREEMENT,
-        fieldType: ProposalTemplateFieldType.PRESELECT,
-      },
-    ],
+          ],
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+        {
+          key: RESERVED_KEYS.PAYMENTS,
+          mapsTo: RESERVED_KEYS.PAYMENTS,
+          value: [
+            {
+              milestoneIndex: 0,
+              senderAddress: PARTNERS.STATION.ADDRESS,
+              recipientAddress: undefined,
+              token: {
+                chainId: PARTNERS.STATION.CHAIN_ID,
+                ...getNetworkCoin(PARTNERS.STATION.CHAIN_ID),
+              },
+              amount: 0.01,
+            },
+          ],
+          fieldType: ProposalTemplateFieldType.PREFILL,
+        },
+        {
+          key: RESERVED_KEYS.PAYMENT_TERMS,
+          mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
+          value: PaymentTerm.ON_AGREEMENT,
+          fieldType: ProposalTemplateFieldType.PRESELECT,
+        },
+      ],
+    },
   },
   UNISWAP: {
     POAP_DESIGN: {
