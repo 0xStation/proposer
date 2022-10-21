@@ -58,6 +58,8 @@ const ProposalStepper = () => {
     },
     {
       description: "Signers approve proposal",
+      subtitle:
+        "Reach out to signers on twitter or Discord to get proposals reviewed and approved.",
       status: proposal
         ? proposal.status === ProposalStatus.APPROVED
           ? StepStatus.complete
