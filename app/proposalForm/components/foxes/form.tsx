@@ -335,11 +335,12 @@ export const FoxesProposalForm = () => {
                   <Button
                     isDisabled={
                       unFilledProposalFields ||
+                      !activeUser?.address ||
                       (!!rfp?.data?.singleTokenGate &&
                         (isTokenGatingCheckLoading ||
                           (isTokenGatingCheckComplete && !userHasRequiredToken)))
                     }
-                    isLoading={isTokenGatingCheckLoading}
+                    isLoading={Boolean(activeUser?.address) && isTokenGatingCheckLoading}
                     onClick={async () => {
                       if (!session.siwe?.address) {
                         toggleWalletModal(true)
