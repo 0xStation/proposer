@@ -1,9 +1,7 @@
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
-import { PROPOSAL_NEW_STATUS_FILTER_OPTIONS } from "app/core/utils/constants"
-import db, { ProposalRoleType, ProposalStatus, RfpStatus } from "db"
+import db, { ProposalRoleType, ProposalStatus } from "db"
 import * as z from "zod"
 import { Proposal } from "../types"
-import getProposalsByAddress from "./getProposalsByAddress"
 
 const GetProposalCountForAccount = z.object({
   address: z.string(),

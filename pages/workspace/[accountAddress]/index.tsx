@@ -42,11 +42,8 @@ import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber
 import { Account } from "app/account/types"
 import { isAddress } from "ethers/lib/utils"
 import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
-import { Rfp } from "app/rfp/types"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
 import { getPaymentAmount, getPaymentToken } from "app/template/utils"
-import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpId"
-import getTemplateByRfpId from "app/template/queries/getTemplateByRfpId"
 import getRfpCountForAccount from "app/rfp/queries/getRfpCountForAccount"
 import getProposalCountForAccount from "app/proposal/queries/getProposalCountForAccount"
 
