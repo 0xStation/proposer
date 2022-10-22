@@ -1,4 +1,7 @@
-import { Link, Routes, useParam, useQuery, useRouter } from "blitz"
+import Link from "next/link"
+import { useRouter } from "next/router"
+import { useQuery } from "@blitzjs/rpc"
+import { Routes, useParam } from "@blitzjs/next"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import getProposalById from "app/proposal/queries/getProposalById"
 import {

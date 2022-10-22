@@ -1,5 +1,5 @@
+import { useMutation, invalidateQuery } from "@blitzjs/rpc"
 import { useState } from "react"
-import { useMutation, invalidateQuery } from "blitz"
 import Modal from "app/core/components/Modal"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useGnosisSignature from "app/core/hooks/useGnosisSignature"
@@ -77,8 +77,8 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
       <>
         <h3 className="text-2xl font-bold mt-4">Queue transaction</h3>
         <p className="mt-2">
-          Sign to queue this transaction on Gnosis. Afterwards, you and other signers will be able to view and execute this
-          transaction on the Gnosis app.
+          Sign to queue this transaction on Gnosis. Afterwards, you and other signers will be able
+          to view and execute this transaction on the Gnosis app.
         </p>
         <div className="mt-8 flex items-center">
           <Button

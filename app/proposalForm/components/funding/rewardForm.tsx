@@ -1,4 +1,4 @@
-import { useSession } from "blitz"
+import { useSession } from "@blitzjs/auth"
 import { useEffect, useState } from "react"
 import ImportTokenModal from "app/core/components/ImportTokenModal"
 import useStore from "app/core/hooks/useStore"

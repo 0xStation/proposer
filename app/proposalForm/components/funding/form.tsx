@@ -1,25 +1,28 @@
-import React, { useState, useEffect } from "react"
-import { useQuery, useSession, useRouter, Routes, useMutation } from "blitz"
-import { Form } from "react-final-form"
-import { useNetwork } from "wagmi"
+import { useSession } from "@blitzjs/auth"
+import { Routes } from "@blitzjs/next"
+import { useMutation, useQuery } from "@blitzjs/rpc"
 import { ProposalRoleType } from "@prisma/client"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import Stepper from "../Stepper"
-import { ProposeForm } from "./proposeForm"
-import getTokensByAccount from "app/token/queries/getTokensByAccount"
-import { getNetworkTokens } from "app/core/utils/networkInfo"
-import RewardForm from "./rewardForm"
-import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
-import { Proposal } from "app/proposal/types"
-import BackArrow from "app/core/icons/BackArrow"
 import useStore from "app/core/hooks/useStore"
-import { ConfirmForm } from "../ConfirmForm"
+import { FundingProposalStep } from "app/core/utils/constants"
+import { getNetworkTokens } from "app/core/utils/networkInfo"
+import createProposal from "app/proposal/mutations/createProposal"
+import { Proposal } from "app/proposal/types"
+import { useConfirmAuthorship } from "app/proposalForm/hooks/useConfirmAuthorship"
+import { useResolveEnsAddress } from "app/proposalForm/hooks/useResolveEnsAddress"
+import getTokensByAccount from "app/token/queries/getTokensByAccount"
+import { useRouter } from "next/router"
+import React, { useEffect, useState } from "react"
+import { useNetwork } from "wagmi"
+import Stepper from "app/proposalForm/components/Stepper"
+import { Form } from "react-final-form"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { PaymentTerm } from "app/proposalPayment/types"
-import createProposal from "app/proposal/mutations/createProposal"
-import { useResolveEnsAddress } from "app/proposalForm/hooks/useResolveEnsAddress"
-import { useConfirmAuthorship } from "app/proposalForm/hooks/useConfirmAuthorship"
-import { FundingProposalStep } from "app/core/utils/constants"
+import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
+import { ProposeForm } from "./proposeForm"
+import RewardForm from "./rewardForm"
+import { ConfirmForm } from "../ConfirmForm"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import BackArrow from "app/core/icons/BackArrow"
 import { isValidAdvancedPaymentPercentage } from "app/utils/validators"
 
 const HeaderCopy = {
@@ -111,21 +114,6 @@ export const ProposalFundingForm = ({
     },
     { enabled: Boolean(chain && session?.userId) }
   )
-  useEffect(() => {
-    // `shouldHandlePostProposalCreationProcessing` is used to retrigger this `useEffect` hook
-    // if the user declines to sign the message verifying their authorship.
-    if (createdProposal && shouldHandlePostProposalCreationProcessing) {
-      if (!proposalShouldSendLater) {
-        confirmAuthorship({ proposal: createdProposal, representingRoles: [] })
-      } else {
-        router.push(
-          Routes.ViewProposal({
-            proposalId: createdProposal.id,
-          })
-        )
-      }
-    }
-  }, [createdProposal, proposalShouldSendLater, shouldHandlePostProposalCreationProcessing])
 
   useEffect(() => {
     if (chain?.id) {

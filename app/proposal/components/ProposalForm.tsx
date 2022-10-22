@@ -1,4 +1,7 @@
-import { Routes, useRouter, useMutation, useQuery, useSession } from "blitz"
+import { useSession } from "@blitzjs/auth"
+import { useMutation, useQuery } from "@blitzjs/rpc"
+import { useRouter } from "next/router"
+import { Routes } from "@blitzjs/next"
 import { useEffect, useState } from "react"
 import { useProvider } from "wagmi"
 import { RadioGroup } from "@headlessui/react"

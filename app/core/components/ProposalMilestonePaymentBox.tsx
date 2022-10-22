@@ -1,5 +1,5 @@
+import { invalidateQuery, useQuery } from "@blitzjs/rpc"
 import { useState, useEffect } from "react"
-import { invalidateQuery, useQuery } from "blitz"
 import { ArrowRightIcon, CheckCircleIcon } from "@heroicons/react/solid"
 import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
 import AttachTransactionModal from "app/proposal/components/AttachTransactionModal"

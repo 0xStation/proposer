@@ -1,5 +1,5 @@
+import { useQuery } from "@blitzjs/rpc"
 import { useState, useEffect } from "react"
-import { useQuery } from "blitz"
 import { Proposal } from "app/proposal/types"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"

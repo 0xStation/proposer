@@ -1,5 +1,7 @@
+import { useQuery } from "@blitzjs/rpc"
+import { useRouter } from "next/router"
+import { Routes, useParam } from "@blitzjs/next"
 import React from "react"
-import { Routes, useRouter, useParam, useQuery } from "blitz"
 import getRfpById from "../queries/getRfpById"
 import { useUserIsWorkspaceOrSigner } from "app/core/hooks/useUserIsWorkspaceOrSigner"
 

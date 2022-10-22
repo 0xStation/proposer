@@ -1,4 +1,4 @@
-import { Image } from "blitz"
+import Image from "next/image"
 import Verified from "/public/check-mark.svg"
 import { truncateString } from "app/core/utils/truncateString"
 

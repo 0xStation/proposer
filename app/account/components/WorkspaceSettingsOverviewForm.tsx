@@ -1,5 +1,6 @@
+import { useParam } from "@blitzjs/next"
+import { useMutation, invoke, invalidateQuery, useQuery } from "@blitzjs/rpc"
 import { useState, useEffect } from "react"
-import { useMutation, invoke, invalidateQuery, useQuery, useParam } from "blitz"
 import { Field, Form } from "react-final-form"
 import updateAccount from "../mutations/updateAccount"
 import createAccount from "../mutations/createAccount"

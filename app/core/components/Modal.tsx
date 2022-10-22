@@ -1,6 +1,6 @@
+import Image from "next/image"
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
-import { Image } from "blitz"
 
 const checkBanner = (picture) => {
   if (picture) {

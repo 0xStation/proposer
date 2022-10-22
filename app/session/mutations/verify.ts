@@ -1,5 +1,6 @@
+import { invoke } from "@blitzjs/rpc"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
-import { Ctx, invoke } from "blitz"
+import { Ctx } from "blitz"
 import { SiweMessage } from "siwe"
 import * as z from "zod"
 

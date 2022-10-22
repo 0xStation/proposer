@@ -1,5 +1,7 @@
+import { useRouter } from "next/router"
+import { useParam, Routes } from "@blitzjs/next"
+import { useQuery } from "@blitzjs/rpc"
 import { Field } from "react-final-form"
-import { useQuery, useParam, useRouterQuery, useRouter, Routes } from "blitz"
 import {
   composeValidators,
   mustBeAboveNumWords,
@@ -15,7 +17,7 @@ import getRfpById from "app/rfp/queries/getRfpById"
 
 export const FoxesProposeFirstStep = () => {
   const templateId = useParam("templateId") as string
-  const { rfpId } = useRouterQuery()
+  const { rfpId } = useRouter().query
   const router = useRouter()
   const [rfp] = useQuery(
     getRfpById,

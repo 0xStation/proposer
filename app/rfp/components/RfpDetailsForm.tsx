@@ -1,7 +1,7 @@
+import { invalidateQuery, useMutation } from "@blitzjs/rpc"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
 import { mustOmitLongWords } from "app/utils/validators"
-import { invalidateQuery, useMutation } from "blitz"
 import React from "react"
 import { Field, Form } from "react-final-form"
 import { requiredField } from "../../utils/validators"

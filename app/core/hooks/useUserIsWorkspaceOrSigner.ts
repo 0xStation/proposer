@@ -1,5 +1,5 @@
+import { useQuery } from "@blitzjs/rpc"
 import { AddressType } from "@prisma/client"
-import { useQuery } from "blitz"
 import useStore from "./useStore"
 import getSafeMetadata from "app/account/queries/getSafeMetadata"
 

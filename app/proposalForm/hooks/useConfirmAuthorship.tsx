@@ -1,9 +1,9 @@
-import { useMutation, useSession } from "blitz"
+import { useSession } from "@blitzjs/auth"
+import { useMutation } from "@blitzjs/rpc"
 import { ProposalRoleType } from "@prisma/client"
 import useSignature from "app/core/hooks/useSignature"
 import { genProposalDigest } from "app/signatures/proposal"
 import { getHash } from "app/signatures/utils"
-import updateProposalMetadata from "app/proposal/mutations/updateProposalMetadata"
 import sendProposal from "app/proposal/mutations/sendProposal"
 import { Proposal } from "app/proposal/types"
 

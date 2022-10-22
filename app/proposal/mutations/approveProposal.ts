@@ -1,6 +1,6 @@
+import { invoke } from "@blitzjs/rpc"
 import * as z from "zod"
 import db from "db"
-import { invoke } from "blitz"
 import { ProposalStatus, ProposalRoleApprovalStatus } from "@prisma/client"
 import pinProposalSignature from "app/proposalSignature/mutations/pinProposalSignature"
 import pinProposal from "./pinProposal"
