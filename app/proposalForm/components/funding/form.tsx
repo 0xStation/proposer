@@ -112,7 +112,7 @@ export const ProposalFundingForm = ({
       chainId: chain?.id || 1,
       userId: session?.userId as number,
     },
-    { enabled: Boolean(chain && session?.userId) }
+    { suspense: false, enabled: Boolean(chain && session?.userId) }
   )
 
   useEffect(() => {
