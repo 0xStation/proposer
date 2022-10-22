@@ -7,7 +7,7 @@ import Layout from "app/core/layouts/Layout"
 import FoxesProposalForm from "app/proposalForm/components/foxes/form"
 import BackIcon from "/public/back-icon.svg"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
-import { getPaymentAmount, getPaymentToken } from "app/template/utils"
+import { getPaymentAmount, getPayments, getPaymentToken } from "app/template/utils"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
 import ReadMore from "app/core/components/ReadMore"
 import TextLink from "app/core/components/TextLink"
@@ -124,23 +124,27 @@ const ProposalTemplateForm: BlitzPage = () => {
                   </div>
                 </div>
               )}
-              {/* NETWORK */}
-              <div>
-                <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
-                <p className="mt-2">
-                  {getNetworkName(getPaymentToken(template?.data?.fields)?.chainId)}
-                </p>
-              </div>
-              {/* PAYMENT TOKEN */}
-              <div>
-                <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
-                <p className="mt-2">{getPaymentToken(template?.data?.fields)?.symbol}</p>
-              </div>
-              {/* PAYMENT AMOUNT */}
-              <div>
-                <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-                <p className="mt-2">{getPaymentAmount(template?.data?.fields)}</p>
-              </div>
+              {getPayments(template?.data.fields)?.length > 0 && (
+                <>
+                  {/* NETWORK */}
+                  <div>
+                    <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
+                    <p className="mt-2">
+                      {getNetworkName(getPaymentToken(template?.data?.fields)?.chainId)}
+                    </p>
+                  </div>
+                  {/* PAYMENT TOKEN */}
+                  <div>
+                    <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
+                    <p className="mt-2">{getPaymentToken(template?.data?.fields)?.symbol}</p>
+                  </div>
+                  {/* PAYMENT AMOUNT */}
+                  <div>
+                    <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
+                    <p className="mt-2">{getPaymentAmount(template?.data?.fields)}</p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

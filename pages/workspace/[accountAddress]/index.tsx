@@ -371,9 +371,11 @@ const WorkspaceHome: BlitzPage = () => {
     const RfpCard = ({ rfp }) => {
       return (
         <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
-          <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer">
-            <RfpStatusPill status={rfp.status} />
-            <h2 className="text-xl font-bold mt-4">{rfp?.data?.content.title || ""}</h2>
+          <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden flex flex-col justify-between bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer">
+            <div>
+              <RfpStatusPill status={rfp.status} />
+              <h2 className="text-xl font-bold mt-4">{rfp?.data?.content.title || ""}</h2>
+            </div>
             <div className="flex flex-row mt-4 justify-between">
               <span>
                 {" "}
