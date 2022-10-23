@@ -1,4 +1,4 @@
-import { createMachine, assign } from "xstate"
+import { createMachine, assign, sendParent } from "xstate"
 
 type ProposalRoleContext = {
   quorum: number
@@ -36,6 +36,7 @@ const proposalRoleMachine = createMachine(
             return context.signedCount + 1
           },
         }),
+        exit: sendParent("PROCESSED"),
       },
       approved: { type: "final" },
     },

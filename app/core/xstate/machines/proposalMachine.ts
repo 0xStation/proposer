@@ -49,37 +49,25 @@ const proposalMachine = createMachine(
       // as far as I can tell we can't pass params to the entry action, so there is no way to make a general
       // approving action that takes the role as a param. We have to have a separate action / state for each role.
       approvingAuthor: {
-        // on: {
-        //   PROCESSED: { target: "approvingPassThrough" },
-        // },
-        always: [
-          { target: "approved", cond: "rolesSigned" },
-          { target: "awaitingApproval", cond: "rolesRemaining" },
-        ],
+        on: {
+          PROCESSED: { target: "approvingPassThrough" },
+        },
         entry: send("SIGN", {
           to: (context: ProposalContext) => context.author,
         }),
       },
       approvingClient: {
-        // on: {
-        //   PROCESSED: { target: "approvingPassThrough" },
-        // },
-        always: [
-          { target: "approved", cond: "rolesSigned" },
-          { target: "awaitingApproval", cond: "rolesRemaining" },
-        ],
+        on: {
+          PROCESSED: { target: "approvingPassThrough" },
+        },
         entry: send("SIGN", {
           to: (context: ProposalContext) => context.client,
         }),
       },
       approvingContributor: {
-        // on: {
-        //   PROCESSED: { target: "approvingPassThrough" },
-        // },
-        always: [
-          { target: "approved", cond: "rolesSigned" },
-          { target: "awaitingApproval", cond: "rolesRemaining" },
-        ],
+        on: {
+          PROCESSED: { target: "approvingPassThrough" },
+        },
         entry: send("SIGN", {
           to: (context: ProposalContext) => context.contributor,
         }),
@@ -96,9 +84,9 @@ const proposalMachine = createMachine(
     guards: {
       rolesRemaining: (context: ProposalContext, _event) => {
         return (
-          context.author.state.value !== "approved" ||
-          context.client.state.value !== "approved" ||
-          context.contributor.state.value !== "approved"
+          context.author.getSnapshot().value !== "approved" ||
+          context.client.getSnapshot().value !== "approved" ||
+          context.contributor.getSnapshot().value !== "approved"
         )
       },
       rolesSigned: (context: ProposalContext, _event) => {
