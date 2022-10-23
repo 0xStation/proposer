@@ -32,7 +32,9 @@ const proposalRoleMachine = createMachine(
           { target: "approved", cond: "quorumReached" },
         ],
         entry: assign({
-          signedCount: (context: ProposalRoleContext, _event) => context.signedCount + 1,
+          signedCount: (context: ProposalRoleContext, _event) => {
+            return context.signedCount + 1
+          },
         }),
       },
       approved: { type: "final" },
