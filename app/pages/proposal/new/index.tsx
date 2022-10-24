@@ -16,7 +16,7 @@ const ProposalTypeSelection: BlitzPage = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 lg:gap-6 gap-2">
           {/* REQUEST FUNDING */}
           <Link
-            href={Routes.CreateFundingProposal({
+            href={Routes.ProposalNewFunding({
               clients: queryParams?.clients,
               contributors: queryParams?.contributors,
             })}
@@ -28,7 +28,7 @@ const ProposalTypeSelection: BlitzPage = () => {
             </div>
           </Link>
           {/* SHARE AN IDEA */}
-          <Link href={Routes.CreateNonFundingProposal({ clients: queryParams?.clients })}>
+          <Link href={Routes.ProposalNewIdea({ clients: queryParams?.clients })}>
             <div className="max-w-[325px] mb-3 sm:mr-3 rounded-md overflow-hidden bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer">
               <Image src={ShareImage} height={550} />
               <h2 className="text-xl font-bold px-4 pt-4">Share an idea</h2>
@@ -52,7 +52,7 @@ const ProposalTypeSelection: BlitzPage = () => {
             </div>
           </Link>
           {/* CUSTOM */}
-          <div className="max-w-[325px] mb-3 sm:mr-3 rounded-md overflow-hidden bg-wet-concrete cursor-not-allowed">
+          <div className="max-w-[325px] mb-3 sm:mr-3 rounded-md overflow-hidden bg-charcoal border border-wet-concrete cursor-not-allowed">
             <LockClosedIcon className="h-8 w-8 absolute block z-50 fill-marble-white pt-2 pl-2" />
             <Image src={CustomImage} height={550} className="opacity-50" />
             <h2 className="text-xl font-bold px-4 pt-4 opacity-50">Custom</h2>

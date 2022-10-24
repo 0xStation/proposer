@@ -461,7 +461,7 @@ const WorkspaceHome: BlitzPage = () => {
                 Unlock this feature by sending a proposal to Station Helpdesk.
               </p>
               <Link
-                href={Routes.CreateNonFundingProposal({
+                href={Routes.ProposalNewIdea({
                   clients: "station-helpdesk.eth",
                   title: "Requesting RFP access for " + accountAddress,
                 })}

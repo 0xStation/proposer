@@ -2,7 +2,7 @@ import { BlitzPage, useRouterQuery } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import ProposalNonFundingForm from "app/proposalForm/components/nonFunding/form"
 
-const CreateNonFundingProposal: BlitzPage = () => {
+const ProposalNewIdea: BlitzPage = () => {
   const queryParams = useRouterQuery()
   const clients = (queryParams?.clients as string)?.split(",").filter((s) => !!s) || []
   const title = queryParams?.title as string
@@ -14,6 +14,6 @@ const CreateNonFundingProposal: BlitzPage = () => {
   )
 }
 
-CreateNonFundingProposal.suppressFirstRenderFlicker = true
+ProposalNewIdea.suppressFirstRenderFlicker = true
 
-export default CreateNonFundingProposal
+export default ProposalNewIdea
