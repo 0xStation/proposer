@@ -13,6 +13,7 @@ import createProposal from "app/proposal/mutations/createProposal"
 import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
 import { ConfirmForm } from "../ConfirmForm"
 import { ProposeFirstStep } from "./proposeForm"
+import { ProposalRoleType } from "@prisma/client"
 
 enum FundingProposalStep {
   PROPOSE = "PROPOSE",
@@ -24,11 +25,13 @@ const HeaderCopy = {
   [FundingProposalStep.CONFIRM]: "Confirm",
 }
 
-export const ProposalNonFundingForm = ({
+export const ProposalFormPartnership = ({
   prefillClients,
+  prefillContributors,
   prefillTitle,
 }: {
   prefillClients: string[]
+  prefillContributors: string[]
   prefillTitle: string
 }) => {
   const router = useRouter()
@@ -41,6 +44,14 @@ export const ProposalNonFundingForm = ({
   const [proposalShouldSendLater, setProposalShouldSendLater] = useState<boolean>(false)
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
   const session = useSession({ suspense: false })
+  const [proposingAs, setProposingAs] = useState<string>(
+    // set default proposingAs to prefilled values, choosing contributor if both provided for product bias
+    prefillClients.length > 0
+      ? ProposalRoleType.CONTRIBUTOR
+      : prefillContributors.length > 0
+      ? ProposalRoleType.CLIENT
+      : ""
+  )
   const [
     shouldHandlePostProposalCreationProcessing,
     setShouldHandlePostProposalCreationProcessing,
@@ -109,7 +120,9 @@ export const ProposalNonFundingForm = ({
       />
       <Form
         initialValues={{
-          toAddress: prefillClients?.[0] || "",
+          proposingAs: proposingAs || "",
+          client: prefillClients?.[0] || "",
+          contributor: prefillContributors?.[0] || "",
           title: prefillTitle || "",
         }}
         onSubmit={async (values: any, form) => {
@@ -131,14 +144,55 @@ export const ProposalNonFundingForm = ({
                 message: "Not signed in, please connect wallet and sign in.",
               })
             }
-            const toAddress = await resolveEnsAddress(values.toAddress?.trim())
+
+            let contributorAddress
+            let clientAddress
+            // if proposing as contributor, take active user address
+            // otherwise, resolve input ENS or address
+            if (proposingAs === ProposalRoleType.CONTRIBUTOR) {
+              contributorAddress = session?.siwe?.address
+            } else {
+              contributorAddress = await resolveEnsAddress(values.contributor?.trim())
+            }
+            // if proposing as client, take active user address
+            // otherwise, resolve input ENS or address
+            if (proposingAs === ProposalRoleType.CLIENT) {
+              clientAddress = session?.siwe?.address
+            } else {
+              clientAddress = await resolveEnsAddress(values.client?.trim())
+            }
+
+            if (!contributorAddress) {
+              setIsLoading(false)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message:
+                  proposingAs === ProposalRoleType.CONTRIBUTOR
+                    ? "Not signed in, please connect wallet and sign in."
+                    : "Invalid ENS name or wallet address provided.",
+              })
+              return
+            }
+            if (!clientAddress) {
+              setIsLoading(false)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message:
+                  proposingAs === ProposalRoleType.CLIENT
+                    ? "Not signed in, please connect wallet and sign in."
+                    : "Invalid ENS name or wallet address provided.",
+              })
+              return
+            }
 
             try {
               await createProposalMutation({
                 contentTitle: values.title,
                 contentBody: values.body,
-                contributorAddresses: [],
-                clientAddresses: [toAddress],
+                contributorAddresses: [contributorAddress],
+                clientAddresses: [clientAddress],
                 authorAddresses: [session?.siwe?.address as string],
               })
             } catch (err) {
@@ -156,7 +210,17 @@ export const ProposalNonFundingForm = ({
           const formState = form.getState()
 
           const unFilledProposalFields =
-            !formState.values.toAddress || !formState.values.title || !formState.values.body
+            // has not selected who user is proposing as
+            !formState.values.proposingAs ||
+            // proposing as author or client but has not filled in contributor
+            (formState.values.proposingAs !== ProposalRoleType.CONTRIBUTOR &&
+              !formState.values.contributor) ||
+            // proposing as author or contributor but has not filled in client
+            (formState.values.proposingAs !== ProposalRoleType.CLIENT &&
+              !formState.values.client) ||
+            // has not filled in title or body
+            !formState.values.title ||
+            !formState.values.body
 
           return (
             <form onSubmit={handleSubmit} className="mt-20">
@@ -171,7 +235,9 @@ export const ProposalNonFundingForm = ({
                     <h2 className="text-marble-white text-xl font-bold">
                       {HeaderCopy[proposalStep]}
                     </h2>
-                    {proposalStep === FundingProposalStep.PROPOSE && <ProposeFirstStep />}
+                    {proposalStep === FundingProposalStep.PROPOSE && (
+                      <ProposeFirstStep proposingAs={proposingAs} setProposingAs={setProposingAs} />
+                    )}
                     {proposalStep === FundingProposalStep.CONFIRM && <ConfirmForm />}
                   </>
                 )}
@@ -181,27 +247,58 @@ export const ProposalNonFundingForm = ({
                   isDisabled={unFilledProposalFields}
                   className="my-6 float-right"
                   onClick={async () => {
-                    const toAddress = await resolveEnsAddress(formState.values.toAddress?.trim())
+                    let contributorAddress
+                    let clientAddress
+                    // if proposing as contributor, take active user address
+                    // otherwise, resolve input ENS or address
+                    if (proposingAs === ProposalRoleType.CONTRIBUTOR) {
+                      contributorAddress = session?.siwe?.address
+                    } else {
+                      contributorAddress = await resolveEnsAddress(
+                        formState.values.contributor?.trim()
+                      )
+                    }
+                    // if proposing as client, take active user address
+                    // otherwise, resolve input ENS or address
+                    if (proposingAs === ProposalRoleType.CLIENT) {
+                      clientAddress = session?.siwe?.address
+                    } else {
+                      clientAddress = await resolveEnsAddress(formState.values.client?.trim())
+                    }
 
-                    if (!toAddress) {
+                    if (!contributorAddress) {
                       setIsLoading(false)
                       setToastState({
                         isToastShowing: true,
                         type: "error",
-                        message: "Invalid ENS name or wallet address provided.",
+                        message:
+                          proposingAs === ProposalRoleType.CONTRIBUTOR
+                            ? "Not signed in, please connect wallet and sign in."
+                            : "Invalid ENS name or wallet address provided.",
                       })
                       return
                     }
-
-                    if (
-                      addressesAreEqual(toAddress, activeUser?.address as string) ||
-                      addressesAreEqual(toAddress, session?.siwe?.address as string)
-                    ) {
+                    if (!clientAddress) {
                       setIsLoading(false)
                       setToastState({
                         isToastShowing: true,
                         type: "error",
-                        message: "Cannot propose to yourself, please propose to another address.",
+                        message:
+                          proposingAs === ProposalRoleType.CLIENT
+                            ? "Not signed in, please connect wallet and sign in."
+                            : "Invalid ENS name or wallet address provided.",
+                      })
+                      return
+                    }
+                    if (addressesAreEqual(contributorAddress, clientAddress)) {
+                      setIsLoading(false)
+                      setToastState({
+                        isToastShowing: true,
+                        type: "error",
+                        message:
+                          proposingAs !== ProposalRoleType.AUTHOR
+                            ? "Cannot propose to yourself, please propose to another address."
+                            : "Same address cannot deliver and review work, please change either address.",
                       })
                       return
                     }
@@ -268,4 +365,4 @@ export const ProposalNonFundingForm = ({
   )
 }
 
-export default ProposalNonFundingForm
+export default ProposalFormPartnership

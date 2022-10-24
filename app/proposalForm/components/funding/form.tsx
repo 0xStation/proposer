@@ -326,7 +326,8 @@ export const ProposalFundingForm = ({
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
 
-          const unFilledProposalFields = // has not selected who user is proposing as
+          const unFilledProposalFields =
+            // has not selected who user is proposing as
             !formState.values.proposingAs ||
             // proposing as author or client but has not filled in contributor
             (formState.values.proposingAs !== ProposalRoleType.CONTRIBUTOR &&
