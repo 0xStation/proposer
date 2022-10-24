@@ -60,6 +60,7 @@ export const ProposalFundingForm = ({
     setShouldHandlePostProposalCreationProcessing,
   ] = useState<boolean>(false)
   const session = useSession({ suspense: false })
+  const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
   const { resolveEnsAddress } = useResolveEnsAddress()
 
@@ -376,7 +377,7 @@ export const ProposalFundingForm = ({
                   isDisabled={unFilledProposalFields}
                   className="my-6 float-right"
                   onClick={async () => {
-                    if (!session?.siwe?.address) {
+                    if (!session?.siwe?.address || !activeUser?.address) {
                       toggleWalletModal(true)
                     } else {
                       const contributorAddress =
