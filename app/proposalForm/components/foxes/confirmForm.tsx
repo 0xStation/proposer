@@ -1,6 +1,11 @@
 import { useQuery, useParam, useRouterQuery, useRouter, Routes } from "blitz"
 import Preview from "app/core/components/MarkdownPreview"
-import { getClientAddress, getPaymentAmount, getPaymentToken } from "app/template/utils"
+import {
+  getClientAddress,
+  getPaymentAmount,
+  getPaymentToken,
+  getTotalPaymentAmount,
+} from "app/template/utils"
 import { getNetworkName } from "app/core/utils/networkInfo"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import getTemplateById from "app/template/queries/getTemplateById"
@@ -63,7 +68,7 @@ export const FoxesConfirmForm = ({ body }) => {
       {/* TITLE */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Title</span>
-        <span className="items-end">{`${rfp?.data.content.title} submission`}</span>
+        <span className="items-end">{`"${rfp?.data.content.title}" submission`}</span>
       </div>
       {/* NETWORK */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
@@ -80,7 +85,7 @@ export const FoxesConfirmForm = ({ body }) => {
       {/* PAYMENT AMOUNT */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Payment amount</span>
-        <span className="items-end">{getPaymentAmount(template?.data?.fields)}</span>
+        <span className="items-end">{getTotalPaymentAmount(template?.data?.fields)}</span>
       </div>
       {/* DETAILS */}
       <div className="mt-4 flex flex-col w-full">

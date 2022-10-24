@@ -50,7 +50,7 @@ import { isAddress } from "ethers/lib/utils"
 import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 import { Rfp } from "app/rfp/types"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
-import { getPaymentAmount, getPaymentToken } from "app/template/utils"
+import { getPaymentAmount, getPaymentToken, getTotalPaymentAmount } from "app/template/utils"
 import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpId"
 import getTemplateByRfpId from "app/template/queries/getTemplateByRfpId"
 import getRfpCountForAccount from "app/rfp/queries/getRfpCountForAccount"
@@ -388,7 +388,7 @@ const WorkspaceHome: BlitzPage = () => {
             <div className="flex flex-row mt-4 justify-between">
               <span>
                 {" "}
-                <p className="inline">{getPaymentAmount(rfp?.template?.data?.fields)} </p>
+                <p className="inline">{getTotalPaymentAmount(rfp?.template?.data?.fields)} </p>
                 <p className="inline">{getPaymentToken(rfp?.template?.data?.fields)?.symbol}</p>
               </span>
               <span>{rfp?._count.proposals} proposals</span>
