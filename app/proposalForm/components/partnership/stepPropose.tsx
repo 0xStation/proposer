@@ -12,6 +12,7 @@ import { EnsAddressMetadataText } from "../EnsAddressMetadataText"
 import TextLink from "app/core/components/TextLink"
 import { LINKS, PROPOSING_AS_ROLE_MAP } from "app/core/utils/constants"
 import { ProposalRoleType } from "@prisma/client"
+import { isEns } from "app/core/utils/isEns"
 
 export const PartnershipFormStepPropose = ({ proposingAs, setProposingAs }) => {
   const { setAddressInputVal: setClientAddressInputVal, ensAddressResult: clientEnsAddressResult } =
@@ -23,8 +24,11 @@ export const PartnershipFormStepPropose = ({ proposingAs, setProposingAs }) => {
 
   const handleEnsAddressInputValOnKeyUp = (val, setValToCheckEns) => {
     const fieldVal = val.trim()
-    // if value is already an address, we don't need to check for ens
+    // if value is already an address, skip ENS check
     if (ethersIsAddress(fieldVal)) return
+
+    // if value does not adhere to ENS string format, skip ENS check
+    if (!isEns(val)) return
 
     // set state input val to update ens address
     setValToCheckEns(fieldVal)

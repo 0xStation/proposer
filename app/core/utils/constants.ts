@@ -283,6 +283,8 @@ export const SUPPORTED_CHAINS = [chain.mainnet, chain.goerli, chain.optimism, ch
 
 export const SUPPORTED_CHAIN_IDS = SUPPORTED_CHAINS.map((chain) => chain.id)
 
+export const validEnsDomains = ["eth", "xyz"]
+
 export enum Sizes {
   SM = "SM",
   BASE = "BASE",
