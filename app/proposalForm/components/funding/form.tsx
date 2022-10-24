@@ -458,6 +458,11 @@ export const ProposalFormFunding = ({
                     }
                     className="float-right"
                     onClick={() => {
+                      if (!session.siwe?.address) {
+                        toggleWalletModal(true)
+                        return
+                      }
+
                       setProposalStep(ProposalFormStep.CONFIRM)
                     }}
                   >

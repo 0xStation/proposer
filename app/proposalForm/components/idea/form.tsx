@@ -172,6 +172,11 @@ export const ProposalFormIdea = ({
                   isDisabled={unFilledProposalFields}
                   className="my-6 float-right"
                   onClick={async () => {
+                    if (!session.siwe?.address) {
+                      toggleWalletModal(true)
+                      return
+                    }
+
                     const toAddress = await resolveEnsAddress(formState.values.toAddress?.trim())
 
                     if (!toAddress) {

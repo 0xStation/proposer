@@ -352,7 +352,7 @@ export const ProposalFormTemplate = () => {
                   >
                     Next
                   </Button>
-                  {isTokenGatingCheckComplete && !userHasRequiredToken && (
+                  {!userHasRequiredToken && (
                     <span className="text-xs text-concrete">
                       Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
                       RFP.
