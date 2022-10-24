@@ -25,7 +25,10 @@ export const ApproveGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) 
     return (
       <>
         <h3 className="text-2xl font-bold mt-4">Approve transaction</h3>
-        <p className="mt-2">Sign to approve this transaction.</p>
+        <p className="mt-2">
+          Signing this message marks your approval within gnosis. This will not execute the
+          transaction.
+        </p>
         <div className="mt-8 flex items-center">
           <Button
             className="mr-2"
@@ -45,22 +48,22 @@ export const ApproveGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) 
               setIsLoading(true)
               try {
                 const response = await signGnosis()
-                if (!response) {
-                  setIsLoading(false)
-                  throw new Error("Signature Failed")
-                }
-                const s = await updatePaymentMutation({
-                  multisigTransaction: {
-                    transactionId: response.txId,
-                    safeTxHash: response.detailedExecutionInfo.safeTxHash,
-                    address: response.safeAddress,
-                  },
-                  paymentId: activePayment.id,
-                })
-                console.log(s)
-                invalidateQuery(getMilestonesByProposal)
-                setIsLoading(false)
-                setIsOpen(false)
+                // if (!response) {
+                //   setIsLoading(false)
+                //   throw new Error("Signature Failed")
+                // }
+                // const s = await updatePaymentMutation({
+                //   multisigTransaction: {
+                //     transactionId: response.txId,
+                //     safeTxHash: response.detailedExecutionInfo.safeTxHash,
+                //     address: response.safeAddress,
+                //   },
+                //   paymentId: activePayment.id,
+                // })
+                console.log(response)
+                // invalidateQuery(getMilestonesByProposal)
+                // setIsLoading(false)
+                // setIsOpen(false)
               } catch (e) {
                 setToastState({
                   isToastShowing: true,
@@ -74,7 +77,6 @@ export const ApproveGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) 
             Sign
           </Button>
         </div>
-        <p className="text-xs mt-2">You’ll be redirected to a transaction page to confirm.</p>
       </>
     )
   }

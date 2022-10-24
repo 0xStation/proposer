@@ -19,6 +19,7 @@ import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
 import getProposalById from "app/proposal/queries/getProposalById"
 import ApproveGnosisTransactionModal from "app/proposalPayment/components/ApproveGnosisTransactionModal"
+import { getNetworkGnosisUrl } from "app/core/utils/networkInfo"
 
 const PaymentRow = ({
   payment,
@@ -37,6 +38,7 @@ const PaymentRow = ({
     quorum: any
     signers: any
   }>()
+  const [quorumMet, setQuorumMet] = useState<boolean>(false)
   const [userHasSignedGnosisTx, setUserHasSignedGnosisTx] = useState<boolean>(false)
 
   // if a payment is queued to gnosis, continually check if it is complete
@@ -77,6 +79,9 @@ const PaymentRow = ({
         addressesAreEqual(c.owner, activeUser?.address || "")
       )
       setUserHasSignedGnosisTx(userHasSignedGnosisSafe)
+      if (confirmations.length >= quorum) {
+        setQuorumMet(true)
+      }
     }
   }, [safeDetails, gnosisTxStatus])
 
@@ -158,6 +163,29 @@ const PaymentRow = ({
           >
             Queue Gnosis transaction
           </Button>
+        ) : quorumMet ? (
+          <>
+            <a
+              href={`${getNetworkGnosisUrl(payment.data.token.chainId)}:${
+                payment.data.multisigTransaction.address
+              }/transactions/queue`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <button className="mt-4 mb-2 sm:mb-0 border rounded w-[300px] sm:w-[400px] md:w-[614px] h-[35px] bg-electric-violet border-electric-violet text-tunnel-black">
+                Execute on Gnosis
+                <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
+              </button>
+            </a>
+            <span
+              className="text-electric-violet text-xs mt-2 cursor-pointer"
+              onClick={() => {
+                setIsAttachtxModalOpen(true)
+              }}
+            >
+              Paste a transaction link
+            </span>
+          </>
         ) : userHasSignedGnosisTx ? (
           <>
             <button
@@ -174,29 +202,6 @@ const PaymentRow = ({
           >
             Approve
           </button>
-
-          // <>
-          //   <a
-          //     href={`${getNetworkGnosisUrl(payment.data.token.chainId)}:${
-          //       payment.data.multisigTransaction.address
-          //     }/transactions/queue`}
-          //     target="_blank"
-          //     rel="noreferrer"
-          //   >
-          //     <button className="mt-4 mb-2 sm:mb-0 border rounded w-[300px] sm:w-[400px] md:w-[614px] h-[35px] bg-electric-violet border-electric-violet text-tunnel-black">
-          //       Execute on Gnosis
-          //       <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
-          //     </button>
-          //   </a>
-          //   <span
-          //     className="text-electric-violet text-xs mt-2 cursor-pointer"
-          //     onClick={() => {
-          //       setIsAttachtxModalOpen(true)
-          //     }}
-          //   >
-          //     Paste a transaction link
-          //   </span>
-          // </>
         ))}
       {userIsPayer &&
         // proactive logic for when we have multiple milestone payment blocks -> only the current milestone should be payable
