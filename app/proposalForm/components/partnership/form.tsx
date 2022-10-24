@@ -252,6 +252,11 @@ export const ProposalFormPartnership = ({
                   isDisabled={unFilledProposalFields}
                   className="my-6 float-right"
                   onClick={async () => {
+                    if (!session.siwe?.address) {
+                      toggleWalletModal(true)
+                      return
+                    }
+
                     let contributorAddress
                     let clientAddress
                     // if proposing as contributor, take active user address
