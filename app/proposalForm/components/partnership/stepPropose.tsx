@@ -13,7 +13,7 @@ import TextLink from "app/core/components/TextLink"
 import { LINKS, PROPOSING_AS_ROLE_MAP } from "app/core/utils/constants"
 import { ProposalRoleType } from "@prisma/client"
 
-export const ProposeFirstStep = ({ proposingAs, setProposingAs }) => {
+export const PartnershipFormStepPropose = ({ proposingAs, setProposingAs }) => {
   const { setAddressInputVal: setClientAddressInputVal, ensAddressResult: clientEnsAddressResult } =
     useEnsInput()
   const {
@@ -185,7 +185,11 @@ export const ProposeFirstStep = ({ proposingAs, setProposingAs }) => {
             inspirations? Check out{" "}
             <TextLink url={LINKS.PROPOSAL_TEMPLATE}>proposal templates</TextLink>.
           </span>
-          <Field name="body" component="textarea" validate={requiredField}>
+          <Field
+            name="body"
+            component="textarea"
+            validate={composeValidators(requiredField, mustOmitLongWords(50))}
+          >
             {({ input, meta }) => (
               <div>
                 <textarea

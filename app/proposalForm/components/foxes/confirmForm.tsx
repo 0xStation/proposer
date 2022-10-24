@@ -90,7 +90,7 @@ export const FoxesConfirmForm = ({ body }) => {
       {/* DETAILS */}
       <div className="mt-4 flex flex-col w-full">
         <span className="font-bold">Details</span>
-        <div className="mt-4 ml-6 mr-6">
+        <div className="mt-4 mx-6">
           <Preview markdown={body} />
         </div>
       </div>

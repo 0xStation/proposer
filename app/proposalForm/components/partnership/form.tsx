@@ -11,9 +11,9 @@ import { useResolveEnsAddress } from "app/proposalForm/hooks/useResolveEnsAddres
 import { addressesAreEqual } from "../../../core/utils/addressesAreEqual"
 import createProposal from "app/proposal/mutations/createProposal"
 import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
-import { ConfirmForm } from "../ConfirmForm"
-import { ProposeFirstStep } from "./proposeForm"
+import { PartnershipFormStepPropose } from "./stepPropose"
 import { ProposalRoleType } from "@prisma/client"
+import { PartnershipFormStepConfirm } from "./stepConfirm"
 
 enum FundingProposalStep {
   PROPOSE = "PROPOSE",
@@ -236,9 +236,14 @@ export const ProposalFormPartnership = ({
                       {HeaderCopy[proposalStep]}
                     </h2>
                     {proposalStep === FundingProposalStep.PROPOSE && (
-                      <ProposeFirstStep proposingAs={proposingAs} setProposingAs={setProposingAs} />
+                      <PartnershipFormStepPropose
+                        proposingAs={proposingAs}
+                        setProposingAs={setProposingAs}
+                      />
                     )}
-                    {proposalStep === FundingProposalStep.CONFIRM && <ConfirmForm />}
+                    {proposalStep === FundingProposalStep.CONFIRM && (
+                      <PartnershipFormStepConfirm formState={formState} />
+                    )}
                   </>
                 )}
               </div>
