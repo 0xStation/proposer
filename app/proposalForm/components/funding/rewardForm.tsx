@@ -40,10 +40,10 @@ export const RewardForm = ({
     // if user's wallet isn't connected redirect back to the first step
     // the reward form relies on the active chain to determine which tokens
     // to pull from
-    if (!activeUser?.address) {
+    if (!activeUser?.address || !session?.siwe?.address) {
       setProposalStep(FundingProposalStep.PROPOSE)
     }
-  }, [activeUser?.address])
+  }, [activeUser?.address, session?.siwe?.address])
 
   return (
     <>
