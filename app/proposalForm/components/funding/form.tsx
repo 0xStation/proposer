@@ -376,62 +376,60 @@ export const ProposalFundingForm = ({
                   isDisabled={unFilledProposalFields}
                   className="my-6 float-right"
                   onClick={async () => {
-                    let contributorAddress
-                    let clientAddress
-                    // if proposing as contributor, take active user address
-                    // otherwise, resolve input ENS or address
-                    if (proposingAs === ProposalRoleType.CONTRIBUTOR) {
-                      contributorAddress = session?.siwe?.address
+                    if (!session?.siwe?.address) {
+                      toggleWalletModal(true)
                     } else {
-                      contributorAddress = await resolveEnsAddress(
-                        formState.values.contributor?.trim()
-                      )
-                    }
-                    // if proposing as client, take active user address
-                    // otherwise, resolve input ENS or address
-                    if (proposingAs === ProposalRoleType.CLIENT) {
-                      clientAddress = session?.siwe?.address
-                    } else {
-                      clientAddress = await resolveEnsAddress(formState.values.client?.trim())
-                    }
+                      const contributorAddress =
+                        proposingAs === ProposalRoleType.CONTRIBUTOR
+                          ? session?.siwe?.address
+                          : await resolveEnsAddress(formState.values.contributor?.trim())
+                      // if proposing as client, take active user address
+                      // otherwise, resolve input ENS or address
 
-                    if (!contributorAddress) {
-                      setIsLoading(false)
-                      setToastState({
-                        isToastShowing: true,
-                        type: "error",
-                        message:
-                          proposingAs === ProposalRoleType.CONTRIBUTOR
-                            ? "Not signed in, please connect wallet and sign in."
-                            : "Invalid ENS name or wallet address provided.",
-                      })
-                      return
+                      const clientAddress =
+                        proposingAs === ProposalRoleType.CLIENT
+                          ? session?.siwe?.address
+                          : await resolveEnsAddress(formState.values.client?.trim())
+
+                      if (!contributorAddress) {
+                        setIsLoading(false)
+                        setToastState({
+                          isToastShowing: true,
+                          type: "error",
+                          message:
+                            proposingAs === ProposalRoleType.CONTRIBUTOR
+                              ? "Not signed in, please connect wallet and sign in."
+                              : "Invalid ENS name or wallet address provided.",
+                        })
+                        return
+                      }
+                      if (!clientAddress) {
+                        setIsLoading(false)
+
+                        setToastState({
+                          isToastShowing: true,
+                          type: "error",
+                          message:
+                            proposingAs === ProposalRoleType.CLIENT
+                              ? "Not signed in, please connect wallet and sign in."
+                              : "Invalid ENS name or wallet address provided.",
+                        })
+                        return
+                      }
+                      if (addressesAreEqual(contributorAddress, clientAddress)) {
+                        setIsLoading(false)
+                        setToastState({
+                          isToastShowing: true,
+                          type: "error",
+                          message:
+                            proposingAs !== ProposalRoleType.AUTHOR
+                              ? "Cannot propose to yourself, please propose to another address."
+                              : "Same address cannot deliver and review work, please change either address.",
+                        })
+                        return
+                      }
+                      setProposalStep(FundingProposalStep.REWARDS)
                     }
-                    if (!clientAddress) {
-                      setIsLoading(false)
-                      setToastState({
-                        isToastShowing: true,
-                        type: "error",
-                        message:
-                          proposingAs === ProposalRoleType.CLIENT
-                            ? "Not signed in, please connect wallet and sign in."
-                            : "Invalid ENS name or wallet address provided.",
-                      })
-                      return
-                    }
-                    if (addressesAreEqual(contributorAddress, clientAddress)) {
-                      setIsLoading(false)
-                      setToastState({
-                        isToastShowing: true,
-                        type: "error",
-                        message:
-                          proposingAs !== ProposalRoleType.AUTHOR
-                            ? "Cannot propose to yourself, please propose to another address."
-                            : "Same address cannot deliver and review work, please change either address.",
-                      })
-                      return
-                    }
-                    setProposalStep(FundingProposalStep.REWARDS)
                   }}
                 >
                   Next
