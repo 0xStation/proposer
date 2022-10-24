@@ -13,7 +13,7 @@ import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 
-export const FoxesProposeFirstStep = () => {
+export const TemplateFormStepPropose = () => {
   const templateId = useParam("templateId") as string
   const { rfpId } = useRouterQuery()
   const router = useRouter()
@@ -97,3 +97,5 @@ export const FoxesProposeFirstStep = () => {
     </>
   )
 }
+
+export default TemplateFormStepPropose

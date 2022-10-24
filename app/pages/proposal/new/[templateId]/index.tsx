@@ -9,7 +9,7 @@ import {
   useRouter,
 } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import FoxesProposalForm from "app/proposalForm/components/foxes/form"
+import ProposalFormTemplate from "app/proposalForm/components/template/form"
 import BackIcon from "/public/back-icon.svg"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
 import {
@@ -61,9 +61,9 @@ const ProposalTemplateForm: BlitzPage = () => {
     }
   )
   const templateIdToForm = {
-    ["835ef848-91c1-46da-bdf9-4b0a277fe808"]: <FoxesProposalForm />, // foxes template id
-    ["cd28828c-e51a-4796-80f5-e39d4cc43fab"]: <FoxesProposalForm />, // station template id
-    ["96058a8b-b1f5-4ba5-811d-e3415eccb3ce"]: <FoxesProposalForm />, // uniswap template id
+    ["835ef848-91c1-46da-bdf9-4b0a277fe808"]: <ProposalFormTemplate />, // foxes template id
+    ["cd28828c-e51a-4796-80f5-e39d4cc43fab"]: <ProposalFormTemplate />, // station template id
+    ["96058a8b-b1f5-4ba5-811d-e3415eccb3ce"]: <ProposalFormTemplate />, // uniswap template id
   }
 
   return (
@@ -115,11 +115,11 @@ const ProposalTemplateForm: BlitzPage = () => {
                 </div>
               )}
               {/* SUBMISSION REQUIREMENT */}
-              {!!rfp?.data?.singleTokenGate && (
-                <div>
-                  <h4 className="text-xs font-bold text-concrete uppercase">
-                    Submission requirement
-                  </h4>
+              <div>
+                <h4 className="text-xs font-bold text-concrete uppercase">
+                  Submission requirement
+                </h4>
+                {!!rfp?.data?.singleTokenGate ? (
                   <div className="mt-2">
                     {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
                     <TextLink
@@ -132,8 +132,10 @@ const ProposalTemplateForm: BlitzPage = () => {
                       {rfp?.data?.singleTokenGate.token.name}
                     </TextLink>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="mt-2">Public</div>
+                )}
+              </div>
               {getPayments(template?.data.fields)?.length > 0 && (
                 <>
                   {/* NETWORK */}
@@ -158,7 +160,7 @@ const ProposalTemplateForm: BlitzPage = () => {
             </div>
           </div>
         </div>
-        {templateIdToForm[templateId as string] || <FoxesProposalForm />}
+        {templateIdToForm[templateId as string] || <ProposalFormTemplate />}
       </div>
     </Layout>
   )

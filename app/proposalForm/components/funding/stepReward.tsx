@@ -2,7 +2,7 @@ import { useSession } from "blitz"
 import { useEffect, useState } from "react"
 import ImportTokenModal from "app/core/components/ImportTokenModal"
 import useStore from "app/core/hooks/useStore"
-import { FundingProposalStep, PAYMENT_TERM_MAP } from "app/core/utils/constants"
+import { ProposalFormStep, PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import { Field } from "react-final-form"
 import {
   composeValidators,
@@ -21,7 +21,7 @@ export function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-export const RewardForm = ({
+export const FundingFormStepReward = ({
   chainId,
   selectedToken,
   setSelectedToken,
@@ -43,7 +43,7 @@ export const RewardForm = ({
     // the reward form relies on the active chain to determine which tokens
     // to pull from
     if (hasMounted && (!activeUser?.address || !session?.siwe?.address)) {
-      setProposalStep(FundingProposalStep.PROPOSE)
+      setProposalStep(ProposalFormStep.PROPOSE)
     }
   }, [activeUser?.address, session?.siwe?.address, hasMounted])
 
@@ -237,4 +237,4 @@ export const RewardForm = ({
   )
 }
 
-export default RewardForm
+export default FundingFormStepReward

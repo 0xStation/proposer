@@ -92,9 +92,9 @@ export const RfpSidebar = ({ rfp }) => {
             </div>
           )}
           {/* SUBMISSION REQUIREMENT */}
-          {!!rfp?.data?.singleTokenGate && (
-            <div>
-              <h4 className="text-xs font-bold text-concrete uppercase">Submission requirement</h4>
+          <div>
+            <h4 className="text-xs font-bold text-concrete uppercase">Submission requirement</h4>
+            {!!rfp?.data?.singleTokenGate ? (
               <div className="mt-2">
                 {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
                 <TextLink
@@ -107,8 +107,10 @@ export const RfpSidebar = ({ rfp }) => {
                   {rfp?.data?.singleTokenGate.token.name}
                 </TextLink>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="mt-2">Public</div>
+            )}
+          </div>
           {getPayments(template?.data.fields)?.length > 0 && (
             <>
               {/* NETWORK */}

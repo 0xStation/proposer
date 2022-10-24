@@ -30,10 +30,16 @@ export const gradientMap = {
   5: Gradient5,
 }
 
-export enum FundingProposalStep {
+export enum ProposalFormStep {
   PROPOSE = "PROPOSE",
   REWARDS = "REWARDS",
   CONFIRM = "CONFIRM",
+}
+
+export const PROPOSAL_FORM_HEADER_COPY = {
+  [ProposalFormStep.PROPOSE]: "Propose",
+  [ProposalFormStep.REWARDS]: "Define terms",
+  [ProposalFormStep.CONFIRM]: "Confirm",
 }
 
 export const CONTRACTS = {
@@ -282,6 +288,8 @@ export const CHAIN_IDS = {
 export const SUPPORTED_CHAINS = [chain.mainnet, chain.goerli, chain.optimism, chain.polygon]
 
 export const SUPPORTED_CHAIN_IDS = SUPPORTED_CHAINS.map((chain) => chain.id)
+
+export const validEnsDomains = ["eth", "xyz"]
 
 export enum Sizes {
   SM = "SM",
