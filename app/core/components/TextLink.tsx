@@ -7,7 +7,12 @@ export const TextLink = ({
   children?: any
 }) => {
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer" className="text-electric-violet">
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-electric-violet font-bold"
+    >
       {children}
     </a>
   )
