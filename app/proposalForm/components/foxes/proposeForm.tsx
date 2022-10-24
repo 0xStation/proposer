@@ -60,7 +60,7 @@ export const FoxesProposeFirstStep = () => {
       </div>
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Title</span>
-        <span className="items-end">{`${rfp?.data.content.title || ""} submission`}</span>
+        <span className="items-end">{`"${rfp?.data.content.title || ""}" submission`}</span>
       </div>
       {/* BODY */}
       <label className="font-bold block mt-6">Details*</label>

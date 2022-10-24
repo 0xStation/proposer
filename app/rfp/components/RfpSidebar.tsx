@@ -4,7 +4,12 @@ import BackIcon from "/public/back-icon.svg"
 import TextLink from "app/core/components/TextLink"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
 import { WorkspaceTab } from "app/pages/workspace/[accountAddress]"
-import { getPaymentToken, getPaymentAmount, getPayments } from "app/template/utils"
+import {
+  getPaymentToken,
+  getPaymentAmount,
+  getPayments,
+  getTotalPaymentAmount,
+} from "app/template/utils"
 import RfpStatusPill from "./RfpStatusPill"
 import Button from "app/core/components/sds/buttons/Button"
 import ReadMore from "app/core/components/ReadMore"
@@ -121,7 +126,7 @@ export const RfpSidebar = ({ rfp }) => {
               {/* PAYMENT AMOUNT */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-                <p className="mt-2">{getPaymentAmount(template?.data?.fields)}</p>
+                <p className="mt-2">{getTotalPaymentAmount(template?.data?.fields)}</p>
               </div>
             </>
           )}

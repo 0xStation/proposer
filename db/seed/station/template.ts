@@ -2,7 +2,7 @@ import { PARTNERS, TEMPLATES } from "app/core/utils/constants"
 import db from "db"
 
 const seed = async () => {
-  const templates = [TEMPLATES.STATION.PARTNERSHIPS]
+  const templates = [TEMPLATES.STATION.NEWSTAND]
 
   templates.forEach(async (template: { id: string; title: string; fields: any[] }) => {
     const updatedTemplate = await db.proposalTemplate.upsert({

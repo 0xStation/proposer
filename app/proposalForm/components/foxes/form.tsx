@@ -260,7 +260,7 @@ export const FoxesProposalForm = () => {
 
               await createProposalMutation({
                 rfpId: rfp?.id,
-                contentTitle: `${rfp?.data.content.title} submission`,
+                contentTitle: `"${rfp?.data.content.title}" submission`,
                 contentBody: values.body,
                 authorAddresses: [contributorAddress],
                 contributorAddresses: [contributorAddress],

@@ -431,9 +431,9 @@ export const TEMPLATES = {
     },
   },
   STATION: {
-    PARTNERSHIPS: {
+    NEWSTAND: {
       id: "cd28828c-e51a-4796-80f5-e39d4cc43fab",
-      title: "Partnerships",
+      title: "Station is seeking stories about contributing in web3",
       fields: [
         {
           key: RESERVED_KEYS.CONTRIBUTORS,
@@ -458,8 +458,12 @@ export const TEMPLATES = {
           mapsTo: RESERVED_KEYS.MILESTONES,
           value: [
             {
-              title: "Upfront payment",
+              title: "Advance payment",
               index: 0,
+            },
+            {
+              title: "Completion payment",
+              index: 1,
             },
           ],
           fieldType: ProposalTemplateFieldType.PRESELECT,
@@ -473,10 +477,20 @@ export const TEMPLATES = {
               senderAddress: PARTNERS.STATION.ADDRESS,
               recipientAddress: undefined,
               token: {
+                ...getNetworkUsdc(PARTNERS.STATION.CHAIN_ID),
                 chainId: PARTNERS.STATION.CHAIN_ID,
-                ...getNetworkCoin(PARTNERS.STATION.CHAIN_ID),
               },
-              amount: 0.01,
+              amount: 100,
+            },
+            {
+              milestoneIndex: 1,
+              senderAddress: PARTNERS.STATION.ADDRESS,
+              recipientAddress: undefined,
+              token: {
+                ...getNetworkUsdc(PARTNERS.STATION.CHAIN_ID),
+                chainId: PARTNERS.STATION.CHAIN_ID,
+              },
+              amount: 400,
             },
           ],
           fieldType: ProposalTemplateFieldType.PREFILL,
@@ -484,7 +498,7 @@ export const TEMPLATES = {
         {
           key: RESERVED_KEYS.PAYMENT_TERMS,
           mapsTo: RESERVED_KEYS.PAYMENT_TERMS,
-          value: PaymentTerm.ON_AGREEMENT,
+          value: PaymentTerm.ADVANCE_PAYMENT,
           fieldType: ProposalTemplateFieldType.PRESELECT,
         },
       ],
