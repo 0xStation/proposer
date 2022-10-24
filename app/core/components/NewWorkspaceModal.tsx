@@ -109,7 +109,15 @@ export const NewWorkspaceModal = ({
                   selected network. Change your network in the upper-right corner of this page to
                   the left of your profile.
                 </span>
-                <Select name="safeAddress" options={safes} placeholder="Select one" />
+                <select className="w-full bg-wet-concrete p-2 rounded text-marble-white">
+                  {safes.map((safe: any, idx) => {
+                    return (
+                      <option key={idx} value={safe.value}>
+                        {safe.label}
+                      </option>
+                    )
+                  })}
+                </select>
                 <div className="mt-6 flex justify-end">
                   <div className="flex flex-col">
                     <Button
