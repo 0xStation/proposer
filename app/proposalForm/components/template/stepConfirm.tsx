@@ -11,7 +11,7 @@ import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 
-export const FoxesConfirmForm = ({ body }) => {
+export const TemplateFormStepConfirm = ({ body }) => {
   const templateId = useParam("templateId") as string
   const { rfpId } = useRouterQuery()
   const router = useRouter()
@@ -97,3 +97,5 @@ export const FoxesConfirmForm = ({ body }) => {
     </>
   )
 }
+
+export default TemplateFormStepConfirm

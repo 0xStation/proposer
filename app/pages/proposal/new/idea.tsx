@@ -1,6 +1,6 @@
 import { BlitzPage, useRouterQuery } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import ProposalNonFundingForm from "app/proposalForm/components/nonFunding/form"
+import ProposalFormIdea from "app/proposalForm/components/idea/form"
 
 const ProposalNewIdea: BlitzPage = () => {
   const queryParams = useRouterQuery()
@@ -9,7 +9,7 @@ const ProposalNewIdea: BlitzPage = () => {
 
   return (
     <Layout title="New Proposal">
-      <ProposalNonFundingForm prefillClients={clients} prefillTitle={title} />
+      <ProposalFormIdea prefillClients={clients} prefillTitle={title} />
     </Layout>
   )
 }

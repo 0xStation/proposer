@@ -213,3 +213,5 @@ export const PartnershipFormStepPropose = ({ proposingAs, setProposingAs }) => {
     </>
   )
 }
+
+export default PartnershipFormStepPropose

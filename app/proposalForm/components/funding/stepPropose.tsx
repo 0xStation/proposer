@@ -8,7 +8,7 @@ import { Field } from "react-final-form"
 import { EnsAddressMetadataText } from "../EnsAddressMetadataText"
 import useEnsInput from "app/proposalForm/hooks/useEnsInput"
 
-export const ProposeForm = ({ proposingAs, setProposingAs }) => {
+export const FundingFormStepPropose = ({ proposingAs, setProposingAs }) => {
   const { setAddressInputVal: setClientAddressInputVal, ensAddressResult: clientEnsAddressResult } =
     useEnsInput()
   const {
@@ -200,3 +200,5 @@ export const ProposeForm = ({ proposingAs, setProposingAs }) => {
     </>
   )
 }
+
+export default FundingFormStepPropose

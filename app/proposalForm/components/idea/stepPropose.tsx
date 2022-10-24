@@ -12,7 +12,7 @@ import { EnsAddressMetadataText } from "../EnsAddressMetadataText"
 import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
 
-export const ProposeFirstStep = () => {
+export const IdeaFormStepPropose = () => {
   const { setAddressInputVal, ensAddressResult } = useEnsInput()
 
   const handleEnsAddressInputValOnKeyUp = (val, setValToCheckEns) => {
@@ -101,3 +101,5 @@ export const ProposeFirstStep = () => {
     </>
   )
 }
+
+export default IdeaFormStepPropose

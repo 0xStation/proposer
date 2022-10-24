@@ -11,19 +11,10 @@ import { useResolveEnsAddress } from "app/proposalForm/hooks/useResolveEnsAddres
 import { addressesAreEqual } from "../../../core/utils/addressesAreEqual"
 import createProposal from "app/proposal/mutations/createProposal"
 import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
-import { PartnershipFormStepPropose } from "./stepPropose"
 import { ProposalRoleType } from "@prisma/client"
-import { PartnershipFormStepConfirm } from "./stepConfirm"
-
-enum FundingProposalStep {
-  PROPOSE = "PROPOSE",
-  CONFIRM = "CONFIRM",
-}
-
-const HeaderCopy = {
-  [FundingProposalStep.PROPOSE]: "Propose",
-  [FundingProposalStep.CONFIRM]: "Confirm",
-}
+import PartnershipFormStepPropose from "./stepPropose"
+import PartnershipFormStepConfirm from "./stepConfirm"
+import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
 
 export const ProposalFormPartnership = ({
   prefillClients,
@@ -38,7 +29,7 @@ export const ProposalFormPartnership = ({
   const walletModalOpen = useStore((state) => state.walletModalOpen)
   const setToastState = useStore((state) => state.setToastState)
   const activeUser = useStore((state) => state.activeUser)
-  const [proposalStep, setProposalStep] = useState<FundingProposalStep>(FundingProposalStep.PROPOSE)
+  const [proposalStep, setProposalStep] = useState<ProposalFormStep>(ProposalFormStep.PROPOSE)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [proposalShouldSendLater, setProposalShouldSendLater] = useState<boolean>(false)
@@ -114,7 +105,7 @@ export const ProposalFormPartnership = ({
   return (
     <div className="max-w-[580px] h-full mx-auto">
       <Stepper
-        activeStep={HeaderCopy[proposalStep]}
+        activeStep={PROPOSAL_FORM_HEADER_COPY[proposalStep]}
         steps={["Propose", "Confirm"]}
         className="mt-10"
       />
@@ -233,21 +224,21 @@ export const ProposalFormPartnership = ({
                 ) : (
                   <>
                     <h2 className="text-marble-white text-xl font-bold">
-                      {HeaderCopy[proposalStep]}
+                      {PROPOSAL_FORM_HEADER_COPY[proposalStep]}
                     </h2>
-                    {proposalStep === FundingProposalStep.PROPOSE && (
+                    {proposalStep === ProposalFormStep.PROPOSE && (
                       <PartnershipFormStepPropose
                         proposingAs={proposingAs}
                         setProposingAs={setProposingAs}
                       />
                     )}
-                    {proposalStep === FundingProposalStep.CONFIRM && (
+                    {proposalStep === ProposalFormStep.CONFIRM && (
                       <PartnershipFormStepConfirm formState={formState} />
                     )}
                   </>
                 )}
               </div>
-              {proposalStep === FundingProposalStep.PROPOSE && (
+              {proposalStep === ProposalFormStep.PROPOSE && (
                 <Button
                   isDisabled={unFilledProposalFields}
                   className="my-6 float-right"
@@ -312,16 +303,16 @@ export const ProposalFormPartnership = ({
                       })
                       return
                     }
-                    setProposalStep(FundingProposalStep.CONFIRM)
+                    setProposalStep(ProposalFormStep.CONFIRM)
                   }}
                 >
                   Next
                 </Button>
               )}
-              {proposalStep === FundingProposalStep.CONFIRM && (
+              {proposalStep === ProposalFormStep.CONFIRM && (
                 <div className="flex justify-between mt-6">
                   <span
-                    onClick={() => setProposalStep(FundingProposalStep.PROPOSE)}
+                    onClick={() => setProposalStep(ProposalFormStep.PROPOSE)}
                     className="cursor-pointer border rounded border-marble-white p-2 self-start"
                   >
                     <BackArrow className="fill-marble-white" />

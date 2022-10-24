@@ -76,3 +76,5 @@ export const PartnershipFormStepConfirm = ({ formState }) => {
     </div>
   )
 }
+
+export default PartnershipFormStepConfirm
