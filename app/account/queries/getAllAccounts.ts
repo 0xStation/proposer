@@ -13,20 +13,35 @@ const GetAllAccounts = z.object({
 export default async function getAllAccounts(input: z.infer<typeof GetAllAccounts>) {
   const params = GetAllAccounts.parse(input)
 
-  const accounts = await db.account.findMany({
-    ...(params.sortUpdatedAt && {
-      orderBy: {
-        updatedAt: "desc",
-      },
+  const [accounts, count] = await db.$transaction([
+    db.account.findMany({
+      ...(params.sortUpdatedAt && {
+        orderBy: {
+          updatedAt: "desc",
+        },
+      }),
+      ...(params.filterAddressType && {
+        where: {
+          addressType: params.filterAddressType,
+        },
+      }),
+      take: input.paginationTake,
+      skip: input.page * input.paginationTake,
     }),
-    ...(params.filterAddressType && {
-      where: {
-        addressType: params.filterAddressType,
-      },
+    db.account.count({
+      ...(params.filterAddressType && {
+        where: {
+          addressType: params.filterAddressType,
+        },
+      }),
     }),
-    take: input.paginationTake,
-    skip: input.page * input.paginationTake,
-  })
+  ])
 
-  return accounts as Account[]
+  return {
+    accounts,
+    count,
+  } as {
+    accounts: Account[]
+    count: number
+  }
 }
