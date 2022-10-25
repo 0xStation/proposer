@@ -10,6 +10,7 @@ import { LockClosedIcon } from "@heroicons/react/solid"
 import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 import { RfpCard } from "app/rfp/components/RfpCard"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import { RfpStatus } from "@prisma/client"
 
 enum ProposalView {
   ProposalType = "ProposalType",
@@ -52,6 +53,7 @@ const ProposalTypeSelection: BlitzPage = () => {
       address: (clients || contributors) as string,
       paginationTake: 50, // TODO: not adding pagination rn, because most workspaces don't need it
       page: 0,
+      statuses: [RfpStatus.OPEN],
     },
     { suspense: false, enabled: Boolean(clients?.[0] || contributors?.[0]) }
   )
