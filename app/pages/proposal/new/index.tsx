@@ -60,14 +60,16 @@ const ProposalTypeSelection: BlitzPage = () => {
     <Layout title="New Proposal">
       {view === ProposalView.ProposalType && (
         <>
-          <button
-            className="h-[20px] w-[20px] absolute mt-4 ml-4"
-            onClick={() => {
-              router.back()
-            }}
-          >
-            <Image src={BackIcon} alt="Back icon" />
-          </button>
+          {Boolean(rfps?.length) && (
+            <button
+              className="h-[20px] w-[20px] absolute mt-4 ml-4"
+              onClick={() => {
+                router.back()
+              }}
+            >
+              <Image src={BackIcon} alt="Back icon" />
+            </button>
+          )}
           <div className="w-full mx-auto max-w-fit mt-9">
             <div className="flex flex-row justify-between">
               <h1 className="text-2xl font-bold mb-6">Select a proposal type</h1>
