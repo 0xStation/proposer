@@ -1,11 +1,6 @@
 import { Field } from "react-final-form"
 import { useQuery, useParam, useRouterQuery, useRouter, Routes } from "blitz"
-import {
-  composeValidators,
-  mustBeAboveNumWords,
-  requiredField,
-  mustOmitLongWords,
-} from "app/utils/validators"
+import { composeValidators, mustBeAboveNumWords, requiredField } from "app/utils/validators"
 import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
 import { getClientAddress, getFieldValue, getMinNumWords } from "app/template/utils"
@@ -75,7 +70,6 @@ export const TemplateFormStepPropose = () => {
         component="textarea"
         validate={composeValidators(
           requiredField,
-          mustOmitLongWords(50),
           mustBeAboveNumWords(getMinNumWords(template?.data.fields))
         )}
       >
