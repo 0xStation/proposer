@@ -188,7 +188,20 @@ const WorkspaceHome: BlitzPage = () => {
 
     return (
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
-        <h1 className="text-2xl font-bold">Proposals</h1>
+        <div className="flex flex-row justify-between">
+          <h1 className="text-2xl font-bold">Proposals</h1>
+          <Link
+            href={Routes.ProposalTypeSelection({
+              // pre-fill for both so that if user changes toggle to reverse roles, the input address is still there
+              clients: accountEnsName || accountAddress,
+              contributors: accountEnsName || accountAddress,
+            })}
+          >
+            <Button className="w-full px-10" overrideWidthClassName="max-w-fit">
+              Propose
+            </Button>
+          </Link>
+        </div>
         {/* FILTERS & PAGINATION */}
         <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">
           {/* FILTERS */}
@@ -504,7 +517,7 @@ const WorkspaceHome: BlitzPage = () => {
               />
             )}
             {/* CTA */}
-            {
+            {/* {
               // activeTab !== WorkspaceTab.RFPS &&
               <Link
                 href={Routes.ProposalTypeSelection({
@@ -515,7 +528,7 @@ const WorkspaceHome: BlitzPage = () => {
               >
                 <Button className="w-full">Propose</Button>
               </Link>
-            }
+            } */}
           </div>
           {/* TABS */}
           <ul className="mt-6 space-y-2">
