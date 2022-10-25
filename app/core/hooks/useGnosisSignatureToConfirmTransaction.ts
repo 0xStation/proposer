@@ -3,7 +3,7 @@ import { getHash } from "app/signatures/utils"
 import { genGnosisTransactionDigest } from "app/signatures/gnosisTransaction"
 import networks from "app/utils/networks.json"
 import useSignature from "app/core/hooks/useSignature"
-import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 const useGnosisSignatureToConfirmTransaction = (payment) => {
   const setToastState = useStore((state) => state.setToastState)
@@ -11,9 +11,11 @@ const useGnosisSignatureToConfirmTransaction = (payment) => {
   const signMessage = async () => {
     // prompt the Metamask signature modal
     try {
-      const nonce = await getNonce(payment.data.token.chainId, payment.senderAddress)
+      const nonce = await getNonce(
+        payment.data.token.chainId,
+        payment.data.multisigTransaction.safeTxHash
+      )
       const transactionData = genGnosisTransactionDigest(payment, nonce)
-
       const signature = await signMessageHook(transactionData)
       const data = await addConfirmationSignatureToGnosisTransaction(signature, transactionData)
       setToastState({
@@ -77,12 +79,26 @@ const useGnosisSignatureToConfirmTransaction = (payment) => {
   return { signMessage }
 }
 
-const getNonce = async (chainId, safeAddress) => {
+const getNonce = async (chainId, safeTxHash) => {
+  const network = networks[chainId]?.gnosisNetwork
+  if (!network) {
+    throw Error("chainId not available on Gnosis")
+  }
+  const url = `https://safe-transaction.${network}.gnosis.io/api/v1/multisig-transactions/${safeTxHash}/`
+
+  let response
   try {
-    const details = await getGnosisSafeDetails(chainId, safeAddress)
-    return details?.quorum
-  } catch (e) {
-    console.error(e)
+    response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    const data = await response.json()
+    return data.nonce
+  } catch (err) {
+    console.error(err)
+    return null
   }
 }
 

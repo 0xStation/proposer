@@ -1,9 +1,8 @@
 import { useState } from "react"
-import { useMutation, invalidateQuery } from "blitz"
+import { invalidateQuery } from "blitz"
 import Modal from "app/core/components/Modal"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useGnosisSignatureToConfirmTransaction from "app/core/hooks/useGnosisSignatureToConfirmTransaction"
-import updatePayment from "app/proposalPayment/mutations/updatePayment"
 import useStore from "app/core/hooks/useStore"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
 
@@ -13,13 +12,6 @@ export const ApproveGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) 
 
   const { signMessage: signGnosis } = useGnosisSignatureToConfirmTransaction(activePayment)
   const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  const [updatePaymentMutation] = useMutation(updatePayment, {
-    onSuccess: (data) => {},
-    onError: (error) => {
-      console.error(error)
-    },
-  })
 
   const ApprovePaymentTab = () => {
     return (
@@ -47,23 +39,10 @@ export const ApproveGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) 
             onClick={async () => {
               setIsLoading(true)
               try {
-                const response = await signGnosis()
-                // if (!response) {
-                //   setIsLoading(false)
-                //   throw new Error("Signature Failed")
-                // }
-                // const s = await updatePaymentMutation({
-                //   multisigTransaction: {
-                //     transactionId: response.txId,
-                //     safeTxHash: response.detailedExecutionInfo.safeTxHash,
-                //     address: response.safeAddress,
-                //   },
-                //   paymentId: activePayment.id,
-                // })
-                console.log(response)
-                // invalidateQuery(getMilestonesByProposal)
-                // setIsLoading(false)
-                // setIsOpen(false)
+                await signGnosis()
+                invalidateQuery(getMilestonesByProposal)
+                setIsLoading(false)
+                setIsOpen(false)
               } catch (e) {
                 setToastState({
                   isToastShowing: true,
