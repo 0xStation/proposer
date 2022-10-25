@@ -1,6 +1,5 @@
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
-import { mustOmitLongWords } from "app/utils/validators"
 import { invalidateQuery, useMutation } from "blitz"
 import React from "react"
 import { Field, Form } from "react-final-form"
@@ -80,7 +79,7 @@ export const RfpDetailsForm = ({ rfp }) => {
               }}
             </Field>
             <label className="font-bold block mt-6">Submission guidelines</label>
-            <Field name="submissionGuideline" component="textarea" validate={mustOmitLongWords(50)}>
+            <Field name="submissionGuideline" component="textarea">
               {({ input, meta }) => (
                 <div>
                   <textarea

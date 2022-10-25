@@ -2,12 +2,7 @@ import { Field } from "react-final-form"
 import debounce from "lodash.debounce"
 import { isAddress as ethersIsAddress } from "@ethersproject/address"
 import useEnsInput from "app/proposalForm/hooks/useEnsInput"
-import {
-  composeValidators,
-  isEnsOrAddress,
-  requiredField,
-  mustOmitLongWords,
-} from "app/utils/validators"
+import { composeValidators, isEnsOrAddress, requiredField } from "app/utils/validators"
 import { EnsAddressMetadataText } from "../EnsAddressMetadataText"
 import TextLink from "app/core/components/TextLink"
 import { LINKS, PROPOSING_AS_ROLE_MAP } from "app/core/utils/constants"
@@ -189,11 +184,7 @@ export const PartnershipFormStepPropose = ({ proposingAs, setProposingAs }) => {
             inspirations? Check out{" "}
             <TextLink url={LINKS.PROPOSAL_TEMPLATE}>proposal templates</TextLink>.
           </span>
-          <Field
-            name="body"
-            component="textarea"
-            validate={composeValidators(requiredField, mustOmitLongWords(50))}
-          >
+          <Field name="body" component="textarea" validate={composeValidators(requiredField)}>
             {({ input, meta }) => (
               <div>
                 <textarea
