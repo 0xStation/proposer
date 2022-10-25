@@ -37,17 +37,12 @@ export const RfpDetailsForm = ({ rfp }) => {
         try {
           await updateRfpMetadataMutation({
             rfpId: rfp?.id,
-            submissionGuideline: values.submissionGuideline,
             status: rfp?.status,
             title: values?.title,
             body: rfp?.data?.content?.body,
             oneLiner: rfp?.data?.content?.oneLiner,
-            token:
-              rfp?.data?.singleTokenGate?.token &&
-              JSON.parse(JSON.stringify(rfp?.data?.singleTokenGate?.token)),
-            minBalance:
-              rfp?.data?.singleTokenGate?.minBalance &&
-              JSON.parse(JSON.stringify(rfp?.data?.singleTokenGate?.minBalance)),
+            submissionGuideline: values.submissionGuideline,
+            ...(rfp?.data?.singleTokenGate && { singleTokenGate: rfp?.data?.singleTokenGate }),
           })
         } catch (err) {
           console.error(err)

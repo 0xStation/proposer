@@ -10,8 +10,12 @@ const UpdateRfpMetadata = z.object({
   body: z.string(),
   oneLiner: z.string(),
   submissionGuideline: z.string().optional(),
-  token: ZodToken,
-  minBalance: z.string().optional(), // string to pass directly into BigNumber.from in logic check
+  singleTokenGate: z
+    .object({
+      token: ZodToken,
+      minBalance: z.string(), // string to pass directly into BigNumber.from in logic check
+    })
+    .optional(),
 })
 
 export default async function updateRfpMetadata(input: z.infer<typeof UpdateRfpMetadata>) {
@@ -27,10 +31,9 @@ export default async function updateRfpMetadata(input: z.infer<typeof UpdateRfpM
             oneLiner: params.oneLiner,
             submissionGuideline: params.submissionGuideline,
           },
-          singleTokenGate: {
-            token: params.token,
-            minBalance: params.minBalance, // string to pass directly into BigNumber.from in logic check
-          },
+          ...(params.singleTokenGate && {
+            singleTokenGate: params.singleTokenGate,
+          }),
         },
       },
     })
