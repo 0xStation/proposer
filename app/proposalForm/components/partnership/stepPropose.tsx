@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Field } from "react-final-form"
 import debounce from "lodash.debounce"
 import { isAddress as ethersIsAddress } from "@ethersproject/address"
@@ -8,14 +9,17 @@ import TextLink from "app/core/components/TextLink"
 import { LINKS, PROPOSING_AS_ROLE_MAP } from "app/core/utils/constants"
 import { ProposalRoleType } from "@prisma/client"
 import { isEns } from "app/core/utils/isEns"
+import Preview from "app/core/components/MarkdownPreview"
+import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid"
 
-export const PartnershipFormStepPropose = ({ proposingAs, setProposingAs }) => {
+export const PartnershipFormStepPropose = ({ proposingAs, setProposingAs, formState }) => {
   const { setAddressInputVal: setClientAddressInputVal, ensAddressResult: clientEnsAddressResult } =
     useEnsInput()
   const {
     setAddressInputVal: setContributorAddressInputVal,
     ensAddressResult: contributorEnsAddressResult,
   } = useEnsInput()
+  const [previewMode, setPreviewMode] = useState<boolean>(false)
 
   const handleEnsAddressInputValOnKeyUp = (val, setValToCheckEns) => {
     const fieldVal = val.trim()
@@ -178,27 +182,57 @@ export const PartnershipFormStepPropose = ({ proposingAs, setProposingAs }) => {
             )}
           </Field>
           {/* BODY */}
-          <label className="font-bold block mt-6">Details*</label>
-          <span className="text-xs text-concrete block">
-            Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown syntax</TextLink>. Need
-            inspirations? Check out{" "}
-            <TextLink url={LINKS.PROPOSAL_TEMPLATE}>proposal templates</TextLink>.
-          </span>
-          <Field name="body" component="textarea" validate={composeValidators(requiredField)}>
-            {({ input, meta }) => (
-              <div>
-                <textarea
-                  {...input}
-                  placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
-                  className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[236px] w-full"
-                />
-                {/* this error shows up when the user focuses the field (meta.touched) */}
-                {meta.error && meta.touched && (
-                  <span className=" text-xs text-torch-red block">{meta.error}</span>
-                )}
-              </div>
-            )}
-          </Field>
+          <div className="flex flex-row justify-between">
+            <div className="flex-col">
+              <label className="font-bold block mt-6">Details*</label>
+              <span className="text-xs text-concrete block">
+                Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown syntax</TextLink>. Need
+                inspirations? Check out{" "}
+                <TextLink url={LINKS.PROPOSAL_TEMPLATE}>proposal templates</TextLink>.
+              </span>
+            </div>
+            <button
+              type="button"
+              className="pt-1"
+              onClick={(e) => {
+                e.preventDefault()
+                setPreviewMode(!previewMode)
+              }}
+            >
+              {previewMode ? (
+                <>
+                  <p className="inline text-sm text-concrete">Edit</p>{" "}
+                  <EyeOffIcon className="inline h-5 w-5 fill-concrete" />
+                </>
+              ) : (
+                <>
+                  <p className="inline text-sm text-concrete">Read</p>{" "}
+                  <EyeIcon className="inline h-5 w-5 fill-concrete" />
+                </>
+              )}
+            </button>
+          </div>
+          {previewMode ? (
+            <div className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[236px] w-full ">
+              <Preview markdown={formState.values.body} />
+            </div>
+          ) : (
+            <Field name="body" component="textarea" validate={composeValidators(requiredField)}>
+              {({ input, meta }) => (
+                <div>
+                  <textarea
+                    {...input}
+                    placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
+                    className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[236px] w-full"
+                  />
+                  {/* this error shows up when the user focuses the field (meta.touched) */}
+                  {meta.error && meta.touched && (
+                    <span className=" text-xs text-torch-red block">{meta.error}</span>
+                  )}
+                </div>
+              )}
+            </Field>
+          )}
         </>
       )}
     </>

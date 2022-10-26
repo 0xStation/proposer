@@ -350,6 +350,7 @@ export const ProposalFormFunding = ({
                       <FundingFormStepPropose
                         proposingAs={proposingAs}
                         setProposingAs={setProposingAs}
+                        formState={formState}
                       />
                     )}
                     {proposalStep === ProposalFormStep.REWARDS && (

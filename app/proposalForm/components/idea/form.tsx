@@ -162,7 +162,9 @@ export const ProposalFormIdea = ({
                     <h2 className="text-marble-white text-xl font-bold">
                       {PROPOSAL_FORM_HEADER_COPY[proposalStep]}
                     </h2>
-                    {proposalStep === ProposalFormStep.PROPOSE && <IdeaFormStepPropose />}
+                    {proposalStep === ProposalFormStep.PROPOSE && (
+                      <IdeaFormStepPropose formState={formState} />
+                    )}
                     {proposalStep === ProposalFormStep.CONFIRM && <ConfirmForm />}
                   </>
                 )}
