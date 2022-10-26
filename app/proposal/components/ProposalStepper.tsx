@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useParam, useQuery } from "blitz"
 import useStore from "app/core/hooks/useStore"
 import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
-import useGetUsersRolesAwaitingApproval from "app/core/hooks/useGetUsersRolesPendingApproval"
+import useGetUsersRolesCanApprove from "app/core/hooks/useGetUsersRolesCanApprove"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { ProposalRoleType, ProposalStatus, RfpStatus } from "@prisma/client"
 import Stepper, { StepStatus } from "app/core/components/Stepper"
@@ -27,7 +27,7 @@ const ProposalStepper = () => {
   const [stepperSteps, setStepperSteps] = useState<any>([])
   const [stepperLoading, setStepperLoading] = useState<boolean>(true)
 
-  const { roles: rolesAwaitingApproval } = useGetUsersRolesAwaitingApproval(proposalId)
+  const { roles: rolesCanApprove } = useGetUsersRolesCanApprove(proposalId)
   const { roles: userRoles } = useGetUsersRoles(proposalId)
 
   const rawSteps = [
@@ -61,7 +61,7 @@ const ProposalStepper = () => {
           : StepStatus.current
         : StepStatus.loading,
       actions: {
-        [ProposalRoleType.CLIENT]: rolesAwaitingApproval.filter(
+        [ProposalRoleType.CLIENT]: rolesCanApprove.filter(
           (role) => role.type === ProposalRoleType.CLIENT
         ).length > 0 && (
           <Button
@@ -72,7 +72,7 @@ const ProposalStepper = () => {
             Approve
           </Button>
         ),
-        [ProposalRoleType.CONTRIBUTOR]: rolesAwaitingApproval.filter(
+        [ProposalRoleType.CONTRIBUTOR]: rolesCanApprove.filter(
           (role) => role.type === ProposalRoleType.CONTRIBUTOR
         ).length > 0 && (
           <Button
@@ -92,7 +92,7 @@ const ProposalStepper = () => {
       setStepperSteps(rawSteps)
       setStepperLoading(false)
     }
-  }, [proposal, userRoles, rolesAwaitingApproval])
+  }, [proposal, userRoles, rolesCanApprove])
 
   return (
     <Stepper

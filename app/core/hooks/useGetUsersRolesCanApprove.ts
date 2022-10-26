@@ -7,13 +7,15 @@ import useGetUserRoles from "./useGetUsersRoles"
 import { ProposalRoleWithSignatures } from "app/proposalRole/types"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
-const useGetUsersRolesPendingApproval = (proposalId: string | undefined | null) => {
+const useGetUsersRolesCanApprove = (proposalId: string | undefined | null) => {
   const activeUser = useStore((state) => state.activeUser)
   const { roles: userRoles, isLoading } = useGetUserRoles(proposalId)
 
   const awaitingApproval = userRoles
     .filter((role) => {
+      // filter on PENDING status
       role.approvalStatus === ProposalRoleApprovalStatus.PENDING &&
+        // filter on user having not signed already
         !role.signatures.some((signature) => {
           return addressesAreEqual(signature.address, activeUser?.address || "")
         })
@@ -22,13 +24,15 @@ const useGetUsersRolesPendingApproval = (proposalId: string | undefined | null) 
       return {
         ...role,
         oneSignerNeededToComplete:
+          // if account is a wallet, only one signature is needed to complete approval
           role.account?.addressType === AddressType.WALLET
             ? true
-            : role.signatures.length + 1 === role.account?.data.quorum,
+            : // if account is a safe, current signature count is one less than quorum
+              role.signatures.length + 1 === role.account?.data.quorum,
       }
     }) as (ProposalRoleWithSignatures & { oneSignerNeededToComplete: boolean })[]
 
   return { roles: awaitingApproval, isLoading }
 }
 
-export default useGetUsersRolesPendingApproval
+export default useGetUsersRolesCanApprove
