@@ -429,7 +429,7 @@ const WorkspaceHome: BlitzPage = () => {
           {rfps &&
             rfps?.length > 0 &&
             rfps?.map((rfp, idx) => {
-              return <RfpCard key={idx} rfp={rfp} />
+              return <RfpCard key={idx} rfp={rfp} href={Routes.RfpDetail({ rfpId: rfp.id })} />
             })}
           {/* RFP LOADING */}
           {!rfps &&
