@@ -24,6 +24,7 @@ export type ProposalPaymentMetadata = {
   multisigTransaction?: {
     type: AddressType["SAFE"]
     address: string
+    nonce: number
     safeTxHash: string
     transactionId: string
   }

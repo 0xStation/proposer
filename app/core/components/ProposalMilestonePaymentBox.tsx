@@ -14,11 +14,12 @@ import { Proposal } from "app/proposal/types"
 import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import QueueGnosisTransactionModal from "app/proposalPayment/components/QueueGnosisTransactionModal"
-import { getNetworkGnosisUrl } from "app/core/utils/networkInfo"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
 import getProposalById from "app/proposal/queries/getProposalById"
+import ApproveGnosisTransactionModal from "app/proposalPayment/components/ApproveGnosisTransactionModal"
+import { getNetworkGnosisUrl } from "app/core/utils/networkInfo"
 
 const PaymentRow = ({
   payment,
@@ -27,6 +28,7 @@ const PaymentRow = ({
   setQueueGnosisTransactionModalOpen,
   setIsExecutePaymentModalOpen,
   setIsAttachtxModalOpen,
+  setApproveGnosisTransactionModalOpen,
 }) => {
   const setToastState = useStore((state) => state.setToastState)
   const activeUser = useStore((state) => state.activeUser)
@@ -36,9 +38,11 @@ const PaymentRow = ({
     quorum: any
     signers: any
   }>()
+  const [quorumMet, setQuorumMet] = useState<boolean>(false)
+  const [userHasSignedGnosisTx, setUserHasSignedGnosisTx] = useState<boolean>(false)
 
   // if a payment is queued to gnosis, continually check if it is complete
-  useQuery(
+  const [gnosisTxStatus] = useQuery(
     getGnosisTxStatus,
     {
       chainId: payment.data.token.chainId || 1,
@@ -66,6 +70,20 @@ const PaymentRow = ({
       },
     }
   )
+
+  useEffect(() => {
+    if (safeDetails && gnosisTxStatus) {
+      const quorum = safeDetails.quorum
+      const confirmations = gnosisTxStatus.confirmations
+      const userHasSignedGnosisSafe = confirmations.some((confirmation) =>
+        addressesAreEqual(confirmation.owner, activeUser?.address || "")
+      )
+      setUserHasSignedGnosisTx(userHasSignedGnosisSafe)
+      if (confirmations.length >= quorum) {
+        setQuorumMet(true)
+      }
+    }
+  }, [safeDetails, gnosisTxStatus])
 
   // going to be running this no matter what type of address is payer
   // possible improvement would be to store the type of address on a payment and only run on safe
@@ -145,7 +163,7 @@ const PaymentRow = ({
           >
             Queue Gnosis transaction
           </Button>
-        ) : (
+        ) : quorumMet ? (
           <>
             <a
               href={`${getNetworkGnosisUrl(payment.data.token.chainId)}:${
@@ -168,6 +186,22 @@ const PaymentRow = ({
               Paste a transaction link
             </span>
           </>
+        ) : userHasSignedGnosisTx ? (
+          <>
+            <button
+              className="mt-4 mb-2 sm:mb-0 border rounded w-[300px] sm:w-[400px] md:w-[614px] h-[35px] border-concrete text-concrete"
+              disabled={true}
+            >
+              You have already approved
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={() => setApproveGnosisTransactionModalOpen(true)}
+            className="mt-4 mb-2 sm:mb-0 border rounded w-[300px] sm:w-[400px] md:w-[614px] h-[35px] bg-electric-violet border-electric-violet text-tunnel-black"
+          >
+            Approve
+          </button>
         ))}
       {userIsPayer &&
         // proactive logic for when we have multiple milestone payment blocks -> only the current milestone should be payable
@@ -207,7 +241,8 @@ export const ProposalMilestonePaymentBox = ({
   const [isAttachtxModalOpen, setIsAttachtxModalOpen] = useState<boolean>(false)
   const [queueGnosisTransactionModalOpen, setQueueGnosisTransactionModalOpen] =
     useState<boolean>(false)
-
+  const [approveGnosisTransactionModalOpen, setApproveGnosisTransactionModalOpen] =
+    useState<boolean>(false)
   const milestoneStatus = getMilestoneStatus(proposal, milestone) || ""
 
   return (
@@ -227,6 +262,13 @@ export const ProposalMilestonePaymentBox = ({
         isOpen={isAttachtxModalOpen}
         setIsOpen={setIsAttachtxModalOpen}
       />
+      {milestone.payments && milestone.payments[0] && (
+        <ApproveGnosisTransactionModal
+          payment={milestone.payments[0]}
+          isOpen={approveGnosisTransactionModalOpen}
+          setIsOpen={setApproveGnosisTransactionModalOpen}
+        />
+      )}
       <div className={`border border-b border-concrete rounded-2xl px-6 py-9 ${className}`}>
         <div className="flex flex-row items-center justify-between mb-4">
           {/* TITLE */}
@@ -259,6 +301,7 @@ export const ProposalMilestonePaymentBox = ({
             setQueueGnosisTransactionModalOpen={setQueueGnosisTransactionModalOpen}
             setIsExecutePaymentModalOpen={setIsExecutePaymentModalOpen}
             setIsAttachtxModalOpen={setIsAttachtxModalOpen}
+            setApproveGnosisTransactionModalOpen={setApproveGnosisTransactionModalOpen}
             proposal={proposal}
             milestone={milestone}
           />
