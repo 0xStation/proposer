@@ -12,13 +12,15 @@ export const RfpCard = ({ rfp, href }) => {
         </div>
         <div className="flex flex-row mt-4 justify-between">
           <span>
-            {getTotalPaymentAmount(rfp?.template?.data?.fields) &&
-              getPaymentToken(rfp?.template?.data?.fields)?.symbol && (
-                <>
-                  <p className="inline">{getTotalPaymentAmount(rfp?.template?.data?.fields)} </p>
-                  <p className="inline">{getPaymentToken(rfp?.template?.data?.fields)?.symbol}</p>
-                </>
-              )}
+            {Boolean(
+              getTotalPaymentAmount(rfp?.template?.data?.fields) &&
+                getPaymentToken(rfp?.template?.data?.fields)?.symbol
+            ) && (
+              <>
+                <p className="inline">{getTotalPaymentAmount(rfp?.template?.data?.fields)} </p>
+                <p className="inline">{getPaymentToken(rfp?.template?.data?.fields)?.symbol}</p>
+              </>
+            )}
           </span>
           <span>{rfp?._count.proposals || 0} proposals</span>
         </div>
