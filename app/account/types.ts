@@ -14,4 +14,7 @@ export type AccountMetadata = {
   hasVerifiedEmail?: boolean
   // for smart contract Accounts (e.g. multisigs), indicate the chainId of the smart contract
   chainId?: number
+  // not saved in database, but threaded into account object sometimes in queries
+  quorum?: number
+  signers?: string[]
 }
