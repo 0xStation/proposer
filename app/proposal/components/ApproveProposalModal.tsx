@@ -8,7 +8,7 @@ import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import getProposalById from "../queries/getProposalById"
 import { genProposalApprovalDigest } from "app/signatures/proposalSignature"
 import { Proposal } from "app/proposal/types"
-import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
+import useGetUsersRolesAwaitingApproval from "app/core/hooks/useGetUsersRolesPendingApproval"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import networks from "app/utils/networks.json"
@@ -21,7 +21,6 @@ export const ApproveProposalModal = ({
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
   proposal: Proposal
-  additionalRoles?: { roleId: string; complete: boolean }[]
 }) => {
   const router = useRouter()
   const activeUser = useStore((state) => state.activeUser)
@@ -30,8 +29,9 @@ export const ApproveProposalModal = ({
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const isPaymentProposal = proposal.data.totalPayments && proposal.data.totalPayments?.length > 0
 
-  const [remainingRoles, _signedRoles, _error, getRolesIsLoading] =
-    useGetUsersRolesToSignFor(proposal)
+  const { roles, isLoading: isRolesAwaitingApprovalLoading } = useGetUsersRolesAwaitingApproval(
+    proposal?.id
+  )
 
   const { signMessage } = useSignature()
 
@@ -58,9 +58,9 @@ export const ApproveProposalModal = ({
         return
       }
 
-      const representingRoles = remainingRoles.map((role) => {
+      const representingRoles = roles.map((role) => {
         return {
-          roleId: role.roleId,
+          roleId: role.id,
           complete: role.oneSignerNeededToComplete,
         }
       })
@@ -159,7 +159,7 @@ export const ApproveProposalModal = ({
           <Button
             isSubmitType={true}
             isLoading={isLoading}
-            isDisabled={isLoading || getRolesIsLoading}
+            isDisabled={isLoading || isRolesAwaitingApprovalLoading}
             onClick={() => {
               setIsLoading(true)
               initiateSignature()

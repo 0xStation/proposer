@@ -19,7 +19,7 @@ export const RoleSignaturesView = ({
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       enabled: Boolean(proposal?.id),
-      cacheTime: 60 * 1000, // one minute in milliseconds
+      staleTime: 60 * 1000, // 1 minute
     }
   )
   const isFundingProposal = proposal?.payments && Boolean(proposal?.payments?.length)

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react"
 import { useParam, useQuery } from "blitz"
 import useStore from "app/core/hooks/useStore"
-import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
+import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
+import useGetUsersRolesAwaitingApproval from "app/core/hooks/useGetUsersRolesPendingApproval"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { ProposalRoleType, ProposalStatus, RfpStatus } from "@prisma/client"
 import Stepper, { StepStatus } from "app/core/components/Stepper"
@@ -25,17 +26,9 @@ const ProposalStepper = () => {
   const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
   const [stepperSteps, setStepperSteps] = useState<any>([])
   const [stepperLoading, setStepperLoading] = useState<boolean>(true)
-  const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(proposal)
-  const activeUserIsSigner = signedRoles.length + remainingRoles.length > 0
-  const activeUserHasRolesToSign = remainingRoles.length > 0
-  const authorRoles =
-    proposal?.roles?.filter((role) => {
-      return role.type === ProposalRoleType.AUTHOR && role.address === activeUser?.address
-    }) || []
 
-  const usersRoles = [...remainingRoles, ...signedRoles, ...authorRoles].map(
-    (role) => role.type
-  ) as ProposalRoleType[]
+  const { roles: rolesAwaitingApproval } = useGetUsersRolesAwaitingApproval(proposalId)
+  const { roles: userRoles } = useGetUsersRoles(proposalId)
 
   const rawSteps = [
     {
@@ -68,7 +61,9 @@ const ProposalStepper = () => {
           : StepStatus.current
         : StepStatus.loading,
       actions: {
-        [ProposalRoleType.CLIENT]: activeUserHasRolesToSign && (
+        [ProposalRoleType.CLIENT]: rolesAwaitingApproval.filter(
+          (role) => role.type === ProposalRoleType.CLIENT
+        ).length > 0 && (
           <Button
             type={ButtonType.Secondary}
             isDisabled={Boolean(rfp && rfp?.status === RfpStatus.CLOSED)}
@@ -77,7 +72,9 @@ const ProposalStepper = () => {
             Approve
           </Button>
         ),
-        [ProposalRoleType.CONTRIBUTOR]: activeUserHasRolesToSign && (
+        [ProposalRoleType.CONTRIBUTOR]: rolesAwaitingApproval.filter(
+          (role) => role.type === ProposalRoleType.CONTRIBUTOR
+        ).length > 0 && (
           <Button
             type={ButtonType.Secondary}
             isDisabled={Boolean(rfp && rfp?.status === RfpStatus.CLOSED)}
@@ -95,12 +92,12 @@ const ProposalStepper = () => {
       setStepperSteps(rawSteps)
       setStepperLoading(false)
     }
-  }, [proposal, activeUserHasRolesToSign, activeUserIsSigner])
+  }, [proposal, userRoles, rolesAwaitingApproval])
 
   return (
     <Stepper
       loading={stepperLoading}
-      roles={usersRoles}
+      roles={userRoles?.map((role) => role.type).filter((v, i, roles) => roles.indexOf(v) === i)} // filter out duplicate roles
       steps={stepperSteps}
       className="absolute right-[-340px] top-0"
     />
