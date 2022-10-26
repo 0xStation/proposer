@@ -3,7 +3,6 @@ import { Link } from "blitz"
 import RfpStatusPill from "./RfpStatusPill"
 
 export const RfpCard = ({ rfp, href }) => {
-  console.log("href", href)
   return (
     <Link href={href}>
       <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden flex flex-col justify-between bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer">
