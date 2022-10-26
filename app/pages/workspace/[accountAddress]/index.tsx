@@ -496,19 +496,6 @@ const WorkspaceHome: BlitzPage = () => {
                 className={`h-10 w-full rounded-4xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
               />
             )}
-            {/* CTA */}
-            {/* {
-              // activeTab !== WorkspaceTab.RFPS &&
-              <Link
-                href={Routes.ProposalTypeSelection({
-                  // pre-fill for both so that if user changes toggle to reverse roles, the input address is still there
-                  clients: accountEnsName || accountAddress,
-                  contributors: accountEnsName || accountAddress,
-                })}
-              >
-                <Button className="w-full">Propose</Button>
-              </Link>
-            } */}
           </div>
           {/* TABS */}
           <ul className="mt-6 space-y-2">

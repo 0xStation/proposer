@@ -97,6 +97,7 @@ const ProposalTypeSelection: BlitzPage = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 lg:gap-6 gap-2">
               {/* REQUEST FUNDING */}
               <Link
+                shallow={true}
                 href={Routes.ProposalNewFunding({
                   clients: clients,
                   contributors: contributors,
@@ -109,7 +110,7 @@ const ProposalTypeSelection: BlitzPage = () => {
                 </div>
               </Link>
               {/* SHARE AN IDEA */}
-              <Link href={Routes.ProposalNewIdea({ clients: clients })}>
+              <Link shallow={true} href={Routes.ProposalNewIdea({ clients: clients })}>
                 <div className="max-w-[325px] mb-3 sm:mr-3 rounded-md overflow-hidden bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer">
                   <Image src={ShareImage} height={550} />
                   <h2 className="text-xl font-bold px-4 pt-4">Share an idea</h2>
@@ -120,6 +121,7 @@ const ProposalTypeSelection: BlitzPage = () => {
               </Link>
               {/* FORM A PARTNERSHIP */}
               <Link
+                shallow={true}
                 href={Routes.ProposalNewPartnership({
                   clients: clients,
                   contributors: contributors,
