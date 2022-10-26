@@ -11,7 +11,6 @@ export enum StepStatus {
 }
 export type Step = {
   description: string
-  subtitle?: string
   status: StepStatus
   actions: {
     [key: string]: JSX.Element
@@ -103,7 +102,7 @@ const Stepper = ({
                     </span>
                   </span>
                   <span className="ml-4 min-w-0">
-                    <span className="text-sm text-gray-500">{step.description}</span>
+                    <span className="text-sm text-concrete">{step.description}</span>
                   </span>
                 </span>
               </>
@@ -117,15 +116,10 @@ const Stepper = ({
                 ) : null}
                 <span className="group relative flex items-start" aria-current="step">
                   <span className="flex h-6 items-center" aria-hidden="true">
-                    <span className="relative z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 bg-marble-white">
-                      <CheckIcon className="h-3 w-3 text-concrete" aria-hidden="true" />
-                    </span>
+                    <span className="relative z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 border-marble-white bg-wet-concrete"></span>
                   </span>
                   <div className="flex flex-col space-y-2 ml-4 min-w-0">
                     <span className="text-sm text-marble-white">{step.description}</span>
-                    {step.subtitle && (
-                      <span className="text-xs text-marble-white">{step.subtitle}</span>
-                    )}
                     {activeRole && step.actions[activeRole] && step.actions[activeRole]}
                   </div>
                 </span>
@@ -140,9 +134,7 @@ const Stepper = ({
                 ) : null}
                 <span className="group relative flex items-start">
                   <span className="flex h-6 items-center" aria-hidden="true">
-                    <span className="relative z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 border-concrete bg-concrete group-hover:border-gray-400">
-                      <CheckIcon className="h-3 w-3 text-wet-concrete" aria-hidden="true" />
-                    </span>
+                    <span className="relative z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 border-concrete bg-wet-concrete group-hover:border-gray-400"></span>
                   </span>
                   <span className="ml-4 min-w-0">
                     <span className="text-sm text-gray-500">{step.description}</span>
