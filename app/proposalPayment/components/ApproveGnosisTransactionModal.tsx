@@ -4,11 +4,23 @@ import Modal from "app/core/components/Modal"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useGnosisSignatureToConfirmTransaction from "app/core/hooks/useGnosisSignatureToConfirmTransaction"
 import useStore from "app/core/hooks/useStore"
+import { ProposalPayment } from "app/proposalPayment/types"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
+import { useNetwork } from "wagmi"
+import SwitchNetworkView from "app/core/components/SwitchNetworkView"
 
-export const ApproveGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) => {
+export const ApproveGnosisTransactionModal = ({
+  isOpen,
+  setIsOpen,
+  payment,
+}: {
+  isOpen: boolean
+  setIsOpen: (isOpen: boolean) => void
+  payment: ProposalPayment
+}) => {
   const setToastState = useStore((state) => state.setToastState)
-  const activePayment = milestone.payments[0]
+  const activePayment = payment
+  const { chain: activeChain } = useNetwork()
 
   const { signMessage: signGnosis } = useGnosisSignatureToConfirmTransaction(activePayment)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -63,7 +75,15 @@ export const ApproveGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) 
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        <ApprovePaymentTab />
+        {!activeChain || activeChain.id !== activePayment?.data?.token.chainId ? (
+          <SwitchNetworkView
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            chainId={activePayment?.data?.token.chainId}
+          />
+        ) : (
+          <ApprovePaymentTab />
+        )}
       </div>
     </Modal>
   )

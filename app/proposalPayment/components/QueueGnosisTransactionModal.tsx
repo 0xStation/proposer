@@ -6,11 +6,13 @@ import useGnosisSignature from "app/core/hooks/useGnosisSignature"
 import updatePayment from "app/proposalPayment/mutations/updatePayment"
 import useStore from "app/core/hooks/useStore"
 import { Field, Form } from "react-final-form"
+import { useNetwork } from "wagmi"
 import { composeValidators, isValidTransactionLink, requiredField } from "app/utils/validators"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import { txPathString } from "app/core/utils/constants"
 import saveTransactionHashToPayments from "app/proposal/mutations/saveTransactionToPayments"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
+import SwitchNetworkView from "app/core/components/SwitchNetworkView"
 
 enum Tab {
   QUEUE_PAYMENT = "QUEUE_PAYMENT",
@@ -20,6 +22,7 @@ enum Tab {
 export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) => {
   const setToastState = useStore((state) => state.setToastState)
   const activePayment = milestone.payments[0]
+  const { chain: activeChain } = useNetwork()
 
   const { signMessage: signGnosis } = useGnosisSignature(activePayment)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -77,8 +80,8 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
       <>
         <h3 className="text-2xl font-bold mt-4">Queue transaction</h3>
         <p className="mt-2">
-          Sign to queue this transaction on Gnosis. Afterwards, you and other signers will be able to view and execute this
-          transaction on the Gnosis app.
+          Sign to queue this transaction on Gnosis. Afterwards, you and other signers will be able
+          to view and execute this transaction on the Gnosis app.
         </p>
         <div className="mt-8 flex items-center">
           <Button
@@ -103,15 +106,15 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
                   setIsLoading(false)
                   throw new Error("Signature Failed")
                 }
-                const s = await updatePaymentMutation({
+                await updatePaymentMutation({
                   multisigTransaction: {
                     transactionId: response.txId,
+                    nonce: response.detailedExecutionInfo.nonce,
                     safeTxHash: response.detailedExecutionInfo.safeTxHash,
                     address: response.safeAddress,
                   },
                   paymentId: activePayment.id,
                 })
-                console.log(s)
                 invalidateQuery(getMilestonesByProposal)
                 setIsLoading(false)
                 setIsOpen(false)
@@ -208,26 +211,36 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        <div className="space-x-4 text-l mt-4">
-          <span
-            className={`${
-              selectedTab === Tab.QUEUE_PAYMENT && "border-b mb-[-1px] font-bold"
-            } cursor-pointer`}
-            onClick={() => setSelectedTab(Tab.QUEUE_PAYMENT)}
-          >
-            Queue payment
-          </span>
-          <span
-            className={`${
-              selectedTab === Tab.ATTACH_TRANSACTION && "border-b mb-[-1px] font-bold"
-            } cursor-pointer`}
-            onClick={() => setSelectedTab(Tab.ATTACH_TRANSACTION)}
-          >
-            Attach transaction
-          </span>
-        </div>
-        {selectedTab === Tab.QUEUE_PAYMENT && <QueuePaymentTab />}
-        {selectedTab === Tab.ATTACH_TRANSACTION && <AttachPaymentTab />}
+        {!activeChain || activeChain.id !== activePayment?.data?.token.chainId ? (
+          <SwitchNetworkView
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            chainId={activePayment?.data?.token.chainId}
+          />
+        ) : (
+          <>
+            <div className="space-x-4 text-l mt-4">
+              <span
+                className={`${
+                  selectedTab === Tab.QUEUE_PAYMENT && "border-b mb-[-1px] font-bold"
+                } cursor-pointer`}
+                onClick={() => setSelectedTab(Tab.QUEUE_PAYMENT)}
+              >
+                Queue payment
+              </span>
+              <span
+                className={`${
+                  selectedTab === Tab.ATTACH_TRANSACTION && "border-b mb-[-1px] font-bold"
+                } cursor-pointer`}
+                onClick={() => setSelectedTab(Tab.ATTACH_TRANSACTION)}
+              >
+                Attach transaction
+              </span>
+            </div>
+            {selectedTab === Tab.QUEUE_PAYMENT && <QueuePaymentTab />}
+            {selectedTab === Tab.ATTACH_TRANSACTION && <AttachPaymentTab />}
+          </>
+        )}
       </div>
     </Modal>
   )

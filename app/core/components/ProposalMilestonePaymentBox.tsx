@@ -75,8 +75,8 @@ const PaymentRow = ({
     if (safeDetails && gnosisTxStatus) {
       const quorum = safeDetails.quorum
       const confirmations = gnosisTxStatus.confirmations
-      const userHasSignedGnosisSafe = confirmations.some((c) =>
-        addressesAreEqual(c.owner, activeUser?.address || "")
+      const userHasSignedGnosisSafe = confirmations.some((confirmation) =>
+        addressesAreEqual(confirmation.owner, activeUser?.address || "")
       )
       setUserHasSignedGnosisTx(userHasSignedGnosisSafe)
       if (confirmations.length >= quorum) {
@@ -192,7 +192,7 @@ const PaymentRow = ({
               className="mt-4 mb-2 sm:mb-0 border rounded w-[300px] sm:w-[400px] md:w-[614px] h-[35px] border-concrete text-concrete"
               disabled={true}
             >
-              You have already signed transaction
+              You have already approved
             </button>
           </>
         ) : (
@@ -262,11 +262,13 @@ export const ProposalMilestonePaymentBox = ({
         isOpen={isAttachtxModalOpen}
         setIsOpen={setIsAttachtxModalOpen}
       />
-      <ApproveGnosisTransactionModal
-        milestone={milestone}
-        isOpen={approveGnosisTransactionModalOpen}
-        setIsOpen={setApproveGnosisTransactionModalOpen}
-      />
+      {milestone.payments && milestone.payments[0] && (
+        <ApproveGnosisTransactionModal
+          payment={milestone.payments[0]}
+          isOpen={approveGnosisTransactionModalOpen}
+          setIsOpen={setApproveGnosisTransactionModalOpen}
+        />
+      )}
       <div className={`border border-b border-concrete rounded-2xl px-6 py-9 ${className}`}>
         <div className="flex flex-row items-center justify-between mb-4">
           {/* TITLE */}
