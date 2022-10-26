@@ -5,9 +5,7 @@ import useStore from "./useStore"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import { ProposalRoleWithSignatures } from "app/proposalRole/types"
 
-/**
- * Hook for fetching the roles a user still needs to sign for given a proposal and the associated signatures.
- */
+// Get the roles the activeUser has permission over via address-ownership or safe-signership
 export const useGetUsersRoles = (
   proposalId: string | undefined | null
 ): { roles: ProposalRoleWithSignatures[]; isLoading: boolean } => {

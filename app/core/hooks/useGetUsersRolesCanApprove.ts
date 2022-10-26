@@ -7,6 +7,7 @@ import useGetUserRoles from "./useGetUsersRoles"
 import { ProposalRoleWithSignatures } from "app/proposalRole/types"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
+// Get the roles the activeUser can approve for based on the roles' approval status and user's previous signatures
 const useGetUsersRolesCanApprove = (proposalId: string | undefined | null) => {
   const activeUser = useStore((state) => state.activeUser)
   const { roles: userRoles, isLoading } = useGetUserRoles(proposalId)

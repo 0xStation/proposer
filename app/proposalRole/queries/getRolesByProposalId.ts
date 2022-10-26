@@ -24,7 +24,9 @@ export default async function getRolesByProposalId(input: z.infer<typeof GetRole
       return []
     }
 
+    // account metadata accumulator to insert safe details into
     let accountMetadatas = {}
+    // make requests to gnosis for each role that is a SAFE
     let gnosisRequests: any[] = []
     proposalRoles.forEach((role) => {
       accountMetadatas[role.address] = role.account?.data
@@ -33,7 +35,7 @@ export default async function getRolesByProposalId(input: z.infer<typeof GetRole
           getGnosisSafeDetails(role.account?.data.chainId as number, role.address)
         )
     })
-
+    // batch await gnosis requests and add safe details to each account metadata accumulator
     const gnosisResults = await Promise.all(gnosisRequests)
     gnosisResults.forEach((results) => {
       if (!results) return
@@ -44,7 +46,7 @@ export default async function getRolesByProposalId(input: z.infer<typeof GetRole
         signers: results.signers,
       }
     })
-
+    // combine fetched quorum and signers into returned role entities
     return proposalRoles.map((role) => {
       return {
         ...role,
