@@ -28,8 +28,10 @@ export const useGetUsersRoles = (
     roles:
       roles?.filter(
         (role) =>
+          // account is WALLET and active user is address
           (role?.account?.addressType === AddressType.WALLET &&
             addressesAreEqual(role?.address, activeUser?.address || "")) ||
+          // account is SAFE and active user is a signer
           (role?.account?.addressType === AddressType.SAFE &&
             role?.account?.data?.signers?.some((signer) =>
               addressesAreEqual(signer, activeUser?.address || "")
