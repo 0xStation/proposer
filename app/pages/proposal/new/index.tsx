@@ -33,7 +33,16 @@ const RfpListComponent = ({ rfps, setView }) => {
           {rfps &&
             rfps?.length > 0 &&
             rfps?.map((rfp, idx) => {
-              return <RfpCard key={idx} rfp={rfp} />
+              return (
+                <RfpCard
+                  key={idx}
+                  rfp={rfp}
+                  href={Routes.ProposalTemplateForm({
+                    templateId: rfp?.template?.id,
+                    rfpId: rfp?.id,
+                  })}
+                />
+              )
             })}
         </div>
       </div>
