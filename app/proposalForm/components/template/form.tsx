@@ -319,7 +319,9 @@ export const ProposalFormTemplate = () => {
                     <h2 className="text-marble-white text-xl font-bold">
                       {PROPOSAL_FORM_HEADER_COPY[proposalStep]}
                     </h2>
-                    {proposalStep === ProposalFormStep.PROPOSE && <TemplateFormStepPropose />}
+                    {proposalStep === ProposalFormStep.PROPOSE && (
+                      <TemplateFormStepPropose formState={formState} />
+                    )}
                     {proposalStep === ProposalFormStep.CONFIRM && (
                       <TemplateFormStepConfirm body={formState.values.body} />
                     )}

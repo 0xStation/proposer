@@ -230,6 +230,7 @@ export const ProposalFormPartnership = ({
                       <PartnershipFormStepPropose
                         proposingAs={proposingAs}
                         setProposingAs={setProposingAs}
+                        formState={formState}
                       />
                     )}
                     {proposalStep === ProposalFormStep.CONFIRM && (
