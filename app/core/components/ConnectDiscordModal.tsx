@@ -9,6 +9,7 @@ import { useEnsName } from "wagmi"
 
 export const ConnectDiscordModal = ({ isOpen, setIsOpen }) => {
   const activeUser = useStore((state) => state.activeUser)
+  const setActiveUser = useStore((state) => state.setActiveUser)
   const setToastState = useStore((state) => state.setToastState)
   const { data: ensName } = useEnsName({
     address: activeUser?.address as string,
@@ -35,7 +36,7 @@ export const ConnectDiscordModal = ({ isOpen, setIsOpen }) => {
 
           const user = await response.json()
 
-          const account = await invoke(updateAccountWithoutEmail, {
+          await invoke(updateAccountWithoutEmail, {
             address: activeUser?.address,
             discordId: user?.id,
             name: activeUser?.data?.name || (!ensName ? user?.username : undefined),
@@ -54,6 +55,11 @@ export const ConnectDiscordModal = ({ isOpen, setIsOpen }) => {
             type: "success",
             message: "Your Station and Discord accounts are now connected.",
           })
+
+          // reset activeUser to update pfp
+          const account = await invoke(getAccountByAddress, { address: activeUser?.address })
+
+          setActiveUser(account)
 
           return user
         } catch (err) {
@@ -77,13 +83,13 @@ export const ConnectDiscordModal = ({ isOpen, setIsOpen }) => {
         setIsOpen(!isOpen)
       }}
     >
-      <div className="mt-8">
+      <div className="mt-8 px-2">
         <h1 className="text-2xl font-bold">Connect your Station workspace with Discord</h1>
         <p className="text-base mt-3">
           Connecting your Station profile with Discord to provides a means for individuals tied to
           your proposal to contact you.
         </p>
-        <Button className="mt-5 mb-3" onClick={callbackWithDCAuth}>
+        <Button className="mt-8 mb-3" onClick={callbackWithDCAuth}>
           Connect
         </Button>
       </div>
