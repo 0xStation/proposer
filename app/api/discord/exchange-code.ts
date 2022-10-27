@@ -12,8 +12,6 @@ export default async function handler(req, res) {
   params.append("grant_type", "authorization_code")
   params.append("code", req.body.code)
 
-  console.log("params", params)
-
   try {
     const response = await fetch(`${process.env.BLITZ_PUBLIC_API_ENDPOINT}/oauth2/token`, {
       method: "POST",
@@ -25,7 +23,6 @@ export default async function handler(req, res) {
     })
 
     const token = await response.json()
-    console.log("token", token)
     res.status(200).json(token)
   } catch (e) {
     console.error(e)

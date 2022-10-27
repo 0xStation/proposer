@@ -20,7 +20,6 @@ const DiscordAuth = () => {
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log("data", data)
           if (data.error) {
             console.error(`${data.error}: ${data.error_description}`)
           } else {
