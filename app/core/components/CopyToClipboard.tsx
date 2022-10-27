@@ -15,8 +15,10 @@ export const AddressLink = ({
   return (
     <div>
       <button
+        type="button"
         className={className}
-        onClick={() => {
+        onClick={(e) => {
+          e.preventDefault()
           navigator.clipboard.writeText(text).then(() => {
             setIsClipboardAddressCopied(true)
             setTimeout(() => setIsClipboardAddressCopied(false), 3000)

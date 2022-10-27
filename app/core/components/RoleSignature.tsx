@@ -54,7 +54,7 @@ const SafeRole = ({ role, proposalStatus }) => {
         {role ? (
           <div className="flex flex-col w-full">
             <div className="flex flex-row w-full items-center justify-between">
-              <AccountMediaObject account={role?.account} />
+              <AccountMediaObject account={role?.account} showActionIcons={true} />
               <div className="flex flex-col items-end space-y-1">
                 {showSignButton ? (
                   <span
@@ -122,7 +122,7 @@ const WalletRole = ({ role, proposalStatus }) => {
   const activeUser = useStore((state) => state.activeUser)
   const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
-  const activeUserHasApproved = role.signatures?.some(
+  const activeUserHasApproved = role?.signatures?.some(
     (signature) =>
       addressesAreEqual(activeUser?.address || "", signature.address) &&
       signature.type === ProposalSignatureType.APPROVE
@@ -147,7 +147,7 @@ const WalletRole = ({ role, proposalStatus }) => {
     <div className="flex flex-row w-full items-center justify-between">
       {role ? (
         <>
-          <AccountMediaObject account={role?.account} />
+          <AccountMediaObject account={role?.account} showActionIcons={true} />
           <div className="flex flex-col items-end space-y-1">
             {/* show send button, or show sign button, or show approval status */}
             {showSendButton ? (

@@ -48,14 +48,10 @@ import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber
 import { Account } from "app/account/types"
 import { isAddress } from "ethers/lib/utils"
 import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
-import { Rfp } from "app/rfp/types"
-import RfpStatusPill from "app/rfp/components/RfpStatusPill"
-import { getPaymentAmount, getPaymentToken, getTotalPaymentAmount } from "app/template/utils"
-import getProposalCountByRfpId from "app/proposal/queries/getProposalCountByRfpId"
-import getTemplateByRfpId from "app/template/queries/getTemplateByRfpId"
 import getRfpCountForAccount from "app/rfp/queries/getRfpCountForAccount"
 import getProposalCountForAccount from "app/proposal/queries/getProposalCountForAccount"
 import { RfpCard } from "app/rfp/components/RfpCard"
+import ConnectDiscordProfileModal from "app/core/components/ConnectDiscordModal"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
@@ -91,7 +87,8 @@ const WorkspaceHome: BlitzPage = () => {
   const accountAddress = useParam("accountAddress", "string") as string
   const queryParams = useRouterQuery()
   const tab = queryParams?.tab as string
-
+  const [isDiscordModalOpen, setIsDiscordModalOpen] = useState<boolean>(false)
+  const [newAuth, setNewAuth] = useState<string>("")
   const activeUser = useStore((state) => state.activeUser)
   const accountData = useAccount()
   const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
@@ -471,9 +468,9 @@ const WorkspaceHome: BlitzPage = () => {
 
   const SettingsTab = () => {
     return (
-      <div className="h-[calc(100vh-240px)] p-10 flex-1">
+      <div className="overflow-auto p-10 flex-1">
         <h1 className="text-2xl font-bold">Settings</h1>
-        <div className="mt-12">
+        <div className="mt-10">
           <WorkspaceSettingsOverviewForm account={account as Account} isEdit={true} />
         </div>
       </div>

@@ -2,22 +2,22 @@ import db, { AddressType } from "db"
 import * as z from "zod"
 import { Ctx } from "blitz"
 import { Account } from "../types"
-import { getEmail, saveEmail } from "app/utils/privy"
-import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 
-const UpdateAccount = z.object({
+const UpdateAccountWithoutEmail = z.object({
   address: z.string(),
   discordId: z.string().optional(),
   name: z.string().optional(),
   bio: z.string().optional(),
   pfpUrl: z.string().optional(),
   discordHandle: z.string().optional(),
-  email: z.string().optional(),
 })
 
-export default async function updateAccount(input: z.infer<typeof UpdateAccount>, ctx: Ctx) {
-  const params = UpdateAccount.parse(input)
+export default async function updateAccountWithoutEmail(
+  input: z.infer<typeof UpdateAccountWithoutEmail>,
+  ctx: Ctx
+) {
+  const params = UpdateAccountWithoutEmail.parse(input)
 
   const existingAccount = (await db.account.findUnique({
     where: {
@@ -42,21 +42,6 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
 
   ctx.session.$authorize(validAddresses, [existingAccount.id])
 
-  let hasVerifiedEmail = false
-  const existingEmail = await getEmail(params.address as string)
-  if (params.email && params.email === existingEmail) {
-    hasVerifiedEmail = !!existingAccount?.data?.hasVerifiedEmail
-  } else {
-    // store email with Privy so it does not live in our database to reduce leakage risk
-    // not in try-catch to handle errors on client
-    // allows saving if no email provided as the removal mechanism while Privy's delete API in development
-    const email = await saveEmail(params.address as string, params.email || "")
-
-    if (params.email && email) {
-      await sendVerificationEmail({ accountId: existingAccount.id })
-    }
-  }
-
   const payload = {
     address: params.address,
     addressType: existingAccount.addressType,
@@ -69,9 +54,6 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
       bio: params.bio,
       pfpUrl: params.pfpUrl,
       discordHandle: params.discordHandle,
-      // mark email as saved for this account to not show email input modals
-      hasSavedEmail: !!params.email,
-      hasVerifiedEmail,
     },
   }
 
