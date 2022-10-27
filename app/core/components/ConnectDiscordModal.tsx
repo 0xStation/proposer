@@ -5,10 +5,16 @@ import Modal from "./Modal"
 import updateAccountWithoutEmail from "app/account/mutations/updateAccountWithoutEmail"
 import Button from "./sds/buttons/Button"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import { useEnsName } from "wagmi"
 
 export const ConnectDiscordModal = ({ isOpen, setIsOpen }) => {
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
+  const { data: ensName } = useEnsName({
+    address: activeUser?.address as string,
+    chainId: 1,
+    cacheTime: 60 * 60 * 1000, // (1 hr) time (in ms) which the data should remain in the cache
+  })
 
   const { callbackWithDCAuth, isAuthenticating, authorization } = useDiscordAuthWithCallback(
     "identify guilds",
@@ -32,7 +38,7 @@ export const ConnectDiscordModal = ({ isOpen, setIsOpen }) => {
           const account = await invoke(updateAccountWithoutEmail, {
             address: activeUser?.address,
             discordId: user?.id,
-            name: activeUser?.data?.name || user?.username,
+            name: activeUser?.data?.name || (!ensName ? user?.username : undefined),
             bio: activeUser?.data?.bio,
             pfpUrl:
               activeUser?.data?.pfpUrl ||
