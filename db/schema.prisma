@@ -16,6 +16,7 @@ generator client {
 model Account {
   id          Int         @id @default(autoincrement())
   address     String      @unique
+  discordId   String?     @unique
   addressType AddressType
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
