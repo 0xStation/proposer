@@ -20,12 +20,14 @@ const useGetRolesUserCanApprove = (
   const awaitingApproval = userRoles
     .filter((role) => {
       // filter on PENDING status
-      role.approvalStatus === ProposalRoleApprovalStatus.PENDING &&
+      return (
+        role.approvalStatus === ProposalRoleApprovalStatus.PENDING &&
         // filter on user having not signed already
         // to be used by multisigs that can collect many signatures while role is PENDING
         !role.signatures.some((signature) => {
-          return addressesAreEqual(signature.address, activeUser?.address || "")
+          return addressesAreEqual(signature.address, activeUser?.address)
         })
+      )
     })
     .map((role) => {
       return {

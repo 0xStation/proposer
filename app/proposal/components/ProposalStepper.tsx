@@ -61,9 +61,9 @@ const ProposalStepper = () => {
           : StepStatus.current
         : StepStatus.loading,
       actions: {
-        [ProposalRoleType.CLIENT]: rolesUserCanApprove.filter(
-          (role) => role.type === ProposalRoleType.CLIENT
-        ).length > 0 && (
+        [ProposalRoleType.CLIENT]: rolesUserCanApprove.filter((role) => {
+          return role.type === ProposalRoleType.CLIENT
+        }).length > 0 && (
           <Button
             type={ButtonType.Secondary}
             isDisabled={Boolean(rfp && rfp?.status === RfpStatus.CLOSED)}
@@ -88,11 +88,9 @@ const ProposalStepper = () => {
   ]
 
   useEffect(() => {
-    if (proposal) {
-      setStepperSteps(rawSteps)
-      setStepperLoading(false)
-    }
-  }, [proposal, userRoles, rolesUserCanApprove])
+    setStepperSteps(rawSteps)
+    setStepperLoading(false)
+  }, [proposal, rfp, rolesUserCanApprove.length > 0, userRoles.length > 0])
 
   return (
     <Stepper

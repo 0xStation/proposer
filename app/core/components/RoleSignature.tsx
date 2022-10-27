@@ -20,11 +20,13 @@ const SafeRole = ({ role, proposalStatus }) => {
   const [toggleSigners, setToggleSigners] = useState<boolean>(false)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
 
-  const activeUserHasSigned = activeUserMeetsCriteria(activeUser, role.signatures)
-  const activeUserHasAProposalRole = activeUserMeetsCriteria(
-    activeUser,
-    role.account.data?.signers || []
+  const activeUserHasSigned = role.signatures.some((signature) =>
+    addressesAreEqual(signature.address, activeUser?.address)
   )
+  const activeUserHasAProposalRole = role.account.data?.signers?.some((signer) =>
+    addressesAreEqual(signer, activeUser?.address)
+  )
+
   const showSignButton =
     proposalStatus !== ProposalStatus.DRAFT && activeUserHasAProposalRole && !activeUserHasSigned
 
