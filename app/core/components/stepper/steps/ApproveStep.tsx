@@ -7,7 +7,7 @@ import Step, { StepStatus } from "./Step"
 
 const ApproveStep = ({ proposal }: { proposal: Proposal }) => {
   const status =
-    proposal.status === ProposalStatus.APPROVED
+    proposal.status === ProposalStatus.APPROVED || proposal.status === ProposalStatus.COMPLETE
       ? StepStatus.complete
       : proposal.status === ProposalStatus.DRAFT
       ? StepStatus.upcoming

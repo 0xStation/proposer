@@ -17,8 +17,8 @@ const PaymentStep = ({
   proposal: Proposal
   isLastStep?: boolean
 }) => {
-  const executePaymentModalOpen = useStore((state) => state.executePaymentModalOpen)
-  const toggleExecutePaymentModalOpen = useStore((state) => state.toggleExecutePaymentModalOpen)
+  const executePaymentModalMap = useStore((state) => state.executePaymentModalMap)
+  const toggleExecutePaymentModalMap = useStore((state) => state.toggleExecutePaymentModalMap)
   const payment = proposal.payments?.find((payment) => payment.milestoneId === milestone.id)
 
   const status =
@@ -32,28 +32,36 @@ const PaymentStep = ({
   const [remainingRoles, _signedRoles, _error, _loading] = useGetUsersRolesToSignFor(proposal)
 
   const actions = {
-    ...(true && {
-      [ProposalRoleType.CLIENT]: (
-        <Button type={ButtonType.Secondary} onClick={() => toggleExecutePaymentModalOpen(true)}>
-          Pay
-        </Button>
-      ),
-    }),
-    ...(true && {
-      [ProposalRoleType.CONTRIBUTOR]: (
-        <Button type={ButtonType.Secondary} onClick={() => toggleExecutePaymentModalOpen(true)}>
-          Pay
-        </Button>
-      ),
-    }),
+    ...(true &&
+      payment && {
+        [ProposalRoleType.CLIENT]: (
+          <Button
+            type={ButtonType.Secondary}
+            onClick={() => toggleExecutePaymentModalMap({ open: true, id: payment.id })}
+          >
+            Pay
+          </Button>
+        ),
+      }),
+    ...(true &&
+      payment && {
+        [ProposalRoleType.CONTRIBUTOR]: (
+          <Button
+            type={ButtonType.Secondary}
+            onClick={() => toggleExecutePaymentModalMap({ open: true, id: payment.id })}
+          >
+            Pay
+          </Button>
+        ),
+      }),
   }
 
   return (
     <>
       {payment && (
         <ExecutePaymentModal
-          isOpen={executePaymentModalOpen}
-          setIsOpen={toggleExecutePaymentModalOpen}
+          isOpen={executePaymentModalMap[payment.id] || false}
+          setIsOpen={(open) => toggleExecutePaymentModalMap({ open, id: payment.id })}
           milestone={milestone}
           payment={payment}
         />

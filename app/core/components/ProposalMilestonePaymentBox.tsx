@@ -242,7 +242,7 @@ export const ProposalMilestonePaymentBox = ({
   const [approveGnosisTransactionModalOpen, setApproveGnosisTransactionModalOpen] =
     useState<boolean>(false)
   const milestoneStatus = getMilestoneStatus(proposal, milestone) || ""
-  const toggleExecutePaymentModalOpen = useStore((state) => state.toggleExecutePaymentModalOpen)
+  const toggleExecutePaymentModalMap = useStore((state) => state.toggleExecutePaymentModalMap)
 
   return (
     <>
@@ -293,7 +293,9 @@ export const ProposalMilestonePaymentBox = ({
             key={`payment-row-${idx}`}
             payment={payment}
             setQueueGnosisTransactionModalOpen={setQueueGnosisTransactionModalOpen}
-            toggleExecutePaymentModalOpen={toggleExecutePaymentModalOpen}
+            toggleExecutePaymentModalOpen={(open) =>
+              toggleExecutePaymentModalMap({ open, id: payment.id })
+            }
             setIsAttachtxModalOpen={setIsAttachtxModalOpen}
             setApproveGnosisTransactionModalOpen={setApproveGnosisTransactionModalOpen}
             proposal={proposal}
