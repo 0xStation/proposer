@@ -39,25 +39,28 @@ const AccountMediaObject = ({
             <p className="w-max truncate leading-4">
               @{ensName || truncateString(account?.address || "")}
             </p>
-            {showActionIcons && <CopyToClipboard text={account?.address || ""} />}
-            {account?.data?.discordHandle && (
-              <div className="group inline">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    navigator.clipboard.writeText(account?.data?.discordHandle)
-                    setIsDiscordHandleCopied(true)
-                    setTimeout(() => setIsDiscordHandleCopied(false), 1500)
-                  }}
-                >
-                  <DiscordIcon fill="#646464" height={10} />
-                </button>
-                <span className="hidden group-hover:inline ml-1 text-[.6rem] uppercase font-bold tracking-wider rounded px-2 py-1 absolute text-marble-white bg-wet-concrete">
-                  {isDiscordHandleCopied ? "copied!" : "copy to clipboard"}
-                </span>
-              </div>
+            {showActionIcons && (
+              <>
+                <CopyToClipboard text={account?.address || ""} />
+                {account?.data?.discordHandle && (
+                  <div className="group inline">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        navigator.clipboard.writeText(account?.data?.discordHandle)
+                        setIsDiscordHandleCopied(true)
+                        setTimeout(() => setIsDiscordHandleCopied(false), 1500)
+                      }}
+                    >
+                      <DiscordIcon fill="#646464" height={10} />
+                    </button>
+                    <span className="hidden group-hover:inline ml-1 text-[.6rem] uppercase font-bold tracking-wider rounded px-2 py-1 absolute text-marble-white bg-wet-concrete">
+                      {isDiscordHandleCopied ? "copied!" : "copy to clipboard"}
+                    </span>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
