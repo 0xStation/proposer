@@ -8,7 +8,12 @@ import { ProposalRoleWithSignatures } from "app/proposalRole/types"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
 // Get the roles the activeUser can approve for based on the roles' approval status and user's previous signatures
-const useGetUsersRolesCanApprove = (proposalId: string | undefined | null) => {
+const useGetRolesUserCanApprove = (
+  proposalId: string | undefined | null
+): {
+  roles: (ProposalRoleWithSignatures & { oneSignerNeededToComplete: boolean })[]
+  isLoading: boolean
+} => {
   const activeUser = useStore((state) => state.activeUser)
   const { roles: userRoles, isLoading } = useGetUserRoles(proposalId)
 
@@ -17,6 +22,7 @@ const useGetUsersRolesCanApprove = (proposalId: string | undefined | null) => {
       // filter on PENDING status
       role.approvalStatus === ProposalRoleApprovalStatus.PENDING &&
         // filter on user having not signed already
+        // to be used by multisigs that can collect many signatures while role is PENDING
         !role.signatures.some((signature) => {
           return addressesAreEqual(signature.address, activeUser?.address || "")
         })
@@ -31,9 +37,9 @@ const useGetUsersRolesCanApprove = (proposalId: string | undefined | null) => {
             : // if account is a safe, current signature count is one less than quorum
               role.signatures.length + 1 === role.account?.data.quorum,
       }
-    }) as (ProposalRoleWithSignatures & { oneSignerNeededToComplete: boolean })[]
+    })
 
   return { roles: awaitingApproval, isLoading }
 }
 
-export default useGetUsersRolesCanApprove
+export default useGetRolesUserCanApprove

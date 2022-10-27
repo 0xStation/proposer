@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useParam, useQuery } from "blitz"
 import useStore from "app/core/hooks/useStore"
 import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
-import useGetUsersRolesCanApprove from "app/core/hooks/useGetUsersRolesCanApprove"
+import useGetRolesUserCanApprove from "app/core/hooks/useGetRolesUserCanApprove"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { ProposalRoleType, ProposalStatus, RfpStatus } from "@prisma/client"
 import Stepper, { StepStatus } from "app/core/components/Stepper"
@@ -27,7 +27,7 @@ const ProposalStepper = () => {
   const [stepperSteps, setStepperSteps] = useState<any>([])
   const [stepperLoading, setStepperLoading] = useState<boolean>(true)
 
-  const { roles: rolesCanApprove } = useGetUsersRolesCanApprove(proposalId)
+  const { roles: rolesUserCanApprove } = useGetRolesUserCanApprove(proposalId)
   const { roles: userRoles } = useGetUsersRoles(proposalId)
 
   const rawSteps = [
@@ -61,7 +61,7 @@ const ProposalStepper = () => {
           : StepStatus.current
         : StepStatus.loading,
       actions: {
-        [ProposalRoleType.CLIENT]: rolesCanApprove.filter(
+        [ProposalRoleType.CLIENT]: rolesUserCanApprove.filter(
           (role) => role.type === ProposalRoleType.CLIENT
         ).length > 0 && (
           <Button
@@ -72,7 +72,7 @@ const ProposalStepper = () => {
             Approve
           </Button>
         ),
-        [ProposalRoleType.CONTRIBUTOR]: rolesCanApprove.filter(
+        [ProposalRoleType.CONTRIBUTOR]: rolesUserCanApprove.filter(
           (role) => role.type === ProposalRoleType.CONTRIBUTOR
         ).length > 0 && (
           <Button
@@ -92,12 +92,13 @@ const ProposalStepper = () => {
       setStepperSteps(rawSteps)
       setStepperLoading(false)
     }
-  }, [proposal, userRoles, rolesCanApprove])
+  }, [proposal, userRoles, rolesUserCanApprove])
 
   return (
     <Stepper
       loading={stepperLoading}
-      roles={userRoles?.map((role) => role.type).filter((v, i, roles) => roles.indexOf(v) === i)} // filter out duplicate roles
+      // filter out duplicate roles, e.g. user is a CONTRIBUTOR and a Safe that they are a signer for is also a CONTRIBUTOR
+      roles={userRoles?.map((role) => role.type).filter((v, i, roles) => roles.indexOf(v) === i)}
       steps={stepperSteps}
       className="absolute right-[-340px] top-0"
     />

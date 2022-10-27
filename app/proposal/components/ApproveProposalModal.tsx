@@ -8,7 +8,7 @@ import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import getProposalById from "../queries/getProposalById"
 import { genProposalApprovalDigest } from "app/signatures/proposalSignature"
 import { Proposal } from "app/proposal/types"
-import useGetUsersRolesCanApprove from "app/core/hooks/useGetUsersRolesCanApprove"
+import useGetRolesUserCanApprove from "app/core/hooks/useGetRolesUserCanApprove"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import networks from "app/utils/networks.json"
@@ -29,7 +29,7 @@ export const ApproveProposalModal = ({
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const isPaymentProposal = proposal.data.totalPayments && proposal.data.totalPayments?.length > 0
 
-  const { roles, isLoading: isRolesCanApproveLoading } = useGetUsersRolesCanApprove(proposal?.id)
+  const { roles, isLoading: loadingRolesUserCanApprove } = useGetRolesUserCanApprove(proposal?.id)
 
   const { signMessage } = useSignature()
 
@@ -157,7 +157,7 @@ export const ApproveProposalModal = ({
           <Button
             isSubmitType={true}
             isLoading={isLoading}
-            isDisabled={isLoading || isRolesCanApproveLoading}
+            isDisabled={isLoading || loadingRolesUserCanApprove}
             onClick={() => {
               setIsLoading(true)
               initiateSignature()

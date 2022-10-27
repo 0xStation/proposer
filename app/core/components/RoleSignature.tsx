@@ -29,7 +29,7 @@ const SafeRole = ({ role, proposalStatus }) => {
     proposalStatus !== ProposalStatus.DRAFT && activeUserHasAProposalRole && !activeUserHasSigned
 
   const totalSafeSignersSigned = role.signatures.filter((signature) => {
-    return (role.account.data?.signers || []).some((signer) => {
+    return role.account.data?.signers?.some((signer) => {
       return (
         addressesAreEqual(signature.address, signer) &&
         signature.type === ProposalSignatureType.APPROVE // only count APPROVE signatures to ignore author's SEND signature
