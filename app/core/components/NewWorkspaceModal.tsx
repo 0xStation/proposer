@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react"
 import { useMutation, useRouter, Routes, invoke } from "blitz"
 import Modal from "./sds/overlays/modal"
-import Select from "./form/Select"
 import Button from "./sds/buttons/Button"
-import { Form } from "react-final-form"
+import { Form, Field } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import createSafe from "app/account/mutations/createSafe"
 import { Account } from "app/account/types"
@@ -101,6 +100,7 @@ export const NewWorkspaceModal = ({
           }}
           render={({ form, handleSubmit }) => {
             const formState = form.getState()
+            console.log(formState)
             return (
               <form onSubmit={handleSubmit}>
                 <label className="font-bold block mt-6">Gnosis Safe address*</label>
@@ -109,7 +109,16 @@ export const NewWorkspaceModal = ({
                   selected network. Change your network in the upper-right corner of this page to
                   the left of your profile.
                 </span>
-                <select className="w-full bg-wet-concrete p-2 rounded text-marble-white">
+
+                <Field
+                  placeholder="Select a Gnosis Safe"
+                  name="safeAddress"
+                  component="select"
+                  className="w-full bg-wet-concrete p-2 rounded text-marble-white"
+                >
+                  <option value="" disabled selected>
+                    Select a safe
+                  </option>
                   {safes.map((safe: any, idx) => {
                     return (
                       <option key={idx} value={safe.value}>
@@ -117,7 +126,7 @@ export const NewWorkspaceModal = ({
                       </option>
                     )
                   })}
-                </select>
+                </Field>
                 <div className="mt-6 flex justify-end">
                   <div className="flex flex-col">
                     <Button
