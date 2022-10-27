@@ -6,6 +6,7 @@ import useStore from "app/core/hooks/useStore"
 import StepperRenderer from "./StepperRenderer"
 import SendStep from "./steps/SendStep"
 import ApproveStep from "./steps/ApproveStep"
+import PaymentStep from "./steps/PaymentStep"
 
 interface StepperState {
   activeUsersRoles: ProposalRoleType[]
@@ -57,6 +58,9 @@ const ProposalStepper = () => {
         <>
           <SendStep proposal={proposal} />
           <ApproveStep proposal={proposal} />
+          {proposal.milestones?.map((milestone, idx) => (
+            <PaymentStep key={`milestone-${idx}`} milestone={milestone} proposal={proposal} />
+          ))}
         </>
       )}
     </StepperRenderer>

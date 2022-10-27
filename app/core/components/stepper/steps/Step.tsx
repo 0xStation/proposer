@@ -34,7 +34,7 @@ const Step = ({
   options?: { first?: boolean; last?: boolean }
 }) => {
   return (
-    <li className={classNames(options?.first ? "pb-5" : "", "relative")}>
+    <li className={classNames(!options?.last ? "pb-5" : "", "relative")}>
       {status === StepStatus.complete ? (
         <>
           {!options?.last ? (
