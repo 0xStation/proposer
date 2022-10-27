@@ -122,7 +122,7 @@ const WalletRole = ({ role, proposalStatus }) => {
   const activeUser = useStore((state) => state.activeUser)
   const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
-  const activeUserHasApproved = role.signatures?.some(
+  const activeUserHasApproved = role?.signatures?.some(
     (signature) =>
       addressesAreEqual(activeUser?.address || "", signature.address) &&
       signature.type === ProposalSignatureType.APPROVE

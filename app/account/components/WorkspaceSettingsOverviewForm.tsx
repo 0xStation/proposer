@@ -45,7 +45,7 @@ const PfpInput = ({ pfpUrl, onUpload }) => {
       <label className="font-bold">Profile picture or logo</label>
       <p className="text-concrete text-sm">.jpg or .png, 600 x 600px recommended.</p>
       <div
-        className="w-[5.66rem] h-[5.66rem] border border-wet-concrete rounded-full bg-gradient-to-b object-cover from-electric-violet to-magic-mint flex items-center justify-center cursor-pointer mt-2"
+        className="relative w-[5.66rem] h-[5.66rem] border border-wet-concrete rounded-full bg-gradient-to-b object-cover from-electric-violet to-magic-mint flex items-center justify-center cursor-pointer mt-2"
         {...getRootProps()}
       >
         <>
@@ -149,7 +149,9 @@ const WorkspaceSettingsOverviewForm = ({
 
   return (
     <>
-      <ConnectDiscordModal isOpen={isDiscordModalOpen} setIsOpen={setIsDiscordModalOpen} />
+      {!account?.discordId && (
+        <ConnectDiscordModal isOpen={isDiscordModalOpen} setIsOpen={setIsDiscordModalOpen} />
+      )}
       <Form
         initialValues={{
           ...Object(account?.data),
@@ -284,17 +286,27 @@ const WorkspaceSettingsOverviewForm = ({
                 Provide your Discord handle so individuals on your proposal have a way to contact
                 you.
               </p>
-              <button
-                type="button"
-                className="mt-3 border border-marble-white text-marble-white rounded flex flex-row py-2 px-3 hover:bg-wet-concrete"
-                onClick={(e) => {
-                  e.preventDefault()
-                  setIsDiscordModalOpen(true)
-                }}
-              >
-                <Image src={DiscordIcon} alt="Discord icon" width={20} height={20} />
-                <p className="pl-2">Connect Discord</p>
-              </button>
+              {account?.discordId ? (
+                <button
+                  disabled
+                  className="mt-3 border border-marble-white text-marble-white rounded flex flex-row py-2 px-3 opacity-70 cursor-not-allowed"
+                >
+                  <Image src={DiscordIcon} alt="Discord icon" width={20} height={20} />
+                  <p className="pl-2">Connected to Discord</p>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="mt-3 border border-marble-white text-marble-white rounded flex flex-row py-2 px-3 hover:bg-wet-concrete"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setIsDiscordModalOpen(true)
+                  }}
+                >
+                  <Image src={DiscordIcon} alt="Discord icon" width={20} height={20} />
+                  <p className="pl-2">Connect Discord</p>
+                </button>
+              )}
             </div>
             <Button
               className="mt-12"

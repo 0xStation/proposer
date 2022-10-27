@@ -4,6 +4,7 @@ import useStore from "../hooks/useStore"
 import Modal from "./Modal"
 import updateAccountWithoutEmail from "app/account/mutations/updateAccountWithoutEmail"
 import Button from "./sds/buttons/Button"
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
 export const ConnectDiscordModal = ({ isOpen, setIsOpen }) => {
   const activeUser = useStore((state) => state.activeUser)
@@ -38,6 +39,8 @@ export const ConnectDiscordModal = ({ isOpen, setIsOpen }) => {
               `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`,
             discordHandle: user?.username + "#" + user?.discriminator,
           })
+
+          invalidateQuery(getAccountByAddress)
 
           setIsOpen(false)
           setToastState({
