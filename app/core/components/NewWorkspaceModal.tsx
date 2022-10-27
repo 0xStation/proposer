@@ -86,7 +86,7 @@ export const NewWorkspaceModal = ({
           onSubmit={(values) => {
             try {
               createSafeMutation({
-                address: values.safeAddress.value,
+                address: values.safeAddress,
                 chainId: activeChain.id,
               })
             } catch (e) {
@@ -100,7 +100,6 @@ export const NewWorkspaceModal = ({
           }}
           render={({ form, handleSubmit }) => {
             const formState = form.getState()
-            console.log(formState)
             return (
               <form onSubmit={handleSubmit}>
                 <label className="font-bold block mt-6">Gnosis Safe address*</label>
