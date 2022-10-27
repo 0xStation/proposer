@@ -14,10 +14,12 @@ const PaymentStep = ({
   proposal: Proposal
 }) => {
   console.log(milestone)
+  console.log(proposal)
+
   const status =
-    proposal.status === ProposalStatus.APPROVED
+    proposal.currentMilestoneIndex > milestone.index
       ? StepStatus.complete
-      : proposal.status === ProposalStatus.DRAFT
+      : proposal.status !== ProposalStatus.COMPLETE
       ? StepStatus.upcoming
       : StepStatus.current
 

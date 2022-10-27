@@ -7,6 +7,7 @@ import StepperRenderer from "./StepperRenderer"
 import SendStep from "./steps/SendStep"
 import ApproveStep from "./steps/ApproveStep"
 import PaymentStep from "./steps/PaymentStep"
+import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
 
 interface StepperState {
   activeUsersRoles: ProposalRoleType[]
@@ -52,8 +53,22 @@ const ProposalStepper = () => {
     }
   )
 
+  // everything below can get removed when we merge syms PR
+  const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(proposal)
+  const activeUserIsSigner = signedRoles.length + remainingRoles.length > 0
+  const activeUserHasRolesToSign = remainingRoles.length > 0
+  const authorRoles =
+    proposal?.roles?.filter((role) => {
+      return role.type === ProposalRoleType.AUTHOR && role.address === activeUser?.address
+    }) || []
+
+  const usersRoles = [...remainingRoles, ...signedRoles, ...authorRoles].map(
+    (role) => role.type
+  ) as ProposalRoleType[]
+  // end of stuff that can get removed
+
   return (
-    <StepperRenderer activeUserRoles={[]} className="absolute right-[-340px] top-0">
+    <StepperRenderer activeUserRoles={usersRoles} className="absolute right-[-340px] top-0">
       {proposal && (
         <>
           <SendStep proposal={proposal} />
