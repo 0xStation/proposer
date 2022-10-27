@@ -1,3 +1,4 @@
+import create from "zustand"
 import { useState, useEffect } from "react"
 import { ProposalRoleType } from "@prisma/client"
 import { PROPOSAL_ROLE_MAP } from "app/core/utils/constants"
@@ -18,6 +19,28 @@ export type Step = {
   button?: JSX.Element
 }
 
+interface StepperState {
+  activeUsersRoles: ProposalRoleType[]
+  activeRole: ProposalRoleType | null
+  setActiveRole: (role: ProposalRoleType) => void
+  setActiveUsersRoles: (roles: ProposalRoleType[]) => void
+}
+
+export const useStepperStore = create<StepperState>((set) => ({
+  activeUsersRoles: [],
+  activeRole: null,
+  setActiveRole: (state) => {
+    set(() => {
+      return { activeRole: state }
+    })
+  },
+  setActiveUsersRoles: (state) => {
+    set(() => {
+      return { activeUsersRoles: state }
+    })
+  },
+}))
+
 const StepperRenderer = ({
   activeUserRoles,
   className,
@@ -27,12 +50,16 @@ const StepperRenderer = ({
   className?: string
   children: any
 }) => {
-  const [activeRole, setActiveRole] = useState<ProposalRoleType | undefined>()
   const [showInfo, setShowInfo] = useState<boolean>(true)
+  const activeUsersRoles = useStepperStore((state) => state.activeUsersRoles)
+  const activeRole = useStepperStore((state) => state.activeRole)
+  const setActiveRole = useStepperStore((state) => state.setActiveRole)
 
   useEffect(() => {
-    setActiveRole(activeUserRoles[0])
-  }, [activeUserRoles])
+    if (activeUsersRoles[0]) {
+      setActiveRole(activeUsersRoles[0])
+    }
+  }, [activeUsersRoles])
 
   return (
     <nav aria-label="Progress" className={`bg-wet-concrete rounded-lg w-[300px] p-4 ${className}`}>

@@ -4,13 +4,7 @@ import useStore from "app/core/hooks/useStore"
 import Step, { StepStatus } from "./Step"
 
 const SendStep = ({ proposal }: { proposal: Proposal }) => {
-  const status =
-    proposal.status === ProposalStatus.APPROVED
-      ? StepStatus.complete
-      : proposal.status === ProposalStatus.DRAFT
-      ? StepStatus.upcoming
-      : StepStatus.current
-
+  const status = proposal.status === ProposalStatus.DRAFT ? StepStatus.current : StepStatus.complete
   const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
 
   const actions = {

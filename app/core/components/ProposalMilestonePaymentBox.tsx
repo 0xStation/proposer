@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { invalidateQuery, useQuery } from "blitz"
 import { ArrowRightIcon, CheckCircleIcon } from "@heroicons/react/solid"
-import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
 import AttachTransactionModal from "app/proposal/components/AttachTransactionModal"
 import { ProposalMilestone, ProposalMilestoneStatus } from "app/proposalMilestone/types"
 import { getMilestoneStatus } from "app/proposalMilestone/utils"
@@ -26,7 +25,7 @@ const PaymentRow = ({
   proposal,
   milestone,
   setQueueGnosisTransactionModalOpen,
-  setIsExecutePaymentModalOpen,
+  toggleExecutePaymentModalOpen,
   setIsAttachtxModalOpen,
   setApproveGnosisTransactionModalOpen,
 }) => {
@@ -211,7 +210,7 @@ const PaymentRow = ({
             overrideWidthClassName="w-full"
             className="mt-4"
             type={ButtonType.Secondary}
-            onClick={() => setIsExecutePaymentModalOpen(true)}
+            onClick={() => toggleExecutePaymentModalOpen(true)}
           >
             Pay
           </Button>
@@ -237,21 +236,16 @@ export const ProposalMilestonePaymentBox = ({
   milestone: ProposalMilestone
   className?: string
 }) => {
-  const [isExecutePaymentModalOpen, setIsExecutePaymentModalOpen] = useState<boolean>(false)
   const [isAttachtxModalOpen, setIsAttachtxModalOpen] = useState<boolean>(false)
   const [queueGnosisTransactionModalOpen, setQueueGnosisTransactionModalOpen] =
     useState<boolean>(false)
   const [approveGnosisTransactionModalOpen, setApproveGnosisTransactionModalOpen] =
     useState<boolean>(false)
   const milestoneStatus = getMilestoneStatus(proposal, milestone) || ""
+  const toggleExecutePaymentModalOpen = useStore((state) => state.toggleExecutePaymentModalOpen)
 
   return (
     <>
-      <ExecutePaymentModal
-        isOpen={isExecutePaymentModalOpen}
-        setIsOpen={setIsExecutePaymentModalOpen}
-        milestone={milestone}
-      />
       <QueueGnosisTransactionModal
         milestone={milestone}
         isOpen={queueGnosisTransactionModalOpen}
@@ -299,7 +293,7 @@ export const ProposalMilestonePaymentBox = ({
             key={`payment-row-${idx}`}
             payment={payment}
             setQueueGnosisTransactionModalOpen={setQueueGnosisTransactionModalOpen}
-            setIsExecutePaymentModalOpen={setIsExecutePaymentModalOpen}
+            toggleExecutePaymentModalOpen={toggleExecutePaymentModalOpen}
             setIsAttachtxModalOpen={setIsAttachtxModalOpen}
             setApproveGnosisTransactionModalOpen={setApproveGnosisTransactionModalOpen}
             proposal={proposal}

@@ -4,53 +4,67 @@ import useStore from "app/core/hooks/useStore"
 import { Proposal } from "app/proposal/types"
 import { ProposalMilestone } from "app/proposalMilestone/types"
 import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
+import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
+
 import Step, { StepStatus } from "./Step"
 
 const PaymentStep = ({
   milestone,
   proposal,
+  isLastStep,
 }: {
   milestone: ProposalMilestone
   proposal: Proposal
+  isLastStep?: boolean
 }) => {
-  console.log(milestone)
-  console.log(proposal)
+  const executePaymentModalOpen = useStore((state) => state.executePaymentModalOpen)
+  const toggleExecutePaymentModalOpen = useStore((state) => state.toggleExecutePaymentModalOpen)
+  const payment = proposal.payments?.find((payment) => payment.milestoneId === milestone.id)
 
   const status =
     proposal.currentMilestoneIndex > milestone.index
       ? StepStatus.complete
-      : proposal.status !== ProposalStatus.COMPLETE
-      ? StepStatus.upcoming
-      : StepStatus.current
+      : proposal.status === ProposalStatus.APPROVED &&
+        proposal.currentMilestoneIndex === milestone.index
+      ? StepStatus.current
+      : StepStatus.upcoming
 
-  const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
   const [remainingRoles, _signedRoles, _error, _loading] = useGetUsersRolesToSignFor(proposal)
-  const activeUserHasRolesToSign = remainingRoles.length > 0
 
   const actions = {
-    ...(activeUserHasRolesToSign && {
+    ...(true && {
       [ProposalRoleType.CLIENT]: (
-        <Button type={ButtonType.Secondary} onClick={() => toggleProposalApprovalModalOpen(true)}>
-          Approve
+        <Button type={ButtonType.Secondary} onClick={() => toggleExecutePaymentModalOpen(true)}>
+          Pay
         </Button>
       ),
     }),
-    ...(activeUserHasRolesToSign && {
+    ...(true && {
       [ProposalRoleType.CONTRIBUTOR]: (
-        <Button type={ButtonType.Secondary} onClick={() => toggleProposalApprovalModalOpen(true)}>
-          Approve
+        <Button type={ButtonType.Secondary} onClick={() => toggleExecutePaymentModalOpen(true)}>
+          Pay
         </Button>
       ),
     }),
   }
 
   return (
-    <Step
-      description={milestone.data.title}
-      status={status}
-      options={{ last: true }}
-      actions={actions}
-    />
+    <>
+      {payment && (
+        <ExecutePaymentModal
+          isOpen={executePaymentModalOpen}
+          setIsOpen={toggleExecutePaymentModalOpen}
+          milestone={milestone}
+          payment={payment}
+        />
+      )}
+      <Step
+        description={milestone.data.title}
+        status={status}
+        options={{ last: isLastStep }}
+        actions={actions}
+      />
+    </>
   )
 }
 

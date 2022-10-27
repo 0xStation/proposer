@@ -1,5 +1,6 @@
 import { CheckIcon } from "@heroicons/react/solid"
 import { ProposalRoleType } from "@prisma/client"
+import { useStepperStore } from "../StepperRenderer"
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
@@ -22,17 +23,17 @@ const Step = ({
   status,
   description,
   subtitle,
-  activeRole,
   actions,
   options,
 }: {
   status: StepStatus
-  activeRole?: ProposalRoleType
   actions?: ActionMapType
   description: string
   subtitle?: string
   options?: { first?: boolean; last?: boolean }
 }) => {
+  const activeRole = useStepperStore((state) => state.activeRole)
+
   return (
     <li className={classNames(!options?.last ? "pb-5" : "", "relative")}>
       {status === StepStatus.complete ? (
@@ -68,7 +69,7 @@ const Step = ({
             </span>
             <div className="flex flex-col space-y-2 ml-4 min-w-0">
               <span className="text-sm text-marble-white">{description}</span>
-              <span>{subtitle}</span>
+              <span className="text-xs">{subtitle}</span>
               {activeRole && actions && actions[activeRole]}
             </div>
           </span>
@@ -86,7 +87,7 @@ const Step = ({
               <span className="relative z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 border-concrete bg-wet-concrete group-hover:border-gray-400"></span>
             </span>
             <span className="ml-4 min-w-0">
-              <span className="text-sm text-gray-500">{description}</span>
+              <span className="text-sm text-light-concrete">{description}</span>
             </span>
           </span>
         </>
