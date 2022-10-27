@@ -186,11 +186,6 @@ const WorkspaceHome: BlitzPage = () => {
 
     return (
       <>
-        <ConnectDiscordProfileModal
-          isOpen={true}
-          setIsOpen={setIsDiscordModalOpen}
-          setNewAuth={setNewAuth}
-        />
         <div className="p-10 flex-1 max-h-screen overflow-y-auto">
           <div className="flex flex-row justify-between">
             <h1 className="text-2xl font-bold">Proposals</h1>
@@ -475,9 +470,9 @@ const WorkspaceHome: BlitzPage = () => {
 
   const SettingsTab = () => {
     return (
-      <div className="h-[calc(100vh-240px)] p-10 flex-1">
+      <div className="overflow-auto p-10 flex-1">
         <h1 className="text-2xl font-bold">Settings</h1>
-        <div className="mt-12">
+        <div className="mt-10">
           <WorkspaceSettingsOverviewForm account={account as Account} isEdit={true} />
         </div>
       </div>
