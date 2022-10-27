@@ -5,7 +5,6 @@ import Modal from "./Modal"
 import updateAccountWithoutEmail from "app/account/mutations/updateAccountWithoutEmail"
 import Button from "./sds/buttons/Button"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
-import { useEnsName } from "wagmi"
 
 export const ConnectDiscordModal = ({ isOpen, setIsOpen }) => {
   const activeUser = useStore((state) => state.activeUser)
