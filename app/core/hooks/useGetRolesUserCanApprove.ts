@@ -1,7 +1,5 @@
-import { useState, useEffect } from "react"
-import { useQuery } from "blitz"
 import "app/core/utils/addressesAreEqual"
-import { AddressType, ProposalRoleApprovalStatus, ProposalRoleType } from "@prisma/client"
+import { AddressType, ProposalRoleApprovalStatus } from "@prisma/client"
 import useStore from "./useStore"
 import useGetUserRoles from "./useGetUsersRoles"
 import { ProposalRoleWithSignatures } from "app/proposalRole/types"

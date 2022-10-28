@@ -1,9 +1,12 @@
-import { ProposalRoleType, ProposalStatus } from "@prisma/client"
+import { ProposalRoleType, ProposalStatus, AddressType } from "@prisma/client"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
+import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
 import { Proposal } from "app/proposal/types"
 import { ProposalMilestone } from "app/proposalMilestone/types"
 import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
+import QueueGnosisTransactionModal from "app/proposalPayment/components/QueueGnosisTransactionModal"
+import ApproveGnosisTransactionModal from "app/proposalPayment/components/ApproveGnosisTransactionModal"
 
 import Step, { StepStatus } from "./Step"
 
@@ -16,9 +19,30 @@ const PaymentStep = ({
   proposal: Proposal
   isLastStep?: boolean
 }) => {
+  const { roles: userRoles } = useGetUsersRoles(proposal.id)
+  const userClientRole = userRoles.find((role) => role.type === ProposalRoleType.CLIENT)
+  const userIsPayer = userClientRole
+    ? userClientRole.account?.addressType === AddressType.WALLET
+    : false
+  const userIsSigner = userClientRole
+    ? userClientRole.account?.addressType === AddressType.SAFE
+    : false
+
   const executePaymentModalMap = useStore((state) => state.executePaymentModalMap)
   const toggleExecutePaymentModalMap = useStore((state) => state.toggleExecutePaymentModalMap)
+  const queueGnosisTransactionModalMap = useStore((state) => state.queueGnosisTransactionModalMap)
+  const toggleQueueGnosisTransactionModalMap = useStore(
+    (state) => state.toggleQueueGnosisTransactionModalMap
+  )
+  const approveGnosisTransactionModalMap = useStore(
+    (state) => state.approveGnosisTransactionModalMap
+  )
+  const toggleApproveGnosisTransactionModalMap = useStore(
+    (state) => state.toggleApproveGnosisTransactionModalMap
+  )
+
   const payment = proposal.payments?.find((payment) => payment.milestoneId === milestone.id)
+  console.log(payment)
 
   const status =
     proposal.currentMilestoneIndex > milestone.index
@@ -29,7 +53,7 @@ const PaymentStep = ({
       : StepStatus.upcoming
 
   const actions = {
-    ...(true &&
+    ...(userIsPayer &&
       payment && {
         [ProposalRoleType.CLIENT]: (
           <Button
@@ -40,14 +64,33 @@ const PaymentStep = ({
           </Button>
         ),
       }),
-    ...(true &&
-      payment && {
-        [ProposalRoleType.CONTRIBUTOR]: (
+    // user is signer on the gnosis safe
+    // and payment exists (typescript)
+    // and there is not yet any mutliSigTransaction data on the payment, meaning it is not queued
+    ...(userIsSigner &&
+      payment &&
+      !payment.data.multisigTransaction && {
+        [ProposalRoleType.CLIENT]: (
           <Button
             type={ButtonType.Secondary}
-            onClick={() => toggleExecutePaymentModalMap({ open: true, id: payment.id })}
+            onClick={() => toggleQueueGnosisTransactionModalMap({ open: true, id: payment.id })}
           >
-            Pay
+            Queue transaction
+          </Button>
+        ),
+      }),
+    // user is signer on the gnosis safe
+    // and payment exists (typescript)
+    // and there IS mutliSigTransaction data on the payment, meaning it has been queued
+    ...(userIsSigner &&
+      payment &&
+      !!payment.data.multisigTransaction && {
+        [ProposalRoleType.CLIENT]: (
+          <Button
+            type={ButtonType.Secondary}
+            onClick={() => toggleApproveGnosisTransactionModalMap({ open: true, id: payment.id })}
+          >
+            Approve
           </Button>
         ),
       }),
@@ -56,12 +99,25 @@ const PaymentStep = ({
   return (
     <>
       {payment && (
-        <ExecutePaymentModal
-          isOpen={executePaymentModalMap[payment.id] || false}
-          setIsOpen={(open) => toggleExecutePaymentModalMap({ open, id: payment.id })}
-          milestone={milestone}
-          payment={payment}
-        />
+        <>
+          <ExecutePaymentModal
+            isOpen={executePaymentModalMap[payment.id] || false}
+            setIsOpen={(open) => toggleExecutePaymentModalMap({ open, id: payment.id })}
+            milestone={milestone}
+            payment={payment}
+          />
+          <QueueGnosisTransactionModal
+            milestone={milestone}
+            payment={payment}
+            isOpen={queueGnosisTransactionModalMap[payment.id] || false}
+            setIsOpen={(open) => toggleQueueGnosisTransactionModalMap({ open, id: payment.id })}
+          />
+          <ApproveGnosisTransactionModal
+            payment={payment}
+            isOpen={approveGnosisTransactionModalMap[payment.id] || false}
+            setIsOpen={(open) => toggleApproveGnosisTransactionModalMap({ open, id: payment.id })}
+          />
+        </>
       )}
       <Step
         description={milestone.data.title}

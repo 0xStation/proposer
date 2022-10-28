@@ -12,12 +12,10 @@ import useStore from "../hooks/useStore"
 import { Proposal } from "app/proposal/types"
 import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
-import QueueGnosisTransactionModal from "app/proposalPayment/components/QueueGnosisTransactionModal"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
 import getProposalById from "app/proposal/queries/getProposalById"
-import ApproveGnosisTransactionModal from "app/proposalPayment/components/ApproveGnosisTransactionModal"
 import { getNetworkGnosisUrl } from "app/core/utils/networkInfo"
 
 const PaymentRow = ({
@@ -246,23 +244,11 @@ export const ProposalMilestonePaymentBox = ({
 
   return (
     <>
-      <QueueGnosisTransactionModal
-        milestone={milestone}
-        isOpen={queueGnosisTransactionModalOpen}
-        setIsOpen={setQueueGnosisTransactionModalOpen}
-      />
       <AttachTransactionModal
         milestone={milestone}
         isOpen={isAttachtxModalOpen}
         setIsOpen={setIsAttachtxModalOpen}
       />
-      {milestone.payments && milestone.payments[0] && (
-        <ApproveGnosisTransactionModal
-          payment={milestone.payments[0]}
-          isOpen={approveGnosisTransactionModalOpen}
-          setIsOpen={setApproveGnosisTransactionModalOpen}
-        />
-      )}
       <div className={`border border-b border-concrete rounded-2xl px-6 py-9 ${className}`}>
         <div className="flex flex-row items-center justify-between mb-4">
           {/* TITLE */}

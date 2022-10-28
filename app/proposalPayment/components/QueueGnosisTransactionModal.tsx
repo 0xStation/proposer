@@ -19,12 +19,11 @@ enum Tab {
   ATTACH_TRANSACTION = "ATTACH_TRANSACTION",
 }
 
-export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) => {
+export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone, payment }) => {
   const setToastState = useStore((state) => state.setToastState)
-  const activePayment = milestone.payments[0]
   const { chain: activeChain } = useNetwork()
 
-  const { signMessage: signGnosis } = useGnosisSignature(activePayment)
+  const { signMessage: signGnosis } = useGnosisSignature(payment)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const [selectedTab, setSelectedTab] = useState<Tab>(Tab.QUEUE_PAYMENT)
@@ -113,7 +112,7 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
                     safeTxHash: response.detailedExecutionInfo.safeTxHash,
                     address: response.safeAddress,
                   },
-                  paymentId: activePayment.id,
+                  paymentId: payment.id,
                 })
                 invalidateQuery(getMilestonesByProposal)
                 setIsLoading(false)
@@ -148,7 +147,7 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
   }
 
   const AttachPaymentTab = () => {
-    const chainId = activePayment.data.token.chainId
+    const chainId = payment.data.token.chainId
     return (
       <>
         <h3 className="text-2xl font-bold mt-4">Attach transaction</h3>
@@ -211,11 +210,11 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        {!activeChain || activeChain.id !== activePayment?.data?.token.chainId ? (
+        {!activeChain || activeChain.id !== payment?.data?.token.chainId ? (
           <SwitchNetworkView
             isLoading={isLoading}
             setIsLoading={setIsLoading}
-            chainId={activePayment?.data?.token.chainId}
+            chainId={payment?.data?.token.chainId}
           />
         ) : (
           <>
