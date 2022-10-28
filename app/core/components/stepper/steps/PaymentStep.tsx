@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useQuery } from "blitz"
+import { ArrowRightIcon } from "@heroicons/react/solid"
 import { ProposalRoleType, ProposalStatus, AddressType } from "@prisma/client"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
@@ -12,6 +13,7 @@ import ApproveGnosisTransactionModal from "app/proposalPayment/components/Approv
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { getMilestoneStatus } from "app/proposalMilestone/utils"
 import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
+import { getNetworkGnosisUrl } from "app/core/utils/networkInfo"
 
 import Step, { StepStatus } from "./Step"
 
@@ -130,7 +132,8 @@ const PaymentStep = ({
     ...(userIsSigner &&
       payment &&
       !!payment.data.multisigTransaction &&
-      !userHasSignedGnosisTx && {
+      !userHasSignedGnosisTx &&
+      !quorumMet && {
         [ProposalRoleType.CLIENT]: (
           <Button
             type={ButtonType.Secondary}
@@ -140,7 +143,32 @@ const PaymentStep = ({
           </Button>
         ),
       }),
+    // user is signer on the gnosis safe
+    // and payment exists (typescript)
+    // and there IS mutliSigTransaction data on the payment, meaning it has been queued
+    // and the quorum is met
+    ...(userIsSigner &&
+      payment &&
+      !!payment.data.multisigTransaction &&
+      !!quorumMet && {
+        [ProposalRoleType.CLIENT]: (
+          <a
+            href={`${getNetworkGnosisUrl(payment.data.token.chainId)}:${
+              payment.data.multisigTransaction.address
+            }/transactions/queue`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <button className="mt-4 mb-2 sm:mb-0 border rounded px-4 h-[35px] bg-electric-violet border-electric-violet text-tunnel-black">
+              Execute on Gnosis
+              <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
+            </button>
+          </a>
+        ),
+      }),
   }
+
+  console.log(actions)
 
   return (
     <>
@@ -158,6 +186,7 @@ const PaymentStep = ({
             isOpen={queueGnosisTransactionModalMap[payment.id] || false}
             setIsOpen={(open) => toggleQueueGnosisTransactionModalMap({ open, id: payment.id })}
           />
+          {/* TODO: after final approval, refetch getGnosisTxStatus */}
           <ApproveGnosisTransactionModal
             payment={payment}
             isOpen={approveGnosisTransactionModalMap[payment.id] || false}
@@ -169,7 +198,11 @@ const PaymentStep = ({
         description={milestone.data.title}
         status={status}
         subtitle={
-          userIsSigner && payment && !!payment.data.multisigTransaction && !!userHasSignedGnosisTx
+          userIsSigner &&
+          payment &&
+          !!payment.data.multisigTransaction &&
+          !!userHasSignedGnosisTx &&
+          !quorumMet
             ? "You have already approved this payment, waiting for others to sign until the tx reaches quorum."
             : ""
         }
