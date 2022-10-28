@@ -19,8 +19,8 @@ import { addressesAreEqual } from "../../../core/utils/addressesAreEqual"
 import createProposal from "app/proposal/mutations/createProposal"
 import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
 import deleteProposalById from "app/proposal/mutations/deleteProposalById"
-import TemplateFormStepPropose from "./stepPropose"
-import TemplateFormStepConfirm from "./stepConfirm"
+import FoxesFormStepPropose from "app/proposalForm/components/foxes/stepPropose"
+import FoxesFormStepConfirm from "app/proposalForm/components/foxes/stepConfirm"
 import { AddressType, ProposalRoleType } from "@prisma/client"
 import { mustBeAboveNumWords } from "app/utils/validators"
 import {
@@ -36,7 +36,7 @@ import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
 
-export const ProposalFormTemplate = () => {
+export const ProposalFoxesForm = () => {
   const router = useRouter()
   const walletModalOpen = useStore((state) => state.walletModalOpen)
   const setToastState = useStore((state) => state.setToastState)
@@ -320,10 +320,10 @@ export const ProposalFormTemplate = () => {
                       {PROPOSAL_FORM_HEADER_COPY[proposalStep]}
                     </h2>
                     {proposalStep === ProposalFormStep.PROPOSE && (
-                      <TemplateFormStepPropose formState={formState} />
+                      <FoxesFormStepPropose formState={formState} />
                     )}
                     {proposalStep === ProposalFormStep.CONFIRM && (
-                      <TemplateFormStepConfirm body={formState.values.body} />
+                      <FoxesFormStepConfirm body={formState.values.body} />
                     )}
                   </>
                 )}
@@ -347,6 +347,13 @@ export const ProposalFormTemplate = () => {
                           isToastShowing: true,
                           type: "error",
                           message: "You do not own the required tokens to submit to this RFP.",
+                        })
+                      } else if (!activeUser?.discordId) {
+                        setToastState({
+                          isToastShowing: true,
+                          type: "error",
+                          message:
+                            "Please verify your Discord account to move on to the next step.",
                         })
                       } else if (session.siwe?.address) {
                         setProposalStep(ProposalFormStep.CONFIRM)
@@ -387,8 +394,8 @@ export const ProposalFormTemplate = () => {
                         e.preventDefault()
                         setIsLoading(true)
                         if (!session.siwe?.address) {
-                          toggleWalletModal(true)
                           setIsLoading(false)
+                          toggleWalletModal(true)
                           return
                         } else if (!!rfp?.data?.singleTokenGate && !userHasRequiredToken) {
                           setToastState({
@@ -426,4 +433,4 @@ export const ProposalFormTemplate = () => {
   )
 }
 
-export default ProposalFormTemplate
+export default ProposalFoxesForm

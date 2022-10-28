@@ -51,7 +51,6 @@ import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 import getRfpCountForAccount from "app/rfp/queries/getRfpCountForAccount"
 import getProposalCountForAccount from "app/proposal/queries/getProposalCountForAccount"
 import { RfpCard } from "app/rfp/components/RfpCard"
-import ConnectDiscordProfileModal from "app/core/components/ConnectDiscordModal"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
