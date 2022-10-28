@@ -2,10 +2,13 @@ import { ProposalRoleType, ProposalStatus } from "@prisma/client"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
 import { Proposal } from "app/proposal/types"
-import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
+import useGetRolesUserCanApprove from "app/core/hooks/useGetRolesUserCanApprove"
 import Step, { StepStatus } from "./Step"
 
 const ApproveStep = ({ proposal }: { proposal: Proposal }) => {
+  const { roles: rolesUserCanApprove } = useGetRolesUserCanApprove(proposal.id)
+  const activeUserHasRolesToSign = rolesUserCanApprove.length > 0
+
   const status =
     proposal.status === ProposalStatus.APPROVED || proposal.status === ProposalStatus.COMPLETE
       ? StepStatus.complete
@@ -14,9 +17,6 @@ const ApproveStep = ({ proposal }: { proposal: Proposal }) => {
       : StepStatus.current
 
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
-
-  const [remainingRoles, _signedRoles, _error, _loading] = useGetUsersRolesToSignFor(proposal)
-  const activeUserHasRolesToSign = remainingRoles.length > 0
 
   const actions = {
     ...(activeUserHasRolesToSign && {

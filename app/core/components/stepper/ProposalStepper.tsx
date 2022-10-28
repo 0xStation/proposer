@@ -1,4 +1,3 @@
-import { ProposalRoleType, Proposal } from "@prisma/client"
 import { useParam, useQuery } from "blitz"
 import getProposalById from "app/proposal/queries/getProposalById"
 import useStore from "app/core/hooks/useStore"
@@ -6,7 +5,7 @@ import StepperRenderer from "./StepperRenderer"
 import SendStep from "./steps/SendStep"
 import ApproveStep from "./steps/ApproveStep"
 import PaymentStep from "./steps/PaymentStep"
-import useGetUsersRolesToSignFor from "app/core/hooks/useGetUsersRolesToSignFor"
+import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
 // import { useStepperStore } from "./StepperRenderer"
 
 const ProposalStepper = () => {
@@ -29,20 +28,11 @@ const ProposalStepper = () => {
     }
   )
 
-  // everything below can get removed when we merge syms PR
-  const [remainingRoles, signedRoles, _error, loading] = useGetUsersRolesToSignFor(proposal)
-  const authorRoles =
-    proposal?.roles?.filter((role) => {
-      return role.type === ProposalRoleType.AUTHOR && role.address === activeUser?.address
-    }) || []
-
-  const usersRoles = [...remainingRoles, ...signedRoles, ...authorRoles].map(
-    (role) => role.type
-  ) as ProposalRoleType[]
-  // end of stuff that can get removed
+  const { roles: userRoles } = useGetUsersRoles(proposalId)
+  const userRoleTypes = userRoles.map((role) => role.type)
 
   return (
-    <StepperRenderer activeUserRoles={usersRoles} className="absolute right-[-340px] top-0">
+    <StepperRenderer activeUserRoles={userRoleTypes} className="absolute right-[-340px] top-0">
       {proposal && (
         <>
           <SendStep proposal={proposal} />
