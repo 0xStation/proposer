@@ -55,7 +55,7 @@ const PaymentRow = ({
         // milestone is in progress
         getMilestoneStatus(proposal, milestone) === ProposalMilestoneStatus.IN_PROGRESS &&
         // payment is still pending
-        !payment.transtransactionHash &&
+        !payment.transactionHash &&
         // payment has been queued to Gnosis
         !!payment.data.multisigTransaction?.safeTxHash,
       onSuccess: (markedTransactionAsComplete) => {
