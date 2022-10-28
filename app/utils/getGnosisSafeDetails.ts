@@ -39,5 +39,6 @@ export const getGnosisSafeDetails = async (chainId: number, address: string, sig
     address,
     quorum: results.threshold,
     signers: results.owners,
+    version: results.version,
   }
 }

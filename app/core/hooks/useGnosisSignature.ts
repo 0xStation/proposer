@@ -4,6 +4,8 @@ import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { genGnosisTransactionDigest } from "app/signatures/gnosisTransaction"
 import networks from "app/utils/networks.json"
 import useSignature from "app/core/hooks/useSignature"
+import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
+import { getSafeContractVersion } from "../utils/getSafeContractVersion"
 
 const useGnosisSignature = (payment) => {
   const activeUser = useStore((state) => state.activeUser)
@@ -13,10 +15,22 @@ const useGnosisSignature = (payment) => {
     // prompt the Metamask signature modal
     try {
       const nonce = await getNonce()
-      const transactionData = genGnosisTransactionDigest(payment, nonce)
+      const contractVersion = await getSafeContractVersion(
+        payment.data.token.chainId,
+        payment.senderAddress
+      )
+      const transactionData = genGnosisTransactionDigest(payment, nonce, contractVersion)
 
       const signature = await signMessageHook(transactionData)
       const data = await createTransaction(signature, transactionData)
+
+      // success case returns no code, failure returns code
+      // only code returned in our experience so far is 1337 for an invalid safeTxHash value
+      if (data?.code) {
+        console.error("Gnosis signature error: " + data?.message)
+        throw Error("Gnosis signature error: " + data?.message)
+      }
+
       setToastState({
         isToastShowing: true,
         type: "success",

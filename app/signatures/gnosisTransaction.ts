@@ -1,7 +1,7 @@
 import { ZERO_ADDRESS } from "app/core/utils/constants"
 import { preparePaymentTransaction } from "app/transaction/payments"
 
-export const genGnosisTransactionDigest = (activePayment, nonce) => {
+export const genGnosisTransactionDigest = (activePayment, nonce, contractVersion) => {
   const sendTo = activePayment.recipientAddress
   const sendAmount = activePayment.amount
   const safeAddress = activePayment.senderAddress
@@ -20,7 +20,9 @@ export const genGnosisTransactionDigest = (activePayment, nonce) => {
   return {
     domain: {
       verifyingContract: safeAddress,
-      chainId: chainId,
+      // only Safe contracts from version 1.3.0 contain a chainId in the signature domain -> https://github.com/safe-global/safe-contracts/blob/186a21a74b327f17fc41217a927dea7064f74604/CHANGELOG.md#add-chainid-to-transaction-hash
+      // note that most recent version strings come in as "1.3.0+L2" which is still parseable by parseFloat by taking the first compatible float
+      ...(parseFloat(contractVersion) >= 1.3 && { chainId: chainId }),
     },
     /// @param to Destination address.
     /// @param value Ether value.
