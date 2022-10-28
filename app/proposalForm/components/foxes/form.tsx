@@ -36,7 +36,7 @@ import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
 
-export const ProposalFormTemplate = () => {
+export const ProposalFoxesForm = () => {
   const router = useRouter()
   const walletModalOpen = useStore((state) => state.walletModalOpen)
   const setToastState = useStore((state) => state.setToastState)
@@ -433,4 +433,4 @@ export const ProposalFormTemplate = () => {
   )
 }
 
-export default ProposalFormTemplate
+export default ProposalFoxesForm

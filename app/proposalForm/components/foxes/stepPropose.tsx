@@ -14,7 +14,7 @@ import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid"
 import ConnectDiscordModal from "app/core/components/ConnectDiscordModal"
 import useStore from "app/core/hooks/useStore"
 
-export const TemplateFormStepPropose = ({ formState }) => {
+export const FoxesFormStepPropose = ({ formState }) => {
   const [previewMode, setPreviewMode] = useState<boolean>(false)
   const [isDiscordModalOpen, setIsDiscordModalOpen] = useState<boolean>(false)
   const activeUser = useStore((state) => state.activeUser)
@@ -158,4 +158,4 @@ export const TemplateFormStepPropose = ({ formState }) => {
   )
 }
 
-export default TemplateFormStepPropose
+export default FoxesFormStepPropose
