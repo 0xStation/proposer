@@ -133,10 +133,10 @@ export const FoxesFormStepPropose = ({ formState }) => {
           )}
         </Field>
       )}
-      {!activeUser?.discordId && (
-        <div className="mt-6 pb-1">
-          <label className="font-bold block">Verify with Discord*</label>
-          <p className="text-concrete text-sm">Connect your Discord account to verify</p>
+      <div className="mt-6 pb-1">
+        <label className="font-bold block">Verify with Discord*</label>
+        <p className="text-concrete text-sm">Connect your Discord account to verify</p>
+        {!activeUser?.discordId ? (
           <button
             type="button"
             className="mt-3 border border-marble-white text-marble-white rounded flex flex-row py-2 px-6 hover:bg-wet-concrete"
@@ -152,8 +152,16 @@ export const FoxesFormStepPropose = ({ formState }) => {
             <Image src={DiscordIcon} alt="Discord icon" width={20} height={20} />
             <p className="pl-2">Connect Discord</p>
           </button>
-        </div>
-      )}
+        ) : (
+          <button
+            disabled
+            className="mt-3 border border-marble-white text-marble-white rounded flex flex-row py-2 px-6 opacity-70 cursor-not-allowed"
+          >
+            <Image src={DiscordIcon} alt="Discord icon" width={20} height={20} />
+            <p className="pl-2">Connected to Discord</p>
+          </button>
+        )}
+      </div>
     </>
   )
 }
