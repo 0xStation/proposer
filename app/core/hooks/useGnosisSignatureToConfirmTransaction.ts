@@ -4,6 +4,7 @@ import { genGnosisTransactionDigest } from "app/signatures/gnosisTransaction"
 import networks from "app/utils/networks.json"
 import useSignature from "app/core/hooks/useSignature"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
+import { getSafeContractVersion } from "../utils/getSafeContractVersion"
 
 const useGnosisSignatureToConfirmTransaction = (payment) => {
   const setToastState = useStore((state) => state.setToastState)
@@ -12,7 +13,10 @@ const useGnosisSignatureToConfirmTransaction = (payment) => {
   const signMessage = async () => {
     // prompt the Metamask signature modal
     try {
-      const contractVersion = await getContractVersion()
+      const contractVersion = await getSafeContractVersion(
+        payment.data.token.chainId,
+        payment.senderAddress
+      )
       const transactionData = genGnosisTransactionDigest(
         payment,
         payment.data.multisigTransaction.nonce,
@@ -73,18 +77,6 @@ const useGnosisSignatureToConfirmTransaction = (payment) => {
       })
     }
     return response
-  }
-
-  const getContractVersion = async () => {
-    const gnosisSafeDetails = await getGnosisSafeDetails(
-      payment.data.token.chainId,
-      payment.senderAddress
-    )
-    if (!gnosisSafeDetails?.version) {
-      console.error("Could not retrieve Safe contract version for: " + payment.senderAddress)
-      throw Error("Could not retrieve Safe contract version for: " + payment.senderAddress)
-    }
-    return gnosisSafeDetails.version
   }
 
   return { signMessage }
