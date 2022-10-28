@@ -45,6 +45,7 @@ const ViewProposal: BlitzPage = () => {
       enabled: !!proposalId,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
+      staleTime: 60 * 1000, // 1 minute
     }
   )
 

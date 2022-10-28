@@ -8,6 +8,7 @@ import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber
 import truncateString from "app/core/utils/truncateString"
 import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
 import {
+  AddressType,
   ProposalRoleApprovalStatus,
   ProposalRoleType,
   ProposalSignatureType,
@@ -16,28 +17,21 @@ import {
 
 const SafeRole = ({ role, proposalStatus }) => {
   const activeUser = useStore((state) => state.activeUser)
-  const [safeDetails, setSafeDetails] = useState<any | null>({})
-  const [signers, setSigners] = useState<string[]>([])
   const [toggleSigners, setToggleSigners] = useState<boolean>(false)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
 
-  const activeUserHasSigned = activeUserMeetsCriteria(activeUser, role.signatures)
-  const activeUserHasAProposalRole = activeUserMeetsCriteria(activeUser, signers)
+  const activeUserHasSigned = role.signatures.some((signature) =>
+    addressesAreEqual(signature.address, activeUser?.address)
+  )
+  const activeUserHasAProposalRole = role.account.data?.signers?.some((signer) =>
+    addressesAreEqual(signer, activeUser?.address)
+  )
+
   const showSignButton =
     proposalStatus !== ProposalStatus.DRAFT && activeUserHasAProposalRole && !activeUserHasSigned
 
-  useEffect(() => {
-    const getGnosisDetails = async () => {
-      const gnosisSafeDetails = await getGnosisSafeDetails(role.account.data.chainId, role.address)
-      setSafeDetails(gnosisSafeDetails)
-      setSigners(gnosisSafeDetails?.signers)
-    }
-
-    getGnosisDetails()
-  }, [role])
-
   const totalSafeSignersSigned = role.signatures.filter((signature) => {
-    return signers.some((signer) => {
+    return role.account.data?.signers?.some((signer) => {
       return (
         addressesAreEqual(signature.address, signer) &&
         signature.type === ProposalSignatureType.APPROVE // only count APPROVE signatures to ignore author's SEND signature
@@ -80,11 +74,11 @@ const SafeRole = ({ role, proposalStatus }) => {
                 )}
                 <ProgressCircleAndNumber
                   numerator={
-                    totalSafeSignersSigned > safeDetails?.quorum
-                      ? safeDetails?.quorum
+                    totalSafeSignersSigned > role.account.data?.quorum
+                      ? role.account.data?.quorum
                       : totalSafeSignersSigned
                   }
-                  denominator={safeDetails?.quorum}
+                  denominator={role.account.data?.quorum}
                 />
               </div>
             </div>
@@ -96,7 +90,7 @@ const SafeRole = ({ role, proposalStatus }) => {
             </p>
             {toggleSigners && (
               <ul className="text-sm">
-                {signers.map((signer, idx) => {
+                {(role.account.data?.signers || []).map((signer, idx) => {
                   return (
                     <p key={`signer-${idx}`} className="text-xs text-concrete">
                       {truncateString(signer)}
@@ -193,7 +187,7 @@ const WalletRole = ({ role, proposalStatus }) => {
 }
 
 export const RoleSignature = ({ role, proposalStatus }) => {
-  const isSafe = role?.account?.addressType === "SAFE"
+  const isSafe = role?.account?.addressType === AddressType.SAFE
 
   return (
     <>
