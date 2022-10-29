@@ -20,23 +20,15 @@ export type Step = {
 }
 
 interface StepperState {
-  activeUsersRoles: ProposalRoleType[]
   activeRole: ProposalRoleType | null
   setActiveRole: (role: ProposalRoleType) => void
-  setActiveUsersRoles: (roles: ProposalRoleType[]) => void
 }
 
 export const useStepperStore = create<StepperState>((set) => ({
-  activeUsersRoles: [],
   activeRole: null,
   setActiveRole: (state) => {
     set(() => {
       return { activeRole: state }
-    })
-  },
-  setActiveUsersRoles: (state) => {
-    set(() => {
-      return { activeUsersRoles: state }
     })
   },
 }))
@@ -51,15 +43,14 @@ const StepperRenderer = ({
   children: any
 }) => {
   const [showInfo, setShowInfo] = useState<boolean>(true)
-  const activeUsersRoles = useStepperStore((state) => state.activeUsersRoles)
   const activeRole = useStepperStore((state) => state.activeRole)
   const setActiveRole = useStepperStore((state) => state.setActiveRole)
 
   useEffect(() => {
-    if (activeUsersRoles[0]) {
-      setActiveRole(activeUsersRoles[0])
+    if (activeUserRoles[0]) {
+      setActiveRole(activeUserRoles[0])
     }
-  }, [activeUsersRoles])
+  }, [activeUserRoles])
 
   return (
     <nav aria-label="Progress" className={`bg-wet-concrete rounded-lg w-[300px] p-4 ${className}`}>
