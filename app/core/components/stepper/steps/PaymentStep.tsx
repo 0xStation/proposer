@@ -129,6 +129,7 @@ const PaymentStep = ({
     // and payment exists (typescript)
     // and there IS mutliSigTransaction data on the payment, meaning it has been queued
     // and the user has not yet signed the gnosis tx
+    // TODO: approve flashes slightly after it's first executed.
     ...(userIsSigner &&
       payment &&
       !!payment.data.multisigTransaction &&
@@ -167,8 +168,6 @@ const PaymentStep = ({
         ),
       }),
   }
-
-  console.log(actions)
 
   return (
     <>

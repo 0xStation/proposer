@@ -13,6 +13,8 @@ import { txPathString } from "app/core/utils/constants"
 import saveTransactionHashToPayments from "app/proposal/mutations/saveTransactionToPayments"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
 import SwitchNetworkView from "app/core/components/SwitchNetworkView"
+import getProposalById from "app/proposal/queries/getProposalById"
+import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 
 enum Tab {
   QUEUE_PAYMENT = "QUEUE_PAYMENT",
@@ -55,6 +57,8 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone, paym
       })
 
       invalidateQuery(getMilestonesByProposal)
+      invalidateQuery(getProposalById)
+      invalidateQuery(getGnosisTxStatus)
 
       setIsOpen(false)
       setToastState({
@@ -115,6 +119,8 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone, paym
                   paymentId: payment.id,
                 })
                 invalidateQuery(getMilestonesByProposal)
+                invalidateQuery(getProposalById)
+                invalidateQuery(getGnosisTxStatus)
                 setIsLoading(false)
                 setIsOpen(false)
               } catch (e) {

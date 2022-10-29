@@ -1,15 +1,12 @@
 import { useParam, useQuery } from "blitz"
 import getProposalById from "app/proposal/queries/getProposalById"
-import useStore from "app/core/hooks/useStore"
 import StepperRenderer from "./StepperRenderer"
 import SendStep from "./steps/SendStep"
 import ApproveStep from "./steps/ApproveStep"
 import PaymentStep from "./steps/PaymentStep"
 import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
-// import { useStepperStore } from "./StepperRenderer"
 
 const ProposalStepper = () => {
-  const activeUser = useStore((state) => state.activeUser)
   const proposalId = useParam("proposalId") as string
 
   // fetch and set proposal in data
