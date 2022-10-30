@@ -24,9 +24,11 @@ const Step = ({
   description,
   subtitle,
   actions,
+  action,
   options,
 }: {
   status: StepStatus
+  action?: JSX.Element
   actions?: ActionMapType
   description: string
   subtitle?: string
@@ -70,7 +72,8 @@ const Step = ({
             <div className="flex flex-col space-y-2 ml-4 min-w-0">
               <span className="text-sm text-marble-white">{description}</span>
               <span className="text-xs">{subtitle}</span>
-              {activeRole && actions && actions[activeRole]}
+              {action}
+              {/* {activeRole && actions && actions[activeRole]} */}
             </div>
           </span>
         </>
