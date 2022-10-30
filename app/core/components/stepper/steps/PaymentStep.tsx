@@ -5,7 +5,7 @@ import { ProposalMilestone } from "app/proposalMilestone/types"
 import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
 import QueueGnosisTransactionModal from "app/proposalPayment/components/QueueGnosisTransactionModal"
 import ApproveGnosisTransactionModal from "app/proposalPayment/components/ApproveGnosisTransactionModal"
-import PaymentAction from "../actions/paymentAction"
+import PaymentAction from "../actions/PaymentAction"
 
 import Step, { StepStatus } from "./Step"
 

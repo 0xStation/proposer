@@ -7,7 +7,7 @@ import truncateString from "../utils/truncateString"
 import { Proposal } from "app/proposal/types"
 import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
-import PaymentAction from "../components/stepper/actions/paymentAction"
+import PaymentAction from "./stepper/actions/PaymentAction"
 
 const PaymentRow = ({ payment, proposal, milestone }) => {
   return (

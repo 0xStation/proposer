@@ -1,22 +1,13 @@
-import { ProposalRoleType, ProposalStatus } from "@prisma/client"
+import { ProposalRoleType } from "@prisma/client"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import useStore from "app/core/hooks/useStore"
-import { Proposal } from "app/proposal/types"
 import useGetRolesUserCanApprove from "app/core/hooks/useGetRolesUserCanApprove"
-import Step, { StepStatus } from "./Step"
-import ApproveAction from "../actions/ApproveAction"
+import { useStepperStore } from "../StepperRenderer"
+import useStore from "app/core/hooks/useStore"
 
-const ApproveStep = ({ proposal }: { proposal: Proposal }) => {
+const ApproveAction = ({ proposal }) => {
+  const activeRole = useStepperStore((state) => state.activeRole)
   const { roles: rolesUserCanApprove } = useGetRolesUserCanApprove(proposal.id)
   const activeUserHasRolesToSign = rolesUserCanApprove.length > 0
-
-  const status =
-    proposal.status === ProposalStatus.APPROVED || proposal.status === ProposalStatus.COMPLETE
-      ? StepStatus.complete
-      : proposal.status === ProposalStatus.DRAFT
-      ? StepStatus.upcoming
-      : StepStatus.current
-
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
 
   const actions = {
@@ -36,14 +27,11 @@ const ApproveStep = ({ proposal }: { proposal: Proposal }) => {
     }),
   }
 
-  return (
-    <Step
-      description="Signers approve proposal"
-      subtitle="Reach out to signers on twitter or Discord to get proposals reviewed and approved."
-      status={status}
-      action={<ApproveAction proposal={proposal} />}
-    />
-  )
+  if (activeRole && actions[activeRole]) {
+    return actions[activeRole]
+  } else {
+    return <></>
+  }
 }
 
-export default ApproveStep
+export default ApproveAction

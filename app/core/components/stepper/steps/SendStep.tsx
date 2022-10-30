@@ -2,6 +2,7 @@ import { ProposalRoleType, ProposalStatus, Proposal } from "@prisma/client"
 import Button from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
 import Step, { StepStatus } from "./Step"
+import SendAction from "../actions/SendAction"
 
 const SendStep = ({ proposal }: { proposal: Proposal }) => {
   const status = proposal.status === ProposalStatus.DRAFT ? StepStatus.current : StepStatus.complete
@@ -14,7 +15,12 @@ const SendStep = ({ proposal }: { proposal: Proposal }) => {
   }
 
   return (
-    <Step description="Send proposal" status={status} options={{ first: true }} actions={actions} />
+    <Step
+      description="Send proposal"
+      status={status}
+      options={{ first: true }}
+      action={<SendAction />}
+    />
   )
 }
 
