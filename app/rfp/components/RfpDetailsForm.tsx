@@ -31,7 +31,7 @@ export const RfpDetailsForm = ({ rfp }) => {
     <Form
       initialValues={{
         title: rfp?.data?.content?.title,
-        submissionGuideline: rfp?.data?.content?.submissionGuideline,
+        body: rfp?.data?.content?.body,
       }}
       onSubmit={async (values: any, form) => {
         try {
@@ -39,9 +39,8 @@ export const RfpDetailsForm = ({ rfp }) => {
             rfpId: rfp?.id,
             status: rfp?.status,
             title: values?.title,
-            body: rfp?.data?.content?.body,
+            body: values.body,
             oneLiner: rfp?.data?.content?.oneLiner,
-            submissionGuideline: values.submissionGuideline,
             ...(rfp?.data?.singleTokenGate && { singleTokenGate: rfp?.data?.singleTokenGate }),
           })
         } catch (err) {
@@ -74,7 +73,7 @@ export const RfpDetailsForm = ({ rfp }) => {
               }}
             </Field>
             <label className="font-bold block mt-6">Submission guidelines</label>
-            <Field name="submissionGuideline" component="textarea">
+            <Field name="body" component="textarea">
               {({ input, meta }) => (
                 <div>
                   <textarea

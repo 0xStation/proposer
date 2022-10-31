@@ -9,7 +9,6 @@ const UpdateRfpMetadata = z.object({
   title: z.string(),
   body: z.string(),
   oneLiner: z.string(),
-  submissionGuideline: z.string().optional(),
   singleTokenGate: z
     .object({
       token: ZodToken,
@@ -29,7 +28,6 @@ export default async function updateRfpMetadata(input: z.infer<typeof UpdateRfpM
             title: params.title,
             body: params.body,
             oneLiner: params.oneLiner,
-            submissionGuideline: params.submissionGuideline,
           },
           ...(params.singleTokenGate && {
             singleTokenGate: params.singleTokenGate,
