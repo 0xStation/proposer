@@ -73,7 +73,6 @@ const Step = ({
               <span className="text-sm text-marble-white">{description}</span>
               <span className="text-xs">{subtitle}</span>
               {action}
-              {/* {activeRole && actions && actions[activeRole]} */}
             </div>
           </span>
         </>

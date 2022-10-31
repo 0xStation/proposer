@@ -9,8 +9,6 @@ import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
 const ProposalStepper = () => {
   const proposalId = useParam("proposalId") as string
 
-  // fetch and set proposal in data
-  // not actually used in this component
   const [proposal] = useQuery(
     getProposalById,
     { id: proposalId },
@@ -19,9 +17,6 @@ const ProposalStepper = () => {
       refetchOnWindowFocus: false,
       enabled: Boolean(proposalId),
       staleTime: 500,
-      onSuccess: (data) => {
-        // setProposal(data)
-      },
     }
   )
 

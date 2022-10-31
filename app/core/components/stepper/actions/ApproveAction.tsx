@@ -17,8 +17,6 @@ const ApproveAction = ({ proposal }) => {
           Approve
         </Button>
       ),
-    }),
-    ...(activeUserHasRolesToSign && {
       [ProposalRoleType.CONTRIBUTOR]: (
         <Button type={ButtonType.Secondary} onClick={() => toggleProposalApprovalModalOpen(true)}>
           Approve
