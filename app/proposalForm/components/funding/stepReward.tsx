@@ -2,7 +2,7 @@ import { useSession } from "@blitzjs/auth"
 import { useEffect, useState } from "react"
 import ImportTokenModal from "app/core/components/ImportTokenModal"
 import useStore from "app/core/hooks/useStore"
-import { FundingProposalStep, PAYMENT_TERM_MAP } from "app/core/utils/constants"
+import { ProposalFormStep, PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import { Field } from "react-final-form"
 import {
   composeValidators,
@@ -15,12 +15,13 @@ import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { formatPercentValue, formatTokenAmount } from "app/utils/formatters"
 import { PaymentTerm } from "app/proposalPayment/types"
 import WhenFieldChanges from "app/core/components/WhenFieldChanges"
+import useHasMounted from "app/core/hooks/useHasMounted"
 
 export function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-export const RewardForm = ({
+export const FundingFormStepReward = ({
   chainId,
   selectedToken,
   setSelectedToken,
@@ -35,15 +36,16 @@ export const RewardForm = ({
   const session = useSession({ suspense: false })
   const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  const { hasMounted } = useHasMounted()
 
   useEffect(() => {
     // if user's wallet isn't connected redirect back to the first step
     // the reward form relies on the active chain to determine which tokens
     // to pull from
-    if (!activeUser?.address) {
-      setProposalStep(FundingProposalStep.PROPOSE)
+    if (hasMounted && (!activeUser?.address || !session?.siwe?.address)) {
+      setProposalStep(ProposalFormStep.PROPOSE)
     }
-  }, [activeUser?.address])
+  }, [activeUser?.address, session?.siwe?.address, hasMounted])
 
   return (
     <>
@@ -235,4 +237,4 @@ export const RewardForm = ({
   )
 }
 
-export default RewardForm
+export default FundingFormStepReward

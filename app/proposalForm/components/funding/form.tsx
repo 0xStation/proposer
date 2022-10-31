@@ -1,37 +1,31 @@
+import React, { useEffect, useState } from "react"
 import { useSession } from "@blitzjs/auth"
 import { Routes } from "@blitzjs/next"
 import { useMutation, useQuery } from "@blitzjs/rpc"
 import { ProposalRoleType } from "@prisma/client"
-import useStore from "app/core/hooks/useStore"
-import { FundingProposalStep } from "app/core/utils/constants"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import Stepper from "../Stepper"
+import getTokensByAccount from "app/token/queries/getTokensByAccount"
 import { getNetworkTokens } from "app/core/utils/networkInfo"
-import createProposal from "app/proposal/mutations/createProposal"
+import FundingFormStepPropose from "./stepPropose"
+import FundingFormStepReward from "./stepReward"
+import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
 import { Proposal } from "app/proposal/types"
+import BackArrow from "app/core/icons/BackArrow"
+import useStore from "app/core/hooks/useStore"
+import createProposal from "app/proposal/mutations/createProposal"
 import { useConfirmAuthorship } from "app/proposalForm/hooks/useConfirmAuthorship"
 import { useResolveEnsAddress } from "app/proposalForm/hooks/useResolveEnsAddress"
-import getTokensByAccount from "app/token/queries/getTokensByAccount"
 import { useRouter } from "next/router"
-import React, { useEffect, useState } from "react"
 import { useNetwork } from "wagmi"
-import Stepper from "app/proposalForm/components/Stepper"
 import { Form } from "react-final-form"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { PaymentTerm } from "app/proposalPayment/types"
-import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
-import { ProposeForm } from "./proposeForm"
-import RewardForm from "./rewardForm"
-import { ConfirmForm } from "../ConfirmForm"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import BackArrow from "app/core/icons/BackArrow"
+import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
 import { isValidAdvancedPaymentPercentage } from "app/utils/validators"
+import { ConfirmForm } from "../ConfirmForm"
 
-const HeaderCopy = {
-  [FundingProposalStep.PROPOSE]: "Propose",
-  [FundingProposalStep.REWARDS]: "Define terms",
-  [FundingProposalStep.CONFIRM]: "Confirm",
-}
-
-export const ProposalFundingForm = ({
+export const ProposalFormFunding = ({
   prefillClients,
   prefillContributors,
 }: {
@@ -42,7 +36,7 @@ export const ProposalFundingForm = ({
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const walletModalOpen = useStore((state) => state.walletModalOpen)
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [proposalStep, setProposalStep] = useState<FundingProposalStep>(FundingProposalStep.PROPOSE)
+  const [proposalStep, setProposalStep] = useState<ProposalFormStep>(ProposalFormStep.PROPOSE)
   const [proposingAs, setProposingAs] = useState<string>(
     // set default proposingAs to prefilled values, choosing contributor if both provided for product bias
     prefillClients.length > 0
@@ -63,6 +57,7 @@ export const ProposalFundingForm = ({
     setShouldHandlePostProposalCreationProcessing,
   ] = useState<boolean>(false)
   const session = useSession({ suspense: false })
+  const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
   const { resolveEnsAddress } = useResolveEnsAddress()
 
@@ -116,6 +111,22 @@ export const ProposalFundingForm = ({
   )
 
   useEffect(() => {
+    // `shouldHandlePostProposalCreationProcessing` is used to retrigger this `useEffect` hook
+    // if the user declines to sign the message verifying their authorship.
+    if (createdProposal && shouldHandlePostProposalCreationProcessing) {
+      if (!proposalShouldSendLater) {
+        confirmAuthorship({ proposal: createdProposal, representingRoles: [] })
+      } else {
+        router.push(
+          Routes.ViewProposal({
+            proposalId: createdProposal.id,
+          })
+        )
+      }
+    }
+  }, [createdProposal, proposalShouldSendLater, shouldHandlePostProposalCreationProcessing])
+
+  useEffect(() => {
     if (chain?.id) {
       const networkTokens = getNetworkTokens(chain?.id || 1)
       // sets options for reward token dropdown. includes default tokens and
@@ -127,7 +138,7 @@ export const ProposalFundingForm = ({
   return (
     <div className="max-w-[580px] h-full mx-auto">
       <Stepper
-        activeStep={HeaderCopy[proposalStep]}
+        activeStep={PROPOSAL_FORM_HEADER_COPY[proposalStep]}
         steps={["Propose", "Define terms", "Confirm"]}
         className="mt-10"
       />
@@ -313,7 +324,8 @@ export const ProposalFundingForm = ({
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
 
-          const unFilledProposalFields = // has not selected who user is proposing as
+          const unFilledProposalFields =
+            // has not selected who user is proposing as
             !formState.values.proposingAs ||
             // proposing as author or client but has not filled in contributor
             (formState.values.proposingAs !== ProposalRoleType.CONTRIBUTOR &&
@@ -336,13 +348,17 @@ export const ProposalFundingForm = ({
                 ) : (
                   <>
                     <h2 className="text-marble-white text-xl font-bold">
-                      {HeaderCopy[proposalStep]}
+                      {PROPOSAL_FORM_HEADER_COPY[proposalStep]}
                     </h2>
-                    {proposalStep === FundingProposalStep.PROPOSE && (
-                      <ProposeForm proposingAs={proposingAs} setProposingAs={setProposingAs} />
+                    {proposalStep === ProposalFormStep.PROPOSE && (
+                      <FundingFormStepPropose
+                        proposingAs={proposingAs}
+                        setProposingAs={setProposingAs}
+                        formState={formState}
+                      />
                     )}
-                    {proposalStep === FundingProposalStep.REWARDS && (
-                      <RewardForm
+                    {proposalStep === ProposalFormStep.REWARDS && (
+                      <FundingFormStepReward
                         chainId={(chain?.id as number) || 1}
                         tokenOptions={tokenOptions}
                         refetchTokens={refetchTokens}
@@ -355,80 +371,78 @@ export const ProposalFundingForm = ({
                         setProposalStep={setProposalStep}
                       />
                     )}
-                    {proposalStep === FundingProposalStep.CONFIRM && <ConfirmForm />}
+                    {proposalStep === ProposalFormStep.CONFIRM && <ConfirmForm />}
                   </>
                 )}
               </div>
-              {proposalStep === FundingProposalStep.PROPOSE && (
+              {proposalStep === ProposalFormStep.PROPOSE && (
                 <Button
                   isDisabled={unFilledProposalFields}
                   className="my-6 float-right"
                   onClick={async () => {
-                    let contributorAddress
-                    let clientAddress
-                    // if proposing as contributor, take active user address
-                    // otherwise, resolve input ENS or address
-                    if (proposingAs === ProposalRoleType.CONTRIBUTOR) {
-                      contributorAddress = session?.siwe?.address
+                    if (!session?.siwe?.address || !activeUser?.address) {
+                      toggleWalletModal(true)
                     } else {
-                      contributorAddress = await resolveEnsAddress(
-                        formState.values.contributor?.trim()
-                      )
-                    }
-                    // if proposing as client, take active user address
-                    // otherwise, resolve input ENS or address
-                    if (proposingAs === ProposalRoleType.CLIENT) {
-                      clientAddress = session?.siwe?.address
-                    } else {
-                      clientAddress = await resolveEnsAddress(formState.values.client?.trim())
-                    }
+                      const contributorAddress =
+                        proposingAs === ProposalRoleType.CONTRIBUTOR
+                          ? session?.siwe?.address
+                          : await resolveEnsAddress(formState.values.contributor?.trim())
+                      // if proposing as client, take active user address
+                      // otherwise, resolve input ENS or address
 
-                    if (!contributorAddress) {
-                      setIsLoading(false)
-                      setToastState({
-                        isToastShowing: true,
-                        type: "error",
-                        message:
-                          proposingAs === ProposalRoleType.CONTRIBUTOR
-                            ? "Not signed in, please connect wallet and sign in."
-                            : "Invalid ENS name or wallet address provided.",
-                      })
-                      return
+                      const clientAddress =
+                        proposingAs === ProposalRoleType.CLIENT
+                          ? session?.siwe?.address
+                          : await resolveEnsAddress(formState.values.client?.trim())
+
+                      if (!contributorAddress) {
+                        setIsLoading(false)
+                        setToastState({
+                          isToastShowing: true,
+                          type: "error",
+                          message:
+                            proposingAs === ProposalRoleType.CONTRIBUTOR
+                              ? "Not signed in, please connect wallet and sign in."
+                              : "Invalid ENS name or wallet address provided.",
+                        })
+                        return
+                      }
+                      if (!clientAddress) {
+                        setIsLoading(false)
+
+                        setToastState({
+                          isToastShowing: true,
+                          type: "error",
+                          message:
+                            proposingAs === ProposalRoleType.CLIENT
+                              ? "Not signed in, please connect wallet and sign in."
+                              : "Invalid ENS name or wallet address provided.",
+                        })
+                        return
+                      }
+                      if (addressesAreEqual(contributorAddress, clientAddress)) {
+                        setIsLoading(false)
+                        setToastState({
+                          isToastShowing: true,
+                          type: "error",
+                          message:
+                            proposingAs !== ProposalRoleType.AUTHOR
+                              ? "Cannot propose to yourself, please propose to another address."
+                              : "Same address cannot deliver and review work, please change either address.",
+                        })
+                        return
+                      }
+                      setProposalStep(ProposalFormStep.REWARDS)
                     }
-                    if (!clientAddress) {
-                      setIsLoading(false)
-                      setToastState({
-                        isToastShowing: true,
-                        type: "error",
-                        message:
-                          proposingAs === ProposalRoleType.CLIENT
-                            ? "Not signed in, please connect wallet and sign in."
-                            : "Invalid ENS name or wallet address provided.",
-                      })
-                      return
-                    }
-                    if (addressesAreEqual(contributorAddress, clientAddress)) {
-                      setIsLoading(false)
-                      setToastState({
-                        isToastShowing: true,
-                        type: "error",
-                        message:
-                          proposingAs !== ProposalRoleType.AUTHOR
-                            ? "Cannot propose to yourself, please propose to another address."
-                            : "Same address cannot deliver and review work, please change either address.",
-                      })
-                      return
-                    }
-                    setProposalStep(FundingProposalStep.REWARDS)
                   }}
                 >
                   Next
                 </Button>
               )}
-              {proposalStep === FundingProposalStep.REWARDS && (
+              {proposalStep === ProposalFormStep.REWARDS && (
                 <div className="flex justify-between mt-6">
                   <span
-                    onClick={() => setProposalStep(FundingProposalStep.PROPOSE)}
+                    onClick={() => setProposalStep(ProposalFormStep.PROPOSE)}
                     className="cursor-pointer border rounded border-marble-white p-2 self-start"
                   >
                     <BackArrow className="fill-marble-white" />
@@ -449,17 +463,22 @@ export const ProposalFundingForm = ({
                     }
                     className="float-right"
                     onClick={() => {
-                      setProposalStep(FundingProposalStep.CONFIRM)
+                      if (!session.siwe?.address) {
+                        toggleWalletModal(true)
+                        return
+                      }
+
+                      setProposalStep(ProposalFormStep.CONFIRM)
                     }}
                   >
                     Next
                   </Button>
                 </div>
               )}
-              {proposalStep === FundingProposalStep.CONFIRM && (
+              {proposalStep === ProposalFormStep.CONFIRM && (
                 <div className="flex justify-between mt-6">
                   <span
-                    onClick={() => setProposalStep(FundingProposalStep.REWARDS)}
+                    onClick={() => setProposalStep(ProposalFormStep.REWARDS)}
                     className="cursor-pointer border rounded border-marble-white p-2 self-start"
                   >
                     <BackArrow className="fill-marble-white" />
@@ -513,4 +532,4 @@ export const ProposalFundingForm = ({
   )
 }
 
-export default ProposalFundingForm
+export default ProposalFormFunding

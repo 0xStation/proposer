@@ -13,7 +13,7 @@ export type RfpMetadata = {
     title: string
     body: string
     oneLiner: string
-    submissionGuideline?: string
+    submissionGuideline: string
   }
   singleTokenGate: {
     token: Token

@@ -4,6 +4,7 @@ import isEmail from "validator/lib/isEmail"
 import { formatPercentValue, formatTokenAmount } from "./formatters"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import { txPathString } from "app/core/utils/constants"
+import { isEns } from "app/core/utils/isEns"
 
 // reducer that takes in an array of validators (functions) and returns the appropriate error
 // useful if you have a form field that has a few different validations (required field, must be number, etc)
@@ -87,9 +88,7 @@ export const isAddress = (address: string) => {
 export const isEnsOrAddress = (text: string) => {
   if (!text) return undefined
   if (text.includes(".")) {
-    const validEnsDomains = ["eth", "xyz"]
-    const domain = text.split(".").slice(-1)[0] // grab last substring after period
-    if (domain && validEnsDomains.includes(domain)) return undefined
+    if (isEns(text)) return undefined
   }
   return ethersIsAddress(text) ? undefined : "Not a valid ENS name or address."
 }

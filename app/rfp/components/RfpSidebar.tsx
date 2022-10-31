@@ -7,7 +7,7 @@ import BackIcon from "/public/back-icon.svg"
 import TextLink from "app/core/components/TextLink"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
 import { WorkspaceTab } from "pages/workspace/[accountAddress]"
-import { getPaymentToken, getPaymentAmount, getPayments } from "app/template/utils"
+import { getPaymentToken, getPayments, getTotalPaymentAmount } from "app/template/utils"
 import RfpStatusPill from "./RfpStatusPill"
 import Button from "app/core/components/sds/buttons/Button"
 import ReadMore from "app/core/components/ReadMore"
@@ -82,18 +82,18 @@ export const RfpSidebar = ({ rfp }) => {
         {/* METADATA */}
         <div className="pt-6 flex flex-col space-y-6">
           {/* SUBMISSION GUIDELINES */}
-          {rfp?.data?.content.submissionGuideline && (
+          {!!rfp?.data?.content.body && (
             <div>
               <h4 className="text-xs font-bold text-concrete uppercase">Submission guidelines</h4>
               <ReadMore className="mt-2" maxCharLength={75}>
-                {rfp?.data?.content.submissionGuideline}
+                {rfp?.data?.content.body}
               </ReadMore>
             </div>
           )}
           {/* SUBMISSION REQUIREMENT */}
-          {!!rfp?.data?.singleTokenGate && (
-            <div>
-              <h4 className="text-xs font-bold text-concrete uppercase">Submission requirement</h4>
+          <div>
+            <h4 className="text-xs font-bold text-concrete uppercase">Submission requirement</h4>
+            {!!rfp?.data?.singleTokenGate ? (
               <div className="mt-2">
                 {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
                 <TextLink
@@ -106,8 +106,10 @@ export const RfpSidebar = ({ rfp }) => {
                   {rfp?.data?.singleTokenGate.token.name}
                 </TextLink>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="mt-2">Public</div>
+            )}
+          </div>
           {getPayments(template?.data.fields)?.length > 0 && (
             <>
               {/* NETWORK */}
@@ -125,7 +127,7 @@ export const RfpSidebar = ({ rfp }) => {
               {/* PAYMENT AMOUNT */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-                <p className="mt-2">{getPaymentAmount(template?.data?.fields)}</p>
+                <p className="mt-2">{getTotalPaymentAmount(template?.data?.fields)}</p>
               </div>
             </>
           )}

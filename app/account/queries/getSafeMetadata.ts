@@ -14,7 +14,7 @@ export default async function getSafeMetadata(input: z.infer<typeof GetSafeMetad
   if (!network) {
     throw Error("chainId not available on Gnosis")
   }
-  const url = `https://safe-transaction.${network}.gnosis.io/api/v1/safes/${toChecksumAddress(
+  const url = `https://safe-transaction.${network}.safe.global/api/v1/safes/${toChecksumAddress(
     params.address
   )}`
 

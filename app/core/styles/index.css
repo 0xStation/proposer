@@ -122,6 +122,7 @@ body {
 .markdown-prose > blockquote,
 .markdown-prose > hr {
   @apply mb-3;
+  word-break: break-word;
 }
 
 .markdown-prose h1:not(:first-child),

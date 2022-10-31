@@ -2,13 +2,18 @@ import { useRouter } from "next/router"
 import { useParam, Routes } from "@blitzjs/next"
 import { useQuery } from "@blitzjs/rpc"
 import Preview from "app/core/components/MarkdownPreview"
-import { getClientAddress, getPaymentAmount, getPaymentToken } from "app/template/utils"
+import {
+  getClientAddress,
+  getPaymentAmount,
+  getPaymentToken,
+  getTotalPaymentAmount,
+} from "app/template/utils"
 import { getNetworkName } from "app/core/utils/networkInfo"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 
-export const FoxesConfirmForm = ({ body }) => {
+export const FoxesFormStepConfirm = ({ body }) => {
   const templateId = useParam("templateId") as string
   const { rfpId } = useRouter().query
   const router = useRouter()
@@ -65,7 +70,7 @@ export const FoxesConfirmForm = ({ body }) => {
       {/* TITLE */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Title</span>
-        <span className="items-end">{`${rfp?.data.content.title} submission`}</span>
+        <span className="items-end">{`"${rfp?.data.content.title}" submission`}</span>
       </div>
       {/* NETWORK */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
@@ -82,15 +87,17 @@ export const FoxesConfirmForm = ({ body }) => {
       {/* PAYMENT AMOUNT */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Payment amount</span>
-        <span className="items-end">{getPaymentAmount(template?.data?.fields)}</span>
+        <span className="items-end">{getTotalPaymentAmount(template?.data?.fields)}</span>
       </div>
       {/* DETAILS */}
       <div className="mt-4 flex flex-col w-full">
         <span className="font-bold">Details</span>
-        <div className="mt-4 ml-6 mr-6">
+        <div className="mt-4 mx-6">
           <Preview markdown={body} />
         </div>
       </div>
     </>
   )
 }
+
+export default FoxesFormStepConfirm

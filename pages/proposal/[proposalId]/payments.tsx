@@ -48,6 +48,7 @@ export const ProposalPayments: BlitzPage = () => {
       enabled: !!proposalId,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
+      staleTime: 60 * 1000, // 1 minute
     }
   )
 
@@ -59,6 +60,7 @@ export const ProposalPayments: BlitzPage = () => {
       enabled: !!proposal?.id,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
+      staleTime: 60 * 1000, // 1 minute
     }
   )
 

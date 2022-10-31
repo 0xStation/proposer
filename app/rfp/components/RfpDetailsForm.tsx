@@ -1,7 +1,6 @@
 import { invalidateQuery, useMutation } from "@blitzjs/rpc"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
-import { mustOmitLongWords } from "app/utils/validators"
 import React from "react"
 import { Field, Form } from "react-final-form"
 import { requiredField } from "../../utils/validators"
@@ -32,23 +31,17 @@ export const RfpDetailsForm = ({ rfp }) => {
     <Form
       initialValues={{
         title: rfp?.data?.content?.title,
-        submissionGuideline: rfp?.data?.content?.submissionGuideline,
+        body: rfp?.data?.content?.body,
       }}
       onSubmit={async (values: any, form) => {
         try {
           await updateRfpMetadataMutation({
             rfpId: rfp?.id,
-            submissionGuideline: values.submissionGuideline,
             status: rfp?.status,
             title: values?.title,
-            body: rfp?.data?.content?.body,
+            body: values.body,
             oneLiner: rfp?.data?.content?.oneLiner,
-            token:
-              rfp?.data?.singleTokenGate?.token &&
-              JSON.parse(JSON.stringify(rfp?.data?.singleTokenGate?.token)),
-            minBalance:
-              rfp?.data?.singleTokenGate?.minBalance &&
-              JSON.parse(JSON.stringify(rfp?.data?.singleTokenGate?.minBalance)),
+            ...(rfp?.data?.singleTokenGate && { singleTokenGate: rfp?.data?.singleTokenGate }),
           })
         } catch (err) {
           console.error(err)
@@ -80,7 +73,7 @@ export const RfpDetailsForm = ({ rfp }) => {
               }}
             </Field>
             <label className="font-bold block mt-6">Submission guidelines</label>
-            <Field name="submissionGuideline" component="textarea" validate={mustOmitLongWords(50)}>
+            <Field name="body" component="textarea">
               {({ input, meta }) => (
                 <div>
                   <textarea

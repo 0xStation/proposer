@@ -9,7 +9,7 @@ export const getGnosisSafeDetails = async (chainId: number, address: string, sig
   if (!network) {
     throw Error("chainId not available on Gnosis")
   }
-  const url = `https://safe-transaction.${network}.gnosis.io/api/v1/safes/${toChecksumAddress(
+  const url = `https://safe-transaction.${network}.safe.global/api/v1/safes/${toChecksumAddress(
     address
   )}`
 
@@ -39,5 +39,6 @@ export const getGnosisSafeDetails = async (chainId: number, address: string, sig
     address,
     quorum: results.threshold,
     signers: results.owners,
+    version: results.version,
   }
 }

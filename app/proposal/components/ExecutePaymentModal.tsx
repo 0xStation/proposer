@@ -20,7 +20,7 @@ enum Tab {
   DIRECT_PAYMENT = "DIRECT_PAYMENT",
   ATTACH_TRANSACTION = "ATTACH_TRANSACTION",
 }
-export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
+export const ExecutePaymentModal = ({ isOpen, setIsOpen, payment, milestone }) => {
   const setToastState = useStore((state) => state.setToastState)
   const [selectedTab, setSelectedTab] = useState<Tab>(Tab.DIRECT_PAYMENT)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -37,10 +37,6 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
 
   const { chain: activeChain } = useNetwork()
   const { sendTransactionAsync } = useSendTransaction({ mode: "recklesslyUnprepared" })
-
-  // for now, only one payment per milestone
-  // once we support splits, this logic will need to support multiple payments and bundle execution to multicall contract
-  const payment = milestone?.payments[0]
 
   useEffect(() => {
     if (payment) {
@@ -277,7 +273,11 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, milestone }) => {
                 className={`${
                   selectedTab === Tab.DIRECT_PAYMENT && "border-b mb-[-1px] font-bold"
                 } cursor-pointer`}
-                onClick={() => setSelectedTab(Tab.DIRECT_PAYMENT)}
+                onClick={() => {
+                  console.log(isOpen)
+                  setSelectedTab(Tab.DIRECT_PAYMENT)
+                  console.log(isOpen)
+                }}
               >
                 Direct payment
               </span>

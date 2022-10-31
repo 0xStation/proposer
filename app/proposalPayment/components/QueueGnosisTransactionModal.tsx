@@ -6,22 +6,26 @@ import useGnosisSignature from "app/core/hooks/useGnosisSignature"
 import updatePayment from "app/proposalPayment/mutations/updatePayment"
 import useStore from "app/core/hooks/useStore"
 import { Field, Form } from "react-final-form"
+import { useNetwork } from "wagmi"
 import { composeValidators, isValidTransactionLink, requiredField } from "app/utils/validators"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import { txPathString } from "app/core/utils/constants"
 import saveTransactionHashToPayments from "app/proposal/mutations/saveTransactionToPayments"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
+import SwitchNetworkView from "app/core/components/SwitchNetworkView"
+import getProposalById from "app/proposal/queries/getProposalById"
+import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 
 enum Tab {
   QUEUE_PAYMENT = "QUEUE_PAYMENT",
   ATTACH_TRANSACTION = "ATTACH_TRANSACTION",
 }
 
-export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) => {
+export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone, payment }) => {
   const setToastState = useStore((state) => state.setToastState)
-  const activePayment = milestone.payments[0]
+  const { chain: activeChain } = useNetwork()
 
-  const { signMessage: signGnosis } = useGnosisSignature(activePayment)
+  const { signMessage: signGnosis } = useGnosisSignature(payment)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const [selectedTab, setSelectedTab] = useState<Tab>(Tab.QUEUE_PAYMENT)
@@ -53,6 +57,8 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
       })
 
       invalidateQuery(getMilestonesByProposal)
+      invalidateQuery(getProposalById)
+      invalidateQuery(getGnosisTxStatus)
 
       setIsOpen(false)
       setToastState({
@@ -103,16 +109,18 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
                   setIsLoading(false)
                   throw new Error("Signature Failed")
                 }
-                const s = await updatePaymentMutation({
+                await updatePaymentMutation({
                   multisigTransaction: {
                     transactionId: response.txId,
+                    nonce: response.detailedExecutionInfo.nonce,
                     safeTxHash: response.detailedExecutionInfo.safeTxHash,
                     address: response.safeAddress,
                   },
-                  paymentId: activePayment.id,
+                  paymentId: payment.id,
                 })
-                console.log(s)
                 invalidateQuery(getMilestonesByProposal)
+                invalidateQuery(getProposalById)
+                invalidateQuery(getGnosisTxStatus)
                 setIsLoading(false)
                 setIsOpen(false)
               } catch (e) {
@@ -145,7 +153,7 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
   }
 
   const AttachPaymentTab = () => {
-    const chainId = activePayment.data.token.chainId
+    const chainId = payment.data.token.chainId
     return (
       <>
         <h3 className="text-2xl font-bold mt-4">Attach transaction</h3>
@@ -208,26 +216,36 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone }) =>
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
-        <div className="space-x-4 text-l mt-4">
-          <span
-            className={`${
-              selectedTab === Tab.QUEUE_PAYMENT && "border-b mb-[-1px] font-bold"
-            } cursor-pointer`}
-            onClick={() => setSelectedTab(Tab.QUEUE_PAYMENT)}
-          >
-            Queue payment
-          </span>
-          <span
-            className={`${
-              selectedTab === Tab.ATTACH_TRANSACTION && "border-b mb-[-1px] font-bold"
-            } cursor-pointer`}
-            onClick={() => setSelectedTab(Tab.ATTACH_TRANSACTION)}
-          >
-            Attach transaction
-          </span>
-        </div>
-        {selectedTab === Tab.QUEUE_PAYMENT && <QueuePaymentTab />}
-        {selectedTab === Tab.ATTACH_TRANSACTION && <AttachPaymentTab />}
+        {!activeChain || activeChain.id !== payment?.data?.token.chainId ? (
+          <SwitchNetworkView
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            chainId={payment?.data?.token.chainId}
+          />
+        ) : (
+          <>
+            <div className="space-x-4 text-l mt-4">
+              <span
+                className={`${
+                  selectedTab === Tab.QUEUE_PAYMENT && "border-b mb-[-1px] font-bold"
+                } cursor-pointer`}
+                onClick={() => setSelectedTab(Tab.QUEUE_PAYMENT)}
+              >
+                Queue payment
+              </span>
+              <span
+                className={`${
+                  selectedTab === Tab.ATTACH_TRANSACTION && "border-b mb-[-1px] font-bold"
+                } cursor-pointer`}
+                onClick={() => setSelectedTab(Tab.ATTACH_TRANSACTION)}
+              >
+                Attach transaction
+              </span>
+            </div>
+            {selectedTab === Tab.QUEUE_PAYMENT && <QueuePaymentTab />}
+            {selectedTab === Tab.ATTACH_TRANSACTION && <AttachPaymentTab />}
+          </>
+        )}
       </div>
     </Modal>
   )

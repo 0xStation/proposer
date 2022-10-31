@@ -42,10 +42,9 @@ import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber
 import { Account } from "app/account/types"
 import { isAddress } from "ethers/lib/utils"
 import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
-import RfpStatusPill from "app/rfp/components/RfpStatusPill"
-import { getPaymentAmount, getPaymentToken } from "app/template/utils"
 import getRfpCountForAccount from "app/rfp/queries/getRfpCountForAccount"
 import getProposalCountForAccount from "app/proposal/queries/getProposalCountForAccount"
+import { RfpCard } from "app/rfp/components/RfpCard"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
@@ -81,7 +80,8 @@ const WorkspaceHome: BlitzPage = () => {
   const accountAddress = useParam("accountAddress", "string") as string
   const queryParams = useRouter().query
   const tab = queryParams?.tab as string
-
+  const [isDiscordModalOpen, setIsDiscordModalOpen] = useState<boolean>(false)
+  const [newAuth, setNewAuth] = useState<string>("")
   const activeUser = useStore((state) => state.activeUser)
   const accountData = useAccount()
   const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
@@ -179,7 +179,20 @@ const WorkspaceHome: BlitzPage = () => {
 
     return (
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
-        <h1 className="text-2xl font-bold">Proposals</h1>
+        <div className="flex flex-row justify-between">
+          <h1 className="text-2xl font-bold">Proposals</h1>
+          <Link
+            href={Routes.ProposalTypeSelection({
+              // pre-fill for both so that if user changes toggle to reverse roles, the input address is still there
+              clients: accountEnsName || accountAddress,
+              contributors: accountEnsName || accountAddress,
+            })}
+          >
+            <Button className="w-full px-10" overrideWidthClassName="max-w-fit">
+              Propose
+            </Button>
+          </Link>
+        </div>
         {/* FILTERS & PAGINATION */}
         <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">
           {/* FILTERS */}
@@ -368,27 +381,6 @@ const WorkspaceHome: BlitzPage = () => {
       }
     )
 
-    const RfpCard = ({ rfp }) => {
-      return (
-        <Link href={Routes.RfpDetail({ rfpId: rfp.id })}>
-          <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden flex flex-col justify-between bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer">
-            <div>
-              <RfpStatusPill status={rfp.status} />
-              <h2 className="text-xl font-bold mt-4">{rfp?.data?.content.title || ""}</h2>
-            </div>
-            <div className="flex flex-row mt-4 justify-between">
-              <span>
-                {" "}
-                <p className="inline">{getPaymentAmount(rfp?.template?.data?.fields)} </p>
-                <p className="inline">{getPaymentToken(rfp?.template?.data?.fields)?.symbol}</p>
-              </span>
-              <span>{rfp?._count.proposals} proposals</span>
-            </div>
-          </div>
-        </Link>
-      )
-    }
-
     return (
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
         <h1 className="text-2xl font-bold">RFPs</h1>
@@ -427,7 +419,7 @@ const WorkspaceHome: BlitzPage = () => {
           {rfps &&
             rfps?.length > 0 &&
             rfps?.map((rfp, idx) => {
-              return <RfpCard key={idx} rfp={rfp} />
+              return <RfpCard key={idx} rfp={rfp} href={Routes.RfpDetail({ rfpId: rfp.id })} />
             })}
           {/* RFP LOADING */}
           {!rfps &&
@@ -452,7 +444,7 @@ const WorkspaceHome: BlitzPage = () => {
                 Unlock this feature by sending a proposal to Station Helpdesk.
               </p>
               <Link
-                href={Routes.CreateNonFundingProposal({
+                href={Routes.ProposalNewIdea({
                   clients: "station-helpdesk.eth",
                   title: "Requesting RFP access for " + accountAddress,
                 })}
@@ -469,9 +461,9 @@ const WorkspaceHome: BlitzPage = () => {
 
   const SettingsTab = () => {
     return (
-      <div className="h-[calc(100vh-240px)] p-10 flex-1">
+      <div className="overflow-auto p-10 flex-1">
         <h1 className="text-2xl font-bold">Settings</h1>
-        <div className="mt-12">
+        <div className="mt-10">
           <WorkspaceSettingsOverviewForm account={account as Account} isEdit={true} />
         </div>
       </div>
@@ -495,7 +487,7 @@ const WorkspaceHome: BlitzPage = () => {
               />
             )}
             {/* CTA */}
-            {
+            {/* {
               // activeTab !== WorkspaceTab.RFPS &&
               <Link
                 href={Routes.ProposalTypeSelection({
@@ -506,7 +498,7 @@ const WorkspaceHome: BlitzPage = () => {
               >
                 <Button className="w-full">Propose</Button>
               </Link>
-            }
+            } */}
           </div>
           {/* TABS */}
           <ul className="mt-6 space-y-2">

@@ -56,11 +56,9 @@ export default async function getGnosisTxStatus(params: z.infer<typeof GetGnosis
       // we probably don't need this entire chain of trues and falses though
       // we are not even consuming the response from this function right now
       if (e.message.includes("proposal is not on milestone:")) {
-        return true
+        // doesn't really matter we arent doing anything wtih results anyways
       }
-      return false
     }
-    return true
   }
-  return false
+  return results
 }

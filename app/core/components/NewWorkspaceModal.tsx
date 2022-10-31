@@ -3,9 +3,8 @@ import { useRouter } from "next/router"
 import { useMutation, invoke } from "@blitzjs/rpc"
 import { useEffect, useState } from "react"
 import Modal from "./sds/overlays/modal"
-import Select from "./form/Select"
 import Button from "./sds/buttons/Button"
-import { Form } from "react-final-form"
+import { Form, Field } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import createSafe from "app/account/mutations/createSafe"
 import { Account } from "app/account/types"
@@ -89,7 +88,7 @@ export const NewWorkspaceModal = ({
           onSubmit={(values) => {
             try {
               createSafeMutation({
-                address: values.safeAddress.value,
+                address: values.safeAddress,
                 chainId: activeChain.id,
               })
             } catch (e) {
@@ -111,7 +110,24 @@ export const NewWorkspaceModal = ({
                   selected network. Change your network in the upper-right corner of this page to
                   the left of your profile.
                 </span>
-                <Select name="safeAddress" options={safes} placeholder="Select one" />
+
+                <Field
+                  placeholder="Select a Gnosis Safe"
+                  name="safeAddress"
+                  component="select"
+                  className="w-full bg-wet-concrete p-2 rounded text-marble-white"
+                >
+                  <option value="" disabled selected>
+                    Select a safe
+                  </option>
+                  {safes.map((safe: any, idx) => {
+                    return (
+                      <option key={idx} value={safe.value}>
+                        {safe.label}
+                      </option>
+                    )
+                  })}
+                </Field>
                 <div className="mt-6 flex justify-end">
                   <div className="flex flex-col">
                     <Button

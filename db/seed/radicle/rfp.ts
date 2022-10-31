@@ -6,8 +6,7 @@ const seed = async () => {
   const rfps = [
     {
       title: "Contribute ideas to the Radicle x Giveth partnership",
-      submissionGuideline:
-        "Radicle is partnering with Giveth, a community focused on Building the Future of Giving, to reimagine donation on the blockchain. We're inviting developers and contributor members of the Radicle and Giveth community to propose ideas on how the two ecosystems can best work together.",
+      body: "Radicle is partnering with Giveth, a community focused on Building the Future of Giving, to reimagine donation on the blockchain. We're inviting developers and contributor members of the Radicle and Giveth community to propose ideas on how the two ecosystems can best work together.",
       templateId: TEMPLATES.RADICLE.GIVETH_IDEAS.id,
     },
   ]
@@ -20,9 +19,8 @@ const seed = async () => {
         data: {
           content: {
             title: rfp.title,
-            body: "",
             oneLiner: "",
-            submissionGuideline: rfp.submissionGuideline,
+            body: rfp.body,
           },
         },
       }

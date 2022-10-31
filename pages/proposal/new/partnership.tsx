@@ -1,20 +1,25 @@
 import { useRouter } from "next/router"
 import { BlitzPage } from "@blitzjs/next"
 import Layout from "app/core/layouts/Layout"
-import ProposalFundingForm from "app/proposalForm/components/funding/form"
+import ProposalFormPartnership from "app/proposalForm/components/partnership/form"
 
-const CreateFundingProposal: BlitzPage = () => {
+const ProposalNewPartnership: BlitzPage = () => {
   const queryParams = useRouter().query
   const clients = (queryParams?.clients as string)?.split(",").filter((s) => !!s) || []
   const contributors = (queryParams?.contributors as string)?.split(",").filter((s) => !!s) || []
+  const title = queryParams?.title as string
 
   return (
     <Layout title="New Proposal">
-      <ProposalFundingForm prefillClients={clients} prefillContributors={contributors} />
+      <ProposalFormPartnership
+        prefillClients={clients}
+        prefillContributors={contributors}
+        prefillTitle={title}
+      />
     </Layout>
   )
 }
 
-CreateFundingProposal.suppressFirstRenderFlicker = true
+ProposalNewPartnership.suppressFirstRenderFlicker = true
 
-export default CreateFundingProposal
+export default ProposalNewPartnership

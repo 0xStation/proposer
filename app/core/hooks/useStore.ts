@@ -6,6 +6,10 @@ interface StoreState {
   activeUser: undefined | Account | null
   walletModalOpen: boolean
   accountModalOpen: boolean
+  executePaymentModalMap: any
+  queueGnosisTransactionModalMap: any
+  approveGnosisTransactionModalMap: any
+  executePaymentModalOpen: boolean
   proposalApprovalModalOpen: boolean
   sendProposalModalOpen: boolean
   toastState: {
@@ -16,6 +20,10 @@ interface StoreState {
   activeChain: Chain | undefined
   toggleWalletModal: (boolean) => void
   toggleAccountModal: (boolean) => void
+  toggleApproveGnosisTransactionModalMap: ({ open, id }) => void
+  toggleQueueGnosisTransactionModalMap: ({ open, id }) => void
+  toggleExecutePaymentModalMap: ({ open, id }) => void
+  toggleExecutePaymentModalOpen: (boolean) => void
   toggleProposalApprovalModalOpen: (boolean) => void
   toggleSendProposalModalOpen: (boolean) => void
   setToastState: (toastState: any) => void
@@ -27,6 +35,10 @@ const useStore = create<StoreState>((set) => ({
   activeUser: undefined, // undefined on start, Account if found, null if not found
   walletModalOpen: false,
   accountModalOpen: false,
+  approveGnosisTransactionModalMap: {},
+  queueGnosisTransactionModalMap: {},
+  executePaymentModalMap: {},
+  executePaymentModalOpen: false,
   proposalApprovalModalOpen: false,
   sendProposalModalOpen: false,
   activeChain: undefined,
@@ -48,6 +60,41 @@ const useStore = create<StoreState>((set) => ({
   toggleAccountModal: (state) => {
     set(() => {
       return { accountModalOpen: state }
+    })
+  },
+  toggleApproveGnosisTransactionModalMap: ({ open, id }) => {
+    set((state) => {
+      return {
+        approveGnosisTransactionModalMap: {
+          ...state.approveGnosisTransactionModalMap,
+          [id]: open,
+        },
+      }
+    })
+  },
+  toggleQueueGnosisTransactionModalMap: ({ open, id }) => {
+    set((state) => {
+      return {
+        queueGnosisTransactionModalMap: {
+          ...state.queueGnosisTransactionModalMap,
+          [id]: open,
+        },
+      }
+    })
+  },
+  toggleExecutePaymentModalMap: ({ open, id }) => {
+    set((state) => {
+      return {
+        executePaymentModalMap: {
+          ...state.executePaymentModalMap,
+          [id]: open,
+        },
+      }
+    })
+  },
+  toggleExecutePaymentModalOpen: (state) => {
+    set(() => {
+      return { executePaymentModalOpen: state }
     })
   },
   toggleProposalApprovalModalOpen: (state) => {

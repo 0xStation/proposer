@@ -42,6 +42,12 @@ export const getPaymentAmount = (template: ProposalTemplateField[] | undefined):
   return getPayments(template)?.[0]?.amount
 }
 
+export const getTotalPaymentAmount = (template: ProposalTemplateField[] | undefined): number => {
+  return getPayments(template)
+    ?.map((payment) => payment.amount)
+    .reduce((acc, val) => acc + val, 0)
+}
+
 export const getMinNumWords = (template: ProposalTemplateField[] | undefined): number => {
   return getField(template, RESERVED_KEYS.BODY)?.validation?.[0]?.args[0] || 0
 }

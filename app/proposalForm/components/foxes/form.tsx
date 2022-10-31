@@ -13,9 +13,9 @@ import { useConfirmAuthorship } from "app/proposalForm/hooks/useConfirmAuthorshi
 import { addressesAreEqual } from "../../../core/utils/addressesAreEqual"
 import createProposal from "app/proposal/mutations/createProposal"
 import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
-import { FoxesProposeFirstStep } from "./proposeForm"
 import deleteProposalById from "app/proposal/mutations/deleteProposalById"
-import { FoxesConfirmForm } from "./confirmForm"
+import FoxesFormStepPropose from "app/proposalForm/components/foxes/stepPropose"
+import FoxesFormStepConfirm from "app/proposalForm/components/foxes/stepConfirm"
 import { AddressType, ProposalRoleType } from "@prisma/client"
 import { mustBeAboveNumWords } from "app/utils/validators"
 import {
@@ -29,23 +29,14 @@ import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
 import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinTokenBalance"
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
+import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
 
-enum FundingProposalStep {
-  PROPOSE = "PROPOSE",
-  CONFIRM = "CONFIRM",
-}
-
-const HeaderCopy = {
-  [FundingProposalStep.PROPOSE]: "Propose",
-  [FundingProposalStep.CONFIRM]: "Confirm",
-}
-
-export const FoxesProposalForm = () => {
+export const ProposalFoxesForm = () => {
   const router = useRouter()
   const walletModalOpen = useStore((state) => state.walletModalOpen)
   const setToastState = useStore((state) => state.setToastState)
   const activeUser = useStore((state) => state.activeUser)
-  const [proposalStep, setProposalStep] = useState<FundingProposalStep>(FundingProposalStep.PROPOSE)
+  const [proposalStep, setProposalStep] = useState<ProposalFormStep>(ProposalFormStep.PROPOSE)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [proposalShouldSendLater, setProposalShouldSendLater] = useState<boolean>(false)
@@ -200,7 +191,7 @@ export const FoxesProposalForm = () => {
   return (
     <div className="max-w-[580px] min-w-[580px] h-full mx-auto">
       <Stepper
-        activeStep={HeaderCopy[proposalStep]}
+        activeStep={PROPOSAL_FORM_HEADER_COPY[proposalStep]}
         steps={["Propose", "Confirm"]}
         className="mt-10"
       />
@@ -255,7 +246,7 @@ export const FoxesProposalForm = () => {
 
               await createProposalMutation({
                 rfpId: rfp?.id,
-                contentTitle: `${rfp?.data.content.title} submission`,
+                contentTitle: `"${rfp?.data.content.title}" submission`,
                 contentBody: values.body,
                 authorAddresses: [contributorAddress],
                 contributorAddresses: [contributorAddress],
@@ -302,7 +293,7 @@ export const FoxesProposalForm = () => {
                   if (!createdProposal) {
                     if (dirty && !unsavedChanges) {
                       setUnsavedChanges(true)
-                    } else if (proposalStep === FundingProposalStep.CONFIRM) {
+                    } else if (proposalStep === ProposalFormStep.CONFIRM) {
                       // currently there are no fields on the form so formspy indicates
                       // that the form is pristine when it's not rendered
                       setUnsavedChanges(true)
@@ -321,16 +312,18 @@ export const FoxesProposalForm = () => {
                 ) : (
                   <>
                     <h2 className="text-marble-white text-xl font-bold">
-                      {HeaderCopy[proposalStep]}
+                      {PROPOSAL_FORM_HEADER_COPY[proposalStep]}
                     </h2>
-                    {proposalStep === FundingProposalStep.PROPOSE && <FoxesProposeFirstStep />}
-                    {proposalStep === FundingProposalStep.CONFIRM && (
-                      <FoxesConfirmForm body={formState.values.body} />
+                    {proposalStep === ProposalFormStep.PROPOSE && (
+                      <FoxesFormStepPropose formState={formState} />
+                    )}
+                    {proposalStep === ProposalFormStep.CONFIRM && (
+                      <FoxesFormStepConfirm body={formState.values.body} />
                     )}
                   </>
                 )}
               </div>
-              {proposalStep === FundingProposalStep.PROPOSE && (
+              {proposalStep === ProposalFormStep.PROPOSE && (
                 <div className="my-6 float-right flex flex-col space-y-1 items-end">
                   <Button
                     isDisabled={
@@ -340,8 +333,9 @@ export const FoxesProposalForm = () => {
                         (isTokenGatingCheckLoading ||
                           (isTokenGatingCheckComplete && !userHasRequiredToken)))
                     }
-                    isLoading={Boolean(activeUser?.address) && isTokenGatingCheckLoading}
-                    onClick={async () => {
+                    isLoading={isTokenGatingCheckLoading}
+                    onClick={async (e) => {
+                      e.preventDefault()
                       if (!session.siwe?.address) {
                         toggleWalletModal(true)
                       } else if (!!rfp?.data?.singleTokenGate && !userHasRequiredToken) {
@@ -350,14 +344,21 @@ export const FoxesProposalForm = () => {
                           type: "error",
                           message: "You do not own the required tokens to submit to this RFP.",
                         })
+                      } else if (!activeUser?.discordId) {
+                        setToastState({
+                          isToastShowing: true,
+                          type: "error",
+                          message:
+                            "Please verify your Discord account to move on to the next step.",
+                        })
                       } else if (session.siwe?.address) {
-                        setProposalStep(FundingProposalStep.CONFIRM)
+                        setProposalStep(ProposalFormStep.CONFIRM)
                       }
                     }}
                   >
                     Next
                   </Button>
-                  {isTokenGatingCheckComplete && !userHasRequiredToken && (
+                  {!userHasRequiredToken && (
                     <span className="text-xs text-concrete">
                       Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
                       RFP.
@@ -365,10 +366,10 @@ export const FoxesProposalForm = () => {
                   )}
                 </div>
               )}
-              {proposalStep === FundingProposalStep.CONFIRM && (
+              {proposalStep === ProposalFormStep.CONFIRM && (
                 <div className="flex justify-between mt-6">
                   <span
-                    onClick={() => setProposalStep(FundingProposalStep.PROPOSE)}
+                    onClick={() => setProposalStep(ProposalFormStep.PROPOSE)}
                     className="cursor-pointer border rounded border-marble-white p-2 self-start"
                   >
                     <BackArrow className="fill-marble-white" />
@@ -389,13 +390,17 @@ export const FoxesProposalForm = () => {
                         e.preventDefault()
                         setIsLoading(true)
                         if (!session.siwe?.address) {
+                          setIsLoading(false)
                           toggleWalletModal(true)
+                          return
                         } else if (!!rfp?.data?.singleTokenGate && !userHasRequiredToken) {
                           setToastState({
                             isToastShowing: true,
                             type: "error",
                             message: "You do not own the required tokens to submit to this RFP.",
                           })
+                          setIsLoading(false)
+                          return
                         } else if (session.siwe?.address) {
                           if (createdProposal) {
                             setShouldHandlePostProposalCreationProcessing(true)
@@ -424,4 +429,4 @@ export const FoxesProposalForm = () => {
   )
 }
 
-export default FoxesProposalForm
+export default ProposalFoxesForm

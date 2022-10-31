@@ -18,7 +18,7 @@ const Explore: BlitzPage = () => {
   const [page, setPage] = useState<number>(0)
   const [tab, setTab] = useState<Tab>(Tab.ORGANIZATIONS)
 
-  const [accounts] = useQuery(
+  const [accountTransaction] = useQuery(
     getAllAccounts,
     {
       page: page,
@@ -50,7 +50,10 @@ const Explore: BlitzPage = () => {
               className={`${
                 tab === Tab.ORGANIZATIONS && "border-b mb-[-1px] font-bold"
               } cursor-pointer`}
-              onClick={() => setTab(Tab.ORGANIZATIONS)}
+              onClick={() => {
+                setTab(Tab.ORGANIZATIONS)
+                setPage(0)
+              }}
             >
               Organizations
             </span>
@@ -58,15 +61,18 @@ const Explore: BlitzPage = () => {
               className={`${
                 tab === Tab.INDIVIDUALS && "border-b mb-[-1px] font-bold"
               } cursor-pointer`}
-              onClick={() => setTab(Tab.INDIVIDUALS)}
+              onClick={() => {
+                setTab(Tab.INDIVIDUALS)
+                setPage(0)
+              }}
             >
               Individuals
             </span>
           </div>
 
           <Pagination
-            results={accounts as any[]}
-            resultsCount={accounts?.length as number}
+            results={accountTransaction?.accounts as any[]}
+            resultsCount={accountTransaction?.count as number}
             page={page}
             setPage={setPage}
             resultsLabel={tab.toString().toLowerCase()}
@@ -84,8 +90,8 @@ const Explore: BlitzPage = () => {
           </thead>
           {/* Rows */}
           <tbody>
-            {accounts &&
-              accounts.map((account, idx) => {
+            {accountTransaction?.accounts &&
+              accountTransaction.accounts.map((account, idx) => {
                 return (
                   <Link
                     href={Routes.WorkspaceHome({ accountAddress: account.address as string })}
@@ -102,7 +108,7 @@ const Explore: BlitzPage = () => {
               })}
           </tbody>
         </table>
-        {!accounts &&
+        {!accountTransaction?.accounts &&
           Array.from(Array(10)).map((idx) => (
             <div
               key={idx}
