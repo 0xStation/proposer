@@ -1,4 +1,4 @@
-import ProposalStepper from "app/proposal/components/ProposalStepper"
+import ProposalStepper from "app/core/components/stepper/ProposalStepper"
 import { ProposalViewHeaderNavigation } from "app/proposal/components/viewPage/ProposalViewHeaderNavigation"
 
 export const ProposalNestedLayout = ({ children }) => {

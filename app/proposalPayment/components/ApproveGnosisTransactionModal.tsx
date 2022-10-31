@@ -8,6 +8,8 @@ import { ProposalPayment } from "app/proposalPayment/types"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
 import { useNetwork } from "wagmi"
 import SwitchNetworkView from "app/core/components/SwitchNetworkView"
+import getProposalById from "app/proposal/queries/getProposalById"
+import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 
 export const ApproveGnosisTransactionModal = ({
   isOpen,
@@ -53,6 +55,8 @@ export const ApproveGnosisTransactionModal = ({
               try {
                 await signGnosis()
                 invalidateQuery(getMilestonesByProposal)
+                invalidateQuery(getProposalById)
+                invalidateQuery(getGnosisTxStatus)
                 setIsLoading(false)
                 setIsOpen(false)
               } catch (e) {
