@@ -96,6 +96,7 @@ const PaymentAction = ({ proposal, milestone }) => {
           <Button
             type={ButtonType.Secondary}
             onClick={() => toggleQueueGnosisTransactionModalMap({ open: true, id: payment.id })}
+            overrideWidthClassName="w-full px-4"
           >
             Queue transaction
           </Button>
@@ -115,6 +116,7 @@ const PaymentAction = ({ proposal, milestone }) => {
           <Button
             type={ButtonType.Secondary}
             onClick={() => toggleApproveGnosisTransactionModalMap({ open: true, id: payment.id })}
+            overrideWidthClassName="w-full px-4"
           >
             Approve
           </Button>
@@ -136,7 +138,7 @@ const PaymentAction = ({ proposal, milestone }) => {
             target="_blank"
             rel="noreferrer"
           >
-            <button className="mt-4 mb-2 sm:mb-0 border rounded px-4 h-[35px] bg-electric-violet border-electric-violet text-tunnel-black">
+            <button className="mb-2 sm:mb-0 border rounded px-4 h-[35px] bg-electric-violet border-electric-violet text-tunnel-black w-full">
               Execute on Gnosis
               <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
             </button>

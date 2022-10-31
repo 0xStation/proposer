@@ -38,7 +38,9 @@ const PaymentRow = ({ payment, proposal, milestone }) => {
           )}
         </span>
       </div>
-      <PaymentAction proposal={proposal} milestone={milestone} />
+      <div className="mt-4">
+        <PaymentAction proposal={proposal} milestone={milestone} />
+      </div>
     </>
   )
 }
