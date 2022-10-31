@@ -105,13 +105,13 @@ const ProposalTemplateForm: BlitzPage = () => {
             {/* METADATA */}
             <div className="mt-12 pt-6 flex flex-col space-y-6">
               {/* SUBMISSION GUIDELINES */}
-              {rfp?.data?.content.submissionGuideline && (
+              {!!rfp?.data?.content.body && (
                 <div>
                   <h4 className="text-xs font-bold text-concrete uppercase">
                     Submission guidelines
                   </h4>
                   <ReadMore className="mt-2" maxCharLength={75}>
-                    {rfp?.data?.content.submissionGuideline}
+                    {rfp?.data?.content.body}
                   </ReadMore>
                 </div>
               )}

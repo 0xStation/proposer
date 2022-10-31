@@ -6,14 +6,12 @@ const seed = async () => {
   const rfps = [
     {
       title: "Design Uniswap’s POAP",
-      submissionGuideline:
-        "Designing Uniswap’s POAP based on Uniswap’s [brand guideline](https://uniswap.org/blog/brand-update).",
+      body: "Designing Uniswap’s POAP based on Uniswap’s [brand guideline](https://uniswap.org/blog/brand-update).",
       templateId: TEMPLATES.UNISWAP.POAP_DESIGN.id,
     },
     {
       title: "Draft Uniswap community newsletter",
-      submissionGuideline:
-        "Looking for writers, designers, and editors to create and maintain Uniswap’s community newsletter. ",
+      body: "Looking for writers, designers, and editors to create and maintain Uniswap’s community newsletter. ",
       templateId: TEMPLATES.UNISWAP.COMMUNITY_NEWSLETTER.id,
     },
   ]
@@ -26,9 +24,8 @@ const seed = async () => {
         data: {
           content: {
             title: rfp.title,
-            body: "",
             oneLiner: "",
-            submissionGuideline: rfp.submissionGuideline,
+            body: rfp.body,
           },
         },
       }

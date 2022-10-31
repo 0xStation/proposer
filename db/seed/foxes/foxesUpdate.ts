@@ -19,10 +19,8 @@ const seed = async () => {
           ...Object(rfp.data),
           content: {
             title: rfp.data?.content?.title,
-            body: "",
             oneLiner: "",
-            submissionGuideline:
-              "Please make sure your submission is 125+ words, and double check for typos.\n\nSubmissions should be fully aligned with, and inclusive of, already established Philosophical Foxes lore. The best entries will connect to other entries in a way that expands the known lore and creates new connections that were previously unknown. Entries should be written in the voice of fox historians in the future. This means that they can be opinionated and inclusive of knowledge not yet known to our current generation of foxes. [Learn more](https://mirror.xyz/0x643D06108d4694605B266DFd85B1816BacCFb55D/JB2RzZZEkFDbC1E6LI7zCgiJ1zJ2NReW8LAzZ0OAugQ).",
+            body: "Please make sure your submission is 125+ words, and double check for typos.\n\nSubmissions should be fully aligned with, and inclusive of, already established Philosophical Foxes lore. The best entries will connect to other entries in a way that expands the known lore and creates new connections that were previously unknown. Entries should be written in the voice of fox historians in the future. This means that they can be opinionated and inclusive of knowledge not yet known to our current generation of foxes. [Learn more](https://mirror.xyz/0x643D06108d4694605B266DFd85B1816BacCFb55D/JB2RzZZEkFDbC1E6LI7zCgiJ1zJ2NReW8LAzZ0OAugQ).",
           },
           singleTokenGate: {
             token: {
