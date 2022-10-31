@@ -7,7 +7,7 @@ import { PaymentTerm } from "app/proposalPayment/types"
 
 const CreateRfp = z.object({
   title: z.string(),
-  submissionGuidelines: z.string(),
+  body: z.string(),
   associatedAccountAddress: z.string(),
   preselectClientAddress: z.string().optional(),
   preselectContributorAddress: z.string().optional(),
@@ -156,9 +156,8 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
     const rfpMetadata = {
       content: {
         title: params.title,
-        body: "",
+        body: params.body,
         oneLiner: "",
-        submissionGuidelines: params.submissionGuidelines,
       },
       singleTokenGate: params.singleTokenGate,
     }

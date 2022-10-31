@@ -30,3 +30,20 @@ export const formatPercentValue = (value: string): string => {
 
   return decimalCapped
 }
+
+// only register typing 0-9
+export const formatPositiveInt = (amount: string): string => {
+  // strip commas for case where input is pasted from another page
+  const commaStripped = (amount || "").replaceAll(",", "")
+  // remove zero pad
+  const zeroStripped =
+    commaStripped.substring(0, 1) === "0"
+      ? commaStripped.substring(1, commaStripped.length)
+      : commaStripped
+  // supports one or no period, plus/minus sign not supported, forked from: https://regexland.com/regex-decimal-numbers/
+  const integerRegex = /([0-9]+)/
+  const regexMatches = zeroStripped.match(integerRegex) || [""]
+  // only keep the first match i.e. throw away non-matching characters/sequences
+  const parsedValue = regexMatches[0]!
+  return parsedValue
+}

@@ -5,7 +5,7 @@ import { useMutation, useQuery } from "@blitzjs/rpc"
 import { useParam, Routes } from "@blitzjs/next"
 import { useSession } from "@blitzjs/auth"
 import Button from "app/core/components/sds/buttons/Button"
-import Stepper from "../Stepper"
+import FormHeaderStepper from "app/core/components/FormHeaderStepper"
 import BackArrow from "app/core/icons/BackArrow"
 import useStore from "app/core/hooks/useStore"
 import { Proposal } from "app/proposal/types"
@@ -190,7 +190,7 @@ export const ProposalFormTemplate = () => {
 
   return (
     <div className="max-w-[580px] min-w-[580px] h-full mx-auto">
-      <Stepper
+      <FormHeaderStepper
         activeStep={PROPOSAL_FORM_HEADER_COPY[proposalStep]}
         steps={["Propose", "Confirm"]}
         className="mt-10"

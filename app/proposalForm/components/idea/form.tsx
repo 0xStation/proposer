@@ -5,7 +5,7 @@ import { useRouter } from "next/router"
 import React, { useState, useEffect } from "react"
 import { Form } from "react-final-form"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import Stepper from "../Stepper"
+import FormHeaderStepper from "app/core/components/FormHeaderStepper"
 import BackArrow from "app/core/icons/BackArrow"
 import useStore from "app/core/hooks/useStore"
 import { Proposal } from "app/proposal/types"
@@ -96,7 +96,7 @@ export const ProposalFormIdea = ({
 
   return (
     <div className="max-w-[580px] h-full mx-auto">
-      <Stepper
+      <FormHeaderStepper
         activeStep={PROPOSAL_FORM_HEADER_COPY[proposalStep]}
         steps={["Propose", "Confirm"]}
         className="mt-10"
