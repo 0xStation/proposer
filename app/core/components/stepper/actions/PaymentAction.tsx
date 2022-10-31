@@ -73,9 +73,12 @@ const PaymentAction = ({ proposal, milestone }) => {
     }
   }, [userIsSigner, gnosisTxStatus])
 
+  const paymentComplete = !!payment.transactionHash
+
   const actions = {
     ...(userIsPayer &&
-      payment && {
+      payment &&
+      !paymentComplete && {
         [ProposalRoleType.CLIENT]: (
           <Button
             type={ButtonType.Secondary}
