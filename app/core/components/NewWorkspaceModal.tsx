@@ -83,12 +83,10 @@ export const NewWorkspaceModal = ({
       }}
     >
       <div className="p-6">
-        <h1 className="text-2xl font-bold">Create a new workspace</h1>
+        <h1 className="text-2xl font-bold">Create a new multi-sig account</h1>
         <p className="text-base mt-6">
           Select a <TextLink url={LINKS.GNOSIS_SAFE}>Gnosis Safe </TextLink>
-          address that you would like to govern the workspace. If you are looking to create a
-          workspace with another personal wallet, connect your wallet to a new address and sign in
-          again.
+          address you're an admin of to govern the account.
         </p>
         <Form
           initialValues={{}}
