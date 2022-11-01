@@ -1,5 +1,5 @@
 import { getGnosisSafeDetails } from "./getGnosisSafeDetails"
-import { CHAIN_IDS } from "app/core/utils/constants"
+import { SUPPORTED_CHAIN_IDS } from "app/core/utils/constants"
 import { AddressType } from "@prisma/client"
 
 /**
@@ -8,15 +8,14 @@ import { AddressType } from "@prisma/client"
 export const getAddressType = async (
   address
 ): Promise<{ addressType: AddressType; chainId: number }> => {
-  const validChainIds = Object.values(CHAIN_IDS)
-  const requests = validChainIds.map((chainId) => getGnosisSafeDetails(chainId, address))
+  const requests = SUPPORTED_CHAIN_IDS.map((chainId) => getGnosisSafeDetails(chainId, address))
   const responses = await Promise.all(requests)
 
-  for (let i in validChainIds) {
+  for (let i in SUPPORTED_CHAIN_IDS) {
     if (!!responses[i]) {
       return {
         addressType: AddressType.SAFE,
-        chainId: validChainIds[i]!,
+        chainId: SUPPORTED_CHAIN_IDS[i]!,
       }
     }
   }

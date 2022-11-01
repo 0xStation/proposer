@@ -6,7 +6,7 @@ const useAllowedNetwork = () => {
   const { chain: activeChain } = useNetwork()
 
   if (!!activeChain?.id && activeChain?.id != 4 && activeChain?.id != 1337) {
-    const error = "Invalid chain selected. Please select Rinkeby or Localhost"
+    const error = "Invalid chain selected. Please select Goerli or Localhost"
     console.error(error)
     setToastState({
       isToastShowing: true,
