@@ -72,7 +72,7 @@ const PaymentStep = ({
         //   !!payment.data.multisigTransaction &&
         //   !!userHasSignedGnosisTx &&
         //   !quorumMet
-        //     ? "You have already approved this payment, waiting for others to sign until the tx reaches quorum."
+        //     ? "You have already approved this payment, awaiting other signatures."
         //     : ""
         // }
         options={{ last: isLastStep }}
