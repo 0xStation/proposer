@@ -1,4 +1,5 @@
-import { Routes, Link, Image } from "blitz"
+import Link from "next/link"
+import { Routes } from "@blitzjs/next"
 import { useState } from "react"
 import { useEnsName } from "wagmi"
 import truncateString from "app/core/utils/truncateString"

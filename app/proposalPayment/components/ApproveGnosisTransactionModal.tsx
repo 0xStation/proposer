@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { invalidateQuery } from "blitz"
+import { invalidateQuery } from "@blitzjs/rpc"
 import Modal from "app/core/components/Modal"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useGnosisSignatureToConfirmTransaction from "app/core/hooks/useGnosisSignatureToConfirmTransaction"

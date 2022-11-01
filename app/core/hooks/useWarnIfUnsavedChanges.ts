@@ -1,5 +1,5 @@
+import { useRouter } from "next/router"
 import { useEffect } from "react"
-import { useRouter } from "blitz"
 
 const useWarnIfUnsavedChanges = (unsavedChanges: boolean, callback: () => boolean) => {
   const router = useRouter()

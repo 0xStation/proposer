@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useQuery } from "blitz"
+import { useQuery } from "@blitzjs/rpc"
 import { ArrowRightIcon } from "@heroicons/react/solid"
 import { ProposalRoleType, AddressType } from "@prisma/client"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"

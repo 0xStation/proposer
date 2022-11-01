@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { randomBytes } from "crypto"
-import { useRouter } from "blitz"
+import { useRouter } from "next/router"
 import useLocalStorage from "./useLocalStorage"
 import usePopupWindow from "./usePopupWindow"
 import { Auth } from "app/auth/types"

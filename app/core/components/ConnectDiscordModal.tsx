@@ -1,4 +1,4 @@
-import { invoke, invalidateQuery } from "blitz"
+import { invoke, invalidateQuery } from "@blitzjs/rpc"
 import useDiscordAuthWithCallback from "../hooks/useDiscordAuthWithCallback"
 import useStore from "../hooks/useStore"
 import Modal from "./Modal"

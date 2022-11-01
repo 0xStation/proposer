@@ -1,4 +1,5 @@
-import { useRouter, Routes } from "blitz"
+import { Routes } from "@blitzjs/next"
+import { useRouter } from "next/router"
 import { Sizes } from "../utils/constants"
 import Avatar from "./sds/images/avatar"
 

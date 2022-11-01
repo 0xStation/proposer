@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { useRouter } from "blitz"
+import { useRouter } from "next/router"
 
 const DiscordAuth = () => {
   const router = useRouter()

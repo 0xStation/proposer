@@ -1,4 +1,4 @@
-import { invalidateQuery, useMutation } from "blitz"
+import { invalidateQuery, useMutation } from "@blitzjs/rpc"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
 import truncateString from "app/core/utils/truncateString"

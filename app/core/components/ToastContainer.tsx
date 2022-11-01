@@ -1,7 +1,7 @@
+import Image from "next/image"
 import { Fragment, useState, useEffect } from "react"
 import useStore from "../hooks/useStore"
 import { CheckCircleIcon, EmojiSadIcon } from "@heroicons/react/outline"
-import { Image } from "blitz"
 import Exit from "/public/exit-button.svg"
 import { Transition } from "@headlessui/react"
 

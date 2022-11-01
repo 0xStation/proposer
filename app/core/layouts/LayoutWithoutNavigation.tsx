@@ -1,4 +1,5 @@
-import { Head, BlitzLayout } from "blitz"
+import Head from "next/head"
+import { BlitzLayout } from "@blitzjs/next"
 import ModalContainer from "../components/ModalContainer"
 import ToastContainer from "../components/ToastContainer"
 

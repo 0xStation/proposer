@@ -1,4 +1,6 @@
-import { useQuery, useParam, useRouterQuery, useRouter, Routes } from "blitz"
+import { useRouter } from "next/router"
+import { useParam, Routes } from "@blitzjs/next"
+import { useQuery } from "@blitzjs/rpc"
 import Preview from "app/core/components/MarkdownPreview"
 import {
   getClientAddress,
@@ -13,7 +15,7 @@ import getRfpById from "app/rfp/queries/getRfpById"
 
 export const FoxesFormStepConfirm = ({ body }) => {
   const templateId = useParam("templateId") as string
-  const { rfpId } = useRouterQuery()
+  const { rfpId } = useRouter().query
   const router = useRouter()
   const [template] = useQuery(
     getTemplateById,

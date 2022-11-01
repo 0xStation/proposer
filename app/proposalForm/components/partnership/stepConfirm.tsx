@@ -1,4 +1,4 @@
-import { useSession } from "blitz"
+import { useSession } from "@blitzjs/auth"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import PreviewEditor from "app/core/components/MarkdownPreview"
 import { ProposalRoleType } from "@prisma/client"

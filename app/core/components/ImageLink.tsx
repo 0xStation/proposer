@@ -1,4 +1,4 @@
-import { Image } from "blitz"
+import Image from "next/image"
 import Globe from "/public/mirror-logo.svg"
 
 const ImageLink = ({ link }) => {

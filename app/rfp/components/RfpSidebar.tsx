@@ -1,15 +1,13 @@
-import { Link, Routes, Image, useParam, useQuery } from "blitz"
+import Link from "next/link"
+import Image from "next/image"
+import { useQuery } from "@blitzjs/rpc"
+import { Routes, useParam } from "@blitzjs/next"
 import { RfpStatus } from "@prisma/client"
 import BackIcon from "/public/back-icon.svg"
 import TextLink from "app/core/components/TextLink"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
-import { WorkspaceTab } from "app/pages/workspace/[accountAddress]"
-import {
-  getPaymentToken,
-  getPaymentAmount,
-  getPayments,
-  getTotalPaymentAmount,
-} from "app/template/utils"
+import { WorkspaceTab } from "pages/workspace/[accountAddress]"
+import { getPaymentToken, getPayments, getTotalPaymentAmount } from "app/template/utils"
 import RfpStatusPill from "./RfpStatusPill"
 import Button from "app/core/components/sds/buttons/Button"
 import ReadMore from "app/core/components/ReadMore"

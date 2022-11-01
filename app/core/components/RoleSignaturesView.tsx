@@ -1,5 +1,5 @@
+import { useQuery } from "@blitzjs/rpc"
 import { ProposalRoleType } from "@prisma/client"
-import { useQuery } from "blitz"
 import { Proposal } from "app/proposal/types"
 import { RoleSignature } from "./RoleSignature"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"

@@ -1,5 +1,7 @@
+import { Routes } from "@blitzjs/next"
+import { useRouter } from "next/router"
+import { useMutation, invoke } from "@blitzjs/rpc"
 import { useEffect, useState } from "react"
-import { useMutation, useRouter, Routes, invoke } from "blitz"
 import Modal from "./sds/overlays/modal"
 import Button from "./sds/buttons/Button"
 import { Form, Field } from "react-final-form"
@@ -49,11 +51,18 @@ export const NewWorkspaceModal = ({
     // get multisigs for user
     const fetchSafes = async (address: string) => {
       const network = networks[activeChain.id]?.gnosisNetwork
-      const url = `https://safe-transaction.${network}.gnosis.io/api/v1/owners/${toChecksumAddress(
+      // only absolute urls supported
+      const url = `https://safe-transaction-${network}.safe.global/api/v1/owners/${toChecksumAddress(
         address
       )}/safes`
-      const response = await fetch(url)
-      const data = await response.json()
+      let data
+      try {
+        const response = await fetch(url)
+        data = await response.json()
+      } catch (err) {
+        console.error("Failed to fetch safe", err)
+        return
+      }
       const safes = data.safes
       setSafes(
         safes.map((safe) => {

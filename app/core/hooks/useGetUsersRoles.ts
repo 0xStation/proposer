@@ -1,4 +1,4 @@
-import { useQuery } from "blitz"
+import { useQuery } from "@blitzjs/rpc"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { AddressType } from "@prisma/client"
 import useStore from "./useStore"

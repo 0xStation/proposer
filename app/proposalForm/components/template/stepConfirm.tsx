@@ -1,11 +1,8 @@
-import { useQuery, useParam, useRouterQuery, useRouter, Routes } from "blitz"
+import { useRouter } from "next/router"
+import { useQuery } from "@blitzjs/rpc"
+import { useParam, Routes } from "@blitzjs/next"
 import Preview from "app/core/components/MarkdownPreview"
-import {
-  getClientAddress,
-  getPaymentAmount,
-  getPaymentToken,
-  getTotalPaymentAmount,
-} from "app/template/utils"
+import { getClientAddress, getPaymentToken, getTotalPaymentAmount } from "app/template/utils"
 import { getNetworkName } from "app/core/utils/networkInfo"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import getTemplateById from "app/template/queries/getTemplateById"
@@ -13,7 +10,7 @@ import getRfpById from "app/rfp/queries/getRfpById"
 
 export const TemplateFormStepConfirm = ({ body }) => {
   const templateId = useParam("templateId") as string
-  const { rfpId } = useRouterQuery()
+  const { rfpId } = useRouter().query
   const router = useRouter()
   const [template] = useQuery(
     getTemplateById,

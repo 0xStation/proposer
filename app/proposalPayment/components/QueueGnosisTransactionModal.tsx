@@ -1,5 +1,5 @@
+import { useMutation, invalidateQuery } from "@blitzjs/rpc"
 import { useState } from "react"
-import { useMutation, invalidateQuery } from "blitz"
 import Modal from "app/core/components/Modal"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useGnosisSignature from "app/core/hooks/useGnosisSignature"

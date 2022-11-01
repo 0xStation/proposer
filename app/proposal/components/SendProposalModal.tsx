@@ -1,4 +1,5 @@
-import { invalidateQuery, useMutation, useSession } from "blitz"
+import { useSession } from "@blitzjs/auth"
+import { invalidateQuery, useMutation } from "@blitzjs/rpc"
 import { useState } from "react"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"

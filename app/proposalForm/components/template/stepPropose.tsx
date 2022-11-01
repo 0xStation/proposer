@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { Field } from "react-final-form"
-import { useQuery, useParam, useRouterQuery, useRouter, Routes } from "blitz"
+import { useRouter } from "next/router"
+import { useQuery } from "@blitzjs/rpc"
+import { useParam, Routes } from "@blitzjs/next"
 import { composeValidators, mustBeAboveNumWords, requiredField } from "app/utils/validators"
 import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
@@ -14,7 +16,7 @@ import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid"
 export const TemplateFormStepPropose = ({ formState }) => {
   const [previewMode, setPreviewMode] = useState<boolean>(false)
   const templateId = useParam("templateId") as string
-  const { rfpId } = useRouterQuery()
+  const { rfpId } = useRouter().query
   const router = useRouter()
   const [rfp] = useQuery(
     getRfpById,

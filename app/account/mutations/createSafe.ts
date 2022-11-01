@@ -2,7 +2,6 @@ import db, { AddressType } from "db"
 import * as z from "zod"
 import { Ctx } from "blitz"
 import { Account } from "../types"
-import truncateString from "app/core/utils/truncateString"
 import { AccountAccountType } from "@prisma/client"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import networks from "app/utils/networks.json"
@@ -16,9 +15,11 @@ export default async function createSafe(input: z.infer<typeof CreateSafe>, ctx:
   const params = CreateSafe.parse(input)
 
   const multisigChainId = params.chainId
+
   const network = networks[params.chainId]?.gnosisNetwork
 
-  const url = `https://safe-transaction.${network}.gnosis.io/api/v1/safes/${toChecksumAddress(
+  // only absolute urls supported
+  const url = `https://safe-transaction-${network}.safe.global/api/v1/safes/${toChecksumAddress(
     params.address
   )}`
 

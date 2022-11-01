@@ -1,4 +1,5 @@
-import { useMutation, useRouter, invalidateQuery, useQuery } from "blitz"
+import { useRouter } from "next/router"
+import { useMutation, invalidateQuery, useQuery } from "@blitzjs/rpc"
 import { useState } from "react"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"

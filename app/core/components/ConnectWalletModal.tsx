@@ -1,5 +1,7 @@
+import Image from "next/image"
+import { useParam } from "@blitzjs/next"
+import { invoke } from "@blitzjs/rpc"
 import { useState, useEffect } from "react"
-import { Image, invoke, useParam } from "blitz"
 import { trackClick, trackError, initializeUser } from "app/utils/amplitude"
 import { TRACKING_EVENTS } from "app/core/utils/constants"
 import { METAMASK_ERROR_CODES } from "app/utils/metamaskErrorCodes"

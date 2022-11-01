@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from "react"
 import { Form, FormSpy } from "react-final-form"
-import {
-  useRouter,
-  useSession,
-  Routes,
-  useMutation,
-  useQuery,
-  useParam,
-  useRouterQuery,
-} from "blitz"
+import { useRouter } from "next/router"
+import { useMutation, useQuery } from "@blitzjs/rpc"
+import { useParam, Routes } from "@blitzjs/next"
+import { useSession } from "@blitzjs/auth"
 import Button from "app/core/components/sds/buttons/Button"
 import Stepper from "../Stepper"
 import BackArrow from "app/core/icons/BackArrow"
@@ -58,7 +53,7 @@ export const ProposalFormTemplate = () => {
   })
 
   const templateId = useParam("templateId") as string
-  const { rfpId } = useRouterQuery()
+  const { rfpId } = useRouter().query
   const [template] = useQuery(
     getTemplateById,
     {

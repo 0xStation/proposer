@@ -1,5 +1,5 @@
 import { Account } from "app/account/types"
-import { DefaultCtx, SessionContext } from "blitz"
+import { SessionContext } from "@blitzjs/auth"
 import { SiweMessage } from "siwe"
 import * as z from "zod"
 
@@ -8,8 +8,8 @@ export interface AddressOrUserIdIsAuthorized {
 }
 
 export type Role = "ADMIN" | "USER"
-declare module "blitz" {
-  export interface Ctx extends DefaultCtx {
+declare module "@blitzjs/auth" {
+  export interface Ctx {
     session: SessionContext
   }
   export interface Session {

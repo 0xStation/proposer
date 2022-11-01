@@ -1,7 +1,7 @@
+import Image from "next/image"
 import React from "react"
 import { Sizes } from "app/core/utils/constants"
 import { gradientMap } from "app/core/utils/constants"
-import { Image } from "blitz"
 
 interface AvatarProps {
   /**

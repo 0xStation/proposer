@@ -1,5 +1,5 @@
 import { getTotalPaymentAmount, getPaymentToken } from "app/template/utils"
-import { Link } from "blitz"
+import Link from "next/link"
 import RfpStatusPill from "./RfpStatusPill"
 
 export const RfpCard = ({ rfp, href }) => {

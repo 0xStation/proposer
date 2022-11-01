@@ -1,7 +1,11 @@
 import { useState } from "react"
 import { Field } from "react-final-form"
 import DiscordIcon from "/public/discord-icon.svg"
-import { useQuery, useParam, useRouterQuery, useRouter, Routes, Image } from "blitz"
+import { useQuery } from "@blitzjs/rpc"
+import { useParam } from "@blitzjs/next"
+import { useRouter } from "next/router"
+import { Routes } from "@blitzjs/next"
+import Image from "next/image"
 import { composeValidators, mustBeAboveNumWords, requiredField } from "app/utils/validators"
 import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
@@ -20,7 +24,7 @@ export const FoxesFormStepPropose = ({ formState }) => {
   const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const templateId = useParam("templateId") as string
-  const { rfpId } = useRouterQuery()
+  const { rfpId } = useRouter().query
   const router = useRouter()
   const [rfp] = useQuery(
     getRfpById,

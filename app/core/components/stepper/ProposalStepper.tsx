@@ -1,4 +1,5 @@
-import { useParam, useQuery } from "blitz"
+import { useQuery } from "@blitzjs/rpc"
+import { useParam } from "@blitzjs/next"
 import getProposalById from "app/proposal/queries/getProposalById"
 import StepperRenderer from "./StepperRenderer"
 import SendStep from "./steps/SendStep"

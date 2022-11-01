@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react"
-import { useQuery, useSession, useRouter, Routes, useMutation } from "blitz"
-import { Form } from "react-final-form"
-import { useNetwork } from "wagmi"
+import React, { useEffect, useState } from "react"
+import { useSession } from "@blitzjs/auth"
+import { Routes } from "@blitzjs/next"
+import { useMutation, useQuery } from "@blitzjs/rpc"
 import { ProposalRoleType } from "@prisma/client"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import Stepper from "../Stepper"
@@ -13,14 +13,17 @@ import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
 import { Proposal } from "app/proposal/types"
 import BackArrow from "app/core/icons/BackArrow"
 import useStore from "app/core/hooks/useStore"
-import { ConfirmForm } from "../ConfirmForm"
+import createProposal from "app/proposal/mutations/createProposal"
+import { useConfirmAuthorship } from "app/proposalForm/hooks/useConfirmAuthorship"
+import { useResolveEnsAddress } from "app/proposalForm/hooks/useResolveEnsAddress"
+import { useRouter } from "next/router"
+import { useNetwork } from "wagmi"
+import { Form } from "react-final-form"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { PaymentTerm } from "app/proposalPayment/types"
-import createProposal from "app/proposal/mutations/createProposal"
-import { useResolveEnsAddress } from "app/proposalForm/hooks/useResolveEnsAddress"
-import { useConfirmAuthorship } from "app/proposalForm/hooks/useConfirmAuthorship"
 import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
 import { isValidAdvancedPaymentPercentage } from "app/utils/validators"
+import { ConfirmForm } from "../ConfirmForm"
 
 export const ProposalFormFunding = ({
   prefillClients,
@@ -104,8 +107,9 @@ export const ProposalFormFunding = ({
       chainId: chain?.id || 1,
       userId: session?.userId as number,
     },
-    { enabled: Boolean(chain && session?.userId) }
+    { suspense: false, enabled: Boolean(chain && session?.userId) }
   )
+
   useEffect(() => {
     // `shouldHandlePostProposalCreationProcessing` is used to retrigger this `useEffect` hook
     // if the user declines to sign the message verifying their authorship.

@@ -1,5 +1,7 @@
+import { useParam } from "@blitzjs/next"
+import Image from "next/image"
+import { useMutation, invoke, invalidateQuery, useQuery } from "@blitzjs/rpc"
 import { useState, useEffect } from "react"
-import { useMutation, invoke, invalidateQuery, useQuery, useParam, Image } from "blitz"
 import { Field, Form } from "react-final-form"
 import DiscordIcon from "/public/discord-icon.svg"
 import updateAccount from "../mutations/updateAccount"
