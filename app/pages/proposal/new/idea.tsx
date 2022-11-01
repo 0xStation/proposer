@@ -8,7 +8,7 @@ const ProposalNewIdea: BlitzPage = () => {
   const title = queryParams?.title as string
 
   return (
-    <Layout title="New Proposal">
+    <Layout title="New proposal">
       <ProposalFormIdea prefillClients={clients} prefillTitle={title} />
     </Layout>
   )

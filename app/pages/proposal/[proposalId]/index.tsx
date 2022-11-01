@@ -63,7 +63,7 @@ const ViewProposal: BlitzPage = () => {
 ViewProposal.getLayout = function getLayout(page) {
   // persist layout between pages https://nextjs.org/docs/basic-features/layouts
   return (
-    <Layout title="View Proposal">
+    <Layout title="View proposal">
       <ProposalNestedLayout>{page}</ProposalNestedLayout>
     </Layout>
   )

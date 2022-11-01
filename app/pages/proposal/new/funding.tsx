@@ -8,7 +8,7 @@ const ProposalNewFunding: BlitzPage = () => {
   const contributors = (queryParams?.contributors as string)?.split(",").filter((s) => !!s) || []
 
   return (
-    <Layout title="New Proposal">
+    <Layout title="New proposal">
       <ProposalFormFunding prefillClients={clients} prefillContributors={contributors} />
     </Layout>
   )

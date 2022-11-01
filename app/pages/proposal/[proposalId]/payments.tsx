@@ -97,7 +97,7 @@ export const ProposalPayments: BlitzPage = () => {
 ProposalPayments.getLayout = function getLayout(page) {
   // persist layout between pages https://nextjs.org/docs/basic-features/layouts
   return (
-    <Layout title="Proposal Payments">
+    <Layout title="Proposal payments">
       <ProposalNestedLayout>{page}</ProposalNestedLayout>
     </Layout>
   )

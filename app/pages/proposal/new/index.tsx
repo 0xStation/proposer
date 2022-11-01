@@ -68,7 +68,7 @@ const ProposalTypeSelection: BlitzPage = () => {
   )
 
   return (
-    <Layout title="New Proposal">
+    <Layout title="New proposal">
       {view === ProposalView.ProposalType && (
         <>
           {Boolean(rfps?.length) && (

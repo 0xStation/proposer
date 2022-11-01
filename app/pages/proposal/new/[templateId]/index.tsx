@@ -68,7 +68,7 @@ const ProposalTemplateForm: BlitzPage = () => {
   }
 
   return (
-    <Layout title="New Proposal">
+    <Layout title="New proposal">
       {/* LEFT SIDEBAR | PROPOSAL FORM */}
       <div className="flex flex-row h-full">
         {/* LEFT SIDEBAR */}
