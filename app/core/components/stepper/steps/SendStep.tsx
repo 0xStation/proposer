@@ -7,7 +7,7 @@ const SendStep = ({ proposal }: { proposal: Proposal }) => {
 
   return (
     <Step
-      description="Send proposal"
+      description="Proposal sent"
       status={status}
       options={{ first: true }}
       action={<SendAction />}

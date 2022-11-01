@@ -13,8 +13,8 @@ const ApproveStep = ({ proposal }: { proposal: Proposal }) => {
 
   return (
     <Step
-      description="Signers approve proposal"
-      subtitle="Reach out to signers on twitter or Discord to get proposals reviewed and approved."
+      description="Proposal approved by signers"
+      subtitle="Reach out to signers on Twitter or Discord to get proposals reviewed and approved."
       status={status}
       action={<ApproveAction proposal={proposal} />}
     />
