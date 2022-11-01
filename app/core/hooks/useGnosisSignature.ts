@@ -87,8 +87,12 @@ const useGnosisSignature = (payment) => {
   }
 
   const getNonce = async () => {
-    const { gnosisApi } = networks[payment.data.token.chainId]
-    const url = `${gnosisApi}/api/v1/safes/${toChecksumAddress(
+    const network = networks[payment.data.token.chainId]?.gnosisNetwork
+    if (!network) {
+      throw Error("chainId not available on Gnosis")
+    }
+    // only absolute urls supported
+    const url = `https://safe-transaction-${networks}.safe.global/api/v1/safes/${toChecksumAddress(
       payment.senderAddress
     )}/multisig-transactions/`
 

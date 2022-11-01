@@ -5,7 +5,6 @@ import { Account } from "../types"
 import { saveEmail } from "app/utils/privy"
 import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
 import { getAddressType } from "app/utils/getAddressType"
-import truncateString from "app/core/utils/truncateString"
 
 const CreateAccount = z.object({
   address: z.string(),

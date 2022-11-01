@@ -50,10 +50,19 @@ export const NewWorkspaceModal = ({
   useEffect(() => {
     // get multisigs for user
     const fetchSafes = async (address: string) => {
-      const { gnosisApi } = networks[activeChain.id]
-      const url = `${gnosisApi}/api/v1/owners/${toChecksumAddress(address)}/safes`
-      const response = await fetch(url)
-      const data = await response.json()
+      const network = networks[activeChain.id]?.gnosisNetwork
+      // only absolute urls supported
+      const url = `https://safe-transaction-${network}.safe.global/api/v1/owners/${toChecksumAddress(
+        address
+      )}/safes`
+      let data
+      try {
+        const response = await fetch(url)
+        data = await response.json()
+      } catch (err) {
+        console.error("Failed to fetch safe", err)
+        return
+      }
       const safes = data.safes
       setSafes(
         safes.map((safe) => {

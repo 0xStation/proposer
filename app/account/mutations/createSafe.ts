@@ -15,9 +15,13 @@ export default async function createSafe(input: z.infer<typeof CreateSafe>, ctx:
   const params = CreateSafe.parse(input)
 
   const multisigChainId = params.chainId
-  const gnosisApi = networks[params.chainId]
 
-  const url = `${gnosisApi}/api/v1/safes/${toChecksumAddress(params.address)}`
+  const network = networks[params.chainId]?.gnosisNetwork
+
+  // only absolute urls supported
+  const url = `https://safe-transaction-${network}.safe.global/api/v1/safes/${toChecksumAddress(
+    params.address
+  )}`
 
   const response = await fetch(url)
 

@@ -5,9 +5,14 @@ import networks from "./networks.json"
  * Fetches the details of a Gnosis Safe for a particular chainId and address
  */
 export const getGnosisSafeDetails = async (chainId: number, address: string, signal?: any) => {
-  const { gnosisApi } = networks[chainId]
-
-  const url = `${gnosisApi}/api/v1/safes/${toChecksumAddress(address)}`
+  const network = networks[chainId]?.gnosisNetwork
+  if (!network) {
+    throw Error("chainId not available on Gnosis")
+  }
+  // only absolute urls supported
+  const url = `https://safe-transaction-${network}.safe.global//api/v1/safes/${toChecksumAddress(
+    address
+  )}`
 
   let response
   try {

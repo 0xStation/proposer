@@ -9,10 +9,14 @@ const GetSafeMetadata = z.object({
 
 export default async function getSafeMetadata(input: z.infer<typeof GetSafeMetadata>) {
   const params = GetSafeMetadata.parse(input)
-
-  const gnosisApi = networks[params.chainId]
-  const url = `${gnosisApi}/api/v1/safes/${toChecksumAddress(params.address)}`
-
+  const network = networks[params.chainId]?.gnosisNetwork
+  if (!network) {
+    throw Error("chainId not available on Gnosis")
+  }
+  // only absolute urls supported
+  const url = `https://safe-transaction-${network}.safe.global/api/v1/safes/${toChecksumAddress(
+    params.address
+  )}`
   let response
   try {
     response = await fetch(url, {
