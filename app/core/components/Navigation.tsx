@@ -107,7 +107,7 @@ const Navigation = ({ children }: { children?: any }) => {
         />
       )}
       <div className="w-full border-b border-concrete h-[70px] px-6 flex items-center justify-between">
-        <Link shallow={true} href={Routes.Explore({})}>
+        <Link href={Routes.Explore({})}>
           <Image src={StationLogo} alt="Station logo" height={30} width={80} />
         </Link>
         <div className="flex flex-row items-center space-x-4">
@@ -259,7 +259,7 @@ transition-all duration-200 origin-left`}
         className={`${
           exploreSelected ? "border-marble-white" : "border-wet-concrete"
         } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg h-[47px] mb-4`}
-        onClick={() => router.push(Routes.Explore(), undefined, { shallow: true })}
+        onClick={() => router.push(Routes.Explore())}
       >
         <Image src={ExploreImageIcon} alt="Explore icon" height={46} width={46} />
       </button>

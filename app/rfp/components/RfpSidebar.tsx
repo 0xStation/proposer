@@ -63,7 +63,6 @@ export const RfpSidebar = ({ rfp }) => {
         {/* CTA */}
         <div className="mb-10 relative group">
           <Link
-            shallow={true}
             href={Routes.ProposalTemplateForm({
               templateId: template?.id as string,
               rfpId: rfp?.id as string,
