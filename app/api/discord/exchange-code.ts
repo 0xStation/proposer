@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   params.append("code", req.body.code)
 
   try {
-    const response = await fetch(`${process.env.BLITZ_PUBLIC_API_ENDPOINT}/oauth2/token`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DISCORD_API_ENDPOINT}/oauth2/token`, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
