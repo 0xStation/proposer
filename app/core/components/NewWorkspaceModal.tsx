@@ -86,7 +86,7 @@ export const NewWorkspaceModal = ({
         <h1 className="text-2xl font-bold">Create a new multi-sig account</h1>
         <p className="text-base mt-6">
           Select a <TextLink url={LINKS.GNOSIS_SAFE}>Gnosis Safe </TextLink>
-          address you're an admin of to govern the account.
+          address you&apos;re an admin of to govern the account.
         </p>
         <Form
           initialValues={{}}
