@@ -333,7 +333,7 @@ export const ProposalFoxesForm = () => {
                         (isTokenGatingCheckLoading ||
                           (isTokenGatingCheckComplete && !userHasRequiredToken)))
                     }
-                    isLoading={isTokenGatingCheckLoading}
+                    isLoading={!!rfp?.data?.singleTokenGate && isTokenGatingCheckLoading}
                     onClick={async (e) => {
                       e.preventDefault()
                       if (!session.siwe?.address) {
@@ -384,7 +384,8 @@ export const ProposalFoxesForm = () => {
                             (isTokenGatingCheckComplete && !userHasRequiredToken)))
                       }
                       isLoading={
-                        isTokenGatingCheckLoading || (!proposalShouldSendLater && isLoading)
+                        (!!rfp?.data?.singleTokenGate && isTokenGatingCheckLoading) ||
+                        (!proposalShouldSendLater && isLoading)
                       }
                       onClick={async (e) => {
                         e.preventDefault()
