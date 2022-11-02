@@ -70,7 +70,6 @@ const StepperRenderer = ({
   const activeStep = useStepperStore((state) => state.activeStep)
 
   const activeActions = activeStep ? actions[activeStep] : {}
-  console.log(activeActions)
 
   useEffect(() => {
     if (activeUserRoles[0]) {
