@@ -1,12 +1,10 @@
-import { BlitzPage, useRouterQuery } from "blitz"
+import { BlitzPage } from "@blitzjs/next"
 import Layout from "app/core/layouts/Layout"
 import RfpForm from "app/rfp/components/form/form"
 
 const RfpNew: BlitzPage = () => {
-  const queryParams = useRouterQuery()
-
   return (
-    <Layout title="New Proposal">
+    <Layout title="New RFP">
       <RfpForm />
     </Layout>
   )

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react"
-import { useQuery, useSession, useRouter, Routes, useMutation } from "blitz"
+import { useQuery, useMutation } from "@blitzjs/rpc"
+import { Routes } from "@blitzjs/next"
+import { useRouter } from "next/router"
+import { useSession } from "@blitzjs/auth"
 import { Form } from "react-final-form"
 import { useNetwork } from "wagmi"
 import { ProposalRoleType } from "@prisma/client"
@@ -72,7 +75,7 @@ export const RfpForm = () => {
       chainId: chain?.id || 1,
       userId: session?.userId as number,
     },
-    { enabled: Boolean(chain && session?.userId) }
+    { suspense: false, enabled: Boolean(chain && session?.userId) }
   )
 
   useEffect(() => {

@@ -5,7 +5,6 @@ import { useSession } from "@blitzjs/auth"
 import React, { useState, useEffect } from "react"
 import { Form, FormSpy } from "react-final-form"
 import Button from "app/core/components/sds/buttons/Button"
-import Stepper from "../Stepper"
 import BackArrow from "app/core/icons/BackArrow"
 import useStore from "app/core/hooks/useStore"
 import { Proposal } from "app/proposal/types"
@@ -30,6 +29,7 @@ import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinToke
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
+import FormHeaderStepper from "app/core/components/FormHeaderStepper"
 
 export const ProposalFoxesForm = () => {
   const router = useRouter()
@@ -190,7 +190,7 @@ export const ProposalFoxesForm = () => {
 
   return (
     <div className="max-w-[580px] min-w-[580px] h-full mx-auto">
-      <Stepper
+      <FormHeaderStepper
         activeStep={PROPOSAL_FORM_HEADER_COPY[proposalStep]}
         steps={["Propose", "Confirm"]}
         className="mt-10"

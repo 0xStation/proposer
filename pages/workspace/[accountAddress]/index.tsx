@@ -383,7 +383,14 @@ const WorkspaceHome: BlitzPage = () => {
 
     return (
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
-        <h1 className="text-2xl font-bold">RFPs</h1>
+        <div className="flex flex-row justify-between">
+          <h1 className="text-2xl font-bold">RFPs</h1>
+          <Link href={Routes.RfpNew()}>
+            <Button className="w-full px-10" overrideWidthClassName="max-w-fit">
+              Create RFP
+            </Button>
+          </Link>
+        </div>
         {/* FILTERS & PAGINATION */}
         <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">
           {/* FILTERS */}
