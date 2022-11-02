@@ -1,4 +1,6 @@
-export default async function handler(req, res) {
+import { api } from "app/blitz-server"
+
+export default api(async function handler(req, res) {
   const params = new URLSearchParams()
 
   if (!process.env.DISCORD_CLIENT_ID || !process.env.DISCORD_CLIENT_SECRET) {
@@ -28,4 +30,4 @@ export default async function handler(req, res) {
     console.error(e)
     res.status(500).json({ error: "something went wrong!" })
   }
-}
+})
