@@ -16,7 +16,7 @@ export const ConnectDiscordModal = ({ isOpen, setIsOpen }) => {
     async (authorization) => {
       if (authorization) {
         try {
-          let response = await fetch(`${process.env.BLITZ_PUBLIC_API_ENDPOINT}/users/@me`, {
+          let response = await fetch(`${process.env.NEXT_PUBLIC_DISCORD_API_ENDPOINT}/users/@me`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${authorization}`,
