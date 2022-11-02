@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { useRouter } from "next/router"
+import { getAntiCSRFToken } from "@blitzjs/auth"
 
 const DiscordAuth = () => {
   const router = useRouter()
@@ -15,6 +16,7 @@ const DiscordAuth = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "anti-csrf": getAntiCSRFToken(),
         },
         body: JSON.stringify({ code: router.query.code, redirect }),
       })

@@ -10,6 +10,7 @@ import { SUPPORTED_CHAINS } from "../utils/constants"
 import { useState } from "react"
 import { TokenType } from "@prisma/client"
 import { composeValidators, isAddress, requiredField } from "app/utils/validators"
+import { getAntiCSRFToken } from "@blitzjs/auth"
 
 export const ImportTokenModal = ({
   isOpen,
@@ -61,6 +62,7 @@ export const ImportTokenModal = ({
                   headers: {
                     Accept: "application/json, text/plain, */*",
                     "Content-Type": "application/json",
+                    "anti-csrf": getAntiCSRFToken(),
                   },
                   body: JSON.stringify({
                     address: values?.tokenAddress,
