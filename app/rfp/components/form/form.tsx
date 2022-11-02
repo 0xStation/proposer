@@ -18,12 +18,18 @@ import useStore from "app/core/hooks/useStore"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { RfpFormStep, RFP_FORM_HEADER_COPY } from "app/core/utils/constants"
-import { isValidAdvancedPaymentPercentage } from "app/utils/validators"
+import {
+  isPositiveAmount,
+  isValidAdvancedPaymentPercentage,
+  isValidTokenAmount,
+} from "app/utils/validators"
 import RfpFormStepPayment from "./stepPayment"
 import RfpFormStepPermission from "./stepPermissions"
 import { FormLoadingScreen } from "app/core/components/FormLoadingScreen"
 import createRfp from "app/rfp/mutations/createRfp"
 import { PaymentDirection } from "app/rfp/types"
+import { ProposalTemplateFieldValidationName } from "app/template/types"
+import { formatPositiveInt } from "app/utils/formatters"
 
 export const RfpForm = () => {
   const setToastState = useStore((state) => state.setToastState)
@@ -142,7 +148,30 @@ export const RfpForm = () => {
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
 
-          const missingFields = false
+          const missingFieldsGeneral =
+            !formState.values.title ||
+            !formState.values.body ||
+            (formState.values.bodyValidation === ProposalTemplateFieldValidationName.MIN_WORDS &&
+              !formatPositiveInt(formState.values.minWordCount))
+
+          const missingFieldsPayment =
+            !formState.values.paymentDirection ||
+            !formState.values.tokenAddress ||
+            !formState.values.paymentAmount ||
+            !formState.values.paymentTerms ||
+            !(
+              formState.values.paymentTerms !== PaymentTerm.ADVANCE_PAYMENT ||
+              // isValidAdvancedPaymentPercentage returns string if there is an error or undefined if things are okay
+              !isValidAdvancedPaymentPercentage(formState.values.advancedPaymentPercentage)
+            )
+
+          const missingFieldsPermissions = !(
+            !selectedSubmissionToken ||
+            // isValidTokenAmount returns string if error or undefined if all good
+            !isValidTokenAmount(selectedSubmissionToken?.decimals)(
+              formState.values.submissionTokenMinBalance
+            )
+          )
 
           return (
             <form onSubmit={handleSubmit} className="mt-20">
@@ -194,7 +223,7 @@ export const RfpForm = () => {
               </div>
               {proposalStep === RfpFormStep.GENERAL && (
                 <Button
-                  isDisabled={missingFields}
+                  isDisabled={missingFieldsGeneral}
                   className="my-6 float-right"
                   onClick={async () => {
                     if (!session?.siwe?.address || !activeUser?.address) {
@@ -216,19 +245,7 @@ export const RfpForm = () => {
                     <BackArrow className="fill-marble-white" />
                   </span>
                   <Button
-                    isDisabled={
-                      missingFields ||
-                      !(
-                        formState.values.tokenAddress &&
-                        formState.values.paymentAmount &&
-                        formState.values.paymentTerms &&
-                        // terms are ON_AGREEMENT or they are AFTER_COMPLETION && advanced percentage value is valid
-                        (formState.values.paymentTerms !== PaymentTerm.ADVANCE_PAYMENT ||
-                          !isValidAdvancedPaymentPercentage(
-                            formState.values.advancedPaymentPercentage
-                          ))
-                      )
-                    }
+                    isDisabled={missingFieldsPayment}
                     className="float-right"
                     onClick={() => {
                       if (!session.siwe?.address) {
@@ -253,7 +270,7 @@ export const RfpForm = () => {
                   </span>
                   <div>
                     <Button
-                      isDisabled={isLoading}
+                      isDisabled={isLoading || missingFieldsPermissions}
                       isLoading={isLoading}
                       onClick={async (e) => {
                         e.preventDefault()
