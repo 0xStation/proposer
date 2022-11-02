@@ -3,32 +3,53 @@ import { useState, useEffect } from "react"
 import { ProposalRoleType } from "@prisma/client"
 import { PROPOSAL_ROLE_MAP } from "app/core/utils/constants"
 import { InformationCircleIcon } from "@heroicons/react/solid"
+import { StepStatus, StepType } from "./steps/Step"
 
-export enum StepStatus {
-  complete = "complete",
-  current = "current",
-  upcoming = "upcoming",
-  loading = "loading",
-}
 export type Step = {
   description: string
   status: StepStatus
   actions: {
-    [key: string]: JSX.Element
+    [key: string]: {
+      [key: string]: JSX.Element
+    }
   }
   button?: JSX.Element
 }
 
 interface StepperState {
   activeRole: ProposalRoleType | null
+  activeStep: StepType | null
+  actions: {
+    [key: string]: JSX.Element
+  }
+  setActiveStep: (step: StepType) => void
+  setActions: (actions: any) => void // could improve types but was giving me a hard time
   setActiveRole: (role: ProposalRoleType) => void
 }
 
-export const useStepperStore = create<StepperState>((set) => ({
+export const useStepperStore = create<StepperState>((set, get) => ({
   activeRole: null,
+  activeStep: null,
+  actions: {},
   setActiveRole: (state) => {
     set(() => {
       return { activeRole: state }
+    })
+  },
+  setActiveStep: (state) => {
+    set(() => {
+      return { activeStep: state }
+    })
+  },
+  setActions: (state) => {
+    const currentActions = get().actions
+    set(() => {
+      return {
+        actions: {
+          ...currentActions,
+          [state.step]: state.actions,
+        },
+      }
     })
   },
 }))
@@ -45,6 +66,11 @@ const StepperRenderer = ({
   const [showInfo, setShowInfo] = useState<boolean>(true)
   const activeRole = useStepperStore((state) => state.activeRole)
   const setActiveRole = useStepperStore((state) => state.setActiveRole)
+  const actions = useStepperStore((state) => state.actions)
+  const activeStep = useStepperStore((state) => state.activeStep)
+
+  const activeActions = activeStep ? actions[activeStep] : {}
+  console.log(activeActions)
 
   useEffect(() => {
     if (activeUserRoles[0]) {
@@ -64,12 +90,15 @@ const StepperRenderer = ({
                 return (
                   <span
                     key={`step-${idx}`}
-                    className={`text-sm px-2 py-0.5 cursor-pointer rounded-full ${
+                    className={`text-sm px-2 py-0.5 cursor-pointer rounded-full relative ${
                       activeRole === role ? "bg-electric-violet" : "bg-concrete"
                     }`}
                     onClick={() => setActiveRole(role)}
                   >
                     {PROPOSAL_ROLE_MAP[role]}
+                    {activeActions && role in activeActions && (
+                      <span className="bg-neon-carrot w-3 h-3 rounded-full block absolute top-[-3px] right-[-3px]"></span>
+                    )}
                   </span>
                 )
               })}

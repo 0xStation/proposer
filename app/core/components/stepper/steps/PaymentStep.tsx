@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { ProposalStatus } from "@prisma/client"
 import useStore from "app/core/hooks/useStore"
 import { Proposal } from "app/proposal/types"
@@ -6,8 +7,8 @@ import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
 import QueueGnosisTransactionModal from "app/proposalPayment/components/QueueGnosisTransactionModal"
 import ApproveGnosisTransactionModal from "app/proposalPayment/components/ApproveGnosisTransactionModal"
 import PaymentAction from "../actions/PaymentAction"
-
-import Step, { StepStatus } from "./Step"
+import { useStepperStore } from "../StepperRenderer"
+import Step, { StepStatus, StepType } from "./Step"
 
 const PaymentStep = ({
   milestone,
@@ -34,11 +35,18 @@ const PaymentStep = ({
 
   const status =
     proposal.currentMilestoneIndex > milestone.index
-      ? StepStatus.complete
+      ? StepStatus.COMPLETE
       : proposal.status === ProposalStatus.APPROVED &&
         proposal.currentMilestoneIndex === milestone.index
-      ? StepStatus.current
-      : StepStatus.upcoming
+      ? StepStatus.CURRENT
+      : StepStatus.UPCOMING
+
+  const setActiveStep = useStepperStore((state) => state.setActiveStep)
+  useEffect(() => {
+    if (status === StepStatus.CURRENT) {
+      setActiveStep(StepType.PAYMENT)
+    }
+  }, [status])
 
   return (
     <>
@@ -66,16 +74,7 @@ const PaymentStep = ({
       <Step
         description={milestone.data.title}
         status={status}
-        // subtitle={
-        //   userIsSigner &&
-        //   payment &&
-        //   !!payment.data.multisigTransaction &&
-        //   !!userHasSignedGnosisTx &&
-        //   !quorumMet
-        //     ? "You have already approved this payment, waiting for others to sign until the tx reaches quorum."
-        //     : ""
-        // }
-        options={{ last: isLastStep }}
+        isLastStep={isLastStep}
         action={<PaymentAction proposal={proposal} milestone={milestone} />}
       />
     </>
