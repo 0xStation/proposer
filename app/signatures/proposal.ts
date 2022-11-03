@@ -16,7 +16,7 @@ export const genProposalDigest = (proposal: Proposal) => {
       // should have a domain. Keep hardcoded
       name: "Proposal",
       // use semver versioning https://semver.org/
-      version: "0.0.2",
+      version: "0.1.0",
     },
     types: {
       Type: [
@@ -39,6 +39,7 @@ export const genProposalDigest = (proposal: Proposal) => {
       Proposal: [
         { name: "signedAt", type: "uint256" }, // UNIX timestamp for when this data was signed
         { name: "proposalId", type: "string" }, // UUID to identify this proposal, used to connect audit trail for version history
+        { name: "version", type: "uint256" }, // denotes the proposals editing history version
         { name: "rfpId", type: "string" }, // [OPTIONAL] UUID to label an RFP this proposal is responding to, empty string for no RFP
         // schema defintiions
         { name: "type", type: "Type" },
@@ -57,6 +58,7 @@ export const genProposalDigest = (proposal: Proposal) => {
       signedAt: Date.now(),
       proposalId: proposal.id,
       rfpId: proposal.rfpId || "",
+      version: proposal.version,
       // schema
       type: {
         key: "funding",
