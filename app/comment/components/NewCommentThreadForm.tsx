@@ -27,7 +27,7 @@ const NewCommentThreadForm = ({ proposal, cleanup }) => {
             proposalId: proposal.id,
             authorId: activeUser.id,
           })
-          invalidateQuery(getProposalById)
+          await invalidateQuery(getProposalById)
           form.restart()
           cleanup()
         }}

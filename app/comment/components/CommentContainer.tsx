@@ -16,15 +16,17 @@ const CommentContainer = ({ proposal, comment }) => {
   })
 
   return (
-    <div className="mt-12 border rounded-lg border-wet-concrete p-4 flex flex-col space-y-4">
-      <AccountMediaRow comment={comment} />
-      <span>{comment.data.message}</span>
-      {comment.children.map((child) => {
+    <div className="border rounded-lg border-wet-concrete p-4 flex flex-col space-y-6">
+      <div>
+        <AccountMediaRow comment={comment} />
+        <span className="mt-2 block">{comment.data.message}</span>
+      </div>
+      {comment.children.map((child, idx) => {
         return (
-          <>
+          <div key={idx}>
             <AccountMediaRow comment={child} />
-            <span>{child.data.message}</span>
-          </>
+            <span className="mt-2 block">{child.data.message}</span>
+          </div>
         )
       })}
       <Form

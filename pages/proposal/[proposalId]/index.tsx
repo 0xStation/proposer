@@ -15,6 +15,7 @@ import useStore from "app/core/hooks/useStore"
 import { Form, Field } from "react-final-form"
 import createComment from "app/comment/mutations/createComment"
 import NewCommentThread from "app/comment/components/NewCommentThread"
+import CommentEmptyState from "app/comment/components/CommentEmptyState"
 
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
   const { proposalId } = params
@@ -73,61 +74,18 @@ const ViewProposal: BlitzPage = () => {
       {(proposal?.data.totalPayments || []).length > 0 && (
         <TotalPaymentView proposal={proposal!} className="mt-9" />
       )}
-      {proposal?.comments && proposal.comments.length === 0 && (
-        <>
-          <div className="flex flex-col items-center mt-12">
-            <span className="font-bold mb-2 text-lg">
-              There are no comments on this proposal yet!
-            </span>
-            <Button>Start a conversation</Button>
-          </div>
-          <div>
-            <div className="flex flex-row items-center mb-2 space-x-2">
-              <Avatar address={activeUser?.address as string} pfpUrl={activeUser?.data?.pfpUrl} />
-              <span className="text-marble-white">{activeUser?.data?.name}</span>
-              <span className="text-concrete">{activeUser?.address}</span>
-            </div>
-            <Form
-              onSubmit={async (values: any) => {
-                if (!activeUser) {
-                  // add toast?
-                  console.error("Need to be logged in to comment")
-                  return
-                }
-                createCommentMutation({
-                  commentBody: values.commentBody,
-                  proposalId: proposal.id,
-                  authorId: activeUser.id,
-                })
-              }}
-              render={({ handleSubmit }) => {
-                return (
-                  <form onSubmit={handleSubmit} className="w-full flex flex-row space-x-2">
-                    <Field
-                      name="commentBody"
-                      component="input"
-                      className="w-full bg-wet-concrete rounded"
-                    />
-                    <Button
-                      onClick={async (e) => {
-                        e.preventDefault()
-                        await handleSubmit()
-                      }}
-                    >
-                      Send
-                    </Button>
-                  </form>
-                )
-              }}
-            />
-          </div>
-        </>
+      <h3 className="text-concrete text-xs uppercase font-bold mb-2 mt-12">Comments</h3>
+      {proposal?.comments && proposal.comments.length === 0 ? (
+        <CommentEmptyState proposal={proposal} />
+      ) : (
+        <div className="space-y-6">
+          {proposal?.comments &&
+            proposal.comments.map((comment) => (
+              <CommentContainer key={comment.id} comment={comment} proposal={proposal} />
+            ))}
+          <NewCommentThread proposal={proposal} />
+        </div>
       )}
-      {proposal?.comments &&
-        proposal.comments.map((comment) => (
-          <CommentContainer key={comment.id} comment={comment} proposal={proposal} />
-        ))}
-      <NewCommentThread proposal={proposal} />
     </>
   )
 }
