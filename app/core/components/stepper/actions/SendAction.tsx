@@ -18,7 +18,7 @@ const SendAction = () => {
 
   useEffect(() => {
     setActions({
-      step: StepType.PAYMENT,
+      step: StepType.SEND,
       actions: actions,
     })
   }, [actions])

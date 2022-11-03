@@ -70,6 +70,16 @@ const StepperRenderer = ({
   const activeStep = useStepperStore((state) => state.activeStep)
 
   const activeActions = activeStep ? actions[activeStep] : {}
+  const rolesSortedByExistenceOfAction = activeUserRoles.sort((a, b) => {
+    if (!activeActions) return 0
+    if (a in activeActions && b in activeActions) {
+      return 0
+    } else if (a in activeActions) {
+      return -1
+    } else {
+      return 1
+    }
+  })
 
   useEffect(() => {
     if (activeUserRoles[0]) {
@@ -80,12 +90,12 @@ const StepperRenderer = ({
   return (
     <nav aria-label="Progress" className={`bg-wet-concrete rounded-lg w-[300px] p-4 ${className}`}>
       <h3 className="mb-2">Proposal Progress</h3>
-      {activeUserRoles.length > 0 && (
+      {rolesSortedByExistenceOfAction.length > 0 && (
         <>
           <h4 className="mb-2 text-xs text-light-concrete uppercase">Your Roles</h4>
           <div className="flex flex-row justify-between items-center mb-3">
             <div className="flex flex-row space-x-2">
-              {activeUserRoles.map((role, idx) => {
+              {rolesSortedByExistenceOfAction.map((role, idx) => {
                 return (
                   <span
                     key={`step-${idx}`}

@@ -139,7 +139,7 @@ const PaymentAction = ({ proposal, milestone }) => {
             isDisabled={true}
             overrideWidthClassName="w-full px-4"
           >
-            Already approved
+            You have approved
           </Button>
         ),
       }),
