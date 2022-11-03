@@ -20,6 +20,12 @@ export default async function getProposalById(params: z.infer<typeof GetProposal
       },
       milestones: true,
       payments: true,
+      comments: {
+        include: {
+          children: true,
+          author: true,
+        },
+      },
     },
   })
 

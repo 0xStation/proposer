@@ -30,6 +30,7 @@ model Account {
   targetsOf          AccountAccount[]    @relation("target")
   verificationEmails EmailVerification[]
   proposalTemplates  ProposalTemplate[]
+  Comment            Comment[]
 }
 
 enum AddressType {
@@ -110,6 +111,7 @@ model Proposal {
   milestones ProposalMilestone[]
   payments   ProposalPayment[]
   signatures ProposalSignature[]
+  comments   Comment[]
 }
 
 enum ProposalStatus {
@@ -269,4 +271,26 @@ model EmailVerification {
   accountId Int
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+// COMMENT
+
+// can expand these later
+enum FieldKey {
+  ROLES
+}
+
+model Comment {
+  id         String    @id @default(uuid())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  data       Json?
+  fieldKey   FieldKey?
+  children   Comment[] @relation("Comment_Children")
+  parent     Comment?  @relation("Comment_Children", fields: [parentId], references: [id])
+  parentId   String?
+  proposal   Proposal  @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  proposalId String
+  author     Account   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId   Int
 }

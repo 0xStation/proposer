@@ -1,5 +1,5 @@
 import { gSSP } from "app/blitz-server"
-import { useQuery, invoke } from "@blitzjs/rpc"
+import { useQuery, useMutation, invoke } from "@blitzjs/rpc"
 import { BlitzPage, useParam } from "@blitzjs/next"
 import Layout from "app/core/layouts/Layout"
 import getProposalById from "app/proposal/queries/getProposalById"
@@ -8,6 +8,12 @@ import { TotalPaymentView } from "app/core/components/TotalPaymentView"
 import RoleSignaturesView from "app/core/components/RoleSignaturesView"
 import { Proposal } from "app/proposal/types"
 import { ProposalNestedLayout } from "app/core/components/ProposalNestedLayout"
+import CommentContainer from "app/comment/components/CommentContainer"
+import Button from "app/core/components/sds/buttons/Button"
+import Avatar from "app/core/components/sds/images/avatar"
+import useStore from "app/core/hooks/useStore"
+import { Form, Field } from "react-final-form"
+import createComment from "app/comment/mutations/createComment"
 
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
   const { proposalId } = params
@@ -51,6 +57,14 @@ const ViewProposal: BlitzPage = () => {
     }
   )
 
+  const activeUser = useStore((state) => state.activeUser)
+  const [createCommentMutation] = useMutation(createComment, {
+    onSuccess: (_data) => {},
+    onError: (error) => {
+      console.error(error)
+    },
+  })
+
   return (
     <>
       <ReadMore className="mt-9 mb-9">{proposal?.data?.content?.body}</ReadMore>
@@ -58,6 +72,60 @@ const ViewProposal: BlitzPage = () => {
       {(proposal?.data.totalPayments || []).length > 0 && (
         <TotalPaymentView proposal={proposal!} className="mt-9" />
       )}
+      {proposal?.comments && proposal.comments.length === 0 && (
+        <>
+          <div className="flex flex-col items-center mt-12">
+            <span className="font-bold mb-2 text-lg">
+              There are no comments on this proposal yet!
+            </span>
+            <Button>Start a conversation</Button>
+          </div>
+          <div>
+            <div className="flex flex-row items-center mb-2 space-x-2">
+              <Avatar address={activeUser?.address as string} pfpUrl={activeUser?.data?.pfpUrl} />
+              <span className="text-marble-white">{activeUser?.data?.name}</span>
+              <span className="text-concrete">{activeUser?.address}</span>
+            </div>
+            <Form
+              onSubmit={async (values: any) => {
+                if (!activeUser) {
+                  // add toast?
+                  console.error("Need to be logged in to comment")
+                  return
+                }
+                createCommentMutation({
+                  commentBody: values.commentBody,
+                  proposalId: proposal.id,
+                  authorId: activeUser.id,
+                })
+              }}
+              render={({ handleSubmit }) => {
+                return (
+                  <form onSubmit={handleSubmit} className="w-full flex flex-row space-x-2">
+                    <Field
+                      name="commentBody"
+                      component="input"
+                      className="w-full bg-wet-concrete rounded"
+                    />
+                    <Button
+                      onClick={async (e) => {
+                        e.preventDefault()
+                        await handleSubmit()
+                      }}
+                    >
+                      Send
+                    </Button>
+                  </form>
+                )
+              }}
+            />
+          </div>
+        </>
+      )}
+      {proposal?.comments &&
+        proposal.comments.map((comment) => (
+          <CommentContainer key={comment.id} comment={comment} proposal={proposal} />
+        ))}
     </>
   )
 }

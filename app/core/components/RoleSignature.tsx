@@ -1,15 +1,12 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import useStore from "../hooks/useStore"
 import { addressesAreEqual } from "../utils/addressesAreEqual"
 import { PROPOSAL_ROLE_APPROVAL_STATUS_MAP } from "../utils/constants"
 import AccountMediaObject from "./AccountMediaObject"
-import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import truncateString from "app/core/utils/truncateString"
-import { activeUserMeetsCriteria } from "app/core/utils/activeUserMeetsCriteria"
 import {
   AddressType,
-  ProposalRoleApprovalStatus,
   ProposalRoleType,
   ProposalSignatureType,
   ProposalStatus,
