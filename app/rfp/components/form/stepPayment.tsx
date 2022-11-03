@@ -30,7 +30,7 @@ export const RfpFormStepPayment = ({
   setSelectedPaymentDirection,
   selectedPaymentTerms,
   setSelectedPaymentTerms,
-  tokenOptions,
+  paymentTokenOptions,
   refetchTokens,
   isImportTokenModalOpen,
   setIsImportTokenModalOpen,
@@ -113,7 +113,7 @@ export const RfpFormStepPayment = ({
                       className="w-full bg-wet-concrete rounded p-2 mt-1"
                       value={selectedToken?.address as string}
                       onChange={(e) => {
-                        const selectedToken = tokenOptions.find((token) =>
+                        const selectedToken = paymentTokenOptions.find((token) =>
                           addressesAreEqual(token.address, e.target.value)
                         )
                         setSelectedToken(selectedToken || {})
@@ -124,7 +124,7 @@ export const RfpFormStepPayment = ({
                       }}
                     >
                       <option value="">Choose option</option>
-                      {tokenOptions?.map((token) => {
+                      {paymentTokenOptions?.map((token) => {
                         return (
                           <option key={token?.address} value={token?.address}>
                             {token?.symbol}

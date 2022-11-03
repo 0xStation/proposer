@@ -5,7 +5,7 @@ import { useRouter } from "next/router"
 import { useSession } from "@blitzjs/auth"
 import { Form } from "react-final-form"
 import { useNetwork } from "wagmi"
-import { ProposalRoleType } from "@prisma/client"
+import { ProposalRoleType, TokenType } from "@prisma/client"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import FormHeaderStepper from "app/core/components/FormHeaderStepper"
 import getTokensByAccount from "app/token/queries/getTokensByAccount"
@@ -47,7 +47,7 @@ export const RfpForm = () => {
 
   // payment directoin in parent form state because it gets reset when flipping through steps
   const [selectedPaymentDirection, setSelectedPaymentDirection] = useState<string>("")
-  const [tokenOptions, setTokenOptions] = useState<any[]>()
+  const [paymentTokenOptions, setPaymentTokenOptions] = useState<any[]>()
   const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
   const [selectedToken, setSelectedToken] = useState<any>()
   // payment terms in parent form state because it gets reset when flipping through steps if put in the rewards form
@@ -55,6 +55,7 @@ export const RfpForm = () => {
 
   // PERMISSION step
 
+  const [permissionTokenOptions, setPermissionTokenOptions] = useState<any[]>()
   const [selectedSubmissionToken, setSelectedSubmissionToken] = useState<any>()
 
   // other
@@ -81,17 +82,24 @@ export const RfpForm = () => {
       chainId: chain?.id || 1,
       userId: session?.userId as number,
     },
-    { suspense: false, enabled: Boolean(chain && session?.userId) }
+    { suspense: false, enabled: Boolean(chain && session?.userId), staleTime: 30 * 1000 }
   )
 
   useEffect(() => {
     if (chain?.id) {
       const networkTokens = getNetworkTokens(chain?.id || 1)
+      const userTokens = savedUserTokens?.filter((token) => token.chainId === chain?.id)
       // sets options for reward token dropdown. includes default tokens and
       // tokens that the user has imported to their account
-      setTokenOptions([...networkTokens, ...(savedUserTokens || [])])
+      setPaymentTokenOptions([
+        ...networkTokens,
+        // only support payments with ERC20 right now
+        ...(userTokens?.filter((token) => token.type === TokenType.ERC20) || []),
+      ])
+      // only token gate on user-defined tokens
+      setPermissionTokenOptions(userTokens || [])
     }
-  }, [chain?.id])
+  }, [chain?.id, savedUserTokens])
 
   return (
     <div className="max-w-[580px] h-full mx-auto">
@@ -107,7 +115,6 @@ export const RfpForm = () => {
       <Form
         initialValues={{}}
         onSubmit={async (values: any, form) => {
-          console.log("paymentDirection", values.paymentDirection)
           const clientAddress =
             values.paymentDirection === PaymentDirection.AUTHOR_IS_SENDER
               ? session.siwe?.address
@@ -193,7 +200,7 @@ export const RfpForm = () => {
                     {proposalStep === RfpFormStep.PAYMENT && (
                       <RfpFormStepPayment
                         chainId={(chain?.id as number) || 1}
-                        tokenOptions={tokenOptions}
+                        paymentTokenOptions={paymentTokenOptions}
                         refetchTokens={refetchTokens}
                         isImportTokenModalOpen={isImportTokenModalOpen}
                         setIsImportTokenModalOpen={setIsImportTokenModalOpen}
@@ -208,7 +215,7 @@ export const RfpForm = () => {
                     )}
                     {proposalStep === RfpFormStep.PERMISSIONS && (
                       <RfpFormStepPermission
-                        tokenOptions={tokenOptions}
+                        permissionTokenOptions={permissionTokenOptions}
                         selectedSubmissionToken={selectedSubmissionToken}
                         setSelectedSubmissionToken={setSelectedSubmissionToken}
                         isImportTokenModalOpen={isImportTokenModalOpen}
@@ -274,8 +281,8 @@ export const RfpForm = () => {
                       isLoading={isLoading}
                       onClick={async (e) => {
                         e.preventDefault()
-                        setIsLoading(true)
                         if (session.siwe?.address) {
+                          setIsLoading(true)
                           await handleSubmit()
                         } else {
                           toggleWalletModal(true)

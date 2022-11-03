@@ -5,15 +5,18 @@ import { LINKS, RfpFormStep } from "app/core/utils/constants"
 import { composeValidators, isValidTokenAmount, requiredField } from "app/utils/validators"
 import { Field } from "react-final-form"
 import Preview from "app/core/components/MarkdownPreview"
-import { formatTokenAmount } from "app/utils/formatters"
+import { formatPositiveInt, formatTokenAmount } from "app/utils/formatters"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { useSession } from "@blitzjs/auth"
 import useStore from "app/core/hooks/useStore"
 import useHasMounted from "app/core/hooks/useHasMounted"
 import ImportTokenModal from "app/core/components/ImportTokenModal"
+import { TokenType } from "@prisma/client"
+import WhenFieldChanges from "app/core/components/WhenFieldChanges"
+import { getNetworkName } from "app/core/utils/networkInfo"
 
 export const RfpFormStepPermission = ({
-  tokenOptions,
+  permissionTokenOptions,
   selectedSubmissionToken,
   setSelectedSubmissionToken,
   isImportTokenModalOpen,
@@ -47,7 +50,10 @@ export const RfpFormStepPermission = ({
       />
       {/* SUBMISSION TOKEN */}
       <label className="font-bold block mt-6">Token-gating on proposal submissions*</label>
-      {/* <span className="text-xs text-concrete block"></span> */}
+      <span className="text-xs text-concrete block">
+        Select from ERC-20 or ERC-721 tokens on the{" "}
+        <span className="font-bold">{getNetworkName(chainId).toUpperCase()}</span> network.
+      </span>
       <Field name="submissionTokenAddress">
         {({ input, meta }) => {
           return (
@@ -60,7 +66,7 @@ export const RfpFormStepPermission = ({
                   className="w-full bg-wet-concrete rounded p-2 mt-1"
                   value={selectedSubmissionToken?.address as string}
                   onChange={(e) => {
-                    const selectedSubmissionToken = tokenOptions.find((token) =>
+                    const selectedSubmissionToken = permissionTokenOptions.find((token) =>
                       addressesAreEqual(token.address, e.target.value)
                     )
                     setSelectedSubmissionToken(selectedSubmissionToken)
@@ -71,10 +77,10 @@ export const RfpFormStepPermission = ({
                   }}
                 >
                   <option value="">None</option>
-                  {tokenOptions?.map((token) => {
+                  {permissionTokenOptions?.map((token) => {
                     return (
                       <option key={token?.address} value={token?.address}>
-                        {token?.symbol}
+                        {`${token?.symbol} - ${token?.name} (${token?.type})`}
                       </option>
                     )
                   })}
@@ -87,11 +93,7 @@ export const RfpFormStepPermission = ({
           )
         }}
       </Field>
-      <div className="flex flex-row justify-between">
-        <span className="text-xs text-concrete block">
-          {" "}
-          Don&apos;t see your token? Import an ERC-20 with its address.
-        </span>
+      <div className="flex flex-row justify-end">
         <button
           className="text-electric-violet cursor-pointer flex justify-start"
           onClick={(e) => {
@@ -108,10 +110,19 @@ export const RfpFormStepPermission = ({
         <>
           {/* MINIMUM BALANCE */}
           <label className="font-bold block mt-6">Minimum balance*</label>
-          {/* <span className="text-xs text-concrete block"></span> */}
+          <WhenFieldChanges
+            // when changing tokens, reset minimum balance value
+            field="submissionTokenAddress"
+            set="submissionTokenMinBalance"
+            to={""}
+          />
           <Field
             name="submissionTokenMinBalance"
-            format={formatTokenAmount}
+            format={
+              selectedSubmissionToken.type === TokenType.ERC721
+                ? formatPositiveInt // 721 has no decimals so all balances are integers
+                : formatTokenAmount // other token amounts support decimals
+            }
             validate={composeValidators(requiredField, isValidTokenAmount)}
           >
             {({ input, meta }) => {
