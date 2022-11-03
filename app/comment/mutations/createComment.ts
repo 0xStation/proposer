@@ -11,6 +11,7 @@ const CreateComment = z.object({
 
 export default async function createComment(input: z.infer<typeof CreateComment>, ctx: Ctx) {
   const params = CreateComment.parse(input)
+  console.log(params)
 
   await db.comment.create({
     data: {
