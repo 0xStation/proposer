@@ -1,11 +1,14 @@
+import { useEffect } from "react"
 import { ProposalRoleType } from "@prisma/client"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useGetRolesUserCanApprove from "app/core/hooks/useGetRolesUserCanApprove"
 import { useStepperStore } from "../StepperRenderer"
 import useStore from "app/core/hooks/useStore"
+import { StepType } from "../steps/Step"
 
 const ApproveAction = ({ proposal }) => {
   const activeRole = useStepperStore((state) => state.activeRole)
+  const setActions = useStepperStore((state) => state.setActions)
   const { roles: rolesUserCanApprove } = useGetRolesUserCanApprove(proposal.id)
   const activeUserHasRolesToSign = rolesUserCanApprove.length > 0
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
@@ -24,6 +27,13 @@ const ApproveAction = ({ proposal }) => {
       ),
     }),
   }
+
+  useEffect(() => {
+    setActions({
+      step: StepType.APPROVE,
+      actions: actions,
+    })
+  }, [actions])
 
   if (activeRole && actions[activeRole]) {
     return actions[activeRole]
