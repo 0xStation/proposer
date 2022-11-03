@@ -348,6 +348,12 @@ export const ProposalFormTemplate = () => {
                   <Button
                     isDisabled={
                       unFilledProposalFields ||
+                      // proposing to own RFP
+                      addressesAreEqual(
+                        session?.siwe?.address as string,
+                        rfp?.accountAddress as string
+                      ) ||
+                      // has not connected wallet with token requirement (if one exists)
                       (!!rfp?.data?.singleTokenGate &&
                         (isTokenGatingCheckLoading ||
                           (isTokenGatingCheckComplete && !userHasRequiredToken)))
@@ -376,6 +382,14 @@ export const ProposalFormTemplate = () => {
                   >
                     Next
                   </Button>
+                  {addressesAreEqual(
+                    session?.siwe?.address as string,
+                    rfp?.accountAddress as string
+                  ) && (
+                    <span className="text-xs text-concrete">
+                      You cannot propose to your own RFP.
+                    </span>
+                  )}
                   {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
                     <span className="text-xs text-concrete">
                       Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
@@ -397,6 +411,12 @@ export const ProposalFormTemplate = () => {
                       isDisabled={
                         isLoading ||
                         unFilledProposalFields ||
+                        // proposing to own RFP
+                        addressesAreEqual(
+                          session?.siwe?.address as string,
+                          rfp?.accountAddress as string
+                        ) ||
+                        // has not connected wallet with token requirement (if one exists)
                         (!!rfp?.data?.singleTokenGate &&
                           (isTokenGatingCheckLoading ||
                             (isTokenGatingCheckComplete && !userHasRequiredToken)))
@@ -435,6 +455,14 @@ export const ProposalFormTemplate = () => {
                     >
                       Send proposal
                     </Button>
+                    {addressesAreEqual(
+                      session?.siwe?.address as string,
+                      rfp?.accountAddress as string
+                    ) && (
+                      <span className="text-xs text-concrete">
+                        You cannot propose to your own RFP.
+                      </span>
+                    )}
                     {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
                       <span className="text-xs text-concrete">
                         Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this

@@ -13,6 +13,7 @@ import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { useSession } from "@blitzjs/auth"
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
 export const TemplateFormStepConfirm = ({ body }) => {
   const session = useSession({ suspense: false })
@@ -54,13 +55,12 @@ export const TemplateFormStepConfirm = ({ body }) => {
 
   const templateClientAddress = getClientAddress(template?.data?.fields)
   const templateContributorAddress = getContributorAddress(template?.data?.fields)
+  const connectedAddress = session?.siwe?.address as string
 
-  const clientAddress = templateClientAddress
-    ? templateClientAddress
-    : (session?.siwe?.address as string)
+  const clientAddress = templateClientAddress ? templateClientAddress : connectedAddress
   const contributorAddress = templateContributorAddress
     ? templateContributorAddress
-    : (session?.siwe?.address as string)
+    : connectedAddress
 
   const { text: clientDisplayAddress } = useDisplayAddress(clientAddress)
   const { text: contributorDisplayAddress } = useDisplayAddress(contributorAddress)
@@ -73,12 +73,20 @@ export const TemplateFormStepConfirm = ({ body }) => {
       {/* CLIENT */}
       <div className="mt-6 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Client</span>
-        <span className="items-end">{"@" + clientDisplayAddress}</span>
+        <span className="items-end">
+          {"@" +
+            clientDisplayAddress +
+            (addressesAreEqual(connectedAddress, clientAddress) ? " (you)" : "")}
+        </span>
       </div>
       {/* CONTRIBUTOR */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Contributor</span>
-        <span className="items-end">{"@" + contributorDisplayAddress}</span>
+        <span className="items-end">
+          {"@" +
+            contributorDisplayAddress +
+            (addressesAreEqual(connectedAddress, contributorAddress) ? " (you)" : "")}
+        </span>
       </div>
       {/* TITLE */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">

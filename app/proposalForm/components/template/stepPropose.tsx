@@ -55,13 +55,12 @@ export const TemplateFormStepPropose = ({ formState }) => {
 
   const templateClientAddress = getClientAddress(template?.data?.fields)
   const templateContributorAddress = getContributorAddress(template?.data?.fields)
+  const connectedAddress = session?.siwe?.address as string
 
-  const clientAddress = templateClientAddress
-    ? templateClientAddress
-    : (session?.siwe?.address as string)
+  const clientAddress = templateClientAddress ? templateClientAddress : connectedAddress
   const contributorAddress = templateContributorAddress
     ? templateContributorAddress
-    : (session?.siwe?.address as string)
+    : connectedAddress
 
   const { text: clientDisplayAddress } = useDisplayAddress(clientAddress)
   const { text: contributorDisplayAddress } = useDisplayAddress(contributorAddress)
@@ -72,7 +71,7 @@ export const TemplateFormStepPropose = ({ formState }) => {
         <>
           {/* CLIENT */}
           <div className="mt-4 flex flex-row w-full items-center justify-between">
-            <span className="font-bold">Client</span>
+            <span className="font-bold">To</span>
             <span className="items-end">{"@" + clientDisplayAddress}</span>
           </div>
         </>
@@ -81,7 +80,7 @@ export const TemplateFormStepPropose = ({ formState }) => {
         <>
           {/* CONTRIBUTOR */}
           <div className="mt-4 flex flex-row w-full items-center justify-between">
-            <span className="font-bold">Contributor</span>
+            <span className="font-bold">To</span>
             <span className="items-end">{"@" + contributorDisplayAddress}</span>
           </div>
         </>
