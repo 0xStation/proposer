@@ -11,6 +11,7 @@ import { ProposalNestedLayout } from "app/core/components/ProposalNestedLayout"
 import CommentContainer from "app/comment/components/CommentContainer"
 import NewCommentThread from "app/comment/components/NewCommentThread"
 import CommentEmptyState from "app/comment/components/CommentEmptyState"
+import useGetUserRoles from "app/core/hooks/useGetUsersRoles"
 
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
   const { proposalId } = params
@@ -54,6 +55,10 @@ const ViewProposal: BlitzPage = () => {
     }
   )
 
+  const { roles: userRoles } = useGetUserRoles(proposal?.id)
+  const canRead = userRoles.length > 0
+  const canWrite = userRoles.length > 0
+
   return (
     <>
       <ReadMore className="mt-9 mb-9">{proposal?.data?.content?.body}</ReadMore>
@@ -61,21 +66,41 @@ const ViewProposal: BlitzPage = () => {
       {(proposal?.data.totalPayments || []).length > 0 && (
         <TotalPaymentView proposal={proposal!} className="mt-9" />
       )}
-      <h3 className="text-concrete text-xs uppercase font-bold mb-2 mt-12">Comments</h3>
+      {canRead && (
+        <h3 className="text-concrete text-xs uppercase font-bold mb-2 mt-12">Comments</h3>
+      )}
       {proposal?.comments && proposal.comments.length === 0 ? (
-        <CommentEmptyState proposal={proposal} setProposalQueryData={setProposalQueryData} />
+        <CommentEmptyState
+          proposal={proposal}
+          setProposalQueryData={setProposalQueryData}
+          permissions={{
+            canRead,
+            canWrite,
+          }}
+        />
       ) : (
         <div className="space-y-6">
           {proposal?.comments &&
-            proposal.comments.map((comment) => (
+            proposal.comments.map((comment, idx) => (
               <CommentContainer
-                key={comment.id}
+                key={`comment-${idx}`}
                 comment={comment}
                 proposal={proposal}
                 setProposalQueryData={setProposalQueryData}
+                permissions={{
+                  canRead,
+                  canWrite,
+                }}
               />
             ))}
-          <NewCommentThread proposal={proposal} setProposalQueryData={setProposalQueryData} />
+          <NewCommentThread
+            proposal={proposal}
+            setProposalQueryData={setProposalQueryData}
+            permissions={{
+              canRead,
+              canWrite,
+            }}
+          />
         </div>
       )}
     </>

@@ -3,11 +3,12 @@ import { Transition } from "@headlessui/react"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import NewCommentThreadForm from "app/comment/components/NewCommentThreadForm"
 
-const NewCommentThread = ({ proposal, setProposalQueryData }) => {
+const NewCommentThread = ({ proposal, setProposalQueryData, permissions }) => {
+  const { canWrite, canRead } = permissions
   const [showNewThread, setShowNewThread] = useState(false)
   return (
     <div className="mt-4 h-[100px]">
-      {!showNewThread && (
+      {!showNewThread && canWrite && (
         <Button
           type={ButtonType.Unemphasized}
           className="mx-auto block"
@@ -17,7 +18,7 @@ const NewCommentThread = ({ proposal, setProposalQueryData }) => {
         </Button>
       )}
       <Transition
-        show={showNewThread}
+        show={showNewThread && canWrite}
         enter="transform transition ease-in-out duration-500 sm:duration-700"
         enterFrom="translate-y-full"
         enterTo="translate-y-0"

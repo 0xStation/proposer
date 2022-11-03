@@ -11,7 +11,28 @@ const CreateComment = z.object({
 
 export default async function createComment(input: z.infer<typeof CreateComment>, ctx: Ctx) {
   const params = CreateComment.parse(input)
-  console.log(params)
+
+  const proposal = await db.proposal.findUnique({
+    where: {
+      id: params.proposalId,
+    },
+    include: {
+      roles: {
+        include: {
+          account: true,
+        },
+      },
+    },
+  })
+
+  if (!proposal) {
+    console.error("cannot add comments to a proposal that does not exist")
+    return null
+  }
+
+  const addressesWithValidRoles = proposal.roles.map((role) => role.address)
+  const accountIdsWithValidRoles = proposal.roles.map((role) => role.account.id)
+  ctx.session.$authorize(addressesWithValidRoles, accountIdsWithValidRoles)
 
   await db.comment.create({
     data: {

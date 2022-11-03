@@ -3,16 +3,17 @@ import { Transition } from "@headlessui/react"
 import Button from "app/core/components/sds/buttons/Button"
 import NewCommentThreadForm from "app/comment/components/NewCommentThreadForm"
 
-const CommentEmptyState = ({ proposal, setProposalQueryData }) => {
+const CommentEmptyState = ({ proposal, setProposalQueryData, permissions }) => {
+  const { canRead, canWrite } = permissions
   const [showNewThread, setShowNewThread] = useState(false)
   return (
     <div className="h-[300px]">
-      {!showNewThread && (
+      {!showNewThread && canRead && (
         <div className="flex h-full flex-col items-center justify-center">
           <span className="font-bold mb-4 text-xl">
             There are no comments on this proposal yet!
           </span>
-          <Button onClick={() => setShowNewThread(true)}>Start a conversation</Button>
+          {canWrite && <Button onClick={() => setShowNewThread(true)}>Start a conversation</Button>}
         </div>
       )}
       <Transition
