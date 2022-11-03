@@ -35,7 +35,7 @@ export const RfpFormStepPermission = ({
     // the reward form relies on the active chain to determine which tokens
     // to pull from
     if (hasMounted && (!activeUser?.address || !session?.siwe?.address)) {
-      setProposalStep(RfpFormStep.GENERAL)
+      setProposalStep(RfpFormStep.RFP)
     }
   }, [activeUser?.address, session?.siwe?.address, hasMounted])
 

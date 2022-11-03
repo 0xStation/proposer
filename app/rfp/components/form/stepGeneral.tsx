@@ -88,7 +88,7 @@ export const RfpFormStepPropose = ({
         </Field>
       )}
       {/* WORD COUNT */}
-      <label className="font-bold block mt-6">Word count requirment</label>
+      <label className="font-bold block mt-6">Word count requirement</label>
       {/* <span className="text-xs text-concrete block"></span> */}
       <Field name="bodyValidation">
         {({ meta, input }) => (

@@ -46,6 +46,7 @@ import getRfpCountForAccount from "app/rfp/queries/getRfpCountForAccount"
 import getProposalCountForAccount from "app/proposal/queries/getProposalCountForAccount"
 import { RfpCard } from "app/rfp/components/RfpCard"
 import { useSession } from "@blitzjs/auth"
+import useUserHasAuthority from "app/core/hooks/useUserHasAuthority"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
@@ -86,8 +87,6 @@ const WorkspaceHome: BlitzPage = () => {
   const [newAuth, setNewAuth] = useState<string>("")
   const activeUser = useStore((state) => state.activeUser)
   const accountData = useAccount()
-  const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
-  const [canViewSettings, setCanViewSettings] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<WorkspaceTab>(
     (tab as WorkspaceTab) || WorkspaceTab.PROPOSALS
   )
@@ -109,34 +108,12 @@ const WorkspaceHome: BlitzPage = () => {
     }
   )
 
-  const [safeMetadata] = useQuery(
-    getSafeMetadata,
-    { chainId: account?.data?.chainId!, address: account?.address! },
-    {
-      enabled: !!account && account.addressType === AddressType.SAFE,
-      suspense: false,
-      refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute
-    }
+  // checks if session address is page's account address or is a signer of the account's Safe
+  const { hasAuthority: hasPrivateAccess } = useUserHasAuthority(
+    accountAddress,
+    account?.addressType,
+    account?.data?.chainId
   )
-
-  // if activeUser is the workspace address or is a signer for it, show settings tab
-  useEffect(() => {
-    const userIsWorkspace =
-      accountAddress === activeUser?.address && accountAddress === connectedAddress
-    const userIsWorkspaceSigner =
-      safeMetadata?.signers.includes(activeUser?.address || "") &&
-      safeMetadata?.signers.includes(connectedAddress || "")
-
-    if (userIsWorkspace || userIsWorkspaceSigner) {
-      setCanViewSettings(true)
-    } else {
-      setCanViewSettings(false)
-      if (activeTab === WorkspaceTab.SETTINGS) {
-        setActiveTab(WorkspaceTab.PROPOSALS)
-      }
-    }
-  }, [activeUser, connectedAddress, accountAddress, safeMetadata])
 
   const ProposalTab = () => {
     const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
@@ -387,7 +364,7 @@ const WorkspaceHome: BlitzPage = () => {
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
         <div className="flex flex-row justify-between">
           <h1 className="text-2xl font-bold">RFPs</h1>
-          {accountAddress === session?.siwe?.address && (
+          {hasPrivateAccess && (
             <Link href={Routes.RfpNew()}>
               <Button className="w-full px-10" overrideWidthClassName="max-w-fit">
                 Create RFP
@@ -534,7 +511,7 @@ const WorkspaceHome: BlitzPage = () => {
               <span>RFPs</span>
             </li>
             {/* SETTINGS */}
-            {canViewSettings && (
+            {hasPrivateAccess && (
               <li
                 className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
                   activeTab === WorkspaceTab.SETTINGS && "bg-wet-concrete"

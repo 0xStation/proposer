@@ -44,14 +44,14 @@ export const PROPOSAL_FORM_HEADER_COPY = {
 }
 
 export enum RfpFormStep {
-  GENERAL = "GENERAL",
+  RFP = "RFP",
   PAYMENT = "PAYMENT",
   PERMISSIONS = "PERMISSIONS",
 }
 
 export const RFP_FORM_HEADER_COPY = {
-  [RfpFormStep.GENERAL]: "General information",
-  [RfpFormStep.PAYMENT]: "Payment details",
+  [RfpFormStep.RFP]: "RFP",
+  [RfpFormStep.PAYMENT]: "Payment",
   [RfpFormStep.PERMISSIONS]: "Permissions",
 }
 

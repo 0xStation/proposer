@@ -36,7 +36,7 @@ export const RfpForm = () => {
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const walletModalOpen = useStore((state) => state.walletModalOpen)
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [proposalStep, setProposalStep] = useState<RfpFormStep>(RfpFormStep.GENERAL)
+  const [proposalStep, setProposalStep] = useState<RfpFormStep>(RfpFormStep.RFP)
 
   // GENERAL step
 
@@ -106,7 +106,7 @@ export const RfpForm = () => {
       <FormHeaderStepper
         activeStep={RFP_FORM_HEADER_COPY[proposalStep]}
         steps={[
-          RFP_FORM_HEADER_COPY[RfpFormStep.GENERAL],
+          RFP_FORM_HEADER_COPY[RfpFormStep.RFP],
           RFP_FORM_HEADER_COPY[RfpFormStep.PAYMENT],
           RFP_FORM_HEADER_COPY[RfpFormStep.PERMISSIONS],
         ]}
@@ -190,7 +190,7 @@ export const RfpForm = () => {
                     <h2 className="text-marble-white text-xl font-bold">
                       {RFP_FORM_HEADER_COPY[proposalStep]}
                     </h2>
-                    {proposalStep === RfpFormStep.GENERAL && (
+                    {proposalStep === RfpFormStep.RFP && (
                       <RfpFormStepPropose
                         formState={formState}
                         selectedBodyValidation={selectedBodyValidation}
@@ -228,7 +228,7 @@ export const RfpForm = () => {
                   </>
                 )}
               </div>
-              {proposalStep === RfpFormStep.GENERAL && (
+              {proposalStep === RfpFormStep.RFP && (
                 <Button
                   isDisabled={missingFieldsGeneral}
                   className="my-6 float-right"
@@ -246,7 +246,7 @@ export const RfpForm = () => {
               {proposalStep === RfpFormStep.PAYMENT && (
                 <div className="flex justify-between mt-6">
                   <span
-                    onClick={() => setProposalStep(RfpFormStep.GENERAL)}
+                    onClick={() => setProposalStep(RfpFormStep.RFP)}
                     className="cursor-pointer border rounded border-marble-white p-2 self-start"
                   >
                     <BackArrow className="fill-marble-white" />
