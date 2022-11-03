@@ -14,6 +14,7 @@ import Avatar from "app/core/components/sds/images/avatar"
 import useStore from "app/core/hooks/useStore"
 import { Form, Field } from "react-final-form"
 import createComment from "app/comment/mutations/createComment"
+import NewCommentThread from "app/comment/components/NewCommentThread"
 
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
   const { proposalId } = params
@@ -126,6 +127,7 @@ const ViewProposal: BlitzPage = () => {
         proposal.comments.map((comment) => (
           <CommentContainer key={comment.id} comment={comment} proposal={proposal} />
         ))}
+      <NewCommentThread proposal={proposal} />
     </>
   )
 }

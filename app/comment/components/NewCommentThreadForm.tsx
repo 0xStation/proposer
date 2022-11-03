@@ -1,48 +1,35 @@
 import { useMutation, invalidateQuery } from "@blitzjs/rpc"
 import useStore from "app/core/hooks/useStore"
-import { Form, Field } from "react-final-form"
 import createComment from "app/comment/mutations/createComment"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import AccountMediaRow from "./AccountMediaRow"
+import { Form, Field } from "react-final-form"
+import Button from "app/core/components/sds/buttons/Button"
 import getProposalById from "app/proposal/queries/getProposalById"
 
-const CommentContainer = ({ proposal, comment }) => {
+const NewCommentThreadForm = ({ proposal, cleanup }) => {
   const activeUser = useStore((state) => state.activeUser)
-  const [createCommentMutation] = useMutation(createComment, {
-    onSuccess: (_data) => {},
-    onError: (error) => {
-      console.error(error)
-    },
-  })
+  const setToastState = useStore((state) => state.setToastState)
+  const [createCommentMutation] = useMutation(createComment)
 
   return (
-    <div className="mt-12 border rounded-lg border-wet-concrete p-4 flex flex-col space-y-4">
-      <AccountMediaRow comment={comment} />
-      <span>{comment.data.message}</span>
-      {comment.children.map((child) => {
-        return (
-          <>
-            <AccountMediaRow comment={child} />
-            <span>{child.data.message}</span>
-          </>
-        )
-      })}
+    <div>
       <Form
         onSubmit={async (values: any, form) => {
           if (!activeUser) {
-            // add toast?
-            console.error("Need to be logged in to comment")
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "You must be logged in to comment",
+            })
             return
           }
           await createCommentMutation({
             commentBody: values.commentBody,
             proposalId: proposal.id,
             authorId: activeUser.id,
-            parentId: comment.id,
           })
-
           invalidateQuery(getProposalById)
           form.restart()
+          cleanup()
         }}
         render={({ handleSubmit }) => {
           return (
@@ -50,11 +37,16 @@ const CommentContainer = ({ proposal, comment }) => {
               <Field
                 name="commentBody"
                 component="input"
-                placeholder="leave a reply"
+                placeholder="Write your comment here"
                 className="w-full bg-wet-concrete rounded px-2"
               />
-              <Button type={ButtonType.Secondary} isSubmitType={true}>
-                Reply
+              <Button
+                onClick={async (e) => {
+                  e.preventDefault()
+                  await handleSubmit()
+                }}
+              >
+                Send
               </Button>
             </form>
           )
@@ -64,4 +56,4 @@ const CommentContainer = ({ proposal, comment }) => {
   )
 }
 
-export default CommentContainer
+export default NewCommentThreadForm
