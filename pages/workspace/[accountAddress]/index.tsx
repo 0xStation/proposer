@@ -45,6 +45,7 @@ import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 import getRfpCountForAccount from "app/rfp/queries/getRfpCountForAccount"
 import getProposalCountForAccount from "app/proposal/queries/getProposalCountForAccount"
 import { RfpCard } from "app/rfp/components/RfpCard"
+import { useSession } from "@blitzjs/auth"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
@@ -77,6 +78,7 @@ export const getServerSideProps = gSSP(async ({ params = {} }) => {
 })
 
 const WorkspaceHome: BlitzPage = () => {
+  const session = useSession({ suspense: false })
   const accountAddress = useParam("accountAddress", "string") as string
   const queryParams = useRouter().query
   const tab = queryParams?.tab as string
@@ -385,11 +387,13 @@ const WorkspaceHome: BlitzPage = () => {
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
         <div className="flex flex-row justify-between">
           <h1 className="text-2xl font-bold">RFPs</h1>
-          <Link href={Routes.RfpNew()}>
-            <Button className="w-full px-10" overrideWidthClassName="max-w-fit">
-              Create RFP
-            </Button>
-          </Link>
+          {accountAddress === session?.siwe?.address && (
+            <Link href={Routes.RfpNew()}>
+              <Button className="w-full px-10" overrideWidthClassName="max-w-fit">
+                Create RFP
+              </Button>
+            </Link>
+          )}
         </div>
         {/* FILTERS & PAGINATION */}
         <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">
