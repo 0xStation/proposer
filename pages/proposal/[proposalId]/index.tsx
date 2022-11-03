@@ -1,5 +1,5 @@
 import { gSSP } from "app/blitz-server"
-import { useQuery, useMutation, invoke } from "@blitzjs/rpc"
+import { useQuery, invoke } from "@blitzjs/rpc"
 import { BlitzPage, useParam } from "@blitzjs/next"
 import Layout from "app/core/layouts/Layout"
 import getProposalById from "app/proposal/queries/getProposalById"
@@ -9,11 +9,6 @@ import RoleSignaturesView from "app/core/components/RoleSignaturesView"
 import { Proposal } from "app/proposal/types"
 import { ProposalNestedLayout } from "app/core/components/ProposalNestedLayout"
 import CommentContainer from "app/comment/components/CommentContainer"
-import Button from "app/core/components/sds/buttons/Button"
-import Avatar from "app/core/components/sds/images/avatar"
-import useStore from "app/core/hooks/useStore"
-import { Form, Field } from "react-final-form"
-import createComment from "app/comment/mutations/createComment"
 import NewCommentThread from "app/comment/components/NewCommentThread"
 import CommentEmptyState from "app/comment/components/CommentEmptyState"
 
@@ -47,7 +42,7 @@ export const getServerSideProps = gSSP(async ({ params = {} }) => {
 
 const ViewProposal: BlitzPage = () => {
   const proposalId = useParam("proposalId") as string
-  const [proposal] = useQuery(
+  const [proposal, { setQueryData: setProposalQueryData }] = useQuery(
     getProposalById,
     { id: proposalId },
     {
@@ -59,14 +54,6 @@ const ViewProposal: BlitzPage = () => {
     }
   )
 
-  const activeUser = useStore((state) => state.activeUser)
-  const [createCommentMutation] = useMutation(createComment, {
-    onSuccess: (_data) => {},
-    onError: (error) => {
-      console.error(error)
-    },
-  })
-
   return (
     <>
       <ReadMore className="mt-9 mb-9">{proposal?.data?.content?.body}</ReadMore>
@@ -76,14 +63,19 @@ const ViewProposal: BlitzPage = () => {
       )}
       <h3 className="text-concrete text-xs uppercase font-bold mb-2 mt-12">Comments</h3>
       {proposal?.comments && proposal.comments.length === 0 ? (
-        <CommentEmptyState proposal={proposal} />
+        <CommentEmptyState proposal={proposal} setProposalQueryData={setProposalQueryData} />
       ) : (
         <div className="space-y-6">
           {proposal?.comments &&
             proposal.comments.map((comment) => (
-              <CommentContainer key={comment.id} comment={comment} proposal={proposal} />
+              <CommentContainer
+                key={comment.id}
+                comment={comment}
+                proposal={proposal}
+                setProposalQueryData={setProposalQueryData}
+              />
             ))}
-          <NewCommentThread proposal={proposal} />
+          <NewCommentThread proposal={proposal} setProposalQueryData={setProposalQueryData} />
         </div>
       )}
     </>

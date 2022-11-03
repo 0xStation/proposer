@@ -1,19 +1,13 @@
-import { useMutation, invalidateQuery } from "@blitzjs/rpc"
+import { useMutation } from "@blitzjs/rpc"
 import useStore from "app/core/hooks/useStore"
 import { Form, Field } from "react-final-form"
 import createComment from "app/comment/mutations/createComment"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import AccountMediaRow from "./AccountMediaRow"
-import getProposalById from "app/proposal/queries/getProposalById"
 
-const CommentContainer = ({ proposal, comment }) => {
+const CommentContainer = ({ proposal, comment, setProposalQueryData }) => {
   const activeUser = useStore((state) => state.activeUser)
-  const [createCommentMutation] = useMutation(createComment, {
-    onSuccess: (_data) => {},
-    onError: (error) => {
-      console.error(error)
-    },
-  })
+  const [createCommentMutation] = useMutation(createComment)
 
   return (
     <div className="border rounded-lg border-wet-concrete p-4 flex flex-col space-y-6">
@@ -42,8 +36,30 @@ const CommentContainer = ({ proposal, comment }) => {
             authorId: activeUser.id,
             parentId: comment.id,
           })
-
-          invalidateQuery(getProposalById)
+          const proposalWithNewReply = {
+            ...proposal,
+            comments: proposal.comments.map((mapComment) => {
+              if (mapComment.id === comment.id) {
+                return {
+                  ...comment,
+                  children: [
+                    ...comment.children,
+                    {
+                      // don't need id for optomistic update, and we don't have it anyways
+                      createdAt: new Date(),
+                      data: {
+                        message: values.commentBody,
+                      },
+                      author: {
+                        address: activeUser.address,
+                      },
+                    },
+                  ],
+                }
+              }
+            }),
+          }
+          setProposalQueryData(proposalWithNewReply)
           form.restart()
         }}
         render={({ handleSubmit }) => {

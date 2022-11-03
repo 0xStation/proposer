@@ -3,7 +3,7 @@ import { Transition } from "@headlessui/react"
 import Button from "app/core/components/sds/buttons/Button"
 import NewCommentThreadForm from "app/comment/components/NewCommentThreadForm"
 
-const CommentEmptyState = ({ proposal }) => {
+const CommentEmptyState = ({ proposal, setProposalQueryData }) => {
   const [showNewThread, setShowNewThread] = useState(false)
   return (
     <div className="h-[300px]">
@@ -25,7 +25,11 @@ const CommentEmptyState = ({ proposal }) => {
         leaveTo="opacity-0"
       >
         <div className="rounded-lg border border-wet-concrete p-4 mb-36">
-          <NewCommentThreadForm proposal={proposal} cleanup={() => setShowNewThread(false)} />
+          <NewCommentThreadForm
+            proposal={proposal}
+            cleanup={() => setShowNewThread(false)}
+            setProposalQueryData={setProposalQueryData}
+          />
         </div>
       </Transition>
     </div>

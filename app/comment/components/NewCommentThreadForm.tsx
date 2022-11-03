@@ -5,7 +5,7 @@ import { Form, Field } from "react-final-form"
 import Button from "app/core/components/sds/buttons/Button"
 import getProposalById from "app/proposal/queries/getProposalById"
 
-const NewCommentThreadForm = ({ proposal, cleanup }) => {
+const NewCommentThreadForm = ({ proposal, cleanup, setProposalQueryData }) => {
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const [createCommentMutation] = useMutation(createComment)
@@ -27,7 +27,25 @@ const NewCommentThreadForm = ({ proposal, cleanup }) => {
             proposalId: proposal.id,
             authorId: activeUser.id,
           })
-          await invalidateQuery(getProposalById)
+
+          const proposalWithNewComment = {
+            ...proposal,
+            comments: [
+              ...proposal.comments,
+              {
+                // don't need id for optomistic update, and we don't have it anyways
+                createdAt: new Date(),
+                data: {
+                  message: values.commentBody,
+                },
+                author: {
+                  address: activeUser.address,
+                },
+                children: [],
+              },
+            ],
+          }
+          setProposalQueryData(proposalWithNewComment)
           form.restart()
           cleanup()
         }}
