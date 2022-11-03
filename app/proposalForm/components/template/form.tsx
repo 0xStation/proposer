@@ -19,8 +19,9 @@ import TemplateFormStepConfirm from "./stepConfirm"
 import { AddressType, ProposalRoleType } from "@prisma/client"
 import { mustBeAboveNumWords } from "app/utils/validators"
 import {
-  addAddressAsRecipientToPayments,
+  addAddressesToPayments,
   getClientAddress,
+  getContributorAddress,
   getFieldValue,
   getMinNumWords,
 } from "app/template/utils"
@@ -241,20 +242,39 @@ export const ProposalFormTemplate = () => {
               return
             }
 
-            try {
-              const contributorAddress = session?.siwe?.address as string
+            const templateClientAddress = getClientAddress(template?.data?.fields)
+            const templateContributorAddress = getContributorAddress(template?.data?.fields)
 
+            if (!templateClientAddress && !templateContributorAddress) {
+              setIsLoading(false)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "RFP missing required fields.",
+              })
+              return
+            }
+
+            const clientAddress = templateClientAddress
+              ? templateClientAddress
+              : (session?.siwe?.address as string)
+            const contributorAddress = templateContributorAddress
+              ? templateContributorAddress
+              : (session?.siwe?.address as string)
+
+            try {
               await createProposalMutation({
                 rfpId: rfp?.id,
                 contentTitle: `"${rfp?.data.content.title}" submission`,
                 contentBody: values.body,
                 authorAddresses: [contributorAddress],
                 contributorAddresses: [contributorAddress],
-                clientAddresses: [getClientAddress(template?.data?.fields)],
+                clientAddresses: [clientAddress],
                 milestones: getFieldValue(template?.data?.fields, RESERVED_KEYS.MILESTONES),
-                payments: addAddressAsRecipientToPayments(
+                payments: addAddressesToPayments(
                   template?.data?.fields as ProposalTemplateField[],
-                  contributorAddress
+                  clientAddress, // sender address
+                  contributorAddress // recipient address
                 ),
                 paymentTerms: getFieldValue(template?.data?.fields, RESERVED_KEYS.PAYMENT_TERMS),
               })
