@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { getAntiCSRFToken } from "@blitzjs/auth"
 
 interface GuildMember {
   nick?: string
@@ -23,6 +24,7 @@ const useGuildMembers = (
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "anti-csrf": getAntiCSRFToken(),
         },
         body: JSON.stringify({ guildId }),
       })

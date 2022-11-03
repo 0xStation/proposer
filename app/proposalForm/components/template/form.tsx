@@ -332,7 +332,13 @@ export const ProposalFormTemplate = () => {
                         (isTokenGatingCheckLoading ||
                           (isTokenGatingCheckComplete && !userHasRequiredToken)))
                     }
-                    isLoading={isTokenGatingCheckLoading}
+                    isLoading={
+                      // query enabled
+                      !!activeUser?.address &&
+                      !!rfp?.data?.singleTokenGate &&
+                      // query is loading
+                      isTokenGatingCheckLoading
+                    }
                     onClick={async (e) => {
                       e.preventDefault()
                       if (!session.siwe?.address) {
@@ -350,7 +356,7 @@ export const ProposalFormTemplate = () => {
                   >
                     Next
                   </Button>
-                  {!userHasRequiredToken && (
+                  {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
                     <span className="text-xs text-concrete">
                       Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
                       RFP.
@@ -376,7 +382,12 @@ export const ProposalFormTemplate = () => {
                             (isTokenGatingCheckComplete && !userHasRequiredToken)))
                       }
                       isLoading={
-                        isTokenGatingCheckLoading || (!proposalShouldSendLater && isLoading)
+                        // query enabled
+                        (!!activeUser?.address &&
+                          !!rfp?.data?.singleTokenGate &&
+                          // query is loading
+                          isTokenGatingCheckLoading) ||
+                        (!proposalShouldSendLater && isLoading)
                       }
                       onClick={async (e) => {
                         e.preventDefault()
@@ -404,7 +415,7 @@ export const ProposalFormTemplate = () => {
                     >
                       Send proposal
                     </Button>
-                    {isTokenGatingCheckComplete && !userHasRequiredToken && (
+                    {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
                       <span className="text-xs text-concrete">
                         Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
                         RFP.

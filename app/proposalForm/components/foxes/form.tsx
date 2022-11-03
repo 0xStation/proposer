@@ -333,7 +333,13 @@ export const ProposalFoxesForm = () => {
                         (isTokenGatingCheckLoading ||
                           (isTokenGatingCheckComplete && !userHasRequiredToken)))
                     }
-                    isLoading={isTokenGatingCheckLoading}
+                    isLoading={
+                      // query enabled
+                      !!activeUser?.address &&
+                      !!rfp?.data?.singleTokenGate &&
+                      // query loading
+                      isTokenGatingCheckLoading
+                    }
                     onClick={async (e) => {
                       e.preventDefault()
                       if (!session.siwe?.address) {
@@ -358,7 +364,7 @@ export const ProposalFoxesForm = () => {
                   >
                     Next
                   </Button>
-                  {!userHasRequiredToken && (
+                  {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
                     <span className="text-xs text-concrete">
                       Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
                       RFP.
@@ -384,7 +390,12 @@ export const ProposalFoxesForm = () => {
                             (isTokenGatingCheckComplete && !userHasRequiredToken)))
                       }
                       isLoading={
-                        isTokenGatingCheckLoading || (!proposalShouldSendLater && isLoading)
+                        // query enabled
+                        (!!activeUser?.address &&
+                          !!rfp?.data?.singleTokenGate &&
+                          // query loading
+                          isTokenGatingCheckLoading) ||
+                        (!proposalShouldSendLater && isLoading)
                       }
                       onClick={async (e) => {
                         e.preventDefault()

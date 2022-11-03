@@ -1,4 +1,6 @@
-export default async function handler(req, res) {
+import { api } from "app/blitz-server"
+
+export default api(async function handler(req, res) {
   const params = new URLSearchParams()
 
   if (!process.env.DISCORD_CLIENT_ID || !process.env.DISCORD_CLIENT_SECRET) {
@@ -13,7 +15,7 @@ export default async function handler(req, res) {
   params.append("code", req.body.code)
 
   try {
-    const response = await fetch(`${process.env.BLITZ_PUBLIC_API_ENDPOINT}/oauth2/token`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_DISCORD_API_ENDPOINT}/oauth2/token`, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -28,4 +30,4 @@ export default async function handler(req, res) {
     console.error(e)
     res.status(500).json({ error: "something went wrong!" })
   }
-}
+})

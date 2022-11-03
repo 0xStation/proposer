@@ -22,8 +22,8 @@ const ApproveStep = ({ proposal, isLastStep }: { proposal: Proposal; isLastStep:
 
   return (
     <Step
-      description="Signers approve proposal"
-      subtitle="Reach out to signers on Twitter or Discord to get proposals reviewed and approved."
+      description="Proposal approved by signers"
+      subtitle="Approvals from all signers are required to activate the proposal."
       status={status}
       isLastStep={isLastStep}
       action={<ApproveAction proposal={proposal} />}

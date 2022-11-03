@@ -13,7 +13,13 @@ const SendStep = ({ proposal }: { proposal: Proposal }) => {
     }
   }, [status])
 
-  return <Step description="Send proposal" status={status} action={<SendAction />} />
+  return (
+    <Step
+      description="Proposal sent"
+      status={status}
+      action={<SendAction />}
+    />
+  )
 }
 
 export default SendStep

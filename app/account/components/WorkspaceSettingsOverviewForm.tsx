@@ -24,6 +24,7 @@ import truncateString from "app/core/utils/truncateString"
 import getAccountEmail from "../queries/getAccountEmail"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import ConnectDiscordModal from "app/core/components/ConnectDiscordModal"
+import { getAntiCSRFToken } from "@blitzjs/auth"
 
 const PfpInput = ({ pfpUrl, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
@@ -31,6 +32,9 @@ const PfpInput = ({ pfpUrl, onUpload }) => {
     formData.append("file", acceptedFiles[0])
     let res = await fetch("/api/uploadImage", {
       method: "POST",
+      headers: {
+        "anti-csrf": getAntiCSRFToken(),
+      },
       body: formData,
     })
     const data = await res.json()

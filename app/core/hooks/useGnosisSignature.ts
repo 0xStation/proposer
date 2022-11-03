@@ -92,7 +92,7 @@ const useGnosisSignature = (payment) => {
       throw Error("chainId not available on Gnosis")
     }
     // only absolute urls supported
-    const url = `https://safe-transaction-${networks}.safe.global/api/v1/safes/${toChecksumAddress(
+    const url = `https://safe-transaction-${network}.safe.global/api/v1/safes/${toChecksumAddress(
       payment.senderAddress
     )}/multisig-transactions/`
 
