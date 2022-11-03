@@ -123,7 +123,10 @@ export const RfpFormStepPermission = ({
                 ? formatPositiveInt // 721 has no decimals so all balances are integers
                 : formatTokenAmount // other token amounts support decimals
             }
-            validate={composeValidators(requiredField, isValidTokenAmount)}
+            validate={composeValidators(
+              requiredField,
+              isValidTokenAmount(selectedSubmissionToken?.decimals || 0)
+            )}
           >
             {({ input, meta }) => {
               return (

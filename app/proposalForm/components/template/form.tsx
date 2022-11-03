@@ -31,6 +31,7 @@ import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinToke
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
+import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 
 export const ProposalFormTemplate = () => {
   const router = useRouter()
@@ -97,7 +98,11 @@ export const ProposalFormTemplate = () => {
       chainId: rfp?.data?.singleTokenGate?.token?.chainId as number,
       tokenAddress: rfp?.data?.singleTokenGate?.token?.address as string,
       accountAddress: activeUser?.address as string,
-      minBalance: rfp?.data?.singleTokenGate?.minBalance || "1", // string to pass directly into BigNumber.from in logic check
+      minBalance:
+        decimalToBigNumber(
+          rfp?.data?.singleTokenGate?.minBalance || 0,
+          rfp?.data?.singleTokenGate?.token?.decimals || 0
+        ).toString() || "1", // string to pass directly into BigNumber.from in logic check
     },
     {
       enabled: !!activeUser?.address && !!rfp?.data?.singleTokenGate,
@@ -244,6 +249,7 @@ export const ProposalFormTemplate = () => {
 
             const templateClientAddress = getClientAddress(template?.data?.fields)
             const templateContributorAddress = getContributorAddress(template?.data?.fields)
+            const connectedAddress = session?.siwe?.address as string
 
             if (!templateClientAddress && !templateContributorAddress) {
               setIsLoading(false)
@@ -255,19 +261,17 @@ export const ProposalFormTemplate = () => {
               return
             }
 
-            const clientAddress = templateClientAddress
-              ? templateClientAddress
-              : (session?.siwe?.address as string)
+            const clientAddress = templateClientAddress ? templateClientAddress : connectedAddress
             const contributorAddress = templateContributorAddress
               ? templateContributorAddress
-              : (session?.siwe?.address as string)
+              : connectedAddress
 
             try {
               await createProposalMutation({
                 rfpId: rfp?.id,
                 contentTitle: `"${rfp?.data.content.title}" submission`,
                 contentBody: values.body,
-                authorAddresses: [contributorAddress],
+                authorAddresses: [connectedAddress],
                 contributorAddresses: [contributorAddress],
                 clientAddresses: [clientAddress],
                 milestones: getFieldValue(template?.data?.fields, RESERVED_KEYS.MILESTONES),

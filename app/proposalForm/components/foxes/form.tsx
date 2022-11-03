@@ -30,6 +30,7 @@ import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
 import FormHeaderStepper from "app/core/components/FormHeaderStepper"
+import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 
 export const ProposalFoxesForm = () => {
   const router = useRouter()
@@ -96,7 +97,11 @@ export const ProposalFoxesForm = () => {
       chainId: rfp?.data?.singleTokenGate?.token?.chainId as number,
       tokenAddress: rfp?.data?.singleTokenGate?.token?.address as string,
       accountAddress: activeUser?.address as string,
-      minBalance: rfp?.data?.singleTokenGate?.minBalance || "1", // string to pass directly into BigNumber.from in logic check
+      minBalance:
+        decimalToBigNumber(
+          rfp?.data?.singleTokenGate?.minBalance || 0,
+          rfp?.data?.singleTokenGate?.token?.decimals || 0
+        ).toString() || "1", // string to pass directly into BigNumber.from in logic check
     },
     {
       enabled: !!activeUser?.address && !!rfp?.data?.singleTokenGate,
