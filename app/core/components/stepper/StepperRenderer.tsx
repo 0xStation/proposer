@@ -70,6 +70,7 @@ const StepperRenderer = ({
   const activeStep = useStepperStore((state) => state.activeStep)
 
   const activeActions = activeStep ? actions[activeStep] : {}
+  // sort by roles that have actions so the order is preserved
   const rolesSortedByExistenceOfAction = activeUserRoles.sort((a, b) => {
     if (!activeActions) return 0
     if (a in activeActions && b in activeActions) {
