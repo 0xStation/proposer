@@ -39,7 +39,7 @@ export const genProposalDigest = (proposal: Proposal) => {
       Proposal: [
         { name: "signedAt", type: "uint256" }, // UNIX timestamp for when this data was signed
         { name: "proposalId", type: "string" }, // UUID to identify this proposal, used to connect audit trail for version history
-        { name: "version", type: "uint256" }, // denotes the proposals editing history version
+        { name: "version", type: "uint256" }, // denotes the proposal's editing history version
         { name: "rfpId", type: "string" }, // [OPTIONAL] UUID to label an RFP this proposal is responding to, empty string for no RFP
         // schema defintiions
         { name: "type", type: "Type" },

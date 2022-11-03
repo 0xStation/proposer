@@ -112,7 +112,7 @@ model Proposal {
   milestones      ProposalMilestone[]
   payments        ProposalPayment[]
   signatures      ProposalSignature[]
-  ProposalVersion ProposalVersion[]
+  proposalVersion ProposalVersion[]
 }
 
 enum ProposalStatus {
