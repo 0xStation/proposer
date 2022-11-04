@@ -12,7 +12,7 @@ export const useUserHasPermissionOfAddress = (
   chainId?: number
 ): { hasPermissionOfAddress: boolean } => {
   const session = useSession({ suspense: false })
-  const [hasPermissionOfAddress, sethasPermissionOfAddress] = useState<boolean>(false)
+  const [hasPermissionOfAddress, setHasPermissionOfAddress] = useState<boolean>(false)
   const safeQueryEnabled = !!address && addressType === AddressType.SAFE && !!chainId
   const [safeMetadata] = useQuery(
     getSafeMetadata,
@@ -31,11 +31,7 @@ export const useUserHasPermissionOfAddress = (
       addressesAreEqual(session?.siwe?.address, signer)
     )
 
-    if (userIsWorkspace || userIsWorkspaceSigner) {
-      sethasPermissionOfAddress(true)
-    } else {
-      sethasPermissionOfAddress(false)
-    }
+    setHasPermissionOfAddress(userIsWorkspace || userIsWorkspaceSigner)
   }, [session?.siwe?.address, address, safeMetadata])
 
   return { hasPermissionOfAddress }

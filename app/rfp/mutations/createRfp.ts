@@ -43,7 +43,10 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
             ? {
                 fieldType: ProposalTemplateFieldType.PRESELECT,
                 value: [
-                  { address: params.preselectContributorAddress, type: ProposalRoleType.CLIENT },
+                  {
+                    address: params.preselectContributorAddress,
+                    type: ProposalRoleType.CONTRIBUTOR,
+                  },
                 ],
               }
             : {

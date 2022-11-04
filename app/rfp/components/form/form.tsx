@@ -40,7 +40,7 @@ export const RfpForm = () => {
 
   // GENERAL step
 
-  // payment directoin in parent form state because it gets reset when flipping through steps
+  // payment direction in parent form state because it gets reset when flipping through steps
   const [selectedBodyValidation, setSelectedBodyValidation] = useState<string>("")
 
   // PAYMENT step
@@ -72,7 +72,7 @@ export const RfpForm = () => {
       enabled: !!accountAddress,
       suspense: false,
       refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute
+      staleTime: 60 * 1000, // 1 minute
       onSuccess: (data) => {
         if (!data) {
           router.push(Routes.Page404())
@@ -110,7 +110,7 @@ export const RfpForm = () => {
       chainId: chain?.id || 1,
       userId: account?.id, // get tokens by account id so that different authors for the same workspace can share previously made tokens for the workspace
     },
-    { suspense: false, enabled: Boolean(chain && session?.userId), staleTime: 30 * 1000 }
+    { suspense: false, enabled: Boolean(chain?.id && account?.id), staleTime: 30 * 1000 }
   )
 
   useEffect(() => {

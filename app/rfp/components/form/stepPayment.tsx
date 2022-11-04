@@ -48,7 +48,6 @@ export const RfpFormStepPayment = ({
       {/* PAYMENT DIRECTION */}
       <div className="flex flex-col mt-6">
         <label className="font-bold block">Are you distributing or receiving payment?*</label>
-        {/* <span className="text-xs text-concrete block"></span> */}
       </div>
       <Field name="paymentDirection" validate={requiredField}>
         {({ meta, input }) => (
@@ -84,7 +83,6 @@ export const RfpFormStepPayment = ({
           {/* TOKEN */}
           <div className="flex flex-col mt-6">
             <label className="font-bold block">Reward token*</label>
-            {/* <span className="text-xs text-concrete block"></span> */}
           </div>
           <Field name="tokenAddress" validate={requiredField}>
             {({ input, meta }) => {
@@ -186,7 +184,6 @@ export const RfpFormStepPayment = ({
           </Field>
           {/* PAYMENT TERMS */}
           <label className="font-bold block mt-6">Payment terms*</label>
-          {/* <span className="text-xs text-concrete block"></span> */}
           <Field name="paymentTerms" validate={requiredField}>
             {({ meta, input }) => (
               <>
@@ -222,6 +219,9 @@ export const RfpFormStepPayment = ({
           {selectedPaymentTerms === PaymentTerm.ADVANCE_PAYMENT && (
             <>
               {/* ADVANCE PAYMENT */}
+              <span className="text-xs text-concrete">
+                Enter the percent of payment to be sent before work is to start.
+              </span>
               <Field
                 name="advancedPaymentPercentage"
                 format={formatPercentValue}

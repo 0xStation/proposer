@@ -13,6 +13,9 @@ import { formatPositiveInt } from "app/utils/formatters"
 import { composeValidators, isPositiveAmount, requiredField } from "app/utils/validators"
 // MODULE
 import { ProposalTemplateFieldValidationName } from "app/template/types"
+import { useQuery } from "@blitzjs/rpc"
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 export const RfpFormStepRfp = ({
   formState,
@@ -24,9 +27,30 @@ export const RfpFormStepRfp = ({
   const { text: displayAddress } = useDisplayAddress(accountAddress)
   const router = useRouter()
 
+  const [account] = useQuery(
+    getAccountByAddress,
+    { address: toChecksumAddress(accountAddress) },
+    {
+      enabled: !!accountAddress,
+      suspense: false,
+      refetchOnWindowFocus: false,
+      staleTime: 60 * 1000, // 1 minute
+      onSuccess: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
+      onError: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
+    }
+  )
+
   return (
     <>
-      <div className="mt-2 flex flex-row space-x-1">
+      <div className="mt-2 flex flex-row space-x-1 items-center">
         <span className="text-sm text-marble-white">This RFP will be listed on </span>
         <button
           className="text-sm text-electric-violet font-bold"
@@ -34,7 +58,7 @@ export const RfpFormStepRfp = ({
             router.push(Routes.WorkspaceHome({ accountAddress }))
           }}
         >
-          {"@" + displayAddress}
+          {account?.data?.name || displayAddress}
         </button>
       </div>
       {/* TITLE */}
@@ -138,6 +162,9 @@ export const RfpFormStepRfp = ({
       </Field>
       {selectedBodyValidation === ProposalTemplateFieldValidationName.MIN_WORDS && (
         <>
+          <span className="text-xs text-concrete">
+            Enter the minimum word count for proposals submitting to this RFP.
+          </span>
           <Field
             name="minWordCount"
             format={formatPositiveInt}
