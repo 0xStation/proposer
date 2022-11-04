@@ -76,7 +76,7 @@ const CommentContainer = ({ proposal, comment, setProposalQueryData, permissions
                 <Field
                   name="commentBody"
                   component="input"
-                  placeholder="leave a reply"
+                  placeholder="Leave a reply"
                   className="w-full bg-wet-concrete rounded px-2"
                 />
                 <Button type={ButtonType.Secondary} isSubmitType={true}>

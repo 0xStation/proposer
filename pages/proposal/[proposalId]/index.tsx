@@ -56,7 +56,7 @@ const ViewProposal: BlitzPage = () => {
   )
 
   const { roles: userRoles } = useGetUserRoles(proposal?.id)
-  const canRead = userRoles.length > 0
+  const canRead = true
   const canWrite = userRoles.length > 0
 
   return (
