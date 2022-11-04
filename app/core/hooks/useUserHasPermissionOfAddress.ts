@@ -6,13 +6,13 @@ import { useSession } from "@blitzjs/auth"
 import { useEffect, useState } from "react"
 
 // checks if session address is an address or is a signer of the Safe located at address & chainId
-export const useUserHasAuthority = (
+export const useUserHasPermissionOfAddress = (
   address: string,
   addressType?: AddressType,
   chainId?: number
-): { hasAuthority: boolean } => {
+): { hasPermissionOfAddress: boolean } => {
   const session = useSession({ suspense: false })
-  const [hasAuthority, setHasAuthority] = useState<boolean>(false)
+  const [hasPermissionOfAddress, sethasPermissionOfAddress] = useState<boolean>(false)
   const safeQueryEnabled = !!address && addressType === AddressType.SAFE && !!chainId
   const [safeMetadata] = useQuery(
     getSafeMetadata,
@@ -32,13 +32,13 @@ export const useUserHasAuthority = (
     )
 
     if (userIsWorkspace || userIsWorkspaceSigner) {
-      setHasAuthority(true)
+      sethasPermissionOfAddress(true)
     } else {
-      setHasAuthority(false)
+      sethasPermissionOfAddress(false)
     }
   }, [session?.siwe?.address, address, safeMetadata])
 
-  return { hasAuthority }
+  return { hasPermissionOfAddress }
 }
 
-export default useUserHasAuthority
+export default useUserHasPermissionOfAddress

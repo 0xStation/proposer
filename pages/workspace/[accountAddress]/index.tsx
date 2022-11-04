@@ -46,7 +46,7 @@ import getRfpCountForAccount from "app/rfp/queries/getRfpCountForAccount"
 import getProposalCountForAccount from "app/proposal/queries/getProposalCountForAccount"
 import { RfpCard } from "app/rfp/components/RfpCard"
 import { useSession } from "@blitzjs/auth"
-import useUserHasAuthority from "app/core/hooks/useUserHasAuthority"
+import useUserHasPermissionOfAddress from "app/core/hooks/useUserHasPermissionOfAddress"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
@@ -109,7 +109,7 @@ const WorkspaceHome: BlitzPage = () => {
   )
 
   // checks if session address is page's account address or is a signer of the account's Safe
-  const { hasAuthority: hasPrivateAccess } = useUserHasAuthority(
+  const { hasPermissionOfAddress: hasPrivateAccess } = useUserHasPermissionOfAddress(
     accountAddress,
     account?.addressType,
     account?.data?.chainId
@@ -365,7 +365,7 @@ const WorkspaceHome: BlitzPage = () => {
         <div className="flex flex-row justify-between">
           <h1 className="text-2xl font-bold">RFPs</h1>
           {hasPrivateAccess && (
-            <Link href={Routes.RfpNew()}>
+            <Link href={Routes.RfpNew({ accountAddress })}>
               <Button className="w-full px-10" overrideWidthClassName="max-w-fit">
                 Create RFP
               </Button>

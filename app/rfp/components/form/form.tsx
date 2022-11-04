@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { useQuery, useMutation } from "@blitzjs/rpc"
-import { Routes } from "@blitzjs/next"
+import { Routes, useParam } from "@blitzjs/next"
 import { useRouter } from "next/router"
 import { useSession } from "@blitzjs/auth"
 import { Form } from "react-final-form"
@@ -30,8 +30,12 @@ import createRfp from "app/rfp/mutations/createRfp"
 import { PaymentDirection } from "app/rfp/types"
 import { ProposalTemplateFieldValidationName } from "app/template/types"
 import { formatPositiveInt } from "app/utils/formatters"
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import useUserHasPermissionOfAddress from "app/core/hooks/useUserHasPermissionOfAddress"
 
 export const RfpForm = () => {
+  const accountAddress = useParam("accountAddress", "string") as string
   const setToastState = useStore((state) => state.setToastState)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const walletModalOpen = useStore((state) => state.walletModalOpen)
@@ -65,6 +69,34 @@ export const RfpForm = () => {
 
   const { chain } = useNetwork()
 
+  const [account] = useQuery(
+    getAccountByAddress,
+    { address: toChecksumAddress(accountAddress) },
+    {
+      enabled: !!accountAddress,
+      suspense: false,
+      refetchOnWindowFocus: false,
+      cacheTime: 60 * 1000, // 1 minute
+      onSuccess: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
+      onError: (data) => {
+        if (!data) {
+          router.push(Routes.Page404())
+        }
+      },
+    }
+  )
+
+  // checks if session address is page's account address or is a signer of the account's Safe
+  const { hasPermissionOfAddress: userCanPostRfpForAccount } = useUserHasPermissionOfAddress(
+    accountAddress,
+    account?.addressType,
+    account?.data?.chainId
+  )
+
   const [createRfpMutation] = useMutation(createRfp, {
     onSuccess: (data) => {
       console.log(data)
@@ -80,7 +112,7 @@ export const RfpForm = () => {
     getTokensByAccount,
     {
       chainId: chain?.id || 1,
-      userId: session?.userId as number,
+      userId: account?.id, // get tokens by account id so that different authors for the same workspace can share previously made tokens for the workspace
     },
     { suspense: false, enabled: Boolean(chain && session?.userId), staleTime: 30 * 1000 }
   )
@@ -117,19 +149,19 @@ export const RfpForm = () => {
         onSubmit={async (values: any, form) => {
           const clientAddress =
             values.paymentDirection === PaymentDirection.AUTHOR_IS_SENDER
-              ? session.siwe?.address
+              ? accountAddress
               : undefined
 
           const contributorAddress =
             values.paymentDirection === PaymentDirection.AUTHOR_IS_RECIPIENT
-              ? session.siwe?.address
+              ? accountAddress
               : undefined
 
           try {
             await createRfpMutation({
               title: values.title,
               body: values.body,
-              associatedAccountAddress: session.siwe?.address as string,
+              associatedAccountAddress: accountAddress,
               preselectClientAddress: clientAddress,
               preselectContributorAddress: contributorAddress,
               payment: {
@@ -229,19 +261,25 @@ export const RfpForm = () => {
                 )}
               </div>
               {proposalStep === RfpFormStep.RFP && (
-                <Button
-                  isDisabled={missingFieldsGeneral}
-                  className="my-6 float-right"
-                  onClick={async () => {
-                    if (!session?.siwe?.address || !activeUser?.address) {
-                      toggleWalletModal(true)
-                    } else {
-                      setProposalStep(RfpFormStep.PAYMENT)
-                    }
-                  }}
-                >
-                  Next
-                </Button>
+                <div className="my-6 float-right flex flex-col space-y-1 items-end">
+                  <Button
+                    isDisabled={missingFieldsGeneral || !userCanPostRfpForAccount}
+                    onClick={async () => {
+                      if (!session?.siwe?.address || !activeUser?.address) {
+                        toggleWalletModal(true)
+                      } else {
+                        setProposalStep(RfpFormStep.PAYMENT)
+                      }
+                    }}
+                  >
+                    Next
+                  </Button>
+                  {!userCanPostRfpForAccount && (
+                    <span className="text-xs text-concrete">
+                      Must connect a wallet with permission over this account.
+                    </span>
+                  )}
+                </div>
               )}
               {proposalStep === RfpFormStep.PAYMENT && (
                 <div className="flex justify-between mt-6">
@@ -251,20 +289,27 @@ export const RfpForm = () => {
                   >
                     <BackArrow className="fill-marble-white" />
                   </span>
-                  <Button
-                    isDisabled={missingFieldsPayment}
-                    className="float-right"
-                    onClick={() => {
-                      if (!session.siwe?.address) {
-                        toggleWalletModal(true)
-                        return
-                      }
+                  <div className="flex flex-col space-y-1 items-end">
+                    <Button
+                      isDisabled={missingFieldsPayment || !userCanPostRfpForAccount}
+                      className="float-right"
+                      onClick={() => {
+                        if (!session.siwe?.address) {
+                          toggleWalletModal(true)
+                          return
+                        }
 
-                      setProposalStep(RfpFormStep.PERMISSIONS)
-                    }}
-                  >
-                    Next
-                  </Button>
+                        setProposalStep(RfpFormStep.PERMISSIONS)
+                      }}
+                    >
+                      Next
+                    </Button>
+                    {!userCanPostRfpForAccount && (
+                      <span className="text-xs text-concrete">
+                        Must connect a wallet with permission over this account.
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
               {proposalStep === RfpFormStep.PERMISSIONS && (
@@ -275,9 +320,11 @@ export const RfpForm = () => {
                   >
                     <BackArrow className="fill-marble-white" />
                   </span>
-                  <div>
+                  <div className="flex flex-col space-y-1 items-end">
                     <Button
-                      isDisabled={isLoading || missingFieldsPermissions}
+                      isDisabled={
+                        isLoading || missingFieldsPermissions || !userCanPostRfpForAccount
+                      }
                       isLoading={isLoading}
                       onClick={async (e) => {
                         e.preventDefault()
@@ -291,6 +338,11 @@ export const RfpForm = () => {
                     >
                       Create RFP
                     </Button>
+                    {!userCanPostRfpForAccount && (
+                      <span className="text-xs text-concrete">
+                        Must connect a wallet with permission over this account.
+                      </span>
+                    )}
                   </div>
                 </div>
               )}

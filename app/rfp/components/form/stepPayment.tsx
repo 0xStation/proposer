@@ -37,18 +37,7 @@ export const RfpFormStepPayment = ({
   setProposalStep,
 }) => {
   const session = useSession({ suspense: false })
-  const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
-  const { hasMounted } = useHasMounted()
-
-  useEffect(() => {
-    // if user's wallet isn't connected redirect back to the first step
-    // the reward form relies on the active chain to determine which tokens
-    // to pull from
-    if (hasMounted && (!activeUser?.address || !session?.siwe?.address)) {
-      setProposalStep(ProposalFormStep.PROPOSE)
-    }
-  }, [activeUser?.address, session?.siwe?.address, hasMounted])
 
   return (
     <>
