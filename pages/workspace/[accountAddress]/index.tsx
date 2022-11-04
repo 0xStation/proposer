@@ -428,19 +428,9 @@ const WorkspaceHome: BlitzPage = () => {
             </div>
           ) : (
             <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-              <p className="text-2xl font-bold w-1/3 text-center">
-                Unlock this feature by sending a proposal to Station Helpdesk.
+              <p className="text-2xl font-bold w-[295px] text-center">
+                This workspace has no RFPs yet
               </p>
-              <Link
-                href={Routes.ProposalNewIdea({
-                  clients: "station-helpdesk.eth",
-                  title: "Requesting RFP access for " + accountAddress,
-                })}
-              >
-                <Button className="mt-8 w-48" type={ButtonType.Secondary}>
-                  Request access
-                </Button>
-              </Link>
             </div>
           ))}
       </div>

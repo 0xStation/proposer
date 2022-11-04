@@ -10,8 +10,7 @@ export type AccountMetadata = {
   name: string
   bio?: string
   pfpUrl?: string
-  discordHandle?: string
-  discordId?: string
+  discordHandle: string
   hasSavedEmail?: boolean
   hasVerifiedEmail?: boolean
   // for smart contract Accounts (e.g. multisigs), indicate the chainId of the smart contract

@@ -1,3 +1,4 @@
+// PACKAGE
 import React, { useState, useEffect } from "react"
 import { useQuery, useMutation } from "@blitzjs/rpc"
 import { Routes, useParam } from "@blitzjs/next"
@@ -5,40 +6,35 @@ import { useRouter } from "next/router"
 import { useSession } from "@blitzjs/auth"
 import { Form } from "react-final-form"
 import { useNetwork } from "wagmi"
-import { ProposalRoleType, TokenType } from "@prisma/client"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import { TokenType } from "@prisma/client"
+// CORE
+import Button from "app/core/components/sds/buttons/Button"
 import FormHeaderStepper from "app/core/components/FormHeaderStepper"
-import getTokensByAccount from "app/token/queries/getTokensByAccount"
-import { getNetworkTokens } from "app/core/utils/networkInfo"
-import RfpFormStepPropose from "./stepGeneral"
-// import RfpFormStepPayment from "./stepReward"
-import { Proposal } from "app/proposal/types"
+import { FormLoadingScreen } from "app/core/components/FormLoadingScreen"
+import useUserHasPermissionOfAddress from "app/core/hooks/useUserHasPermissionOfAddress"
 import BackArrow from "app/core/icons/BackArrow"
 import useStore from "app/core/hooks/useStore"
-import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
-import { PaymentTerm } from "app/proposalPayment/types"
 import { RfpFormStep, RFP_FORM_HEADER_COPY } from "app/core/utils/constants"
-import {
-  isPositiveAmount,
-  isValidAdvancedPaymentPercentage,
-  isValidTokenAmount,
-} from "app/utils/validators"
-import RfpFormStepPayment from "./stepPayment"
-import RfpFormStepPermission from "./stepPermissions"
-import { FormLoadingScreen } from "app/core/components/FormLoadingScreen"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import { getNetworkTokens } from "app/core/utils/networkInfo"
+import { formatPositiveInt } from "app/utils/formatters"
+import { isValidAdvancedPaymentPercentage, isValidTokenAmount } from "app/utils/validators"
+// MODULE
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
+import { PaymentTerm } from "app/proposalPayment/types"
 import createRfp from "app/rfp/mutations/createRfp"
 import { PaymentDirection } from "app/rfp/types"
 import { ProposalTemplateFieldValidationName } from "app/template/types"
-import { formatPositiveInt } from "app/utils/formatters"
-import getAccountByAddress from "app/account/queries/getAccountByAddress"
-import { toChecksumAddress } from "app/core/utils/checksumAddress"
-import useUserHasPermissionOfAddress from "app/core/hooks/useUserHasPermissionOfAddress"
+import getTokensByAccount from "app/token/queries/getTokensByAccount"
+// LOCAL
+import RfpFormStepRfp from "./stepRfp"
+import RfpFormStepPayment from "./stepPayment"
+import RfpFormStepPermission from "./stepPermissions"
 
 export const RfpForm = () => {
   const accountAddress = useParam("accountAddress", "string") as string
   const setToastState = useStore((state) => state.setToastState)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
-  const walletModalOpen = useStore((state) => state.walletModalOpen)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [proposalStep, setProposalStep] = useState<RfpFormStep>(RfpFormStep.RFP)
 
@@ -223,7 +219,7 @@ export const RfpForm = () => {
                       {RFP_FORM_HEADER_COPY[proposalStep]}
                     </h2>
                     {proposalStep === RfpFormStep.RFP && (
-                      <RfpFormStepPropose
+                      <RfpFormStepRfp
                         formState={formState}
                         selectedBodyValidation={selectedBodyValidation}
                         setSelectedBodyValidation={setSelectedBodyValidation}
@@ -242,7 +238,6 @@ export const RfpForm = () => {
                         setSelectedPaymentDirection={setSelectedPaymentDirection}
                         selectedPaymentTerms={selectedPaymentTerms}
                         setSelectedPaymentTerms={setSelectedPaymentTerms}
-                        setProposalStep={setProposalStep}
                       />
                     )}
                     {proposalStep === RfpFormStep.PERMISSIONS && (
@@ -252,7 +247,6 @@ export const RfpForm = () => {
                         setSelectedSubmissionToken={setSelectedSubmissionToken}
                         isImportTokenModalOpen={isImportTokenModalOpen}
                         setIsImportTokenModalOpen={setIsImportTokenModalOpen}
-                        setProposalStep={setProposalStep}
                         chainId={(chain?.id as number) || 1}
                         refetchTokens={refetchTokens}
                       />

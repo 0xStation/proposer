@@ -1,9 +1,13 @@
+// PACKAGE
 import { useSession } from "@blitzjs/auth"
-import { useEffect, useState } from "react"
-import ImportTokenModal from "app/core/components/ImportTokenModal"
-import useStore from "app/core/hooks/useStore"
-import { ProposalFormStep, PAYMENT_TERM_MAP, PAYMENT_DIRECTION_MAP } from "app/core/utils/constants"
 import { Field } from "react-final-form"
+// CORE
+import ImportTokenModal from "app/core/components/ImportTokenModal"
+import WhenFieldChanges from "app/core/components/WhenFieldChanges"
+import useStore from "app/core/hooks/useStore"
+import { PAYMENT_TERM_MAP, PAYMENT_DIRECTION_MAP } from "app/core/utils/constants"
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
+import { formatPercentValue, formatTokenAmount } from "app/utils/formatters"
 import {
   composeValidators,
   isPositiveAmount,
@@ -11,16 +15,9 @@ import {
   isValidTokenAmount,
   requiredField,
 } from "app/utils/validators"
-import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
-import { formatPercentValue, formatTokenAmount } from "app/utils/formatters"
+// MODULE
 import { PaymentTerm } from "app/proposalPayment/types"
-import WhenFieldChanges from "app/core/components/WhenFieldChanges"
-import useHasMounted from "app/core/hooks/useHasMounted"
 import { PaymentDirection } from "app/rfp/types"
-
-export function classNames(...classes) {
-  return classes.filter(Boolean).join(" ")
-}
 
 export const RfpFormStepPayment = ({
   chainId,
@@ -34,7 +31,6 @@ export const RfpFormStepPayment = ({
   refetchTokens,
   isImportTokenModalOpen,
   setIsImportTokenModalOpen,
-  setProposalStep,
 }) => {
   const session = useSession({ suspense: false })
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)

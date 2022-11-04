@@ -1,19 +1,15 @@
-import { useEffect, useState } from "react"
-import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid"
-import TextLink from "app/core/components/TextLink"
-import { LINKS, RfpFormStep } from "app/core/utils/constants"
-import { composeValidators, isValidTokenAmount, requiredField } from "app/utils/validators"
-import { Field } from "react-final-form"
-import Preview from "app/core/components/MarkdownPreview"
-import { formatPositiveInt, formatTokenAmount } from "app/utils/formatters"
-import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
+// PACKAGE
 import { useSession } from "@blitzjs/auth"
-import useStore from "app/core/hooks/useStore"
-import useHasMounted from "app/core/hooks/useHasMounted"
-import ImportTokenModal from "app/core/components/ImportTokenModal"
 import { TokenType } from "@prisma/client"
+import { Field } from "react-final-form"
+// CORE
+import ImportTokenModal from "app/core/components/ImportTokenModal"
 import WhenFieldChanges from "app/core/components/WhenFieldChanges"
+import useStore from "app/core/hooks/useStore"
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { getNetworkName } from "app/core/utils/networkInfo"
+import { composeValidators, isValidTokenAmount, requiredField } from "app/utils/validators"
+import { formatPositiveInt, formatTokenAmount } from "app/utils/formatters"
 
 export const RfpFormStepPermission = ({
   permissionTokenOptions,
@@ -21,7 +17,6 @@ export const RfpFormStepPermission = ({
   setSelectedSubmissionToken,
   isImportTokenModalOpen,
   setIsImportTokenModalOpen,
-  setProposalStep,
   chainId,
   refetchTokens,
 }) => {

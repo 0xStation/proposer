@@ -1,22 +1,42 @@
-import { useState } from "react"
+// PACKAGE
+import { Routes, useParam } from "@blitzjs/next"
 import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid"
-import TextLink from "app/core/components/TextLink"
-import { BODY_CONSTRAINT_MAP, LINKS } from "app/core/utils/constants"
-import { composeValidators, isPositiveAmount, requiredField } from "app/utils/validators"
+import { useRouter } from "next/router"
+import { useState } from "react"
 import { Field } from "react-final-form"
+// CORE
 import Preview from "app/core/components/MarkdownPreview"
-import { ProposalTemplateFieldValidationName } from "app/template/types"
+import TextLink from "app/core/components/TextLink"
+import useDisplayAddress from "app/core/hooks/useDisplayAddress"
+import { BODY_CONSTRAINT_MAP, LINKS } from "app/core/utils/constants"
 import { formatPositiveInt } from "app/utils/formatters"
+import { composeValidators, isPositiveAmount, requiredField } from "app/utils/validators"
+// MODULE
+import { ProposalTemplateFieldValidationName } from "app/template/types"
 
-export const RfpFormStepPropose = ({
+export const RfpFormStepRfp = ({
   formState,
   selectedBodyValidation,
   setSelectedBodyValidation,
 }) => {
   const [previewMode, setPreviewMode] = useState<boolean>(false)
+  const accountAddress = useParam("accountAddress", "string") as string
+  const { text: displayAddress } = useDisplayAddress(accountAddress)
+  const router = useRouter()
 
   return (
     <>
+      <div className="mt-2 flex flex-row space-x-1">
+        <span className="text-sm text-marble-white">This RFP will be listed on </span>
+        <button
+          className="text-sm text-electric-violet font-bold"
+          onClick={() => {
+            router.push(Routes.WorkspaceHome({ accountAddress }))
+          }}
+        >
+          {"@" + displayAddress}
+        </button>
+      </div>
       {/* TITLE */}
       <label className="font-bold block mt-6">Title*</label>
       <Field name="title" validate={requiredField}>
@@ -145,4 +165,4 @@ export const RfpFormStepPropose = ({
   )
 }
 
-export default RfpFormStepPropose
+export default RfpFormStepRfp

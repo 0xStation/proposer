@@ -49,7 +49,7 @@ const AccountMediaObject = ({
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation()
-                        navigator.clipboard.writeText(account?.data?.discordHandle!)
+                        navigator.clipboard.writeText(account?.data?.discordHandle)
                         setIsDiscordHandleCopied(true)
                         setTimeout(() => setIsDiscordHandleCopied(false), 1500)
                       }}
