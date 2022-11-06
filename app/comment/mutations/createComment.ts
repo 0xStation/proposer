@@ -4,7 +4,6 @@ import { Ctx } from "blitz"
 
 const CreateComment = z.object({
   commentBody: z.string(),
-  authorId: z.number(),
   proposalId: z.string(),
   parentId: z.string().optional(),
 })
@@ -12,35 +11,27 @@ const CreateComment = z.object({
 export default async function createComment(input: z.infer<typeof CreateComment>, ctx: Ctx) {
   const params = CreateComment.parse(input)
 
-  const proposal = await db.proposal.findUnique({
+  const roles = await db.proposalRole.findMany({
     where: {
-      id: params.proposalId,
-    },
-    include: {
-      roles: {
-        include: {
-          account: true,
-        },
-      },
+      proposalId: params.proposalId,
     },
   })
 
-  if (!proposal) {
-    console.error("cannot add comments to a proposal that does not exist")
+  const addressesWithValidRoles = roles.map((role) => role.address)
+  ctx.session.$authorize(addressesWithValidRoles, [])
+
+  if (!ctx.session.$publicData.siwe) {
+    console.error("cannot comment without a user session.")
     return null
   }
-
-  const addressesWithValidRoles = proposal.roles.map((role) => role.address)
-  const accountIdsWithValidRoles = proposal.roles.map((role) => role.account.id)
-  ctx.session.$authorize(addressesWithValidRoles, accountIdsWithValidRoles)
 
   await db.comment.create({
     data: {
       proposalId: params.proposalId,
-      authorId: params.authorId,
+      authorAddress: ctx.session.$publicData.siwe.address,
       parentId: params.parentId,
       data: {
-        message: params.commentBody,
+        body: params.commentBody,
       },
     },
   })

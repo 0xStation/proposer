@@ -11,7 +11,7 @@ import { ProposalNestedLayout } from "app/core/components/ProposalNestedLayout"
 import CommentContainer from "app/comment/components/CommentContainer"
 import NewCommentThread from "app/comment/components/NewCommentThread"
 import CommentEmptyState from "app/comment/components/CommentEmptyState"
-import useGetUserRoles from "app/core/hooks/useGetUsersRoles"
+import useCommentPermissions from "app/core/hooks/useCommentPermissions"
 
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
   const { proposalId } = params
@@ -55,9 +55,7 @@ const ViewProposal: BlitzPage = () => {
     }
   )
 
-  const { roles: userRoles } = useGetUserRoles(proposal?.id)
-  const canRead = true
-  const canWrite = userRoles.length > 0
+  const { canRead, canWrite } = useCommentPermissions(proposal?.id)
 
   return (
     <>
@@ -70,14 +68,7 @@ const ViewProposal: BlitzPage = () => {
         <h3 className="text-concrete text-xs uppercase font-bold mb-2 mt-12">Comments</h3>
       )}
       {proposal?.comments && proposal.comments.length === 0 ? (
-        <CommentEmptyState
-          proposal={proposal}
-          setProposalQueryData={setProposalQueryData}
-          permissions={{
-            canRead,
-            canWrite,
-          }}
-        />
+        <CommentEmptyState proposal={proposal} setProposalQueryData={setProposalQueryData} />
       ) : (
         <div className="space-y-6">
           {proposal?.comments &&
@@ -87,20 +78,9 @@ const ViewProposal: BlitzPage = () => {
                 comment={comment}
                 proposal={proposal}
                 setProposalQueryData={setProposalQueryData}
-                permissions={{
-                  canRead,
-                  canWrite,
-                }}
               />
             ))}
-          <NewCommentThread
-            proposal={proposal}
-            setProposalQueryData={setProposalQueryData}
-            permissions={{
-              canRead,
-              canWrite,
-            }}
-          />
+          <NewCommentThread proposal={proposal} setProposalQueryData={setProposalQueryData} />
         </div>
       )}
     </>

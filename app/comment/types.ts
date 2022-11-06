@@ -7,4 +7,6 @@ export type Comment = PrismaComment & {
 }
 
 // fill out when we get to v2
-export type CommentMetadata = {}
+export type CommentMetadata = {
+  body: string
+}

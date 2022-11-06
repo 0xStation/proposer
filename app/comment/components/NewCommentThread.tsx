@@ -2,9 +2,10 @@ import { useState } from "react"
 import { Transition } from "@headlessui/react"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import NewCommentThreadForm from "app/comment/components/NewCommentThreadForm"
+import useCommentPermissions from "app/core/hooks/useCommentPermissions"
 
-const NewCommentThread = ({ proposal, setProposalQueryData, permissions }) => {
-  const { canWrite, canRead } = permissions
+const NewCommentThread = ({ proposal, setProposalQueryData }) => {
+  const { canRead, canWrite } = useCommentPermissions(proposal?.id)
   const [showNewThread, setShowNewThread] = useState(false)
   return (
     <div className="mt-4 h-[100px]">
@@ -29,7 +30,7 @@ const NewCommentThread = ({ proposal, setProposalQueryData, permissions }) => {
         <div className="rounded-lg border border-wet-concrete p-4">
           <NewCommentThreadForm
             proposal={proposal}
-            cleanup={() => setShowNewThread(false)}
+            startNewThread={() => setShowNewThread(false)}
             setProposalQueryData={setProposalQueryData}
           />
         </div>

@@ -30,7 +30,7 @@ model Account {
   targetsOf          AccountAccount[]    @relation("target")
   verificationEmails EmailVerification[]
   proposalTemplates  ProposalTemplate[]
-  Comment            Comment[]
+  comments           Comment[]
 }
 
 enum AddressType {
@@ -281,16 +281,16 @@ enum FieldKey {
 }
 
 model Comment {
-  id         String    @id @default(uuid())
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  data       Json?
-  fieldKey   FieldKey?
-  children   Comment[] @relation("Comment_Children")
-  parent     Comment?  @relation("Comment_Children", fields: [parentId], references: [id])
-  parentId   String?
-  proposal   Proposal  @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  proposalId String
-  author     Account   @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId   Int
+  id            String    @id @default(uuid())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  data          Json?
+  fieldKey      FieldKey?
+  children      Comment[] @relation("Comment_Children")
+  parent        Comment?  @relation("Comment_Children", fields: [parentId], references: [id])
+  parentId      String?
+  proposal      Proposal  @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  proposalId    String
+  author        Account   @relation(fields: [authorAddress], references: [address], onDelete: Cascade)
+  authorAddress String
 }

@@ -4,9 +4,12 @@ import { Form, Field } from "react-final-form"
 import createComment from "app/comment/mutations/createComment"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import AccountMediaRow from "./AccountMediaRow"
+import timeSince from "app/core/utils/timeSince"
+import useCommentPermissions from "app/core/hooks/useCommentPermissions"
 
-const CommentContainer = ({ proposal, comment, setProposalQueryData, permissions }) => {
-  const { canWrite, canRead } = permissions
+const CommentContainer = ({ proposal, comment, setProposalQueryData }) => {
+  const { canRead, canWrite } = useCommentPermissions(proposal?.id)
+  const setToastState = useStore((state) => state.setToastState)
   const activeUser = useStore((state) => state.activeUser)
   const [createCommentMutation] = useMutation(createComment)
 
@@ -17,14 +20,20 @@ const CommentContainer = ({ proposal, comment, setProposalQueryData, permissions
   return (
     <div className="border rounded-lg border-wet-concrete p-4 flex flex-col space-y-6">
       <div>
-        <AccountMediaRow comment={comment} />
-        <span className="mt-2 block">{comment.data.message}</span>
+        <div className="flex flex-row items-center space-x-2">
+          <AccountMediaRow account={comment.author} />
+          <span className="text-light-concrete text-sm">{timeSince(comment.createdAt)}</span>
+        </div>
+        <span className="mt-2 block">{comment.data.body}</span>
       </div>
       {comment.children.map((child, idx) => {
         return (
           <div key={idx}>
-            <AccountMediaRow comment={child} />
-            <span className="mt-2 block">{child.data.message}</span>
+            <div className="flex flex-row items-center space-x-2">
+              <AccountMediaRow account={child.author} />
+              <span className="text-light-concrete text-sm">{timeSince(child.createdAt)}</span>
+            </div>
+            <span className="mt-2 block">{child.data.body}</span>
           </div>
         )
       })}
@@ -32,14 +41,16 @@ const CommentContainer = ({ proposal, comment, setProposalQueryData, permissions
         <Form
           onSubmit={async (values: any, form) => {
             if (!activeUser) {
-              // add toast?
-              console.error("Need to be logged in to comment")
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "You must be logged in to comment",
+              })
               return
             }
             await createCommentMutation({
               commentBody: values.commentBody,
               proposalId: proposal.id,
-              authorId: activeUser.id,
               parentId: comment.id,
             })
             const proposalWithNewReply = {
@@ -54,7 +65,7 @@ const CommentContainer = ({ proposal, comment, setProposalQueryData, permissions
                         // don't need id for optomistic update, and we don't have it anyways
                         createdAt: new Date(),
                         data: {
-                          message: values.commentBody,
+                          body: values.commentBody,
                         },
                         author: {
                           address: activeUser.address,

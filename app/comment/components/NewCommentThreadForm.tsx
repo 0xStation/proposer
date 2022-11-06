@@ -1,11 +1,10 @@
-import { useMutation, invalidateQuery } from "@blitzjs/rpc"
+import { useMutation } from "@blitzjs/rpc"
 import useStore from "app/core/hooks/useStore"
 import createComment from "app/comment/mutations/createComment"
 import { Form, Field } from "react-final-form"
 import Button from "app/core/components/sds/buttons/Button"
-import getProposalById from "app/proposal/queries/getProposalById"
 
-const NewCommentThreadForm = ({ proposal, cleanup, setProposalQueryData }) => {
+const NewCommentThreadForm = ({ proposal, startNewThread, setProposalQueryData }) => {
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const [createCommentMutation] = useMutation(createComment)
@@ -25,7 +24,6 @@ const NewCommentThreadForm = ({ proposal, cleanup, setProposalQueryData }) => {
           await createCommentMutation({
             commentBody: values.commentBody,
             proposalId: proposal.id,
-            authorId: activeUser.id,
           })
 
           const proposalWithNewComment = {
@@ -45,9 +43,16 @@ const NewCommentThreadForm = ({ proposal, cleanup, setProposalQueryData }) => {
               },
             ],
           }
+          // https://blitzjs.com/docs/mutation-usage#optimistic-updates
+          // setting an optomistic update -- we can predict what the data will look like assuming a
+          // successful mutation so that way we can immediately render the update without waiting
+          // for the server to respond. once the server responds the data is updated appropriately.
           setProposalQueryData(proposalWithNewComment)
+          // form.restart clears the input so a new comment can be entered.
           form.restart()
-          cleanup()
+          // start new thread is a callback that is passed in from the parent component
+          // designed to close the new thread component and reset the comment creation flow.
+          startNewThread()
         }}
         render={({ handleSubmit }) => {
           return (
@@ -58,14 +63,7 @@ const NewCommentThreadForm = ({ proposal, cleanup, setProposalQueryData }) => {
                 placeholder="Write your comment here"
                 className="w-full bg-wet-concrete rounded px-2"
               />
-              <Button
-                onClick={async (e) => {
-                  e.preventDefault()
-                  await handleSubmit()
-                }}
-              >
-                Send
-              </Button>
+              <Button isSubmitType={true}>Send</Button>
             </form>
           )
         }}
