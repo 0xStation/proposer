@@ -71,7 +71,7 @@ export const RfpPermissionsForm = ({ rfp }) => {
       setToastState({
         isToastShowing: true,
         type: "success",
-        message: "RFP successfully updated. ",
+        message: "RFP successfully updated.",
       })
     },
     onError: (error) => {
@@ -130,7 +130,6 @@ export const RfpPermissionsForm = ({ rfp }) => {
                       <div className="custom-select-wrapper">
                         <select
                           // if network is selected make the token address field required.
-                          // required
                           {...input}
                           className="w-full bg-wet-concrete rounded p-2 mt-1"
                           value={selectedSubmissionToken?.address as string}

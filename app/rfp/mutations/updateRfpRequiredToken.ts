@@ -18,6 +18,9 @@ export default async function updateRfpRequiredToken(
 ) {
   const params = UpdateRfpRequiredToken.parse(input)
   try {
+    // use $transaction to eliminate risk of race condition with changing other metadata
+    // in edit form and waiting for new data to populate frontend state by just changing
+    // token-gating metadata with fresh query on backend-side
     const rfp = await db.$transaction(async (db) => {
       const rfp = await db.rfp.findUnique({
         where: { id: params.rfpId },
