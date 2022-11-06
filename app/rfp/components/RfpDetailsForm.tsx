@@ -1,6 +1,7 @@
 import { invalidateQuery, useMutation } from "@blitzjs/rpc"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
+import { formatTrimLeadingSpace } from "app/utils/formatters"
 import React from "react"
 import { Field, Form } from "react-final-form"
 import { requiredField } from "../../utils/validators"
@@ -52,8 +53,8 @@ export const RfpDetailsForm = ({ rfp }) => {
 
         return (
           <form onSubmit={handleSubmit}>
-            <label className="font-bold block mt-6">RFP title*</label>
-            <Field name="title" validate={requiredField}>
+            <label className="font-bold block mt-6">Title*</label>
+            <Field name="title" validate={requiredField} format={formatTrimLeadingSpace}>
               {({ meta, input }) => {
                 return (
                   <>
@@ -92,7 +93,7 @@ export const RfpDetailsForm = ({ rfp }) => {
             <Button
               type={ButtonType.Secondary}
               isSubmitType={true}
-              isDisabled={formState.pristine}
+              isDisabled={!formState.valid || formState.pristine}
               className="mt-7"
             >
               Save

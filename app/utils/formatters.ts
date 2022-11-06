@@ -47,3 +47,8 @@ export const formatPositiveInt = (amount: string): string => {
   const parsedValue = regexMatches[0]!
   return parsedValue
 }
+
+export const formatTrimLeadingSpace = (text: string): string => {
+  const leadingSpaceRegex = /^\s+/g
+  return text?.replaceAll(leadingSpaceRegex, "") || ""
+}

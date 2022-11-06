@@ -219,7 +219,7 @@ export const RfpPermissionsForm = ({ rfp }) => {
               <Button
                 type={ButtonType.Secondary}
                 isSubmitType={true}
-                isDisabled={!formState.valid}
+                isDisabled={!formState.valid || formState.pristine}
                 className="mt-7"
               >
                 Save
