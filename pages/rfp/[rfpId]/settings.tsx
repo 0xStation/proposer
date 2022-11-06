@@ -11,6 +11,7 @@ import { RfpStatus } from "@prisma/client"
 import updateRfpStatus from "app/rfp/mutations/updateRfpStatus"
 import useStore from "app/core/hooks/useStore"
 import { RfpDetailsForm } from "app/rfp/components/RfpDetailsForm"
+import { RfpPermissionsForm } from "app/rfp/components/RfpPermissionsForm"
 
 const RfpSettings: BlitzPage = () => {
   const rfpId = useParam("rfpId", "string") as string
@@ -107,7 +108,7 @@ const RfpSettings: BlitzPage = () => {
               <RfpNavigator />
               <div className="mt-8 lg:w-3/5 w-full">
                 <RfpDetailsForm rfp={rfp} />
-                <div className="mt-7 border-t border-t-concrete">
+                <div className="mt-8 border-t border-t-concrete">
                   <h1 className="font-bold mt-5">Current status</h1>
                   <div className="flex flex-col mt-3">
                     <p>Open for submissions</p>
@@ -123,6 +124,10 @@ const RfpSettings: BlitzPage = () => {
                       {rfp?.status === RfpStatus.OPEN ? "Close this RFP" : "Open this RFP"}
                     </Button>
                   </div>
+                </div>
+                <div className="mt-8 border-t border-t-concrete">
+                  <h1 className="font-bold mt-5">Requirements</h1>
+                  <RfpPermissionsForm rfp={rfp} />
                 </div>
               </div>
             </>

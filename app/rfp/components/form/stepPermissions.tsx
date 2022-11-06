@@ -8,7 +8,12 @@ import WhenFieldChanges from "app/core/components/WhenFieldChanges"
 import useStore from "app/core/hooks/useStore"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { getNetworkName } from "app/core/utils/networkInfo"
-import { composeValidators, isValidTokenAmount, requiredField } from "app/utils/validators"
+import {
+  composeValidators,
+  isPositiveAmount,
+  isValidTokenAmount,
+  requiredField,
+} from "app/utils/validators"
 import { formatPositiveInt, formatTokenAmount } from "app/utils/formatters"
 
 export const RfpFormStepPermission = ({
@@ -109,7 +114,8 @@ export const RfpFormStepPermission = ({
             }
             validate={composeValidators(
               requiredField,
-              isValidTokenAmount(selectedSubmissionToken?.decimals || 0)
+              isValidTokenAmount(selectedSubmissionToken?.decimals || 0),
+              isPositiveAmount
             )}
           >
             {({ input, meta }) => {
