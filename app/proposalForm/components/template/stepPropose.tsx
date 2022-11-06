@@ -6,14 +6,16 @@ import { useParam, Routes } from "@blitzjs/next"
 import { composeValidators, mustBeAboveNumWords, requiredField } from "app/utils/validators"
 import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
-import { getClientAddress, getMinNumWords } from "app/template/utils"
+import { getClientAddress, getContributorAddress, getMinNumWords } from "app/template/utils"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import Preview from "app/core/components/MarkdownPreview"
 import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid"
+import { useSession } from "@blitzjs/auth"
 
 export const TemplateFormStepPropose = ({ formState }) => {
+  const session = useSession({ suspense: false })
   const [previewMode, setPreviewMode] = useState<boolean>(false)
   const templateId = useParam("templateId") as string
   const { rfpId } = useRouter().query
@@ -51,14 +53,38 @@ export const TemplateFormStepPropose = ({ formState }) => {
     }
   )
 
-  const { text: displayAddress } = useDisplayAddress(getClientAddress(template?.data?.fields))
+  const templateClientAddress = getClientAddress(template?.data?.fields)
+  const templateContributorAddress = getContributorAddress(template?.data?.fields)
+  const connectedAddress = session?.siwe?.address as string
+
+  const clientAddress = templateClientAddress ? templateClientAddress : connectedAddress
+  const contributorAddress = templateContributorAddress
+    ? templateContributorAddress
+    : connectedAddress
+
+  const { text: clientDisplayAddress } = useDisplayAddress(clientAddress)
+  const { text: contributorDisplayAddress } = useDisplayAddress(contributorAddress)
 
   return (
     <>
-      <div className="mt-4 flex flex-row w-full items-center justify-between">
-        <span className="font-bold">To</span>
-        <span className="items-end">{"@" + displayAddress}</span>
-      </div>
+      {templateClientAddress && (
+        <>
+          {/* CLIENT */}
+          <div className="mt-4 flex flex-row w-full items-center justify-between">
+            <span className="font-bold">To</span>
+            <span className="items-end">{"@" + clientDisplayAddress}</span>
+          </div>
+        </>
+      )}
+      {templateContributorAddress && (
+        <>
+          {/* CONTRIBUTOR */}
+          <div className="mt-4 flex flex-row w-full items-center justify-between">
+            <span className="font-bold">To</span>
+            <span className="items-end">{"@" + contributorDisplayAddress}</span>
+          </div>
+        </>
+      )}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Title</span>
         <span className="items-end">{`"${rfp?.data.content.title || ""}" submission`}</span>

@@ -106,8 +106,9 @@ export const isPositiveAmount = (amount: string) => {
 
 export const isValidTokenAmount = (decimals: number) => {
   return (preFormatAmount: string) => {
-    if (!preFormatAmount) return undefined
+    if (!preFormatAmount) return "No token amount provided"
     const amount = formatTokenAmount(preFormatAmount)
+    if (Number.isNaN(parseFloat(amount))) return "No number provided"
 
     if ((amount.split(".")[1]?.length || 0) > decimals)
       return `Cannot have more than ${decimals} decimal places.`
@@ -166,6 +167,7 @@ export const isValidTransactionLink = (chainId: number) => {
 export const isValidAdvancedPaymentPercentage = (value: string) => {
   if (!value) return "No percentage value provided"
   const parsedValue = parseFloat(formatPercentValue(value))
+  if (Number.isNaN(parsedValue)) return "No percentage value provided"
   if (parsedValue >= 100) return "Advance payment must be less than 100%"
   if (parsedValue === 0) return "Advance payment must be more than 0%"
   return undefined

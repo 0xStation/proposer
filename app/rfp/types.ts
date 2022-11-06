@@ -20,3 +20,8 @@ export type RfpMetadata = {
     minBalance?: string // string to pass directly into BigNumber.from in logic check
   }
 }
+
+export enum PaymentDirection {
+  AUTHOR_IS_RECIPIENT = "AUTHOR_IS_RECIPIENT",
+  AUTHOR_IS_SENDER = "AUTHOR_IS_SENDER",
+}

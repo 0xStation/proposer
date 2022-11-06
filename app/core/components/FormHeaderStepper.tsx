@@ -12,7 +12,7 @@ const stepperSizeToStepsStyling = {
   },
 }
 
-export const Stepper = ({
+export const FormHeaderStepper = ({
   activeStep,
   steps,
   className,
@@ -50,4 +50,4 @@ export const Stepper = ({
   )
 }
 
-export default Stepper
+export default FormHeaderStepper

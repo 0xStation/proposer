@@ -5,7 +5,7 @@ import { useMutation, useQuery } from "@blitzjs/rpc"
 import { useParam, Routes } from "@blitzjs/next"
 import { useSession } from "@blitzjs/auth"
 import Button from "app/core/components/sds/buttons/Button"
-import Stepper from "../Stepper"
+import FormHeaderStepper from "app/core/components/FormHeaderStepper"
 import BackArrow from "app/core/icons/BackArrow"
 import useStore from "app/core/hooks/useStore"
 import { Proposal } from "app/proposal/types"
@@ -19,8 +19,9 @@ import TemplateFormStepConfirm from "./stepConfirm"
 import { AddressType, ProposalRoleType } from "@prisma/client"
 import { mustBeAboveNumWords } from "app/utils/validators"
 import {
-  addAddressAsRecipientToPayments,
+  addAddressesToPayments,
   getClientAddress,
+  getContributorAddress,
   getFieldValue,
   getMinNumWords,
 } from "app/template/utils"
@@ -30,6 +31,7 @@ import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinToke
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
+import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 
 export const ProposalFormTemplate = () => {
   const router = useRouter()
@@ -96,7 +98,11 @@ export const ProposalFormTemplate = () => {
       chainId: rfp?.data?.singleTokenGate?.token?.chainId as number,
       tokenAddress: rfp?.data?.singleTokenGate?.token?.address as string,
       accountAddress: activeUser?.address as string,
-      minBalance: rfp?.data?.singleTokenGate?.minBalance || "1", // string to pass directly into BigNumber.from in logic check
+      minBalance:
+        decimalToBigNumber(
+          rfp?.data?.singleTokenGate?.minBalance || 0,
+          rfp?.data?.singleTokenGate?.token?.decimals || 0
+        ).toString() || "1", // string to pass directly into BigNumber.from in logic check
     },
     {
       enabled: !!activeUser?.address && !!rfp?.data?.singleTokenGate,
@@ -190,7 +196,7 @@ export const ProposalFormTemplate = () => {
 
   return (
     <div className="max-w-[580px] min-w-[580px] h-full mx-auto">
-      <Stepper
+      <FormHeaderStepper
         activeStep={PROPOSAL_FORM_HEADER_COPY[proposalStep]}
         steps={["Propose", "Confirm"]}
         className="mt-10"
@@ -241,20 +247,38 @@ export const ProposalFormTemplate = () => {
               return
             }
 
-            try {
-              const contributorAddress = session?.siwe?.address as string
+            const templateClientAddress = getClientAddress(template?.data?.fields)
+            const templateContributorAddress = getContributorAddress(template?.data?.fields)
+            const connectedAddress = session?.siwe?.address as string
 
+            if (!templateClientAddress && !templateContributorAddress) {
+              setIsLoading(false)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "RFP missing required fields.",
+              })
+              return
+            }
+
+            const clientAddress = templateClientAddress ? templateClientAddress : connectedAddress
+            const contributorAddress = templateContributorAddress
+              ? templateContributorAddress
+              : connectedAddress
+
+            try {
               await createProposalMutation({
                 rfpId: rfp?.id,
                 contentTitle: `"${rfp?.data.content.title}" submission`,
                 contentBody: values.body,
-                authorAddresses: [contributorAddress],
+                authorAddresses: [connectedAddress],
                 contributorAddresses: [contributorAddress],
-                clientAddresses: [getClientAddress(template?.data?.fields)],
+                clientAddresses: [clientAddress],
                 milestones: getFieldValue(template?.data?.fields, RESERVED_KEYS.MILESTONES),
-                payments: addAddressAsRecipientToPayments(
+                payments: addAddressesToPayments(
                   template?.data?.fields as ProposalTemplateField[],
-                  contributorAddress
+                  clientAddress, // sender address
+                  contributorAddress // recipient address
                 ),
                 paymentTerms: getFieldValue(template?.data?.fields, RESERVED_KEYS.PAYMENT_TERMS),
               })
@@ -328,6 +352,12 @@ export const ProposalFormTemplate = () => {
                   <Button
                     isDisabled={
                       unFilledProposalFields ||
+                      // proposing to own RFP
+                      addressesAreEqual(
+                        session?.siwe?.address as string,
+                        rfp?.accountAddress as string
+                      ) ||
+                      // has not connected wallet with token requirement (if one exists)
                       (!!rfp?.data?.singleTokenGate &&
                         (isTokenGatingCheckLoading ||
                           (isTokenGatingCheckComplete && !userHasRequiredToken)))
@@ -356,6 +386,14 @@ export const ProposalFormTemplate = () => {
                   >
                     Next
                   </Button>
+                  {addressesAreEqual(
+                    session?.siwe?.address as string,
+                    rfp?.accountAddress as string
+                  ) && (
+                    <span className="text-xs text-concrete">
+                      You cannot propose to your own RFP.
+                    </span>
+                  )}
                   {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
                     <span className="text-xs text-concrete">
                       Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
@@ -377,6 +415,12 @@ export const ProposalFormTemplate = () => {
                       isDisabled={
                         isLoading ||
                         unFilledProposalFields ||
+                        // proposing to own RFP
+                        addressesAreEqual(
+                          session?.siwe?.address as string,
+                          rfp?.accountAddress as string
+                        ) ||
+                        // has not connected wallet with token requirement (if one exists)
                         (!!rfp?.data?.singleTokenGate &&
                           (isTokenGatingCheckLoading ||
                             (isTokenGatingCheckComplete && !userHasRequiredToken)))
@@ -415,6 +459,14 @@ export const ProposalFormTemplate = () => {
                     >
                       Send proposal
                     </Button>
+                    {addressesAreEqual(
+                      session?.siwe?.address as string,
+                      rfp?.accountAddress as string
+                    ) && (
+                      <span className="text-xs text-concrete">
+                        You cannot propose to your own RFP.
+                      </span>
+                    )}
                     {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
                       <span className="text-xs text-concrete">
                         Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this

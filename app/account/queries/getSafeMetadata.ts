@@ -25,22 +25,21 @@ export default async function getSafeMetadata(input: z.infer<typeof GetSafeMetad
         "Content-Type": "application/json",
       },
     })
+
+    if (response.status === 404) {
+      // assume it's a personal wallet
+      return null
+    }
+
+    const results = await response.json()
+    return {
+      chainId: params.chainId,
+      address: params.address,
+      quorum: results.threshold,
+      signers: results.owners,
+    }
   } catch (err) {
     console.error(err)
     return null
-  }
-
-  if (response.status === 404) {
-    // assume it's a personal wallet
-    return null
-  }
-
-  const results = await response.json()
-
-  return {
-    chainId: params.chainId,
-    address: params.address,
-    quorum: results.threshold,
-    signers: results.owners,
   }
 }

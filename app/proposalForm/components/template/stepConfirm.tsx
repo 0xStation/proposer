@@ -2,13 +2,21 @@ import { useRouter } from "next/router"
 import { useQuery } from "@blitzjs/rpc"
 import { useParam, Routes } from "@blitzjs/next"
 import Preview from "app/core/components/MarkdownPreview"
-import { getClientAddress, getPaymentToken, getTotalPaymentAmount } from "app/template/utils"
+import {
+  getClientAddress,
+  getContributorAddress,
+  getPaymentToken,
+  getTotalPaymentAmount,
+} from "app/template/utils"
 import { getNetworkName } from "app/core/utils/networkInfo"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
+import { useSession } from "@blitzjs/auth"
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
 export const TemplateFormStepConfirm = ({ body }) => {
+  const session = useSession({ suspense: false })
   const templateId = useParam("templateId") as string
   const { rfpId } = useRouter().query
   const router = useRouter()
@@ -45,22 +53,40 @@ export const TemplateFormStepConfirm = ({ body }) => {
     }
   )
 
-  const { text: displayAddress } = useDisplayAddress(getClientAddress(template?.data?.fields))
+  const templateClientAddress = getClientAddress(template?.data?.fields)
+  const templateContributorAddress = getContributorAddress(template?.data?.fields)
+  const connectedAddress = session?.siwe?.address as string
+
+  const clientAddress = templateClientAddress ? templateClientAddress : connectedAddress
+  const contributorAddress = templateContributorAddress
+    ? templateContributorAddress
+    : connectedAddress
+
+  const { text: clientDisplayAddress } = useDisplayAddress(clientAddress)
+  const { text: contributorDisplayAddress } = useDisplayAddress(contributorAddress)
 
   return (
     <>
       <div className="flex flex-col mt-6 pb-6 border-b border-wet-concrete">
-        <p>Upon confirmation, the proposal will be sent to Philosophical Foxes for review.</p>
+        <p>Upon confirmation, the proposal will be sent to the recipient for review.</p>
       </div>
-      {/* TO */}
+      {/* CLIENT */}
       <div className="mt-6 flex flex-row w-full items-center justify-between">
-        <span className="font-bold">To</span>
-        <span className="items-end">{"@" + displayAddress}</span>
+        <span className="font-bold">Client</span>
+        <span className="items-end">
+          {"@" +
+            clientDisplayAddress +
+            (addressesAreEqual(connectedAddress, clientAddress) ? " (you)" : "")}
+        </span>
       </div>
-      {/* RFP */}
+      {/* CONTRIBUTOR */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
-        <span className="font-bold">RFP</span>
-        <span className="items-end">{rfp?.data.content.title}</span>
+        <span className="font-bold">Contributor</span>
+        <span className="items-end">
+          {"@" +
+            contributorDisplayAddress +
+            (addressesAreEqual(connectedAddress, contributorAddress) ? " (you)" : "")}
+        </span>
       </div>
       {/* TITLE */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
