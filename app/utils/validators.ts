@@ -99,7 +99,7 @@ export const isValidEmail = (email: string) => {
 }
 
 export const isPositiveAmount = (amount: string) => {
-  if (!amount) return undefined
+  if (!amount) return "No amount provided"
   if (parseFloat(amount) > 0) return undefined // want to allow 0 amount proposals?
   return "Amount must be greater than zero."
 }
