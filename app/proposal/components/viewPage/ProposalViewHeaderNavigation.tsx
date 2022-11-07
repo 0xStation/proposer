@@ -231,6 +231,9 @@ export const ProposalViewHeaderNavigation = () => {
                 )}
               </Tab>
             )}
+            <Tab router={router} route={Routes.ProposalHistory({ proposalId })}>
+              History
+            </Tab>
           </ul>
         </div>
       </div>
