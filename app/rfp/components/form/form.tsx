@@ -38,11 +38,6 @@ export const RfpForm = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [proposalStep, setProposalStep] = useState<RfpFormStep>(RfpFormStep.RFP)
 
-  // GENERAL step
-
-  // payment direction in parent form state because it gets reset when flipping through steps
-  const [selectedBodyValidation, setSelectedBodyValidation] = useState<string>("")
-
   // PAYMENT step
 
   // payment directoin in parent form state because it gets reset when flipping through steps
@@ -53,8 +48,9 @@ export const RfpForm = () => {
   // payment terms in parent form state because it gets reset when flipping through steps if put in the rewards form
   const [selectedPaymentTerms, setSelectedPaymentTerms] = useState<string>("")
 
-  // PERMISSION step
+  // REQUIREMENTS step
 
+  const [wordCountRequirement, setWordCountRequirement] = useState<string>("")
   const [permissionTokenOptions, setPermissionTokenOptions] = useState<any[]>()
   const [selectedSubmissionToken, setSelectedSubmissionToken] = useState<any>()
 
@@ -171,6 +167,10 @@ export const RfpForm = () => {
                 : undefined,
               // social connections currently single choice but will become multiple choice once more integrations are added
               requiredSocialConnections: !!values.socialConnection ? [values.socialConnection] : [],
+              minWordCount:
+                values.wordCountRequirement === ProposalTemplateFieldValidationName.MIN_WORDS
+                  ? parseInt(values.minWordCount)
+                  : undefined,
             })
           } catch (err) {
             setIsLoading(false)
@@ -220,13 +220,7 @@ export const RfpForm = () => {
                     <h2 className="text-marble-white text-xl font-bold">
                       {RFP_FORM_HEADER_COPY[proposalStep]}
                     </h2>
-                    {proposalStep === RfpFormStep.RFP && (
-                      <RfpFormStepRfp
-                        formState={formState}
-                        selectedBodyValidation={selectedBodyValidation}
-                        setSelectedBodyValidation={setSelectedBodyValidation}
-                      />
-                    )}
+                    {proposalStep === RfpFormStep.RFP && <RfpFormStepRfp formState={formState} />}
                     {proposalStep === RfpFormStep.PAYMENT && (
                       <RfpFormStepPayment
                         chainId={(chain?.id as number) || 1}
@@ -251,6 +245,8 @@ export const RfpForm = () => {
                         setIsImportTokenModalOpen={setIsImportTokenModalOpen}
                         chainId={(chain?.id as number) || 1}
                         refetchTokens={refetchTokens}
+                        wordCountRequirement={wordCountRequirement}
+                        setWordCountRequirement={setWordCountRequirement}
                       />
                     )}
                   </>

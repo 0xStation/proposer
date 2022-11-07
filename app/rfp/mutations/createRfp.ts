@@ -2,7 +2,11 @@ import * as z from "zod"
 import db, { ProposalRoleType } from "db"
 import { ZodToken } from "app/types/zod"
 import { Rfp, SocialConnection } from "app/rfp/types"
-import { ProposalTemplateFieldType, RESERVED_KEYS } from "app/template/types"
+import {
+  ProposalTemplateFieldType,
+  ProposalTemplateFieldValidationName,
+  RESERVED_KEYS,
+} from "app/template/types"
 import { PaymentTerm } from "app/proposalPayment/types"
 
 const CreateRfp = z.object({
@@ -36,6 +40,7 @@ const CreateRfp = z.object({
       SocialConnection.LENS,
     ])
     .array(),
+  minWordCount: z.number().optional(),
 })
 
 export default async function createRfp(input: z.infer<typeof CreateRfp>) {
@@ -76,6 +81,21 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
                 value: [],
               }),
         },
+        ...(!!params.minWordCount
+          ? [
+              {
+                key: RESERVED_KEYS.BODY,
+                mapsTo: RESERVED_KEYS.BODY,
+                fieldType: ProposalTemplateFieldType.OPEN,
+                validation: [
+                  {
+                    name: ProposalTemplateFieldValidationName.MIN_WORDS,
+                    args: [params.minWordCount],
+                  },
+                ],
+              },
+            ]
+          : []),
         {
           key: RESERVED_KEYS.MILESTONES,
           mapsTo: RESERVED_KEYS.MILESTONES,
