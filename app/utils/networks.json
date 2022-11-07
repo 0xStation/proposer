@@ -4,6 +4,7 @@
     "name": "Ethereum",
     "chainId": 1,
     "network": "homestead",
+    "alchemyNetwork": "homestead",
     "gnosisApi": "https://safe-transaction.gnosis.io",
     "gnosisNetwork": "mainnet",
     "gnosisUrl": "https://gnosis-safe.io/app/eth",
@@ -43,49 +44,13 @@
       }
     ]
   },
-  "4": {
-    "key": "4",
-    "name": "Rinkeby (testnet)",
-    "shortName": "Rinkeby",
-    "chainId": 4,
-    "network": "rinkeby",
-    "gnosisApi": "https://safe-transaction.rinkeby.gnosis.io",
-    "gnosisNetwork": "rinkeby",
-    "gnosisUrl": "https://gnosis-safe.io/app/rin",
-    "testnet": true,
-    "multicall": "0x42ad527de7d4e9d9d011ac45b31d8551f8fe9821",
-    "ensResolver": "0xf6305c19e814d2a75429fd637d01f7ee0e77d615",
-    "rpc": [
-      "https://eth-rinkeby.alchemyapi.io/v2/ugiPEBqMebLQbjro42kalZ1h4StpW_fR",
-      "https://eth-rinkeby.gateway.pokt.network/v1/5f76124fb90218002e9ce985"
-    ],
-    "ws": ["wss://eth-rinkeby.ws.alchemyapi.io/v2/twReQE9Px03E-E_N_Fbb3OVF7YgHxoGq"],
-    "explorer": "https://rinkeby.etherscan.io",
-    "start": 4534725,
-    "logo": "ipfs://QmR2UYZczmYa4s8mr9HZHci5AQwyAnwUW7tSUZz7KWF3sA",
-    "coin": {
-      "type": "COIN",
-      "name": "Rinkeby ETH",
-      "symbol": "ETH",
-      "address": "0x0000000000000000000000000000000000000000",
-      "decimals": 18
-    },
-    "stablecoins": [
-      {
-        "type": "ERC20",
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "address": "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
-        "decimals": 6
-      }
-    ]
-  },
   "5": {
     "key": "5",
     "name": "Goerli (testnet)",
     "shortName": "Goerli",
     "chainId": 5,
     "network": "goerli",
+    "alchemyNetwork": "goerli",
     "gnosisApi": "https://safe-transaction-goerli.safe.global",
     "gnosisNetwork": "goerli",
     "gnosisUrl": "https://gnosis-safe.io/app/gor",
@@ -117,6 +82,7 @@
     "name": "Optimism",
     "chainId": 10,
     "network": "Optimism mainnet",
+    "alchemyNetwork": "optimism",
     "gnosisApi": "https://safe-transaction-optimism.safe.global",
     "gnosisNetwork": "optimism",
     "gnosisUrl": "https://gnosis-safe.io/app/oeth",
@@ -168,6 +134,7 @@
     "key": "137",
     "name": "Polygon Mainnet",
     "shortName": "Polygon",
+    "alchemyNetwork": "matic",
     "gnosisNetwork": "polygon",
     "gnosisApi": "https://safe-transaction-polygon.safe.global",
     "gnosisUrl": "https://gnosis-safe.io/app/matic",
@@ -218,6 +185,7 @@
     "name": "Arbitrum",
     "chainId": 42161,
     "network": "Arbitrum mainnet",
+    "alchemyNetwork": "arbitrum",
     "gnosisApi": "https://safe-transaction-arbitrum.safe.global",
     "gnosisNetwork": "arbitrum",
     "gnosisUrl": "https://gnosis-safe.io/app/arb1",

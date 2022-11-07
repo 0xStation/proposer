@@ -3,19 +3,19 @@ import { Ctx } from "blitz"
 import { z } from "zod"
 
 const GetTokensByAccount = z.object({
-  chainId: z.number(),
   userId: z.number().optional(),
+  chainId: z.number().optional(),
 })
 
 export async function getTokensByAccount(input: z.infer<typeof GetTokensByAccount>, ctx: Ctx) {
-  const data = GetTokensByAccount.parse(input)
-  const { chainId, userId } = data
+  const params = GetTokensByAccount.parse(input)
+  const { chainId, userId } = params
 
   try {
     const accountTokens = await db.accountToken.findMany({
       where: {
-        chainId,
         accountId: userId || (ctx.session?.userId as number),
+        ...(chainId ? { chainId } : {}),
       },
       include: {
         token: true,
