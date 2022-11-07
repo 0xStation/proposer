@@ -15,7 +15,7 @@ import getRfpById from "app/rfp/queries/getRfpById"
 import { useSession } from "@blitzjs/auth"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
-export const TemplateFormStepConfirm = ({ body }) => {
+export const TemplateFormStepConfirm = ({ formState }) => {
   const session = useSession({ suspense: false })
   const templateId = useParam("templateId") as string
   const { rfpId } = useRouter().query
@@ -91,7 +91,7 @@ export const TemplateFormStepConfirm = ({ body }) => {
       {/* TITLE */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Title</span>
-        <span className="items-end">{`"${rfp?.data.content.title}" submission`}</span>
+        <span className="items-end">{formState.values.title}</span>
       </div>
       {/* NETWORK */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
@@ -114,7 +114,7 @@ export const TemplateFormStepConfirm = ({ body }) => {
       <div className="mt-4 flex flex-col w-full">
         <span className="font-bold">Details</span>
         <div className="mt-4 mx-6">
-          <Preview markdown={body} />
+          <Preview markdown={formState.values.body} />
         </div>
       </div>
     </>

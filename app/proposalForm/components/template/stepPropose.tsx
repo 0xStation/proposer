@@ -99,10 +99,25 @@ export const TemplateFormStepPropose = ({ formState }) => {
           </div>
         </>
       )}
-      <div className="mt-4 flex flex-row w-full items-center justify-between">
-        <span className="font-bold">Title</span>
-        <span className="items-end">{`"${rfp?.data.content.title || ""}" submission`}</span>
-      </div>
+      {/* TITLE */}
+      <label className="font-bold block mt-6">Title*</label>
+      <Field name="title" validate={requiredField}>
+        {({ meta, input }) => (
+          <>
+            <input
+              {...input}
+              type="text"
+              required
+              placeholder="Add a title for your idea"
+              className="bg-wet-concrete rounded mt-1 w-full p-2"
+            />
+
+            {meta.touched && meta.error && (
+              <span className="text-torch-red text-xs">{meta.error}</span>
+            )}
+          </>
+        )}
+      </Field>
       {/* BODY */}
       <div className="flex flex-row justify-between">
         <div className="flex-col">
