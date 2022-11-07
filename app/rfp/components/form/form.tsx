@@ -171,6 +171,7 @@ export const RfpForm = () => {
                 values.wordCountRequirement === ProposalTemplateFieldValidationName.MIN_WORDS
                   ? parseInt(values.minWordCount)
                   : undefined,
+              bodyPrefill: values.bodyPrefill,
             })
           } catch (err) {
             setIsLoading(false)
@@ -187,7 +188,6 @@ export const RfpForm = () => {
 
           const missingFieldsGeneral =
             !formState.values.title ||
-            !formState.values.body ||
             (formState.values.bodyValidation === ProposalTemplateFieldValidationName.MIN_WORDS &&
               !formatPositiveInt(formState.values.minWordCount))
 

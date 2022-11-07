@@ -1,11 +1,9 @@
 // PACKAGE
 import { Routes, useParam } from "@blitzjs/next"
-import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid"
 import { useRouter } from "next/router"
 import { useState } from "react"
 import { Field } from "react-final-form"
 // CORE
-import Preview from "app/core/components/MarkdownPreview"
 import TextLink from "app/core/components/TextLink"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import { BODY_CONSTRAINT_MAP, LINKS } from "app/core/utils/constants"
@@ -16,9 +14,12 @@ import { ProposalTemplateFieldValidationName } from "app/template/types"
 import { useQuery } from "@blitzjs/rpc"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import TextareaFieldOrMarkdownPreview from "app/core/components/TextareaFieldOrMarkdownPreview"
+import ReadEditMarkdownButton from "app/core/components/ReadEditMarkdownButton"
 
 export const RfpFormStepRfp = ({ formState }) => {
-  const [previewMode, setPreviewMode] = useState<boolean>(false)
+  const [bodyPreviewMode, setBodyPreviewMode] = useState<boolean>(false)
+  const [bodyPrefillPreviewMode, setBodyPrefillPreviewMode] = useState<boolean>(false)
   const accountAddress = useParam("accountAddress", "string") as string
   const { text: displayAddress } = useDisplayAddress(accountAddress)
   const router = useRouter()
@@ -77,56 +78,45 @@ export const RfpFormStepRfp = ({ formState }) => {
         )}
       </Field>
       {/* SUBMISSION GUIDELINES */}
-      <div className="flex flex-row justify-between">
-        <div className="flex-col">
-          <label className="font-bold block mt-6">What are you looking for?*</label>
-          <span className="text-xs text-concrete block">
-            Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown syntax</TextLink>.
-          </span>
-        </div>
-        <button
-          type="button"
-          className="pt-1"
-          onClick={(e) => {
-            e.preventDefault()
-            setPreviewMode(!previewMode)
-          }}
-        >
-          {previewMode ? (
-            <>
-              <p className="inline text-sm text-concrete">Edit</p>{" "}
-              <EyeOffIcon className="inline h-5 w-5 fill-concrete" />
-            </>
-          ) : (
-            <>
-              <p className="inline text-sm text-concrete">Read</p>{" "}
-              <EyeIcon className="inline h-5 w-5 fill-concrete" />
-            </>
-          )}
-        </button>
+      <div className="mt-6 flex flex-row justify-between items-center">
+        <label className="font-bold block">Submission guidelines</label>
+        <ReadEditMarkdownButton
+          previewMode={bodyPrefillPreviewMode}
+          setPreviewMode={setBodyPrefillPreviewMode}
+        />
       </div>
+      <span className="text-xs text-concrete block">
+        Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>. See{" "}
+        <TextLink url={LINKS.MARKDOWN_GUIDE}>examples of RFPs</TextLink>.
+      </span>
       {/* TOGGLE */}
-      {previewMode ? (
-        <div className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[180px] w-full ">
-          <Preview markdown={formState.values.body} />
-        </div>
-      ) : (
-        <Field name="body" component="textarea" validate={requiredField}>
-          {({ input, meta }) => (
-            <div>
-              <textarea
-                {...input}
-                placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
-                className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[180px] w-full"
-              />
-              {/* this error shows up when the user focuses the field (meta.touched) */}
-              {meta.error && meta.touched && (
-                <span className=" text-xs text-torch-red block">{meta.error}</span>
-              )}
-            </div>
-          )}
-        </Field>
-      )}
+      <TextareaFieldOrMarkdownPreview
+        previewMode={bodyPreviewMode}
+        setPreviewMode={setBodyPreviewMode}
+        markdown={formState.values.body}
+        placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
+        fieldName="body"
+      />
+      {/* PROPOSAL TEMPLATE */}
+      <div className="mt-6 flex flex-row justify-between items-center">
+        <label className="font-bold block">Proposal template</label>
+        <ReadEditMarkdownButton
+          previewMode={bodyPrefillPreviewMode}
+          setPreviewMode={setBodyPrefillPreviewMode}
+        />
+      </div>
+      <span className="text-xs text-concrete block">
+        Proposer will automatically see the template&apos;s content in proposal details. Supports{" "}
+        <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>. See examples of{" "}
+        <TextLink url={LINKS.MARKDOWN_GUIDE}>RFP templates</TextLink>.
+      </span>
+      <TextareaFieldOrMarkdownPreview
+        previewMode={bodyPrefillPreviewMode}
+        setPreviewMode={setBodyPrefillPreviewMode}
+        markdown={formState.values.bodyPrefill}
+        placeholder={`# Summary\n\n# Deliverables\n\n# Timeline`}
+        fieldName="bodyPrefill"
+      />
     </>
   )
 }

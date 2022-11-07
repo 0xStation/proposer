@@ -14,6 +14,7 @@ export default async function getRfpById(params: z.infer<typeof GetRfpById>) {
       },
       include: {
         account: true,
+        template: true,
       },
     })
 

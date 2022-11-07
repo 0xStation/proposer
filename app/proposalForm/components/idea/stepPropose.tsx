@@ -78,9 +78,8 @@ export const IdeaFormStepPropose = ({ formState }) => {
         <div className="flex-col">
           <label className="font-bold block mt-6">Details*</label>
           <span className="text-xs text-concrete block">
-            Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown syntax</TextLink>. Need
-            inspirations? Check out{" "}
-            <TextLink url={LINKS.PROPOSAL_TEMPLATE}>proposal templates</TextLink>.
+            Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>. Need inspirations?
+            Check out <TextLink url={LINKS.PROPOSAL_TEMPLATE}>proposal templates</TextLink>.
           </span>
         </div>
         <button

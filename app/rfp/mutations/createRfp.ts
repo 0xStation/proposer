@@ -11,7 +11,7 @@ import { PaymentTerm } from "app/proposalPayment/types"
 
 const CreateRfp = z.object({
   title: z.string(),
-  body: z.string(),
+  body: z.string().optional().default(""),
   associatedAccountAddress: z.string(),
   preselectClientAddress: z.string().optional(),
   preselectContributorAddress: z.string().optional(),
@@ -41,6 +41,7 @@ const CreateRfp = z.object({
     ])
     .array(),
   minWordCount: z.number().optional(),
+  bodyPrefill: z.string().optional(),
 })
 
 export default async function createRfp(input: z.infer<typeof CreateRfp>) {
@@ -81,21 +82,26 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
                 value: [],
               }),
         },
-        ...(!!params.minWordCount
-          ? [
-              {
-                key: RESERVED_KEYS.BODY,
-                mapsTo: RESERVED_KEYS.BODY,
+        {
+          key: RESERVED_KEYS.BODY,
+          mapsTo: RESERVED_KEYS.BODY,
+          ...(!!params.bodyPrefill
+            ? {
+                fieldType: ProposalTemplateFieldType.PREFILL,
+                value: params.bodyPrefill,
+              }
+            : {
                 fieldType: ProposalTemplateFieldType.OPEN,
-                validation: [
-                  {
-                    name: ProposalTemplateFieldValidationName.MIN_WORDS,
-                    args: [params.minWordCount],
-                  },
-                ],
-              },
-            ]
-          : []),
+              }),
+          validation: !!params.minWordCount
+            ? [
+                {
+                  name: ProposalTemplateFieldValidationName.MIN_WORDS,
+                  args: [params.minWordCount],
+                },
+              ]
+            : [],
+        },
         {
           key: RESERVED_KEYS.MILESTONES,
           mapsTo: RESERVED_KEYS.MILESTONES,

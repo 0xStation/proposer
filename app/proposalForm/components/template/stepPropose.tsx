@@ -6,7 +6,7 @@ import { useParam, Routes } from "@blitzjs/next"
 import { composeValidators, mustBeAboveNumWords, requiredField } from "app/utils/validators"
 import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
-import { getClientAddress, getContributorAddress, getMinNumWords } from "app/template/utils"
+import { getMinNumWords } from "app/template/utils"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
@@ -62,17 +62,7 @@ export const TemplateFormStepPropose = ({ formState }) => {
     }
   )
 
-  const templateClientAddress = getClientAddress(template?.data?.fields)
-  const templateContributorAddress = getContributorAddress(template?.data?.fields)
-  const connectedAddress = session?.siwe?.address as string
-
-  const clientAddress = templateClientAddress ? templateClientAddress : connectedAddress
-  const contributorAddress = templateContributorAddress
-    ? templateContributorAddress
-    : connectedAddress
-
-  const { text: clientDisplayAddress } = useDisplayAddress(clientAddress)
-  const { text: contributorDisplayAddress } = useDisplayAddress(contributorAddress)
+  const { text: toDisplayAddress } = useDisplayAddress(rfp?.accountAddress)
 
   return (
     <>
@@ -81,24 +71,11 @@ export const TemplateFormStepPropose = ({ formState }) => {
         !activeUser?.discordId && (
           <ConnectDiscordModal isOpen={isDiscordModalOpen} setIsOpen={setIsDiscordModalOpen} />
         )}
-      {templateClientAddress && (
-        <>
-          {/* CLIENT */}
-          <div className="mt-4 flex flex-row w-full items-center justify-between">
-            <span className="font-bold">To</span>
-            <span className="items-end">{"@" + clientDisplayAddress}</span>
-          </div>
-        </>
-      )}
-      {templateContributorAddress && (
-        <>
-          {/* CONTRIBUTOR */}
-          <div className="mt-4 flex flex-row w-full items-center justify-between">
-            <span className="font-bold">To</span>
-            <span className="items-end">{"@" + contributorDisplayAddress}</span>
-          </div>
-        </>
-      )}
+      {/* TO */}
+      <div className="mt-4 flex flex-row w-full items-center justify-between">
+        <span className="font-bold">To</span>
+        <span className="items-end">{"@" + toDisplayAddress}</span>
+      </div>
       {/* TITLE */}
       <label className="font-bold block mt-6">Title*</label>
       <Field name="title" validate={requiredField}>
@@ -126,7 +103,7 @@ export const TemplateFormStepPropose = ({ formState }) => {
             {getMinNumWords(template?.data.fields) > 0
               ? `${getMinNumWords(template?.data.fields)} words minimum.`
               : ""}{" "}
-            Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown syntax</TextLink>.
+            Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>.
           </span>
         </div>
         <button

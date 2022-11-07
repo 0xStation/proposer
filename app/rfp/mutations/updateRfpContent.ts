@@ -1,11 +1,14 @@
 import * as z from "zod"
 import db from "db"
 import { Rfp, RfpMetadata } from "../types"
+import { ProposalTemplateFieldType, RESERVED_KEYS } from "app/template/types"
+import { ProposalTemplateMetadata } from "app/template/types"
 
 const UpdateRfpContent = z.object({
   rfpId: z.string(),
   title: z.string(),
   body: z.string(),
+  bodyPrefill: z.string().optional(),
   oneLiner: z.string(),
 })
 
@@ -18,9 +21,42 @@ export default async function updateRfpContent(input: z.infer<typeof UpdateRfpCo
     const rfp = await db.$transaction(async (db) => {
       const rfp = await db.rfp.findUnique({
         where: { id: params.rfpId },
+        include: { template: true },
       })
 
-      const metadata = {
+      const oldTemplateFields = (rfp?.template?.data as ProposalTemplateMetadata)?.fields || []
+      const oldBodyValidation = oldTemplateFields.find(
+        (field) => field.key === RESERVED_KEYS.BODY
+      )?.validation
+
+      const templateMetadata = {
+        title: params.title,
+        fields: [
+          ...oldTemplateFields.filter((field) => field.key !== RESERVED_KEYS.BODY),
+          {
+            key: RESERVED_KEYS.BODY,
+            mapsTo: RESERVED_KEYS.BODY,
+            ...(!!params.bodyPrefill
+              ? {
+                  fieldType: ProposalTemplateFieldType.PREFILL,
+                  value: params.bodyPrefill,
+                }
+              : {
+                  fieldType: ProposalTemplateFieldType.OPEN,
+                }),
+            validation: oldBodyValidation,
+          },
+        ],
+      }
+
+      const updatedTemplate = await db.proposalTemplate.update({
+        where: { id: rfp?.templateId as string },
+        data: {
+          data: templateMetadata,
+        },
+      })
+
+      const rfpMetadata = {
         ...Object(rfp?.data),
         content: {
           title: params.title,
@@ -32,7 +68,10 @@ export default async function updateRfpContent(input: z.infer<typeof UpdateRfpCo
       const updatedRfp = await db.rfp.update({
         where: { id: params.rfpId },
         data: {
-          data: metadata,
+          data: rfpMetadata,
+        },
+        include: {
+          template: true,
         },
       })
 
