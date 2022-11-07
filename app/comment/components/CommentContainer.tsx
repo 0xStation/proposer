@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useMutation } from "@blitzjs/rpc"
 import useStore from "app/core/hooks/useStore"
 import { Form, Field } from "react-final-form"
@@ -12,31 +13,45 @@ const CommentContainer = ({ proposal, comment, setProposalQueryData }) => {
   const setToastState = useStore((state) => state.setToastState)
   const activeUser = useStore((state) => state.activeUser)
   const [createCommentMutation] = useMutation(createComment)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   if (!canRead) {
     return <></>
   }
 
-  return (
-    <div className="border rounded-lg border-wet-concrete p-4 flex flex-col space-y-6">
+  const CommentElement = ({ comment }) => {
+    return (
       <div>
-        <div className="flex flex-row items-center space-x-2">
+        <div className="flex flex-row items-start space-x-2">
           <AccountMediaRow account={comment.author} />
           <span className="text-light-concrete text-sm">{timeSince(comment.createdAt)}</span>
         </div>
-        <span className="mt-2 block">{comment.data.body}</span>
+        <span className="ml-8 block">{comment.data.body}</span>
       </div>
-      {comment.children.map((child, idx) => {
-        return (
-          <div key={idx}>
-            <div className="flex flex-row items-center space-x-2">
-              <AccountMediaRow account={child.author} />
-              <span className="text-light-concrete text-sm">{timeSince(child.createdAt)}</span>
-            </div>
-            <span className="mt-2 block">{child.data.body}</span>
-          </div>
-        )
-      })}
+    )
+  }
+
+  return (
+    <div className="border rounded-lg border-wet-concrete p-4 flex flex-col space-y-6">
+      <CommentElement comment={comment} />
+      {!isExpanded && comment.children.length > 0 && (
+        <div>
+          {comment.children.length > 1 && (
+            <span
+              className="bg-wet-concrete px-4 py-2 rounded-full cursor-pointer inline-block mb-6"
+              onClick={() => setIsExpanded(true)}
+            >
+              Show {comment.children.length - 1} more replies
+            </span>
+          )}
+          <CommentElement comment={comment.children[comment.children.length - 1]} />
+        </div>
+      )}
+
+      {isExpanded &&
+        comment.children.map((child, idx) => {
+          return <CommentElement comment={child} key={idx} />
+        })}
       {canWrite && (
         <Form
           onSubmit={async (values: any, form) => {

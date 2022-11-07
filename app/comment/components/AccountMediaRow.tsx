@@ -6,7 +6,7 @@ const AccountMediaRow = ({ account }) => {
   const displayName = useDisplayAddress(account.address)
 
   return (
-    <div className="flex flex-row space-x-2 items-center">
+    <div className="flex flex-row space-x-2 items-start">
       <Avatar size={Sizes.SM} address={account.address as string} pfpUrl={account.pfpUrl} />
       {account.data?.name && (
         <span className="text-marble-white text-base">{account.data?.name}</span>
