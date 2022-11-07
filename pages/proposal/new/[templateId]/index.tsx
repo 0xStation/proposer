@@ -4,7 +4,6 @@ import { useRouter } from "next/router"
 import { useQuery } from "@blitzjs/rpc"
 import { BlitzPage, Routes, useParam } from "@blitzjs/next"
 import Layout from "app/core/layouts/Layout"
-import FoxesForm from "app/proposalForm/components/foxes/form"
 import ProposalFormTemplate from "app/proposalForm/components/template/form"
 import BackIcon from "/public/back-icon.svg"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
@@ -56,11 +55,6 @@ const ProposalTemplateForm: BlitzPage = () => {
       },
     }
   )
-  const templateIdToForm = {
-    ["835ef848-91c1-46da-bdf9-4b0a277fe808"]: <FoxesForm />, // foxes template id
-    ["cd28828c-e51a-4796-80f5-e39d4cc43fab"]: <ProposalFormTemplate />, // station template id
-    ["96058a8b-b1f5-4ba5-811d-e3415eccb3ce"]: <ProposalFormTemplate />, // uniswap template id
-  }
 
   return (
     <Layout title="New Proposal">
@@ -156,7 +150,7 @@ const ProposalTemplateForm: BlitzPage = () => {
             </div>
           </div>
         </div>
-        {templateIdToForm[templateId as string] || <ProposalFormTemplate />}
+        <ProposalFormTemplate />
       </div>
     </Layout>
   )

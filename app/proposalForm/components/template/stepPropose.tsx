@@ -18,7 +18,6 @@ import ConnectDiscordModal from "app/core/components/ConnectDiscordModal"
 import { SocialConnection } from "app/rfp/types"
 import Image from "next/image"
 import DiscordIcon from "/public/discord-icon.svg"
-import ConnectDiscordField from "app/core/components/ConnectDiscordField"
 
 export const TemplateFormStepPropose = ({ formState }) => {
   const session = useSession({ suspense: false })
