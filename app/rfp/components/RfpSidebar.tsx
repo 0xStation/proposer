@@ -97,7 +97,7 @@ export const RfpSidebar = ({ rfp }) => {
           )}
           {/* REQUIREMENTS */}
           {(!!rfp?.data?.singleTokenGate ||
-            !!rfp?.data?.requiredSocialConnections ||
+            !!rfp?.data?.requiredSocialConnections?.length ||
             getMinNumWords(template?.data?.fields) > 0) && (
             <div>
               <h4 className="text-xs font-bold text-concrete uppercase">Requirements</h4>

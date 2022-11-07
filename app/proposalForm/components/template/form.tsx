@@ -209,7 +209,7 @@ export const ProposalFormTemplate = () => {
         className="mt-10"
       />
       <Form
-        initialValues={{}}
+        initialValues={{ title: `"${rfp?.data?.content?.title}" submission` }}
         onSubmit={async (values: any, form) => {
           // an author needs to sign the proposal to upload the content to ipfs.
           // if they decline the signature, but submit again, we don't want to
@@ -276,7 +276,7 @@ export const ProposalFormTemplate = () => {
             try {
               await createProposalMutation({
                 rfpId: rfp?.id,
-                contentTitle: `"${rfp?.data.content.title}" submission`,
+                contentTitle: values.title,
                 contentBody: values.body,
                 authorAddresses: [connectedAddress],
                 contributorAddresses: [contributorAddress],
@@ -349,7 +349,7 @@ export const ProposalFormTemplate = () => {
                       <TemplateFormStepPropose formState={formState} />
                     )}
                     {proposalStep === ProposalFormStep.CONFIRM && (
-                      <TemplateFormStepConfirm body={formState.values.body} />
+                      <TemplateFormStepConfirm formState={formState} />
                     )}
                   </>
                 )}
