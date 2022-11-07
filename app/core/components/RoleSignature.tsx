@@ -40,6 +40,8 @@ const SafeRole = ({ role, proposalStatus }) => {
   const showStatus =
     proposalStatus !== ProposalStatus.DRAFT || role.type === ProposalRoleType.AUTHOR
 
+  console.log(role)
+
   return (
     <>
       <div className="flex flex-row w-full items-center justify-between">
@@ -89,7 +91,7 @@ const SafeRole = ({ role, proposalStatus }) => {
             <GnosisSafeSignersModal
               isOpen={toggleSigners}
               setIsOpen={setToggleSigners}
-              signers={role.account.data?.signers || []}
+              role={role}
             />
             {toggleSigners && (
               <ul className="text-sm">

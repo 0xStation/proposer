@@ -1,8 +1,8 @@
 import Modal from "./Modal"
 import truncateString from "app/core/utils/truncateString"
+import { formatDate } from "app/core/utils/formatDate"
 
-const GnosisSafeSignersModal = ({ isOpen, setIsOpen, signers }) => {
-  console.log(signers)
+const GnosisSafeSignersModal = ({ isOpen, setIsOpen, role }) => {
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-6">
@@ -12,14 +12,27 @@ const GnosisSafeSignersModal = ({ isOpen, setIsOpen, signers }) => {
           <span className="text-xs text-light-concrete uppercase font-bold">Signer</span>
           <span className="text-xs text-light-concrete uppercase font-bold">Status</span>
           <span className="text-xs text-light-concrete uppercase font-bold">Date</span>
-          {signers.map((signer, idx) => {
+          {role.account.data.signers.map((signer, idx) => {
             return (
               <>
-                <p key={`signer-${idx}`} className="text-sm">
+                <p key={`signer-${idx}`} className="text-sm self-center">
                   {truncateString(signer)}
                 </p>
-                <span></span>
-                <span></span>
+                {role.signatures.some((signature) => signature.address === signer) ? (
+                  <span className="text-sm bg-magic-mint font-bold text-tunnel-black inline-block rounded-full px-2 py-1 w-fit">
+                    Signed
+                  </span>
+                ) : (
+                  <span className="text-sm bg-neon-carrot font-bold text-tunnel-black inline-block rounded-full px-2 py-1 w-fit">
+                    Pending
+                  </span>
+                )}
+                <span className="text-sm self-center">
+                  {formatDate(
+                    role.signatures.filter((signature) => signature.address === signer)[0]
+                      ?.timestamp
+                  )}
+                </span>
               </>
             )
           })}
