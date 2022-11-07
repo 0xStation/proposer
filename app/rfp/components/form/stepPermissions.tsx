@@ -15,6 +15,8 @@ import {
   requiredField,
 } from "app/utils/validators"
 import { formatPositiveInt, formatTokenAmount } from "app/utils/formatters"
+import { SocialConnection } from "app/rfp/types"
+import { toTitleCase } from "app/core/utils/titleCase"
 
 export const RfpFormStepPermission = ({
   permissionTokenOptions,
@@ -136,6 +138,25 @@ export const RfpFormStepPermission = ({
           </Field>
         </>
       )}
+      {/* SOCIAL CONNECTIONS */}
+      <label className="font-bold block mt-6">Social connection*</label>
+      <span className="text-xs text-concrete block">
+        Require proposers to have connected a social account for easy communication.
+      </span>
+      <Field name="socialConnection">
+        {({ meta, input }) => (
+          <>
+            <div className="custom-select-wrapper">
+              <select {...input} className="w-full bg-wet-concrete rounded p-2 mt-1">
+                <option value="">None</option>
+                <option value={SocialConnection.DISCORD}>
+                  {toTitleCase(SocialConnection.DISCORD)}
+                </option>
+              </select>
+            </div>
+          </>
+        )}
+      </Field>
     </>
   )
 }

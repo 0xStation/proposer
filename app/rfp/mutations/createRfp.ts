@@ -1,7 +1,7 @@
 import * as z from "zod"
 import db, { ProposalRoleType } from "db"
 import { ZodToken } from "app/types/zod"
-import { Rfp } from "app/rfp/types"
+import { Rfp, SocialConnection } from "app/rfp/types"
 import { ProposalTemplateFieldType, RESERVED_KEYS } from "app/template/types"
 import { PaymentTerm } from "app/proposalPayment/types"
 
@@ -27,6 +27,15 @@ const CreateRfp = z.object({
       minBalance: z.string(),
     })
     .optional(),
+  requiredSocialConnections: z
+    .enum([
+      SocialConnection.DISCORD,
+      SocialConnection.TWITTER,
+      SocialConnection.GITHUB,
+      SocialConnection.FARCASTER,
+      SocialConnection.LENS,
+    ])
+    .array(),
 })
 
 export default async function createRfp(input: z.infer<typeof CreateRfp>) {
@@ -163,6 +172,7 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
         oneLiner: "",
       },
       singleTokenGate: params.singleTokenGate,
+      requiredSocialConnections: params.requiredSocialConnections,
     }
 
     const rfp = await db.rfp.create({

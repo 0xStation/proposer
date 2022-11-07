@@ -169,6 +169,8 @@ export const RfpForm = () => {
               singleTokenGate: !!selectedSubmissionToken
                 ? { token: selectedSubmissionToken, minBalance: values.submissionTokenMinBalance }
                 : undefined,
+              // social connections currently single choice but will become multiple choice once more integrations are added
+              requiredSocialConnections: !!values.socialConnection ? [values.socialConnection] : [],
             })
           } catch (err) {
             setIsLoading(false)

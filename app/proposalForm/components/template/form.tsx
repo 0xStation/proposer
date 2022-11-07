@@ -32,6 +32,7 @@ import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
 import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
+import { SocialConnection } from "app/rfp/types"
 
 export const ProposalFormTemplate = () => {
   const router = useRouter()
@@ -193,6 +194,12 @@ export const ProposalFormTemplate = () => {
       }
     }
   }, [createdProposal, proposalShouldSendLater, shouldHandlePostProposalCreationProcessing])
+
+  const missingRequiredToken = !!rfp?.data?.singleTokenGate && !userHasRequiredToken
+  const missingRequiredDiscordConnection =
+    rfp?.data?.requiredSocialConnections?.includes(SocialConnection.DISCORD) &&
+    activeUser &&
+    !activeUser?.discordId
 
   return (
     <div className="max-w-[580px] min-w-[580px] h-full mx-auto">
@@ -357,10 +364,10 @@ export const ProposalFormTemplate = () => {
                         session?.siwe?.address as string,
                         rfp?.accountAddress as string
                       ) ||
-                      // has not connected wallet with token requirement (if one exists)
-                      (!!rfp?.data?.singleTokenGate &&
-                        (isTokenGatingCheckLoading ||
-                          (isTokenGatingCheckComplete && !userHasRequiredToken)))
+                      // has not connected account or account with Discord requirement (if requirement exists)
+                      missingRequiredDiscordConnection ||
+                      // has not connected wallet with token requirement (if requirement exists)
+                      missingRequiredToken
                     }
                     isLoading={
                       // query enabled
@@ -394,7 +401,10 @@ export const ProposalFormTemplate = () => {
                       You cannot propose to your own RFP.
                     </span>
                   )}
-                  {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
+                  {missingRequiredDiscordConnection && (
+                    <span className="text-xs text-concrete">Missing connection to Discord.</span>
+                  )}
+                  {missingRequiredToken && (
                     <span className="text-xs text-concrete">
                       Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
                       RFP.
@@ -420,10 +430,10 @@ export const ProposalFormTemplate = () => {
                           session?.siwe?.address as string,
                           rfp?.accountAddress as string
                         ) ||
-                        // has not connected wallet with token requirement (if one exists)
-                        (!!rfp?.data?.singleTokenGate &&
-                          (isTokenGatingCheckLoading ||
-                            (isTokenGatingCheckComplete && !userHasRequiredToken)))
+                        // has not connected account or account with Discord requirement (if requirement exists)
+                        missingRequiredDiscordConnection ||
+                        // has not connected wallet with token requirement (if requirement exists)
+                        missingRequiredToken
                       }
                       isLoading={
                         // query enabled
@@ -467,7 +477,10 @@ export const ProposalFormTemplate = () => {
                         You cannot propose to your own RFP.
                       </span>
                     )}
-                    {!!rfp?.data?.singleTokenGate && !userHasRequiredToken && (
+                    {missingRequiredDiscordConnection && (
+                      <span className="text-xs text-concrete">Missing connection to Discord.</span>
+                    )}
+                    {missingRequiredToken && (
                       <span className="text-xs text-concrete">
                         Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
                         RFP.
