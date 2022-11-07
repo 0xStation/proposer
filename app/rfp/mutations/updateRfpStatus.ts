@@ -4,7 +4,7 @@ import { Rfp } from "../types"
 
 const UpdateRfpStatus = z.object({
   rfpId: z.string(),
-  status: z.string(),
+  status: z.enum([RfpStatus.OPEN, RfpStatus.CLOSED]),
 })
 
 export default async function updateRfpStatus(input: z.infer<typeof UpdateRfpStatus>) {
@@ -13,7 +13,7 @@ export default async function updateRfpStatus(input: z.infer<typeof UpdateRfpSta
     const rfp = await db.rfp.update({
       where: { id: params.rfpId },
       data: {
-        status: params.status as RfpStatus,
+        status: params.status,
       },
     })
 

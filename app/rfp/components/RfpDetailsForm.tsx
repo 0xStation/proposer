@@ -5,12 +5,12 @@ import { formatTrimLeadingSpace } from "app/utils/formatters"
 import React from "react"
 import { Field, Form } from "react-final-form"
 import { requiredField } from "../../utils/validators"
-import updateRfpMetadata from "../mutations/updateRfpMetadata"
+import updateRfpContent from "../mutations/updateRfpContent"
 import getRfpById from "../queries/getRfpById"
 
 export const RfpDetailsForm = ({ rfp }) => {
   const setToastState = useStore((state) => state.setToastState)
-  const [updateRfpMetadataMutation] = useMutation(updateRfpMetadata, {
+  const [updateRfpContentMutation] = useMutation(updateRfpContent, {
     onSuccess: async (data) => {
       invalidateQuery(getRfpById)
       setToastState({
@@ -36,7 +36,7 @@ export const RfpDetailsForm = ({ rfp }) => {
       }}
       onSubmit={async (values: any, form) => {
         try {
-          await updateRfpMetadataMutation({
+          await updateRfpContentMutation({
             rfpId: rfp?.id,
             status: rfp?.status,
             title: values?.title,
