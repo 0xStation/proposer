@@ -70,3 +70,7 @@ export const getTotalPaymentAmount = (template: ProposalTemplateField[] | undefi
 export const getMinNumWords = (template: ProposalTemplateField[] | undefined): number => {
   return getField(template, RESERVED_KEYS.BODY)?.validation?.[0]?.args[0] || 0
 }
+
+export const getProposalTemplateBody = (template: ProposalTemplateField[] | undefined): string => {
+  return getField(template, RESERVED_KEYS.BODY)?.value
+}

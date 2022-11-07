@@ -18,7 +18,9 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 export const RfpFormStepRfp = ({ formState }) => {
-  const [previewMode, setPreviewMode] = useState<boolean>(false)
+  const [submissionGuidelinesPreviewMode, setSubmissionGuidelinesPreviewMode] =
+    useState<boolean>(false)
+  const [proposalTemplatePreviewMode, setProposalTemplatePreviewMode] = useState<boolean>(false)
   const accountAddress = useParam("accountAddress", "string") as string
   const { text: displayAddress } = useDisplayAddress(accountAddress)
   const router = useRouter()
@@ -77,46 +79,97 @@ export const RfpFormStepRfp = ({ formState }) => {
         )}
       </Field>
       {/* SUBMISSION GUIDELINES */}
-      <div className="flex flex-row justify-between">
-        <div className="flex-col">
-          <label className="font-bold block mt-6">What are you looking for?*</label>
-          <span className="text-xs text-concrete block">
-            Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown syntax</TextLink>.
-          </span>
-        </div>
+      <div className="mt-6 flex flex-row justify-between items-center">
+        <label className="font-bold block">Submission guidelines</label>
         <button
           type="button"
-          className="pt-1"
           onClick={(e) => {
             e.preventDefault()
-            setPreviewMode(!previewMode)
+            setSubmissionGuidelinesPreviewMode(!submissionGuidelinesPreviewMode)
           }}
         >
-          {previewMode ? (
-            <>
+          {submissionGuidelinesPreviewMode ? (
+            <div className="flex flex-row items-center space-x-1">
               <p className="inline text-sm text-concrete">Edit</p>{" "}
-              <EyeOffIcon className="inline h-5 w-5 fill-concrete" />
-            </>
+              <EyeOffIcon className="inline h-4 w-4 fill-concrete" />
+            </div>
           ) : (
-            <>
+            <div className="flex flex-row items-center space-x-1">
               <p className="inline text-sm text-concrete">Read</p>{" "}
-              <EyeIcon className="inline h-5 w-5 fill-concrete" />
-            </>
+              <EyeIcon className="inline h-4 w-4 fill-concrete" />
+            </div>
           )}
         </button>
       </div>
+      <span className="text-xs text-concrete block">
+        Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>. See{" "}
+        <TextLink url={LINKS.MARKDOWN_GUIDE}>examples of RFPs</TextLink>.
+      </span>
       {/* TOGGLE */}
-      {previewMode ? (
+      {/* <div> */}
+      {submissionGuidelinesPreviewMode ? (
         <div className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[180px] w-full ">
           <Preview markdown={formState.values.body} />
         </div>
       ) : (
-        <Field name="body" component="textarea" validate={requiredField}>
+        <Field name="body" component="textarea">
           {({ input, meta }) => (
             <div>
               <textarea
                 {...input}
                 placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
+                className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[180px] w-full"
+              />
+              {/* this error shows up when the user focuses the field (meta.touched) */}
+              {meta.error && meta.touched && (
+                <span className=" text-xs text-torch-red block">{meta.error}</span>
+              )}
+            </div>
+          )}
+        </Field>
+      )}
+      {/* </div> */}
+      {/* PROPOSAL TEMPLATE */}
+      <div className="mt-6 flex flex-row justify-between items-center">
+        <label className="font-bold block">Proposal template</label>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault()
+            setProposalTemplatePreviewMode(!proposalTemplatePreviewMode)
+          }}
+        >
+          {proposalTemplatePreviewMode ? (
+            <div className="flex flex-row items-center space-x-1">
+              <p className="inline text-sm text-concrete">Edit</p>{" "}
+              <EyeOffIcon className="inline h-4 w-4 fill-concrete" />
+            </div>
+          ) : (
+            <div className="flex flex-row items-center space-x-1">
+              <p className="inline text-sm text-concrete">Read</p>{" "}
+              <EyeIcon className="inline h-4 w-4 fill-concrete" />
+            </div>
+          )}
+        </button>
+      </div>
+      <span className="text-xs text-concrete block">
+        Proposer will automatically see the template&apos;s content in proposal details. Supports{" "}
+        <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>. See examples of{" "}
+        <TextLink url={LINKS.MARKDOWN_GUIDE}>RFP templates</TextLink>.
+      </span>
+      {/* TOGGLE */}
+
+      {proposalTemplatePreviewMode ? (
+        <div className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[180px] w-full">
+          <Preview markdown={formState.values.body} />
+        </div>
+      ) : (
+        <Field name="proposalTemplate" component="textarea">
+          {({ input, meta }) => (
+            <div>
+              <textarea
+                {...input}
+                placeholder={`# Summary\n\n# Deliverables\n\n# Timeline`}
                 className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[180px] w-full"
               />
               {/* this error shows up when the user focuses the field (meta.touched) */}
