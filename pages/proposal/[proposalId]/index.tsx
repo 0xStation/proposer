@@ -1,6 +1,9 @@
 import { gSSP } from "app/blitz-server"
+import { Routes } from "@blitzjs/next"
 import { useQuery, invoke } from "@blitzjs/rpc"
 import { BlitzPage, useParam } from "@blitzjs/next"
+import Link from "next/link"
+import { PencilIcon } from "@heroicons/react/solid"
 import Layout from "app/core/layouts/Layout"
 import getProposalById from "app/proposal/queries/getProposalById"
 import ReadMore from "app/core/components/ReadMore"
@@ -8,6 +11,8 @@ import { TotalPaymentView } from "app/core/components/TotalPaymentView"
 import RoleSignaturesView from "app/core/components/RoleSignaturesView"
 import { Proposal } from "app/proposal/types"
 import { ProposalNestedLayout } from "app/core/components/ProposalNestedLayout"
+import { ProposalRoleType } from "@prisma/client"
+import useStore from "app/core/hooks/useStore"
 
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
   const { proposalId } = params
@@ -50,10 +55,27 @@ const ViewProposal: BlitzPage = () => {
       staleTime: 60 * 1000, // 1 minute
     }
   )
+  const activeUser = useStore((state) => state.activeUser)
+  const activeUserIsAuthor = proposal?.roles?.find(
+    (role) => role.type === ProposalRoleType.AUTHOR && role.address === activeUser?.address
+  )
 
   return (
     <>
-      <ReadMore className="mt-9 mb-9">{proposal?.data?.content?.body}</ReadMore>
+      {activeUserIsAuthor && (
+        <div className="relative group float-right mt-5">
+          <div className="bg-wet-concrete invisible group-hover:visible inline rounded p-2 mr-1.5">
+            You can edit your proposal here.
+          </div>
+          <Link href={Routes.EditProposalPage({ proposalId })}>
+            <div className="inline mt-5 w-full cursor-pointer align-middle">
+              <PencilIcon className="h-5 w-5 inline" />
+              <p className="inline ml-2">Edit proposal</p>
+            </div>
+          </Link>
+        </div>
+      )}
+      <ReadMore className="mt-12 mb-9">{proposal?.data?.content?.body}</ReadMore>
       <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" />
       {(proposal?.data.totalPayments || []).length > 0 && (
         <TotalPaymentView proposal={proposal!} className="mt-9" />

@@ -20,14 +20,25 @@ const config = {
       },
     ]
   },
-  /* Uncomment this to customize the webpack config
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     // Note: we provide webpack above so you should not `require` it
     // Perform customizations to webpack config
     // Important: return the modified config
+    // config.module.rules.push({
+    //   test: /\.(mp4|webm|ogg|swf|ogv)$/,
+    //   use: [
+    //     {
+    //       loader: "file-loader",
+    //       options: {
+    //         publicPath: `./.next/static/videos/`,
+    //         outputPath: `${isServer ? "../" : ""}static/videos/`,
+    //         name: "[name].[ext]",
+    //       },
+    //     },
+    //   ],
+    // })
     return config
   },
-  */
 }
 
 module.exports = withBlitz(config)
