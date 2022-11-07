@@ -6,6 +6,7 @@ export const TextareaFieldOrMarkdownPreview = ({
   setPreviewMode,
   markdown,
   fieldName,
+  placeholder = "",
 }) => {
   return (
     <Field name={fieldName}>
@@ -23,7 +24,7 @@ export const TextareaFieldOrMarkdownPreview = ({
             <textarea
               {...input}
               autoFocus
-              placeholder={`# Summary\n\n# Deliverables\n\n# Timeline`}
+              placeholder={placeholder}
               className="mt-1 p-2 bg-wet-concrete text-marble-white rounded min-h-[180px] w-full"
             />
           )}

@@ -1,6 +1,4 @@
 import { invalidateQuery, useMutation } from "@blitzjs/rpc"
-import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid"
-import Preview from "app/core/components/MarkdownPreview"
 import ReadEditMarkdownButton from "app/core/components/ReadEditMarkdownButton"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import TextareaFieldOrMarkdownPreview from "app/core/components/TextareaFieldOrMarkdownPreview"
@@ -93,6 +91,7 @@ export const RfpDetailsForm = ({ rfp }) => {
               previewMode={bodyPreviewMode}
               setPreviewMode={setBodyPreviewMode}
               markdown={formState.values.body}
+              placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
               fieldName="body"
             />
             {/* PROPOSAL TEMPLATE */}
@@ -108,6 +107,7 @@ export const RfpDetailsForm = ({ rfp }) => {
               previewMode={bodyPrefillPreviewMode}
               setPreviewMode={setBodyPrefillPreviewMode}
               markdown={formState.values.bodyPrefill}
+              placeholder={`# Summary\n\n# Deliverables\n\n# Timeline`}
               fieldName="bodyPrefill"
             />
             <Button

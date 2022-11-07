@@ -1,11 +1,9 @@
 // PACKAGE
 import { Routes, useParam } from "@blitzjs/next"
-import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid"
 import { useRouter } from "next/router"
 import { useState } from "react"
 import { Field } from "react-final-form"
 // CORE
-import Preview from "app/core/components/MarkdownPreview"
 import TextLink from "app/core/components/TextLink"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import { BODY_CONSTRAINT_MAP, LINKS } from "app/core/utils/constants"
@@ -96,6 +94,7 @@ export const RfpFormStepRfp = ({ formState }) => {
         previewMode={bodyPreviewMode}
         setPreviewMode={setBodyPreviewMode}
         markdown={formState.values.body}
+        placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
         fieldName="body"
       />
       {/* PROPOSAL TEMPLATE */}
@@ -115,6 +114,7 @@ export const RfpFormStepRfp = ({ formState }) => {
         previewMode={bodyPrefillPreviewMode}
         setPreviewMode={setBodyPrefillPreviewMode}
         markdown={formState.values.bodyPrefill}
+        placeholder={`# Summary\n\n# Deliverables\n\n# Timeline`}
         fieldName="bodyPrefill"
       />
     </>
