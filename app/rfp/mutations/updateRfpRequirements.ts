@@ -1,9 +1,9 @@
 import * as z from "zod"
 import db from "db"
-import { Rfp, RfpMetadata } from "../types"
+import { Rfp, RfpMetadata, SocialConnection } from "../types"
 import { ZodToken } from "../../types/zod"
 
-const UpdateRfpRequiredToken = z.object({
+const UpdateRfpRequirements = z.object({
   rfpId: z.string(),
   singleTokenGate: z
     .object({
@@ -11,12 +11,19 @@ const UpdateRfpRequiredToken = z.object({
       minBalance: z.string(), // string to pass directly into BigNumber.from in logic check
     })
     .optional(),
+  requiredSocialConnections: z
+    .enum([
+      SocialConnection.DISCORD,
+      SocialConnection.TWITTER,
+      SocialConnection.GITHUB,
+      SocialConnection.FARCASTER,
+      SocialConnection.LENS,
+    ])
+    .array(),
 })
 
-export default async function updateRfpRequiredToken(
-  input: z.infer<typeof UpdateRfpRequiredToken>
-) {
-  const params = UpdateRfpRequiredToken.parse(input)
+export default async function updateRfpRequirements(input: z.infer<typeof UpdateRfpRequirements>) {
+  const params = UpdateRfpRequirements.parse(input)
   try {
     // use $transaction to eliminate risk of race condition with changing other metadata
     // in edit form and waiting for new data to populate frontend state by just changing
@@ -29,6 +36,7 @@ export default async function updateRfpRequiredToken(
       const metadata = {
         ...Object(rfp?.data),
         singleTokenGate: params.singleTokenGate,
+        requiredSocialConnections: params.requiredSocialConnections,
       } as RfpMetadata
 
       const updatedRfp = await db.rfp.update({

@@ -9,6 +9,7 @@ import useStore from "app/core/hooks/useStore"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { getNetworkName } from "app/core/utils/networkInfo"
+import { toTitleCase } from "app/core/utils/titleCase"
 import getTokensByAccount from "app/token/queries/getTokensByAccount"
 import { formatPositiveInt, formatTokenAmount } from "app/utils/formatters"
 import React, { useState } from "react"
@@ -20,8 +21,9 @@ import {
   isValidTokenAmount,
   requiredField,
 } from "../../utils/validators"
-import updateRfpRequiredToken from "../mutations/updateRfpRequiredToken"
+import updateRfpRequirements from "../mutations/updateRfpRequirements"
 import getRfpById from "../queries/getRfpById"
+import { SocialConnection } from "../types"
 
 export const RfpPermissionsForm = ({ rfp }) => {
   const setToastState = useStore((state) => state.setToastState)
@@ -65,7 +67,7 @@ export const RfpPermissionsForm = ({ rfp }) => {
     }
   )
 
-  const [updateRfpRequiredTokenMutation] = useMutation(updateRfpRequiredToken, {
+  const [updateRfpRequirementsMutation] = useMutation(updateRfpRequirements, {
     onSuccess: async (data) => {
       invalidateQuery(getRfpById)
       setToastState({
@@ -96,14 +98,16 @@ export const RfpPermissionsForm = ({ rfp }) => {
         initialValues={{
           submissionTokenAddress: rfp?.data?.singleTokenGate?.token.address,
           submissionTokenMinBalance: rfp?.data?.singleTokenGate?.minBalance,
+          socialConnection: rfp?.data?.requiredSocialConnections?.[0] || "",
         }}
         onSubmit={async (values: any, form) => {
           try {
-            await updateRfpRequiredTokenMutation({
+            await updateRfpRequirementsMutation({
               rfpId: rfp?.id,
               singleTokenGate: !!selectedSubmissionToken
                 ? { token: selectedSubmissionToken, minBalance: values.submissionTokenMinBalance }
                 : undefined,
+              requiredSocialConnections: !!values.socialConnection ? [values.socialConnection] : [],
             })
           } catch (err) {
             console.error(err)
@@ -215,6 +219,24 @@ export const RfpPermissionsForm = ({ rfp }) => {
                   </Field>
                 </>
               )}
+              <label className="font-bold block mt-6">Social connection*</label>
+              <span className="text-xs text-concrete block">
+                Require proposers to have connected a social account for easy communication.
+              </span>
+              <Field name="socialConnection">
+                {({ meta, input }) => (
+                  <>
+                    <div className="custom-select-wrapper">
+                      <select {...input} className="w-full bg-wet-concrete rounded p-2 mt-1">
+                        <option value="">None</option>
+                        <option value={SocialConnection.DISCORD}>
+                          {toTitleCase(SocialConnection.DISCORD)}
+                        </option>
+                      </select>
+                    </div>
+                  </>
+                )}
+              </Field>
               <Button
                 type={ButtonType.Secondary}
                 isSubmitType={true}

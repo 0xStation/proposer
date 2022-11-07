@@ -4,11 +4,11 @@ import { useRouter } from "next/router"
 import { useQuery } from "@blitzjs/rpc"
 import { BlitzPage, Routes, useParam } from "@blitzjs/next"
 import Layout from "app/core/layouts/Layout"
-import FoxesForm from "app/proposalForm/components/foxes/form"
 import ProposalFormTemplate from "app/proposalForm/components/template/form"
 import BackIcon from "/public/back-icon.svg"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
 import {
+  getMinNumWords,
   getPaymentAmount,
   getPayments,
   getPaymentToken,
@@ -19,6 +19,7 @@ import ReadMore from "app/core/components/ReadMore"
 import TextLink from "app/core/components/TextLink"
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
+import { toTitleCase } from "app/core/utils/titleCase"
 
 const ProposalTemplateForm: BlitzPage = () => {
   const templateId = useParam("templateId") as string
@@ -56,11 +57,6 @@ const ProposalTemplateForm: BlitzPage = () => {
       },
     }
   )
-  const templateIdToForm = {
-    ["835ef848-91c1-46da-bdf9-4b0a277fe808"]: <FoxesForm />, // foxes template id
-    ["cd28828c-e51a-4796-80f5-e39d4cc43fab"]: <ProposalFormTemplate />, // station template id
-    ["96058a8b-b1f5-4ba5-811d-e3415eccb3ce"]: <ProposalFormTemplate />, // uniswap template id
-  }
 
   return (
     <Layout title="New Proposal">
@@ -110,28 +106,39 @@ const ProposalTemplateForm: BlitzPage = () => {
                   </ReadMore>
                 </div>
               )}
-              {/* SUBMISSION REQUIREMENT */}
-              <div>
-                <h4 className="text-xs font-bold text-concrete uppercase">
-                  Submission requirement
-                </h4>
-                {!!rfp?.data?.singleTokenGate ? (
-                  <div className="mt-2">
-                    {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
-                    <TextLink
-                      url={
-                        getNetworkExplorer(rfp?.data?.singleTokenGate.token.chainId) +
-                        "/token/" +
-                        rfp?.data?.singleTokenGate.token.address
-                      }
-                    >
-                      {rfp?.data?.singleTokenGate.token.name}
-                    </TextLink>
-                  </div>
-                ) : (
-                  <div className="mt-2">Public</div>
-                )}
-              </div>
+              {/* REQUIREMENTS */}
+              {(!!rfp?.data?.singleTokenGate ||
+                !!rfp?.data?.requiredSocialConnections ||
+                getMinNumWords(template?.data?.fields) > 0) && (
+                <div>
+                  <h4 className="text-xs font-bold text-concrete uppercase">Requirements</h4>
+                  {!!rfp?.data?.singleTokenGate && (
+                    <p className="mt-2">
+                      {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
+                      <TextLink
+                        url={
+                          getNetworkExplorer(rfp?.data?.singleTokenGate.token.chainId) +
+                          "/token/" +
+                          rfp?.data?.singleTokenGate.token.address
+                        }
+                      >
+                        {rfp?.data?.singleTokenGate.token.name}
+                      </TextLink>
+                    </p>
+                  )}
+                  {!!rfp?.data?.requiredSocialConnections &&
+                    rfp?.data?.requiredSocialConnections.map((social, idx) => (
+                      <p className="mt-2" key={idx}>
+                        {toTitleCase(social)} connection
+                      </p>
+                    ))}
+                  {getMinNumWords(template?.data?.fields) > 0 && (
+                    <p className="mt-2">
+                      {getMinNumWords(template?.data?.fields) + " word minimum"}
+                    </p>
+                  )}
+                </div>
+              )}
               {getPayments(template?.data.fields)?.length > 0 && (
                 <>
                   {/* NETWORK */}
@@ -156,7 +163,7 @@ const ProposalTemplateForm: BlitzPage = () => {
             </div>
           </div>
         </div>
-        {templateIdToForm[templateId as string] || <ProposalFormTemplate />}
+        <ProposalFormTemplate />
       </div>
     </Layout>
   )

@@ -15,6 +15,9 @@ import {
   requiredField,
 } from "app/utils/validators"
 import { formatPositiveInt, formatTokenAmount } from "app/utils/formatters"
+import { SocialConnection } from "app/rfp/types"
+import { toTitleCase } from "app/core/utils/titleCase"
+import { ProposalTemplateFieldValidationName } from "app/template/types"
 
 export const RfpFormStepPermission = ({
   permissionTokenOptions,
@@ -24,6 +27,8 @@ export const RfpFormStepPermission = ({
   setIsImportTokenModalOpen,
   chainId,
   refetchTokens,
+  wordCountRequirement,
+  setWordCountRequirement,
 }) => {
   const session = useSession({ suspense: false })
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
@@ -37,6 +42,60 @@ export const RfpFormStepPermission = ({
         // refetches the tokens in the new proposal form token dropdown
         callback={() => refetchTokens(true)}
       />
+      {/* WORD COUNT */}
+      <label className="font-bold block mt-6">Word count requirement</label>
+      <Field name="wordCountRequirement">
+        {({ meta, input }) => (
+          <>
+            <div className="custom-select-wrapper">
+              <select
+                {...input}
+                required
+                className="w-full bg-wet-concrete rounded p-2 mt-1"
+                value={wordCountRequirement}
+                onChange={(e) => {
+                  setWordCountRequirement(e.target.value)
+                  // custom values can be compatible with react-final-form by calling
+                  // the props.input.onChange callback
+                  // https://final-form.org/docs/react-final-form/api/Field
+                  input.onChange(e.target.value)
+                }}
+              >
+                <option value="">None</option>
+                <option value={ProposalTemplateFieldValidationName.MIN_WORDS}>Minimum</option>
+              </select>
+            </div>
+          </>
+        )}
+      </Field>
+      {wordCountRequirement === ProposalTemplateFieldValidationName.MIN_WORDS && (
+        <>
+          <span className="text-xs text-concrete">
+            Enter the minimum word count for proposals submitting to this RFP.
+          </span>
+          <Field
+            name="minWordCount"
+            format={formatPositiveInt}
+            validate={composeValidators(requiredField, isPositiveAmount)}
+          >
+            {({ input, meta }) => {
+              return (
+                <div className="h-10 mt-1 w-full bg-wet-concrete text-marble-white mb-5 rounded">
+                  <input
+                    {...input}
+                    type="text"
+                    placeholder="0"
+                    className="h-full p-2 inline w-full bg-wet-concrete text-marble-white rounded"
+                  />
+                  {meta.error && meta.touched && (
+                    <span className="text-xs text-torch-red mt-2 block">{meta.error}</span>
+                  )}
+                </div>
+              )
+            }}
+          </Field>
+        </>
+      )}
       {/* SUBMISSION TOKEN */}
       <label className="font-bold block mt-6">Token-gating on proposal submissions*</label>
       <span className="text-xs text-concrete block">
@@ -136,6 +195,25 @@ export const RfpFormStepPermission = ({
           </Field>
         </>
       )}
+      {/* SOCIAL CONNECTIONS */}
+      <label className="font-bold block mt-6">Social connection*</label>
+      <span className="text-xs text-concrete block">
+        Require proposers to have connected a social account for easy communication.
+      </span>
+      <Field name="socialConnection">
+        {({ meta, input }) => (
+          <>
+            <div className="custom-select-wrapper">
+              <select {...input} className="w-full bg-wet-concrete rounded p-2 mt-1">
+                <option value="">None</option>
+                <option value={SocialConnection.DISCORD}>
+                  {toTitleCase(SocialConnection.DISCORD)}
+                </option>
+              </select>
+            </div>
+          </>
+        )}
+      </Field>
     </>
   )
 }

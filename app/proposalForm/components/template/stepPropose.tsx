@@ -13,13 +13,22 @@ import getRfpById from "app/rfp/queries/getRfpById"
 import Preview from "app/core/components/MarkdownPreview"
 import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid"
 import { useSession } from "@blitzjs/auth"
+import useStore from "app/core/hooks/useStore"
+import ConnectDiscordModal from "app/core/components/ConnectDiscordModal"
+import { SocialConnection } from "app/rfp/types"
+import Image from "next/image"
+import DiscordIcon from "/public/discord-icon.svg"
 
 export const TemplateFormStepPropose = ({ formState }) => {
   const session = useSession({ suspense: false })
   const [previewMode, setPreviewMode] = useState<boolean>(false)
+  const [isDiscordModalOpen, setIsDiscordModalOpen] = useState<boolean>(false)
+  const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const templateId = useParam("templateId") as string
   const { rfpId } = useRouter().query
   const router = useRouter()
+  const activeUser = useStore((state) => state.activeUser)
+
   const [rfp] = useQuery(
     getRfpById,
     {
@@ -67,6 +76,11 @@ export const TemplateFormStepPropose = ({ formState }) => {
 
   return (
     <>
+      {rfp?.data?.requiredSocialConnections?.includes(SocialConnection.DISCORD) &&
+        activeUser &&
+        !activeUser?.discordId && (
+          <ConnectDiscordModal isOpen={isDiscordModalOpen} setIsOpen={setIsDiscordModalOpen} />
+        )}
       {templateClientAddress && (
         <>
           {/* CLIENT */}
@@ -149,6 +163,39 @@ export const TemplateFormStepPropose = ({ formState }) => {
             </div>
           )}
         </Field>
+      )}
+      {rfp?.data?.requiredSocialConnections?.includes(SocialConnection.DISCORD) && (
+        <>
+          <div className="mt-6 pb-1">
+            <label className="font-bold block">Verify with Discord*</label>
+            <p className="text-concrete text-sm">Connect your Discord account to verify</p>
+            {!activeUser?.discordId ? (
+              <button
+                type="button"
+                className="mt-3 border border-marble-white text-marble-white rounded flex flex-row py-2 px-6 hover:bg-wet-concrete"
+                onClick={(e) => {
+                  e.preventDefault()
+                  if (!activeUser?.address) {
+                    toggleWalletModal(true)
+                  } else {
+                    setIsDiscordModalOpen(true)
+                  }
+                }}
+              >
+                <Image src={DiscordIcon} alt="Discord icon" width={20} height={20} />
+                <p className="pl-2">Connect Discord</p>
+              </button>
+            ) : (
+              <button
+                disabled
+                className="mt-3 border border-marble-white text-marble-white rounded flex flex-row py-2 px-6 opacity-70 cursor-not-allowed"
+              >
+                <Image src={DiscordIcon} alt="Discord icon" width={20} height={20} />
+                <p className="pl-2">Connected to Discord</p>
+              </button>
+            )}
+          </div>
+        </>
       )}
     </>
   )

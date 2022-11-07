@@ -7,11 +7,17 @@ import BackIcon from "/public/back-icon.svg"
 import TextLink from "app/core/components/TextLink"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
 import { WorkspaceTab } from "pages/workspace/[accountAddress]"
-import { getPaymentToken, getPayments, getTotalPaymentAmount } from "app/template/utils"
+import {
+  getPaymentToken,
+  getPayments,
+  getTotalPaymentAmount,
+  getMinNumWords,
+} from "app/template/utils"
 import RfpStatusPill from "./RfpStatusPill"
 import Button from "app/core/components/sds/buttons/Button"
 import ReadMore from "app/core/components/ReadMore"
 import getTemplateByRfpId from "app/template/queries/getTemplateByRfpId"
+import { toTitleCase } from "app/core/utils/titleCase"
 
 export const RfpSidebar = ({ rfp }) => {
   const [template] = useQuery(
@@ -89,26 +95,37 @@ export const RfpSidebar = ({ rfp }) => {
               </ReadMore>
             </div>
           )}
-          {/* SUBMISSION REQUIREMENT */}
-          <div>
-            <h4 className="text-xs font-bold text-concrete uppercase">Submission requirement</h4>
-            {!!rfp?.data?.singleTokenGate ? (
-              <div className="mt-2">
-                {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
-                <TextLink
-                  url={
-                    getNetworkExplorer(rfp?.data?.singleTokenGate.token.chainId) +
-                    "/token/" +
-                    rfp?.data?.singleTokenGate.token.address
-                  }
-                >
-                  {rfp?.data?.singleTokenGate.token.name}
-                </TextLink>
-              </div>
-            ) : (
-              <div className="mt-2">Public</div>
-            )}
-          </div>
+          {/* REQUIREMENTS */}
+          {(!!rfp?.data?.singleTokenGate ||
+            !!rfp?.data?.requiredSocialConnections ||
+            getMinNumWords(template?.data?.fields) > 0) && (
+            <div>
+              <h4 className="text-xs font-bold text-concrete uppercase">Requirements</h4>
+              {!!rfp?.data?.singleTokenGate && (
+                <p className="mt-2">
+                  {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
+                  <TextLink
+                    url={
+                      getNetworkExplorer(rfp?.data?.singleTokenGate.token.chainId) +
+                      "/token/" +
+                      rfp?.data?.singleTokenGate.token.address
+                    }
+                  >
+                    {rfp?.data?.singleTokenGate.token.name}
+                  </TextLink>
+                </p>
+              )}
+              {!!rfp?.data?.requiredSocialConnections &&
+                rfp?.data?.requiredSocialConnections.map((social, idx) => (
+                  <p className="mt-2" key={idx}>
+                    {toTitleCase(social)} connection
+                  </p>
+                ))}
+              {getMinNumWords(template?.data?.fields) > 0 && (
+                <p className="mt-2">{getMinNumWords(template?.data?.fields) + " word minimum"}</p>
+              )}
+            </div>
+          )}
           {getPayments(template?.data.fields)?.length > 0 && (
             <>
               {/* NETWORK */}

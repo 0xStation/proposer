@@ -14,13 +14,13 @@ import {
   ProposalTemplateFieldType,
   ProposalTemplateFieldValidationName,
 } from "app/template/types"
+import { PaymentDirection } from "app/rfp/types"
 import Gradient0 from "/public/gradients/0.png"
 import Gradient1 from "/public/gradients/1.png"
 import Gradient2 from "/public/gradients/2.png"
 import Gradient3 from "/public/gradients/3.png"
 import Gradient4 from "/public/gradients/4.png"
 import Gradient5 from "/public/gradients/5.png"
-import { PaymentDirection } from "app/rfp/types"
 
 export const gradientMap = {
   0: Gradient0,
