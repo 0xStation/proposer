@@ -8,6 +8,7 @@ import ProposalFormTemplate from "app/proposalForm/components/template/form"
 import BackIcon from "/public/back-icon.svg"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
 import {
+  getMinNumWords,
   getPaymentAmount,
   getPayments,
   getPaymentToken,
@@ -106,31 +107,38 @@ const ProposalTemplateForm: BlitzPage = () => {
                 </div>
               )}
               {/* REQUIREMENTS */}
-              <div>
-                <h4 className="text-xs font-bold text-concrete uppercase">Requirements</h4>
-                {!!rfp?.data?.singleTokenGate ? (
-                  <p className="mt-2">
-                    {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
-                    <TextLink
-                      url={
-                        getNetworkExplorer(rfp?.data?.singleTokenGate.token.chainId) +
-                        "/token/" +
-                        rfp?.data?.singleTokenGate.token.address
-                      }
-                    >
-                      {rfp?.data?.singleTokenGate.token.name}
-                    </TextLink>
-                  </p>
-                ) : (
-                  <p className="mt-2">Public</p>
-                )}
-                {!!rfp?.data?.requiredSocialConnections &&
-                  rfp?.data?.requiredSocialConnections.map((social, idx) => (
-                    <p className="mt-2" key={idx}>
-                      {toTitleCase(social)} connection
+              {(!!rfp?.data?.singleTokenGate ||
+                !!rfp?.data?.requiredSocialConnections ||
+                getMinNumWords(template?.data?.fields) > 0) && (
+                <div>
+                  <h4 className="text-xs font-bold text-concrete uppercase">Requirements</h4>
+                  {!!rfp?.data?.singleTokenGate && (
+                    <p className="mt-2">
+                      {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
+                      <TextLink
+                        url={
+                          getNetworkExplorer(rfp?.data?.singleTokenGate.token.chainId) +
+                          "/token/" +
+                          rfp?.data?.singleTokenGate.token.address
+                        }
+                      >
+                        {rfp?.data?.singleTokenGate.token.name}
+                      </TextLink>
                     </p>
-                  ))}
-              </div>
+                  )}
+                  {!!rfp?.data?.requiredSocialConnections &&
+                    rfp?.data?.requiredSocialConnections.map((social, idx) => (
+                      <p className="mt-2" key={idx}>
+                        {toTitleCase(social)} connection
+                      </p>
+                    ))}
+                  {getMinNumWords(template?.data?.fields) > 0 && (
+                    <p className="mt-2">
+                      {getMinNumWords(template?.data?.fields) + " word minimum"}
+                    </p>
+                  )}
+                </div>
+              )}
               {getPayments(template?.data.fields)?.length > 0 && (
                 <>
                   {/* NETWORK */}
