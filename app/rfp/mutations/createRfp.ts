@@ -41,7 +41,7 @@ const CreateRfp = z.object({
     ])
     .array(),
   minWordCount: z.number().optional(),
-  proposalTemplate: z.string().optional(),
+  bodyPrefill: z.string().optional(),
 })
 
 export default async function createRfp(input: z.infer<typeof CreateRfp>) {
@@ -85,10 +85,10 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
         {
           key: RESERVED_KEYS.BODY,
           mapsTo: RESERVED_KEYS.BODY,
-          ...(!!params.proposalTemplate
+          ...(!!params.bodyPrefill
             ? {
                 fieldType: ProposalTemplateFieldType.PREFILL,
-                value: params.proposalTemplate,
+                value: params.bodyPrefill,
               }
             : {
                 fieldType: ProposalTemplateFieldType.OPEN,

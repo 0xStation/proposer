@@ -171,7 +171,7 @@ export const RfpForm = () => {
                 values.wordCountRequirement === ProposalTemplateFieldValidationName.MIN_WORDS
                   ? parseInt(values.minWordCount)
                   : undefined,
-              proposalTemplate: values.proposalTemplate,
+              bodyPrefill: values.bodyPrefill,
             })
           } catch (err) {
             setIsLoading(false)

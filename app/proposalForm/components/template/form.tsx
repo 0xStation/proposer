@@ -24,7 +24,7 @@ import {
   getContributorAddress,
   getFieldValue,
   getMinNumWords,
-  getProposalTemplateBody,
+  getBodyPrefill,
 } from "app/template/utils"
 import { RESERVED_KEYS, ProposalTemplateField } from "app/template/types"
 import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
@@ -212,7 +212,7 @@ export const ProposalFormTemplate = () => {
       <Form
         initialValues={{
           title: `"${rfp?.data?.content?.title}" submission`,
-          body: getProposalTemplateBody(template?.data?.fields),
+          body: getBodyPrefill(template?.data?.fields),
         }}
         onSubmit={async (values: any, form) => {
           // an author needs to sign the proposal to upload the content to ipfs.

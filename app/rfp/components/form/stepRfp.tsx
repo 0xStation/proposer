@@ -18,9 +18,8 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 export const RfpFormStepRfp = ({ formState }) => {
-  const [submissionGuidelinesPreviewMode, setSubmissionGuidelinesPreviewMode] =
-    useState<boolean>(false)
-  const [proposalTemplatePreviewMode, setProposalTemplatePreviewMode] = useState<boolean>(false)
+  const [bodyPreviewMode, setBodyPreviewMode] = useState<boolean>(false)
+  const [bodyPrefillPreviewMode, setBodyPrefillPreviewMode] = useState<boolean>(false)
   const accountAddress = useParam("accountAddress", "string") as string
   const { text: displayAddress } = useDisplayAddress(accountAddress)
   const router = useRouter()
@@ -85,10 +84,10 @@ export const RfpFormStepRfp = ({ formState }) => {
           type="button"
           onClick={(e) => {
             e.preventDefault()
-            setSubmissionGuidelinesPreviewMode(!submissionGuidelinesPreviewMode)
+            setBodyPreviewMode(!bodyPreviewMode)
           }}
         >
-          {submissionGuidelinesPreviewMode ? (
+          {bodyPreviewMode ? (
             <div className="flex flex-row items-center space-x-1">
               <p className="inline text-sm text-concrete">Edit</p>{" "}
               <EyeOffIcon className="inline h-4 w-4 fill-concrete" />
@@ -106,8 +105,7 @@ export const RfpFormStepRfp = ({ formState }) => {
         <TextLink url={LINKS.MARKDOWN_GUIDE}>examples of RFPs</TextLink>.
       </span>
       {/* TOGGLE */}
-      {/* <div> */}
-      {submissionGuidelinesPreviewMode ? (
+      {bodyPreviewMode ? (
         <div className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[180px] w-full ">
           <Preview markdown={formState.values.body} />
         </div>
@@ -128,7 +126,6 @@ export const RfpFormStepRfp = ({ formState }) => {
           )}
         </Field>
       )}
-      {/* </div> */}
       {/* PROPOSAL TEMPLATE */}
       <div className="mt-6 flex flex-row justify-between items-center">
         <label className="font-bold block">Proposal template</label>
@@ -136,10 +133,10 @@ export const RfpFormStepRfp = ({ formState }) => {
           type="button"
           onClick={(e) => {
             e.preventDefault()
-            setProposalTemplatePreviewMode(!proposalTemplatePreviewMode)
+            setBodyPrefillPreviewMode(!bodyPrefillPreviewMode)
           }}
         >
-          {proposalTemplatePreviewMode ? (
+          {bodyPrefillPreviewMode ? (
             <div className="flex flex-row items-center space-x-1">
               <p className="inline text-sm text-concrete">Edit</p>{" "}
               <EyeOffIcon className="inline h-4 w-4 fill-concrete" />
@@ -158,13 +155,12 @@ export const RfpFormStepRfp = ({ formState }) => {
         <TextLink url={LINKS.MARKDOWN_GUIDE}>RFP templates</TextLink>.
       </span>
       {/* TOGGLE */}
-
-      {proposalTemplatePreviewMode ? (
+      {bodyPrefillPreviewMode ? (
         <div className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[180px] w-full">
-          <Preview markdown={formState.values.body} />
+          <Preview markdown={formState.values.bodyPrefill} />
         </div>
       ) : (
-        <Field name="proposalTemplate" component="textarea">
+        <Field name="bodyPrefill" component="textarea">
           {({ input, meta }) => (
             <div>
               <textarea
