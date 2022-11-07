@@ -30,7 +30,7 @@ model Account {
   targetsOf          AccountAccount[]    @relation("target")
   verificationEmails EmailVerification[]
   proposalTemplates  ProposalTemplate[]
-  ProposalVersion    ProposalVersion[]
+  proposalVersion    ProposalVersion[]
 }
 
 enum AddressType {

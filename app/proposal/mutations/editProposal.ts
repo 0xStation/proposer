@@ -1,12 +1,13 @@
 import { Ctx } from "blitz"
-import db, { Proposal, ProposalStatus } from "db"
+import db, { ProposalStatus, ProposalVersion } from "db"
 import * as z from "zod"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { ZodToken } from "app/types/zod"
-import { ProposalMetadata } from "../types"
+import { Proposal, ProposalMetadata } from "../types"
 
 const EditProposal = z.object({
   proposalId: z.string(),
+  updatedVersion: z.number(),
   contentTitle: z.string(),
   contentBody: z.string(),
   signature: z.string(), // signature of editor (author)
@@ -65,11 +66,11 @@ export default async function editProposal(input: z.infer<typeof EditProposal>, 
   } as unknown as ProposalMetadata
 
   try {
-    const [data] = await db.$transaction([
+    const [updatedProposal, newProposalVersion] = await db.$transaction([
       db.proposal.update({
         where: { id: params.proposalId },
         data: {
-          version: proposal.version + 1,
+          version: params?.updatedVersion,
           data: proposalMetadata,
         },
         include: {
@@ -84,11 +85,11 @@ export default async function editProposal(input: z.infer<typeof EditProposal>, 
       db.proposalVersion.create({
         data: {
           proposalId: proposal?.id,
-          version: proposal?.version + 1,
+          version: params?.updatedVersion,
           editorAddress: ctx?.session?.siwe?.address as string,
           data: {
             content: {
-              title: `Version ${proposal?.version + 1}`,
+              title: `Version ${params?.updatedVersion}`,
               body: undefined,
             },
             proposalSignatureMessage: proposal?.data?.signatureMessage,
@@ -98,7 +99,10 @@ export default async function editProposal(input: z.infer<typeof EditProposal>, 
       }),
     ])
 
-    return proposal
+    return { updatedProposal, newProposalVersion } as {
+      updatedProposal: Proposal
+      newProposalVersion: ProposalVersion
+    }
   } catch (err) {
     throw Error(`Error updating proposal, failed with error: ${err.message}`)
   }
