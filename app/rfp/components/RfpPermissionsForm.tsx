@@ -52,7 +52,6 @@ export const RfpPermissionsForm = ({ rfp }) => {
   const [permissionTokenOptions, { refetch: refetchTokens }] = useQuery(
     getTokensByAccount,
     {
-      chainId: chain?.id || 1,
       userId: account?.id, // get tokens by account id so that different authors for the same workspace can share previously made tokens for the workspace
     },
     {

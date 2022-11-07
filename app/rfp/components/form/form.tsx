@@ -103,7 +103,6 @@ export const RfpForm = () => {
   const [savedUserTokens, { refetch: refetchTokens }] = useQuery(
     getTokensByAccount,
     {
-      chainId: chain?.id || 1,
       userId: account?.id, // get tokens by account id so that different authors for the same workspace can share previously made tokens for the workspace
     },
     { suspense: false, enabled: Boolean(chain?.id && account?.id), staleTime: 30 * 1000 }
@@ -112,16 +111,17 @@ export const RfpForm = () => {
   useEffect(() => {
     if (chain?.id) {
       const networkTokens = getNetworkTokens(chain?.id || 1)
-      const userTokens = savedUserTokens?.filter((token) => token.chainId === chain?.id)
       // sets options for reward token dropdown. includes default tokens and
       // tokens that the user has imported to their account
       setPaymentTokenOptions([
         ...networkTokens,
         // only support payments with ERC20 right now
-        ...(userTokens?.filter((token) => token.type === TokenType.ERC20) || []),
+        ...(savedUserTokens
+          ?.filter((token) => token.chainId === chain?.id)
+          ?.filter((token) => token.type === TokenType.ERC20) || []),
       ])
       // only token gate on user-defined tokens
-      setPermissionTokenOptions(userTokens || [])
+      setPermissionTokenOptions(savedUserTokens || [])
     }
   }, [chain?.id, savedUserTokens])
 

@@ -19,7 +19,10 @@ export async function multicall(chainId: string, abi: string[], calls: AtomicCal
   ]
 
   // node provider for making calls to smart contracts
-  const provider = new AlchemyProvider(networks[chainId].network, requireEnv("ALCHEMY_API_KEY"))
+  const provider = new AlchemyProvider(
+    networks[chainId].alchemyNetwork,
+    requireEnv("ALCHEMY_API_KEY")
+  )
   // multicall contract object
   const multi = new Contract(
     networks[chainId].multicall, // address of multicall contract on specific chain
