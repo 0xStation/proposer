@@ -3,6 +3,7 @@ import Layout from "app/core/layouts/Layout"
 import ResetSignaturesModal from "app/core/components/ResetSignaturesModal"
 import { EditForm } from "app/proposal/components/EditForm"
 
+// TODO: add non-author gating here
 const EditProposalPage = () => {
   const [isResetSignaturesModalOpen, setIsResetSignaturesModalOpen] = useState<boolean>(false)
 

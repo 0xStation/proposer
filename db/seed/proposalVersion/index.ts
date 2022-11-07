@@ -14,7 +14,7 @@ const seed = async () => {
     // await db.proposalVersion.create({
     //   data: {
     //     createdAt: proposal?.timestamp,
-    //     authorAddress: author?.address,
+    //     editorAddress: author?.address,
     //     proposalId: proposal?.id,
     //     version: 1,
     //     data: {
@@ -22,6 +22,8 @@ const seed = async () => {
     //         title: "Version 1",
     //         body: undefined,
     //       },
+    //       proposalSignatureMessage: proposal?.data?.signatureMessage,
+    //       proposalHash: proposal?.data?.proposalHash,
     //     },
     //   },
     // })

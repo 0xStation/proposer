@@ -2,14 +2,15 @@ import React, { useState } from "react"
 import { Field, Form } from "react-final-form"
 import { useRouter } from "next/router"
 import { Routes, useParam } from "@blitzjs/next"
-import { useQuery, useMutation } from "@blitzjs/rpc"
+import { useQuery, useMutation, invalidateQuery } from "@blitzjs/rpc"
 import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid"
 import { requiredField } from "app/utils/validators"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import Preview from "app/core/components/MarkdownPreview"
 import getProposalById from "../queries/getProposalById"
-import updateProposalMetadata from "../mutations/updateProposalMetadata"
 import useStore from "app/core/hooks/useStore"
+import { useSignProposal } from "app/core/hooks/useSignProposal"
+import editProposal from "../mutations/editProposal"
 
 export const EditForm = () => {
   const [previewMode, setPreviewMode] = useState<boolean>(false)
@@ -26,7 +27,7 @@ export const EditForm = () => {
       staleTime: 500,
     }
   )
-  const [updateProposalMetadataMutation] = useMutation(updateProposalMetadata, {
+  const [editProposalMutation] = useMutation(editProposal, {
     onSuccess: (data) => {
       setToastState({
         isToastShowing: true,
@@ -35,6 +36,7 @@ export const EditForm = () => {
       })
     },
   })
+  const { signProposal } = useSignProposal()
   return (
     <Form
       initialValues={{
@@ -42,27 +44,68 @@ export const EditForm = () => {
         body: proposal?.data?.content?.body,
       }}
       onSubmit={async (values: any, form) => {
-        const { title, body } = values
-        const proposalMetadata = JSON.parse(JSON.stringify(proposal?.data || {}))
+        const proposalCopy = JSON.parse(JSON.stringify(proposal))
+        console.log({
+          ...proposalCopy,
+          version: proposalCopy?.version + 1,
+          data: {
+            content: {
+              title: values.title,
+              body: values.body,
+            },
+            ...proposalCopy.data,
+          },
+        })
+        let signatureData
         try {
-          await updateProposalMetadataMutation({
-            proposalId: proposal?.id as string,
-            contentTitle: title,
-            contentBody: body,
-            proposalHash: proposalMetadata?.proposalHash,
-            authorSignature: proposalMetadata.authorSignature,
-            signatureMessage: proposalMetadata.signatureMessage,
-            totalPayments: proposalMetadata?.totalPayments,
-            paymentTerms: proposalMetadata?.paymentTerms,
-            advancePaymentPercentage: proposalMetadata?.advancePaymentPercentage,
+          signatureData = await signProposal({
+            proposal: {
+              ...proposalCopy,
+              version: proposalCopy?.version + 1,
+              data: {
+                ...proposalCopy.data,
+                content: {
+                  title: values.title,
+                  body: values.body,
+                },
+              },
+            },
           })
         } catch (err) {
-          console.error("Error editing a proposal", err)
+          console.error("Failed to sign proposal", err)
           setToastState({
             isToastShowing: true,
             type: "error",
-            message: "Sorry something went wrong: failed to edit a proposal.",
+            message: `Unable to edit proposal. ${err}`,
           })
+          return
+        }
+        const { message, signature, proposalHash } = signatureData
+        const { title, body } = values
+        const proposalMetadata = JSON.parse(JSON.stringify(proposal?.data || {}))
+        if (message && signature && proposalHash) {
+          try {
+            await editProposalMutation({
+              proposalId: proposal?.id as string,
+              contentTitle: title,
+              contentBody: body,
+              proposalHash: proposalHash,
+              signature: signature,
+              signatureMessage: message,
+              totalPayments: proposalMetadata?.totalPayments,
+              paymentTerms: proposalMetadata?.paymentTerms,
+              advancePaymentPercentage: proposalMetadata?.advancePaymentPercentage,
+            })
+            invalidateQuery(getProposalById)
+          } catch (err) {
+            console.error("Error editing a proposal", err)
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: `Unable to edit a proposal.`,
+            })
+            return
+          }
         }
       }}
       render={({ form, handleSubmit }) => {
@@ -101,7 +144,7 @@ export const EditForm = () => {
                 Cancel
               </Button>
               <Button isSubmitType={true} isDisabled={!formState.dirty}>
-                Save changes
+                Re-sign & save new changes
               </Button>
             </div>
             <div className="lg:mx-80 md:mx-48 sm:mx-24 mt-3">
