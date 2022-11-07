@@ -18,6 +18,7 @@ import ReadMore from "app/core/components/ReadMore"
 import TextLink from "app/core/components/TextLink"
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
+import { toTitleCase } from "app/core/utils/titleCase"
 
 const ProposalTemplateForm: BlitzPage = () => {
   const templateId = useParam("templateId") as string
@@ -104,13 +105,11 @@ const ProposalTemplateForm: BlitzPage = () => {
                   </ReadMore>
                 </div>
               )}
-              {/* SUBMISSION REQUIREMENT */}
+              {/* REQUIREMENTS */}
               <div>
-                <h4 className="text-xs font-bold text-concrete uppercase">
-                  Submission requirement
-                </h4>
+                <h4 className="text-xs font-bold text-concrete uppercase">Requirements</h4>
                 {!!rfp?.data?.singleTokenGate ? (
-                  <div className="mt-2">
+                  <p className="mt-2">
                     {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
                     <TextLink
                       url={
@@ -121,10 +120,16 @@ const ProposalTemplateForm: BlitzPage = () => {
                     >
                       {rfp?.data?.singleTokenGate.token.name}
                     </TextLink>
-                  </div>
+                  </p>
                 ) : (
-                  <div className="mt-2">Public</div>
+                  <p className="mt-2">Public</p>
                 )}
+                {!!rfp?.data?.requiredSocialConnections &&
+                  rfp?.data?.requiredSocialConnections.map((social, idx) => (
+                    <p className="mt-2" key={idx}>
+                      {toTitleCase(social)} connection
+                    </p>
+                  ))}
               </div>
               {getPayments(template?.data.fields)?.length > 0 && (
                 <>

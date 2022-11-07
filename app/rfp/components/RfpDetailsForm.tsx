@@ -38,11 +38,9 @@ export const RfpDetailsForm = ({ rfp }) => {
         try {
           await updateRfpContentMutation({
             rfpId: rfp?.id,
-            status: rfp?.status,
             title: values?.title,
             body: values.body,
             oneLiner: rfp?.data?.content?.oneLiner,
-            ...(rfp?.data?.singleTokenGate && { singleTokenGate: rfp?.data?.singleTokenGate }),
           })
         } catch (err) {
           console.error(err)

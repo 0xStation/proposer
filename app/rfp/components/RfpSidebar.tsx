@@ -12,6 +12,7 @@ import RfpStatusPill from "./RfpStatusPill"
 import Button from "app/core/components/sds/buttons/Button"
 import ReadMore from "app/core/components/ReadMore"
 import getTemplateByRfpId from "app/template/queries/getTemplateByRfpId"
+import { toTitleCase } from "app/core/utils/titleCase"
 
 export const RfpSidebar = ({ rfp }) => {
   const [template] = useQuery(
@@ -89,11 +90,11 @@ export const RfpSidebar = ({ rfp }) => {
               </ReadMore>
             </div>
           )}
-          {/* SUBMISSION REQUIREMENT */}
+          {/* REQUIREMENTS */}
           <div>
-            <h4 className="text-xs font-bold text-concrete uppercase">Submission requirement</h4>
+            <h4 className="text-xs font-bold text-concrete uppercase">Requirements</h4>
             {!!rfp?.data?.singleTokenGate ? (
-              <div className="mt-2">
+              <p className="mt-2">
                 {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
                 <TextLink
                   url={
@@ -104,10 +105,16 @@ export const RfpSidebar = ({ rfp }) => {
                 >
                   {rfp?.data?.singleTokenGate.token.name}
                 </TextLink>
-              </div>
+              </p>
             ) : (
-              <div className="mt-2">Public</div>
+              <p className="mt-2">Public</p>
             )}
+            {!!rfp?.data?.requiredSocialConnections &&
+              rfp?.data?.requiredSocialConnections.map((social, idx) => (
+                <p className="mt-2" key={idx}>
+                  {toTitleCase(social)} connection
+                </p>
+              ))}
           </div>
           {getPayments(template?.data.fields)?.length > 0 && (
             <>
