@@ -48,7 +48,7 @@ export const RfpFormStepRfp = ({ formState }) => {
   return (
     <>
       <div className="mt-2 flex flex-row space-x-1 items-center">
-        <span className="text-sm text-marble-white">This RFP will be listed on </span>
+        <span className="text-sm text-concrete">This RFP will be listed on </span>
         <button
           className="text-sm text-electric-violet font-bold"
           onClick={() => {
@@ -86,8 +86,7 @@ export const RfpFormStepRfp = ({ formState }) => {
         />
       </div>
       <span className="text-xs text-concrete block">
-        Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>. See{" "}
-        <TextLink url={LINKS.MARKDOWN_GUIDE}>examples of RFPs</TextLink>.
+        Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>. 
       </span>
       {/* TOGGLE */}
       <TextareaFieldOrMarkdownPreview
@@ -107,8 +106,7 @@ export const RfpFormStepRfp = ({ formState }) => {
       </div>
       <span className="text-xs text-concrete block">
         Proposer will automatically see the template&apos;s content in proposal details. Supports{" "}
-        <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>. See examples of{" "}
-        <TextLink url={LINKS.MARKDOWN_GUIDE}>RFP templates</TextLink>.
+        <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>. 
       </span>
       <TextareaFieldOrMarkdownPreview
         previewMode={bodyPrefillPreviewMode}
