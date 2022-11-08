@@ -12,6 +12,7 @@ import useStore from "app/core/hooks/useStore"
 import { useSignProposal } from "app/core/hooks/useSignProposal"
 import editProposal from "../mutations/editProposal"
 import AnnotateProposalVersionModal from "app/proposalVersion/components/AnnotateProposalVersionModal"
+import getProposalVersionsByProposalId from "app/proposalVersion/queries/getProposalVersionsByProposalId"
 
 export const EditProposalForm = () => {
   const [previewMode, setPreviewMode] = useState<boolean>(false)
@@ -93,6 +94,7 @@ export const EditProposalForm = () => {
           proposalVersionAnnotation: annotationValue,
         })
         invalidateQuery(getProposalById)
+        invalidateQuery(getProposalVersionsByProposalId)
       } catch (err) {
         setIsAnnotateModalOpen(false)
         setIsSubmitting(false)
@@ -209,7 +211,8 @@ export const EditProposalForm = () => {
                     <Field name="body" validate={requiredField}>
                       {({ input, meta }) => (
                         <div>
-                          <input
+                          <textarea
+                            rows={20}
                             {...input}
                             className="mt-1 bg-tunnel-black text-marble-white w-full"
                           />
