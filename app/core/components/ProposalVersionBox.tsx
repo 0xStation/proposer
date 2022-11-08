@@ -15,18 +15,22 @@ export const ProposalVersionBox = ({
     <div className={`border border-b border-concrete rounded-2xl mt-6 px-6 py-9 ${className}`}>
       <label className="uppercase text-sm font-bold text-concrete tracking-wider">Changes</label>
       <h1 className="mt-4">{(proposalVersion?.data as ProposalVersionMetadata)?.content?.title}</h1>
-      <p className="text-concrete mt-1 mb-6">
+      <p className="text-concrete mt-1 mb-2">
         Edited by {editorDisplayName} on{" "}
         {DateTime.fromJSDate(proposalVersion?.createdAt as Date).toLocaleString(
           DateTime.DATETIME_FULL
         )}
       </p>
-      <label className="mt-6 uppercase text-sm font-bold text-concrete tracking-wider">
-        Note from {editorDisplayName}
-      </label>
-      <p className="mt-4">
-        &quot;{(proposalVersion?.data as ProposalVersionMetadata)?.content?.body}&quot;
-      </p>
+      {(proposalVersion?.data as ProposalVersionMetadata)?.content?.body && (
+        <div className="mt-4">
+          <label className="uppercase text-sm font-bold text-concrete tracking-wider">
+            Note from {editorDisplayName}
+          </label>
+          <p className="mt-4">
+            &quot;{(proposalVersion?.data as ProposalVersionMetadata)?.content?.body}&quot;
+          </p>
+        </div>
+      )}
     </div>
   )
 }

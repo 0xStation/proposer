@@ -18,6 +18,7 @@ const EditProposal = z.object({
     .enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION, PaymentTerm.ADVANCE_PAYMENT])
     .optional(),
   advancePaymentPercentage: z.number().optional(),
+  proposalVersionAnnotation: z.string().optional(),
 })
 
 // `editProposal`'s use case is to update a proposal's title and body
@@ -90,7 +91,7 @@ export default async function editProposal(input: z.infer<typeof EditProposal>, 
           data: {
             content: {
               title: `Version ${params?.updatedVersion}`,
-              body: undefined,
+              body: params.proposalVersionAnnotation,
             },
             proposalSignatureMessage: proposal?.data?.signatureMessage,
             proposalHash: params.proposalHash,

@@ -70,7 +70,7 @@ const ViewProposal: BlitzPage = () => {
         proposal?.status === ProposalStatus.AWAITING_APPROVAL ? (
           <div className="relative group float-right mt-5">
             <div className="bg-wet-concrete invisible group-hover:visible inline rounded p-2 mr-1.5">
-              You can edit your proposal here.
+              Only you as the author can edit your proposal.
             </div>
             <Link href={Routes.EditProposalPage({ proposalId })}>
               <div className="inline mt-5 w-full cursor-pointer align-middle">

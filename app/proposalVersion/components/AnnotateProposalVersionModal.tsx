@@ -1,37 +1,19 @@
-import { Routes } from "@blitzjs/next"
-import { useMutation } from "@blitzjs/rpc"
+import { Field, Form } from "react-final-form"
 import Modal from "app/core/components/Modal"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import useStore from "app/core/hooks/useStore"
-import { Proposal } from "app/proposal/types"
-import { useRouter } from "next/router"
-import { Field, Form } from "react-final-form"
-import updateProposalVersion from "../mutations/updateProposalVersion"
 
 export const AnnotateProposalVersionModal = ({
   isOpen,
   setIsOpen,
-  proposal,
-  newVersion,
+  isSubmitting,
+  handleSubmit,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
-  proposal: Proposal
-  newVersion: number
+  isSubmitting: boolean
+  handleSubmit: (annotationValues: any) => Promise<void>
 }) => {
-  const router = useRouter()
-  const setToastState = useStore((state) => state.setToastState)
-  const [updateProposalVersionMutation] = useMutation(updateProposalVersion, {
-    onSuccess: (data) => {
-      setToastState({
-        isToastShowing: true,
-        type: "success",
-        message: `Updated your proposal history to include your annotation. Redirecting back to your proposal...`,
-      })
-      setIsOpen(false)
-      router.push(Routes.ViewProposal({ proposalId: proposal?.id as string }))
-    },
-  })
+  console.log("isSubmitting", isSubmitting)
   return (
     <Modal
       open={isOpen}
@@ -48,23 +30,8 @@ export const AnnotateProposalVersionModal = ({
           message explaining the changes. This is not required but is strongly suggested.
         </p>
         <Form
-          onSubmit={async (values: any, form) => {
-            try {
-              await updateProposalVersionMutation({
-                proposalId: proposal?.id,
-                version: newVersion,
-                contentTitle: `Version ${newVersion}`,
-                contentBody: values?.body,
-                proposalSignatureMessage: proposal?.data?.signatureMessage,
-                proposalHash: proposal?.data?.proposalHash as string,
-              })
-            } catch (err) {
-              setToastState({
-                isToastShowing: true,
-                type: "error",
-                message: `Unable to add change notes. ${err}`,
-              })
-            }
+          onSubmit={async ({ body }: any, form) => {
+            await handleSubmit(body)
           }}
           render={({ handleSubmit }) => {
             return (
@@ -86,10 +53,19 @@ export const AnnotateProposalVersionModal = ({
                   )}
                 </Field>
                 <div className="mt-6 flex justify-end">
-                  <Button type={ButtonType.Secondary} className="mr-2">
+                  <Button
+                    type={ButtonType.Secondary}
+                    className="mr-2"
+                    onClick={() => setIsOpen(false)}
+                  >
                     Cancel
                   </Button>
-                  <Button isSubmitType={true} className="block self-end">
+                  <Button
+                    isSubmitType={true}
+                    className="block self-end"
+                    isDisabled={isSubmitting}
+                    isLoading={isSubmitting}
+                  >
                     Confirm
                   </Button>
                 </div>

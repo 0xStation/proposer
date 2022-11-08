@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { Field, Form } from "react-final-form"
 import { useRouter } from "next/router"
 import { Routes, useParam } from "@blitzjs/next"
@@ -12,12 +12,10 @@ import useStore from "app/core/hooks/useStore"
 import { useSignProposal } from "app/core/hooks/useSignProposal"
 import editProposal from "../mutations/editProposal"
 import AnnotateProposalVersionModal from "app/proposalVersion/components/AnnotateProposalVersionModal"
-import { Proposal } from "../types"
 
 export const EditProposalForm = () => {
   const [previewMode, setPreviewMode] = useState<boolean>(false)
-  const [updatedProposalInfo, setUpdatedProposalInfo] =
-    useState<{ proposal: Proposal; version: number }>()
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const setToastState = useStore((state) => state.setToastState)
   const [isAnnotateModalOpen, setIsAnnotateModalOpen] = useState<boolean>(false)
   const router = useRouter()
@@ -34,95 +32,111 @@ export const EditProposalForm = () => {
   )
   const [editProposalMutation] = useMutation(editProposal, {
     onSuccess: (data) => {
+      setIsSubmitting(false)
       setToastState({
         isToastShowing: true,
         type: "success",
-        message: "Successfully updated your proposal.",
+        message:
+          "Successfully updated your proposal. Redirecting you back to the proposal details page.",
       })
+      router.push(Routes.ViewProposal({ proposalId: proposalId as string }))
     },
   })
   const { signProposal } = useSignProposal()
 
-  useEffect(() => {
-    if (updatedProposalInfo?.proposal && updatedProposalInfo?.version) {
-      setIsAnnotateModalOpen(true)
+  const handleFormSubmit = async (values: any, annotationValue: any) => {
+    setIsSubmitting(true)
+    const proposalCopy = JSON.parse(JSON.stringify(proposal))
+    const newVersion = proposalCopy?.version + 1
+    let signatureData
+    try {
+      signatureData = await signProposal({
+        proposal: {
+          ...proposalCopy,
+          version: newVersion,
+          data: {
+            ...proposalCopy.data,
+            content: {
+              title: values.title,
+              body: values.body,
+            },
+          },
+        },
+      })
+    } catch (err) {
+      setIsAnnotateModalOpen(false)
+      setIsSubmitting(false)
+      console.error("Failed to sign proposal", err)
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: `Unable to edit proposal. ${err}`,
+      })
+      return
     }
-  }, [updatedProposalInfo])
+    const { message, signature, proposalHash } = signatureData
+    const { title, body } = values
+    const proposalMetadata = JSON.parse(JSON.stringify(proposal?.data || {}))
+    if (message && signature && proposalHash) {
+      try {
+        await editProposalMutation({
+          proposalId: proposal?.id as string,
+          updatedVersion: newVersion,
+          contentTitle: title,
+          contentBody: body,
+          proposalHash: proposalHash,
+          signature: signature,
+          signatureMessage: message,
+          totalPayments: proposalMetadata?.totalPayments,
+          paymentTerms: proposalMetadata?.paymentTerms,
+          advancePaymentPercentage: proposalMetadata?.advancePaymentPercentage,
+          proposalVersionAnnotation: annotationValue,
+        })
+        invalidateQuery(getProposalById)
+      } catch (err) {
+        setIsAnnotateModalOpen(false)
+        setIsSubmitting(false)
+        console.error("Error editing a proposal", err)
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: `Unable to edit a proposal.`,
+        })
+        return
+      }
+    } else {
+      setIsAnnotateModalOpen(false)
+      setIsSubmitting(false)
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: `Unable to edit a proposal.`,
+      })
+    }
+  }
   return (
     <>
-      <AnnotateProposalVersionModal
-        isOpen={isAnnotateModalOpen}
-        setIsOpen={setIsAnnotateModalOpen}
-        proposal={updatedProposalInfo?.proposal as Proposal}
-        newVersion={updatedProposalInfo?.version as number}
-      />
       <Form
         initialValues={{
           title: proposal?.data?.content?.title,
           body: proposal?.data?.content?.body,
         }}
         onSubmit={async (values: any, form) => {
-          const proposalCopy = JSON.parse(JSON.stringify(proposal))
-          const newVersion = proposalCopy?.version + 1
-          let signatureData
-          try {
-            signatureData = await signProposal({
-              proposal: {
-                ...proposalCopy,
-                version: newVersion,
-                data: {
-                  ...proposalCopy.data,
-                  content: {
-                    title: values.title,
-                    body: values.body,
-                  },
-                },
-              },
-            })
-          } catch (err) {
-            console.error("Failed to sign proposal", err)
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: `Unable to edit proposal. ${err}`,
-            })
-            return
-          }
-          const { message, signature, proposalHash } = signatureData
-          const { title, body } = values
-          const proposalMetadata = JSON.parse(JSON.stringify(proposal?.data || {}))
-          if (message && signature && proposalHash) {
-            try {
-              const { updatedProposal } = await editProposalMutation({
-                proposalId: proposal?.id as string,
-                updatedVersion: newVersion,
-                contentTitle: title,
-                contentBody: body,
-                proposalHash: proposalHash,
-                signature: signature,
-                signatureMessage: message,
-                totalPayments: proposalMetadata?.totalPayments,
-                paymentTerms: proposalMetadata?.paymentTerms,
-                advancePaymentPercentage: proposalMetadata?.advancePaymentPercentage,
-              })
-              setUpdatedProposalInfo({ proposal: updatedProposal, version: newVersion })
-              invalidateQuery(getProposalById)
-            } catch (err) {
-              console.error("Error editing a proposal", err)
-              setToastState({
-                isToastShowing: true,
-                type: "error",
-                message: `Unable to edit a proposal.`,
-              })
-              return
-            }
-          }
+          setIsAnnotateModalOpen(true)
         }}
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
 
           return (
             <form onSubmit={handleSubmit} className="pt-8 px-8 w-full">
+              <AnnotateProposalVersionModal
+                isOpen={isAnnotateModalOpen}
+                setIsOpen={setIsAnnotateModalOpen}
+                isSubmitting={isSubmitting}
+                handleSubmit={async (annotationValues) =>
+                  await handleFormSubmit(formState.values, annotationValues)
+                }
+              />
               <div className="flex flex-row items-center justify-end w-full">
                 <button
                   type="button"
@@ -153,7 +167,11 @@ export const EditProposalForm = () => {
                 >
                   Cancel
                 </Button>
-                <Button isSubmitType={true} isDisabled={!formState.dirty}>
+                <Button
+                  isSubmitType={true}
+                  isDisabled={!formState.dirty || isSubmitting}
+                  isLoading={isSubmitting}
+                >
                   Re-sign & save changes
                 </Button>
               </div>
