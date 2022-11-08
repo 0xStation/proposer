@@ -89,7 +89,6 @@ const ViewProposal: BlitzPage = () => {
 
   return (
     <>
-      {/* TODO: clean this up  */}
       {activeUserIsAuthor ? (
         proposal?.status === ProposalStatus.DRAFT ||
         proposal?.status === ProposalStatus.AWAITING_APPROVAL ? (
@@ -97,7 +96,6 @@ const ViewProposal: BlitzPage = () => {
             <ToolTip>Only you as the author can edit your proposal.</ToolTip>
             <button
               onClick={() => {
-                console.log("hi!")
                 router.push(Routes.EditProposalPage({ proposalId }))
               }}
             >
