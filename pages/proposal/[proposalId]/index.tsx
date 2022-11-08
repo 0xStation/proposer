@@ -4,6 +4,7 @@ import { useQuery, invoke } from "@blitzjs/rpc"
 import { BlitzPage, useParam } from "@blitzjs/next"
 import Link from "next/link"
 import { PencilIcon } from "@heroicons/react/solid"
+import { ProposalRoleType, ProposalStatus } from "@prisma/client"
 import Layout from "app/core/layouts/Layout"
 import getProposalById from "app/proposal/queries/getProposalById"
 import ReadMore from "app/core/components/ReadMore"
@@ -11,9 +12,12 @@ import { TotalPaymentView } from "app/core/components/TotalPaymentView"
 import RoleSignaturesView from "app/core/components/RoleSignaturesView"
 import { Proposal } from "app/proposal/types"
 import { ProposalNestedLayout } from "app/core/components/ProposalNestedLayout"
-import { ProposalRoleType, ProposalStatus } from "@prisma/client"
 import useStore from "app/core/hooks/useStore"
 import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
+import CommentContainer from "app/comment/components/CommentContainer"
+import NewCommentThread from "app/comment/components/NewCommentThread"
+import CommentEmptyState from "app/comment/components/CommentEmptyState"
+import useCommentPermissions from "app/core/hooks/useCommentPermissions"
 
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
   const { proposalId } = params
@@ -45,7 +49,7 @@ export const getServerSideProps = gSSP(async ({ params = {} }) => {
 
 const ViewProposal: BlitzPage = () => {
   const proposalId = useParam("proposalId") as string
-  const [proposal] = useQuery(
+  const [proposal, { setQueryData: setProposalQueryData }] = useQuery(
     getProposalById,
     { id: proposalId },
     {
@@ -61,6 +65,8 @@ const ViewProposal: BlitzPage = () => {
     (role) => role.type === ProposalRoleType.AUTHOR && role.address === activeUser?.address
   )
   const { roles: activeUsersRoles } = useGetUsersRoles(proposalId)
+
+  const { canRead, canWrite } = useCommentPermissions(proposal?.id)
 
   return (
     <>
@@ -107,6 +113,25 @@ const ViewProposal: BlitzPage = () => {
       <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" />
       {(proposal?.data.totalPayments || []).length > 0 && (
         <TotalPaymentView proposal={proposal!} className="mt-9" />
+      )}
+      {canRead && (
+        <h3 className="text-concrete text-xs uppercase font-bold mb-2 mt-12">Comments</h3>
+      )}
+      {proposal?.comments && proposal.comments.length === 0 ? (
+        <CommentEmptyState proposal={proposal} setProposalQueryData={setProposalQueryData} />
+      ) : (
+        <div className="space-y-6">
+          {proposal?.comments &&
+            proposal.comments.map((comment, idx) => (
+              <CommentContainer
+                key={`comment-${idx}`}
+                comment={comment}
+                proposal={proposal}
+                setProposalQueryData={setProposalQueryData}
+              />
+            ))}
+          <NewCommentThread proposal={proposal} setProposalQueryData={setProposalQueryData} />
+        </div>
       )}
     </>
   )

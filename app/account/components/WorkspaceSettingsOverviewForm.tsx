@@ -9,15 +9,10 @@ import createAccount from "../mutations/createAccount"
 import useStore from "app/core/hooks/useStore"
 import { useDropzone } from "react-dropzone"
 import UploadIcon from "app/core/icons/UploadIcon"
-import { Account, AccountMetadata } from "app/account/types"
-import {
-  requiredField,
-  composeValidators,
-  mustBeUnderNumCharacters,
-  isValidEmail,
-} from "app/utils/validators"
+import { Account } from "app/account/types"
+import { composeValidators, mustBeUnderNumCharacters, isValidEmail } from "app/utils/validators"
 import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import Button from "app/core/components/sds/buttons/Button"
 import getAccountByAddress from "../queries/getAccountByAddress"
 import { useEnsName } from "wagmi"
 import truncateString from "app/core/utils/truncateString"
