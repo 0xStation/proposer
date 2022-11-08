@@ -29,12 +29,18 @@ export default async function getProposalsByAddress(input: z.infer<typeof GetPro
             }),
         },
       },
-      ...(params.statuses &&
-        params.statuses.length > 0 && {
-          status: {
-            in: params.statuses,
-          },
-        }),
+      ...(params.statuses && params.statuses.length > 0
+        ? {
+            status: {
+              in: params.statuses,
+              not: ProposalStatus.DRAFT,
+            },
+          }
+        : {
+            status: {
+              not: ProposalStatus.DRAFT,
+            },
+          }),
     },
   }
 

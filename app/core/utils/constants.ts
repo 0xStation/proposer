@@ -150,7 +150,7 @@ export const PAGINATION_TAKE = 50
 export const PROPOSAL_NEW_STATUS_FILTER_OPTIONS = [
   ProposalStatus.APPROVED,
   ProposalStatus.AWAITING_APPROVAL,
-  ProposalStatus.DRAFT,
+  // ProposalStatus.DRAFT, // DRAFT currently pertains to an unsigned proposal - we're making a decision to hide this from view
   ProposalStatus.COMPLETE,
 ]
 

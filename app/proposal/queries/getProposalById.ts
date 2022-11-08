@@ -1,4 +1,4 @@
-import db from "db"
+import db, { ProposalStatus } from "db"
 import * as z from "zod"
 import { Proposal } from "../types"
 
@@ -11,6 +11,9 @@ export default async function getProposalById(params: z.infer<typeof GetProposal
     where: {
       id: params.id,
       suppress: false,
+      status: {
+        not: ProposalStatus.DRAFT,
+      },
     },
     include: {
       roles: {

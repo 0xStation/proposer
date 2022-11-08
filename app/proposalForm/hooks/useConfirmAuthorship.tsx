@@ -9,7 +9,7 @@ export const useConfirmAuthorship = ({
   onError,
 }: {
   onSuccess: (data) => void
-  onError: (error) => void
+  onError: (error, proposal) => void
 }) => {
   const session = useSession({ suspense: false })
   const [sendProposalMutation] = useMutation(sendProposal)
@@ -25,6 +25,10 @@ export const useConfirmAuthorship = ({
     try {
       const { message, signature, proposalHash } = await signProposal({ proposal })
 
+      if (!message || !signature || !proposalHash) {
+        throw Error("Signature rejected.")
+      }
+
       const sendProposalSuccess = await sendProposalMutation({
         proposalId: proposal?.id as string,
         authorAddress: session?.siwe?.address as string,
@@ -39,7 +43,7 @@ export const useConfirmAuthorship = ({
         onSuccess(proposal)
       }
     } catch (err) {
-      onError(err)
+      onError(err, proposal)
       console.error(err)
       return
     }

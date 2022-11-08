@@ -79,14 +79,9 @@ export const getServerSideProps = gSSP(async ({ params = {} }) => {
 })
 
 const WorkspaceHome: BlitzPage = () => {
-  const session = useSession({ suspense: false })
   const accountAddress = useParam("accountAddress", "string") as string
   const queryParams = useRouter().query
   const tab = queryParams?.tab as string
-  const [isDiscordModalOpen, setIsDiscordModalOpen] = useState<boolean>(false)
-  const [newAuth, setNewAuth] = useState<string>("")
-  const activeUser = useStore((state) => state.activeUser)
-  const accountData = useAccount()
   const [activeTab, setActiveTab] = useState<WorkspaceTab>(
     (tab as WorkspaceTab) || WorkspaceTab.PROPOSALS
   )
