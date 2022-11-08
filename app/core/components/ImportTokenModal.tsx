@@ -40,7 +40,7 @@ export const ImportTokenModal = ({
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-2">
         <h3 className="text-2xl font-bold pt-6">Import a token</h3>
-        <p className="mt-2">Import ERC-20s that you’d like to be rewarded in.</p>
+        <p className="mt-2">Only ERC-20 and ERC-721 standards are supported.</p>
 
         <div className="mt-6">
           <Form
@@ -83,12 +83,15 @@ export const ImportTokenModal = ({
                 }
 
                 tokenMetadata = tokenMetadataRes?.data
-                if (tokenMetadata?.type !== TokenType.ERC20) {
+                if (
+                  tokenMetadata?.type !== TokenType.ERC20 &&
+                  tokenMetadata?.type !== TokenType.ERC721
+                ) {
                   setLoading(false)
                   setToastState({
                     isToastShowing: true,
                     type: "error",
-                    message: "Please import an ERC20 contract address",
+                    message: "Provided address was not an ERC-20 or ERC-721 token",
                   })
                   setIsOpen(false)
                   return

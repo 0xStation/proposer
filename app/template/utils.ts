@@ -17,6 +17,10 @@ export const getClientAddress = (template: ProposalTemplateField[] | undefined):
   return getFieldValue(template, RESERVED_KEYS.CLIENTS)?.[0]?.address
 }
 
+export const getContributorAddress = (template: ProposalTemplateField[] | undefined): string => {
+  return getFieldValue(template, RESERVED_KEYS.CONTRIBUTORS)?.[0]?.address
+}
+
 export const addAddressAsRecipientToPayments = (
   template: ProposalTemplateField[],
   address: string
@@ -26,6 +30,21 @@ export const addAddressAsRecipientToPayments = (
     return {
       ...payment,
       recipientAddress: address,
+    }
+  })
+}
+
+export const addAddressesToPayments = (
+  template: ProposalTemplateField[],
+  senderAddress: string,
+  recipientAddress: string
+) => {
+  const payments = getFieldValue(template, RESERVED_KEYS.PAYMENTS)
+  return payments.map((payment) => {
+    return {
+      ...payment,
+      senderAddress,
+      recipientAddress,
     }
   })
 }
@@ -50,4 +69,8 @@ export const getTotalPaymentAmount = (template: ProposalTemplateField[] | undefi
 
 export const getMinNumWords = (template: ProposalTemplateField[] | undefined): number => {
   return getField(template, RESERVED_KEYS.BODY)?.validation?.[0]?.args[0] || 0
+}
+
+export const getBodyPrefill = (template: ProposalTemplateField[] | undefined): string => {
+  return getField(template, RESERVED_KEYS.BODY)?.value
 }

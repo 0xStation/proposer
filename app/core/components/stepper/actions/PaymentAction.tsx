@@ -11,6 +11,7 @@ import { getMilestoneStatus } from "app/proposalMilestone/utils"
 import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 import { getNetworkGnosisUrl } from "app/core/utils/networkInfo"
 import { useStepperStore } from "../StepperRenderer"
+import { StepType } from "../steps/Step"
 
 const PaymentAction = ({ proposal, milestone }) => {
   const payment = proposal.payments?.find((payment) => payment.milestoneId === milestone.id)
@@ -34,6 +35,7 @@ const PaymentAction = ({ proposal, milestone }) => {
   const toggleApproveGnosisTransactionModalMap = useStore(
     (state) => state.toggleApproveGnosisTransactionModalMap
   )
+  const setActions = useStepperStore((state) => state.setActions)
 
   const [gnosisTxStatus] = useQuery(
     getGnosisTxStatus,
@@ -125,6 +127,23 @@ const PaymentAction = ({ proposal, milestone }) => {
           </Button>
         ),
       }),
+
+    ...(userIsSigner &&
+      payment &&
+      !!payment.data.multisigTransaction &&
+      !!userHasSignedGnosisTx &&
+      !quorumMet && {
+        [ProposalRoleType.CLIENT]: (
+          <Button
+            type={ButtonType.Unemphasized}
+            isDisabled={true}
+            overrideWidthClassName="w-full px-4"
+          >
+            You have approved
+          </Button>
+        ),
+      }),
+
     // user is signer on the gnosis safe
     // and payment exists (typescript)
     // and there IS mutliSigTransaction data on the payment, meaning it has been queued
@@ -141,7 +160,7 @@ const PaymentAction = ({ proposal, milestone }) => {
             target="_blank"
             rel="noreferrer"
           >
-            <button className="mb-2 sm:mb-0 border rounded px-4 h-[35px] bg-electric-violet border-electric-violet text-tunnel-black w-full">
+            <button className="mb-2 sm:mb-0 font-bold border rounded px-4 h-[35px] bg-electric-violet border-electric-violet text-tunnel-black w-full">
               Execute on Gnosis
               <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
             </button>
@@ -149,6 +168,13 @@ const PaymentAction = ({ proposal, milestone }) => {
         ),
       }),
   }
+
+  useEffect(() => {
+    setActions({
+      step: StepType.PAYMENT,
+      actions: actions,
+    })
+  }, [actions])
 
   if (activeRole && actions[activeRole]) {
     return actions[activeRole]

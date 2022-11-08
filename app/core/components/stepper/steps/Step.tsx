@@ -1,46 +1,41 @@
 import { CheckIcon } from "@heroicons/react/solid"
-import { ProposalRoleType } from "@prisma/client"
-import { useStepperStore } from "../StepperRenderer"
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-export enum StepStatus {
-  complete = "complete",
-  current = "current",
-  upcoming = "upcoming",
-  loading = "loading",
+export enum StepType {
+  APPROVE = "Approve",
+  PAYMENT = "Payment",
+  SEND = "Send",
 }
 
-type ActionMapType = {
-  [ProposalRoleType.AUTHOR]?: JSX.Element
-  [ProposalRoleType.CLIENT]?: JSX.Element
-  [ProposalRoleType.CONTRIBUTOR]?: JSX.Element
+export enum StepStatus {
+  COMPLETE = "complete",
+  CURRENT = "current",
+  UPCOMING = "upcoming",
+  LOADING = "loading",
 }
 
 const Step = ({
   status,
   description,
   subtitle,
-  actions,
   action,
-  options,
+  isLastStep,
 }: {
   status: StepStatus
   action?: JSX.Element
-  actions?: ActionMapType
   description: string
   subtitle?: string
-  options?: { first?: boolean; last?: boolean }
+  // all non-last steps start drawing the connector to the next step. The last step should omit this.
+  isLastStep?: boolean
 }) => {
-  const activeRole = useStepperStore((state) => state.activeRole)
-
   return (
-    <li className={classNames(!options?.last ? "pb-5" : "", "relative")}>
-      {status === StepStatus.complete ? (
+    <li className={classNames(!isLastStep ? "pb-5" : "", "relative")}>
+      {status === StepStatus.COMPLETE ? (
         <>
-          {!options?.last ? (
+          {!isLastStep ? (
             <div
               className="absolute top-2.5 left-2.5 -ml-px mt-0.5 h-full w-0.5 bg-electric-violet"
               aria-hidden="true"
@@ -57,9 +52,9 @@ const Step = ({
             </span>
           </span>
         </>
-      ) : status === StepStatus.current ? (
+      ) : status === StepStatus.CURRENT ? (
         <>
-          {!options?.last ? (
+          {!isLastStep ? (
             <div
               className="absolute top-2.5 left-2.5 -ml-px mt-0.5 h-full w-0.5 bg-concrete"
               aria-hidden="true"
@@ -78,7 +73,7 @@ const Step = ({
         </>
       ) : (
         <>
-          {!options?.last ? (
+          {!isLastStep ? (
             <div
               className="absolute top-2.5 left-2.5 -ml-px mt-0.5 h-full w-0.5 bg-concrete"
               aria-hidden="true"

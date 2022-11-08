@@ -14,6 +14,7 @@ import {
   ProposalTemplateFieldType,
   ProposalTemplateFieldValidationName,
 } from "app/template/types"
+import { PaymentDirection } from "app/rfp/types"
 import Gradient0 from "/public/gradients/0.png"
 import Gradient1 from "/public/gradients/1.png"
 import Gradient2 from "/public/gradients/2.png"
@@ -40,6 +41,18 @@ export const PROPOSAL_FORM_HEADER_COPY = {
   [ProposalFormStep.PROPOSE]: "Propose",
   [ProposalFormStep.REWARDS]: "Define terms",
   [ProposalFormStep.CONFIRM]: "Confirm",
+}
+
+export enum RfpFormStep {
+  RFP = "RFP",
+  PAYMENT = "PAYMENT",
+  PERMISSIONS = "PERMISSIONS",
+}
+
+export const RFP_FORM_HEADER_COPY = {
+  [RfpFormStep.RFP]: "RFP",
+  [RfpFormStep.PAYMENT]: "Payment",
+  [RfpFormStep.PERMISSIONS]: "Permissions",
 }
 
 export const CONTRACTS = {
@@ -306,6 +319,15 @@ export const FEATURE_FLAG_KEYS = {
   MEMBER_DIRECTORY: "member_directory",
 }
 
+export const PAYMENT_DIRECTION_MAP = {
+  [PaymentDirection.AUTHOR_IS_RECIPIENT]: {
+    copy: "Receiving payment",
+  },
+  [PaymentDirection.AUTHOR_IS_SENDER]: {
+    copy: "Distributing payment",
+  },
+}
+
 export const PAYMENT_TERM_MAP = {
   [PaymentTerm.ON_AGREEMENT]: {
     copy: "Pay in full upon proposal agreement",
@@ -315,6 +337,12 @@ export const PAYMENT_TERM_MAP = {
   },
   [PaymentTerm.ADVANCE_PAYMENT]: {
     copy: "Advance payment",
+  },
+}
+
+export const BODY_CONSTRAINT_MAP = {
+  [ProposalTemplateFieldValidationName.MIN_WORDS]: {
+    copy: "Minimum",
   },
 }
 

@@ -4,7 +4,7 @@ import { Routes } from "@blitzjs/next"
 import { useMutation, useQuery } from "@blitzjs/rpc"
 import { ProposalRoleType } from "@prisma/client"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import Stepper from "../Stepper"
+import FormHeaderStepper from "app/core/components/FormHeaderStepper"
 import getTokensByAccount from "app/token/queries/getTokensByAccount"
 import { getNetworkTokens } from "app/core/utils/networkInfo"
 import FundingFormStepPropose from "./stepPropose"
@@ -137,7 +137,7 @@ export const ProposalFormFunding = ({
 
   return (
     <div className="max-w-[580px] h-full mx-auto">
-      <Stepper
+      <FormHeaderStepper
         activeStep={PROPOSAL_FORM_HEADER_COPY[proposalStep]}
         steps={["Propose", "Define terms", "Confirm"]}
         className="mt-10"

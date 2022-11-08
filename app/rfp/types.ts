@@ -19,4 +19,18 @@ export type RfpMetadata = {
     token: Token
     minBalance?: string // string to pass directly into BigNumber.from in logic check
   }
+  requiredSocialConnections: string[]
+}
+
+export enum PaymentDirection {
+  AUTHOR_IS_RECIPIENT = "AUTHOR_IS_RECIPIENT",
+  AUTHOR_IS_SENDER = "AUTHOR_IS_SENDER",
+}
+
+export enum SocialConnection {
+  DISCORD = "DISCORD",
+  TWITTER = "TWITTER",
+  GITHUB = "GITHUB",
+  FARCASTER = "FARCASTER",
+  LENS = "LENS",
 }

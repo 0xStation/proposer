@@ -9,7 +9,7 @@ export const ZodToken = z.object({
   type: z.enum([TokenType.COIN, TokenType.ERC20, TokenType.ERC721, TokenType.ERC1155]),
   name: z.string().optional(),
   symbol: z.string().optional(),
-  decimals: z.number().optional(),
+  decimals: z.number().optional().nullable(),
 })
 
 export const ZodMilestone = z.object({

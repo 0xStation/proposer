@@ -45,6 +45,8 @@ import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 import getRfpCountForAccount from "app/rfp/queries/getRfpCountForAccount"
 import getProposalCountForAccount from "app/proposal/queries/getProposalCountForAccount"
 import { RfpCard } from "app/rfp/components/RfpCard"
+import { useSession } from "@blitzjs/auth"
+import useUserHasPermissionOfAddress from "app/core/hooks/useUserHasPermissionOfAddress"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
@@ -77,6 +79,7 @@ export const getServerSideProps = gSSP(async ({ params = {} }) => {
 })
 
 const WorkspaceHome: BlitzPage = () => {
+  const session = useSession({ suspense: false })
   const accountAddress = useParam("accountAddress", "string") as string
   const queryParams = useRouter().query
   const tab = queryParams?.tab as string
@@ -84,8 +87,6 @@ const WorkspaceHome: BlitzPage = () => {
   const [newAuth, setNewAuth] = useState<string>("")
   const activeUser = useStore((state) => state.activeUser)
   const accountData = useAccount()
-  const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
-  const [canViewSettings, setCanViewSettings] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<WorkspaceTab>(
     (tab as WorkspaceTab) || WorkspaceTab.PROPOSALS
   )
@@ -107,34 +108,12 @@ const WorkspaceHome: BlitzPage = () => {
     }
   )
 
-  const [safeMetadata] = useQuery(
-    getSafeMetadata,
-    { chainId: account?.data?.chainId!, address: account?.address! },
-    {
-      enabled: !!account && account.addressType === AddressType.SAFE,
-      suspense: false,
-      refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute
-    }
+  // checks if session address is page's account address or is a signer of the account's Safe
+  const { hasPermissionOfAddress: hasPrivateAccess } = useUserHasPermissionOfAddress(
+    accountAddress,
+    account?.addressType,
+    account?.data?.chainId
   )
-
-  // if activeUser is the workspace address or is a signer for it, show settings tab
-  useEffect(() => {
-    const userIsWorkspace =
-      accountAddress === activeUser?.address && accountAddress === connectedAddress
-    const userIsWorkspaceSigner =
-      safeMetadata?.signers.includes(activeUser?.address || "") &&
-      safeMetadata?.signers.includes(connectedAddress || "")
-
-    if (userIsWorkspace || userIsWorkspaceSigner) {
-      setCanViewSettings(true)
-    } else {
-      setCanViewSettings(false)
-      if (activeTab === WorkspaceTab.SETTINGS) {
-        setActiveTab(WorkspaceTab.PROPOSALS)
-      }
-    }
-  }, [activeUser, connectedAddress, accountAddress, safeMetadata])
 
   const ProposalTab = () => {
     const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
@@ -383,7 +362,16 @@ const WorkspaceHome: BlitzPage = () => {
 
     return (
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
-        <h1 className="text-2xl font-bold">RFPs</h1>
+        <div className="flex flex-row justify-between">
+          <h1 className="text-2xl font-bold">RFPs</h1>
+          {hasPrivateAccess && (
+            <Link href={Routes.RfpNew({ accountAddress })}>
+              <Button className="w-full px-10" overrideWidthClassName="max-w-fit">
+                Create RFP
+              </Button>
+            </Link>
+          )}
+        </div>
         {/* FILTERS & PAGINATION */}
         <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">
           {/* FILTERS */}
@@ -440,19 +428,9 @@ const WorkspaceHome: BlitzPage = () => {
             </div>
           ) : (
             <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-              <p className="text-2xl font-bold w-1/3 text-center">
-                Unlock this feature by sending a proposal to Station Helpdesk.
+              <p className="text-2xl font-bold w-[295px] text-center">
+                This workspace has no RFPs yet
               </p>
-              <Link
-                href={Routes.ProposalNewIdea({
-                  clients: "station-helpdesk.eth",
-                  title: "Requesting RFP access for " + accountAddress,
-                })}
-              >
-                <Button className="mt-8 w-48" type={ButtonType.Secondary}>
-                  Request access
-                </Button>
-              </Link>
             </div>
           ))}
       </div>
@@ -523,7 +501,7 @@ const WorkspaceHome: BlitzPage = () => {
               <span>RFPs</span>
             </li>
             {/* SETTINGS */}
-            {canViewSettings && (
+            {hasPrivateAccess && (
               <li
                 className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
                   activeTab === WorkspaceTab.SETTINGS && "bg-wet-concrete"
