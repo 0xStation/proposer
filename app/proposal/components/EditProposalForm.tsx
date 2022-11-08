@@ -154,7 +154,7 @@ export const EditProposalForm = () => {
                   Cancel
                 </Button>
                 <Button isSubmitType={true} isDisabled={!formState.dirty}>
-                  Re-sign & save new changes
+                  Re-sign & save changes
                 </Button>
               </div>
               <div className="lg:mx-80 md:mx-48 sm:mx-24 mt-3">
