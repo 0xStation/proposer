@@ -6,6 +6,12 @@ import { ZodMilestone, ZodPayment } from "app/types/zod"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
 import { Token } from "app/token/types"
 import { PaymentTerm } from "app/proposalPayment/types"
+import Moralis from "moralis"
+import { EvmChain } from "@moralisweb3/evm-utils"
+
+Moralis.start({
+  apiKey: "fGXzQqFWWmLIs9QLwunZ6Nu2JmOx6WgIC7QbWeca0bcepI7wQfr30YsPB4Bab8XG",
+})
 
 const CreateProposal = z.object({
   rfpId: z.string().optional(),
@@ -172,5 +178,15 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     })
   }
 
+  const stream = {
+    chains: [EvmChain.GOERLI],
+    description: "demo",
+    tag: "gnosis",
+    webhookUrl: "http://api.webhookinbox.com/i/hqugBxgJ/in/",
+    includeNativeTxs: true,
+  }
+  const createdStream = await Moralis.Streams.add(stream)
+  const { id } = createdStream.toJSON()
+  await Moralis.Streams.addAddress({ address: params.clientAddresses, id })
   return proposal as unknown as Proposal
 }
