@@ -150,7 +150,14 @@ export const PAGINATION_TAKE = 50
 export const PROPOSAL_NEW_STATUS_FILTER_OPTIONS = [
   ProposalStatus.APPROVED,
   ProposalStatus.AWAITING_APPROVAL,
-  // ProposalStatus.DRAFT, // DRAFT currently pertains to an unsigned proposal - we're making a decision to hide this from view
+  // DRAFT currently pertains to an unsigned proposal -
+  // to create a proposal, we are first creating a proposal
+  // to generate a signature, and then having the user sign to update the proposal's metadata.
+  // if the user doesn't sign, the proposal is incomplete, therefore
+  // we leave it in draft form. We're making a decision to hide
+  // draft view from the user since there's some complexity with
+  // _not_ increasing the proposal versioning when a user edits the proposal.
+  // ProposalStatus.DRAFT,
   ProposalStatus.COMPLETE,
 ]
 

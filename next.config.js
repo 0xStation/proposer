@@ -24,19 +24,6 @@ const config = {
     // Note: we provide webpack above so you should not `require` it
     // Perform customizations to webpack config
     // Important: return the modified config
-    // config.module.rules.push({
-    //   test: /\.(mp4|webm|ogg|swf|ogv)$/,
-    //   use: [
-    //     {
-    //       loader: "file-loader",
-    //       options: {
-    //         publicPath: `./.next/static/videos/`,
-    //         outputPath: `${isServer ? "../" : ""}static/videos/`,
-    //         name: "[name].[ext]",
-    //       },
-    //     },
-    //   ],
-    // })
     return config
   },
 }

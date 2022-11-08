@@ -105,6 +105,7 @@ export const ProposalFormIdea = ({
               type: "error",
               message: "Not signed in, please connect wallet and sign in.",
             })
+            return
           }
           const toAddress = await resolveEnsAddress(values.toAddress?.trim())
 

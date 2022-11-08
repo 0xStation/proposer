@@ -17,6 +17,7 @@ export const ProposalVersionBox = ({
       <h1 className="mt-4">{(proposalVersion?.data as ProposalVersionMetadata)?.content?.title}</h1>
       <p className="text-concrete mt-1 mb-2">
         Edited by {editorDisplayName} on{" "}
+        {/* DATETIME_FULL formatting example: 'April 20, 2017 at 11:32 AM EDT' */}
         {DateTime.fromJSDate(proposalVersion?.createdAt as Date).toLocaleString(
           DateTime.DATETIME_FULL
         )}

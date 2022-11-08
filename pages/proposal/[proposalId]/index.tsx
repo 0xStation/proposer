@@ -19,6 +19,24 @@ import NewCommentThread from "app/comment/components/NewCommentThread"
 import CommentEmptyState from "app/comment/components/CommentEmptyState"
 import useCommentPermissions from "app/core/hooks/useCommentPermissions"
 
+export const ToolTip = ({ children }) => {
+  return (
+    <div className="bg-wet-concrete invisible group-hover:visible inline rounded p-2 mr-1.5">
+      {children}
+    </div>
+  )
+}
+
+export const EditIcon = ({ disabled = false, children }) => {
+  const disabledStyling = disabled ? "text-concrete" : "text-marble-white"
+  return (
+    <div className="inline mt-5 w-full cursor-pointer align-middle">
+      <PencilIcon className={`h-5 w-5 inline ${disabledStyling}`} />
+      <p className={`inline ml-2 ${disabledStyling}`}>{children}</p>
+    </div>
+  )
+}
+
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
   const { proposalId } = params
   // regex checks if a string is a uuid
@@ -75,37 +93,22 @@ const ViewProposal: BlitzPage = () => {
         proposal?.status === ProposalStatus.DRAFT ||
         proposal?.status === ProposalStatus.AWAITING_APPROVAL ? (
           <div className="relative group float-right mt-5">
-            <div className="bg-wet-concrete invisible group-hover:visible inline rounded p-2 mr-1.5">
-              Only you as the author can edit your proposal.
-            </div>
+            <ToolTip>Only you as the author can edit your proposal.</ToolTip>
             <Link href={Routes.EditProposalPage({ proposalId })}>
-              <div className="inline mt-5 w-full cursor-pointer align-middle">
-                <PencilIcon className="h-5 w-5 inline" />
-                <p className="inline ml-2">Edit proposal</p>
-              </div>
+              <EditIcon>Edit Proposal</EditIcon>
             </Link>
           </div>
         ) : (
           <div className="relative group float-right mt-5">
-            <div className="bg-wet-concrete invisible group-hover:visible inline rounded p-2 mr-1.5">
-              You can only edit the proposal before approval.
-            </div>
-            <div className="inline mt-5 w-full cursor-pointer align-middle">
-              <PencilIcon className="h-5 w-5 inline text-concrete" />
-              <p className="inline ml-2 text-concrete">Edit proposal</p>
-            </div>
+            <ToolTip>You can only edit the proposal before approval.</ToolTip>
+            <EditIcon disabled={true}>Edit Proposal</EditIcon>
           </div>
         )
       ) : (
         activeUsersRoles?.length > 0 && (
           <div className="relative group float-right mt-5">
-            <div className="bg-wet-concrete invisible group-hover:visible inline rounded p-2 mr-1.5">
-              Currently, only the author can edit the proposal.
-            </div>
-            <div className="inline mt-5 w-full cursor-pointer align-middle">
-              <PencilIcon className="h-5 w-5 inline text-concrete" />
-              <p className="inline ml-2 text-concrete">Edit proposal</p>
-            </div>
+            <ToolTip>Currently, only the author can edit the proposal.</ToolTip>
+            <EditIcon disabled={true}>Edit Proposal</EditIcon>
           </div>
         )
       )}

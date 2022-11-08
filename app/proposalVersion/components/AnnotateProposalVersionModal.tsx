@@ -13,7 +13,6 @@ export const AnnotateProposalVersionModal = ({
   isSubmitting: boolean
   handleSubmit: (annotationValues: any) => Promise<void>
 }) => {
-  console.log("isSubmitting", isSubmitting)
   return (
     <Modal
       open={isOpen}

@@ -86,7 +86,6 @@ export const ProposalFormPartnership = ({
       setCreatedProposal(data)
     },
     onError: (error: Error) => {
-      console.log("we are erroring")
       console.error(error)
     },
   })
@@ -119,6 +118,7 @@ export const ProposalFormPartnership = ({
               type: "error",
               message: "Not signed in, please connect wallet and sign in.",
             })
+            return
           }
 
           let contributorAddress
