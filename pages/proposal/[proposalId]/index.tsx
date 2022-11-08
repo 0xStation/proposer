@@ -11,8 +11,9 @@ import { TotalPaymentView } from "app/core/components/TotalPaymentView"
 import RoleSignaturesView from "app/core/components/RoleSignaturesView"
 import { Proposal } from "app/proposal/types"
 import { ProposalNestedLayout } from "app/core/components/ProposalNestedLayout"
-import { ProposalRoleType } from "@prisma/client"
+import { ProposalRoleType, ProposalStatus } from "@prisma/client"
 import useStore from "app/core/hooks/useStore"
+import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
 
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
   const { proposalId } = params
@@ -59,21 +60,48 @@ const ViewProposal: BlitzPage = () => {
   const activeUserIsAuthor = proposal?.roles?.find(
     (role) => role.type === ProposalRoleType.AUTHOR && role.address === activeUser?.address
   )
+  const { roles: activeUsersRoles } = useGetUsersRoles(proposalId)
 
   return (
     <>
-      {activeUserIsAuthor && (
-        <div className="relative group float-right mt-5">
-          <div className="bg-wet-concrete invisible group-hover:visible inline rounded p-2 mr-1.5">
-            You can edit your proposal here.
-          </div>
-          <Link href={Routes.EditProposalPage({ proposalId })}>
-            <div className="inline mt-5 w-full cursor-pointer align-middle">
-              <PencilIcon className="h-5 w-5 inline" />
-              <p className="inline ml-2">Edit proposal</p>
+      {/* TODO: clean this up  */}
+      {activeUserIsAuthor ? (
+        proposal?.status === ProposalStatus.DRAFT ||
+        proposal?.status === ProposalStatus.AWAITING_APPROVAL ? (
+          <div className="relative group float-right mt-5">
+            <div className="bg-wet-concrete invisible group-hover:visible inline rounded p-2 mr-1.5">
+              You can edit your proposal here.
             </div>
-          </Link>
-        </div>
+            <Link href={Routes.EditProposalPage({ proposalId })}>
+              <div className="inline mt-5 w-full cursor-pointer align-middle">
+                <PencilIcon className="h-5 w-5 inline" />
+                <p className="inline ml-2">Edit proposal</p>
+              </div>
+            </Link>
+          </div>
+        ) : (
+          <div className="relative group float-right mt-5">
+            <div className="bg-wet-concrete invisible group-hover:visible inline rounded p-2 mr-1.5">
+              You can only edit the proposal before approval.
+            </div>
+            <div className="inline mt-5 w-full cursor-pointer align-middle">
+              <PencilIcon className="h-5 w-5 inline text-concrete" />
+              <p className="inline ml-2 text-concrete">Edit proposal</p>
+            </div>
+          </div>
+        )
+      ) : (
+        activeUsersRoles?.length > 0 && (
+          <div className="relative group float-right mt-5">
+            <div className="bg-wet-concrete invisible group-hover:visible inline rounded p-2 mr-1.5">
+              Currently, only the author can edit the proposal.
+            </div>
+            <div className="inline mt-5 w-full cursor-pointer align-middle">
+              <PencilIcon className="h-5 w-5 inline text-concrete" />
+              <p className="inline ml-2 text-concrete">Edit proposal</p>
+            </div>
+          </div>
+        )
       )}
       <ReadMore className="mt-12 mb-9">{proposal?.data?.content?.body}</ReadMore>
       <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" />

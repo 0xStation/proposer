@@ -63,10 +63,12 @@ export const ProposalHistory: BlitzPage = () => {
 
   return (
     <>
-      {proposalVersions ? (
-        proposalVersions.map((version, i) => (
-          <ProposalVersionBox key={version?.id} proposalVersion={version} />
-        ))
+      {(proposalVersions || []).length > 1 ? (
+        proposalVersions
+          ?.filter(({ version }) => version !== 1)
+          ?.map((proposalVersion, i) => (
+            <ProposalVersionBox key={proposalVersion?.id} proposalVersion={proposalVersion} />
+          ))
       ) : Boolean(proposal?.roles) ? (
         <div className="w-full h-full flex items-center flex-col sm:mt-0">
           <h1 className="text-2xl font-bold w-[295px] text-center mt-44">
