@@ -202,7 +202,7 @@ export const FundingFormStepPropose = ({ proposingAs, setProposingAs, formState 
                 </>
               ) : (
                 <>
-                  <p className="inline text-sm text-concrete">Read</p>{" "}
+                  <p className="inline text-sm text-concrete">Preview</p>{" "}
                   <EyeIcon className="inline h-5 w-5 fill-concrete" />
                 </>
               )}

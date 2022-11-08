@@ -43,13 +43,8 @@ export const ProposalFormTemplate = () => {
   const [proposalStep, setProposalStep] = useState<ProposalFormStep>(ProposalFormStep.PROPOSE)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [proposalShouldSendLater, setProposalShouldSendLater] = useState<boolean>(false)
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
   const session = useSession({ suspense: false })
-  const [
-    shouldHandlePostProposalCreationProcessing,
-    setShouldHandlePostProposalCreationProcessing,
-  ] = useState<boolean>(false)
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false)
 
   useWarnIfUnsavedChanges(unsavedChanges, () => {
@@ -117,7 +112,6 @@ export const ProposalFormTemplate = () => {
     onSuccess: (data) => {
       setCreatedProposal(data)
       setUnsavedChanges(false)
-      setShouldHandlePostProposalCreationProcessing(true)
     },
     onError: (error: Error) => {
       console.error(error)
@@ -141,13 +135,12 @@ export const ProposalFormTemplate = () => {
         })
       )
     },
-    onError: (error) => {
+    onError: (error, proposal) => {
       deleteProposalByIdMutation({
-        proposalId: createdProposal?.id as string,
+        proposalId: proposal?.id as string,
       })
       setCreatedProposal(null)
 
-      setShouldHandlePostProposalCreationProcessing(false)
       setIsLoading(false)
       console.error(error)
       setToastState({
@@ -161,40 +154,8 @@ export const ProposalFormTemplate = () => {
   useEffect(() => {
     if (!walletModalOpen && isLoading) {
       setIsLoading(false)
-      setProposalShouldSendLater(false)
     }
   }, [walletModalOpen])
-
-  useEffect(() => {
-    // `shouldHandlePostProposalCreationProcessing` is used to retrigger this `useEffect` hook
-    // if the user declines to sign the message verifying their authorship.
-    if (createdProposal && shouldHandlePostProposalCreationProcessing) {
-      if (!proposalShouldSendLater) {
-        const representingRoles = createdProposal.roles
-          ?.filter(
-            (role) =>
-              // IMPORTANT: filters out multisigs to enable signers to submit proposals without auto-approving
-              addressesAreEqual(role.address, session.siwe?.address || "") &&
-              role.type !== ProposalRoleType.AUTHOR
-          )
-          .map((role) => {
-            return {
-              roleId: role.id,
-              // if role's account is WALLET, then one signature is left
-              // if role's account is SAFE, then we don't to trigger an approval on send to let the multisig decide, we should revisit this and I am willing to change mind here
-              complete: role.account?.addressType === AddressType.WALLET,
-            }
-          })
-        confirmAuthorship({ proposal: createdProposal, representingRoles })
-      } else {
-        router.push(
-          Routes.ViewProposal({
-            proposalId: createdProposal.id,
-          })
-        )
-      }
-    }
-  }, [createdProposal, proposalShouldSendLater, shouldHandlePostProposalCreationProcessing])
 
   const missingRequiredToken = !!rfp?.data?.singleTokenGate && !userHasRequiredToken
   const missingRequiredDiscordConnection =
@@ -277,8 +238,9 @@ export const ProposalFormTemplate = () => {
               ? templateContributorAddress
               : connectedAddress
 
+            let newProposal
             try {
-              await createProposalMutation({
+              newProposal = await createProposalMutation({
                 rfpId: rfp?.id,
                 contentTitle: values.title,
                 contentBody: values.body,
@@ -301,6 +263,32 @@ export const ProposalFormTemplate = () => {
                 message: err.message,
               })
               return
+            }
+
+            try {
+              const representingRoles = newProposal.roles
+                ?.filter(
+                  (role) =>
+                    // IMPORTANT: filters out multisigs to enable signers to submit proposals without auto-approving
+                    addressesAreEqual(role.address, session.siwe?.address || "") &&
+                    role.type !== ProposalRoleType.AUTHOR
+                )
+                .map((role) => {
+                  return {
+                    roleId: role.id,
+                    // if role's account is WALLET, then one signature is left
+                    // if role's account is SAFE, then we don't to trigger an approval on send to let the multisig decide, we should revisit this and I am willing to change mind here
+                    complete: role.account?.addressType === AddressType.WALLET,
+                  }
+                })
+              await confirmAuthorship({ proposal: newProposal, representingRoles })
+            } catch (err) {
+              setIsLoading(false)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: err.message,
+              })
             }
           }
         }}
@@ -340,10 +328,7 @@ export const ProposalFormTemplate = () => {
               />
               <div className="rounded-2xl border border-concrete p-6 h-[560px] overflow-y-scroll">
                 {isLoading ? (
-                  <ProposalCreationLoadingScreen
-                    createdProposal={createdProposal}
-                    proposalShouldSendLater={proposalShouldSendLater}
-                  />
+                  <ProposalCreationLoadingScreen createdProposal={createdProposal} />
                 ) : (
                   <>
                     <h2 className="text-marble-white text-xl font-bold">
@@ -445,7 +430,7 @@ export const ProposalFormTemplate = () => {
                           !!rfp?.data?.singleTokenGate &&
                           // query is loading
                           isTokenGatingCheckLoading) ||
-                        (!proposalShouldSendLater && isLoading)
+                        isLoading
                       }
                       onClick={async (e) => {
                         e.preventDefault()
@@ -463,11 +448,7 @@ export const ProposalFormTemplate = () => {
                           setIsLoading(false)
                           return
                         } else if (session.siwe?.address) {
-                          if (createdProposal) {
-                            setShouldHandlePostProposalCreationProcessing(true)
-                          } else {
-                            await handleSubmit()
-                          }
+                          await handleSubmit()
                         }
                       }}
                     >

@@ -3,7 +3,7 @@ import { useSession } from "@blitzjs/auth"
 import { Routes } from "@blitzjs/next"
 import { useMutation, useQuery } from "@blitzjs/rpc"
 import { ProposalRoleType } from "@prisma/client"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import Button from "app/core/components/sds/buttons/Button"
 import FormHeaderStepper from "app/core/components/FormHeaderStepper"
 import getTokensByAccount from "app/token/queries/getTokensByAccount"
 import { getNetworkTokens } from "app/core/utils/networkInfo"
@@ -24,6 +24,7 @@ import { PaymentTerm } from "app/proposalPayment/types"
 import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
 import { isValidAdvancedPaymentPercentage } from "app/utils/validators"
 import { ConfirmForm } from "../ConfirmForm"
+import deleteProposalById from "app/proposal/mutations/deleteProposalById"
 
 export const ProposalFormFunding = ({
   prefillClients,
@@ -51,11 +52,6 @@ export const ProposalFormFunding = ({
   // payment terms in parent form state because it gets reset when flipping through steps if put in the rewards form
   const [selectedPaymentTerms, setSelectedPaymentTerms] = useState<string>("")
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
-  const [proposalShouldSendLater, setProposalShouldSendLater] = useState<boolean>(false)
-  const [
-    shouldHandlePostProposalCreationProcessing,
-    setShouldHandlePostProposalCreationProcessing,
-  ] = useState<boolean>(false)
   const session = useSession({ suspense: false })
   const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
@@ -66,9 +62,18 @@ export const ProposalFormFunding = ({
   useEffect(() => {
     if (!walletModalOpen && isLoading) {
       setIsLoading(false)
-      setProposalShouldSendLater(false)
     }
   }, [walletModalOpen])
+
+  const [deleteProposalByIdMutation] = useMutation(deleteProposalById, {
+    onSuccess: (_data) => {
+      console.log("proposal deleted: ", _data)
+    },
+    onError: (error: Error) => {
+      setCreatedProposal(null)
+      console.error(error)
+    },
+  })
 
   const { confirmAuthorship } = useConfirmAuthorship({
     onSuccess: (updatedProposal) => {
@@ -78,8 +83,10 @@ export const ProposalFormFunding = ({
         })
       )
     },
-    onError: (error) => {
-      setShouldHandlePostProposalCreationProcessing(false)
+    onError: (error, proposal) => {
+      deleteProposalByIdMutation({
+        proposalId: proposal?.id as string,
+      })
       setIsLoading(false)
       console.error(error)
       setToastState({
@@ -93,7 +100,6 @@ export const ProposalFormFunding = ({
   const [createProposalMutation] = useMutation(createProposal, {
     onSuccess: (data) => {
       setCreatedProposal(data)
-      setShouldHandlePostProposalCreationProcessing(true)
     },
     onError: (error: Error) => {
       console.log("we are erroring")
@@ -109,22 +115,6 @@ export const ProposalFormFunding = ({
     },
     { suspense: false, enabled: Boolean(chain && session?.userId) }
   )
-
-  useEffect(() => {
-    // `shouldHandlePostProposalCreationProcessing` is used to retrigger this `useEffect` hook
-    // if the user declines to sign the message verifying their authorship.
-    if (createdProposal && shouldHandlePostProposalCreationProcessing) {
-      if (!proposalShouldSendLater) {
-        confirmAuthorship({ proposal: createdProposal, representingRoles: [] })
-      } else {
-        router.push(
-          Routes.ViewProposal({
-            proposalId: createdProposal.id,
-          })
-        )
-      }
-    }
-  }, [createdProposal, proposalShouldSendLater, shouldHandlePostProposalCreationProcessing])
 
   useEffect(() => {
     if (chain?.id) {
@@ -149,176 +139,176 @@ export const ProposalFormFunding = ({
           contributor: prefillContributors?.[0] || "",
         }}
         onSubmit={async (values: any, form) => {
-          // an author needs to sign the proposal to upload the content to ipfs.
-          // if they decline the signature, but submit again, we don't want to
-          // create the same proposal, rather we want to skip to the signature step.
-          if (createdProposal) {
-            router.push(
-              Routes.ViewProposal({
-                proposalId: createdProposal.id,
-              })
-            )
+          let contributorAddress
+          let clientAddress
+          // if proposing as contributor, take active user address
+          // otherwise, resolve input ENS or address
+          if (proposingAs === ProposalRoleType.CONTRIBUTOR) {
+            contributorAddress = session?.siwe?.address
           } else {
-            let contributorAddress
-            let clientAddress
-            // if proposing as contributor, take active user address
-            // otherwise, resolve input ENS or address
-            if (proposingAs === ProposalRoleType.CONTRIBUTOR) {
-              contributorAddress = session?.siwe?.address
-            } else {
-              contributorAddress = await resolveEnsAddress(values.contributor?.trim())
-            }
-            // if proposing as client, take active user address
-            // otherwise, resolve input ENS or address
-            if (proposingAs === ProposalRoleType.CLIENT) {
-              clientAddress = session?.siwe?.address
-            } else {
-              clientAddress = await resolveEnsAddress(values.client?.trim())
-            }
+            contributorAddress = await resolveEnsAddress(values.contributor?.trim())
+          }
+          // if proposing as client, take active user address
+          // otherwise, resolve input ENS or address
+          if (proposingAs === ProposalRoleType.CLIENT) {
+            clientAddress = session?.siwe?.address
+          } else {
+            clientAddress = await resolveEnsAddress(values.client?.trim())
+          }
 
-            if (!contributorAddress) {
-              setIsLoading(false)
-              setToastState({
-                isToastShowing: true,
-                type: "error",
-                message:
-                  proposingAs === ProposalRoleType.CONTRIBUTOR
-                    ? "Not signed in, please connect wallet and sign in."
-                    : "Invalid ENS name or wallet address provided.",
-              })
-              return
-            }
-            if (!clientAddress) {
-              setIsLoading(false)
-              setToastState({
-                isToastShowing: true,
-                type: "error",
-                message:
-                  proposingAs === ProposalRoleType.CLIENT
-                    ? "Not signed in, please connect wallet and sign in."
-                    : "Invalid ENS name or wallet address provided.",
-              })
-              return
-            }
+          if (!contributorAddress) {
+            setIsLoading(false)
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message:
+                proposingAs === ProposalRoleType.CONTRIBUTOR
+                  ? "Not signed in, please connect wallet and sign in."
+                  : "Invalid ENS name or wallet address provided.",
+            })
+            return
+          }
+          if (!clientAddress) {
+            setIsLoading(false)
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message:
+                proposingAs === ProposalRoleType.CLIENT
+                  ? "Not signed in, please connect wallet and sign in."
+                  : "Invalid ENS name or wallet address provided.",
+            })
+            return
+          }
 
-            // tokenAddress might just be null if they are not requesting funding
-            // need to check tokenAddress exists, AND it is not found before erroring
-            const token = values.tokenAddress
-              ? tokenOptions?.find((token) => addressesAreEqual(token.address, values.tokenAddress))
-              : null
+          // tokenAddress might just be null if they are not requesting funding
+          // need to check tokenAddress exists, AND it is not found before erroring
+          const token = values.tokenAddress
+            ? tokenOptions?.find((token) => addressesAreEqual(token.address, values.tokenAddress))
+            : null
 
-            if (values.tokenAddress && !token) {
-              setIsLoading(false)
-              throw Error("token not found")
-            }
+          if (values.tokenAddress && !token) {
+            setIsLoading(false)
+            throw Error("token not found")
+          }
 
-            let milestones: any[] = []
-            let payments: any[] = []
-            // if payment details are present, populate milestone and payment objects
-            // supports payment and non-payment proposals
-            if (
-              ![
-                PaymentTerm.ON_AGREEMENT,
-                PaymentTerm.AFTER_COMPLETION,
-                PaymentTerm.ADVANCE_PAYMENT,
-              ].some((term) => term === values.paymentTerms)
-            ) {
-              setIsLoading(false)
-              console.error("Missing payment terms, please select an option on the previous page.")
-              setToastState({
-                isToastShowing: true,
-                type: "error",
-                message: "Missing payment terms, please select an option on the previous page.",
-              })
-              return
-            }
+          let milestones: any[] = []
+          let payments: any[] = []
+          // if payment details are present, populate milestone and payment objects
+          // supports payment and non-payment proposals
+          if (
+            ![
+              PaymentTerm.ON_AGREEMENT,
+              PaymentTerm.AFTER_COMPLETION,
+              PaymentTerm.ADVANCE_PAYMENT,
+            ].some((term) => term === values.paymentTerms)
+          ) {
+            setIsLoading(false)
+            console.error("Missing payment terms, please select an option on the previous page.")
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "Missing payment terms, please select an option on the previous page.",
+            })
+            return
+          }
 
-            const tokenTransferBase = {
-              senderAddress: clientAddress,
-              recipientAddress: contributorAddress,
-              token: { ...token, chainId: chain?.id || 1 },
-            }
+          const tokenTransferBase = {
+            senderAddress: clientAddress,
+            recipientAddress: contributorAddress,
+            token: { ...token, chainId: chain?.id || 1 },
+          }
 
-            // set up milestones and payments conditional on payment terms inputs
-            const MILESTONE_COPY = {
-              UPFRONT_PAYMENT: "Upfront payment",
-              ADVANCE_PAYMENT: "Advance payment",
-              COMPLETION_PAYMENT: "Completion payment",
-            }
+          // set up milestones and payments conditional on payment terms inputs
+          const MILESTONE_COPY = {
+            UPFRONT_PAYMENT: "Upfront payment",
+            ADVANCE_PAYMENT: "Advance payment",
+            COMPLETION_PAYMENT: "Completion payment",
+          }
 
-            if (values.paymentTerms === PaymentTerm.ADVANCE_PAYMENT) {
-              // if pay on proposal completion and non-zero advance payment, set up two milestones and two payments
-              milestones = [
-                {
-                  index: 0,
-                  title: MILESTONE_COPY.ADVANCE_PAYMENT,
-                },
-                {
-                  index: 1,
-                  title: MILESTONE_COPY.COMPLETION_PAYMENT,
-                },
-              ]
+          if (values.paymentTerms === PaymentTerm.ADVANCE_PAYMENT) {
+            // if pay on proposal completion and non-zero advance payment, set up two milestones and two payments
+            milestones = [
+              {
+                index: 0,
+                title: MILESTONE_COPY.ADVANCE_PAYMENT,
+              },
+              {
+                index: 1,
+                title: MILESTONE_COPY.COMPLETION_PAYMENT,
+              },
+            ]
 
-              const advancedPayment =
-                (parseFloat(values.paymentAmount) * parseFloat(values.advancedPaymentPercentage)) /
-                100
-              const completionPayment = parseFloat(values.paymentAmount) - advancedPayment
+            const advancedPayment =
+              (parseFloat(values.paymentAmount) * parseFloat(values.advancedPaymentPercentage)) /
+              100
+            const completionPayment = parseFloat(values.paymentAmount) - advancedPayment
 
-              payments = [
-                {
-                  ...tokenTransferBase,
-                  milestoneIndex: 0,
-                  amount: advancedPayment,
-                },
-                {
-                  ...tokenTransferBase,
-                  milestoneIndex: 1,
-                  amount: completionPayment,
-                },
-              ]
-            } else {
-              // there is only one payment, conditional on whether message is Advance or Completion
-              milestones = [
-                {
-                  index: 0,
-                  title:
-                    values.paymentTerms === PaymentTerm.ON_AGREEMENT
-                      ? MILESTONE_COPY.UPFRONT_PAYMENT
-                      : MILESTONE_COPY.COMPLETION_PAYMENT, // if terms are not ON_ARGEEMENT, they are AFTER_COMPLETION
-                },
-              ]
-              payments = [
-                {
-                  ...tokenTransferBase,
-                  milestoneIndex: 0,
-                  amount: parseFloat(values.paymentAmount),
-                },
-              ]
-            }
+            payments = [
+              {
+                ...tokenTransferBase,
+                milestoneIndex: 0,
+                amount: advancedPayment,
+              },
+              {
+                ...tokenTransferBase,
+                milestoneIndex: 1,
+                amount: completionPayment,
+              },
+            ]
+          } else {
+            // there is only one payment, conditional on whether message is Advance or Completion
+            milestones = [
+              {
+                index: 0,
+                title:
+                  values.paymentTerms === PaymentTerm.ON_AGREEMENT
+                    ? MILESTONE_COPY.UPFRONT_PAYMENT
+                    : MILESTONE_COPY.COMPLETION_PAYMENT, // if terms are not ON_ARGEEMENT, they are AFTER_COMPLETION
+              },
+            ]
+            payments = [
+              {
+                ...tokenTransferBase,
+                milestoneIndex: 0,
+                amount: parseFloat(values.paymentAmount),
+              },
+            ]
+          }
 
-            try {
-              await createProposalMutation({
-                contentTitle: values.title,
-                contentBody: values.body,
-                contributorAddresses: [contributorAddress],
-                clientAddresses: [clientAddress],
-                authorAddresses: [session?.siwe?.address as string],
-                milestones,
-                payments,
-                paymentTerms: values.paymentTerms,
-                ...(parseFloat(values.advancedPaymentPercentage) > 0 && {
-                  advancePaymentPercentage: parseFloat(values.advancedPaymentPercentage),
-                }),
-              })
-            } catch (err) {
-              setIsLoading(false)
-              setToastState({
-                isToastShowing: true,
-                type: "error",
-                message: err.message,
-              })
-              return
-            }
+          let newProposal
+          try {
+            newProposal = await createProposalMutation({
+              contentTitle: values.title,
+              contentBody: values.body,
+              contributorAddresses: [contributorAddress],
+              clientAddresses: [clientAddress],
+              authorAddresses: [session?.siwe?.address as string],
+              milestones,
+              payments,
+              paymentTerms: values.paymentTerms,
+              ...(parseFloat(values.advancedPaymentPercentage) > 0 && {
+                advancePaymentPercentage: parseFloat(values.advancedPaymentPercentage),
+              }),
+            })
+          } catch (err) {
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: err.message,
+            })
+            return
+          }
+
+          try {
+            await confirmAuthorship({ proposal: newProposal, representingRoles: [] })
+          } catch (err) {
+            setIsLoading(false)
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: err.message,
+            })
           }
         }}
         render={({ form, handleSubmit }) => {
@@ -341,10 +331,7 @@ export const ProposalFormFunding = ({
             <form onSubmit={handleSubmit} className="mt-20">
               <div className="rounded-2xl border border-concrete p-6 h-[560px] overflow-y-scroll">
                 {isLoading ? (
-                  <ProposalCreationLoadingScreen
-                    createdProposal={createdProposal}
-                    proposalShouldSendLater={proposalShouldSendLater}
-                  />
+                  <ProposalCreationLoadingScreen createdProposal={createdProposal} />
                 ) : (
                   <>
                     <h2 className="text-marble-white text-xl font-bold">
@@ -485,13 +472,11 @@ export const ProposalFormFunding = ({
                   </span>
                   <div>
                     <Button
-                      type={ButtonType.Secondary}
                       className="mr-2"
                       isDisabled={isLoading}
-                      isLoading={proposalShouldSendLater && isLoading}
+                      isLoading={isLoading}
                       onClick={async (e) => {
                         e.preventDefault()
-                        setProposalShouldSendLater(true)
                         setIsLoading(true)
                         if (session.siwe?.address) {
                           await handleSubmit()
@@ -500,26 +485,7 @@ export const ProposalFormFunding = ({
                         }
                       }}
                     >
-                      Send later
-                    </Button>
-                    <Button
-                      isDisabled={isLoading}
-                      isLoading={!proposalShouldSendLater && isLoading}
-                      onClick={async (e) => {
-                        e.preventDefault()
-                        setIsLoading(true)
-                        if (session.siwe?.address) {
-                          if (createdProposal) {
-                            setShouldHandlePostProposalCreationProcessing(true)
-                          } else {
-                            await handleSubmit()
-                          }
-                        } else {
-                          toggleWalletModal(true)
-                        }
-                      }}
-                    >
-                      Send proposal
+                      Create proposal
                     </Button>
                   </div>
                 </div>

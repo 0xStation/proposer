@@ -109,6 +109,20 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
           }),
         },
       },
+      versions: {
+        create: [
+          {
+            editorAddress: toChecksumAddress(params.authorAddresses[0] as string), // TODO: this only supports one address
+            version: 1,
+            data: {
+              content: {
+                title: "Version 1",
+                body: undefined,
+              },
+            },
+          },
+        ],
+      },
     },
     include: {
       milestones: true,

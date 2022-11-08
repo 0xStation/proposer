@@ -1,6 +1,6 @@
 import { locationModule } from "./modules/location"
 
-export const genProposalApprovalDigest = ({ proposalId, proposalHash }) => {
+export const genProposalApprovalDigest = ({ proposalId, proposalHash, proposalVersion }) => {
   return {
     domain: {
       // name aka feature name -
@@ -8,7 +8,7 @@ export const genProposalApprovalDigest = ({ proposalId, proposalHash }) => {
       // The idea is everything that should have its own api + versioning
       // should have a domain. Keep hardcoded
       name: "ProposalSignature", // keep hardcoded
-      version: "0.0.1", // references the web app's version
+      version: "0.1.0", // references the web app's version
     },
     types: {
       Type: [
@@ -27,6 +27,7 @@ export const genProposalApprovalDigest = ({ proposalId, proposalHash }) => {
         // core
         { name: "signedAt", type: "uint256" }, // UNIX timestamp for when this data was signed
         { name: "proposalId", type: "string" }, // uuid
+        { name: "proposalVersion", type: "uint256" }, // denotes a proposal's editing history version
         { name: "proposalHash", type: "string" }, // typed data hash as defined by EIP712, implemented with ether's _TypedDataEncoder
         // schema defintiions
         { name: "type", type: "Type" },
@@ -37,7 +38,8 @@ export const genProposalApprovalDigest = ({ proposalId, proposalHash }) => {
     },
     value: {
       signedAt: Date.now(),
-      proposalId: proposalId,
+      proposalId,
+      proposalVersion,
       proposalHash,
       // schema
       type: {

@@ -1,4 +1,4 @@
-import { useEnsAddress, useEnsName } from "wagmi"
+import { useEnsName } from "wagmi"
 import truncateString from "../utils/truncateString"
 import { isAddress } from "@ethersproject/address"
 import { isEns } from "../utils/isEns"

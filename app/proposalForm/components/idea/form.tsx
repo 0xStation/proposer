@@ -4,7 +4,7 @@ import { useSession } from "@blitzjs/auth"
 import { useRouter } from "next/router"
 import React, { useState, useEffect } from "react"
 import { Form } from "react-final-form"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import Button from "app/core/components/sds/buttons/Button"
 import FormHeaderStepper from "app/core/components/FormHeaderStepper"
 import BackArrow from "app/core/icons/BackArrow"
 import useStore from "app/core/hooks/useStore"
@@ -17,6 +17,7 @@ import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
 import { ConfirmForm } from "../ConfirmForm"
 import IdeaFormStepPropose from "./stepPropose"
 import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
+import deleteProposalById from "app/proposal/mutations/deleteProposalById"
 
 export const ProposalFormIdea = ({
   prefillClients,
@@ -32,19 +33,24 @@ export const ProposalFormIdea = ({
   const [proposalStep, setProposalStep] = useState<ProposalFormStep>(ProposalFormStep.PROPOSE)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [proposalShouldSendLater, setProposalShouldSendLater] = useState<boolean>(false)
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
   const session = useSession({ suspense: false })
-  const [
-    shouldHandlePostProposalCreationProcessing,
-    setShouldHandlePostProposalCreationProcessing,
-  ] = useState<boolean>(false)
   const { resolveEnsAddress } = useResolveEnsAddress()
-
+  const [deleteProposalByIdMutation] = useMutation(deleteProposalById, {
+    onSuccess: (_data) => {
+      console.log("proposal deleted: ", _data)
+    },
+    onError: (error: Error) => {
+      deleteProposalByIdMutation({
+        proposalId: createdProposal?.id as string,
+      })
+      setCreatedProposal(null)
+      console.error(error)
+    },
+  })
   const [createProposalMutation] = useMutation(createProposal, {
     onSuccess: (data) => {
       setCreatedProposal(data)
-      setShouldHandlePostProposalCreationProcessing(true)
     },
     onError: (error: Error) => {
       console.log("we are erroring")
@@ -59,8 +65,10 @@ export const ProposalFormIdea = ({
         })
       )
     },
-    onError: (error) => {
-      setShouldHandlePostProposalCreationProcessing(false)
+    onError: (error, proposal) => {
+      deleteProposalByIdMutation({
+        proposalId: proposal?.id as string,
+      })
       setIsLoading(false)
       console.error(error)
       setToastState({
@@ -74,25 +82,8 @@ export const ProposalFormIdea = ({
   useEffect(() => {
     if (!walletModalOpen && isLoading) {
       setIsLoading(false)
-      setProposalShouldSendLater(false)
     }
   }, [walletModalOpen])
-
-  useEffect(() => {
-    // `shouldHandlePostProposalCreationProcessing` is used to retrigger this `useEffect` hook
-    // if the user declines to sign the message verifying their authorship.
-    if (createdProposal && shouldHandlePostProposalCreationProcessing) {
-      if (!proposalShouldSendLater) {
-        confirmAuthorship({ proposal: createdProposal, representingRoles: [] })
-      } else {
-        router.push(
-          Routes.ViewProposal({
-            proposalId: createdProposal.id,
-          })
-        )
-      }
-    }
-  }, [createdProposal, proposalShouldSendLater, shouldHandlePostProposalCreationProcessing])
 
   return (
     <div className="max-w-[580px] h-full mx-auto">
@@ -107,43 +98,45 @@ export const ProposalFormIdea = ({
           title: prefillTitle || "",
         }}
         onSubmit={async (values: any, form) => {
-          // an author needs to sign the proposal to upload the content to ipfs.
-          // if they decline the signature, but submit again, we don't want to
-          // create the same proposal, rather we want to skip to the signature step.
-          if (createdProposal) {
-            router.push(
-              Routes.ViewProposal({
-                proposalId: createdProposal.id,
-              })
-            )
-          } else {
-            if (!session?.siwe?.address) {
-              setIsLoading(false)
-              setToastState({
-                isToastShowing: true,
-                type: "error",
-                message: "Not signed in, please connect wallet and sign in.",
-              })
-            }
-            const toAddress = await resolveEnsAddress(values.toAddress?.trim())
+          if (!session?.siwe?.address) {
+            setIsLoading(false)
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "Not signed in, please connect wallet and sign in.",
+            })
+            return
+          }
+          const toAddress = await resolveEnsAddress(values.toAddress?.trim())
 
-            try {
-              await createProposalMutation({
-                contentTitle: values.title,
-                contentBody: values.body,
-                contributorAddresses: [],
-                clientAddresses: [toAddress],
-                authorAddresses: [session?.siwe?.address as string],
-              })
-            } catch (err) {
-              setIsLoading(false)
-              setToastState({
-                isToastShowing: true,
-                type: "error",
-                message: err.message,
-              })
-              return
-            }
+          let newProposal
+          try {
+            newProposal = await createProposalMutation({
+              contentTitle: values.title,
+              contentBody: values.body,
+              contributorAddresses: [],
+              clientAddresses: [toAddress],
+              authorAddresses: [session?.siwe?.address as string],
+            })
+          } catch (err) {
+            setIsLoading(false)
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: err.message,
+            })
+            return
+          }
+
+          try {
+            await confirmAuthorship({ proposal: newProposal, representingRoles: [] })
+          } catch (err) {
+            setIsLoading(false)
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: err.message,
+            })
           }
         }}
         render={({ form, handleSubmit }) => {
@@ -156,10 +149,7 @@ export const ProposalFormIdea = ({
             <form onSubmit={handleSubmit} className="mt-20">
               <div className="rounded-2xl border border-concrete p-6 h-[560px] overflow-y-scroll">
                 {isLoading ? (
-                  <ProposalCreationLoadingScreen
-                    createdProposal={createdProposal}
-                    proposalShouldSendLater={proposalShouldSendLater}
-                  />
+                  <ProposalCreationLoadingScreen createdProposal={createdProposal} />
                 ) : (
                   <>
                     <h2 className="text-marble-white text-xl font-bold">
@@ -222,13 +212,10 @@ export const ProposalFormIdea = ({
                   </span>
                   <div>
                     <Button
-                      type={ButtonType.Secondary}
-                      className="mr-2"
                       isDisabled={isLoading}
-                      isLoading={proposalShouldSendLater && isLoading}
+                      isLoading={isLoading}
                       onClick={async (e) => {
                         e.preventDefault()
-                        setProposalShouldSendLater(true)
                         setIsLoading(true)
                         if (session.siwe?.address) {
                           await handleSubmit()
@@ -237,26 +224,7 @@ export const ProposalFormIdea = ({
                         }
                       }}
                     >
-                      Send later
-                    </Button>
-                    <Button
-                      isDisabled={isLoading}
-                      isLoading={!proposalShouldSendLater && isLoading}
-                      onClick={async (e) => {
-                        e.preventDefault()
-                        setIsLoading(true)
-                        if (session.siwe?.address) {
-                          if (createdProposal) {
-                            setShouldHandlePostProposalCreationProcessing(true)
-                          } else {
-                            await handleSubmit()
-                          }
-                        } else {
-                          toggleWalletModal(true)
-                        }
-                      }}
-                    >
-                      Send proposal
+                      Create proposal
                     </Button>
                   </div>
                 </div>

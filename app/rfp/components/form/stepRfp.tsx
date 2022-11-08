@@ -86,7 +86,7 @@ export const RfpFormStepRfp = ({ formState }) => {
         />
       </div>
       <span className="text-xs text-concrete block">
-        Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>. 
+        Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>.
       </span>
       {/* TOGGLE */}
       <TextareaFieldOrMarkdownPreview
@@ -106,7 +106,7 @@ export const RfpFormStepRfp = ({ formState }) => {
       </div>
       <span className="text-xs text-concrete block">
         Proposer will automatically see the template&apos;s content in proposal details. Supports{" "}
-        <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>. 
+        <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>.
       </span>
       <TextareaFieldOrMarkdownPreview
         previewMode={bodyPrefillPreviewMode}
