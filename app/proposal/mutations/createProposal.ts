@@ -109,7 +109,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
           }),
         },
       },
-      proposalVersion: {
+      versions: {
         create: [
           {
             editorAddress: toChecksumAddress(params.authorAddresses[0] as string), // TODO: this only supports one address

@@ -30,7 +30,7 @@ model Account {
   targetsOf          AccountAccount[]    @relation("target")
   verificationEmails EmailVerification[]
   proposalTemplates  ProposalTemplate[]
-  proposalVersion    ProposalVersion[]
+  proposalVersions   ProposalVersion[]
 }
 
 enum AddressType {
@@ -108,11 +108,11 @@ model Proposal {
 
   rfp Rfp? @relation(fields: [rfpId], references: [id], onDelete: Cascade)
 
-  roles           ProposalRole[]
-  milestones      ProposalMilestone[]
-  payments        ProposalPayment[]
-  signatures      ProposalSignature[]
-  proposalVersion ProposalVersion[]
+  roles      ProposalRole[]
+  milestones ProposalMilestone[]
+  payments   ProposalPayment[]
+  signatures ProposalSignature[]
+  versions   ProposalVersion[]
 }
 
 enum ProposalStatus {

@@ -4,7 +4,7 @@ import { useParam, BlitzPage } from "@blitzjs/next"
 import Layout from "app/core/layouts/Layout"
 import getProposalById from "app/proposal/queries/getProposalById"
 import { ProposalNestedLayout } from "app/core/components/ProposalNestedLayout"
-import getProposalVersionByProposalId from "app/proposalVersion/queries/getProposalVersionByProposalId"
+import getProposalVersionsByProposalId from "app/proposalVersion/queries/getProposalVersionsByProposalId"
 import ProposalVersionBox from "app/core/components/ProposalVersionBox"
 
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
@@ -50,7 +50,7 @@ export const ProposalHistory: BlitzPage = () => {
   )
 
   const [proposalVersions] = useQuery(
-    getProposalVersionByProposalId,
+    getProposalVersionsByProposalId,
     { proposalId: proposalId },
     {
       suspense: false,

@@ -1,12 +1,12 @@
 import db, { ProposalVersion } from "db"
 import * as z from "zod"
 
-const GetProposalVersionByProposalId = z.object({
+const GetProposalVersionsByProposalId = z.object({
   proposalId: z.string(),
 })
 
-export default async function getProposalVersionByProposalId(
-  params: z.infer<typeof GetProposalVersionByProposalId>
+export default async function getProposalVersionsByProposalId(
+  params: z.infer<typeof GetProposalVersionsByProposalId>
 ) {
   const versions = await db.proposalVersion.findMany({
     where: {

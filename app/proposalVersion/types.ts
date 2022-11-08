@@ -9,6 +9,6 @@ export type ProposalVersionMetadata = {
     title: string
     body?: string
   }
-  proposalSignatureMessage?: any
-  proposalHash?: string
+  proposalSignatureMessage: any
+  proposalHash: string
 }
