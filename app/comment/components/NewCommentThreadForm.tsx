@@ -21,38 +21,47 @@ const NewCommentThreadForm = ({ proposal, startNewThread, setProposalQueryData }
             })
             return
           }
-          await createCommentMutation({
-            commentBody: values.commentBody,
-            proposalId: proposal.id,
-          })
+          try {
+            await createCommentMutation({
+              commentBody: values.commentBody,
+              proposalId: proposal.id,
+            })
 
-          const proposalWithNewComment = {
-            ...proposal,
-            comments: [
-              ...proposal.comments,
-              {
-                // don't need id for optomistic update, and we don't have it anyways
-                createdAt: new Date(),
-                data: {
-                  message: values.commentBody,
+            const proposalWithNewComment = {
+              ...proposal,
+              comments: [
+                ...proposal.comments,
+                {
+                  // don't need id for optomistic update, and we don't have it anyways
+                  createdAt: new Date(),
+                  data: {
+                    message: values.commentBody,
+                  },
+                  author: {
+                    address: activeUser.address,
+                  },
+                  children: [],
                 },
-                author: {
-                  address: activeUser.address,
-                },
-                children: [],
-              },
-            ],
+              ],
+            }
+            // https://blitzjs.com/docs/mutation-usage#optimistic-updates
+            // setting an optomistic update -- we can predict what the data will look like assuming a
+            // successful mutation so that way we can immediately render the update without waiting
+            // for the server to respond. once the server responds the data is updated appropriately.
+            setProposalQueryData(proposalWithNewComment)
+            // form.restart clears the input so a new comment can be entered.
+            form.restart()
+            // start new thread is a callback that is passed in from the parent component
+            // designed to close the new thread component and reset the comment creation flow.
+            startNewThread()
+          } catch (error) {
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: error.message,
+            })
+            return
           }
-          // https://blitzjs.com/docs/mutation-usage#optimistic-updates
-          // setting an optomistic update -- we can predict what the data will look like assuming a
-          // successful mutation so that way we can immediately render the update without waiting
-          // for the server to respond. once the server responds the data is updated appropriately.
-          setProposalQueryData(proposalWithNewComment)
-          // form.restart clears the input so a new comment can be entered.
-          form.restart()
-          // start new thread is a callback that is passed in from the parent component
-          // designed to close the new thread component and reset the comment creation flow.
-          startNewThread()
         }}
         render={({ handleSubmit }) => {
           return (

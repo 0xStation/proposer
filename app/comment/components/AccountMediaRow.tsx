@@ -9,7 +9,7 @@ const AccountMediaRow = ({ account }) => {
     <div className="flex flex-row space-x-2 items-start">
       <Avatar size={Sizes.SM} address={account.address as string} pfpUrl={account?.data?.pfpUrl} />
       {account.data?.name && (
-        <span className="text-marble-white text-base">{account.data?.name}</span>
+        <span className="text-marble-white text-sm">{account.data?.name}</span>
       )}
       <span className="text-concrete text-sm">{displayAddress.text}</span>
     </div>

@@ -63,38 +63,47 @@ const CommentContainer = ({ proposal, comment, setProposalQueryData }) => {
               })
               return
             }
-            await createCommentMutation({
-              commentBody: values.commentBody,
-              proposalId: proposal.id,
-              parentId: comment.id,
-            })
-            const proposalWithNewReply = {
-              ...proposal,
-              comments: proposal.comments.map((mapComment) => {
-                if (mapComment.id === comment.id) {
-                  return {
-                    ...comment,
-                    children: [
-                      ...comment.children,
-                      {
-                        // don't need id for optomistic update, and we don't have it anyways
-                        createdAt: new Date(),
-                        data: {
-                          body: values.commentBody,
+            try {
+              await createCommentMutation({
+                commentBody: values.commentBody,
+                proposalId: proposal.id,
+                parentId: comment.id,
+              })
+              const proposalWithNewReply = {
+                ...proposal,
+                comments: proposal.comments.map((mapComment) => {
+                  if (mapComment.id === comment.id) {
+                    return {
+                      ...comment,
+                      children: [
+                        ...comment.children,
+                        {
+                          // don't need id for optomistic update, and we don't have it anyways
+                          createdAt: new Date(),
+                          data: {
+                            body: values.commentBody,
+                          },
+                          author: {
+                            address: activeUser.address,
+                          },
                         },
-                        author: {
-                          address: activeUser.address,
-                        },
-                      },
-                    ],
+                      ],
+                    }
+                  } else {
+                    return mapComment
                   }
-                } else {
-                  return mapComment
-                }
-              }),
+                }),
+              }
+              setProposalQueryData(proposalWithNewReply)
+              form.restart()
+            } catch (error) {
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: error.message,
+              })
+              return
             }
-            setProposalQueryData(proposalWithNewReply)
-            form.restart()
           }}
           render={({ handleSubmit }) => {
             return (
