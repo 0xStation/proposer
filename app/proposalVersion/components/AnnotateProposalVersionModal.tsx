@@ -35,7 +35,8 @@ export const AnnotateProposalVersionModal = ({
           render={({ handleSubmit }) => {
             return (
               <form onSubmit={handleSubmit} className="mt-5 w-full">
-                <label className="font-bold block mb-1">Change notes</label>
+                <label className="font-bold mb-1 inline">Change notes</label>
+                <span className="text-xs text-concrete inline"> (optional)</span>
                 <Field component="textarea" name="body">
                   {({ input, meta }) => (
                     <div>

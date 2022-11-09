@@ -23,7 +23,7 @@ export const ProposalVersionBox = ({
         )}
       </p>
       {(proposalVersion?.data as ProposalVersionMetadata)?.content?.body && (
-        <div className="mt-4">
+        <div className="mt-6">
           <label className="uppercase text-sm font-bold text-concrete tracking-wider">
             Note from {editorDisplayName}
           </label>
