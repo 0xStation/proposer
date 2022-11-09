@@ -11,22 +11,22 @@ const seed = async () => {
         type: ProposalRoleType.AUTHOR,
       },
     })
-    await db.proposalVersion.create({
-      data: {
-        createdAt: proposal?.timestamp,
-        editorAddress: author?.address as string,
-        proposalId: proposal?.id as string,
-        version: 1,
-        data: {
-          content: {
-            title: "Version 1",
-            body: undefined,
-          },
-          proposalSignatureMessage: proposal?.data?.signatureMessage,
-          proposalHash: proposal?.data?.proposalHash,
-        },
-      },
-    })
+     await db.proposalVersion.create({
+       data: {
+         createdAt: proposal?.timestamp,
+         editorAddress: author?.address as string,
+         proposalId: proposal?.id as string,
+         version: 1,
+         data: {
+           content: {
+             title: "Version 1",
+             body: undefined,
+           },
+           proposalSignatureMessage: proposal?.data?.signatureMessage,
+           proposalHash: proposal?.data?.proposalHash,
+         },
+       },
+     })
   })
 }
 

@@ -2,7 +2,6 @@ import { gSSP } from "app/blitz-server"
 import { Routes } from "@blitzjs/next"
 import { useQuery, invoke } from "@blitzjs/rpc"
 import { BlitzPage, useParam } from "@blitzjs/next"
-import Link from "next/link"
 import { PencilIcon } from "@heroicons/react/solid"
 import { ProposalRoleType, ProposalStatus } from "@prisma/client"
 import Layout from "app/core/layouts/Layout"
@@ -18,6 +17,7 @@ import CommentContainer from "app/comment/components/CommentContainer"
 import NewCommentThread from "app/comment/components/NewCommentThread"
 import CommentEmptyState from "app/comment/components/CommentEmptyState"
 import useCommentPermissions from "app/core/hooks/useCommentPermissions"
+import { useRouter } from "next/router"
 
 export const ToolTip = ({ children }) => {
   return (
@@ -83,20 +83,24 @@ const ViewProposal: BlitzPage = () => {
     (role) => role.type === ProposalRoleType.AUTHOR && role.address === activeUser?.address
   )
   const { roles: activeUsersRoles } = useGetUsersRoles(proposalId)
+  const router = useRouter()
 
   const { canRead, canWrite } = useCommentPermissions(proposal?.id)
 
   return (
     <>
-      {/* TODO: clean this up  */}
       {activeUserIsAuthor ? (
         proposal?.status === ProposalStatus.DRAFT ||
         proposal?.status === ProposalStatus.AWAITING_APPROVAL ? (
           <div className="relative group float-right mt-5">
             <ToolTip>Only you as the author can edit your proposal.</ToolTip>
-            <Link href={Routes.EditProposalPage({ proposalId })}>
+            <button
+              onClick={() => {
+                router.push(Routes.EditProposalPage({ proposalId }))
+              }}
+            >
               <EditIcon>Edit Proposal</EditIcon>
-            </Link>
+            </button>
           </div>
         ) : (
           <div className="relative group float-right mt-5">
