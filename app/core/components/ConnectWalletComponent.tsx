@@ -30,7 +30,6 @@ export const ConnectWalletComponent = () => {
   })
   const [errorMessage, setErrorMessage] = useState<string>("")
   const [showSignView, setShowSignView] = useState<boolean>(false)
-  const terminalHandle = useParam("terminalHandle")
   const accountData = useAccount()
   const { connectors, connectAsync, pendingConnector } = useConnect()
   const { chain: activeChain } = useNetwork()
@@ -52,7 +51,6 @@ export const ConnectWalletComponent = () => {
         setErrorMessage(errorMsg)
         trackError(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_ERROR, {
           pageName: window.location.href,
-          stationHandle: terminalHandle as string,
           errorMsg: err.message,
         })
         setConnectState({ error: true, loading: false })
@@ -69,7 +67,6 @@ export const ConnectWalletComponent = () => {
     const chainId = activeChain?.id
     trackClick(WALLET_CONNECTION.EVENT_NAME.SIGN_IN_WITH_ETHEREUM_BUTTON_CLICKED, {
       pageName: window.location.href,
-      stationHandle: terminalHandle as string,
       userAddress: accountData?.address,
       chainId,
     })
@@ -121,7 +118,6 @@ export const ConnectWalletComponent = () => {
       }
       trackError(WALLET_CONNECTION.EVENT_NAME.SIGN_IN_WITH_ETHEREUM_ERROR, {
         pageName: window.location.href,
-        stationHandle: terminalHandle as string,
         userAddress: accountData?.address,
         errorMsg,
       })
@@ -210,7 +206,6 @@ export const ConnectWalletComponent = () => {
                 onClick={async () => {
                   trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BUTTON_CLICKED, {
                     pageName: window.location.href,
-                    stationHandle: terminalHandle as string,
                     userAddress: accountData?.address,
                     wallet: "metamask",
                   })
@@ -238,7 +233,6 @@ export const ConnectWalletComponent = () => {
                 onClick={async () => {
                   trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BUTTON_CLICKED, {
                     pageName: window.location.href,
-                    stationHandle: terminalHandle as string,
                     userAddress: accountData?.address,
                     wallet: "wallet_connection",
                   })
@@ -271,7 +265,6 @@ export const ConnectWalletComponent = () => {
                 onClick={async () => {
                   trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BUTTON_CLICKED, {
                     pageName: window.location.href,
-                    stationHandle: terminalHandle as string,
                     userAddress: accountData?.address,
                     wallet: "coinbase",
                   })

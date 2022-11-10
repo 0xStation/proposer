@@ -4,6 +4,7 @@ import { useSession } from "@blitzjs/auth"
 import { useRouter } from "next/router"
 import { Routes } from "@blitzjs/next"
 import { invoke } from "@blitzjs/rpc"
+import { TRACKING_EVENTS } from "app/core/utils/constants"
 import StationLogo from "public/station-letters.svg"
 import { useEffect, useMemo, useState } from "react"
 import useStore from "../hooks/useStore"
@@ -24,6 +25,13 @@ import { DotsHorizontalIcon, PlusIcon } from "@heroicons/react/solid"
 import NewWorkspaceModal from "app/core/components/NewWorkspaceModal"
 import { AccountAccountType } from "@prisma/client"
 import { useEnsName } from "wagmi"
+import { trackClick } from "app/utils/amplitude"
+
+const {
+  FEATURE: {
+    WALLET_CONNECTION: { EVENT_NAME },
+  },
+} = TRACKING_EVENTS
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -51,6 +59,11 @@ const Navigation = ({ children }: { children?: any }) => {
   }
 
   const handleDisconnect = async () => {
+    if (typeof window !== "undefined")
+      trackClick(EVENT_NAME.WALLET_DISCONNECT_CLICKED, {
+        userAddress: activeUser?.address,
+        pageName: window.location.href,
+      })
     await invoke(logout, {})
     disconnect()
     setActiveUser(null)

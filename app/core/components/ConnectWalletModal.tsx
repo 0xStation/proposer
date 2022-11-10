@@ -1,5 +1,4 @@
 import Image from "next/image"
-import { useParam } from "@blitzjs/next"
 import { invoke } from "@blitzjs/rpc"
 import { useState, useEffect } from "react"
 import { trackClick, trackError, initializeUser } from "app/utils/amplitude"
@@ -41,7 +40,6 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
   const { chain: activeChain } = useNetwork()
   const { connectors, connectAsync, data: connectData, pendingConnector } = useConnect()
   const [metamaskWallet, walletConnect, coinbaseWallet] = connectors
-  const terminalHandle = useParam("terminalHandle")
 
   const handleCloseConnectWalletModal = () => {
     setConnectState({ error: false, success: false, loading: false })
@@ -71,7 +69,6 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
 
         trackError(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_ERROR, {
           pageName: window.location.href,
-          stationHandle: terminalHandle as string,
           errorMsg: err.message,
         })
         setConnectState({ error: true, success: false, loading: false })
@@ -89,7 +86,6 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
 
     trackClick(WALLET_CONNECTION.EVENT_NAME.SIGN_IN_WITH_ETHEREUM_BUTTON_CLICKED, {
       pageName: window.location.href,
-      stationHandle: terminalHandle as string,
       userAddress: address,
       chainId,
     })
@@ -141,7 +137,6 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
 
       trackError(WALLET_CONNECTION.EVENT_NAME.SIGN_IN_WITH_ETHEREUM_ERROR, {
         pageName: window.location.href,
-        stationHandle: terminalHandle as string,
         errorMsg,
       })
 
@@ -215,7 +210,6 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                 onClick={async () => {
                   trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BUTTON_CLICKED, {
                     pageName: window.location.href,
-                    stationHandle: terminalHandle as string,
                     userAddress: accountData?.address,
                     wallet: "metamask",
                   })
@@ -243,7 +237,6 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                 onClick={async () => {
                   trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BUTTON_CLICKED, {
                     pageName: window.location.href,
-                    stationHandle: terminalHandle as string,
                     userAddress: accountData?.address,
                     wallet: "wallet_connect",
                   })
@@ -276,7 +269,6 @@ const ConnectWalletModal = ({ isWalletOpen, setIsWalletOpen }) => {
                 onClick={async () => {
                   trackClick(WALLET_CONNECTION.EVENT_NAME.WALLET_CONNECTION_BUTTON_CLICKED, {
                     pageName: window.location.href,
-                    stationHandle: terminalHandle as string,
                     userAddress: accountData?.address,
                     wallet: "coinbase",
                   })
