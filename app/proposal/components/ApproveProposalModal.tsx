@@ -30,7 +30,10 @@ export const ApproveProposalModal = ({
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const isPaymentProposal = proposal.data.totalPayments && proposal.data.totalPayments?.length > 0
 
-  const { roles, isLoading: loadingRolesUserCanApprove } = useGetRolesUserCanApprove(proposal?.id)
+  const { roles, isLoading: loadingRolesUserCanApprove } = useGetRolesUserCanApprove({
+    proposalId: proposal?.id,
+    proposalVersion: proposal?.version,
+  })
 
   const { signMessage } = useSignature()
 
@@ -68,6 +71,7 @@ export const ApproveProposalModal = ({
       try {
         await approveProposalMutation({
           proposalId: proposal?.id,
+          proposalVersion: proposal?.version,
           signerAddress: activeUser!.address!,
           message,
           signature,

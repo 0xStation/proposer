@@ -1,5 +1,5 @@
 import { Ctx } from "blitz"
-import db, { ProposalStatus, ProposalVersion } from "db"
+import db, { ProposalRoleApprovalStatus, ProposalStatus, ProposalVersion } from "db"
 import * as z from "zod"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { ZodToken } from "app/types/zod"
@@ -96,6 +96,15 @@ export default async function editProposal(input: z.infer<typeof EditProposal>, 
             proposalSignatureMessage: proposal?.data?.signatureMessage,
             proposalHash: params.proposalHash,
           },
+        },
+      }),
+      db.proposalRole.updateMany({
+        where: {
+          proposalId: proposal?.id as string,
+          approvalStatus: ProposalRoleApprovalStatus.APPROVED,
+        },
+        data: {
+          approvalStatus: ProposalRoleApprovalStatus.PENDING,
         },
       }),
     ])

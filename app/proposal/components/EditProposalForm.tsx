@@ -13,6 +13,7 @@ import { useSignProposal } from "app/core/hooks/useSignProposal"
 import editProposal from "../mutations/editProposal"
 import AnnotateProposalVersionModal from "app/proposalVersion/components/AnnotateProposalVersionModal"
 import getProposalVersionsByProposalId from "app/proposalVersion/queries/getProposalVersionsByProposalId"
+import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 
 export const EditProposalForm = () => {
   const [previewMode, setPreviewMode] = useState<boolean>(false)
@@ -95,6 +96,7 @@ export const EditProposalForm = () => {
         })
         invalidateQuery(getProposalById)
         invalidateQuery(getProposalVersionsByProposalId)
+        invalidateQuery(getRolesByProposalId)
       } catch (err) {
         setIsAnnotateModalOpen(false)
         setIsSubmitting(false)
