@@ -17,9 +17,9 @@ const SafeRole = ({ role, proposal }) => {
   const [toggleSigners, setToggleSigners] = useState<boolean>(false)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
 
-  const activeUserHasSigned = role.signatures.some((signature) =>
-    addressesAreEqual(signature.address, activeUser?.address)
-  )
+  const activeUserHasSigned = role.signatures
+    ?.filter((signature) => signature?.proposalVersion === proposal?.version)
+    .some((signature) => addressesAreEqual(signature.address, activeUser?.address))
   const activeUserHasAProposalRole = role.account.data?.signers?.some((signer) =>
     addressesAreEqual(signer, activeUser?.address)
   )
@@ -28,12 +28,15 @@ const SafeRole = ({ role, proposal }) => {
     proposal?.status !== ProposalStatus.DRAFT && activeUserHasAProposalRole && !activeUserHasSigned
 
   const totalSafeSignersSigned = role.signatures.filter((signature) => {
-    return role.account.data?.signers?.some((signer) => {
-      return (
-        addressesAreEqual(signature.address, signer) &&
-        signature.type === ProposalSignatureType.APPROVE // only count APPROVE signatures to ignore author's SEND signature
-      )
-    })
+    return (
+      signature.proposalVersion === proposal?.version &&
+      role.account.data?.signers?.some((signer) => {
+        return (
+          addressesAreEqual(signature.address, signer) &&
+          signature.type === ProposalSignatureType.APPROVE // only count APPROVE signatures to ignore author's SEND signature
+        )
+      })
+    )
   }).length
 
   const showStatus =

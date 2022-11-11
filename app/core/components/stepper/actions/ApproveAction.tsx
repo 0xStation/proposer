@@ -9,7 +9,10 @@ import { StepType } from "../steps/Step"
 const ApproveAction = ({ proposal }) => {
   const activeRole = useStepperStore((state) => state.activeRole)
   const setActions = useStepperStore((state) => state.setActions)
-  const { roles: rolesUserCanApprove } = useGetRolesUserCanApprove(proposal.id)
+  const { roles: rolesUserCanApprove } = useGetRolesUserCanApprove({
+    proposalId: proposal.id,
+    proposalVersion: proposal.id,
+  })
   const activeUserHasRolesToSign = rolesUserCanApprove.length > 0
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
 

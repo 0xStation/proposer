@@ -125,7 +125,7 @@ export const PROPOSAL_ROLE_APPROVAL_STATUS_MAP = {
     color: "bg-magic-mint",
   },
   [ProposalRoleApprovalStatus.SENT]: {
-    copy: "sent",
+    copy: "created",
     color: "bg-magic-mint",
   },
 }
