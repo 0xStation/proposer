@@ -68,6 +68,7 @@ export const ApproveProposalModal = ({
       try {
         await approveProposalMutation({
           proposalId: proposal?.id,
+          proposalVersion: proposal?.version,
           signerAddress: activeUser!.address!,
           message,
           signature,

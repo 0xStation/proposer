@@ -12,7 +12,7 @@ import {
   ProposalStatus,
 } from "@prisma/client"
 
-const SafeRole = ({ role, proposalStatus }) => {
+const SafeRole = ({ role, proposal }) => {
   const activeUser = useStore((state) => state.activeUser)
   const [toggleSigners, setToggleSigners] = useState<boolean>(false)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
@@ -25,7 +25,7 @@ const SafeRole = ({ role, proposalStatus }) => {
   )
 
   const showSignButton =
-    proposalStatus !== ProposalStatus.DRAFT && activeUserHasAProposalRole && !activeUserHasSigned
+    proposal?.status !== ProposalStatus.DRAFT && activeUserHasAProposalRole && !activeUserHasSigned
 
   const totalSafeSignersSigned = role.signatures.filter((signature) => {
     return role.account.data?.signers?.some((signer) => {
@@ -37,7 +37,7 @@ const SafeRole = ({ role, proposalStatus }) => {
   }).length
 
   const showStatus =
-    proposalStatus !== ProposalStatus.DRAFT || role.type === ProposalRoleType.AUTHOR
+    proposal?.status !== ProposalStatus.DRAFT || role.type === ProposalRoleType.AUTHOR
 
   return (
     <>
@@ -109,30 +109,32 @@ const SafeRole = ({ role, proposalStatus }) => {
   )
 }
 
-const WalletRole = ({ role, proposalStatus }) => {
+const WalletRole = ({ role, proposal }) => {
   const activeUser = useStore((state) => state.activeUser)
   const toggleSendProposalModalOpen = useStore((state) => state.toggleSendProposalModalOpen)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
-  const activeUserHasApproved = role?.signatures?.some(
-    (signature) =>
-      addressesAreEqual(activeUser?.address || "", signature.address) &&
-      signature.type === ProposalSignatureType.APPROVE
-  )
+  const activeUserHasApproved = role?.signatures
+    ?.filter?.((signature) => signature?.proposalVersion === proposal?.version)
+    ?.some(
+      (signature) =>
+        addressesAreEqual(activeUser?.address || "", signature.address) &&
+        signature.type === ProposalSignatureType.APPROVE
+    )
   const activeUserHasAProposalRole = addressesAreEqual(activeUser?.address || "", role?.address)
 
   const showSendButton =
-    proposalStatus === ProposalStatus.DRAFT &&
+    proposal?.status === ProposalStatus.DRAFT &&
     role.type === ProposalRoleType.AUTHOR &&
     activeUserHasAProposalRole
 
   const showSignButton =
-    proposalStatus !== ProposalStatus.DRAFT &&
+    proposal?.status !== ProposalStatus.DRAFT &&
     activeUserHasAProposalRole &&
     !activeUserHasApproved &&
     role.type !== ProposalRoleType.AUTHOR // only show sign option if user is not author
 
   const showStatus =
-    proposalStatus !== ProposalStatus.DRAFT || role.type === ProposalRoleType.AUTHOR
+    proposal?.status !== ProposalStatus.DRAFT || role.type === ProposalRoleType.AUTHOR
 
   return (
     <div className="flex flex-row w-full items-center justify-between">
@@ -183,15 +185,15 @@ const WalletRole = ({ role, proposalStatus }) => {
   )
 }
 
-export const RoleSignature = ({ role, proposalStatus }) => {
+export const RoleSignature = ({ role, proposal }) => {
   const isSafe = role?.account?.addressType === AddressType.SAFE
 
   return (
     <>
       {isSafe ? (
-        <SafeRole role={role} proposalStatus={proposalStatus} />
+        <SafeRole role={role} proposal={proposal} />
       ) : (
-        <WalletRole role={role} proposalStatus={proposalStatus} />
+        <WalletRole role={role} proposal={proposal} />
       )}
     </>
   )

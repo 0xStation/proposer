@@ -36,7 +36,7 @@ export const RoleSignaturesView = ({
           <h4 className="text-xs font-bold text-concrete uppercase mt-2 mb-2">Contributor</h4>
           <RoleSignature
             role={roles?.find((role) => role.type === ProposalRoleType.CONTRIBUTOR)}
-            proposalStatus={proposal?.status}
+            proposal={proposal}
           />
         </>
       )}
@@ -50,13 +50,13 @@ export const RoleSignaturesView = ({
       </h4>
       <RoleSignature
         role={roles?.find((role) => role.type === ProposalRoleType.CLIENT)}
-        proposalStatus={proposal?.status}
+        proposal={proposal}
       />
       {/* AUTHOR */}
       <h4 className="text-xs font-bold text-concrete uppercase mb-2 mt-6">Author</h4>
       <RoleSignature
         role={roles?.find((role) => role.type === ProposalRoleType.AUTHOR)}
-        proposalStatus={proposal?.status}
+        proposal={proposal}
       />
     </div>
   ) : (
