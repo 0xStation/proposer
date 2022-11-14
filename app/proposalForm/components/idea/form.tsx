@@ -115,7 +115,7 @@ export const ProposalFormIdea = ({
               contentTitle: values.title,
               contentBody: values.body,
               contributorAddresses: [],
-              clientAddresses: [toAddress],
+              clientAddresses: [toAddress as string],
               authorAddresses: [session?.siwe?.address as string],
             })
           } catch (err) {

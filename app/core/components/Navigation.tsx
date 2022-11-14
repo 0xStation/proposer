@@ -91,7 +91,7 @@ const Navigation = ({ children }: { children?: any }) => {
   }, [chain])
 
   const { data: ensName } = useEnsName({
-    address: activeUser?.address || undefined,
+    address: activeUser?.address as `0x${string}`,
     chainId: 1,
     cacheTime: 60 * 60 * 1000, // (1 hr) time (in ms) which the data should remain in the cache
     enabled: !!activeUser,

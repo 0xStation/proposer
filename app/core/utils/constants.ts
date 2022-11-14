@@ -299,7 +299,6 @@ export const LINKS = {
 
 export const CHAIN_IDS = {
   ETHEREUM: 1,
-  RINKEBY: 4,
   GOERLI: 5,
   OPTIMISM: 10,
   POLYGON: 137,

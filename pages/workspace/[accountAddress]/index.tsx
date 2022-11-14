@@ -87,7 +87,7 @@ const WorkspaceHome: BlitzPage = () => {
   )
 
   const { data: accountEnsName } = useEnsName({
-    address: accountAddress,
+    address: accountAddress as `0x${string}`,
     chainId: 1,
     cacheTime: 10 * 60 * 1000, // 10 minutes (time in ms) which the data should remain in the cache
   })
