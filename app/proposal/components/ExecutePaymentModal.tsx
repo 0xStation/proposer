@@ -51,7 +51,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, payment, milestone }) =
 
   useWaitForTransaction({
     confirmations: 1,
-    hash: txnHash as string,
+    hash: txnHash as `0x${string}`,
     onSuccess: async (data) => {
       try {
         invalidateQuery(getProposalById)

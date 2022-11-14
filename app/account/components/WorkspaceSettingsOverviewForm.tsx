@@ -85,7 +85,7 @@ const WorkspaceSettingsOverviewForm = ({
   const accountAddress = useParam("accountAddress", "string") as string
 
   const { data: ensName } = useEnsName({
-    address: account?.address as string,
+    address: account?.address as `0x${string}`,
     chainId: 1,
     cacheTime: 60 * 60 * 1000, // (1 hr) time (in ms) which the data should remain in the cache
   })

@@ -12,7 +12,7 @@ import { publicProvider } from "wagmi/providers/public"
 
 const { chains, provider } = configureChains(
   [...allChains],
-  [alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY }), publicProvider()]
+  [alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string }), publicProvider()]
 )
 
 // // Set up connectors
