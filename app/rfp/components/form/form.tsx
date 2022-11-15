@@ -194,7 +194,6 @@ export const RfpForm = () => {
           const missingFieldsPayment =
             (!formState.values.paymentDirection && !formState.values.tokenAddress) ||
             !formState.values.paymentAmount ||
-            !formState.values.paymentTerms ||
             !(
               formState.values.paymentTerms !== PaymentTerm.ADVANCE_PAYMENT ||
               // isValidAdvancedPaymentPercentage returns string if there is an error or undefined if things are okay

@@ -12,7 +12,6 @@ import { ProposalRoleType } from "@prisma/client"
 export const RfpProposalFormStepConfirm = ({ formState }) => {
   const session = useSession({ suspense: false })
   const rfpId = useParam("rfpId") as string
-  const router = useRouter()
   const [rfp] = useQuery(
     getRfpById,
     {
@@ -22,16 +21,6 @@ export const RfpProposalFormStepConfirm = ({ formState }) => {
       enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
-      onSuccess: (data) => {
-        if (!data) {
-          router.push(Routes.Page404())
-        }
-      },
-      onError: (data) => {
-        if (!data) {
-          router.push(Routes.Page404())
-        }
-      },
     }
   )
 

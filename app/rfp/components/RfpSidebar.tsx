@@ -64,7 +64,7 @@ export const RfpSidebar = ({ rfp }) => {
         <div className="mb-10 relative group">
           <Link
             href={Routes.ProposalRfpForm({
-              templateId: rfp?.id as string,
+              rfpId: rfp?.id as string,
             })}
           >
             <Button className="w-full" isDisabled={rfp?.status === RfpStatus.CLOSED}>

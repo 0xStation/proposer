@@ -39,7 +39,7 @@ export enum ProposalFormStep {
 
 export const PROPOSAL_FORM_HEADER_COPY = {
   [ProposalFormStep.PROPOSE]: "Propose",
-  [ProposalFormStep.REWARDS]: "Define terms",
+  [ProposalFormStep.REWARDS]: "Rewards",
   [ProposalFormStep.CONFIRM]: "Confirm",
 }
 

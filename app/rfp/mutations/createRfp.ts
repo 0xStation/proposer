@@ -13,11 +13,9 @@ const CreateRfp = z.object({
   payment: z.object({
     token: ZodToken,
     amount: z.number(),
-    terms: z.enum([
-      PaymentTerm.ON_AGREEMENT,
-      PaymentTerm.AFTER_COMPLETION,
-      PaymentTerm.ADVANCE_PAYMENT,
-    ]),
+    terms: z
+      .enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION, PaymentTerm.ADVANCE_PAYMENT])
+      .optional(),
     advancePaymentPercentage: z.number().optional(),
   }),
   singleTokenGate: z

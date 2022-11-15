@@ -42,8 +42,7 @@ const RfpListComponent = ({ rfps, setView }) => {
                 <RfpCard
                   key={idx}
                   rfp={rfp}
-                  href={Routes.ProposalTemplateForm({
-                    templateId: rfp?.template?.id,
+                  href={Routes.ProposalRfpForm({
                     rfpId: rfp?.id,
                   })}
                 />

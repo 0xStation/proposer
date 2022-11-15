@@ -26,6 +26,7 @@ import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 import { SocialConnection } from "app/rfp/types"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { generateMilestonePayments } from "app/proposal/utils"
+import RfpProposalFormStepReward from "./stepReward"
 
 export const ProposalFormRfp = () => {
   const router = useRouter()
@@ -38,6 +39,7 @@ export const ProposalFormRfp = () => {
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
   const session = useSession({ suspense: false })
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false)
+  const [selectedPaymentTerms, setSelectedPaymentTerms] = useState<string>("")
 
   useWarnIfUnsavedChanges(unsavedChanges, () => {
     return confirm("Warning! You have unsaved changes.")
@@ -147,7 +149,11 @@ export const ProposalFormRfp = () => {
     <div className="max-w-[580px] min-w-[580px] h-full mx-auto">
       <FormHeaderStepper
         activeStep={PROPOSAL_FORM_HEADER_COPY[proposalStep]}
-        steps={["Propose", "Confirm"]}
+        steps={[
+          PROPOSAL_FORM_HEADER_COPY[ProposalFormStep.PROPOSE],
+          PROPOSAL_FORM_HEADER_COPY[ProposalFormStep.REWARDS],
+          PROPOSAL_FORM_HEADER_COPY[ProposalFormStep.CONFIRM],
+        ]}
         className="mt-10"
       />
       <Form
@@ -214,13 +220,15 @@ export const ProposalFormRfp = () => {
             let newProposal
 
             try {
+              const paymentTerms = rfp?.data?.proposal?.payment?.terms || values.paymentTerms
+
               const { milestones, payments } = generateMilestonePayments(
                 clientAddress,
                 contributorAddress,
                 rfp?.data?.proposal?.payment?.token,
                 rfp?.data?.proposal?.payment?.token?.chainId,
                 rfp?.data?.proposal?.payment?.amount,
-                rfp?.data?.proposal?.payment?.terms,
+                paymentTerms,
                 values.advancedPaymentPercentage
               )
               newProposal = await createProposalMutation({
@@ -232,7 +240,7 @@ export const ProposalFormRfp = () => {
                 clientAddresses: [clientAddress],
                 milestones,
                 payments,
-                paymentTerms: PaymentTerm.ON_AGREEMENT,
+                paymentTerms,
               })
             } catch (err) {
               setIsLoading(false)
@@ -316,6 +324,12 @@ export const ProposalFormRfp = () => {
                     {proposalStep === ProposalFormStep.PROPOSE && (
                       <RfpProposalFormStepPropose formState={formState} />
                     )}
+                    {proposalStep === ProposalFormStep.REWARDS && (
+                      <RfpProposalFormStepReward
+                        selectedPaymentTerms={selectedPaymentTerms}
+                        setSelectedPaymentTerms={setSelectedPaymentTerms}
+                      />
+                    )}
                     {proposalStep === ProposalFormStep.CONFIRM && (
                       <RfpProposalFormStepConfirm formState={formState} />
                     )}
@@ -332,6 +346,66 @@ export const ProposalFormRfp = () => {
                         session?.siwe?.address as string,
                         rfp?.accountAddress as string
                       ) ||
+                      // has not connected account or account with Discord requirement (if requirement exists)
+                      missingRequiredDiscordConnection ||
+                      // has not connected wallet with token requirement (if requirement exists)
+                      missingRequiredToken
+                    }
+                    isLoading={
+                      // query enabled
+                      !!activeUser?.address &&
+                      !!rfp?.data?.singleTokenGate &&
+                      // query is loading
+                      isTokenGatingCheckLoading
+                    }
+                    onClick={async (e) => {
+                      e.preventDefault()
+                      if (!session.siwe?.address) {
+                        toggleWalletModal(true)
+                      } else if (!!rfp?.data?.singleTokenGate && !userHasRequiredToken) {
+                        setToastState({
+                          isToastShowing: true,
+                          type: "error",
+                          message: "You do not own the required tokens to submit to this RFP.",
+                        })
+                      } else if (session.siwe?.address) {
+                        setProposalStep(ProposalFormStep.REWARDS)
+                      }
+                    }}
+                  >
+                    Next
+                  </Button>
+                  {addressesAreEqual(
+                    session?.siwe?.address as string,
+                    rfp?.accountAddress as string
+                  ) && (
+                    <span className="text-xs text-concrete">
+                      You cannot propose to your own RFP.
+                    </span>
+                  )}
+                  {missingRequiredDiscordConnection && (
+                    <span className="text-xs text-concrete">Missing connection to Discord.</span>
+                  )}
+                  {missingRequiredToken && (
+                    <span className="text-xs text-concrete">
+                      Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
+                      RFP.
+                    </span>
+                  )}
+                </div>
+              )}
+              {proposalStep === ProposalFormStep.REWARDS && (
+                <div className="my-6 float-right flex flex-col space-y-1 items-end">
+                  <Button
+                    isDisabled={
+                      unFilledProposalFields ||
+                      // proposing to own RFP
+                      addressesAreEqual(
+                        session?.siwe?.address as string,
+                        rfp?.accountAddress as string
+                      ) ||
+                      // RFP doesn't have payment terms and user has not defined payment terms
+                      (!rfp?.data?.proposal?.payment?.terms && !formState.values.paymentTerms) ||
                       // has not connected account or account with Discord requirement (if requirement exists)
                       missingRequiredDiscordConnection ||
                       // has not connected wallet with token requirement (if requirement exists)
@@ -383,7 +457,7 @@ export const ProposalFormRfp = () => {
               {proposalStep === ProposalFormStep.CONFIRM && (
                 <div className="flex justify-between mt-6">
                   <span
-                    onClick={() => setProposalStep(ProposalFormStep.PROPOSE)}
+                    onClick={() => setProposalStep(ProposalFormStep.REWARDS)}
                     className="cursor-pointer border rounded border-marble-white p-2 self-start"
                   >
                     <BackArrow className="fill-marble-white" />

@@ -18,7 +18,7 @@ export const generateMilestonePayments = (
       (term) => term === paymentTerms
     )
   ) {
-    throw Error("Missing payment terms, please select an option on the previous page.")
+    throw Error("Missing payment terms.")
   }
 
   const tokenTransferBase = {

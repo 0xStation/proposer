@@ -106,7 +106,7 @@ export const RfpFormStepPayment = ({
                         input.onChange(selectedToken?.address)
                       }}
                     >
-                      <option value="">Flexible</option>
+                      <option value="">Choose option</option>
                       {paymentTokenOptions?.map((token) => {
                         return (
                           <option key={token?.address} value={token?.address}>
@@ -185,8 +185,8 @@ export const RfpFormStepPayment = ({
                 }}
               </Field>
               {/* PAYMENT TERMS */}
-              <label className="font-bold block mt-6">Payment terms*</label>
-              <Field name="paymentTerms" validate={requiredField}>
+              <label className="font-bold block mt-6">Payment terms</label>
+              <Field name="paymentTerms">
                 {({ meta, input }) => (
                   <>
                     <div className="custom-select-wrapper">
@@ -203,7 +203,7 @@ export const RfpFormStepPayment = ({
                           input.onChange(e.target.value)
                         }}
                       >
-                        <option value="">Choose option</option>
+                        <option value="">Flexible</option>
                         <option value={PaymentTerm.ON_AGREEMENT}>
                           {PAYMENT_TERM_MAP[PaymentTerm.ON_AGREEMENT]?.copy}
                         </option>
