@@ -33,11 +33,10 @@ export type RfpMetadata = {
       minWordCount?: number
     }
     payment: {
-      token: Token | null
-      minAmount: number | null
-      maxAmount: number | null
-      amount: number | null
-      terms: PaymentTerm | null
+      token?: Token
+      minAmount?: number
+      maxAmount?: number
+      terms?: PaymentTerm
       advancePaymentPercentage?: number
     }
   }
@@ -54,4 +53,12 @@ export enum SocialConnection {
   GITHUB = "GITHUB",
   FARCASTER = "FARCASTER",
   LENS = "LENS",
+}
+
+export enum PaymentAmountType {
+  FLEXIBLE = "FLEXIBLE",
+  FIXED = "FIXED",
+  MINIMUM = "MINIMUM",
+  MAXIMUM = "MAXIMUM",
+  RANGE = "RANGE",
 }

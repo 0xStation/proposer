@@ -10,20 +10,16 @@ import { WorkspaceTab } from "pages/workspace/[accountAddress]"
 import RfpStatusPill from "./RfpStatusPill"
 import Button from "app/core/components/sds/buttons/Button"
 import ReadMore from "app/core/components/ReadMore"
-import getTemplateByRfpId from "app/template/queries/getTemplateByRfpId"
 import { toTitleCase } from "app/core/utils/titleCase"
+import { PaymentAmountType } from "../types"
+import { getPaymentAmountDetails } from "../utils"
 
 export const RfpSidebar = ({ rfp }) => {
-  const [template] = useQuery(
-    getTemplateByRfpId,
-    { rfpId: rfp?.id as string },
-    {
-      suspense: false,
-      enabled: Boolean(rfp?.id),
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-    }
+  const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
+    rfp?.data?.proposal?.payment?.minAmount,
+    rfp?.data?.proposal?.payment?.maxAmount
   )
+
   return (
     <div className="h-full w-[288px] overflow-y-scroll p-6 border-r border-concrete">
       <div className="flex flex-col pb-6 space-y-6">
@@ -136,7 +132,7 @@ export const RfpSidebar = ({ rfp }) => {
               {/* PAYMENT AMOUNT */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-                <p className="mt-2">{rfp?.data?.proposal?.payment?.amount}</p>
+                <p className="mt-2">{toTitleCase(paymentAmountType) + " " + paymentAmount}</p>
               </div>
             </>
           )}

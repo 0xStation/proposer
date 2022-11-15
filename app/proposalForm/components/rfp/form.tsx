@@ -27,6 +27,7 @@ import { SocialConnection } from "app/rfp/types"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { generateMilestonePayments } from "app/proposal/utils"
 import RfpProposalFormStepReward from "./stepReward"
+import { getPaymentAmountDetails } from "app/rfp/utils"
 
 export const ProposalFormRfp = () => {
   const router = useRouter()
@@ -145,6 +146,14 @@ export const ProposalFormRfp = () => {
     activeUser &&
     !activeUser?.discordId
 
+  const invalidRequirements =
+    // proposing to own RFP
+    addressesAreEqual(session?.siwe?.address as string, rfp?.accountAddress as string) ||
+    // has not connected account or account with Discord requirement (if requirement exists)
+    missingRequiredDiscordConnection ||
+    // has not connected wallet with token requirement (if requirement exists)
+    missingRequiredToken
+
   return (
     <div className="max-w-[580px] min-w-[580px] h-full mx-auto">
       <FormHeaderStepper
@@ -227,7 +236,7 @@ export const ProposalFormRfp = () => {
                 contributorAddress,
                 rfp?.data?.proposal?.payment?.token,
                 rfp?.data?.proposal?.payment?.token?.chainId,
-                rfp?.data?.proposal?.payment?.amount,
+                values.paymentAmount || rfp?.data?.proposal?.payment?.minAmount,
                 paymentTerms,
                 values.advancedPaymentPercentage
               )
@@ -281,12 +290,6 @@ export const ProposalFormRfp = () => {
         }}
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
-
-          const minNumWords = rfp?.data?.proposal?.body?.minWordCount || 0
-
-          const unFilledProposalFields =
-            !formState.values.body || !!mustBeAboveNumWords(minNumWords)(formState.values.body)
-
           return (
             <form onSubmit={handleSubmit} className="mt-20">
               <FormSpy
@@ -339,18 +342,7 @@ export const ProposalFormRfp = () => {
               {proposalStep === ProposalFormStep.PROPOSE && (
                 <div className="my-6 float-right flex flex-col space-y-1 items-end">
                   <Button
-                    isDisabled={
-                      unFilledProposalFields ||
-                      // proposing to own RFP
-                      addressesAreEqual(
-                        session?.siwe?.address as string,
-                        rfp?.accountAddress as string
-                      ) ||
-                      // has not connected account or account with Discord requirement (if requirement exists)
-                      missingRequiredDiscordConnection ||
-                      // has not connected wallet with token requirement (if requirement exists)
-                      missingRequiredToken
-                    }
+                    isDisabled={formState.invalid || invalidRequirements}
                     isLoading={
                       // query enabled
                       !!activeUser?.address &&
@@ -395,63 +387,58 @@ export const ProposalFormRfp = () => {
                 </div>
               )}
               {proposalStep === ProposalFormStep.REWARDS && (
-                <div className="my-6 float-right flex flex-col space-y-1 items-end">
-                  <Button
-                    isDisabled={
-                      unFilledProposalFields ||
-                      // proposing to own RFP
-                      addressesAreEqual(
-                        session?.siwe?.address as string,
-                        rfp?.accountAddress as string
-                      ) ||
-                      // RFP doesn't have payment terms and user has not defined payment terms
-                      (!rfp?.data?.proposal?.payment?.terms && !formState.values.paymentTerms) ||
-                      // has not connected account or account with Discord requirement (if requirement exists)
-                      missingRequiredDiscordConnection ||
-                      // has not connected wallet with token requirement (if requirement exists)
-                      missingRequiredToken
-                    }
-                    isLoading={
-                      // query enabled
-                      !!activeUser?.address &&
-                      !!rfp?.data?.singleTokenGate &&
-                      // query is loading
-                      isTokenGatingCheckLoading
-                    }
-                    onClick={async (e) => {
-                      e.preventDefault()
-                      if (!session.siwe?.address) {
-                        toggleWalletModal(true)
-                      } else if (!!rfp?.data?.singleTokenGate && !userHasRequiredToken) {
-                        setToastState({
-                          isToastShowing: true,
-                          type: "error",
-                          message: "You do not own the required tokens to submit to this RFP.",
-                        })
-                      } else if (session.siwe?.address) {
-                        setProposalStep(ProposalFormStep.CONFIRM)
-                      }
-                    }}
+                <div className="flex justify-between mt-6">
+                  <span
+                    onClick={() => setProposalStep(ProposalFormStep.PROPOSE)}
+                    className="cursor-pointer border rounded border-marble-white p-2 self-start"
                   >
-                    Next
-                  </Button>
-                  {addressesAreEqual(
-                    session?.siwe?.address as string,
-                    rfp?.accountAddress as string
-                  ) && (
-                    <span className="text-xs text-concrete">
-                      You cannot propose to your own RFP.
-                    </span>
-                  )}
-                  {missingRequiredDiscordConnection && (
-                    <span className="text-xs text-concrete">Missing connection to Discord.</span>
-                  )}
-                  {missingRequiredToken && (
-                    <span className="text-xs text-concrete">
-                      Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
-                      RFP.
-                    </span>
-                  )}
+                    <BackArrow className="fill-marble-white" />
+                  </span>
+                  <div className="flex flex-col space-y-1 items-end">
+                    <Button
+                      isDisabled={formState.invalid || invalidRequirements}
+                      isLoading={
+                        // query enabled
+                        !!activeUser?.address &&
+                        !!rfp?.data?.singleTokenGate &&
+                        // query is loading
+                        isTokenGatingCheckLoading
+                      }
+                      onClick={async (e) => {
+                        e.preventDefault()
+                        if (!session.siwe?.address) {
+                          toggleWalletModal(true)
+                        } else if (!!rfp?.data?.singleTokenGate && !userHasRequiredToken) {
+                          setToastState({
+                            isToastShowing: true,
+                            type: "error",
+                            message: "You do not own the required tokens to submit to this RFP.",
+                          })
+                        } else if (session.siwe?.address) {
+                          setProposalStep(ProposalFormStep.CONFIRM)
+                        }
+                      }}
+                    >
+                      Next
+                    </Button>
+                    {addressesAreEqual(
+                      session?.siwe?.address as string,
+                      rfp?.accountAddress as string
+                    ) && (
+                      <span className="text-xs text-concrete">
+                        You cannot propose to your own RFP.
+                      </span>
+                    )}
+                    {missingRequiredDiscordConnection && (
+                      <span className="text-xs text-concrete">Missing connection to Discord.</span>
+                    )}
+                    {missingRequiredToken && (
+                      <span className="text-xs text-concrete">
+                        Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
+                        RFP.
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
               {proposalStep === ProposalFormStep.CONFIRM && (
@@ -464,19 +451,7 @@ export const ProposalFormRfp = () => {
                   </span>
                   <div className="flex flex-col space-y-1 items-end">
                     <Button
-                      isDisabled={
-                        isLoading ||
-                        unFilledProposalFields ||
-                        // proposing to own RFP
-                        addressesAreEqual(
-                          session?.siwe?.address as string,
-                          rfp?.accountAddress as string
-                        ) ||
-                        // has not connected account or account with Discord requirement (if requirement exists)
-                        missingRequiredDiscordConnection ||
-                        // has not connected wallet with token requirement (if requirement exists)
-                        missingRequiredToken
-                      }
+                      isDisabled={isLoading || formState.invalid || invalidRequirements}
                       isLoading={
                         // query enabled
                         (!!activeUser?.address &&

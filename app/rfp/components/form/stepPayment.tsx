@@ -17,7 +17,9 @@ import {
 } from "app/utils/validators"
 // MODULE
 import { PaymentTerm } from "app/proposalPayment/types"
-import { PaymentDirection } from "app/rfp/types"
+import { PaymentAmountType, PaymentDirection } from "app/rfp/types"
+import { toTitleCase } from "app/core/utils/titleCase"
+import { useEffect } from "react"
 
 export const RfpFormStepPayment = ({
   chainId,
@@ -31,9 +33,15 @@ export const RfpFormStepPayment = ({
   refetchTokens,
   isImportTokenModalOpen,
   setIsImportTokenModalOpen,
+  paymentAmountType,
+  setPaymentAmountType,
 }) => {
   const session = useSession({ suspense: false })
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+
+  useEffect(() => {
+    setPaymentAmountType(PaymentAmountType.FLEXIBLE)
+  }, [selectedToken])
 
   return (
     <>
@@ -144,46 +152,83 @@ export const RfpFormStepPayment = ({
             <>
               {/* PAYMENT AMOUNT */}
               <label className="font-bold block mt-6">Payment per proposal*</label>
-              {/* <span className="text-xs text-concrete block"></span> */}
-              <WhenFieldChanges
-                field="tokenAddress"
-                set="paymentAmount"
-                // need to change to field value to empty string so form field validation is triggered
-                // with new decimal number validation. The ideal state is to keep the paymentAmount field
-                // value the same but the decimal amount isn't being update correctly for the validation.
-                // Another option would be to validate on submit, although it doesn't follow the validation pattern.
-                to={""}
-              />
-              <Field
-                name="paymentAmount"
-                format={formatTokenAmount}
-                validate={
-                  // only validate decimals if a token is selected
-                  Boolean(selectedToken?.address)
-                    ? composeValidators(
-                        requiredField,
-                        isPositiveAmount,
-                        isValidTokenAmount(selectedToken?.decimals || 0)
-                      )
-                    : requiredField
-                }
-              >
-                {({ input, meta }) => {
-                  return (
-                    <div>
-                      <input
+              <Field name="paymentAmountType">
+                {({ meta, input }) => (
+                  <>
+                    <div className="custom-select-wrapper">
+                      <select
                         {...input}
-                        type="text"
-                        className="w-full bg-wet-concrete rounded mt-1 p-2"
-                        placeholder="0.00"
-                      />
-                      {meta.touched && meta.error && (
-                        <span className="text-torch-red text-xs">{meta.error}</span>
-                      )}
+                        required
+                        className="w-full bg-wet-concrete rounded p-2 mt-1"
+                        value={paymentAmountType}
+                        onChange={(e) => {
+                          setPaymentAmountType(e.target.value)
+                          // custom values can be compatible with react-final-form by calling
+                          // the props.input.onChange callback
+                          // https://final-form.org/docs/react-final-form/api/Field
+                          input.onChange(e.target.value)
+                        }}
+                      >
+                        <option value={PaymentAmountType.FLEXIBLE}>
+                          {toTitleCase(PaymentAmountType.FLEXIBLE)}
+                        </option>
+                        <option value={PaymentAmountType.FIXED}>
+                          {toTitleCase(PaymentAmountType.FIXED)}
+                        </option>
+                        <option value={PaymentAmountType.MINIMUM}>
+                          {toTitleCase(PaymentAmountType.MINIMUM)}
+                        </option>
+                        <option value={PaymentAmountType.MAXIMUM}>
+                          {toTitleCase(PaymentAmountType.MAXIMUM)}
+                        </option>
+                      </select>
                     </div>
-                  )
-                }}
+                  </>
+                )}
               </Field>
+              {paymentAmountType !== PaymentAmountType.FLEXIBLE && (
+                <>
+                  <WhenFieldChanges
+                    field="tokenAddress"
+                    set="paymentAmount"
+                    // need to change to field value to empty string so form field validation is triggered
+                    // with new decimal number validation. The ideal state is to keep the paymentAmount field
+                    // value the same but the decimal amount isn't being update correctly for the validation.
+                    // Another option would be to validate on submit, although it doesn't follow the validation pattern.
+                    to={""}
+                  />
+                  <Field
+                    name="paymentAmount"
+                    format={formatTokenAmount}
+                    validate={
+                      // only validate decimals if a token is selected
+                      Boolean(selectedToken?.address)
+                        ? composeValidators(
+                            requiredField,
+                            isPositiveAmount,
+                            isValidTokenAmount(selectedToken?.decimals || 0)
+                          )
+                        : requiredField
+                    }
+                  >
+                    {({ input, meta }) => {
+                      return (
+                        <div>
+                          <input
+                            {...input}
+                            type="text"
+                            className="w-full bg-wet-concrete rounded mt-1 p-2"
+                            placeholder="0.00"
+                          />
+                          {meta.touched && meta.error && (
+                            <span className="text-torch-red text-xs">{meta.error}</span>
+                          )}
+                        </div>
+                      )
+                    }}
+                  </Field>
+                </>
+              )}
               {/* PAYMENT TERMS */}
               <label className="font-bold block mt-6">Payment terms</label>
               <Field name="paymentTerms">

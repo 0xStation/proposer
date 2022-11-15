@@ -6,6 +6,8 @@ import { ProposalFormStep, PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import { Field } from "react-final-form"
 import {
   composeValidators,
+  isNotAboveMaximum,
+  isNotBelowMinimum,
   isPositiveAmount,
   isValidAdvancedPaymentPercentage,
   isValidTokenAmount,
@@ -19,6 +21,9 @@ import useHasMounted from "app/core/hooks/useHasMounted"
 import { useParam } from "@blitzjs/next"
 import { useQuery } from "@blitzjs/rpc"
 import getRfpById from "app/rfp/queries/getRfpById"
+import { getPaymentAmountDetails } from "app/rfp/utils"
+import { PaymentAmountType } from "app/rfp/types"
+import { toTitleCase } from "app/core/utils/titleCase"
 
 export function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
@@ -43,8 +48,53 @@ export const RfpProposalFormStepReward = ({ selectedPaymentTerms, setSelectedPay
     }
   )
 
+  const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
+    rfp?.data?.proposal?.payment?.minAmount,
+    rfp?.data?.proposal?.payment?.maxAmount
+  )
+
   return (
     <>
+      {paymentAmountType !== PaymentAmountType.FIXED && (
+        <>
+          {/* PAYMENT AMOUNT */}
+          <label className="font-bold block mt-6">Payment amount*</label>
+          <span className="text-xs text-concrete block">
+            {paymentAmountType === PaymentAmountType.MAXIMUM ||
+            paymentAmountType === PaymentAmountType.MINIMUM
+              ? `${toTitleCase(paymentAmountType)} amount allowed of ${paymentAmount}`
+              : ""}
+          </span>
+          <Field
+            name="paymentAmount"
+            format={formatTokenAmount}
+            validate={composeValidators(
+              // TODO: validate against min/max data from rfp definition
+              requiredField,
+              isPositiveAmount,
+              isValidTokenAmount(rfp?.data?.proposal?.payment?.token?.decimals || 0),
+              isNotBelowMinimum(rfp?.data?.proposal?.payment?.minAmount),
+              isNotAboveMaximum(rfp?.data?.proposal?.payment?.maxAmount)
+            )}
+          >
+            {({ input, meta }) => {
+              return (
+                <div>
+                  <input
+                    {...input}
+                    type="text"
+                    className="w-full bg-wet-concrete rounded mt-1 p-2"
+                    placeholder="0.00"
+                  />
+                  {meta.touched && meta.error && (
+                    <span className="text-torch-red text-xs">{meta.error}</span>
+                  )}
+                </div>
+              )
+            }}
+          </Field>
+        </>
+      )}
       {!rfp?.data?.proposal?.payment?.terms && (
         <>
           {/* PAYMENT TERMS */}

@@ -12,6 +12,7 @@ import TextLink from "app/core/components/TextLink"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { toTitleCase } from "app/core/utils/titleCase"
 import ProposalFormRfp from "app/proposalForm/components/rfp/form"
+import { getPaymentAmountDetails } from "app/rfp/utils"
 
 const ProposalRfpForm: BlitzPage = () => {
   const rfpId = useParam("rfpId") as string
@@ -36,6 +37,11 @@ const ProposalRfpForm: BlitzPage = () => {
         }
       },
     }
+  )
+
+  const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
+    rfp?.data?.proposal?.payment?.minAmount,
+    rfp?.data?.proposal?.payment?.maxAmount
   )
 
   return (
@@ -136,7 +142,7 @@ const ProposalRfpForm: BlitzPage = () => {
                   {/* PAYMENT AMOUNT */}
                   <div>
                     <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-                    <p className="mt-2">{rfp?.data?.proposal?.payment?.amount}</p>
+                    <p className="mt-2">{toTitleCase(paymentAmountType) + " " + paymentAmount}</p>
                   </div>
                 </>
               )}

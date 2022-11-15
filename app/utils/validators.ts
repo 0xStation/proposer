@@ -172,3 +172,19 @@ export const isValidAdvancedPaymentPercentage = (value: string) => {
   if (parsedValue === 0) return "Advance payment must be more than 0%"
   return undefined
 }
+
+export const isNotBelowMinimum = (minValue?: number) => {
+  return (value: string) => {
+    if (!minValue) return undefined
+    if (!value) return "No value provided"
+    if (parseFloat(value) < minValue) return "Value is below minimum of " + minValue
+  }
+}
+
+export const isNotAboveMaximum = (maxValue?: number) => {
+  return (value: string) => {
+    if (!maxValue) return undefined
+    if (!value) return "No value provided"
+    if (parseFloat(value) > maxValue) return "Value is above maximum of " + maxValue
+  }
+}

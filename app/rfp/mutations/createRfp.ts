@@ -12,7 +12,8 @@ const CreateRfp = z.object({
   proposerRole: z.enum([ProposalRoleType.CLIENT, ProposalRoleType.CONTRIBUTOR]),
   payment: z.object({
     token: ZodToken,
-    amount: z.number(),
+    minAmount: z.number().optional(),
+    maxAmount: z.number().optional(),
     terms: z
       .enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION, PaymentTerm.ADVANCE_PAYMENT])
       .optional(),

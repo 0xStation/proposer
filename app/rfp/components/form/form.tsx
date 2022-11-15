@@ -23,7 +23,7 @@ import { isValidAdvancedPaymentPercentage, isValidTokenAmount } from "app/utils/
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { PaymentTerm } from "app/proposalPayment/types"
 import createRfp from "app/rfp/mutations/createRfp"
-import { PaymentDirection } from "app/rfp/types"
+import { PaymentAmountType, PaymentDirection } from "app/rfp/types"
 import { ProposalTemplateFieldValidationName } from "app/template/types"
 import getTokensByAccount from "app/token/queries/getTokensByAccount"
 // LOCAL
@@ -45,6 +45,7 @@ export const RfpForm = () => {
   const [paymentTokenOptions, setPaymentTokenOptions] = useState<any[]>()
   const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
   const [selectedToken, setSelectedToken] = useState<any>()
+  const [paymentAmountType, setPaymentAmountType] = useState<string>(PaymentAmountType.FLEXIBLE)
   // payment terms in parent form state because it gets reset when flipping through steps if put in the rewards form
   const [selectedPaymentTerms, setSelectedPaymentTerms] = useState<string>("")
 
@@ -149,6 +150,23 @@ export const RfpForm = () => {
             proposerRole = ProposalRoleType.CLIENT
           }
 
+          let minAmount
+          let maxAmount
+          if (paymentAmountType === PaymentAmountType.FIXED) {
+            minAmount = parseFloat(values.paymentAmount)
+            maxAmount = parseFloat(values.paymentAmount)
+          } else if (paymentAmountType === PaymentAmountType.MINIMUM) {
+            minAmount = parseFloat(values.paymentAmount)
+            maxAmount = undefined
+          } else if (paymentAmountType === PaymentAmountType.MAXIMUM) {
+            minAmount = undefined
+            maxAmount = parseFloat(values.paymentAmount)
+          } else {
+            // FLEXIBLE
+            minAmount = undefined
+            maxAmount = undefined
+          }
+
           try {
             await createRfpMutation({
               title: values.title,
@@ -158,7 +176,8 @@ export const RfpForm = () => {
               proposerRole,
               payment: {
                 token: { ...selectedToken, chainId: chain?.id || 1 },
-                amount: parseFloat(values.paymentAmount),
+                minAmount,
+                maxAmount,
                 terms: values.paymentTerms,
                 advancePaymentPercentage: values.advancePaymentPercentage,
               },
@@ -193,7 +212,7 @@ export const RfpForm = () => {
 
           const missingFieldsPayment =
             (!formState.values.paymentDirection && !formState.values.tokenAddress) ||
-            !formState.values.paymentAmount ||
+            (paymentAmountType !== PaymentAmountType.FLEXIBLE && !formState.values.paymentAmount) ||
             !(
               formState.values.paymentTerms !== PaymentTerm.ADVANCE_PAYMENT ||
               // isValidAdvancedPaymentPercentage returns string if there is an error or undefined if things are okay
@@ -232,6 +251,8 @@ export const RfpForm = () => {
                         setSelectedPaymentDirection={setSelectedPaymentDirection}
                         selectedPaymentTerms={selectedPaymentTerms}
                         setSelectedPaymentTerms={setSelectedPaymentTerms}
+                        paymentAmountType={paymentAmountType}
+                        setPaymentAmountType={setPaymentAmountType}
                       />
                     )}
                     {proposalStep === RfpFormStep.PERMISSIONS && (

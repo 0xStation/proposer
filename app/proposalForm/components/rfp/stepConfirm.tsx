@@ -83,7 +83,9 @@ export const RfpProposalFormStepConfirm = ({ formState }) => {
       {/* PAYMENT AMOUNT */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Payment amount</span>
-        <span className="items-end">{rfp?.data?.proposal?.payment?.amount}</span>
+        <span className="items-end">
+          {formState.values.paymentAmount || rfp?.data?.proposal?.payment?.minAmount}
+        </span>
       </div>
       {/* DETAILS */}
       <div className="mt-4 flex flex-col w-full">
