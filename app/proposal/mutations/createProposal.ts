@@ -178,13 +178,21 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     })
   }
 
+  // TODO: NEED TO DETECT THE CORRECT CHAIN
   const stream = {
     chains: [EvmChain.GOERLI],
-    description: "demo",
-    tag: "gnosis",
-    webhookUrl: "http://api.webhookinbox.com/i/hqugBxgJ/in/",
+    description: `Station proposal ${proposal.id}`,
+    tag: "Gnosis, Station, Proposal",
+    // TODO: replace
+    webhookUrl: "https://99b8-38-15-57-26.ngrok.io/api/webhook/parse-gnosis-tx",
     includeNativeTxs: true,
+    includeInternalTxs: true,
+    includeContractLogs: true,
   }
+
+  // we actually only need to create a stream if its a payment proposal type
+  // AND if the client is a gnosis safe
+  // also probably don't need to create another stream if one already exists for that particular gnosis safe?
   const createdStream = await Moralis.Streams.add(stream)
   const { id } = createdStream.toJSON()
   await Moralis.Streams.addAddress({ address: params.clientAddresses, id })

@@ -4,7 +4,6 @@ import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { genGnosisTransactionDigest } from "app/signatures/gnosisTransaction"
 import networks from "app/utils/networks.json"
 import useSignature from "app/core/hooks/useSignature"
-import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { getSafeContractVersion } from "../utils/getSafeContractVersion"
 
 const useGnosisSignature = (payment) => {
