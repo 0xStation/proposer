@@ -6,12 +6,7 @@ import { ZodMilestone, ZodPayment } from "app/types/zod"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
 import { Token } from "app/token/types"
 import { PaymentTerm } from "app/proposalPayment/types"
-import Moralis from "moralis"
-import { EvmChain } from "@moralisweb3/evm-utils"
-
-Moralis.start({
-  apiKey: process.env.NEXT_PUBLIC_MORALIS_API_KEY,
-})
+import { createMoralisStream } from "app/utils/createMoralisStream"
 
 const CreateProposal = z.object({
   rfpId: z.string().optional(),
@@ -41,7 +36,11 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     throw Error("cannot have zero authors")
   }
 
-  let paymentsProposalMetadata = {}
+  let paymentsProposalMetadata: {
+    totalPayments: any
+    paymentTerms: any
+    advancePaymentPercentage: any
+  } = {} as any
   if (params.payments) {
     // validate non-negative amounts and construct totalPayments object
     let totalPayments: Record<string, { token: Token; amount: number }> = {}
@@ -178,23 +177,15 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     })
   }
 
-  // TODO: NEED TO DETECT THE CORRECT CHAIN
-  const stream = {
-    chains: [EvmChain.GOERLI],
-    description: `Station proposal ${proposal.id}`,
-    tag: "Gnosis, Station, Proposal",
-    // TODO: replace
-    webhookUrl: "https://99b8-38-15-57-26.ngrok.io/api/webhook/parse-gnosis-tx",
-    includeNativeTxs: true,
-    includeInternalTxs: true,
-    includeContractLogs: true,
-  }
+  const activeChainIds = paymentsProposalMetadata.totalPayments.map(
+    (payment) => payment.token.chainId
+  )
+  const uniqueChainIds = activeChainIds.filter((v, i, a) => a.indexOf(v) == i)
 
   // we actually only need to create a stream if its a payment proposal type
   // AND if the client is a gnosis safe
   // also probably don't need to create another stream if one already exists for that particular gnosis safe?
-  const createdStream = await Moralis.Streams.add(stream)
-  const { id } = createdStream.toJSON()
-  await Moralis.Streams.addAddress({ address: params.clientAddresses, id })
+  await createMoralisStream(proposal, uniqueChainIds, params.clientAddresses)
+
   return proposal as unknown as Proposal
 }

@@ -1,5 +1,21 @@
 import networks from "app/utils/networks.json"
 import { Token } from "@prisma/client"
+import { EvmChain } from "@moralisweb3/evm-utils"
+
+const moralisChainMap: Record<string, EvmChain> = {
+  "1": EvmChain.ETHEREUM,
+  "3": EvmChain.ROPSTEN,
+  "4": EvmChain.RINKEBY,
+  "5": EvmChain.GOERLI,
+  "42": EvmChain.KOVAN,
+  "137": EvmChain.POLYGON,
+  "80001": EvmChain.MUMBAI,
+  "43114": EvmChain.AVALANCHE,
+}
+
+export const getMoralisNetwork = (chainId: number) => {
+  return moralisChainMap[chainId.toString()]
+}
 
 export const getNetworkCoin = (chainId: number): Token | undefined => {
   try {
