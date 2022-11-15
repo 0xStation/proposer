@@ -10,7 +10,7 @@ import Moralis from "moralis"
 import { EvmChain } from "@moralisweb3/evm-utils"
 
 Moralis.start({
-  apiKey: "fGXzQqFWWmLIs9QLwunZ6Nu2JmOx6WgIC7QbWeca0bcepI7wQfr30YsPB4Bab8XG",
+  apiKey: process.env.NEXT_PUBLIC_MORALIS_API_KEY,
 })
 
 const CreateProposal = z.object({
