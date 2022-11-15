@@ -6,7 +6,7 @@ import { useRouter } from "next/router"
 import { useSession } from "@blitzjs/auth"
 import { Form } from "react-final-form"
 import { useNetwork } from "wagmi"
-import { TokenType } from "@prisma/client"
+import { ProposalRoleType, TokenType } from "@prisma/client"
 // CORE
 import Button from "app/core/components/sds/buttons/Button"
 import FormHeaderStepper from "app/core/components/FormHeaderStepper"
@@ -139,23 +139,23 @@ export const RfpForm = () => {
       <Form
         initialValues={{}}
         onSubmit={async (values: any, form) => {
-          const clientAddress =
-            values.paymentDirection === PaymentDirection.AUTHOR_IS_SENDER
-              ? accountAddress
-              : undefined
-
-          const contributorAddress =
-            values.paymentDirection === PaymentDirection.AUTHOR_IS_RECIPIENT
-              ? accountAddress
-              : undefined
+          let requesterRole
+          let proposerRole
+          if (values.paymentDirection === PaymentDirection.AUTHOR_IS_SENDER) {
+            requesterRole = ProposalRoleType.CLIENT
+            proposerRole = ProposalRoleType.CONTRIBUTOR
+          } else if (values.paymentDirection === PaymentDirection.AUTHOR_IS_RECIPIENT) {
+            requesterRole = ProposalRoleType.CONTRIBUTOR
+            proposerRole = ProposalRoleType.CLIENT
+          }
 
           try {
             await createRfpMutation({
               title: values.title,
               body: values.body,
-              associatedAccountAddress: accountAddress,
-              preselectClientAddress: clientAddress,
-              preselectContributorAddress: contributorAddress,
+              requesterAddress: accountAddress,
+              requesterRole,
+              proposerRole,
               payment: {
                 token: { ...selectedToken, chainId: chain?.id || 1 },
                 amount: parseFloat(values.paymentAmount),
@@ -192,8 +192,7 @@ export const RfpForm = () => {
               !formatPositiveInt(formState.values.minWordCount))
 
           const missingFieldsPayment =
-            !formState.values.paymentDirection ||
-            !formState.values.tokenAddress ||
+            (!formState.values.paymentDirection && !formState.values.tokenAddress) ||
             !formState.values.paymentAmount ||
             !formState.values.paymentTerms ||
             !(

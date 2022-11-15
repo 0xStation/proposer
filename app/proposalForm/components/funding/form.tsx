@@ -25,6 +25,7 @@ import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/cons
 import { isValidAdvancedPaymentPercentage } from "app/utils/validators"
 import { ConfirmForm } from "../ConfirmForm"
 import deleteProposalById from "app/proposal/mutations/deleteProposalById"
+import { generateMilestonePayments } from "app/proposal/utils"
 
 export const ProposalFormFunding = ({
   prefillClients,
@@ -192,92 +193,18 @@ export const ProposalFormFunding = ({
             throw Error("token not found")
           }
 
-          let milestones: any[] = []
-          let payments: any[] = []
-          // if payment details are present, populate milestone and payment objects
-          // supports payment and non-payment proposals
-          if (
-            ![
-              PaymentTerm.ON_AGREEMENT,
-              PaymentTerm.AFTER_COMPLETION,
-              PaymentTerm.ADVANCE_PAYMENT,
-            ].some((term) => term === values.paymentTerms)
-          ) {
-            setIsLoading(false)
-            console.error("Missing payment terms, please select an option on the previous page.")
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: "Missing payment terms, please select an option on the previous page.",
-            })
-            return
-          }
-
-          const tokenTransferBase = {
-            senderAddress: clientAddress,
-            recipientAddress: contributorAddress,
-            token: { ...token, chainId: chain?.id || 1 },
-          }
-
-          // set up milestones and payments conditional on payment terms inputs
-          const MILESTONE_COPY = {
-            UPFRONT_PAYMENT: "Upfront payment",
-            ADVANCE_PAYMENT: "Advance payment",
-            COMPLETION_PAYMENT: "Completion payment",
-          }
-
-          if (values.paymentTerms === PaymentTerm.ADVANCE_PAYMENT) {
-            // if pay on proposal completion and non-zero advance payment, set up two milestones and two payments
-            milestones = [
-              {
-                index: 0,
-                title: MILESTONE_COPY.ADVANCE_PAYMENT,
-              },
-              {
-                index: 1,
-                title: MILESTONE_COPY.COMPLETION_PAYMENT,
-              },
-            ]
-
-            const advancedPayment =
-              (parseFloat(values.paymentAmount) * parseFloat(values.advancedPaymentPercentage)) /
-              100
-            const completionPayment = parseFloat(values.paymentAmount) - advancedPayment
-
-            payments = [
-              {
-                ...tokenTransferBase,
-                milestoneIndex: 0,
-                amount: advancedPayment,
-              },
-              {
-                ...tokenTransferBase,
-                milestoneIndex: 1,
-                amount: completionPayment,
-              },
-            ]
-          } else {
-            // there is only one payment, conditional on whether message is Advance or Completion
-            milestones = [
-              {
-                index: 0,
-                title:
-                  values.paymentTerms === PaymentTerm.ON_AGREEMENT
-                    ? MILESTONE_COPY.UPFRONT_PAYMENT
-                    : MILESTONE_COPY.COMPLETION_PAYMENT, // if terms are not ON_ARGEEMENT, they are AFTER_COMPLETION
-              },
-            ]
-            payments = [
-              {
-                ...tokenTransferBase,
-                milestoneIndex: 0,
-                amount: parseFloat(values.paymentAmount),
-              },
-            ]
-          }
-
           let newProposal
           try {
+            const { milestones, payments } = generateMilestonePayments(
+              clientAddress,
+              contributorAddress,
+              selectedToken,
+              chain?.id || 1,
+              values.paymentAmount,
+              values.paymentTerms,
+              values.advancedPaymentPercentage
+            )
+
             newProposal = await createProposalMutation({
               contentTitle: values.title,
               contentBody: values.body,
@@ -292,6 +219,8 @@ export const ProposalFormFunding = ({
               }),
             })
           } catch (err) {
+            setIsLoading(false)
+            console.error(console.error())
             setToastState({
               isToastShowing: true,
               type: "error",

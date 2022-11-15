@@ -7,12 +7,6 @@ import BackIcon from "/public/back-icon.svg"
 import TextLink from "app/core/components/TextLink"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
 import { WorkspaceTab } from "pages/workspace/[accountAddress]"
-import {
-  getPaymentToken,
-  getPayments,
-  getTotalPaymentAmount,
-  getMinNumWords,
-} from "app/template/utils"
 import RfpStatusPill from "./RfpStatusPill"
 import Button from "app/core/components/sds/buttons/Button"
 import ReadMore from "app/core/components/ReadMore"
@@ -69,9 +63,8 @@ export const RfpSidebar = ({ rfp }) => {
         {/* CTA */}
         <div className="mb-10 relative group">
           <Link
-            href={Routes.ProposalTemplateForm({
-              templateId: template?.id as string,
-              rfpId: rfp?.id as string,
+            href={Routes.ProposalRfpForm({
+              templateId: rfp?.id as string,
             })}
           >
             <Button className="w-full" isDisabled={rfp?.status === RfpStatus.CLOSED}>
@@ -98,7 +91,7 @@ export const RfpSidebar = ({ rfp }) => {
           {/* REQUIREMENTS */}
           {(!!rfp?.data?.singleTokenGate ||
             !!rfp?.data?.requiredSocialConnections?.length ||
-            getMinNumWords(template?.data?.fields) > 0) && (
+            rfp?.data?.proposal?.body?.minWordCount > 0) && (
             <div>
               <h4 className="text-xs font-bold text-concrete uppercase">Requirements</h4>
               {!!rfp?.data?.singleTokenGate && (
@@ -121,29 +114,29 @@ export const RfpSidebar = ({ rfp }) => {
                     {toTitleCase(social)} connection
                   </p>
                 ))}
-              {getMinNumWords(template?.data?.fields) > 0 && (
-                <p className="mt-2">{getMinNumWords(template?.data?.fields) + " word minimum"}</p>
+              {rfp?.data?.proposal?.body?.minWordCount > 0 && (
+                <p className="mt-2">{rfp?.data?.proposal?.body?.minWordCount + " word minimum"}</p>
               )}
             </div>
           )}
-          {getPayments(template?.data.fields)?.length > 0 && (
+          {rfp?.data?.proposal?.payment?.token && (
             <>
               {/* NETWORK */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
                 <p className="mt-2">
-                  {getNetworkName(getPaymentToken(template?.data?.fields)?.chainId)}
+                  {getNetworkName(rfp?.data?.proposal?.payment?.token?.chainId)}
                 </p>
               </div>
               {/* PAYMENT TOKEN */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
-                <p className="mt-2">{getPaymentToken(template?.data?.fields)?.symbol}</p>
+                <p className="mt-2">{rfp?.data?.proposal?.payment?.token?.symbol}</p>
               </div>
               {/* PAYMENT AMOUNT */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-                <p className="mt-2">{getTotalPaymentAmount(template?.data?.fields)}</p>
+                <p className="mt-2">{rfp?.data?.proposal?.payment?.amount}</p>
               </div>
             </>
           )}
