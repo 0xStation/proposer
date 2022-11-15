@@ -1,6 +1,11 @@
 import networks from "app/utils/networks.json"
 import { Token } from "@prisma/client"
 import { EvmChain } from "@moralisweb3/evm-utils"
+import Moralis from "moralis"
+
+Moralis.start({
+  apiKey: process.env.NEXT_PUBLIC_MORALIS_API_KEY,
+})
 
 const moralisChainMap: Record<string, EvmChain> = {
   "1": EvmChain.ETHEREUM,

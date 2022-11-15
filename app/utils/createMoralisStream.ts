@@ -1,6 +1,6 @@
-import Moralis from "moralis"
 import { getMoralisNetwork } from "app/core/utils/networkInfo"
 import { EvmChain } from "@moralisweb3/evm-utils"
+import Moralis from "moralis"
 
 export const createMoralisStream = async (proposal, chainIds, clientAddresses) => {
   Moralis.start({
