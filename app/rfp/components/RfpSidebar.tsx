@@ -16,6 +16,7 @@ import { getPaymentAmountDetails, paymentDetailsString } from "../utils"
 import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { paymentTermsString } from "app/proposal/utils"
+import AccountMediaRow from "app/comment/components/AccountMediaRow"
 
 export const RfpSidebar = ({ rfp }) => {
   const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
@@ -33,10 +34,20 @@ export const RfpSidebar = ({ rfp }) => {
             tab: WorkspaceTab.RFPS,
           })}
         >
-          <div className="h-[16px] w-[16px] cursor-pointer">
+          <div className="h-[16px] w-[16px] cursor-pointer mb-2">
             <Image src={BackIcon} alt="Back icon" />
           </div>
         </Link>
+        {/* ACCOUNT */}
+        {rfp ? (
+          <AccountMediaRow account={rfp?.account} />
+        ) : (
+          <div
+            tabIndex={0}
+            className={`h-6 w-full rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+          />
+          // LOADING STATE
+        )}
         {/* TITLE */}
         {rfp ? (
           <span className="mt-6 text-2xl font-bold text-marble-white">

@@ -16,6 +16,7 @@ import { getPaymentAmountDetails, paymentDetailsString } from "app/rfp/utils"
 import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { paymentTermsString } from "app/proposal/utils"
+import AccountMediaRow from "app/comment/components/AccountMediaRow"
 
 const ProposalRfpForm: BlitzPage = () => {
   const rfpId = useParam("rfpId") as string
@@ -56,10 +57,19 @@ const ProposalRfpForm: BlitzPage = () => {
           <div className="flex flex-col pb-6 space-y-6">
             {/* BACK */}
             <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>
-              <div className="h-[16px] w-[16px]">
+              <div className="h-[16px] w-[16px] cursor-pointer mb-2">
                 <Image src={BackIcon} alt="Back icon" />
               </div>
             </Link>
+            {rfp ? (
+              <AccountMediaRow account={rfp?.account} />
+            ) : (
+              <div
+                tabIndex={0}
+                className={`h-6 w-full rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+              />
+              // LOADING STATE
+            )}
             {/* TITLE */}
             {rfp ? (
               <span className="mt-6 text-2xl font-bold text-marble-white">
