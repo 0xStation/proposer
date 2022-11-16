@@ -6,7 +6,6 @@ import { ZodMilestone, ZodPayment } from "app/types/zod"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
 import { Token } from "app/token/types"
 import { PaymentTerm } from "app/proposalPayment/types"
-import { createMoralisStream } from "app/utils/createMoralisStream"
 
 const CreateProposal = z.object({
   rfpId: z.string().optional(),
@@ -176,16 +175,6 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       },
     })
   }
-
-  const activeChainIds = paymentsProposalMetadata.totalPayments.map(
-    (payment) => payment.token.chainId
-  )
-  const uniqueChainIds = activeChainIds.filter((v, i, a) => a.indexOf(v) == i)
-
-  // we actually only need to create a stream if its a payment proposal type
-  // AND if the client is a gnosis safe
-  // also probably don't need to create another stream if one already exists for that particular gnosis safe?
-  await createMoralisStream(proposal, uniqueChainIds, params.clientAddresses)
 
   return proposal as unknown as Proposal
 }

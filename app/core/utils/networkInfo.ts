@@ -19,7 +19,7 @@ const moralisChainMap: Record<string, EvmChain> = {
 }
 
 export const getMoralisNetwork = (chainId: number) => {
-  return moralisChainMap[chainId.toString()]
+  return moralisChainMap[chainId.toString()] || EvmChain.ETHEREUM
 }
 
 export const getNetworkCoin = (chainId: number): Token | undefined => {

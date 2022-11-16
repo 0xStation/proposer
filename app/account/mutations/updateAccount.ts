@@ -13,6 +13,7 @@ const UpdateAccount = z.object({
   bio: z.string().optional(),
   pfpUrl: z.string().optional(),
   discordHandle: z.string().optional(),
+  moralisStreamId: z.string().optional(),
   email: z.string().optional(),
 })
 
@@ -69,6 +70,7 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
       bio: params.bio,
       pfpUrl: params.pfpUrl,
       discordHandle: params.discordHandle,
+      moralisStreamId: params.moralisStreamId,
       // mark email as saved for this account to not show email input modals
       hasSavedEmail: !!params.email,
       hasVerifiedEmail,

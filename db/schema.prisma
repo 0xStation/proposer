@@ -14,13 +14,14 @@ generator client {
 // ACCOUNT SYSTEM
 
 model Account {
-  id          Int         @id @default(autoincrement())
-  address     String      @unique
-  discordId   String?
-  addressType AddressType
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  data        Json
+  id              Int         @id @default(autoincrement())
+  address         String      @unique
+  discordId       String?
+  addressType     AddressType
+  moralisStreamId String?     @unique
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  data            Json
 
   sessions           Session[]
   rfps               Rfp[]
