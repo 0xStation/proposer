@@ -21,10 +21,11 @@ import useHasMounted from "app/core/hooks/useHasMounted"
 import { useParam } from "@blitzjs/next"
 import { useQuery } from "@blitzjs/rpc"
 import getRfpById from "app/rfp/queries/getRfpById"
-import { getPaymentAmountDetails } from "app/rfp/utils"
+import { getPaymentAmountDetails, paymentDetailsString } from "app/rfp/utils"
 import { PaymentAmountType } from "app/rfp/types"
 import { toTitleCase } from "app/core/utils/titleCase"
 import { useNetwork } from "wagmi"
+import { getNetworkName } from "app/core/utils/networkInfo"
 
 export function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
@@ -67,6 +68,46 @@ export const RfpProposalFormStepReward = ({
 
   return (
     <>
+      <div className="flex flex-col mt-6 pb-6 border-b border-wet-concrete space-y-6">
+        <p>The following details have already been set by this RFP.</p>
+        {rfp?.data?.proposal?.payment?.token && (
+          <>
+            {/* NETWORK */}
+            <div>
+              <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
+              <p className="mt-2">{getNetworkName(rfp?.data?.proposal?.payment?.token?.chainId)}</p>
+            </div>
+            {/* PAYMENT TOKEN */}
+            <div>
+              <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
+              <p className="mt-2">{rfp?.data?.proposal?.payment?.token?.symbol}</p>
+            </div>
+          </>
+        )}
+        {paymentAmountType !== PaymentAmountType.FLEXIBLE && (
+          <>
+            {/* PAYMENT AMOUNT */}
+            <div>
+              <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
+              <p className="mt-2">{paymentDetailsString(paymentAmountType, paymentAmount)}</p>
+            </div>
+          </>
+        )}
+        {rfp?.data?.proposal?.payment?.terms && (
+          <>
+            {/* PAYMENT TERMS */}
+            <div>
+              <h4 className="text-xs font-bold text-concrete uppercase">Payment terms</h4>
+              <p className="mt-2">
+                {PAYMENT_TERM_MAP[rfp?.data?.proposal?.payment?.terms]?.copy +
+                  (rfp?.data?.proposal?.payment?.terms === PaymentTerm.ADVANCE_PAYMENT
+                    ? ` (${rfp?.data?.proposal?.payment?.advancePaymentPercentage}%)`
+                    : "")}
+              </p>
+            </div>
+          </>
+        )}
+      </div>
       {!rfp?.data?.proposal?.payment?.token && (
         <>
           <ImportTokenModal

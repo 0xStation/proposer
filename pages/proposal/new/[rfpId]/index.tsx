@@ -12,7 +12,9 @@ import TextLink from "app/core/components/TextLink"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { toTitleCase } from "app/core/utils/titleCase"
 import ProposalFormRfp from "app/proposalForm/components/rfp/form"
-import { getPaymentAmountDetails } from "app/rfp/utils"
+import { getPaymentAmountDetails, paymentDetailsString } from "app/rfp/utils"
+import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
+import { PaymentTerm } from "app/proposalPayment/types"
 
 const ProposalRfpForm: BlitzPage = () => {
   const rfpId = useParam("rfpId") as string
@@ -142,7 +144,17 @@ const ProposalRfpForm: BlitzPage = () => {
                   {/* PAYMENT AMOUNT */}
                   <div>
                     <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-                    <p className="mt-2">{toTitleCase(paymentAmountType) + " " + paymentAmount}</p>
+                    <p className="mt-2">{paymentDetailsString(paymentAmountType, paymentAmount)}</p>
+                  </div>
+                  {/* PAYMENT TERMS */}
+                  <div>
+                    <h4 className="text-xs font-bold text-concrete uppercase">Payment terms</h4>
+                    <p className="mt-2">
+                      {PAYMENT_TERM_MAP[rfp?.data?.proposal?.payment?.terms || ""]?.copy +
+                        (rfp?.data?.proposal?.payment?.terms === PaymentTerm.ADVANCE_PAYMENT
+                          ? ` (${rfp?.data?.proposal?.payment?.advancePaymentPercentage}%)`
+                          : "")}
+                    </p>
                   </div>
                 </>
               )}

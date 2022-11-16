@@ -12,7 +12,9 @@ import Button from "app/core/components/sds/buttons/Button"
 import ReadMore from "app/core/components/ReadMore"
 import { toTitleCase } from "app/core/utils/titleCase"
 import { PaymentAmountType } from "../types"
-import { getPaymentAmountDetails } from "../utils"
+import { getPaymentAmountDetails, paymentDetailsString } from "../utils"
+import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
+import { PaymentTerm } from "app/proposalPayment/types"
 
 export const RfpSidebar = ({ rfp }) => {
   const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
@@ -132,7 +134,17 @@ export const RfpSidebar = ({ rfp }) => {
               {/* PAYMENT AMOUNT */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-                <p className="mt-2">{toTitleCase(paymentAmountType) + " " + paymentAmount}</p>
+                <p className="mt-2">{paymentDetailsString(paymentAmountType, paymentAmount)}</p>
+              </div>
+              {/* PAYMENT TERMS */}
+              <div>
+                <h4 className="text-xs font-bold text-concrete uppercase">Payment terms</h4>
+                <p className="mt-2">
+                  {PAYMENT_TERM_MAP[rfp?.data?.proposal?.payment?.terms]?.copy +
+                    (rfp?.data?.proposal?.payment?.terms === PaymentTerm.ADVANCE_PAYMENT
+                      ? ` (${rfp?.data?.proposal?.payment?.advancePaymentPercentage}%)`
+                      : "")}
+                </p>
               </div>
             </>
           )}
