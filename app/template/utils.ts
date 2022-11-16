@@ -49,6 +49,10 @@ export const addAddressesToPayments = (
   })
 }
 
+export const getPaymentTerms = (template: ProposalTemplateField[] | undefined) => {
+  return getFieldValue(template, RESERVED_KEYS.PAYMENT_TERMS)
+}
+
 export const getPayments = (template: ProposalTemplateField[] | undefined) => {
   return getFieldValue(template, RESERVED_KEYS.PAYMENTS)
 }

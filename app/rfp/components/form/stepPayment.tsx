@@ -17,7 +17,9 @@ import {
 } from "app/utils/validators"
 // MODULE
 import { PaymentTerm } from "app/proposalPayment/types"
-import { PaymentDirection } from "app/rfp/types"
+import { PaymentAmountType, PaymentDirection } from "app/rfp/types"
+import { toTitleCase } from "app/core/utils/titleCase"
+import { useEffect } from "react"
 
 export const RfpFormStepPayment = ({
   chainId,
@@ -31,9 +33,15 @@ export const RfpFormStepPayment = ({
   refetchTokens,
   isImportTokenModalOpen,
   setIsImportTokenModalOpen,
+  paymentAmountType,
+  setPaymentAmountType,
 }) => {
   const session = useSession({ suspense: false })
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+
+  useEffect(() => {
+    setPaymentAmountType(PaymentAmountType.FLEXIBLE)
+  }, [selectedToken])
 
   return (
     <>
@@ -82,9 +90,9 @@ export const RfpFormStepPayment = ({
         <>
           {/* TOKEN */}
           <div className="flex flex-col mt-6">
-            <label className="font-bold block">Reward token*</label>
+            <label className="font-bold block">Payment token</label>
           </div>
-          <Field name="tokenAddress" validate={requiredField}>
+          <Field name="tokenAddress">
             {({ input, meta }) => {
               return (
                 <>
@@ -99,14 +107,14 @@ export const RfpFormStepPayment = ({
                         const selectedToken = paymentTokenOptions.find((token) =>
                           addressesAreEqual(token.address, e.target.value)
                         )
-                        setSelectedToken(selectedToken || {})
+                        setSelectedToken(selectedToken)
                         // custom values can be compatible with react-final-form by calling
                         // the props.input.onChange callback
                         // https://final-form.org/docs/react-final-form/api/Field
                         input.onChange(selectedToken?.address)
                       }}
                     >
-                      <option value="">Choose option</option>
+                      <option value="">Flexible</option>
                       {paymentTokenOptions?.map((token) => {
                         return (
                           <option key={token?.address} value={token?.address}>
@@ -140,51 +148,92 @@ export const RfpFormStepPayment = ({
               + Import
             </button>
           </div>
-          {/* PAYMENT AMOUNT */}
-          <label className="font-bold block mt-6">Payment per proposal*</label>
-          {/* <span className="text-xs text-concrete block"></span> */}
-          <WhenFieldChanges
-            field="tokenAddress"
-            set="paymentAmount"
-            // need to change to field value to empty string so form field validation is triggered
-            // with new decimal number validation. The ideal state is to keep the paymentAmount field
-            // value the same but the decimal amount isn't being update correctly for the validation.
-            // Another option would be to validate on submit, although it doesn't follow the validation pattern.
-            to={""}
-          />
-          <Field
-            name="paymentAmount"
-            format={formatTokenAmount}
-            validate={
-              // only validate decimals if a token is selected
-              Boolean(selectedToken?.address)
-                ? composeValidators(
-                    requiredField,
-                    isPositiveAmount,
-                    isValidTokenAmount(selectedToken?.decimals || 0)
-                  )
-                : requiredField
-            }
-          >
-            {({ input, meta }) => {
-              return (
-                <div>
-                  <input
-                    {...input}
-                    type="text"
-                    className="w-full bg-wet-concrete rounded mt-1 p-2"
-                    placeholder="0.00"
+          {!!selectedToken && (
+            <>
+              {/* PAYMENT AMOUNT */}
+              <label className="font-bold block mt-6">Payment per proposal*</label>
+              <Field name="paymentAmountType">
+                {({ meta, input }) => (
+                  <>
+                    <div className="custom-select-wrapper">
+                      <select
+                        {...input}
+                        required
+                        className="w-full bg-wet-concrete rounded p-2 mt-1"
+                        value={paymentAmountType}
+                        onChange={(e) => {
+                          setPaymentAmountType(e.target.value)
+                          // custom values can be compatible with react-final-form by calling
+                          // the props.input.onChange callback
+                          // https://final-form.org/docs/react-final-form/api/Field
+                          input.onChange(e.target.value)
+                        }}
+                      >
+                        <option value={PaymentAmountType.FLEXIBLE}>
+                          {toTitleCase(PaymentAmountType.FLEXIBLE)}
+                        </option>
+                        <option value={PaymentAmountType.FIXED}>
+                          {toTitleCase(PaymentAmountType.FIXED)}
+                        </option>
+                        <option value={PaymentAmountType.MINIMUM}>
+                          {toTitleCase(PaymentAmountType.MINIMUM)}
+                        </option>
+                        <option value={PaymentAmountType.MAXIMUM}>
+                          {toTitleCase(PaymentAmountType.MAXIMUM)}
+                        </option>
+                      </select>
+                    </div>
+                  </>
+                )}
+              </Field>
+              {paymentAmountType !== PaymentAmountType.FLEXIBLE && (
+                <>
+                  <WhenFieldChanges
+                    field="tokenAddress"
+                    set="paymentAmount"
+                    // need to change to field value to empty string so form field validation is triggered
+                    // with new decimal number validation. The ideal state is to keep the paymentAmount field
+                    // value the same but the decimal amount isn't being update correctly for the validation.
+                    // Another option would be to validate on submit, although it doesn't follow the validation pattern.
+                    to={""}
                   />
-                  {meta.touched && meta.error && (
-                    <span className="text-torch-red text-xs">{meta.error}</span>
-                  )}
-                </div>
-              )
-            }}
-          </Field>
+                  <Field
+                    name="paymentAmount"
+                    format={formatTokenAmount}
+                    validate={
+                      // only validate decimals if a token is selected
+                      Boolean(selectedToken?.address)
+                        ? composeValidators(
+                            requiredField,
+                            isPositiveAmount,
+                            isValidTokenAmount(selectedToken?.decimals || 0)
+                          )
+                        : requiredField
+                    }
+                  >
+                    {({ input, meta }) => {
+                      return (
+                        <div>
+                          <input
+                            {...input}
+                            type="text"
+                            className="w-full bg-wet-concrete rounded mt-1 p-2"
+                            placeholder="0.00"
+                          />
+                          {meta.touched && meta.error && (
+                            <span className="text-torch-red text-xs">{meta.error}</span>
+                          )}
+                        </div>
+                      )
+                    }}
+                  </Field>
+                </>
+              )}
+            </>
+          )}
           {/* PAYMENT TERMS */}
-          <label className="font-bold block mt-6">Payment terms*</label>
-          <Field name="paymentTerms" validate={requiredField}>
+          <label className="font-bold block mt-6">Payment terms</label>
+          <Field name="paymentTerms">
             {({ meta, input }) => (
               <>
                 <div className="custom-select-wrapper">
@@ -201,7 +250,7 @@ export const RfpFormStepPayment = ({
                       input.onChange(e.target.value)
                     }}
                   >
-                    <option value="">Choose option</option>
+                    <option value="">Flexible</option>
                     <option value={PaymentTerm.ON_AGREEMENT}>
                       {PAYMENT_TERM_MAP[PaymentTerm.ON_AGREEMENT]?.copy}
                     </option>
@@ -223,7 +272,7 @@ export const RfpFormStepPayment = ({
                 Enter the percent of payment to be sent before work is to start.
               </span>
               <Field
-                name="advancedPaymentPercentage"
+                name="advancePaymentPercentage"
                 format={formatPercentValue}
                 validate={composeValidators(requiredField, isValidAdvancedPaymentPercentage)}
               >

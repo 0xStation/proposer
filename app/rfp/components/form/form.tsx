@@ -6,7 +6,7 @@ import { useRouter } from "next/router"
 import { useSession } from "@blitzjs/auth"
 import { Form } from "react-final-form"
 import { useNetwork } from "wagmi"
-import { TokenType } from "@prisma/client"
+import { ProposalRoleType, TokenType } from "@prisma/client"
 // CORE
 import Button from "app/core/components/sds/buttons/Button"
 import FormHeaderStepper from "app/core/components/FormHeaderStepper"
@@ -23,7 +23,7 @@ import { isValidAdvancedPaymentPercentage, isValidTokenAmount } from "app/utils/
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { PaymentTerm } from "app/proposalPayment/types"
 import createRfp from "app/rfp/mutations/createRfp"
-import { PaymentDirection } from "app/rfp/types"
+import { PaymentAmountType, PaymentDirection } from "app/rfp/types"
 import { ProposalTemplateFieldValidationName } from "app/template/types"
 import getTokensByAccount from "app/token/queries/getTokensByAccount"
 // LOCAL
@@ -45,6 +45,7 @@ export const RfpForm = () => {
   const [paymentTokenOptions, setPaymentTokenOptions] = useState<any[]>()
   const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
   const [selectedToken, setSelectedToken] = useState<any>()
+  const [paymentAmountType, setPaymentAmountType] = useState<string>(PaymentAmountType.FLEXIBLE)
   // payment terms in parent form state because it gets reset when flipping through steps if put in the rewards form
   const [selectedPaymentTerms, setSelectedPaymentTerms] = useState<string>("")
 
@@ -92,6 +93,9 @@ export const RfpForm = () => {
   const [createRfpMutation] = useMutation(createRfp, {
     onSuccess: (data) => {
       console.log(data)
+      if (!data) {
+        throw Error("Error encountered, RFP could not create.")
+      }
       router.push(Routes.RfpDetail({ rfpId: data?.id as string }))
     },
     onError: (error: Error) => {
@@ -139,28 +143,48 @@ export const RfpForm = () => {
       <Form
         initialValues={{}}
         onSubmit={async (values: any, form) => {
-          const clientAddress =
-            values.paymentDirection === PaymentDirection.AUTHOR_IS_SENDER
-              ? accountAddress
-              : undefined
+          let requesterRole
+          let proposerRole
+          if (values.paymentDirection === PaymentDirection.AUTHOR_IS_SENDER) {
+            requesterRole = ProposalRoleType.CLIENT
+            proposerRole = ProposalRoleType.CONTRIBUTOR
+          } else if (values.paymentDirection === PaymentDirection.AUTHOR_IS_RECIPIENT) {
+            requesterRole = ProposalRoleType.CONTRIBUTOR
+            proposerRole = ProposalRoleType.CLIENT
+          }
 
-          const contributorAddress =
-            values.paymentDirection === PaymentDirection.AUTHOR_IS_RECIPIENT
-              ? accountAddress
-              : undefined
+          let minAmount
+          let maxAmount
+          if (paymentAmountType === PaymentAmountType.FIXED) {
+            minAmount = parseFloat(values.paymentAmount)
+            maxAmount = parseFloat(values.paymentAmount)
+          } else if (paymentAmountType === PaymentAmountType.MINIMUM) {
+            minAmount = parseFloat(values.paymentAmount)
+            maxAmount = undefined
+          } else if (paymentAmountType === PaymentAmountType.MAXIMUM) {
+            minAmount = undefined
+            maxAmount = parseFloat(values.paymentAmount)
+          } else {
+            // FLEXIBLE
+            minAmount = undefined
+            maxAmount = undefined
+          }
 
           try {
             await createRfpMutation({
               title: values.title,
               body: values.body,
-              associatedAccountAddress: accountAddress,
-              preselectClientAddress: clientAddress,
-              preselectContributorAddress: contributorAddress,
+              requesterAddress: accountAddress,
+              requesterRole,
+              proposerRole,
               payment: {
-                token: { ...selectedToken, chainId: chain?.id || 1 },
-                amount: parseFloat(values.paymentAmount),
+                token: selectedToken ? { ...selectedToken, chainId: chain?.id || 1 } : undefined,
+                minAmount,
+                maxAmount,
                 terms: values.paymentTerms,
-                advancePaymentPercentage: values.advancePaymentPercentage,
+                advancePaymentPercentage: values.advancePaymentPercentage
+                  ? parseFloat(values.advancePaymentPercentage)
+                  : undefined,
               },
               singleTokenGate: !!selectedSubmissionToken
                 ? { token: selectedSubmissionToken, minBalance: values.submissionTokenMinBalance }
@@ -192,14 +216,12 @@ export const RfpForm = () => {
               !formatPositiveInt(formState.values.minWordCount))
 
           const missingFieldsPayment =
-            !formState.values.paymentDirection ||
-            !formState.values.tokenAddress ||
-            !formState.values.paymentAmount ||
-            !formState.values.paymentTerms ||
+            (!formState.values.paymentDirection && !formState.values.tokenAddress) ||
+            (paymentAmountType !== PaymentAmountType.FLEXIBLE && !formState.values.paymentAmount) ||
             !(
               formState.values.paymentTerms !== PaymentTerm.ADVANCE_PAYMENT ||
               // isValidAdvancedPaymentPercentage returns string if there is an error or undefined if things are okay
-              !isValidAdvancedPaymentPercentage(formState.values.advancedPaymentPercentage)
+              !isValidAdvancedPaymentPercentage(formState.values.advancePaymentPercentage)
             )
 
           const missingFieldsPermissions = !(
@@ -234,6 +256,8 @@ export const RfpForm = () => {
                         setSelectedPaymentDirection={setSelectedPaymentDirection}
                         selectedPaymentTerms={selectedPaymentTerms}
                         setSelectedPaymentTerms={setSelectedPaymentTerms}
+                        paymentAmountType={paymentAmountType}
+                        setPaymentAmountType={setPaymentAmountType}
                       />
                     )}
                     {proposalStep === RfpFormStep.PERMISSIONS && (
