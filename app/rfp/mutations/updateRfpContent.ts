@@ -6,8 +6,9 @@ const UpdateRfpContent = z.object({
   rfpId: z.string(),
   title: z.string(),
   body: z.string(),
-  bodyPrefill: z.string().optional(),
   oneLiner: z.string(),
+  bodyPrefill: z.string().optional(),
+  minWordCount: z.number().optional(),
 })
 
 export default async function updateRfpContent(input: z.infer<typeof UpdateRfpContent>) {
@@ -28,6 +29,13 @@ export default async function updateRfpContent(input: z.infer<typeof UpdateRfpCo
           title: params.title,
           body: params.body,
           oneLiner: params.oneLiner,
+        },
+        proposal: {
+          ...(rfp?.data as RfpMetadata)?.proposal,
+          body: {
+            prefill: params.bodyPrefill,
+            minWordCount: params.minWordCount,
+          },
         },
       } as RfpMetadata
 
