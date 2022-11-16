@@ -62,6 +62,7 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
     address: params.address,
     addressType: existingAccount.addressType,
     discordId: params.discordId,
+    moralisStreamId: params.moralisStreamId,
     data: {
       // save existing account data with overwrites below
       // without this, chainId for multisig accounts gets wiped
@@ -70,7 +71,6 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
       bio: params.bio,
       pfpUrl: params.pfpUrl,
       discordHandle: params.discordHandle,
-      moralisStreamId: params.moralisStreamId,
       // mark email as saved for this account to not show email input modals
       hasSavedEmail: !!params.email,
       hasVerifiedEmail,
