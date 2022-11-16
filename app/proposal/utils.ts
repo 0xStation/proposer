@@ -1,3 +1,4 @@
+import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import { PaymentTerm } from "app/proposalPayment/types"
 
 export const generateMilestonePayments = (
@@ -82,4 +83,11 @@ export const generateMilestonePayments = (
     ]
   }
   return { milestones, payments }
+}
+
+export const paymentTermsString = (terms, advancePaymentPercentage) => {
+  return !terms
+    ? "Flexible"
+    : PAYMENT_TERM_MAP[terms]?.copy +
+        (terms === PaymentTerm.ADVANCE_PAYMENT ? ` (${advancePaymentPercentage}%)` : "")
 }

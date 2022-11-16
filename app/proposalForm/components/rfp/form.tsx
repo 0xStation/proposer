@@ -269,7 +269,7 @@ export const ProposalFormRfp = () => {
               const paymentAmount = values.paymentAmount || rfp?.data?.proposal?.payment?.minAmount
               const paymentTerms = rfp?.data?.proposal?.payment?.terms || values.paymentTerms
               const advancePaymentPercentage =
-                values.advancePaymentPercentage ||
+                parseFloat(values.advancePaymentPercentage) ||
                 rfp?.data?.proposal?.payment?.advancePaymentPercentage
 
               const { milestones, payments } = generateMilestonePayments(

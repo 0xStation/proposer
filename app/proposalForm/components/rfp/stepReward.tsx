@@ -26,6 +26,7 @@ import { PaymentAmountType } from "app/rfp/types"
 import { toTitleCase } from "app/core/utils/titleCase"
 import { useNetwork } from "wagmi"
 import { getNetworkName } from "app/core/utils/networkInfo"
+import { paymentTermsString } from "app/proposal/utils"
 
 export function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
@@ -99,10 +100,10 @@ export const RfpProposalFormStepReward = ({
             <div>
               <h4 className="text-xs font-bold text-concrete uppercase">Payment terms</h4>
               <p className="mt-2">
-                {PAYMENT_TERM_MAP[rfp?.data?.proposal?.payment?.terms]?.copy +
-                  (rfp?.data?.proposal?.payment?.terms === PaymentTerm.ADVANCE_PAYMENT
-                    ? ` (${rfp?.data?.proposal?.payment?.advancePaymentPercentage}%)`
-                    : "")}
+                {paymentTermsString(
+                  rfp?.data?.proposal?.payment?.terms,
+                  rfp?.data?.proposal?.payment?.advancePaymentPercentage
+                )}
               </p>
             </div>
           </>

@@ -15,6 +15,7 @@ import { PaymentAmountType } from "../types"
 import { getPaymentAmountDetails, paymentDetailsString } from "../utils"
 import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import { PaymentTerm } from "app/proposalPayment/types"
+import { paymentTermsString } from "app/proposal/utils"
 
 export const RfpSidebar = ({ rfp }) => {
   const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
@@ -140,10 +141,10 @@ export const RfpSidebar = ({ rfp }) => {
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Payment terms</h4>
                 <p className="mt-2">
-                  {PAYMENT_TERM_MAP[rfp?.data?.proposal?.payment?.terms]?.copy +
-                    (rfp?.data?.proposal?.payment?.terms === PaymentTerm.ADVANCE_PAYMENT
-                      ? ` (${rfp?.data?.proposal?.payment?.advancePaymentPercentage}%)`
-                      : "")}
+                  {paymentTermsString(
+                    rfp?.data?.proposal?.payment?.terms,
+                    rfp?.data?.proposal?.payment?.advancePaymentPercentage
+                  )}
                 </p>
               </div>
             </>

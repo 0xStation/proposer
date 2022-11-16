@@ -182,7 +182,9 @@ export const RfpForm = () => {
                 minAmount,
                 maxAmount,
                 terms: values.paymentTerms,
-                advancePaymentPercentage: parseFloat(values.advancePaymentPercentage),
+                advancePaymentPercentage: values.advancePaymentPercentage
+                  ? parseFloat(values.advancePaymentPercentage)
+                  : undefined,
               },
               singleTokenGate: !!selectedSubmissionToken
                 ? { token: selectedSubmissionToken, minBalance: values.submissionTokenMinBalance }

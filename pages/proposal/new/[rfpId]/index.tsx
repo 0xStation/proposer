@@ -15,6 +15,7 @@ import ProposalFormRfp from "app/proposalForm/components/rfp/form"
 import { getPaymentAmountDetails, paymentDetailsString } from "app/rfp/utils"
 import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import { PaymentTerm } from "app/proposalPayment/types"
+import { paymentTermsString } from "app/proposal/utils"
 
 const ProposalRfpForm: BlitzPage = () => {
   const rfpId = useParam("rfpId") as string
@@ -150,10 +151,10 @@ const ProposalRfpForm: BlitzPage = () => {
                   <div>
                     <h4 className="text-xs font-bold text-concrete uppercase">Payment terms</h4>
                     <p className="mt-2">
-                      {PAYMENT_TERM_MAP[rfp?.data?.proposal?.payment?.terms || ""]?.copy +
-                        (rfp?.data?.proposal?.payment?.terms === PaymentTerm.ADVANCE_PAYMENT
-                          ? ` (${rfp?.data?.proposal?.payment?.advancePaymentPercentage}%)`
-                          : "")}
+                      {paymentTermsString(
+                        rfp?.data?.proposal?.payment?.terms,
+                        rfp?.data?.proposal?.payment?.advancePaymentPercentage
+                      )}
                     </p>
                   </div>
                 </>
