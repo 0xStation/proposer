@@ -1,5 +1,10 @@
-import { Rfp as PrismaRfp, ProposalTemplate as PrismaProposalTemplate } from "@prisma/client"
+import {
+  Rfp as PrismaRfp,
+  ProposalTemplate as PrismaProposalTemplate,
+  ProposalRoleType,
+} from "@prisma/client"
 import { Account } from "app/account/types"
+import { PaymentTerm } from "app/proposalPayment/types"
 import { Token } from "app/token/types"
 
 export type Rfp = PrismaRfp & {
@@ -20,6 +25,21 @@ export type RfpMetadata = {
     minBalance?: string // string to pass directly into BigNumber.from in logic check
   }
   requiredSocialConnections: string[]
+  proposal: {
+    requesterRole: ProposalRoleType
+    proposerRole: ProposalRoleType
+    body: {
+      prefill?: string
+      minWordCount?: number
+    }
+    payment: {
+      token?: Token
+      minAmount?: number
+      maxAmount?: number
+      terms?: PaymentTerm
+      advancePaymentPercentage?: number
+    }
+  }
 }
 
 export enum PaymentDirection {
@@ -33,4 +53,12 @@ export enum SocialConnection {
   GITHUB = "GITHUB",
   FARCASTER = "FARCASTER",
   LENS = "LENS",
+}
+
+export enum PaymentAmountType {
+  FLEXIBLE = "FLEXIBLE",
+  FIXED = "FIXED",
+  MINIMUM = "MINIMUM",
+  MAXIMUM = "MAXIMUM",
+  RANGE = "RANGE",
 }

@@ -4,38 +4,21 @@ import { useRouter } from "next/router"
 import { useQuery } from "@blitzjs/rpc"
 import { BlitzPage, Routes, useParam } from "@blitzjs/next"
 import Layout from "app/core/layouts/Layout"
-import ProposalFormTemplate from "app/proposalForm/components/template/form"
 import BackIcon from "/public/back-icon.svg"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
-import {
-  getMinNumWords,
-  getPaymentAmount,
-  getPayments,
-  getPaymentToken,
-  getTotalPaymentAmount,
-} from "app/template/utils"
 import RfpStatusPill from "app/rfp/components/RfpStatusPill"
 import ReadMore from "app/core/components/ReadMore"
 import TextLink from "app/core/components/TextLink"
-import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { toTitleCase } from "app/core/utils/titleCase"
+import ProposalFormRfp from "app/proposalForm/components/rfp/form"
+import { getPaymentAmountDetails, paymentDetailsString } from "app/rfp/utils"
+import { paymentTermsString } from "app/proposal/utils"
+import AccountMediaRow from "app/comment/components/AccountMediaRow"
 
-const ProposalTemplateForm: BlitzPage = () => {
-  const templateId = useParam("templateId") as string
-  const { rfpId } = useRouter().query
+const ProposalRfpForm: BlitzPage = () => {
+  const rfpId = useParam("rfpId") as string
   const router = useRouter()
-  const [template] = useQuery(
-    getTemplateById,
-    {
-      id: templateId,
-    },
-    {
-      enabled: !!templateId,
-      suspense: false,
-      refetchOnWindowFocus: false,
-    }
-  )
   const [rfp] = useQuery(
     getRfpById,
     {
@@ -58,6 +41,11 @@ const ProposalTemplateForm: BlitzPage = () => {
     }
   )
 
+  const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
+    rfp?.data?.proposal?.payment?.minAmount,
+    rfp?.data?.proposal?.payment?.maxAmount
+  )
+
   return (
     <>
       {/* LEFT SIDEBAR | PROPOSAL FORM */}
@@ -67,10 +55,19 @@ const ProposalTemplateForm: BlitzPage = () => {
           <div className="flex flex-col pb-6 space-y-6">
             {/* BACK */}
             <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>
-              <div className="h-[16px] w-[16px]">
+              <div className="h-[16px] w-[16px] cursor-pointer mb-2">
                 <Image src={BackIcon} alt="Back icon" />
               </div>
             </Link>
+            {rfp ? (
+              <AccountMediaRow account={rfp?.account} />
+            ) : (
+              <div
+                tabIndex={0}
+                className={`h-6 w-full rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+              />
+              // LOADING STATE
+            )}
             {/* TITLE */}
             {rfp ? (
               <span className="mt-6 text-2xl font-bold text-marble-white">
@@ -109,7 +106,7 @@ const ProposalTemplateForm: BlitzPage = () => {
               {/* REQUIREMENTS */}
               {(!!rfp?.data?.singleTokenGate ||
                 !!rfp?.data?.requiredSocialConnections?.length ||
-                getMinNumWords(template?.data?.fields) > 0) && (
+                (rfp?.data?.proposal?.body?.minWordCount || 0) > 0) && (
                 <div>
                   <h4 className="text-xs font-bold text-concrete uppercase">Requirements</h4>
                   {!!rfp?.data?.singleTokenGate && (
@@ -132,47 +129,57 @@ const ProposalTemplateForm: BlitzPage = () => {
                         {toTitleCase(social)} connection
                       </p>
                     ))}
-                  {getMinNumWords(template?.data?.fields) > 0 && (
+                  {(rfp?.data?.proposal?.body?.minWordCount || 0) > 0 && (
                     <p className="mt-2">
-                      {getMinNumWords(template?.data?.fields) + " word minimum"}
+                      {rfp?.data?.proposal?.body?.minWordCount + " word minimum"}
                     </p>
                   )}
                 </div>
               )}
-              {getPayments(template?.data.fields)?.length > 0 && (
+              {rfp?.data?.proposal?.payment?.token && (
                 <>
                   {/* NETWORK */}
                   <div>
                     <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
                     <p className="mt-2">
-                      {getNetworkName(getPaymentToken(template?.data?.fields)?.chainId)}
+                      {getNetworkName(rfp?.data?.proposal?.payment?.token?.chainId)}
                     </p>
                   </div>
                   {/* PAYMENT TOKEN */}
                   <div>
                     <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
-                    <p className="mt-2">{getPaymentToken(template?.data?.fields)?.symbol}</p>
+                    <p className="mt-2">{rfp?.data?.proposal?.payment?.token?.symbol}</p>
                   </div>
                   {/* PAYMENT AMOUNT */}
                   <div>
                     <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-                    <p className="mt-2">{getTotalPaymentAmount(template?.data?.fields)}</p>
+                    <p className="mt-2">{paymentDetailsString(paymentAmountType, paymentAmount)}</p>
+                  </div>
+                  {/* PAYMENT TERMS */}
+                  <div>
+                    <h4 className="text-xs font-bold text-concrete uppercase">Payment terms</h4>
+                    <p className="mt-2">
+                      {paymentTermsString(
+                        rfp?.data?.proposal?.payment?.terms,
+                        rfp?.data?.proposal?.payment?.advancePaymentPercentage
+                      )}
+                    </p>
                   </div>
                 </>
               )}
             </div>
           </div>
         </div>
-        <ProposalFormTemplate />
+        <ProposalFormRfp />
       </div>
     </>
   )
 }
 
-ProposalTemplateForm.suppressFirstRenderFlicker = true
-ProposalTemplateForm.getLayout = function getLayout(page) {
+ProposalRfpForm.suppressFirstRenderFlicker = true
+ProposalRfpForm.getLayout = function getLayout(page) {
   // persist layout between pages https://nextjs.org/docs/basic-features/layouts
   return <Layout title="New Proposal">{page}</Layout>
 }
 
-export default ProposalTemplateForm
+export default ProposalRfpForm
