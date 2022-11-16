@@ -229,70 +229,70 @@ export const RfpFormStepPayment = ({
                   </Field>
                 </>
               )}
-              {/* PAYMENT TERMS */}
-              <label className="font-bold block mt-6">Payment terms</label>
-              <Field name="paymentTerms">
-                {({ meta, input }) => (
-                  <>
-                    <div className="custom-select-wrapper">
-                      <select
-                        {...input}
-                        required
-                        className="w-full bg-wet-concrete rounded p-2 mt-1"
-                        value={selectedPaymentTerms}
-                        onChange={(e) => {
-                          setSelectedPaymentTerms(e.target.value)
-                          // custom values can be compatible with react-final-form by calling
-                          // the props.input.onChange callback
-                          // https://final-form.org/docs/react-final-form/api/Field
-                          input.onChange(e.target.value)
-                        }}
-                      >
-                        <option value="">Flexible</option>
-                        <option value={PaymentTerm.ON_AGREEMENT}>
-                          {PAYMENT_TERM_MAP[PaymentTerm.ON_AGREEMENT]?.copy}
-                        </option>
-                        <option value={PaymentTerm.AFTER_COMPLETION}>
-                          {PAYMENT_TERM_MAP[PaymentTerm.AFTER_COMPLETION]?.copy}
-                        </option>
-                        <option value={PaymentTerm.ADVANCE_PAYMENT}>
-                          {PAYMENT_TERM_MAP[PaymentTerm.ADVANCE_PAYMENT]?.copy}
-                        </option>
-                      </select>
-                    </div>
-                  </>
-                )}
-              </Field>
-              {selectedPaymentTerms === PaymentTerm.ADVANCE_PAYMENT && (
-                <>
-                  {/* ADVANCE PAYMENT */}
-                  <span className="text-xs text-concrete">
-                    Enter the percent of payment to be sent before work is to start.
-                  </span>
-                  <Field
-                    name="advancePaymentPercentage"
-                    format={formatPercentValue}
-                    validate={composeValidators(requiredField, isValidAdvancedPaymentPercentage)}
-                  >
-                    {({ input, meta }) => {
-                      return (
-                        <div className="h-10 mt-1 w-full bg-wet-concrete text-marble-white mb-5 rounded">
-                          <input
-                            {...input}
-                            type="text"
-                            placeholder="0"
-                            className="h-full p-2 inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white rounded"
-                          />
-                          <div className="py-2 px-4 w-[2%] inline h-full">%</div>
-                          {meta.error && meta.touched && (
-                            <span className="text-xs text-torch-red mt-2 block">{meta.error}</span>
-                          )}
-                        </div>
-                      )
+            </>
+          )}
+          {/* PAYMENT TERMS */}
+          <label className="font-bold block mt-6">Payment terms</label>
+          <Field name="paymentTerms">
+            {({ meta, input }) => (
+              <>
+                <div className="custom-select-wrapper">
+                  <select
+                    {...input}
+                    required
+                    className="w-full bg-wet-concrete rounded p-2 mt-1"
+                    value={selectedPaymentTerms}
+                    onChange={(e) => {
+                      setSelectedPaymentTerms(e.target.value)
+                      // custom values can be compatible with react-final-form by calling
+                      // the props.input.onChange callback
+                      // https://final-form.org/docs/react-final-form/api/Field
+                      input.onChange(e.target.value)
                     }}
-                  </Field>
-                </>
-              )}
+                  >
+                    <option value="">Flexible</option>
+                    <option value={PaymentTerm.ON_AGREEMENT}>
+                      {PAYMENT_TERM_MAP[PaymentTerm.ON_AGREEMENT]?.copy}
+                    </option>
+                    <option value={PaymentTerm.AFTER_COMPLETION}>
+                      {PAYMENT_TERM_MAP[PaymentTerm.AFTER_COMPLETION]?.copy}
+                    </option>
+                    <option value={PaymentTerm.ADVANCE_PAYMENT}>
+                      {PAYMENT_TERM_MAP[PaymentTerm.ADVANCE_PAYMENT]?.copy}
+                    </option>
+                  </select>
+                </div>
+              </>
+            )}
+          </Field>
+          {selectedPaymentTerms === PaymentTerm.ADVANCE_PAYMENT && (
+            <>
+              {/* ADVANCE PAYMENT */}
+              <span className="text-xs text-concrete">
+                Enter the percent of payment to be sent before work is to start.
+              </span>
+              <Field
+                name="advancePaymentPercentage"
+                format={formatPercentValue}
+                validate={composeValidators(requiredField, isValidAdvancedPaymentPercentage)}
+              >
+                {({ input, meta }) => {
+                  return (
+                    <div className="h-10 mt-1 w-full bg-wet-concrete text-marble-white mb-5 rounded">
+                      <input
+                        {...input}
+                        type="text"
+                        placeholder="0"
+                        className="h-full p-2 inline w-[80%] sm:w-[90%] bg-wet-concrete text-marble-white rounded"
+                      />
+                      <div className="py-2 px-4 w-[2%] inline h-full">%</div>
+                      {meta.error && meta.touched && (
+                        <span className="text-xs text-torch-red mt-2 block">{meta.error}</span>
+                      )}
+                    </div>
+                  )
+                }}
+              </Field>
             </>
           )}
         </>

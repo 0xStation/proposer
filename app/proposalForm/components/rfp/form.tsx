@@ -196,7 +196,7 @@ export const ProposalFormRfp = () => {
         activeStep={PROPOSAL_FORM_HEADER_COPY[proposalStep]}
         steps={[
           PROPOSAL_FORM_HEADER_COPY[ProposalFormStep.PROPOSE],
-          PROPOSAL_FORM_HEADER_COPY[ProposalFormStep.REWARDS],
+          PROPOSAL_FORM_HEADER_COPY[ProposalFormStep.PAYMENT],
           PROPOSAL_FORM_HEADER_COPY[ProposalFormStep.CONFIRM],
         ]}
         className="mt-10"
@@ -368,7 +368,7 @@ export const ProposalFormRfp = () => {
                     {proposalStep === ProposalFormStep.PROPOSE && (
                       <RfpProposalFormStepPropose formState={formState} />
                     )}
-                    {proposalStep === ProposalFormStep.REWARDS && (
+                    {proposalStep === ProposalFormStep.PAYMENT && (
                       <RfpProposalFormStepReward
                         selectedPaymentTerms={selectedPaymentTerms}
                         setSelectedPaymentTerms={setSelectedPaymentTerms}
@@ -413,7 +413,7 @@ export const ProposalFormRfp = () => {
                           message: "You do not own the required tokens to submit to this RFP.",
                         })
                       } else if (session.siwe?.address) {
-                        setProposalStep(ProposalFormStep.REWARDS)
+                        setProposalStep(ProposalFormStep.PAYMENT)
                       }
                     }}
                   >
@@ -438,7 +438,7 @@ export const ProposalFormRfp = () => {
                   )}
                 </div>
               )}
-              {proposalStep === ProposalFormStep.REWARDS && (
+              {proposalStep === ProposalFormStep.PAYMENT && (
                 <div className="flex justify-between mt-6">
                   <span
                     onClick={() => setProposalStep(ProposalFormStep.PROPOSE)}
@@ -496,7 +496,7 @@ export const ProposalFormRfp = () => {
               {proposalStep === ProposalFormStep.CONFIRM && (
                 <div className="flex justify-between mt-6">
                   <span
-                    onClick={() => setProposalStep(ProposalFormStep.REWARDS)}
+                    onClick={() => setProposalStep(ProposalFormStep.PAYMENT)}
                     className="cursor-pointer border rounded border-marble-white p-2 self-start"
                   >
                     <BackArrow className="fill-marble-white" />

@@ -33,13 +33,13 @@ export const gradientMap = {
 
 export enum ProposalFormStep {
   PROPOSE = "PROPOSE",
-  REWARDS = "REWARDS",
+  PAYMENT = "PAYMENT",
   CONFIRM = "CONFIRM",
 }
 
 export const PROPOSAL_FORM_HEADER_COPY = {
   [ProposalFormStep.PROPOSE]: "Propose",
-  [ProposalFormStep.REWARDS]: "Rewards",
+  [ProposalFormStep.PAYMENT]: "Payment",
   [ProposalFormStep.CONFIRM]: "Confirm",
 }
 

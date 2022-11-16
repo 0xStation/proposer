@@ -69,46 +69,49 @@ export const RfpProposalFormStepReward = ({
 
   return (
     <>
-      <div className="flex flex-col mt-6 pb-6 border-b border-wet-concrete space-y-6">
-        <p>The following details have already been set by this RFP.</p>
-        {rfp?.data?.proposal?.payment?.token && (
-          <>
-            {/* NETWORK */}
-            <div>
-              <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
-              <p className="mt-2">{getNetworkName(rfp?.data?.proposal?.payment?.token?.chainId)}</p>
-            </div>
-            {/* PAYMENT TOKEN */}
-            <div>
-              <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
-              <p className="mt-2">{rfp?.data?.proposal?.payment?.token?.symbol}</p>
-            </div>
-          </>
-        )}
-        {paymentAmountType !== PaymentAmountType.FLEXIBLE && (
-          <>
-            {/* PAYMENT AMOUNT */}
-            <div>
-              <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-              <p className="mt-2">{paymentDetailsString(paymentAmountType, paymentAmount)}</p>
-            </div>
-          </>
-        )}
-        {rfp?.data?.proposal?.payment?.terms && (
-          <>
-            {/* PAYMENT TERMS */}
-            <div>
-              <h4 className="text-xs font-bold text-concrete uppercase">Payment terms</h4>
-              <p className="mt-2">
-                {paymentTermsString(
-                  rfp?.data?.proposal?.payment?.terms,
-                  rfp?.data?.proposal?.payment?.advancePaymentPercentage
-                )}
-              </p>
-            </div>
-          </>
-        )}
-      </div>
+      {!!rfp?.data?.proposal.payment && (
+        <div className="flex flex-col mt-6 pb-6 border-b border-wet-concrete space-y-6">
+          {rfp?.data?.proposal?.payment?.token && (
+            <>
+              {/* NETWORK */}
+              <div>
+                <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
+                <p className="mt-2">
+                  {getNetworkName(rfp?.data?.proposal?.payment?.token?.chainId)}
+                </p>
+              </div>
+              {/* PAYMENT TOKEN */}
+              <div>
+                <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
+                <p className="mt-2">{rfp?.data?.proposal?.payment?.token?.symbol}</p>
+              </div>
+            </>
+          )}
+          {paymentAmountType !== PaymentAmountType.FLEXIBLE && (
+            <>
+              {/* PAYMENT AMOUNT */}
+              <div>
+                <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
+                <p className="mt-2">{paymentDetailsString(paymentAmountType, paymentAmount)}</p>
+              </div>
+            </>
+          )}
+          {rfp?.data?.proposal?.payment?.terms && (
+            <>
+              {/* PAYMENT TERMS */}
+              <div>
+                <h4 className="text-xs font-bold text-concrete uppercase">Payment terms</h4>
+                <p className="mt-2">
+                  {paymentTermsString(
+                    rfp?.data?.proposal?.payment?.terms,
+                    rfp?.data?.proposal?.payment?.advancePaymentPercentage
+                  )}
+                </p>
+              </div>
+            </>
+          )}
+        </div>
+      )}
       {!rfp?.data?.proposal?.payment?.token && (
         <>
           <ImportTokenModal

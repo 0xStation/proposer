@@ -273,7 +273,7 @@ export const ProposalFormFunding = ({
                         formState={formState}
                       />
                     )}
-                    {proposalStep === ProposalFormStep.REWARDS && (
+                    {proposalStep === ProposalFormStep.PAYMENT && (
                       <FundingFormStepReward
                         chainId={(chain?.id as number) || 1}
                         tokenOptions={tokenOptions}
@@ -348,14 +348,14 @@ export const ProposalFormFunding = ({
                         })
                         return
                       }
-                      setProposalStep(ProposalFormStep.REWARDS)
+                      setProposalStep(ProposalFormStep.PAYMENT)
                     }
                   }}
                 >
                   Next
                 </Button>
               )}
-              {proposalStep === ProposalFormStep.REWARDS && (
+              {proposalStep === ProposalFormStep.PAYMENT && (
                 <div className="flex justify-between mt-6">
                   <span
                     onClick={() => setProposalStep(ProposalFormStep.PROPOSE)}
@@ -394,7 +394,7 @@ export const ProposalFormFunding = ({
               {proposalStep === ProposalFormStep.CONFIRM && (
                 <div className="flex justify-between mt-6">
                   <span
-                    onClick={() => setProposalStep(ProposalFormStep.REWARDS)}
+                    onClick={() => setProposalStep(ProposalFormStep.PAYMENT)}
                     className="cursor-pointer border rounded border-marble-white p-2 self-start"
                   >
                     <BackArrow className="fill-marble-white" />
