@@ -10,13 +10,11 @@ const ProposalNewPartnership: BlitzPage = () => {
   const title = queryParams?.title as string
 
   return (
-    <Layout title="New Proposal">
-      <ProposalFormPartnership
-        prefillClients={clients}
-        prefillContributors={contributors}
-        prefillTitle={title}
-      />
-    </Layout>
+    <ProposalFormPartnership
+      prefillClients={clients}
+      prefillContributors={contributors}
+      prefillTitle={title}
+    />
   )
 }
 
