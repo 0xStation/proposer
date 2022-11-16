@@ -98,7 +98,7 @@ const RfpSettings: BlitzPage = () => {
   )
 
   return (
-    <Layout>
+    <>
       {/* LEFT SIDEBAR | PROPOSALS */}
       <div className="flex flex-row h-full">
         <RfpSidebar rfp={rfp} />
@@ -136,9 +136,13 @@ const RfpSettings: BlitzPage = () => {
           )}
         </div>
       </div>
-    </Layout>
+    </>
   )
 }
 
 RfpSettings.suppressFirstRenderFlicker = true
+RfpSettings.getLayout = function getLayout(page) {
+  // persist layout between pages https://nextjs.org/docs/basic-features/layouts
+  return <Layout title="RFP settings">{page}</Layout>
+}
 export default RfpSettings

@@ -59,7 +59,7 @@ const ProposalTemplateForm: BlitzPage = () => {
   )
 
   return (
-    <Layout title="New Proposal">
+    <>
       {/* LEFT SIDEBAR | PROPOSAL FORM */}
       <div className="flex flex-row h-full">
         {/* LEFT SIDEBAR */}
@@ -165,10 +165,14 @@ const ProposalTemplateForm: BlitzPage = () => {
         </div>
         <ProposalFormTemplate />
       </div>
-    </Layout>
+    </>
   )
 }
 
 ProposalTemplateForm.suppressFirstRenderFlicker = true
+ProposalTemplateForm.getLayout = function getLayout(page) {
+  // persist layout between pages https://nextjs.org/docs/basic-features/layouts
+  return <Layout title="New Proposal">{page}</Layout>
+}
 
 export default ProposalTemplateForm
