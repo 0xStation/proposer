@@ -16,18 +16,18 @@ import { ProposalCreationLoadingScreen } from "../ProposalCreationLoadingScreen"
 import deleteProposalById from "app/proposal/mutations/deleteProposalById"
 import RfpProposalFormStepPropose from "./stepPropose"
 import RfpProposalFormStepConfirm from "./stepConfirm"
-import { AddressType, ProposalRoleType } from "@prisma/client"
-import { mustBeAboveNumWords } from "app/utils/validators"
+import { AddressType, ProposalRoleType, TokenType } from "@prisma/client"
 import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
 import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinTokenBalance"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
 import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 import { SocialConnection } from "app/rfp/types"
-import { PaymentTerm } from "app/proposalPayment/types"
 import { generateMilestonePayments } from "app/proposal/utils"
 import RfpProposalFormStepReward from "./stepReward"
-import { getPaymentAmountDetails } from "app/rfp/utils"
+import getTokensByAccount from "app/token/queries/getTokensByAccount"
+import { useNetwork } from "wagmi"
+import { getNetworkTokens } from "app/core/utils/networkInfo"
 
 export const ProposalFormRfp = () => {
   const router = useRouter()
@@ -41,6 +41,11 @@ export const ProposalFormRfp = () => {
   const session = useSession({ suspense: false })
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false)
   const [selectedPaymentTerms, setSelectedPaymentTerms] = useState<string>("")
+  const [tokenOptions, setTokenOptions] = useState<any[]>()
+  const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
+  const [selectedToken, setSelectedToken] = useState<any>()
+
+  const { chain } = useNetwork()
 
   useWarnIfUnsavedChanges(unsavedChanges, () => {
     return confirm("Warning! You have unsaved changes.")
@@ -56,9 +61,13 @@ export const ProposalFormRfp = () => {
       enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
+      staleTime: 60 * 1000, // 1 minute
       onSuccess: (data) => {
         if (!data) {
           router.push(Routes.Page404())
+        }
+        if (!selectedToken) {
+          setSelectedToken(data?.data?.proposal?.payment?.token)
         }
       },
       onError: (data) => {
@@ -90,6 +99,33 @@ export const ProposalFormRfp = () => {
       refetchOnWindowFocus: false,
     }
   )
+
+  const [savedUserTokens, { refetch: refetchTokens }] = useQuery(
+    getTokensByAccount,
+    {
+      chainId: chain?.id || 1,
+      userId: session?.userId as number,
+    },
+    {
+      suspense: false,
+      enabled: Boolean(chain && session?.userId),
+      staleTime: 60 * 1000, // 1 minute
+    }
+  )
+
+  useEffect(() => {
+    if (chain?.id) {
+      const networkTokens = getNetworkTokens(chain?.id || 1)
+      // sets options for reward token dropdown. includes default tokens and
+      // tokens that the user has imported to their account
+      setTokenOptions([
+        ...networkTokens,
+        ...(savedUserTokens?.filter(
+          (token) => token.chainId === chain?.id && token.type === TokenType.ERC20
+        ) || []),
+      ])
+    }
+  }, [chain?.id])
 
   const [createProposalMutation] = useMutation(createProposal, {
     onSuccess: (data) => {
@@ -229,16 +265,21 @@ export const ProposalFormRfp = () => {
             let newProposal
 
             try {
+              const paymentToken = rfp?.data?.proposal?.payment?.token || selectedToken
+              const paymentAmount = values.paymentAmount || rfp?.data?.proposal?.payment?.minAmount
               const paymentTerms = rfp?.data?.proposal?.payment?.terms || values.paymentTerms
+              const advancePaymentPercentage =
+                values.advancePaymentPercentage ||
+                rfp?.data?.proposal?.payment?.advancePaymentPercentage
 
               const { milestones, payments } = generateMilestonePayments(
                 clientAddress,
                 contributorAddress,
-                rfp?.data?.proposal?.payment?.token,
-                rfp?.data?.proposal?.payment?.token?.chainId,
-                values.paymentAmount || rfp?.data?.proposal?.payment?.minAmount,
+                paymentToken,
+                paymentToken.chainId,
+                paymentAmount,
                 paymentTerms,
-                values.advancedPaymentPercentage
+                advancePaymentPercentage
               )
               newProposal = await createProposalMutation({
                 rfpId: rfp?.id,
@@ -331,10 +372,21 @@ export const ProposalFormRfp = () => {
                       <RfpProposalFormStepReward
                         selectedPaymentTerms={selectedPaymentTerms}
                         setSelectedPaymentTerms={setSelectedPaymentTerms}
+                        tokenOptions={tokenOptions}
+                        isImportTokenModalOpen={isImportTokenModalOpen}
+                        selectedToken={selectedToken}
+                        setTokenOptions={setTokenOptions}
+                        setIsImportTokenModalOpen={setIsImportTokenModalOpen}
+                        setSelectedToken={setSelectedToken}
+                        refetchTokens={refetchTokens}
+                        chainId={chain?.id}
                       />
                     )}
                     {proposalStep === ProposalFormStep.CONFIRM && (
-                      <RfpProposalFormStepConfirm formState={formState} />
+                      <RfpProposalFormStepConfirm
+                        formState={formState}
+                        selectedToken={selectedToken}
+                      />
                     )}
                   </>
                 )}

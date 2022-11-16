@@ -202,7 +202,7 @@ export const ProposalFormFunding = ({
               chain?.id || 1,
               values.paymentAmount,
               values.paymentTerms,
-              values.advancedPaymentPercentage
+              values.advancePaymentPercentage
             )
 
             newProposal = await createProposalMutation({
@@ -214,8 +214,8 @@ export const ProposalFormFunding = ({
               milestones,
               payments,
               paymentTerms: values.paymentTerms,
-              ...(parseFloat(values.advancedPaymentPercentage) > 0 && {
-                advancePaymentPercentage: parseFloat(values.advancedPaymentPercentage),
+              ...(parseFloat(values.advancePaymentPercentage) > 0 && {
+                advancePaymentPercentage: parseFloat(values.advancePaymentPercentage),
               }),
             })
           } catch (err) {
@@ -373,7 +373,7 @@ export const ProposalFormFunding = ({
                         // terms are ON_AGREEMENT or they are AFTER_COMPLETION && advanced percentage value is valid
                         (formState.values.paymentTerms !== PaymentTerm.ADVANCE_PAYMENT ||
                           !isValidAdvancedPaymentPercentage(
-                            formState.values.advancedPaymentPercentage
+                            formState.values.advancePaymentPercentage
                           ))
                       )
                     }

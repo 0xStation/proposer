@@ -9,7 +9,7 @@ import { useSession } from "@blitzjs/auth"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { ProposalRoleType } from "@prisma/client"
 
-export const RfpProposalFormStepConfirm = ({ formState }) => {
+export const RfpProposalFormStepConfirm = ({ formState, selectedToken }) => {
   const session = useSession({ suspense: false })
   const rfpId = useParam("rfpId") as string
   const [rfp] = useQuery(
@@ -21,6 +21,7 @@ export const RfpProposalFormStepConfirm = ({ formState }) => {
       enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
+      staleTime: 60 * 1000, // 1 minute
     }
   )
 
@@ -38,6 +39,8 @@ export const RfpProposalFormStepConfirm = ({ formState }) => {
 
   const { text: clientDisplayAddress } = useDisplayAddress(clientAddress)
   const { text: contributorDisplayAddress } = useDisplayAddress(contributorAddress)
+
+  const paymentToken = rfp?.data?.proposal?.payment?.token || selectedToken
 
   return (
     <>
@@ -71,14 +74,14 @@ export const RfpProposalFormStepConfirm = ({ formState }) => {
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Network</span>
         <span className="items-end">
-          {getNetworkName(rfp?.data?.proposal?.payment?.token?.chainId || 1)}
+          {getNetworkName(paymentToken?.chainId)}
           {/* TODO choose from RFP or form input */}
         </span>
       </div>
       {/* PAYMENT TOKEN */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">Payment token</span>
-        <span className="items-end">{rfp?.data?.proposal?.payment?.token?.symbol}</span>
+        <span className="items-end">{paymentToken?.symbol}</span>
       </div>
       {/* PAYMENT AMOUNT */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">

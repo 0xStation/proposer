@@ -7,7 +7,7 @@ export const generateMilestonePayments = (
   chainId,
   paymentAmount,
   paymentTerms,
-  advancedPaymentPercentage
+  advancePaymentPercentage
 ) => {
   let milestones: any[] = []
   let payments: any[] = []
@@ -47,8 +47,7 @@ export const generateMilestonePayments = (
       },
     ]
 
-    const advancedPayment =
-      (parseFloat(paymentAmount) * parseFloat(advancedPaymentPercentage)) / 100
+    const advancedPayment = (parseFloat(paymentAmount) * parseFloat(advancePaymentPercentage)) / 100
     const completionPayment = parseFloat(paymentAmount) - advancedPayment
 
     payments = [

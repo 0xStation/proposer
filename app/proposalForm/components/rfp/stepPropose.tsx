@@ -35,6 +35,7 @@ export const RfpProposalFormStepPropose = ({ formState }) => {
       enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
+      staleTime: 60 * 1000, // 1 minute
       onSuccess: (data) => {
         if (!data) {
           router.push(Routes.Page404())

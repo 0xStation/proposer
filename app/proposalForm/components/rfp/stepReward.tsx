@@ -24,16 +24,27 @@ import getRfpById from "app/rfp/queries/getRfpById"
 import { getPaymentAmountDetails } from "app/rfp/utils"
 import { PaymentAmountType } from "app/rfp/types"
 import { toTitleCase } from "app/core/utils/titleCase"
+import { useNetwork } from "wagmi"
 
 export function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-export const RfpProposalFormStepReward = ({ selectedPaymentTerms, setSelectedPaymentTerms }) => {
+export const RfpProposalFormStepReward = ({
+  selectedPaymentTerms,
+  setSelectedPaymentTerms,
+  tokenOptions,
+  isImportTokenModalOpen,
+  selectedToken,
+  setTokenOptions,
+  setIsImportTokenModalOpen,
+  setSelectedToken,
+  chainId,
+  refetchTokens,
+}) => {
   const session = useSession({ suspense: false })
   const activeUser = useStore((state) => state.activeUser)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
-  const { hasMounted } = useHasMounted()
 
   const rfpId = useParam("rfpId") as string
   const [rfp] = useQuery(
@@ -45,6 +56,7 @@ export const RfpProposalFormStepReward = ({ selectedPaymentTerms, setSelectedPay
       enabled: !!rfpId,
       suspense: false,
       refetchOnWindowFocus: false,
+      staleTime: 60 * 1000, // 1 minute
     }
   )
 
@@ -55,6 +67,81 @@ export const RfpProposalFormStepReward = ({ selectedPaymentTerms, setSelectedPay
 
   return (
     <>
+      {!rfp?.data?.proposal?.payment?.token && (
+        <>
+          <ImportTokenModal
+            isOpen={isImportTokenModalOpen}
+            setIsOpen={setIsImportTokenModalOpen}
+            chainId={chainId.toString()}
+            // refetches the tokens in the new proposal form token dropdown
+            callback={() => refetchTokens()}
+          />
+
+          {/* TOKEN */}
+          <div className="flex flex-col mt-6">
+            <label className="font-bold block">Reward token*</label>
+            <span className="text-xs text-concrete block">
+              Please select a network before you select a token.
+            </span>
+          </div>
+          <Field name="tokenAddress" validate={requiredField}>
+            {({ input, meta }) => {
+              return (
+                <>
+                  <div className="custom-select-wrapper">
+                    <select
+                      // if network is selected make the token address field required.
+                      required
+                      {...input}
+                      className="w-full bg-wet-concrete rounded p-2 mt-1"
+                      value={selectedToken?.address as string}
+                      onChange={(e) => {
+                        const token = tokenOptions.find((token) =>
+                          addressesAreEqual(token.address, e.target.value)
+                        )
+                        setSelectedToken(token)
+                        // custom values can be compatible with react-final-form by calling
+                        // the props.input.onChange callback
+                        // https://final-form.org/docs/react-final-form/api/Field
+                        input.onChange(token?.address)
+                      }}
+                    >
+                      <option value="">Choose option</option>
+                      {tokenOptions?.map((token) => {
+                        return (
+                          <option key={token?.address} value={token?.address}>
+                            {token?.symbol}
+                          </option>
+                        )
+                      })}
+                    </select>
+                  </div>
+                  {meta.touched && meta.error && (
+                    <span className="text-torch-red text-xs">{meta.error}</span>
+                  )}
+                </>
+              )
+            }}
+          </Field>
+          <div className="flex flex-row justify-between">
+            <span className="text-xs text-concrete block">
+              {" "}
+              Don&apos;t see your token? Import an ERC-20 with its address.
+            </span>
+            <button
+              className="text-electric-violet cursor-pointer flex justify-start"
+              onClick={(e) => {
+                e.preventDefault()
+                return !session.siwe?.address
+                  ? toggleWalletModal(true)
+                  : setIsImportTokenModalOpen(true)
+              }}
+            >
+              + Import
+            </button>
+          </div>
+        </>
+      )}
       {paymentAmountType !== PaymentAmountType.FIXED && (
         <>
           {/* PAYMENT AMOUNT */}
@@ -141,7 +228,7 @@ export const RfpProposalFormStepReward = ({ selectedPaymentTerms, setSelectedPay
                 Enter the percent of payment to be sent before work is to start.
               </span>
               <Field
-                name="advancedPaymentPercentage"
+                name="advancePaymentPercentage"
                 format={formatPercentValue}
                 validate={composeValidators(requiredField, isValidAdvancedPaymentPercentage)}
               >

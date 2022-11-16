@@ -90,7 +90,7 @@ export const RfpFormStepPayment = ({
         <>
           {/* TOKEN */}
           <div className="flex flex-col mt-6">
-            <label className="font-bold block">Payment token*</label>
+            <label className="font-bold block">Payment token</label>
           </div>
           <Field name="tokenAddress">
             {({ input, meta }) => {
@@ -114,7 +114,7 @@ export const RfpFormStepPayment = ({
                         input.onChange(selectedToken?.address)
                       }}
                     >
-                      <option value="">Choose option</option>
+                      <option value="">Flexible</option>
                       {paymentTokenOptions?.map((token) => {
                         return (
                           <option key={token?.address} value={token?.address}>
@@ -270,7 +270,7 @@ export const RfpFormStepPayment = ({
                     Enter the percent of payment to be sent before work is to start.
                   </span>
                   <Field
-                    name="advancedPaymentPercentage"
+                    name="advancePaymentPercentage"
                     format={formatPercentValue}
                     validate={composeValidators(requiredField, isValidAdvancedPaymentPercentage)}
                   >

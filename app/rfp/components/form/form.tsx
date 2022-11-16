@@ -93,6 +93,9 @@ export const RfpForm = () => {
   const [createRfpMutation] = useMutation(createRfp, {
     onSuccess: (data) => {
       console.log(data)
+      if (!data) {
+        throw Error("Error encountered, RFP could not create.")
+      }
       router.push(Routes.RfpDetail({ rfpId: data?.id as string }))
     },
     onError: (error: Error) => {
@@ -175,11 +178,11 @@ export const RfpForm = () => {
               requesterRole,
               proposerRole,
               payment: {
-                token: { ...selectedToken, chainId: chain?.id || 1 },
+                token: selectedToken ? { ...selectedToken, chainId: chain?.id || 1 } : undefined,
                 minAmount,
                 maxAmount,
                 terms: values.paymentTerms,
-                advancePaymentPercentage: values.advancePaymentPercentage,
+                advancePaymentPercentage: parseFloat(values.advancePaymentPercentage),
               },
               singleTokenGate: !!selectedSubmissionToken
                 ? { token: selectedSubmissionToken, minBalance: values.submissionTokenMinBalance }
@@ -216,7 +219,7 @@ export const RfpForm = () => {
             !(
               formState.values.paymentTerms !== PaymentTerm.ADVANCE_PAYMENT ||
               // isValidAdvancedPaymentPercentage returns string if there is an error or undefined if things are okay
-              !isValidAdvancedPaymentPercentage(formState.values.advancedPaymentPercentage)
+              !isValidAdvancedPaymentPercentage(formState.values.advancePaymentPercentage)
             )
 
           const missingFieldsPermissions = !(
