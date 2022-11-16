@@ -13,8 +13,6 @@ import getRfpById from "app/rfp/queries/getRfpById"
 import { toTitleCase } from "app/core/utils/titleCase"
 import ProposalFormRfp from "app/proposalForm/components/rfp/form"
 import { getPaymentAmountDetails, paymentDetailsString } from "app/rfp/utils"
-import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
-import { PaymentTerm } from "app/proposalPayment/types"
 import { paymentTermsString } from "app/proposal/utils"
 import AccountMediaRow from "app/comment/components/AccountMediaRow"
 
@@ -49,7 +47,7 @@ const ProposalRfpForm: BlitzPage = () => {
   )
 
   return (
-    <Layout title="New Proposal">
+    <>
       {/* LEFT SIDEBAR | PROPOSAL FORM */}
       <div className="flex flex-row h-full">
         {/* LEFT SIDEBAR */}
@@ -174,10 +172,14 @@ const ProposalRfpForm: BlitzPage = () => {
         </div>
         <ProposalFormRfp />
       </div>
-    </Layout>
+    </>
   )
 }
 
 ProposalRfpForm.suppressFirstRenderFlicker = true
+ProposalRfpForm.getLayout = function getLayout(page) {
+  // persist layout between pages https://nextjs.org/docs/basic-features/layouts
+  return <Layout title="New Proposal">{page}</Layout>
+}
 
 export default ProposalRfpForm

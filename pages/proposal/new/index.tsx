@@ -71,7 +71,7 @@ const ProposalTypeSelection: BlitzPage = () => {
   )
 
   return (
-    <Layout title="New Proposal">
+    <>
       {view === ProposalView.ProposalType && (
         <>
           {Boolean(rfps?.length) && (
@@ -151,10 +151,14 @@ const ProposalTypeSelection: BlitzPage = () => {
         </>
       )}
       {view === ProposalView.RfpList && <RfpListComponent rfps={rfps} setView={setView} />}
-    </Layout>
+    </>
   )
 }
 
 ProposalTypeSelection.suppressFirstRenderFlicker = true
+ProposalTypeSelection.getLayout = function getLayout(page) {
+  // persist layout between pages https://nextjs.org/docs/basic-features/layouts
+  return <Layout title="New Proposal">{page}</Layout>
+}
 
 export default ProposalTypeSelection

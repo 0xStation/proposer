@@ -53,15 +53,20 @@ const EditProposalPage = () => {
   const proposalId = useParam("proposalId")
 
   return (
-    <Layout title="Edit Proposal">
+    <>
       <ResetSignaturesModal
         isOpen={isResetSignaturesModalOpen}
         setIsOpen={setIsResetSignaturesModalOpen}
         proposalId={proposalId as string}
       />
       <EditProposalForm />
-    </Layout>
+    </>
   )
+}
+
+EditProposalPage.getLayout = function getLayout(page) {
+  // persist layout between pages https://nextjs.org/docs/basic-features/layouts
+  return <Layout title="Edit Proposal">{page}</Layout>
 }
 
 export default EditProposalPage

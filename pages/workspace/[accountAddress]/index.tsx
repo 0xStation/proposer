@@ -444,23 +444,22 @@ const WorkspaceHome: BlitzPage = () => {
   }
 
   return (
-    <Layout>
-      <div className="flex flex-row h-full">
-        {/* LEFT SIDEBAR */}
-        <div className="h-full w-[288px] border-r border-concrete p-6">
-          <div className="pb-6 border-b border-wet-concrete space-y-6">
-            {/* PROFILE */}
-            {account ? (
-              <AccountMediaObject account={account} showActionIcons={true} />
-            ) : (
-              // LOADING STATE
-              <div
-                tabIndex={0}
-                className={`h-10 w-full rounded-4xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
-              />
-            )}
-            {/* CTA */}
-            {/* {
+    <div className="flex flex-row h-full">
+      {/* LEFT SIDEBAR */}
+      <div className="h-full w-[288px] border-r border-concrete p-6">
+        <div className="pb-6 border-b border-wet-concrete space-y-6">
+          {/* PROFILE */}
+          {account ? (
+            <AccountMediaObject account={account} showActionIcons={true} />
+          ) : (
+            // LOADING STATE
+            <div
+              tabIndex={0}
+              className={`h-10 w-full rounded-4xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+            />
+          )}
+          {/* CTA */}
+          {/* {
               // activeTab !== WorkspaceTab.RFPS &&
               <Link
                 href={Routes.ProposalTypeSelection({
@@ -472,51 +471,54 @@ const WorkspaceHome: BlitzPage = () => {
                 <Button className="w-full">Propose</Button>
               </Link>
             } */}
-          </div>
-          {/* TABS */}
-          <ul className="mt-6 space-y-2">
-            {/* PROPOSALS */}
-            <li
-              className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
-                activeTab === WorkspaceTab.PROPOSALS && "bg-wet-concrete"
-              }`}
-              onClick={() => setActiveTab(WorkspaceTab.PROPOSALS)}
-            >
-              <LightBulbIcon className="h-5 w-5 text-white cursor-pointer" />
-              <span>Proposals</span>
-            </li>
-            {/* RFPS */}
-            <li
-              className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
-                activeTab === WorkspaceTab.RFPS && "bg-wet-concrete"
-              }`}
-              onClick={() => setActiveTab(WorkspaceTab.RFPS)}
-            >
-              <NewspaperIcon className="h-5 w-5 text-white cursor-pointer" />
-              <span>RFPs</span>
-            </li>
-            {/* SETTINGS */}
-            {hasPrivateAccess && (
-              <li
-                className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
-                  activeTab === WorkspaceTab.SETTINGS && "bg-wet-concrete"
-                }`}
-                onClick={() => setActiveTab(WorkspaceTab.SETTINGS)}
-              >
-                <CogIcon className="h-5 w-5 text-white cursor-pointer" />
-                <span>Settings</span>
-              </li>
-            )}
-          </ul>
         </div>
-        {/* TAB CONTENT */}
-        {activeTab === WorkspaceTab.PROPOSALS && <ProposalTab />}
-        {activeTab === WorkspaceTab.RFPS && <RfpTab />}
-        {activeTab === WorkspaceTab.SETTINGS && <SettingsTab />}
+        {/* TABS */}
+        <ul className="mt-6 space-y-2">
+          {/* PROPOSALS */}
+          <li
+            className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
+              activeTab === WorkspaceTab.PROPOSALS && "bg-wet-concrete"
+            }`}
+            onClick={() => setActiveTab(WorkspaceTab.PROPOSALS)}
+          >
+            <LightBulbIcon className="h-5 w-5 text-white cursor-pointer" />
+            <span>Proposals</span>
+          </li>
+          {/* RFPS */}
+          <li
+            className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
+              activeTab === WorkspaceTab.RFPS && "bg-wet-concrete"
+            }`}
+            onClick={() => setActiveTab(WorkspaceTab.RFPS)}
+          >
+            <NewspaperIcon className="h-5 w-5 text-white cursor-pointer" />
+            <span>RFPs</span>
+          </li>
+          {/* SETTINGS */}
+          {hasPrivateAccess && (
+            <li
+              className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
+                activeTab === WorkspaceTab.SETTINGS && "bg-wet-concrete"
+              }`}
+              onClick={() => setActiveTab(WorkspaceTab.SETTINGS)}
+            >
+              <CogIcon className="h-5 w-5 text-white cursor-pointer" />
+              <span>Settings</span>
+            </li>
+          )}
+        </ul>
       </div>
-    </Layout>
+      {/* TAB CONTENT */}
+      {activeTab === WorkspaceTab.PROPOSALS && <ProposalTab />}
+      {activeTab === WorkspaceTab.RFPS && <RfpTab />}
+      {activeTab === WorkspaceTab.SETTINGS && <SettingsTab />}
+    </div>
   )
 }
 
 WorkspaceHome.suppressFirstRenderFlicker = true
+WorkspaceHome.getLayout = function getLayout(page) {
+  // persist layout between pages https://nextjs.org/docs/basic-features/layouts
+  return <Layout title="Workspace">{page}</Layout>
+}
 export default WorkspaceHome
