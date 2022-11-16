@@ -21,8 +21,8 @@ const useGetRolesUserCanApprove = ({
 
   const awaitingApproval = userRoles
     .filter((role) => {
-      // filter on PENDING status
       return (
+        // filter on PENDING status
         role.approvalStatus === ProposalRoleApprovalStatus.PENDING &&
         // filter on user having not signed already
         // to be used by multisigs that can collect many signatures while role is PENDING
