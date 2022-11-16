@@ -1,5 +1,5 @@
 import Moralis from "moralis"
-import { useMutation } from "@blitzjs/rpc"
+import { useMutation, invoke } from "@blitzjs/rpc"
 import useStore from "app/core/hooks/useStore"
 import { getHash } from "app/signatures/utils"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
@@ -11,6 +11,7 @@ import { getMoralisNetwork } from "app/core/utils/networkInfo"
 import { EvmChain } from "@moralisweb3/evm-utils"
 import { ProposalPayment } from "app/proposalPayment/types"
 import updateAccount from "app/account/mutations/updateAccount"
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
 const createMoralisStream = async (
   proposalId: string,
@@ -64,18 +65,32 @@ const useGnosisSignature = (payment: ProposalPayment) => {
         throw Error("Gnosis signature error: " + data?.message)
       }
 
-      // TODO: only create a stream if one does not exist?
-      const moralisStreamId = await createMoralisStream(
-        payment.proposalId,
-        getMoralisNetwork(payment.data.token.chainId),
-        payment.senderAddress
-      )
-
-      // update the account to include the moralis stream
-      await updateAccountMutation({
-        address: payment.senderAddress,
-        moralisStreamId,
+      const account = await invoke(getAccountByAddress, {
+        where: { address: payment.senderAddress },
       })
+
+      if (!account) {
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: "Proposal client has no account.",
+        })
+        return data
+      }
+
+      if (!account.moralisStreamId) {
+        const moralisStreamId = await createMoralisStream(
+          payment.proposalId,
+          getMoralisNetwork(payment.data.token.chainId),
+          payment.senderAddress
+        )
+
+        // update the account to include the moralis stream
+        await updateAccountMutation({
+          address: payment.senderAddress,
+          moralisStreamId,
+        })
+      }
 
       setToastState({
         isToastShowing: true,
