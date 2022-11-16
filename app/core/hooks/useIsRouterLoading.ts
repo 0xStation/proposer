@@ -12,7 +12,7 @@ export const useIsRouterLoading = () => {
     }
     const handleComplete = (url) => {
       // timeout is used to prevent glitching from loading to page
-      setTimeout(() => setLoading(false), 500)
+      setLoading(false)
     }
 
     router.events.on("routeChangeStart", handleStart)

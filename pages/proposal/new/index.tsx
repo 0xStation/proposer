@@ -72,7 +72,7 @@ const ProposalTypeSelection: BlitzPage = () => {
   )
 
   return (
-    <Layout title="New Proposal">
+    <>
       {view === ProposalView.ProposalType && (
         <>
           {Boolean(rfps?.length) && (
@@ -152,7 +152,7 @@ const ProposalTypeSelection: BlitzPage = () => {
         </>
       )}
       {view === ProposalView.RfpList && <RfpListComponent rfps={rfps} setView={setView} />}
-    </Layout>
+    </>
   )
 }
 
