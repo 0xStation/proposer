@@ -7,12 +7,11 @@ Moralis.start({
   apiKey: process.env.NEXT_PUBLIC_MORALIS_API_KEY,
 })
 
+// moralis only supports a few chains --
+// what does that mean for what we are able to support in our own app?
 const moralisChainMap: Record<string, EvmChain> = {
   "1": EvmChain.ETHEREUM,
-  "3": EvmChain.ROPSTEN,
-  "4": EvmChain.RINKEBY,
   "5": EvmChain.GOERLI,
-  "42": EvmChain.KOVAN,
   "137": EvmChain.POLYGON,
   "80001": EvmChain.MUMBAI,
   "43114": EvmChain.AVALANCHE,
