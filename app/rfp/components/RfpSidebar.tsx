@@ -13,6 +13,7 @@ import { toTitleCase } from "app/core/utils/titleCase"
 import { getPaymentAmountDetails, paymentDetailsString } from "../utils"
 import { paymentTermsString } from "app/proposal/utils"
 import AccountMediaRow from "app/comment/components/AccountMediaRow"
+import LookingForPill from "./LookingForPill"
 
 export const RfpSidebar = ({ rfp }) => {
   const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
@@ -60,9 +61,9 @@ export const RfpSidebar = ({ rfp }) => {
         {rfp ? (
           <div className="flex flex-row flex-wrap gap-1">
             <RfpStatusPill status={rfp?.status} />
-            <span className="bg-wet-concrete rounded-full px-2 py-1 flex items-center w-fit text-xs uppercase text-marble-white font-bold">
-              Looking for {rfp?.data?.proposal?.proposerRole + "S"}
-            </span>
+            {rfp?.status !== RfpStatus.CLOSED && (
+              <LookingForPill role={rfp?.data?.proposal?.proposerRole} />
+            )}
           </div>
         ) : (
           // LOADING STATE
