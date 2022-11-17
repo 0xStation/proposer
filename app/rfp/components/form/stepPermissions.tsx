@@ -43,7 +43,7 @@ export const RfpFormStepPermission = ({
         callback={() => refetchTokens(true)}
       />
       {/* WORD COUNT */}
-      <label className="font-bold block mt-6">Word count requirement</label>
+      <label className="font-bold block mt-6">Word count requirement*</label>
       <Field name="wordCountRequirement">
         {({ meta, input }) => (
           <>

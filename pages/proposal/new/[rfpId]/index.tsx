@@ -15,6 +15,9 @@ import ProposalFormRfp from "app/proposalForm/components/rfp/form"
 import { getPaymentAmountDetails, paymentDetailsString } from "app/rfp/utils"
 import { paymentTermsString } from "app/proposal/utils"
 import AccountMediaRow from "app/comment/components/AccountMediaRow"
+import LookingForPill from "app/rfp/components/LookingForPill"
+import { RfpStatus } from "@prisma/client"
+import AccountMediaObject from "app/core/components/AccountMediaObject"
 
 const ProposalRfpForm: BlitzPage = () => {
   const rfpId = useParam("rfpId") as string
@@ -59,15 +62,6 @@ const ProposalRfpForm: BlitzPage = () => {
                 <Image src={BackIcon} alt="Back icon" />
               </div>
             </Link>
-            {rfp ? (
-              <AccountMediaRow account={rfp?.account} />
-            ) : (
-              <div
-                tabIndex={0}
-                className={`h-6 w-full rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
-              />
-              // LOADING STATE
-            )}
             {/* TITLE */}
             {rfp ? (
               <span className="mt-6 text-2xl font-bold text-marble-white">
@@ -82,7 +76,12 @@ const ProposalRfpForm: BlitzPage = () => {
             )}
             {/* STATUS PILL */}
             {rfp ? (
-              <RfpStatusPill status={rfp?.status} />
+              <div className="flex flex-row flex-wrap gap-1">
+                <RfpStatusPill status={rfp?.status} />
+                {rfp?.status !== RfpStatus.CLOSED && (
+                  <LookingForPill role={rfp?.data?.proposal?.proposerRole} />
+                )}
+              </div>
             ) : (
               // LOADING STATE
               <div
@@ -92,6 +91,15 @@ const ProposalRfpForm: BlitzPage = () => {
             )}
             {/* METADATA */}
             <div className="mt-12 pt-6 flex flex-col space-y-6">
+              {/* ACCOUNT */}
+              {rfp?.account && (
+                <div>
+                  <h4 className="text-xs font-bold text-concrete uppercase mb-2">
+                    {rfp?.data?.proposal?.requesterRole}
+                  </h4>
+                  <AccountMediaObject account={rfp?.account} />
+                </div>
+              )}
               {/* SUBMISSION GUIDELINES */}
               {!!rfp?.data?.content.body && (
                 <div>

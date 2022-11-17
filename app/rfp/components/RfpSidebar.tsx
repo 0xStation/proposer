@@ -1,7 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { useQuery } from "@blitzjs/rpc"
-import { Routes, useParam } from "@blitzjs/next"
+import { Routes } from "@blitzjs/next"
 import { RfpStatus } from "@prisma/client"
 import BackIcon from "/public/back-icon.svg"
 import TextLink from "app/core/components/TextLink"
@@ -11,12 +10,11 @@ import RfpStatusPill from "./RfpStatusPill"
 import Button from "app/core/components/sds/buttons/Button"
 import ReadMore from "app/core/components/ReadMore"
 import { toTitleCase } from "app/core/utils/titleCase"
-import { PaymentAmountType } from "../types"
 import { getPaymentAmountDetails, paymentDetailsString } from "../utils"
-import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
-import { PaymentTerm } from "app/proposalPayment/types"
 import { paymentTermsString } from "app/proposal/utils"
 import AccountMediaRow from "app/comment/components/AccountMediaRow"
+import LookingForPill from "./LookingForPill"
+import AccountMediaObject from "app/core/components/AccountMediaObject"
 
 export const RfpSidebar = ({ rfp }) => {
   const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
@@ -38,16 +36,6 @@ export const RfpSidebar = ({ rfp }) => {
             <Image src={BackIcon} alt="Back icon" />
           </div>
         </Link>
-        {/* ACCOUNT */}
-        {rfp ? (
-          <AccountMediaRow account={rfp?.account} />
-        ) : (
-          <div
-            tabIndex={0}
-            className={`h-6 w-full rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
-          />
-          // LOADING STATE
-        )}
         {/* TITLE */}
         {rfp ? (
           <span className="mt-6 text-2xl font-bold text-marble-white">
@@ -60,14 +48,19 @@ export const RfpSidebar = ({ rfp }) => {
             className={`h-8 w-full rounded-lg flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
           />
         )}
-        {/* STATUS PILL */}
+        {/* PILLS */}
         {rfp ? (
-          <RfpStatusPill status={rfp?.status} />
+          <div className="flex flex-row flex-wrap gap-1">
+            <RfpStatusPill status={rfp?.status} />
+            {rfp?.status !== RfpStatus.CLOSED && (
+              <LookingForPill role={rfp?.data?.proposal?.proposerRole} />
+            )}
+          </div>
         ) : (
           // LOADING STATE
           <div
             tabIndex={0}
-            className={`h-6 w-1/3 rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+            className={`h-6 w-full rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
           />
         )}
         {/* CTA */}
@@ -89,6 +82,15 @@ export const RfpSidebar = ({ rfp }) => {
         </div>
         {/* METADATA */}
         <div className="pt-6 flex flex-col space-y-6">
+          {/* ACCOUNT */}
+          {rfp?.account && (
+            <div>
+              <h4 className="text-xs font-bold text-concrete uppercase mb-2">
+                {rfp?.data?.proposal?.requesterRole}
+              </h4>
+              <AccountMediaObject account={rfp?.account} />
+            </div>
+          )}
           {/* SUBMISSION GUIDELINES */}
           {!!rfp?.data?.content.body && (
             <div>
