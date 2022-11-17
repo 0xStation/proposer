@@ -146,7 +146,10 @@ const Navigation = ({ children }: { children?: any }) => {
                   </span>
                 </div>
               }
-              items={[{ name: "Disconnect", onClick: () => handleDisconnect() }]}
+              items={[
+                { name: "Create group workspace", onClick: () => setNewWorkspaceModalOpen(true) },
+                { name: "Disconnect", onClick: () => handleDisconnect() },
+              ]}
             />
           )}
           <Dropdown
@@ -165,18 +168,6 @@ const Navigation = ({ children }: { children?: any }) => {
       <div className="h-[calc(100vh-70px)] w-[70px] bg-tunnel-black border-r border-concrete fixed top-[70px] left-0 text-center flex flex-col">
         <div className="h-full mt-4">
           <ExploreIcon />
-          <NewWorkspaceIcon
-            onClick={(toggle) => {
-              if (!activeUser) {
-                setToastState({
-                  isToastShowing: true,
-                  type: "error",
-                  message: "You must have a connected wallet to add a new account.",
-                })
-              }
-              setNewWorkspaceModalOpen(toggle)
-            }}
-          />
           {/* if connected wallet changes from activeUser (from SIWE session), hide left nav options */}
           {activeUser && address === activeUser?.address && (
             <>

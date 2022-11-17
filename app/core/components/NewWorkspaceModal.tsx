@@ -83,11 +83,7 @@ export const NewWorkspaceModal = ({
       }}
     >
       <div className="p-6">
-        <h1 className="text-2xl font-bold">Create a new multi-sig account</h1>
-        <p className="text-base mt-6">
-          Select a <TextLink url={LINKS.GNOSIS_SAFE}>Gnosis Safe </TextLink>
-          address you&apos;re an admin of to govern the account.
-        </p>
+        <h1 className="text-2xl font-bold">Create a group workspace</h1>
         <Form
           initialValues={{}}
           onSubmit={(values) => {
@@ -109,11 +105,9 @@ export const NewWorkspaceModal = ({
             const formState = form.getState()
             return (
               <form onSubmit={handleSubmit}>
-                <label className="font-bold block mt-6">Gnosis Safe address*</label>
+                <label className="font-bold block mt-6">Select a Gnosis Safe</label>
                 <span className="text-xs text-light-concrete block mb-2">
-                  Listed options are the Gnosis Safes that you are a current admin of on the
-                  selected network. Change your network in the upper-right corner of this page to
-                  the left of your profile.
+                  To see different options, change your network.
                 </span>
 
                 <Field
@@ -123,7 +117,7 @@ export const NewWorkspaceModal = ({
                   className="w-full bg-wet-concrete p-2 rounded text-marble-white"
                 >
                   <option value="" disabled selected>
-                    Select a safe
+                    Select one
                   </option>
                   {safes.map((safe: any, idx) => {
                     return (
@@ -144,7 +138,7 @@ export const NewWorkspaceModal = ({
                       Create
                     </Button>
                     {!formState.values?.safeAddress && (
-                      <span className="text-xs mt-2">
+                      <span className="text-xs text-concrete mt-2">
                         You can continue once you&apos;ve selected an option.
                       </span>
                     )}
