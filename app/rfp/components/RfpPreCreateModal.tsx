@@ -21,6 +21,7 @@ export const RfpPreCreateModal = ({
   const router = useRouter()
   const setToastState = useStore((state) => state.setToastState)
 
+  // when closing modal, reset selection for next open
   useEffect(() => {
     if (!isOpen) {
       setLookingFor(null)
@@ -51,9 +52,11 @@ export const RfpPreCreateModal = ({
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-6">
         <RadioGroup value={lookingFor} onChange={setLookingFor} className="mt-4">
+          {/* TITLE */}
           <RadioGroup.Label className="text-2xl font-bold text-marble-white">
             What are you looking for?
           </RadioGroup.Label>
+          {/* OPTIONS */}
           <div className="mt-4 space-y-2">
             <LookingForOption
               value={ProposalRoleType.CLIENT}
@@ -67,6 +70,7 @@ export const RfpPreCreateModal = ({
             />
           </div>
         </RadioGroup>
+        {/* CTA */}
         <Button
           type={ButtonType.Primary}
           className="my-10 float-right"

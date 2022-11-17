@@ -3,9 +3,9 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { useQuery, invalidateQuery, invoke } from "@blitzjs/rpc"
 import { BlitzPage, useParam, Routes } from "@blitzjs/next"
-import { useEffect, useState, useMemo } from "react"
+import { useState } from "react"
 import Layout from "app/core/layouts/Layout"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import Button from "app/core/components/sds/buttons/Button"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { formatDate } from "app/core/utils/formatDate"
 import FilterPill from "app/core/components/FilterPill"
@@ -22,7 +22,6 @@ import {
   RFP_STATUS_DISPLAY_MAP,
 } from "app/core/utils/constants"
 import {
-  AddressType,
   ProposalStatus,
   ProposalRoleApprovalStatus,
   ProposalRoleType,
@@ -45,7 +44,6 @@ import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 import getRfpCountForAccount from "app/rfp/queries/getRfpCountForAccount"
 import getProposalCountForAccount from "app/proposal/queries/getProposalCountForAccount"
 import { RfpCard } from "app/rfp/components/RfpCard"
-import { useSession } from "@blitzjs/auth"
 import useUserHasPermissionOfAddress from "app/core/hooks/useUserHasPermissionOfAddress"
 import RfpPreCreateModal from "app/rfp/components/RfpPreCreateModal"
 
@@ -366,9 +364,10 @@ const WorkspaceHome: BlitzPage = () => {
         />
         <div className="p-10 flex-1 max-h-screen overflow-y-auto">
           <div className="flex flex-row justify-between">
+            {/* HEADER */}
             <h1 className="text-2xl font-bold">RFPs</h1>
+            {/* CTA */}
             {hasPrivateAccess && (
-              // <Link href={Routes.RfpNew({ accountAddress })}>
               <Button
                 className="w-full px-10"
                 overrideWidthClassName="max-w-fit"
@@ -378,11 +377,9 @@ const WorkspaceHome: BlitzPage = () => {
               >
                 Create RFP
               </Button>
-              // </Link>
             )}
           </div>
           {/* FILTERS & PAGINATION */}
-
           <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">
             {/* FILTERS */}
             <div className="space-x-2 flex flex-row">
