@@ -98,13 +98,13 @@ const PaymentAction = ({ proposal, milestone }) => {
       payment &&
       !payment.data.multisigTransaction && {
         [ProposalRoleType.CLIENT]: (
-          <Button
-            type={ButtonType.Secondary}
+          <button
             onClick={() => toggleQueueGnosisTransactionModalMap({ open: true, id: payment.id })}
-            overrideWidthClassName="w-full px-4"
+            className="mb-2 sm:mb-0 font-bold border rounded px-4 h-[35px] bg-electric-violet border-electric-violet text-tunnel-black w-full"
           >
-            Queue and approve transaction
-          </Button>
+            Queue and approve
+            <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
+          </button>
         ),
       }),
     // user is signer on the gnosis safe
