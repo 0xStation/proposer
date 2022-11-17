@@ -103,7 +103,7 @@ const PaymentAction = ({ proposal, milestone }) => {
             onClick={() => toggleQueueGnosisTransactionModalMap({ open: true, id: payment.id })}
             overrideWidthClassName="w-full px-4"
           >
-            Queue transaction
+            Queue and approve transaction
           </Button>
         ),
       }),
@@ -123,7 +123,7 @@ const PaymentAction = ({ proposal, milestone }) => {
             onClick={() => toggleApproveGnosisTransactionModalMap({ open: true, id: payment.id })}
             overrideWidthClassName="w-full px-4"
           >
-            Approve
+            Approve transaction
           </Button>
         ),
       }),
