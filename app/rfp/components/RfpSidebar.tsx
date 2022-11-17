@@ -1,7 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { useQuery } from "@blitzjs/rpc"
-import { Routes, useParam } from "@blitzjs/next"
+import { Routes } from "@blitzjs/next"
 import { RfpStatus } from "@prisma/client"
 import BackIcon from "/public/back-icon.svg"
 import TextLink from "app/core/components/TextLink"
@@ -11,10 +10,7 @@ import RfpStatusPill from "./RfpStatusPill"
 import Button from "app/core/components/sds/buttons/Button"
 import ReadMore from "app/core/components/ReadMore"
 import { toTitleCase } from "app/core/utils/titleCase"
-import { PaymentAmountType } from "../types"
 import { getPaymentAmountDetails, paymentDetailsString } from "../utils"
-import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
-import { PaymentTerm } from "app/proposalPayment/types"
 import { paymentTermsString } from "app/proposal/utils"
 import AccountMediaRow from "app/comment/components/AccountMediaRow"
 
@@ -60,14 +56,19 @@ export const RfpSidebar = ({ rfp }) => {
             className={`h-8 w-full rounded-lg flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
           />
         )}
-        {/* STATUS PILL */}
+        {/* PILLS */}
         {rfp ? (
-          <RfpStatusPill status={rfp?.status} />
+          <div className="flex flex-row flex-wrap gap-1">
+            <RfpStatusPill status={rfp?.status} />
+            <span className="bg-wet-concrete rounded-full px-2 py-1 flex items-center w-fit text-xs uppercase text-marble-white font-bold">
+              Looking for {rfp?.data?.proposal?.proposerRole + "S"}
+            </span>
+          </div>
         ) : (
           // LOADING STATE
           <div
             tabIndex={0}
-            className={`h-6 w-1/3 rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+            className={`h-6 w-full rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
           />
         )}
         {/* CTA */}

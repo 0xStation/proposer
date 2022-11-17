@@ -17,13 +17,10 @@ import useStore from "app/core/hooks/useStore"
 import { RfpFormStep, RFP_FORM_HEADER_COPY } from "app/core/utils/constants"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { getNetworkTokens } from "app/core/utils/networkInfo"
-import { formatPositiveInt } from "app/utils/formatters"
-import { isValidAdvancedPaymentPercentage, isValidTokenAmount } from "app/utils/validators"
 // MODULE
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
-import { PaymentTerm } from "app/proposalPayment/types"
 import createRfp from "app/rfp/mutations/createRfp"
-import { PaymentAmountType, PaymentDirection } from "app/rfp/types"
+import { PaymentAmountType } from "app/rfp/types"
 import { ProposalTemplateFieldValidationName } from "app/template/types"
 import getTokensByAccount from "app/token/queries/getTokensByAccount"
 // LOCAL
@@ -33,6 +30,7 @@ import RfpFormStepPermission from "./stepPermissions"
 
 export const RfpForm = () => {
   const accountAddress = useParam("accountAddress", "string") as string
+  const lookingFor = useParam("lookingFor", "string") as string
   const setToastState = useStore((state) => state.setToastState)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -145,10 +143,10 @@ export const RfpForm = () => {
         onSubmit={async (values: any, form) => {
           let requesterRole
           let proposerRole
-          if (values.paymentDirection === PaymentDirection.AUTHOR_IS_SENDER) {
+          if (lookingFor.toUpperCase() === ProposalRoleType.CONTRIBUTOR) {
             requesterRole = ProposalRoleType.CLIENT
             proposerRole = ProposalRoleType.CONTRIBUTOR
-          } else if (values.paymentDirection === PaymentDirection.AUTHOR_IS_RECIPIENT) {
+          } else if (lookingFor.toUpperCase() === ProposalRoleType.CLIENT) {
             requesterRole = ProposalRoleType.CONTRIBUTOR
             proposerRole = ProposalRoleType.CLIENT
           }
@@ -210,28 +208,6 @@ export const RfpForm = () => {
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
 
-          const missingFieldsGeneral =
-            !formState.values.title ||
-            (formState.values.bodyValidation === ProposalTemplateFieldValidationName.MIN_WORDS &&
-              !formatPositiveInt(formState.values.minWordCount))
-
-          const missingFieldsPayment =
-            (!formState.values.paymentDirection && !formState.values.tokenAddress) ||
-            (paymentAmountType !== PaymentAmountType.FLEXIBLE && !formState.values.paymentAmount) ||
-            !(
-              formState.values.paymentTerms !== PaymentTerm.ADVANCE_PAYMENT ||
-              // isValidAdvancedPaymentPercentage returns string if there is an error or undefined if things are okay
-              !isValidAdvancedPaymentPercentage(formState.values.advancePaymentPercentage)
-            )
-
-          const missingFieldsPermissions = !(
-            !selectedSubmissionToken ||
-            // isValidTokenAmount returns string if error or undefined if all good
-            !isValidTokenAmount(selectedSubmissionToken?.decimals)(
-              formState.values.submissionTokenMinBalance
-            )
-          )
-
           return (
             <form onSubmit={handleSubmit} className="mt-20">
               <div className="rounded-2xl border border-concrete p-6 h-[560px] overflow-y-scroll">
@@ -252,8 +228,6 @@ export const RfpForm = () => {
                         setIsImportTokenModalOpen={setIsImportTokenModalOpen}
                         selectedToken={selectedToken}
                         setSelectedToken={setSelectedToken}
-                        selectedPaymentDirection={selectedPaymentDirection}
-                        setSelectedPaymentDirection={setSelectedPaymentDirection}
                         selectedPaymentTerms={selectedPaymentTerms}
                         setSelectedPaymentTerms={setSelectedPaymentTerms}
                         paymentAmountType={paymentAmountType}
@@ -279,7 +253,7 @@ export const RfpForm = () => {
               {proposalStep === RfpFormStep.RFP && (
                 <div className="my-6 float-right flex flex-col space-y-1 items-end">
                   <Button
-                    isDisabled={missingFieldsGeneral || !userCanPostRfpForAccount}
+                    isDisabled={formState.invalid || !userCanPostRfpForAccount}
                     onClick={async () => {
                       if (!session?.siwe?.address || !activeUser?.address) {
                         toggleWalletModal(true)
@@ -307,7 +281,7 @@ export const RfpForm = () => {
                   </span>
                   <div className="flex flex-col space-y-1 items-end">
                     <Button
-                      isDisabled={missingFieldsPayment || !userCanPostRfpForAccount}
+                      isDisabled={formState.invalid || !userCanPostRfpForAccount}
                       className="float-right"
                       onClick={() => {
                         if (!session.siwe?.address) {
@@ -338,9 +312,7 @@ export const RfpForm = () => {
                   </span>
                   <div className="flex flex-col space-y-1 items-end">
                     <Button
-                      isDisabled={
-                        isLoading || missingFieldsPermissions || !userCanPostRfpForAccount
-                      }
+                      isDisabled={isLoading || formState.invalid || !userCanPostRfpForAccount}
                       isLoading={isLoading}
                       onClick={async (e) => {
                         e.preventDefault()

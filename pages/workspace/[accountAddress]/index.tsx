@@ -47,6 +47,7 @@ import getProposalCountForAccount from "app/proposal/queries/getProposalCountFor
 import { RfpCard } from "app/rfp/components/RfpCard"
 import { useSession } from "@blitzjs/auth"
 import useUserHasPermissionOfAddress from "app/core/hooks/useUserHasPermissionOfAddress"
+import RfpPreCreateModal from "app/rfp/components/RfpPreCreateModal"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
@@ -324,6 +325,7 @@ const WorkspaceHome: BlitzPage = () => {
     const RFP_PAGINATION_TAKE = 25
     const [rfpPage, setRfpPage] = useState<number>(0)
     const [rfpStatusFilters, setRfpStatusFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
+    const [isRfpPreCreateModalOpen, setIsRfpPreCreateModalOpen] = useState<boolean>(false)
 
     const [rfps] = useQuery(
       getRfpsForAccount,
@@ -356,79 +358,93 @@ const WorkspaceHome: BlitzPage = () => {
     )
 
     return (
-      <div className="p-10 flex-1 max-h-screen overflow-y-auto">
-        <div className="flex flex-row justify-between">
-          <h1 className="text-2xl font-bold">RFPs</h1>
-          {hasPrivateAccess && (
-            <Link href={Routes.RfpNew({ accountAddress })}>
-              <Button className="w-full px-10" overrideWidthClassName="max-w-fit">
+      <>
+        <RfpPreCreateModal
+          isOpen={isRfpPreCreateModalOpen}
+          setIsOpen={setIsRfpPreCreateModalOpen}
+          accountAddress={accountAddress}
+        />
+        <div className="p-10 flex-1 max-h-screen overflow-y-auto">
+          <div className="flex flex-row justify-between">
+            <h1 className="text-2xl font-bold">RFPs</h1>
+            {hasPrivateAccess && (
+              // <Link href={Routes.RfpNew({ accountAddress })}>
+              <Button
+                className="w-full px-10"
+                overrideWidthClassName="max-w-fit"
+                onClick={() => {
+                  setIsRfpPreCreateModalOpen(true)
+                }}
+              >
                 Create RFP
               </Button>
-            </Link>
-          )}
-        </div>
-        {/* FILTERS & PAGINATION */}
-        <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">
-          {/* FILTERS */}
-          <div className="space-x-2 flex flex-row">
-            <FilterPill
-              label="status"
-              filterOptions={RFP_STATUS_FILTER_OPTIONS.map((status) => ({
-                name: RFP_STATUS_DISPLAY_MAP[status]?.copy?.toUpperCase(),
-                value: status,
-              }))}
-              appliedFilters={rfpStatusFilters}
-              setAppliedFilters={setRfpStatusFilters}
-              refetchCallback={() => {
-                setRfpPage(0)
-                invalidateQuery(getRfpsForAccount)
-                invalidateQuery(getRfpCountForAccount)
-              }}
+              // </Link>
+            )}
+          </div>
+          {/* FILTERS & PAGINATION */}
+
+          <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">
+            {/* FILTERS */}
+            <div className="space-x-2 flex flex-row">
+              <FilterPill
+                label="status"
+                filterOptions={RFP_STATUS_FILTER_OPTIONS.map((status) => ({
+                  name: RFP_STATUS_DISPLAY_MAP[status]?.copy?.toUpperCase(),
+                  value: status,
+                }))}
+                appliedFilters={rfpStatusFilters}
+                setAppliedFilters={setRfpStatusFilters}
+                refetchCallback={() => {
+                  setRfpPage(0)
+                  invalidateQuery(getRfpsForAccount)
+                  invalidateQuery(getRfpCountForAccount)
+                }}
+              />
+            </div>
+            {/* PAGINATION */}
+            <Pagination
+              results={rfps as any[]}
+              resultsCount={rfpCount || 0}
+              page={rfpPage}
+              setPage={setRfpPage}
+              resultsLabel="rfps"
+              paginationTake={RFP_PAGINATION_TAKE}
+              className="ml-6 sm:ml-0 text-sm self-end"
             />
           </div>
-          {/* PAGINATION */}
-          <Pagination
-            results={rfps as any[]}
-            resultsCount={rfpCount || 0}
-            page={rfpPage}
-            setPage={setRfpPage}
-            resultsLabel="rfps"
-            paginationTake={RFP_PAGINATION_TAKE}
-            className="ml-6 sm:ml-0 text-sm self-end"
-          />
-        </div>
-        {/* RFP CARDS */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:gap-2 md:gap-4 lg:gap-6 gap-1">
+          {/* RFP CARDS */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:gap-2 md:gap-4 lg:gap-6 gap-1">
+            {rfps &&
+              rfps?.length > 0 &&
+              rfps?.map((rfp, idx) => {
+                return <RfpCard key={idx} rfp={rfp} href={Routes.RfpDetail({ rfpId: rfp.id })} />
+              })}
+            {/* RFP LOADING */}
+            {!rfps &&
+              Array.from(Array(9)).map((idx) => (
+                <div
+                  key={idx}
+                  tabIndex={0}
+                  className="h-36 rounded-md overflow-hidden bg-wet-concrete shadow border-solid motion-safe:animate-pulse"
+                />
+              ))}
+          </div>
+          {/* RFP EMPTY */}
           {rfps &&
-            rfps?.length > 0 &&
-            rfps?.map((rfp, idx) => {
-              return <RfpCard key={idx} rfp={rfp} href={Routes.RfpDetail({ rfpId: rfp.id })} />
-            })}
-          {/* RFP LOADING */}
-          {!rfps &&
-            Array.from(Array(9)).map((idx) => (
-              <div
-                key={idx}
-                tabIndex={0}
-                className="h-36 rounded-md overflow-hidden bg-wet-concrete shadow border-solid motion-safe:animate-pulse"
-              />
+            rfps.length === 0 &&
+            (rfpStatusFilters.size ? (
+              <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
+                <p className="text-2xl font-bold w-[295px] text-center">No matches.</p>
+              </div>
+            ) : (
+              <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
+                <p className="text-2xl font-bold w-[295px] text-center">
+                  This workspace has no RFPs yet
+                </p>
+              </div>
             ))}
         </div>
-        {/* RFP EMPTY */}
-        {rfps &&
-          rfps.length === 0 &&
-          (rfpStatusFilters.size ? (
-            <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-              <p className="text-2xl font-bold w-[295px] text-center">No matches.</p>
-            </div>
-          ) : (
-            <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-              <p className="text-2xl font-bold w-[295px] text-center">
-                This workspace has no RFPs yet
-              </p>
-            </div>
-          ))}
-      </div>
+      </>
     )
   }
 
