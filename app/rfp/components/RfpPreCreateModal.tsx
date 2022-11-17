@@ -39,7 +39,7 @@ export const RfpPreCreateModal = ({
                 "flex flex-col space-y-1 justify relative flex cursor-pointer rounded-lg border p-4"
               )}
             >
-              <h4 className="text-lg">{title}</h4>
+              <h4 className="text-lg font-bold">{title}</h4>
               <div className="text-concrete text-xs">{subtitle}</div>
             </div>
           </>

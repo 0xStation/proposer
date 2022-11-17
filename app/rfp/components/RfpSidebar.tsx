@@ -14,6 +14,7 @@ import { getPaymentAmountDetails, paymentDetailsString } from "../utils"
 import { paymentTermsString } from "app/proposal/utils"
 import AccountMediaRow from "app/comment/components/AccountMediaRow"
 import LookingForPill from "./LookingForPill"
+import AccountMediaObject from "app/core/components/AccountMediaObject"
 
 export const RfpSidebar = ({ rfp }) => {
   const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
@@ -35,16 +36,6 @@ export const RfpSidebar = ({ rfp }) => {
             <Image src={BackIcon} alt="Back icon" />
           </div>
         </Link>
-        {/* ACCOUNT */}
-        {rfp ? (
-          <AccountMediaRow account={rfp?.account} />
-        ) : (
-          <div
-            tabIndex={0}
-            className={`h-6 w-full rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
-          />
-          // LOADING STATE
-        )}
         {/* TITLE */}
         {rfp ? (
           <span className="mt-6 text-2xl font-bold text-marble-white">
@@ -91,6 +82,15 @@ export const RfpSidebar = ({ rfp }) => {
         </div>
         {/* METADATA */}
         <div className="pt-6 flex flex-col space-y-6">
+          {/* ACCOUNT */}
+          {rfp?.account && (
+            <div>
+              <h4 className="text-xs font-bold text-concrete uppercase mb-2">
+                {rfp?.data?.proposal?.requesterRole}
+              </h4>
+              <AccountMediaObject account={rfp?.account} />
+            </div>
+          )}
           {/* SUBMISSION GUIDELINES */}
           {!!rfp?.data?.content.body && (
             <div>

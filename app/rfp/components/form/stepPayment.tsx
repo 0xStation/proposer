@@ -52,7 +52,7 @@ export const RfpFormStepPayment = ({
       />
       {/* TOKEN */}
       <div className="flex flex-col mt-6">
-        <label className="font-bold block">Payment token</label>
+        <label className="font-bold block">Payment token*</label>
       </div>
       <Field name="tokenAddress">
         {({ input, meta }) => {
@@ -194,7 +194,7 @@ export const RfpFormStepPayment = ({
         </>
       )}
       {/* PAYMENT TERMS */}
-      <label className="font-bold block mt-6">Payment terms</label>
+      <label className="font-bold block mt-6">Payment terms*</label>
       <Field name="paymentTerms">
         {({ meta, input }) => (
           <>
