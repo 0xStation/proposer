@@ -40,8 +40,6 @@ const SafeRole = ({ role, proposalStatus }) => {
   const showStatus =
     proposalStatus !== ProposalStatus.DRAFT || role.type === ProposalRoleType.AUTHOR
 
-  console.log(role)
-
   return (
     <>
       <div className="flex flex-row w-full items-center justify-between">
