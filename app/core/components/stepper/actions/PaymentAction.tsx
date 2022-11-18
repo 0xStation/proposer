@@ -100,7 +100,7 @@ const PaymentAction = ({ proposal, milestone }) => {
         [ProposalRoleType.CLIENT]: (
           <button
             onClick={() => toggleQueueGnosisTransactionModalMap({ open: true, id: payment.id })}
-            className="mb-2 sm:mb-0 font-bold border rounded px-4 h-[35px] bg-electric-violet border-electric-violet text-tunnel-black w-full"
+            className="mb-2 sm:mb-0 font-bold border rounded px-4 h-[35px] text-electric-violet border-electric-violet bg-transparent hover:opacity-70 w-full"
           >
             Queue and approve
             <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
@@ -160,7 +160,7 @@ const PaymentAction = ({ proposal, milestone }) => {
             target="_blank"
             rel="noreferrer"
           >
-            <button className="mb-2 sm:mb-0 font-bold border rounded px-4 h-[35px] bg-electric-violet border-electric-violet text-tunnel-black w-full">
+            <button className="mb-2 sm:mb-0 font-bold border rounded px-4 h-[35px] text-electric-violet border-electric-violet bg-transparent hover:opacity-70 w-full">
               Execute on Gnosis
               <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
             </button>

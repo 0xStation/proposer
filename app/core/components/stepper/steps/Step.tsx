@@ -47,7 +47,7 @@ const Step = ({
                 <CheckIcon className="h-3 w-3 text-marble-white" aria-hidden="true" />
               </span>
             </span>
-            <span className="ml-4 min-w-0">
+            <span className="ml-4 w-full">
               <span className="text-sm text-concrete">{description}</span>
             </span>
           </span>
@@ -64,7 +64,7 @@ const Step = ({
             <span className="flex h-6 items-center" aria-hidden="true">
               <span className="relative z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 border-marble-white bg-wet-concrete"></span>
             </span>
-            <div className="flex flex-col space-y-2 ml-4 min-w-0">
+            <div className="flex flex-col space-y-2 ml-4 w-full">
               <span className="text-sm text-marble-white">{description}</span>
               <span className="text-xs">{subtitle}</span>
               {action}
@@ -83,7 +83,7 @@ const Step = ({
             <span className="flex h-6 items-center" aria-hidden="true">
               <span className="relative z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 border-concrete bg-wet-concrete group-hover:border-gray-400"></span>
             </span>
-            <span className="ml-4 min-w-0">
+            <span className="ml-4 w-full">
               <span className="text-sm text-light-concrete">{description}</span>
             </span>
           </span>
