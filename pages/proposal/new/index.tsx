@@ -107,8 +107,8 @@ const ProposalTypeSelection: BlitzPage = () => {
               >
                 <div className="max-w-[325px] mb-3 sm:mr-3 rounded-md overflow-hidden bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer">
                   <Image src={RequestImage} height={550} />
-                  <h2 className="text-xl font-bold px-4 pt-4">Request funding</h2>
-                  <p className="pb-4 px-4 pt-3">Request funding in ETH, USDC, or any ERC-20</p>
+                  <h2 className="text-xl font-bold px-4 pt-4">Request or distribute funding</h2>
+                  <p className="pb-4 px-4 pt-3">Request or distribute funding in ETH, USDC, or any ERC-20</p>
                 </div>
               </Link>
               {/* SHARE AN IDEA */}
