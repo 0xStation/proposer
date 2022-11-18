@@ -14,7 +14,7 @@ import Dropdown from "app/core/components/Dropdown"
 import Listbox from "app/core/components/Listbox"
 import { useDisconnect, useNetwork, useSwitchNetwork, useAccount, allChains } from "wagmi"
 import logout from "app/session/mutations/logout"
-import Button from "app/core/components/sds/buttons/Button"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import truncateString from "app/core/utils/truncateString"
 import { LINKS, SUPPORTED_CHAINS, Sizes, gradientMap } from "app/core/utils/constants"
 import Avatar from "app/core/components/sds/images/avatar"
@@ -41,6 +41,7 @@ const Navigation = ({ children }: { children?: any }) => {
   const connectedChain = SUPPORTED_CHAINS.find((supportedChain) => supportedChain.id === chain?.id)
   const isChainSupported = chain ? !!connectedChain : undefined
   const [newWorkspaceModalOpen, setNewWorkspaceModalOpen] = useState<boolean>(false)
+  const router = useRouter()
 
   if (isError) {
     setToastState({
@@ -111,6 +112,12 @@ const Navigation = ({ children }: { children?: any }) => {
           <Image src={StationLogo} alt="Station logo" height={30} width={80} />
         </Link>
         <div className="flex flex-row items-center space-x-4">
+          <Button
+            type={ButtonType.Secondary}
+            onClick={() => router.push(Routes.ProposalTypeSelection())}
+          >
+            Create
+          </Button>
           <Listbox
             error={isChainSupported === false ? { message: "Switch network" } : undefined}
             defaultValue={connectedChain}

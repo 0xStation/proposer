@@ -1,16 +1,14 @@
-import {
-  Rfp as PrismaRfp,
-  ProposalTemplate as PrismaProposalTemplate,
-  ProposalRoleType,
-} from "@prisma/client"
+import { Rfp as PrismaRfp, ProposalRoleType } from "@prisma/client"
 import { Account } from "app/account/types"
 import { PaymentTerm } from "app/proposalPayment/types"
+import { ProposalTemplate } from "app/template/types"
 import { Token } from "app/token/types"
 
 export type Rfp = PrismaRfp & {
   data: RfpMetadata
   account?: Account
-  template?: PrismaProposalTemplate
+  template?: ProposalTemplate
+  _count?: { proposals: number }
 }
 
 export type RfpMetadata = {

@@ -1,13 +1,16 @@
 import { RfpStatus } from "@prisma/client"
 import { getTotalPaymentAmount, getPaymentToken } from "app/template/utils"
+import { RouteUrlObject } from "blitz"
 import Link from "next/link"
+import React, { RefObject } from "react"
+import { Rfp } from "../types"
 import LookingForPill from "./LookingForPill"
 import RfpStatusPill from "./RfpStatusPill"
 
-export const RfpCard = ({ rfp, href }) => {
-  return (
-    <Link href={href}>
-      <div className="pl-4 pr-4 pt-4 pb-4 rounded-md overflow-hidden flex flex-col justify-between bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer">
+export const RfpCard = React.forwardRef(
+  ({ rfp, href }: { rfp: Rfp; href: RouteUrlObject }, ref) => {
+    const RfpCardContent = ({ rfp }) => (
+      <>
         <div>
           <div className="flex flex-row flex-wrap gap-1">
             <RfpStatusPill status={rfp?.status} />
@@ -29,9 +32,25 @@ export const RfpCard = ({ rfp, href }) => {
               </>
             )}
           </span>
-          <span>{rfp?._count.proposals || 0} proposals</span>
+          <span>{rfp?._count?.proposals || 0} proposals</span>
         </div>
-      </div>
-    </Link>
-  )
-}
+      </>
+    )
+    return ref ? (
+      <Link href={href}>
+        <div
+          ref={ref as RefObject<HTMLDivElement>}
+          className="pl-4 pr-4 pt-4 pb-4 h-[170px] rounded-md overflow-hidden flex flex-col justify-between bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer"
+        >
+          <RfpCardContent rfp={rfp} />
+        </div>
+      </Link>
+    ) : (
+      <Link href={href}>
+        <div className="pl-4 pr-4 pt-4 pb-4 h-[170px] rounded-md overflow-hidden flex flex-col justify-between bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer">
+          <RfpCardContent rfp={rfp} />
+        </div>
+      </Link>
+    )
+  }
+)
