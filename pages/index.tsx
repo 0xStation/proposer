@@ -3,15 +3,28 @@ import { useInfiniteQuery, useQuery } from "@blitzjs/rpc"
 import { SearchIcon } from "@heroicons/react/solid"
 import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
-import Button from "app/core/components/sds/buttons/Button"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import Layout from "../app/core/layouts/Layout"
 import { RfpCard } from "app/rfp/components/RfpCard"
 import getPaginatedRfps from "app/rfp/queries/getPaginatedRfps"
-import { useCallback, useRef } from "react"
+import { useCallback, useRef, useState } from "react"
 import { Rfp } from "app/rfp/types"
 import { RfpStatus } from "@prisma/client"
+import { useRouter } from "next/router"
+import { useSession } from "@blitzjs/auth"
+import useStore from "app/core/hooks/useStore"
+import dynamic from "next/dynamic"
+
+const RfpPreCreateModal = dynamic(() => import("app/rfp/components/RfpPreCreateModal"), {
+  ssr: false,
+})
 
 const Home: BlitzPage = () => {
+  const session = useSession({ suspense: false })
+  const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  const router = useRouter()
+  const searchRef = useRef<HTMLInputElement>(null)
+  const [isRfpPreCreateModalOpen, setIsRfpPreCreateModalOpen] = useState<boolean>(false)
   const [results, { isFetchingNextPage, fetchNextPage, hasNextPage }] = useInfiniteQuery(
     getPaginatedRfps,
     (
@@ -103,44 +116,82 @@ const Home: BlitzPage = () => {
   )
 
   return (
-    <div className="h-full mx-44 ">
-      <div className="flex flex-col">
-        <h1 className="text-center mt-20 font-bold text-marble-white text-4xl">
-          Start collaborating today.
-        </h1>
-        <div className="h-11 mt-11 w-full bg-wet-concrete">
-          <SearchIcon className="mx-4 w-[2%] h-[80%] inline fill-marble-white" />
-          <input
-            className="bg-wet-concrete h-full inline w-[80%] lg:max-xl:w-[90%] xl:w-[93%] rounded placeholder:text-lg"
-            placeholder="Search for an ENS name or input an ETH address"
-          />
+    <>
+      {session.siwe?.address && isRfpPreCreateModalOpen && (
+        <RfpPreCreateModal
+          isOpen={isRfpPreCreateModalOpen}
+          setIsOpen={setIsRfpPreCreateModalOpen}
+          accountAddress={session.siwe?.address}
+        />
+      )}
+      <div className="h-full mx-44">
+        <div className="flex flex-col">
+          <h1 className="text-center mt-20 font-bold text-marble-white text-4xl">
+            Start collaborating today.
+          </h1>
+          <div className="h-11 mt-11 w-full bg-wet-concrete">
+            <SearchIcon className="mx-4 w-[2%] h-[80%] inline fill-marble-white" />
+            <input
+              ref={searchRef}
+              className="bg-wet-concrete h-full inline w-[80%] lg:max-xl:w-[90%] xl:w-[93%] rounded placeholder:text-lg"
+              placeholder="Search for an ENS name or input an ETH address"
+            />
+          </div>
+          <Button
+            className="h-[52px]"
+            overrideWidthClassName="w-fit px-8 mx-auto mt-7"
+            onClick={() =>
+              router.push(
+                Routes.ProposalTypeSelection({
+                  // pre-fill for both so that if user changes toggle to reverse roles, the input address is still there
+                  clients: searchRef?.current?.value,
+                  contributors: searchRef?.current?.value,
+                })
+              )
+            }
+          >
+            Create new proposal
+          </Button>
         </div>
-        <Button className="h-[52px]" overrideWidthClassName="w-fit px-8 mx-auto mt-7">
-          Create new proposal
-        </Button>
-      </div>
-      <div className="mt-14">
-        <h2 className="text-2xl mb-3">Featured active contributors</h2>
-        <div className="flex flex-row overflow flex-wrap gap-x-2 gap-y-2">
-          {accounts?.map((account) => (
-            <div
-              key={account?.address}
-              tabIndex={0}
-              className="rounded-full border border-marble-white p-3 w-52 hover:bg-wet-concrete cursor-pointer"
-            >
-              <AccountMediaObject account={account} />
-            </div>
-          ))}
+        <div className="my-10 px-6 mx-44 py-3 bg-wet-concrete flex flex-row rounded items-center justify-between">
+          <p>You can now also put a call out for contributors.</p>
+          <Button
+            onClick={() => {
+              if (!session.siwe?.address) {
+                toggleWalletModal(true)
+              } else {
+                setIsRfpPreCreateModalOpen(true)
+              }
+            }}
+            type={ButtonType.Unemphasized}
+            className="bg-wet-concrete hover:bg-concrete"
+          >
+            Create an opportunity
+          </Button>
         </div>
-      </div>
+        <div className="mt-14">
+          <h2 className="text-2xl mb-3">Featured active contributors</h2>
+          <div className="flex flex-row overflow flex-wrap gap-x-2 gap-y-2">
+            {accounts?.map((account) => (
+              <div
+                key={account?.address}
+                tabIndex={0}
+                className="rounded-full border border-marble-white p-3 w-52 hover:bg-wet-concrete cursor-pointer"
+              >
+                <AccountMediaObject account={account} />
+              </div>
+            ))}
+          </div>
+        </div>
 
-      <div className="mt-14">
-        <h2 className="text-2xl mb-3">Open listings for work</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:gap-2 md:gap-4 lg:gap-6 gap-1">
-          {content}
+        <div className="mt-14">
+          <h2 className="text-2xl mb-3">Open listings for work</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:gap-2 md:gap-4 lg:gap-6 gap-1">
+            {content}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
