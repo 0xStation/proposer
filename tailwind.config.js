@@ -11,6 +11,7 @@ module.exports = {
       "electric-violet": "#AD72FF",
       concrete: "#646464",
       "wet-concrete": "#2E2E2E",
+      "wet-concrete-50": "#121212",
       charcoal: "#1A1A1A",
       "torch-red": "#FF5650",
       "marble-white": "#F2EFEF",
