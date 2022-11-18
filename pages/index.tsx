@@ -1,8 +1,8 @@
 import { BlitzPage, Routes } from "@blitzjs/next"
 import { useInfiniteQuery, useQuery } from "@blitzjs/rpc"
-import { SearchIcon } from "@heroicons/react/solid"
-import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
-import AccountMediaObject from "app/core/components/AccountMediaObject"
+// Commenting out account querying until we want to showcase active contributors
+// import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
+// import AccountMediaObject from "app/core/components/AccountMediaObject"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import Layout from "../app/core/layouts/Layout"
 import { RfpCard } from "app/rfp/components/RfpCard"
@@ -30,16 +30,6 @@ const Home: BlitzPage = () => {
     (
       page = {
         take: 12,
-        where: { status: RfpStatus.OPEN },
-        orderBy: {
-          createdAt: "desc",
-        },
-        include: {
-          template: true,
-          _count: {
-            select: { proposals: true },
-          },
-        },
       }
     ) => page,
     {
@@ -132,16 +122,20 @@ const Home: BlitzPage = () => {
           accountAddress={session.siwe?.address}
         />
       )}
-      <main className="bg-scroll" style={{ backgroundImage: "url('/bg-hero-landing.webp')" }}>
+      <main
+        className="bg-cover bg-center bg-no-repeat h-full"
+        style={{ backgroundImage: "url('/bg-hero-landing.webp')" }}
+        id="#top"
+      >
         <div className="h-full mx-56">
           <div className="flex flex-col">
-            <h1 className="text-center mt-20 font-bold text-marble-white text-4xl">
+            <h1 className="text-center mt-20 font-bold bg-transparent text-marble-white text-4xl">
               Start collaborating today
             </h1>
-            <div className="h-14 mt-11 w-full bg-wet-concrete rounded pl-4">
+            <div className="h-14 mt-11 w-full rounded">
               <input
                 ref={searchRef}
-                className="text-center bg-wet-concrete h-full w-full inline rounded placeholder:text-lg"
+                className="text-center bg-transparent border border-marble-white h-full w-full inline rounded placeholder:text-lg focus:bg-wet-concrete"
                 placeholder="Enter a wallet address or an ENS name"
               />
             </div>
@@ -203,11 +197,13 @@ const Home: BlitzPage = () => {
 
           <div className="mt-14">
             <div className="flex flex-row justify-between">
-              <h2 className="text-2xl mb-3">Open RFPs for work</h2>
+              <h2 className="text-2xl mb-3 font-bold">Open RFPs for work</h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:gap-2 md:gap-4 lg:gap-6 gap-1">
               {rfpCards}
             </div>
+            {/* a buffer for the end of the infinite scroll */}
+            <div className="h-10" />
           </div>
         </div>
       </main>

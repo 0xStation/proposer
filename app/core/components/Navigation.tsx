@@ -113,7 +113,7 @@ const Navigation = ({ children }: { children?: any }) => {
         </Link>
         <div className="flex flex-row items-center space-x-4">
           <Button
-            type={ButtonType.Unemphasized}
+            type={ButtonType.Secondary}
             onClick={() => router.push(Routes.ProposalTypeSelection())}
           >
             Create
