@@ -4,6 +4,7 @@ import { addressesAreEqual } from "../utils/addressesAreEqual"
 import { PROPOSAL_ROLE_APPROVAL_STATUS_MAP } from "../utils/constants"
 import AccountMediaObject from "./AccountMediaObject"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
+import GnosisSafeSignersModal from "app/core/components/GnosisSafeSignersModal"
 import truncateString from "app/core/utils/truncateString"
 import {
   AddressType,
@@ -88,6 +89,11 @@ const SafeRole = ({ role, proposal }) => {
             >
               See multisig signers
             </p>
+            <GnosisSafeSignersModal
+              isOpen={toggleSigners}
+              setIsOpen={setToggleSigners}
+              role={role}
+            />
             {toggleSigners && (
               <ul className="text-sm">
                 {(role.account.data?.signers || []).map((signer, idx) => {
