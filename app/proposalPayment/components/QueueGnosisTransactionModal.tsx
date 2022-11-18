@@ -86,7 +86,7 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone, paym
           Sign to queue this transaction on Gnosis. Afterwards, you and other signers will be able
           to view and execute this transaction on the Gnosis app.
         </p>
-        <div className="mt-8 flex items-center">
+        <div className="mt-8 flex items-center justify-end">
           <Button
             className="mr-2"
             type={ButtonType.Secondary}
@@ -136,8 +136,10 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone, paym
             Sign
           </Button>
         </div>
-        <p className="text-xs mt-2">You’ll be redirected to a transaction page to confirm.</p>
-        <p className="text-xs">
+        <p className="text-xs mt-2 text-right">
+          You’ll be redirected to a transaction page to confirm.
+        </p>
+        <p className="text-xs text-right">
           Already paid?{" "}
           <button
             onClick={() => {
@@ -169,7 +171,7 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone, paym
           render={({ handleSubmit }) => {
             return (
               <form onSubmit={handleSubmit}>
-                <label className="font-bold block mt-12">Proof of payment*</label>
+                <label className="font-bold block mt-6">Proof of payment*</label>
                 <Field
                   name="transactionLink"
                   validate={composeValidators(requiredField, isValidTransactionLink(chainId))}
@@ -190,7 +192,7 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone, paym
                     </>
                   )}
                 </Field>
-                <div className="mt-8 flex items-center">
+                <div className="mt-8 flex items-center justify-end">
                   <Button
                     className="mr-2"
                     type={ButtonType.Secondary}
