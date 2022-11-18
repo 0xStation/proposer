@@ -88,32 +88,39 @@ const Home: BlitzPage = () => {
     [isFetchingNextPage, fetchNextPage, hasNextPage]
   )
 
-  const content = results?.map(({ rfps }) =>
-    rfps.map((rfp, i) => {
-      // if it's the last rfp, attach ref
-      if (rfps.length === i + 1) {
-        return (
-          <RfpCard
-            ref={lastPostRef}
-            key={rfp.id}
-            rfp={rfp as Rfp}
-            href={Routes.ProposalRfpForm({
-              rfpId: rfp?.id,
-            })}
-          />
-        )
-      }
-      return (
-        <RfpCard
-          key={rfp.id}
-          rfp={rfp as Rfp}
-          href={Routes.ProposalRfpForm({
-            rfpId: rfp?.id,
-          })}
-        />
+  const rfpCards = results
+    ? results?.map(({ rfps }) =>
+        rfps.map((rfp, i) => {
+          // if it's the last rfp, attach ref
+          if (rfps.length === i + 1) {
+            return (
+              <RfpCard
+                ref={lastPostRef}
+                key={rfp.id}
+                rfp={rfp as Rfp}
+                href={Routes.ProposalRfpForm({
+                  rfpId: rfp?.id,
+                })}
+              />
+            )
+          }
+          return (
+            <RfpCard
+              key={rfp.id}
+              rfp={rfp as Rfp}
+              href={Routes.ProposalRfpForm({
+                rfpId: rfp?.id,
+              })}
+            />
+          )
+        })
       )
-    })
-  )
+    : Array.from(Array(12)).map((idx) => (
+        <div
+          key={idx}
+          className="h-[170px] motion-safe:animate-pulse rounded bg-wet-concrete"
+        ></div>
+      ))
 
   return (
     <>
@@ -172,22 +179,29 @@ const Home: BlitzPage = () => {
         <div className="mt-14">
           <h2 className="text-2xl mb-3">Featured active contributors</h2>
           <div className="flex flex-row overflow flex-wrap gap-x-2 gap-y-2">
-            {accounts?.map((account) => (
-              <div
-                key={account?.address}
-                tabIndex={0}
-                className="rounded-full border border-marble-white p-3 w-52 hover:bg-wet-concrete cursor-pointer"
-              >
-                <AccountMediaObject account={account} />
-              </div>
-            ))}
+            {accounts
+              ? accounts?.map((account) => (
+                  <div
+                    key={account?.address}
+                    tabIndex={0}
+                    className="rounded-full border border-marble-white p-3 w-52 hover:bg-wet-concrete cursor-pointer"
+                  >
+                    <AccountMediaObject account={account} />
+                  </div>
+                ))
+              : Array.from(Array(10)).map((idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-full motion-safe:animate-pulse shadow bg-wet-concrete p-3 w-52 h-[68px] hover:bg-wet-concrete cursor-pointer"
+                  ></div>
+                ))}
           </div>
         </div>
 
         <div className="mt-14">
           <h2 className="text-2xl mb-3">Open listings for work</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:gap-2 md:gap-4 lg:gap-6 gap-1">
-            {content}
+            {rfpCards}
           </div>
         </div>
       </div>
