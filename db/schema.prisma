@@ -81,6 +81,7 @@ model Rfp {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   status         RfpStatus @default(OPEN)
+  suppress       Boolean   @default(false)
 
   account Account @relation(fields: [accountAddress], references: [address], onDelete: Cascade)
 
