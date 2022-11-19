@@ -5,7 +5,7 @@ import { useMutation, useQuery } from "@blitzjs/rpc"
 import { useParam, Routes } from "@blitzjs/next"
 import { useSession } from "@blitzjs/auth"
 import Button from "app/core/components/sds/buttons/Button"
-import Stepper from "../Stepper"
+import FormHeaderStepper from "app/core/components/FormHeaderStepper"
 import BackArrow from "app/core/icons/BackArrow"
 import useStore from "app/core/hooks/useStore"
 import { Proposal } from "app/proposal/types"
@@ -19,10 +19,12 @@ import TemplateFormStepConfirm from "./stepConfirm"
 import { AddressType, ProposalRoleType } from "@prisma/client"
 import { mustBeAboveNumWords } from "app/utils/validators"
 import {
-  addAddressAsRecipientToPayments,
+  addAddressesToPayments,
   getClientAddress,
+  getContributorAddress,
   getFieldValue,
   getMinNumWords,
+  getBodyPrefill,
 } from "app/template/utils"
 import { RESERVED_KEYS, ProposalTemplateField } from "app/template/types"
 import useWarnIfUnsavedChanges from "app/core/hooks/useWarnIfUnsavedChanges"
@@ -30,6 +32,8 @@ import getAccountHasMinTokenBalance from "app/token/queries/getAccountHasMinToke
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
+import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
+import { SocialConnection } from "app/rfp/types"
 
 export const ProposalFormTemplate = () => {
   const router = useRouter()
@@ -39,13 +43,8 @@ export const ProposalFormTemplate = () => {
   const [proposalStep, setProposalStep] = useState<ProposalFormStep>(ProposalFormStep.PROPOSE)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [proposalShouldSendLater, setProposalShouldSendLater] = useState<boolean>(false)
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
   const session = useSession({ suspense: false })
-  const [
-    shouldHandlePostProposalCreationProcessing,
-    setShouldHandlePostProposalCreationProcessing,
-  ] = useState<boolean>(false)
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false)
 
   useWarnIfUnsavedChanges(unsavedChanges, () => {
@@ -96,7 +95,11 @@ export const ProposalFormTemplate = () => {
       chainId: rfp?.data?.singleTokenGate?.token?.chainId as number,
       tokenAddress: rfp?.data?.singleTokenGate?.token?.address as string,
       accountAddress: activeUser?.address as string,
-      minBalance: rfp?.data?.singleTokenGate?.minBalance || "1", // string to pass directly into BigNumber.from in logic check
+      minBalance:
+        decimalToBigNumber(
+          rfp?.data?.singleTokenGate?.minBalance || 0,
+          rfp?.data?.singleTokenGate?.token?.decimals || 0
+        ).toString() || "1", // string to pass directly into BigNumber.from in logic check
     },
     {
       enabled: !!activeUser?.address && !!rfp?.data?.singleTokenGate,
@@ -109,7 +112,6 @@ export const ProposalFormTemplate = () => {
     onSuccess: (data) => {
       setCreatedProposal(data)
       setUnsavedChanges(false)
-      setShouldHandlePostProposalCreationProcessing(true)
     },
     onError: (error: Error) => {
       console.error(error)
@@ -133,13 +135,12 @@ export const ProposalFormTemplate = () => {
         })
       )
     },
-    onError: (error) => {
+    onError: (error, proposal) => {
       deleteProposalByIdMutation({
-        proposalId: createdProposal?.id as string,
+        proposalId: proposal?.id as string,
       })
       setCreatedProposal(null)
 
-      setShouldHandlePostProposalCreationProcessing(false)
       setIsLoading(false)
       console.error(error)
       setToastState({
@@ -153,50 +154,27 @@ export const ProposalFormTemplate = () => {
   useEffect(() => {
     if (!walletModalOpen && isLoading) {
       setIsLoading(false)
-      setProposalShouldSendLater(false)
     }
   }, [walletModalOpen])
 
-  useEffect(() => {
-    // `shouldHandlePostProposalCreationProcessing` is used to retrigger this `useEffect` hook
-    // if the user declines to sign the message verifying their authorship.
-    if (createdProposal && shouldHandlePostProposalCreationProcessing) {
-      if (!proposalShouldSendLater) {
-        const representingRoles = createdProposal.roles
-          ?.filter(
-            (role) =>
-              // IMPORTANT: filters out multisigs to enable signers to submit proposals without auto-approving
-              addressesAreEqual(role.address, session.siwe?.address || "") &&
-              role.type !== ProposalRoleType.AUTHOR
-          )
-          .map((role) => {
-            return {
-              roleId: role.id,
-              // if role's account is WALLET, then one signature is left
-              // if role's account is SAFE, then we don't to trigger an approval on send to let the multisig decide, we should revisit this and I am willing to change mind here
-              complete: role.account?.addressType === AddressType.WALLET,
-            }
-          })
-        confirmAuthorship({ proposal: createdProposal, representingRoles })
-      } else {
-        router.push(
-          Routes.ViewProposal({
-            proposalId: createdProposal.id,
-          })
-        )
-      }
-    }
-  }, [createdProposal, proposalShouldSendLater, shouldHandlePostProposalCreationProcessing])
+  const missingRequiredToken = !!rfp?.data?.singleTokenGate && !userHasRequiredToken
+  const missingRequiredDiscordConnection =
+    rfp?.data?.requiredSocialConnections?.includes(SocialConnection.DISCORD) &&
+    activeUser &&
+    !activeUser?.discordId
 
   return (
     <div className="max-w-[580px] min-w-[580px] h-full mx-auto">
-      <Stepper
+      <FormHeaderStepper
         activeStep={PROPOSAL_FORM_HEADER_COPY[proposalStep]}
         steps={["Propose", "Confirm"]}
         className="mt-10"
       />
       <Form
-        initialValues={{}}
+        initialValues={{
+          title: `"${rfp?.data?.content?.title}" submission`,
+          body: getBodyPrefill(template?.data?.fields),
+        }}
         onSubmit={async (values: any, form) => {
           // an author needs to sign the proposal to upload the content to ipfs.
           // if they decline the signature, but submit again, we don't want to
@@ -241,20 +219,39 @@ export const ProposalFormTemplate = () => {
               return
             }
 
-            try {
-              const contributorAddress = session?.siwe?.address as string
+            const templateClientAddress = getClientAddress(template?.data?.fields)
+            const templateContributorAddress = getContributorAddress(template?.data?.fields)
+            const connectedAddress = session?.siwe?.address as string
 
-              await createProposalMutation({
+            if (!templateClientAddress && !templateContributorAddress) {
+              setIsLoading(false)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: "RFP missing required fields.",
+              })
+              return
+            }
+
+            const clientAddress = templateClientAddress ? templateClientAddress : connectedAddress
+            const contributorAddress = templateContributorAddress
+              ? templateContributorAddress
+              : connectedAddress
+
+            let newProposal
+            try {
+              newProposal = await createProposalMutation({
                 rfpId: rfp?.id,
-                contentTitle: `"${rfp?.data.content.title}" submission`,
+                contentTitle: values.title,
                 contentBody: values.body,
-                authorAddresses: [contributorAddress],
+                authorAddresses: [connectedAddress],
                 contributorAddresses: [contributorAddress],
-                clientAddresses: [getClientAddress(template?.data?.fields)],
+                clientAddresses: [clientAddress],
                 milestones: getFieldValue(template?.data?.fields, RESERVED_KEYS.MILESTONES),
-                payments: addAddressAsRecipientToPayments(
+                payments: addAddressesToPayments(
                   template?.data?.fields as ProposalTemplateField[],
-                  contributorAddress
+                  clientAddress, // sender address
+                  contributorAddress // recipient address
                 ),
                 paymentTerms: getFieldValue(template?.data?.fields, RESERVED_KEYS.PAYMENT_TERMS),
               })
@@ -266,6 +263,32 @@ export const ProposalFormTemplate = () => {
                 message: err.message,
               })
               return
+            }
+
+            try {
+              const representingRoles = newProposal.roles
+                ?.filter(
+                  (role) =>
+                    // IMPORTANT: filters out multisigs to enable signers to submit proposals without auto-approving
+                    addressesAreEqual(role.address, session.siwe?.address || "") &&
+                    role.type !== ProposalRoleType.AUTHOR
+                )
+                .map((role) => {
+                  return {
+                    roleId: role.id,
+                    // if role's account is WALLET, then one signature is left
+                    // if role's account is SAFE, then we don't to trigger an approval on send to let the multisig decide, we should revisit this and I am willing to change mind here
+                    complete: role.account?.addressType === AddressType.WALLET,
+                  }
+                })
+              await confirmAuthorship({ proposal: newProposal, representingRoles })
+            } catch (err) {
+              setIsLoading(false)
+              setToastState({
+                isToastShowing: true,
+                type: "error",
+                message: err.message,
+              })
             }
           }
         }}
@@ -305,10 +328,7 @@ export const ProposalFormTemplate = () => {
               />
               <div className="rounded-2xl border border-concrete p-6 h-[560px] overflow-y-scroll">
                 {isLoading ? (
-                  <ProposalCreationLoadingScreen
-                    createdProposal={createdProposal}
-                    proposalShouldSendLater={proposalShouldSendLater}
-                  />
+                  <ProposalCreationLoadingScreen createdProposal={createdProposal} />
                 ) : (
                   <>
                     <h2 className="text-marble-white text-xl font-bold">
@@ -318,7 +338,7 @@ export const ProposalFormTemplate = () => {
                       <TemplateFormStepPropose formState={formState} />
                     )}
                     {proposalStep === ProposalFormStep.CONFIRM && (
-                      <TemplateFormStepConfirm body={formState.values.body} />
+                      <TemplateFormStepConfirm formState={formState} />
                     )}
                   </>
                 )}
@@ -328,11 +348,23 @@ export const ProposalFormTemplate = () => {
                   <Button
                     isDisabled={
                       unFilledProposalFields ||
-                      (!!rfp?.data?.singleTokenGate &&
-                        (isTokenGatingCheckLoading ||
-                          (isTokenGatingCheckComplete && !userHasRequiredToken)))
+                      // proposing to own RFP
+                      addressesAreEqual(
+                        session?.siwe?.address as string,
+                        rfp?.accountAddress as string
+                      ) ||
+                      // has not connected account or account with Discord requirement (if requirement exists)
+                      missingRequiredDiscordConnection ||
+                      // has not connected wallet with token requirement (if requirement exists)
+                      missingRequiredToken
                     }
-                    isLoading={isTokenGatingCheckLoading}
+                    isLoading={
+                      // query enabled
+                      !!activeUser?.address &&
+                      !!rfp?.data?.singleTokenGate &&
+                      // query is loading
+                      isTokenGatingCheckLoading
+                    }
                     onClick={async (e) => {
                       e.preventDefault()
                       if (!session.siwe?.address) {
@@ -350,7 +382,18 @@ export const ProposalFormTemplate = () => {
                   >
                     Next
                   </Button>
-                  {!userHasRequiredToken && (
+                  {addressesAreEqual(
+                    session?.siwe?.address as string,
+                    rfp?.accountAddress as string
+                  ) && (
+                    <span className="text-xs text-concrete">
+                      You cannot propose to your own RFP.
+                    </span>
+                  )}
+                  {missingRequiredDiscordConnection && (
+                    <span className="text-xs text-concrete">Missing connection to Discord.</span>
+                  )}
+                  {missingRequiredToken && (
                     <span className="text-xs text-concrete">
                       Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
                       RFP.
@@ -371,12 +414,23 @@ export const ProposalFormTemplate = () => {
                       isDisabled={
                         isLoading ||
                         unFilledProposalFields ||
-                        (!!rfp?.data?.singleTokenGate &&
-                          (isTokenGatingCheckLoading ||
-                            (isTokenGatingCheckComplete && !userHasRequiredToken)))
+                        // proposing to own RFP
+                        addressesAreEqual(
+                          session?.siwe?.address as string,
+                          rfp?.accountAddress as string
+                        ) ||
+                        // has not connected account or account with Discord requirement (if requirement exists)
+                        missingRequiredDiscordConnection ||
+                        // has not connected wallet with token requirement (if requirement exists)
+                        missingRequiredToken
                       }
                       isLoading={
-                        isTokenGatingCheckLoading || (!proposalShouldSendLater && isLoading)
+                        // query enabled
+                        (!!activeUser?.address &&
+                          !!rfp?.data?.singleTokenGate &&
+                          // query is loading
+                          isTokenGatingCheckLoading) ||
+                        isLoading
                       }
                       onClick={async (e) => {
                         e.preventDefault()
@@ -394,17 +448,24 @@ export const ProposalFormTemplate = () => {
                           setIsLoading(false)
                           return
                         } else if (session.siwe?.address) {
-                          if (createdProposal) {
-                            setShouldHandlePostProposalCreationProcessing(true)
-                          } else {
-                            await handleSubmit()
-                          }
+                          await handleSubmit()
                         }
                       }}
                     >
                       Send proposal
                     </Button>
-                    {isTokenGatingCheckComplete && !userHasRequiredToken && (
+                    {addressesAreEqual(
+                      session?.siwe?.address as string,
+                      rfp?.accountAddress as string
+                    ) && (
+                      <span className="text-xs text-concrete">
+                        You cannot propose to your own RFP.
+                      </span>
+                    )}
+                    {missingRequiredDiscordConnection && (
+                      <span className="text-xs text-concrete">Missing connection to Discord.</span>
+                    )}
+                    {missingRequiredToken && (
                       <span className="text-xs text-concrete">
                         Only {rfp?.data?.singleTokenGate?.token?.name} holders can propose to this
                         RFP.

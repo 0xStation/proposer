@@ -9,6 +9,7 @@ import { getEmails } from "app/utils/privy"
 
 const ApproveProposal = z.object({
   proposalId: z.string(),
+  proposalVersion: z.number(),
   signerAddress: z.string(),
   message: z.any(),
   signature: z.string(),
@@ -36,6 +37,7 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
       db.proposalSignature.create({
         data: {
           address: params.signerAddress,
+          proposalVersion: params.proposalVersion,
           data: {
             message: params.message,
             signature: params.signature,

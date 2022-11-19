@@ -3,9 +3,9 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { useQuery, invalidateQuery, invoke } from "@blitzjs/rpc"
 import { BlitzPage, useParam, Routes } from "@blitzjs/next"
-import { useEffect, useState, useMemo } from "react"
+import { useState } from "react"
 import Layout from "app/core/layouts/Layout"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import Button from "app/core/components/sds/buttons/Button"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { formatDate } from "app/core/utils/formatDate"
 import FilterPill from "app/core/components/FilterPill"
@@ -22,7 +22,6 @@ import {
   RFP_STATUS_DISPLAY_MAP,
 } from "app/core/utils/constants"
 import {
-  AddressType,
   ProposalStatus,
   ProposalRoleApprovalStatus,
   ProposalRoleType,
@@ -45,6 +44,8 @@ import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 import getRfpCountForAccount from "app/rfp/queries/getRfpCountForAccount"
 import getProposalCountForAccount from "app/proposal/queries/getProposalCountForAccount"
 import { RfpCard } from "app/rfp/components/RfpCard"
+import useUserHasPermissionOfAddress from "app/core/hooks/useUserHasPermissionOfAddress"
+import RfpPreCreateModal from "app/rfp/components/RfpPreCreateModal"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
@@ -80,18 +81,12 @@ const WorkspaceHome: BlitzPage = () => {
   const accountAddress = useParam("accountAddress", "string") as string
   const queryParams = useRouter().query
   const tab = queryParams?.tab as string
-  const [isDiscordModalOpen, setIsDiscordModalOpen] = useState<boolean>(false)
-  const [newAuth, setNewAuth] = useState<string>("")
-  const activeUser = useStore((state) => state.activeUser)
-  const accountData = useAccount()
-  const connectedAddress = useMemo(() => accountData?.address || undefined, [accountData?.address])
-  const [canViewSettings, setCanViewSettings] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<WorkspaceTab>(
     (tab as WorkspaceTab) || WorkspaceTab.PROPOSALS
   )
 
   const { data: accountEnsName } = useEnsName({
-    address: accountAddress,
+    address: accountAddress as `0x${string}`,
     chainId: 1,
     cacheTime: 10 * 60 * 1000, // 10 minutes (time in ms) which the data should remain in the cache
   })
@@ -107,34 +102,12 @@ const WorkspaceHome: BlitzPage = () => {
     }
   )
 
-  const [safeMetadata] = useQuery(
-    getSafeMetadata,
-    { chainId: account?.data?.chainId!, address: account?.address! },
-    {
-      enabled: !!account && account.addressType === AddressType.SAFE,
-      suspense: false,
-      refetchOnWindowFocus: false,
-      cacheTime: 60 * 1000, // 1 minute
-    }
+  // checks if session address is page's account address or is a signer of the account's Safe
+  const { hasPermissionOfAddress: hasPrivateAccess } = useUserHasPermissionOfAddress(
+    accountAddress,
+    account?.addressType,
+    account?.data?.chainId
   )
-
-  // if activeUser is the workspace address or is a signer for it, show settings tab
-  useEffect(() => {
-    const userIsWorkspace =
-      accountAddress === activeUser?.address && accountAddress === connectedAddress
-    const userIsWorkspaceSigner =
-      safeMetadata?.signers.includes(activeUser?.address || "") &&
-      safeMetadata?.signers.includes(connectedAddress || "")
-
-    if (userIsWorkspace || userIsWorkspaceSigner) {
-      setCanViewSettings(true)
-    } else {
-      setCanViewSettings(false)
-      if (activeTab === WorkspaceTab.SETTINGS) {
-        setActiveTab(WorkspaceTab.PROPOSALS)
-      }
-    }
-  }, [activeUser, connectedAddress, accountAddress, safeMetadata])
 
   const ProposalTab = () => {
     const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
@@ -337,9 +310,7 @@ const WorkspaceHome: BlitzPage = () => {
             </div>
           ) : (
             <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-              <p className="text-2xl font-bold w-[295px] text-center">
-                No proposals
-              </p>
+              <p className="text-2xl font-bold w-[295px] text-center">No proposals</p>
             </div>
           ))}
       </div>
@@ -350,6 +321,7 @@ const WorkspaceHome: BlitzPage = () => {
     const RFP_PAGINATION_TAKE = 25
     const [rfpPage, setRfpPage] = useState<number>(0)
     const [rfpStatusFilters, setRfpStatusFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
+    const [isRfpPreCreateModalOpen, setIsRfpPreCreateModalOpen] = useState<boolean>(false)
 
     const [rfps] = useQuery(
       getRfpsForAccount,
@@ -382,70 +354,90 @@ const WorkspaceHome: BlitzPage = () => {
     )
 
     return (
-      <div className="p-10 flex-1 max-h-screen overflow-y-auto">
-        <h1 className="text-2xl font-bold">RFPs</h1>
-        {/* FILTERS & PAGINATION */}
-        <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">
-          {/* FILTERS */}
-          <div className="space-x-2 flex flex-row">
-            <FilterPill
-              label="status"
-              filterOptions={RFP_STATUS_FILTER_OPTIONS.map((status) => ({
-                name: RFP_STATUS_DISPLAY_MAP[status]?.copy?.toUpperCase(),
-                value: status,
-              }))}
-              appliedFilters={rfpStatusFilters}
-              setAppliedFilters={setRfpStatusFilters}
-              refetchCallback={() => {
-                setRfpPage(0)
-                invalidateQuery(getRfpsForAccount)
-                invalidateQuery(getRfpCountForAccount)
-              }}
+      <>
+        <RfpPreCreateModal
+          isOpen={isRfpPreCreateModalOpen}
+          setIsOpen={setIsRfpPreCreateModalOpen}
+          accountAddress={accountAddress}
+        />
+        <div className="p-10 flex-1 max-h-screen overflow-y-auto">
+          <div className="flex flex-row justify-between">
+            {/* HEADER */}
+            <h1 className="text-2xl font-bold">RFPs</h1>
+            {/* CTA */}
+            {hasPrivateAccess && (
+              <Button
+                className="w-full px-10"
+                overrideWidthClassName="max-w-fit"
+                onClick={() => {
+                  setIsRfpPreCreateModalOpen(true)
+                }}
+              >
+                Create RFP
+              </Button>
+            )}
+          </div>
+          {/* FILTERS & PAGINATION */}
+          <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">
+            {/* FILTERS */}
+            <div className="space-x-2 flex flex-row">
+              <FilterPill
+                label="status"
+                filterOptions={RFP_STATUS_FILTER_OPTIONS.map((status) => ({
+                  name: RFP_STATUS_DISPLAY_MAP[status]?.copy?.toUpperCase(),
+                  value: status,
+                }))}
+                appliedFilters={rfpStatusFilters}
+                setAppliedFilters={setRfpStatusFilters}
+                refetchCallback={() => {
+                  setRfpPage(0)
+                  invalidateQuery(getRfpsForAccount)
+                  invalidateQuery(getRfpCountForAccount)
+                }}
+              />
+            </div>
+            {/* PAGINATION */}
+            <Pagination
+              results={rfps as any[]}
+              resultsCount={rfpCount || 0}
+              page={rfpPage}
+              setPage={setRfpPage}
+              resultsLabel="rfps"
+              paginationTake={RFP_PAGINATION_TAKE}
+              className="ml-6 sm:ml-0 text-sm self-end"
             />
           </div>
-          {/* PAGINATION */}
-          <Pagination
-            results={rfps as any[]}
-            resultsCount={rfpCount || 0}
-            page={rfpPage}
-            setPage={setRfpPage}
-            resultsLabel="rfps"
-            paginationTake={RFP_PAGINATION_TAKE}
-            className="ml-6 sm:ml-0 text-sm self-end"
-          />
-        </div>
-        {/* RFP CARDS */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:gap-2 md:gap-4 lg:gap-6 gap-1">
+          {/* RFP CARDS */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:gap-2 md:gap-4 lg:gap-6 gap-1">
+            {rfps &&
+              rfps?.length > 0 &&
+              rfps?.map((rfp, idx) => {
+                return <RfpCard key={idx} rfp={rfp} href={Routes.RfpDetail({ rfpId: rfp.id })} />
+              })}
+            {/* RFP LOADING */}
+            {!rfps &&
+              Array.from(Array(9)).map((idx) => (
+                <div
+                  key={idx}
+                  tabIndex={0}
+                  className="h-36 rounded-md overflow-hidden bg-wet-concrete shadow border-solid motion-safe:animate-pulse"
+                />
+              ))}
+          </div>
+          {/* RFP EMPTY */}
           {rfps &&
-            rfps?.length > 0 &&
-            rfps?.map((rfp, idx) => {
-              return <RfpCard key={idx} rfp={rfp} href={Routes.RfpDetail({ rfpId: rfp.id })} />
-            })}
-          {/* RFP LOADING */}
-          {!rfps &&
-            Array.from(Array(9)).map((idx) => (
-              <div
-                key={idx}
-                tabIndex={0}
-                className="h-36 rounded-md overflow-hidden bg-wet-concrete shadow border-solid motion-safe:animate-pulse"
-              />
+            rfps.length === 0 &&
+            (rfpStatusFilters.size ? (
+              <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
+                <p className="text-2xl font-bold w-[295px] text-center">No matches</p>
+              </div>
+            ) : (
+              <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
+                <p className="text-2xl font-bold w-[295px] text-center">No RFPs</p>
+              </div>
             ))}
         </div>
-        {/* RFP EMPTY */}
-        {rfps &&
-          rfps.length === 0 &&
-          (rfpStatusFilters.size ? (
-            <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-              <p className="text-2xl font-bold w-[295px] text-center">No matches</p>
-            </div>
-          ) : (
-            <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-              <p className="text-2xl font-bold w-1/3 text-center">
-                No RFPs
-              </p>
-            </div>
-          ))}
-      </div>
+      </>
     )
   }
 
@@ -461,23 +453,22 @@ const WorkspaceHome: BlitzPage = () => {
   }
 
   return (
-    <Layout>
-      <div className="flex flex-row h-full">
-        {/* LEFT SIDEBAR */}
-        <div className="h-full w-[288px] border-r border-concrete p-6">
-          <div className="pb-6 border-b border-wet-concrete space-y-6">
-            {/* PROFILE */}
-            {account ? (
-              <AccountMediaObject account={account} showActionIcons={true} />
-            ) : (
-              // LOADING STATE
-              <div
-                tabIndex={0}
-                className={`h-10 w-full rounded-4xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
-              />
-            )}
-            {/* CTA */}
-            {/* {
+    <div className="flex flex-row h-full">
+      {/* LEFT SIDEBAR */}
+      <div className="h-full w-[288px] border-r border-concrete p-6">
+        <div className="pb-6 border-b border-wet-concrete space-y-6">
+          {/* PROFILE */}
+          {account ? (
+            <AccountMediaObject account={account} showActionIcons={true} />
+          ) : (
+            // LOADING STATE
+            <div
+              tabIndex={0}
+              className={`h-10 w-full rounded-4xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+            />
+          )}
+          {/* CTA */}
+          {/* {
               // activeTab !== WorkspaceTab.RFPS &&
               <Link
                 href={Routes.ProposalTypeSelection({
@@ -489,51 +480,54 @@ const WorkspaceHome: BlitzPage = () => {
                 <Button className="w-full">Propose</Button>
               </Link>
             } */}
-          </div>
-          {/* TABS */}
-          <ul className="mt-6 space-y-2">
-            {/* PROPOSALS */}
-            <li
-              className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
-                activeTab === WorkspaceTab.PROPOSALS && "bg-wet-concrete"
-              }`}
-              onClick={() => setActiveTab(WorkspaceTab.PROPOSALS)}
-            >
-              <LightBulbIcon className="h-5 w-5 text-white cursor-pointer" />
-              <span>Proposals</span>
-            </li>
-            {/* RFPS */}
-            <li
-              className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
-                activeTab === WorkspaceTab.RFPS && "bg-wet-concrete"
-              }`}
-              onClick={() => setActiveTab(WorkspaceTab.RFPS)}
-            >
-              <NewspaperIcon className="h-5 w-5 text-white cursor-pointer" />
-              <span>RFPs</span>
-            </li>
-            {/* SETTINGS */}
-            {canViewSettings && (
-              <li
-                className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
-                  activeTab === WorkspaceTab.SETTINGS && "bg-wet-concrete"
-                }`}
-                onClick={() => setActiveTab(WorkspaceTab.SETTINGS)}
-              >
-                <CogIcon className="h-5 w-5 text-white cursor-pointer" />
-                <span>Settings</span>
-              </li>
-            )}
-          </ul>
         </div>
-        {/* TAB CONTENT */}
-        {activeTab === WorkspaceTab.PROPOSALS && <ProposalTab />}
-        {activeTab === WorkspaceTab.RFPS && <RfpTab />}
-        {activeTab === WorkspaceTab.SETTINGS && <SettingsTab />}
+        {/* TABS */}
+        <ul className="mt-6 space-y-2">
+          {/* PROPOSALS */}
+          <li
+            className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
+              activeTab === WorkspaceTab.PROPOSALS && "bg-wet-concrete"
+            }`}
+            onClick={() => setActiveTab(WorkspaceTab.PROPOSALS)}
+          >
+            <LightBulbIcon className="h-5 w-5 text-white cursor-pointer" />
+            <span>Proposals</span>
+          </li>
+          {/* RFPS */}
+          <li
+            className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
+              activeTab === WorkspaceTab.RFPS && "bg-wet-concrete"
+            }`}
+            onClick={() => setActiveTab(WorkspaceTab.RFPS)}
+          >
+            <NewspaperIcon className="h-5 w-5 text-white cursor-pointer" />
+            <span>RFPs</span>
+          </li>
+          {/* SETTINGS */}
+          {hasPrivateAccess && (
+            <li
+              className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer ${
+                activeTab === WorkspaceTab.SETTINGS && "bg-wet-concrete"
+              }`}
+              onClick={() => setActiveTab(WorkspaceTab.SETTINGS)}
+            >
+              <CogIcon className="h-5 w-5 text-white cursor-pointer" />
+              <span>Settings</span>
+            </li>
+          )}
+        </ul>
       </div>
-    </Layout>
+      {/* TAB CONTENT */}
+      {activeTab === WorkspaceTab.PROPOSALS && <ProposalTab />}
+      {activeTab === WorkspaceTab.RFPS && <RfpTab />}
+      {activeTab === WorkspaceTab.SETTINGS && <SettingsTab />}
+    </div>
   )
 }
 
 WorkspaceHome.suppressFirstRenderFlicker = true
+WorkspaceHome.getLayout = function getLayout(page) {
+  // persist layout between pages https://nextjs.org/docs/basic-features/layouts
+  return <Layout title="Workspace">{page}</Layout>
+}
 export default WorkspaceHome

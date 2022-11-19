@@ -9,21 +9,17 @@ import createAccount from "../mutations/createAccount"
 import useStore from "app/core/hooks/useStore"
 import { useDropzone } from "react-dropzone"
 import UploadIcon from "app/core/icons/UploadIcon"
-import { Account, AccountMetadata } from "app/account/types"
-import {
-  requiredField,
-  composeValidators,
-  mustBeUnderNumCharacters,
-  isValidEmail,
-} from "app/utils/validators"
+import { Account } from "app/account/types"
+import { composeValidators, mustBeUnderNumCharacters, isValidEmail } from "app/utils/validators"
 import sendVerificationEmail from "app/email/mutations/sendVerificationEmail"
-import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
+import Button from "app/core/components/sds/buttons/Button"
 import getAccountByAddress from "../queries/getAccountByAddress"
 import { useEnsName } from "wagmi"
 import truncateString from "app/core/utils/truncateString"
 import getAccountEmail from "../queries/getAccountEmail"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import ConnectDiscordModal from "app/core/components/ConnectDiscordModal"
+import { getAntiCSRFToken } from "@blitzjs/auth"
 
 const PfpInput = ({ pfpUrl, onUpload }) => {
   const uploadFile = async (acceptedFiles) => {
@@ -31,6 +27,9 @@ const PfpInput = ({ pfpUrl, onUpload }) => {
     formData.append("file", acceptedFiles[0])
     let res = await fetch("/api/uploadImage", {
       method: "POST",
+      headers: {
+        "anti-csrf": getAntiCSRFToken(),
+      },
       body: formData,
     })
     const data = await res.json()
@@ -86,7 +85,7 @@ const WorkspaceSettingsOverviewForm = ({
   const accountAddress = useParam("accountAddress", "string") as string
 
   const { data: ensName } = useEnsName({
-    address: account?.address as string,
+    address: account?.address as `0x${string}`,
     chainId: 1,
     cacheTime: 60 * 60 * 1000, // (1 hr) time (in ms) which the data should remain in the cache
   })

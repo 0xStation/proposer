@@ -12,20 +12,31 @@ const AccountMediaObject = ({
   account,
   className = "",
   showActionIcons = false,
+  shouldLinkToProposalPage = false,
 }: {
   account: Account
   className?: string
   showActionIcons?: boolean
+  shouldLinkToProposalPage?: boolean
 }) => {
   const { data: ensName } = useEnsName({
-    address: account?.address as string,
+    address: account?.address as `0x${string}`,
     chainId: 1,
     cacheTime: 60 * 60 * 1000, // (1 hr) time (in ms) which the data should remain in the cache
   })
   const [isDiscordHandleCopied, setIsDiscordHandleCopied] = useState<boolean>(false)
 
   return (
-    <Link href={Routes.WorkspaceHome({ accountAddress: account?.address as string })}>
+    <Link
+      href={
+        shouldLinkToProposalPage
+          ? Routes.ProposalNewFunding({
+              clients: ensName || account?.address,
+              contributors: ensName || account?.address,
+            })
+          : Routes.WorkspaceHome({ accountAddress: account?.address as string })
+      }
+    >
       <div className={`flex flex-row rounded ${className} cursor-pointer`}>
         <div className="flex flex-col content-center align-middle mr-3">
           <Avatar address={account.address as string} pfpUrl={account?.data?.pfpUrl} />

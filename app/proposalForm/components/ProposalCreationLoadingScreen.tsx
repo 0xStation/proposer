@@ -1,13 +1,12 @@
 import { Spinner } from "app/core/components/Spinner"
 
-export const ProposalCreationLoadingScreen = ({ createdProposal, proposalShouldSendLater }) => {
-  const sendNowLoadingState = createdProposal && !proposalShouldSendLater
+export const ProposalCreationLoadingScreen = ({ createdProposal }) => {
   return (
     <div className="flex flex-col justify-center items-center mt-48">
       <p className="text-concrete tracking-wide">
-        {sendNowLoadingState ? "Sign to prove your authorship." : "Creating proposal..."}
+        {!createdProposal ? "Creating proposal..." : "Sign to prove your authorship."}
       </p>
-      {sendNowLoadingState && (
+      {createdProposal && (
         <p className="text-concrete tracking-wide">Check your wallet for your next action.</p>
       )}
       <div className="h-4 w-4 mt-6">

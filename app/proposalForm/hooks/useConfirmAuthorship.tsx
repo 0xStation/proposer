@@ -1,22 +1,19 @@
 import { useSession } from "@blitzjs/auth"
 import { useMutation } from "@blitzjs/rpc"
-import { ProposalRoleType } from "@prisma/client"
-import useSignature from "app/core/hooks/useSignature"
-import { genProposalDigest } from "app/signatures/proposal"
-import { getHash } from "app/signatures/utils"
 import sendProposal from "app/proposal/mutations/sendProposal"
 import { Proposal } from "app/proposal/types"
+import { useSignProposal } from "app/core/hooks/useSignProposal"
 
 export const useConfirmAuthorship = ({
   onSuccess,
   onError,
 }: {
   onSuccess: (data) => void
-  onError: (error) => void
+  onError: (error, proposal) => void
 }) => {
-  const { signMessage } = useSignature()
   const session = useSession({ suspense: false })
   const [sendProposalMutation] = useMutation(sendProposal)
+  const { signProposal } = useSignProposal()
 
   const confirmAuthorship = async ({
     proposal,
@@ -26,21 +23,11 @@ export const useConfirmAuthorship = ({
     representingRoles: { roleId: string; complete: boolean }[] | undefined
   }) => {
     try {
-      const authorRole = proposal?.roles?.find((role) => role.type === ProposalRoleType.AUTHOR)
+      const { message, signature, proposalHash } = await signProposal({ proposal })
 
-      // if user disconnects and logs in as another user, we need to check if they are the author
-      if (authorRole?.address !== session?.siwe?.address) {
-        throw Error("Current address doesn't match author's address.")
+      if (!message || !signature || !proposalHash) {
+        throw Error("Signature rejected.")
       }
-      // prompt author to sign proposal to prove they are the author of the content
-      const message = genProposalDigest(proposal)
-      const signature = await signMessage(message)
-
-      if (!signature) {
-        throw Error("Unsuccessful signature.")
-      }
-      const { domain, types, value } = message
-      const proposalHash = getHash(domain, types, value)
 
       const sendProposalSuccess = await sendProposalMutation({
         proposalId: proposal?.id as string,
@@ -56,7 +43,7 @@ export const useConfirmAuthorship = ({
         onSuccess(proposal)
       }
     } catch (err) {
-      onError(err)
+      onError(err, proposal)
       console.error(err)
       return
     }

@@ -50,7 +50,7 @@ const Modal = ({ open, toggle, children, width = "max-w-2xl" }: ModalProps) => {
             leaveTo="opacity-0 scale-95"
           >
             <div
-              className={`inline-block w-full ${width} my-8 overflow-hidden rounded text-left align-middle transition-all transform bg-tunnel-black border `}
+              className={`inline-block w-full ${width} my-8 overflow-hidden rounded text-left align-middle transition-all transform bg-tunnel-black border border-concrete`}
             >
               <div className="w-full h-full relative">
                 <button

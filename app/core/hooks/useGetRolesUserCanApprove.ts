@@ -6,9 +6,13 @@ import { ProposalRoleWithSignatures } from "app/proposalRole/types"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
 // Get the roles the activeUser can approve for based on the roles' approval status and user's previous signatures
-const useGetRolesUserCanApprove = (
+const useGetRolesUserCanApprove = ({
+  proposalId,
+  proposalVersion,
+}: {
   proposalId: string | undefined | null
-): {
+  proposalVersion: number
+}): {
   roles: (ProposalRoleWithSignatures & { oneSignerNeededToComplete: boolean })[]
   isLoading: boolean
 } => {
@@ -17,14 +21,16 @@ const useGetRolesUserCanApprove = (
 
   const awaitingApproval = userRoles
     .filter((role) => {
-      // filter on PENDING status
       return (
+        // filter on PENDING status
         role.approvalStatus === ProposalRoleApprovalStatus.PENDING &&
         // filter on user having not signed already
         // to be used by multisigs that can collect many signatures while role is PENDING
-        !role.signatures.some((signature) => {
-          return addressesAreEqual(signature.address, activeUser?.address)
-        })
+        !role.signatures
+          .filter((signature) => signature.proposalVersion === proposalVersion)
+          ?.some((signature) => {
+            return addressesAreEqual(signature.address, activeUser?.address)
+          })
       )
     })
     .map((role) => {
@@ -35,7 +41,10 @@ const useGetRolesUserCanApprove = (
           role.account?.addressType === AddressType.WALLET
             ? true
             : // if account is a safe, current signature count is one less than quorum
-              role.signatures.length + 1 === role.account?.data.quorum,
+              role.signatures?.filter((signature) => signature.proposalVersion === proposalVersion)
+                ?.length +
+                1 ===
+              role.account?.data.quorum,
       }
     })
 

@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useDropzone } from "react-dropzone"
 import useStore from "app/core/hooks/useStore"
 import { Spinner } from "app/core/components/Spinner"
+import { getAntiCSRFToken } from "@blitzjs/auth"
 
 // ;<div
 //   className="space-x-1 items-center flex cursor-pointer"
@@ -34,6 +35,9 @@ const UploadImageButton = () => {
     try {
       let res = await fetch("/api/uploadImage", {
         method: "POST",
+        headers: {
+          "anti-csrf": getAntiCSRFToken(),
+        },
         body: formData,
       })
       const data = await res.json()

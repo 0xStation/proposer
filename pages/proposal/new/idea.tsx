@@ -8,13 +8,13 @@ const ProposalNewIdea: BlitzPage = () => {
   const clients = (queryParams?.clients as string)?.split(",").filter((s) => !!s) || []
   const title = queryParams?.title as string
 
-  return (
-    <Layout title="New Proposal">
-      <ProposalFormIdea prefillClients={clients} prefillTitle={title} />
-    </Layout>
-  )
+  return <ProposalFormIdea prefillClients={clients} prefillTitle={title} />
 }
 
 ProposalNewIdea.suppressFirstRenderFlicker = true
+ProposalNewIdea.getLayout = function getLayout(page) {
+  // persist layout between pages https://nextjs.org/docs/basic-features/layouts
+  return <Layout title="New Proposal">{page}</Layout>
+}
 
 export default ProposalNewIdea

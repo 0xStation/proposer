@@ -30,6 +30,8 @@ model Account {
   targetsOf          AccountAccount[]    @relation("target")
   verificationEmails EmailVerification[]
   proposalTemplates  ProposalTemplate[]
+  proposalVersions   ProposalVersion[]
+  comments           Comment[]
 }
 
 enum AddressType {
@@ -79,6 +81,7 @@ model Rfp {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   status         RfpStatus @default(OPEN)
+  suppress       Boolean   @default(false)
 
   account Account @relation(fields: [accountAddress], references: [address], onDelete: Cascade)
 
@@ -97,6 +100,7 @@ enum RfpStatus {
 
 model Proposal {
   id                    String         @id @default(uuid())
+  version               Int            @default(1)
   rfpId                 String?
   status                ProposalStatus @default(DRAFT)
   timestamp             DateTime       @default(now())
@@ -110,6 +114,8 @@ model Proposal {
   milestones ProposalMilestone[]
   payments   ProposalPayment[]
   signatures ProposalSignature[]
+  versions   ProposalVersion[]
+  comments   Comment[]
 }
 
 enum ProposalStatus {
@@ -150,12 +156,13 @@ enum ProposalRoleApprovalStatus {
 }
 
 model ProposalSignature {
-  id         String                @id @default(uuid())
-  proposalId String
-  address    String
-  timestamp  DateTime              @default(now())
-  data       Json
-  type       ProposalSignatureType @default(APPROVE)
+  id              String                @id @default(uuid())
+  proposalId      String
+  proposalVersion Int                   @default(1)
+  address         String
+  timestamp       DateTime              @default(now())
+  data            Json
+  type            ProposalSignatureType @default(APPROVE)
 
   proposal Proposal       @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   // m-n relation to support one signature being utilized for many roles
@@ -195,6 +202,19 @@ model ProposalPayment {
 
   proposal  Proposal          @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   milestone ProposalMilestone @relation(fields: [milestoneId], references: [id])
+}
+
+model ProposalVersion {
+  id            String   @default(uuid())
+  version       Int      @default(1)
+  createdAt     DateTime @default(now())
+  editorAddress String
+  proposalId    String
+  data          Json
+  editor        Account  @relation(fields: [editorAddress], references: [address])
+  proposal      Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@id([proposalId, version])
 }
 
 // SESSION MANAGEMENT
@@ -269,4 +289,26 @@ model EmailVerification {
   accountId Int
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+// COMMENT
+
+// can expand these later
+enum FieldKey {
+  ROLES
+}
+
+model Comment {
+  id            String    @id @default(uuid())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  data          Json?
+  fieldKey      FieldKey?
+  children      Comment[] @relation("Comment_Children")
+  parent        Comment?  @relation("Comment_Children", fields: [parentId], references: [id])
+  parentId      String?
+  proposal      Proposal  @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  proposalId    String
+  author        Account   @relation(fields: [authorAddress], references: [address], onDelete: Cascade)
+  authorAddress String
 }

@@ -14,6 +14,7 @@ import {
   ProposalTemplateFieldType,
   ProposalTemplateFieldValidationName,
 } from "app/template/types"
+import { PaymentDirection } from "app/rfp/types"
 import Gradient0 from "/public/gradients/0.png"
 import Gradient1 from "/public/gradients/1.png"
 import Gradient2 from "/public/gradients/2.png"
@@ -32,14 +33,26 @@ export const gradientMap = {
 
 export enum ProposalFormStep {
   PROPOSE = "PROPOSE",
-  REWARDS = "REWARDS",
+  PAYMENT = "PAYMENT",
   CONFIRM = "CONFIRM",
 }
 
 export const PROPOSAL_FORM_HEADER_COPY = {
   [ProposalFormStep.PROPOSE]: "Propose",
-  [ProposalFormStep.REWARDS]: "Define terms",
+  [ProposalFormStep.PAYMENT]: "Payment",
   [ProposalFormStep.CONFIRM]: "Confirm",
+}
+
+export enum RfpFormStep {
+  RFP = "RFP",
+  PAYMENT = "PAYMENT",
+  PERMISSIONS = "PERMISSIONS",
+}
+
+export const RFP_FORM_HEADER_COPY = {
+  [RfpFormStep.RFP]: "RFP",
+  [RfpFormStep.PAYMENT]: "Payment",
+  [RfpFormStep.PERMISSIONS]: "Permissions",
 }
 
 export const CONTRACTS = {
@@ -112,7 +125,7 @@ export const PROPOSAL_ROLE_APPROVAL_STATUS_MAP = {
     color: "bg-magic-mint",
   },
   [ProposalRoleApprovalStatus.SENT]: {
-    copy: "sent",
+    copy: "created",
     color: "bg-magic-mint",
   },
 }
@@ -137,7 +150,14 @@ export const PAGINATION_TAKE = 50
 export const PROPOSAL_NEW_STATUS_FILTER_OPTIONS = [
   ProposalStatus.APPROVED,
   ProposalStatus.AWAITING_APPROVAL,
-  ProposalStatus.DRAFT,
+  // DRAFT currently pertains to an unsigned proposal -
+  // to create a proposal, we are first creating a proposal
+  // to generate a signature, and then having the user sign to update the proposal's metadata.
+  // if the user doesn't sign, the proposal is incomplete, therefore
+  // we leave it in draft form. We're making a decision to hide
+  // draft view from the user since there's some complexity with
+  // _not_ increasing the proposal versioning when a user edits the proposal.
+  // ProposalStatus.DRAFT,
   ProposalStatus.COMPLETE,
 ]
 
@@ -279,7 +299,6 @@ export const LINKS = {
 
 export const CHAIN_IDS = {
   ETHEREUM: 1,
-  RINKEBY: 4,
   GOERLI: 5,
   OPTIMISM: 10,
   POLYGON: 137,
@@ -306,6 +325,15 @@ export const FEATURE_FLAG_KEYS = {
   MEMBER_DIRECTORY: "member_directory",
 }
 
+export const PAYMENT_DIRECTION_MAP = {
+  [PaymentDirection.AUTHOR_IS_RECIPIENT]: {
+    copy: "Receiving payment",
+  },
+  [PaymentDirection.AUTHOR_IS_SENDER]: {
+    copy: "Distributing payment",
+  },
+}
+
 export const PAYMENT_TERM_MAP = {
   [PaymentTerm.ON_AGREEMENT]: {
     copy: "Pay in full upon proposal agreement",
@@ -315,6 +343,12 @@ export const PAYMENT_TERM_MAP = {
   },
   [PaymentTerm.ADVANCE_PAYMENT]: {
     copy: "Advance payment",
+  },
+}
+
+export const BODY_CONSTRAINT_MAP = {
+  [ProposalTemplateFieldValidationName.MIN_WORDS]: {
+    copy: "Minimum",
   },
 }
 

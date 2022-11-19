@@ -29,7 +29,10 @@ const ProposalStepper = () => {
       {proposal && (
         <>
           <SendStep proposal={proposal} />
-          <ApproveStep proposal={proposal} />
+          <ApproveStep
+            proposal={proposal}
+            isLastStep={!proposal.milestones || proposal.milestones.length === 0}
+          />
           {proposal.milestones?.map((milestone, idx) => (
             <PaymentStep
               key={`milestone-${idx}`}

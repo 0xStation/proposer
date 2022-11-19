@@ -88,6 +88,24 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
           status: ProposalStatus.AWAITING_APPROVAL,
         },
       }),
+      db.proposalVersion.update({
+        where: {
+          proposalId_version: {
+            proposalId: proposal?.id,
+            version: proposal?.version,
+          },
+        },
+        data: {
+          data: {
+            content: {
+              title: "Version 1",
+              body: undefined,
+            },
+            proposalSignatureMessage: params?.signatureMessage,
+            proposalHash: params.proposalHash,
+          },
+        },
+      }),
       // Note: existing proposal signatures and role approvals for this proposal
       // should have already been wiped if an author made edits and wants to re-send the proposal
 

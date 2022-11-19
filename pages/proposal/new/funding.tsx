@@ -8,13 +8,13 @@ const ProposalNewFunding: BlitzPage = () => {
   const clients = (queryParams?.clients as string)?.split(",").filter((s) => !!s) || []
   const contributors = (queryParams?.contributors as string)?.split(",").filter((s) => !!s) || []
 
-  return (
-    <Layout title="New Proposal">
-      <ProposalFormFunding prefillClients={clients} prefillContributors={contributors} />
-    </Layout>
-  )
+  return <ProposalFormFunding prefillClients={clients} prefillContributors={contributors} />
 }
 
 ProposalNewFunding.suppressFirstRenderFlicker = true
+ProposalNewFunding.getLayout = function getLayout(page) {
+  // persist layout between pages https://nextjs.org/docs/basic-features/layouts
+  return <Layout title="New Proposal">{page}</Layout>
+}
 
 export default ProposalNewFunding

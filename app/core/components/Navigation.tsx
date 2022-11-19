@@ -14,7 +14,7 @@ import Dropdown from "app/core/components/Dropdown"
 import Listbox from "app/core/components/Listbox"
 import { useDisconnect, useNetwork, useSwitchNetwork, useAccount, allChains } from "wagmi"
 import logout from "app/session/mutations/logout"
-import Button from "app/core/components/sds/buttons/Button"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import truncateString from "app/core/utils/truncateString"
 import { LINKS, SUPPORTED_CHAINS, Sizes, gradientMap } from "app/core/utils/constants"
 import Avatar from "app/core/components/sds/images/avatar"
@@ -41,6 +41,7 @@ const Navigation = ({ children }: { children?: any }) => {
   const connectedChain = SUPPORTED_CHAINS.find((supportedChain) => supportedChain.id === chain?.id)
   const isChainSupported = chain ? !!connectedChain : undefined
   const [newWorkspaceModalOpen, setNewWorkspaceModalOpen] = useState<boolean>(false)
+  const router = useRouter()
 
   if (isError) {
     setToastState({
@@ -91,7 +92,7 @@ const Navigation = ({ children }: { children?: any }) => {
   }, [chain])
 
   const { data: ensName } = useEnsName({
-    address: activeUser?.address || undefined,
+    address: activeUser?.address as `0x${string}`,
     chainId: 1,
     cacheTime: 60 * 60 * 1000, // (1 hr) time (in ms) which the data should remain in the cache
     enabled: !!activeUser,
@@ -107,10 +108,18 @@ const Navigation = ({ children }: { children?: any }) => {
         />
       )}
       <div className="w-full border-b border-concrete h-[70px] px-6 flex items-center justify-between">
-        <Link href={Routes.Explore({})}>
-          <Image src={StationLogo} alt="Station logo" height={30} width={80} />
-        </Link>
+        <div className="cursor-pointer">
+          <Link href={Routes.Home({})}>
+            <Image src={StationLogo} alt="Station logo" height={30} width={80} />
+          </Link>
+        </div>
         <div className="flex flex-row items-center space-x-4">
+          <Button
+            type={ButtonType.Secondary}
+            onClick={() => router.push(Routes.ProposalTypeSelection())}
+          >
+            Create
+          </Button>
           <Listbox
             error={isChainSupported === false ? { message: "Switch network" } : undefined}
             defaultValue={connectedChain}
@@ -146,7 +155,10 @@ const Navigation = ({ children }: { children?: any }) => {
                   </span>
                 </div>
               }
-              items={[{ name: "Disconnect", onClick: () => handleDisconnect() }]}
+              items={[
+                { name: "Create group workspace", onClick: () => setNewWorkspaceModalOpen(true) },
+                { name: "Disconnect", onClick: () => handleDisconnect() },
+              ]}
             />
           )}
           <Dropdown
@@ -165,18 +177,6 @@ const Navigation = ({ children }: { children?: any }) => {
       <div className="h-[calc(100vh-70px)] w-[70px] bg-tunnel-black border-r border-concrete fixed top-[70px] left-0 text-center flex flex-col">
         <div className="h-full mt-4">
           <ExploreIcon />
-          <NewWorkspaceIcon
-            onClick={(toggle) => {
-              if (!activeUser) {
-                setToastState({
-                  isToastShowing: true,
-                  type: "error",
-                  message: "You must have a connected wallet to add a new account.",
-                })
-              }
-              setNewWorkspaceModalOpen(toggle)
-            }}
-          />
           {/* if connected wallet changes from activeUser (from SIWE session), hide left nav options */}
           {activeUser && address === activeUser?.address && (
             <>

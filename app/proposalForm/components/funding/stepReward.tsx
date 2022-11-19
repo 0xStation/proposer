@@ -210,7 +210,7 @@ export const FundingFormStepReward = ({
             approval to kickstart their project?
           </span>
           <Field
-            name="advancedPaymentPercentage"
+            name="advancePaymentPercentage"
             format={formatPercentValue}
             validate={composeValidators(requiredField, isValidAdvancedPaymentPercentage)}
           >

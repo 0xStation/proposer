@@ -26,7 +26,7 @@ const useDiscordAuth = (scope: string) => {
 
   const { onOpen, windowInstance } = usePopupWindow(
     `https://discord.com/api/oauth2/authorize?client_id=${
-      process.env.BLITZ_PUBLIC_DISCORD_CLIENT_ID
+      process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID
     }&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(
       scope
     )}&state=${encodeURIComponent(state)}`

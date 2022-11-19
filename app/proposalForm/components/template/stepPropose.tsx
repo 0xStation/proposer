@@ -6,18 +6,29 @@ import { useParam, Routes } from "@blitzjs/next"
 import { composeValidators, mustBeAboveNumWords, requiredField } from "app/utils/validators"
 import TextLink from "app/core/components/TextLink"
 import { LINKS } from "app/core/utils/constants"
-import { getClientAddress, getMinNumWords } from "app/template/utils"
+import { getMinNumWords } from "app/template/utils"
 import useDisplayAddress from "app/core/hooks/useDisplayAddress"
 import getTemplateById from "app/template/queries/getTemplateById"
 import getRfpById from "app/rfp/queries/getRfpById"
 import Preview from "app/core/components/MarkdownPreview"
 import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid"
+import { useSession } from "@blitzjs/auth"
+import useStore from "app/core/hooks/useStore"
+import ConnectDiscordModal from "app/core/components/ConnectDiscordModal"
+import { SocialConnection } from "app/rfp/types"
+import Image from "next/image"
+import DiscordIcon from "/public/discord-icon.svg"
 
 export const TemplateFormStepPropose = ({ formState }) => {
+  const session = useSession({ suspense: false })
   const [previewMode, setPreviewMode] = useState<boolean>(false)
+  const [isDiscordModalOpen, setIsDiscordModalOpen] = useState<boolean>(false)
+  const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const templateId = useParam("templateId") as string
   const { rfpId } = useRouter().query
   const router = useRouter()
+  const activeUser = useStore((state) => state.activeUser)
+
   const [rfp] = useQuery(
     getRfpById,
     {
@@ -51,18 +62,39 @@ export const TemplateFormStepPropose = ({ formState }) => {
     }
   )
 
-  const { text: displayAddress } = useDisplayAddress(getClientAddress(template?.data?.fields))
+  const { text: toDisplayAddress } = useDisplayAddress(rfp?.accountAddress)
 
   return (
     <>
+      {rfp?.data?.requiredSocialConnections?.includes(SocialConnection.DISCORD) &&
+        activeUser &&
+        !activeUser?.discordId && (
+          <ConnectDiscordModal isOpen={isDiscordModalOpen} setIsOpen={setIsDiscordModalOpen} />
+        )}
+      {/* TO */}
       <div className="mt-4 flex flex-row w-full items-center justify-between">
         <span className="font-bold">To</span>
-        <span className="items-end">{"@" + displayAddress}</span>
+        <span className="items-end">{"@" + toDisplayAddress}</span>
       </div>
-      <div className="mt-4 flex flex-row w-full items-center justify-between">
-        <span className="font-bold">Title</span>
-        <span className="items-end">{`"${rfp?.data.content.title || ""}" submission`}</span>
-      </div>
+      {/* TITLE */}
+      <label className="font-bold block mt-6">Title*</label>
+      <Field name="title" validate={requiredField}>
+        {({ meta, input }) => (
+          <>
+            <input
+              {...input}
+              type="text"
+              required
+              placeholder="Add a title for your idea"
+              className="bg-wet-concrete rounded mt-1 w-full p-2"
+            />
+
+            {meta.touched && meta.error && (
+              <span className="text-torch-red text-xs">{meta.error}</span>
+            )}
+          </>
+        )}
+      </Field>
       {/* BODY */}
       <div className="flex flex-row justify-between">
         <div className="flex-col">
@@ -71,7 +103,7 @@ export const TemplateFormStepPropose = ({ formState }) => {
             {getMinNumWords(template?.data.fields) > 0
               ? `${getMinNumWords(template?.data.fields)} words minimum.`
               : ""}{" "}
-            Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown syntax</TextLink>.
+            Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>.
           </span>
         </div>
         <button
@@ -89,7 +121,7 @@ export const TemplateFormStepPropose = ({ formState }) => {
             </>
           ) : (
             <>
-              <p className="inline text-sm text-concrete">Read</p>{" "}
+              <p className="inline text-sm text-concrete">Preview</p>{" "}
               <EyeIcon className="inline h-5 w-5 fill-concrete" />
             </>
           )}
@@ -123,6 +155,39 @@ export const TemplateFormStepPropose = ({ formState }) => {
             </div>
           )}
         </Field>
+      )}
+      {rfp?.data?.requiredSocialConnections?.includes(SocialConnection.DISCORD) && (
+        <>
+          <div className="mt-6 pb-1">
+            <label className="font-bold block">Verify with Discord*</label>
+            <p className="text-concrete text-sm">Connect your Discord account to verify</p>
+            {!activeUser?.discordId ? (
+              <button
+                type="button"
+                className="mt-3 border border-marble-white text-marble-white rounded flex flex-row py-2 px-6 hover:bg-wet-concrete"
+                onClick={(e) => {
+                  e.preventDefault()
+                  if (!activeUser?.address) {
+                    toggleWalletModal(true)
+                  } else {
+                    setIsDiscordModalOpen(true)
+                  }
+                }}
+              >
+                <Image src={DiscordIcon} alt="Discord icon" width={20} height={20} />
+                <p className="pl-2">Connect Discord</p>
+              </button>
+            ) : (
+              <button
+                disabled
+                className="mt-3 border border-marble-white text-marble-white rounded flex flex-row py-2 px-6 opacity-70 cursor-not-allowed"
+              >
+                <Image src={DiscordIcon} alt="Discord icon" width={20} height={20} />
+                <p className="pl-2">Connected to Discord</p>
+              </button>
+            )}
+          </div>
+        </>
       )}
     </>
   )

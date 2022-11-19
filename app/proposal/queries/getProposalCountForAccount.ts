@@ -39,12 +39,18 @@ export default async function getProposalCountForAccount(
             }),
         },
       },
-      ...(params.statuses &&
-        params.statuses.length > 0 && {
-          status: {
-            in: params.statuses,
-          },
-        }),
+      ...(params.statuses && params.statuses.length > 0
+        ? {
+            status: {
+              in: params.statuses,
+              not: ProposalStatus.DRAFT,
+            },
+          }
+        : {
+            status: {
+              not: ProposalStatus.DRAFT,
+            },
+          }),
     },
   }
 

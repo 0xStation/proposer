@@ -10,16 +10,18 @@ const ProposalNewPartnership: BlitzPage = () => {
   const title = queryParams?.title as string
 
   return (
-    <Layout title="New Proposal">
-      <ProposalFormPartnership
-        prefillClients={clients}
-        prefillContributors={contributors}
-        prefillTitle={title}
-      />
-    </Layout>
+    <ProposalFormPartnership
+      prefillClients={clients}
+      prefillContributors={contributors}
+      prefillTitle={title}
+    />
   )
 }
 
 ProposalNewPartnership.suppressFirstRenderFlicker = true
+ProposalNewPartnership.getLayout = function getLayout(page) {
+  // persist layout between pages https://nextjs.org/docs/basic-features/layouts
+  return <Layout title="New Proposal">{page}</Layout>
+}
 
 export default ProposalNewPartnership

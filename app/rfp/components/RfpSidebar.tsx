@@ -1,29 +1,26 @@
 import Link from "next/link"
 import Image from "next/image"
-import { useQuery } from "@blitzjs/rpc"
-import { Routes, useParam } from "@blitzjs/next"
+import { Routes } from "@blitzjs/next"
 import { RfpStatus } from "@prisma/client"
 import BackIcon from "/public/back-icon.svg"
 import TextLink from "app/core/components/TextLink"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
 import { WorkspaceTab } from "pages/workspace/[accountAddress]"
-import { getPaymentToken, getPayments, getTotalPaymentAmount } from "app/template/utils"
 import RfpStatusPill from "./RfpStatusPill"
 import Button from "app/core/components/sds/buttons/Button"
 import ReadMore from "app/core/components/ReadMore"
-import getTemplateByRfpId from "app/template/queries/getTemplateByRfpId"
+import { toTitleCase } from "app/core/utils/titleCase"
+import { getPaymentAmountDetails, paymentDetailsString } from "../utils"
+import { paymentTermsString } from "app/proposal/utils"
+import LookingForPill from "./LookingForPill"
+import AccountMediaObject from "app/core/components/AccountMediaObject"
 
 export const RfpSidebar = ({ rfp }) => {
-  const [template] = useQuery(
-    getTemplateByRfpId,
-    { rfpId: rfp?.id as string },
-    {
-      suspense: false,
-      enabled: Boolean(rfp?.id),
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-    }
+  const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
+    rfp?.data?.proposal?.payment?.minAmount,
+    rfp?.data?.proposal?.payment?.maxAmount
   )
+
   return (
     <div className="h-full w-[288px] overflow-y-scroll p-6 border-r border-concrete">
       <div className="flex flex-col pb-6 space-y-6">
@@ -34,7 +31,7 @@ export const RfpSidebar = ({ rfp }) => {
             tab: WorkspaceTab.RFPS,
           })}
         >
-          <div className="h-[16px] w-[16px] cursor-pointer">
+          <div className="h-[16px] w-[16px] cursor-pointer mb-2">
             <Image src={BackIcon} alt="Back icon" />
           </div>
         </Link>
@@ -50,21 +47,25 @@ export const RfpSidebar = ({ rfp }) => {
             className={`h-8 w-full rounded-lg flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
           />
         )}
-        {/* STATUS PILL */}
+        {/* PILLS */}
         {rfp ? (
-          <RfpStatusPill status={rfp?.status} />
+          <div className="flex flex-row flex-wrap gap-1">
+            <RfpStatusPill status={rfp?.status} />
+            {rfp?.status !== RfpStatus.CLOSED && (
+              <LookingForPill role={rfp?.data?.proposal?.proposerRole} />
+            )}
+          </div>
         ) : (
           // LOADING STATE
           <div
             tabIndex={0}
-            className={`h-6 w-1/3 rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+            className={`h-6 w-full rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
           />
         )}
         {/* CTA */}
         <div className="mb-10 relative group">
           <Link
-            href={Routes.ProposalTemplateForm({
-              templateId: template?.id as string,
+            href={Routes.ProposalRfpForm({
               rfpId: rfp?.id as string,
             })}
           >
@@ -80,6 +81,15 @@ export const RfpSidebar = ({ rfp }) => {
         </div>
         {/* METADATA */}
         <div className="pt-6 flex flex-col space-y-6">
+          {/* ACCOUNT */}
+          {rfp?.account && (
+            <div>
+              <h4 className="text-xs font-bold text-concrete uppercase mb-2">
+                {rfp?.data?.proposal?.requesterRole}
+              </h4>
+              <AccountMediaObject account={rfp?.account} />
+            </div>
+          )}
           {/* SUBMISSION GUIDELINES */}
           {!!rfp?.data?.content.body && (
             <div>
@@ -89,44 +99,65 @@ export const RfpSidebar = ({ rfp }) => {
               </ReadMore>
             </div>
           )}
-          {/* SUBMISSION REQUIREMENT */}
-          <div>
-            <h4 className="text-xs font-bold text-concrete uppercase">Submission requirement</h4>
-            {!!rfp?.data?.singleTokenGate ? (
-              <div className="mt-2">
-                {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
-                <TextLink
-                  url={
-                    getNetworkExplorer(rfp?.data?.singleTokenGate.token.chainId) +
-                    "/token/" +
-                    rfp?.data?.singleTokenGate.token.address
-                  }
-                >
-                  {rfp?.data?.singleTokenGate.token.name}
-                </TextLink>
-              </div>
-            ) : (
-              <div className="mt-2">Public</div>
-            )}
-          </div>
-          {getPayments(template?.data.fields)?.length > 0 && (
+          {/* REQUIREMENTS */}
+          {(!!rfp?.data?.singleTokenGate ||
+            !!rfp?.data?.requiredSocialConnections?.length ||
+            rfp?.data?.proposal?.body?.minWordCount > 0) && (
+            <div>
+              <h4 className="text-xs font-bold text-concrete uppercase">Requirements</h4>
+              {!!rfp?.data?.singleTokenGate && (
+                <p className="mt-2">
+                  {`At least ${rfp?.data?.singleTokenGate.minBalance || 1} `}
+                  <TextLink
+                    url={
+                      getNetworkExplorer(rfp?.data?.singleTokenGate.token.chainId) +
+                      "/token/" +
+                      rfp?.data?.singleTokenGate.token.address
+                    }
+                  >
+                    {rfp?.data?.singleTokenGate.token.name}
+                  </TextLink>
+                </p>
+              )}
+              {!!rfp?.data?.requiredSocialConnections &&
+                rfp?.data?.requiredSocialConnections.map((social, idx) => (
+                  <p className="mt-2" key={idx}>
+                    {toTitleCase(social)} connection
+                  </p>
+                ))}
+              {rfp?.data?.proposal?.body?.minWordCount > 0 && (
+                <p className="mt-2">{rfp?.data?.proposal?.body?.minWordCount + " word minimum"}</p>
+              )}
+            </div>
+          )}
+          {rfp?.data?.proposal?.payment?.token && (
             <>
               {/* NETWORK */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Network</h4>
                 <p className="mt-2">
-                  {getNetworkName(getPaymentToken(template?.data?.fields)?.chainId)}
+                  {getNetworkName(rfp?.data?.proposal?.payment?.token?.chainId)}
                 </p>
               </div>
               {/* PAYMENT TOKEN */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
-                <p className="mt-2">{getPaymentToken(template?.data?.fields)?.symbol}</p>
+                <p className="mt-2">{rfp?.data?.proposal?.payment?.token?.symbol}</p>
               </div>
               {/* PAYMENT AMOUNT */}
               <div>
                 <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-                <p className="mt-2">{getTotalPaymentAmount(template?.data?.fields)}</p>
+                <p className="mt-2">{paymentDetailsString(paymentAmountType, paymentAmount)}</p>
+              </div>
+              {/* PAYMENT TERMS */}
+              <div>
+                <h4 className="text-xs font-bold text-concrete uppercase">Payment terms</h4>
+                <p className="mt-2">
+                  {paymentTermsString(
+                    rfp?.data?.proposal?.payment?.terms,
+                    rfp?.data?.proposal?.payment?.advancePaymentPercentage
+                  )}
+                </p>
               </div>
             </>
           )}
