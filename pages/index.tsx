@@ -1,17 +1,15 @@
 import { BlitzPage, Routes } from "@blitzjs/next"
 import { useInfiniteQuery, useQuery } from "@blitzjs/rpc"
-// Commenting out account querying until we want to showcase active contributors
-// import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
-// import AccountMediaObject from "app/core/components/AccountMediaObject"
+import { useCallback, useRef, useState } from "react"
+import { Rfp } from "app/rfp/types"
+import { useRouter } from "next/router"
+import { useSession } from "@blitzjs/auth"
+import getAccountsByAddresses from "app/account/queries/getAccountsByAddresses"
+import AccountMediaObject from "app/core/components/AccountMediaObject"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import Layout from "../app/core/layouts/Layout"
 import { RfpCard } from "app/rfp/components/RfpCard"
 import getPaginatedRfps from "app/rfp/queries/getPaginatedRfps"
-import { useCallback, useRef, useState } from "react"
-import { Rfp } from "app/rfp/types"
-import { RfpStatus } from "@prisma/client"
-import { useRouter } from "next/router"
-import { useSession } from "@blitzjs/auth"
 import useStore from "app/core/hooks/useStore"
 import dynamic from "next/dynamic"
 
@@ -40,25 +38,24 @@ const Home: BlitzPage = () => {
     }
   )
 
-  // Commenting this out until we have a list of active contributors to showcase
-  // const [accounts] = useQuery(
-  //   getAccountsByAddresses,
-  //   {
-  //     addresses: [
-  //       "0xaE55f61f85935BBB68b8809d5c02142e4CbA9a13",
-  //       "0xd32FA3e71737a19eE4CA44334b9f3c52665a6CDB",
-  //       "0x2Ae8c972fB2E6c00ddED8986E2dc672ED190DA06",
-  //       "0xBb398Fd83126500E3f0afec6d4c69411576bc7FB",
-  //       "0x78918036a8e4B9179bEE3CAB57110A3397986E44",
-  //       "0x016562aA41A8697720ce0943F003141f5dEAe006",
-  //       "0x65A3870F48B5237f27f674Ec42eA1E017E111D63",
-  //       "0x96F0F1Ddafae2C6bd0635D28BdbA6B959Fb99eea",
-  //       "0xC3c74B36A7F7c3395c6D59086F5a49540ed180ED",
-  //       "0x0b74007a73ca49c96C833ba0E38Aa929ba71c40f",
-  //     ],
-  //   },
-  //   { suspense: false }
-  // )
+  const [accounts] = useQuery(
+    getAccountsByAddresses,
+    {
+      addresses: [
+        "0x0C528bA4964673a9187A6F7BEc96E8aFD3409a54", // tiny factories
+        "0x332557dE221d09AD5b164a665c585fca0200b4B1", // foxes
+        "0x96F0F1Ddafae2C6bd0635D28BdbA6B959Fb99eea", // tchard.eth
+        "0xc517c83f417b73dA98647dad0FCB80af9f3b9531", // station
+        "0x08C75DE5686923a93E6D1B0160E3ef4913c3F3f0", // polygon
+        "0xEC41a0AAea12ad8F588e5aD0e71A837d83e05792", // popp.eth
+        "0x8dca852d10c3CfccB88584281eC1Ef2d335253Fd", // cabindao
+        "0xEAB32a423B3dA4049F1Ad379737fCf1f4F9a5137", // radicle
+        "0xBb398Fd83126500E3f0afec6d4c69411576bc7FB", // blurryjpeg
+        "0x6Bf1CA007aBC7eFebAe284b31e690782A6d3e850", // the symmetrical
+      ],
+    },
+    { suspense: false }
+  )
 
   // attach ref to last post so that when it's seen, we fetch
   // the next batch of paginated rfps
@@ -135,7 +132,7 @@ const Home: BlitzPage = () => {
             <div className="h-14 mt-11 w-full rounded">
               <input
                 ref={searchRef}
-                className="text-center bg-transparent border border-marble-white h-full w-full inline rounded placeholder:text-lg focus:bg-wet-concrete"
+                className="text-center bg-transparent border border-concrete h-full w-full inline rounded placeholder:text-lg focus:bg-wet-concrete"
                 placeholder="Enter a wallet address or an ENS name"
               />
             </div>
@@ -172,28 +169,27 @@ const Home: BlitzPage = () => {
             </Button>
           </div>
 
-          {/* Commenting this out until we have a list of active contributors to showcase*/}
-          {/* <div className="mt-14">
-          <h2 className="text-2xl mb-3">Featured active contributors</h2>
-          <div className="flex flex-row flex-wrap gap-x-2 gap-y-2">
-            {accounts
-              ? accounts?.map((account) => (
-                  <div
-                    key={account?.address}
-                    tabIndex={0}
-                    className="rounded-full bg-wet-concrete-50 p-3 w-fit hover:bg-wet-concrete cursor-pointer"
-                  >
-                    <AccountMediaObject account={account} />
-                  </div>
-                ))
-              : Array.from(Array(10)).map((idx) => (
-                  <div
-                    key={idx}
-                    className="rounded-full motion-safe:animate-pulse shadow bg-wet-concrete p-3 w-52 h-[68px] hover:bg-wet-concrete cursor-pointer"
-                  ></div>
-                ))}
+          <div className="mt-14">
+            <h2 className="text-2xl font-bold mb-3">Propose to collaborate</h2>
+            <div className="flex flex-row flex-wrap gap-x-2 gap-y-2">
+              {accounts
+                ? accounts?.map((account) => (
+                    <div
+                      key={account?.address}
+                      tabIndex={0}
+                      className="rounded-full bg-wet-concrete-50 p-3 w-fit hover:bg-wet-concrete cursor-pointer"
+                    >
+                      <AccountMediaObject account={account} shouldLinkToProposalPage={true} />
+                    </div>
+                  ))
+                : Array.from(Array(10)).map((idx) => (
+                    <div
+                      key={idx}
+                      className="rounded-full motion-safe:animate-pulse shadow bg-wet-concrete p-3 w-52 h-[68px] hover:bg-wet-concrete cursor-pointer"
+                    ></div>
+                  ))}
+            </div>
           </div>
-        </div> */}
 
           <div className="mt-14">
             <div className="flex flex-row justify-between">
