@@ -12,7 +12,6 @@ import ReadMore from "app/core/components/ReadMore"
 import { toTitleCase } from "app/core/utils/titleCase"
 import { getPaymentAmountDetails, paymentDetailsString } from "../utils"
 import { paymentTermsString } from "app/proposal/utils"
-import AccountMediaRow from "app/comment/components/AccountMediaRow"
 import LookingForPill from "./LookingForPill"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 

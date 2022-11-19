@@ -108,9 +108,11 @@ const Navigation = ({ children }: { children?: any }) => {
         />
       )}
       <div className="w-full border-b border-concrete h-[70px] px-6 flex items-center justify-between">
-        <Link href={Routes.Explore({})}>
-          <Image src={StationLogo} alt="Station logo" height={30} width={80} />
-        </Link>
+        <div className="cursor-pointer">
+          <Link href={Routes.Home({})}>
+            <Image src={StationLogo} alt="Station logo" height={30} width={80} />
+          </Link>
+        </div>
         <div className="flex flex-row items-center space-x-4">
           <Button
             type={ButtonType.Secondary}
