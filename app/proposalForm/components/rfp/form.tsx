@@ -255,11 +255,11 @@ export const ProposalFormRfp = () => {
             let contributorAddress
             let clientAddress
             if (rfp?.data?.proposal?.proposerRole === ProposalRoleType.CLIENT) {
-              clientAddress = rfp.accountAddress
-              contributorAddress = connectedAddress
-            } else if (rfp?.data?.proposal?.proposerRole === ProposalRoleType.CONTRIBUTOR) {
               clientAddress = connectedAddress
               contributorAddress = rfp.accountAddress
+            } else if (rfp?.data?.proposal?.proposerRole === ProposalRoleType.CONTRIBUTOR) {
+              clientAddress = rfp.accountAddress
+              contributorAddress = connectedAddress
             }
 
             let newProposal
