@@ -57,7 +57,7 @@ const Modal = ({ open, toggle, children, width = "max-w-2xl" }: ModalProps) => {
                   className="text-marble-white absolute z-50 right-2 top-2"
                   onClick={() => toggle(!open)}
                 >
-                  <img src="/exit-button.svg" alt="Close button" />
+                  <img src="/exit-button.svg" alt="Close button " />
                 </button>
               </div>
               {children}
