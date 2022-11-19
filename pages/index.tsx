@@ -141,8 +141,7 @@ const Home: BlitzPage = () => {
               overrideWidthClassName="w-fit px-8 mx-auto mt-3"
               onClick={() =>
                 router.push(
-                  Routes.ProposalTypeSelection({
-                    // pre-fill for both so that if user changes toggle to reverse roles, the input address is still there
+                  Routes.ProposalNewFunding({
                     clients: searchRef?.current?.value,
                     contributors: searchRef?.current?.value,
                   })
