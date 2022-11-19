@@ -122,7 +122,6 @@ const Home: BlitzPage = () => {
       <main
         className="bg-cover bg-center bg-no-repeat h-full"
         style={{ backgroundImage: "url('/bg-hero-landing.webp')" }}
-        id="#top"
       >
         <div className="h-full mx-56">
           <div className="flex flex-col">
