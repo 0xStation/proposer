@@ -18,7 +18,7 @@ export default resolver.pipe(async ({ where, skip = 0, take = 100 }: GetPaginate
     query: (paginateArgs) =>
       db.rfp.findMany({
         ...paginateArgs,
-        where: { status: RfpStatus.OPEN },
+        where: { status: RfpStatus.OPEN, suppress: false },
         orderBy: {
           createdAt: "desc",
         },

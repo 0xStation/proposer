@@ -127,7 +127,7 @@ const Home: BlitzPage = () => {
         <div className="h-full mx-56">
           <div className="flex flex-col">
             <h1 className="text-center mt-20 font-bold bg-transparent text-marble-white text-4xl">
-              Start collaborating today
+              Start collaborating now
             </h1>
             <div className="h-14 mt-11 w-full rounded">
               <input
