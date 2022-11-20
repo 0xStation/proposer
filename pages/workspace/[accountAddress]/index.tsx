@@ -306,13 +306,11 @@ const WorkspaceHome: BlitzPage = () => {
           proposals.length === 0 &&
           (proposalStatusFilters.size || proposalRoleFilters.size ? (
             <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-              <p className="text-2xl font-bold w-[295px] text-center">No matches.</p>
+              <p className="text-2xl font-bold w-[295px] text-center">No matches</p>
             </div>
           ) : (
             <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-              <p className="text-2xl font-bold w-[295px] text-center">
-                This workspace has no proposals yet
-              </p>
+              <p className="text-2xl font-bold w-[295px] text-center">No proposals</p>
             </div>
           ))}
       </div>
@@ -431,13 +429,11 @@ const WorkspaceHome: BlitzPage = () => {
             rfps.length === 0 &&
             (rfpStatusFilters.size ? (
               <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-                <p className="text-2xl font-bold w-[295px] text-center">No matches.</p>
+                <p className="text-2xl font-bold w-[295px] text-center">No matches</p>
               </div>
             ) : (
               <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
-                <p className="text-2xl font-bold w-[295px] text-center">
-                  This workspace has no RFPs yet
-                </p>
+                <p className="text-2xl font-bold w-[295px] text-center">No RFPs</p>
               </div>
             ))}
         </div>
