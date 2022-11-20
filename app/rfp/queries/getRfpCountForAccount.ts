@@ -1,6 +1,7 @@
 import db, { RfpStatus } from "db"
 import * as z from "zod"
 import { Rfp } from "../types"
+import { computeRfpDbStatusFilter } from "../utils"
 
 const GetRfpCountForAccount = z.object({
   address: z.string(),
@@ -15,9 +16,7 @@ export default async function getRfpCountForAccount(input: z.infer<typeof GetRfp
       accountAddress: params.address,
       ...(params.statuses &&
         params.statuses.length > 0 && {
-          status: {
-            in: params.statuses,
-          },
+          OR: params.statuses.map((status) => computeRfpDbStatusFilter(status)),
         }),
     },
   })

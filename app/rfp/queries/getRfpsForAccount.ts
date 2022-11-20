@@ -1,6 +1,7 @@
 import db, { RfpStatus } from "db"
 import * as z from "zod"
 import { Rfp } from "../types"
+import { computeRfpDbStatusFilter, getRfpStatus } from "../utils"
 
 const GetRfpsForAccount = z.object({
   address: z.string(),
@@ -12,14 +13,12 @@ const GetRfpsForAccount = z.object({
 export default async function getRfpsForAccount(input: z.infer<typeof GetRfpsForAccount>) {
   const params = GetRfpsForAccount.parse(input)
 
-  const rfps = db.rfp.findMany({
+  const rfps = await db.rfp.findMany({
     where: {
       accountAddress: params.address,
       ...(params.statuses &&
         params.statuses.length > 0 && {
-          status: {
-            in: params.statuses,
-          },
+          OR: params.statuses.map((status) => computeRfpDbStatusFilter(status)),
         }),
     },
     include: {
@@ -32,5 +31,7 @@ export default async function getRfpsForAccount(input: z.infer<typeof GetRfpsFor
     skip: input.page * input.paginationTake,
   })
 
-  return rfps as unknown as Rfp[]
+  return rfps.map((rfp) => {
+    return { ...rfp, status: getRfpStatus(rfp.status, rfp.startDate, rfp.endDate) }
+  }) as unknown as Rfp[]
 }
