@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import Link from "next/link"
 import { useQuery } from "@blitzjs/rpc"
 import { BlitzPage, Routes } from "@blitzjs/next"
@@ -8,6 +9,7 @@ import { PAGINATION_TAKE } from "app/core/utils/constants"
 import getAllAccounts from "app/account/queries/getAllAccounts"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 import { AddressType } from "@prisma/client"
+import { getAntiCSRFToken } from "@blitzjs/auth"
 
 enum Tab {
   ORGANIZATIONS = "ORGANIZATIONS",

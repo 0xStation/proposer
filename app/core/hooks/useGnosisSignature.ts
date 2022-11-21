@@ -66,7 +66,7 @@ const useGnosisSignature = (payment: ProposalPayment) => {
       }
 
       const account = await invoke(getAccountByAddress, {
-        where: { address: payment.senderAddress },
+        address: payment.senderAddress,
       })
 
       if (!account) {

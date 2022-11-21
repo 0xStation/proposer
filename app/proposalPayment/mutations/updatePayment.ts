@@ -4,6 +4,8 @@ import { Ctx } from "blitz"
 
 const UpdatePayment = z.object({
   paymentId: z.string(),
+  isError: z.boolean().optional(),
+  isRejected: z.boolean().optional(),
   multisigTransaction: z.object({
     address: z.string().optional(),
     safeTxHash: z.string().optional(),
@@ -33,6 +35,8 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
   const payment = await db.proposalPayment.update({
     where: { id: params.paymentId },
     data: {
+      isError: params.isError || existingPayment.isError,
+      isRejected: params.isRejected || existingPayment.isRejected,
       data: {
         ...(existingPayment.data as {}),
         ...(params.multisigTransaction && {
