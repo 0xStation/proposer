@@ -14,12 +14,14 @@ import { getPaymentAmountDetails, paymentDetailsString } from "../utils"
 import { paymentTermsString } from "app/proposal/utils"
 import LookingForPill from "./LookingForPill"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
+import useCountdown from "app/core/hooks/useCountdown"
 
 export const RfpSidebar = ({ rfp }) => {
   const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
     rfp?.data?.proposal?.payment?.minAmount,
     rfp?.data?.proposal?.payment?.maxAmount
   )
+  const timeLeft = useCountdown(rfp?.endDate)
 
   return (
     <div className="h-full w-[288px] overflow-y-scroll p-6 border-r border-concrete">
@@ -35,18 +37,6 @@ export const RfpSidebar = ({ rfp }) => {
             <Image src={BackIcon} alt="Back icon" />
           </div>
         </Link>
-        {/* TITLE */}
-        {rfp ? (
-          <span className="mt-6 text-2xl font-bold text-marble-white">
-            {rfp?.data.content.title}
-          </span>
-        ) : (
-          // LOADING STATE
-          <div
-            tabIndex={0}
-            className={`h-8 w-full rounded-lg flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
-          />
-        )}
         {/* PILLS */}
         {rfp ? (
           <div className="flex flex-row flex-wrap gap-1">
@@ -61,6 +51,24 @@ export const RfpSidebar = ({ rfp }) => {
             tabIndex={0}
             className={`h-6 w-full rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
           />
+        )}
+        {/* TITLE */}
+        {rfp ? (
+          <span className="mt-6 text-2xl font-bold text-marble-white">
+            {rfp?.data.content.title}
+          </span>
+        ) : (
+          // LOADING STATE
+          <div
+            tabIndex={0}
+            className={`h-8 w-full rounded-lg flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+          />
+        )}
+        {rfp?.endDate && rfp?.endDate > new Date() && (
+          <div>
+            <h4 className="text-xs font-bold text-concrete uppercase">Ends in</h4>
+            <p className="mt-2 text-lg font-bold">{timeLeft}</p>
+          </div>
         )}
         {/* CTA */}
         <div className="mb-10 relative group">

@@ -18,6 +18,7 @@ import AccountMediaRow from "app/comment/components/AccountMediaRow"
 import LookingForPill from "app/rfp/components/LookingForPill"
 import { RfpStatus } from "@prisma/client"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
+import useCountdown from "app/core/hooks/useCountdown"
 
 const ProposalRfpForm: BlitzPage = () => {
   const rfpId = useParam("rfpId") as string
@@ -48,6 +49,7 @@ const ProposalRfpForm: BlitzPage = () => {
     rfp?.data?.proposal?.payment?.minAmount,
     rfp?.data?.proposal?.payment?.maxAmount
   )
+  const timeLeft = useCountdown(rfp?.endDate)
 
   return (
     <>
@@ -62,18 +64,6 @@ const ProposalRfpForm: BlitzPage = () => {
                 <Image src={BackIcon} alt="Back icon" />
               </div>
             </Link>
-            {/* TITLE */}
-            {rfp ? (
-              <span className="mt-6 text-2xl font-bold text-marble-white">
-                {rfp?.data.content.title}
-              </span>
-            ) : (
-              // LOADING STATE
-              <div
-                tabIndex={0}
-                className={`h-8 w-full rounded-lg flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
-              />
-            )}
             {/* STATUS PILL */}
             {rfp ? (
               <div className="flex flex-row flex-wrap gap-1">
@@ -89,8 +79,26 @@ const ProposalRfpForm: BlitzPage = () => {
                 className={`h-6 w-1/3 rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
               />
             )}
+            {/* TITLE */}
+            {rfp ? (
+              <span className="mt-6 text-2xl font-bold text-marble-white">
+                {rfp?.data.content.title}
+              </span>
+            ) : (
+              // LOADING STATE
+              <div
+                tabIndex={0}
+                className={`h-8 w-full rounded-lg flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+              />
+            )}
+            {rfp?.endDate && rfp?.endDate > new Date() && (
+              <div>
+                <h4 className="text-xs font-bold text-concrete uppercase">Ends in</h4>
+                <p className="mt-2 text-lg font-bold">{timeLeft}</p>
+              </div>
+            )}
             {/* METADATA */}
-            <div className="mt-12 pt-6 flex flex-col space-y-6">
+            <div className="flex flex-col space-y-6">
               {/* ACCOUNT */}
               {rfp?.account && (
                 <div>
