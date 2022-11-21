@@ -41,6 +41,21 @@ export const paymentDetailsString = (type, amount) => {
   }
 }
 
+export const rewardString = (token, amountType, amount) => {
+  if (!token) {
+    return "Flexible"
+  }
+  if (amountType === PaymentAmountType.FLEXIBLE) {
+    return token.symbol
+  } else if (amountType === PaymentAmountType.FIXED) {
+    return amount + " " + token.symbol
+  } else if (amountType === PaymentAmountType.MINIMUM) {
+    return "Minimum " + amount + " " + token.symbol
+  } else if (amountType === PaymentAmountType.MAXIMUM) {
+    return "Maximum " + amount + " " + token.symbol
+  }
+}
+
 export const getRfpStatus = (dbStatus, startDate, endDate) => {
   if (dbStatus !== RfpStatus.TIME_DEPENDENT) {
     return dbStatus

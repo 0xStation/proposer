@@ -14,8 +14,8 @@ import { getPaymentAmountDetails, paymentDetailsString } from "../utils"
 import { paymentTermsString } from "app/proposal/utils"
 import LookingForPill from "./LookingForPill"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
-import useCountdown from "app/core/hooks/useCountdown"
-import RfpEndsIn from "./EndsIn"
+import RfpEndsIn from "./metadata/RfpEndsIn"
+import RfpReward from "./metadata/RfpReward"
 
 export const RfpSidebar = ({ rfp }) => {
   const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
@@ -64,6 +64,7 @@ export const RfpSidebar = ({ rfp }) => {
             className={`h-8 w-full rounded-lg flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
           />
         )}
+        <RfpReward rfpProposalPayment={rfp?.data?.proposal?.payment} />
         <RfpEndsIn status={rfp?.status} endDate={rfp?.endDate} />
         {/* CTA */}
         <div className="mb-10 relative group">
@@ -141,16 +142,6 @@ export const RfpSidebar = ({ rfp }) => {
                 <p className="mt-2">
                   {getNetworkName(rfp?.data?.proposal?.payment?.token?.chainId)}
                 </p>
-              </div>
-              {/* PAYMENT TOKEN */}
-              <div>
-                <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
-                <p className="mt-2">{rfp?.data?.proposal?.payment?.token?.symbol}</p>
-              </div>
-              {/* PAYMENT AMOUNT */}
-              <div>
-                <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-                <p className="mt-2">{paymentDetailsString(paymentAmountType, paymentAmount)}</p>
               </div>
               {/* PAYMENT TERMS */}
               <div>

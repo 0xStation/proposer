@@ -24,6 +24,7 @@ export default resolver.pipe(async ({ where, skip = 0, take = 100 }: GetPaginate
         },
         include: {
           template: true,
+          account: true,
           _count: {
             select: { proposals: true },
           },

@@ -15,13 +15,14 @@ import getRfpsForAccount from "app/rfp/queries/getRfpsForAccount"
 import { RfpCard } from "app/rfp/components/RfpCard"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { RfpStatus } from "@prisma/client"
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
 enum ProposalView {
   ProposalType = "ProposalType",
   RfpList = "RfpList",
 }
 
-const RfpListComponent = ({ rfps, setView }) => {
+const RfpListComponent = ({ account, rfps, setView }) => {
   return (
     <>
       <button
@@ -41,6 +42,7 @@ const RfpListComponent = ({ rfps, setView }) => {
               return (
                 <RfpCard
                   key={idx}
+                  account={account}
                   rfp={rfp}
                   href={Routes.ProposalRfpForm({
                     rfpId: rfp?.id,
@@ -59,15 +61,25 @@ const ProposalTypeSelection: BlitzPage = () => {
   const router = useRouter()
   const [view, setView] = useState<ProposalView>(ProposalView.ProposalType)
 
+  const accountAddress = (clients || contributors) as string
+
+  const [account] = useQuery(
+    getAccountByAddress,
+    {
+      address: accountAddress,
+    },
+    { suspense: false, enabled: !!accountAddress, staleTime: 60 * 1000 }
+  )
+
   const [rfps] = useQuery(
     getRfpsForAccount,
     {
-      address: (clients || contributors) as string,
+      address: accountAddress,
       paginationTake: 50, // TODO: not adding pagination rn, because most workspaces don't need it
       page: 0,
       statuses: [RfpStatus.OPEN],
     },
-    { suspense: false, enabled: Boolean(clients?.[0] || contributors?.[0]) }
+    { suspense: false, enabled: !!accountAddress, staleTime: 10 * 1000 }
   )
 
   return (
@@ -108,7 +120,9 @@ const ProposalTypeSelection: BlitzPage = () => {
                 <div className="max-w-[325px] mb-3 sm:mr-3 rounded-md overflow-hidden bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer">
                   <Image src={RequestImage} height={550} />
                   <h2 className="text-xl font-bold px-4 pt-4">Request or distribute funding</h2>
-                  <p className="pb-4 px-4 pt-3">Request or distribute funding in ETH, USDC, or any ERC-20</p>
+                  <p className="pb-4 px-4 pt-3">
+                    Request or distribute funding in ETH, USDC, or any ERC-20
+                  </p>
                 </div>
               </Link>
               {/* SHARE AN IDEA */}
@@ -150,7 +164,9 @@ const ProposalTypeSelection: BlitzPage = () => {
           </div>
         </>
       )}
-      {view === ProposalView.RfpList && <RfpListComponent rfps={rfps} setView={setView} />}
+      {view === ProposalView.RfpList && (
+        <RfpListComponent account={account} rfps={rfps} setView={setView} />
+      )}
     </>
   )
 }

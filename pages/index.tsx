@@ -12,6 +12,7 @@ import { RfpCard } from "app/rfp/components/RfpCard"
 import getPaginatedRfps from "app/rfp/queries/getPaginatedRfps"
 import useStore from "app/core/hooks/useStore"
 import dynamic from "next/dynamic"
+import { Account } from "app/account/types"
 
 const RfpPreCreateModal = dynamic(() => import("app/rfp/components/RfpPreCreateModal"), {
   ssr: false,
@@ -85,6 +86,7 @@ const Home: BlitzPage = () => {
               <RfpCard
                 ref={lastPostRef}
                 key={rfp.id}
+                account={rfp.account as Account}
                 rfp={rfp as Rfp}
                 href={Routes.ProposalRfpForm({
                   rfpId: rfp?.id,
@@ -95,6 +97,7 @@ const Home: BlitzPage = () => {
           return (
             <RfpCard
               key={rfp.id}
+              account={rfp.account as Account}
               rfp={rfp as Rfp}
               href={Routes.ProposalRfpForm({
                 rfpId: rfp?.id,
