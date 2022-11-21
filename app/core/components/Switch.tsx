@@ -1,9 +1,9 @@
 import { classNames } from "app/core/utils/classNames"
-import { Switch } from "@headlessui/react"
+import { Switch as SwitchComponent } from "@headlessui/react"
 
-export const BinarySwitch = ({ name, value, onChange }) => {
+export const Switch = ({ name, value, onChange }) => {
   return (
-    <Switch
+    <SwitchComponent
       name={name}
       checked={value}
       onChange={onChange}
@@ -18,8 +18,8 @@ export const BinarySwitch = ({ name, value, onChange }) => {
           "inline-block h-5 w-5 transform rounded-full transition"
         )}
       />
-    </Switch>
+    </SwitchComponent>
   )
 }
 
-export default BinarySwitch
+export default Switch

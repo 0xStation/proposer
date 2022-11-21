@@ -13,10 +13,20 @@ export const RfpStatusForm = ({ rfp }: { rfp?: Rfp | null }) => {
 
   const [updateRfpStatusMutation] = useMutation(updateRfpStatus, {
     onSuccess: (data) => {
+      setToastState({
+        isToastShowing: true,
+        type: "success",
+        message: "Successfully updated status and schedule.",
+      })
       invalidateQuery(getRfpById)
     },
     onError: (error) => {
       console.error(error)
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: "Error updating status and schedule.",
+      })
     },
   })
 
@@ -32,28 +42,13 @@ export const RfpStatusForm = ({ rfp }: { rfp?: Rfp | null }) => {
         try {
           const { status, startDate, endDate } = extractStatusValues(values)
 
-          const updatedStatus = await updateRfpStatusMutation({
+          await updateRfpStatusMutation({
             rfpId: rfp?.id as string,
             status,
             startDate,
             endDate,
           })
-
-          if (updatedStatus) {
-            setToastState({
-              isToastShowing: true,
-              type: "success",
-              message: "Successfully updated status and schedule.",
-            })
-          }
-        } catch (err) {
-          console.error(err)
-          setToastState({
-            isToastShowing: true,
-            type: "error",
-            message: "Error updating status and schedule.",
-          })
-        }
+        } catch {}
       }}
       render={({ form, handleSubmit }) => {
         const formState = form.getState()

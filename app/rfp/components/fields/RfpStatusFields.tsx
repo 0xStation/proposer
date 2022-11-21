@@ -6,7 +6,7 @@ import { requiredField } from "app/utils/validators"
 import formatDateForFieldInput from "app/core/utils/formatDateForFieldInput"
 import { RfpStatus } from "@prisma/client"
 import { toTitleCase } from "app/core/utils/titleCase"
-import BinarySwitch from "app/core/components/BinarySwitch"
+import Switch from "app/core/components/Switch"
 import convertDateFieldInputToDate from "app/core/utils/convertDateFieldInputToDate"
 
 export const extractStatusValues = ({
@@ -53,7 +53,7 @@ export const RfpStatusFields = ({ formState }) => {
         <h1 className="font-bold">Schedule RFP</h1>
         <Field name="scheduleEnabled">
           {({ input }) => (
-            <BinarySwitch name={input.name} value={input.value} onChange={input.onChange} />
+            <Switch name={input.name} value={input.value} onChange={input.onChange} />
           )}
         </Field>
       </div>
