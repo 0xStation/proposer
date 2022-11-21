@@ -1,12 +1,13 @@
 // PACKAGE
 import React, { useState, useEffect } from "react"
 import { useQuery, useMutation } from "@blitzjs/rpc"
-import { Routes, useParam } from "@blitzjs/next"
+import { Routes, useParam, useRouterQuery } from "@blitzjs/next"
 import { useRouter } from "next/router"
 import { useSession } from "@blitzjs/auth"
 import { Form } from "react-final-form"
 import { useNetwork } from "wagmi"
 import { ProposalRoleType, RfpStatus, TokenType } from "@prisma/client"
+import * as z from "zod"
 // CORE
 import Button from "app/core/components/sds/buttons/Button"
 import FormHeaderStepper from "app/core/components/FormHeaderStepper"
@@ -20,7 +21,7 @@ import { getNetworkTokens } from "app/core/utils/networkInfo"
 // MODULE
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import createRfp from "app/rfp/mutations/createRfp"
-import { PaymentAmountType } from "app/rfp/types"
+import { PaymentAmountType, GhIssueRfpContent } from "app/rfp/types"
 import { ProposalTemplateFieldValidationName } from "app/template/types"
 import getTokensByAccount from "app/token/queries/getTokensByAccount"
 // LOCAL
@@ -29,13 +30,26 @@ import RfpFormStepPayment from "./stepPayment"
 import RfpFormStepPermission from "./stepPermissions"
 import { extractStatusValues } from "../fields/RfpStatusFields"
 
-export const RfpForm = () => {
+// Optional prams provided in the URI query string
+export const GhIssueParams = z.object({
+  installationId: z.string().transform((val) => parseInt(val)),
+  repo: z.string().transform((val) => decodeURIComponent(val)),
+  issue: z.string().transform((val) => parseInt(val)),
+})
+
+export const RfpForm: React.FC<{ initialValues?: GhIssueRfpContent; ghIssueId?: number }> = (
+  props
+) => {
   const accountAddress = useParam("accountAddress", "string") as string
   const lookingFor = useParam("lookingFor", "string") as string
   const setToastState = useStore((state) => state.setToastState)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [proposalStep, setProposalStep] = useState<RfpFormStep>(RfpFormStep.RFP)
+
+  // Optional GitHub issue params
+  const query = useRouterQuery()
+  const ghParams = GhIssueParams.safeParse(query)
 
   // PAYMENT step
 
@@ -65,7 +79,7 @@ export const RfpForm = () => {
     getAccountByAddress,
     { address: toChecksumAddress(accountAddress) },
     {
-      enabled: !!accountAddress,
+      enabled: !!accountAddress && accountAddress !== "undefined",
       suspense: false,
       refetchOnWindowFocus: false,
       staleTime: 60 * 1000, // 1 minute
@@ -140,7 +154,7 @@ export const RfpForm = () => {
         className="mt-10"
       />
       <Form
-        initialValues={{ status: RfpStatus.CLOSED }}
+        initialValues={{ ...props.initialValues, status: RfpStatus.CLOSED }}
         onSubmit={async (values: any, form) => {
           let requesterRole
           let proposerRole
@@ -171,6 +185,16 @@ export const RfpForm = () => {
 
           const { status, startDate, endDate } = extractStatusValues(values)
 
+          let ghIssue
+          if (ghParams.success && typeof props.ghIssueId !== "undefined") {
+            ghIssue = {
+              id: props.ghIssueId,
+              number: ghParams.data.issue,
+              repo: ghParams.data.repo,
+              installationId: ghParams.data.installationId,
+            }
+          }
+
           try {
             await createRfpMutation({
               requesterAddress: accountAddress,
@@ -200,6 +224,7 @@ export const RfpForm = () => {
                   ? parseInt(values.minWordCount)
                   : undefined,
               bodyPrefill: values.bodyPrefill,
+              ghIssue,
             })
           } catch (err) {
             setIsLoading(false)

@@ -84,6 +84,7 @@ model Rfp {
   suppress       Boolean   @default(false)
   startDate      DateTime?
   endDate        DateTime?
+  ghIssueId      Int?
 
   account Account @relation(fields: [accountAddress], references: [address], onDelete: Cascade)
 

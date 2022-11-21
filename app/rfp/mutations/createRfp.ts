@@ -39,6 +39,14 @@ const CreateRfp = z.object({
       SocialConnection.LENS,
     ])
     .array(),
+  ghIssue: z
+    .object({
+      id: z.number(),
+      number: z.number(),
+      repo: z.string(),
+      installationId: z.number(),
+    })
+    .optional(),
 })
 
 export default async function createRfp(input: z.infer<typeof CreateRfp>) {
@@ -62,6 +70,7 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
         },
         payment: params.payment,
       },
+      ghIssue: params.ghIssue,
     }
 
     const rfp = await db.rfp.create({
@@ -71,6 +80,7 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
         startDate: params.startDate,
         endDate: params.endDate,
         data: rfpMetadata,
+        ghIssueId: params.ghIssue?.id,
       },
     })
 

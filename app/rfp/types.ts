@@ -38,6 +38,17 @@ export type RfpMetadata = {
       advancePaymentPercentage?: number
     }
   }
+  ghIssue?: {
+    number: number
+    repo: string
+    installationId: number
+  }
+}
+
+// RFP content we extract from a GitHub issue.
+export type GhIssueRfpContent = {
+  title: string
+  body: string
 }
 
 export enum PaymentDirection {
