@@ -5,7 +5,6 @@ const useCountdown = (date?: Date | null) => {
     if (!date) return ""
     const now = new Date()
     const totalSeconds = (date.getTime() - now.getTime()) / 1000
-
     const minutes = 60
     const hours = 60 * minutes
     const days = 24 * hours
@@ -26,11 +25,9 @@ const useCountdown = (date?: Date | null) => {
 
   useEffect(() => {
     // set repeating timer if time left includes seconds
-    if (timeLeft.includes("sec")) {
-      setTimeout(() => {
-        setTimeLeft(calculateTimeLeft())
-      }, 1000)
-    }
+    setTimeout(() => {
+      setTimeLeft(calculateTimeLeft())
+    }, 1000)
   })
 
   return timeLeft

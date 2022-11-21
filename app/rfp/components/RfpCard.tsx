@@ -5,13 +5,12 @@ import { RouteUrlObject } from "blitz"
 import Link from "next/link"
 import React, { RefObject } from "react"
 import { Rfp } from "../types"
+import RfpEndsIn from "./EndsIn"
 import LookingForPill from "./LookingForPill"
 import RfpStatusPill from "./RfpStatusPill"
 
 export const RfpCard = React.forwardRef(
   ({ rfp, href }: { rfp: Rfp; href: RouteUrlObject }, ref) => {
-    const timeLeft = useCountdown(rfp?.endDate)
-
     const RfpCardContent = ({ rfp }) => (
       <>
         <div>
@@ -26,14 +25,7 @@ export const RfpCard = React.forwardRef(
           <h2 className="text-xl font-bold mt-4">{rfp?.data?.content.title || ""}</h2>
         </div>
         <div className="mt-6 flex flex-col space-y-4 h-[120px]">
-          {rfp?.endDate && rfp?.endDate > new Date() ? (
-            <div>
-              <h4 className="text-xs font-bold text-concrete uppercase">Ends in</h4>
-              <p className="mt-2">{timeLeft}</p>
-            </div>
-          ) : (
-            <div className="h-12" />
-          )}
+          <RfpEndsIn status={rfp?.status} endDate={rfp?.endDate} />
         </div>
         <div className="flex flex-row mt-6 justify-between">
           <span>

@@ -3,7 +3,7 @@ import { RfpStatus } from "@prisma/client"
 import BinarySwitch from "app/core/components/BinarySwitch"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
-import getFormattedDateForMinDateInput from "app/utils/getFormattedDateForMinDateInput"
+import formatDateForFieldInput from "app/utils/formatDateForFieldInput"
 import { DateTime } from "luxon"
 import { Field, Form } from "react-final-form"
 import { requiredField } from "../../utils/validators"
@@ -63,12 +63,8 @@ export const RfpStatusForm = ({ rfp }: { rfp?: Rfp | null }) => {
     <Form
       initialValues={{
         scheduleEnabled: Boolean(rfp?.startDate || rfp?.endDate),
-        startDate: rfp?.startDate
-          ? getFormattedDateForMinDateInput({ dateTime: DateTime.fromJSDate(rfp?.startDate) })
-          : undefined,
-        endDate: rfp?.endDate
-          ? getFormattedDateForMinDateInput({ dateTime: DateTime.fromJSDate(rfp?.endDate) })
-          : undefined,
+        startDate: rfp?.startDate ? formatDateForFieldInput(rfp?.startDate) : undefined,
+        endDate: rfp?.endDate ? formatDateForFieldInput(rfp?.endDate) : undefined,
       }}
       onSubmit={async (values: any, form) => {
         try {
@@ -84,7 +80,7 @@ export const RfpStatusForm = ({ rfp }: { rfp?: Rfp | null }) => {
               : {
                   startDate: values.startDate
                     ? DateTime.fromISO(values.startDate).toUTC().toJSDate()
-                    : null,
+                    : new Date(),
                   endDate: values.endDate
                     ? DateTime.fromISO(values.endDate).toUTC().toJSDate()
                     : null,
@@ -143,7 +139,7 @@ export const RfpStatusForm = ({ rfp }: { rfp?: Rfp | null }) => {
                         <input
                           {...input}
                           type="datetime-local"
-                          min={getFormattedDateForMinDateInput({ dateTime: DateTime.local() })}
+                          min={formatDateForFieldInput(new Date())}
                           max={formState.values.endDate}
                           className="bg-wet-concrete rounded p-2 mt-1 w-full"
                         />
@@ -159,9 +155,7 @@ export const RfpStatusForm = ({ rfp }: { rfp?: Rfp | null }) => {
             {formState.values.scheduleEnabled && (
               <>
                 {/* END DATE */}
-                <label className="font-bold block mt-6">
-                  End date{rfp?.status === RfpStatus.OPEN ? "*" : ""}
-                </label>
+                <label className="font-bold block mt-6">End date*</label>
                 <Field name="endDate" validate={requiredField}>
                   {({ input, meta }) => {
                     return (
@@ -169,10 +163,7 @@ export const RfpStatusForm = ({ rfp }: { rfp?: Rfp | null }) => {
                         <input
                           {...input}
                           type="datetime-local"
-                          min={
-                            formState.values.startDate ||
-                            getFormattedDateForMinDateInput({ dateTime: DateTime.local() })
-                          }
+                          min={formState.values.startDate || formatDateForFieldInput(new Date())}
                           className="bg-wet-concrete rounded p-2 mt-1 w-full"
                         />
                         {meta.touched && meta.error && (

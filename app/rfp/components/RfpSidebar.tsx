@@ -15,13 +15,13 @@ import { paymentTermsString } from "app/proposal/utils"
 import LookingForPill from "./LookingForPill"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 import useCountdown from "app/core/hooks/useCountdown"
+import RfpEndsIn from "./EndsIn"
 
 export const RfpSidebar = ({ rfp }) => {
   const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
     rfp?.data?.proposal?.payment?.minAmount,
     rfp?.data?.proposal?.payment?.maxAmount
   )
-  const timeLeft = useCountdown(rfp?.endDate)
 
   return (
     <div className="h-full w-[288px] overflow-y-scroll p-6 border-r border-concrete">
@@ -64,12 +64,7 @@ export const RfpSidebar = ({ rfp }) => {
             className={`h-8 w-full rounded-lg flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
           />
         )}
-        {rfp?.endDate && rfp?.endDate > new Date() && (
-          <div>
-            <h4 className="text-xs font-bold text-concrete uppercase">Ends in</h4>
-            <p className="mt-2 text-lg font-bold">{timeLeft}</p>
-          </div>
-        )}
+        <RfpEndsIn status={rfp?.status} endDate={rfp?.endDate} />
         {/* CTA */}
         <div className="mb-10 relative group">
           <Link
