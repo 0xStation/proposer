@@ -16,10 +16,11 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import TextareaFieldOrMarkdownPreview from "app/core/components/TextareaFieldOrMarkdownPreview"
 import ReadEditMarkdownButton from "app/core/components/ReadEditMarkdownButton"
+import RfpStatusFields from "../fields/RfpStatusFields"
 
 export const RfpFormStepRfp = ({ formState }) => {
   const [bodyPreviewMode, setBodyPreviewMode] = useState<boolean>(false)
-  const [bodyPrefillPreviewMode, setBodyPrefillPreviewMode] = useState<boolean>(false)
+
   const accountAddress = useParam("accountAddress", "string") as string
   const { text: displayAddress } = useDisplayAddress(accountAddress)
   const router = useRouter()
@@ -80,10 +81,7 @@ export const RfpFormStepRfp = ({ formState }) => {
       {/* SUBMISSION GUIDELINES */}
       <div className="mt-6 flex flex-row justify-between items-center">
         <label className="font-bold block">Submission guidelines</label>
-        <ReadEditMarkdownButton
-          previewMode={bodyPrefillPreviewMode}
-          setPreviewMode={setBodyPrefillPreviewMode}
-        />
+        <ReadEditMarkdownButton previewMode={bodyPreviewMode} setPreviewMode={bodyPreviewMode} />
       </div>
       <span className="text-xs text-concrete block">
         Supports <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>.
@@ -96,25 +94,7 @@ export const RfpFormStepRfp = ({ formState }) => {
         placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
         fieldName="body"
       />
-      {/* PROPOSAL TEMPLATE */}
-      <div className="mt-6 flex flex-row justify-between items-center">
-        <label className="font-bold block">Proposal template</label>
-        <ReadEditMarkdownButton
-          previewMode={bodyPrefillPreviewMode}
-          setPreviewMode={setBodyPrefillPreviewMode}
-        />
-      </div>
-      <span className="text-xs text-concrete block">
-        Proposer will automatically see the template&apos;s content in proposal details. Supports{" "}
-        <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>.
-      </span>
-      <TextareaFieldOrMarkdownPreview
-        previewMode={bodyPrefillPreviewMode}
-        setPreviewMode={setBodyPrefillPreviewMode}
-        markdown={formState.values.bodyPrefill}
-        placeholder={`# Summary\n\n# Deliverables\n\n# Timeline`}
-        fieldName="bodyPrefill"
-      />
+      <RfpStatusFields formState={formState} />
     </>
   )
 }

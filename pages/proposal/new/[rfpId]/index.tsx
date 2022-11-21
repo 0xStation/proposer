@@ -55,7 +55,7 @@ const ProposalRfpForm: BlitzPage = () => {
       {/* LEFT SIDEBAR | PROPOSAL FORM */}
       <div className="flex flex-row h-full">
         {/* LEFT SIDEBAR */}
-        <div className="h-full w-[288px] overflow-y-scroll border-r border-concrete p-6">
+        <div className="h-full w-[320px] overflow-y-scroll border-r border-concrete p-6">
           <div className="flex flex-col pb-6 space-y-6">
             {/* BACK */}
             <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>

@@ -24,7 +24,7 @@ export const RfpSidebar = ({ rfp }) => {
   )
 
   return (
-    <div className="h-full w-[288px] overflow-y-scroll p-6 border-r border-concrete">
+    <div className="h-full w-[320px] overflow-y-scroll p-6 border-r border-concrete">
       <div className="flex flex-col pb-6 space-y-6">
         {/* BACK */}
         <Link

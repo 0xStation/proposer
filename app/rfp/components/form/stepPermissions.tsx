@@ -18,8 +18,14 @@ import { formatPositiveInt, formatTokenAmount } from "app/utils/formatters"
 import { SocialConnection } from "app/rfp/types"
 import { toTitleCase } from "app/core/utils/titleCase"
 import { ProposalTemplateFieldValidationName } from "app/template/types"
+import ReadEditMarkdownButton from "app/core/components/ReadEditMarkdownButton"
+import { useState } from "react"
+import TextLink from "app/core/components/TextLink"
+import { LINKS } from "app/core/utils/constants"
+import TextareaFieldOrMarkdownPreview from "app/core/components/TextareaFieldOrMarkdownPreview"
 
 export const RfpFormStepPermission = ({
+  formState,
   permissionTokenOptions,
   selectedSubmissionToken,
   setSelectedSubmissionToken,
@@ -32,6 +38,7 @@ export const RfpFormStepPermission = ({
 }) => {
   const session = useSession({ suspense: false })
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
+  const [bodyPrefillPreviewMode, setBodyPrefillPreviewMode] = useState<boolean>(false)
 
   return (
     <>
@@ -41,6 +48,25 @@ export const RfpFormStepPermission = ({
         chainId={chainId?.toString()}
         // refetches the tokens in the new proposal form token dropdown
         callback={() => refetchTokens(true)}
+      />
+      {/* PROPOSAL TEMPLATE */}
+      <div className="mt-6 flex flex-row justify-between items-center">
+        <label className="font-bold block">Proposal template</label>
+        <ReadEditMarkdownButton
+          previewMode={bodyPrefillPreviewMode}
+          setPreviewMode={setBodyPrefillPreviewMode}
+        />
+      </div>
+      <span className="text-xs text-concrete block">
+        Proposer will automatically see the template&apos;s content in proposal details. Supports{" "}
+        <TextLink url={LINKS.MARKDOWN_GUIDE}>markdown</TextLink>.
+      </span>
+      <TextareaFieldOrMarkdownPreview
+        previewMode={bodyPrefillPreviewMode}
+        setPreviewMode={setBodyPrefillPreviewMode}
+        markdown={formState.values.bodyPrefill}
+        placeholder={`# Summary\n\n# Deliverables\n\n# Timeline`}
+        fieldName="bodyPrefill"
       />
       {/* WORD COUNT */}
       <label className="font-bold block mt-6">Word count requirement*</label>
