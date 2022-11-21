@@ -32,6 +32,9 @@ const PaymentAction = ({ proposal, milestone }) => {
   const toggleQueueGnosisTransactionModalMap = useStore(
     (state) => state.toggleQueueGnosisTransactionModalMap
   )
+  const toggleReQueueGnosisTransactionModalMap = useStore(
+    (state) => state.toggleReQueueGnosisTransactionModalMap
+  )
   const toggleApproveGnosisTransactionModalMap = useStore(
     (state) => state.toggleApproveGnosisTransactionModalMap
   )
@@ -151,6 +154,7 @@ const PaymentAction = ({ proposal, milestone }) => {
     ...(userIsSigner &&
       payment &&
       !!payment.data.multisigTransaction &&
+      !payment.isRejected &&
       !!quorumMet && {
         [ProposalRoleType.CLIENT]: (
           <a
@@ -165,6 +169,25 @@ const PaymentAction = ({ proposal, milestone }) => {
               <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
             </button>
           </a>
+        ),
+      }),
+    // user is signer on the gnosis safe
+    // and payment exists (typescript)
+    // and there IS mutliSigTransaction data on the payment, meaning it has been queued
+    // and the quorum is met
+    ...(userIsSigner &&
+      payment &&
+      !!payment.data.multisigTransaction &&
+      !!payment.isRejected &&
+      !!quorumMet && {
+        [ProposalRoleType.CLIENT]: (
+          <button
+            className="mb-2 sm:mb-0 font-bold border rounded px-4 h-[35px] bg-electric-violet border-electric-violet text-tunnel-black w-full"
+            onClick={() => toggleReQueueGnosisTransactionModalMap({ open: true, id: payment.id })}
+          >
+            Re-queue transaction
+            <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
+          </button>
         ),
       }),
   }

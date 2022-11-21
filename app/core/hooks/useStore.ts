@@ -7,6 +7,7 @@ interface StoreState {
   walletModalOpen: boolean
   accountModalOpen: boolean
   executePaymentModalMap: any
+  reQueueGnosisTransactionModalMap: any
   queueGnosisTransactionModalMap: any
   approveGnosisTransactionModalMap: any
   executePaymentModalOpen: boolean
@@ -22,6 +23,7 @@ interface StoreState {
   toggleAccountModal: (boolean) => void
   toggleApproveGnosisTransactionModalMap: ({ open, id }) => void
   toggleQueueGnosisTransactionModalMap: ({ open, id }) => void
+  toggleReQueueGnosisTransactionModalMap: ({ open, id }) => void
   toggleExecutePaymentModalMap: ({ open, id }) => void
   toggleExecutePaymentModalOpen: (boolean) => void
   toggleProposalApprovalModalOpen: (boolean) => void
@@ -37,6 +39,7 @@ const useStore = create<StoreState>((set) => ({
   accountModalOpen: false,
   approveGnosisTransactionModalMap: {},
   queueGnosisTransactionModalMap: {},
+  reQueueGnosisTransactionModalMap: {},
   executePaymentModalMap: {},
   executePaymentModalOpen: false,
   proposalApprovalModalOpen: false,
@@ -77,6 +80,16 @@ const useStore = create<StoreState>((set) => ({
       return {
         queueGnosisTransactionModalMap: {
           ...state.queueGnosisTransactionModalMap,
+          [id]: open,
+        },
+      }
+    })
+  },
+  toggleReQueueGnosisTransactionModalMap: ({ open, id }) => {
+    set((state) => {
+      return {
+        reQueueGnosisTransactionModalMap: {
+          ...state.reQueueGnosisTransactionModalMap,
           [id]: open,
         },
       }

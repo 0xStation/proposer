@@ -10,6 +10,7 @@ import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import PaymentAction from "./stepper/actions/PaymentAction"
 
 const PaymentRow = ({ payment, proposal, milestone }) => {
+  console.log(payment)
   return (
     <>
       <div className="w-full flex flex-row items-end" key={payment?.id}>
@@ -38,6 +39,22 @@ const PaymentRow = ({ payment, proposal, milestone }) => {
           )}
         </span>
       </div>
+      {payment?.isRejected && (
+        <div className="flex flex-row">
+          <span className="bg-torch-red w-2 rounded-l"></span>
+          <div className="bg-wet-concrete w-full px-2 py-1 block rounded-r">
+            Transaction was <span className="text-torch-red">rejected</span> on Gnosis Safe.
+          </div>
+        </div>
+      )}
+      {!!payment.transactionHash && (
+        <div className="flex flex-row">
+          <span className="bg-magic-mint w-2 rounded-l"></span>
+          <div className="bg-wet-concrete w-full px-2 py-1 block rounded-r">
+            Transaction was <span className="text-magic-mint">executed</span> on Gnosis Safe.
+          </div>
+        </div>
+      )}
       <div className="mt-4">
         <PaymentAction proposal={proposal} milestone={milestone} />
       </div>
