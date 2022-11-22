@@ -70,7 +70,7 @@ export const RfpStatusFields = ({ formState }) => {
                     type="datetime-local"
                     min={formatDateForFieldInput(new Date())}
                     max={formState.values.endDate}
-                    className="bg-wet-concrete rounded p-2 mt-1 w-full"
+                    className="bg-wet-concrete rounded p-2 mt-1 w-full text-electric-violet"
                   />
                   {meta.touched && meta.error && (
                     <span className="text-torch-red text-xs">{meta.error}</span>

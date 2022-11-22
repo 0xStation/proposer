@@ -1,11 +1,10 @@
 import { RfpStatus } from "@prisma/client"
-import useCountdown from "app/core/hooks/useCountdown"
 import { getTotalPaymentAmount, getPaymentToken } from "app/template/utils"
 import { RouteUrlObject } from "blitz"
 import Link from "next/link"
 import React, { RefObject } from "react"
 import { Rfp } from "../types"
-import RfpEndsIn from "./metadata/RfpEndsIn"
+import RfpSchedule from "./metadata/RfpSchedule"
 import LookingForPill from "./LookingForPill"
 import RfpStatusPill from "./RfpStatusPill"
 import RfpReward from "./metadata/RfpReward"
@@ -29,7 +28,7 @@ export const RfpCard = React.forwardRef(
         </div>
         <div className="mt-6 flex flex-col space-y-4 h-[120px]">
           <RfpReward rfpProposalPayment={rfp?.data?.proposal?.payment} />
-          <RfpEndsIn status={rfp?.status} endDate={rfp?.endDate} />
+          <RfpSchedule status={rfp?.status} startDate={rfp?.startDate} endDate={rfp?.endDate} />
         </div>
         <div className="flex flex-row mt-6 justify-between">
           <span>
