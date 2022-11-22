@@ -9,10 +9,9 @@ import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import PaymentAction from "./stepper/actions/PaymentAction"
 
-const PaymentRow = ({ payment, proposal, milestone }) => {
-  console.log(payment)
+const PaymentRow = ({ payment, proposal, milestone, isMostRecent }) => {
   return (
-    <>
+    <div>
       <div className="w-full flex flex-row items-end" key={payment?.id}>
         <span className="basis-32 mb-2 tracking-wider">
           {truncateString(payment?.senderAddress)}
@@ -41,24 +40,26 @@ const PaymentRow = ({ payment, proposal, milestone }) => {
       </div>
       {payment?.isRejected && (
         <div className="flex flex-row">
-          <span className="bg-torch-red w-2 rounded-l"></span>
+          <span className="bg-torch-red w-2 rounded-l block"></span>
           <div className="bg-wet-concrete w-full px-2 py-1 block rounded-r">
-            Transaction was <span className="text-torch-red">rejected</span> on Gnosis Safe.
+            Transaction was <span className="text-torch-red">rejected</span> on Gnosis safe.
           </div>
         </div>
       )}
-      {!!payment.transactionHash && (
+      {!!payment.transactionHash && !payment?.isRejected && (
         <div className="flex flex-row">
-          <span className="bg-magic-mint w-2 rounded-l"></span>
+          <span className="bg-magic-mint w-2 rounded-l block"></span>
           <div className="bg-wet-concrete w-full px-2 py-1 block rounded-r">
-            Transaction was <span className="text-magic-mint">executed</span> on Gnosis Safe.
+            Transaction was <span className="text-magic-mint">executed</span> on Gnosis safe.
           </div>
         </div>
       )}
-      <div className="mt-4">
-        <PaymentAction proposal={proposal} milestone={milestone} />
-      </div>
-    </>
+      {isMostRecent && (
+        <div className="mt-4">
+          <PaymentAction proposal={proposal} milestone={milestone} />
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -106,14 +107,19 @@ export const ProposalMilestonePaymentBox = ({
           <span className="basis-28"></span>
         </div>
         {/* MILESTONE PAYMENTS */}
-        {milestone?.payments?.map((payment, idx) => (
-          <PaymentRow
-            key={`payment-row-${idx}`}
-            payment={payment}
-            proposal={proposal}
-            milestone={milestone}
-          />
-        ))}
+        <div className="space-y-8">
+          {milestone?.payments
+            ?.sort((a, b) => (b.createdAt as any) - (a.createdAt as any))
+            .map((payment, idx) => (
+              <PaymentRow
+                key={`payment-row-${idx}`}
+                payment={payment}
+                proposal={proposal}
+                milestone={milestone}
+                isMostRecent={idx === 0}
+              />
+            ))}
+        </div>
       </div>
     </>
   )

@@ -120,6 +120,8 @@ export const ReQueueGnosisTransactionModal = ({
                   milestoneId: milestone.id,
                   senderAddress: originalPayment.senderAddress,
                   recipientAddress: originalPayment.recipientAddress,
+                  token: originalPayment.data.token,
+                  amount: originalPayment.amount,
                   multisigTransaction: {
                     transactionId: response.txId,
                     nonce: response.detailedExecutionInfo.nonce,

@@ -193,7 +193,7 @@ model ProposalMilestone {
 }
 
 model ProposalPayment {
-  id               String  @id @default(uuid())
+  id               String   @id @default(uuid())
   proposalId       String
   milestoneId      String
   senderAddress    String
@@ -202,8 +202,9 @@ model ProposalPayment {
   tokenId          Float? // float to support larger size numbers
   transactionHash  String?
   data             Json
-  isError          Boolean @default(false)
-  isRejected       Boolean @default(false)
+  isError          Boolean  @default(false)
+  isRejected       Boolean  @default(false)
+  createdAt        DateTime @default(now())
 
   proposal  Proposal          @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   milestone ProposalMilestone @relation(fields: [milestoneId], references: [id])
