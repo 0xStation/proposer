@@ -47,7 +47,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }&repo=${encodeURIComponent(repo)}&issue=${number})`,
           })
         } catch (e) {
-          return res.status(500).json({ response: "error", message: "failed to comment" })
+          return res
+            .status(500)
+            .json({ response: "error", message: e.message, appId: process.env.GITHUB_APP_ID })
         }
       }
     }
