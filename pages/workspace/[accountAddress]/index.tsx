@@ -26,6 +26,7 @@ import {
   ProposalRoleApprovalStatus,
   ProposalRoleType,
   RfpStatus,
+  Rfp,
 } from "@prisma/client"
 import { LightBulbIcon, CogIcon, NewspaperIcon } from "@heroicons/react/solid"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
@@ -46,6 +47,7 @@ import getProposalCountForAccount from "app/proposal/queries/getProposalCountFor
 import { RfpCard } from "app/rfp/components/RfpCard"
 import useUserHasPermissionOfAddress from "app/core/hooks/useUserHasPermissionOfAddress"
 import RfpPreCreateModal from "app/rfp/components/RfpPreCreateModal"
+import { RfpProductStatus } from "app/rfp/types"
 
 export enum WorkspaceTab {
   PROPOSALS = "proposals",
@@ -320,7 +322,9 @@ const WorkspaceHome: BlitzPage = () => {
   const RfpTab = () => {
     const RFP_PAGINATION_TAKE = 25
     const [rfpPage, setRfpPage] = useState<number>(0)
-    const [rfpStatusFilters, setRfpStatusFilters] = useState<Set<RfpStatus>>(new Set<RfpStatus>())
+    const [rfpStatusFilters, setRfpProductStatuss] = useState<Set<RfpProductStatus>>(
+      new Set<RfpProductStatus>()
+    )
     const [isRfpPreCreateModalOpen, setIsRfpPreCreateModalOpen] = useState<boolean>(false)
 
     const [rfps] = useQuery(
@@ -388,7 +392,7 @@ const WorkspaceHome: BlitzPage = () => {
                   value: status,
                 }))}
                 appliedFilters={rfpStatusFilters}
-                setAppliedFilters={setRfpStatusFilters}
+                setAppliedFilters={setRfpProductStatuss}
                 refetchCallback={() => {
                   setRfpPage(0)
                   invalidateQuery(getRfpsForAccount)
@@ -412,7 +416,14 @@ const WorkspaceHome: BlitzPage = () => {
             {rfps &&
               rfps?.length > 0 &&
               rfps?.map((rfp, idx) => {
-                return <RfpCard key={idx} rfp={rfp} href={Routes.RfpDetail({ rfpId: rfp.id })} />
+                return (
+                  <RfpCard
+                    key={idx}
+                    account={account!}
+                    rfp={rfp}
+                    href={Routes.RfpDetail({ rfpId: rfp.id })}
+                  />
+                )
               })}
             {/* RFP LOADING */}
             {!rfps &&

@@ -1,4 +1,4 @@
-import { Rfp as PrismaRfp, ProposalRoleType } from "@prisma/client"
+import { Rfp as PrismaRfp, ProposalRoleType, RfpStatus } from "@prisma/client"
 import { Account } from "app/account/types"
 import { PaymentTerm } from "app/proposalPayment/types"
 import { ProposalTemplate } from "app/template/types"
@@ -59,4 +59,9 @@ export enum PaymentAmountType {
   MINIMUM = "MINIMUM",
   MAXIMUM = "MAXIMUM",
   RANGE = "RANGE",
+}
+
+export enum RfpProductStatus {
+  OPEN = "OPEN",
+  CLOSED = "CLOSED",
 }

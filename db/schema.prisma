@@ -82,6 +82,8 @@ model Rfp {
   updatedAt      DateTime  @updatedAt
   status         RfpStatus @default(OPEN)
   suppress       Boolean   @default(false)
+  startDate      DateTime?
+  endDate        DateTime?
 
   account Account @relation(fields: [accountAddress], references: [address], onDelete: Cascade)
 
@@ -93,7 +95,7 @@ model Rfp {
 enum RfpStatus {
   OPEN
   CLOSED
-  // TIME_DEPENDENT -- will be used to indicate rely on start/end times to render status
+  TIME_DEPENDENT // used to indicate reliance on start/end times to render status
 }
 
 // PROPOSAL SYSTEM

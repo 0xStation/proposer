@@ -6,7 +6,7 @@ import { useRouter } from "next/router"
 import { useSession } from "@blitzjs/auth"
 import { Form } from "react-final-form"
 import { useNetwork } from "wagmi"
-import { ProposalRoleType, TokenType } from "@prisma/client"
+import { ProposalRoleType, RfpStatus, TokenType } from "@prisma/client"
 // CORE
 import Button from "app/core/components/sds/buttons/Button"
 import FormHeaderStepper from "app/core/components/FormHeaderStepper"
@@ -27,6 +27,7 @@ import getTokensByAccount from "app/token/queries/getTokensByAccount"
 import RfpFormStepRfp from "./stepRfp"
 import RfpFormStepPayment from "./stepPayment"
 import RfpFormStepPermission from "./stepPermissions"
+import { extractStatusValues } from "../fields/RfpStatusFields"
 
 export const RfpForm = () => {
   const accountAddress = useParam("accountAddress", "string") as string
@@ -134,12 +135,12 @@ export const RfpForm = () => {
         steps={[
           RFP_FORM_HEADER_COPY[RfpFormStep.RFP],
           RFP_FORM_HEADER_COPY[RfpFormStep.PAYMENT],
-          RFP_FORM_HEADER_COPY[RfpFormStep.PERMISSIONS],
+          RFP_FORM_HEADER_COPY[RfpFormStep.REQUIREMENTS],
         ]}
         className="mt-10"
       />
       <Form
-        initialValues={{}}
+        initialValues={{ status: RfpStatus.CLOSED }}
         onSubmit={async (values: any, form) => {
           let requesterRole
           let proposerRole
@@ -168,13 +169,18 @@ export const RfpForm = () => {
             maxAmount = undefined
           }
 
+          const { status, startDate, endDate } = extractStatusValues(values)
+
           try {
             await createRfpMutation({
-              title: values.title,
-              body: values.body,
               requesterAddress: accountAddress,
               requesterRole,
               proposerRole,
+              title: values.title,
+              body: values.body,
+              status,
+              startDate,
+              endDate,
               payment: {
                 token: selectedToken ? { ...selectedToken, chainId: chain?.id || 1 } : undefined,
                 minAmount,
@@ -234,8 +240,9 @@ export const RfpForm = () => {
                         setPaymentAmountType={setPaymentAmountType}
                       />
                     )}
-                    {proposalStep === RfpFormStep.PERMISSIONS && (
+                    {proposalStep === RfpFormStep.REQUIREMENTS && (
                       <RfpFormStepPermission
+                        formState={formState}
                         permissionTokenOptions={permissionTokenOptions}
                         selectedSubmissionToken={selectedSubmissionToken}
                         setSelectedSubmissionToken={setSelectedSubmissionToken}
@@ -289,7 +296,7 @@ export const RfpForm = () => {
                           return
                         }
 
-                        setProposalStep(RfpFormStep.PERMISSIONS)
+                        setProposalStep(RfpFormStep.REQUIREMENTS)
                       }}
                     >
                       Next
@@ -302,7 +309,7 @@ export const RfpForm = () => {
                   </div>
                 </div>
               )}
-              {proposalStep === RfpFormStep.PERMISSIONS && (
+              {proposalStep === RfpFormStep.REQUIREMENTS && (
                 <div className="flex justify-between mt-6">
                   <span
                     onClick={() => setProposalStep(RfpFormStep.PAYMENT)}

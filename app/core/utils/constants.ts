@@ -46,13 +46,13 @@ export const PROPOSAL_FORM_HEADER_COPY = {
 export enum RfpFormStep {
   RFP = "RFP",
   PAYMENT = "PAYMENT",
-  PERMISSIONS = "PERMISSIONS",
+  REQUIREMENTS = "REQUIREMENTS",
 }
 
 export const RFP_FORM_HEADER_COPY = {
   [RfpFormStep.RFP]: "RFP",
   [RfpFormStep.PAYMENT]: "Payment",
-  [RfpFormStep.PERMISSIONS]: "Permissions",
+  [RfpFormStep.REQUIREMENTS]: "Requirements",
 }
 
 export const CONTRACTS = {

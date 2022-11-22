@@ -1,15 +1,18 @@
 import * as z from "zod"
-import db, { ProposalRoleType } from "db"
+import db, { ProposalRoleType, RfpStatus } from "db"
 import { ZodToken } from "app/types/zod"
 import { Rfp, SocialConnection } from "app/rfp/types"
 import { PaymentTerm } from "app/proposalPayment/types"
 
 const CreateRfp = z.object({
-  title: z.string(),
-  body: z.string().optional().default(""),
   requesterAddress: z.string(),
   requesterRole: z.enum([ProposalRoleType.CLIENT, ProposalRoleType.CONTRIBUTOR]),
   proposerRole: z.enum([ProposalRoleType.CLIENT, ProposalRoleType.CONTRIBUTOR]),
+  title: z.string(),
+  body: z.string().optional().default(""),
+  status: z.enum([RfpStatus.OPEN, RfpStatus.CLOSED, RfpStatus.TIME_DEPENDENT]),
+  startDate: z.date().nullable(),
+  endDate: z.date().nullable(),
   payment: z.object({
     token: ZodToken.optional(),
     minAmount: z.number().optional(),
@@ -19,6 +22,8 @@ const CreateRfp = z.object({
       .optional(),
     advancePaymentPercentage: z.number().optional(),
   }),
+  bodyPrefill: z.string().optional(),
+  minWordCount: z.number().optional(),
   singleTokenGate: z
     .object({
       token: ZodToken,
@@ -34,8 +39,6 @@ const CreateRfp = z.object({
       SocialConnection.LENS,
     ])
     .array(),
-  minWordCount: z.number().optional(),
-  bodyPrefill: z.string().optional(),
 })
 
 export default async function createRfp(input: z.infer<typeof CreateRfp>) {
@@ -64,6 +67,9 @@ export default async function createRfp(input: z.infer<typeof CreateRfp>) {
     const rfp = await db.rfp.create({
       data: {
         accountAddress: params.requesterAddress,
+        status: params.status,
+        startDate: params.startDate,
+        endDate: params.endDate,
         data: rfpMetadata,
       },
     })

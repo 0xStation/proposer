@@ -1,3 +1,4 @@
+import { RfpStatus } from "@prisma/client"
 import { toTitleCase } from "app/core/utils/titleCase"
 import { PaymentAmountType } from "./types"
 
@@ -37,5 +38,97 @@ export const paymentDetailsString = (type, amount) => {
     return "≥" + amount
   } else if (type === PaymentAmountType.MAXIMUM) {
     return "≤" + amount
+  }
+}
+
+export const rewardString = (token, amountType, amount) => {
+  if (!token) {
+    return "Flexible"
+  }
+  if (amountType === PaymentAmountType.FLEXIBLE) {
+    return token.symbol
+  } else if (amountType === PaymentAmountType.FIXED) {
+    return amount + " " + token.symbol
+  } else if (amountType === PaymentAmountType.MINIMUM) {
+    return "Minimum " + amount + " " + token.symbol
+  } else if (amountType === PaymentAmountType.MAXIMUM) {
+    return "Maximum " + amount + " " + token.symbol
+  }
+}
+
+export const getRfpStatus = (dbStatus, startDate, endDate) => {
+  if (dbStatus !== RfpStatus.TIME_DEPENDENT) {
+    return dbStatus
+  } else if (endDate && Date.now() > endDate) {
+    return RfpStatus.CLOSED
+  } else if (startDate && Date.now() < startDate) {
+    return RfpStatus.CLOSED
+  }
+  return RfpStatus.OPEN
+}
+
+export const computeRfpDbStatusFilter = (status: RfpStatus) => {
+  if (status === RfpStatus.OPEN) {
+    return {
+      OR: [
+        {
+          status: RfpStatus.OPEN,
+        },
+        {
+          status: RfpStatus.TIME_DEPENDENT,
+          OR: [
+            {
+              startDate: {
+                equals: null,
+              },
+              endDate: {
+                gte: new Date(),
+              },
+            },
+            {
+              startDate: {
+                lte: new Date(),
+              },
+              endDate: {
+                gte: new Date(),
+              },
+            },
+            {
+              startDate: {
+                lte: new Date(),
+              },
+              endDate: {
+                equals: null,
+              },
+            },
+          ],
+        },
+      ],
+    }
+  } else if (status === RfpStatus.CLOSED) {
+    return {
+      OR: [
+        {
+          status: RfpStatus.CLOSED,
+        },
+        {
+          status: RfpStatus.TIME_DEPENDENT,
+          OR: [
+            {
+              startDate: {
+                gt: new Date(),
+              },
+            },
+            {
+              endDate: {
+                lt: new Date(),
+              },
+            },
+          ],
+        },
+      ],
+    }
+  } else {
+    return {}
   }
 }

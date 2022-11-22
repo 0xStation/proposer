@@ -14,6 +14,8 @@ import { getPaymentAmountDetails, paymentDetailsString } from "../utils"
 import { paymentTermsString } from "app/proposal/utils"
 import LookingForPill from "./LookingForPill"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
+import RfpEndsIn from "./metadata/RfpEndsIn"
+import RfpReward from "./metadata/RfpReward"
 import { useQuery } from "@blitzjs/rpc"
 import getRfpById from "../queries/getRfpById"
 import { useRouter } from "next/router"
@@ -93,6 +95,20 @@ export const RfpSidebar = () => {
             className={`h-6 w-full rounded-xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
           />
         )}
+        {/* TITLE */}
+        {rfp ? (
+          <span className="mt-6 text-2xl font-bold text-marble-white">
+            {rfp?.data.content.title}
+          </span>
+        ) : (
+          // LOADING STATE
+          <div
+            tabIndex={0}
+            className={`h-8 w-full rounded-lg flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+          />
+        )}
+        <RfpReward rfpProposalPayment={rfp?.data?.proposal?.payment} />
+        <RfpEndsIn status={rfp?.status} endDate={rfp?.endDate} />
         {/* CTA */}
         <div className="mb-10 relative group">
           {/* Hide "Propose" button when showing the proposal creation form  */}
@@ -180,16 +196,6 @@ export const RfpSidebar = () => {
                 <p className="mt-2">
                   {getNetworkName(rfp?.data?.proposal?.payment?.token?.chainId)}
                 </p>
-              </div>
-              {/* PAYMENT TOKEN */}
-              <div>
-                <h4 className="text-xs font-bold text-concrete uppercase">Payment token</h4>
-                <p className="mt-2">{rfp?.data?.proposal?.payment?.token?.symbol}</p>
-              </div>
-              {/* PAYMENT AMOUNT */}
-              <div>
-                <h4 className="text-xs font-bold text-concrete uppercase">Payment amount</h4>
-                <p className="mt-2">{paymentDetailsString(paymentAmountType, paymentAmount)}</p>
               </div>
               {/* PAYMENT TERMS */}
               <div>
