@@ -49,7 +49,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         } catch (e) {
           return res
             .status(500)
-            .json({ response: "error", message: e.message, appId: process.env.GITHUB_APP_ID })
+            .json({
+              response: "error",
+              message: e.message,
+              appId: process.env.GITHUB_APP_ID,
+              pk: process.env.GITHUB_PRIVATE_KEY,
+            })
         }
       }
     }
