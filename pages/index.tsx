@@ -135,16 +135,16 @@ const Home: BlitzPage = () => {
               Propose to&nbsp;
               <span className="typewriter nocaret" />
             </h1>
-            <div className="h-12 mt-11 w-full rounded">
+            <div className="h-16 mt-11 w-[733px] mx-auto rounded">
               <input
                 ref={searchRef}
-                className="rounded-r-none pl-3 bg-wet-concrete border border-concrete h-full w-[80%] inline rounded placeholder:text-lg"
-                placeholder="Enter a wallet address or an ENS name"
+                className="outline-concrete rounded-r-none pl-3 bg-wet-concrete-50 border border-wet-concrete h-full w-[75%] inline rounded placeholder:text-lg"
+                placeholder="Enter a recipient’s wallet address or an ENS name"
               />
               <Button
                 className="rounded-l-none"
-                overrideHeightClassName="h-12"
-                overrideWidthClassName="w-[20%] mt-3"
+                overrideHeightClassName="h-16"
+                overrideWidthClassName="w-[25%] mt-3 px-3"
                 onClick={() =>
                   router.push(
                     Routes.ProposalNewFunding({
