@@ -75,11 +75,22 @@ export const RfpForm: React.FC<{ initialValues?: GhIssueRfpContent; ghIssueId?: 
 
   const { chain } = useNetwork()
 
+  const workspacePending = !accountAddress || accountAddress === "undefined"
+
+  useEffect(() => {
+    if (activeUser && workspacePending) {
+      router.replace({
+        pathname: router.pathname,
+        query: { ...router.query, accountAddress: activeUser.address },
+      })
+    }
+  }, [workspacePending, activeUser])
+
   const [account] = useQuery(
     getAccountByAddress,
     { address: toChecksumAddress(accountAddress) },
     {
-      enabled: !!accountAddress && accountAddress !== "undefined",
+      enabled: !workspacePending,
       suspense: false,
       refetchOnWindowFocus: false,
       staleTime: 60 * 1000, // 1 minute
