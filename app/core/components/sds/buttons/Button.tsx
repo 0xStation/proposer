@@ -34,6 +34,10 @@ interface ButtonProps {
    */
   overrideWidthClassName?: string
   /**
+   * Override default 35px and dynamic height for buttons by providing an alternative className
+   */
+  overrideHeightClassName?: string
+  /**
    * Any additional classNames
    */
   className?: string
@@ -56,6 +60,7 @@ const Button = ({
   isDisabled = false,
   isLoading = false,
   overrideWidthClassName = undefined,
+  overrideHeightClassName = undefined,
   className,
   children,
   ...props
@@ -65,7 +70,7 @@ const Button = ({
       type={isSubmitType ? "submit" : "button"}
       disabled={isDisabled}
       className={classNames(
-        `border rounded h-[35px] font-bold cursor-pointer ${className}`,
+        `border rounded font-bold cursor-pointer ${className}`,
         isDisabled && "opacity-70 cursor-not-allowed",
         type === ButtonType.Primary &&
           "bg-electric-violet border-electric-violet text-tunnel-black hover:bg-electric-violet/80 hover:border-transparent",
@@ -73,6 +78,7 @@ const Button = ({
           "text-electric-violet border-electric-violet bg-transparent hover:opacity-70",
         type === ButtonType.Unemphasized &&
           "text-marble-white border-marble-white bg-tunnel-black hover:bg-wet-concrete",
+        overrideHeightClassName ? overrideHeightClassName : "h-[35px]",
         overrideWidthClassName
           ? overrideWidthClassName
           : children.length <= 5 || isLoading

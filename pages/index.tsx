@@ -142,7 +142,8 @@ const Home: BlitzPage = () => {
                 placeholder="Enter a wallet address or an ENS name"
               />
               <Button
-                className="rounded-l-none h-12"
+                className="rounded-l-none"
+                overrideHeightClassName="h-12"
                 overrideWidthClassName="w-[20%] mt-3"
                 onClick={() =>
                   router.push(
