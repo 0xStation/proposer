@@ -121,17 +121,25 @@ export const ProposalViewHeaderNavigation = () => {
       <div className="w-full min-h-64 relative">
         <div className="mt-6 flex flex-row">
           {rfp ? (
-            <>
-              <span className="text-concrete hover:text-light-concrete">
-                <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>RFPs</Link> /&nbsp;
-              </span>
-
+            <nav>
               {rfp?.data?.content?.title ? (
-                <span className="text-marble-white">{rfp?.data?.content?.title}</span>
+                <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>
+                  <span className="text-concrete cursor-pointer hover:text-concrete">
+                    {rfp?.data?.content?.title}
+                  </span>
+                </Link>
               ) : (
                 <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
               )}
-            </>
+              <span className="text-concrete">&nbsp;/&nbsp;</span>
+              {proposal?.data.content.title ? (
+                <span className="text-marble-white cursor-default">
+                  {proposal?.data.content.title}
+                </span>
+              ) : (
+                <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+              )}
+            </nav>
           ) : (
             <>
               {" "}

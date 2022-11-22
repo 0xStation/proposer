@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Routes } from "@blitzjs/next"
+import { Routes, useParam } from "@blitzjs/next"
 import { RfpStatus } from "@prisma/client"
 import BackIcon from "/public/back-icon.svg"
 import TextLink from "app/core/components/TextLink"
@@ -16,27 +16,70 @@ import LookingForPill from "./LookingForPill"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 import RfpEndsIn from "./metadata/RfpEndsIn"
 import RfpReward from "./metadata/RfpReward"
+import { useQuery } from "@blitzjs/rpc"
+import getRfpById from "../queries/getRfpById"
+import { useRouter } from "next/router"
 
-export const RfpSidebar = ({ rfp }) => {
+export const RfpSidebar = () => {
+  const rfpId = useParam("rfpId") as string
+
+  const [rfp] = useQuery(
+    getRfpById,
+    { id: rfpId },
+    {
+      suspense: false,
+      refetchOnWindowFocus: false,
+      enabled: Boolean(rfpId),
+      staleTime: 500,
+    }
+  )
   const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
     rfp?.data?.proposal?.payment?.minAmount,
     rfp?.data?.proposal?.payment?.maxAmount
   )
 
+  const router = useRouter()
+
   return (
-    <div className="h-full w-[320px] overflow-y-scroll p-6 border-r border-concrete">
+    <div className="h-full w-[330px] overflow-y-scroll p-6 border-r border-concrete">
       <div className="flex flex-col pb-6 space-y-6">
-        {/* BACK */}
-        <Link
-          href={Routes.WorkspaceHome({
-            accountAddress: rfp?.accountAddress as string,
-            tab: WorkspaceTab.RFPS,
-          })}
-        >
-          <div className="h-[16px] w-[16px] cursor-pointer mb-2">
-            <Image src={BackIcon} alt="Back icon" />
-          </div>
-        </Link>
+        <nav>
+          <Link
+            href={Routes.WorkspaceHome({
+              accountAddress: rfp?.accountAddress as string,
+              tab: WorkspaceTab.RFPS,
+            })}
+          >
+            <span className="text-concrete cursor-pointer hover:text-concrete">RFPs</span>
+          </Link>
+
+          <span className="text-concrete">&nbsp;/&nbsp;</span>
+          {rfp?.data?.content?.title ? (
+            router.pathname === Routes.RfpDetail({ rfpId }).pathname ? (
+              <span className="text-marble-white cursor-default">{rfp?.data?.content?.title}</span>
+            ) : (
+              <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>
+                <span className="text-marble-white cursor-pointer hover:text-concrete">
+                  {rfp?.data?.content?.title}
+                </span>
+              </Link>
+            )
+          ) : (
+            <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
+          )}
+        </nav>
+        {/* TITLE */}
+        {rfp ? (
+          <span className="mt-6 text-2xl font-bold text-marble-white">
+            {rfp?.data.content.title}
+          </span>
+        ) : (
+          // LOADING STATE
+          <div
+            tabIndex={0}
+            className={`h-8 w-full rounded-lg flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
+          />
+        )}
         {/* PILLS */}
         {rfp ? (
           <div className="flex flex-row flex-wrap gap-1">
@@ -68,15 +111,22 @@ export const RfpSidebar = ({ rfp }) => {
         <RfpEndsIn status={rfp?.status} endDate={rfp?.endDate} />
         {/* CTA */}
         <div className="mb-10 relative group">
-          <Link
-            href={Routes.ProposalRfpForm({
-              rfpId: rfp?.id as string,
-            })}
-          >
-            <Button className="w-full" isDisabled={rfp?.status === RfpStatus.CLOSED}>
+          {/* Hide "Propose" button when showing the proposal creation form  */}
+          {router.pathname !== Routes.ProposalRfpForm({ rfpId }).pathname && (
+            <Button
+              onClick={() =>
+                router.push(
+                  Routes.ProposalRfpForm({
+                    rfpId: rfp?.id as string,
+                  })
+                )
+              }
+              className="w-full"
+              isDisabled={rfp?.status === RfpStatus.CLOSED}
+            >
               Propose
             </Button>
-          </Link>
+          )}
           {rfp?.status === RfpStatus.CLOSED && (
             <div className="absolute group-hover:block hidden text-xs text-marble-white bg-wet-concrete rounded p-3 mt-2 -mb-5">
               This RFP is currently not accepting submissions.
@@ -106,7 +156,8 @@ export const RfpSidebar = ({ rfp }) => {
           {/* REQUIREMENTS */}
           {(!!rfp?.data?.singleTokenGate ||
             !!rfp?.data?.requiredSocialConnections?.length ||
-            rfp?.data?.proposal?.body?.minWordCount > 0) && (
+            (typeof rfp?.data?.proposal?.body?.minWordCount === "number" &&
+              rfp?.data?.proposal?.body?.minWordCount > 0)) && (
             <div>
               <h4 className="text-xs font-bold text-concrete uppercase">Requirements</h4>
               {!!rfp?.data?.singleTokenGate && (
@@ -129,9 +180,12 @@ export const RfpSidebar = ({ rfp }) => {
                     {toTitleCase(social)} connection
                   </p>
                 ))}
-              {rfp?.data?.proposal?.body?.minWordCount > 0 && (
-                <p className="mt-2">{rfp?.data?.proposal?.body?.minWordCount + " word minimum"}</p>
-              )}
+              {typeof rfp?.data?.proposal?.body?.minWordCount === "number" &&
+                rfp?.data?.proposal?.body?.minWordCount > 0 && (
+                  <p className="mt-2">
+                    {rfp?.data?.proposal?.body?.minWordCount + " word minimum"}
+                  </p>
+                )}
             </div>
           )}
           {rfp?.data?.proposal?.payment?.token && (

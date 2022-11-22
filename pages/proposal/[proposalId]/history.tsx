@@ -3,7 +3,7 @@ import { useQuery, invoke } from "@blitzjs/rpc"
 import { useParam, BlitzPage } from "@blitzjs/next"
 import Layout from "app/core/layouts/Layout"
 import getProposalById from "app/proposal/queries/getProposalById"
-import { ProposalNestedLayout } from "app/core/components/ProposalNestedLayout"
+import { ProposalNestedLayout } from "app/core/layouts/ProposalNestedLayout"
 import getProposalVersionsByProposalId from "app/proposalVersion/queries/getProposalVersionsByProposalId"
 import ProposalVersionBox from "app/core/components/ProposalVersionBox"
 

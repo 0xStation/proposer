@@ -69,7 +69,7 @@ export const RfpFormStepPermission = ({
         fieldName="bodyPrefill"
       />
       {/* WORD COUNT */}
-      <label className="font-bold block mt-6">Word count requirement*</label>
+      <label className="font-bold block mt-6">Word count requirement</label>
       <Field name="wordCountRequirement">
         {({ meta, input }) => (
           <>
@@ -96,8 +96,11 @@ export const RfpFormStepPermission = ({
       </Field>
       {wordCountRequirement === ProposalTemplateFieldValidationName.MIN_WORDS && (
         <>
+          <label className="font-bold block mt-2">
+            Enter the minimum word count for proposals*
+          </label>
           <span className="text-xs text-concrete">
-            Enter the minimum word count for proposals submitting to this RFP.
+            Proposals submitting to this RFP must meet this minimum word requirement.
           </span>
           <Field
             name="minWordCount"
@@ -123,7 +126,7 @@ export const RfpFormStepPermission = ({
         </>
       )}
       {/* SUBMISSION TOKEN */}
-      <label className="font-bold block mt-6">Token-gating on proposal submissions*</label>
+      <label className="font-bold block mt-6">Token-gating on proposal submissions</label>
       <span className="text-xs text-concrete block">
         Select from ERC-20 or ERC-721 tokens on the{" "}
         <span className="font-bold">{getNetworkName(chainId).toUpperCase()}</span> network.
@@ -222,7 +225,7 @@ export const RfpFormStepPermission = ({
         </>
       )}
       {/* SOCIAL CONNECTIONS */}
-      <label className="font-bold block mt-6">Social connection*</label>
+      <label className="font-bold block mt-6">Social connection</label>
       <span className="text-xs text-concrete block">
         Require proposers to have connected a social account for easy communication.
       </span>

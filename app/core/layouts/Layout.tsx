@@ -1,5 +1,4 @@
 import Head from "next/head"
-import Script from "next/script"
 import { useSession } from "@blitzjs/auth"
 import { invoke } from "@blitzjs/rpc"
 import { BlitzLayout } from "@blitzjs/next"
