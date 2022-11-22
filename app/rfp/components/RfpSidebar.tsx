@@ -95,19 +95,22 @@ export const RfpSidebar = () => {
         )}
         {/* CTA */}
         <div className="mb-10 relative group">
-          <Button
-            onClick={() =>
-              router.push(
-                Routes.ProposalRfpForm({
-                  rfpId: rfp?.id as string,
-                })
-              )
-            }
-            className="w-full"
-            isDisabled={rfp?.status === RfpStatus.CLOSED}
-          >
-            Propose
-          </Button>
+          {/* Hide "Propose" button when showing the proposal creation form  */}
+          {router.pathname !== Routes.ProposalRfpForm({ rfpId }).pathname && (
+            <Button
+              onClick={() =>
+                router.push(
+                  Routes.ProposalRfpForm({
+                    rfpId: rfp?.id as string,
+                  })
+                )
+              }
+              className="w-full"
+              isDisabled={rfp?.status === RfpStatus.CLOSED}
+            >
+              Propose
+            </Button>
+          )}
           {rfp?.status === RfpStatus.CLOSED && (
             <div className="absolute group-hover:block hidden text-xs text-marble-white bg-wet-concrete rounded p-3 mt-2 -mb-5">
               This RFP is currently not accepting submissions.
