@@ -55,11 +55,33 @@ export const ReQueueGnosisTransactionModal = ({
   const saveTransactionHashToPayment = async (transactionHash: string) => {
     try {
       setIsLoading(true)
+      const response = await signGnosis()
+      if (!response) {
+        setIsLoading(false)
+        throw new Error("Signature Failed")
+      }
+      // since we are queing a new payment, we need to create a new payment record
+      // before we can attach the manually created transaction hash to it
+      const newPayment = await createPaymentMutation({
+        proposalId: milestone.proposalId,
+        milestoneId: milestone.id,
+        senderAddress: originalPayment.senderAddress,
+        recipientAddress: originalPayment.recipientAddress,
+        token: originalPayment.data.token,
+        amount: originalPayment.amount,
+        multisigTransaction: {
+          transactionId: response.txId,
+          nonce: response.detailedExecutionInfo.nonce,
+          safeTxHash: response.detailedExecutionInfo.safeTxHash,
+          address: response.safeAddress,
+        },
+      })
       // update payment as cashed in db
       await saveTransactionHashToPaymentsMutation({
         proposalId: milestone.proposalId,
         milestoneId: milestone.id,
         transactionHash,
+        paymentId: newPayment.id,
       })
 
       invalidateQuery(getMilestonesByProposal)

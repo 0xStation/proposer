@@ -2,7 +2,6 @@ import { gSSP } from "app/blitz-server"
 import { useQuery, invoke } from "@blitzjs/rpc"
 import { useParam, BlitzPage } from "@blitzjs/next"
 import { ProposalStatus } from "@prisma/client"
-import { ProposalViewHeaderNavigation } from "app/proposal/components/viewPage/ProposalViewHeaderNavigation"
 import Layout from "app/core/layouts/Layout"
 import getProposalById from "app/proposal/queries/getProposalById"
 import ProposalMilestonePaymentBox from "app/core/components/ProposalMilestonePaymentBox"
@@ -63,6 +62,8 @@ export const ProposalPayments: BlitzPage = () => {
       staleTime: 60 * 1000, // 1 minute
     }
   )
+
+  console.log(milestones)
 
   const proposalContainsPayment = (proposal?.payments && proposal?.payments.length > 0) || false
 

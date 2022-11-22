@@ -75,6 +75,7 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
           milestoneId: payment.milestoneId,
           proposalId: payment.proposalId,
           transactionHash: gnosisTxSuccessEventLog.transactionHash,
+          paymentId: payment.id,
         })
       } catch (e) {
         console.log(e)

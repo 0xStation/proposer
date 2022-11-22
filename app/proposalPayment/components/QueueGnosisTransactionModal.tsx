@@ -53,6 +53,7 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone, paym
       await saveTransactionHashToPaymentsMutation({
         proposalId: milestone.proposalId,
         milestoneId: milestone.id,
+        paymentId: payment.id,
         transactionHash,
       })
 

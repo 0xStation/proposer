@@ -75,6 +75,9 @@ export const ProposalMilestonePaymentBox = ({
   const [isAttachtxModalOpen, setIsAttachtxModalOpen] = useState<boolean>(false)
   const milestoneStatus = getMilestoneStatus(proposal, milestone) || ""
 
+  console.log(milestone?.payments?.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()))
+  console.log(milestone?.payments?.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()))
+
   return (
     <>
       <AttachTransactionModal
@@ -108,17 +111,18 @@ export const ProposalMilestonePaymentBox = ({
         </div>
         {/* MILESTONE PAYMENTS */}
         <div className="space-y-8">
-          {milestone?.payments
-            ?.sort((a, b) => (b.createdAt as any) - (a.createdAt as any))
-            .map((payment, idx) => (
-              <PaymentRow
-                key={`payment-row-${idx}`}
-                payment={payment}
-                proposal={proposal}
-                milestone={milestone}
-                isMostRecent={idx === 0}
-              />
-            ))}
+          {milestone?.payments &&
+            milestone?.payments
+              ?.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+              .map((payment, idx) => (
+                <PaymentRow
+                  key={`payment-row-${idx}`}
+                  payment={payment}
+                  proposal={proposal}
+                  milestone={milestone}
+                  isMostRecent={idx === 0}
+                />
+              ))}
         </div>
       </div>
     </>

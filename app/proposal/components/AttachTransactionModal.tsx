@@ -12,6 +12,8 @@ import saveTransactionHashToPayments from "app/proposal/mutations/saveTransactio
 
 export const AttachTransactionModal = ({ isOpen, setIsOpen, milestone }) => {
   const setToastState = useStore((state) => state.setToastState)
+  // TODO: not sure we can claim activePayment is 0th index anymore
+  // now that we can queue multiple payments if one is rejected... reassess
   const activePayment = milestone.payments[0]
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -32,6 +34,7 @@ export const AttachTransactionModal = ({ isOpen, setIsOpen, milestone }) => {
         proposalId: milestone.proposalId,
         milestoneId: milestone.id,
         transactionHash,
+        paymentId: activePayment.id,
       })
 
       invalidateQuery(getProposalById)
