@@ -48,7 +48,7 @@ export const RfpSidebar = () => {
               tab: WorkspaceTab.RFPS,
             })}
           >
-            <span className="text-marble-white cursor-pointer hover:text-concrete">RFPs</span>
+            <span className="text-concrete cursor-pointer hover:text-concrete">RFPs</span>
           </Link>
 
           <span className="text-concrete">&nbsp;/&nbsp;</span>

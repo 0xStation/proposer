@@ -124,7 +124,7 @@ export const ProposalViewHeaderNavigation = () => {
             <nav>
               {rfp?.data?.content?.title ? (
                 <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>
-                  <span className="text-marble-white cursor-pointer hover:text-concrete">
+                  <span className="text-concrete cursor-pointer hover:text-concrete">
                     {rfp?.data?.content?.title}
                   </span>
                 </Link>
