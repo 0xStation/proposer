@@ -128,30 +128,34 @@ const Home: BlitzPage = () => {
       >
         <div className="h-full mx-56">
           <div className="flex flex-col">
-            <h1 className="text-center mt-20 font-bold bg-transparent text-marble-white text-4xl">
-              Start collaborating now
+            <h1
+              aria-label="Propose to collaborate"
+              className="text-center mt-20 font-bold bg-transparent text-marble-white text-4xl"
+            >
+              Propose to&nbsp;
+              <span className="typewriter nocaret" />
             </h1>
-            <div className="h-14 mt-11 w-full rounded">
+            <div className="h-12 mt-11 w-full rounded">
               <input
                 ref={searchRef}
-                className="text-center bg-transparent border border-concrete h-full w-full inline rounded placeholder:text-lg focus:bg-wet-concrete"
+                className="rounded-r-none pl-3 bg-wet-concrete border border-concrete h-full w-[80%] inline rounded placeholder:text-lg"
                 placeholder="Enter a wallet address or an ENS name"
               />
+              <Button
+                className="rounded-l-none h-12"
+                overrideWidthClassName="w-[20%] mt-3"
+                onClick={() =>
+                  router.push(
+                    Routes.ProposalNewFunding({
+                      clients: searchRef?.current?.value,
+                      contributors: searchRef?.current?.value,
+                    })
+                  )
+                }
+              >
+                Create a proposal
+              </Button>
             </div>
-            <Button
-              className="h-[52px]"
-              overrideWidthClassName="w-fit px-8 mx-auto mt-3"
-              onClick={() =>
-                router.push(
-                  Routes.ProposalNewFunding({
-                    clients: searchRef?.current?.value,
-                    contributors: searchRef?.current?.value,
-                  })
-                )
-              }
-            >
-              Create a proposal
-            </Button>
           </div>
           <div className="my-10 px-6 mx-44 py-3 bg-wet-concrete-50 flex flex-row rounded items-center justify-between">
             <p>You can now also put a call out for contributors.</p>
