@@ -63,8 +63,6 @@ export const ProposalPayments: BlitzPage = () => {
     }
   )
 
-  console.log(milestones)
-
   const proposalContainsPayment = (proposal?.payments && proposal?.payments.length > 0) || false
 
   const showPayInformation =

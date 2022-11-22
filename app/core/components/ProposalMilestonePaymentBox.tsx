@@ -75,9 +75,6 @@ export const ProposalMilestonePaymentBox = ({
   const [isAttachtxModalOpen, setIsAttachtxModalOpen] = useState<boolean>(false)
   const milestoneStatus = getMilestoneStatus(proposal, milestone) || ""
 
-  console.log(milestone?.payments?.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()))
-  console.log(milestone?.payments?.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()))
-
   return (
     <>
       <AttachTransactionModal

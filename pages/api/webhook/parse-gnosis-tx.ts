@@ -21,7 +21,6 @@ const fetchGnosisNonce = async (chainId: string, targetAddress: string) => {
 export default api(async function handler(req: NextApiRequest, res: NextApiResponse) {
   const response = req.body
   const streamId = response.streamId
-  console.log(response)
 
   // eventually look for error logs as well
   const gnosisTxSuccessEventLog = response.logs.find(
@@ -47,7 +46,6 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
   }
 
   const nonce = await fetchGnosisNonce(String(account.data.chainId || 1), account.address)
-  console.log("nonce", nonce)
 
   const payment = (await db.proposalPayment.findFirst({
     where: {
