@@ -2,6 +2,7 @@ import { useRouter } from "next/router"
 import { BlitzPage } from "@blitzjs/next"
 import Layout from "app/core/layouts/Layout"
 import ProposalFormFunding from "app/proposalForm/components/funding/form"
+import BackButtonLayout from "app/core/layouts/BackButtonLayout"
 
 const ProposalNewFunding: BlitzPage = () => {
   const queryParams = useRouter().query
@@ -14,7 +15,11 @@ const ProposalNewFunding: BlitzPage = () => {
 ProposalNewFunding.suppressFirstRenderFlicker = true
 ProposalNewFunding.getLayout = function getLayout(page) {
   // persist layout between pages https://nextjs.org/docs/basic-features/layouts
-  return <Layout title="New Proposal">{page}</Layout>
+  return (
+    <Layout title="New Proposal">
+      <BackButtonLayout>{page}</BackButtonLayout>
+    </Layout>
+  )
 }
 
 export default ProposalNewFunding
