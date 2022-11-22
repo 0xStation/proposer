@@ -19,6 +19,7 @@ import RfpReward from "./metadata/RfpReward"
 import { useQuery } from "@blitzjs/rpc"
 import getRfpById from "../queries/getRfpById"
 import { useRouter } from "next/router"
+import { useRefreshRfp } from "app/core/hooks/useRefreshRfp"
 
 export const RfpSidebar = () => {
   const rfpId = useParam("rfpId") as string
@@ -38,6 +39,8 @@ export const RfpSidebar = () => {
     rfp?.data?.proposal?.payment?.maxAmount
   )
 
+  useRefreshRfp(rfp?.startDate)
+  useRefreshRfp(rfp?.endDate)
   const router = useRouter()
 
   return (

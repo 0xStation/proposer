@@ -94,7 +94,7 @@ export const RfpFormStepRfp = ({ formState }) => {
         placeholder="Describe your ideas, detail the value you aim to deliver, and link any relevant documents."
         fieldName="body"
       />
-      <RfpStatusFields formState={formState} />
+      <RfpStatusFields formState={formState} isCreateForm={true} />
     </>
   )
 }

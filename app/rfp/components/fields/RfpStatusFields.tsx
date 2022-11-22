@@ -32,11 +32,12 @@ export const extractStatusValues = ({
   return { status: newStatus, startDate: newStartDate, endDate: newEndDate }
 }
 
-export const RfpStatusFields = ({ formState }) => {
+export const RfpStatusFields = ({ formState, isCreateForm = false }) => {
   return (
     <>
       {/* STATUS */}
       <label className="font-bold block mt-6">Status*</label>
+      {isCreateForm && <span className="text-xs text-concrete block">RFP status at publish</span>}
       <Field name="status">
         {({ input, meta }) => (
           <>
@@ -70,7 +71,7 @@ export const RfpStatusFields = ({ formState }) => {
                     type="datetime-local"
                     min={formatDateForFieldInput(new Date())}
                     max={formState.values.endDate}
-                    className="bg-wet-concrete rounded p-2 mt-1 w-full text-electric-violet"
+                    className="bg-wet-concrete rounded p-2 mt-1 w-full text-marble-white"
                   />
                   {meta.touched && meta.error && (
                     <span className="text-torch-red text-xs">{meta.error}</span>
