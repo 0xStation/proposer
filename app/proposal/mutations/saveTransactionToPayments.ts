@@ -41,6 +41,10 @@ export default async function saveTransactionHashToPayments(
     // it either doesn't exist -- or it is immediately executed
     const mostRecentPaymentAttempt = existingPayment.data?.history?.slice(-1)[0]
 
+    // the problem is that we queue another attempt when we queue a gnosis transaction
+    // but we do not queue another attempt if we are directly attaching a payment
+    // so it overrides the old error attempt
+
     // update most recent payment attempt with transaction hash
     await db.proposalPayment.update({
       where: { id: params.paymentId },
