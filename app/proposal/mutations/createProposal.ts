@@ -160,6 +160,7 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
                 tokenId: payment.tokenId,
                 data: {
                   token: payment.token as Token,
+                  history: [],
                 },
               }
             }),

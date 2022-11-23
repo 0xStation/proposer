@@ -37,7 +37,9 @@ export default async function saveTransactionHashToPayments(
       where: { id: params.paymentId },
     })) as ProposalPayment
 
-    const mostRecentPayment = existingPayment.data?.history?.slice(-1)[0]
+    // non-gnosis safe payments have no history because there is no concept of the payment being "queued"
+    // it either doesn't exist -- or it is immediately executed
+    const mostRecentPaymentAttempt = existingPayment.data?.history?.slice(-1)[0]
 
     // update most recent payment attempt with transaction hash
     await db.proposalPayment.update({
@@ -48,7 +50,7 @@ export default async function saveTransactionHashToPayments(
           history: [
             ...existingPayment.data.history.slice(0, existingPayment.data.history.length - 1),
             {
-              ...mostRecentPayment,
+              ...mostRecentPaymentAttempt,
               transactionHash: params.transactionHash,
               status: ProposalPaymentStatus.SUCCESS,
               timestamp: new Date(),

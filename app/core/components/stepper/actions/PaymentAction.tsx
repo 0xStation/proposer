@@ -55,7 +55,8 @@ const PaymentAction = ({ proposal, milestone }) => {
         // payment attempt exists
         mostRecentPaymentAttempt &&
         // payment attempt is still pending
-        mostRecentPaymentAttempt.status === ProposalPaymentStatus.QUEUED,
+        mostRecentPaymentAttempt.status === ProposalPaymentStatus.QUEUED &&
+        !!mostRecentPaymentAttempt?.multisigTransaction?.safeTxHash,
     }
   )
 
