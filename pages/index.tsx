@@ -142,7 +142,7 @@ const Home: BlitzPage = () => {
                 placeholder="Enter a recipient’s wallet address or an ENS name"
               />
               <Button
-                className="rounded-l-none"
+                className="rounded-l-none text-lg"
                 overrideHeightClassName="h-16"
                 overrideWidthClassName="w-[25%] mt-3 px-3"
                 onClick={() =>
@@ -158,7 +158,7 @@ const Home: BlitzPage = () => {
               </Button>
             </div>
           </div>
-          <div className="my-10 px-6 mx-44 py-3 bg-wet-concrete-50 flex flex-row rounded items-center justify-between">
+          <div className="my-10 px-6 mx-auto w-[600px] py-3 bg-wet-concrete-50 flex flex-row rounded items-center justify-between">
             <p>You can now also put a call out for contributors.</p>
             <Button
               onClick={() => {
