@@ -2,7 +2,7 @@ import { RfpStatus } from "@prisma/client"
 import { getTotalPaymentAmount, getPaymentToken } from "app/template/utils"
 import { RouteUrlObject } from "blitz"
 import Link from "next/link"
-import React, { RefObject } from "react"
+import React, { RefObject, useEffect, useState } from "react"
 import { Rfp } from "../types"
 import RfpSchedule from "./metadata/RfpSchedule"
 import LookingForPill from "./LookingForPill"
@@ -10,16 +10,21 @@ import RfpStatusPill from "./RfpStatusPill"
 import RfpReward from "./metadata/RfpReward"
 import AccountMediaRow from "app/comment/components/AccountMediaRow"
 import { Account } from "app/account/types"
+import { useScheduleCallback } from "app/core/hooks/useScheduleCallback"
 
 export const RfpCard = React.forwardRef(
   ({ account, rfp, href }: { account: Account; rfp: Rfp; href: RouteUrlObject }, ref) => {
+    const [rfpStatus, setRfpStatus] = useState<RfpStatus>(rfp?.status)
+    useScheduleCallback({ callback: () => setRfpStatus(RfpStatus.OPEN), date: rfp?.startDate })
+    useScheduleCallback({ callback: () => setRfpStatus(RfpStatus.CLOSED), date: rfp?.endDate })
+
     const RfpCardContent = ({ account, rfp }) => (
       <>
         <div>
           {/* STATUS PILLS */}
           <div className="flex flex-row flex-wrap gap-1">
-            <RfpStatusPill status={rfp?.status} />
-            {rfp?.status !== RfpStatus.CLOSED && (
+            <RfpStatusPill status={rfpStatus} />
+            {rfpStatus !== RfpStatus.CLOSED && (
               <LookingForPill role={rfp?.data?.proposal?.proposerRole} />
             )}
           </div>
@@ -28,7 +33,7 @@ export const RfpCard = React.forwardRef(
         </div>
         <div className="mt-6 flex flex-col space-y-4 h-[120px]">
           <RfpReward rfpProposalPayment={rfp?.data?.proposal?.payment} />
-          <RfpSchedule status={rfp?.status} startDate={rfp?.startDate} endDate={rfp?.endDate} />
+          <RfpSchedule status={rfpStatus} startDate={rfp?.startDate} endDate={rfp?.endDate} />
         </div>
         <div className="flex flex-row mt-6 justify-between">
           <span>

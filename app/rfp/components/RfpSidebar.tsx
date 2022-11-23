@@ -16,10 +16,10 @@ import LookingForPill from "./LookingForPill"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 import RfpSchedule from "./metadata/RfpSchedule"
 import RfpReward from "./metadata/RfpReward"
-import { useQuery } from "@blitzjs/rpc"
+import { invalidateQuery, useQuery } from "@blitzjs/rpc"
 import getRfpById from "../queries/getRfpById"
 import { useRouter } from "next/router"
-import { useRefreshRfp } from "app/core/hooks/useRefreshRfp"
+import { useScheduleCallback } from "app/core/hooks/useScheduleCallback"
 
 export const RfpSidebar = () => {
   const rfpId = useParam("rfpId") as string
@@ -39,8 +39,8 @@ export const RfpSidebar = () => {
     rfp?.data?.proposal?.payment?.maxAmount
   )
 
-  useRefreshRfp(rfp?.startDate)
-  useRefreshRfp(rfp?.endDate)
+  useScheduleCallback({ callback: () => invalidateQuery(getRfpById), date: rfp?.startDate })
+  useScheduleCallback({ callback: () => invalidateQuery(getRfpById), date: rfp?.endDate })
   const router = useRouter()
 
   return (
