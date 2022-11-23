@@ -14,11 +14,12 @@ import { getPaymentAmountDetails, paymentDetailsString } from "../utils"
 import { paymentTermsString } from "app/proposal/utils"
 import LookingForPill from "./LookingForPill"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
-import RfpEndsIn from "./metadata/RfpEndsIn"
+import RfpSchedule from "./metadata/RfpSchedule"
 import RfpReward from "./metadata/RfpReward"
-import { useQuery } from "@blitzjs/rpc"
+import { invalidateQuery, useQuery } from "@blitzjs/rpc"
 import getRfpById from "../queries/getRfpById"
 import { useRouter } from "next/router"
+import { useScheduleCallback } from "app/core/hooks/useScheduleCallback"
 
 export const RfpSidebar = () => {
   const rfpId = useParam("rfpId") as string
@@ -38,6 +39,8 @@ export const RfpSidebar = () => {
     rfp?.data?.proposal?.payment?.maxAmount
   )
 
+  useScheduleCallback({ callback: () => invalidateQuery(getRfpById), date: rfp?.startDate })
+  useScheduleCallback({ callback: () => invalidateQuery(getRfpById), date: rfp?.endDate })
   const router = useRouter()
 
   return (
@@ -108,7 +111,7 @@ export const RfpSidebar = () => {
           />
         )}
         <RfpReward rfpProposalPayment={rfp?.data?.proposal?.payment} />
-        <RfpEndsIn status={rfp?.status} endDate={rfp?.endDate} />
+        <RfpSchedule status={rfp?.status} startDate={rfp?.startDate} endDate={rfp?.endDate} />
         {/* CTA */}
         <div className="mb-10 relative group">
           {/* Hide "Propose" button when showing the proposal creation form  */}
