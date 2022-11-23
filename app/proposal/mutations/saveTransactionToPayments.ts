@@ -45,6 +45,7 @@ export default async function saveTransactionHashToPayments(
     await db.proposalPayment.update({
       where: { id: params.paymentId },
       data: {
+        ...existingPayment,
         data: {
           ...(existingPayment.data as {}),
           history: [

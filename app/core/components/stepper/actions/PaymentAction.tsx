@@ -116,6 +116,7 @@ const PaymentAction = ({ proposal, milestone }) => {
     ...(userIsSigner &&
       payment &&
       !!mostRecentPaymentAttempt &&
+      mostRecentPaymentAttempt.status === ProposalPaymentStatus.QUEUED &&
       !userHasSignedGnosisTx &&
       !quorumMet && {
         [ProposalRoleType.CLIENT]: (
@@ -172,13 +173,12 @@ const PaymentAction = ({ proposal, milestone }) => {
     // user is signer on the gnosis safe
     // and payment exists (typescript)
     // and there IS mutliSigTransaction data on the payment, meaning it has been queued
-    // and the quorum is met
     ...(userIsSigner &&
       payment &&
       !!mostRecentPaymentAttempt &&
       (mostRecentPaymentAttempt.status === ProposalPaymentStatus.REJECTED ||
         mostRecentPaymentAttempt.status === ProposalPaymentStatus.FAILED) &&
-      !!quorumMet && {
+      !quorumMet && {
         [ProposalRoleType.CLIENT]: (
           <button
             className="mb-2 sm:mb-0 font-bold border rounded px-4 h-[35px] bg-electric-violet border-electric-violet text-tunnel-black w-full"
