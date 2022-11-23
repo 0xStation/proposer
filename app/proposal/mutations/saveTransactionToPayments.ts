@@ -46,7 +46,7 @@ export default async function saveTransactionHashToPayments(
         data: {
           ...(existingPayment.data as {}),
           history: [
-            ...(existingPayment.data?.history || []),
+            ...existingPayment.data.history.slice(0, existingPayment.data.history.length - 1),
             {
               ...mostRecentPayment,
               transactionHash: params.transactionHash,

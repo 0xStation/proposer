@@ -47,24 +47,31 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
 
   const nonce = await fetchGnosisNonce(String(account.data.chainId || 1), account.address)
 
-  const payment = (await db.proposalPayment.findFirst({
+  // TODO: get feedback on this line -- really annoying that we have to parse through every single payment
+  // ever from a particular account just to find the matching payment
+  const accountPayments = (await db.proposalPayment.findMany({
     where: {
       senderAddress: account.address,
-      data: {
-        path: ["multisigTransaction", "nonce"],
-        equals: nonce - 1,
-      },
     },
-  })) as ProposalPayment
+  })) as ProposalPayment[]
 
-  // might be a transaction that is not a station transaction
-  if (!payment) {
-    return res.end()
+  let payment
+  let mostRecentPaymentAttempt
+  for (let i = accountPayments.length - 1; i >= 0; i--) {
+    const currentPayment = accountPayments[i]
+    const paymentAttempt = currentPayment?.data?.history?.slice(-1)[0]
+    // nonce is a BigNumber, so we need to unwrap it
+    // nonce is incremented after a successful transaction, so we need to subtract 1 to match to previous tx
+    if (paymentAttempt?.multisigTransaction?.nonce === nonce.toNumber() - 1) {
+      payment = currentPayment
+      mostRecentPaymentAttempt = paymentAttempt
+      break
+    }
   }
 
-  const mostRecentPaymentAttempt = payment.data.history[payment.data.history.length - 1]
-
-  if (!mostRecentPaymentAttempt) {
+  // webhook might be responding to transaction that is not a station transaction
+  // because we cannot find it
+  if (!mostRecentPaymentAttempt || !payment) {
     return res.end()
   }
 
