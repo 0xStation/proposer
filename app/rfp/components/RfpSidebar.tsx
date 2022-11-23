@@ -44,7 +44,7 @@ export const RfpSidebar = () => {
   const router = useRouter()
 
   return (
-    <div className="h-full w-[330px] overflow-y-scroll p-6 border-r border-concrete">
+    <div className="h-full w-[380px] overflow-y-scroll p-6 border-r border-concrete">
       <div className="flex flex-col pb-6 space-y-6">
         <nav>
           <Link
@@ -71,18 +71,6 @@ export const RfpSidebar = () => {
             <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
           )}
         </nav>
-        {/* TITLE */}
-        {rfp ? (
-          <span className="mt-6 text-2xl font-bold text-marble-white">
-            {rfp?.data.content.title}
-          </span>
-        ) : (
-          // LOADING STATE
-          <div
-            tabIndex={0}
-            className={`h-8 w-full rounded-lg flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
-          />
-        )}
         {/* PILLS */}
         {rfp ? (
           <div className="flex flex-row flex-wrap gap-1">
