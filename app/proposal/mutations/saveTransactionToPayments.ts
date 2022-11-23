@@ -1,5 +1,6 @@
 import * as z from "zod"
 import db, { ProposalStatus } from "db"
+import { ProposalPayment, ProposalPaymentStatus } from "app/proposalPayment/types"
 
 const SaveTransactionHashToPayments = z.object({
   milestoneId: z.string(),
@@ -32,11 +33,28 @@ export default async function saveTransactionHashToPayments(
     if (proposal.currentMilestoneIndex !== milestone.index)
       throw Error("proposal is not on milestone: " + milestone.index)
 
-    // update payment with transaction hash
+    const existingPayment = (await db.proposalPayment.findUnique({
+      where: { id: params.paymentId },
+    })) as ProposalPayment
+
+    const mostRecentPayment = existingPayment.data?.history?.slice(-1)[0]
+
+    // update most recent payment attempt with transaction hash
     await db.proposalPayment.update({
       where: { id: params.paymentId },
       data: {
-        transactionHash: params.transactionHash,
+        data: {
+          ...(existingPayment.data as {}),
+          history: [
+            ...(existingPayment.data?.history || []),
+            {
+              ...mostRecentPayment,
+              transactionHash: params.transactionHash,
+              status: ProposalPaymentStatus.SUCCESS,
+              timestamp: new Date(),
+            },
+          ] as any,
+        },
       },
     })
 

@@ -18,7 +18,7 @@ const CreatePayment = z.object({
   }),
 })
 
-export default async function updatePayment(input: z.infer<typeof CreatePayment>, ctx: Ctx) {
+export default async function createPayment(input: z.infer<typeof CreatePayment>, ctx: Ctx) {
   const params = CreatePayment.parse(input)
 
   // TODO: better auth

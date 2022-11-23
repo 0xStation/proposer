@@ -3,7 +3,7 @@ import networks from "app/utils/networks.json"
 
 const GetGnosisTxStatus = z.object({
   chainId: z.number(),
-  transactionHash: z.string(),
+  safeTxHash: z.string(),
   proposalId: z.string(),
   milestoneId: z.string(),
 })
@@ -22,7 +22,7 @@ export default async function getGnosisTxStatus(params: z.infer<typeof GetGnosis
     throw Error("chainId not available on Gnosis")
   }
 
-  const url = `${apiHost}/api/v1/multisig-transactions/${input.transactionHash}/`
+  const url = `${apiHost}/api/v1/multisig-transactions/${input.safeTxHash}/`
 
   let response
   try {

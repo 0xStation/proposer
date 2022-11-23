@@ -2,14 +2,18 @@ import { useState } from "react"
 import AttachTransactionModal from "app/proposal/components/AttachTransactionModal"
 import { ProposalMilestone } from "app/proposalMilestone/types"
 import { getMilestoneStatus } from "app/proposalMilestone/utils"
-import { PROPOSAL_MILESTONE_STATUS_MAP } from "../utils/constants"
+import {
+  PROPOSAL_MILESTONE_STATUS_MAP,
+  PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP,
+} from "../utils/constants"
 import truncateString from "../utils/truncateString"
 import { Proposal } from "app/proposal/types"
 import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import PaymentAction from "./stepper/actions/PaymentAction"
+import { formatDate } from "app/core/utils/formatDate"
 
-const PaymentRow = ({ payment, proposal, milestone, isMostRecent }) => {
+const PaymentRow = ({ payment, proposal, milestone }) => {
   return (
     <div>
       <div className="w-full flex flex-row items-end" key={payment?.id}>
@@ -38,27 +42,28 @@ const PaymentRow = ({ payment, proposal, milestone, isMostRecent }) => {
           )}
         </span>
       </div>
-      {payment?.isRejected && (
-        <div className="flex flex-row">
-          <span className="bg-torch-red w-2 rounded-l block"></span>
-          <div className="bg-wet-concrete w-full px-2 py-1 block rounded-r">
-            Transaction was <span className="text-torch-red">rejected</span> on Gnosis safe.
+      {payment.data.history.map((attempt, idx) => {
+        return (
+          <div className="flex flex-row" key={`attempt-${idx}`}>
+            <span
+              className={`${
+                PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP[attempt.status].bgColor
+              } w-2 rounded-l block`}
+            ></span>
+            <div className="bg-wet-concrete w-full px-2 py-1 block rounded-r">
+              Transaction was{" "}
+              <span className={`${PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP[attempt.status].textColor}`}>
+                {PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP[attempt.status].copy}
+              </span>{" "}
+              on {formatDate(new Date(attempt.timestamp))}
+            </div>
           </div>
-        </div>
-      )}
-      {!!payment.transactionHash && !payment?.isRejected && (
-        <div className="flex flex-row">
-          <span className="bg-magic-mint w-2 rounded-l block"></span>
-          <div className="bg-wet-concrete w-full px-2 py-1 block rounded-r">
-            Transaction was <span className="text-magic-mint">executed</span> on Gnosis safe.
-          </div>
-        </div>
-      )}
-      {isMostRecent && (
-        <div className="mt-4">
-          <PaymentAction proposal={proposal} milestone={milestone} />
-        </div>
-      )}
+        )
+      })}
+
+      <div className="mt-4">
+        <PaymentAction proposal={proposal} milestone={milestone} />
+      </div>
     </div>
   )
 }
@@ -109,17 +114,14 @@ export const ProposalMilestonePaymentBox = ({
         {/* MILESTONE PAYMENTS */}
         <div className="space-y-8">
           {milestone?.payments &&
-            milestone?.payments
-              ?.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-              .map((payment, idx) => (
-                <PaymentRow
-                  key={`payment-row-${idx}`}
-                  payment={payment}
-                  proposal={proposal}
-                  milestone={milestone}
-                  isMostRecent={idx === 0}
-                />
-              ))}
+            milestone?.payments.map((payment, idx) => (
+              <PaymentRow
+                key={`payment-row-${idx}`}
+                payment={payment}
+                proposal={proposal}
+                milestone={milestone}
+              />
+            ))}
         </div>
       </div>
     </>

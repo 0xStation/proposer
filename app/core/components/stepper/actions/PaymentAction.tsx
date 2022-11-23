@@ -5,16 +5,18 @@ import { ProposalRoleType, AddressType } from "@prisma/client"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
 import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
-import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
-import { getMilestoneStatus } from "app/proposalMilestone/utils"
 import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 import { getNetworkGnosisUrl } from "app/core/utils/networkInfo"
 import { useStepperStore } from "../StepperRenderer"
+import { ProposalPayment, ProposalPaymentStatus } from "app/proposalPayment/types"
 import { StepType } from "../steps/Step"
 
 const PaymentAction = ({ proposal, milestone }) => {
-  const payment = proposal.payments?.find((payment) => payment.milestoneId === milestone.id)
+  const payment = proposal.payments?.find(
+    (payment) => payment.milestoneId === milestone.id
+  ) as ProposalPayment
+  const mostRecentPaymentAttempt = payment.data?.history?.[payment.data.history.length - 1]
   const { roles: userRoles } = useGetUsersRoles(proposal.id)
   const userClientRole = userRoles.find((role) => role.type === ProposalRoleType.CLIENT)
   const userIsPayer = userClientRole
@@ -44,7 +46,7 @@ const PaymentAction = ({ proposal, milestone }) => {
     getGnosisTxStatus,
     {
       chainId: payment?.data.token.chainId || 1,
-      transactionHash: payment?.data.multisigTransaction?.safeTxHash || "",
+      safeTxHash: mostRecentPaymentAttempt?.multisigTransaction?.safeTxHash || "",
       proposalId: proposal.id,
       milestoneId: milestone.id,
     },
@@ -53,14 +55,10 @@ const PaymentAction = ({ proposal, milestone }) => {
       // refetchOnWindowFocus defaults to true so switching tabs will re-trigger query for immediate response feel
       refetchInterval: 30 * 1000, // 30 seconds, background refresh rate in-case user doesn't switch around tabs
       enabled:
-        // payment exists
-        payment &&
-        // milestone is in progress
-        getMilestoneStatus(proposal, milestone) === ProposalMilestoneStatus.IN_PROGRESS &&
-        // payment is still pending
-        !payment.transactionHash &&
-        // payment has been queued to Gnosis
-        !!payment.data.multisigTransaction?.safeTxHash,
+        // payment attempt exists
+        mostRecentPaymentAttempt &&
+        // payment attempt is still pending
+        mostRecentPaymentAttempt.status === ProposalPaymentStatus.QUEUED,
     }
   )
 
@@ -78,7 +76,9 @@ const PaymentAction = ({ proposal, milestone }) => {
     }
   }, [userIsSigner, gnosisTxStatus])
 
-  const paymentComplete = !!payment.transactionHash
+  const paymentComplete = mostRecentPaymentAttempt
+    ? mostRecentPaymentAttempt.status !== ProposalPaymentStatus.QUEUED
+    : false
 
   const actions = {
     ...(userIsPayer &&
@@ -96,10 +96,10 @@ const PaymentAction = ({ proposal, milestone }) => {
       }),
     // user is signer on the gnosis safe
     // and payment exists (typescript)
-    // and there is not yet any mutliSigTransaction data on the payment, meaning it is not queued
+    // and there is not a payment attempt
     ...(userIsSigner &&
       payment &&
-      !payment.data.multisigTransaction && {
+      !mostRecentPaymentAttempt && {
         [ProposalRoleType.CLIENT]: (
           <button
             onClick={() => toggleQueueGnosisTransactionModalMap({ open: true, id: payment.id })}
@@ -112,12 +112,12 @@ const PaymentAction = ({ proposal, milestone }) => {
       }),
     // user is signer on the gnosis safe
     // and payment exists (typescript)
-    // and there IS mutliSigTransaction data on the payment, meaning it has been queued
+    // and there IS a payment attempt, meaning it has been queued
     // and the user has not yet signed the gnosis tx
     // TODO: approve flashes slightly after it's first executed.
     ...(userIsSigner &&
       payment &&
-      !!payment.data.multisigTransaction &&
+      !!mostRecentPaymentAttempt &&
       !userHasSignedGnosisTx &&
       !quorumMet && {
         [ProposalRoleType.CLIENT]: (
@@ -133,7 +133,7 @@ const PaymentAction = ({ proposal, milestone }) => {
 
     ...(userIsSigner &&
       payment &&
-      !!payment.data.multisigTransaction &&
+      !!mostRecentPaymentAttempt &&
       !!userHasSignedGnosisTx &&
       !quorumMet && {
         [ProposalRoleType.CLIENT]: (
@@ -153,13 +153,13 @@ const PaymentAction = ({ proposal, milestone }) => {
     // and the quorum is met
     ...(userIsSigner &&
       payment &&
-      !!payment.data.multisigTransaction &&
-      !payment.isRejected &&
+      !!mostRecentPaymentAttempt &&
+      mostRecentPaymentAttempt.status === ProposalPaymentStatus.QUEUED &&
       !!quorumMet && {
         [ProposalRoleType.CLIENT]: (
           <a
             href={`${getNetworkGnosisUrl(payment.data.token.chainId)}:${
-              payment.data.multisigTransaction.address
+              mostRecentPaymentAttempt.multisigTransaction?.address
             }/transactions/queue`}
             target="_blank"
             rel="noreferrer"
@@ -177,8 +177,9 @@ const PaymentAction = ({ proposal, milestone }) => {
     // and the quorum is met
     ...(userIsSigner &&
       payment &&
-      !!payment.data.multisigTransaction &&
-      !!payment.isRejected &&
+      !!mostRecentPaymentAttempt &&
+      (mostRecentPaymentAttempt.status === ProposalPaymentStatus.REJECTED ||
+        mostRecentPaymentAttempt.status === ProposalPaymentStatus.FAILED) &&
       !!quorumMet && {
         [ProposalRoleType.CLIENT]: (
           <button
