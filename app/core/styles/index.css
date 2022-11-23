@@ -133,3 +133,202 @@ body {
 ::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }
+
+/* Typewriter effect 1 */
+@keyframes typing {
+  0.0000%,
+  27.3488% {
+    content: "";
+  }
+  1.1395%,
+  26.2093% {
+    content: "c";
+  }
+  2.2791%,
+  25.0698% {
+    content: "co";
+  }
+  3.4186%,
+  23.9302% {
+    content: "col";
+  }
+  4.5581%,
+  22.7907% {
+    content: "coll";
+  }
+  5.6977%,
+  21.6512% {
+    content: "colla";
+  }
+  6.8372%,
+  20.5116% {
+    content: "collab";
+  }
+  7.9767%,
+  19.3721% {
+    content: "collabor";
+  }
+  9.1163%,
+  18.2326% {
+    content: "collabora";
+  }
+  10.2558%,
+  17.0930% {
+    content: "collaborate";
+  }
+
+  30.7674%,
+  57.2791% {
+    content: "";
+  }
+  31.9070%,
+  56.1395% {
+    content: "c";
+  }
+  33.0465%,
+  55.5000% {
+    content: "co";
+  }
+  34.1860%,
+  54.8605% {
+    content: "con";
+  }
+  35.3256%,
+  53.7209% {
+    content: "contr";
+  }
+  36.3953%,
+  52.5116% {
+    content: "contri";
+  }
+  37.5349%,
+  51.3721% {
+    content: "contrib";
+  }
+  38.5349%,
+  51.3721% {
+    content: "contribu";
+  }
+  39.5349%,
+  48.3721% {
+    content: "contribut";
+  }
+  40.5349%,
+  47.3721% {
+    content: "contribute";
+  }
+
+  60.0000%,
+  93.3488% {
+    content: "";
+  }
+  61.1395%,
+  92.2093% {
+    content: "m";
+  }
+  62.2791%,
+  91.0698% {
+    content: "ma";
+  }
+  63.4186%,
+  90.9302% {
+    content: "mak";
+  }
+  64.5581%,
+  89.7907% {
+    content: "make";
+  }
+  65.6977%,
+  88.6512% {
+    content: "make ";
+  }
+  66.8372%,
+  87.5116% {
+    content: "make c";
+  }
+  67.9767%,
+  86.3721% {
+    content: "make ch";
+  }
+  68.1163%,
+  85.2326% {
+    content: "make cha";
+  }
+  69.2558%,
+  84.0930% {
+    content: "make chan";
+  }
+  70.3256%,
+  83.1628% {
+    content: "make chang";
+  }
+  71.3256%,
+  82.1628% {
+    content: "make change";
+  }
+  72.3256%,
+  81.1628% {
+    content: "make changes";
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.typewriter {
+  --caret: currentcolor;
+  color: #63ebaf;
+}
+
+.typewriter::before {
+  content: "";
+  animation: typing 8s infinite;
+}
+
+.typewriter::after {
+  content: "";
+  border-right: 1px solid var(--caret);
+  animation: blink 0.5s linear infinite;
+}
+
+.typewriter.thick::after {
+  border-right: 1ch solid var(--caret);
+}
+
+.typewriter.nocaret::after {
+  border-right: 0;
+}
+
+@media (prefers-reduced-motion) {
+  .typewriter::after {
+    animation: none;
+  }
+
+  @keyframes sequencePopup {
+    0%,
+    100% {
+      content: "collaborate";
+    }
+    25% {
+      content: "work";
+    }
+    50% {
+      content: "contribute";
+    }
+    75% {
+      content: "make changes";
+    }
+  }
+
+  .typewriter::before {
+    content: "collaborate";
+    animation: sequencePopup 12s linear infinite;
+  }
+}
