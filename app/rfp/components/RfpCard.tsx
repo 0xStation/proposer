@@ -14,6 +14,8 @@ import { useScheduleCallback } from "app/core/hooks/useScheduleCallback"
 
 export const RfpCard = React.forwardRef(
   ({ account, rfp, href }: { account: Account; rfp: Rfp; href: RouteUrlObject }, ref) => {
+    // cards are populated from a bulk query which is more expensive to invalidate
+    // so we give local state to cards to visually update
     const [rfpStatus, setRfpStatus] = useState<RfpStatus>(rfp?.status)
     useScheduleCallback({ callback: () => setRfpStatus(RfpStatus.OPEN), date: rfp?.startDate })
     useScheduleCallback({ callback: () => setRfpStatus(RfpStatus.CLOSED), date: rfp?.endDate })
