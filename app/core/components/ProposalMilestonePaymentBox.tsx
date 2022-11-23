@@ -42,24 +42,26 @@ const PaymentRow = ({ payment, proposal, milestone }) => {
           )}
         </span>
       </div>
-      {payment.data.history.map((attempt, idx) => {
-        return (
-          <div className="flex flex-row" key={`attempt-${idx}`}>
-            <span
-              className={`${
-                PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP[attempt.status].bgColor
-              } w-2 rounded-l block`}
-            ></span>
-            <div className="bg-wet-concrete w-full px-2 py-1 block rounded-r">
-              Transaction was{" "}
-              <span className={`${PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP[attempt.status].textColor}`}>
-                {PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP[attempt.status].copy}
-              </span>{" "}
-              on {formatDate(new Date(attempt.timestamp))}
+      <div className="space-y-4">
+        {payment.data?.history?.map((attempt, idx) => {
+          return (
+            <div className="flex flex-row" key={`attempt-${idx}`}>
+              <span
+                className={`${
+                  PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP[attempt.status].bgColor
+                } w-2 rounded-l block`}
+              ></span>
+              <div className="bg-wet-concrete w-full px-2 py-1 block rounded-r">
+                Transaction was{" "}
+                <span className={`${PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP[attempt.status].textColor}`}>
+                  {PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP[attempt.status].copy}
+                </span>{" "}
+                on {formatDate(new Date(attempt.timestamp))}
+              </div>
             </div>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
 
       <div className="mt-4">
         <PaymentAction proposal={proposal} milestone={milestone} />

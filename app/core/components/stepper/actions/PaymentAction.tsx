@@ -34,9 +34,6 @@ const PaymentAction = ({ proposal, milestone }) => {
   const toggleQueueGnosisTransactionModalMap = useStore(
     (state) => state.toggleQueueGnosisTransactionModalMap
   )
-  const toggleReQueueGnosisTransactionModalMap = useStore(
-    (state) => state.toggleReQueueGnosisTransactionModalMap
-  )
   const toggleApproveGnosisTransactionModalMap = useStore(
     (state) => state.toggleApproveGnosisTransactionModalMap
   )
@@ -184,7 +181,7 @@ const PaymentAction = ({ proposal, milestone }) => {
         [ProposalRoleType.CLIENT]: (
           <button
             className="mb-2 sm:mb-0 font-bold border rounded px-4 h-[35px] bg-electric-violet border-electric-violet text-tunnel-black w-full"
-            onClick={() => toggleReQueueGnosisTransactionModalMap({ open: true, id: payment.id })}
+            onClick={() => toggleQueueGnosisTransactionModalMap({ open: true, id: payment.id })}
           >
             Re-queue transaction
             <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
