@@ -40,6 +40,21 @@ export default async function saveTransactionHashToPayments(
     // non-gnosis safe payments have no history because there is no concept of the payment being "queued"
     // it either doesn't exist -- or it is immediately executed
     const mostRecentPaymentAttempt = existingPayment.data?.history?.slice(-1)[0]
+    let paymentAttempt
+    if (mostRecentPaymentAttempt?.status === ProposalPaymentStatus.QUEUED) {
+      paymentAttempt = {
+        ...mostRecentPaymentAttempt,
+        transactionHash: params.transactionHash,
+        status: ProposalPaymentStatus.SUCCESS,
+        timestamp: new Date(),
+      }
+    } else {
+      paymentAttempt = {
+        transactionHash: params.transactionHash,
+        status: ProposalPaymentStatus.SUCCESS,
+        timestamp: new Date(),
+      }
+    }
 
     // the problem is that we queue another attempt when we queue a gnosis transaction
     // but we do not queue another attempt if we are directly attaching a payment
@@ -54,12 +69,7 @@ export default async function saveTransactionHashToPayments(
           ...(existingPayment.data as {}),
           history: [
             ...existingPayment.data.history.slice(0, existingPayment.data.history.length - 1),
-            {
-              ...mostRecentPaymentAttempt,
-              transactionHash: params.transactionHash,
-              status: ProposalPaymentStatus.SUCCESS,
-              timestamp: new Date(),
-            },
+            paymentAttempt,
           ] as any,
         },
       },
