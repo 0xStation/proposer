@@ -40,25 +40,7 @@ export default async function saveTransactionHashToPayments(
     // non-gnosis safe payments have no history because there is no concept of the payment being "queued"
     // it either doesn't exist -- or it is immediately executed
     const mostRecentPaymentAttempt = existingPayment.data?.history?.slice(-1)[0]
-    let paymentAttempt
-    if (mostRecentPaymentAttempt?.status === ProposalPaymentStatus.QUEUED) {
-      paymentAttempt = {
-        ...mostRecentPaymentAttempt,
-        transactionHash: params.transactionHash,
-        status: ProposalPaymentStatus.SUCCESS,
-        timestamp: new Date(),
-      }
-    } else {
-      paymentAttempt = {
-        transactionHash: params.transactionHash,
-        status: ProposalPaymentStatus.SUCCESS,
-        timestamp: new Date(),
-      }
-    }
-
-    // the problem is that we queue another attempt when we queue a gnosis transaction
-    // but we do not queue another attempt if we are directly attaching a payment
-    // so it overrides the old error attempt
+    const currentQueued = mostRecentPaymentAttempt?.status === ProposalPaymentStatus.QUEUED
 
     // update most recent payment attempt with transaction hash
     await db.proposalPayment.update({
@@ -68,8 +50,20 @@ export default async function saveTransactionHashToPayments(
         data: {
           ...(existingPayment.data as {}),
           history: [
-            ...existingPayment.data.history.slice(0, existingPayment.data.history.length - 1),
-            paymentAttempt,
+            ...existingPayment.data.history.slice(
+              0,
+              // if the current most recent attempt is in queued state we want to override it,
+              // otherwise we want to keep it, and add a new attempt
+              currentQueued
+                ? existingPayment.data.history.length - 1
+                : existingPayment.data.history.length
+            ),
+            {
+              ...mostRecentPaymentAttempt,
+              transactionHash: params.transactionHash,
+              status: ProposalPaymentStatus.SUCCESS,
+              timestamp: new Date(),
+            },
           ] as any,
         },
       },
