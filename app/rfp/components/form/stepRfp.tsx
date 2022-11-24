@@ -25,11 +25,13 @@ export const RfpFormStepRfp = ({ formState }) => {
   const { text: displayAddress } = useDisplayAddress(accountAddress)
   const router = useRouter()
 
+  const noAccount = accountAddress === "undefined"
+
   const [account] = useQuery(
     getAccountByAddress,
     { address: toChecksumAddress(accountAddress) },
     {
-      enabled: !!accountAddress,
+      enabled: !!accountAddress && !noAccount,
       suspense: false,
       refetchOnWindowFocus: false,
       staleTime: 60 * 1000, // 1 minute
@@ -49,15 +51,23 @@ export const RfpFormStepRfp = ({ formState }) => {
   return (
     <>
       <div className="mt-2 flex flex-row space-x-1 items-center">
-        <span className="text-sm text-concrete">This RFP will be listed on </span>
-        <button
-          className="text-sm text-electric-violet font-bold"
-          onClick={() => {
-            router.push(Routes.WorkspaceHome({ accountAddress }))
-          }}
-        >
-          {account?.data?.name || displayAddress}
-        </button>
+        {noAccount ? (
+          <span className="text-sm text-concrete">
+            Connect your wallet to list this RFP under your workspace.
+          </span>
+        ) : (
+          <>
+            <span className="text-sm text-concrete">This RFP will be listed on </span>
+            <button
+              className="text-sm text-electric-violet font-bold"
+              onClick={() => {
+                router.push(Routes.WorkspaceHome({ accountAddress }))
+              }}
+            >
+              {account?.data?.name || displayAddress}
+            </button>
+          </>
+        )}
       </div>
       {/* TITLE */}
       <label className="font-bold block mt-6">Title*</label>

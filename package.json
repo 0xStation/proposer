@@ -45,6 +45,8 @@
     "@heroicons/react": "1.0.5",
     "@mui/icons-material": "5.5.1",
     "@mui/material": "5.5.3",
+    "@octokit/auth-app": "4.0.7",
+    "@octokit/core": "4.1.0",
     "@prisma/client": "3.6.0",
     "@privy-io/privy-node": "0.0.1",
     "@radix-ui/react-progress": "0.1.4",
@@ -86,6 +88,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.18.10",
+    "@octokit/webhooks-types": "6.7.0",
     "@storybook/addon-actions": "6.5.10",
     "@storybook/addon-essentials": "6.5.10",
     "@storybook/addon-interactions": "6.5.10",
