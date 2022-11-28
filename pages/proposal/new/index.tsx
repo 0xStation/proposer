@@ -30,7 +30,7 @@ const ProposalTypeSelection: BlitzPage = () => {
           accountAddress={session.siwe?.address}
         />
       )}
-      <div className="w-full mx-auto max-w-fit mt-36 flex flex-row">
+      <div className="w-full mx-2 sm:mx-auto max-w-fit mt-36 flex flex-col md:flex-row">
         {/* REQUEST FUNDING */}
         <Link
           href={Routes.ProposalNewFunding({

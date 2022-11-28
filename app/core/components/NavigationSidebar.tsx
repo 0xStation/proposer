@@ -40,7 +40,7 @@ const ProfileIcon = ({
         <button
           className={`${
             profileSelected ? "border-marble-white" : "border-wet-concrete"
-          } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-full h-[47px] mb-4`}
+          } bg-clip-border inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-full h-[47px] mb-4`}
           onClick={() => {
             router.push(Routes.WorkspaceHome({ accountAddress: activeUser.address }))
             if (toggleMobileSidebar) {
@@ -105,7 +105,13 @@ export const NavigationSidebar = ({ toggleMobileSidebar }: { toggleMobileSidebar
             {activeUser?.originsOf
               ?.filter((aa) => aa.type === AccountAccountType.PIN_WORKSPACE)
               ?.map((aa, idx) => {
-                return <ProfileIcon activeUser={aa.targetAccount} key={`profile-${idx}`} />
+                return (
+                  <ProfileIcon
+                    activeUser={aa.targetAccount}
+                    key={`profile-${idx}`}
+                    toggleMobileSidebar={toggleMobileSidebar}
+                  />
+                )
               })}
           </>
         )}
