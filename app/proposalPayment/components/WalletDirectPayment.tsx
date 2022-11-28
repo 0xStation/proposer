@@ -134,6 +134,9 @@ export const WalletDirectPayment = ({
       } else if (e.message.includes("ERC20: transfer amount exceeds balance")) {
         // don't have enough ERC20 to pay
         message = "Insufficient wallet balance for payment."
+      } else if (e.message.includes("GS013")) {
+        // Safe transaction failed, blame on insufficient funds for now (one potential cause)
+        message = "Insufficient Safe balance for payment."
       }
       setToastState({
         isToastShowing: true,
