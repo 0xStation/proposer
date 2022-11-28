@@ -1,6 +1,6 @@
 import networks from "app/utils/networks.json"
 import { Token } from "@prisma/client"
-import { EvmChain } from "@moralisweb3/evm-utils"
+import { EvmChain } from "@moralisweb3/common-evm-utils"
 import Moralis from "moralis"
 
 Moralis.start({
