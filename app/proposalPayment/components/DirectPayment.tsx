@@ -188,8 +188,12 @@ export const DirectPayment = ({
           </table>
           <Button
             className="mt-8 mb-2"
-            isLoading={isLoading || isSafeTxStatusLoading}
-            isDisabled={!transactionPayload || isLoading || isSafeTxStatusLoading || isNonceBlocked}
+            isLoading={isLoading || (!!payment?.data?.multisigTransaction && isSafeTxStatusLoading)}
+            isDisabled={
+              !transactionPayload ||
+              isLoading ||
+              (!!payment?.data?.multisigTransaction && (isSafeTxStatusLoading || isNonceBlocked))
+            }
             onClick={() => initiatePayment()}
           >
             Pay

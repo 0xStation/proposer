@@ -141,7 +141,7 @@ export const PROPOSAL_MILESTONE_STATUS_MAP = {
   },
   [ProposalMilestoneStatus.COMPLETE]: {
     copy: "paid",
-    color: "bg-magic-mint",
+    color: "bg-electric-violet",
   },
 }
 
