@@ -132,6 +132,7 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
     // and the quorum is met
     ...(userIsSigner &&
       payment &&
+      !paymentComplete &&
       !!payment.data.multisigTransaction &&
       !!quorumMet && {
         [ProposalRoleType.CLIENT]: (
