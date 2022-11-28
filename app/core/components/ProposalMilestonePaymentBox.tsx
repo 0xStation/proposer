@@ -39,7 +39,12 @@ const PaymentRow = ({ proposal, milestone, payment }) => {
         </span>
       </div>
       <div className="mt-4">
-        <PaymentAction proposal={proposal} milestone={milestone} payment={payment} />
+        <PaymentAction
+          proposal={proposal}
+          milestone={milestone}
+          payment={payment}
+          isWithinStepper={false}
+        />
       </div>
     </>
   )

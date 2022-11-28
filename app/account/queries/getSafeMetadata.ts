@@ -37,6 +37,7 @@ export default async function getSafeMetadata(input: z.infer<typeof GetSafeMetad
       address: params.address,
       quorum: results.threshold,
       signers: results.owners,
+      nonce: results.nonce,
     }
   } catch (err) {
     console.error(err)

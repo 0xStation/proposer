@@ -29,7 +29,11 @@ export const WalletDirectPayment = ({
   const { chain: activeChain } = useNetwork()
   const { sendTransactionAsync } = useSendTransaction({ mode: "recklesslyUnprepared" })
 
-  const confirmations = useSafeTxStatus(proposal, milestone, payment)
+  const {
+    confirmations,
+    isNonceBlocked,
+    isLoading: isSafeTxStatusLoading,
+  } = useSafeTxStatus(proposal, milestone, payment)
 
   useEffect(() => {
     if (payment) {
@@ -181,8 +185,8 @@ export const WalletDirectPayment = ({
           </table>
           <Button
             className="mt-8 mb-2"
-            isLoading={isLoading}
-            isDisabled={!transactionPayload || isLoading}
+            isLoading={isLoading || isSafeTxStatusLoading}
+            isDisabled={!transactionPayload || isLoading || isSafeTxStatusLoading || isNonceBlocked}
             onClick={() => initiatePayment()}
           >
             Pay

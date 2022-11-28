@@ -13,8 +13,9 @@ import { getNetworkGnosisUrl } from "app/core/utils/networkInfo"
 import { useStepperStore } from "../StepperRenderer"
 import { StepType } from "../steps/Step"
 import { useSafeTxStatus } from "app/core/hooks/useSafeTxStatus"
+import TextLink from "../../TextLink"
 
-const PaymentAction = ({ proposal, milestone, payment }) => {
+const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true }) => {
   const { roles: userRoles } = useGetUsersRoles(proposal.id)
   const userClientRole = userRoles.find((role) => role.type === ProposalRoleType.CLIENT)
   const userIsPayer = userClientRole
@@ -37,7 +38,11 @@ const PaymentAction = ({ proposal, milestone, payment }) => {
   )
   const setActions = useStepperStore((state) => state.setActions)
 
-  const confirmations = useSafeTxStatus(proposal, milestone, payment)
+  const {
+    confirmations,
+    isNonceBlocked,
+    isLoading: isSafeTxStatusLoading,
+  } = useSafeTxStatus(proposal, milestone, payment)
 
   useEffect(() => {
     if (userIsSigner && confirmations) {
@@ -130,18 +135,34 @@ const PaymentAction = ({ proposal, milestone, payment }) => {
       !!payment.data.multisigTransaction &&
       !!quorumMet && {
         [ProposalRoleType.CLIENT]: (
-          <Button
-            type={ButtonType.Secondary}
-            onClick={() =>
-              toggleExecutePaymentModalMap({
-                open: true,
-                id: payment.id,
-              })
-            }
-            overrideWidthClassName="w-full"
-          >
-            Pay
-          </Button>
+          <>
+            <Button
+              type={isWithinStepper ? ButtonType.Secondary : ButtonType.Primary}
+              isDisabled={isSafeTxStatusLoading || isNonceBlocked}
+              onClick={() =>
+                toggleExecutePaymentModalMap({
+                  open: true,
+                  id: payment.id,
+                })
+              }
+              overrideWidthClassName="w-full"
+            >
+              Pay
+            </Button>
+            {isNonceBlocked && (
+              <span className="w-full text-xs text-concrete">
+                This transaction is blocked by other pending transactions.{" "}
+                <TextLink
+                  url={`${getNetworkGnosisUrl(payment.data.token.chainId)}:${
+                    payment.data.multisigTransaction.address
+                  }/transactions/queue`}
+                >
+                  Execute them on Gnosis
+                </TextLink>{" "}
+                to continue.
+              </span>
+            )}
+          </>
         ),
       }),
   }

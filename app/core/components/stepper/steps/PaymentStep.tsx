@@ -12,7 +12,6 @@ import Step, { StepStatus, StepType } from "./Step"
 import { useQuery } from "@blitzjs/rpc"
 import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 import { getMilestoneStatus } from "app/proposalMilestone/utils"
-import { useSafeTxStatus } from "app/core/hooks/useSafeTxStatus"
 
 const PaymentStep = ({
   milestone,

@@ -1,14 +1,20 @@
 import { useQuery } from "@blitzjs/rpc"
-import { ContentPasteSearchOutlined } from "@mui/icons-material"
 import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
 import { getMilestoneStatus } from "app/proposalMilestone/utils"
+import { useSafeMetadata } from "./useSafeMetadata"
 
 export const useSafeTxStatus = (proposal, milestone, payment) => {
+  const address = payment?.data.multisigTransaction?.address
+  const addressType = payment?.data.multisigTransaction?.type
+  const chainId = payment?.data.token.chainId || 1
+
+  const safeMetadata = useSafeMetadata(address, addressType, chainId)
+
   const [gnosisTxStatus] = useQuery(
     getGnosisTxStatus,
     {
-      chainId: payment?.data.token.chainId || 1,
+      chainId,
       transactionHash: payment?.data.multisigTransaction?.safeTxHash || "",
       proposalId: proposal.id,
       milestoneId: milestone.id,
@@ -30,5 +36,11 @@ export const useSafeTxStatus = (proposal, milestone, payment) => {
     }
   )
 
-  return gnosisTxStatus?.confirmations || []
+  const isLoading = !safeMetadata || !gnosisTxStatus
+
+  return {
+    isLoading,
+    isNonceBlocked: isLoading ? false : safeMetadata.nonce < gnosisTxStatus.nonce,
+    confirmations: isLoading ? [] : gnosisTxStatus.confirmations,
+  }
 }
