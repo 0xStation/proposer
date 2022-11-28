@@ -199,7 +199,7 @@ Blitz comes with a set of tools that corrects and formats your code, facilitatin
 
 Read the [Blitz.js Documentation](https://blitzjs.com/docs/getting-started) to learn more.
 
-The Blitz community is warm, safe, diverse, inclusive, and fun! Feel free to reach out to us in any of our communication channels.
+The Blitz community is warm, safe, diverse, inclusive, and fun! Feel free to reach out to us in any of our communication channels!
 
 - [Website](https://blitzjs.com)
 - [Discord](https://blitzjs.com/discord)
