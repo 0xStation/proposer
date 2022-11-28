@@ -90,6 +90,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, payment, milestone }) =
         proposalId: milestone.proposalId,
         milestoneId: milestone.id,
         transactionHash,
+        paymentId: payment.id,
       })
 
       invalidateQuery(getProposalById)
@@ -127,6 +128,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, payment, milestone }) =
         proposalId: milestone.proposalId,
         milestoneId: milestone.id,
         transactionHash: transaction.hash,
+        paymentId: payment.id,
       })
 
       // the `txnHash` state is required to enable the useWaitForTransaction hook in the parent page
@@ -135,7 +137,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, payment, milestone }) =
       setTxnHash(transaction.hash)
     } catch (e) {
       setIsLoading(false)
-      console.error(e)
+      console.error("errror", e)
       let message = "Something went wrong."
       if (e.name == "ConnectorNotFoundError") {
         message = "Please reset wallet connection.\n(ConnectorNotFoundError)"
@@ -274,9 +276,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, payment, milestone }) =
                   selectedTab === Tab.DIRECT_PAYMENT && "border-b mb-[-1px] font-bold"
                 } cursor-pointer`}
                 onClick={() => {
-                  console.log(isOpen)
                   setSelectedTab(Tab.DIRECT_PAYMENT)
-                  console.log(isOpen)
                 }}
               >
                 Direct payment

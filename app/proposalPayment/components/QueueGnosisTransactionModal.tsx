@@ -3,7 +3,7 @@ import { useState } from "react"
 import Modal from "app/core/components/Modal"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useGnosisSignature from "app/core/hooks/useGnosisSignature"
-import updatePayment from "app/proposalPayment/mutations/updatePayment"
+import addPaymentAttempt from "app/proposalPayment/mutations/addPaymentAttempt"
 import useStore from "app/core/hooks/useStore"
 import { Field, Form } from "react-final-form"
 import { useNetwork } from "wagmi"
@@ -30,7 +30,7 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone, paym
 
   const [selectedTab, setSelectedTab] = useState<Tab>(Tab.QUEUE_PAYMENT)
 
-  const [updatePaymentMutation] = useMutation(updatePayment, {
+  const [addPaymentAttemptMutation] = useMutation(addPaymentAttempt, {
     onSuccess: (data) => {},
     onError: (error) => {
       console.error(error)
@@ -53,6 +53,7 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone, paym
       await saveTransactionHashToPaymentsMutation({
         proposalId: milestone.proposalId,
         milestoneId: milestone.id,
+        paymentId: payment.id,
         transactionHash,
       })
 
@@ -109,14 +110,14 @@ export const QueueGnosisTransactionModal = ({ isOpen, setIsOpen, milestone, paym
                   setIsLoading(false)
                   throw new Error("Signature Failed")
                 }
-                await updatePaymentMutation({
+                await addPaymentAttemptMutation({
+                  paymentId: payment.id,
                   multisigTransaction: {
                     transactionId: response.txId,
                     nonce: response.detailedExecutionInfo.nonce,
                     safeTxHash: response.detailedExecutionInfo.safeTxHash,
                     address: response.safeAddress,
                   },
-                  paymentId: payment.id,
                 })
                 invalidateQuery(getMilestonesByProposal)
                 invalidateQuery(getProposalById)

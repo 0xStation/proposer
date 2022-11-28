@@ -1,15 +1,49 @@
+import Moralis from "moralis"
+import { useMutation, invoke } from "@blitzjs/rpc"
 import useStore from "app/core/hooks/useStore"
 import { getHash } from "app/signatures/utils"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { genGnosisTransactionDigest } from "app/signatures/gnosisTransaction"
 import networks from "app/utils/networks.json"
 import useSignature from "app/core/hooks/useSignature"
-import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import { getSafeContractVersion } from "../utils/getSafeContractVersion"
+import { getMoralisNetwork } from "app/core/utils/networkInfo"
+import { EvmChain } from "@moralisweb3/evm-utils"
+import { ProposalPayment } from "app/proposalPayment/types"
+import updateAccount from "app/account/mutations/updateAccount"
+import getAccountByAddress from "app/account/queries/getAccountByAddress"
 
-const useGnosisSignature = (payment) => {
+const createMoralisStream = async (
+  proposalId: string,
+  evmChain: EvmChain,
+  clientAddress: string
+) => {
+  Moralis.start({
+    apiKey: process.env.NEXT_PUBLIC_MORALIS_API_KEY,
+  })
+
+  const stream = {
+    chains: [evmChain],
+    description: `Station proposal ${proposalId}`,
+    tag: "Gnosis, Station, Proposal",
+    webhookUrl: process.env.NEXT_PUBLIC_MORALIS_WEBHOOK_URL || "",
+    includeNativeTxs: true,
+    includeInternalTxs: true,
+    includeContractLogs: true,
+  }
+
+  const createdStream = await Moralis.Streams.add(stream)
+  const { id } = createdStream.toJSON()
+  await Moralis.Streams.addAddress({ address: clientAddress, id })
+
+  // returns stream id
+  return id
+}
+
+const useGnosisSignature = (payment: ProposalPayment) => {
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
+  const [updateAccountMutation] = useMutation(updateAccount)
   const { signMessage: signMessageHook } = useSignature()
   const signMessage = async () => {
     // prompt the Metamask signature modal
@@ -29,6 +63,33 @@ const useGnosisSignature = (payment) => {
       if (data?.code) {
         console.error("Gnosis signature error: " + data?.message)
         throw Error("Gnosis signature error: " + data?.message)
+      }
+
+      const account = await invoke(getAccountByAddress, {
+        address: payment.senderAddress,
+      })
+
+      if (!account) {
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: "Proposal client has no account.",
+        })
+        return data
+      }
+
+      if (!account.moralisStreamId) {
+        const moralisStreamId = await createMoralisStream(
+          payment.proposalId,
+          getMoralisNetwork(payment.data.token.chainId),
+          payment.senderAddress
+        )
+
+        // update the account to include the moralis stream
+        await updateAccountMutation({
+          address: payment.senderAddress,
+          moralisStreamId,
+        })
       }
 
       setToastState({
