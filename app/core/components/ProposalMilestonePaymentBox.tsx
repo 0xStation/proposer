@@ -9,7 +9,7 @@ import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import PaymentAction from "./stepper/actions/PaymentAction"
 
-const PaymentRow = ({ payment, proposal, milestone }) => {
+const PaymentRow = ({ proposal, milestone, payment }) => {
   return (
     <>
       <div className="w-full flex flex-row items-end" key={payment?.id}>
@@ -39,7 +39,7 @@ const PaymentRow = ({ payment, proposal, milestone }) => {
         </span>
       </div>
       <div className="mt-4">
-        <PaymentAction proposal={proposal} milestone={milestone} />
+        <PaymentAction proposal={proposal} milestone={milestone} payment={payment} />
       </div>
     </>
   )

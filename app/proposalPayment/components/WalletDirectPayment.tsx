@@ -1,16 +1,27 @@
-import { invalidateQuery, useMutation } from "@blitzjs/rpc"
+import { invalidateQuery, invoke, useMutation } from "@blitzjs/rpc"
+import { AddressType } from "@prisma/client"
 import Button from "app/core/components/sds/buttons/Button"
 import SwitchNetworkView from "app/core/components/SwitchNetworkView"
+import { useSafeTxStatus } from "app/core/hooks/useSafeTxStatus"
 import useStore from "app/core/hooks/useStore"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
+import { getNetworkName } from "app/core/utils/networkInfo"
 import truncateString from "app/core/utils/truncateString"
 import saveTransactionHashToPayments from "app/proposal/mutations/saveTransactionToPayments"
 import getProposalById from "app/proposal/queries/getProposalById"
-import { preparePaymentTransaction } from "app/transaction/payments"
+import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
+import { preparePaymentTransaction, prepareSafeTransaction } from "app/transaction/payments"
 import { useEffect, useState } from "react"
 import { useNetwork, useSendTransaction, useWaitForTransaction } from "wagmi"
 
-export const WalletDirectPayment = ({ milestone, payment, isLoading, setIsLoading, setIsOpen }) => {
+export const WalletDirectPayment = ({
+  proposal,
+  milestone,
+  payment,
+  isLoading,
+  setIsLoading,
+  setIsOpen,
+}) => {
   const setToastState = useStore((state) => state.setToastState)
   const [txnHash, setTxnHash] = useState<string>()
   const [transactionPayload, setTransactionPayload] = useState<any>()
@@ -18,14 +29,28 @@ export const WalletDirectPayment = ({ milestone, payment, isLoading, setIsLoadin
   const { chain: activeChain } = useNetwork()
   const { sendTransactionAsync } = useSendTransaction({ mode: "recklesslyUnprepared" })
 
+  const confirmations = useSafeTxStatus(proposal, milestone, payment)
+
   useEffect(() => {
     if (payment) {
-      const payload = preparePaymentTransaction(
+      const transferPayload = preparePaymentTransaction(
         payment?.recipientAddress,
         payment?.data?.token,
         payment?.amount
       )
-      setTransactionPayload(payload)
+      if (payment.data.multisigTransaction?.type === AddressType.SAFE) {
+        // payment is to be paid by Safe
+        const transactionData = prepareSafeTransaction(transferPayload, confirmations)
+        setTransactionPayload({
+          chainId: transferPayload.chainId,
+          to: payment.data.multisigTransaction.address,
+          value: 0,
+          data: transactionData,
+        })
+      } else {
+        // payment to be paid by wallet
+        setTransactionPayload(transferPayload)
+      }
     }
   }, [payment])
 
@@ -35,6 +60,7 @@ export const WalletDirectPayment = ({ milestone, payment, isLoading, setIsLoadin
     onSuccess: async (data) => {
       try {
         invalidateQuery(getProposalById)
+        invalidateQuery(getMilestonesByProposal)
 
         setIsOpen(false)
         setToastState({
@@ -124,39 +150,44 @@ export const WalletDirectPayment = ({ milestone, payment, isLoading, setIsLoadin
         />
       ) : (
         <>
-          <h3 className="text-2xl font-bold pt-6">
-            Next, pay the Contributor for their contribution
-          </h3>
+          <h3 className="text-2xl font-bold pt-6">Pay the Contributor for their contribution</h3>
           <table className="mt-8">
             <tr>
               <th className="w-36"></th>
               <th></th>
             </tr>
             <tbody>
-              <tr className="h-12">
-                <td className="text-concrete">Pay to</td>
-                {/* TODO: ENS wrap this */}
-                <td>{truncateString(payment?.recipientAddress)}</td>
+              <tr className="h-8">
+                <td className="text-concrete">From</td>
+                <td>{truncateString(payment?.senderAddress, 5)}</td>
               </tr>
-              <tr className="h-12">
+              <tr className="h-8">
+                <td className="text-concrete">To</td>
+                <td>{truncateString(payment?.recipientAddress, 5)}</td>
+              </tr>
+              <tr className="h-8">
+                <td className="text-concrete">Network</td>
+                <td>{getNetworkName(payment?.data?.token.chainId)}</td>
+              </tr>
+              <tr className="h-8">
                 <td className="text-concrete">Token</td>
                 <td>{payment?.data?.token.symbol}</td>
               </tr>
-              <tr className="h-12">
+              <tr className="h-8">
                 <td className="text-concrete">Amount</td>
                 <td>{formatCurrencyAmount(payment?.amount.toString())}</td>
               </tr>
             </tbody>
           </table>
           <Button
-            className="mt-8"
+            className="mt-8 mb-2"
             isLoading={isLoading}
-            isDisabled={isLoading}
+            isDisabled={!transactionPayload || isLoading}
             onClick={() => initiatePayment()}
           >
             Pay
           </Button>
-          <p className="text-xs mt-2">You’ll be redirected to a transaction page to confirm.</p>
+          <p className="text-xs">You’ll be redirected to a transaction page to confirm.</p>
         </>
       )}
     </>

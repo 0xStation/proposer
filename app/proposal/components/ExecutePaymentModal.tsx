@@ -7,7 +7,7 @@ enum Tab {
   DIRECT_PAYMENT = "DIRECT_PAYMENT",
   ATTACH_TRANSACTION = "ATTACH_TRANSACTION",
 }
-export const ExecutePaymentModal = ({ isOpen, setIsOpen, payment, milestone }) => {
+export const ExecutePaymentModal = ({ isOpen, setIsOpen, proposal, milestone, payment }) => {
   const [selectedTab, setSelectedTab] = useState<Tab>(Tab.DIRECT_PAYMENT)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -39,6 +39,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, payment, milestone }) =
         {selectedTab === Tab.DIRECT_PAYMENT ? (
           <>
             <WalletDirectPayment
+              proposal={proposal}
               milestone={milestone}
               payment={payment}
               isLoading={isLoading}

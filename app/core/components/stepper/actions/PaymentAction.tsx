@@ -12,9 +12,9 @@ import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 import { getNetworkGnosisUrl } from "app/core/utils/networkInfo"
 import { useStepperStore } from "../StepperRenderer"
 import { StepType } from "../steps/Step"
+import { useSafeTxStatus } from "app/core/hooks/useSafeTxStatus"
 
-const PaymentAction = ({ proposal, milestone }) => {
-  const payment = proposal.payments?.find((payment) => payment.milestoneId === milestone.id)
+const PaymentAction = ({ proposal, milestone, payment }) => {
   const { roles: userRoles } = useGetUsersRoles(proposal.id)
   const userClientRole = userRoles.find((role) => role.type === ProposalRoleType.CLIENT)
   const userIsPayer = userClientRole
@@ -37,34 +37,11 @@ const PaymentAction = ({ proposal, milestone }) => {
   )
   const setActions = useStepperStore((state) => state.setActions)
 
-  const [gnosisTxStatus] = useQuery(
-    getGnosisTxStatus,
-    {
-      chainId: payment?.data.token.chainId || 1,
-      transactionHash: payment?.data.multisigTransaction?.safeTxHash || "",
-      proposalId: proposal.id,
-      milestoneId: milestone.id,
-    },
-    {
-      suspense: false,
-      // refetchOnWindowFocus defaults to true so switching tabs will re-trigger query for immediate response feel
-      refetchInterval: 30 * 1000, // 30 seconds, background refresh rate in-case user doesn't switch around tabs
-      enabled:
-        // payment exists
-        payment &&
-        // milestone is in progress
-        getMilestoneStatus(proposal, milestone) === ProposalMilestoneStatus.IN_PROGRESS &&
-        // payment is still pending
-        !payment.transactionHash &&
-        // payment has been queued to Gnosis
-        !!payment.data.multisigTransaction?.safeTxHash,
-    }
-  )
+  const confirmations = useSafeTxStatus(proposal, milestone, payment)
 
   useEffect(() => {
-    if (userIsSigner && gnosisTxStatus) {
+    if (userIsSigner && confirmations) {
       const quorum = userClientRole?.account?.data.quorum ?? 1
-      const confirmations = gnosisTxStatus.confirmations
       const userHasSignedGnosisSafeTx = confirmations.some((confirmation) =>
         addressesAreEqual(confirmation.owner, activeUser?.address || "")
       )
@@ -73,9 +50,9 @@ const PaymentAction = ({ proposal, milestone }) => {
         setQuorumMet(true)
       }
     }
-  }, [userIsSigner, gnosisTxStatus])
+  }, [userIsSigner, confirmations])
 
-  const paymentComplete = !!payment.transactionHash
+  const paymentComplete = !!payment?.transactionHash
 
   const actions = {
     ...(userIsPayer &&
@@ -153,18 +130,18 @@ const PaymentAction = ({ proposal, milestone }) => {
       !!payment.data.multisigTransaction &&
       !!quorumMet && {
         [ProposalRoleType.CLIENT]: (
-          <a
-            href={`${getNetworkGnosisUrl(payment.data.token.chainId)}:${
-              payment.data.multisigTransaction.address
-            }/transactions/queue`}
-            target="_blank"
-            rel="noreferrer"
+          <Button
+            type={ButtonType.Secondary}
+            onClick={() =>
+              toggleExecutePaymentModalMap({
+                open: true,
+                id: payment.id,
+              })
+            }
+            overrideWidthClassName="w-full"
           >
-            <button className="mb-2 sm:mb-0 font-bold border rounded px-4 h-[35px] text-electric-violet border-electric-violet bg-transparent hover:opacity-70 w-full">
-              Execute on Gnosis
-              <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
-            </button>
-          </a>
+            Pay
+          </Button>
         ),
       }),
   }
