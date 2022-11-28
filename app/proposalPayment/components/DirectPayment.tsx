@@ -14,7 +14,7 @@ import { preparePaymentTransaction, prepareSafeTransaction } from "app/transacti
 import { useEffect, useState } from "react"
 import { useNetwork, useSendTransaction, useWaitForTransaction } from "wagmi"
 
-export const WalletDirectPayment = ({
+export const DirectPayment = ({
   proposal,
   milestone,
   payment,

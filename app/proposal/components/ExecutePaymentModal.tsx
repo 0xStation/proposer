@@ -1,7 +1,7 @@
 import Modal from "app/core/components/Modal"
 import { useState } from "react"
 import { AttachTransactionForm } from "app/proposalPayment/components/AttachTransactionForm"
-import { WalletDirectPayment } from "app/proposalPayment/components/WalletDirectPayment"
+import { DirectPayment } from "app/proposalPayment/components/DirectPayment"
 
 enum Tab {
   DIRECT_PAYMENT = "DIRECT_PAYMENT",
@@ -38,7 +38,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, proposal, milestone, pa
         </div>
         {selectedTab === Tab.DIRECT_PAYMENT ? (
           <>
-            <WalletDirectPayment
+            <DirectPayment
               proposal={proposal}
               milestone={milestone}
               payment={payment}
