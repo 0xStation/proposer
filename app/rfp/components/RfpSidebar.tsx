@@ -70,6 +70,13 @@ export const RfpSidebar = () => {
           ) : (
             <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
           )}
+          {rfp?.data?.content?.title &&
+            router.pathname === Routes.ProposalRfpForm({ rfpId }).pathname && (
+              <>
+                <span className="text-concrete">&nbsp;/&nbsp;</span>
+                <span className="text-marble-white cursor-default">New proposal</span>
+              </>
+            )}
         </nav>
         {/* PILLS */}
         {rfp ? (
