@@ -88,7 +88,7 @@ const Home: BlitzPage = () => {
                 key={rfp.id}
                 account={rfp.account as Account}
                 rfp={rfp as Rfp}
-                href={Routes.ProposalRfpForm({
+                href={Routes.RfpDetail({
                   rfpId: rfp?.id,
                 })}
               />
@@ -99,7 +99,7 @@ const Home: BlitzPage = () => {
               key={rfp.id}
               account={rfp.account as Account}
               rfp={rfp as Rfp}
-              href={Routes.ProposalRfpForm({
+              href={Routes.RfpDetail({
                 rfpId: rfp?.id,
               })}
             />
@@ -123,33 +123,36 @@ const Home: BlitzPage = () => {
         />
       )}
       <main
-        className="bg-cover bg-center bg-no-repeat h-full"
+        className="bg-cover bg-center bg-no-repeat h-screen w-screen"
         style={{ backgroundImage: "url('/bg-hero-landing.webp')" }}
       >
-        <div className="h-full mx-56">
+        <div className="h-full mx-10 lg:mx-56">
           <div className="flex flex-col">
             <h1
               aria-label="Propose to collaborate"
-              className="text-center mt-20 font-bold bg-transparent text-marble-white text-4xl"
+              className="h-[80px] md:h-fit text-center mt-20 font-bold bg-transparent text-marble-white text-4xl"
             >
               Propose to&nbsp;
-              <span className="typewriter nocaret" />
+              <span className="hidden md:inline typewriter nocaret" />
+              <p className="block md:hidden">
+                <span className="typewriter nocaret" />
+              </p>
             </h1>
-            <div className="h-16 mt-11 w-[733px] mx-auto rounded">
+            <div className="hidden md:block h-fit w-fit md:h-16 mt-11 md:w-[733px] mx-auto rounded">
               <input
                 ref={searchRef}
                 className="outline-concrete rounded-r-none pl-3 bg-wet-concrete-50 border border-wet-concrete h-full w-[75%] inline rounded placeholder:text-lg"
                 placeholder="Enter a recipient’s wallet address or an ENS name"
               />
               <Button
-                className="rounded-l-none text-lg"
+                className="md:rounded-l-none text-lg mx-auto"
                 overrideHeightClassName="h-16"
-                overrideWidthClassName="w-[25%] mt-3 px-3"
+                overrideWidthClassName="w-full md:w-[25%] mt-3 px-3"
                 onClick={() =>
                   router.push(
                     Routes.ProposalNewFunding({
-                      clients: searchRef?.current?.value,
-                      contributors: searchRef?.current?.value,
+                      client: searchRef?.current?.value,
+                      contributor: searchRef?.current?.value,
                     })
                   )
                 }
@@ -158,8 +161,8 @@ const Home: BlitzPage = () => {
               </Button>
             </div>
           </div>
-          <div className="my-10 px-6 mx-auto w-[600px] py-3 bg-wet-concrete-50 flex flex-row rounded items-center justify-between">
-            <p>You can now also put a call out for contributors.</p>
+          <div className="hidden my-10 px-6 mx-auto md:w-[600px] py-3 md:bg-wet-concrete-50 md:flex flex-row rounded items-center md:justify-between">
+            <p className="inline">You can now also put a call out for contributors.</p>
             <Button
               onClick={() => {
                 if (!session.siwe?.address) {
@@ -176,8 +179,8 @@ const Home: BlitzPage = () => {
           </div>
 
           <div className="mt-14">
-            <h2 className="text-2xl font-bold mb-3">Propose to collaborate</h2>
-            <div className="flex flex-row flex-wrap gap-x-2 gap-y-2">
+            <h2 className="hidden md:block text-2xl font-bold mb-3">Propose to collaborate</h2>
+            <div className="hidden md:flex flex-row flex-wrap gap-x-2 gap-y-2">
               {accounts
                 ? accounts?.map((account) => (
                     <div
@@ -185,7 +188,13 @@ const Home: BlitzPage = () => {
                       tabIndex={0}
                       className="rounded-full bg-wet-concrete-50 p-3 w-fit hover:bg-wet-concrete cursor-pointer"
                     >
-                      <AccountMediaObject account={account} shouldLinkToProposalPage={true} />
+                      <AccountMediaObject
+                        account={account}
+                        href={Routes.ProposalNewFunding({
+                          client: account?.address,
+                          contributor: account?.address,
+                        })}
+                      />
                     </div>
                   ))
                 : Array.from(Array(10)).map((idx) => (
@@ -197,11 +206,11 @@ const Home: BlitzPage = () => {
             </div>
           </div>
 
-          <div className="mt-14">
+          <div className="mt-4 md:mt-14">
             <div className="flex flex-row justify-between">
               <h2 className="text-2xl mb-3 font-bold">Open RFPs for work</h2>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 sm:gap-2 md:gap-4 lg:gap-6 gap-1">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 lg:gap-6 gap-3">
               {rfpCards}
             </div>
             {/* a buffer for the end of the infinite scroll */}

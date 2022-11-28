@@ -18,6 +18,7 @@ type ListboxComponentProps = {
   onChange: (item: ListboxItem) => boolean
   defaultValue: ListboxItem | undefined
   error?: ListboxError
+  className?: string
 }
 
 const defaultListboxItem = {
@@ -25,7 +26,13 @@ const defaultListboxItem = {
   name: "string",
 }
 
-const CustomListbox = ({ items, onChange, defaultValue, error }: ListboxComponentProps) => {
+const CustomListbox = ({
+  items,
+  onChange,
+  defaultValue,
+  error,
+  className = "",
+}: ListboxComponentProps) => {
   const [selected, setSelected] = useState<ListboxItem>(
     defaultValue || items[0] || defaultListboxItem
   )
@@ -50,7 +57,7 @@ const CustomListbox = ({ items, onChange, defaultValue, error }: ListboxComponen
             error
               ? "border-torch-red bg-torch-red text-tunnel-black"
               : "border-marble-white text-marble-white"
-          }`}
+          } ${className}`}
         >
           <Listbox.Button className="relative w-full cursor-default h-[35px] pl-3 pr-10 text-left shadow-md focus:outline-none sm:text-sm">
             <span className="block truncate font-bold text-base">

@@ -28,11 +28,11 @@ import deleteProposalById from "app/proposal/mutations/deleteProposalById"
 import { generateMilestonePayments } from "app/proposal/utils"
 
 export const ProposalFormFunding = ({
-  prefillClients,
-  prefillContributors,
+  prefilledClient,
+  prefilledContributor,
 }: {
-  prefillClients: string[]
-  prefillContributors: string[]
+  prefilledClient: string
+  prefilledContributor: string
 }) => {
   const setToastState = useStore((state) => state.setToastState)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
@@ -41,9 +41,9 @@ export const ProposalFormFunding = ({
   const [proposalStep, setProposalStep] = useState<ProposalFormStep>(ProposalFormStep.PROPOSE)
   const [proposingAs, setProposingAs] = useState<string>(
     // set default proposingAs to prefilled values, choosing contributor if both provided for product bias
-    prefillClients.length > 0
+    prefilledClient
       ? ProposalRoleType.CONTRIBUTOR
-      : prefillContributors.length > 0
+      : prefilledContributor
       ? ProposalRoleType.CLIENT
       : ""
   )
@@ -136,8 +136,8 @@ export const ProposalFormFunding = ({
       <Form
         initialValues={{
           proposingAs: proposingAs || "",
-          client: prefillClients?.[0] || "",
-          contributor: prefillContributors?.[0] || "",
+          client: prefilledClient || "",
+          contributor: prefilledContributor || "",
         }}
         onSubmit={async (values: any, form) => {
           let contributorAddress

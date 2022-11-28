@@ -40,9 +40,9 @@ const Explore: BlitzPage = () => {
   )
 
   return (
-    <div className="h-[calc(100vh-240px)] p-10 flex-1">
+    <div className="h-full md:h-[calc(100vh-240px)] p-10 flex-1">
       <h1 className="font-bold text-2xl">Explore</h1>
-      <div className="flex flex-row mb-4 border-b border-concrete sm:flex-row justify-between">
+      <div className="flex flex-row mb-4 border-b border-concrete md:flex-row justify-between">
         {/* Tabs */}
         <div className="self-end flex flex-row space-x-4">
           <span

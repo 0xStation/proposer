@@ -16,7 +16,7 @@ const RfpPreCreateModal = dynamic(() => import("app/rfp/components/RfpPreCreateM
 })
 
 const ProposalTypeSelection: BlitzPage = () => {
-  const { clients, contributors } = useRouter().query
+  const { client, contributor } = useRouter().query
   const session = useSession({ suspense: false })
   const [isRfpPreCreateModalOpen, setIsRfpPreCreateModalOpen] = useState<boolean>(false)
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
@@ -34,8 +34,8 @@ const ProposalTypeSelection: BlitzPage = () => {
         {/* REQUEST FUNDING */}
         <Link
           href={Routes.ProposalNewFunding({
-            clients: clients as string,
-            contributors: contributors as string,
+            client: client as string,
+            contributor: contributor as string,
           })}
         >
           <div className="w-[383px] mb-3 sm:mr-3 rounded-md overflow-hidden bg-charcoal border border-wet-concrete hover:bg-wet-concrete cursor-pointer">

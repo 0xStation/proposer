@@ -1,16 +1,13 @@
 import Link from "next/link"
-import Image from "next/image"
 import { Routes, useParam } from "@blitzjs/next"
 import { RfpStatus } from "@prisma/client"
-import BackIcon from "/public/back-icon.svg"
 import TextLink from "app/core/components/TextLink"
 import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
-import { WorkspaceTab } from "pages/workspace/[accountAddress]"
 import RfpStatusPill from "./RfpStatusPill"
 import Button from "app/core/components/sds/buttons/Button"
 import ReadMore from "app/core/components/ReadMore"
 import { toTitleCase } from "app/core/utils/titleCase"
-import { getPaymentAmountDetails, paymentDetailsString } from "../utils"
+import { getPaymentAmountDetails } from "../utils"
 import { paymentTermsString } from "app/proposal/utils"
 import LookingForPill from "./LookingForPill"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
@@ -44,13 +41,12 @@ export const RfpSidebar = () => {
   const router = useRouter()
 
   return (
-    <div className="h-full w-[380px] overflow-y-scroll p-6 border-r border-concrete">
-      <div className="flex flex-col pb-6 space-y-6">
+    <div className="h-full w-full md:w-[380px] overflow-y-scroll px-6 pt-6 md:p-6 md:border-r md:border-concrete">
+      <div className="flex flex-col pt-2 md:pb-6 space-y-6">
         <nav>
           <Link
-            href={Routes.WorkspaceHome({
+            href={Routes.WorkspaceRfps({
               accountAddress: rfp?.accountAddress as string,
-              tab: WorkspaceTab.RFPS,
             })}
           >
             <span className="text-concrete cursor-pointer hover:text-concrete">RFPs</span>
@@ -101,7 +97,7 @@ export const RfpSidebar = () => {
         <RfpReward rfpProposalPayment={rfp?.data?.proposal?.payment} />
         <RfpSchedule status={rfp?.status} startDate={rfp?.startDate} endDate={rfp?.endDate} />
         {/* CTA */}
-        <div className="mb-10 relative group">
+        <div className="mb-10 hidden md:relative group">
           {/* Hide "Propose" button when showing the proposal creation form  */}
           {router.pathname !== Routes.ProposalRfpForm({ rfpId }).pathname && (
             <Button
@@ -112,7 +108,7 @@ export const RfpSidebar = () => {
                   })
                 )
               }
-              className="w-full"
+              className="w-full hidden md:block"
               isDisabled={rfp?.status === RfpStatus.CLOSED}
             >
               Propose
@@ -125,7 +121,7 @@ export const RfpSidebar = () => {
           )}
         </div>
         {/* METADATA */}
-        <div className="pt-6 flex flex-col space-y-6">
+        <div className="pt-0 md:pt-6 flex flex-col space-y-6">
           {/* ACCOUNT */}
           {rfp?.account && (
             <div>

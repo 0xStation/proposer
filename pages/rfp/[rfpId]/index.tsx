@@ -177,7 +177,7 @@ const RfpDetail: BlitzPage = () => {
           />
         ))}
       {proposals && proposals.length === 0 && (
-        <div className="w-full h-3/4 flex items-center flex-col sm:justify-center sm:mt-0">
+        <div className="w-full h-3/4 flex items-center flex-col mt-10 sm:justify-center sm:mt-0">
           <p className="text-2xl font-bold w-1/3 text-center">This RFP has no proposals yet</p>
         </div>
       )}
