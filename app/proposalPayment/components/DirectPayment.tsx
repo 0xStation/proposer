@@ -2,10 +2,13 @@ import { invalidateQuery, invoke, useMutation } from "@blitzjs/rpc"
 import { AddressType } from "@prisma/client"
 import Button from "app/core/components/sds/buttons/Button"
 import SwitchNetworkView from "app/core/components/SwitchNetworkView"
+import TextLink from "app/core/components/TextLink"
 import { useSafeTxStatus } from "app/core/hooks/useSafeTxStatus"
 import useStore from "app/core/hooks/useStore"
+import LinkArrow from "app/core/icons/LinkArrow"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
-import { getNetworkName } from "app/core/utils/networkInfo"
+import { getTransactionLink } from "app/core/utils/getTransactionLink"
+import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
 import truncateString from "app/core/utils/truncateString"
 import saveTransactionHashToPayments from "app/proposal/mutations/saveTransactionToPayments"
 import getProposalById from "app/proposal/queries/getProposalById"
@@ -21,6 +24,7 @@ export const DirectPayment = ({
   isLoading,
   setIsLoading,
   setIsOpen,
+  setTabAttachTransaction,
 }) => {
   const setToastState = useStore((state) => state.setToastState)
   const [txnHash, setTxnHash] = useState<string>()
@@ -186,19 +190,41 @@ export const DirectPayment = ({
               </tr>
             </tbody>
           </table>
-          <Button
-            className="mt-8 mb-2"
-            isLoading={isLoading || (!!payment?.data?.multisigTransaction && isSafeTxStatusLoading)}
-            isDisabled={
-              !transactionPayload ||
-              isLoading ||
-              (!!payment?.data?.multisigTransaction && (isSafeTxStatusLoading || isNonceBlocked))
-            }
-            onClick={() => initiatePayment()}
-          >
-            Pay
-          </Button>
-          <p className="text-xs">You’ll be redirected to a transaction page to confirm.</p>
+          <div className="text-right">
+            <Button
+              className="mt-8 mb-2"
+              isLoading={
+                isLoading || (!!payment?.data?.multisigTransaction && isSafeTxStatusLoading)
+              }
+              isDisabled={
+                !transactionPayload ||
+                isLoading ||
+                (!!payment?.data?.multisigTransaction && (isSafeTxStatusLoading || isNonceBlocked))
+              }
+              onClick={() => initiatePayment()}
+            >
+              Pay
+            </Button>
+            {!txnHash ? (
+              <>
+                <p className="text-xs">You’ll be redirected to a transaction page to confirm.</p>
+                <p className="text-xs">
+                  Already paid?{" "}
+                  <button onClick={setTabAttachTransaction}>
+                    <span className="text-electric-violet">Paste a transaction link</span>
+                  </button>
+                  .
+                </p>
+              </>
+            ) : (
+              <p className="text-xs">
+                Executing the transaction.{" "}
+                <TextLink url={getTransactionLink(payment.data.token.chainId, txnHash)}>
+                  View on Explorer
+                </TextLink>{" "}
+              </p>
+            )}
+          </div>
         </>
       )}
     </>

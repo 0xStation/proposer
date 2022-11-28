@@ -45,18 +45,10 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, proposal, milestone, pa
               isLoading={isLoading}
               setIsLoading={setIsLoading}
               setIsOpen={setIsOpen}
+              setTabAttachTransaction={() => {
+                setSelectedTab(Tab.ATTACH_TRANSACTION)
+              }}
             />
-            <p className="text-xs">
-              Already paid?{" "}
-              <button
-                onClick={() => {
-                  setSelectedTab(Tab.ATTACH_TRANSACTION)
-                }}
-              >
-                <span className="text-electric-violet">Paste a transaction link</span>
-              </button>
-              .
-            </p>
           </>
         ) : (
           <AttachTransactionForm

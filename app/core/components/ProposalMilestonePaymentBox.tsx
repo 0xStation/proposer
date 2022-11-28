@@ -8,6 +8,8 @@ import { Proposal } from "app/proposal/types"
 import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import PaymentAction from "./stepper/actions/PaymentAction"
+import { getTransactionLink } from "../utils/getTransactionLink"
+import TextLink from "./TextLink"
 
 const PaymentRow = ({ proposal, milestone, payment }) => {
   return (
@@ -25,16 +27,9 @@ const PaymentRow = ({ proposal, milestone, payment }) => {
         </span>
         <span className="basis-28 mb-2">
           {payment.transactionHash && (
-            <a
-              className="text-sm text-electric-violet"
-              target="_blank"
-              href={`${getNetworkExplorer(payment.data.token.chainId)}/tx/${
-                payment.transactionHash
-              }`}
-              rel="noreferrer"
-            >
+            <TextLink url={getTransactionLink(payment.data.token.chainId, payment.transactionHash)}>
               See transaction
-            </a>
+            </TextLink>
           )}
         </span>
       </div>

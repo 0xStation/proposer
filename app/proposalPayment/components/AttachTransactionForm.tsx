@@ -95,7 +95,7 @@ export const AttachTransactionForm = ({
                   </>
                 )}
               </Field>
-              <div className="mt-16 mb-11">
+              <div className="mt-16 mb-11 text-right">
                 <Button
                   isLoading={isLoading}
                   isDisabled={formState.invalid || isLoading}
