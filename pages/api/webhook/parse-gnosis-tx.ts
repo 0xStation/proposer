@@ -21,7 +21,6 @@ const fetchGnosisNonce = async (chainId: string, targetAddress: string) => {
 export default api(async function handler(req: NextApiRequest, res: NextApiResponse) {
   const response = req.body
   const streamId = response.streamId
-  console.log(response)
 
   // eventually look for error logs as well
   const gnosisTxSuccessEventLog = response.logs.find(
@@ -71,8 +70,12 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
   }
 
   // webhook might be responding to transaction that is not a station transaction
-  // because we cannot find it
-  if (!mostRecentPaymentAttempt || !payment) {
+  // because we cannot find it. Or, the tx is not in queued state, so we dont want to change it.
+  if (
+    !mostRecentPaymentAttempt ||
+    !payment ||
+    mostRecentPaymentAttempt.status !== ProposalPaymentStatus.QUEUED
+  ) {
     return res.end()
   }
 
@@ -94,8 +97,7 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
       }
     }
   } else {
-    // probably want to save the transaction hash here as well, in order to track the transaction
-    // even though it was "rejected" it still has a transaction confirmation
+    // probably want to make sure the most recent is queued and not success
     await db.proposalPayment.update({
       where: { id: payment.id },
       data: {
