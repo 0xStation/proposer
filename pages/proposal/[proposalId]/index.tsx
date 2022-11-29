@@ -21,7 +21,7 @@ import { useRouter } from "next/router"
 
 export const ToolTip = ({ children }) => {
   return (
-    <div className="bg-wet-concrete invisible group-hover:visible inline rounded p-2 mr-1.5">
+    <div className="hidden bg-wet-concrete invisible group-hover:visible md:inline rounded p-2 mr-1.5">
       {children}
     </div>
   )
@@ -92,7 +92,7 @@ const ViewProposal: BlitzPage = () => {
       {activeUserIsAuthor ? (
         proposal?.status === ProposalStatus.DRAFT ||
         proposal?.status === ProposalStatus.AWAITING_APPROVAL ? (
-          <div className="relative group float-right mt-5">
+          <div className="relative group float-right mt-5 mr-2 md:mr-0">
             <ToolTip>Only you as the author can edit your proposal.</ToolTip>
             <button
               onClick={() => {
@@ -103,26 +103,28 @@ const ViewProposal: BlitzPage = () => {
             </button>
           </div>
         ) : (
-          <div className="relative group float-right mt-5">
+          <div className="relative group float-right mt-5 mr-2 md:mr-0">
             <ToolTip>You can only edit the proposal before approval.</ToolTip>
             <EditIcon disabled={true}>Edit Proposal</EditIcon>
           </div>
         )
       ) : (
         activeUsersRoles?.length > 0 && (
-          <div className="relative group float-right mt-5">
+          <div className="relative group float-right mt-5 mr-2 md:mr-0">
             <ToolTip>Currently, only the author can edit the proposal.</ToolTip>
             <EditIcon disabled={true}>Edit Proposal</EditIcon>
           </div>
         )
       )}
-      <ReadMore className="mt-12 mb-9">{proposal?.data?.content?.body}</ReadMore>
+      <ReadMore className="mt-12 mb-9 mx-6 md:mx-0">{proposal?.data?.content?.body}</ReadMore>
       <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" />
       {(proposal?.data.totalPayments || []).length > 0 && (
         <TotalPaymentView proposal={proposal!} className="mt-9" />
       )}
       {canRead && (
-        <h3 className="text-concrete text-xs uppercase font-bold mb-2 mt-12">Comments</h3>
+        <h3 className="text-concrete text-xs uppercase font-bold mb-2 mt-12 mx-6 md:mx-0">
+          Comments
+        </h3>
       )}
       {proposal?.comments && proposal.comments.length === 0 ? (
         <CommentEmptyState proposal={proposal} setProposalQueryData={setProposalQueryData} />

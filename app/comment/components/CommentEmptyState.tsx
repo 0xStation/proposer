@@ -8,7 +8,7 @@ const CommentEmptyState = ({ proposal, setProposalQueryData }) => {
   const { canRead, canWrite } = useCommentPermissions(proposal?.id)
   const [showNewThread, setShowNewThread] = useState(false)
   return (
-    <div className="h-[300px]">
+    <div className="h-[300px] mx-6 md:mx-0 text-center">
       {!showNewThread && canRead && (
         <div className="flex h-full flex-col items-center justify-center">
           <span className="font-bold mb-4 text-xl">

@@ -25,7 +25,10 @@ const ProposalStepper = () => {
   const userRoleTypes = userRoles.map((role) => role.type)
 
   return (
-    <StepperRenderer activeUserRoles={userRoleTypes} className="absolute right-[-340px] top-0">
+    <StepperRenderer
+      activeUserRoles={userRoleTypes}
+      className="hidden md:block absolute right-[-340px] top-0"
+    >
       {proposal && (
         <>
           <SendStep proposal={proposal} />
