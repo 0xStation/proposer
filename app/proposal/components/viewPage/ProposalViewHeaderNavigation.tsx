@@ -124,7 +124,7 @@ export const ProposalViewHeaderNavigation = () => {
           proposal={proposal}
         />
       )}
-      <div className="w-full min-h-64 relative">
+      <div className="w-full min-h-64 relative px-6 md:px-0">
         <div className="mt-6 flex flex-row">
           {rfp ? (
             <nav>
@@ -228,8 +228,8 @@ export const ProposalViewHeaderNavigation = () => {
           {proposal && <CopyBtn textToWrite={currentPageUrl} />}
         </div>
         {/* TABS */}
-        <div className="mt-12 self-end flex flex-row space-x-4 border-b border-concrete">
-          <ul className="flex flex-row">
+        <div className="mt-12 self-end flex flex-row space-x-4 border-b border-concrete -mx-6 md:mx-0">
+          <ul className="flex flex-row ml-6 md:ml-0">
             <Tab router={router} route={Routes.ViewProposal({ proposalId })}>
               Proposal
             </Tab>

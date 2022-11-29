@@ -7,16 +7,18 @@ import Avatar from "app/core/components/sds/images/avatar"
 import CopyToClipboard from "./CopyToClipboard"
 import { Account } from "app/account/types"
 import DiscordIcon from "../icons/DiscordIcon"
+import { RouteUrlObject } from "blitz"
 
 const AccountMediaObject = ({
   account,
   className = "",
   showActionIcons = false,
-  shouldLinkToProposalPage = false,
+  href,
 }: {
   account: Account
   className?: string
   showActionIcons?: boolean
+  href?: string | RouteUrlObject
   shouldLinkToProposalPage?: boolean
 }) => {
   const { data: ensName } = useEnsName({
@@ -27,16 +29,7 @@ const AccountMediaObject = ({
   const [isDiscordHandleCopied, setIsDiscordHandleCopied] = useState<boolean>(false)
 
   return (
-    <Link
-      href={
-        shouldLinkToProposalPage
-          ? Routes.ProposalNewFunding({
-              clients: ensName || account?.address,
-              contributors: ensName || account?.address,
-            })
-          : Routes.WorkspaceHome({ accountAddress: account?.address as string })
-      }
-    >
+    <Link href={href || Routes.WorkspaceHome({ accountAddress: account?.address as string })}>
       <div className={`flex flex-row rounded ${className} cursor-pointer`}>
         <div className="flex flex-col content-center align-middle mr-3">
           <Avatar address={account.address as string} pfpUrl={account?.data?.pfpUrl} />

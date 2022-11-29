@@ -32,7 +32,7 @@ const CommentContainer = ({ proposal, comment, setProposalQueryData }) => {
   }
 
   return (
-    <div className="border rounded-lg border-wet-concrete p-4 flex flex-col space-y-6">
+    <div className="border rounded-lg border-wet-concrete p-6 md:p-4 flex flex-col space-y-6">
       <CommentElement comment={comment} />
       {!isExpanded && comment.children.length > 0 && (
         <div>

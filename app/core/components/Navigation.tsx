@@ -9,21 +9,27 @@ import { useEffect, useMemo, useState } from "react"
 import useStore from "../hooks/useStore"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import createAccount from "app/account/mutations/createAccount"
-import ExploreImageIcon from "public/explore.svg"
 import Dropdown from "app/core/components/Dropdown"
 import Listbox from "app/core/components/Listbox"
 import { useDisconnect, useNetwork, useSwitchNetwork, useAccount, allChains } from "wagmi"
 import logout from "app/session/mutations/logout"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import truncateString from "app/core/utils/truncateString"
-import { LINKS, SUPPORTED_CHAINS, Sizes, gradientMap } from "app/core/utils/constants"
+import { LINKS, SUPPORTED_CHAINS, Sizes } from "app/core/utils/constants"
 import Avatar from "app/core/components/sds/images/avatar"
-import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 import DropdownChevronIcon from "../icons/DropdownChevronIcon"
-import { DotsHorizontalIcon, PlusIcon } from "@heroicons/react/solid"
+import { DotsHorizontalIcon, MenuAlt4Icon } from "@heroicons/react/solid"
 import NewWorkspaceModal from "app/core/components/NewWorkspaceModal"
-import { AccountAccountType } from "@prisma/client"
 import { useEnsName } from "wagmi"
+import { NavigationSidebar } from "./NavigationSidebar"
+import dynamic from "next/dynamic"
+
+const WorkspaceNavigationDrawer = dynamic(
+  () => import("app/core/components/WorkspaceNavigationDrawer"),
+  {
+    ssr: false,
+  }
+)
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
@@ -40,6 +46,7 @@ const Navigation = ({ children }: { children?: any }) => {
   // the useNetwork object weirdly doesn't have the right names, but the objects from allChains do so we convert
   const connectedChain = SUPPORTED_CHAINS.find((supportedChain) => supportedChain.id === chain?.id)
   const isChainSupported = chain ? !!connectedChain : undefined
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false)
   const [newWorkspaceModalOpen, setNewWorkspaceModalOpen] = useState<boolean>(false)
   const router = useRouter()
 
@@ -101,22 +108,41 @@ const Navigation = ({ children }: { children?: any }) => {
   return (
     <>
       {activeUser && (
+        <WorkspaceNavigationDrawer
+          isOpen={isMobileSidebarOpen}
+          setIsOpen={setIsMobileSidebarOpen}
+          account={activeUser}
+        />
+      )}
+      {activeUser && (
         <NewWorkspaceModal
           isOpen={newWorkspaceModalOpen}
           setIsOpen={setNewWorkspaceModalOpen}
           activeUser={activeUser}
         />
       )}
+      <div className="bg-wet-concrete text-sm text-center py-2 block md:hidden">
+        <p>Mobile experience is currently read-only.</p>
+        <p>Use on desktop to create proposals and RFPs.</p>
+      </div>
       <div className="w-full border-b border-concrete h-[70px] px-6 flex items-center justify-between">
-        <div className="cursor-pointer">
+        <div className={`cursor-pointer ${activeUser ? "hidden" : "block"} md:block`}>
           <Link href={Routes.Home({})}>
             <Image src={StationLogo} alt="Station logo" height={30} width={80} />
           </Link>
+        </div>
+        <div
+          className={` ${
+            activeUser ? "block" : "hidden"
+          } hover:bg-wet-concrete hover:rounded p-1 md:hidden`}
+        >
+          <MenuAlt4Icon height={25} width={25} onClick={() => setIsMobileSidebarOpen(true)} />
         </div>
         <div className="flex flex-row items-center space-x-4">
           <Button
             type={ButtonType.Secondary}
             onClick={() => router.push(Routes.ProposalTypeSelection())}
+            className="hidden md:inline"
           >
             Create
           </Button>
@@ -130,6 +156,7 @@ const Navigation = ({ children }: { children?: any }) => {
               setActiveChain?.(activeChain)
               return true
             }}
+            className="hidden md:relative"
           />
           {!address ? (
             <Button onClick={() => toggleWalletModal(true)}>Connect wallet</Button>
@@ -163,7 +190,7 @@ const Navigation = ({ children }: { children?: any }) => {
           )}
           <Dropdown
             button={
-              <DotsHorizontalIcon className="inline-block h-4 w-4 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
+              <DotsHorizontalIcon className="hidden sm:inline-block h-4 w-4 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
             }
             items={[
               { name: "Product manual", href: LINKS.PRODUCT_MANUAL },
@@ -174,96 +201,13 @@ const Navigation = ({ children }: { children?: any }) => {
           />
         </div>
       </div>
-      <div className="h-[calc(100vh-70px)] w-[70px] bg-tunnel-black border-r border-concrete fixed top-[70px] left-0 text-center flex flex-col">
-        <div className="h-full mt-4">
-          <ExploreIcon />
-          {/* if connected wallet changes from activeUser (from SIWE session), hide left nav options */}
-          {activeUser && address === activeUser?.address && (
-            <>
-              <ProfileIcon activeUser={activeUser} />
-              {activeUser?.originsOf
-                ?.filter((aa) => aa.type === AccountAccountType.PIN_WORKSPACE)
-                ?.map((aa, idx) => {
-                  return <ProfileIcon activeUser={aa.targetAccount} key={`profile-${idx}`} />
-                })}
-            </>
-          )}
-        </div>
+      <span className="hidden md:block">
+        <NavigationSidebar toggleMobileSidebar={setIsMobileSidebarOpen} />
+      </span>
+      <div className="h-full md:h-[calc(100vh-70px)] md:ml-[70px] relative overflow-y-scroll">
+        {children}
       </div>
-      <div className="h-[calc(100vh-70px)] ml-[70px] relative overflow-y-scroll">{children}</div>
     </>
-  )
-}
-
-const ProfileIcon = ({ activeUser }) => {
-  if (!activeUser) {
-    return <></>
-  }
-  const profileSelected =
-    typeof window !== "undefined" &&
-    window?.location?.pathname ===
-      genUrlFromRoute(Routes.WorkspaceHome({ accountAddress: activeUser.address }))
-
-  return (
-    <Link href={Routes.WorkspaceHome({ accountAddress: activeUser.address })}>
-      <div className="relative flex items-center justify-center group">
-        <span
-          className={`${
-            profileSelected ? "scale-100" : "scale-0 group-hover:scale-75"
-          }  absolute w-[3px] h-[46px] min-w-max left-0 rounded-r-lg inline-block mr-2 mb-4
-bg-marble-white
-transition-all duration-200 origin-left`}
-        />
-        <button
-          className={`${
-            profileSelected ? "border-marble-white" : "border-wet-concrete"
-          } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-full h-[47px] mb-4`}
-        >
-          <Image
-            src={activeUser?.data?.pfpUrl || gradientMap[parseInt(activeUser.address, 16) % 6]}
-            alt="Account profile picture. If no profile picture is set, there is a blue to green linear gradient."
-            height={46}
-            width={46}
-          />
-        </button>
-      </div>
-    </Link>
-  )
-}
-
-const NewWorkspaceIcon = ({ onClick }) => {
-  return (
-    <button
-      className={`bg-wet-concrete hover:border-marble-white border-wet-concrete inline-flex overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg h-[47px] w-[47px] mb-4 items-center justify-center`}
-      onClick={() => onClick(true)}
-    >
-      <PlusIcon className="h-6 w-6" aria-hidden="true" />
-    </button>
-  )
-}
-
-const ExploreIcon = () => {
-  const exploreSelected =
-    typeof window !== "undefined" && window?.location?.pathname === Routes.Explore().pathname
-  const router = useRouter()
-  return (
-    <div className="relative flex items-center justify-center group">
-      <span
-        className={`${
-          exploreSelected ? "scale-100" : "scale-0 group-hover:scale-75"
-        }  absolute w-[3px] h-[46px] min-w-max left-0 rounded-r-lg inline-block mr-2 mb-4
-bg-marble-white
-transition-all duration-200 origin-left`}
-      />
-      <button
-        className={`${
-          exploreSelected ? "border-marble-white" : "border-wet-concrete"
-        } inline-block overflow-hidden cursor-pointer border group-hover:border-marble-white rounded-lg h-[47px] mb-4`}
-        onClick={() => router.push(Routes.Explore())}
-      >
-        <Image src={ExploreImageIcon} alt="Explore icon" height={46} width={46} />
-      </button>
-    </div>
   )
 }
 
