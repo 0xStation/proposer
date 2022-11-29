@@ -49,12 +49,12 @@ export const DirectPayment = ({
         payment?.data?.token,
         payment?.amount
       )
-      if (mostRecentPaymentAttempt.multisigTransaction?.type === AddressType.SAFE) {
+      if (mostRecentPaymentAttempt?.multisigTransaction?.type === AddressType.SAFE) {
         // payment is to be paid by Safe
         const transactionData = prepareSafeTransaction(transferPayload, confirmations)
         setTransactionPayload({
           chainId: transferPayload.chainId,
-          to: mostRecentPaymentAttempt.multisigTransaction.address,
+          to: mostRecentPaymentAttempt?.multisigTransaction.address,
           value: 0,
           data: transactionData,
         })
