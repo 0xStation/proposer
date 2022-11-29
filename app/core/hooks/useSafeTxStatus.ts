@@ -3,16 +3,18 @@ import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
 import { getMilestoneStatus } from "app/proposalMilestone/utils"
 import { ProposalPaymentStatus } from "app/proposalPayment/types"
+import { getMostRecentPaymentAttempt } from "app/proposalPayment/utils"
 import { useSafeMetadata } from "./useSafeMetadata"
 
 export const useSafeTxStatus = (proposal, milestone, payment) => {
-  const address = payment?.data.multisigTransaction?.address
-  const addressType = payment?.data.multisigTransaction?.type
+  const mostRecentPaymentAttempt = getMostRecentPaymentAttempt(payment)
+
+  const address = mostRecentPaymentAttempt?.multisigTransaction?.address
+  const addressType = mostRecentPaymentAttempt?.multisigTransaction?.type
   const chainId = payment?.data.token.chainId || 1
 
   const safeMetadata = useSafeMetadata(address, addressType, chainId)
 
-  const mostRecentPaymentAttempt = payment.data?.history?.[payment.data.history.length - 1]
   const [gnosisTxStatus] = useQuery(
     getGnosisTxStatus,
     {

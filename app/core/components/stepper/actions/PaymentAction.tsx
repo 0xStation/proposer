@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useQuery } from "@blitzjs/rpc"
+import { ProposalRoleType, AddressType } from "@prisma/client"
 import { ArrowRightIcon } from "@heroicons/react/solid"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
@@ -12,11 +13,10 @@ import { ProposalPayment, ProposalPaymentStatus } from "app/proposalPayment/type
 import { StepType } from "../steps/Step"
 import { useSafeTxStatus } from "app/core/hooks/useSafeTxStatus"
 import TextLink from "../../TextLink"
-
-import { ProposalRoleType, AddressType } from "@prisma/client"
+import { getMostRecentPaymentAttempt } from "app/proposalPayment/utils"
 
 const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true }) => {
-  const mostRecentPaymentAttempt = payment.data?.history?.[payment.data.history.length - 1]
+  const mostRecentPaymentAttempt = getMostRecentPaymentAttempt(payment)
   const { roles: userRoles } = useGetUsersRoles(proposal.id)
   const userClientRole = userRoles.find((role) => role.type === ProposalRoleType.CLIENT)
   const userIsPayer = userClientRole
@@ -159,7 +159,7 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
                 This transaction is blocked by other pending transactions.{" "}
                 <TextLink
                   url={`${getNetworkGnosisUrl(payment.data.token.chainId)}:${
-                    payment.data.multisigTransaction.address
+                    payment.senderAddress
                   }/transactions/queue`}
                 >
                   Execute them on Gnosis

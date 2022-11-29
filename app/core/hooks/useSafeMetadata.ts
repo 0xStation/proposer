@@ -3,6 +3,7 @@ import { AddressType } from "@prisma/client"
 import getSafeMetadata from "app/account/queries/getSafeMetadata"
 
 export const useSafeMetadata = (address, addressType, chainId) => {
+  console.log(address, addressType, chainId)
   const safeQueryEnabled = !!address && addressType === AddressType.SAFE && !!chainId
   const [safeMetadata] = useQuery(
     getSafeMetadata,

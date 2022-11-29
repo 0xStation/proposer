@@ -14,8 +14,11 @@ import PaymentAction from "./stepper/actions/PaymentAction"
 import { getTransactionLink } from "../utils/getTransactionLink"
 import TextLink from "./TextLink"
 import { formatDate } from "app/core/utils/formatDate"
+import { getMostRecentPaymentAttempt } from "app/proposalPayment/utils"
 
 const PaymentRow = ({ proposal, milestone, payment }) => {
+  const mostRecentPaymentAttempt = getMostRecentPaymentAttempt(payment)
+
   return (
     <div>
       <div className="w-full flex flex-row items-end" key={payment?.id}>
@@ -30,8 +33,13 @@ const PaymentRow = ({ proposal, milestone, payment }) => {
           {formatCurrencyAmount(payment?.amount?.toString())}
         </span>
         <span className="basis-28 mb-2">
-          {payment.transactionHash && (
-            <TextLink url={getTransactionLink(payment.data.token.chainId, payment.transactionHash)}>
+          {mostRecentPaymentAttempt?.transactionHash && (
+            <TextLink
+              url={getTransactionLink(
+                payment.data.token.chainId,
+                mostRecentPaymentAttempt.transactionHash
+              )}
+            >
               See transaction
             </TextLink>
           )}

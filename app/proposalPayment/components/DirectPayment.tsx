@@ -16,6 +16,7 @@ import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestones
 import { preparePaymentTransaction, prepareSafeTransaction } from "app/transaction/payments"
 import { useEffect, useState } from "react"
 import { useNetwork, useSendTransaction, useWaitForTransaction } from "wagmi"
+import { getMostRecentPaymentAttempt } from "../utils"
 
 export const DirectPayment = ({
   proposal,
@@ -39,6 +40,8 @@ export const DirectPayment = ({
     isLoading: isSafeTxStatusLoading,
   } = useSafeTxStatus(proposal, milestone, payment)
 
+  const mostRecentPaymentAttempt = getMostRecentPaymentAttempt(payment)
+
   useEffect(() => {
     if (payment) {
       const transferPayload = preparePaymentTransaction(
@@ -46,12 +49,12 @@ export const DirectPayment = ({
         payment?.data?.token,
         payment?.amount
       )
-      if (payment.data.multisigTransaction?.type === AddressType.SAFE) {
+      if (mostRecentPaymentAttempt.multisigTransaction?.type === AddressType.SAFE) {
         // payment is to be paid by Safe
         const transactionData = prepareSafeTransaction(transferPayload, confirmations)
         setTransactionPayload({
           chainId: transferPayload.chainId,
-          to: payment.data.multisigTransaction.address,
+          to: mostRecentPaymentAttempt.multisigTransaction.address,
           value: 0,
           data: transactionData,
         })
