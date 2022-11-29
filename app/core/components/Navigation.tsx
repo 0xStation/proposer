@@ -156,7 +156,7 @@ const Navigation = ({ children }: { children?: any }) => {
               setActiveChain?.(activeChain)
               return true
             }}
-            className="hidden md:relative"
+            className="hidden md:inline relative"
           />
           {!address ? (
             <Button onClick={() => toggleWalletModal(true)}>Connect wallet</Button>
