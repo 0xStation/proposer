@@ -69,7 +69,7 @@ const RfpDetail: BlitzPage = () => {
 
   return (
     <>
-      <div className="mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-end">
+      <div className="mb-4 pb-4 flex flex-row justify-end">
         <Pagination
           results={proposals as any[]}
           resultsCount={proposalCount || 0}
@@ -80,20 +80,20 @@ const RfpDetail: BlitzPage = () => {
         />
       </div>
       {/* PROPOSALS TABLE */}
-      <table className="w-full">
+      <table className="min-w-[600px] md:w-full">
         {/* TABLE HEADERS */}
         <thead>
-          <tr className="border-b border-wet-concrete">
-            <th className="pl-4 w-96 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
+          <tr className="border-t border-b border-wet-concrete">
+            <th className="pl-4 w-96 text-xs tracking-wide uppercase text-concrete py-2 text-left">
               Title
             </th>
-            <th className="w-64 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
+            <th className="w-64 text-xs tracking-wide uppercase text-concrete py-2 text-left">
               Proposal status
             </th>
-            <th className="w-40 text-xs tracking-wide uppercase text-concrete pb-2 text-left">
+            <th className="w-40 text-xs tracking-wide uppercase text-concrete py-2 text-left">
               Payment
             </th>
-            <th className="text-xs tracking-wide uppercase text-concrete pb-2 text-left">
+            <th className="text-xs tracking-wide uppercase text-concrete py-2 text-left">
               Last updated
             </th>
             {/* title-less header for role pfps */}
