@@ -52,7 +52,7 @@ const Home: BlitzPage = () => {
         "0x8dca852d10c3CfccB88584281eC1Ef2d335253Fd", // cabindao
         "0xEAB32a423B3dA4049F1Ad379737fCf1f4F9a5137", // radicle
         "0xBb398Fd83126500E3f0afec6d4c69411576bc7FB", // blurryjpeg
-        "0x6Bf1CA007aBC7eFebAe284b31e690782A6d3e850", // the symmetrical
+        "0xf60B82309D90c0c90826266aaa22b00322C2f632", // the symmetrical
       ],
     },
     { suspense: false }
@@ -188,13 +188,7 @@ const Home: BlitzPage = () => {
                       tabIndex={0}
                       className="rounded-full bg-wet-concrete-50 p-3 w-fit hover:bg-wet-concrete cursor-pointer"
                     >
-                      <AccountMediaObject
-                        account={account}
-                        href={Routes.ProposalNewFunding({
-                          client: account?.address,
-                          contributor: account?.address,
-                        })}
-                      />
+                      <AccountMediaObject account={account} />
                     </div>
                   ))
                 : Array.from(Array(10)).map((idx) => (
