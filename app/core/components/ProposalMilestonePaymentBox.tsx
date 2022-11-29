@@ -9,11 +9,11 @@ import {
 import truncateString from "../utils/truncateString"
 import { Proposal } from "app/proposal/types"
 import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
-import { getNetworkExplorer } from "app/core/utils/networkInfo"
 import PaymentAction from "./stepper/actions/PaymentAction"
 import { getTransactionLink } from "../utils/getTransactionLink"
 import TextLink from "./TextLink"
 import { formatDate } from "app/core/utils/formatDate"
+import { convertJSDateToDateAndTime } from "app/core/utils/convertJSDateToDateAndTime"
 import { getMostRecentPaymentAttempt } from "app/proposalPayment/utils"
 
 const PaymentRow = ({ proposal, milestone, payment }) => {
@@ -22,29 +22,20 @@ const PaymentRow = ({ proposal, milestone, payment }) => {
   return (
     <div>
       <div className="w-full flex flex-row items-end" key={payment?.id}>
-        <span className="basis-32 mb-2 tracking-wider">
+        <span className="basis-36 mb-2 tracking-wider">
           {truncateString(payment?.senderAddress)}
         </span>
-        <span className="basis-32 ml-6 mb-2 tracking-wider">
+        <span className="basis-36 ml-6 mb-2 tracking-wider">
           {truncateString(payment?.recipientAddress)}
         </span>
-        <span className="basis-28 ml-6 mb-2 tracking-wider">{payment?.data?.token?.symbol}</span>
-        <span className="basis-28 ml-6 mb-2 tracking-wider">
+        <span className="basis-32 ml-6 mb-2 tracking-wider">{payment?.data?.token?.symbol}</span>
+        <span className="basis-32 ml-6 mb-2 tracking-wider">
           {formatCurrencyAmount(payment?.amount?.toString())}
         </span>
-        <span className="basis-28 mb-2">
-          {mostRecentPaymentAttempt?.transactionHash && (
-            <TextLink
-              url={getTransactionLink(
-                payment.data.token.chainId,
-                mostRecentPaymentAttempt.transactionHash
-              )}
-            >
-              See transaction
-            </TextLink>
-          )}
-        </span>
       </div>
+      {payment.data?.history.length > 0 && (
+        <h4 className="text-concrete uppercase text-xs font-bold tracking-wider my-2">History</h4>
+      )}
       <div className="space-y-4">
         {payment.data?.history?.map((attempt, idx) => {
           return (
@@ -54,12 +45,22 @@ const PaymentRow = ({ proposal, milestone, payment }) => {
                   PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP[attempt.status].bgColor
                 } w-2 rounded-l block`}
               ></span>
-              <div className="bg-wet-concrete w-full px-2 py-1 block rounded-r">
-                Transaction was{" "}
-                <span className={`${PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP[attempt.status].textColor}`}>
-                  {PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP[attempt.status].copy}
-                </span>{" "}
-                on {formatDate(new Date(attempt.timestamp))}
+              <div className="bg-wet-concrete w-full px-2 py-1 rounded-r flex flex-row items-center justify-between">
+                <span>
+                  Transaction was{" "}
+                  <span
+                    className={`${PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP[attempt.status].textColor}`}
+                  >
+                    {PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP[attempt.status].copy}
+                  </span>{" "}
+                  on {convertJSDateToDateAndTime({ timestamp: new Date(attempt.timestamp) })}
+                </span>
+                <TextLink
+                  url={getTransactionLink(payment.data.token.chainId, attempt.transactionHash)}
+                  className="text-sm text-tunnel-black"
+                >
+                  See transaction
+                </TextLink>
               </div>
             </div>
           )
@@ -115,11 +116,10 @@ export const ProposalMilestonePaymentBox = ({
         </div>
         {/* TABLE HEADER */}
         <div className=" text-concrete uppercase text-xs font-bold w-full flex flex-row items-end">
-          <span className="basis-32 mb-2 tracking-wider">From</span>
-          <span className="basis-32 ml-6 mb-2 tracking-wider">To</span>
-          <span className="basis-28 ml-6 mb-2 tracking-wider">Token</span>
-          <span className="basis-28 ml-6 mb-2 tracking-wider">Amount</span>
-          <span className="basis-28"></span>
+          <span className="basis-36 mb-2 tracking-wider">From</span>
+          <span className="basis-36 ml-6 mb-2 tracking-wider">To</span>
+          <span className="basis-32 ml-6 mb-2 tracking-wider">Token</span>
+          <span className="basis-32 ml-6 mb-2 tracking-wider">Amount</span>
         </div>
         {/* MILESTONE PAYMENTS */}
         <div className="space-y-8">

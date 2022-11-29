@@ -1,6 +1,7 @@
 export const TextLink = ({
   url,
   children,
+  className,
 }: {
   className?: string
   url: string
@@ -11,7 +12,7 @@ export const TextLink = ({
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-electric-violet font-bold"
+      className={`text-electric-violet font-bold ${className}`}
     >
       {children}
     </a>
