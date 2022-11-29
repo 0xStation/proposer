@@ -2,13 +2,16 @@ import { useEffect } from "react"
 import { ProposalStatus } from "@prisma/client"
 import useStore from "app/core/hooks/useStore"
 import { Proposal } from "app/proposal/types"
-import { ProposalMilestone } from "app/proposalMilestone/types"
+import { ProposalMilestone, ProposalMilestoneStatus } from "app/proposalMilestone/types"
 import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
 import QueueGnosisTransactionModal from "app/proposalPayment/components/QueueGnosisTransactionModal"
 import ApproveGnosisTransactionModal from "app/proposalPayment/components/ApproveGnosisTransactionModal"
 import PaymentAction from "../actions/PaymentAction"
 import { useStepperStore } from "../StepperRenderer"
 import Step, { StepStatus, StepType } from "./Step"
+import { useQuery } from "@blitzjs/rpc"
+import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
+import { getMilestoneStatus } from "app/proposalMilestone/utils"
 
 const PaymentStep = ({
   milestone,
@@ -55,6 +58,7 @@ const PaymentStep = ({
           <ExecutePaymentModal
             isOpen={executePaymentModalMap[payment.id] || false}
             setIsOpen={(open) => toggleExecutePaymentModalMap({ open, id: payment.id })}
+            proposal={proposal}
             milestone={milestone}
             payment={payment}
           />
@@ -75,7 +79,7 @@ const PaymentStep = ({
         description={milestone.data.title}
         status={status}
         isLastStep={isLastStep}
-        action={<PaymentAction proposal={proposal} milestone={milestone} />}
+        action={<PaymentAction proposal={proposal} milestone={milestone} payment={payment} />}
       />
     </>
   )

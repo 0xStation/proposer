@@ -94,17 +94,6 @@ const SafeRole = ({ role, proposal }) => {
               setIsOpen={setToggleSigners}
               role={role}
             />
-            {toggleSigners && (
-              <ul className="text-sm">
-                {(role.account.data?.signers || []).map((signer, idx) => {
-                  return (
-                    <p key={`signer-${idx}`} className="text-xs text-concrete">
-                      {truncateString(signer)}
-                    </p>
-                  )
-                })}
-              </ul>
-            )}
           </div>
         ) : (
           // Skeleton loading screen

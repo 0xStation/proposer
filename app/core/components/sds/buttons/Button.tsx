@@ -48,7 +48,7 @@ interface ButtonProps {
   /**
    * Button contents
    */
-  children: string
+  children: any
 }
 
 /**

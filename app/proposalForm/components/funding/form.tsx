@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { useSession } from "@blitzjs/auth"
 import { Routes } from "@blitzjs/next"
 import { useMutation, useQuery } from "@blitzjs/rpc"
-import { ProposalRoleType } from "@prisma/client"
+import { ProposalRoleType, TokenType } from "@prisma/client"
 import Button from "app/core/components/sds/buttons/Button"
 import FormHeaderStepper from "app/core/components/FormHeaderStepper"
 import getTokensByAccount from "app/token/queries/getTokensByAccount"
@@ -122,9 +122,14 @@ export const ProposalFormFunding = ({
       const networkTokens = getNetworkTokens(chain?.id || 1)
       // sets options for reward token dropdown. includes default tokens and
       // tokens that the user has imported to their account
-      setTokenOptions([...networkTokens, ...(savedUserTokens || [])])
+      setTokenOptions([
+        ...networkTokens,
+        ...(savedUserTokens
+          ?.filter((token) => token.chainId === chain?.id)
+          ?.filter((token) => token.type === TokenType.ERC20) || []),
+      ])
     }
-  }, [chain?.id])
+  }, [chain?.id, savedUserTokens])
 
   return (
     <div className="max-w-[580px] h-full mx-auto">

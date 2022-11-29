@@ -35,7 +35,7 @@ export const SwitchNetworkView = ({ isLoading, setIsLoading, chainId }) => {
       <p className="mt-2">You are connected to the wrong network! Click below to switch neworks.</p>
       <div className="mt-8">
         <Button
-          className="mb-8"
+          className="mb-2"
           isLoading={isLoading}
           isDisabled={isLoading}
           isSubmitType={true}
