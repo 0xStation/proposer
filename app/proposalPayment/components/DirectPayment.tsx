@@ -34,11 +34,7 @@ export const DirectPayment = ({
   const { chain: activeChain } = useNetwork()
   const { sendTransactionAsync } = useSendTransaction({ mode: "recklesslyUnprepared" })
 
-  const {
-    confirmations,
-    isNonceBlocked,
-    isLoading: isSafeTxStatusLoading,
-  } = useSafeTxStatus(proposal, milestone, payment)
+  const { confirmations } = useSafeTxStatus(proposal, milestone, payment)
 
   const mostRecentPaymentAttempt = getMostRecentPaymentAttempt(payment)
 
@@ -197,14 +193,8 @@ export const DirectPayment = ({
           <div className="text-right">
             <Button
               className="mt-8 mb-2"
-              isLoading={
-                isLoading || (!!payment?.data?.multisigTransaction && isSafeTxStatusLoading)
-              }
-              isDisabled={
-                !transactionPayload ||
-                isLoading ||
-                (!!payment?.data?.multisigTransaction && (isSafeTxStatusLoading || isNonceBlocked))
-              }
+              isLoading={isLoading}
+              isDisabled={!transactionPayload || isLoading}
               onClick={() => initiatePayment()}
             >
               Pay
