@@ -5,7 +5,7 @@ import { Proposal, ProposalMetadata } from "../types"
 import { ZodMilestone, ZodPayment } from "app/types/zod"
 import { createAccountsIfNotExist } from "app/utils/createAccountsIfNotExist"
 import { Token } from "app/token/types"
-import { PaymentTerm } from "app/proposalPayment/types"
+import { PaymentTerm, ProposalPaymentStatus } from "app/proposalPayment/types"
 
 const CreateProposal = z.object({
   rfpId: z.string().optional(),
@@ -35,7 +35,11 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     throw Error("cannot have zero authors")
   }
 
-  let paymentsProposalMetadata = {}
+  let paymentsProposalMetadata: {
+    totalPayments: any
+    paymentTerms: any
+    advancePaymentPercentage: any
+  } = {} as any
   if (params.payments) {
     // validate non-negative amounts and construct totalPayments object
     let totalPayments: Record<string, { token: Token; amount: number }> = {}
@@ -154,7 +158,10 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
                 recipientAddress: payment.recipientAddress,
                 amount: payment.amount,
                 tokenId: payment.tokenId,
-                data: { token: payment.token as Token },
+                data: {
+                  token: payment.token as Token,
+                  history: [],
+                },
               }
             }),
           },

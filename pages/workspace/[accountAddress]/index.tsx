@@ -112,6 +112,7 @@ const WorkspaceHome: BlitzPage = () => {
   )
 
   const ProposalTab = () => {
+    const router = useRouter()
     const [proposalStatusFilters, setProposalStatusFilters] = useState<Set<ProposalStatus>>(
       new Set<ProposalStatus>()
     )
@@ -156,17 +157,21 @@ const WorkspaceHome: BlitzPage = () => {
       <div className="p-10 flex-1 max-h-screen overflow-y-auto">
         <div className="flex flex-row justify-between">
           <h1 className="text-2xl font-bold">Proposals</h1>
-          <Link
-            href={Routes.ProposalTypeSelection({
-              // pre-fill for both so that if user changes toggle to reverse roles, the input address is still there
-              clients: accountEnsName || accountAddress,
-              contributors: accountEnsName || accountAddress,
-            })}
+          <Button
+            className="w-full px-10"
+            overrideWidthClassName="max-w-fit"
+            onClick={() => {
+              router.push(
+                Routes.ProposalNewFunding({
+                  // pre-fill for both so that if user changes toggle to reverse roles, the input address is still there
+                  clients: accountEnsName || accountAddress,
+                  contributors: accountEnsName || accountAddress,
+                })
+              )
+            }}
           >
-            <Button className="w-full px-10" overrideWidthClassName="max-w-fit">
-              Propose
-            </Button>
-          </Link>
+            Propose
+          </Button>
         </div>
         {/* FILTERS & PAGINATION */}
         <div className="mt-8 mb-4 border-b border-wet-concrete pb-4 flex flex-row justify-between">

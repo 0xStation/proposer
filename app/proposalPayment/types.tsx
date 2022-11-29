@@ -21,13 +21,25 @@ type AddressType = {
 
 export type ProposalPaymentMetadata = {
   token: Token
-  multisigTransaction?: {
-    type: AddressType["SAFE"]
-    address: string
-    nonce: number
-    safeTxHash: string
-    transactionId: string
-  }
+  history: {
+    status: ProposalPaymentStatus
+    timestamp: Date
+    transactionHash?: string
+    multisigTransaction?: {
+      type: AddressType
+      address: string
+      nonce: number
+      safeTxHash: string
+      transactionId: string
+    }
+  }[]
+}
+
+export enum ProposalPaymentStatus {
+  SUCCESS = "SUCCESS",
+  FAILED = "FAILED",
+  REJECTED = "REJECTED",
+  QUEUED = "QUEUED",
 }
 
 export enum PaymentTerm {

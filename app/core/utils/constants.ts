@@ -6,7 +6,7 @@ import {
   ProposalRoleApprovalStatus,
   RfpStatus,
 } from "@prisma/client"
-import { PaymentTerm } from "app/proposalPayment/types"
+import { PaymentTerm, ProposalPaymentStatus } from "app/proposalPayment/types"
 import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
 import { getNetworkCoin, getNetworkUsdc } from "./networkInfo"
 import {
@@ -83,6 +83,29 @@ export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 export const DEFAULT_PFP_URLS = {
   USER: "https://station-images.nyc3.digitaloceanspaces.com/pfp-gradient.png",
   TERMINAL: "https://station-images.nyc3.digitaloceanspaces.com/terminal-gradient.png",
+}
+
+export const PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP = {
+  [ProposalPaymentStatus.SUCCESS]: {
+    copy: "executed",
+    textColor: "text-magic-mint",
+    bgColor: "bg-magic-mint",
+  },
+  [ProposalPaymentStatus.FAILED]: {
+    copy: "failed",
+    textColor: "text-torch-red",
+    bgColor: "bg-torch-red",
+  },
+  [ProposalPaymentStatus.REJECTED]: {
+    copy: "rejected",
+    textColor: "text-torch-red",
+    bgColor: "bg-torch-red",
+  },
+  [ProposalPaymentStatus.QUEUED]: {
+    copy: "queued",
+    textColor: "text-electric-violet",
+    bgColor: "bg-electric-violet",
+  },
 }
 
 export const PROPOSAL_NEW_STATUS_DISPLAY_MAP = {
@@ -717,3 +740,6 @@ export enum AccountInitiativeStatus {
   CONTRIBUTING = "CONTRIBUTING",
   PREVIOUSLY_CONTRIBUTED = "PREVIOUSLY_CONTRIBUTED",
 }
+
+export const GNOSIS_EXECUTION_SUCCESS_EVENT_HASH =
+  "0x442e715f626346e8c54381002da614f62bee8d27386535b2521ec8540898556e"

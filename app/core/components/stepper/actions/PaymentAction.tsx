@@ -5,17 +5,17 @@ import { ProposalRoleType, AddressType } from "@prisma/client"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
 import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
-import { ProposalMilestoneStatus } from "app/proposalMilestone/types"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
-import { getMilestoneStatus } from "app/proposalMilestone/utils"
 import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
 import { getNetworkGnosisUrl } from "app/core/utils/networkInfo"
 import { useStepperStore } from "../StepperRenderer"
+import { ProposalPayment, ProposalPaymentStatus } from "app/proposalPayment/types"
 import { StepType } from "../steps/Step"
 import { useSafeTxStatus } from "app/core/hooks/useSafeTxStatus"
 import TextLink from "../../TextLink"
 
 const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true }) => {
+  const mostRecentPaymentAttempt = payment.data?.history?.[payment.data.history.length - 1]
   const { roles: userRoles } = useGetUsersRoles(proposal.id)
   const userClientRole = userRoles.find((role) => role.type === ProposalRoleType.CLIENT)
   const userIsPayer = userClientRole
@@ -57,7 +57,9 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
     }
   }, [userIsSigner, confirmations])
 
-  const paymentComplete = !!payment?.transactionHash
+  const paymentComplete = mostRecentPaymentAttempt
+    ? mostRecentPaymentAttempt.status !== ProposalPaymentStatus.QUEUED
+    : false
 
   const actions = {
     ...(userIsPayer &&
@@ -75,10 +77,10 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
       }),
     // user is signer on the gnosis safe
     // and payment exists (typescript)
-    // and there is not yet any mutliSigTransaction data on the payment, meaning it is not queued
+    // and there is not a payment attempt
     ...(userIsSigner &&
       payment &&
-      !payment.data.multisigTransaction && {
+      !mostRecentPaymentAttempt && {
         [ProposalRoleType.CLIENT]: (
           <button
             onClick={() => toggleQueueGnosisTransactionModalMap({ open: true, id: payment.id })}
@@ -91,12 +93,13 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
       }),
     // user is signer on the gnosis safe
     // and payment exists (typescript)
-    // and there IS mutliSigTransaction data on the payment, meaning it has been queued
+    // and there IS a payment attempt, meaning it has been queued
     // and the user has not yet signed the gnosis tx
     // TODO: approve flashes slightly after it's first executed.
     ...(userIsSigner &&
       payment &&
-      !!payment.data.multisigTransaction &&
+      !!mostRecentPaymentAttempt &&
+      mostRecentPaymentAttempt.status === ProposalPaymentStatus.QUEUED &&
       !userHasSignedGnosisTx &&
       !quorumMet && {
         [ProposalRoleType.CLIENT]: (
@@ -112,7 +115,7 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
 
     ...(userIsSigner &&
       payment &&
-      !!payment.data.multisigTransaction &&
+      !!mostRecentPaymentAttempt &&
       !!userHasSignedGnosisTx &&
       !quorumMet && {
         [ProposalRoleType.CLIENT]: (
@@ -132,8 +135,8 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
     // and the quorum is met
     ...(userIsSigner &&
       payment &&
-      !paymentComplete &&
-      !!payment.data.multisigTransaction &&
+      !!mostRecentPaymentAttempt &&
+      mostRecentPaymentAttempt.status === ProposalPaymentStatus.QUEUED &&
       !!quorumMet && {
         [ProposalRoleType.CLIENT]: (
           <>
@@ -164,6 +167,25 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
               </span>
             )}
           </>
+        ),
+      }),
+    // user is signer on the gnosis safe
+    // and payment exists (typescript)
+    // and there IS mutliSigTransaction data on the payment, meaning it has been queued
+    ...(userIsSigner &&
+      payment &&
+      !!mostRecentPaymentAttempt &&
+      (mostRecentPaymentAttempt.status === ProposalPaymentStatus.REJECTED ||
+        mostRecentPaymentAttempt.status === ProposalPaymentStatus.FAILED) &&
+      !quorumMet && {
+        [ProposalRoleType.CLIENT]: (
+          <button
+            className="mb-2 sm:mb-0 font-bold border rounded px-4 h-[35px] bg-electric-violet border-electric-violet text-tunnel-black w-full"
+            onClick={() => toggleQueueGnosisTransactionModalMap({ open: true, id: payment.id })}
+          >
+            Re-queue transaction
+            <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
+          </button>
         ),
       }),
   }
