@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { useQuery } from "@blitzjs/rpc"
 import { ArrowRightIcon } from "@heroicons/react/solid"
-import { ProposalRoleType, AddressType } from "@prisma/client"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
 import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
@@ -13,6 +12,8 @@ import { ProposalPayment, ProposalPaymentStatus } from "app/proposalPayment/type
 import { StepType } from "../steps/Step"
 import { useSafeTxStatus } from "app/core/hooks/useSafeTxStatus"
 import TextLink from "../../TextLink"
+
+import { ProposalRoleType, AddressType } from "@prisma/client"
 
 const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true }) => {
   const mostRecentPaymentAttempt = payment.data?.history?.[payment.data.history.length - 1]

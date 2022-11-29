@@ -53,6 +53,7 @@ export const ExecutePaymentModal = ({ isOpen, setIsOpen, proposal, milestone, pa
         ) : (
           <AttachTransactionForm
             milestone={milestone}
+            payment={payment}
             chainId={payment?.data?.token.chainId}
             isLoading={isLoading}
             setIsLoading={setIsLoading}

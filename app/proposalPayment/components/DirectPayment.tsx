@@ -120,6 +120,7 @@ export const DirectPayment = ({
         proposalId: milestone.proposalId,
         milestoneId: milestone.id,
         transactionHash: transaction.hash,
+        paymentId: payment.id,
       })
 
       // the `txnHash` state is required to enable the useWaitForTransaction hook in the parent page

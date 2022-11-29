@@ -10,6 +10,7 @@ import { Field, Form } from "react-final-form"
 
 export const AttachTransactionForm = ({
   milestone,
+  payment,
   chainId,
   isLoading,
   setIsLoading,
@@ -34,6 +35,7 @@ export const AttachTransactionForm = ({
         proposalId: milestone.proposalId,
         milestoneId: milestone.id,
         transactionHash,
+        paymentId: payment.id,
       })
 
       invalidateQuery(getProposalById)
