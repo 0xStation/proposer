@@ -62,13 +62,20 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
     ? mostRecentPaymentAttempt.status !== ProposalPaymentStatus.QUEUED
     : false
 
+  const currentMilestoneId = proposal?.milestones?.find(
+    (milestone) => milestone.index === proposal?.currentMilestoneIndex
+  )?.id
+  const paymentIsActive = payment?.milestoneId === currentMilestoneId
+
   const actions = {
     ...(userIsPayer &&
       payment &&
-      !paymentComplete && {
+      !paymentComplete &&
+      paymentIsActive && {
         [ProposalRoleType.CLIENT]: (
           <Button
-            type={ButtonType.Secondary}
+            type={isWithinStepper ? ButtonType.Secondary : ButtonType.Primary}
+            isDisabled={!paymentIsActive}
             onClick={() => toggleExecutePaymentModalMap({ open: true, id: payment.id })}
             overrideWidthClassName="w-full"
           >
@@ -81,15 +88,18 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
     // and there is not a payment attempt
     ...(userIsSigner &&
       payment &&
-      !mostRecentPaymentAttempt && {
+      !mostRecentPaymentAttempt &&
+      paymentIsActive && {
         [ProposalRoleType.CLIENT]: (
-          <button
+          <Button
+            type={isWithinStepper ? ButtonType.Secondary : ButtonType.Primary}
+            isDisabled={!paymentIsActive}
             onClick={() => toggleQueueGnosisTransactionModalMap({ open: true, id: payment.id })}
-            className="mb-2 sm:mb-0 font-bold border rounded px-4 h-[35px] text-electric-violet border-electric-violet bg-transparent hover:opacity-70 w-full"
+            overrideWidthClassName="w-full"
           >
             Queue and approve
             <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
-          </button>
+          </Button>
         ),
       }),
     // user is signer on the gnosis safe
@@ -99,13 +109,15 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
     // TODO: approve flashes slightly after it's first executed.
     ...(userIsSigner &&
       payment &&
+      paymentIsActive &&
       !!mostRecentPaymentAttempt &&
       mostRecentPaymentAttempt.status === ProposalPaymentStatus.QUEUED &&
       !userHasSignedGnosisTx &&
       !quorumMet && {
         [ProposalRoleType.CLIENT]: (
           <Button
-            type={ButtonType.Secondary}
+            type={isWithinStepper ? ButtonType.Secondary : ButtonType.Primary}
+            isDisabled={!paymentIsActive}
             onClick={() => toggleApproveGnosisTransactionModalMap({ open: true, id: payment.id })}
             overrideWidthClassName="w-full px-4"
           >
@@ -116,6 +128,7 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
 
     ...(userIsSigner &&
       payment &&
+      paymentIsActive &&
       !!mostRecentPaymentAttempt &&
       !!userHasSignedGnosisTx &&
       !quorumMet && {
@@ -136,6 +149,7 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
     // and the quorum is met
     ...(userIsSigner &&
       payment &&
+      paymentIsActive &&
       !!mostRecentPaymentAttempt &&
       mostRecentPaymentAttempt.status === ProposalPaymentStatus.QUEUED &&
       !!quorumMet && {
@@ -143,7 +157,7 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
           <>
             <Button
               type={isWithinStepper ? ButtonType.Secondary : ButtonType.Primary}
-              isDisabled={isSafeTxStatusLoading || isNonceBlocked}
+              isDisabled={isSafeTxStatusLoading || isNonceBlocked || !paymentIsActive}
               onClick={() =>
                 toggleExecutePaymentModalMap({
                   open: true,
@@ -175,18 +189,21 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
     // and there IS mutliSigTransaction data on the payment, meaning it has been queued
     ...(userIsSigner &&
       payment &&
+      paymentIsActive &&
       !!mostRecentPaymentAttempt &&
       (mostRecentPaymentAttempt.status === ProposalPaymentStatus.REJECTED ||
         mostRecentPaymentAttempt.status === ProposalPaymentStatus.FAILED) &&
       !quorumMet && {
         [ProposalRoleType.CLIENT]: (
-          <button
-            className="mb-2 sm:mb-0 font-bold border rounded px-4 h-[35px] bg-electric-violet border-electric-violet text-tunnel-black w-full"
+          <Button
+            type={isWithinStepper ? ButtonType.Secondary : ButtonType.Primary}
+            isDisabled={!paymentIsActive}
             onClick={() => toggleQueueGnosisTransactionModalMap({ open: true, id: payment.id })}
+            overrideWidthClassName="w-full"
           >
             Re-queue transaction
             <ArrowRightIcon className="h-4 w-4 inline mb-1 ml-2 rotate-[315deg]" />
-          </button>
+          </Button>
         ),
       }),
   }
