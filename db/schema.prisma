@@ -8,19 +8,20 @@ datasource db {
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
+  previewFeatures = ["interactiveTransactions", "filterJson"]
 }
 
 // ACCOUNT SYSTEM
 
 model Account {
-  id          Int         @id @default(autoincrement())
-  address     String      @unique
-  discordId   String?
-  addressType AddressType
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  data        Json
+  id              Int         @id @default(autoincrement())
+  address         String      @unique
+  discordId       String?
+  addressType     AddressType
+  moralisStreamId String?     @unique
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  data            Json
 
   sessions           Session[]
   rfps               Rfp[]
@@ -201,6 +202,7 @@ model ProposalPayment {
   tokenId          Float? // float to support larger size numbers
   transactionHash  String?
   data             Json
+
 
   proposal  Proposal          @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   milestone ProposalMilestone @relation(fields: [milestoneId], references: [id])

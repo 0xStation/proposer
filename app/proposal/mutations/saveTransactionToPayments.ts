@@ -1,10 +1,12 @@
 import * as z from "zod"
 import db, { ProposalStatus } from "db"
+import { ProposalPayment, ProposalPaymentStatus } from "app/proposalPayment/types"
 
 const SaveTransactionHashToPayments = z.object({
   milestoneId: z.string(),
   proposalId: z.string(),
   transactionHash: z.string(),
+  paymentId: z.string(),
 })
 
 export default async function saveTransactionHashToPayments(
@@ -31,13 +33,39 @@ export default async function saveTransactionHashToPayments(
     if (proposal.currentMilestoneIndex !== milestone.index)
       throw Error("proposal is not on milestone: " + milestone.index)
 
-    // update payments with transaction hash
-    await db.proposalPayment.updateMany({
-      where: {
-        milestoneId: params.milestoneId,
-      },
+    const existingPayment = (await db.proposalPayment.findUnique({
+      where: { id: params.paymentId },
+    })) as ProposalPayment
+
+    // non-gnosis safe payments have no history because there is no concept of the payment being "queued"
+    // it either doesn't exist -- or it is immediately executed
+    const mostRecentPaymentAttempt = existingPayment.data?.history?.slice(-1)[0]
+    const currentQueued = mostRecentPaymentAttempt?.status === ProposalPaymentStatus.QUEUED
+
+    // update most recent payment attempt with transaction hash
+    await db.proposalPayment.update({
+      where: { id: params.paymentId },
       data: {
-        transactionHash: params.transactionHash,
+        ...existingPayment,
+        data: {
+          ...(existingPayment.data as {}),
+          history: [
+            ...existingPayment.data.history.slice(
+              0,
+              // if the current most recent attempt is in queued state we want to override it,
+              // otherwise we want to keep it, and add a new attempt
+              currentQueued
+                ? existingPayment.data.history.length - 1
+                : existingPayment.data.history.length
+            ),
+            {
+              ...mostRecentPaymentAttempt,
+              transactionHash: params.transactionHash,
+              status: ProposalPaymentStatus.SUCCESS,
+              timestamp: new Date(),
+            },
+          ] as any,
+        },
       },
     })
 

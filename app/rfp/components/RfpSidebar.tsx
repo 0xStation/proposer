@@ -58,7 +58,13 @@ export const RfpSidebar = () => {
               <span className="text-marble-white cursor-default">{rfp?.data?.content?.title}</span>
             ) : (
               <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>
-                <span className="text-marble-white cursor-pointer hover:text-concrete">
+                <span
+                  className={`${
+                    router.pathname === Routes.ProposalRfpForm({ rfpId }).pathname
+                      ? "text-concrete"
+                      : "text-marble-white"
+                  } cursor-pointer hover:text-concrete`}
+                >
                   {rfp?.data?.content?.title}
                 </span>
               </Link>
@@ -66,6 +72,13 @@ export const RfpSidebar = () => {
           ) : (
             <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
           )}
+          {rfp?.data?.content?.title &&
+            router.pathname === Routes.ProposalRfpForm({ rfpId }).pathname && (
+              <>
+                <span className="text-concrete">&nbsp;/&nbsp;</span>
+                <span className="text-marble-white cursor-default">New proposal</span>
+              </>
+            )}
         </nav>
         {/* PILLS */}
         {rfp ? (
@@ -97,7 +110,7 @@ export const RfpSidebar = () => {
         <RfpReward rfpProposalPayment={rfp?.data?.proposal?.payment} />
         <RfpSchedule status={rfp?.status} startDate={rfp?.startDate} endDate={rfp?.endDate} />
         {/* CTA */}
-        <div className="mb-10 hidden md:relative group">
+        <div className="mb-10 hidden md:block relative group">
           {/* Hide "Propose" button when showing the proposal creation form  */}
           {router.pathname !== Routes.ProposalRfpForm({ rfpId }).pathname && (
             <Button

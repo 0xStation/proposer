@@ -13,6 +13,7 @@ const UpdateAccount = z.object({
   bio: z.string().optional(),
   pfpUrl: z.string().optional(),
   discordHandle: z.string().optional(),
+  moralisStreamId: z.string().optional(),
   email: z.string().optional(),
 })
 
@@ -61,6 +62,7 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
     address: params.address,
     addressType: existingAccount.addressType,
     discordId: params.discordId,
+    moralisStreamId: params.moralisStreamId,
     data: {
       // save existing account data with overwrites below
       // without this, chainId for multisig accounts gets wiped

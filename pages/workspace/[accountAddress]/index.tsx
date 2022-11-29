@@ -28,6 +28,7 @@ import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber
 import { isAddress } from "ethers/lib/utils"
 import getProposalCountForAccount from "app/proposal/queries/getProposalCountForAccount"
 import WorkspaceSidebar from "app/core/components/WorkspaceSidebar"
+import { useRouter } from "next/router"
 
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
   const { accountAddress } = params
@@ -55,6 +56,7 @@ export const getServerSideProps = gSSP(async ({ params = {} }) => {
 
 const WorkspaceHome: BlitzPage = () => {
   const accountAddress = useParam("accountAddress", "string") as string
+  const router = useRouter()
 
   const { data: accountEnsName } = useEnsName({
     address: accountAddress as `0x${string}`,
@@ -106,17 +108,21 @@ const WorkspaceHome: BlitzPage = () => {
     <>
       <div className="flex flex-row justify-between">
         <h1 className="text-2xl font-bold">Proposals</h1>
-        <Link
-          href={Routes.ProposalTypeSelection({
-            // pre-fill for both so that if user changes toggle to reverse roles, the input address is still there
-            client: accountEnsName || accountAddress,
-            contributor: accountEnsName || accountAddress,
-          })}
+        <Button
+          className="hidden md:block w-full px-10"
+          overrideWidthClassName="max-w-fit"
+          onClick={() => {
+            router.push(
+              Routes.ProposalNewFunding({
+                // pre-fill for both so that if user changes toggle to reverse roles, the input address is still there
+                clients: accountEnsName || accountAddress,
+                contributors: accountEnsName || accountAddress,
+              })
+            )
+          }}
         >
-          <Button className="w-full px-10 hidden md:block" overrideWidthClassName="max-w-fit">
-            Propose
-          </Button>
-        </Link>
+          Propose
+        </Button>
       </div>
       {/* FILTERS & PAGINATION */}
       <div className="mt-8 mb-4 pb-4 flex flex-row justify-between">
