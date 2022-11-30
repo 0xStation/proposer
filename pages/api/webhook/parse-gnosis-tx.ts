@@ -21,6 +21,7 @@ const fetchGnosisNonce = async (chainId: string, targetAddress: string) => {
 export default api(async function handler(req: NextApiRequest, res: NextApiResponse) {
   const response = req.body
   const streamId = response.streamId
+  console.log(response)
 
   // eventually look for error logs as well
   const gnosisTxSuccessEventLog = response.logs.find(
