@@ -129,11 +129,18 @@ const WorkspaceSettingsOverviewForm = ({
 
   const [accountEmail, { isLoading: isAccountEmailLoading }] = useQuery(
     getAccountEmail,
-    { address: toChecksumAddress(accountAddress) },
+    { address: toChecksumAddress(accountAddress), chainId: account?.data?.chainId },
     {
       enabled: !!accountAddress,
       suspense: false,
       refetchOnWindowFocus: false,
+      onError: (error) => {
+        setToastState({
+          isToastShowing: true,
+          type: "error",
+          message: "Error retrieving email for account.",
+        })
+      },
     }
   )
 
