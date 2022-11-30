@@ -3,16 +3,14 @@ import { Routes } from "@blitzjs/next"
 import { useQuery, invoke } from "@blitzjs/rpc"
 import { BlitzPage, useParam } from "@blitzjs/next"
 import { PencilIcon } from "@heroicons/react/solid"
-import { ProposalRoleType, ProposalStatus } from "@prisma/client"
+import { ProposalStatus } from "@prisma/client"
 import Layout from "app/core/layouts/Layout"
 import getProposalById from "app/proposal/queries/getProposalById"
 import ReadMore from "app/core/components/ReadMore"
 import { TotalPaymentView } from "app/core/components/TotalPaymentView"
-import RoleSignaturesView from "app/core/components/RoleSignaturesView"
 import { Proposal } from "app/proposal/types"
 import { ProposalNestedLayout } from "app/core/layouts/ProposalNestedLayout"
 import useStore from "app/core/hooks/useStore"
-import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
 import CommentContainer from "app/comment/components/CommentContainer"
 import NewCommentThread from "app/comment/components/NewCommentThread"
 import CommentEmptyState from "app/comment/components/CommentEmptyState"
@@ -31,9 +29,9 @@ export const ToolTip = ({ children }) => {
 export const EditIcon = ({ disabled = false, children }) => {
   const disabledStyling = disabled ? "text-concrete" : "text-marble-white"
   return (
-    <div className="cursor-pointer space-x-2 items-center">
+    <div className="inline mt-5 w-full cursor-pointer align-middle">
       <PencilIcon className={`h-5 w-5 inline ${disabledStyling}`} />
-      <span className={`inline ${disabledStyling}`}>{children}</span>
+      <p className={`inline ml-2 ${disabledStyling}`}>{children}</p>
     </div>
   )
 }
@@ -79,7 +77,6 @@ const ViewProposal: BlitzPage = () => {
       staleTime: 60 * 1000, // 1 minute
     }
   )
-  const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
 
   const { canRead, canWrite } = useCommentPermissions(proposal?.id)
@@ -107,7 +104,6 @@ const ViewProposal: BlitzPage = () => {
       )}
       <ReadMore className="mt-12 mb-9 mx-6 md:mx-0">{proposal?.data?.content?.body}</ReadMore>
       <ParticipantModule proposal={proposal as Proposal} className="mt-9" />
-      {/* <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" /> */}
       {(proposal?.data.totalPayments || []).length > 0 && (
         <TotalPaymentView proposal={proposal!} className="mt-9" />
       )}

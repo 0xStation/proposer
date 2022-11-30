@@ -8,8 +8,6 @@ import ProposalMilestonePaymentBox from "app/core/components/ProposalMilestonePa
 import { Proposal } from "app/proposal/types"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
 import { ProposalNestedLayout } from "app/core/layouts/ProposalNestedLayout"
-import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
-import useStore from "app/core/hooks/useStore"
 
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
   const { proposalId } = params

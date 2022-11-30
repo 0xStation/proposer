@@ -3,7 +3,6 @@ import truncateString from "app/core/utils/truncateString"
 import { formatDate } from "app/core/utils/formatDate"
 
 const GnosisSafeSignersModal = ({ isOpen, setIsOpen, participant }) => {
-  console.log(participant)
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-6">
