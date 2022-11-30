@@ -2,7 +2,7 @@ import { useQuery } from "@blitzjs/rpc"
 import getParticipantsByProposal from "../queries/getParticipantsByProposal"
 
 export const useParticipants = (proposalId) => {
-  const [participants] = useQuery(
+  const [participants, { isLoading }] = useQuery(
     getParticipantsByProposal,
     { proposalId: proposalId as string },
     {
@@ -14,5 +14,5 @@ export const useParticipants = (proposalId) => {
     }
   )
 
-  return participants
+  return { participants, isLoading }
 }

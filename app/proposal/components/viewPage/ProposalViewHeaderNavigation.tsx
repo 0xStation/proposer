@@ -2,17 +2,9 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { useQuery } from "@blitzjs/rpc"
 import { Routes, useParam } from "@blitzjs/next"
-import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import getProposalById from "app/proposal/queries/getProposalById"
-import {
-  ProposalStatus,
-  ProposalRoleApprovalStatus,
-  ProposalRoleType,
-  RfpStatus,
-} from "@prisma/client"
-import { ProposalRole } from "app/proposalRole/types"
+import { RfpStatus } from "@prisma/client"
 import useStore from "app/core/hooks/useStore"
-import { ProposalStatusPill } from "../../../core/components/ProposalStatusPill"
 import { genPathFromUrlObject } from "app/utils"
 import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
@@ -21,13 +13,9 @@ import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTim
 import LinkArrow from "app/core/icons/LinkArrow"
 import { LINKS } from "app/core/utils/constants"
 import SendProposalModal from "../SendProposalModal"
-import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import getRfpByProposalId from "app/rfp/queries/getRfpByProposalId"
 import { ProposalStatusIndicator } from "../ProposalStatusIndicator"
 import { useParticipants } from "app/proposalParticipant/hooks/useParticipants"
-
-const findProposalRoleByRoleType = (roles, proposalType) =>
-  roles?.find((role) => role.type === proposalType)
 
 const Tab = ({ router, route, children }) => {
   return (
@@ -61,19 +49,8 @@ export const ProposalViewHeaderNavigation = () => {
     }
   )
 
-  const participants = useParticipants(proposalId)
+  const { participants, isLoading } = useParticipants(proposalId)
 
-  const [roles] = useQuery(
-    getRolesByProposalId,
-    { proposalId: proposalId },
-    {
-      suspense: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      enabled: Boolean(proposalId),
-      staleTime: 60 * 1000, // one minute
-    }
-  )
   const [rfp] = useQuery(
     getRfpByProposalId,
     { proposalId: proposalId },
@@ -84,9 +61,6 @@ export const ProposalViewHeaderNavigation = () => {
       enabled: !!proposalId,
     }
   )
-
-  // author used to return to workspace page with proposal list view
-  const author = findProposalRoleByRoleType(roles, ProposalRoleType.AUTHOR)
 
   const currentPageUrl =
     typeof window !== "undefined"
@@ -124,7 +98,7 @@ export const ProposalViewHeaderNavigation = () => {
       )}
       <div className="w-full min-h-64 relative px-6 md:px-0">
         <div className="mt-6 flex flex-row">
-          {rfp ? (
+          {rfp && (
             <nav>
               {rfp?.data?.content?.title ? (
                 <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>
@@ -144,19 +118,6 @@ export const ProposalViewHeaderNavigation = () => {
                 <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
               )}
             </nav>
-          ) : (
-            <>
-              {" "}
-              <span className="text-concrete hover:text-light-concrete">
-                <Link href={Routes.WorkspaceHome({ accountAddress: author?.address as string })}>
-                  Proposals
-                </Link>{" "}
-                /&nbsp;
-              </span>
-              {proposal?.data?.content?.title || (
-                <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
-              )}
-            </>
           )}
         </div>
         {proposal?.data.content.title ? (

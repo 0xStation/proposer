@@ -1,12 +1,10 @@
-import { useCheckUserIsParticipant } from "app/proposalParticipant/hooks/useCheckUserIsParticipant"
-import useStore from "./useStore"
+import useGetUsersParticipants from "app/proposalParticipant/hooks/useGetUsersParticipants"
 
 const useCommentPermissions = (proposalId) => {
-  const activeUser = useStore((state) => state.activeUser)
-  const userIsParticipant = useCheckUserIsParticipant(proposalId, activeUser?.address || "")
+  const { participants } = useGetUsersParticipants(proposalId)
 
   const canRead = true
-  const canWrite = userIsParticipant
+  const canWrite = participants.length > 0
 
   return { canRead, canWrite }
 }
