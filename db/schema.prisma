@@ -23,16 +23,17 @@ model Account {
   updatedAt       DateTime    @updatedAt
   data            Json
 
-  sessions           Session[]
-  rfps               Rfp[]
-  proposals          ProposalRole[]
-  tokens             AccountToken[]
-  originsOf          AccountAccount[]    @relation("origin")
-  targetsOf          AccountAccount[]    @relation("target")
-  verificationEmails EmailVerification[]
-  proposalTemplates  ProposalTemplate[]
-  proposalVersions   ProposalVersion[]
-  comments           Comment[]
+  sessions            Session[]
+  rfps                Rfp[]
+  proposals           ProposalRole[]
+  tokens              AccountToken[]
+  originsOf           AccountAccount[]      @relation("origin")
+  targetsOf           AccountAccount[]      @relation("target")
+  verificationEmails  EmailVerification[]
+  proposalTemplates   ProposalTemplate[]
+  proposalVersions    ProposalVersion[]
+  comments            Comment[]
+  ProposalParticipant ProposalParticipant[]
 }
 
 enum AddressType {
@@ -113,12 +114,13 @@ model Proposal {
 
   rfp Rfp? @relation(fields: [rfpId], references: [id], onDelete: Cascade)
 
-  roles      ProposalRole[]
-  milestones ProposalMilestone[]
-  payments   ProposalPayment[]
-  signatures ProposalSignature[]
-  versions   ProposalVersion[]
-  comments   Comment[]
+  participants ProposalParticipant[]
+  roles        ProposalRole[]
+  milestones   ProposalMilestone[]
+  payments     ProposalPayment[]
+  signatures   ProposalSignature[]
+  versions     ProposalVersion[]
+  comments     Comment[]
 }
 
 enum ProposalStatus {
@@ -126,6 +128,31 @@ enum ProposalStatus {
   AWAITING_APPROVAL
   APPROVED
   COMPLETE
+}
+
+// PROPOSAL PARTICIPANT
+
+model ProposalParticipant {
+  id             String                    @id @default(uuid())
+  proposalId     String
+  accountAddress String
+  approvalStatus ParticipantApprovalStatus @default(PENDING)
+  data           Json
+
+  account    Account             @relation(fields: [accountAddress], references: [address], onDelete: Cascade)
+  proposal   Proposal            @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  // m-n relation to support one role containing multiple supporting signatures to reach COMPLETE approval status
+  // for example, a multisig needs Q (quorum) signatures to approve by default
+  // another example, a DAO using token voting needs a majority vote of at least Q (quorum) votes to approve
+  signatures ProposalSignature[] @relation("ParticipantApprovalSignature")
+  @@unique([proposalId, accountAddress])
+}
+
+enum ParticipantApprovalStatus {
+  PENDING // role is pending approval
+  APPROVED // role has approved
+  SENT // signed by author to send to recipients
+  // DENY - future for denying proposals
 }
 
 // PROPOSAL ROLES
@@ -167,11 +194,12 @@ model ProposalSignature {
   data            Json
   type            ProposalSignatureType @default(APPROVE)
 
-  proposal Proposal       @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  proposal     Proposal              @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   // m-n relation to support one signature being utilized for many roles
   // for example, I can have the AUTHOR and CONTRIBUTOR role simultaneously
   // another example, I can be a AUTHOR and represent a CLIENT as a signer of its multisig
-  roles    ProposalRole[] @relation("RoleApprovalSignature")
+  roles        ProposalRole[]        @relation("RoleApprovalSignature")
+  participants ProposalParticipant[] @relation("ParticipantApprovalSignature")
 }
 
 enum ProposalSignatureType {

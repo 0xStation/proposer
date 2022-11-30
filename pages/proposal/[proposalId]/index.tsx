@@ -18,6 +18,7 @@ import NewCommentThread from "app/comment/components/NewCommentThread"
 import CommentEmptyState from "app/comment/components/CommentEmptyState"
 import useCommentPermissions from "app/core/hooks/useCommentPermissions"
 import { useRouter } from "next/router"
+import ParticipantModule from "app/proposalParticipant/components/ParticipantModule"
 
 export const ToolTip = ({ children }) => {
   return (
@@ -117,7 +118,8 @@ const ViewProposal: BlitzPage = () => {
         )
       )}
       <ReadMore className="mt-12 mb-9 mx-6 md:mx-0">{proposal?.data?.content?.body}</ReadMore>
-      <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" />
+      <ParticipantModule proposal={proposal as Proposal} className="mt-9" />
+      {/* <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" /> */}
       {(proposal?.data.totalPayments || []).length > 0 && (
         <TotalPaymentView proposal={proposal!} className="mt-9" />
       )}
