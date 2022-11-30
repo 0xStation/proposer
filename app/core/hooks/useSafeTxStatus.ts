@@ -9,11 +9,7 @@ import { useSafeMetadata } from "./useSafeMetadata"
 export const useSafeTxStatus = (proposal, milestone, payment) => {
   const mostRecentPaymentAttempt = getMostRecentPaymentAttempt(payment)
 
-  const address = mostRecentPaymentAttempt?.multisigTransaction?.address
-  const addressType = mostRecentPaymentAttempt?.multisigTransaction?.type
   const chainId = payment?.data.token.chainId || 1
-
-  const safeMetadata = useSafeMetadata(address, addressType, chainId)
 
   const [gnosisTxStatus] = useQuery(
     getGnosisTxStatus,
@@ -38,11 +34,7 @@ export const useSafeTxStatus = (proposal, milestone, payment) => {
     }
   )
 
-  const isLoading = !safeMetadata || !gnosisTxStatus
-
   return {
-    isLoading,
-    isNonceBlocked: isLoading ? false : safeMetadata.nonce < gnosisTxStatus.nonce,
-    confirmations: isLoading ? [] : gnosisTxStatus.confirmations,
+    confirmations: gnosisTxStatus?.confirmations,
   }
 }
