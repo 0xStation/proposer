@@ -7,6 +7,7 @@ import useCommentPermissions from "app/core/hooks/useCommentPermissions"
 const NewCommentThread = ({ proposal, setProposalQueryData }) => {
   const { canRead, canWrite } = useCommentPermissions(proposal?.id)
   const [showNewThread, setShowNewThread] = useState(false)
+
   return (
     <div className="mt-4 h-[100px]">
       {!showNewThread && canWrite && (

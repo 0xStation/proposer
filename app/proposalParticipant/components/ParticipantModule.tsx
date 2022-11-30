@@ -2,6 +2,7 @@ import { useQuery } from "@blitzjs/rpc"
 import AccountMediaRow from "app/comment/components/AccountMediaRow"
 import { PROPOSAL_ROLE_APPROVAL_STATUS_MAP } from "app/core/utils/constants"
 import { Proposal } from "app/proposal/types"
+import { useParticipants } from "../hooks/useParticipants"
 import getParticipantsByProposal from "../queries/getParticipantsByProposal"
 
 export const ParticipantModule = ({
@@ -11,17 +12,7 @@ export const ParticipantModule = ({
   proposal?: Proposal
   className?: string
 }) => {
-  const [participants] = useQuery(
-    getParticipantsByProposal,
-    { proposalId: proposal?.id as string },
-    {
-      suspense: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      enabled: Boolean(proposal?.id),
-      staleTime: 60 * 1000, // 1 minute
-    }
-  )
+  const participants = useParticipants(proposal?.id)
 
   return participants ? (
     <div className={`border border-b border-concrete rounded-2xl px-6 py-6 ${className}`}>

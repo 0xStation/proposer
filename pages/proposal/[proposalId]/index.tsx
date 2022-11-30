@@ -31,9 +31,9 @@ export const ToolTip = ({ children }) => {
 export const EditIcon = ({ disabled = false, children }) => {
   const disabledStyling = disabled ? "text-concrete" : "text-marble-white"
   return (
-    <div className="inline mt-5 w-full cursor-pointer align-middle">
+    <div className="cursor-pointer space-x-2 items-center">
       <PencilIcon className={`h-5 w-5 inline ${disabledStyling}`} />
-      <p className={`inline ml-2 ${disabledStyling}`}>{children}</p>
+      <span className={`inline ${disabledStyling}`}>{children}</span>
     </div>
   )
 }
@@ -80,42 +80,30 @@ const ViewProposal: BlitzPage = () => {
     }
   )
   const activeUser = useStore((state) => state.activeUser)
-  const activeUserIsAuthor = proposal?.roles?.find(
-    (role) => role.type === ProposalRoleType.AUTHOR && role.address === activeUser?.address
-  )
-  const { roles: activeUsersRoles } = useGetUsersRoles(proposalId)
   const router = useRouter()
 
   const { canRead, canWrite } = useCommentPermissions(proposal?.id)
 
   return (
     <>
-      {activeUserIsAuthor ? (
-        proposal?.status === ProposalStatus.DRAFT ||
-        proposal?.status === ProposalStatus.AWAITING_APPROVAL ? (
-          <div className="relative group float-right mt-5 mr-2 md:mr-0">
-            <ToolTip>Only you as the author can edit your proposal.</ToolTip>
-            <button
-              onClick={() => {
-                router.push(Routes.EditProposalPage({ proposalId }))
-              }}
-            >
-              <EditIcon>Edit Proposal</EditIcon>
-            </button>
-          </div>
-        ) : (
-          <div className="relative group float-right mt-5 mr-2 md:mr-0">
-            <ToolTip>You can only edit the proposal before approval.</ToolTip>
-            <EditIcon disabled={true}>Edit Proposal</EditIcon>
-          </div>
-        )
+      {proposal?.status === ProposalStatus.DRAFT ||
+      proposal?.status === ProposalStatus.AWAITING_APPROVAL ? (
+        <div className="relative group float-right mt-5 mr-2 md:mr-0">
+          {/* <ToolTip>Only participants can edit your proposal.</ToolTip> */}
+          <button
+            onClick={() => {
+              router.push(Routes.EditProposalPage({ proposalId }))
+            }}
+            className="p-2 rounded-md hover:bg-charcoal"
+          >
+            <EditIcon>Edit Proposal</EditIcon>
+          </button>
+        </div>
       ) : (
-        activeUsersRoles?.length > 0 && (
-          <div className="relative group float-right mt-5 mr-2 md:mr-0">
-            <ToolTip>Currently, only the author can edit the proposal.</ToolTip>
-            <EditIcon disabled={true}>Edit Proposal</EditIcon>
-          </div>
-        )
+        <div className="relative group float-right mt-5 mr-2 md:mr-0">
+          <ToolTip>You can only edit the proposal before approval.</ToolTip>
+          <EditIcon disabled={true}>Edit Proposal</EditIcon>
+        </div>
       )}
       <ReadMore className="mt-12 mb-9 mx-6 md:mx-0">{proposal?.data?.content?.body}</ReadMore>
       <ParticipantModule proposal={proposal as Proposal} className="mt-9" />
