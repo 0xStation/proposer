@@ -89,7 +89,7 @@ const ViewProposal: BlitzPage = () => {
       {proposal?.status === ProposalStatus.DRAFT ||
       proposal?.status === ProposalStatus.AWAITING_APPROVAL ? (
         <div className="relative group float-right mt-5 mr-2 md:mr-0">
-          {/* <ToolTip>Only participants can edit your proposal.</ToolTip> */}
+          <ToolTip>Only participants can edit your proposal.</ToolTip>
           <button
             onClick={() => {
               router.push(Routes.EditProposalPage({ proposalId }))
