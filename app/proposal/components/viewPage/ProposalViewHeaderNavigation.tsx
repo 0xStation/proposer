@@ -23,6 +23,8 @@ import { LINKS } from "app/core/utils/constants"
 import SendProposalModal from "../SendProposalModal"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import getRfpByProposalId from "app/rfp/queries/getRfpByProposalId"
+import { ProposalStatusIndicator } from "../ProposalStatusIndicator"
+import { useParticipants } from "app/proposalParticipant/hooks/useParticipants"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.type === proposalType)
@@ -58,6 +60,9 @@ export const ProposalViewHeaderNavigation = () => {
       staleTime: 60 * 1000, // one minute
     }
   )
+
+  const participants = useParticipants(proposalId)
+
   const [roles] = useQuery(
     getRolesByProposalId,
     { proposalId: proposalId },
@@ -82,13 +87,6 @@ export const ProposalViewHeaderNavigation = () => {
 
   // author used to return to workspace page with proposal list view
   const author = findProposalRoleByRoleType(roles, ProposalRoleType.AUTHOR)
-  // numerator for the progress circle
-  const totalApprovalCount =
-    proposal?.roles?.filter(
-      (role) =>
-        role.approvalStatus === ProposalRoleApprovalStatus.APPROVED ||
-        role.approvalStatus === ProposalRoleApprovalStatus.SENT // include author's SEND signature in net count too
-    ).length || 0
 
   const currentPageUrl =
     typeof window !== "undefined"
@@ -194,24 +192,8 @@ export const ProposalViewHeaderNavigation = () => {
         )}
         {/* PROPOSAL STATUS */}
         <div className="mt-6 flex flex-row justify-between">
-          <div className="space-x-2 flex flex-row">
-            <ProposalStatusPill status={proposal?.status} />
-            {(proposal?.status === ProposalStatus.AWAITING_APPROVAL ||
-              proposal?.status === ProposalStatus.APPROVED) && (
-              <ProgressCircleAndNumber
-                numerator={totalApprovalCount}
-                denominator={proposal?.roles?.length || 0}
-              />
-            )}
-          </div>
-          <CollaboratorPfps
-            // unique accounts
-            accounts={(proposal?.roles as ProposalRole[])
-              ?.map((role) => role?.account)
-              ?.filter((account, idx, accounts) => {
-                return accounts?.findIndex((acc) => acc?.address === account?.address) === idx
-              })}
-          />
+          <ProposalStatusIndicator status={proposal?.status} participants={participants} />
+          <CollaboratorPfps accounts={participants?.map((participant) => participant?.account)} />
         </div>
         {/* BUTTONS */}
         <div className="w-full mt-6 box-border">
