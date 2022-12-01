@@ -8,6 +8,7 @@ import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 
 const UpdateAccount = z.object({
   address: z.string(),
+  prompt: z.string().optional(),
   discordId: z.string().optional(),
   name: z.string().optional(),
   bio: z.string().optional(),
@@ -69,6 +70,7 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
       ...Object(existingAccount.data),
       name: params.name,
       bio: params.bio,
+      prompt: params.prompt,
       pfpUrl: params.pfpUrl,
       discordHandle: params.discordHandle,
       // mark email as saved for this account to not show email input modals
