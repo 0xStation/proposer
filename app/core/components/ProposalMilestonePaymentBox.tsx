@@ -1,5 +1,3 @@
-import { useState } from "react"
-import AttachTransactionModal from "app/proposal/components/AttachTransactionModal"
 import { ProposalMilestone } from "app/proposalMilestone/types"
 import { getMilestoneStatus } from "app/proposalMilestone/utils"
 import {
@@ -12,7 +10,6 @@ import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 import PaymentAction from "./stepper/actions/PaymentAction"
 import { getTransactionLink } from "../utils/getTransactionLink"
 import TextLink from "./TextLink"
-import { formatDate } from "app/core/utils/formatDate"
 import { convertJSDateToDateAndTime } from "app/core/utils/convertJSDateToDateAndTime"
 import { getMostRecentPaymentAttempt } from "app/proposalPayment/utils"
 
@@ -88,16 +85,10 @@ export const ProposalMilestonePaymentBox = ({
   milestone: ProposalMilestone
   className?: string
 }) => {
-  const [isAttachtxModalOpen, setIsAttachtxModalOpen] = useState<boolean>(false)
   const milestoneStatus = getMilestoneStatus(proposal, milestone) || ""
 
   return (
     <>
-      <AttachTransactionModal
-        milestone={milestone}
-        isOpen={isAttachtxModalOpen}
-        setIsOpen={setIsAttachtxModalOpen}
-      />
       <div className={`border border-b border-concrete rounded-2xl px-6 py-9 ${className}`}>
         <div className="flex flex-row items-center justify-between mb-4">
           {/* TITLE */}
