@@ -92,8 +92,11 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
       data: JSON.parse(JSON.stringify(proposalMetadata)),
       participants: {
         createMany: {
-          data: participantAddresses.map((a) => {
-            return { accountAddress: toChecksumAddress(a), data: {} }
+          data: participantAddresses.map((address) => {
+            return {
+              accountAddress: toChecksumAddress(address),
+              data: { isOwner: params.authorAddresses.includes(address) },
+            }
           }),
         },
       },

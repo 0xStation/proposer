@@ -17,6 +17,7 @@ import CommentEmptyState from "app/comment/components/CommentEmptyState"
 import useCommentPermissions from "app/core/hooks/useCommentPermissions"
 import { useRouter } from "next/router"
 import ParticipantModule from "app/proposalParticipant/components/ParticipantModule"
+import { useProposalPermissions } from "app/proposal/hooks/useProposalPermissions"
 
 export const ToolTip = ({ children }) => {
   return (
@@ -80,25 +81,33 @@ const ViewProposal: BlitzPage = () => {
   const router = useRouter()
 
   const { canRead, canWrite } = useCommentPermissions(proposal?.id)
+  const { canEdit } = useProposalPermissions(proposal?.id)
 
   return (
     <>
-      {proposal?.status === ProposalStatus.DRAFT ||
-      proposal?.status === ProposalStatus.AWAITING_APPROVAL ? (
-        <div className="relative group float-right mt-5 mr-2 md:mr-0">
-          <ToolTip>Only participants can edit your proposal.</ToolTip>
-          <button
-            onClick={() => {
-              router.push(Routes.EditProposalPage({ proposalId }))
-            }}
-            className="p-2 rounded-md hover:bg-charcoal"
-          >
-            <EditIcon>Edit Proposal</EditIcon>
-          </button>
-        </div>
+      {canEdit ? (
+        proposal?.status === ProposalStatus.DRAFT ||
+        proposal?.status === ProposalStatus.AWAITING_APPROVAL ? (
+          <div className="relative group float-right mt-5 mr-2 md:mr-0">
+            <ToolTip>Only you as the author can edit your proposal.</ToolTip>
+            <button
+              onClick={() => {
+                router.push(Routes.EditProposalPage({ proposalId }))
+              }}
+              className="p-2 rounded-md hover:bg-charcoal"
+            >
+              <EditIcon>Edit Proposal</EditIcon>
+            </button>
+          </div>
+        ) : (
+          <div className="relative group float-right mt-5 mr-2 md:mr-0">
+            <ToolTip>You can only edit the proposal before approval.</ToolTip>
+            <EditIcon disabled={true}>Edit Proposal</EditIcon>
+          </div>
+        )
       ) : (
         <div className="relative group float-right mt-5 mr-2 md:mr-0">
-          <ToolTip>You can only edit the proposal before approval.</ToolTip>
+          <ToolTip>Currently, only the author can edit the proposal.</ToolTip>
           <EditIcon disabled={true}>Edit Proposal</EditIcon>
         </div>
       )}

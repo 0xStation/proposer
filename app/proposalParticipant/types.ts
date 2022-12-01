@@ -7,4 +7,6 @@ export type ProposalParticipant = PrismaProposalParticipant & {
   signatures?: ProposalSignature[]
 }
 
-export type ProposalParticipantMetadata = {}
+export type ProposalParticipantMetadata = {
+  isOwner: boolean
+}
