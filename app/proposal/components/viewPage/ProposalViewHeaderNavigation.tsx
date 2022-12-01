@@ -127,29 +127,16 @@ export const ProposalViewHeaderNavigation = () => {
         ) : (
           <div className="mt-6 h-8 w-42 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
         )}
-        {/* IPFS and LAST UPDATED */}
+        {/* LAST UPDATED */}
         {!proposal ? (
           <div className="mt-6 h-4 w-96 rounded-l bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
         ) : (
-          <div className="mt-6 flex flex-row items-center space-x-6 h-4">
-            {proposal?.data?.ipfsMetadata?.hash && (
-              <a
-                href={`${LINKS.PINATA_BASE_URL}${proposal?.data?.ipfsMetadata?.hash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-row uppercase text-xs text-electric-violet items-center"
-              >
-                <p className="inline mr-1"> View on ipfs </p>
-                <LinkArrow className="fill-electric-violet" />
-              </a>
-            )}
-            {proposal?.timestamp && (
-              <div className="uppercase text-xs text-concrete flex flex-row">
-                <p className="inline mr-1"> Last updated: </p>
-                <p>{convertJSDateToDateAndTime({ timestamp: proposal?.timestamp as Date })}</p>
-              </div>
-            )}
-          </div>
+          proposal?.timestamp && (
+            <div className="mt-6 uppercase text-xs text-concrete flex flex-row">
+              <p className="inline mr-1"> Last updated: </p>
+              <p>{convertJSDateToDateAndTime({ timestamp: proposal?.timestamp as Date })}</p>
+            </div>
+          )
         )}
         {/* PROPOSAL STATUS */}
         <div className="mt-6 flex flex-row justify-between">

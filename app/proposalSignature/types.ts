@@ -9,9 +9,4 @@ export type ProposalSignatureMetadata = {
   signature: string
   representingRoles?: string[]
   proposalHash: string
-  ipfsMetadata?: {
-    hash: string
-    ipfsPinSize: number
-    timestamp: string
-  }
 }

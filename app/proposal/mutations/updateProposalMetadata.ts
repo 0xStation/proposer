@@ -11,9 +11,6 @@ const UpdateProposalMetadata = z.object({
   authorSignature: z.string(), // should be optional in draft form
   signatureMessage: z.any(), //should be optional in draft form
   proposalHash: z.string(), // should be optional in draft form
-  ipfsHash: z.string().optional(),
-  ipfsPinSize: z.number().optional(),
-  ipfsTimestamp: z.string().optional(),
   totalPayments: z.object({ token: ZodToken, amount: z.number() }).array().optional(),
   paymentTerms: z
     .enum([PaymentTerm.ON_AGREEMENT, PaymentTerm.AFTER_COMPLETION, PaymentTerm.ADVANCE_PAYMENT])
@@ -28,16 +25,10 @@ export default async function updateProposalMetadata(
 ) {
   const params = UpdateProposalMetadata.parse(input)
 
-  const { ipfsHash, ipfsPinSize, ipfsTimestamp } = params
   const proposalMetadata = {
     content: {
       title: params.contentTitle,
       body: params.contentBody,
-    },
-    ipfsMetadata: {
-      hash: ipfsHash,
-      ipfsPinSize,
-      timestamp: ipfsTimestamp,
     },
     proposalHash: params.proposalHash,
     authorSignature: params.authorSignature,

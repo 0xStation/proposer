@@ -9,9 +9,6 @@ import ApproveGnosisTransactionModal from "app/proposalPayment/components/Approv
 import PaymentAction from "../actions/PaymentAction"
 import { useStepperStore } from "../StepperRenderer"
 import Step, { StepStatus, StepType } from "./Step"
-import { useQuery } from "@blitzjs/rpc"
-import getGnosisTxStatus from "app/proposal/queries/getGnosisTxStatus"
-import { getMilestoneStatus } from "app/proposalMilestone/utils"
 
 const PaymentStep = ({
   milestone,

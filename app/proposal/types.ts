@@ -19,11 +19,6 @@ export type Proposal = PrismaProposal & {
 export type ProposalMetadata = {
   content: { title: string; body: string }
   digest?: Digest
-  ipfsMetadata?: {
-    hash: string
-    ipfsPinSize: number
-    timestamp: string
-  }
   // cache total payment amounts for rendering on list components and primary metadata view
   totalPayments?: { token: Token; amount: number }[]
   paymentTerms?: PaymentTerm

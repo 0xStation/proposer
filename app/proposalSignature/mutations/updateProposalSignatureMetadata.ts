@@ -8,9 +8,6 @@ const UpdateProposalSignatureMetadata = z.object({
   representingRoles: z.any(),
   signature: z.string(),
   proposalHash: z.string(),
-  ipfsHash: z.string().optional(),
-  ipfsPinSize: z.number().optional(),
-  ipfsTimestamp: z.string().optional(),
 })
 
 // Updates the json metadata of a signature
@@ -21,17 +18,11 @@ export default async function updateProposalSignatureMetadata(
 ) {
   const params = UpdateProposalSignatureMetadata.parse(input)
 
-  const { ipfsHash, ipfsPinSize, ipfsTimestamp } = params
   const proposalSignatureMetadata = {
     message: params?.message,
     signature: params?.signature,
     representingRoles: params?.representingRoles,
     proposalHash: params?.proposalHash,
-    ipfsMetadata: {
-      hash: ipfsHash,
-      ipfsPinSize,
-      timestamp: ipfsTimestamp,
-    },
   } as unknown as ProposalSignatureMetadata
 
   try {

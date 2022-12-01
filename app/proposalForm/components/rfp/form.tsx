@@ -207,7 +207,7 @@ export const ProposalFormRfp = () => {
           body: rfp?.data?.proposal?.body?.prefill,
         }}
         onSubmit={async (values: any, form) => {
-          // an author needs to sign the proposal to upload the content to ipfs.
+          // an author needs to sign the proposal
           // if they decline the signature, but submit again, we don't want to
           // create the same proposal, rather we want to skip to the signature step.
           if (createdProposal) {

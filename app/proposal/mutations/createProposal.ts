@@ -17,9 +17,6 @@ const CreateProposal = z.object({
   clientAddresses: z.string().array(),
   // for initial P0 build, frontend is only supporting one author
   authorAddresses: z.string().array(),
-  ipfsHash: z.string().optional(),
-  ipfsPinSize: z.number().optional(),
-  ipfsTimestamp: z.date().optional(),
   milestones: ZodMilestone.array().optional(),
   payments: ZodPayment.array().optional(),
   paymentTerms: z
@@ -72,16 +69,10 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
 
   const participantAddresses = roleAddresses.filter((v, i, addresses) => addresses.indexOf(v) === i) // filter out duplicate addresses
 
-  const { ipfsHash, ipfsPinSize, ipfsTimestamp } = params
   const proposalMetadata = {
     content: {
       title: params.contentTitle,
       body: params.contentBody,
-    },
-    ipfsMetadata: {
-      hash: ipfsHash,
-      ipfsPinSize,
-      timestamp: ipfsTimestamp,
     },
     ...paymentsProposalMetadata,
   } as unknown as ProposalMetadata
