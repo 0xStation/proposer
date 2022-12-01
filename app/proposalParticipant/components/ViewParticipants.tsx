@@ -50,7 +50,6 @@ const ParticipantRow = ({ proposal, participant, setSelectedParticipant }) => {
         </div>
       </td>
       {/* APPROVAL */}
-      {/* <td> */}
       <td>
         <div className="flex flex-row space-x-4 items-center justify-end">
           {participant?.account?.addressType === AddressType.SAFE &&

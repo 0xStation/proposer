@@ -23,17 +23,17 @@ model Account {
   updatedAt       DateTime    @updatedAt
   data            Json
 
-  sessions            Session[]
-  rfps                Rfp[]
-  proposals           ProposalRole[]
-  tokens              AccountToken[]
-  originsOf           AccountAccount[]      @relation("origin")
-  targetsOf           AccountAccount[]      @relation("target")
-  verificationEmails  EmailVerification[]
-  proposalTemplates   ProposalTemplate[]
-  proposalVersions    ProposalVersion[]
-  comments            Comment[]
-  ProposalParticipant ProposalParticipant[]
+  sessions           Session[]
+  rfps               Rfp[]
+  proposals          ProposalRole[]
+  tokens             AccountToken[]
+  originsOf          AccountAccount[]      @relation("origin")
+  targetsOf          AccountAccount[]      @relation("target")
+  verificationEmails EmailVerification[]
+  proposalTemplates  ProposalTemplate[]
+  proposalVersions   ProposalVersion[]
+  comments           Comment[]
+  participants       ProposalParticipant[]
 }
 
 enum AddressType {
@@ -155,7 +155,7 @@ enum ParticipantApprovalStatus {
   // DENY - future for denying proposals
 }
 
-// PROPOSAL ROLES
+// DEPRECATED -- PROPOSAL ROLES
 
 model ProposalRole {
   id             String                     @id @default(uuid())
@@ -185,6 +185,8 @@ enum ProposalRoleApprovalStatus {
   // DENY - future for denying proposals
 }
 
+// PROPOSAL SIGNATURES
+
 model ProposalSignature {
   id              String                @id @default(uuid())
   proposalId      String
@@ -198,8 +200,8 @@ model ProposalSignature {
   // m-n relation to support one signature being utilized for many roles
   // for example, I can have the AUTHOR and CONTRIBUTOR role simultaneously
   // another example, I can be a AUTHOR and represent a CLIENT as a signer of its multisig
-  roles        ProposalRole[]        @relation("RoleApprovalSignature")
   participants ProposalParticipant[] @relation("ParticipantApprovalSignature")
+  roles        ProposalRole[]        @relation("RoleApprovalSignature") // deprecated
 }
 
 enum ProposalSignatureType {
