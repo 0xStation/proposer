@@ -25,7 +25,6 @@ export const DirectPayment = ({
   isLoading,
   setIsLoading,
   setIsOpen,
-  setTabAttachTransaction,
 }) => {
   const setToastState = useStore((state) => state.setToastState)
   const [txnHash, setTxnHash] = useState<string>()
@@ -200,16 +199,7 @@ export const DirectPayment = ({
               Pay
             </Button>
             {!txnHash ? (
-              <>
-                <p className="text-xs">You’ll be redirected to a transaction page to confirm.</p>
-                <p className="text-xs">
-                  Already paid?{" "}
-                  <button onClick={setTabAttachTransaction}>
-                    <span className="text-electric-violet">Paste a transaction link</span>
-                  </button>
-                  .
-                </p>
-              </>
+              <p className="text-xs">You’ll be redirected to a transaction page to confirm.</p>
             ) : (
               <p className="text-xs">
                 Executing the transaction.{" "}
