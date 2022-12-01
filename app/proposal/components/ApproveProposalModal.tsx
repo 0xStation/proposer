@@ -9,10 +9,10 @@ import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import getProposalById from "../queries/getProposalById"
 import { genProposalApprovalDigest } from "app/signatures/proposalSignature"
 import { Proposal } from "app/proposal/types"
-import useGetRolesUserCanApprove from "app/core/hooks/useGetRolesUserCanApprove"
-import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import networks from "app/utils/networks.json"
+import useGetParticipantsUserCanApprove from "app/proposalParticipant/hooks/useGetParticipantsUserCanApprove"
+import getParticipantsByProposal from "app/proposalParticipant/queries/getParticipantsByProposal"
 
 export const ApproveProposalModal = ({
   isOpen,
@@ -30,10 +30,11 @@ export const ApproveProposalModal = ({
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const isPaymentProposal = proposal.data.totalPayments && proposal.data.totalPayments?.length > 0
 
-  const { roles, isLoading: loadingRolesUserCanApprove } = useGetRolesUserCanApprove({
-    proposalId: proposal?.id,
-    proposalVersion: proposal?.version,
-  })
+  const { participants, isLoading: loadingParticipantsUserCanApprove } =
+    useGetParticipantsUserCanApprove({
+      proposalId: proposal?.id,
+      proposalVersion: proposal?.version,
+    })
 
   const { signMessage } = useSignature()
 
@@ -61,10 +62,10 @@ export const ApproveProposalModal = ({
         return
       }
 
-      const representingRoles = roles.map((role) => {
+      const representingParticipants = participants.map((participant) => {
         return {
-          roleId: role.id,
-          complete: role.oneSignerNeededToComplete,
+          participantId: participant.id,
+          complete: participant.oneSignerNeededToComplete,
         }
       })
 
@@ -75,9 +76,9 @@ export const ApproveProposalModal = ({
           signerAddress: activeUser!.address!,
           message,
           signature,
-          representingRoles,
+          representingParticipants,
         })
-        invalidateQuery(getRolesByProposalId)
+        invalidateQuery(getParticipantsByProposal)
         // invalidate proposal query to get ipfs hash post-approval
         // since an ipfs has is created on proposal approval
         invalidateQuery(getProposalById)
@@ -163,7 +164,7 @@ export const ApproveProposalModal = ({
           <Button
             isSubmitType={true}
             isLoading={isLoading}
-            isDisabled={isLoading || loadingRolesUserCanApprove}
+            isDisabled={isLoading || loadingParticipantsUserCanApprove}
             onClick={() => {
               setIsLoading(true)
               initiateSignature()

@@ -11,6 +11,9 @@ import { useSafeTxStatus } from "app/core/hooks/useSafeTxStatus"
 import TextLink from "../../TextLink"
 import { getMostRecentPaymentAttempt } from "app/proposalPayment/utils"
 import { useSafeMetadata } from "app/core/hooks/useSafeMetadata"
+import ExecutePaymentModal from "app/proposal/components/ExecutePaymentModal"
+import QueueGnosisTransactionModal from "app/proposalPayment/components/QueueGnosisTransactionModal"
+import ApproveGnosisTransactionModal from "app/proposalPayment/components/ApproveGnosisTransactionModal"
 
 const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true }) => {
   const mostRecentPaymentAttempt = getMostRecentPaymentAttempt(payment)
@@ -67,8 +70,36 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
   )?.id
   const paymentIsActive = payment?.milestoneId === currentMilestoneId
 
+  const executePaymentModalMap = useStore((state) => state.executePaymentModalMap)
+  const queueGnosisTransactionModalMap = useStore((state) => state.queueGnosisTransactionModalMap)
+  const approveGnosisTransactionModalMap = useStore(
+    (state) => state.approveGnosisTransactionModalMap
+  )
+
   return (
     <>
+      {payment && (
+        <>
+          <ExecutePaymentModal
+            isOpen={executePaymentModalMap[payment.id] || false}
+            setIsOpen={(open) => toggleExecutePaymentModalMap({ open, id: payment.id })}
+            proposal={proposal}
+            milestone={milestone}
+            payment={payment}
+          />
+          <QueueGnosisTransactionModal
+            milestone={milestone}
+            payment={payment}
+            isOpen={queueGnosisTransactionModalMap[payment.id] || false}
+            setIsOpen={(open) => toggleQueueGnosisTransactionModalMap({ open, id: payment.id })}
+          />
+          <ApproveGnosisTransactionModal
+            payment={payment}
+            isOpen={approveGnosisTransactionModalMap[payment.id] || false}
+            setIsOpen={(open) => toggleApproveGnosisTransactionModalMap({ open, id: payment.id })}
+          />
+        </>
+      )}
       {!payment || !paymentIsActive || (!userIsSigner && !userIsPayer) ? (
         <></>
       ) : userIsPayer && !paymentComplete ? (

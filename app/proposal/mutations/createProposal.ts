@@ -67,8 +67,10 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     ...(params.contributorAddresses || []),
     ...params.clientAddresses,
     ...params.authorAddresses,
-  ]
+  ].map((a) => toChecksumAddress(a)) // enforce checksum casing
   await createAccountsIfNotExist(roleAddresses)
+
+  const participantAddresses = roleAddresses.filter((v, i, addresses) => addresses.indexOf(v) === i) // filter out duplicate addresses
 
   const { ipfsHash, ipfsPinSize, ipfsTimestamp } = params
   const proposalMetadata = {
@@ -88,6 +90,16 @@ export default async function createProposal(input: z.infer<typeof CreateProposa
     data: {
       ...(params.rfpId && { rfpId: params.rfpId }),
       data: JSON.parse(JSON.stringify(proposalMetadata)),
+      participants: {
+        createMany: {
+          data: participantAddresses.map((address) => {
+            return {
+              accountAddress: toChecksumAddress(address),
+              data: { isOwner: params.authorAddresses.includes(address) },
+            }
+          }),
+        },
+      },
       roles: {
         createMany: {
           data: [

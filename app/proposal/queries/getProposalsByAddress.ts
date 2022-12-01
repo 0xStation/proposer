@@ -52,6 +52,7 @@ export default async function getProposalsByAddress(input: z.infer<typeof GetPro
       timestamp: "desc",
     },
     include: {
+      participants: { include: { account: true } },
       roles: {
         include: {
           account: true,

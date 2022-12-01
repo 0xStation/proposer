@@ -2,17 +2,9 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { useQuery } from "@blitzjs/rpc"
 import { Routes, useParam } from "@blitzjs/next"
-import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import getProposalById from "app/proposal/queries/getProposalById"
-import {
-  ProposalStatus,
-  ProposalRoleApprovalStatus,
-  ProposalRoleType,
-  RfpStatus,
-} from "@prisma/client"
-import { ProposalRole } from "app/proposalRole/types"
+import { RfpStatus } from "@prisma/client"
 import useStore from "app/core/hooks/useStore"
-import { ProposalStatusPill } from "../../../core/components/ProposalStatusPill"
 import { genPathFromUrlObject } from "app/utils"
 import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
@@ -21,11 +13,9 @@ import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTim
 import LinkArrow from "app/core/icons/LinkArrow"
 import { LINKS } from "app/core/utils/constants"
 import SendProposalModal from "../SendProposalModal"
-import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import getRfpByProposalId from "app/rfp/queries/getRfpByProposalId"
-
-const findProposalRoleByRoleType = (roles, proposalType) =>
-  roles?.find((role) => role.type === proposalType)
+import { ProposalStatusIndicator } from "../ProposalStatusIndicator"
+import { useParticipants } from "app/proposalParticipant/hooks/useParticipants"
 
 const Tab = ({ router, route, children }) => {
   return (
@@ -58,17 +48,9 @@ export const ProposalViewHeaderNavigation = () => {
       staleTime: 60 * 1000, // one minute
     }
   )
-  const [roles] = useQuery(
-    getRolesByProposalId,
-    { proposalId: proposalId },
-    {
-      suspense: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      enabled: Boolean(proposalId),
-      staleTime: 60 * 1000, // one minute
-    }
-  )
+
+  const { participants, isLoading } = useParticipants(proposalId)
+
   const [rfp] = useQuery(
     getRfpByProposalId,
     { proposalId: proposalId },
@@ -79,16 +61,6 @@ export const ProposalViewHeaderNavigation = () => {
       enabled: !!proposalId,
     }
   )
-
-  // author used to return to workspace page with proposal list view
-  const author = findProposalRoleByRoleType(roles, ProposalRoleType.AUTHOR)
-  // numerator for the progress circle
-  const totalApprovalCount =
-    proposal?.roles?.filter(
-      (role) =>
-        role.approvalStatus === ProposalRoleApprovalStatus.APPROVED ||
-        role.approvalStatus === ProposalRoleApprovalStatus.SENT // include author's SEND signature in net count too
-    ).length || 0
 
   const currentPageUrl =
     typeof window !== "undefined"
@@ -126,7 +98,7 @@ export const ProposalViewHeaderNavigation = () => {
       )}
       <div className="w-full min-h-64 relative px-6 md:px-0">
         <div className="mt-6 flex flex-row">
-          {rfp ? (
+          {rfp && (
             <nav>
               {rfp?.data?.content?.title ? (
                 <Link href={Routes.RfpDetail({ rfpId: rfp?.id as string })}>
@@ -146,19 +118,6 @@ export const ProposalViewHeaderNavigation = () => {
                 <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
               )}
             </nav>
-          ) : (
-            <>
-              {" "}
-              <span className="text-concrete hover:text-light-concrete">
-                <Link href={Routes.WorkspaceHome({ accountAddress: author?.address as string })}>
-                  Proposals
-                </Link>{" "}
-                /&nbsp;
-              </span>
-              {proposal?.data?.content?.title || (
-                <span className="h-5 w-36 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
-              )}
-            </>
           )}
         </div>
         {proposal?.data.content.title ? (
@@ -194,24 +153,8 @@ export const ProposalViewHeaderNavigation = () => {
         )}
         {/* PROPOSAL STATUS */}
         <div className="mt-6 flex flex-row justify-between">
-          <div className="space-x-2 flex flex-row">
-            <ProposalStatusPill status={proposal?.status} />
-            {(proposal?.status === ProposalStatus.AWAITING_APPROVAL ||
-              proposal?.status === ProposalStatus.APPROVED) && (
-              <ProgressCircleAndNumber
-                numerator={totalApprovalCount}
-                denominator={proposal?.roles?.length || 0}
-              />
-            )}
-          </div>
-          <CollaboratorPfps
-            // unique accounts
-            accounts={(proposal?.roles as ProposalRole[])
-              ?.map((role) => role?.account)
-              ?.filter((account, idx, accounts) => {
-                return accounts?.findIndex((acc) => acc?.address === account?.address) === idx
-              })}
-          />
+          <ProposalStatusIndicator status={proposal?.status} participants={participants} />
+          <CollaboratorPfps accounts={participants?.map((participant) => participant?.account)} />
         </div>
         {/* BUTTONS */}
         <div className="w-full mt-6 box-border">

@@ -1,4 +1,4 @@
-import { ProposalSignature } from "@prisma/client"
+import { ProposalParticipant, ProposalSignature } from "@prisma/client"
 import { ProposalRole } from "app/proposalRole/types"
 import { ProposalMilestone } from "app/proposalMilestone/types"
 import { Comment } from "app/comment/types"
@@ -8,6 +8,7 @@ import { Proposal as PrismaProposal } from "@prisma/client"
 
 export type Proposal = PrismaProposal & {
   data: ProposalMetadata
+  participants?: ProposalParticipant[]
   roles?: ProposalRole[]
   milestones?: ProposalMilestone[]
   payments?: ProposalPayment[]

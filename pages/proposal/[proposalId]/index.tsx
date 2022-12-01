@@ -3,21 +3,21 @@ import { Routes } from "@blitzjs/next"
 import { useQuery, invoke } from "@blitzjs/rpc"
 import { BlitzPage, useParam } from "@blitzjs/next"
 import { PencilIcon } from "@heroicons/react/solid"
-import { ProposalRoleType, ProposalStatus } from "@prisma/client"
+import { ProposalStatus } from "@prisma/client"
 import Layout from "app/core/layouts/Layout"
 import getProposalById from "app/proposal/queries/getProposalById"
 import ReadMore from "app/core/components/ReadMore"
 import { TotalPaymentView } from "app/core/components/TotalPaymentView"
-import RoleSignaturesView from "app/core/components/RoleSignaturesView"
 import { Proposal } from "app/proposal/types"
 import { ProposalNestedLayout } from "app/core/layouts/ProposalNestedLayout"
 import useStore from "app/core/hooks/useStore"
-import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
 import CommentContainer from "app/comment/components/CommentContainer"
 import NewCommentThread from "app/comment/components/NewCommentThread"
 import CommentEmptyState from "app/comment/components/CommentEmptyState"
 import useCommentPermissions from "app/core/hooks/useCommentPermissions"
 import { useRouter } from "next/router"
+import ParticipantModule from "app/proposalParticipant/components/ParticipantModule"
+import { useProposalPermissions } from "app/proposal/hooks/useProposalPermissions"
 
 export const ToolTip = ({ children }) => {
   return (
@@ -78,18 +78,14 @@ const ViewProposal: BlitzPage = () => {
       staleTime: 60 * 1000, // 1 minute
     }
   )
-  const activeUser = useStore((state) => state.activeUser)
-  const activeUserIsAuthor = proposal?.roles?.find(
-    (role) => role.type === ProposalRoleType.AUTHOR && role.address === activeUser?.address
-  )
-  const { roles: activeUsersRoles } = useGetUsersRoles(proposalId)
   const router = useRouter()
 
   const { canRead, canWrite } = useCommentPermissions(proposal?.id)
+  const { canEdit } = useProposalPermissions(proposal?.id)
 
   return (
     <>
-      {activeUserIsAuthor ? (
+      {canEdit ? (
         proposal?.status === ProposalStatus.DRAFT ||
         proposal?.status === ProposalStatus.AWAITING_APPROVAL ? (
           <div className="relative group float-right mt-5 mr-2 md:mr-0">
@@ -98,6 +94,7 @@ const ViewProposal: BlitzPage = () => {
               onClick={() => {
                 router.push(Routes.EditProposalPage({ proposalId }))
               }}
+              className="p-2 rounded-md hover:bg-charcoal"
             >
               <EditIcon>Edit Proposal</EditIcon>
             </button>
@@ -109,15 +106,13 @@ const ViewProposal: BlitzPage = () => {
           </div>
         )
       ) : (
-        activeUsersRoles?.length > 0 && (
-          <div className="relative group float-right mt-5 mr-2 md:mr-0">
-            <ToolTip>Currently, only the author can edit the proposal.</ToolTip>
-            <EditIcon disabled={true}>Edit Proposal</EditIcon>
-          </div>
-        )
+        <div className="relative group float-right mt-5 mr-2 md:mr-0">
+          <ToolTip>Currently, only the author can edit the proposal.</ToolTip>
+          <EditIcon disabled={true}>Edit Proposal</EditIcon>
+        </div>
       )}
       <ReadMore className="mt-12 mb-9 mx-6 md:mx-0">{proposal?.data?.content?.body}</ReadMore>
-      <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" />
+      <ParticipantModule proposal={proposal as Proposal} className="mt-9" />
       {(proposal?.data.totalPayments || []).length > 0 && (
         <TotalPaymentView proposal={proposal!} className="mt-9" />
       )}

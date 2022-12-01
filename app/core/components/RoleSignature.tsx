@@ -92,7 +92,7 @@ const SafeRole = ({ role, proposal }) => {
             <GnosisSafeSignersModal
               isOpen={toggleSigners}
               setIsOpen={setToggleSigners}
-              role={role}
+              participant={role}
             />
           </div>
         ) : (

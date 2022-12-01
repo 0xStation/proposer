@@ -1,9 +1,10 @@
-import useGetUserRoles from "app/core/hooks/useGetUsersRoles"
+import useGetUsersParticipants from "app/proposalParticipant/hooks/useGetUsersParticipants"
 
 const useCommentPermissions = (proposalId) => {
-  const { roles: userRoles } = useGetUserRoles(proposalId)
+  const { participants } = useGetUsersParticipants(proposalId)
+
   const canRead = true
-  const canWrite = userRoles.length > 0
+  const canWrite = participants.length > 0
 
   return { canRead, canWrite }
 }

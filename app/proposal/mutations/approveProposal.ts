@@ -1,7 +1,7 @@
 import { invoke } from "@blitzjs/rpc"
 import * as z from "zod"
 import db from "db"
-import { ProposalStatus, ProposalRoleApprovalStatus } from "@prisma/client"
+import { ProposalStatus, ParticipantApprovalStatus } from "@prisma/client"
 import pinProposalSignature from "app/proposalSignature/mutations/pinProposalSignature"
 import pinProposal from "./pinProposal"
 import { sendProposalApprovedEmail } from "app/utils/email"
@@ -13,25 +13,25 @@ const ApproveProposal = z.object({
   signerAddress: z.string(),
   message: z.any(),
   signature: z.string(),
-  representingRoles: z
+  representingParticipants: z
     .object({
-      roleId: z.string(),
+      participantId: z.string(),
       complete: z.boolean(),
     })
-    .array(), // array of type role
+    .array(),
 })
 
 export default async function approveProposal(input: z.infer<typeof ApproveProposal>) {
   const params = ApproveProposal.parse(input)
 
-  if (params.representingRoles.length === 0) {
-    throw Error("missing representing roles ids")
+  if (params.representingParticipants.length === 0) {
+    throw Error("missing representing participants ids")
   }
 
   let proposalSignature
   try {
-    // create proposal signature connected to proposalRole
-    // update linked proposalRoles to be of status complete
+    // create proposal signature connected to participant
+    // update linked participants to be of status complete
     // once we support multisigs, check if quorum is met first before updating
     const [proposalSig] = await db.$transaction([
       db.proposalSignature.create({
@@ -41,37 +41,37 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
           data: {
             message: params.message,
             signature: params.signature,
-            representingRoles: params.representingRoles,
+            representingParticipants: params.representingParticipants,
           },
           proposal: {
             connect: {
               id: params.proposalId,
             },
           },
-          roles: {
-            connect: params.representingRoles.map((role) => {
+          participants: {
+            connect: params.representingParticipants.map((participant) => {
               return {
-                id: role.roleId,
+                id: participant.participantId,
               }
             }),
           },
         },
       }),
-      // update role with complete status
+      // update participant with complete status
       // if signature is a multisig, we don't want to mark as complete unless it has met quorum
-      // so we filter for roles that are 'complete'.
+      // so we filter for participants that are 'complete'.
       // complete is a type passed from the front-end indiciating that it is ready to be pushed to status complete
-      ...params.representingRoles
-        .filter((role) => {
-          return role.complete
+      ...params.representingParticipants
+        .filter((participant) => {
+          return participant.complete
         })
-        .map((role) => {
-          return db.proposalRole.update({
+        .map((participant) => {
+          return db.proposalParticipant.update({
             where: {
-              id: role.roleId,
+              id: participant.participantId,
             },
             data: {
-              approvalStatus: ProposalRoleApprovalStatus.APPROVED,
+              approvalStatus: ParticipantApprovalStatus.APPROVED,
             },
           })
         }),
@@ -96,7 +96,7 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
     proposal = await db.proposal.findUnique({
       where: { id: params.proposalId },
       include: {
-        roles: true,
+        participants: true,
         milestones: true,
         payments: true,
         signatures: true,
@@ -109,10 +109,10 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
   // update proposal status based on status of signatures
   // if current status is the same as the pending status change
   // skip the update
-  const pendingStatusChange = proposal.roles.every(
-    (role) =>
-      role.approvalStatus === ProposalRoleApprovalStatus.APPROVED ||
-      role.approvalStatus === ProposalRoleApprovalStatus.SENT
+  const pendingStatusChange = proposal.participants.every(
+    (participant) =>
+      participant.approvalStatus === ParticipantApprovalStatus.APPROVED ||
+      participant.approvalStatus === ParticipantApprovalStatus.SENT
   )
     ? ProposalStatus.APPROVED
     : ProposalStatus.AWAITING_APPROVAL
@@ -139,7 +139,7 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
             }),
         },
         include: {
-          roles: true,
+          participants: true,
           milestones: true,
           payments: true,
           signatures: true,
@@ -160,7 +160,9 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
 
       try {
         // send fully approved email
-        const recipientEmails = await getEmails(proposal.roles.map((role) => role.address))
+        const recipientEmails = await getEmails(
+          proposal.participants.map((participant) => participant.accountAddress)
+        )
         await sendProposalApprovedEmail({ recipients: recipientEmails, proposal })
       } catch (e) {
         // silently fail

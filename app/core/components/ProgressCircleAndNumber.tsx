@@ -4,7 +4,7 @@ export const ProgressCircleAndNumber = ({ className = "", numerator = 0, denomin
   return (
     <div className="flex flex-row space-x-1 items-center">
       <ProgressIndicator
-        percent={numerator / denominator} // filter out duplicate addresses}
+        percent={denominator === 0 ? 0 : numerator / denominator} // filter out duplicate addresses}
         twsize={4}
         cutoff={0}
       />

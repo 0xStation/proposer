@@ -29,6 +29,7 @@ import { isAddress } from "ethers/lib/utils"
 import getProposalCountForAccount from "app/proposal/queries/getProposalCountForAccount"
 import WorkspaceSidebar from "app/core/components/WorkspaceSidebar"
 import { useRouter } from "next/router"
+import { ProposalStatusIndicator } from "app/proposal/components/ProposalStatusIndicator"
 
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
   const { accountAddress } = params
@@ -191,11 +192,6 @@ const WorkspaceHome: BlitzPage = () => {
           {proposals &&
             proposals.length > 0 &&
             proposals.map((proposal, idx) => {
-              const uniqueRoleAccounts = (proposal?.roles as ProposalRole[])
-                ?.map((role) => role?.account!)
-                ?.filter((account, idx, accounts) => {
-                  return accounts?.findIndex((acc) => acc?.address === account?.address) === idx
-                })
               return (
                 <Link
                   href={Routes.ViewProposal({ proposalId: proposal.id })}
@@ -210,21 +206,10 @@ const WorkspaceHome: BlitzPage = () => {
                     </td>
                     {/* PROPOSAL STATUS */}
                     <td className="py-4">
-                      <div className="flex flex-row space-x-2">
-                        <ProposalStatusPill status={proposal?.status} />
-                        {proposal?.status === ProposalStatus.AWAITING_APPROVAL && (
-                          <ProgressCircleAndNumber
-                            numerator={
-                              proposal?.roles?.filter(
-                                (role) =>
-                                  role.approvalStatus === ProposalRoleApprovalStatus.APPROVED ||
-                                  role.approvalStatus === ProposalRoleApprovalStatus.SENT
-                              ).length
-                            }
-                            denominator={proposal?.roles?.length}
-                          />
-                        )}
-                      </div>
+                      <ProposalStatusIndicator
+                        status={proposal?.status}
+                        participants={proposal?.participants}
+                      />
                     </td>
                     {/* PAYMENT */}
                     <td className="text-base py-4">
@@ -239,11 +224,7 @@ const WorkspaceHome: BlitzPage = () => {
                     {/* COLLABORATORS */}
                     <td className="pr-12">
                       <div className="flex">
-                        {uniqueRoleAccounts?.length > 0 ? (
-                          <CollaboratorPfps accounts={uniqueRoleAccounts} size={Sizes.BASE} />
-                        ) : (
-                          ""
-                        )}
+                        <CollaboratorPfps accounts={proposal?.participants} size={Sizes.BASE} />
                       </div>
                     </td>
                   </tr>
