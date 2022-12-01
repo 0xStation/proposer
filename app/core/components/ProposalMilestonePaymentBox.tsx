@@ -12,6 +12,7 @@ import { getTransactionLink } from "../utils/getTransactionLink"
 import TextLink from "./TextLink"
 import { convertJSDateToDateAndTime } from "app/core/utils/convertJSDateToDateAndTime"
 import { getMostRecentPaymentAttempt } from "app/proposalPayment/utils"
+import { ProposalPaymentStatus } from "app/proposalPayment/types"
 
 const PaymentRow = ({ proposal, milestone, payment }) => {
   const mostRecentPaymentAttempt = getMostRecentPaymentAttempt(payment)
@@ -30,7 +31,7 @@ const PaymentRow = ({ proposal, milestone, payment }) => {
           {formatCurrencyAmount(payment?.amount?.toString())}
         </span>
       </div>
-      {payment.data?.history.length > 0 && (
+      {payment.data?.history?.length > 0 && (
         <h4 className="text-concrete uppercase text-xs font-bold tracking-wider my-2">History</h4>
       )}
       <div className="space-y-4">
@@ -52,12 +53,15 @@ const PaymentRow = ({ proposal, milestone, payment }) => {
                   </span>{" "}
                   on {convertJSDateToDateAndTime({ timestamp: new Date(attempt.timestamp) })}
                 </span>
-                <TextLink
-                  url={getTransactionLink(payment.data.token.chainId, attempt.transactionHash)}
-                  className="text-sm text-tunnel-black"
-                >
-                  See transaction
-                </TextLink>
+                {(attempt.status === ProposalPaymentStatus.SUCCESS ||
+                  attempt.status === ProposalPaymentStatus.FAILED) && (
+                  <TextLink
+                    url={getTransactionLink(payment.data.token.chainId, attempt.transactionHash)}
+                    className="text-sm text-tunnel-black"
+                  >
+                    See transaction
+                  </TextLink>
+                )}
               </div>
             </div>
           )
