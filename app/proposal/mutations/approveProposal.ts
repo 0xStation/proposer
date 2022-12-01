@@ -1,9 +1,6 @@
-import { invoke } from "@blitzjs/rpc"
 import * as z from "zod"
 import db from "db"
 import { ProposalStatus, ParticipantApprovalStatus } from "@prisma/client"
-import pinProposalSignature from "app/proposalSignature/mutations/pinProposalSignature"
-import pinProposal from "./pinProposal"
 import { sendProposalApprovedEmail } from "app/utils/email"
 import { getEmails } from "app/utils/privy"
 
@@ -81,16 +78,6 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
     throw Error(`Failed to create signature in approveProposal: ${err}`)
   }
 
-  try {
-    await pinProposalSignature({
-      proposalSignatureId: proposalSignature?.id,
-      signature: params?.signature,
-      signatureMessage: params?.message,
-    })
-  } catch (err) {
-    throw Error(`Failed to pin proposal signature to ipfs in approveProposal: ${err}`)
-  }
-
   let proposal
   try {
     proposal = await db.proposal.findUnique({
@@ -151,13 +138,6 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
     }
 
     if (pendingStatusChange === ProposalStatus.APPROVED) {
-      try {
-        updatedProposal = await invoke(pinProposal, { proposalId: proposal?.id as string })
-      } catch (err) {
-        console.error("Failed to pin proposal in `approveProposal`", err)
-        throw Error(err)
-      }
-
       try {
         // send fully approved email
         const recipientEmails = await getEmails(

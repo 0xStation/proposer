@@ -57,7 +57,6 @@ export default async function editProposal(input: z.infer<typeof EditProposal>, 
       title: params.contentTitle,
       body: params.contentBody,
     },
-    ipfsMetadata: JSON.parse(JSON.stringify(proposal?.data?.ipfsMetadata)), // ipfs data doesn't exist yet, until after a proposal is approved
     proposalHash: params.proposalHash,
     authorSignature: params.signature,
     signatureMessage: params.signatureMessage,

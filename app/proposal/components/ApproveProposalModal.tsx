@@ -79,8 +79,6 @@ export const ApproveProposalModal = ({
           representingParticipants,
         })
         invalidateQuery(getParticipantsByProposal)
-        // invalidate proposal query to get ipfs hash post-approval
-        // since an ipfs has is created on proposal approval
         invalidateQuery(getProposalById)
         router.replace(router.asPath)
         setIsOpen(false)

@@ -7,7 +7,6 @@ import { _TypedDataEncoder } from "@ethersproject/hash"
  * This hash is the EVM-native way of signing typed data and lets us have a consistently sized content-dependent identifier for versions
  * this is important to demonstrate that even if the content of a proposal changes at a given UUID, the signature still indicates what exact data it signed.
  *
- * Initial use to replace use of the proposal's IPFS CID in proposalHash for signing ProposalSignatures
  */
 export function getHash(domain, types, message) {
   return _TypedDataEncoder.hash(domain, types, message)

@@ -11,8 +11,9 @@ const GetGnosisTxStatus = z.object({
 export default async function getGnosisTxStatus(params: z.infer<typeof GetGnosisTxStatus>) {
   const input = GetGnosisTxStatus.parse(params)
 
-  if (!!input.safeTxHash) {
-    throw Error("No safeTxHash provided")
+  if (!input.safeTxHash) {
+    console.error("No safeTxHash provided")
+    return
   }
 
   // thinking we could first check if the proposalCurrentMilestone is on the milestone that is being passed in
