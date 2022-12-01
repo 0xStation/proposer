@@ -7,10 +7,10 @@ import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { genProposalDigest } from "app/signatures/proposal"
 import useSignature from "app/core/hooks/useSignature"
 import getProposalById from "../queries/getProposalById"
-import { ProposalRoleType } from "@prisma/client"
 import { getHash } from "app/signatures/utils"
 import sendProposal from "../mutations/sendProposal"
-import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
+import getParticipantsByProposal from "app/proposalParticipant/queries/getParticipantsByProposal"
+import { useParticipants } from "app/proposalParticipant/hooks/useParticipants"
 
 export const SendProposallModal = ({ isOpen, setIsOpen, proposal }) => {
   const setToastState = useStore((state) => state.setToastState)
@@ -22,7 +22,7 @@ export const SendProposallModal = ({ isOpen, setIsOpen, proposal }) => {
     onSuccess: (data) => {
       setIsLoading(false)
       invalidateQuery(getProposalById)
-      invalidateQuery(getRolesByProposalId)
+      invalidateQuery(getParticipantsByProposal)
       setToastState({
         isToastShowing: true,
         type: "success",
@@ -34,6 +34,8 @@ export const SendProposallModal = ({ isOpen, setIsOpen, proposal }) => {
       console.error(error)
     },
   })
+
+  const { participants } = useParticipants(proposal?.id)
 
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
@@ -61,11 +63,11 @@ export const SendProposallModal = ({ isOpen, setIsOpen, proposal }) => {
           onClick={async () => {
             setIsLoading(true)
             try {
-              const authorRole = proposal?.roles?.find(
-                (role) => role.type === ProposalRoleType.AUTHOR
+              const authorParticipant = participants?.find(
+                (participant) => participant.data.isOwner
               )
               // if user disconnects and logs in as another user, we need to check if they are the author
-              if (authorRole?.address !== session?.siwe?.address) {
+              if (authorParticipant?.accountAddress !== session?.siwe?.address) {
                 throw Error("Current address doesn't match author's address.")
               }
               // prompt author to sign proposal to prove they are the author of the content
@@ -85,7 +87,7 @@ export const SendProposallModal = ({ isOpen, setIsOpen, proposal }) => {
                 authorSignature: signature as string,
                 signatureMessage: message,
                 proposalHash: proposalHash,
-                representingRoles: [],
+                representingParticipants: [],
               })
             } catch (err) {
               setIsLoading(false)

@@ -17,10 +17,10 @@ export const useConfirmAuthorship = ({
 
   const confirmAuthorship = async ({
     proposal,
-    representingRoles = [],
+    representingParticipants = [],
   }: {
     proposal: Proposal
-    representingRoles: { roleId: string; complete: boolean }[] | undefined
+    representingParticipants: { participantId: string; complete: boolean }[] | undefined
   }) => {
     try {
       const { message, signature, proposalHash } = await signProposal({ proposal })
@@ -35,7 +35,7 @@ export const useConfirmAuthorship = ({
         authorSignature: signature as string,
         signatureMessage: message,
         proposalHash,
-        representingRoles,
+        representingParticipants,
       })
 
       if (sendProposalSuccess) {

@@ -235,7 +235,7 @@ export const ProposalFormFunding = ({
           }
 
           try {
-            await confirmAuthorship({ proposal: newProposal, representingRoles: [] })
+            await confirmAuthorship({ proposal: newProposal, representingParticipants: [] })
           } catch (err) {
             setIsLoading(false)
             setToastState({
