@@ -266,22 +266,20 @@ export const ProposalFormTemplate = () => {
             }
 
             try {
-              const representingRoles = newProposal.roles
-                ?.filter(
-                  (role) =>
-                    // IMPORTANT: filters out multisigs to enable signers to submit proposals without auto-approving
-                    addressesAreEqual(role.address, session.siwe?.address || "") &&
-                    role.type !== ProposalRoleType.AUTHOR
+              const representingParticipants = newProposal.participants
+                ?.filter((participant) =>
+                  // IMPORTANT: filters out multisigs to enable signers to submit proposals without auto-approving
+                  addressesAreEqual(participant.accountAddress, session.siwe?.address || "")
                 )
-                .map((role) => {
+                .map((participant) => {
                   return {
-                    roleId: role.id,
-                    // if role's account is WALLET, then one signature is left
-                    // if role's account is SAFE, then we don't to trigger an approval on send to let the multisig decide, we should revisit this and I am willing to change mind here
-                    complete: role.account?.addressType === AddressType.WALLET,
+                    participantId: participant.id,
+                    // if participant's account is WALLET, then one signature is left
+                    // if participant's account is SAFE, then we don't to trigger an approval on send to let the multisig decide, we should revisit this and I am willing to change mind here
+                    complete: participant.account?.addressType === AddressType.WALLET,
                   }
                 })
-              await confirmAuthorship({ proposal: newProposal, representingRoles })
+              await confirmAuthorship({ proposal: newProposal, representingParticipants })
             } catch (err) {
               setIsLoading(false)
               setToastState({

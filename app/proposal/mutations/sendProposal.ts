@@ -1,5 +1,5 @@
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
-import { ProposalRoleApprovalStatus, ProposalRoleType, ProposalSignatureType } from "@prisma/client"
+import { ParticipantApprovalStatus, ProposalSignatureType } from "@prisma/client"
 import { ProposalSignatureMetadata } from "app/proposalSignature/types"
 import db, { ProposalStatus } from "db"
 import * as z from "zod"
@@ -7,6 +7,7 @@ import { ProposalMetadata } from "../types"
 import { Ctx } from "blitz"
 import { getEmails } from "app/utils/privy"
 import { sendNewProposalEmail } from "app/utils/email"
+import { ProposalParticipantMetadata } from "app/proposalParticipant/types"
 
 const SendProposal = z.object({
   proposalId: z.string(),
@@ -14,19 +15,19 @@ const SendProposal = z.object({
   authorSignature: z.string(), // should be optional in draft form
   signatureMessage: z.any(), //should be optional in draft form
   proposalHash: z.string(), // should be optional in draft form
-  representingRoles: z
+  representingParticipants: z
     .object({
-      roleId: z.string(),
+      participantId: z.string(),
       complete: z.boolean(),
     })
     .array()
     .optional()
-    .default([]), // array of type role
+    .default([]), // array of type participant
 })
 
-// Sends a proposal to labeled roles
+// Sends a proposal to labeled participants
 // Updates the proposal's status, deletes existing signatures
-// to update the roles, milestones, or payments of a proposal, use/make their specific mutations
+// to update the participants, milestones, or payments of a proposal, use/make their specific mutations
 export default async function sendProposal(input: z.infer<typeof SendProposal>, ctx: Ctx) {
   const params = SendProposal.parse(input)
 
@@ -35,7 +36,7 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
       id: params.proposalId,
     },
     include: {
-      roles: {
+      participants: {
         include: {
           account: true,
         },
@@ -47,12 +48,13 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
     throw Error("proposal does not exist")
   }
 
-  const associatedAuthorRole = proposal.roles.find(
-    (role) =>
-      addressesAreEqual(role.address, params.authorAddress) && role.type === ProposalRoleType.AUTHOR
+  const authorParticipant = proposal.participants.find(
+    (participant) =>
+      addressesAreEqual(participant.accountAddress, params.authorAddress) &&
+      (participant.data as ProposalParticipantMetadata).isOwner
   )
 
-  if (!associatedAuthorRole) {
+  if (!authorParticipant) {
     throw Error("address provided is not author")
   }
 
@@ -106,10 +108,10 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
           },
         },
       }),
-      // Note: existing proposal signatures and role approvals for this proposal
+      // Note: existing proposal signatures and participant approvals for this proposal
       // should have already been wiped if an author made edits and wants to re-send the proposal
 
-      // create new signature and connect to proposal and author role
+      // create new signature and connect to proposal and author participant
       db.proposalSignature.create({
         data: {
           type: ProposalSignatureType.SEND,
@@ -121,15 +123,15 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
               id: params.proposalId,
             },
           },
-          // connect to the author's role
-          roles: {
+          // connect to the author's participant
+          participants: {
             connect: {
-              id: associatedAuthorRole.id,
+              id: authorParticipant.id,
             },
           },
         },
       }),
-      // create new signature and connect to proposal and author role
+      // create new signature and connect to proposal and author participant
       db.proposalSignature.create({
         data: {
           type: ProposalSignatureType.APPROVE,
@@ -141,38 +143,38 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
               id: params.proposalId,
             },
           },
-          // connect to the other roles held by author
-          roles: {
-            connect: params.representingRoles.map((role) => {
-              return { id: role.roleId }
+          // connect to the other participants held by author
+          participants: {
+            connect: params.representingParticipants.map((participant) => {
+              return { id: participant.participantId }
             }),
           },
         },
       }),
-      // update author role to SENT approvalStatus to mark as done
-      db.proposalRole.update({
+      // update author participant to SENT approvalStatus to mark as done
+      db.proposalParticipant.update({
         where: {
-          id: associatedAuthorRole.id,
+          id: authorParticipant.id,
         },
         data: {
-          approvalStatus: ProposalRoleApprovalStatus.SENT,
+          approvalStatus: ParticipantApprovalStatus.SENT,
         },
       }),
-      // update non-author roles with complete status
+      // update non-author participants with complete status
       // if signature is a multisig, we don't want to mark as complete unless it has met quorum
-      // so we filter for roles that are 'complete'.
+      // so we filter for participants that are 'complete'.
       // complete is a type passed from the front-end indiciating that it is ready to be pushed to status complete
-      ...params.representingRoles
-        .filter((role) => {
-          return role.complete
+      ...params.representingParticipants
+        .filter((participant) => {
+          return participant.complete
         })
-        .map((role) => {
-          return db.proposalRole.update({
+        .map((participant) => {
+          return db.proposalParticipant.update({
             where: {
-              id: role.roleId,
+              id: participant.participantId,
             },
             data: {
-              approvalStatus: ProposalRoleApprovalStatus.APPROVED,
+              approvalStatus: ParticipantApprovalStatus.APPROVED,
             },
           })
         }),
@@ -180,14 +182,15 @@ export default async function sendProposal(input: z.infer<typeof SendProposal>, 
 
     try {
       // send notification emails
-      const author = proposal.roles.find((role) => role.type === ProposalRoleType.AUTHOR)?.account
+      const author = authorParticipant?.account
 
       const emails = await getEmails(
-        proposal.roles
+        proposal.participants
           .filter(
-            (role) => role.type !== ProposalRoleType.AUTHOR && role.address !== author?.address
+            (participant) =>
+              !addressesAreEqual(participant.accountAddress, authorParticipant.accountAddress)
           )
-          .map((role) => role.address)
+          .map((participant) => participant.accountAddress)
       )
 
       await sendNewProposalEmail({

@@ -129,7 +129,7 @@ export const ProposalFormIdea = ({
           }
 
           try {
-            await confirmAuthorship({ proposal: newProposal, representingRoles: [] })
+            await confirmAuthorship({ proposal: newProposal, representingParticipants: [] })
           } catch (err) {
             setIsLoading(false)
             setToastState({
