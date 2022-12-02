@@ -4,6 +4,7 @@ import decimalToBigNumber from "app/core/utils/decimalToBigNumber"
 import { getNetworkCoin } from "app/core/utils/networkInfo"
 import { ZERO_ADDRESS } from "app/core/utils/constants"
 import { BigNumber } from "ethers"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 export const preparePaymentTransaction = (
   recipientAddress: string,
@@ -34,7 +35,7 @@ export const preparePaymentTransaction = (
 
   return {
     chainId: token.chainId,
-    to: target,
+    to: toChecksumAddress(target),
     value,
     data,
   }
