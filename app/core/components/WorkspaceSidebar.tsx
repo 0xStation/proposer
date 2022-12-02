@@ -5,7 +5,7 @@ import AccountMediaObject from "./AccountMediaObject"
 import useUserHasPermissionOfAddress from "../hooks/useUserHasPermissionOfAddress"
 import { Routes, useParam } from "@blitzjs/next"
 import { useRouter } from "next/router"
-import { useQuery } from "@blitzjs/rpc"
+import { useQuery, invalidateQuery } from "@blitzjs/rpc"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { toChecksumAddress } from "../utils/checksumAddress"
@@ -16,7 +16,7 @@ export const WorkspaceSidebar = () => {
   const router = useRouter()
   const accountAddress = useParam("accountAddress", "string") as string
   const [isWorkspaceDrawerOpen, setIsWorkspaceDrawerOpen] = useState<boolean>(false)
-  const [account] = useQuery(
+  const [account, { setQueryData }] = useQuery(
     getAccountByAddress,
     { address: toChecksumAddress(accountAddress) },
     {
@@ -32,7 +32,7 @@ export const WorkspaceSidebar = () => {
     account?.data?.chainId
   )
 
-  const [updateAccountMutation] = useMutation(updateAccount)
+  const [updateAccountMutation, { isLoading }] = useMutation(updateAccount)
   const [editingStatus, setEditingStatus] = useState<boolean>(false)
   const [statusText, setStatusText] = useState<string>("")
 
@@ -70,66 +70,71 @@ export const WorkspaceSidebar = () => {
               className={`h-10 w-full rounded-4xl flex flex-row bg-wet-concrete shadow border-solid motion-safe:animate-pulse`}
             />
           )}
-          <div
-            className="bg-wet-concrete px-4 py-2 rounded-lg border border-concrete relative"
-            onClick={() => {
-              console.log(editingStatus)
-              if (!editingStatus) {
-                setEditingStatus(true)
-              }
-            }}
-          >
-            {!editingStatus ? (
-              <div
-                className="text-base"
-                onClick={() => {
-                  if (!editingStatus) {
-                    console.log("clicked")
-                    setEditingStatus(true)
-                  }
-                }}
-              >
-                {account?.data.prompt ? (
-                  account.data.prompt
-                ) : (
-                  <span className="text-light-concrete">Looking for proposals for...</span>
-                )}
-              </div>
-            ) : (
-              <>
-                <textarea
-                  onChange={(e) => setStatusText(e.target.value)}
-                  className="bg-wet-concrete resize-none min-h-[60px] focus:outline-0"
-                  placeholder={"Looking for proposals for..."}
-                >
-                  {account?.data.prompt && account?.data.prompt}
-                </textarea>
-                <div className="flex flex-row space-x-2">
-                  <Button
-                    type={ButtonType.Secondary}
-                    onClick={() => {
-                      setStatusText("")
-                      setEditingStatus(false)
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={async () => {
-                      await updateAccountMutation({
-                        address: accountAddress,
-                        prompt: statusText,
-                      })
-                      setEditingStatus(false)
-                      // need to invalidate the query, or optomistically update the UI.
-                    }}
-                  >
-                    Save
-                  </Button>
+          {(hasPrivateAccess || account?.data?.prompt) && (
+            <div
+              className="bg-wet-concrete px-4 py-2 rounded-lg border border-concrete relative"
+              onClick={() => {
+                if (!editingStatus && hasPrivateAccess) {
+                  setEditingStatus(true)
+                }
+              }}
+            >
+              {!editingStatus ? (
+                <div className="text-base">
+                  {account?.data.prompt ? (
+                    account.data.prompt
+                  ) : (
+                    <span className="text-light-concrete">Looking for proposals for...</span>
+                  )}
                 </div>
-              </>
-            )}
-          </div>
+              ) : (
+                <>
+                  <textarea
+                    onChange={(e) => setStatusText(e.target.value)}
+                    className="bg-wet-concrete resize-none min-h-[60px] focus:outline-0"
+                    placeholder={"Looking for proposals for..."}
+                  >
+                    {account?.data.prompt && account?.data.prompt}
+                  </textarea>
+                  <div className="flex flex-row space-x-2">
+                    <Button
+                      type={ButtonType.Secondary}
+                      onClick={() => {
+                        setStatusText("")
+                        setEditingStatus(false)
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={async () => {
+                        if (account) {
+                          console.log("setting data")
+                          setQueryData({
+                            ...account,
+                            data: {
+                              ...(account.data as any),
+                              prompt: statusText,
+                            },
+                          })
+                        }
+                        await updateAccountMutation({
+                          address: accountAddress,
+                          prompt: statusText,
+                        })
+                        await invalidateQuery(getAccountByAddress)
+                        setEditingStatus(false)
+                        // need to invalidate the query, or optomistically update the UI.
+                      }}
+                      isLoading={isLoading}
+                    >
+                      Save
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
         {/* TABS */}
         <ul className="mt-6 space-y-2">
