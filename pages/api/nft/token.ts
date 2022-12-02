@@ -33,7 +33,7 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
     return
   }
 
-  const acctName = (account.data as AccountMetadata)?.name
+  const acctName = (account.data as unknown as AccountMetadata)?.name
 
   let payload = {
     name: acctName,

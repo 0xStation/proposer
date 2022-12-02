@@ -30,10 +30,10 @@ export default async function verifyEmail(input: z.infer<typeof VerifyEmail>) {
       where: { id: emailVerification?.account.id },
       data: {
         data: {
-          ...(emailVerification?.account.data as AccountMetadata),
+          ...(emailVerification?.account.data as unknown as AccountMetadata),
           hasSavedEmail: true,
           hasVerifiedEmail: true,
-        },
+        } as any,
       },
     })
 
