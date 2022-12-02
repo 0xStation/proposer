@@ -12,6 +12,7 @@ import { toChecksumAddress } from "../utils/checksumAddress"
 import WorkspaceNavigationDrawer from "./WorkspaceNavigationDrawer"
 import updateAccount from "app/account/mutations/updateAccount"
 import ExpandingTextArea from "./sds/form/ExpandingTextarea"
+import timeSince from "app/core/utils/timeSince"
 
 export const WorkspaceSidebar = () => {
   const router = useRouter()
@@ -73,7 +74,7 @@ export const WorkspaceSidebar = () => {
           )}
           {(hasPrivateAccess || account?.data?.prompt) && (
             <div
-              className="bg-wet-concrete px-4 py-2 rounded-lg relative cursor-pointer"
+              className="bg-wet-concrete px-4 py-3 rounded-lg relative cursor-pointer"
               onClick={() => {
                 if (!currentlyEditingStatus && hasPrivateAccess) {
                   setCurrentlyEditingStatus(true)
@@ -81,36 +82,42 @@ export const WorkspaceSidebar = () => {
               }}
             >
               <svg
-                width="20"
-                height="10"
-                viewBox="0 0 95 60"
+                width="24"
+                height="12"
+                viewBox="0 0 24 12"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="absolute top-[-9px]"
+                className="absolute top-[-7px]"
               >
                 <path
-                  d="M45.9422 0.933843C46.7427 -0.0600909 48.2568 -0.0600873 49.0574 0.933847L93.8089 56.4955C94.8627 57.8039 93.9314 59.75 92.2513 59.75H2.74827C1.06818 59.75 0.136799 57.8039 1.19068 56.4955L45.9422 0.933843Z"
+                  d="M10.001 1.59922C10.7144 1.02847 11.0711 0.743096 11.4667 0.633653C11.8157 0.537115 12.1843 0.537115 12.5333 0.633653C12.9289 0.743096 13.2856 1.02847 13.999 1.59922L19.8765 6.30122C22.0613 8.049 23.1536 8.9229 23.2742 9.68926C23.3785 10.3526 23.143 11.024 22.6471 11.4769C22.0742 12 20.6753 12 17.8775 12H6.1225C3.32468 12 1.92577 12 1.3529 11.4769C0.857045 11.024 0.621518 10.3526 0.725849 9.68926C0.846381 8.9229 1.93875 8.049 4.12348 6.30122L10.001 1.59922Z"
                   fill="#2E2E2E"
                 />
               </svg>
+
               {!currentlyEditingStatus ? (
                 <div className="text-base">
                   {account?.data.prompt ? (
                     <div className="flex flex-col space-y-4">
-                      <span>{account.data.prompt}</span>
-                      {hasPrivateAccess && (
-                        <a
-                          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                            account?.data.prompt
-                          )}%20https://www.app.station.express/workspace/${account?.address}`}
-                          target="_blank"
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-electric-violet font-bold self-start"
-                          rel="noreferrer"
-                        >
-                          Tweet
-                        </a>
-                      )}
+                      <span>{account.data.prompt.text}</span>
+                      <div className="flex flex-row items-center justify-between w-full">
+                        <span className="text-sm text-concrete">
+                          {timeSince(new Date(account.data.prompt.updatedAt))}
+                        </span>
+                        {hasPrivateAccess && (
+                          <a
+                            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                              account?.data.prompt.text
+                            )}%20https://www.app.station.express/workspace/${account?.address}`}
+                            target="_blank"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-electric-violet font-bold self-start"
+                            rel="noreferrer"
+                          >
+                            Tweet
+                          </a>
+                        )}
+                      </div>
                     </div>
                   ) : (
                     <span className="text-light-concrete">Looking for proposals for...</span>
@@ -121,7 +128,7 @@ export const WorkspaceSidebar = () => {
                   <ExpandingTextArea
                     value={statusText}
                     onChange={(e) => setStatusText(e.target.value)}
-                    className="bg-wet-concrete resize-none focus:outline-0 w-full"
+                    className="bg-wet-concrete resize-none focus:outline-0 w-full mb-2"
                     placeholder={"Looking for proposals for..."}
                   />
                   <div className="flex flex-row space-x-2">
@@ -146,7 +153,10 @@ export const WorkspaceSidebar = () => {
                         }
                         const updatedAccount = await updateAccountMutation({
                           address: accountAddress,
-                          prompt: statusText,
+                          prompt: {
+                            text: statusText,
+                            updatedAt: new Date(),
+                          },
                         })
                         setQueryData(updatedAccount)
                         setCurrentlyEditingStatus(false)

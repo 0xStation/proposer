@@ -8,7 +8,12 @@ import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 
 const UpdateAccount = z.object({
   address: z.string(),
-  prompt: z.string().optional(),
+  prompt: z
+    .object({
+      text: z.string(),
+      updatedAt: z.date(),
+    })
+    .optional(),
   discordId: z.string().optional(),
   name: z.string().optional(),
   bio: z.string().optional(),
