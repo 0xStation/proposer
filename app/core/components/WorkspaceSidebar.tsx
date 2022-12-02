@@ -11,6 +11,7 @@ import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { toChecksumAddress } from "../utils/checksumAddress"
 import WorkspaceNavigationDrawer from "./WorkspaceNavigationDrawer"
 import updateAccount from "app/account/mutations/updateAccount"
+import ExpandingTextArea from "./sds/form/ExpandingTextarea"
 
 export const WorkspaceSidebar = () => {
   const router = useRouter()
@@ -34,7 +35,7 @@ export const WorkspaceSidebar = () => {
 
   const [updateAccountMutation, { isLoading }] = useMutation(updateAccount)
   const [currentlyEditingStatus, setCurrentlyEditingStatus] = useState<boolean>(false)
-  const [statusText, setStatusText] = useState<string>("")
+  const [statusText, setStatusText] = useState<string>(account?.data?.prompt || "")
 
   return (
     <>
@@ -117,18 +118,17 @@ export const WorkspaceSidebar = () => {
                 </div>
               ) : (
                 <>
-                  <textarea
+                  <ExpandingTextArea
+                    value={statusText}
                     onChange={(e) => setStatusText(e.target.value)}
-                    className="bg-wet-concrete resize-none min-h-[60px] focus:outline-0"
+                    className="bg-wet-concrete resize-none focus:outline-0 w-full"
                     placeholder={"Looking for proposals for..."}
-                  >
-                    {account?.data.prompt && account?.data.prompt}
-                  </textarea>
+                  />
                   <div className="flex flex-row space-x-2">
                     <Button
                       type={ButtonType.Secondary}
                       onClick={() => {
-                        setStatusText("")
+                        setStatusText(account?.data?.prompt || "")
                         setCurrentlyEditingStatus(false)
                       }}
                     >
