@@ -5,7 +5,7 @@ import AccountMediaObject from "./AccountMediaObject"
 import useUserHasPermissionOfAddress from "../hooks/useUserHasPermissionOfAddress"
 import { Routes, useParam } from "@blitzjs/next"
 import { useRouter } from "next/router"
-import { useQuery, invalidateQuery } from "@blitzjs/rpc"
+import { useQuery } from "@blitzjs/rpc"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { toChecksumAddress } from "../utils/checksumAddress"
@@ -58,8 +58,8 @@ export const WorkspaceSidebar = () => {
         )}
       </div>
       {/* LEFT SIDEBAR */}
-      <div className="hidden md:block h-full w-[288px] border-r border-concrete p-6">
-        <div className="pb-6 border-b border-wet-concrete space-y-6">
+      <div className="hidden md:block h-full min-w-[288px] max-w-[288px] border-r border-concrete p-6">
+        <div className="pb-6 border-b border-wet-concrete space-y-4">
           {/* PROFILE */}
           {account ? (
             <AccountMediaObject account={account} showActionIcons={true} />
@@ -72,13 +72,26 @@ export const WorkspaceSidebar = () => {
           )}
           {(hasPrivateAccess || account?.data?.prompt) && (
             <div
-              className="bg-wet-concrete px-4 py-2 rounded-lg border border-concrete relative"
+              className="bg-wet-concrete px-4 py-2 rounded-lg relative"
               onClick={() => {
                 if (!editingStatus && hasPrivateAccess) {
                   setEditingStatus(true)
                 }
               }}
             >
+              <svg
+                width="20"
+                height="10"
+                viewBox="0 0 95 60"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="absolute top-[-9px]"
+              >
+                <path
+                  d="M45.9422 0.933843C46.7427 -0.0600909 48.2568 -0.0600873 49.0574 0.933847L93.8089 56.4955C94.8627 57.8039 93.9314 59.75 92.2513 59.75H2.74827C1.06818 59.75 0.136799 57.8039 1.19068 56.4955L45.9422 0.933843Z"
+                  fill="#2E2E2E"
+                />
+              </svg>
               {!editingStatus ? (
                 <div className="text-base">
                   {account?.data.prompt ? (
@@ -109,7 +122,6 @@ export const WorkspaceSidebar = () => {
                     <Button
                       onClick={async () => {
                         if (account) {
-                          console.log("setting data")
                           setQueryData({
                             ...account,
                             data: {
@@ -118,13 +130,12 @@ export const WorkspaceSidebar = () => {
                             },
                           })
                         }
-                        await updateAccountMutation({
+                        const updatedAccount = await updateAccountMutation({
                           address: accountAddress,
                           prompt: statusText,
                         })
-                        await invalidateQuery(getAccountByAddress)
+                        setQueryData(updatedAccount)
                         setEditingStatus(false)
-                        // need to invalidate the query, or optomistically update the UI.
                       }}
                       isLoading={isLoading}
                     >
