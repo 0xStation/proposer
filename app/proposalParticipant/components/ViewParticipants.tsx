@@ -109,7 +109,7 @@ export const ViewParticipants = ({ proposal, className }) => {
         setIsOpen={setToggleParticipantSigners}
         participant={selectedParticipant}
       />
-      <ModuleBox isLoading={!!participants} className={className}>
+      <ModuleBox isLoading={!participants} className={className}>
         <div className="text-lg font-bold">Participants</div>
         <table className="mt-2">
           {/* HEADERS */}

@@ -1,10 +1,8 @@
 import ProposalStatusPill from "app/core/components/ProposalStatusPill"
 import { ParticipantApprovalStatus, ProposalStatus } from "@prisma/client"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
-import { ProposalParticipant } from "app/proposalParticipant/types"
 
 export const ProposalStatusIndicator = ({ status, participants }) => {
-  console.log(participants)
   // numerator for the progress circle
   const totalApprovalCount =
     participants?.filter(

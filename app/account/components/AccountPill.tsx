@@ -9,7 +9,7 @@ export const AccountPill = ({ account }) => {
 
   return (
     <Link href={Routes.WorkspaceHome({ accountAddress: account?.address as string })}>
-      <div className="cursor-pointer flex flex-row space-x-2 items-start items-center bg-wet-concrete rounded-full p-2 w-fit">
+      <div className="cursor-pointer flex flex-row space-x-2 items-start bg-wet-concrete rounded-full p-2 w-fit">
         <Avatar
           size={Sizes.SM}
           address={account?.address as string}

@@ -86,7 +86,6 @@ export const ProposalMilestonePaymentBox = ({
   className?: string
 }) => {
   const milestoneStatus = getMilestoneStatus(proposal, milestone) || ""
-
   return (
     <>
       <div className={`border border-b border-concrete rounded-2xl px-6 py-9 ${className}`}>

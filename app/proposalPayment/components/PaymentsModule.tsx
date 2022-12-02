@@ -1,20 +1,20 @@
-import { getNetworkName } from "app/core/utils/networkInfo"
-import { Proposal } from "app/proposal/types"
-import {
-  MILESTONE_TERMS_TO_COPY,
-  PAYMENT_TERM_MAP,
-  SUPPORTED_CHAINS,
-} from "app/core/utils/constants"
-import { formatCurrencyAmount } from "../utils/formatCurrencyAmount"
 import { useQuery } from "@blitzjs/rpc"
+import { AccountPill } from "app/account/components/AccountPill"
+import { Account } from "app/account/types"
+import { ModuleBox } from "app/core/components/ModuleBox"
+import PaymentAction from "app/core/components/stepper/actions/PaymentAction"
+import { MILESTONE_TERMS_TO_COPY, SUPPORTED_CHAINS } from "app/core/utils/constants"
+import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
+import { Proposal } from "app/proposal/types"
 import getMilestonesByProposal from "app/proposalMilestone/queries/getMilestonesByProposal"
+import { useParticipants } from "app/proposalParticipant/hooks/useParticipants"
 
-export const TotalPaymentView = ({
+export const PaymentsModule = ({
   proposal,
-  className,
+  className = "",
 }: {
   proposal?: Proposal
-  className?: string
+  className: string
 }) => {
   const [milestones] = useQuery(
     getMilestonesByProposal,
@@ -27,9 +27,10 @@ export const TotalPaymentView = ({
       staleTime: 60 * 1000, // 1 minute
     }
   )
-  console.log("milestones", milestones)
-  return proposal ? (
-    <div className={`${className} border border-b border-concrete rounded-2xl px-6 py-6`}>
+  const { participants } = useParticipants(proposal?.id as string)
+
+  return (
+    <ModuleBox isLoading={!milestones} className={className}>
       {milestones &&
         milestones.map((milestone, idx) => {
           return (
@@ -65,20 +66,43 @@ export const TotalPaymentView = ({
                         </div>
                       </div>
                       <div className="font-bold mt-4">Funding recipient</div>
+                      <div className="mt-2">
+                        <AccountPill
+                          account={
+                            participants?.find(
+                              (participant) =>
+                                participant?.accountAddress === payment?.senderAddress
+                            )?.account as Account
+                          }
+                        />
+                      </div>
                       <div className="font-bold mt-4">Payment recipient</div>
+                      <div className="mt-2">
+                        <AccountPill
+                          account={
+                            participants?.find(
+                              (participant) =>
+                                participant?.accountAddress === payment?.recipientAddress
+                            )?.account as Account
+                          }
+                        />
+                      </div>
+                      <div className="mt-6">
+                        <PaymentAction
+                          proposal={proposal}
+                          milestone={milestone}
+                          payment={payment}
+                          isWithinStepper={false}
+                        />
+                      </div>
                     </div>
                   )
                 })}
             </div>
           )
         })}
-    </div>
-  ) : (
-    <div className="h-[300px] bg-wet-concrete shadow rounded-2xl motion-safe:animate-pulse" />
+    </ModuleBox>
   )
 }
 
-export default TotalPaymentView
-
-// <div className="font-bold border-r border-concrete">Amount and token</div>
-// <div className="font-bold">Funding condition</div>
+export default PaymentsModule

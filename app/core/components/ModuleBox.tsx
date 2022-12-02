@@ -1,5 +1,5 @@
 export const ModuleBox = ({ isLoading, children, className = "" }) => {
-  return isLoading ? (
+  return !isLoading ? (
     <>
       <div className={`border border-concrete rounded-2xl p-6 ${className}`}>{children}</div>
     </>

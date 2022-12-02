@@ -393,6 +393,18 @@ export const PROPOSING_AS_ROLE_MAP = {
   },
 }
 
+export const MILESTONE_TERMS = {
+  UPFRONT_PAYMENT: "Upfront payment",
+  ADVANCE_PAYMENT: "Advance payment",
+  COMPLETION_PAYMENT: "Completion payment",
+}
+
+export const MILESTONE_TERMS_TO_COPY = {
+  [MILESTONE_TERMS.UPFRONT_PAYMENT]: "Proposal approval",
+  [MILESTONE_TERMS.ADVANCE_PAYMENT]: "Proposal approval",
+  [MILESTONE_TERMS.COMPLETION_PAYMENT]: "Proposal Completion",
+}
+
 export const txPathString = "/tx/"
 
 export const PARTNERS = {

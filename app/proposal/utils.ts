@@ -1,4 +1,4 @@
-import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
+import { MILESTONE_TERMS, PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import { PaymentTerm } from "app/proposalPayment/types"
 
 export const generateMilestonePayments = (
@@ -28,23 +28,16 @@ export const generateMilestonePayments = (
     token: { ...token, chainId },
   }
 
-  // set up milestones and payments conditional on payment terms inputs
-  const MILESTONE_COPY = {
-    UPFRONT_PAYMENT: "Upfront payment",
-    ADVANCE_PAYMENT: "Advance payment",
-    COMPLETION_PAYMENT: "Completion payment",
-  }
-
   if (paymentTerms === PaymentTerm.ADVANCE_PAYMENT) {
     // if pay on proposal completion and non-zero advance payment, set up two milestones and two payments
     milestones = [
       {
         index: 0,
-        title: MILESTONE_COPY.ADVANCE_PAYMENT,
+        title: MILESTONE_TERMS.ADVANCE_PAYMENT,
       },
       {
         index: 1,
-        title: MILESTONE_COPY.COMPLETION_PAYMENT,
+        title: MILESTONE_TERMS.COMPLETION_PAYMENT,
       },
     ]
 
@@ -70,8 +63,8 @@ export const generateMilestonePayments = (
         index: 0,
         title:
           paymentTerms === PaymentTerm.ON_AGREEMENT
-            ? MILESTONE_COPY.UPFRONT_PAYMENT
-            : MILESTONE_COPY.COMPLETION_PAYMENT, // if terms are not ON_ARGEEMENT, they are AFTER_COMPLETION
+            ? MILESTONE_TERMS.UPFRONT_PAYMENT
+            : MILESTONE_TERMS.COMPLETION_PAYMENT, // if terms are not ON_ARGEEMENT, they are AFTER_COMPLETION
       },
     ]
     payments = [
