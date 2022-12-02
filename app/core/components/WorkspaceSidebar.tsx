@@ -35,7 +35,7 @@ export const WorkspaceSidebar = () => {
 
   const [updateAccountMutation, { isLoading }] = useMutation(updateAccount)
   const [currentlyEditingStatus, setCurrentlyEditingStatus] = useState<boolean>(false)
-  const [statusText, setStatusText] = useState<string>(account?.data?.prompt || "")
+  const [statusText, setStatusText] = useState<string>("")
 
   return (
     <>
@@ -128,7 +128,6 @@ export const WorkspaceSidebar = () => {
                     <Button
                       type={ButtonType.Secondary}
                       onClick={() => {
-                        setStatusText(account?.data?.prompt || "")
                         setCurrentlyEditingStatus(false)
                       }}
                     >
