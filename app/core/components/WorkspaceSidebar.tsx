@@ -33,7 +33,7 @@ export const WorkspaceSidebar = () => {
   )
 
   const [updateAccountMutation, { isLoading }] = useMutation(updateAccount)
-  const [editingStatus, setEditingStatus] = useState<boolean>(false)
+  const [currentlyEditingStatus, setCurrentlyEditingStatus] = useState<boolean>(false)
   const [statusText, setStatusText] = useState<string>("")
 
   return (
@@ -72,10 +72,10 @@ export const WorkspaceSidebar = () => {
           )}
           {(hasPrivateAccess || account?.data?.prompt) && (
             <div
-              className="bg-wet-concrete px-4 py-2 rounded-lg relative"
+              className="bg-wet-concrete px-4 py-2 rounded-lg relative cursor-pointer"
               onClick={() => {
-                if (!editingStatus && hasPrivateAccess) {
-                  setEditingStatus(true)
+                if (!currentlyEditingStatus && hasPrivateAccess) {
+                  setCurrentlyEditingStatus(true)
                 }
               }}
             >
@@ -92,10 +92,25 @@ export const WorkspaceSidebar = () => {
                   fill="#2E2E2E"
                 />
               </svg>
-              {!editingStatus ? (
+              {!currentlyEditingStatus ? (
                 <div className="text-base">
                   {account?.data.prompt ? (
-                    account.data.prompt
+                    <div className="flex flex-col space-y-4">
+                      <span>{account.data.prompt}</span>
+                      {hasPrivateAccess && (
+                        <a
+                          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                            account?.data.prompt
+                          )}%20https://www.app.station.express/workspace/${account?.address}`}
+                          target="_blank"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-electric-violet font-bold self-start"
+                          rel="noreferrer"
+                        >
+                          Tweet
+                        </a>
+                      )}
+                    </div>
                   ) : (
                     <span className="text-light-concrete">Looking for proposals for...</span>
                   )}
@@ -114,7 +129,7 @@ export const WorkspaceSidebar = () => {
                       type={ButtonType.Secondary}
                       onClick={() => {
                         setStatusText("")
-                        setEditingStatus(false)
+                        setCurrentlyEditingStatus(false)
                       }}
                     >
                       Cancel
@@ -135,7 +150,7 @@ export const WorkspaceSidebar = () => {
                           prompt: statusText,
                         })
                         setQueryData(updatedAccount)
-                        setEditingStatus(false)
+                        setCurrentlyEditingStatus(false)
                       }}
                       isLoading={isLoading}
                     >
