@@ -74,7 +74,7 @@ export const WorkspaceSidebar = () => {
           )}
           {(hasPrivateAccess || account?.data?.prompt) && (
             <div
-              className="bg-wet-concrete px-4 py-3 rounded-lg relative cursor-pointer"
+              className="bg-wet-concrete px-4 pt-[14px] pb-3 rounded-lg relative cursor-pointer"
               onClick={() => {
                 if (!currentlyEditingStatus && hasPrivateAccess) {
                   setCurrentlyEditingStatus(true)
