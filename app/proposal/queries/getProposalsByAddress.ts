@@ -33,12 +33,12 @@ export default async function getProposalsByAddress(input: z.infer<typeof GetPro
         ? {
             status: {
               in: params.statuses,
-              not: ProposalStatus.DRAFT,
+              notIn: [ProposalStatus.DRAFT, ProposalStatus.DELETED],
             },
           }
         : {
             status: {
-              not: ProposalStatus.DRAFT,
+              notIn: [ProposalStatus.DRAFT, ProposalStatus.DELETED],
             },
           }),
     },

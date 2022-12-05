@@ -18,6 +18,7 @@ import NewCommentThread from "app/comment/components/NewCommentThread"
 import CommentEmptyState from "app/comment/components/CommentEmptyState"
 import useCommentPermissions from "app/core/hooks/useCommentPermissions"
 import { useRouter } from "next/router"
+import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 
 export const ToolTip = ({ children }) => {
   return (
@@ -61,7 +62,7 @@ export const getServerSideProps = gSSP(async ({ params = {} }) => {
   }
 
   return {
-    props: {}, // will be passed to the page component as props
+    props: { status: proposal.status }, // will be passed to the page component as props
   }
 })
 
@@ -150,7 +151,7 @@ ViewProposal.getLayout = function getLayout(page) {
   // persist layout between pages https://nextjs.org/docs/basic-features/layouts
   return (
     <Layout title="View Proposal">
-      <ProposalNestedLayout>{page}</ProposalNestedLayout>
+      <ProposalNestedLayout status={page.props.status}>{page}</ProposalNestedLayout>
     </Layout>
   )
 }

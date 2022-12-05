@@ -126,6 +126,7 @@ enum ProposalStatus {
   AWAITING_APPROVAL
   APPROVED
   COMPLETE
+  DELETED // enables us to show pages as "this proposal is deleted" vs. 404s
 }
 
 // PROPOSAL ROLES

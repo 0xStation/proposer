@@ -12,7 +12,7 @@ export default async function getProposalsByRfpId(params: z.infer<typeof GetProp
       rfpId: params.rfpId,
       suppress: false,
       status: {
-        not: ProposalStatus.DRAFT,
+        notIn: [ProposalStatus.DRAFT, ProposalStatus.DELETED],
       },
     },
     include: {

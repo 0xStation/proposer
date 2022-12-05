@@ -91,15 +91,6 @@ export const ProposalViewHeaderNavigation = () => {
         role.approvalStatus === ProposalRoleApprovalStatus.SENT // include author's SEND signature in net count too
     ).length || 0
 
-  const currentPageUrl =
-    typeof window !== "undefined"
-      ? genPathFromUrlObject(
-          Routes.ViewProposal({
-            proposalId,
-          })
-        )
-      : ""
-
   const currentMilestoneId = proposal?.milestones?.find(
     (milestone) => milestone.index === proposal?.currentMilestoneIndex
   )?.id
@@ -165,7 +156,7 @@ export const ProposalViewHeaderNavigation = () => {
         {proposal?.data.content.title ? (
           <div className="mt-6 flex flex-row justify-between">
             <h2 className="text-marble-white text-2xl font-bold">{proposal?.data.content.title}</h2>
-            <OtherActionsButton proposalUrl={currentPageUrl} />
+            <OtherActionsButton proposalId={proposalId} />
           </div>
         ) : (
           <div className="mt-6 h-8 w-42 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />

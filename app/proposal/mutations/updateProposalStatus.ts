@@ -9,6 +9,7 @@ const UpdateProposalStatus = z.object({
     ProposalStatus.AWAITING_APPROVAL,
     ProposalStatus.COMPLETE,
     ProposalStatus.DRAFT,
+    ProposalStatus.DELETED,
   ]),
   proposalId: z.string(),
 })
