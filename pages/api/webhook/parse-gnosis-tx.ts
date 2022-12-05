@@ -9,6 +9,7 @@ import {
 import { multicall } from "app/utils/rpcMulticall"
 import { Account } from "app/account/types"
 import { ProposalPayment, ProposalPaymentStatus } from "app/proposalPayment/types"
+import { ProposalStatus } from "@prisma/client"
 
 const fetchGnosisThreshold = async (chainId: string, targetAddress: string) => {
   const abi = ["function getThreshold() public view returns (uint256)"]
@@ -34,11 +35,44 @@ const fetchGnosisNonce = async (chainId: string, targetAddress: string) => {
 
 const handleChangedThreshold = async (account) => {
   const threshold = await fetchGnosisThreshold(String(account.data.chainId || 1), account.address)
-  const accountProposals = await db.proposal.findMany({
+  const allAccountRoles = await db.proposalRole.findMany({
     where: {
-      // participant
+      address: account.address,
+    },
+    include: {
+      account: true,
+      proposal: {
+        include: {
+          payments: true,
+        },
+      },
     },
   })
+
+  for (let index in allAccountRoles) {
+    const role = allAccountRoles[index]
+    const status = role?.proposal?.status
+    // if proposal is past approval, need UI state to show quorum has changed
+    // otherwise, the mutation getRolesByProposalId will call the gnosis API to get up to date
+    if (status === ProposalStatus.APPROVED || status === ProposalStatus.COMPLETE) {
+      let account = role?.account as Account
+      let roleMetadata = {}
+      // only need to add metadata if the quorum is not what is already set
+      // otherwise, we want to clear it
+      if (threshold !== account.data.quorum) {
+        roleMetadata = {
+          preApprovalQuorum: account.data.quorum,
+        }
+      }
+
+      await db.proposalRole.update({
+        where: { id: role?.id },
+        data: {
+          data: roleMetadata,
+        },
+      })
+    }
+  }
 }
 
 const handleExecutionSuccess = async (account, log) => {
@@ -119,11 +153,8 @@ const handleExecutionFailure = async () => {
 }
 
 export default api(async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const t = await fetchGnosisThreshold("5", "0xd0e09D3D8C82A8B92e3B1284C5652Da2ED9aEc31")
   const response = req.body
   const streamId = response.streamId
-
-  console.log(response)
 
   const account = (await db.account.findFirst({
     where: {

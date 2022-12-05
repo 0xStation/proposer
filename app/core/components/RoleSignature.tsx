@@ -5,7 +5,6 @@ import { PROPOSAL_ROLE_APPROVAL_STATUS_MAP } from "../utils/constants"
 import AccountMediaObject from "./AccountMediaObject"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import GnosisSafeSignersModal from "app/core/components/GnosisSafeSignersModal"
-import truncateString from "app/core/utils/truncateString"
 import {
   AddressType,
   ProposalRoleType,
@@ -43,6 +42,7 @@ const SafeRole = ({ role, proposal }) => {
   const showStatus =
     proposal?.status !== ProposalStatus.DRAFT || role.type === ProposalRoleType.AUTHOR
 
+  console.log(role)
   return (
     <>
       <div className="flex flex-row w-full items-center justify-between">
@@ -50,7 +50,7 @@ const SafeRole = ({ role, proposal }) => {
           <div className="flex flex-col w-full">
             <div className="flex flex-row w-full items-center justify-between">
               <AccountMediaObject account={role?.account} showActionIcons={true} />
-              <div className="flex flex-col items-end space-y-1">
+              <div className="flex flex-col items-end space-y-1 relative group">
                 {showSignButton ? (
                   <span
                     className="text-electric-violet cursor-pointer"
@@ -67,12 +67,13 @@ const SafeRole = ({ role, proposal }) => {
                     />
 
                     <div className="font-bold text-xs uppercase tracking-wider">
-                      {PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role?.approvalStatus]?.copy}
+                      {PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role?.approvalStatus]?.copy}*
                     </div>
                   </div>
                 ) : (
                   <></>
                 )}
+
                 <ProgressCircleAndNumber
                   numerator={
                     totalSafeSignersSigned > role.account.data?.quorum
@@ -81,6 +82,13 @@ const SafeRole = ({ role, proposal }) => {
                   }
                   denominator={role.account.data?.quorum}
                 />
+
+                {role?.data?.preApprovalQuorum && (
+                  <span className="absolute w-[100px] text-xs group-hover:block hidden bg-wet-concrete p-2 rounded right-[-110px]">
+                    The quorum of this safe has changed to {role?.data?.preApprovalQuorum} since
+                    this proposal was approved.
+                  </span>
+                )}
               </div>
             </div>
             <p
