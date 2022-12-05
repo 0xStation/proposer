@@ -101,7 +101,11 @@ export const WorkspaceSidebar = () => {
                 <div className="text-base">
                   {account?.data.prompt ? (
                     <div className="flex flex-col space-y-4">
-                      <span>{account.data.prompt.text || "Looking for proposals to..."}</span>
+                      {account.data.prompt.text ? (
+                        <span>{account.data.prompt.text}</span>
+                      ) : (
+                        <span className="text-concrete">Looking for proposals to...</span>
+                      )}
                       <div className="flex flex-row items-center justify-between w-full">
                         <span className="text-sm text-concrete">
                           {timeSince(new Date(account.data.prompt.updatedAt))}
@@ -140,7 +144,7 @@ export const WorkspaceSidebar = () => {
                         setStatusText(e.target.value)
                       }
                     }}
-                    className="bg-wet-concrete resize-none focus:outline-0 w-full mb-2"
+                    className="bg-wet-concrete resize-none focus:outline-0 w-full mb-2 placeholder-concrete"
                     placeholder={"Looking for proposals to..."}
                   />
                   <div className="flex flex-row space-x-2">
