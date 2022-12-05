@@ -1,6 +1,8 @@
 import { resolver } from "@blitzjs/rpc"
 import { paginate } from "blitz"
-import db, { Prisma, RfpStatus } from "db"
+import db, { Prisma, ProposalStatus, RfpStatus } from "db"
+import { Rfp } from "../types"
+import { getRfpStatus } from "../utils"
 
 interface GetPaginatedRfpsInput
   extends Pick<Prisma.RfpFindManyArgs, "include" | "where" | "orderBy" | "skip" | "take"> {}
@@ -18,22 +20,32 @@ export default resolver.pipe(async ({ where, skip = 0, take = 100 }: GetPaginate
     query: (paginateArgs) =>
       db.rfp.findMany({
         ...paginateArgs,
-        where: { status: RfpStatus.OPEN, suppress: false },
+        where: { status: { not: RfpStatus.CLOSED }, suppress: false },
         orderBy: {
           createdAt: "desc",
         },
         include: {
           template: true,
           account: true,
-          _count: {
-            select: { proposals: true },
+          proposals: {
+            where: {
+              status: {
+                notIn: [ProposalStatus.DRAFT, ProposalStatus.DELETED],
+              },
+            },
           },
         },
       }),
   })
 
   return {
-    rfps,
+    rfps: rfps.map((rfp) => {
+      return {
+        ...rfp,
+        status: getRfpStatus(rfp.status, rfp.startDate, rfp.endDate),
+        _count: { proposals: rfp.proposals.length },
+      }
+    }) as unknown as Rfp[],
     nextPage,
     hasMore,
     count,
