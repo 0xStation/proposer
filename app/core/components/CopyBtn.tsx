@@ -20,13 +20,11 @@ export const CopyBtn = ({
         }}
         className={`${
           isTextCopied ? "ring-2 ring-concrete" : ""
-        } group w-10 h-[35px] justify-center text-marble-white border rounded border-marble-white bg-tunnel-black hover:bg-wet-concrete`}
+        } group px-2 w-fit h-8 justify-center text-marble-white border rounded border-marble-white bg-tunnel-black hover:bg-wet-concrete`}
       >
         <LinkIcon className="h-5 w-5 inline" />
+        Copy link
       </button>
-      <span className="hidden group-hover:inline mt-1 ml-1 text-[.6rem] uppercase font-bold tracking-wider rounded px-2 py-1 absolute text-marble-white bg-wet-concrete">
-        {isTextCopied ? "copied!" : "copy to clipboard"}
-      </span>
     </div>
   )
 }

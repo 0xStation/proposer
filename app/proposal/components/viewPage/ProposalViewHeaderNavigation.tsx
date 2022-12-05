@@ -23,6 +23,7 @@ import { LINKS } from "app/core/utils/constants"
 import SendProposalModal from "../SendProposalModal"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import getRfpByProposalId from "app/rfp/queries/getRfpByProposalId"
+import { OtherActionsButton } from "../OtherActionsButton"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.type === proposalType)
@@ -162,9 +163,10 @@ export const ProposalViewHeaderNavigation = () => {
           )}
         </div>
         {proposal?.data.content.title ? (
-          <h2 className="mt-6 text-marble-white text-2xl font-bold">
-            {proposal?.data.content.title}
-          </h2>
+          <div className="mt-6 flex flex-row justify-between">
+            <h2 className="text-marble-white text-2xl font-bold">{proposal?.data.content.title}</h2>
+            <OtherActionsButton proposalUrl={currentPageUrl} />
+          </div>
         ) : (
           <div className="mt-6 h-8 w-42 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
         )}
@@ -225,7 +227,6 @@ export const ProposalViewHeaderNavigation = () => {
               </p>
             </div>
           )}
-          {proposal && <CopyBtn textToWrite={currentPageUrl} />}
         </div>
         {/* TABS */}
         <div className="mt-12 self-end flex flex-row space-x-4 border-b border-concrete -mx-6 md:mx-0">

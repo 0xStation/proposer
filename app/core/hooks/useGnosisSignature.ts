@@ -18,9 +18,9 @@ const createMoralisStream = async (
   evmChain: EvmChain,
   clientAddress: string
 ) => {
-  Moralis.start({
-    apiKey: process.env.NEXT_PUBLIC_MORALIS_API_KEY,
-  })
+  // Moralis.start({
+  //   apiKey: process.env.NEXT_PUBLIC_MORALIS_API_KEY,
+  // })
 
   const stream = {
     chains: [evmChain],
