@@ -6,6 +6,7 @@ import useUserHasPermissionOfAddress from "../hooks/useUserHasPermissionOfAddres
 import { Routes, useParam } from "@blitzjs/next"
 import { useRouter } from "next/router"
 import { useQuery } from "@blitzjs/rpc"
+import useStore from "app/core/hooks/useStore"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { toChecksumAddress } from "../utils/checksumAddress"
@@ -16,6 +17,7 @@ import timeSince from "app/core/utils/timeSince"
 
 export const WorkspaceSidebar = () => {
   const router = useRouter()
+  const setToastState = useStore((state) => state.setToastState)
   const accountAddress = useParam("accountAddress", "string") as string
   const [isWorkspaceDrawerOpen, setIsWorkspaceDrawerOpen] = useState<boolean>(false)
   const [account, { setQueryData }] = useQuery(
@@ -99,7 +101,7 @@ export const WorkspaceSidebar = () => {
                 <div className="text-base">
                   {account?.data.prompt ? (
                     <div className="flex flex-col space-y-4">
-                      <span>{account.data.prompt.text}</span>
+                      <span>{account.data.prompt.text || "Looking for proposals to..."}</span>
                       <div className="flex flex-row items-center justify-between w-full">
                         <span className="text-sm text-concrete">
                           {timeSince(new Date(account.data.prompt.updatedAt))}
@@ -127,9 +129,19 @@ export const WorkspaceSidebar = () => {
                 <>
                   <ExpandingTextArea
                     value={statusText}
-                    onChange={(e) => setStatusText(e.target.value)}
+                    onChange={(e) => {
+                      if (e.target.value.length > 200) {
+                        setToastState({
+                          isToastShowing: true,
+                          type: "error",
+                          message: "The status cannot be longer than 200 characters.",
+                        })
+                      } else {
+                        setStatusText(e.target.value)
+                      }
+                    }}
                     className="bg-wet-concrete resize-none focus:outline-0 w-full mb-2"
-                    placeholder={"Looking for proposals for..."}
+                    placeholder={"Looking for proposals to..."}
                   />
                   <div className="flex flex-row space-x-2">
                     <Button
