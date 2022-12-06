@@ -2,6 +2,7 @@ import db from "db"
 import { api } from "app/blitz-server"
 import { NextApiRequest, NextApiResponse } from "next"
 import SaveTransactionHashToPayments from "app/proposal/mutations/saveTransactionToPayments"
+import RetroactivelyApproveProposal from "app/proposal/mutations/retroactivelyApproveProposal"
 import {
   GNOSIS_CHANGED_THRESHOLD_EVENT_HASH,
   GNOSIS_EXECUTION_SUCCESS_EVENT_HASH,
@@ -41,36 +42,26 @@ const handleChangedThreshold = async (account) => {
     },
     include: {
       account: true,
-      proposal: {
-        include: {
-          payments: true,
-        },
-      },
+      proposal: true,
+      signatures: true,
     },
   })
 
   for (let index in allAccountRoles) {
     const role = allAccountRoles[index]
     const status = role?.proposal?.status
-    // if proposal is past approval, need UI state to show quorum has changed
-    // otherwise, the mutation getRolesByProposalId will call the gnosis API to get up to date
-    if (status === ProposalStatus.APPROVED || status === ProposalStatus.COMPLETE) {
+    if (!role) {
+      continue
+    }
+    // only consider proposals that have not yet been approved
+    if (status === ProposalStatus.AWAITING_APPROVAL || status === ProposalStatus.DRAFT) {
       let account = role?.account as Account
-      let roleMetadata = {}
-      // only need to add metadata if the quorum is not what is already set
-      // otherwise, we want to clear it
-      if (threshold !== account.data.quorum) {
-        roleMetadata = {
-          preApprovalQuorum: account.data.quorum,
-        }
-      }
+      let signatures = role?.signatures
 
-      await db.proposalRole.update({
-        where: { id: role?.id },
-        data: {
-          data: roleMetadata,
-        },
-      })
+      // with the change to the threshold, we should now consider the proposal approved
+      if (signatures?.length || 0 >= threshold) {
+        await RetroactivelyApproveProposal({ proposalId: role?.proposal.id, roleId: role.id })
+      }
     }
   }
 }
@@ -168,16 +159,15 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
     return res.end()
   }
 
-  // const gnosisChangedThresholdEventLog = response.logs.find(
-  //   (log) => log.topic0 === GNOSIS_CHANGED_THRESHOLD_EVENT_HASH
-  // )
+  const gnosisChangedThresholdEventLog = response.logs.find(
+    (log) => log.topic0 === GNOSIS_CHANGED_THRESHOLD_EVENT_HASH
+  )
 
-  // if (gnosisChangedThresholdEventLog) {
-  //   console.log("we have a change event")
-  //   await handleChangedThreshold(account)
-  //   res.statusCode = 200
-  //   return res.end()
-  // }
+  if (gnosisChangedThresholdEventLog) {
+    await handleChangedThreshold(account)
+    res.statusCode = 200
+    return res.end()
+  }
 
   // eventually look for error logs as well
   const gnosisTxSuccessEventLog = response.logs.find(
