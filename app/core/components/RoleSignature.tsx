@@ -41,8 +41,9 @@ const SafeRole = ({ role, proposal }) => {
 
   const showStatus =
     proposal?.status !== ProposalStatus.DRAFT || role.type === ProposalRoleType.AUTHOR
+  const newQuroumExists =
+    role?.data?.preApprovalQuorum && role?.data?.preApprovalQuorum !== role.account.data?.quorum
 
-  console.log(role)
   return (
     <>
       <div className="flex flex-row w-full items-center justify-between">
@@ -67,27 +68,34 @@ const SafeRole = ({ role, proposal }) => {
                     />
 
                     <div className="font-bold text-xs uppercase tracking-wider">
-                      {PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role?.approvalStatus]?.copy}*
+                      {PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role?.approvalStatus]?.copy}{" "}
+                      {newQuroumExists && "*"}
                     </div>
                   </div>
                 ) : (
                   <></>
                 )}
 
-                <ProgressCircleAndNumber
-                  numerator={
-                    totalSafeSignersSigned > role.account.data?.quorum
-                      ? role.account.data?.quorum
-                      : totalSafeSignersSigned
-                  }
-                  denominator={role.account.data?.quorum}
-                />
-
-                {role?.data?.preApprovalQuorum && (
-                  <span className="absolute w-[100px] text-xs group-hover:block hidden bg-wet-concrete p-2 rounded right-[-110px]">
-                    The quorum of this safe has changed to {role?.data?.preApprovalQuorum} since
-                    this proposal was approved.
-                  </span>
+                {newQuroumExists ? (
+                  <>
+                    <ProgressCircleAndNumber
+                      numerator={role.data.preApprovalQuorum}
+                      denominator={role.data.preApprovalQuorum}
+                    />
+                    <span className="absolute w-[100px] text-xs group-hover:block hidden bg-wet-concrete p-2 rounded right-[-110px]">
+                      The quorum of this safe has changed to {role.account.data?.quorum} since this
+                      proposal was approved.
+                    </span>
+                  </>
+                ) : (
+                  <ProgressCircleAndNumber
+                    numerator={
+                      totalSafeSignersSigned > role.account.data?.quorum
+                        ? role.account.data?.quorum
+                        : totalSafeSignersSigned
+                    }
+                    denominator={role.account.data?.quorum}
+                  />
                 )}
               </div>
             </div>

@@ -6,6 +6,8 @@ import pinProposalSignature from "app/proposalSignature/mutations/pinProposalSig
 import pinProposal from "./pinProposal"
 import { sendProposalApprovedEmail } from "app/utils/email"
 import { getEmails } from "app/utils/privy"
+import { AddressType } from "@prisma/client"
+import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 
 const ApproveProposal = z.object({
   proposalId: z.string(),
@@ -96,7 +98,11 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
     proposal = await db.proposal.findUnique({
       where: { id: params.proposalId },
       include: {
-        roles: true,
+        roles: {
+          include: {
+            account: true,
+          },
+        },
         milestones: true,
         payments: true,
         signatures: true,
@@ -156,6 +162,47 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
       } catch (err) {
         console.error("Failed to pin proposal in `approveProposal`", err)
         throw Error(err)
+      }
+
+      try {
+        // if the proposal moves into approved, we need to take a snapshot of the current quorums on any safe roles
+        // to make sure we know what the quorum was at the time of approval in case in changes
+
+        let accountQuorumSnapshots = {}
+        let gnosisRequests: any[] = []
+        proposal.roles.forEach((role) => {
+          if (role.account?.addressType === AddressType.SAFE && role.account?.data.chainId)
+            gnosisRequests.push(
+              getGnosisSafeDetails(role.account?.data.chainId as number, role.address)
+            )
+        })
+        // batch await gnosis requests and add safe details to each account metadata accumulator
+        const gnosisResults = await Promise.all(gnosisRequests)
+        gnosisResults.forEach((results) => {
+          if (!results) return
+          accountQuorumSnapshots[results.address] = results.quorum
+        })
+
+        await db.$transaction([
+          ...proposal.roles
+            .filter((role) => {
+              return role.account?.addressType === AddressType.SAFE
+            })
+            .map((role) => {
+              return db.proposalRole.update({
+                where: {
+                  id: role.id,
+                },
+                data: {
+                  data: {
+                    preApprovalQuorum: accountQuorumSnapshots[role.account.address],
+                  },
+                },
+              })
+            }),
+        ])
+      } catch (e) {
+        console.error("could not update proposalRoles")
       }
 
       try {

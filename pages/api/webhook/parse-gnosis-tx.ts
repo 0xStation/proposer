@@ -168,15 +168,16 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
     return res.end()
   }
 
-  const gnosisChangedThresholdEventLog = response.events.find(
-    (log) => log.topic0 === GNOSIS_CHANGED_THRESHOLD_EVENT_HASH
-  )
+  // const gnosisChangedThresholdEventLog = response.logs.find(
+  //   (log) => log.topic0 === GNOSIS_CHANGED_THRESHOLD_EVENT_HASH
+  // )
 
-  if (gnosisChangedThresholdEventLog) {
-    await handleChangedThreshold(account)
-    res.statusCode = 200
-    res.end()
-  }
+  // if (gnosisChangedThresholdEventLog) {
+  //   console.log("we have a change event")
+  //   await handleChangedThreshold(account)
+  //   res.statusCode = 200
+  //   return res.end()
+  // }
 
   // eventually look for error logs as well
   const gnosisTxSuccessEventLog = response.logs.find(
@@ -189,16 +190,13 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
   }
 
   try {
+    console.log("we have a successful tx event")
     await handleExecutionSuccess(account, gnosisTxSuccessEventLog)
     res.statusCode = 200
-    res.end()
+    return res.end()
   } catch (e) {
     console.log(e)
     res.statusCode = 500
-    res.end()
+    return res.end()
   }
-
-  // default response - 500
-  res.statusCode = 500
-  res.end()
 })
