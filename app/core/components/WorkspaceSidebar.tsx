@@ -126,7 +126,7 @@ export const WorkspaceSidebar = () => {
                       </div>
                     </div>
                   ) : (
-                    <span className="text-light-concrete">Looking for proposals for...</span>
+                    <span className="text-light-concrete">Add a status e.g. "Looking for proposals to..."</span>
                   )}
                 </div>
               ) : (
