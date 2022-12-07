@@ -23,9 +23,10 @@ const ProfileIcon = ({
     return <></>
   }
   const profileSelected =
-    typeof window !== "undefined" &&
-    window?.location?.pathname ===
-      genUrlFromRoute(Routes.WorkspaceHome({ accountAddress: activeUser.address }))
+    (typeof window !== "undefined" &&
+      router.pathname === Routes.WorkspaceHome({ accountAddress: activeUser.address }).pathname) ||
+    router.pathname === Routes.WorkspaceSettings({ accountAddress: activeUser.address }).pathname ||
+    router.pathname === Routes.WorkspaceRfps({ accountAddress: activeUser.address }).pathname
 
   return (
     <Link href={Routes.WorkspaceHome({ accountAddress: activeUser.address })}>

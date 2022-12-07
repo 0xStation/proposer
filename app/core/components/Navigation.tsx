@@ -19,7 +19,6 @@ import { LINKS, SUPPORTED_CHAINS, Sizes } from "app/core/utils/constants"
 import Avatar from "app/core/components/sds/images/avatar"
 import DropdownChevronIcon from "../icons/DropdownChevronIcon"
 import { DotsHorizontalIcon, MenuAlt4Icon } from "@heroicons/react/solid"
-import NewWorkspaceModal from "app/core/components/NewWorkspaceModal"
 import { useEnsName } from "wagmi"
 import { NavigationSidebar } from "./NavigationSidebar"
 import dynamic from "next/dynamic"
@@ -30,6 +29,9 @@ const WorkspaceNavigationDrawer = dynamic(
     ssr: false,
   }
 )
+const NewWorkspaceModal = dynamic(() => import("app/core/components/NewWorkspaceModal"), {
+  ssr: false,
+})
 
 const Navigation = ({ children }: { children?: any }) => {
   const session = useSession({ suspense: false })
