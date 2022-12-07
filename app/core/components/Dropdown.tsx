@@ -33,8 +33,8 @@ const Dropdown = ({ button, items, side, className }: DropdownProps) => {
           >
             <Menu.Items
               className={`${
-                side && side === "left" ? `left-[10px]` : `right-[0px]`
-              } text-marble-white origin-top absolute mt-1 bg-wet-concrete border border-wet-concrete rounded whitespace-nowrap z-10 p-1 drop-shadow-lg top-[105%]`}
+                side && side === "left" ? `left-[0px]` : `right-[0px]`
+              } text-marble-white origin-top absolute mt-1 bg-wet-concrete border border-wet-concrete rounded whitespace-nowrap z-2 p-1 drop-shadow-lg top-[80%] z-[100]`}
             >
               {items.map((item, idx) => (
                 <Menu.Item key={idx}>

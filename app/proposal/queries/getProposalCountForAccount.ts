@@ -28,6 +28,7 @@ export default async function getProposalCountForAccount(
   const whereParams = {
     where: {
       suppress: false,
+      deleted: false,
       roles: {
         some: {
           address: params.address,

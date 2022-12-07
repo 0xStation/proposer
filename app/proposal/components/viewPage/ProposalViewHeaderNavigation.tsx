@@ -13,8 +13,6 @@ import {
 import { ProposalRole } from "app/proposalRole/types"
 import useStore from "app/core/hooks/useStore"
 import { ProposalStatusPill } from "../../../core/components/ProposalStatusPill"
-import { genPathFromUrlObject } from "app/utils"
-import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import ApproveProposalModal from "app/proposal/components/ApproveProposalModal"
 import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
@@ -23,6 +21,7 @@ import { LINKS } from "app/core/utils/constants"
 import SendProposalModal from "../SendProposalModal"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import getRfpByProposalId from "app/rfp/queries/getRfpByProposalId"
+import { ProposalEllipsisButton } from "../ProposalEllipsisButton"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.type === proposalType)
@@ -90,15 +89,6 @@ export const ProposalViewHeaderNavigation = () => {
         role.approvalStatus === ProposalRoleApprovalStatus.SENT // include author's SEND signature in net count too
     ).length || 0
 
-  const currentPageUrl =
-    typeof window !== "undefined"
-      ? genPathFromUrlObject(
-          Routes.ViewProposal({
-            proposalId,
-          })
-        )
-      : ""
-
   const currentMilestoneId = proposal?.milestones?.find(
     (milestone) => milestone.index === proposal?.currentMilestoneIndex
   )?.id
@@ -162,9 +152,10 @@ export const ProposalViewHeaderNavigation = () => {
           )}
         </div>
         {proposal?.data.content.title ? (
-          <h2 className="mt-6 text-marble-white text-2xl font-bold">
-            {proposal?.data.content.title}
-          </h2>
+          <div className="mt-6 flex flex-row justify-between">
+            <h2 className="text-marble-white text-2xl font-bold">{proposal?.data.content.title}</h2>
+            <ProposalEllipsisButton proposalId={proposalId} />
+          </div>
         ) : (
           <div className="mt-6 h-8 w-42 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />
         )}
@@ -225,7 +216,6 @@ export const ProposalViewHeaderNavigation = () => {
               </p>
             </div>
           )}
-          {proposal && <CopyBtn textToWrite={currentPageUrl} />}
         </div>
         {/* TABS */}
         <div className="mt-12 self-end flex flex-row space-x-4 border-b border-concrete -mx-6 md:mx-0">

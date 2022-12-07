@@ -1,4 +1,4 @@
-import db, { RfpStatus } from "db"
+import db, { ProposalStatus, RfpStatus } from "db"
 import * as z from "zod"
 import { Rfp } from "../types"
 import { computeRfpDbStatusFilter, getRfpStatus } from "../utils"
@@ -23,8 +23,11 @@ export default async function getRfpsForAccount(input: z.infer<typeof GetRfpsFor
     },
     include: {
       template: true,
-      _count: {
-        select: { proposals: true },
+      proposals: {
+        where: {
+          suppress: false,
+          deleted: false,
+        },
       },
     },
     take: input.paginationTake,
@@ -32,6 +35,10 @@ export default async function getRfpsForAccount(input: z.infer<typeof GetRfpsFor
   })
 
   return rfps.map((rfp) => {
-    return { ...rfp, status: getRfpStatus(rfp.status, rfp.startDate, rfp.endDate) }
+    return {
+      ...rfp,
+      status: getRfpStatus(rfp.status, rfp.startDate, rfp.endDate),
+      _count: { proposals: rfp.proposals.length },
+    }
   }) as unknown as Rfp[]
 }

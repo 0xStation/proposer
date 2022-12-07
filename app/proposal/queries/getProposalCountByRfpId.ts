@@ -12,6 +12,7 @@ export default async function getProposalCountByRfpId(
     where: {
       rfpId: params.rfpId,
       suppress: false,
+      deleted: false,
       status: {
         not: ProposalStatus.DRAFT,
       },
