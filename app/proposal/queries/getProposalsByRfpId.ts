@@ -12,8 +12,9 @@ export default async function getProposalsByRfpId(params: z.infer<typeof GetProp
       rfpId: params.rfpId,
       suppress: false,
       status: {
-        notIn: [ProposalStatus.DRAFT, ProposalStatus.DELETED],
+        not: ProposalStatus.DRAFT,
       },
+      deleted: false,
     },
     include: {
       roles: {

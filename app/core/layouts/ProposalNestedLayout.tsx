@@ -5,11 +5,11 @@ import { ProposalViewHeaderNavigation } from "app/proposal/components/viewPage/P
 import { useRouter } from "next/router"
 import Button, { ButtonType } from "../components/sds/buttons/Button"
 
-export const ProposalNestedLayout = ({ children, status }) => {
+export const ProposalNestedLayout = ({ children }) => {
   const router = useRouter()
   return (
     <>
-      {status === ProposalStatus.DELETED ? (
+      {children.props.isDeleted ? (
         <div className="text-marble-white flex flex-col h-full w-full justify-center text-center align-middle">
           <div>
             <h4 className="text-xl font-bold">This proposal has been deleted</h4>

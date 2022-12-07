@@ -29,9 +29,8 @@ export default resolver.pipe(async ({ where, skip = 0, take = 100 }: GetPaginate
           account: true,
           proposals: {
             where: {
-              status: {
-                notIn: [ProposalStatus.DRAFT, ProposalStatus.DELETED],
-              },
+              suppress: false,
+              deleted: false,
             },
           },
         },

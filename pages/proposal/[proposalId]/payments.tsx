@@ -33,7 +33,7 @@ export const getServerSideProps = gSSP(async ({ params = {} }) => {
   }
 
   return {
-    props: { status: proposal.status }, // will be passed to the page component as props
+    props: { isDeleted: proposal.deleted }, // will be passed to the page component as props
   }
 })
 
@@ -99,7 +99,7 @@ ProposalPayments.getLayout = function getLayout(page) {
   // persist layout between pages https://nextjs.org/docs/basic-features/layouts
   return (
     <Layout title="Proposal Payments">
-      <ProposalNestedLayout status={page.props.status}>{page}</ProposalNestedLayout>
+      <ProposalNestedLayout>{page}</ProposalNestedLayout>
     </Layout>
   )
 }

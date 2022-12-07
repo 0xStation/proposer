@@ -11,7 +11,6 @@ const GetProposalCountForAccount = z.object({
       ProposalStatus.AWAITING_APPROVAL,
       ProposalStatus.DRAFT,
       ProposalStatus.COMPLETE,
-      ProposalStatus.DELETED,
     ])
     .array()
     .optional(),
@@ -29,6 +28,7 @@ export default async function getProposalCountForAccount(
   const whereParams = {
     where: {
       suppress: false,
+      deleted: false,
       roles: {
         some: {
           address: params.address,
@@ -44,12 +44,12 @@ export default async function getProposalCountForAccount(
         ? {
             status: {
               in: params.statuses,
-              notIn: [ProposalStatus.DRAFT, ProposalStatus.DELETED],
+              not: ProposalStatus.DRAFT,
             },
           }
         : {
             status: {
-              notIn: [ProposalStatus.DRAFT, ProposalStatus.DELETED],
+              not: ProposalStatus.DRAFT,
             },
           }),
     },

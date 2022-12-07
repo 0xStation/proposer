@@ -6,8 +6,7 @@ import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
 import { Router, useRouter } from "next/router"
 import { useState } from "react"
-import updateProposalStatus from "../mutations/updateProposalStatus"
-import getProposalById from "../queries/getProposalById"
+import safeDeleteProposal from "../mutations/safeDeleteProposal"
 import getProposalsByAddress from "../queries/getProposalsByAddress"
 
 export const DeleteProposalModal = ({ isOpen, setIsOpen, proposalId }) => {
@@ -16,7 +15,7 @@ export const DeleteProposalModal = ({ isOpen, setIsOpen, proposalId }) => {
   const setToastState = useStore((state) => state.setToastState)
   const router = useRouter()
 
-  const [updateProposalStatusMutation] = useMutation(updateProposalStatus, {
+  const [safeDeleteProposalMutation] = useMutation(safeDeleteProposal, {
     onSuccess: (_data) => {
       console.log("proposal deleted: ", _data)
       setToastState({
@@ -36,13 +35,6 @@ export const DeleteProposalModal = ({ isOpen, setIsOpen, proposalId }) => {
       })
     },
   })
-
-  const deleteProposal = async () => {
-    await updateProposalStatusMutation({
-      proposalId,
-      status: ProposalStatus.DELETED,
-    })
-  }
 
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
@@ -67,7 +59,7 @@ export const DeleteProposalModal = ({ isOpen, setIsOpen, proposalId }) => {
             onClick={async () => {
               setIsLoading(true)
               try {
-                await deleteProposal()
+                await safeDeleteProposalMutation({ proposalId })
                 setIsLoading(false)
                 setIsOpen(false)
               } catch (e) {

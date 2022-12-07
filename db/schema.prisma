@@ -110,6 +110,7 @@ model Proposal {
   currentMilestoneIndex Int            @default(-1) // no current milestone, gets set to 0 after proposal is approved
   data                  Json
   suppress              Boolean        @default(false)
+  deleted               Boolean        @default(false) // enables us to show pages as "this proposal is deleted" vs. 404s
 
   rfp Rfp? @relation(fields: [rfpId], references: [id], onDelete: Cascade)
 
@@ -126,7 +127,6 @@ enum ProposalStatus {
   AWAITING_APPROVAL
   APPROVED
   COMPLETE
-  DELETED // enables us to show pages as "this proposal is deleted" vs. 404s
 }
 
 // PROPOSAL ROLES

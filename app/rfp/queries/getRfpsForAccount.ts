@@ -25,9 +25,8 @@ export default async function getRfpsForAccount(input: z.infer<typeof GetRfpsFor
       template: true,
       proposals: {
         where: {
-          status: {
-            notIn: [ProposalStatus.DRAFT, ProposalStatus.DELETED],
-          },
+          suppress: false,
+          deleted: false,
         },
       },
     },
