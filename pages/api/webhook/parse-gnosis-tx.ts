@@ -1,8 +1,8 @@
 import db from "db"
 import { api } from "app/blitz-server"
 import { NextApiRequest, NextApiResponse } from "next"
-import SaveTransactionHashToPayments from "app/proposal/mutations/saveTransactionToPayments"
-import RetroactivelyApproveProposal from "app/proposal/mutations/retroactivelyApproveProposal"
+import saveTransactionHashToPayments from "app/proposal/mutations/saveTransactionToPayments"
+import retroactivelyApproveProposal from "app/proposal/mutations/retroactivelyApproveProposal"
 import {
   GNOSIS_CHANGED_THRESHOLD_EVENT_HASH,
   GNOSIS_EXECUTION_SUCCESS_EVENT_HASH,
@@ -39,6 +39,9 @@ const handleChangedThreshold = async (account) => {
   const allAccountRoles = await db.proposalRole.findMany({
     where: {
       address: account.address,
+      proposal: {
+        status: ProposalStatus.AWAITING_APPROVAL,
+      },
     },
     include: {
       proposal: true,
@@ -48,18 +51,15 @@ const handleChangedThreshold = async (account) => {
 
   for (let index in allAccountRoles) {
     const role = allAccountRoles[index]
-    const status = role?.proposal?.status
     if (!role) {
       continue
     }
-    // only consider proposals that have not yet been approved
-    if (status === ProposalStatus.AWAITING_APPROVAL || status === ProposalStatus.DRAFT) {
-      let signatures = role?.signatures
 
-      // with the change to the threshold, we should now consider the proposal approved
-      if (signatures?.length || 0 >= threshold) {
-        await RetroactivelyApproveProposal({ proposalId: role?.proposal.id, roleId: role.id })
-      }
+    let signatures = role?.signatures
+
+    // with the change to the threshold, we should now consider the proposal approved
+    if (signatures && signatures.length >= threshold) {
+      await retroactivelyApproveProposal({ proposalId: role?.proposal.id, roleId: role.id })
     }
   }
 }
@@ -104,7 +104,7 @@ const handleExecutionSuccess = async (account, log) => {
   if (mostRecentPaymentAttempt.multisigTransaction?.safeTxHash === safeTxHash) {
     if (mostRecentPaymentAttempt.status === ProposalPaymentStatus.QUEUED) {
       try {
-        await SaveTransactionHashToPayments({
+        await saveTransactionHashToPayments({
           milestoneId: payment.milestoneId,
           proposalId: payment.proposalId,
           transactionHash: log.transactionHash,
@@ -157,34 +157,24 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
     return res.end()
   }
 
-  const gnosisChangedThresholdEventLog = response.logs.find(
-    (log) => log.topic0 === GNOSIS_CHANGED_THRESHOLD_EVENT_HASH
-  )
+  const events = [
+    {
+      hash: GNOSIS_CHANGED_THRESHOLD_EVENT_HASH,
+      callback: handleChangedThreshold,
+    },
+    {
+      hash: GNOSIS_EXECUTION_SUCCESS_EVENT_HASH,
+      callback: handleExecutionSuccess,
+    },
+  ]
 
-  if (gnosisChangedThresholdEventLog) {
-    await handleChangedThreshold(account)
-    res.statusCode = 200
-    return res.end()
-  }
-
-  // eventually look for error logs as well
-  const gnosisTxSuccessEventLog = response.logs.find(
-    (log) => log.topic0 === GNOSIS_EXECUTION_SUCCESS_EVENT_HASH
-  )
-
-  if (!gnosisTxSuccessEventLog) {
-    res.statusCode = 500
-    return res.end()
-  }
-
-  try {
-    console.log("we have a successful tx event")
-    await handleExecutionSuccess(account, gnosisTxSuccessEventLog)
-    res.statusCode = 200
-    return res.end()
-  } catch (e) {
-    console.log(e)
-    res.statusCode = 500
-    return res.end()
-  }
+  response.logs.forEach(async (log) => {
+    events.forEach(async (event) => {
+      if (log.topic0 === event.hash) {
+        // probably next in a try-catch
+        await event.callback(account, log)
+      }
+    })
+  })
+  return res.end()
 })

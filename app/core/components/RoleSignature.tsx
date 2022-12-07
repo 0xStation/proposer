@@ -75,27 +75,18 @@ const SafeRole = ({ role, proposal }) => {
                 ) : (
                   <></>
                 )}
+                <ProgressCircleAndNumber
+                  numerator={totalSafeSignersSigned}
+                  denominator={
+                    newQuroumExists ? role.data.preApprovalQuorum : role.account.data?.quorum
+                  }
+                />
 
-                {newQuroumExists ? (
-                  <>
-                    <ProgressCircleAndNumber
-                      numerator={role.data.preApprovalQuorum}
-                      denominator={role.data.preApprovalQuorum}
-                    />
-                    <span className="absolute w-[100px] text-xs group-hover:block hidden bg-wet-concrete p-2 rounded right-[-110px]">
-                      The quorum of this safe has changed to {role.account.data?.quorum} since this
-                      proposal was approved.
-                    </span>
-                  </>
-                ) : (
-                  <ProgressCircleAndNumber
-                    numerator={
-                      totalSafeSignersSigned > role.account.data?.quorum
-                        ? role.account.data?.quorum
-                        : totalSafeSignersSigned
-                    }
-                    denominator={role.account.data?.quorum}
-                  />
+                {newQuroumExists && (
+                  <span className="absolute w-[100px] text-xs group-hover:block hidden bg-wet-concrete p-2 rounded right-[-110px]">
+                    The quorum of this safe has changed to {role.account.data?.quorum} since this
+                    proposal was approved.
+                  </span>
                 )}
               </div>
             </div>
