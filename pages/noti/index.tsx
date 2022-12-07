@@ -1,29 +1,17 @@
 import { BlitzPage } from "@blitzjs/next"
+import { useNotifications } from "app/core/hooks/useNotifications"
 
 const Demo: BlitzPage = () => {
-  const sendNotification = async () => {
-    await fetch("https://api.novu.co/v1/events/trigger", {
-      method: "POST",
-      headers: {
-        Authorization: `ApiKey ${process.env.NEXT_PUBLIC_NOVU_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: "new-proposal",
-        to: {
-          subscriberId: "123",
-        },
-        payload: {},
-      }),
-    })
-  }
-
+  const { sendNewCommentNotification } = useNotifications()
   return (
     <>
       <div>hello -- notifications demo</div>
       <button
         onClick={async () => {
-          await sendNotification()
+          await sendNewCommentNotification({
+            recipient: "123abcdefg",
+            payload: { comment_body: "testing" },
+          })
         }}
         className="px-2 py-2 bg-neon-carrot text-tunnel-black"
       >
