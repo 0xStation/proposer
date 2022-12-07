@@ -4,6 +4,7 @@ import Dropdown from "app/core/components/Dropdown"
 import useStore from "app/core/hooks/useStore"
 import { genPathFromUrlObject } from "app/utils"
 import { useState } from "react"
+import { ProposalAction, useProposalPermissions } from "../hooks/useProposalPermissions"
 import { DeleteProposalModal } from "./DeleteProposalModal"
 
 export const OtherActionsButton = ({ proposalId }) => {
@@ -19,6 +20,8 @@ export const OtherActionsButton = ({ proposalId }) => {
         )
       : ""
 
+  const canDelete = useProposalPermissions(proposalId, ProposalAction.DELETE)
+
   return (
     <>
       <DeleteProposalModal
@@ -27,7 +30,6 @@ export const OtherActionsButton = ({ proposalId }) => {
         proposalId={proposalId}
       />
       <Dropdown
-        //   side="left"
         button={
           <DotsHorizontalIcon className="p-2 h-8 w-8 cursor-pointer fill-marble-white rounded-md hover:bg-charcoal" />
         }
@@ -44,12 +46,16 @@ export const OtherActionsButton = ({ proposalId }) => {
               })
             },
           },
-          {
-            name: "Delete",
-            onClick: () => {
-              setDeleteModalOpen(true)
-            },
-          },
+          ...(canDelete
+            ? [
+                {
+                  name: "Delete",
+                  onClick: () => {
+                    setDeleteModalOpen(true)
+                  },
+                },
+              ]
+            : []),
         ]}
       />
     </>
