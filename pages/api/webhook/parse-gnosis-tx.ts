@@ -41,7 +41,6 @@ const handleChangedThreshold = async (account) => {
       address: account.address,
     },
     include: {
-      account: true,
       proposal: true,
       signatures: true,
     },
@@ -55,7 +54,6 @@ const handleChangedThreshold = async (account) => {
     }
     // only consider proposals that have not yet been approved
     if (status === ProposalStatus.AWAITING_APPROVAL || status === ProposalStatus.DRAFT) {
-      let account = role?.account as Account
       let signatures = role?.signatures
 
       // with the change to the threshold, we should now consider the proposal approved

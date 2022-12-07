@@ -19,7 +19,7 @@ export default async function retroactivelyApproveProposal(
   const params = RetroactivelyApproveProposal.parse(input)
 
   try {
-    return db.proposalRole.update({
+    await db.proposalRole.update({
       where: {
         id: params.roleId,
       },
