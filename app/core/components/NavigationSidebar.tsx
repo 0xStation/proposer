@@ -22,11 +22,18 @@ const ProfileIcon = ({
   if (!activeUser) {
     return <></>
   }
+  // note: prefer `window?.location?.pathname` vs. `router.pathname`, `router.pathname` displays the route like `/workspace/[accountAddress]`
+  // where the route doesn't exactly need to match up the inputted address param (activeUser.address)
+  // This becomes a problem when we're displaying multiple profile icons for different connected addresses
+  // on the nav bar - they all become highlighted on the `/workspace/[accountAddress]` route.
   const profileSelected =
     (typeof window !== "undefined" &&
-      router.pathname === Routes.WorkspaceHome({ accountAddress: activeUser.address }).pathname) ||
-    router.pathname === Routes.WorkspaceSettings({ accountAddress: activeUser.address }).pathname ||
-    router.pathname === Routes.WorkspaceRfps({ accountAddress: activeUser.address }).pathname
+      window?.location?.pathname ===
+        genUrlFromRoute(Routes.WorkspaceHome({ accountAddress: activeUser.address }))) ||
+    window?.location?.pathname ===
+      genUrlFromRoute(Routes.WorkspaceSettings({ accountAddress: activeUser.address })) ||
+    window?.location?.pathname ===
+      genUrlFromRoute(Routes.WorkspaceRfps({ accountAddress: activeUser.address }))
 
   return (
     <Link href={Routes.WorkspaceHome({ accountAddress: activeUser.address })}>
