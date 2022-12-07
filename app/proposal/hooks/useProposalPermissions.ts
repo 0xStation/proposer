@@ -11,4 +11,5 @@ export const useProposalPermissions = (proposalId, action: ProposalAction) => {
 
 export enum ProposalAction {
   DELETE,
+  // add more
 }

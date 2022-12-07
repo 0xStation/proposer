@@ -13,8 +13,6 @@ import {
 import { ProposalRole } from "app/proposalRole/types"
 import useStore from "app/core/hooks/useStore"
 import { ProposalStatusPill } from "../../../core/components/ProposalStatusPill"
-import { genPathFromUrlObject } from "app/utils"
-import { CopyBtn } from "app/core/components/CopyBtn"
 import { CollaboratorPfps } from "app/core/components/CollaboratorPfps"
 import ApproveProposalModal from "app/proposal/components/ApproveProposalModal"
 import convertJSDateToDateAndTime from "app/core/utils/convertJSDateToDateAndTime"
@@ -23,7 +21,7 @@ import { LINKS } from "app/core/utils/constants"
 import SendProposalModal from "../SendProposalModal"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import getRfpByProposalId from "app/rfp/queries/getRfpByProposalId"
-import { OtherActionsButton } from "../OtherActionsButton"
+import { ProposalEllipsisButton } from "../ProposalEllipsisButton"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.type === proposalType)
@@ -156,7 +154,7 @@ export const ProposalViewHeaderNavigation = () => {
         {proposal?.data.content.title ? (
           <div className="mt-6 flex flex-row justify-between">
             <h2 className="text-marble-white text-2xl font-bold">{proposal?.data.content.title}</h2>
-            <OtherActionsButton proposalId={proposalId} />
+            <ProposalEllipsisButton proposalId={proposalId} />
           </div>
         ) : (
           <div className="mt-6 h-8 w-42 rounded-2xl bg-wet-concrete shadow border-solid motion-safe:animate-pulse" />

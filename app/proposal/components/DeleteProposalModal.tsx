@@ -1,15 +1,22 @@
 import { Routes } from "@blitzjs/next"
 import { invalidateQuery, useMutation } from "@blitzjs/rpc"
-import { ProposalStatus } from "@prisma/client"
 import Modal from "app/core/components/Modal"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
-import { Router, useRouter } from "next/router"
+import { useRouter } from "next/router"
 import { useState } from "react"
 import safeDeleteProposal from "../mutations/safeDeleteProposal"
 import getProposalsByAddress from "../queries/getProposalsByAddress"
 
-export const DeleteProposalModal = ({ isOpen, setIsOpen, proposalId }) => {
+export const DeleteProposalModal = ({
+  isOpen,
+  setIsOpen,
+  proposalId,
+}: {
+  isOpen: boolean
+  setIsOpen: (isOpen: boolean) => void
+  proposalId: string
+}) => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
@@ -60,11 +67,11 @@ export const DeleteProposalModal = ({ isOpen, setIsOpen, proposalId }) => {
               setIsLoading(true)
               try {
                 await safeDeleteProposalMutation({ proposalId })
-                setIsLoading(false)
                 setIsOpen(false)
               } catch (e) {
                 console.error(e)
               }
+              setIsLoading(false)
             }}
           >
             Delete
@@ -74,3 +81,5 @@ export const DeleteProposalModal = ({ isOpen, setIsOpen, proposalId }) => {
     </Modal>
   )
 }
+
+export default DeleteProposalModal
