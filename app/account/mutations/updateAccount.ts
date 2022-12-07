@@ -8,6 +8,12 @@ import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 
 const UpdateAccount = z.object({
   address: z.string(),
+  prompt: z
+    .object({
+      text: z.string(),
+      updatedAt: z.date(),
+    })
+    .optional(),
   discordId: z.string().optional(),
   name: z.string().optional(),
   bio: z.string().optional(),
@@ -67,12 +73,12 @@ export default async function updateAccount(input: z.infer<typeof UpdateAccount>
       // save existing account data with overwrites below
       // without this, chainId for multisig accounts gets wiped
       ...Object(existingAccount.data),
-      name: params.name,
-      bio: params.bio,
-      pfpUrl: params.pfpUrl,
-      discordHandle: params.discordHandle,
-      // mark email as saved for this account to not show email input modals
-      hasSavedEmail: !!params.email,
+      ...(params.name && { name: params.name }),
+      ...(params.bio && { bio: params.bio }),
+      ...(params.prompt && { prompt: params.prompt }),
+      ...(params.pfpUrl && { pfpUrl: params.pfpUrl }),
+      ...(params.discordHandle && { pfpUrl: params.discordHandle }),
+      ...(params.email && { hasSavedEmail: !!params.email }),
       hasVerifiedEmail,
     },
   }

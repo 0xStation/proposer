@@ -9,6 +9,10 @@ export type Account = PrismaAccount & {
 export type AccountMetadata = {
   name: string
   bio?: string
+  prompt?: {
+    text: string
+    updatedAt: Date
+  }
   pfpUrl?: string
   discordHandle: string
   hasSavedEmail?: boolean

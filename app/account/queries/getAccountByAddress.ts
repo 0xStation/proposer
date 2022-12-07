@@ -39,6 +39,6 @@ export default async function getAccountByAddress(input: z.infer<typeof GetAccou
   // merge database model with Privy-stored data
   return {
     ...account,
-    data: { ...(account.data as AccountMetadata), ...(!!email && { email }) },
+    data: { ...(account.data as unknown as AccountMetadata), ...(!!email && { email }) },
   } as Account
 }

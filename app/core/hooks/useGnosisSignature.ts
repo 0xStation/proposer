@@ -1,4 +1,3 @@
-import Moralis from "moralis"
 import { useMutation, invoke } from "@blitzjs/rpc"
 import useStore from "app/core/hooks/useStore"
 import { getHash } from "app/signatures/utils"
@@ -7,38 +6,10 @@ import { genGnosisTransactionDigest } from "app/signatures/gnosisTransaction"
 import networks from "app/utils/networks.json"
 import useSignature from "app/core/hooks/useSignature"
 import { getSafeContractVersion } from "../utils/getSafeContractVersion"
-import { getMoralisNetwork } from "app/core/utils/networkInfo"
-import { EvmChain } from "@moralisweb3/common-evm-utils"
 import { ProposalPayment } from "app/proposalPayment/types"
 import updateAccount from "app/account/mutations/updateAccount"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
-
-const createMoralisStream = async (
-  proposalId: string,
-  evmChain: EvmChain,
-  clientAddress: string
-) => {
-  // Moralis.start({
-  //   apiKey: process.env.NEXT_PUBLIC_MORALIS_API_KEY,
-  // })
-
-  const stream = {
-    chains: [evmChain],
-    description: `Station proposal ${proposalId}`,
-    tag: "Gnosis, Station, Proposal",
-    webhookUrl: process.env.NEXT_PUBLIC_MORALIS_WEBHOOK_URL || "",
-    includeNativeTxs: true,
-    includeInternalTxs: true,
-    includeContractLogs: true,
-  }
-
-  const createdStream = await Moralis.Streams.add(stream)
-  const { id } = createdStream.toJSON()
-  await Moralis.Streams.addAddress({ address: clientAddress, id })
-
-  // returns stream id
-  return id
-}
+import { createMoralisStream, getMoralisNetwork } from "app/core/libraries/moralis"
 
 const useGnosisSignature = (payment: ProposalPayment) => {
   const activeUser = useStore((state) => state.activeUser)

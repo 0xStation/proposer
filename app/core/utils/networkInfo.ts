@@ -1,25 +1,5 @@
 import networks from "app/utils/networks.json"
 import { Token } from "@prisma/client"
-import { EvmChain } from "@moralisweb3/common-evm-utils"
-import Moralis from "moralis"
-
-Moralis.start({
-  apiKey: process.env.NEXT_PUBLIC_MORALIS_API_KEY,
-})
-
-// moralis only supports a few chains --
-// what does that mean for what we are able to support in our own app?
-const moralisChainMap: Record<string, EvmChain> = {
-  "1": EvmChain.ETHEREUM,
-  "5": EvmChain.GOERLI,
-  "137": EvmChain.POLYGON,
-  "80001": EvmChain.MUMBAI,
-  "43114": EvmChain.AVALANCHE,
-}
-
-export const getMoralisNetwork = (chainId: number) => {
-  return moralisChainMap[chainId.toString()] || EvmChain.ETHEREUM
-}
 
 export const getNetworkCoin = (chainId: number): Token | undefined => {
   try {
