@@ -3,6 +3,9 @@ import * as z from "zod"
 import { Ctx } from "blitz"
 import { ProposalRoleType, ProposalStatus } from "@prisma/client"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
+import { genProposalDigest } from "app/signatures/proposal"
+import { Proposal } from "app/proposal/types"
+import { getHash } from "app/signatures/utils"
 
 const UpdateProposalContributors = z.object({
   proposalId: z.string(),
@@ -15,6 +18,7 @@ const UpdateProposalContributors = z.object({
   addAddresses: z.string().array().default([]),
   newFundRecipient: z.string().optional(),
   newFundSender: z.string().optional(),
+  changeNotes: z.string().default(""),
 })
 
 export default async function updateProposalContributors(
@@ -118,6 +122,42 @@ export default async function updateProposalContributors(
       },
     })
   }
+
+  const res2 = await db.$transaction(async (db) => {
+    const newProposalVersion = existingProposal.version + 1
+
+    const proposal = (await db.proposal.update({
+      where: { id: params.proposalId },
+      data: {
+        version: newProposalVersion,
+      },
+      include: {
+        roles: true,
+        milestones: true,
+        payments: true,
+      },
+    })) as Proposal
+
+    const message = genProposalDigest(proposal)
+    const { domain, types, value } = message
+    const proposalHash = getHash(domain, types, value)
+
+    const newVersion = await db.proposalVersion.create({
+      data: {
+        proposalId: params.proposalId,
+        version: newProposalVersion,
+        editorAddress: ctx?.session?.siwe?.address as string,
+        data: {
+          content: {
+            title: `Version ${newProposalVersion}`,
+            body: params.changeNotes,
+          },
+          proposalSignatureMessage: message,
+          proposalHash: proposalHash,
+        },
+      },
+    })
+  })
 
   return res
 }

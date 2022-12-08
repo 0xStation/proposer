@@ -67,6 +67,7 @@ export const UpdateContributorsModal = ({
                 removeRoleIds: removedRoles.map((role) => role.id),
                 newFundRecipient: !!values.newFundRecipient ? values.newFundRecipient : undefined,
                 newFundSender: !!values.newFundSender ? values.newFundSender : undefined,
+                changeNotes: values.changeNotes,
               })
             } catch (e) {
               console.error(e)
@@ -122,6 +123,21 @@ export const UpdateContributorsModal = ({
                     </Field>
                   </>
                 )}
+                <label className="mt-6 font-bold block">Change notes</label>
+                <Field component="textarea" name="changeNotes">
+                  {({ input, meta }) => (
+                    <div>
+                      <textarea
+                        {...input}
+                        placeholder="Describe the changes you made."
+                        className="mt-1 bg-wet-concrete text-marble-white p-2 rounded min-h-[112px] w-full"
+                      />
+                      {meta.error && meta.touched && (
+                        <span className=" text-xs text-torch-red block">{meta.error}</span>
+                      )}
+                    </div>
+                  )}
+                </Field>
                 <Button
                   isSubmitType={true}
                   isDisabled={formState.invalid || isUpdatingRoles}
