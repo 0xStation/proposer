@@ -19,7 +19,7 @@ export const RoleModule = ({
     <EditRoles
       proposal={proposal}
       className={className}
-      editingRole={ProposalRoleType.CONTRIBUTOR}
+      roleType={ProposalRoleType.CONTRIBUTOR}
       setIsView={setIsView}
     />
   )

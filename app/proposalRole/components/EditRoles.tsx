@@ -16,8 +16,11 @@ import { ProposalRole } from "../types"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { ProposalRoleType } from "@prisma/client"
 import { UpdateContributorsModal } from "./UpdateContributorsModal"
+import { useRfp } from "app/rfp/hooks/useRfp"
+import LockClosedIcon from "app/core/icons/LockClosedIcon"
+import { ToolTip } from "app/core/components/ToolTip"
 
-const AccountRow = ({ account, removeAccount, tags = [] }) => {
+const AccountRow = ({ account, removeAccount, tags = [], lockRemoval }) => {
   return (
     <div className="flex flex-row w-full justify-between mt-4">
       <div className="flex items-center flex-row space-x-2 h-full">
@@ -33,16 +36,27 @@ const AccountRow = ({ account, removeAccount, tags = [] }) => {
           </span>
         ))}
       </div>
-      <button className="text-marble-white" onClick={() => removeAccount(account)}>
-        <XIcon />
-      </button>
+      <div className="group flex flex-row items-center">
+        <button
+          disabled={lockRemoval}
+          className="text-marble-white fill-marble-white disabled:text-concrete disabled:cursor-not-allowed"
+          onClick={() => removeAccount(account)}
+        >
+          {lockRemoval ? <LockClosedIcon /> : <XIcon />}
+        </button>
+        {lockRemoval && (
+          <ToolTip className="absolute right-[-240px] w-64">
+            Cannot remove contributors who are added by this proposal&apos;s RFP.
+          </ToolTip>
+        )}
+      </div>
     </div>
   )
 }
 
-export const EditRoles = ({ proposal, className, editingRole, setIsView }) => {
+export const EditRoles = ({ proposal, className, roleType, setIsView }) => {
   const { roles } = useRoles(proposal?.id)
-  const filteredRoles = roles?.filter((role) => role.type === editingRole)
+  const filteredRoles = roles?.filter((role) => role.type === roleType)
   const [isAddingAccount, setIsAddingAccount] = useState<boolean>(false)
   const [isSaveModalOpen, setIsSaveModalOpen] = useState<boolean>(false)
 
@@ -52,6 +66,8 @@ export const EditRoles = ({ proposal, className, editingRole, setIsView }) => {
   )
   const [addedAccounts, setAddedAccounts] = useState<Account[]>([])
   const [removedRoles, setRemovedRoles] = useState<ProposalRole[]>([])
+
+  const { rfp } = useRfp(proposal?.rfpId)
 
   const { resolveEnsAddress } = useResolveEnsAddress()
   const [createAccountMutation] = useMutation(createAccount, {
@@ -96,7 +112,7 @@ export const EditRoles = ({ proposal, className, editingRole, setIsView }) => {
   }
 
   let accountTagsMap = {}
-  if (editingRole === ProposalRoleType.CONTRIBUTOR) {
+  if (roleType === ProposalRoleType.CONTRIBUTOR) {
     filteredRoles
       ?.map((role) => role.address)
       ?.filter((v, i, addresses) => addresses.indexOf(v) === i)
@@ -128,7 +144,7 @@ export const EditRoles = ({ proposal, className, editingRole, setIsView }) => {
       />
       <ModuleBox isLoading={!!roles} className={className}>
         <div className="flex flex-row justify-between items-center mb-4">
-          <p className="text-concrete">Editing {editingRole.toLowerCase()}s</p>
+          <p className="text-concrete">Editing {roleType.toLowerCase()}s</p>
 
           <div className="flex flex-row space-x-4 items-center">
             <Button type={ButtonType.Secondary} onClick={() => setIsView(true)}>
@@ -150,8 +166,9 @@ export const EditRoles = ({ proposal, className, editingRole, setIsView }) => {
             <AccountRow
               account={account}
               removeAccount={removeAccount}
-              key={idx}
               tags={accountTagsMap[account.address] || []}
+              lockRemoval={addressesAreEqual(rfp?.accountAddress, account.address)}
+              key={idx}
             />
           )
         })}
@@ -211,14 +228,14 @@ export const EditRoles = ({ proposal, className, editingRole, setIsView }) => {
                   <button
                     type="submit"
                     disabled={formState.invalid || isAddingAccount}
-                    className="text-sm w-56 bg-electric-violet rounded-tr-md rounded-br-md h-10 text-tunnel-black hover:bg-electric-violet/80 disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="text-sm font-bold w-56 bg-electric-violet rounded-tr-md rounded-br-md h-10 text-tunnel-black hover:bg-electric-violet/80 disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     {isAddingAccount ? (
                       <div className="flex justify-center items-center">
                         <Spinner fill="black" />
                       </div>
                     ) : (
-                      "Add " + editingRole.toLowerCase()
+                      "Add " + roleType.toLowerCase()
                     )}
                   </button>
                 </div>
