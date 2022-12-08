@@ -19,10 +19,22 @@ import updateProposalRoles from "../mutations/updateProposalRoles"
 import getRolesByProposalId from "../queries/getRolesByProposalId"
 import getProposalById from "app/proposal/queries/getProposalById"
 
-const AccountRow = ({ account, removeAccount }) => {
+const AccountRow = ({ account, removeAccount, tags = [] }) => {
   return (
     <div className="flex flex-row w-full justify-between mt-4">
-      <AccountMediaObject account={account} />
+      <div className="flex items-center flex-row space-x-2 h-full">
+        {/* ACCOUNT */}
+        <AccountMediaObject account={account} showActionIcons={true} />
+        {/* TAGS */}
+        {tags.map((tag, idx) => (
+          <span
+            className="bg-wet-concrete rounded-full px-2 py-1 flex items-center w-fit text-xs uppercase text-marble-white font-bold"
+            key={`tag-${idx}`}
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
       <button className="text-marble-white" onClick={() => removeAccount(account)}>
         <XIcon />
       </button>
@@ -107,6 +119,20 @@ export const EditRoles = ({ proposal, className, editingRole, setIsView }) => {
     }
   }
 
+  let accountTagsMap = {}
+  if (editingRole === ProposalRoleType.CONTRIBUTOR) {
+    filteredRoles
+      ?.map((role) => role.address)
+      ?.filter((v, i, addresses) => addresses.indexOf(v) === i)
+      ?.forEach((address) => {
+        if (
+          proposal.payments.some((payment) => addressesAreEqual(payment.recipientAddress, address))
+        ) {
+          accountTagsMap[address] = ["fund recipient"]
+        }
+      })
+  }
+
   return (
     <ModuleBox isLoading={!!roles} className={className}>
       <div className="flex flex-row justify-between items-center mb-4">
@@ -139,7 +165,14 @@ export const EditRoles = ({ proposal, className, editingRole, setIsView }) => {
         </div>
       </div>
       {accounts.map((account, idx) => {
-        return <AccountRow account={account} removeAccount={removeAccount} key={idx} />
+        return (
+          <AccountRow
+            account={account}
+            removeAccount={removeAccount}
+            key={idx}
+            tags={accountTagsMap[account.address] || []}
+          />
+        )
       })}
       {accounts.length === 0 && (
         <p className="mx-auto text-md font-bold w-fit pt-[18px]">Add at least one contributor</p>

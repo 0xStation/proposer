@@ -17,7 +17,7 @@ import { useEffect, useState } from "react"
 import { useRoles } from "../hooks/useRoles"
 import { ProposalRole } from "../types"
 
-const RoleRow = ({ proposal, role, setSelectedRole }) => {
+const RoleRow = ({ proposal, role, setSelectedRole, tags = [] }) => {
   const activeUser = useStore((state) => state.activeUser)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
 
@@ -35,8 +35,19 @@ const RoleRow = ({ proposal, role, setSelectedRole }) => {
   return (
     <div className="flex flex-col w-full mt-4">
       <div className="flex flex-row w-full items-center justify-between">
-        {/* ACCOUNT */}
-        <AccountMediaObject account={role?.account} showActionIcons={true} />
+        <div className="flex items-center flex-row space-x-2 h-full">
+          {/* ACCOUNT */}
+          <AccountMediaObject account={role?.account} showActionIcons={true} />
+          {/* TAGS */}
+          {tags.map((tag, idx) => (
+            <span
+              className="bg-wet-concrete rounded-full px-2 py-1 flex items-center w-fit text-xs uppercase text-marble-white font-bold"
+              key={`tag-${idx}`}
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
         {/* APPROVAL */}
         <div className="flex items-center flex-row space-x-4 h-full justify-end">
           {/* MULTISIG PROGRESS */}
@@ -83,6 +94,21 @@ const RoleRow = ({ proposal, role, setSelectedRole }) => {
 }
 
 const RoleSection = ({ proposal, roles, roleType, setSelectedRole, setIsView }) => {
+  const filteredRoles = roles?.filter((role) => role.type === roleType)
+
+  let accountTagsMap = {}
+  if (roleType === ProposalRoleType.CONTRIBUTOR) {
+    filteredRoles
+      .map((role) => role.address)
+      .filter((v, i, addresses) => addresses.indexOf(v) === i)
+      .forEach((address) => {
+        if (
+          proposal.payments.some((payment) => addressesAreEqual(payment.recipientAddress, address))
+        ) {
+          accountTagsMap[address] = ["fund recipient"]
+        }
+      })
+  }
   return (
     <>
       <div className="w-full flex flex-row justify-between items-center">
@@ -93,13 +119,17 @@ const RoleSection = ({ proposal, roles, roleType, setSelectedRole, setIsView }) 
           <PencilIcon className="h-5 w-5 inline text-marble-white cursor-pointer" />
         </button>
       </div>
-      {roles
-        ?.filter((role) => role.type === roleType)
-        ?.map((role, idx) => {
-          return (
-            <RoleRow proposal={proposal} role={role} setSelectedRole={setSelectedRole} key={idx} />
-          )
-        })}
+      {filteredRoles?.map((role, idx) => {
+        return (
+          <RoleRow
+            proposal={proposal}
+            role={role}
+            setSelectedRole={setSelectedRole}
+            tags={accountTagsMap[role.address] || []}
+            key={idx}
+          />
+        )
+      })}
     </>
   )
 }
