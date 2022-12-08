@@ -19,24 +19,9 @@ import CommentEmptyState from "app/comment/components/CommentEmptyState"
 import useCommentPermissions from "app/core/hooks/useCommentPermissions"
 import { useRouter } from "next/router"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-
-export const ToolTip = ({ children }) => {
-  return (
-    <div className="hidden bg-wet-concrete invisible group-hover:visible md:inline rounded p-2 mr-1.5">
-      {children}
-    </div>
-  )
-}
-
-export const EditIcon = ({ disabled = false, children }) => {
-  const disabledStyling = disabled ? "text-concrete" : "text-marble-white"
-  return (
-    <div className="inline mt-5 w-full cursor-pointer align-middle">
-      <PencilIcon className={`h-5 w-5 inline ${disabledStyling}`} />
-      <p className={`inline ml-2 ${disabledStyling}`}>{children}</p>
-    </div>
-  )
-}
+import { EditIcon } from "app/core/components/EditIcon"
+import { ToolTip } from "app/core/components/ToolTip"
+import RoleModule from "app/proposalRole/components/RolesModule"
 
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
   const { proposalId } = params
@@ -118,7 +103,8 @@ const ViewProposal: BlitzPage = () => {
         )
       )}
       <ReadMore className="mt-12 mb-9 mx-6 md:mx-0">{proposal?.data?.content?.body}</ReadMore>
-      <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" />
+      <RoleModule proposal={proposal as Proposal} className="mt-9" />
+      {/* <RoleSignaturesView proposal={proposal as Proposal} className="mt-9" /> */}
       {(proposal?.data.totalPayments || []).length > 0 && (
         <TotalPaymentView proposal={proposal!} className="mt-9" />
       )}
