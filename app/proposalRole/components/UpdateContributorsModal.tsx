@@ -12,10 +12,12 @@ import getRolesByProposalId from "../queries/getRolesByProposalId"
 
 export const UpdateContributorsModal = ({
   proposal,
-  setIsView,
+  roleType,
+  closeEditView,
   isOpen,
   setIsOpen,
   selectNewFundRecipient,
+  selectNewFundSender,
   accounts,
   addedAccounts,
   removedRoles,
@@ -31,7 +33,7 @@ export const UpdateContributorsModal = ({
       })
       invalidateQuery(getRolesByProposalId)
       invalidateQuery(getProposalById) // resets approval progress denominator
-      setIsView(true)
+      closeEditView()
     },
     onError: (error) => {
       setToastState({
@@ -60,9 +62,11 @@ export const UpdateContributorsModal = ({
             try {
               await updateProposalContributorsMutation({
                 proposalId: proposal?.id,
+                roleType,
                 addAddresses: addedAccounts.map((account) => account.address),
                 removeRoleIds: removedRoles.map((role) => role.id),
                 newFundRecipient: !!values.newFundRecipient ? values.newFundRecipient : undefined,
+                newFundSender: !!values.newFundSender ? values.newFundSender : undefined,
               })
             } catch (e) {
               console.error(e)
@@ -78,6 +82,29 @@ export const UpdateContributorsModal = ({
                     <label className="font-bold block mt-6">Select a new fund recipient*</label>
                     <p className="text-concrete text-sm">Who will be receiving the funds?</p>
                     <Field name="newFundRecipient" validate={requiredField}>
+                      {({ meta, input }) => (
+                        <>
+                          <div className="custom-select-wrapper">
+                            <select {...input} className="w-full bg-wet-concrete rounded p-2 mt-1">
+                              <option value="">Select one</option>
+                              {accounts.map((account, idx) => (
+                                <option value={account.address} key={idx}>
+                                  {account.address}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </>
+                      )}
+                    </Field>
+                  </>
+                )}
+                {selectNewFundSender && (
+                  <>
+                    {/* FUND SENDER */}
+                    <label className="font-bold block mt-6">Select a new fund sender*</label>
+                    <p className="text-concrete text-sm">Who will be sending the funds?</p>
+                    <Field name="newFundSender" validate={requiredField}>
                       {({ meta, input }) => (
                         <>
                           <div className="custom-select-wrapper">

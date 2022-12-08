@@ -54,7 +54,7 @@ const AccountRow = ({ account, removeAccount, tags = [], lockRemoval }) => {
   )
 }
 
-export const EditRoles = ({ proposal, className, roleType, setIsView }) => {
+export const EditRoles = ({ proposal, className, roleType, closeEditView }) => {
   const { roles } = useRoles(proposal?.id)
   const filteredRoles = roles?.filter((role) => role.type === roleType)
   const [isAddingAccount, setIsAddingAccount] = useState<boolean>(false)
@@ -123,21 +123,43 @@ export const EditRoles = ({ proposal, className, roleType, setIsView }) => {
           accountTagsMap[address] = ["fund recipient"]
         }
       })
+  } else if (roleType === ProposalRoleType.CLIENT) {
+    filteredRoles
+      ?.map((role) => role.address)
+      ?.filter((v, i, addresses) => addresses.indexOf(v) === i)
+      ?.forEach((address) => {
+        if (
+          proposal.payments.some((payment) => addressesAreEqual(payment.senderAddress, address))
+        ) {
+          accountTagsMap[address] = ["fund sender"]
+        }
+      })
   }
 
-  const selectNewFundRecipient = !proposal.payments
-    .map((payment) => payment.recipientAddress)
-    .filter((v, i, addresses) => addresses.indexOf(v) === i)
-    .every((address) => accounts.map((account) => account.address).includes(address))
+  const selectNewFundRecipient =
+    roleType === ProposalRoleType.CONTRIBUTOR &&
+    !proposal.payments
+      .map((payment) => payment.recipientAddress)
+      .filter((v, i, addresses) => addresses.indexOf(v) === i)
+      .every((address) => accounts.map((account) => account.address).includes(address))
+
+  const selectNewFundSender =
+    roleType === ProposalRoleType.CLIENT &&
+    !proposal.payments
+      .map((payment) => payment.senderAddress)
+      .filter((v, i, addresses) => addresses.indexOf(v) === i)
+      .every((address) => accounts.map((account) => account.address).includes(address))
 
   return (
     <>
       <UpdateContributorsModal
         proposal={proposal}
-        setIsView={setIsView}
+        roleType={roleType}
+        closeEditView={closeEditView}
         isOpen={isSaveModalOpen}
         setIsOpen={setIsSaveModalOpen}
         selectNewFundRecipient={selectNewFundRecipient}
+        selectNewFundSender={selectNewFundSender}
         accounts={accounts}
         addedAccounts={addedAccounts}
         removedRoles={removedRoles}
@@ -147,7 +169,7 @@ export const EditRoles = ({ proposal, className, roleType, setIsView }) => {
           <p className="text-concrete">Editing {roleType.toLowerCase()}s</p>
 
           <div className="flex flex-row space-x-4 items-center">
-            <Button type={ButtonType.Secondary} onClick={() => setIsView(true)}>
+            <Button type={ButtonType.Secondary} onClick={() => closeEditView()}>
               Cancel
             </Button>
             <Button
@@ -167,13 +189,18 @@ export const EditRoles = ({ proposal, className, roleType, setIsView }) => {
               account={account}
               removeAccount={removeAccount}
               tags={accountTagsMap[account.address] || []}
-              lockRemoval={addressesAreEqual(rfp?.accountAddress, account.address)}
+              lockRemoval={
+                addressesAreEqual(rfp?.accountAddress, account.address) &&
+                rfp?.data?.proposal?.requesterRole === roleType
+              }
               key={idx}
             />
           )
         })}
         {accounts.length === 0 && (
-          <p className="mx-auto text-md font-bold w-fit pt-[18px]">Add at least one contributor</p>
+          <p className="mx-auto text-md font-bold w-fit pt-[18px]">
+            Add at least one {roleType.toLowerCase()}
+          </p>
         )}
         <Form
           initialValues={{}}

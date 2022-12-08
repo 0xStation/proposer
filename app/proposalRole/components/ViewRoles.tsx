@@ -95,7 +95,7 @@ const RoleRow = ({ proposal, role, setSelectedRole, tags = [] }) => {
   )
 }
 
-const RoleSection = ({ proposal, roles, roleType, setSelectedRole, setIsView }) => {
+const RoleSection = ({ proposal, roles, roleType, setSelectedRole, openEditView }) => {
   const filteredRoles = roles?.filter((role) => role.type === roleType)
   const canEditRole = useEditRolesPermissions(proposal?.id, roleType)
 
@@ -111,18 +111,29 @@ const RoleSection = ({ proposal, roles, roleType, setSelectedRole, setIsView }) 
           accountTagsMap[address] = ["fund recipient"]
         }
       })
+  } else if (roleType === ProposalRoleType.CLIENT) {
+    filteredRoles
+      .map((role) => role.address)
+      .filter((v, i, addresses) => addresses.indexOf(v) === i)
+      .forEach((address) => {
+        if (
+          proposal.payments.some((payment) => addressesAreEqual(payment.senderAddress, address))
+        ) {
+          accountTagsMap[address] = ["fund sender"]
+        }
+      })
   }
+
   return (
     <>
       <div className="w-full flex flex-row justify-between items-center">
         <h4 className="text-xs font-bold text-concrete uppercase">
           {roleType.toLowerCase() + "S"}
         </h4>
-        {/* TEMPORARY: remove conditional once support more multiplay things */}
-        {roleType === ProposalRoleType.CONTRIBUTOR && canEditRole && (
+        {canEditRole && (
           <div className="group">
             <ToolTip className="mr-1">You can only edit contributors before approval.</ToolTip>
-            <button onClick={() => setIsView(false)}>
+            <button onClick={() => openEditView(roleType)}>
               <PencilIcon className="h-5 w-5 inline text-marble-white cursor-pointer" />
             </button>
           </div>
@@ -143,7 +154,7 @@ const RoleSection = ({ proposal, roles, roleType, setSelectedRole, setIsView }) 
   )
 }
 
-export const ViewRoles = ({ proposal, className, setIsView }) => {
+export const ViewRoles = ({ proposal, className, openEditView }) => {
   const [selectedRole, setSelectedRole] = useState<ProposalRole | null>()
   const [toggleRoleSigners, setToggleRoleSigners] = useState<boolean>(false)
   const { roles } = useRoles(proposal?.id)
@@ -174,7 +185,7 @@ export const ViewRoles = ({ proposal, className, setIsView }) => {
           roles={roles}
           setSelectedRole={setSelectedRole}
           roleType={ProposalRoleType.CONTRIBUTOR}
-          setIsView={setIsView}
+          openEditView={openEditView}
         />
         <hr className="w-5/6 text-wet-concrete my-4 mx-auto"></hr>
         {/* CLIENTS */}
@@ -183,7 +194,7 @@ export const ViewRoles = ({ proposal, className, setIsView }) => {
           roles={roles}
           setSelectedRole={setSelectedRole}
           roleType={ProposalRoleType.CLIENT}
-          setIsView={setIsView}
+          openEditView={openEditView}
         />
         <hr className="w-5/6 text-wet-concrete my-4 mx-auto"></hr>
         {/* AUTHORS */}
@@ -192,7 +203,7 @@ export const ViewRoles = ({ proposal, className, setIsView }) => {
           roles={roles}
           setSelectedRole={setSelectedRole}
           roleType={ProposalRoleType.AUTHOR}
-          setIsView={setIsView}
+          openEditView={openEditView}
         />
       </ModuleBox>
     </>

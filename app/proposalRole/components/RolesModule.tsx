@@ -1,4 +1,4 @@
-import { ProposalRoleType } from "@prisma/client"
+import { ProposalRole, ProposalRoleType } from "@prisma/client"
 import { Proposal } from "app/proposal/types"
 import { useState } from "react"
 import { EditRoles } from "./EditRoles"
@@ -12,15 +12,25 @@ export const RoleModule = ({
   className: string
 }) => {
   const [isView, setIsView] = useState<boolean>(true)
+  const [editRoleType, setEditRoleType] = useState<ProposalRoleType>()
+
+  const openEditView = (roleType: ProposalRoleType) => {
+    setEditRoleType(roleType)
+    setIsView(false)
+  }
+
+  const closeEditView = () => {
+    setIsView(true)
+  }
 
   return isView ? (
-    <ViewRoles proposal={proposal} className={className} setIsView={setIsView} />
+    <ViewRoles proposal={proposal} className={className} openEditView={openEditView} />
   ) : (
     <EditRoles
       proposal={proposal}
       className={className}
-      roleType={ProposalRoleType.CONTRIBUTOR}
-      setIsView={setIsView}
+      roleType={editRoleType}
+      closeEditView={closeEditView}
     />
   )
 }
