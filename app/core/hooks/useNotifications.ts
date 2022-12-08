@@ -48,7 +48,6 @@ export interface NewRFPSubmissionNotificationType {
     from: NotificationFromUserType | "STATION"
     proposalTitle: string
     rfpTitle: string
-    commentBody: string
   }
 }
 
@@ -57,7 +56,6 @@ export interface ProposalApprovalNotificationType {
   payload: {
     from: NotificationFromUserType | "STATION"
     proposalTitle: string
-    commentBody: string
   }
 }
 

@@ -5,7 +5,8 @@ import { useNotifications } from "app/core/hooks/useNotifications"
 import { NovuProvider, useNotifications as useNovuNotifications } from "@novu/notification-center"
 import StationLogo from "public/station-letters.svg"
 import { convertJSDateToDateAndTime } from "app/core/utils/convertJSDateToDateAndTime"
-import { notificationTemplateIdToContentMap } from "app/core/utils/constants"
+import AccountMediaRow from "app/comment/components/AccountMediaRow"
+import Layout from "app/core/layouts/Layout"
 
 function CustomNotificationCenter() {
   const { notifications, fetchNextPage, hasNextPage, fetching, markAsSeen, refetch } =
@@ -18,7 +19,7 @@ function CustomNotificationCenter() {
   console.log(notifications)
 
   return (
-    <div className="max-w-screen-xl mx-auto mt-20">
+    <div className="mt-20">
       {/* Table */}
       <table className="w-full table-auto">
         {/* Columns */}
@@ -31,13 +32,18 @@ function CustomNotificationCenter() {
         </thead>
         <tbody>
           {notifications.map((notification, idx) => {
+            const from = notification.payload.from as { address: string } | "STATION"
             return (
               <tr
                 className="border-b border-wet-concrete cursor-pointer hover:bg-wet-concrete"
                 key={`row-${idx}`}
               >
                 <td className="py-4 pl-4 align-top">
-                  <Image src={StationLogo} alt="Station logo" height={16} width={50} />
+                  {notification.payload.from === "STATION" ? (
+                    <Image src={StationLogo} alt="Station logo" height={16} width={50} />
+                  ) : (
+                    <AccountMediaRow address={from != "STATION" ? from.address : ""} />
+                  )}
                 </td>
                 <td className="py-4 space-y-2">
                   <span className="block">{notification.payload.title}</span>
@@ -60,33 +66,42 @@ function CustomNotificationCenter() {
   )
 }
 
-const Demo: BlitzPage = () => {
-  const { sendNewCommentNotification } = useNotifications()
+const NotificationPage: BlitzPage = () => {
+  const {
+    sendNewCommentNotification,
+    sendNewProposalNotification,
+    sendPaymentNotification,
+    sendNewRFPSubmissionNotification,
+    sendProposalApprovalNotification,
+  } = useNotifications()
   return (
     <>
-      <div>hello -- notifications demo</div>
-      <button
+      {/* <button
         onClick={async () => {
-          await sendNewCommentNotification({
-            recipient: "123abcdefg",
+          await sendProposalApprovalNotification({
+            recipient: "tester",
             payload: {
-              from: "STATION",
-              proposalTitle: "Proposal title",
-              commentBody: "this is the comment_body",
+              from: { address: "0x6860C9323d4976615ae515Ab4b0039d7399E7CC8" },
+              proposalTitle: "New proposal!",
             },
           })
         }}
         className="px-2 py-2 bg-neon-carrot text-tunnel-black"
       >
         TRIGGER NOTIFICATION
-      </button>
-      <NovuProvider subscriberId={"123abcdefg"} applicationIdentifier={"mbe4KpHO7Mj5"}>
+      </button> */}
+      <NovuProvider subscriberId={"tester"} applicationIdentifier={"mbe4KpHO7Mj5"}>
         <CustomNotificationCenter />
       </NovuProvider>
     </>
   )
 }
 
-Demo.suppressFirstRenderFlicker = true
+NotificationPage.getLayout = function getLayout(page) {
+  // persist layout between pages https://nextjs.org/docs/basic-features/layouts
+  return <Layout title="View Notifications">{page}</Layout>
+}
 
-export default Demo
+NotificationPage.suppressFirstRenderFlicker = true
+
+export default NotificationPage
