@@ -130,14 +130,28 @@ const RoleSection = ({ proposal, roles, roleType, setSelectedRole, openEditView 
         <h4 className="text-xs font-bold text-concrete uppercase">
           {roleType.toLowerCase() + "S"}
         </h4>
-        {canEditRole && (
-          <div className="group">
-            <ToolTip className="mr-1">You can only edit contributors before approval.</ToolTip>
-            <button onClick={() => openEditView(roleType)}>
-              <PencilIcon className="h-5 w-5 inline text-marble-white cursor-pointer" />
-            </button>
-          </div>
-        )}
+        <div className="group">
+          <ToolTip className="mr-1">
+            {proposal.status === ProposalStatus.APPROVED ||
+            proposal.status === ProposalStatus.COMPLETE
+              ? "You cannot edit after the proposal is approved."
+              : !canEditRole
+              ? "You do not have permissions to edit."
+              : "You can edit before the proposal is approved."}
+          </ToolTip>
+          <button
+            onClick={() => openEditView(roleType)}
+            disabled={
+              proposal.status === ProposalStatus.APPROVED ||
+              proposal.status === ProposalStatus.COMPLETE ||
+              !canEditRole
+            }
+            className="text-marble-white cursor-pointer disabled:text-concrete disabled:cursor-not-allowed"
+          >
+            <PencilIcon className="h-5 w-5 inline" />
+            <p className="inline ml-2">{"Edit " + roleType.toLowerCase() + "s"}</p>
+          </button>
+        </div>
       </div>
       {filteredRoles?.map((role, idx) => {
         return (
