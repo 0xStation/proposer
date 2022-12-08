@@ -164,7 +164,7 @@ export const EditRoles = ({ proposal, className, roleType, closeEditView }) => {
         addedAccounts={addedAccounts}
         removedRoles={removedRoles}
       />
-      <ModuleBox isLoading={!!roles} className={className}>
+      <ModuleBox isLoading={!roles} className={className}>
         <div className="flex flex-row justify-between items-center mb-4">
           <p className="text-concrete">Editing {roleType.toLowerCase()}s</p>
 

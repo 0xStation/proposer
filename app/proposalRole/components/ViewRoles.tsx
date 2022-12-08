@@ -192,7 +192,7 @@ export const ViewRoles = ({ proposal, className, openEditView }) => {
         setIsOpen={setToggleRoleSigners}
         role={selectedRole}
       />
-      <ModuleBox isLoading={!!roles} className={className}>
+      <ModuleBox isLoading={!roles} className={className}>
         {/* CONTRIBUTORS */}
         <RoleSection
           proposal={proposal}

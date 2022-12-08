@@ -1,4 +1,4 @@
-import { ProposalVersion as PrismaProposalVersion } from "@prisma/client"
+import { ProposalRoleType, ProposalVersion as PrismaProposalVersion } from "@prisma/client"
 
 export type ProposalVersion = PrismaProposalVersion & {
   data: ProposalVersionMetadata
@@ -11,4 +11,16 @@ export type ProposalVersionMetadata = {
   }
   proposalSignatureMessage: any
   proposalHash: string
+  changes?: {
+    participants?: {
+      address: string
+      roleType: ProposalRoleType
+      changeType: ChangeParticipantType
+    }[]
+  }
+}
+
+export enum ChangeParticipantType {
+  ADDED = "ADDED",
+  REMOVED = "REMOVED",
 }

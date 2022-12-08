@@ -1,5 +1,6 @@
-import db, { ProposalVersion } from "db"
+import db from "db"
 import * as z from "zod"
+import { ProposalVersion } from "../types"
 
 const GetProposalVersionsByProposalId = z.object({
   proposalId: z.string(),

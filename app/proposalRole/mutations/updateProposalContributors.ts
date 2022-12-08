@@ -6,6 +6,7 @@ import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { genProposalDigest } from "app/signatures/proposal"
 import { Proposal } from "app/proposal/types"
 import { getHash } from "app/signatures/utils"
+import { ChangeParticipantType } from "app/proposalVersion/types"
 
 const UpdateProposalContributors = z.object({
   proposalId: z.string(),
@@ -154,6 +155,26 @@ export default async function updateProposalContributors(
           },
           proposalSignatureMessage: message,
           proposalHash: proposalHash,
+          changes: {
+            participants: [
+              ...params.addAddresses.map((address) => {
+                return {
+                  address,
+                  roleType: params.roleType,
+                  changeType: ChangeParticipantType.ADDED,
+                }
+              }),
+              ...existingProposal.roles
+                .filter((role) => params.removeRoleIds.includes(role.id))
+                .map((role) => {
+                  return {
+                    address: role.address,
+                    roleType: params.roleType,
+                    changeType: ChangeParticipantType.REMOVED,
+                  }
+                }),
+            ],
+          },
         },
       },
     })

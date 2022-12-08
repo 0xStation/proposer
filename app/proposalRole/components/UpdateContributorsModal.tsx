@@ -4,6 +4,7 @@ import Modal from "app/core/components/Modal"
 import Button from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
 import getProposalById from "app/proposal/queries/getProposalById"
+import getProposalVersionsByProposalId from "app/proposalVersion/queries/getProposalVersionsByProposalId"
 import { requiredField } from "app/utils/validators"
 import { useState } from "react"
 import { Field, Form } from "react-final-form"
@@ -33,6 +34,7 @@ export const UpdateContributorsModal = ({
       })
       invalidateQuery(getRolesByProposalId)
       invalidateQuery(getProposalById) // resets approval progress denominator
+      invalidateQuery(getProposalVersionsByProposalId) // renders new history item
       closeEditView()
     },
     onError: (error) => {
