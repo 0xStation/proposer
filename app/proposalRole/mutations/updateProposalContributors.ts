@@ -2,23 +2,21 @@ import db from "db"
 import * as z from "zod"
 import { Ctx } from "blitz"
 import { ProposalRoleType, ProposalStatus } from "@prisma/client"
+import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 
-const UpdateProposalRoles = z.object({
+const UpdateProposalContributors = z.object({
   proposalId: z.string(),
-  roleType: z.enum([
-    ProposalRoleType.AUTHOR,
-    ProposalRoleType.CONTRIBUTOR,
-    ProposalRoleType.CLIENT,
-  ]),
   removeRoleIds: z.string().array().default([]),
   addAddresses: z.string().array().default([]),
+  newFundRecipient: z.string().optional(),
 })
 
-export default async function updateProposalRoles(
-  input: z.infer<typeof UpdateProposalRoles>,
+export default async function updateProposalContributors(
+  input: z.infer<typeof UpdateProposalContributors>,
   ctx: Ctx
 ) {
-  const params = UpdateProposalRoles.parse(input)
+  const params = UpdateProposalContributors.parse(input)
+  const roleType = ProposalRoleType.CONTRIBUTOR
 
   const existingProposal = await db.proposal.findUnique({
     where: {
@@ -44,23 +42,32 @@ export default async function updateProposalRoles(
   if (
     !existingProposal.roles
       .filter((role) => params.removeRoleIds.includes(role.id))
-      .every((role) => role.type === params.roleType)
+      .every((role) => role.type === roleType)
   ) {
     throw Error("cannot edit multiple roles at once")
     return null
   }
   if (
     existingProposal.roles
-      .filter((role) => role.type === params.roleType)
+      .filter((role) => role.type === roleType)
       .some((role) => params.addAddresses.includes(role.address))
   ) {
     throw Error("cannot add address for existing role")
     return null
   }
+  if (
+    params.newFundRecipient &&
+    !existingProposal.roles
+      .filter((role) => !params.removeRoleIds.includes(role.id))
+      .some((role) => addressesAreEqual(role.address, params.newFundRecipient)) &&
+    !params.addAddresses.includes(params.newFundRecipient)
+  ) {
+    throw Error("cannot set new fund recipient to someone who is not a contributor")
+  }
 
   ctx.session.$authorize(
     existingProposal.roles
-      .filter((role) => role.type === params.roleType || role.type === ProposalRoleType.AUTHOR)
+      .filter((role) => role.type === roleType || role.type === ProposalRoleType.AUTHOR)
       .map((role) => role.address),
     []
   )
@@ -70,7 +77,7 @@ export default async function updateProposalRoles(
       db.proposalRole.create({
         data: {
           proposalId: params.proposalId,
-          type: params.roleType,
+          type: roleType,
           address,
         },
       })
@@ -83,6 +90,15 @@ export default async function updateProposalRoles(
       })
     ),
   ])
+
+  if (params.newFundRecipient) {
+    await db.proposalPayment.updateMany({
+      where: { proposalId: params.proposalId },
+      data: {
+        recipientAddress: params.newFundRecipient,
+      },
+    })
+  }
 
   return res
 }
