@@ -151,30 +151,29 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
     },
   })) as Account
 
-  // honestly, something has probably gone wrong in the database if we recieve a webhook
-  // for an account that does not exist or is not a safe.
   if (!account || account.addressType !== "SAFE") {
     return res.end()
   }
 
-  const events = [
-    {
-      hash: GNOSIS_CHANGED_THRESHOLD_EVENT_HASH,
+  const events = {
+    [GNOSIS_CHANGED_THRESHOLD_EVENT_HASH]: {
       callback: handleChangedThreshold,
     },
-    {
-      hash: GNOSIS_EXECUTION_SUCCESS_EVENT_HASH,
+    [GNOSIS_EXECUTION_SUCCESS_EVENT_HASH]: {
       callback: handleExecutionSuccess,
     },
-  ]
+  }
 
-  response.logs.forEach(async (log) => {
-    events.forEach(async (event) => {
-      if (log.topic0 === event.hash) {
-        // probably next in a try-catch
+  for (const log of response.logs) {
+    const event = events[log.topic0]
+    if (event) {
+      try {
         await event.callback(account, log)
+      } catch (e) {
+        console.error(e)
       }
-    })
-  })
+    }
+  }
+
   return res.end()
 })
