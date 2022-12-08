@@ -9,11 +9,13 @@ import AccountMediaObject from "app/core/components/AccountMediaObject"
 import GnosisSafeSignersModal from "app/core/components/GnosisSafeSignersModal"
 import { ModuleBox } from "app/core/components/ModuleBox"
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
+import { ToolTip } from "app/core/components/ToolTip"
 import useStore from "app/core/hooks/useStore"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { addressRepresentsAccount } from "app/core/utils/addressRepresentsAccount"
 import { PROPOSAL_ROLE_APPROVAL_STATUS_MAP } from "app/core/utils/constants"
 import { useEffect, useState } from "react"
+import { useEditRolesPermissions } from "../hooks/useEditRolesPermissions"
 import { useRoles } from "../hooks/useRoles"
 import { ProposalRole } from "../types"
 
@@ -95,6 +97,7 @@ const RoleRow = ({ proposal, role, setSelectedRole, tags = [] }) => {
 
 const RoleSection = ({ proposal, roles, roleType, setSelectedRole, setIsView }) => {
   const filteredRoles = roles?.filter((role) => role.type === roleType)
+  const canEditRole = useEditRolesPermissions(proposal?.id, roleType)
 
   let accountTagsMap = {}
   if (roleType === ProposalRoleType.CONTRIBUTOR) {
@@ -115,9 +118,15 @@ const RoleSection = ({ proposal, roles, roleType, setSelectedRole, setIsView }) 
         <h4 className="text-xs font-bold text-concrete uppercase">
           {roleType.toLowerCase() + "S"}
         </h4>
-        <button onClick={() => setIsView(false)}>
-          <PencilIcon className="h-5 w-5 inline text-marble-white cursor-pointer" />
-        </button>
+        {/* TEMPORARY: remove conditional once support more multiplay things */}
+        {roleType === ProposalRoleType.CONTRIBUTOR && canEditRole && (
+          <div className="group">
+            <ToolTip className="mr-1">You can only edit contributors before approval.</ToolTip>
+            <button onClick={() => setIsView(false)}>
+              <PencilIcon className="h-5 w-5 inline text-marble-white cursor-pointer" />
+            </button>
+          </div>
+        )}
       </div>
       {filteredRoles?.map((role, idx) => {
         return (
