@@ -71,6 +71,21 @@ export const useNotifications = () => {
     })
   }
 
+  const getUnreadCount = async (subscriberId) => {
+    try {
+      const response = await fetch(`/api/novu/get-unread-count?subscriberId=${subscriberId}`, {
+        method: "GET",
+        headers: {
+          "anti-csrf": getAntiCSRFToken(),
+        },
+      })
+      const data = await response.json()
+      return data.count
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   const sendNewCommentNotification = async (formData: NewCommentNotificationType) => {
     const type = "new-comment"
 
@@ -154,6 +169,7 @@ export const useNotifications = () => {
   }
 
   return {
+    getUnreadCount,
     sendNewCommentNotification,
     sendNewProposalNotification,
     sendPaymentNotification,

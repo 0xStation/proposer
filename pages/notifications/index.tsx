@@ -39,11 +39,22 @@ function CustomNotificationCenter() {
                 key={`row-${idx}`}
               >
                 <td className="py-4 pl-4 align-top">
-                  {notification.payload.from === "STATION" ? (
-                    <Image src={StationLogo} alt="Station logo" height={16} width={50} />
-                  ) : (
-                    <AccountMediaRow address={from != "STATION" ? from.address : ""} />
-                  )}
+                  <div className="flex flex-row items-center">
+                    {!notification.seen && (
+                      <span className="bg-neon-carrot h-2 w-2 rounded-full block mr-2"></span>
+                    )}
+                    {notification.payload.from === "STATION" ? (
+                      <Image
+                        src={StationLogo}
+                        alt="Station logo"
+                        height={16}
+                        width={50}
+                        className="block"
+                      />
+                    ) : (
+                      <AccountMediaRow address={from != "STATION" ? from.address : ""} />
+                    )}
+                  </div>
                 </td>
                 <td className="py-4 space-y-2">
                   <span className="block">{notification.payload.title}</span>

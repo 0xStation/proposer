@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React, { useMemo, useEffect, useState } from "react"
 import useStore from "../hooks/useStore"
 import { AccountAccountType } from "@prisma/client"
 import { useRouter } from "next/router"
@@ -11,6 +11,7 @@ import Link from "next/link"
 import { gradientMap } from "../utils/constants"
 import { useAccount } from "wagmi"
 import { Account } from "app/account/types"
+import { useNotifications } from "app/core/hooks/useNotifications"
 
 const ProfileIcon = ({
   activeUser,
@@ -104,6 +105,19 @@ const NotificationIcon = ({ toggleMobileSidebar }: { toggleMobileSidebar? }) => 
     typeof window !== "undefined" &&
     window?.location?.pathname === Routes.NotificationPage().pathname
   const router = useRouter()
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState<number>()
+  const { getUnreadCount } = useNotifications()
+
+  useEffect(() => {
+    const read = async () => {
+      const count = await getUnreadCount("tester")
+      setUnreadNotificationCount(count)
+    }
+    read()
+  }, [])
+
+  console.log(unreadNotificationCount)
+
   return (
     <div className="relative flex items-center justify-center group">
       <span
@@ -126,6 +140,7 @@ const NotificationIcon = ({ toggleMobileSidebar }: { toggleMobileSidebar? }) => 
       >
         <Image src={BellIcon} alt="Bell icon" height={46} width={46} />
       </button>
+      <span className="absolute bg-neon-carrot h-3 w-3 rounded-full top-[-3px] right-[5px]"></span>
     </div>
   )
 }
