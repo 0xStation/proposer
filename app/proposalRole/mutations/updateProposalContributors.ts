@@ -1,7 +1,7 @@
 import db from "db"
 import * as z from "zod"
 import { Ctx } from "blitz"
-import { ProposalRoleType, ProposalStatus } from "@prisma/client"
+import { ProposalRoleApprovalStatus, ProposalRoleType, ProposalStatus } from "@prisma/client"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { genProposalDigest } from "app/signatures/proposal"
 import { Proposal } from "app/proposal/types"
@@ -105,6 +105,14 @@ export default async function updateProposalContributors(
         },
       })
     ),
+    db.proposalRole.updateMany({
+      where: {
+        proposalId: params.proposalId as string,
+      },
+      data: {
+        approvalStatus: ProposalRoleApprovalStatus.PENDING,
+      },
+    }),
   ])
 
   if (params.newFundRecipient) {
