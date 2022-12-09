@@ -34,8 +34,8 @@ export const UpdateContributorsModal = ({
         type: "success",
         message: "Successfully updated roles.",
       })
-      invalidateQuery(getRolesByProposalId)
-      invalidateQuery(getProposalById) // resets approval progress denominator
+      // invalidateQuery(getRolesByProposalId)
+      // invalidateQuery(getProposalById) // resets approval progress denominator
       invalidateQuery(getProposalVersionsByProposalId) // renders new history item
       closeEditView()
     },

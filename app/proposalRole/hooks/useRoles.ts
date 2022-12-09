@@ -7,6 +7,7 @@ export const useRoles = (proposalId) => {
     { proposalId: proposalId as string },
     {
       suspense: false,
+      refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       enabled: !!proposalId,

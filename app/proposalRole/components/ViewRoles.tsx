@@ -20,7 +20,7 @@ import { useEditRolesPermissions } from "../hooks/useEditRolesPermissions"
 import { useRoles } from "../hooks/useRoles"
 import { ProposalRole } from "../types"
 
-const RoleRow = ({ proposal, role, setSelectedRole, tags = [] }) => {
+const RoleRow = ({ proposal, role, openGnosisSigners, tags = [] }) => {
   const activeUser = useStore((state) => state.activeUser)
   const toggleProposalApprovalModalOpen = useStore((state) => state.toggleProposalApprovalModalOpen)
 
@@ -56,10 +56,20 @@ const RoleRow = ({ proposal, role, setSelectedRole, tags = [] }) => {
           {/* MULTISIG PROGRESS */}
           {role?.account?.addressType === AddressType.SAFE &&
             role.approvalStatus !== ProposalRoleApprovalStatus.APPROVED && (
-              <ProgressCircleAndNumber
-                numerator={role.signatures.length}
-                denominator={role.account.data?.quorum}
-              />
+              <div className="group relative">
+                <ProgressCircleAndNumber
+                  numerator={role.signatures.length}
+                  denominator={role.account.data?.quorum}
+                />
+                <ToolTip className="absolute left w-[150px] right-0">
+                  <p
+                    className="text-sm text-right text-electric-violet font-bold mt-1 group-hover:cursor-pointer"
+                    onClick={() => openGnosisSigners(role)}
+                  >
+                    See multisig signers
+                  </p>
+                </ToolTip>
+              </div>
             )}
           {/* APPROVE BUTTON */}
           {showApproveButton ? (
@@ -84,19 +94,11 @@ const RoleRow = ({ proposal, role, setSelectedRole, tags = [] }) => {
           )}
         </div>
       </div>
-      {role?.account?.addressType === AddressType.SAFE && (
-        <p
-          className="text-sm text-electric-violet font-bold mt-1 cursor-pointer"
-          onClick={() => setSelectedRole(role)}
-        >
-          See multisig signers
-        </p>
-      )}
     </div>
   )
 }
 
-const RoleSection = ({ proposal, roles, roleType, setSelectedRole, openEditView }) => {
+const RoleSection = ({ proposal, roles, roleType, openGnosisSigners, openEditView }) => {
   const filteredRoles = roles?.filter((role) => role.type === roleType)
   const canEditRole = useEditRolesPermissions(proposal?.id, roleType)
 
@@ -159,7 +161,7 @@ const RoleSection = ({ proposal, roles, roleType, setSelectedRole, openEditView 
           <RoleRow
             proposal={proposal}
             role={role}
-            setSelectedRole={setSelectedRole}
+            openGnosisSigners={openGnosisSigners}
             tags={accountTagsMap[role.address] || []}
             key={idx}
           />
@@ -174,17 +176,10 @@ export const ViewRoles = ({ proposal, className, openEditView }) => {
   const [toggleRoleSigners, setToggleRoleSigners] = useState<boolean>(false)
   const { roles } = useRoles(proposal?.id)
 
-  useEffect(() => {
-    if (selectedRole) {
-      setToggleRoleSigners(true)
-    }
-  }, [selectedRole])
-
-  useEffect(() => {
-    if (!toggleRoleSigners) {
-      setSelectedRole(null)
-    }
-  }, [toggleRoleSigners])
+  const openGnosisSigners = (role) => {
+    setSelectedRole(role)
+    setToggleRoleSigners(true)
+  }
 
   return (
     <>
@@ -198,25 +193,25 @@ export const ViewRoles = ({ proposal, className, openEditView }) => {
         <RoleSection
           proposal={proposal}
           roles={roles}
-          setSelectedRole={setSelectedRole}
+          openGnosisSigners={openGnosisSigners}
           roleType={ProposalRoleType.CONTRIBUTOR}
           openEditView={openEditView}
         />
-        <hr className="w-5/6 text-wet-concrete my-4 mx-auto"></hr>
+        <hr className="w-full text-wet-concrete mt-6 mb-4"></hr>
         {/* CLIENTS */}
         <RoleSection
           proposal={proposal}
           roles={roles}
-          setSelectedRole={setSelectedRole}
+          openGnosisSigners={openGnosisSigners}
           roleType={ProposalRoleType.CLIENT}
           openEditView={openEditView}
         />
-        <hr className="w-5/6 text-wet-concrete my-4 mx-auto"></hr>
+        <hr className="w-full text-wet-concrete mt-6 mb-4"></hr>
         {/* AUTHORS */}
         <RoleSection
           proposal={proposal}
           roles={roles}
-          setSelectedRole={setSelectedRole}
+          openGnosisSigners={openGnosisSigners}
           roleType={ProposalRoleType.AUTHOR}
           openEditView={openEditView}
         />

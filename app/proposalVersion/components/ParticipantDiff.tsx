@@ -18,8 +18,8 @@ export const ParticipantDiff = ({
     const message = `${
       participant.changeType === ChangeParticipantType.ADDED
         ? "was added to the"
-        : "is no longer on the"
-    } ${participant.roleType.toLowerCase()} team`
+        : "was removed from the"
+    } ${participant.roleType.toLowerCase()} list`
     return (
       <div className="mt-2 flex flex-row space-x-2 items-center">
         <AccountPill account={account} />
