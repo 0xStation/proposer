@@ -1,3 +1,4 @@
+import { Proposal } from "app/proposal/types"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 import db, { AddressType } from "db"
 import * as z from "zod"
@@ -10,15 +11,20 @@ const GetRolesByProposalId = z.object({
 export default async function getRolesByProposalId(input: z.infer<typeof GetRolesByProposalId>) {
   try {
     const params = GetRolesByProposalId.parse(input)
-    const proposalRoles = (await db.proposalRole.findMany({
-      where: {
-        proposalId: params.proposalId,
-      },
-      include: {
-        account: true,
-        signatures: true,
-      },
-    })) as unknown as ProposalRoleWithSignatures[]
+    const [proposal, proposalRoles] = (await db.$transaction([
+      db.proposal.findUnique({
+        where: { id: params.proposalId },
+      }),
+      db.proposalRole.findMany({
+        where: {
+          proposalId: params.proposalId,
+        },
+        include: {
+          account: true,
+          signatures: true,
+        },
+      }),
+    ])) as unknown as [Proposal, ProposalRoleWithSignatures[]]
 
     if (!proposalRoles) {
       return []
@@ -54,6 +60,9 @@ export default async function getRolesByProposalId(input: z.infer<typeof GetRole
           ...role.account,
           data: accountMetadatas[role.address], // override with metadata threaded with quorum and signers
         },
+        signatures: role.signatures.filter(
+          (signature) => signature.proposalVersion === proposal.version
+        ),
       }
     }) as unknown as ProposalRoleWithSignatures[]
   } catch (err) {

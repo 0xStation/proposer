@@ -137,14 +137,14 @@ export const EditRoleType = ({ proposal, className, roleType, closeEditView }) =
       })
   }
 
-  const selectNewFundRecipient =
+  const selectNewPaymentRecipient =
     roleType === ProposalRoleType.CONTRIBUTOR &&
     !proposal.payments
       .map((payment) => payment.recipientAddress)
       .filter((v, i, addresses) => addresses.indexOf(v) === i)
       .every((address) => accounts.map((account) => account.address).includes(address))
 
-  const selectNewFundSender =
+  const selectNewPaymentSender =
     roleType === ProposalRoleType.CLIENT &&
     !proposal.payments
       .map((payment) => payment.senderAddress)
@@ -159,8 +159,8 @@ export const EditRoleType = ({ proposal, className, roleType, closeEditView }) =
         closeEditView={closeEditView}
         isOpen={isSaveModalOpen}
         setIsOpen={setIsSaveModalOpen}
-        selectNewFundRecipient={selectNewFundRecipient}
-        selectNewFundSender={selectNewFundSender}
+        selectNewPaymentRecipient={selectNewPaymentRecipient}
+        selectNewPaymentSender={selectNewPaymentSender}
         accounts={accounts}
         addedAccounts={addedAccounts}
         removedRoles={removedRoles}

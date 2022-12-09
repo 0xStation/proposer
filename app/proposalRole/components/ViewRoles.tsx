@@ -16,6 +16,7 @@ import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { addressRepresentsAccount } from "app/core/utils/addressRepresentsAccount"
 import { PROPOSAL_ROLE_APPROVAL_STATUS_MAP } from "app/core/utils/constants"
 import { useEffect, useState } from "react"
+import { useAccountTags } from "../hooks/useAccountTags"
 import { useEditRolesPermissions } from "../hooks/useEditRolesPermissions"
 import { useRoles } from "../hooks/useRoles"
 import { ProposalRole } from "../types"
@@ -102,30 +103,7 @@ const RoleSection = ({ proposal, roles, roleType, openGnosisSigners, openEditVie
   const filteredRoles = roles?.filter((role) => role.type === roleType)
   const canEditRole = useEditRolesPermissions(proposal?.id, roleType)
 
-  let accountTagsMap = {}
-  if (roleType === ProposalRoleType.CONTRIBUTOR) {
-    filteredRoles
-      .map((role) => role.address)
-      .filter((v, i, addresses) => addresses.indexOf(v) === i)
-      .forEach((address) => {
-        if (
-          proposal.payments.some((payment) => addressesAreEqual(payment.recipientAddress, address))
-        ) {
-          accountTagsMap[address] = ["fund recipient"]
-        }
-      })
-  } else if (roleType === ProposalRoleType.CLIENT) {
-    filteredRoles
-      .map((role) => role.address)
-      .filter((v, i, addresses) => addresses.indexOf(v) === i)
-      .forEach((address) => {
-        if (
-          proposal.payments.some((payment) => addressesAreEqual(payment.senderAddress, address))
-        ) {
-          accountTagsMap[address] = ["fund sender"]
-        }
-      })
-  }
+  let { accountTagsMap } = useAccountTags(proposal, filteredRoles, roleType)
 
   return (
     <>

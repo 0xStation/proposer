@@ -19,8 +19,8 @@ export const UpdateContributorsModal = ({
   closeEditView,
   isOpen,
   setIsOpen,
-  selectNewFundRecipient,
-  selectNewFundSender,
+  selectNewPaymentRecipient,
+  selectNewPaymentSender,
   accounts,
   addedAccounts,
   removedRoles,
@@ -34,8 +34,8 @@ export const UpdateContributorsModal = ({
         type: "success",
         message: "Successfully updated roles.",
       })
-      // invalidateQuery(getRolesByProposalId)
-      // invalidateQuery(getProposalById) // resets approval progress denominator
+      invalidateQuery(getRolesByProposalId)
+      invalidateQuery(getProposalById) // resets approval progress denominator
       invalidateQuery(getProposalVersionsByProposalId) // renders new history item
       closeEditView()
     },
@@ -71,7 +71,7 @@ export const UpdateContributorsModal = ({
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
       <div className="p-6">
-        <h1 className="text-2xl font-bold">Save changes to contributors</h1>
+        <h1 className="text-2xl font-bold">Save changes</h1>
         <p className="text-base mt-6">
           Just as a heads up, since this proposal is already published, all other collaborators and
           signers will need to review the new version and re-sign the proposal.
@@ -86,8 +86,10 @@ export const UpdateContributorsModal = ({
                 roleType,
                 addAddresses: addedAccounts.map((account) => account.address),
                 removeRoleIds: removedRoles.map((role) => role.id),
-                newFundRecipient: !!values.newFundRecipient ? values.newFundRecipient : undefined,
-                newFundSender: !!values.newFundSender ? values.newFundSender : undefined,
+                newPaymentRecipient: !!values.newPaymentRecipient
+                  ? values.newPaymentRecipient
+                  : undefined,
+                newPaymentSender: !!values.newPaymentSender ? values.newPaymentSender : undefined,
                 changeNotes: values.changeNotes,
               })
             } catch (e) {
@@ -98,12 +100,12 @@ export const UpdateContributorsModal = ({
             const formState = form.getState()
             return (
               <form onSubmit={handleSubmit}>
-                {selectNewFundRecipient && (
+                {selectNewPaymentRecipient && (
                   <>
                     {/* FUND RECIPIENT */}
-                    <label className="font-bold block mt-6">Select a new fund recipient*</label>
-                    <p className="text-concrete text-sm">Who will be receiving the funds?</p>
-                    <Field name="newFundRecipient" validate={requiredField}>
+                    <label className="font-bold block mt-6">Select a new payment recipient*</label>
+                    <p className="text-concrete text-sm">Who will be receiving the payment?</p>
+                    <Field name="newPaymentRecipient" validate={requiredField}>
                       {({ meta, input }) => (
                         <>
                           <div className="custom-select-wrapper">
@@ -121,12 +123,12 @@ export const UpdateContributorsModal = ({
                     </Field>
                   </>
                 )}
-                {selectNewFundSender && (
+                {selectNewPaymentSender && (
                   <>
                     {/* FUND SENDER */}
-                    <label className="font-bold block mt-6">Select a new fund sender*</label>
-                    <p className="text-concrete text-sm">Who will be sending the funds?</p>
-                    <Field name="newFundSender" validate={requiredField}>
+                    <label className="font-bold block mt-6">Select a new payer*</label>
+                    <p className="text-concrete text-sm">Who will be sending the payment?</p>
+                    <Field name="newPaymentSender" validate={requiredField}>
                       {({ meta, input }) => (
                         <>
                           <div className="custom-select-wrapper">

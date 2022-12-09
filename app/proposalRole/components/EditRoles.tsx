@@ -21,6 +21,7 @@ import LockClosedIcon from "app/core/icons/LockClosedIcon"
 import { ToolTip } from "app/core/components/ToolTip"
 import { AccountPill } from "app/account/components/AccountPill"
 import { AddRoleForm } from "./AddRoleForm"
+import { useAccountTags } from "../hooks/useAccountTags"
 
 const AccountRow = ({ account, removeAccount, tags = [], lockRemoval }) => {
   return (
@@ -101,39 +102,16 @@ export const EditRoles = ({ proposal, className, roleType, closeEditView }) => {
     }
   }
 
-  let accountTagsMap = {}
-  if (roleType === ProposalRoleType.CONTRIBUTOR) {
-    filteredRoles
-      ?.map((role) => role.address)
-      ?.filter((v, i, addresses) => addresses.indexOf(v) === i)
-      ?.forEach((address) => {
-        if (
-          proposal.payments.some((payment) => addressesAreEqual(payment.recipientAddress, address))
-        ) {
-          accountTagsMap[address] = ["fund recipient"]
-        }
-      })
-  } else if (roleType === ProposalRoleType.CLIENT) {
-    filteredRoles
-      ?.map((role) => role.address)
-      ?.filter((v, i, addresses) => addresses.indexOf(v) === i)
-      ?.forEach((address) => {
-        if (
-          proposal.payments.some((payment) => addressesAreEqual(payment.senderAddress, address))
-        ) {
-          accountTagsMap[address] = ["fund sender"]
-        }
-      })
-  }
+  let { accountTagsMap } = useAccountTags(proposal, filteredRoles, roleType)
 
-  const selectNewFundRecipient =
+  const selectNewPaymentRecipient =
     roleType === ProposalRoleType.CONTRIBUTOR &&
     !proposal.payments
       .map((payment) => payment.recipientAddress)
       .filter((v, i, addresses) => addresses.indexOf(v) === i)
       .every((address) => accounts.map((account) => account.address).includes(address))
 
-  const selectNewFundSender =
+  const selectNewPaymentSender =
     roleType === ProposalRoleType.CLIENT &&
     !proposal.payments
       .map((payment) => payment.senderAddress)
@@ -148,8 +126,8 @@ export const EditRoles = ({ proposal, className, roleType, closeEditView }) => {
         closeEditView={closeEditView}
         isOpen={isSaveModalOpen}
         setIsOpen={setIsSaveModalOpen}
-        selectNewFundRecipient={selectNewFundRecipient}
-        selectNewFundSender={selectNewFundSender}
+        selectNewPaymentRecipient={selectNewPaymentRecipient}
+        selectNewPaymentSender={selectNewPaymentSender}
         accounts={accounts}
         addedAccounts={addedAccounts}
         removedRoles={removedRoles}

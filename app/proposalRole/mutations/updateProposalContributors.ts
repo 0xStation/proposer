@@ -17,8 +17,8 @@ const UpdateProposalContributors = z.object({
   ]),
   removeRoleIds: z.string().array().default([]),
   addAddresses: z.string().array().default([]),
-  newFundRecipient: z.string().optional(),
-  newFundSender: z.string().optional(),
+  newPaymentRecipient: z.string().optional(),
+  newPaymentSender: z.string().optional(),
   changeNotes: z.string().default(""),
 })
 
@@ -63,20 +63,20 @@ export default async function updateProposalContributors(
   }
   // Validate payment changes
   if (
-    params.newFundRecipient &&
+    params.newPaymentRecipient &&
     !existingProposal.roles
       .filter((role) => !params.removeRoleIds.includes(role.id))
-      .some((role) => addressesAreEqual(role.address, params.newFundRecipient)) &&
-    !params.addAddresses.includes(params.newFundRecipient)
+      .some((role) => addressesAreEqual(role.address, params.newPaymentRecipient)) &&
+    !params.addAddresses.includes(params.newPaymentRecipient)
   ) {
     throw Error("cannot set new fund recipient to someone who is not on the proposal")
   }
   if (
-    params.newFundSender &&
+    params.newPaymentSender &&
     !existingProposal.roles
       .filter((role) => !params.removeRoleIds.includes(role.id))
-      .some((role) => addressesAreEqual(role.address, params.newFundSender)) &&
-    !params.addAddresses.includes(params.newFundSender)
+      .some((role) => addressesAreEqual(role.address, params.newPaymentSender)) &&
+    !params.addAddresses.includes(params.newPaymentSender)
   ) {
     throw Error("cannot set new fund sender to someone who is not on the proposal")
   }
@@ -115,19 +115,19 @@ export default async function updateProposalContributors(
     }),
   ])
 
-  if (params.newFundRecipient) {
+  if (params.newPaymentRecipient) {
     await db.proposalPayment.updateMany({
       where: { proposalId: params.proposalId },
       data: {
-        recipientAddress: params.newFundRecipient,
+        recipientAddress: params.newPaymentRecipient,
       },
     })
   }
-  if (params.newFundSender) {
+  if (params.newPaymentSender) {
     await db.proposalPayment.updateMany({
       where: { proposalId: params.proposalId },
       data: {
-        senderAddress: params.newFundSender,
+        senderAddress: params.newPaymentSender,
       },
     })
   }
