@@ -357,6 +357,19 @@ export const PAYMENT_DIRECTION_MAP = {
   },
 }
 
+// set up milestones and payments conditional on payment terms inputs
+export const MILESTONE_COPY = {
+  UPFRONT_PAYMENT: "Upfront payment",
+  ADVANCE_PAYMENT: "Advance payment",
+  COMPLETION_PAYMENT: "Completion payment",
+}
+
+export const PAYMENT_TERMS_TO_MILESTONE_COPY = {
+  [PaymentTerm.ON_AGREEMENT]: "UPFRONT_PAYMENT",
+  [PaymentTerm.ADVANCE_PAYMENT]: "ADVANCE_PAYMENT",
+  [PaymentTerm.AFTER_COMPLETION]: "COMPLETION_PAYMENT",
+}
+
 export const PAYMENT_TERM_MAP = {
   [PaymentTerm.ON_AGREEMENT]: {
     copy: "Pay in full upon proposal agreement",

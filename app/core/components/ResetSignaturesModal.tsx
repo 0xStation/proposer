@@ -35,7 +35,9 @@ export const ResetSignaturesModal = ({
             <Button
               type={ButtonType.Secondary}
               className="block self-end mr-2"
-              onClick={() => router.push(Routes.ViewProposal({ proposalId: proposalId as string }))}
+              onClick={() => {
+                router.push(Routes.ViewProposal({ proposalId: proposalId as string }))
+              }}
             >
               Nevermind
             </Button>
