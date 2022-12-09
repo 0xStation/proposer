@@ -20,7 +20,6 @@ import { useRfp } from "app/rfp/hooks/useRfp"
 import LockClosedIcon from "app/core/icons/LockClosedIcon"
 import { ToolTip } from "app/core/components/ToolTip"
 import { AccountPill } from "app/account/components/AccountPill"
-import { AddRoleForm } from "./AddRoleForm"
 
 const AccountRow = ({ account, removeAccount, tags = [], lockRemoval }) => {
   return (
@@ -56,7 +55,7 @@ const AccountRow = ({ account, removeAccount, tags = [], lockRemoval }) => {
   )
 }
 
-export const EditRoles = ({ proposal, className, roleType, closeEditView }) => {
+export const EditRoleType = ({ proposal, className, roleType, closeEditView }) => {
   const { roles } = useRoles(proposal?.id)
   const filteredRoles = roles?.filter((role) => role.type === roleType)
   const [isAddingAccount, setIsAddingAccount] = useState<boolean>(false)
@@ -72,21 +71,33 @@ export const EditRoles = ({ proposal, className, roleType, closeEditView }) => {
   const { rfp } = useRfp(proposal?.rfpId)
 
   const { resolveEnsAddress } = useResolveEnsAddress()
+  const [createAccountMutation] = useMutation(createAccount, {
+    onSuccess: (account) => {
+      setAccounts([...accounts, account])
 
-  const addAccount = (account) => {
-    setAccounts([...accounts, account])
-
-    const existingRole = filteredRoles?.find((role) =>
-      addressesAreEqual(role.address, account.address)
-    )
-    if (existingRole) {
-      setRemovedRoles(
-        removedRoles.filter((role) => !addressesAreEqual(role.address, account.address))
+      const existingRole = filteredRoles?.find((role) =>
+        addressesAreEqual(role.address, account.address)
       )
-    } else {
-      setAddedAccounts([...addedAccounts, account])
-    }
-  }
+      if (existingRole) {
+        setRemovedRoles(
+          removedRoles.filter((role) => !addressesAreEqual(role.address, account.address))
+        )
+      } else {
+        setAddedAccounts([...addedAccounts, account])
+      }
+    },
+    onError: (error) => {
+      console.error(error)
+      setToastState({
+        isToastShowing: true,
+        type: "error",
+        message: "Error adding account.",
+      })
+    },
+    onSettled: () => {
+      setIsAddingAccount(false)
+    },
+  })
 
   const removeAccount = (account) => {
     setAccounts(accounts.filter((a) => a.id !== account.id))
@@ -154,46 +165,111 @@ export const EditRoles = ({ proposal, className, roleType, closeEditView }) => {
         addedAccounts={addedAccounts}
         removedRoles={removedRoles}
       />
-      <ModuleBox isLoading={!roles} className={className}>
-        <div className="flex flex-row justify-between items-center mb-4">
-          <p className="text-concrete">Editing {roleType.toLowerCase()}s</p>
+      <div className="flex flex-row justify-between items-center mb-4">
+        <p className="text-concrete">Editing {roleType.toLowerCase()}s</p>
 
-          <div className="flex flex-row space-x-4 items-center">
-            <Button type={ButtonType.Secondary} onClick={() => closeEditView()}>
-              Cancel
-            </Button>
-            <Button
-              type={ButtonType.Primary}
-              isDisabled={
-                accounts.length === 0 || (addedAccounts.length === 0 && removedRoles.length === 0)
-              }
-              onClick={async () => setIsSaveModalOpen(true)}
-            >
-              Save
-            </Button>
-          </div>
+        <div className="flex flex-row space-x-4 items-center">
+          <Button type={ButtonType.Secondary} onClick={() => closeEditView()}>
+            Cancel
+          </Button>
+          <Button
+            type={ButtonType.Primary}
+            isDisabled={
+              accounts.length === 0 || (addedAccounts.length === 0 && removedRoles.length === 0)
+            }
+            onClick={async () => setIsSaveModalOpen(true)}
+          >
+            Save
+          </Button>
         </div>
-        {accounts.map((account, idx) => {
+      </div>
+      {accounts.map((account, idx) => {
+        return (
+          <AccountRow
+            account={account}
+            removeAccount={removeAccount}
+            tags={accountTagsMap[account.address] || []}
+            lockRemoval={
+              addressesAreEqual(rfp?.accountAddress, account.address) &&
+              rfp?.data?.proposal?.requesterRole === roleType
+            }
+            key={idx}
+          />
+        )
+      })}
+      {accounts.length === 0 && (
+        <p className="mx-auto text-md font-bold w-fit pt-[18px]">
+          Add at least one {roleType.toLowerCase()}
+        </p>
+      )}
+      <Form
+        initialValues={{}}
+        onSubmit={async (values, form) => {
+          console.log("values", values)
+          setIsAddingAccount(true)
+
+          const resolvedAddress = await resolveEnsAddress(values.address.trim())
+          if (!resolvedAddress) {
+            setIsAddingAccount(false)
+            setToastState({
+              isToastShowing: true,
+              type: "error",
+              message: "Invalid ENS name or wallet address provided.",
+            })
+            return
+          }
+
+          try {
+            await createAccountMutation({
+              address: resolvedAddress,
+            })
+            form.reset()
+          } catch (e) {
+            console.error(e)
+          }
+        }}
+        render={({ form, handleSubmit }) => {
+          const formState = form.getState()
           return (
-            <AccountRow
-              account={account}
-              removeAccount={removeAccount}
-              tags={accountTagsMap[account.address] || []}
-              lockRemoval={
-                addressesAreEqual(rfp?.accountAddress, account.address) &&
-                rfp?.data?.proposal?.requesterRole === roleType
-              }
-              key={idx}
-            />
+            <form onSubmit={handleSubmit}>
+              <div className="flex flex-row items-center mt-8">
+                <Field name="address" validate={composeValidators(requiredField, isEnsOrAddress)}>
+                  {({ meta, input }) => {
+                    return (
+                      <>
+                        <input
+                          {...input}
+                          type="text"
+                          required
+                          placeholder="Enter ENS name or wallet address"
+                          className="bg-wet-concrete rounded-tl-md rounded-bl-md w-full p-2"
+                        />
+                        {/* TODO: acting weird with flex-row */}
+                        {/* {meta.touched && meta.error && (
+                          <span className="text-torch-red text-xs">{meta.error}</span>
+                        )} */}
+                      </>
+                    )
+                  }}
+                </Field>
+                <button
+                  type="submit"
+                  disabled={formState.invalid || isAddingAccount}
+                  className="text-sm font-bold w-56 bg-electric-violet rounded-tr-md rounded-br-md h-10 text-tunnel-black hover:bg-electric-violet/80 disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {isAddingAccount ? (
+                    <div className="flex justify-center items-center">
+                      <Spinner fill="black" />
+                    </div>
+                  ) : (
+                    "Add " + roleType.toLowerCase()
+                  )}
+                </button>
+              </div>
+            </form>
           )
-        })}
-        {accounts.length === 0 && (
-          <p className="mx-auto text-md font-bold w-fit pt-[18px]">
-            Add at least one {roleType.toLowerCase()}
-          </p>
-        )}
-        <AddRoleForm addAccount={addAccount} />
-      </ModuleBox>
+        }}
+      />
     </>
   )
 }
