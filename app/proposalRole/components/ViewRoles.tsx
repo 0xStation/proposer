@@ -5,6 +5,7 @@ import {
   ProposalRoleType,
   ProposalStatus,
 } from "@prisma/client"
+import { AccountPill } from "app/account/components/AccountPill"
 import AccountMediaObject from "app/core/components/AccountMediaObject"
 import GnosisSafeSignersModal from "app/core/components/GnosisSafeSignersModal"
 import { ModuleBox } from "app/core/components/ModuleBox"
@@ -39,7 +40,7 @@ const RoleRow = ({ proposal, role, setSelectedRole, tags = [] }) => {
       <div className="flex flex-row w-full items-center justify-between">
         <div className="flex items-center flex-row space-x-2 h-full">
           {/* ACCOUNT */}
-          <AccountMediaObject account={role?.account} showActionIcons={true} />
+          <AccountPill account={role?.account} />
           {/* TAGS */}
           {tags.map((tag, idx) => (
             <span
@@ -149,7 +150,7 @@ const RoleSection = ({ proposal, roles, roleType, setSelectedRole, openEditView 
             className="text-marble-white cursor-pointer disabled:text-concrete disabled:cursor-not-allowed"
           >
             <PencilIcon className="h-5 w-5 inline" />
-            <p className="inline ml-2">{"Edit " + roleType.toLowerCase() + "s"}</p>
+            <p className="inline ml-2">{"Edit"}</p>
           </button>
         </div>
       </div>

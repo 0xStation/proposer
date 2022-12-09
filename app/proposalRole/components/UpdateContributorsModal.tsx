@@ -4,7 +4,9 @@ import Modal from "app/core/components/Modal"
 import Button from "app/core/components/sds/buttons/Button"
 import useStore from "app/core/hooks/useStore"
 import getProposalById from "app/proposal/queries/getProposalById"
+import { ParticipantDiff } from "app/proposalVersion/components/ParticipantDiff"
 import getProposalVersionsByProposalId from "app/proposalVersion/queries/getProposalVersionsByProposalId"
+import { ChangeParticipantType } from "app/proposalVersion/types"
 import { requiredField } from "app/utils/validators"
 import { useState } from "react"
 import { Field, Form } from "react-final-form"
@@ -48,6 +50,23 @@ export const UpdateContributorsModal = ({
       setIsUpdatingRoles(false)
     },
   })
+
+  const participantsDiff = [
+    ...removedRoles.map((role) => {
+      return {
+        address: role.address,
+        roleType,
+        changeType: ChangeParticipantType.REMOVED,
+      }
+    }),
+    ...addedAccounts.map((account) => {
+      return {
+        address: account.address,
+        roleType,
+        changeType: ChangeParticipantType.ADDED,
+      }
+    }),
+  ]
 
   return (
     <Modal open={isOpen} toggle={setIsOpen}>
@@ -140,6 +159,7 @@ export const UpdateContributorsModal = ({
                     </div>
                   )}
                 </Field>
+                <ParticipantDiff participants={participantsDiff} />
                 <Button
                   isSubmitType={true}
                   isDisabled={formState.invalid || isUpdatingRoles}

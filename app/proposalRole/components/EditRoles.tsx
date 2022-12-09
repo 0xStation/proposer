@@ -19,13 +19,14 @@ import { UpdateContributorsModal } from "./UpdateContributorsModal"
 import { useRfp } from "app/rfp/hooks/useRfp"
 import LockClosedIcon from "app/core/icons/LockClosedIcon"
 import { ToolTip } from "app/core/components/ToolTip"
+import { AccountPill } from "app/account/components/AccountPill"
 
 const AccountRow = ({ account, removeAccount, tags = [], lockRemoval }) => {
   return (
     <div className="flex flex-row w-full justify-between mt-4">
       <div className="flex items-center flex-row space-x-2 h-full">
         {/* ACCOUNT */}
-        <AccountMediaObject account={account} showActionIcons={true} />
+        <AccountPill account={account} />
         {/* TAGS */}
         {tags.map((tag, idx) => (
           <span
