@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { BlitzPage } from "@blitzjs/next"
 import Image from "next/image"
+import useStore from "app/core/hooks/useStore"
 import { useNotifications } from "app/core/hooks/useNotifications"
 import { NovuProvider, useNotifications as useNovuNotifications } from "@novu/notification-center"
 import StationLogo from "public/station-letters.svg"
@@ -8,7 +9,7 @@ import { convertJSDateToDateAndTime } from "app/core/utils/convertJSDateToDateAn
 import AccountMediaRow from "app/comment/components/AccountMediaRow"
 import Layout from "app/core/layouts/Layout"
 
-function CustomNotificationCenter() {
+function CustomNotificationCenter({ markAsRead }) {
   const { notifications, fetchNextPage, hasNextPage, fetching, markAsSeen, refetch } =
     useNovuNotifications()
 
@@ -17,6 +18,8 @@ function CustomNotificationCenter() {
   }, [])
 
   console.log(notifications)
+  //  I'm thinking markAsSeen might mark ALL of them as seen
+  console.log(markAsSeen)
 
   return (
     <div className="mt-20">
@@ -37,6 +40,10 @@ function CustomNotificationCenter() {
               <tr
                 className="border-b border-wet-concrete cursor-pointer hover:bg-wet-concrete"
                 key={`row-${idx}`}
+                onClick={() => {
+                  markAsSeen(notification._id)
+                  markAsRead()
+                }}
               >
                 <td className="py-4 pl-4 align-top">
                   <div className="flex flex-row items-center">
@@ -79,30 +86,21 @@ function CustomNotificationCenter() {
 
 const NotificationPage: BlitzPage = () => {
   const {
+    markAsRead,
     sendNewCommentNotification,
     sendNewProposalNotification,
     sendPaymentNotification,
     sendNewRFPSubmissionNotification,
     sendProposalApprovalNotification,
   } = useNotifications()
+
+  const activeUser = useStore((state) => state.activeUser)
   return (
     <>
-      {/* <button
-        onClick={async () => {
-          await sendProposalApprovalNotification({
-            recipient: "tester",
-            payload: {
-              from: { address: "0x6860C9323d4976615ae515Ab4b0039d7399E7CC8" },
-              proposalTitle: "New proposal!",
-            },
-          })
-        }}
-        className="px-2 py-2 bg-neon-carrot text-tunnel-black"
-      >
-        TRIGGER NOTIFICATION
-      </button> */}
-      <NovuProvider subscriberId={"tester"} applicationIdentifier={"mbe4KpHO7Mj5"}>
-        <CustomNotificationCenter />
+      <NovuProvider subscriberId={activeUser?.address} applicationIdentifier={"mbe4KpHO7Mj5"}>
+        <CustomNotificationCenter
+          markAsRead={(notificationId) => markAsRead(activeUser?.address, notificationId)}
+        />
       </NovuProvider>
     </>
   )

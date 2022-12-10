@@ -1,4 +1,6 @@
 import { getAntiCSRFToken } from "@blitzjs/auth"
+import { Proposal } from "app/proposal/types"
+import { ProposalRoleType } from "@prisma/client"
 
 export interface NotificationFromUserType {
   address: string
@@ -16,12 +18,8 @@ export interface NotificationType {
 }
 
 export interface NewCommentNotificationType {
-  recipient: string
-  payload: {
-    from: NotificationFromUserType | "STATION"
-    proposalTitle: string
-    commentBody: string
-  }
+  from: NotificationFromUserType | "STATION"
+  commentBody: string
 }
 
 export interface NewProposalNotificationType {
@@ -86,21 +84,63 @@ export const useNotifications = () => {
     }
   }
 
-  const sendNewCommentNotification = async (formData: NewCommentNotificationType) => {
+  const markAsRead = async (subscriberId, notificationId) => {
+    try {
+      const response = await fetch(
+        `/api/novu/mark-as-seen?subscriberId=${subscriberId}&notificationId=${notificationId}`,
+        {
+          method: "GET",
+          headers: {
+            "anti-csrf": getAntiCSRFToken(),
+          },
+        }
+      )
+      const data = await response.json()
+      return data.count
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const sendNewCommentNotification = async (
+    proposal: Proposal,
+    formData: NewCommentNotificationType
+  ) => {
     const type = "new-comment"
 
-    const data = {
-      type,
-      subscriberId: formData.recipient,
-      payload: {
-        from: formData.payload.from,
-        title: "Commented on your proposal",
-        note: formData.payload.proposalTitle,
-        extra: formData.payload.commentBody,
-      },
+    // There must be a way to validate this with typescript
+    if (!proposal.roles) {
+      console.log("throwing error")
+      throw new Error("Proposal must include roles.")
     }
 
-    fetcher(data)
+    // not sure how we want to determine who to send this to.
+    // for now, let just do author, but we can rewrite this function
+    // to send to all people on proposal if we want.
+    const recipients = proposal.roles.filter((role) => {
+      return role.type === ProposalRoleType.AUTHOR
+    })
+
+    console.log(recipients)
+
+    for (let recipient of recipients) {
+      const data = {
+        type,
+        subscriberId: recipient.address,
+        payload: {
+          from: formData.from,
+          title: "Commented on your proposal",
+          note: proposal.data.content.title,
+          extra: formData.commentBody,
+        },
+      }
+
+      console.log(data)
+
+      await fetcher(data)
+    }
+
+    return true
   }
 
   const sendNewProposalNotification = async (formData: NewProposalNotificationType) => {
@@ -169,6 +209,7 @@ export const useNotifications = () => {
   }
 
   return {
+    markAsRead,
     getUnreadCount,
     sendNewCommentNotification,
     sendNewProposalNotification,

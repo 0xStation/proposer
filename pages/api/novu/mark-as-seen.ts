@@ -2,13 +2,13 @@ import { api } from "app/blitz-server"
 import { NextApiRequest, NextApiResponse } from "next"
 
 export default api(async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { subscriberId } = req.query
+  const { subscriberId, notificationId } = req.query
 
   try {
     const response = await fetch(
-      `https://api.novu.co/v1/subscribers/${subscriberId}/notifications/unseen`,
+      `https://api.novu.co/v1/subscribers/${subscriberId}/messages/${notificationId}/seen`,
       {
-        method: "GET",
+        method: "POST",
         headers: {
           Authorization: `ApiKey ${process.env.NEXT_PUBLIC_NOVU_API_KEY}`,
         },
@@ -16,6 +16,7 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
     )
 
     const data = await response.json()
+    console.log(data)
 
     res.statusCode = 200
     res.json(data.data)

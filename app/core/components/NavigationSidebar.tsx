@@ -105,7 +105,7 @@ const NotificationIcon = ({ toggleMobileSidebar }: { toggleMobileSidebar? }) => 
     typeof window !== "undefined" &&
     window?.location?.pathname === Routes.NotificationPage().pathname
   const router = useRouter()
-  const [unreadNotificationCount, setUnreadNotificationCount] = useState<number>()
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState<number>(0)
   const { getUnreadCount } = useNotifications()
 
   useEffect(() => {
@@ -115,8 +115,6 @@ const NotificationIcon = ({ toggleMobileSidebar }: { toggleMobileSidebar? }) => 
     }
     read()
   }, [])
-
-  console.log(unreadNotificationCount)
 
   return (
     <div className="relative flex items-center justify-center group">
@@ -140,7 +138,9 @@ const NotificationIcon = ({ toggleMobileSidebar }: { toggleMobileSidebar? }) => 
       >
         <Image src={BellIcon} alt="Bell icon" height={46} width={46} />
       </button>
-      <span className="absolute bg-neon-carrot h-3 w-3 rounded-full top-[-3px] right-[5px]"></span>
+      {unreadNotificationCount > 0 && (
+        <span className="absolute bg-neon-carrot h-3 w-3 rounded-full top-[-3px] right-[5px]"></span>
+      )}
     </div>
   )
 }

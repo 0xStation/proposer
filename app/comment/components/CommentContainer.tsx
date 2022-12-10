@@ -7,13 +7,24 @@ import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import AccountMediaRow from "./AccountMediaRow"
 import timeSince from "app/core/utils/timeSince"
 import useCommentPermissions from "app/core/hooks/useCommentPermissions"
+import { useNotifications } from "app/core/hooks/useNotifications"
+import { Proposal } from "app/proposal/types"
 
-const CommentContainer = ({ proposal, comment, setProposalQueryData }) => {
+const CommentContainer = ({
+  proposal,
+  comment,
+  setProposalQueryData,
+}: {
+  proposal: Proposal
+  comment: any
+  setProposalQueryData: any
+}) => {
   const { canRead, canWrite } = useCommentPermissions(proposal?.id)
   const setToastState = useStore((state) => state.setToastState)
   const activeUser = useStore((state) => state.activeUser)
   const [createCommentMutation] = useMutation(createComment)
   const [isExpanded, setIsExpanded] = useState(false)
+  const { sendNewCommentNotification } = useNotifications()
 
   if (!canRead) {
     return <></>
@@ -71,30 +82,41 @@ const CommentContainer = ({ proposal, comment, setProposalQueryData }) => {
               })
               const proposalWithNewReply = {
                 ...proposal,
-                comments: proposal.comments.map((mapComment) => {
-                  if (mapComment.id === comment.id) {
-                    return {
-                      ...comment,
-                      children: [
-                        ...comment.children,
-                        {
-                          // don't need id for optomistic update, and we don't have it anyways
-                          createdAt: new Date(),
-                          data: {
-                            body: values.commentBody,
+                comments:
+                  proposal.comments &&
+                  proposal.comments.map((mapComment) => {
+                    if (mapComment.id === comment.id) {
+                      return {
+                        ...comment,
+                        children: [
+                          ...comment.children,
+                          {
+                            // don't need id for optomistic update, and we don't have it anyways
+                            createdAt: new Date(),
+                            data: {
+                              body: values.commentBody,
+                            },
+                            author: {
+                              address: activeUser.address,
+                            },
                           },
-                          author: {
-                            address: activeUser.address,
-                          },
-                        },
-                      ],
+                        ],
+                      }
+                    } else {
+                      return mapComment
                     }
-                  } else {
-                    return mapComment
-                  }
-                }),
+                  }),
               }
+
               setProposalQueryData(proposalWithNewReply)
+              try {
+                await sendNewCommentNotification(proposal, {
+                  from: { address: activeUser.address },
+                  commentBody: values.commentBody,
+                })
+              } catch (e) {
+                console.error(e)
+              }
               form.restart()
             } catch (error) {
               setToastState({
