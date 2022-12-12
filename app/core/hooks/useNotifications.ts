@@ -17,17 +17,13 @@ export interface NotificationType {
   }
 }
 
-export interface NewCommentNotificationType {
-  from: NotificationFromUserType | "STATION"
+export type NewCommentNotificationType = {
+  from: NotificationFromUserType
   commentBody: string
 }
 
-export interface NewProposalNotificationType {
-  recipient: string
-  payload: {
-    from: NotificationFromUserType | "STATION"
-    proposalTitle: string
-  }
+export type NewProposalNotificationType = {
+  from: NotificationFromUserType
 }
 
 export interface PaymentNotificationType {
@@ -109,6 +105,7 @@ export const useNotifications = () => {
     const type = "new-comment"
 
     // There must be a way to validate this with typescript
+    // ProposalWithRoles type?
     if (!proposal.roles) {
       console.log("throwing error")
       throw new Error("Proposal must include roles.")
@@ -120,8 +117,6 @@ export const useNotifications = () => {
     const recipients = proposal.roles.filter((role) => {
       return role.type === ProposalRoleType.AUTHOR
     })
-
-    console.log(recipients)
 
     for (let recipient of recipients) {
       const data = {
@@ -135,28 +130,42 @@ export const useNotifications = () => {
         },
       }
 
-      console.log(data)
-
       await fetcher(data)
     }
 
     return true
   }
 
-  const sendNewProposalNotification = async (formData: NewProposalNotificationType) => {
+  const sendNewProposalNotification = async (
+    proposal: Proposal,
+    formData: NewProposalNotificationType
+  ) => {
     const type = "new-proposal"
 
-    const data = {
-      type,
-      subscriberId: formData.recipient,
-      payload: {
-        title: "Sent you a proposal",
-        from: formData.payload.from,
-        note: formData.payload.proposalTitle,
-      },
+    if (!proposal.roles) {
+      console.log("throwing error")
+      throw new Error("Proposal must include roles.")
     }
 
-    fetcher(data)
+    const recipients = proposal.roles.filter((role) => {
+      return role.type !== ProposalRoleType.AUTHOR
+    })
+
+    for (let recipient of recipients) {
+      const data = {
+        type,
+        subscriberId: recipient.address,
+        payload: {
+          title: "Sent you a proposal",
+          from: formData.from,
+          note: proposal.data.content.title,
+        },
+      }
+
+      await fetcher(data)
+    }
+
+    return true
   }
 
   const sendPaymentNotification = async (formData: PaymentNotificationType) => {
@@ -191,7 +200,7 @@ export const useNotifications = () => {
     fetcher(data)
   }
 
-  const sendProposalApprovalNotification = async (formData: NewProposalNotificationType) => {
+  const sendProposalApprovalNotification = async (formData: ProposalApprovalNotificationType) => {
     // maybe make these enums
     const type = "proposal-approved"
 

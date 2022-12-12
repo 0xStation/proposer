@@ -18,6 +18,7 @@ import { ConfirmForm } from "../ConfirmForm"
 import IdeaFormStepPropose from "./stepPropose"
 import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
 import deleteProposalById from "app/proposal/mutations/deleteProposalById"
+import { useNotifications } from "app/core/hooks/useNotifications"
 
 export const ProposalFormIdea = ({
   prefillClients,
@@ -36,6 +37,7 @@ export const ProposalFormIdea = ({
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
   const session = useSession({ suspense: false })
   const { resolveEnsAddress } = useResolveEnsAddress()
+  const { sendNewProposalNotification } = useNotifications()
   const [deleteProposalByIdMutation] = useMutation(deleteProposalById, {
     onSuccess: (_data) => {
       console.log("proposal deleted: ", _data)
@@ -127,6 +129,10 @@ export const ProposalFormIdea = ({
             })
             return
           }
+
+          await sendNewProposalNotification(newProposal, {
+            from: { address: session?.siwe?.address as string },
+          })
 
           try {
             await confirmAuthorship({ proposal: newProposal, representingRoles: [] })

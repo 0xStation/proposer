@@ -19,6 +19,7 @@ import PartnershipFormStepPropose from "./stepPropose"
 import PartnershipFormStepConfirm from "./stepConfirm"
 import { ProposalFormStep, PROPOSAL_FORM_HEADER_COPY } from "app/core/utils/constants"
 import deleteProposalById from "app/proposal/mutations/deleteProposalById"
+import { useNotifications } from "app/core/hooks/useNotifications"
 
 export const ProposalFormPartnership = ({
   prefillClients,
@@ -46,6 +47,7 @@ export const ProposalFormPartnership = ({
       : ""
   )
   const { resolveEnsAddress } = useResolveEnsAddress()
+  const { sendNewProposalNotification } = useNotifications()
 
   const [deleteProposalByIdMutation] = useMutation(deleteProposalById, {
     onSuccess: (_data) => {
@@ -181,6 +183,10 @@ export const ProposalFormPartnership = ({
             })
             return
           }
+
+          await sendNewProposalNotification(newProposal, {
+            from: { address: session?.siwe?.address as string },
+          })
 
           try {
             await confirmAuthorship({

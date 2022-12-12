@@ -26,6 +26,7 @@ import { isValidAdvancedPaymentPercentage } from "app/utils/validators"
 import { ConfirmForm } from "../ConfirmForm"
 import deleteProposalById from "app/proposal/mutations/deleteProposalById"
 import { generateMilestonePayments } from "app/proposal/utils"
+import { useNotifications } from "app/core/hooks/useNotifications"
 
 export const ProposalFormFunding = ({
   prefilledClient,
@@ -57,6 +58,7 @@ export const ProposalFormFunding = ({
   const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
   const { resolveEnsAddress } = useResolveEnsAddress()
+  const { sendNewProposalNotification } = useNotifications()
 
   const { chain } = useNetwork()
 
@@ -222,6 +224,10 @@ export const ProposalFormFunding = ({
               ...(parseFloat(values.advancePaymentPercentage) > 0 && {
                 advancePaymentPercentage: parseFloat(values.advancePaymentPercentage),
               }),
+            })
+
+            await sendNewProposalNotification(newProposal, {
+              from: { address: session?.siwe?.address as string },
             })
           } catch (err) {
             setIsLoading(false)
