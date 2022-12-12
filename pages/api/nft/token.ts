@@ -3,7 +3,6 @@ import { NextApiRequest, NextApiResponse } from "next"
 import db from "db"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { AccountMetadata } from "app/account/types"
-import { AccountInitiativeStatus } from "app/core/utils/constants"
 
 type TicketQuery = {
   address: string

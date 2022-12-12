@@ -743,3 +743,11 @@ export enum AccountInitiativeStatus {
 
 export const GNOSIS_EXECUTION_SUCCESS_EVENT_HASH =
   "0x442e715f626346e8c54381002da614f62bee8d27386535b2521ec8540898556e"
+
+export const notificationTemplateIdToContentMap = {
+  "new-proposal": "Sent you a proposal",
+  "new-comment": "Commented on your proposal",
+  paid: "Paid you",
+  "new-rfp-submission": "Submitted a proposal to your RFP",
+  "proposal-approved": "Your proposal has been approved!",
+}

@@ -1,5 +1,5 @@
 import { useRouter } from "next/router"
-import { useMutation, invalidateQuery, useQuery } from "@blitzjs/rpc"
+import { useMutation, invalidateQuery } from "@blitzjs/rpc"
 import { useState } from "react"
 import Modal from "app/core/components/Modal"
 import useStore from "app/core/hooks/useStore"
@@ -13,6 +13,8 @@ import useGetRolesUserCanApprove from "app/core/hooks/useGetRolesUserCanApprove"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import networks from "app/utils/networks.json"
+import { useNotifications } from "app/core/hooks/useNotifications"
+import { ProposalStatus } from "@prisma/client"
 
 export const ApproveProposalModal = ({
   isOpen,
@@ -29,6 +31,7 @@ export const ApproveProposalModal = ({
   const [approveProposalMutation] = useMutation(approveProposal)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const isPaymentProposal = proposal.data.totalPayments && proposal.data.totalPayments?.length > 0
+  const { sendProposalApprovalNotification } = useNotifications()
 
   const { roles, isLoading: loadingRolesUserCanApprove } = useGetRolesUserCanApprove({
     proposalId: proposal?.id,
@@ -69,14 +72,18 @@ export const ApproveProposalModal = ({
       })
 
       try {
-        await approveProposalMutation({
+        const approvedProposal = (await approveProposalMutation({
           proposalId: proposal?.id,
           proposalVersion: proposal?.version,
           signerAddress: activeUser!.address!,
           message,
           signature,
           representingRoles,
-        })
+        })) as Proposal
+
+        if (approvedProposal.status === ProposalStatus.APPROVED) {
+          await sendProposalApprovalNotification(proposal)
+        }
         invalidateQuery(getRolesByProposalId)
         // invalidate proposal query to get ipfs hash post-approval
         // since an ipfs has is created on proposal approval
