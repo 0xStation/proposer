@@ -100,7 +100,13 @@ const ExploreIcon = ({ toggleMobileSidebar }: { toggleMobileSidebar? }) => {
   )
 }
 
-const NotificationIcon = ({ toggleMobileSidebar }: { toggleMobileSidebar? }) => {
+const NotificationIcon = ({
+  toggleMobileSidebar,
+  activeUser,
+}: {
+  toggleMobileSidebar?
+  activeUser: Account
+}) => {
   const notificationSelected =
     typeof window !== "undefined" &&
     window?.location?.pathname === Routes.NotificationPage().pathname
@@ -110,7 +116,7 @@ const NotificationIcon = ({ toggleMobileSidebar }: { toggleMobileSidebar? }) => 
 
   useEffect(() => {
     const read = async () => {
-      const count = await getUnreadCount("tester")
+      const count = await getUnreadCount(activeUser.address)
       setUnreadNotificationCount(count)
     }
     read()
@@ -152,7 +158,9 @@ export const NavigationSidebar = ({ toggleMobileSidebar }: { toggleMobileSidebar
   return (
     <div className="h-full w-[90px] md:h-[calc(100vh-70px)] md:w-[70px] bg-tunnel-black border-r border-concrete md:fixed md:top-[70px] left-0 text-center md:flex flex-col">
       <div className="h-full mt-4">
-        <NotificationIcon toggleMobileSidebar={toggleMobileSidebar} />
+        {activeUser && address === activeUser?.address && (
+          <NotificationIcon activeUser={activeUser} toggleMobileSidebar={toggleMobileSidebar} />
+        )}
         <ExploreIcon toggleMobileSidebar={toggleMobileSidebar} />
         {/* if connected wallet changes from activeUser (from SIWE session), hide left nav options */}
         {activeUser && address === activeUser?.address && (

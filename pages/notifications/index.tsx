@@ -16,8 +16,6 @@ function CustomNotificationCenter({ markAsRead }) {
     refetch()
   }, [])
 
-  console.log(notifications)
-
   return (
     <div className="mt-20">
       {/* Table */}
