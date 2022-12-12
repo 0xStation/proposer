@@ -3,11 +3,13 @@ import useStore from "app/core/hooks/useStore"
 import createComment from "app/comment/mutations/createComment"
 import { Form, Field } from "react-final-form"
 import Button from "app/core/components/sds/buttons/Button"
+import { useNotifications } from "app/core/hooks/useNotifications"
 
 const NewCommentThreadForm = ({ proposal, startNewThread, setProposalQueryData }) => {
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const [createCommentMutation] = useMutation(createComment)
+  const { sendNewCommentNotification } = useNotifications()
 
   return (
     <div>
@@ -49,6 +51,12 @@ const NewCommentThreadForm = ({ proposal, startNewThread, setProposalQueryData }
             // successful mutation so that way we can immediately render the update without waiting
             // for the server to respond. once the server responds the data is updated appropriately.
             setProposalQueryData(proposalWithNewComment)
+
+            await sendNewCommentNotification(proposal, {
+              from: { address: activeUser.address },
+              commentBody: values.commentBody,
+            })
+
             // form.restart clears the input so a new comment can be entered.
             form.restart()
             // start new thread is a callback that is passed in from the parent component

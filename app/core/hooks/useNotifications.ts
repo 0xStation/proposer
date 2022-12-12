@@ -34,6 +34,7 @@ export type NewRFPSubmissionNotificationType = {
 
 export const useNotifications = () => {
   const fetcher = async (formData: NotificationType) => {
+    console.log("we are in here about to fire off the notification")
     await fetch("/api/novu/send-notification", {
       method: "POST",
       headers: {
@@ -160,7 +161,7 @@ export const useNotifications = () => {
       subscriberId: recipient,
       payload: {
         title: `Paid you ${payment.amount} ${payment.data.token.symbol}`,
-        from: from,
+        from: { address: from },
         note: proposal.data.content.title,
       },
     }
@@ -204,7 +205,7 @@ export const useNotifications = () => {
     for (let recipient of recipients) {
       const data = {
         type,
-        subscriberId: recipient,
+        subscriberId: recipient.address,
         payload: {
           from: "STATION",
           title: `${proposal.data.content.title} has been approved!`,
@@ -212,6 +213,7 @@ export const useNotifications = () => {
         },
       }
 
+      console.log(data)
       await fetcher(data)
     }
 
