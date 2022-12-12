@@ -10,16 +10,13 @@ import AccountMediaRow from "app/comment/components/AccountMediaRow"
 import Layout from "app/core/layouts/Layout"
 
 function CustomNotificationCenter({ markAsRead }) {
-  const { notifications, fetchNextPage, hasNextPage, fetching, markAsSeen, refetch } =
-    useNovuNotifications()
+  const { notifications, fetchNextPage, hasNextPage, fetching, refetch } = useNovuNotifications()
 
   useEffect(() => {
     refetch()
   }, [])
 
   console.log(notifications)
-  //  I'm thinking markAsSeen might mark ALL of them as seen
-  console.log(markAsSeen)
 
   return (
     <div className="mt-20">
@@ -41,8 +38,7 @@ function CustomNotificationCenter({ markAsRead }) {
                 className="border-b border-wet-concrete cursor-pointer hover:bg-wet-concrete"
                 key={`row-${idx}`}
                 onClick={() => {
-                  markAsSeen(notification._id)
-                  markAsRead()
+                  markAsRead(notification._id)
                 }}
               >
                 <td className="py-4 pl-4 align-top">
@@ -85,14 +81,7 @@ function CustomNotificationCenter({ markAsRead }) {
 }
 
 const NotificationPage: BlitzPage = () => {
-  const {
-    markAsRead,
-    sendNewCommentNotification,
-    sendNewProposalNotification,
-    sendPaymentNotification,
-    sendNewRFPSubmissionNotification,
-    sendProposalApprovalNotification,
-  } = useNotifications()
+  const { markAsRead } = useNotifications()
 
   const activeUser = useStore((state) => state.activeUser)
   return (

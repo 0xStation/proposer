@@ -90,6 +90,8 @@ export const useNotifications = () => {
       throw new Error("Proposal must include roles.")
     }
 
+    console.log("are we creating a new comment?")
+
     // not sure how we want to determine who to send this to.
     // for now, let just do author, but we can rewrite this function
     // to send to all people on proposal if we want.
