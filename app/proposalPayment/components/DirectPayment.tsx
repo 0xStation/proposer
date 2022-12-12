@@ -1,14 +1,13 @@
-import { invalidateQuery, invoke, useMutation } from "@blitzjs/rpc"
+import { invalidateQuery, useMutation } from "@blitzjs/rpc"
 import { AddressType } from "@prisma/client"
 import Button from "app/core/components/sds/buttons/Button"
 import SwitchNetworkView from "app/core/components/SwitchNetworkView"
 import TextLink from "app/core/components/TextLink"
 import { useSafeTxStatus } from "app/core/hooks/useSafeTxStatus"
 import useStore from "app/core/hooks/useStore"
-import LinkArrow from "app/core/icons/LinkArrow"
 import { formatCurrencyAmount } from "app/core/utils/formatCurrencyAmount"
 import { getTransactionLink } from "app/core/utils/getTransactionLink"
-import { getNetworkExplorer, getNetworkName } from "app/core/utils/networkInfo"
+import { getNetworkName } from "app/core/utils/networkInfo"
 import truncateString from "app/core/utils/truncateString"
 import saveTransactionHashToPayments from "app/proposal/mutations/saveTransactionToPayments"
 import getProposalById from "app/proposal/queries/getProposalById"
@@ -17,6 +16,7 @@ import { preparePaymentTransaction, prepareSafeTransaction } from "app/transacti
 import { useEffect, useState } from "react"
 import { useNetwork, useSendTransaction, useWaitForTransaction } from "wagmi"
 import { getMostRecentPaymentAttempt } from "../utils"
+import { useNotifications } from "app/core/hooks/useNotifications"
 
 export const DirectPayment = ({
   proposal,
@@ -29,6 +29,8 @@ export const DirectPayment = ({
   const setToastState = useStore((state) => state.setToastState)
   const [txnHash, setTxnHash] = useState<string>()
   const [transactionPayload, setTransactionPayload] = useState<any>()
+
+  const { sendPaymentNotification } = useNotifications()
 
   const { chain: activeChain } = useNetwork()
   const { sendTransactionAsync } = useSendTransaction({ mode: "recklesslyUnprepared" })
@@ -79,6 +81,7 @@ export const DirectPayment = ({
           message: "Payment execution succeeded.",
         })
         setIsLoading(false)
+        await sendPaymentNotification(payment, proposal)
       } catch (e) {
         setToastState({
           isToastShowing: true,

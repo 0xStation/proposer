@@ -1,6 +1,7 @@
 import { getAntiCSRFToken } from "@blitzjs/auth"
 import { Proposal } from "app/proposal/types"
 import { Rfp } from "app/rfp/types"
+import { ProposalPayment } from "app/proposalPayment/types"
 import { ProposalRoleType } from "@prisma/client"
 
 export interface NotificationFromUserType {
@@ -25,16 +26,6 @@ export type NewCommentNotificationType = {
 
 export type NewProposalNotificationType = {
   from: NotificationFromUserType
-}
-
-export type PaymentNotificationType = {
-  recipient: string
-  payload: {
-    from: NotificationFromUserType | "STATION"
-    proposalTitle: string
-    paymentAmount: number
-    paymentToken: string
-  }
 }
 
 export type NewRFPSubmissionNotificationType = {
@@ -164,16 +155,19 @@ export const useNotifications = () => {
     return true
   }
 
-  const sendPaymentNotification = async (formData: PaymentNotificationType) => {
+  const sendPaymentNotification = async (payment: ProposalPayment, proposal: Proposal) => {
     const type = "paid"
+
+    const recipient = payment.recipientAddress
+    const from = payment.senderAddress
 
     const data = {
       type,
-      subscriberId: formData.recipient,
+      subscriberId: recipient,
       payload: {
-        title: `Paid you ${formData.payload.paymentAmount} ${formData.payload.paymentToken}`,
-        from: formData.payload.from,
-        note: formData.payload.proposalTitle,
+        title: `Paid you ${payment.amount} ${payment.data.token.symbol}`,
+        from: from,
+        note: proposal.data.content.title,
       },
     }
 
