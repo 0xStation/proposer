@@ -32,14 +32,6 @@ export type NewRFPSubmissionNotificationType = {
   from: NotificationFromUserType
 }
 
-export type ProposalApprovalNotificationType = {
-  recipient: string
-  payload: {
-    from: NotificationFromUserType | "STATION"
-    proposalTitle: string
-  }
-}
-
 export const useNotifications = () => {
   const fetcher = async (formData: NotificationType) => {
     await fetch("/api/novu/send-notification", {
@@ -171,7 +163,8 @@ export const useNotifications = () => {
       },
     }
 
-    fetcher(data)
+    await fetcher(data)
+    return true
   }
 
   const sendNewRFPSubmissionNotification = async (
@@ -196,21 +189,31 @@ export const useNotifications = () => {
     return true
   }
 
-  const sendProposalApprovalNotification = async (formData: ProposalApprovalNotificationType) => {
+  const sendProposalApprovalNotification = async (proposal) => {
     // maybe make these enums
     const type = "proposal-approved"
 
-    const data = {
-      type,
-      subscriberId: formData.recipient,
-      payload: {
-        from: "STATION",
-        title: `${formData.payload.proposalTitle} has been approved!`,
-        note: formData.payload.proposalTitle,
-      },
+    // figured the author and contributor would be most interested?
+    // we can easily update this though, if it differs
+    const recipients = proposal.roles.filter((role) => {
+      return role.type !== ProposalRoleType.CLIENT
+    })
+
+    for (let recipient of recipients) {
+      const data = {
+        type,
+        subscriberId: recipient,
+        payload: {
+          from: "STATION",
+          title: `${proposal.data.content.title} has been approved!`,
+          note: proposal.data.content.title,
+        },
+      }
+
+      await fetcher(data)
     }
 
-    fetcher(data)
+    return true
   }
 
   return {
