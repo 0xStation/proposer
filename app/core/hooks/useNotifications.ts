@@ -3,6 +3,8 @@ import { Proposal } from "app/proposal/types"
 import { Rfp } from "app/rfp/types"
 import { ProposalPayment } from "app/proposalPayment/types"
 import { ProposalRoleType } from "@prisma/client"
+import { Routes } from "@blitzjs/next"
+import { genUrlFromRoute } from "app/utils/genUrlFromRoute"
 
 export interface NotificationFromUserType {
   address: string
@@ -16,6 +18,7 @@ export interface NotificationType {
     title: string
     note: string
     extra?: string
+    link?: string
   }
 }
 
@@ -34,7 +37,6 @@ export type NewRFPSubmissionNotificationType = {
 
 export const useNotifications = () => {
   const fetcher = async (formData: NotificationType) => {
-    console.log("we are in here about to fire off the notification")
     await fetch("/api/novu/send-notification", {
       method: "POST",
       headers: {
@@ -56,7 +58,7 @@ export const useNotifications = () => {
       const data = await response.json()
       return data.count
     } catch (e) {
-      console.log(e)
+      console.error(e)
     }
   }
 
@@ -87,11 +89,8 @@ export const useNotifications = () => {
     // There must be a way to validate this with typescript
     // ProposalWithRoles type?
     if (!proposal.roles) {
-      console.log("throwing error")
       throw new Error("Proposal must include roles.")
     }
-
-    console.log("are we creating a new comment?")
 
     // not sure how we want to determine who to send this to.
     // for now, let just do author, but we can rewrite this function
@@ -109,6 +108,7 @@ export const useNotifications = () => {
           title: "Commented on your proposal",
           note: proposal.data.content.title,
           extra: formData.commentBody,
+          link: genUrlFromRoute(Routes.ViewProposal({ proposalId: proposal.id })),
         },
       }
 
@@ -125,7 +125,6 @@ export const useNotifications = () => {
     const type = "new-proposal"
 
     if (!proposal.roles) {
-      console.log("throwing error")
       throw new Error("Proposal must include roles.")
     }
 
@@ -141,6 +140,7 @@ export const useNotifications = () => {
           title: "Sent you a proposal",
           from: formData.from,
           note: proposal.data.content.title,
+          link: genUrlFromRoute(Routes.ViewProposal({ proposalId: proposal.id })),
         },
       }
 
@@ -185,6 +185,7 @@ export const useNotifications = () => {
         from: formData.from,
         title: "Submitted a proposal to your RFP",
         note: `${rfp.data.content.title} - ${proposal.data.content.title}`,
+        link: genUrlFromRoute(Routes.ViewProposal({ proposalId: proposal.id })),
       },
     }
 
@@ -210,10 +211,10 @@ export const useNotifications = () => {
           from: "STATION",
           title: `${proposal.data.content.title} has been approved!`,
           note: proposal.data.content.title,
+          link: genUrlFromRoute(Routes.ViewProposal({ proposalId: proposal.id })),
         },
       }
 
-      console.log(data)
       await fetcher(data)
     }
 
