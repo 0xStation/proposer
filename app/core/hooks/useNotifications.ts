@@ -1,5 +1,6 @@
 import { getAntiCSRFToken } from "@blitzjs/auth"
 import { Proposal } from "app/proposal/types"
+import { Rfp } from "app/rfp/types"
 import { ProposalRoleType } from "@prisma/client"
 
 export interface NotificationFromUserType {
@@ -26,7 +27,7 @@ export type NewProposalNotificationType = {
   from: NotificationFromUserType
 }
 
-export interface PaymentNotificationType {
+export type PaymentNotificationType = {
   recipient: string
   payload: {
     from: NotificationFromUserType | "STATION"
@@ -36,16 +37,11 @@ export interface PaymentNotificationType {
   }
 }
 
-export interface NewRFPSubmissionNotificationType {
-  recipient: string
-  payload: {
-    from: NotificationFromUserType | "STATION"
-    proposalTitle: string
-    rfpTitle: string
-  }
+export type NewRFPSubmissionNotificationType = {
+  from: NotificationFromUserType
 }
 
-export interface ProposalApprovalNotificationType {
+export type ProposalApprovalNotificationType = {
   recipient: string
   payload: {
     from: NotificationFromUserType | "STATION"
@@ -184,20 +180,26 @@ export const useNotifications = () => {
     fetcher(data)
   }
 
-  const sendNewRFPSubmissionNotification = async (formData: NewRFPSubmissionNotificationType) => {
+  const sendNewRFPSubmissionNotification = async (
+    rfp: Rfp,
+    proposal: Proposal,
+    formData: NewRFPSubmissionNotificationType
+  ) => {
     const type = "new-rfp-submission"
+    const recipient = rfp.accountAddress
 
     const data = {
       type,
-      subscriberId: formData.recipient,
+      subscriberId: recipient,
       payload: {
-        from: formData.payload.from,
+        from: formData.from,
         title: "Submitted a proposal to your RFP",
-        note: `${formData.payload.rfpTitle} - ${formData.payload.proposalTitle}`,
+        note: `${rfp.data.content.title} - ${proposal.data.content.title}`,
       },
     }
 
-    fetcher(data)
+    await fetcher(data)
+    return true
   }
 
   const sendProposalApprovalNotification = async (formData: ProposalApprovalNotificationType) => {

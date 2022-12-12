@@ -28,6 +28,7 @@ import RfpProposalFormStepReward from "./stepReward"
 import getTokensByAccount from "app/token/queries/getTokensByAccount"
 import { useNetwork } from "wagmi"
 import { getNetworkTokens } from "app/core/utils/networkInfo"
+import { useNotifications } from "app/core/hooks/useNotifications"
 
 export const ProposalFormRfp = () => {
   const router = useRouter()
@@ -44,6 +45,7 @@ export const ProposalFormRfp = () => {
   const [tokenOptions, setTokenOptions] = useState<any[]>()
   const [isImportTokenModalOpen, setIsImportTokenModalOpen] = useState<boolean>(false)
   const [selectedToken, setSelectedToken] = useState<any>()
+  const { sendNewRFPSubmissionNotification } = useNotifications()
 
   const { chain } = useNetwork()
 
@@ -291,6 +293,10 @@ export const ProposalFormRfp = () => {
                 milestones,
                 payments,
                 paymentTerms,
+              })
+
+              await sendNewRFPSubmissionNotification(rfp, newProposal, {
+                from: { address: connectedAddress },
               })
             } catch (err) {
               setIsLoading(false)
