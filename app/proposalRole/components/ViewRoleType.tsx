@@ -41,7 +41,7 @@ const RoleRow = ({ proposal, role, openGnosisSigners, tags = [] }) => {
       <div className="flex flex-row w-full items-center justify-between">
         <div className="flex items-center flex-row space-x-2 h-full">
           {/* ACCOUNT */}
-          <AccountPill account={role?.account} />
+          <AccountMediaObject account={role?.account} showActionIcons={true} />
           {/* TAGS */}
           {tags.map((tag, idx) => (
             <span

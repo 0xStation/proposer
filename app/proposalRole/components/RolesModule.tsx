@@ -166,7 +166,7 @@ export const RoleModule = ({
                   ? "You cannot edit after the proposal is approved."
                   : !canEdit
                   ? "You do not have permissions to edit."
-                  : "You can edit before the proposal is approved."}
+                  : "Edit"}
               </ToolTip>
               <button
                 onClick={() => setIsView(false)}
@@ -178,7 +178,6 @@ export const RoleModule = ({
                 className="text-marble-white cursor-pointer disabled:text-concrete disabled:cursor-not-allowed"
               >
                 <PencilIcon className="h-5 w-5 inline" />
-                <p className="inline ml-2">{"Edit"}</p>
               </button>
             </div>
           ) : (

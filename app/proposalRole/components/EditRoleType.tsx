@@ -27,7 +27,7 @@ const AccountRow = ({ account, removeAccount, tags = [], lockRemoval }) => {
     <div className="flex flex-row w-full justify-between mt-4">
       <div className="flex items-center flex-row space-x-2 h-full">
         {/* ACCOUNT */}
-        <AccountPill account={account} />
+        <AccountMediaObject account={account} showActionIcons={true} />
         {/* TAGS */}
         {tags.map((tag, idx) => (
           <span
