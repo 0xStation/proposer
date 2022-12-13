@@ -5,6 +5,7 @@ import GnosisSafeSignersModal from "app/core/components/GnosisSafeSignersModal"
 import { ModuleBox } from "app/core/components/ModuleBox"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
 import { ToolTip } from "app/core/components/ToolTip"
+import useGetUsersRoles from "app/core/hooks/useGetUsersRoles"
 import { Proposal } from "app/proposal/types"
 import { useEffect, useState } from "react"
 import { useEditRolesPermissions } from "../hooks/useEditRolesPermissions"
@@ -33,7 +34,9 @@ export const RoleModule = ({
     setRemovedRoles,
     className = "",
   }) => {
-    return isView ? (
+    const canEditRole = useEditRolesPermissions(proposal?.id, roleType)
+
+    return isView || !canEditRole ? (
       <ViewRoleType
         proposal={proposal}
         roleType={roleType}
@@ -66,7 +69,8 @@ export const RoleModule = ({
 
   const [isView, setIsView] = useState<boolean>(true)
 
-  const canEditRole = useEditRolesPermissions(proposal?.id, ProposalRoleType.AUTHOR)
+  const { roles: usersRoles } = useGetUsersRoles(proposal?.id)
+  const canEdit = usersRoles.length > 0
 
   const [authorAccounts, setAuthorAccounts] = useState<Account[]>(
     roles?.filter((role) => role.type === ProposalRoleType.AUTHOR)?.map((role) => role.account!) ||
@@ -160,7 +164,7 @@ export const RoleModule = ({
                 {proposal?.status === ProposalStatus.APPROVED ||
                 proposal?.status === ProposalStatus.COMPLETE
                   ? "You cannot edit after the proposal is approved."
-                  : !canEditRole
+                  : !canEdit
                   ? "You do not have permissions to edit."
                   : "You can edit before the proposal is approved."}
               </ToolTip>
@@ -169,7 +173,7 @@ export const RoleModule = ({
                 disabled={
                   proposal?.status === ProposalStatus.APPROVED ||
                   proposal?.status === ProposalStatus.COMPLETE ||
-                  !canEditRole
+                  !canEdit
                 }
                 className="text-marble-white cursor-pointer disabled:text-concrete disabled:cursor-not-allowed"
               >

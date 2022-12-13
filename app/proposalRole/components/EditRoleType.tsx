@@ -69,8 +69,6 @@ export const EditRoleType = ({
   const { roles } = useRoles(proposal?.id)
   const filteredRoles = roles?.filter((role) => role.type === roleType)
 
-  const setToastState = useStore((state) => state.setToastState)
-
   const { rfp } = useRfp(proposal?.rfpId)
 
   const addAccount = (account) => {
@@ -97,7 +95,7 @@ export const EditRoleType = ({
     if (existingRole) {
       setRemovedRoles([...removedRoles, existingRole])
     } else {
-      setAddedRoles(addedRoles.filter((a) => a.id !== account.id))
+      setAddedRoles(addedRoles.filter((role) => !addressesAreEqual(role.address, account.address)))
     }
   }
 

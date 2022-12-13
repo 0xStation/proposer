@@ -1,12 +1,21 @@
 import db from "db"
 import * as z from "zod"
 import { Ctx } from "blitz"
-import { ProposalRoleApprovalStatus, ProposalRoleType, ProposalStatus } from "@prisma/client"
+import {
+  AddressType,
+  ProposalRoleApprovalStatus,
+  ProposalRoleType,
+  ProposalStatus,
+} from "@prisma/client"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { genProposalDigest } from "app/signatures/proposal"
 import { Proposal } from "app/proposal/types"
 import { getHash } from "app/signatures/utils"
 import { ChangeParticipantType } from "app/proposalVersion/types"
+import { AccountMetadata } from "app/account/types"
+import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
+import { ContentPasteSearchOutlined } from "@mui/icons-material"
 
 const UpdateRoles = z.object({
   proposalId: z.string(),
@@ -34,7 +43,7 @@ export default async function updateRoles(input: z.infer<typeof UpdateRoles>, ct
       id: params.proposalId,
     },
     include: {
-      roles: true,
+      roles: { include: { account: true } },
     },
   })
 
@@ -92,25 +101,70 @@ export default async function updateRoles(input: z.infer<typeof UpdateRoles>, ct
     throw Error("cannot set new fund sender to someone who is not on the proposal")
   }
 
-  const editingRoles = [
-    ...removeRoles.map((role) => role.type),
-    params.addRoles.map((role) => role.type),
-  ].filter((v, i, addresses) => addresses.indexOf(v) === i) // unique role types
+  const editingRoleTypes = new Set<ProposalRoleType>()
 
-  let authorizedAddresses
-  // can only edit both clients and contributors if user is author
-  if (
-    editingRoles.includes(ProposalRoleType.CLIENT) &&
-    editingRoles.includes(ProposalRoleType.CONTRIBUTOR)
-  ) {
-    authorizedAddresses = existingProposal.roles
-      .filter((role) => role.type === ProposalRoleType.AUTHOR)
-      .map((role) => role.address)
-  } else {
-    authorizedAddresses = existingProposal.roles
-      .filter((role) => editingRoles.includes(role.type) || role.type === ProposalRoleType.AUTHOR)
-      .map((role) => role.address)
+  removeRoles.forEach((role) => editingRoleTypes.add(role.type))
+  params.addRoles.forEach((role) => editingRoleTypes.add(role.type))
+  if (params.newPaymentRecipient) {
+    editingRoleTypes.add(ProposalRoleType.CONTRIBUTOR)
   }
+  if (params.newPaymentSender) {
+    editingRoleTypes.add(ProposalRoleType.CLIENT)
+  }
+
+  const permissions = {}
+
+  existingProposal.roles.forEach((role) => {
+    if (!permissions[role.address]) {
+      permissions[role.address] = new Set<ProposalRoleType>()
+    }
+    permissions[role.address].add(role.type)
+  })
+
+  // make requests to gnosis for each role that is a SAFE
+  let gnosisRequests: any[] = []
+  existingProposal.roles.forEach((role) => {
+    if (
+      role.account?.addressType === AddressType.SAFE &&
+      !!(role.account?.data as unknown as AccountMetadata)?.chainId
+    )
+      gnosisRequests.push(
+        getGnosisSafeDetails(
+          (role.account?.data as unknown as AccountMetadata).chainId as number,
+          role.address
+        )
+      )
+  })
+  // batch await gnosis requests and add safe details to each account metadata accumulator
+  const gnosisResults = await Promise.all(gnosisRequests)
+
+  gnosisResults.forEach((safe) => {
+    safe.signers
+      .map((signer) => toChecksumAddress(signer))
+      .forEach((address) => {
+        if (!permissions[address]) {
+          permissions[address] = new Set<ProposalRoleType>()
+        }
+        permissions[safe.address].forEach((value) => {
+          permissions[address].add(value)
+        })
+      })
+  })
+
+  let authorizedAddresses: string[] = []
+
+  Object.entries(permissions).forEach(([address, roleSet]: [string, Set<ProposalRoleType>]) => {
+    if (roleSet.has(ProposalRoleType.AUTHOR)) {
+      authorizedAddresses.push(address)
+      return
+    }
+    editingRoleTypes.forEach((role) => {
+      if (!roleSet.has(role)) {
+        return
+      }
+    })
+    authorizedAddresses.push(address)
+  })
 
   ctx.session.$authorize(authorizedAddresses, [])
 
