@@ -16,6 +16,7 @@ import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { addressRepresentsAccount } from "app/core/utils/addressRepresentsAccount"
 import { PROPOSAL_ROLE_APPROVAL_STATUS_MAP } from "app/core/utils/constants"
 import { useEffect, useState } from "react"
+import { useAccountTags } from "../hooks/useAccountTags"
 import { useEditRolesPermissions } from "../hooks/useEditRolesPermissions"
 import { useRoles } from "../hooks/useRoles"
 import { ProposalRole } from "../types"
@@ -98,73 +99,19 @@ const RoleRow = ({ proposal, role, openGnosisSigners, tags = [] }) => {
   )
 }
 
-export const ViewRoleType = ({
-  proposal,
-  roleType,
-  openGnosisSigners,
-  openEditView,
-  className,
-}) => {
+export const ViewRoleType = ({ proposal, roleType, openGnosisSigners, className }) => {
   const { roles } = useRoles(proposal?.id)
   const filteredRoles = roles?.filter((role) => role.type === roleType)
   const canEditRole = useEditRolesPermissions(proposal?.id, roleType)
 
-  let accountTagsMap = {}
-  if (roleType === ProposalRoleType.CONTRIBUTOR) {
-    filteredRoles
-      ?.map((role) => role.address)
-      ?.filter((v, i, addresses) => addresses.indexOf(v) === i)
-      ?.forEach((address) => {
-        if (
-          proposal.payments.some((payment) => addressesAreEqual(payment.recipientAddress, address))
-        ) {
-          accountTagsMap[address] = ["fund recipient"]
-        }
-      })
-  } else if (roleType === ProposalRoleType.CLIENT) {
-    filteredRoles
-      ?.map((role) => role.address)
-      ?.filter((v, i, addresses) => addresses.indexOf(v) === i)
-      ?.forEach((address) => {
-        if (
-          proposal.payments.some((payment) => addressesAreEqual(payment.senderAddress, address))
-        ) {
-          accountTagsMap[address] = ["fund sender"]
-        }
-      })
-  }
+  let { accountTagsMap } = useAccountTags(proposal, filteredRoles, roleType)
 
   return (
     <>
-      <div className="w-full flex flex-row justify-between items-center h-[35px]">
-        {/* TITLE */}
-        <h4 className="text-xs font-bold text-concrete uppercase">
-          {roleType.toLowerCase() + "S"}
-        </h4>
-        {/* EDIT BUTTON */}
-        <div className="group">
-          <ToolTip className="mr-1">
-            {proposal.status === ProposalStatus.APPROVED ||
-            proposal.status === ProposalStatus.COMPLETE
-              ? "You cannot edit after the proposal is approved."
-              : !canEditRole
-              ? "You do not have permissions to edit."
-              : "You can edit before the proposal is approved."}
-          </ToolTip>
-          <button
-            onClick={() => openEditView(roleType)}
-            disabled={
-              proposal.status === ProposalStatus.APPROVED ||
-              proposal.status === ProposalStatus.COMPLETE ||
-              !canEditRole
-            }
-            className="text-marble-white cursor-pointer disabled:text-concrete disabled:cursor-not-allowed"
-          >
-            <PencilIcon className="h-5 w-5 inline" />
-            <p className="inline ml-2">{"Edit"}</p>
-          </button>
-        </div>
-      </div>
+      {/* TITLE */}
+      <h4 className="mt-2 text-xs font-bold text-concrete uppercase">
+        {roleType.toLowerCase() + "S"}
+      </h4>
       {/* ROLES */}
       {filteredRoles?.map((role, idx) => {
         return (

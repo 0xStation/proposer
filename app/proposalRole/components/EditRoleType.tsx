@@ -15,11 +15,12 @@ import { useResolveEnsAddress } from "app/proposalForm/hooks/useResolveEnsAddres
 import { ProposalRole } from "../types"
 import { addressesAreEqual } from "app/core/utils/addressesAreEqual"
 import { ProposalRoleType } from "@prisma/client"
-import { UpdateContributorsModal } from "./UpdateContributorsModal"
 import { useRfp } from "app/rfp/hooks/useRfp"
 import LockClosedIcon from "app/core/icons/LockClosedIcon"
 import { ToolTip } from "app/core/components/ToolTip"
 import { AccountPill } from "app/account/components/AccountPill"
+import { AddRoleForm } from "./AddRoleForm"
+import { useAccountTags } from "../hooks/useAccountTags"
 
 const AccountRow = ({ account, removeAccount, tags = [], lockRemoval }) => {
   return (
@@ -55,49 +56,37 @@ const AccountRow = ({ account, removeAccount, tags = [], lockRemoval }) => {
   )
 }
 
-export const EditRoleType = ({ proposal, className, roleType, closeEditView }) => {
+export const EditRoleType = ({
+  proposal,
+  roleType,
+  accounts,
+  setAccounts,
+  addedRoles,
+  setAddedRoles,
+  removedRoles,
+  setRemovedRoles,
+}) => {
   const { roles } = useRoles(proposal?.id)
   const filteredRoles = roles?.filter((role) => role.type === roleType)
-  const [isAddingAccount, setIsAddingAccount] = useState<boolean>(false)
-  const [isSaveModalOpen, setIsSaveModalOpen] = useState<boolean>(false)
 
   const setToastState = useStore((state) => state.setToastState)
-  const [accounts, setAccounts] = useState<Account[]>(
-    filteredRoles?.map((role) => role.account!) || []
-  )
-  const [addedAccounts, setAddedAccounts] = useState<Account[]>([])
-  const [removedRoles, setRemovedRoles] = useState<ProposalRole[]>([])
 
   const { rfp } = useRfp(proposal?.rfpId)
 
-  const { resolveEnsAddress } = useResolveEnsAddress()
-  const [createAccountMutation] = useMutation(createAccount, {
-    onSuccess: (account) => {
-      setAccounts([...accounts, account])
+  const addAccount = (account) => {
+    setAccounts([...accounts, account])
 
-      const existingRole = filteredRoles?.find((role) =>
-        addressesAreEqual(role.address, account.address)
+    const existingRole = filteredRoles?.find((role) =>
+      addressesAreEqual(role.address, account.address)
+    )
+    if (existingRole) {
+      setRemovedRoles(
+        removedRoles.filter((role) => !addressesAreEqual(role.address, account.address))
       )
-      if (existingRole) {
-        setRemovedRoles(
-          removedRoles.filter((role) => !addressesAreEqual(role.address, account.address))
-        )
-      } else {
-        setAddedAccounts([...addedAccounts, account])
-      }
-    },
-    onError: (error) => {
-      console.error(error)
-      setToastState({
-        isToastShowing: true,
-        type: "error",
-        message: "Error adding account.",
-      })
-    },
-    onSettled: () => {
-      setIsAddingAccount(false)
-    },
-  })
+    } else {
+      setAddedRoles([...addedRoles, { type: roleType, address: account.address }])
+    }
+  }
 
   const removeAccount = (account) => {
     setAccounts(accounts.filter((a) => a.id !== account.id))
@@ -108,81 +97,18 @@ export const EditRoleType = ({ proposal, className, roleType, closeEditView }) =
     if (existingRole) {
       setRemovedRoles([...removedRoles, existingRole])
     } else {
-      setAddedAccounts(addedAccounts.filter((a) => a.id !== account.id))
+      setAddedRoles(addedRoles.filter((a) => a.id !== account.id))
     }
   }
 
-  let accountTagsMap = {}
-  if (roleType === ProposalRoleType.CONTRIBUTOR) {
-    filteredRoles
-      ?.map((role) => role.address)
-      ?.filter((v, i, addresses) => addresses.indexOf(v) === i)
-      ?.forEach((address) => {
-        if (
-          proposal.payments.some((payment) => addressesAreEqual(payment.recipientAddress, address))
-        ) {
-          accountTagsMap[address] = ["fund recipient"]
-        }
-      })
-  } else if (roleType === ProposalRoleType.CLIENT) {
-    filteredRoles
-      ?.map((role) => role.address)
-      ?.filter((v, i, addresses) => addresses.indexOf(v) === i)
-      ?.forEach((address) => {
-        if (
-          proposal.payments.some((payment) => addressesAreEqual(payment.senderAddress, address))
-        ) {
-          accountTagsMap[address] = ["fund sender"]
-        }
-      })
-  }
-
-  const selectNewPaymentRecipient =
-    roleType === ProposalRoleType.CONTRIBUTOR &&
-    !proposal.payments
-      .map((payment) => payment.recipientAddress)
-      .filter((v, i, addresses) => addresses.indexOf(v) === i)
-      .every((address) => accounts.map((account) => account.address).includes(address))
-
-  const selectNewPaymentSender =
-    roleType === ProposalRoleType.CLIENT &&
-    !proposal.payments
-      .map((payment) => payment.senderAddress)
-      .filter((v, i, addresses) => addresses.indexOf(v) === i)
-      .every((address) => accounts.map((account) => account.address).includes(address))
+  let { accountTagsMap } = useAccountTags(proposal, filteredRoles, roleType)
 
   return (
     <>
-      <UpdateContributorsModal
-        proposal={proposal}
-        roleType={roleType}
-        closeEditView={closeEditView}
-        isOpen={isSaveModalOpen}
-        setIsOpen={setIsSaveModalOpen}
-        selectNewPaymentRecipient={selectNewPaymentRecipient}
-        selectNewPaymentSender={selectNewPaymentSender}
-        accounts={accounts}
-        addedAccounts={addedAccounts}
-        removedRoles={removedRoles}
-      />
-      <div className="flex flex-row justify-between items-center mb-4">
-        <p className="text-concrete">Editing {roleType.toLowerCase()}s</p>
-
-        <div className="flex flex-row space-x-4 items-center">
-          <Button type={ButtonType.Secondary} onClick={() => closeEditView()}>
-            Cancel
-          </Button>
-          <Button
-            type={ButtonType.Primary}
-            isDisabled={
-              accounts.length === 0 || (addedAccounts.length === 0 && removedRoles.length === 0)
-            }
-            onClick={async () => setIsSaveModalOpen(true)}
-          >
-            Save
-          </Button>
-        </div>
-      </div>
+      {/* TITLE */}
+      <h4 className="mt-2 text-xs font-bold text-concrete uppercase">
+        {roleType.toLowerCase() + "S (EDITING)"}
+      </h4>
       {accounts.map((account, idx) => {
         return (
           <AccountRow
@@ -202,74 +128,7 @@ export const EditRoleType = ({ proposal, className, roleType, closeEditView }) =
           Add at least one {roleType.toLowerCase()}
         </p>
       )}
-      <Form
-        initialValues={{}}
-        onSubmit={async (values, form) => {
-          console.log("values", values)
-          setIsAddingAccount(true)
-
-          const resolvedAddress = await resolveEnsAddress(values.address.trim())
-          if (!resolvedAddress) {
-            setIsAddingAccount(false)
-            setToastState({
-              isToastShowing: true,
-              type: "error",
-              message: "Invalid ENS name or wallet address provided.",
-            })
-            return
-          }
-
-          try {
-            await createAccountMutation({
-              address: resolvedAddress,
-            })
-            form.reset()
-          } catch (e) {
-            console.error(e)
-          }
-        }}
-        render={({ form, handleSubmit }) => {
-          const formState = form.getState()
-          return (
-            <form onSubmit={handleSubmit}>
-              <div className="flex flex-row items-center mt-8">
-                <Field name="address" validate={composeValidators(requiredField, isEnsOrAddress)}>
-                  {({ meta, input }) => {
-                    return (
-                      <>
-                        <input
-                          {...input}
-                          type="text"
-                          required
-                          placeholder="Enter ENS name or wallet address"
-                          className="bg-wet-concrete rounded-tl-md rounded-bl-md w-full p-2"
-                        />
-                        {/* TODO: acting weird with flex-row */}
-                        {/* {meta.touched && meta.error && (
-                          <span className="text-torch-red text-xs">{meta.error}</span>
-                        )} */}
-                      </>
-                    )
-                  }}
-                </Field>
-                <button
-                  type="submit"
-                  disabled={formState.invalid || isAddingAccount}
-                  className="text-sm font-bold w-56 bg-electric-violet rounded-tr-md rounded-br-md h-10 text-tunnel-black hover:bg-electric-violet/80 disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  {isAddingAccount ? (
-                    <div className="flex justify-center items-center">
-                      <Spinner fill="black" />
-                    </div>
-                  ) : (
-                    "Add " + roleType.toLowerCase()
-                  )}
-                </button>
-              </div>
-            </form>
-          )
-        }}
-      />
+      <AddRoleForm addAccount={addAccount} />
     </>
   )
 }

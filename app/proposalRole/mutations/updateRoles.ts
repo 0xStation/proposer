@@ -8,25 +8,26 @@ import { Proposal } from "app/proposal/types"
 import { getHash } from "app/signatures/utils"
 import { ChangeParticipantType } from "app/proposalVersion/types"
 
-const UpdateProposalContributors = z.object({
+const UpdateRoles = z.object({
   proposalId: z.string(),
-  roleType: z.enum([
-    ProposalRoleType.CONTRIBUTOR,
-    ProposalRoleType.CLIENT,
-    ProposalRoleType.AUTHOR,
-  ]),
   removeRoleIds: z.string().array().default([]),
-  addAddresses: z.string().array().default([]),
+  addRoles: z
+    .object({
+      type: z.enum([
+        ProposalRoleType.CONTRIBUTOR,
+        ProposalRoleType.CLIENT,
+        ProposalRoleType.AUTHOR,
+      ]),
+      address: z.string(),
+    })
+    .array(),
   newPaymentRecipient: z.string().optional(),
   newPaymentSender: z.string().optional(),
   changeNotes: z.string().default(""),
 })
 
-export default async function updateProposalContributors(
-  input: z.infer<typeof UpdateProposalContributors>,
-  ctx: Ctx
-) {
-  const params = UpdateProposalContributors.parse(input)
+export default async function updateRoles(input: z.infer<typeof UpdateRoles>, ctx: Ctx) {
+  const params = UpdateRoles.parse(input)
 
   const existingProposal = await db.proposal.findUnique({
     where: {
@@ -40,6 +41,11 @@ export default async function updateProposalContributors(
   if (!existingProposal) {
     throw Error("cannot update the roles of a proposal that does not exist")
   }
+
+  const removeRoles = existingProposal.roles.filter((role) =>
+    params.removeRoleIds.includes(role.id)
+  )
+
   if (
     !params.removeRoleIds.every((roleId) =>
       existingProposal.roles.some((role) => role.id === roleId)
@@ -48,18 +54,15 @@ export default async function updateProposalContributors(
     throw Error("cannot remove roles that do not exist on this proposal")
   }
   if (
-    !existingProposal.roles
-      .filter((role) => params.removeRoleIds.includes(role.id))
-      .every((role) => role.type === params.roleType)
+    params.addRoles.some((newRole) =>
+      existingProposal.roles.some(
+        (existingRole) =>
+          newRole.type === existingRole.type &&
+          addressesAreEqual(newRole.address, existingRole.address)
+      )
+    )
   ) {
-    throw Error("cannot edit multiple roles at once")
-  }
-  if (
-    existingProposal.roles
-      .filter((role) => role.type === params.roleType)
-      .some((role) => params.addAddresses.includes(role.address))
-  ) {
-    throw Error("cannot add address for existing role")
+    throw Error("cannot add role that already exists")
   }
   // Validate payment changes
   if (
@@ -67,7 +70,11 @@ export default async function updateProposalContributors(
     !existingProposal.roles
       .filter((role) => !params.removeRoleIds.includes(role.id))
       .some((role) => addressesAreEqual(role.address, params.newPaymentRecipient)) &&
-    !params.addAddresses.includes(params.newPaymentRecipient)
+    !params.addRoles.some(
+      (role) =>
+        role.type === ProposalRoleType.CONTRIBUTOR &&
+        addressesAreEqual(role.address, params.newPaymentRecipient)
+    )
   ) {
     throw Error("cannot set new fund recipient to someone who is not on the proposal")
   }
@@ -76,25 +83,44 @@ export default async function updateProposalContributors(
     !existingProposal.roles
       .filter((role) => !params.removeRoleIds.includes(role.id))
       .some((role) => addressesAreEqual(role.address, params.newPaymentSender)) &&
-    !params.addAddresses.includes(params.newPaymentSender)
+    !params.addRoles.some(
+      (role) =>
+        role.type === ProposalRoleType.CLIENT &&
+        addressesAreEqual(role.address, params.newPaymentSender)
+    )
   ) {
     throw Error("cannot set new fund sender to someone who is not on the proposal")
   }
 
-  ctx.session.$authorize(
-    existingProposal.roles
-      .filter((role) => role.type === params.roleType || role.type === ProposalRoleType.AUTHOR)
-      .map((role) => role.address),
-    []
-  )
+  const editingRoles = [
+    ...removeRoles.map((role) => role.type),
+    params.addRoles.map((role) => role.type),
+  ].filter((v, i, addresses) => addresses.indexOf(v) === i) // unique role types
+
+  let authorizedAddresses
+  // can only edit both clients and contributors if user is author
+  if (
+    editingRoles.includes(ProposalRoleType.CLIENT) &&
+    editingRoles.includes(ProposalRoleType.CONTRIBUTOR)
+  ) {
+    authorizedAddresses = existingProposal.roles
+      .filter((role) => role.type === ProposalRoleType.AUTHOR)
+      .map((role) => role.address)
+  } else {
+    authorizedAddresses = existingProposal.roles
+      .filter((role) => editingRoles.includes(role.type) || role.type === ProposalRoleType.AUTHOR)
+      .map((role) => role.address)
+  }
+
+  ctx.session.$authorize(authorizedAddresses, [])
 
   const res = await db.$transaction([
-    ...params.addAddresses.map((address) =>
+    ...params.addRoles.map((role) =>
       db.proposalRole.create({
         data: {
           proposalId: params.proposalId,
-          type: params.roleType,
-          address,
+          type: role.type,
+          address: role.address,
         },
       })
     ),
@@ -164,24 +190,26 @@ export default async function updateProposalContributors(
           proposalSignatureMessage: message,
           proposalHash: proposalHash,
           changes: {
-            participants: [
-              ...params.addAddresses.map((address) => {
-                return {
-                  address,
-                  roleType: params.roleType,
-                  changeType: ChangeParticipantType.ADDED,
-                }
-              }),
-              ...existingProposal.roles
-                .filter((role) => params.removeRoleIds.includes(role.id))
-                .map((role) => {
+            participants: {
+              diff: [
+                ...params.addRoles.map((role) => {
                   return {
                     address: role.address,
-                    roleType: params.roleType,
-                    changeType: ChangeParticipantType.REMOVED,
+                    roleType: role.type,
+                    changeType: ChangeParticipantType.ADDED,
                   }
                 }),
-            ],
+                ...existingProposal.roles
+                  .filter((role) => params.removeRoleIds.includes(role.id))
+                  .map((role) => {
+                    return {
+                      address: role.address,
+                      roleType: role.type,
+                      changeType: ChangeParticipantType.REMOVED,
+                    }
+                  }),
+              ],
+            },
           },
         },
       },

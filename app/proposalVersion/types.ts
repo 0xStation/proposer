@@ -13,10 +13,12 @@ export type ProposalVersionMetadata = {
   proposalHash: string
   changes?: {
     participants?: {
-      address: string
-      roleType: ProposalRoleType
-      changeType: ChangeParticipantType
-    }[]
+      diff: {
+        address: string
+        roleType: ProposalRoleType
+        changeType: ChangeParticipantType
+      }[]
+    }
   }
 }
 

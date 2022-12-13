@@ -10,24 +10,29 @@ import { ChangeParticipantType } from "app/proposalVersion/types"
 import { requiredField } from "app/utils/validators"
 import { useState } from "react"
 import { Field, Form } from "react-final-form"
-import updateProposalContributors from "../mutations/updateProposalContributors"
+import updateRoles from "../mutations/updateRoles"
 import getRolesByProposalId from "../queries/getRolesByProposalId"
 
-export const UpdateContributorsModal = ({
+export const UpdateRolesModal = ({
   proposal,
-  roleType,
   closeEditView,
   isOpen,
   setIsOpen,
   selectNewPaymentRecipient,
   selectNewPaymentSender,
-  accounts,
-  addedAccounts,
-  removedRoles,
+  contributorAccounts,
+  contributorAddedRoles,
+  contributorRemovedRoles,
+  clientAccounts,
+  clientAddedRoles,
+  clientRemovedRoles,
+  authorAccounts,
+  authorAddedRoles,
+  authorRemovedRoles,
 }) => {
   const setToastState = useStore((state) => state.setToastState)
   const [isUpdatingRoles, setIsUpdatingRoles] = useState<boolean>(false)
-  const [updateProposalContributorsMutation] = useMutation(updateProposalContributors, {
+  const [updateRolesMutation] = useMutation(updateRoles, {
     onSuccess: (roles) => {
       setToastState({
         isToastShowing: true,
@@ -51,18 +56,21 @@ export const UpdateContributorsModal = ({
     },
   })
 
+  const removedRoles = [...authorRemovedRoles, ...contributorRemovedRoles, ...clientRemovedRoles]
+  const addedRoles = [...authorAddedRoles, ...contributorAddedRoles, ...clientAddedRoles]
+
   const participantsDiff = [
     ...removedRoles.map((role) => {
       return {
         address: role.address,
-        roleType,
+        roleType: role.type,
         changeType: ChangeParticipantType.REMOVED,
       }
     }),
-    ...addedAccounts.map((account) => {
+    ...addedRoles.map((role) => {
       return {
-        address: account.address,
-        roleType,
+        address: role.address,
+        roleType: role.type,
         changeType: ChangeParticipantType.ADDED,
       }
     }),
@@ -81,11 +89,15 @@ export const UpdateContributorsModal = ({
           onSubmit={async (values) => {
             setIsUpdatingRoles(true)
             try {
-              await updateProposalContributorsMutation({
+              await updateRolesMutation({
                 proposalId: proposal?.id,
-                roleType,
-                addAddresses: addedAccounts.map((account) => account.address),
                 removeRoleIds: removedRoles.map((role) => role.id),
+                addRoles: addedRoles.map((role) => {
+                  return {
+                    type: role.type,
+                    address: role.address,
+                  }
+                }),
                 newPaymentRecipient: !!values.newPaymentRecipient
                   ? values.newPaymentRecipient
                   : undefined,
@@ -111,7 +123,7 @@ export const UpdateContributorsModal = ({
                           <div className="custom-select-wrapper">
                             <select {...input} className="w-full bg-wet-concrete rounded p-2 mt-1">
                               <option value="">Select one</option>
-                              {accounts.map((account, idx) => (
+                              {contributorAccounts.map((account, idx) => (
                                 <option value={account.address} key={idx}>
                                   {account.address}
                                 </option>
@@ -134,7 +146,7 @@ export const UpdateContributorsModal = ({
                           <div className="custom-select-wrapper">
                             <select {...input} className="w-full bg-wet-concrete rounded p-2 mt-1">
                               <option value="">Select one</option>
-                              {accounts.map((account, idx) => (
+                              {clientAccounts.map((account, idx) => (
                                 <option value={account.address} key={idx}>
                                   {account.address}
                                 </option>

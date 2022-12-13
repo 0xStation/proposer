@@ -9,6 +9,7 @@ datasource db {
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["interactiveTransactions", "filterJson"]
+  binaryTargets   = ["native", "darwin-arm64"]
 }
 
 // ACCOUNT SYSTEM

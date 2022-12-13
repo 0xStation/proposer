@@ -41,7 +41,7 @@ export const ProposalVersionBox = ({
         </div>
       )}
       {/* PARTICIPANTS */}
-      <ParticipantDiff participants={proposalVersion?.data?.changes?.participants} />
+      <ParticipantDiff participants={proposalVersion?.data?.changes?.participants?.diff} />
     </ModuleBox>
   )
 }
