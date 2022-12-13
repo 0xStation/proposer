@@ -81,7 +81,6 @@ export const ApproveProposalModal = ({
         // invalidate proposal query to get ipfs hash post-approval
         // since an ipfs has is created on proposal approval
         invalidateQuery(getProposalById)
-        router.replace(router.asPath)
         setIsOpen(false)
         setToastState({
           isToastShowing: true,

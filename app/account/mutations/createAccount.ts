@@ -48,8 +48,12 @@ export default async function createAccount(input: z.infer<typeof CreateAccount>
     },
   }
 
-  const account = await db.account.create({
-    data: payload,
+  const account = await db.account.upsert({
+    where: {
+      address: params.address,
+    },
+    create: payload,
+    update: {},
   })
 
   if (account && account.id && params.createSession) {

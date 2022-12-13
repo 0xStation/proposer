@@ -22,7 +22,9 @@ const ProposalStepper = () => {
   )
 
   const { roles: userRoles } = useGetUsersRoles(proposalId)
-  const userRoleTypes = userRoles.map((role) => role.type)
+  const userRoleTypes = userRoles
+    .map((role) => role.type)
+    .filter((v, i, types) => types.indexOf(v) === i)
 
   return (
     <StepperRenderer

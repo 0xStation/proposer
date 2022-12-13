@@ -10,6 +10,7 @@ module.exports = {
       "magic-mint": "#63EBAF",
       "electric-violet": "#AD72FF",
       concrete: "#646464",
+      "concrete-115": "#858585",
       "wet-concrete": "#2E2E2E",
       "wet-concrete-50": "#121212",
       charcoal: "#1A1A1A",

@@ -32,7 +32,7 @@ const GnosisSafeSignersModal = ({ isOpen, setIsOpen, role }) => {
           <span className="col-span-2 text-xs text-light-concrete uppercase font-bold">Signer</span>
           <span className="text-xs text-light-concrete uppercase font-bold">Status</span>
           <span className="text-xs text-light-concrete uppercase font-bold">Date</span>
-          {role.account.data.signers.map((signer, idx) => {
+          {role?.account?.data?.signers?.map((signer, idx) => {
             const hasSigned = role.signatures.some((signature) => signature.address === signer)
             const signedAt = formatDate(
               role.signatures.filter((signature) => signature.address === signer)[0]?.timestamp

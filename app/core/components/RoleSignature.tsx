@@ -8,6 +8,7 @@ import GnosisSafeSignersModal from "app/core/components/GnosisSafeSignersModal"
 import truncateString from "app/core/utils/truncateString"
 import {
   AddressType,
+  ProposalRoleApprovalStatus,
   ProposalRoleType,
   ProposalSignatureType,
   ProposalStatus,
@@ -50,37 +51,33 @@ const SafeRole = ({ role, proposal }) => {
           <div className="flex flex-col w-full">
             <div className="flex flex-row w-full items-center justify-between">
               <AccountMediaObject account={role?.account} showActionIcons={true} />
-              <div className="flex flex-col items-end space-y-1">
+              <div className="flex flex-row space-x-4 items-center justify-end">
+                {role?.account?.addressType === AddressType.SAFE &&
+                  role.approvalStatus !== ProposalRoleApprovalStatus.APPROVED && (
+                    <ProgressCircleAndNumber
+                      numerator={role.signatures.length}
+                      denominator={role.account.data?.quorum}
+                    />
+                  )}
                 {showSignButton ? (
                   <span
-                    className="text-electric-violet cursor-pointer"
+                    className="cursor-pointer text-electric-violet font-bold"
                     onClick={() => toggleProposalApprovalModalOpen(true)}
                   >
                     Approve
                   </span>
-                ) : showStatus ? (
+                ) : (
                   <div className="flex flex-row items-center space-x-1">
                     <span
                       className={`h-2 w-2 rounded-full ${
-                        PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role?.approvalStatus]?.color
+                        PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role.approvalStatus]?.color
                       }`}
                     />
-
                     <div className="font-bold text-xs uppercase tracking-wider">
-                      {PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role?.approvalStatus]?.copy}
+                      {PROPOSAL_ROLE_APPROVAL_STATUS_MAP[role.approvalStatus]?.copy}
                     </div>
                   </div>
-                ) : (
-                  <></>
                 )}
-                <ProgressCircleAndNumber
-                  numerator={
-                    totalSafeSignersSigned > role.account.data?.quorum
-                      ? role.account.data?.quorum
-                      : totalSafeSignersSigned
-                  }
-                  denominator={role.account.data?.quorum}
-                />
               </div>
             </div>
             <p

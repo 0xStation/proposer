@@ -22,6 +22,7 @@ import SendProposalModal from "../SendProposalModal"
 import getRolesByProposalId from "app/proposalRole/queries/getRolesByProposalId"
 import getRfpByProposalId from "app/rfp/queries/getRfpByProposalId"
 import { ProposalEllipsisButton } from "../ProposalEllipsisButton"
+import { useRoles } from "app/proposalRole/hooks/useRoles"
 
 const findProposalRoleByRoleType = (roles, proposalType) =>
   roles?.find((role) => role.type === proposalType)
@@ -57,17 +58,7 @@ export const ProposalViewHeaderNavigation = () => {
       staleTime: 60 * 1000, // one minute
     }
   )
-  const [roles] = useQuery(
-    getRolesByProposalId,
-    { proposalId: proposalId },
-    {
-      suspense: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      enabled: Boolean(proposalId),
-      staleTime: 60 * 1000, // one minute
-    }
-  )
+  const { roles } = useRoles(proposalId)
   const [rfp] = useQuery(
     getRfpByProposalId,
     { proposalId: proposalId },
