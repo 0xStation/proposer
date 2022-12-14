@@ -157,7 +157,11 @@ export const EditPaymentView = ({ proposal, className, setIsEdit }) => {
                   >
                     Cancel
                   </Button>
-                  <Button type={ButtonType.Primary} onClick={handleSubmit}>
+                  <Button
+                    isDisabled={!formState.dirty || isSubmitting}
+                    type={ButtonType.Primary}
+                    onClick={handleSubmit}
+                  >
                     Save
                   </Button>
                 </div>

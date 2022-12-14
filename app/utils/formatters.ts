@@ -1,7 +1,30 @@
+// remove scientific notation + trailing 0's from string
+// https://stackoverflow.com/questions/16139452/how-to-convert-big-negative-scientific-notation-number-into-decimal-notation-str
+const noExponents = (str) => {
+  let data = String(str).split(/[eE]/)
+  if (data.length == 1) return data[0]
+
+  let z = "",
+    sign = str < 0 ? "-" : "",
+    newStr = data?.[0]?.replace(".", ""),
+    mag = Number(data[1]) + 1
+
+  if (mag < 0) {
+    z = sign + "0."
+    while (mag++) z += "0"
+    return z + newStr?.replace(/^\-/, "")
+  }
+  mag -= newStr?.length!
+  while (mag--) z += "0"
+  return newStr + z
+}
+
 // only register typing 0-9 and one decimal
 export const formatTokenAmount = (amount: string): string => {
-  // strip commas for case where input is pasted from another page
-  const commaStripped = (amount || "").replaceAll(",", "")
+  const amountToFixed = noExponents(amount)
+
+  // strip commas for case where input is paseFloat(amount).sted from another page
+  const commaStripped = (amountToFixed || "").replaceAll(",", "")
   // pad zero infront of decimal
   const zeroPadded = commaStripped.substring(0, 1) === "." ? "0" + commaStripped : commaStripped
   // supports one or no period, plus/minus sign not supported, forked from: https://regexland.com/regex-decimal-numbers/
