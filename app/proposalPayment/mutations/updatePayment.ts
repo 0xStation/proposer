@@ -54,8 +54,12 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
   })
 
   try {
+    // There are three high-level checks that make assumptions about the number of milestones.
+    // A proposal can have at most two milestones, and each milestone can have at max one payment.
+    // If a proposal has two milestones, then the payment terms are "advanced payment", else it's
+    // "pay on completion" or "pay on approval".
     await db.$transaction(async () => {
-      // if neither are advancedPayment assume there's one milestone
+      // if neither existing or new payment terms are advancedPayment assume there's one milestone
       if (
         (existingProposal.data as ProposalMetadata).paymentTerms !== PaymentTerm.ADVANCE_PAYMENT &&
         params.paymentTerms !== PaymentTerm.ADVANCE_PAYMENT
@@ -84,7 +88,7 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
           },
         })
       } else if (
-        // assume we update 2 existing milestones & payments
+        // if new terms are advanced payment, assume we update 2 existing milestones & payments
         // or update 1 milestone and payment and create a new milestone/payment
         params.paymentTerms === PaymentTerm.ADVANCE_PAYMENT &&
         params.advancePaymentPercentage
@@ -123,7 +127,7 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
         })
         const updatedMilestones = await Promise.all(upsertMilestones)
         if (milestones.length < 2) {
-          // update the first milestone
+          // update the first milestone's payment
           await db.proposalPayment.update({
             where: {
               id: milestones?.[0]?.payments?.[0]?.id,
@@ -139,7 +143,7 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
               },
             },
           })
-          // create the second milestone
+          // create the second payment and attach it to the new milestone's id
           ;(await db.proposalPayment.create({
             data: {
               proposalId: existingProposal?.id,
@@ -185,12 +189,13 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
           })
         }
       } else if (
+        // existing proposal has two milestones/payments and we need to remove one milestone/payment
         params.paymentTerms !== PaymentTerm.ADVANCE_PAYMENT &&
         (existingProposal.data as ProposalMetadata).paymentTerms === PaymentTerm.ADVANCE_PAYMENT
       ) {
         const paymentToDeleteId = milestones?.[1]?.payments?.[0]?.id
         const milestoneToDeleteId = milestones?.[1]?.id
-        // need to update and delete milestone and payment for the existing terms
+
         await db.proposalMilestone.update({
           where: {
             id: milestones?.[0]?.id as string,
@@ -228,6 +233,7 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
         })
       }
 
+      // update proposal version
       const updatedProposalVersion = existingProposal?.version + 1
       const updatedProposal = await db.proposal.update({
         where: {
@@ -295,6 +301,8 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
         },
       })
 
+      // reset proposal signature status since we're editing the proposal
+      // and updating the payment
       await db.proposalRole.updateMany({
         where: {
           proposalId: updatedProposal?.id as string,
