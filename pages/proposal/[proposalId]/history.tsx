@@ -5,7 +5,7 @@ import Layout from "app/core/layouts/Layout"
 import getProposalById from "app/proposal/queries/getProposalById"
 import { ProposalNestedLayout } from "app/core/layouts/ProposalNestedLayout"
 import getProposalVersionsByProposalId from "app/proposalVersion/queries/getProposalVersionsByProposalId"
-import ProposalVersionBox from "app/core/components/ProposalVersionBox"
+import ProposalVersionBox from "app/proposalVersion/components/ProposalVersionBox"
 
 export const getServerSideProps = gSSP(async ({ params = {} }) => {
   const { proposalId } = params

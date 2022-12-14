@@ -1,12 +1,5 @@
 import { EditIcon } from "./EditIcon"
-
-const ToolTip = ({ children }) => {
-  return (
-    <div className="hidden bg-wet-concrete invisible group-hover:visible md:inline rounded p-2 mr-1.5">
-      {children}
-    </div>
-  )
-}
+import ToolTip from "./Tooltip"
 
 export const EditIconAndTooltip = ({
   editCopy,
