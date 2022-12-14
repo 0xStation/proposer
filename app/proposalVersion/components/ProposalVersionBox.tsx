@@ -84,7 +84,7 @@ export const ProposalVersionBox = ({
                   <PaymentChangeBox
                     className="bg-magic-mint bg-opacity-20 "
                     before={false}
-                    paymentChangeDetails={paymentChange?.before}
+                    paymentChangeDetails={paymentChange?.after}
                   />
                 </div>
               </div>
