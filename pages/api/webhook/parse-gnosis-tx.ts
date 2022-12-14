@@ -35,7 +35,7 @@ const fetchGnosisNonce = async (chainId: string, targetAddress: string) => {
 }
 
 const handleChangedThreshold = async (account) => {
-  const threshold = await fetchGnosisThreshold(String(account.data.chainId || 1), account.address)
+  // const threshold = await fetchGnosisThreshold(String(account.data.chainId || 1), account.address)
   const allAccountRoles = await db.proposalRole.findMany({
     where: {
       address: account.address,
@@ -49,17 +49,18 @@ const handleChangedThreshold = async (account) => {
     },
   })
 
-  for (let index in allAccountRoles) {
-    const role = allAccountRoles[index]
-    if (!role) {
-      continue
-    }
+  let threshold = 1
 
+  for (let role of allAccountRoles) {
     let signatures = role?.signatures
 
     // with the change to the threshold, we should now consider the proposal approved
     if (signatures && signatures.length >= threshold) {
-      await retroactivelyApproveProposal({ proposalId: role?.proposal.id, roleId: role.id })
+      await retroactivelyApproveProposal({
+        proposalId: role?.proposal.id,
+        preApprovalQuorum: signatures.length,
+        roleId: role.id,
+      })
     }
   }
 }

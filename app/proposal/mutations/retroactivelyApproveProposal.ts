@@ -10,6 +10,7 @@ import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 
 const RetroactivelyApproveProposal = z.object({
   proposalId: z.string(),
+  preApprovalQuorum: z.number(),
   roleId: z.string(),
 })
 
@@ -51,24 +52,6 @@ export default async function retroactivelyApproveProposal(
   }
 
   try {
-    // if the proposal moves into approved, we need to take a snapshot of the current quorums on any safe roles
-    // to make sure we know what the quorum was at the time of approval in case in changes
-
-    let accountQuorumSnapshots = {}
-    let gnosisRequests: any[] = []
-    proposal.roles.forEach((role) => {
-      if (role.account?.addressType === AddressType.SAFE && role.account?.data.chainId)
-        gnosisRequests.push(
-          getGnosisSafeDetails(role.account?.data.chainId as number, role.address)
-        )
-    })
-    // batch await gnosis requests and add safe details to each account metadata accumulator
-    const gnosisResults = await Promise.all(gnosisRequests)
-    gnosisResults.forEach((results) => {
-      if (!results) return
-      accountQuorumSnapshots[results.address] = results.quorum
-    })
-
     await db.$transaction([
       ...proposal.roles
         .filter((role) => {
@@ -81,7 +64,7 @@ export default async function retroactivelyApproveProposal(
             },
             data: {
               data: {
-                preApprovalQuorum: accountQuorumSnapshots[role.account.address],
+                preApprovalQuorum: params.preApprovalQuorum,
               },
             },
           })
