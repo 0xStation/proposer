@@ -18,6 +18,7 @@ const UpdatePayment = z.object({
     PaymentTerm.AFTER_COMPLETION,
     PaymentTerm.ADVANCE_PAYMENT,
   ]),
+  recipientAddress: z.string(),
   advancePaymentPercentage: z.string().optional(),
   proposalVersionAnnotation: z.string().optional(),
 })
@@ -74,6 +75,8 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
           where: { id: milestones?.[0]?.payments?.[0]?.id as string },
           data: {
             amount: parseFloat(params?.amount),
+            recipientAddress:
+              params.recipientAddress || milestones?.[0]?.payments?.[0]?.recipientAddress,
             data: {
               token: params.token as Token,
               ...((milestones?.[0]?.payments?.[0] as ProposalPayment)?.data as {}),
@@ -127,6 +130,9 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
             },
             data: {
               amount: advancedPayment,
+              recipientAddress:
+                params.recipientAddress ||
+                (milestones?.[0]?.payments?.[0]?.recipientAddress as string),
               data: {
                 token: params.token as Token,
                 history: [],
@@ -139,7 +145,9 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
               proposalId: existingProposal?.id,
               milestoneId: updatedMilestones[1]?.id as string,
               senderAddress: milestones?.[0]?.payments?.[0]?.senderAddress as string,
-              recipientAddress: milestones?.[0]?.payments?.[0]?.recipientAddress as string,
+              recipientAddress:
+                params.recipientAddress ||
+                (milestones?.[0]?.payments?.[0]?.recipientAddress as string),
               amount: completionPayment,
               data: {
                 token: params.token as Token,
@@ -200,6 +208,9 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
           },
           data: {
             amount: parseFloat(params.amount),
+            recipientAddress:
+              params.recipientAddress ||
+              (milestones?.[0]?.payments?.[0]?.recipientAddress as string),
             data: {
               token: params.token as Token,
               history: [],
@@ -258,7 +269,7 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
               payments: [
                 {
                   before: {
-                    recipientAddress: milestones?.[0]?.payments?.[0]?.recipientAddress,
+                    recipientAddress: milestones?.[0]?.payments?.[0]?.recipientAddress as string,
                     senderAddress: milestones?.[0]?.payments?.[0]?.senderAddress,
                     amount: (existingProposal?.data as ProposalMetadata)?.totalPayments?.[0]
                       ?.amount,
@@ -268,7 +279,9 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
                       .advancePaymentPercentage,
                   },
                   after: {
-                    recipientAddress: milestones?.[0]?.payments?.[0]?.recipientAddress,
+                    recipientAddress:
+                      params.recipientAddress ||
+                      (milestones?.[0]?.payments?.[0]?.recipientAddress as string),
                     senderAddress: milestones?.[0]?.payments?.[0]?.senderAddress,
                     amount: params.amount,
                     token: params.token,

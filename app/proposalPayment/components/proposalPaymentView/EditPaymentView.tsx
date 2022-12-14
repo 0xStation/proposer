@@ -6,6 +6,7 @@ import { PaymentTerm } from "app/proposalPayment/types"
 import { formatPercentValue, formatTokenAmount } from "app/utils/formatters"
 import {
   composeValidators,
+  isEnsOrAddress,
   isPositiveAmount,
   isValidAdvancedPaymentPercentage,
   isValidTokenAmount,
@@ -90,6 +91,7 @@ export const EditPaymentView = ({ proposal, className, setIsEdit }) => {
             ? values.advancePaymentPercentage
             : "",
         proposalVersionAnnotation: annotationValue,
+        recipientAddress: values.recipientAddress,
       })
       setIsSubmitting(false)
       setToastState({
@@ -114,6 +116,7 @@ export const EditPaymentView = ({ proposal, className, setIsEdit }) => {
     }
   }
 
+  console.log("proposal", proposal)
   return (
     <ModuleBox isLoading={!proposal} className="mt-9">
       <Form
@@ -123,6 +126,7 @@ export const EditPaymentView = ({ proposal, className, setIsEdit }) => {
           paymentAmount: proposal?.data?.totalPayments?.[0]?.amount?.toString(), // todo: fix token amount
           paymentTerms: proposal?.data?.paymentTerms,
           advancePaymentPercentage: proposal?.data?.advancePaymentPercentage?.toString(),
+          recipientAddress: proposal?.payments?.[0]?.recipientAddress,
         }}
         onSubmit={async (values) => {
           setIsAnnotateModalOpen(true)
@@ -168,7 +172,7 @@ export const EditPaymentView = ({ proposal, className, setIsEdit }) => {
               </div>
               {/* TOKEN */}
               <div className="flex flex-col mt-6">
-                <label className="font-bold block">Network*</label>
+                <label className="font-bold block">Network</label>
                 <span className="text-xs text-concrete block">
                   What network will the funds be deployed on?
                 </span>
@@ -215,7 +219,7 @@ export const EditPaymentView = ({ proposal, className, setIsEdit }) => {
 
               {/* TOKEN */}
               <div className="flex flex-col mt-6">
-                <label className="font-bold block">Payment*</label>
+                <label className="font-bold block">Payment</label>
                 <span className="text-xs text-concrete block">
                   Payment will occur on your currently selected network{" "}
                   {SUPPORTED_CHAINS.find((chain) => chain?.id === selectedChainId)?.name}
@@ -318,7 +322,7 @@ export const EditPaymentView = ({ proposal, className, setIsEdit }) => {
                 </button>
               </div>
               {/* PAYMENT TERMS */}
-              <label className="font-bold block mt-6">Payment terms*</label>
+              <label className="font-bold block mt-6">Payment terms</label>
               <span className="text-xs text-concrete block">
                 When is the payment expected to be sent to contributors?
               </span>
@@ -357,7 +361,7 @@ export const EditPaymentView = ({ proposal, className, setIsEdit }) => {
               {selectedPaymentTerms === PaymentTerm.ADVANCE_PAYMENT && (
                 <>
                   {/* ADVANCE PAYMENT */}
-                  <label className="font-bold block mt-6">Advance payment*</label>
+                  <label className="font-bold block mt-6">Advance payment</label>
                   <span className="text-xs text-concrete block">
                     How much of the payment amount should the contributors expect to receive at
                     proposal approval to kickstart their project?
@@ -387,6 +391,33 @@ export const EditPaymentView = ({ proposal, className, setIsEdit }) => {
                   </Field>
                 </>
               )}
+              <div className="hidden">
+                <label className="font-bold block mt-6">Fund recipient</label>
+                <span className="text-xs text-concrete block">
+                  Who will be receiving the funds?
+                </span>
+                <Field
+                  name="recipientAddress"
+                  validate={composeValidators(requiredField, isEnsOrAddress)}
+                >
+                  {({ meta, input }) => {
+                    return (
+                      <>
+                        <input
+                          {...input}
+                          type="text"
+                          required
+                          placeholder="Enter ENS name or wallet address"
+                          className="bg-wet-concrete rounded-md w-full p-2 mt-1"
+                        />
+                        {meta.touched && meta.error && (
+                          <span className="text-torch-red text-xs">{meta.error}</span>
+                        )}
+                      </>
+                    )
+                  }}
+                </Field>
+              </div>
             </form>
           )
         }}
