@@ -10,7 +10,7 @@ import CopyToClipboard from "app/core/components/CopyToClipboard"
 const PaymentChangeBox = ({
   before = true,
   paymentChangeDetails,
-  className = "bg-wet-concrete mr-2",
+  className,
 }: {
   before?: boolean
   paymentChangeDetails: any
@@ -20,8 +20,16 @@ const PaymentChangeBox = ({
   const { text: displayAddress } = useDisplayAddress(paymentChangeDetails?.recipientAddress)
 
   return (
-    <div className={`${className} mr-2 bg-wet-concrete p-2 rounded w-1/2`}>
-      <label className="uppercase text-sm font-bold text-concrete tracking-wider">
+    <div
+      className={`${className} ${
+        before ? "bg-wet-concrete" : "bg-magic-mint bg-opacity-20"
+      }  p-2 rounded w-1/2`}
+    >
+      <label
+        className={`uppercase text-sm font-bold ${
+          before ? "text-concrete" : "text-magic-mint"
+        } tracking-wider`}
+      >
         {paymentChangeCopy}
       </label>
       <p className="mt-2">{networks[paymentChangeDetails?.token?.chainId].name}</p>
@@ -80,12 +88,12 @@ export const ProposalVersionBox = ({
                   Payments
                 </label>
                 <div className="mt-4 flex flex-row w-full">
-                  <PaymentChangeBox before={true} paymentChangeDetails={paymentChange?.before} />
                   <PaymentChangeBox
-                    className="bg-magic-mint bg-opacity-20 "
-                    before={false}
-                    paymentChangeDetails={paymentChange?.after}
+                    before={true}
+                    paymentChangeDetails={paymentChange?.before}
+                    className="mr-2"
                   />
+                  <PaymentChangeBox before={false} paymentChangeDetails={paymentChange?.after} />
                 </div>
               </div>
             )
