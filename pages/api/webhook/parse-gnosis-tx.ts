@@ -35,7 +35,7 @@ const fetchGnosisNonce = async (chainId: string, targetAddress: string) => {
 }
 
 const handleChangedThreshold = async (account) => {
-  // const threshold = await fetchGnosisThreshold(String(account.data.chainId || 1), account.address)
+  const threshold = await fetchGnosisThreshold(String(account.data.chainId || 1), account.address)
   const allAccountRoles = await db.proposalRole.findMany({
     where: {
       address: account.address,
@@ -48,8 +48,6 @@ const handleChangedThreshold = async (account) => {
       signatures: true,
     },
   })
-
-  let threshold = 1
 
   for (let role of allAccountRoles) {
     let signatures = role?.signatures
