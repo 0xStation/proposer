@@ -2,7 +2,7 @@ import { useSession } from "@blitzjs/auth"
 import { useEffect, useState } from "react"
 import ImportTokenModal from "app/core/components/ImportTokenModal"
 import useStore from "app/core/hooks/useStore"
-import { ProposalFormStep, PAYMENT_TERM_MAP } from "app/core/utils/constants"
+import { ProposalFormStep, PAYMENT_TERM_MAP, SUPPORTED_CHAINS } from "app/core/utils/constants"
 import { Field } from "react-final-form"
 import {
   composeValidators,
@@ -22,7 +22,8 @@ export function classNames(...classes) {
 }
 
 export const FundingFormStepReward = ({
-  chainId,
+  selectedChainId,
+  setSelectedChainId,
   selectedToken,
   setSelectedToken,
   selectedPaymentTerms,
@@ -52,10 +53,54 @@ export const FundingFormStepReward = ({
       <ImportTokenModal
         isOpen={isImportTokenModalOpen}
         setIsOpen={setIsImportTokenModalOpen}
-        chainId={chainId?.toString()}
+        chainId={selectedChainId?.toString()}
         // refetches the tokens in the new proposal form token dropdown
-        callback={() => refetchTokens(true)}
+        callback={() => refetchTokens()}
       />
+      <div className="flex flex-col mt-6">
+        <label className="font-bold block">Network</label>
+        <span className="text-xs text-concrete block">
+          What network will the funds be deployed on?
+        </span>
+      </div>
+      <Field name="network" validate={requiredField}>
+        {({ input, meta }) => {
+          return (
+            <>
+              <div className="custom-select-wrapper">
+                <select
+                  // if network is selected make the token address field required.
+                  required
+                  {...input}
+                  className="w-full bg-wet-concrete rounded p-2 mt-1"
+                  onChange={(e) => {
+                    const selectedChain = SUPPORTED_CHAINS.find(
+                      (chain) => chain?.id?.toString() === e.target.value
+                    )
+                    setSelectedChainId(selectedChain?.id as number)
+                    // custom values can be compatible with react-final-form by calling
+                    // the props.input.onChange callback
+                    // https://final-form.org/docs/react-final-form/api/Field
+                    input.onChange(selectedChain?.id)
+                  }}
+                >
+                  <option value="">Choose option</option>
+                  {SUPPORTED_CHAINS?.map((chain) => {
+                    return (
+                      <option key={chain?.id} value={chain?.id}>
+                        {chain?.name}
+                      </option>
+                    )
+                  })}
+                </select>
+              </div>
+              {meta.touched && meta.error && (
+                <span className="text-torch-red text-xs">{meta.error}</span>
+              )}
+            </>
+          )
+        }}
+      </Field>
 
       {/* TOKEN */}
       <div className="flex flex-col mt-6">
@@ -105,7 +150,6 @@ export const FundingFormStepReward = ({
       </Field>
       <div className="flex flex-row justify-between">
         <span className="text-xs text-concrete block">
-          {" "}
           Don&apos;t see your token? Import an ERC-20 with its address.
         </span>
         <button

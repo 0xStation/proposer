@@ -52,13 +52,13 @@ export const ProposalFormFunding = ({
   const [selectedToken, setSelectedToken] = useState<any>()
   // payment terms in parent form state because it gets reset when flipping through steps if put in the rewards form
   const [selectedPaymentTerms, setSelectedPaymentTerms] = useState<string>("")
+  const { chain } = useNetwork()
+  const [selectedChainId, setSelectedChainId] = useState<number>(chain?.id || 1)
   const [createdProposal, setCreatedProposal] = useState<Proposal | null>(null)
   const session = useSession({ suspense: false })
   const activeUser = useStore((state) => state.activeUser)
   const router = useRouter()
   const { resolveEnsAddress } = useResolveEnsAddress()
-
-  const { chain } = useNetwork()
 
   useEffect(() => {
     if (!walletModalOpen && isLoading) {
@@ -111,25 +111,27 @@ export const ProposalFormFunding = ({
   const [savedUserTokens, { refetch: refetchTokens }] = useQuery(
     getTokensByAccount,
     {
-      chainId: chain?.id || 1,
+      chainId: selectedChainId,
       userId: session?.userId as number,
     },
-    { suspense: false, enabled: Boolean(chain && session?.userId) }
+    { suspense: false, enabled: Boolean(selectedChainId && session?.userId) }
   )
 
   useEffect(() => {
-    if (chain?.id) {
-      const networkTokens = getNetworkTokens(chain?.id || 1)
-      // sets options for reward token dropdown. includes default tokens and
-      // tokens that the user has imported to their account
-      setTokenOptions([
-        ...networkTokens,
-        ...(savedUserTokens
-          ?.filter((token) => token.chainId === chain?.id)
-          ?.filter((token) => token.type === TokenType.ERC20) || []),
-      ])
-    }
-  }, [chain?.id, savedUserTokens])
+    refetchTokens()
+  }, [selectedChainId])
+
+  useEffect(() => {
+    const networkTokens = getNetworkTokens(selectedChainId)
+    // sets options for reward token dropdown. includes default tokens and
+    // tokens that the user has imported to their account
+    setTokenOptions([
+      ...networkTokens,
+      ...(savedUserTokens
+        ?.filter((token) => token.chainId === chain?.id)
+        ?.filter((token) => token.type === TokenType.ERC20) || []),
+    ])
+  }, [savedUserTokens])
 
   return (
     <div className="max-w-[580px] h-full mx-auto">
@@ -280,7 +282,8 @@ export const ProposalFormFunding = ({
                     )}
                     {proposalStep === ProposalFormStep.PAYMENT && (
                       <FundingFormStepReward
-                        chainId={(chain?.id as number) || 1}
+                        selectedChainId={(chain?.id as number) || 1}
+                        setSelectedChainId={setSelectedChainId}
                         tokenOptions={tokenOptions}
                         refetchTokens={refetchTokens}
                         isImportTokenModalOpen={isImportTokenModalOpen}

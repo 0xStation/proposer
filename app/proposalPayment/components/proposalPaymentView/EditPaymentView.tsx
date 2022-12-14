@@ -116,7 +116,6 @@ export const EditPaymentView = ({ proposal, className, setIsEdit }) => {
     }
   }
 
-  console.log("proposal", proposal)
   return (
     <ModuleBox isLoading={!proposal} className="mt-9">
       <Form
@@ -170,7 +169,6 @@ export const EditPaymentView = ({ proposal, className, setIsEdit }) => {
                   </Button>
                 </div>
               </div>
-              {/* TOKEN */}
               <div className="flex flex-col mt-6">
                 <label className="font-bold block">Network</label>
                 <span className="text-xs text-concrete block">
@@ -217,7 +215,6 @@ export const EditPaymentView = ({ proposal, className, setIsEdit }) => {
                 }}
               </Field>
 
-              {/* TOKEN */}
               <div className="flex flex-col mt-6">
                 <label className="font-bold block">Payment</label>
                 <span className="text-xs text-concrete block">
