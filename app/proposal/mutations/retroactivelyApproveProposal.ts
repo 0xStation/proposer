@@ -2,95 +2,34 @@ import { invoke } from "@blitzjs/rpc"
 import * as z from "zod"
 import db from "db"
 import { ProposalStatus, ProposalRoleApprovalStatus } from "@prisma/client"
-import pinProposalSignature from "app/proposalSignature/mutations/pinProposalSignature"
 import pinProposal from "./pinProposal"
 import { sendProposalApprovedEmail } from "app/utils/email"
 import { getEmails } from "app/utils/privy"
 import { AddressType } from "@prisma/client"
 import { getGnosisSafeDetails } from "app/utils/getGnosisSafeDetails"
 
-const ApproveProposal = z.object({
+const RetroactivelyApproveProposal = z.object({
   proposalId: z.string(),
-  proposalVersion: z.number(),
-  signerAddress: z.string(),
-  message: z.any(),
-  signature: z.string(),
-  representingRoles: z
-    .object({
-      roleId: z.string(),
-      complete: z.boolean(),
-    })
-    .array(), // array of type role
+  preApprovalQuorum: z.number(),
+  roleId: z.string(),
 })
 
-export default async function approveProposal(input: z.infer<typeof ApproveProposal>) {
-  const params = ApproveProposal.parse(input)
-
-  if (params.representingRoles.length === 0) {
-    throw Error("missing representing roles ids")
-  }
-
-  let proposalSignature
-  try {
-    // create proposal signature connected to proposalRole
-    // update linked proposalRoles to be of status complete
-    // once we support multisigs, check if quorum is met first before updating
-    const [proposalSig] = await db.$transaction([
-      db.proposalSignature.create({
-        data: {
-          address: params.signerAddress,
-          proposalVersion: params.proposalVersion,
-          data: {
-            message: params.message,
-            signature: params.signature,
-            representingRoles: params.representingRoles,
-          },
-          proposal: {
-            connect: {
-              id: params.proposalId,
-            },
-          },
-          roles: {
-            connect: params.representingRoles.map((role) => {
-              return {
-                id: role.roleId,
-              }
-            }),
-          },
-        },
-      }),
-      // update role with complete status
-      // if signature is a multisig, we don't want to mark as complete unless it has met quorum
-      // so we filter for roles that are 'complete'.
-      // complete is a type passed from the front-end indiciating that it is ready to be pushed to status complete
-      ...params.representingRoles
-        .filter((role) => {
-          return role.complete
-        })
-        .map((role) => {
-          return db.proposalRole.update({
-            where: {
-              id: role.roleId,
-            },
-            data: {
-              approvalStatus: ProposalRoleApprovalStatus.APPROVED,
-            },
-          })
-        }),
-    ])
-    proposalSignature = proposalSig
-  } catch (err) {
-    throw Error(`Failed to create signature in approveProposal: ${err}`)
-  }
+export default async function retroactivelyApproveProposal(
+  input: z.infer<typeof RetroactivelyApproveProposal>
+) {
+  const params = RetroactivelyApproveProposal.parse(input)
 
   try {
-    await pinProposalSignature({
-      proposalSignatureId: proposalSignature?.id,
-      signature: params?.signature,
-      signatureMessage: params?.message,
+    await db.proposalRole.update({
+      where: {
+        id: params.roleId,
+      },
+      data: {
+        approvalStatus: ProposalRoleApprovalStatus.APPROVED,
+      },
     })
   } catch (err) {
-    throw Error(`Failed to pin proposal signature to ipfs in approveProposal: ${err}`)
+    throw Error(`Failed to update proposal role to approved: ${err}`)
   }
 
   let proposal
@@ -113,24 +52,6 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
   }
 
   try {
-    // if the proposal moves into approved, we need to take a snapshot of the current quorums on any safe roles
-    // to make sure we know what the quorum was at the time of approval in case in changes
-
-    let accountQuorumSnapshots = {}
-    let gnosisRequests: any[] = []
-    proposal.roles.forEach((role) => {
-      if (role.account?.addressType === AddressType.SAFE && role.account?.data.chainId)
-        gnosisRequests.push(
-          getGnosisSafeDetails(role.account?.data.chainId as number, role.address)
-        )
-    })
-    // batch await gnosis requests and add safe details to each account metadata accumulator
-    const gnosisResults = await Promise.all(gnosisRequests)
-    gnosisResults.forEach((results) => {
-      if (!results) return
-      accountQuorumSnapshots[results.address] = results.quorum
-    })
-
     await db.$transaction([
       ...proposal.roles
         .filter((role) => {
@@ -143,7 +64,7 @@ export default async function approveProposal(input: z.infer<typeof ApprovePropo
             },
             data: {
               data: {
-                preApprovalQuorum: accountQuorumSnapshots[role.account.address],
+                preApprovalQuorum: params.preApprovalQuorum,
               },
             },
           })
