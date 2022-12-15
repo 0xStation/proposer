@@ -165,13 +165,15 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
 
             await db.proposalPayment.upsert({
               where: {
-                id: milestones?.[idx]?.payments?.[idx]?.id,
+                id: milestones?.[idx]?.payments?.[0]?.id,
               },
               create: {
                 proposalId: existingProposal?.id,
                 milestoneId: milestone.id,
-                senderAddress: milestones?.[idx]?.payments?.[idx]?.senderAddress as string,
-                recipientAddress: milestones?.[idx]?.payments?.[idx]?.recipientAddress as string,
+                senderAddress: milestones?.[idx]?.payments?.[0]?.senderAddress as string,
+                recipientAddress:
+                  params.recipientAddress ||
+                  (milestones?.[idx]?.payments?.[0]?.recipientAddress as string),
                 amount: payment,
                 data: {
                   token: params.token,
