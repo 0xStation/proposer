@@ -160,20 +160,21 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
             },
           })) as ProposalPayment
         } else {
-          milestones.forEach(async (milestone, idx) => {
-            const payment = idx === 0 ? advancedPayment : completionPayment
+          for (let i = 0; i < milestones.length; i++) {
+            const milestone = milestones[i]
+            const payment = i === 0 ? advancedPayment : completionPayment
 
             await db.proposalPayment.upsert({
               where: {
-                id: milestones?.[idx]?.payments?.[0]?.id,
+                id: milestones?.[i]?.payments?.[0]?.id,
               },
               create: {
                 proposalId: existingProposal?.id,
-                milestoneId: milestone.id,
-                senderAddress: milestones?.[idx]?.payments?.[0]?.senderAddress as string,
+                milestoneId: milestone?.id as string,
+                senderAddress: milestones?.[i]?.payments?.[0]?.senderAddress as string,
                 recipientAddress:
                   params.recipientAddress ||
-                  (milestones?.[idx]?.payments?.[0]?.recipientAddress as string),
+                  (milestones?.[i]?.payments?.[0]?.recipientAddress as string),
                 amount: payment,
                 data: {
                   token: params.token,
@@ -188,7 +189,7 @@ export default async function updatePayment(input: z.infer<typeof UpdatePayment>
                 },
               },
             })
-          })
+          }
         }
       } else if (
         // existing proposal has two milestones/payments and we need to remove one milestone/payment
