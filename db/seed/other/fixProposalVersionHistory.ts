@@ -8,26 +8,19 @@ const seed = async () => {
       roles: true,
       payments: true,
       milestones: true,
+      versions: {
+        orderBy: {
+          version: "asc",
+        },
+      },
     },
   })
 
-  allProposals?.forEach(async (proposal) => {
-    // Get all of the proposalVersions for this proposal
-    const proposalVersions = await db.proposalVersion.findMany({
-      where: {
-        proposalId: proposal?.id,
-      },
-      orderBy: [
-        {
-          version: "asc",
-        },
-      ],
-    })
-
-    const updateVerionQueries = proposalVersions.map(async (proposalVersion, idx) => {
+  for (let proposal of allProposals) {
+    for (let proposalVersion of proposal.versions) {
       if (proposalVersion?.version === 1) {
         // the first version has the correct signature message already
-        return
+        continue
       }
 
       // the next signature has the current proposal's correct signature
@@ -67,14 +60,8 @@ const seed = async () => {
           },
         },
       })
-    }) as PrismaPromise<any>[]
-
-    try {
-      await db.$transaction(updateVerionQueries)
-    } catch (err) {
-      console.error("error!", err)
     }
-  })
+  }
 }
 
 export default seed
