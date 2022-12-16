@@ -7,11 +7,13 @@ export const AnnotateProposalVersionModal = ({
   setIsOpen,
   isSubmitting,
   handleSubmit,
+  title = "Submitting changes to the proposal",
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   isSubmitting: boolean
   handleSubmit: (annotationValues: any) => Promise<void>
+  title?: string
 }) => {
   return (
     <Modal
@@ -21,7 +23,7 @@ export const AnnotateProposalVersionModal = ({
       }}
     >
       <div className="pt-10 pb-6 px-4">
-        <h1 className="text-2xl font-bold">Submitting changes to the proposal</h1>
+        <h1 className="text-2xl font-bold">{title}</h1>
         <p className="text-base mt-6">
           Since you’ve already published this proposal, all other collaborators and signers will
           need to review the new version and re-sign the proposal. The original version will still

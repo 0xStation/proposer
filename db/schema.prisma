@@ -207,7 +207,7 @@ model ProposalPayment {
 
 
   proposal  Proposal          @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  milestone ProposalMilestone @relation(fields: [milestoneId], references: [id])
+  milestone ProposalMilestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
 }
 
 model ProposalVersion {

@@ -1,4 +1,4 @@
-import { PAYMENT_TERM_MAP } from "app/core/utils/constants"
+import { MILESTONE_COPY, PAYMENT_TERM_MAP } from "app/core/utils/constants"
 import { PaymentTerm } from "app/proposalPayment/types"
 
 export const generateMilestonePayments = (
@@ -26,13 +26,6 @@ export const generateMilestonePayments = (
     senderAddress,
     recipientAddress,
     token: { ...token, chainId },
-  }
-
-  // set up milestones and payments conditional on payment terms inputs
-  const MILESTONE_COPY = {
-    UPFRONT_PAYMENT: "Upfront payment",
-    ADVANCE_PAYMENT: "Advance payment",
-    COMPLETION_PAYMENT: "Completion payment",
   }
 
   if (paymentTerms === PaymentTerm.ADVANCE_PAYMENT) {

@@ -122,6 +122,7 @@ export default api(async function handler(req, res) {
       throw Error("No token found.")
     }
   } catch (e) {
+    console.error(e)
     res.status(404).json({ response: "failure", message: "No token found." })
     return
   }
