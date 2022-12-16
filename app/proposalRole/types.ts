@@ -4,6 +4,11 @@ import { ProposalSignature } from "app/proposalSignature/types"
 
 export type ProposalRole = PrismaProposalRole & {
   account?: Account
+  data?: ProposalRoleMetadata
+}
+
+type ProposalRoleMetadata = {
+  preApprovalQuorum?: number
 }
 
 export type ProposalRoleWithSignatures = ProposalRole & {

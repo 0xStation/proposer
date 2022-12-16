@@ -16,6 +16,16 @@ jest.mock("app/core/utils/constants", () => ({
     "0x442e715f626346e8c54381002da614f62bee8d27386535b2521ec8540898556e",
 }))
 
+jest.mock("app/utils/email", () => ({
+  sendProposalApprovedEmail: () => {},
+}))
+
+jest.mock("app/utils/privy", () => ({
+  getEmails: () => {},
+}))
+
+jest.mock("app/proposal/mutations/pinProposal", () => {})
+
 afterAll(async () => {
   const deleteAccounts = db.account.deleteMany()
   await db.$transaction([deleteAccounts])
@@ -282,8 +292,6 @@ test("Moralis webhook -- non station tx", async () => {
 // could happen if there is a bug in moralis or if many streams are set up for the same account
 // of course, many streams should not get set up, but it is a possible error case we should protect against
 test("Moralis webhook -- called twice", async () => {
-  // account with moralis stream already exists
-
   const proposal = await db.proposal.create({
     data: {
       version: 1,

@@ -137,6 +137,7 @@ model ProposalRole {
   address        String
   type           ProposalRoleType
   approvalStatus ProposalRoleApprovalStatus @default(PENDING)
+  data           Json?
 
   account    Account             @relation(fields: [address], references: [address], onDelete: Cascade)
   proposal   Proposal            @relation(fields: [proposalId], references: [id], onDelete: Cascade)

@@ -1,11 +1,27 @@
 import db from "db"
 import { api } from "app/blitz-server"
 import { NextApiRequest, NextApiResponse } from "next"
-import SaveTransactionHashToPayments from "app/proposal/mutations/saveTransactionToPayments"
-import { GNOSIS_EXECUTION_SUCCESS_EVENT_HASH } from "app/core/utils/constants"
+import saveTransactionHashToPayments from "app/proposal/mutations/saveTransactionToPayments"
+import retroactivelyApproveProposal from "app/proposal/mutations/retroactivelyApproveProposal"
+import {
+  GNOSIS_CHANGED_THRESHOLD_EVENT_HASH,
+  GNOSIS_EXECUTION_SUCCESS_EVENT_HASH,
+} from "app/core/utils/constants"
 import { multicall } from "app/utils/rpcMulticall"
 import { Account } from "app/account/types"
 import { ProposalPayment, ProposalPaymentStatus } from "app/proposalPayment/types"
+import { ProposalStatus } from "@prisma/client"
+
+const fetchGnosisThreshold = async (chainId: string, targetAddress: string) => {
+  const abi = ["function getThreshold() public view returns (uint256)"]
+
+  const metadata = await multicall(chainId, abi, [
+    { targetAddress: targetAddress, functionSignature: "getThreshold", callParameters: [] },
+  ])
+
+  const threshold = metadata[0][0]
+  return threshold.toNumber()
+}
 
 const fetchGnosisNonce = async (chainId: string, targetAddress: string) => {
   const abi = ["function nonce() view returns (uint256 nonce)"]
@@ -18,37 +34,38 @@ const fetchGnosisNonce = async (chainId: string, targetAddress: string) => {
   return nonce
 }
 
-export default api(async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const response = req.body
-  const streamId = response.streamId
-
-  // eventually look for error logs as well
-  const gnosisTxSuccessEventLog = response.logs.find(
-    (log) => log.topic0 === GNOSIS_EXECUTION_SUCCESS_EVENT_HASH
-  )
-
-  // I experimented with returning 400s but moralis did not like receiving a 400 in response to a rebhook
-  // so instead we just terminate early
-  if (!gnosisTxSuccessEventLog) {
-    return res.end()
-  }
-
-  const account = (await db.account.findFirst({
+const handleChangedThreshold = async (account) => {
+  const threshold = await fetchGnosisThreshold(String(account.data.chainId || 1), account.address)
+  const allAccountRoles = await db.proposalRole.findMany({
     where: {
-      moralisStreamId: streamId,
+      address: account.address,
+      proposal: {
+        status: ProposalStatus.AWAITING_APPROVAL,
+      },
     },
-  })) as Account
+    include: {
+      proposal: true,
+      signatures: true,
+    },
+  })
 
-  // honestly, something has probably gone wrong in the database if we recieve a webhook
-  // for an account that does not exist or is not a safe.
-  if (!account || account.addressType !== "SAFE") {
-    return res.end()
+  for (let role of allAccountRoles) {
+    let signatures = role?.signatures
+
+    // with the change to the threshold, we should now consider the proposal approved
+    if (signatures && signatures.length >= threshold) {
+      await retroactivelyApproveProposal({
+        proposalId: role?.proposal.id,
+        preApprovalQuorum: signatures.length,
+        roleId: role.id,
+      })
+    }
   }
+}
 
+const handleExecutionSuccess = async (account, log) => {
   const nonce = await fetchGnosisNonce(String(account.data.chainId || 1), account.address)
 
-  // TODO: get feedback on this line -- really annoying that we have to parse through every single payment
-  // ever from a particular account just to find the matching payment
   const accountPayments = (await db.proposalPayment.findMany({
     where: {
       senderAddress: account.address,
@@ -76,20 +93,20 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
     !payment ||
     mostRecentPaymentAttempt.status !== ProposalPaymentStatus.QUEUED
   ) {
-    return res.end()
+    throw new Error("Could not find payment attempt")
   }
 
-  const txData = gnosisTxSuccessEventLog.data
+  const txData = log.data
   const safeTxHash = txData.slice(0, 66)
 
   // webhook is a successful transaction response
   if (mostRecentPaymentAttempt.multisigTransaction?.safeTxHash === safeTxHash) {
     if (mostRecentPaymentAttempt.status === ProposalPaymentStatus.QUEUED) {
       try {
-        await SaveTransactionHashToPayments({
+        await saveTransactionHashToPayments({
           milestoneId: payment.milestoneId,
           proposalId: payment.proposalId,
-          transactionHash: gnosisTxSuccessEventLog.transactionHash,
+          transactionHash: log.transactionHash,
           paymentId: payment.id,
         })
       } catch (e) {
@@ -108,7 +125,7 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
             ...payment.data.history.slice(0, payment.data.history.length - 1),
             {
               ...mostRecentPaymentAttempt,
-              transactionHash: gnosisTxSuccessEventLog.transactionHash,
+              transactionHash: log.transactionHash,
               status: ProposalPaymentStatus.REJECTED,
               timestamp: new Date(),
             },
@@ -117,7 +134,45 @@ export default api(async function handler(req: NextApiRequest, res: NextApiRespo
       },
     })
   }
+}
 
-  res.statusCode = 200
-  res.end()
+const handleExecutionFailure = async () => {
+  // pass
+}
+
+export default api(async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const response = req.body
+  const streamId = response.streamId
+
+  const account = (await db.account.findFirst({
+    where: {
+      moralisStreamId: streamId,
+    },
+  })) as Account
+
+  if (!account || account.addressType !== "SAFE") {
+    return res.end()
+  }
+
+  const events = {
+    [GNOSIS_CHANGED_THRESHOLD_EVENT_HASH]: {
+      callback: handleChangedThreshold,
+    },
+    [GNOSIS_EXECUTION_SUCCESS_EVENT_HASH]: {
+      callback: handleExecutionSuccess,
+    },
+  }
+
+  for (const log of response.logs) {
+    const event = events[log.topic0]
+    if (event) {
+      try {
+        await event.callback(account, log)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  }
+
+  return res.end()
 })
