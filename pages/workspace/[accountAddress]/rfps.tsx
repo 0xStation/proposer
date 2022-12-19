@@ -69,7 +69,7 @@ const WorkspaceRfps: BlitzPage = () => {
     account?.data?.chainId
   )
 
-  const [rfps] = useQuery(
+  const [rfps, { refetch: refetchRfps }] = useQuery(
     getRfpsForAccount,
     {
       address: toChecksumAddress(accountAddress),
@@ -164,6 +164,7 @@ const WorkspaceRfps: BlitzPage = () => {
                   account={account!}
                   rfp={rfp}
                   href={Routes.RfpDetail({ rfpId: rfp.id })}
+                  refetchRfp={refetchRfps}
                 />
               )
             })}
