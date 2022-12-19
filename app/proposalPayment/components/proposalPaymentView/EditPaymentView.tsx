@@ -132,12 +132,19 @@ export const EditPaymentView = ({ proposal, className, setIsEdit }) => {
         }}
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
+
+          const unFilledPaymentFields =
+            !selectedChainId ||
+            !formState.values.tokenAddress ||
+            !formState.values.paymentAmount ||
+            parseFloat(formState.values.paymentAmount) <= 0 ||
+            !formState.values.paymentTerms
           return (
             <form onSubmit={handleSubmit}>
               <ImportTokenModal
                 isOpen={isImportTokenModalOpen}
                 setIsOpen={setIsImportTokenModalOpen}
-                chainId={selectedChainId.toString()}
+                chainId={selectedChainId?.toString()}
                 // refetches the tokens in the new proposal form token dropdown
                 callback={() => refetchTokens()}
               />
@@ -161,7 +168,7 @@ export const EditPaymentView = ({ proposal, className, setIsEdit }) => {
                     Cancel
                   </Button>
                   <Button
-                    isDisabled={!formState.dirty || isSubmitting}
+                    isDisabled={!formState.dirty || isSubmitting || unFilledPaymentFields}
                     type={ButtonType.Primary}
                     onClick={handleSubmit}
                   >
