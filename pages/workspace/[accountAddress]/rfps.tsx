@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
+import { useRouter } from "next/router"
 import { BlitzPage, Routes, useParam } from "@blitzjs/next"
 import { invalidateQuery, invoke, useQuery } from "@blitzjs/rpc"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
@@ -44,12 +45,21 @@ export const getServerSideProps = gSSP(async ({ params = {} }) => {
 
 const WorkspaceRfps: BlitzPage = () => {
   const accountAddress = useParam("accountAddress", "string") as string
+  const router = useRouter()
   const RFP_PAGINATION_TAKE = 25
-  const [rfpPage, setRfpPage] = useState<number>(0)
+  const [rfpPage, setRfpPage] = useState<number>(
+    parseFloat(router.query.pageNum?.[0] as string) || 0
+  )
   const [rfpStatusFilters, setRfpProductStatuss] = useState<Set<RfpProductStatus>>(
     new Set<RfpProductStatus>()
   )
   const [isRfpPreCreateModalOpen, setIsRfpPreCreateModalOpen] = useState<boolean>(false)
+
+  useEffect(() => {
+    router.push(Routes.WorkspaceRfps({ accountAddress, pageNum: rfpPage }), undefined, {
+      shallow: true,
+    })
+  }, [rfpPage])
 
   const [account] = useQuery(
     getAccountByAddress,
@@ -163,7 +173,7 @@ const WorkspaceRfps: BlitzPage = () => {
                   key={idx}
                   account={account!}
                   rfp={rfp}
-                  href={Routes.RfpDetail({ rfpId: rfp.id })}
+                  href={Routes.RfpDetail({ rfpId: rfp.id, fromPageNum: rfpPage })}
                   refetchRfp={refetchRfps}
                 />
               )

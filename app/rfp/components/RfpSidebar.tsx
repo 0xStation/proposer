@@ -20,6 +20,7 @@ import { useScheduleCallback } from "app/core/hooks/useScheduleCallback"
 
 export const RfpSidebar = () => {
   const rfpId = useParam("rfpId") as string
+  const router = useRouter()
 
   const [rfp] = useQuery(
     getRfpById,
@@ -31,14 +32,9 @@ export const RfpSidebar = () => {
       staleTime: 500,
     }
   )
-  const { type: paymentAmountType, amount: paymentAmount } = getPaymentAmountDetails(
-    rfp?.data?.proposal?.payment?.minAmount,
-    rfp?.data?.proposal?.payment?.maxAmount
-  )
 
   useScheduleCallback({ callback: () => invalidateQuery(getRfpById), date: rfp?.startDate })
   useScheduleCallback({ callback: () => invalidateQuery(getRfpById), date: rfp?.endDate })
-  const router = useRouter()
 
   return (
     <div className="h-full w-full md:w-[380px] overflow-y-scroll px-6 pt-6 md:p-6 md:border-r md:border-concrete">
@@ -47,6 +43,7 @@ export const RfpSidebar = () => {
           <Link
             href={Routes.WorkspaceRfps({
               accountAddress: rfp?.accountAddress as string,
+              pageNum: router.query.fromPageNum,
             })}
           >
             <span className="text-concrete cursor-pointer hover:text-concrete">RFPs</span>
