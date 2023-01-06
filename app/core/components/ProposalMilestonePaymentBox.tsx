@@ -54,17 +54,7 @@ const PaymentRow = ({ proposal, milestone, payment }) => {
                   </span>{" "}
                   on {convertJSDateToDateAndTime({ timestamp: new Date(attempt.timestamp) })}
                 </span>
-                {(attempt.status === ProposalPaymentStatus.SUCCESS ||
-                  attempt.status === ProposalPaymentStatus.FAILED) && (
-                  <TextLink
-                    url={getTransactionLink(payment.data.token.chainId, attempt.transactionHash)}
-                    className="text-sm text-tunnel-black"
-                  >
-                    See transaction
-                  </TextLink>
-                )}
-                {(attempt.status === ProposalPaymentStatus.QUEUED ||
-                  attempt.status === ProposalPaymentStatus.REJECTED) && (
+                {attempt.multisigTransaction ? (
                   <TextLink
                     url={`${getNetworkGnosisUrl(payment?.data?.token?.chainId)}:${
                       payment?.senderAddress
@@ -74,6 +64,15 @@ const PaymentRow = ({ proposal, milestone, payment }) => {
                   >
                     See transaction {`(#${attempt.multisigTransaction?.nonce})`}
                   </TextLink>
+                ) : attempt.transactionHash ? (
+                  <TextLink
+                    url={getTransactionLink(payment.data.token.chainId, attempt.transactionHash)}
+                    className="text-sm text-tunnel-black"
+                  >
+                    See transaction
+                  </TextLink>
+                ) : (
+                  <></>
                 )}
               </div>
             </div>
