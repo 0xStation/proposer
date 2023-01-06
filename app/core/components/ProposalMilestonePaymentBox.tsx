@@ -13,6 +13,7 @@ import TextLink from "./TextLink"
 import { convertJSDateToDateAndTime } from "app/core/utils/convertJSDateToDateAndTime"
 import { getMostRecentPaymentAttempt } from "app/proposalPayment/utils"
 import { ProposalPaymentStatus } from "app/proposalPayment/types"
+import { getNetworkGnosisUrl } from "../utils/networkInfo"
 
 const PaymentRow = ({ proposal, milestone, payment }) => {
   const mostRecentPaymentAttempt = getMostRecentPaymentAttempt(payment)
@@ -60,6 +61,18 @@ const PaymentRow = ({ proposal, milestone, payment }) => {
                     className="text-sm text-tunnel-black"
                   >
                     See transaction
+                  </TextLink>
+                )}
+                {(attempt.status === ProposalPaymentStatus.QUEUED ||
+                  attempt.status === ProposalPaymentStatus.REJECTED) && (
+                  <TextLink
+                    url={`${getNetworkGnosisUrl(payment?.data?.token?.chainId)}:${
+                      payment?.senderAddress
+                    }/transactions/${attempt.multisigTransaction.transactionId}`}
+                    // NOTE: if we change gnosisUrl to safe.global, this needs to change too!
+                    className="text-sm"
+                  >
+                    See transaction {`(#${attempt.multisigTransaction?.nonce})`}
                   </TextLink>
                 )}
               </div>
