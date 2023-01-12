@@ -11,7 +11,6 @@ import { multicall } from "app/utils/rpcMulticall"
 import { Account } from "app/account/types"
 import { ProposalPayment, ProposalPaymentStatus } from "app/proposalPayment/types"
 import { ProposalStatus } from "@prisma/client"
-import networks from "app/utils/networks.json"
 import getSafeTxNonce from "app/account/queries/getSafeTxNonce"
 
 const fetchGnosisThreshold = async (chainId: string, targetAddress: string) => {

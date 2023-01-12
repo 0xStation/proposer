@@ -33,6 +33,5 @@ export default async function getSafeTxNonce(input: z.infer<typeof GetSafeTxNonc
   }
 
   const results = await response.json()
-  console.log(results)
-  return results[0].nonce
+  return results.results[0].nonce
 }
