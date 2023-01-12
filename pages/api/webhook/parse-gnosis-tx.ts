@@ -11,6 +11,7 @@ import { multicall } from "app/utils/rpcMulticall"
 import { Account } from "app/account/types"
 import { ProposalPayment, ProposalPaymentStatus } from "app/proposalPayment/types"
 import { ProposalStatus } from "@prisma/client"
+import getSafeTxNonce from "app/account/queries/getSafeTxNonce"
 
 const fetchGnosisThreshold = async (chainId: string, targetAddress: string) => {
   const abi = ["function getThreshold() public view returns (uint256)"]
@@ -64,7 +65,16 @@ const handleChangedThreshold = async (account) => {
 }
 
 const handleExecutionSuccess = async (account, log) => {
-  const nonce = await fetchGnosisNonce(String(account.data.chainId || 1), account.address)
+  const txData = log.data
+  const safeTxHash = txData.slice(0, 66)
+  const nonce = await getSafeTxNonce({
+    chainId: account.data.chainId || 1,
+    address: account.address,
+    safeTxHash,
+  })
+  if (!nonce) {
+    throw Error("no nonce found for safe transaction")
+  }
 
   const accountPayments = (await db.proposalPayment.findMany({
     where: {
@@ -79,7 +89,7 @@ const handleExecutionSuccess = async (account, log) => {
     const paymentAttempt = currentPayment?.data?.history?.slice(-1)[0]
     // nonce is a BigNumber, so we need to unwrap it
     // nonce is incremented after a successful transaction, so we need to subtract 1 to match to previous tx
-    if (paymentAttempt?.multisigTransaction?.nonce === nonce.toNumber() - 1) {
+    if (paymentAttempt?.multisigTransaction?.nonce === nonce) {
       payment = currentPayment
       mostRecentPaymentAttempt = paymentAttempt
       break
@@ -95,9 +105,6 @@ const handleExecutionSuccess = async (account, log) => {
   ) {
     throw new Error("Could not find payment attempt")
   }
-
-  const txData = log.data
-  const safeTxHash = txData.slice(0, 66)
 
   // webhook is a successful transaction response
   if (mostRecentPaymentAttempt.multisigTransaction?.safeTxHash === safeTxHash) {
