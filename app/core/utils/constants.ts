@@ -31,6 +31,12 @@ export const gradientMap = {
   5: Gradient5,
 }
 
+export const FLEXIBLE_SIGNING_CONTRACT = "0xa9879cbfa6a1fe2964f37bccd6fcf6ea61efcdbf" // Goerli
+
+export const CHECKBOOK_MODULE_ADDRESS = {
+  5: FLEXIBLE_SIGNING_CONTRACT,
+}
+
 export enum ProposalFormStep {
   PROPOSE = "PROPOSE",
   PAYMENT = "PAYMENT",
@@ -327,7 +333,12 @@ export const CHAIN_IDS = {
   POLYGON: 137,
 }
 
-export const SUPPORTED_CHAINS = [chain.mainnet, chain.goerli, chain.optimism, chain.polygon]
+export const SUPPORTED_CHAINS = [
+  // chain.mainnet,
+  chain.goerli,
+  // chain.optimism,
+  // chain.polygon
+]
 
 export const SUPPORTED_CHAIN_IDS = SUPPORTED_CHAINS.map((chain) => chain.id)
 
