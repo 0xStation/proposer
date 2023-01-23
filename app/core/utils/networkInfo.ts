@@ -1,5 +1,5 @@
 import networks from "app/utils/networks.json"
-import { Token } from "@prisma/client"
+import { Token } from "app/token/types"
 
 export const getNetworkCoin = (chainId: number): Token | undefined => {
   try {
@@ -47,6 +47,23 @@ export const getNetworkGnosisUrl = (chainId: number): string => {
 export const getNetworkName = (chainId: number): string => {
   try {
     return networks[chainId].name
+  } catch {
+    return ""
+  }
+}
+
+export const getNetworkSymbol = (chainId: number): string => {
+  try {
+    return networks[chainId].symbol
+  } catch {
+    return ""
+  }
+}
+
+export const getNetworkNftUrl = (chainId: number, address: string, tokenId: number): string => {
+  try {
+    const baseUrl = networks[chainId].nftUrl
+    return `${baseUrl}/${address}/${tokenId}`
   } catch {
     return ""
   }

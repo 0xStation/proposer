@@ -9,6 +9,67 @@ datasource db {
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["interactiveTransactions", "filterJson"]
+  binaryTargets   = ["native", "darwin-arm64"]
+}
+
+model Checkbook {
+  chainId   Int
+  address   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  data      Json
+
+  checks  Check[]
+  inboxes Inbox[]
+
+  @@id([chainId, address])
+}
+
+model Check {
+  id        String   @id @default(uuid())
+  nonce     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  data      Json
+  chainId   Int
+  address   String
+  txnHash   String?
+  inboxId   String?
+
+  checkbook Checkbook @relation(fields: [chainId, address], references: [chainId, address])
+  proofs    Proof[]
+  inbox     Inbox?    @relation(fields: [inboxId], references: [id])
+}
+
+model CheckSignature {
+  id        String   @id @default(uuid())
+  signer    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  root      String
+  data      Json
+  proofs    Proof[]
+}
+
+model Proof {
+  id               String         @id @default(uuid())
+  checkSignatureId String
+  checkId          String
+  check            Check          @relation(fields: [checkId], references: [id])
+  signature        CheckSignature @relation(fields: [checkSignatureId], references: [id])
+  data             Json
+}
+
+model Inbox {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  data      Json
+  chainId   Int
+  address   String
+
+  checkbook Checkbook @relation(fields: [chainId, address], references: [chainId, address])
+  checks    Check[]
 }
 
 // ACCOUNT SYSTEM

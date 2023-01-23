@@ -10,6 +10,7 @@ import { ProposalPayment } from "app/proposalPayment/types"
 import updateAccount from "app/account/mutations/updateAccount"
 import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { createMoralisStream, getMoralisNetwork } from "app/core/libraries/moralis"
+import { genGnosisPaymentDigest } from "app/signatures/gnosisPayment"
 
 const useGnosisSignature = (payment: ProposalPayment) => {
   const activeUser = useStore((state) => state.activeUser)
@@ -24,7 +25,7 @@ const useGnosisSignature = (payment: ProposalPayment) => {
         payment.data.token.chainId,
         payment.senderAddress
       )
-      const transactionData = genGnosisTransactionDigest(payment, nonce, contractVersion)
+      const transactionData = genGnosisPaymentDigest(payment, nonce, contractVersion)
 
       const signature = await signMessageHook(transactionData)
       const data = await createTransaction(signature, transactionData)

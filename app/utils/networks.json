@@ -2,12 +2,14 @@
   "1": {
     "key": "1",
     "name": "Ethereum",
+    "symbol": "ETH",
     "chainId": 1,
     "network": "homestead",
     "alchemyNetwork": "homestead",
     "gnosisApi": "https://safe-transaction.gnosis.io",
     "gnosisNetwork": "mainnet",
     "gnosisUrl": "https://gnosis-safe.io/app/eth",
+    "nftUrl": "https://opensea.io/assets/ethereum",
     "multicall": "0xeefba1e63905ef1d7acba5a8513c70307c1ce441",
     "ensResolver": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",
     "rpc": [
@@ -47,6 +49,7 @@
   "5": {
     "key": "5",
     "name": "Goerli (testnet)",
+    "symbol": "GOR",
     "shortName": "Goerli",
     "chainId": 5,
     "network": "goerli",
@@ -54,6 +57,7 @@
     "gnosisApi": "https://safe-transaction-goerli.safe.global",
     "gnosisNetwork": "goerli",
     "gnosisUrl": "https://gnosis-safe.io/app/gor",
+    "nftUrl": "https://testnets.opensea.io/assets/goerli",
     "testnet": true,
     "multicall": "0x77dca2c955b15e9de4dbbcf1246b4b85b651e50e",
     "rpc": ["https://eth-goerli.alchemyapi.io/v2/v4nqH_J-J3STit45Mm07TxuYexMHQsYZ"],
@@ -80,6 +84,7 @@
   "10": {
     "key": "10",
     "name": "Optimism",
+    "symbol": "OP",
     "chainId": 10,
     "network": "Optimism mainnet",
     "alchemyNetwork": "optimism",
@@ -133,6 +138,7 @@
   "137": {
     "key": "137",
     "name": "Polygon Mainnet",
+    "symbol": "POLY",
     "shortName": "Polygon",
     "alchemyNetwork": "matic",
     "gnosisNetwork": "polygon",

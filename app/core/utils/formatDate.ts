@@ -14,7 +14,7 @@ const monthMapper = {
 }
 
 // formateDate to dd-MM-yyyy, ex:) 01-JAN-2022
-export const formatDate = (date: Date, isLocalTime = false) => {
+export const formatDate = (date?: Date, isLocalTime = false) => {
   if (!date) return null
 
   const day = isLocalTime ? date.getDate() : date.getUTCDate()

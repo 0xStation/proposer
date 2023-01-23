@@ -5,6 +5,7 @@ import networks from "app/utils/networks.json"
 import useSignature from "app/core/hooks/useSignature"
 import { getSafeContractVersion } from "../utils/getSafeContractVersion"
 import { getMostRecentPaymentAttempt } from "app/proposalPayment/utils"
+import { genGnosisPaymentDigest } from "app/signatures/gnosisPayment"
 
 const useGnosisSignatureToConfirmTransaction = (payment) => {
   const setToastState = useStore((state) => state.setToastState)
@@ -18,7 +19,7 @@ const useGnosisSignatureToConfirmTransaction = (payment) => {
         payment.senderAddress
       )
       const mostRecentPaymentAttempt = getMostRecentPaymentAttempt(payment)
-      const transactionData = genGnosisTransactionDigest(
+      const transactionData = genGnosisPaymentDigest(
         payment,
         mostRecentPaymentAttempt.multisigTransaction.nonce,
         contractVersion

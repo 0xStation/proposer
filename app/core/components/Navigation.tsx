@@ -22,6 +22,7 @@ import { DotsHorizontalIcon, MenuAlt4Icon } from "@heroicons/react/solid"
 import { useEnsName } from "wagmi"
 import { NavigationSidebar } from "./NavigationSidebar"
 import dynamic from "next/dynamic"
+import NewCheckbookModal from "app/checkbook/components/NewCheckbookModal"
 
 const WorkspaceNavigationDrawer = dynamic(
   () => import("app/core/components/WorkspaceNavigationDrawer"),
@@ -49,7 +50,7 @@ const Navigation = ({ children }: { children?: any }) => {
   const connectedChain = SUPPORTED_CHAINS.find((supportedChain) => supportedChain.id === chain?.id)
   const isChainSupported = chain ? !!connectedChain : undefined
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false)
-  const [newWorkspaceModalOpen, setNewWorkspaceModalOpen] = useState<boolean>(false)
+  const [newCheckbookModalOpen, setNewCheckbookModalOpen] = useState<boolean>(false)
   const router = useRouter()
 
   if (isError) {
@@ -77,6 +78,7 @@ const Navigation = ({ children }: { children?: any }) => {
     }
     if (session?.siwe?.address !== activeUser?.address) {
       const setActiveAccount = async () => {
+        console.log("set active account")
         const account = await invoke(getAccountByAddress, { address: session?.siwe?.address })
         if (!account) {
           const newUser = await invoke(createAccount, {
@@ -117,9 +119,9 @@ const Navigation = ({ children }: { children?: any }) => {
         />
       )}
       {activeUser && (
-        <NewWorkspaceModal
-          isOpen={newWorkspaceModalOpen}
-          setIsOpen={setNewWorkspaceModalOpen}
+        <NewCheckbookModal
+          isOpen={newCheckbookModalOpen}
+          setIsOpen={setNewCheckbookModalOpen}
           activeUser={activeUser}
         />
       )}
@@ -141,13 +143,13 @@ const Navigation = ({ children }: { children?: any }) => {
           <MenuAlt4Icon height={25} width={25} onClick={() => setIsMobileSidebarOpen(true)} />
         </div>
         <div className="flex flex-row items-center space-x-4">
-          <Button
+          {/* <Button
             type={ButtonType.Secondary}
             onClick={() => router.push(Routes.ProposalTypeSelection())}
             className="hidden md:inline"
           >
             Create
-          </Button>
+          </Button> */}
           <Listbox
             error={isChainSupported === false ? { message: "Switch network" } : undefined}
             defaultValue={connectedChain}
@@ -185,12 +187,12 @@ const Navigation = ({ children }: { children?: any }) => {
                 </div>
               }
               items={[
-                { name: "Create group workspace", onClick: () => setNewWorkspaceModalOpen(true) },
+                { name: "Create Checkbook", onClick: () => setNewCheckbookModalOpen(true) },
                 { name: "Disconnect", onClick: () => handleDisconnect() },
               ]}
             />
           )}
-          <Dropdown
+          {/* <Dropdown
             button={
               <DotsHorizontalIcon className="hidden sm:inline-block h-4 w-4 fill-marble-white hover:cursor-pointer hover:fill-concrete" />
             }
@@ -200,15 +202,13 @@ const Navigation = ({ children }: { children?: any }) => {
               { name: "Newstand", href: LINKS.NEWSTAND },
               { name: "Legal & Privacy", href: LINKS.LEGAL },
             ]}
-          />
+          /> */}
         </div>
       </div>
-      <span className="hidden md:block">
+      {/* <span className="hidden md:block">
         <NavigationSidebar toggleMobileSidebar={setIsMobileSidebarOpen} />
-      </span>
-      <div className="h-full md:h-[calc(100vh-70px)] md:ml-[70px] relative overflow-y-scroll">
-        {children}
-      </div>
+      </span> */}
+      <div className="h-full md:h-[calc(100vh-70px)] relative overflow-y-scroll">{children}</div>
     </>
   )
 }

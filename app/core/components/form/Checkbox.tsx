@@ -1,3 +1,4 @@
+import { ConfigurationServicePlaceholders } from "aws-sdk/lib/config_service_placeholders"
 import { Field } from "react-final-form"
 
 // Custom checkbox style
@@ -11,7 +12,7 @@ const Checkbox = ({
   className = "",
 }: {
   name: string
-  value?: string
+  value?: any
   checked?: boolean
   defaultChecked?: boolean
   className?: string
