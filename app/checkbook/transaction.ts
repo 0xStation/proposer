@@ -1,5 +1,9 @@
 import { Interface } from "@ethersproject/abi"
-import { CHECKBOOK_MODULE_ADDRESS, ZERO_ADDRESS } from "app/core/utils/constants"
+import {
+  CHECKBOOK_MODULE_ADDRESS,
+  CHECK_METADATA_PATH,
+  ZERO_ADDRESS,
+} from "app/core/utils/constants"
 import { BigNumber } from "@ethersproject/bignumber"
 
 // function execute(
@@ -12,9 +16,18 @@ import { BigNumber } from "@ethersproject/bignumber"
 //     bytes[] calldata signatures
 // ) external returns (bool success)
 
-export const checkbookTransaction = ({ chainId, safe, nonce, to, value, data, proofs }) => {
+export const checkbookTransaction = ({
+  checkId,
+  chainId,
+  safe,
+  nonce,
+  to,
+  value,
+  data,
+  proofs,
+}) => {
   const checkbookInterface = new Interface([
-    "function execute(address safe,uint256 nonce,address executor,address to,uint256 value,bytes calldata data,tuple(bytes32[] calldata path,bytes signature)[] calldata proofs) external returns (bool success)",
+    "function execute(address safe,uint256 nonce,address executor,address to,uint256 value,bytes calldata data,tuple(bytes32[] calldata path,bytes signature)[] calldata proofs, string note) external returns (bool success)",
   ])
 
   console.log(
@@ -45,6 +58,11 @@ export const checkbookTransaction = ({ chainId, safe, nonce, to, value, data, pr
       path: proof.data.path,
       signature: proof.signature.data.signature,
     })),
+    `${
+      typeof window !== "undefined"
+        ? `${window.location.protocol}//${window.location.host}`
+        : "https://app.station.express"
+    }${CHECK_METADATA_PATH(checkId)}`,
   ])
 
   return {
