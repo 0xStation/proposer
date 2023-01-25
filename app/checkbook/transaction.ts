@@ -1,23 +1,9 @@
 import { Interface } from "@ethersproject/abi"
-import {
-  CHECKBOOK_MODULE_ADDRESS,
-  CHECK_METADATA_PATH,
-  ZERO_ADDRESS,
-} from "app/core/utils/constants"
+import { CHECKBOOK_MODULE_ADDRESS, ZERO_ADDRESS } from "app/core/utils/constants"
 import { BigNumber } from "@ethersproject/bignumber"
 
-// function execute(
-//     address safe,
-//     uint256 nonce,
-//     address executor,
-//     address to,
-//     uint256 value,
-//     bytes calldata data,
-//     bytes[] calldata signatures
-// ) external returns (bool success)
-
 export const checkbookTransaction = ({
-  checkId,
+  checkTitle,
   chainId,
   safe,
   nonce,
@@ -58,11 +44,9 @@ export const checkbookTransaction = ({
       path: proof.data.path,
       signature: proof.signature.data.signature,
     })),
-    `${
-      typeof window !== "undefined"
-        ? `${window.location.protocol}//${window.location.host}`
-        : "https://app.station.express"
-    }${CHECK_METADATA_PATH(checkId)}`,
+    // TODO: we should notify users that the check title will be published on-chain if the checkbook is public
+    // if the checkbook is private, we should pass in an empty string to not publicize on chain
+    checkTitle.length > 44 ? checkTitle.substr(0, 44) + "..." : checkTitle,
   ])
 
   return {
