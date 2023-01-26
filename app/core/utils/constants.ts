@@ -21,6 +21,7 @@ import Gradient2 from "/public/gradients/2.png"
 import Gradient3 from "/public/gradients/3.png"
 import Gradient4 from "/public/gradients/4.png"
 import Gradient5 from "/public/gradients/5.png"
+import { e } from "@blitzjs/auth/dist/index-57d74361"
 
 export const gradientMap = {
   0: Gradient0,
@@ -770,3 +771,6 @@ export const GNOSIS_EXECUTION_SUCCESS_EVENT_HASH =
 
 export const GNOSIS_CHANGED_THRESHOLD_EVENT_HASH =
   "0x610f7ff2b304ae8903c3de74c60c6ab1f7d6226b3f52c5161905bb5ad4039c93"
+
+export const QSTASH_PUBLISH = "https://qstash.upstash.io/v1/publish"
+export const QSTASH_SCHEDULES = "https://qstash.upstash.io/v1/schedules"

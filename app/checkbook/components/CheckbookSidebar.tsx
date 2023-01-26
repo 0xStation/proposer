@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { InboxIcon, LightBulbIcon } from "@heroicons/react/outline"
+import { ClockIcon, InboxIcon, LightBulbIcon } from "@heroicons/react/outline"
 import { Routes, useParam } from "@blitzjs/next"
 import { useRouter } from "next/router"
 import truncateString from "app/core/utils/truncateString"
@@ -66,6 +66,22 @@ export const CheckbookSidebar = () => {
           >
             <LightBulbIcon className="h-5 w-5 text-white cursor-pointer" />
             <span>All Requests</span>
+          </li>
+          {/* SCHEDULES */}
+          <li
+            className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer hover:bg-charcoal ${
+              router.pathname ===
+                Routes.SchedulesHome({ chainId: checkbookChainId, address: checkbookAddress })
+                  .pathname && "bg-wet-concrete"
+            }`}
+            onClick={() =>
+              router.push(
+                Routes.SchedulesHome({ chainId: checkbookChainId, address: checkbookAddress })
+              )
+            }
+          >
+            <ClockIcon className="h-5 w-5 text-white cursor-pointer" />
+            <span>Schedules</span>
           </li>
           {/* INBOXES */}
           <li

@@ -2,7 +2,9 @@ import { DateTime } from "luxon"
 
 // This util is used to get the min date for a datetime input which is
 // only accepted in the format nnnn-nn-nnTnn:nn
-export const formatDateForFieldInput = (date: Date) => {
+export const formatDateForFieldInput = (date?: Date) => {
+  if (!date) return ""
+
   const dateTime = DateTime.fromJSDate(date)
   const isoDate = DateTime.fromISO(dateTime.toString())
 

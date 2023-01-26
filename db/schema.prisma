@@ -19,26 +19,29 @@ model Checkbook {
   updatedAt DateTime @updatedAt
   data      Json
 
-  checks  Check[]
-  inboxes Inbox[]
+  checks    Check[]
+  inboxes   Inbox[]
+  schedules Schedule[]
 
   @@id([chainId, address])
 }
 
 model Check {
-  id        String   @id @default(uuid())
-  nonce     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  data      Json
-  chainId   Int
-  address   String
-  txnHash   String?
-  inboxId   String?
+  id         String   @id @default(uuid())
+  nonce      Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  data       Json
+  chainId    Int
+  address    String
+  txnHash    String?
+  inboxId    String?
+  scheduleId String?
 
   checkbook Checkbook @relation(fields: [chainId, address], references: [chainId, address])
   proofs    Proof[]
   inbox     Inbox?    @relation(fields: [inboxId], references: [id])
+  schedule  Schedule? @relation(fields: [scheduleId], references: [id])
 }
 
 model CheckSignature {
@@ -67,6 +70,20 @@ model Inbox {
   data      Json
   chainId   Int
   address   String
+
+  checkbook Checkbook @relation(fields: [chainId, address], references: [chainId, address])
+  checks    Check[]
+}
+
+model Schedule {
+  id            String    @id @default(uuid())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  data          Json
+  chainId       Int
+  address       String
+  counter       Int       @default(0) // how many refresh cycles 
+  nextRefreshAt DateTime? // null when no next refresh
 
   checkbook Checkbook @relation(fields: [chainId, address], references: [chainId, address])
   checks    Check[]

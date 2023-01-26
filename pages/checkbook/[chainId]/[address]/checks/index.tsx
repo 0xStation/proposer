@@ -17,6 +17,8 @@ import { Form } from "react-final-form"
 import { CheckStatusIndicator } from "app/check/components/CheckStatusIndicator"
 import { SignatureCheckbox } from "app/check/components/SignatureCheckbox"
 import { useChecks } from "app/check/hooks/useChecks"
+import { Schedule } from "app/schedule/types"
+import ViewScheduleModal from "app/schedule/componenets/ViewScheduleModal"
 
 const BatchCheckModal = dynamic(() => import("app/check/components/BatchCheckModal"), {
   ssr: false,
@@ -51,11 +53,13 @@ const CheckbookHome: BlitzPage = () => {
   const checkbookChainId = useParam("chainId", "number") as number
   const checkbookAddress = useParam("address", "string") as string
   const [newCheckModalOpen, setNewCheckModalOpen] = useState<boolean>(false)
-  const [viewCheckModalOpen, setViewCheckModalOpen] = useState<boolean>(false)
   const [batchCheckModalOpen, setBatchCheckModalOpen] = useState<boolean>(false)
   const [selectedCheck, setSelectedCheck] = useState<Check>()
+  const [viewCheckModalOpen, setViewCheckModalOpen] = useState<boolean>(false)
   const [selectedChecks, setSelectedChecks] = useState<Check[]>()
   const { checks } = useChecks(checkbookChainId, checkbookAddress)
+  const [selectedSchedule, setSelectedSchedule] = useState<Schedule>()
+  const [viewScheduleModalOpen, setViewScheduleModalOpen] = useState<boolean>(false)
 
   return (
     <>
@@ -65,6 +69,13 @@ const CheckbookHome: BlitzPage = () => {
           check={selectedCheck}
           isOpen={viewCheckModalOpen}
           setIsOpen={setViewCheckModalOpen}
+        />
+      )}
+      {selectedSchedule && (
+        <ViewScheduleModal
+          schedule={selectedSchedule}
+          isOpen={viewScheduleModalOpen}
+          setIsOpen={setViewScheduleModalOpen}
         />
       )}
       <Form
@@ -171,6 +182,17 @@ const CheckbookHome: BlitzPage = () => {
                                     {check.inbox?.data.name}
                                   </div>
                                 </Link>
+                              )}
+                              {check.schedule && (
+                                <div
+                                  className="w-fit border border-wet-concrete text-concrete-115 text-sm rounded-full px-3 py-1 bg-tunnel-black hover:bg-wet-concrete"
+                                  onClick={() => {
+                                    setSelectedSchedule(check.schedule)
+                                    setViewScheduleModalOpen(true)
+                                  }}
+                                >
+                                  {`Repeats every ${check.schedule?.data.repeatFrequency} ${check.schedule?.data.repeatPeriod}`}
+                                </div>
                               )}
                             </div>
                           </td>
