@@ -2,16 +2,7 @@ import { Field } from "react-final-form"
 import { requiredField } from "app/utils/validators"
 import formatDateForFieldInput from "app/core/utils/formatDateForFieldInput"
 
-export const formatDateConstraint = (date?: Date): string => {
-  if (!date) return ""
-  const yyyy = date.getFullYear()
-  const mm = date.getMonth() > 9 ? date.getMonth() + 1 : "0" + (date.getMonth() + 1)
-  const dd = date.getDate() > 9 ? date.getDate() : "0" + date.getDate()
-
-  return `${yyyy}-${mm}-${dd}`
-}
-
-export const DateField = ({
+export const DatetimeField = ({
   title,
   subtitle,
   fieldName,
@@ -52,4 +43,4 @@ export const DateField = ({
   )
 }
 
-export default DateField
+export default DatetimeField

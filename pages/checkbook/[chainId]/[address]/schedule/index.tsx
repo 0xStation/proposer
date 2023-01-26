@@ -100,7 +100,6 @@ const SchedulesHome: BlitzPage = () => {
                       : "Ongoing"}
                   </td>
                 </tr>
-                // </button>
               )
             })}
         </tbody>

@@ -17,7 +17,7 @@ const UpdateSchedule = z.object({
     repeatPeriod: z.enum([
       ScheduleRepeatPeriod.WEEKS,
       ScheduleRepeatPeriod.MONTHS,
-      ScheduleRepeatPeriod.MINUTES,
+      //   ScheduleRepeatPeriod.MINUTES, // uncomment for testing
     ]),
     maxCount: z.number().optional(),
   }),

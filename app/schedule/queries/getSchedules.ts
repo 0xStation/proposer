@@ -10,8 +10,6 @@ const GetSchedules = z.object({
 export default async function getSchedules(input: z.infer<typeof GetSchedules>) {
   const params = GetSchedules.parse(input)
 
-  console.log("params", params)
-
   const schedules = await db.schedule.findMany({
     where: {
       chainId: params.chainId,

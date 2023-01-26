@@ -8,9 +8,9 @@ export type Schedule = PrismaSchedule & {
 
 export type ScheduleMetadata = CheckMetadata & {
   startDate: Date
-  repeatFrequency: number
+  repeatFrequency: number // integer
   repeatPeriod: ScheduleRepeatPeriod
-  maxCount?: number
+  maxCount?: number // undefined if schedule is ongoing
 }
 
 export enum ScheduleRepeatPeriod {

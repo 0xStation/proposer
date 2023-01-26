@@ -1,7 +1,4 @@
-import { QSTASH_PUBLISH } from "app/core/utils/constants"
 import { ScheduleRepeatPeriod } from "app/schedule/types"
-import { calculateNextRefreshTime } from "app/schedule/utils"
-import { requireEnv } from "app/utils/requireEnv"
 import db from "db"
 import * as z from "zod"
 import { Check } from "../types"
@@ -22,7 +19,7 @@ const CreateCheck = z.object({
       repeatPeriod: z.enum([
         ScheduleRepeatPeriod.WEEKS,
         ScheduleRepeatPeriod.MONTHS,
-        ScheduleRepeatPeriod.MINUTES,
+        // ScheduleRepeatPeriod.MINUTES, // uncomment for testing
       ]),
       maxCount: z.number().optional(),
     })
@@ -64,11 +61,7 @@ export default async function createCheck(input: z.infer<typeof CreateCheck>) {
             repeatPeriod: params.schedule.repeatPeriod,
             maxCount: params.schedule.maxCount,
           },
-          nextRefreshAt: calculateNextRefreshTime({
-            frequency: params.schedule.repeatFrequency,
-            period: params.schedule.repeatPeriod,
-            lastRefreshedAt: new Date(),
-          }),
+          nextRefreshAt: params.schedule.startDate,
         },
       })
       scheduleId = schedule.id
@@ -94,40 +87,6 @@ export default async function createCheck(input: z.infer<typeof CreateCheck>) {
     })
 
     return newCheck
-
-    // create schedule db entry
-
-    // // create schedule on upstash
-    // // first part is Qstash endpoint, second part is url we are asking them to reping
-    // const url = `${QSTASH_PUBLISH}/${requireEnv(
-    //   "WEBHOOK_URL"
-    // )}/api/webhook/schedule/refresh?scheduleId=${schedule.id}`
-
-    // let response = await fetch(url, {
-    //   method: "POST",
-    //   headers: {
-    //     Authorization: `Bearer ${requireEnv("QSTASH_TOKEN")}`,
-    //     "Upstash-Cron": params.schedule.cron,
-    //   },
-    // })
-
-    // console.log(response)
-
-    // const { scheduleId: serviceId } = await response.json()
-
-    // if (serviceId) {
-    //   const updatedSchedule = await db.schedule.update({
-    //     where: {
-    //       id: schedule.id,
-    //     },
-    //     data: {
-    //       serviceId: serviceId,
-    //     },
-    //   })
-    //   console.log("updated schedule with service id", updatedSchedule)
-    // } else {
-    //   console.log("no serviceId extracted")
-    // }
   })
 
   return check as unknown as Check

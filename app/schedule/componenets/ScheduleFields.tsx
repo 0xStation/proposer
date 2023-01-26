@@ -1,4 +1,4 @@
-import DateField from "app/core/components/form/DateField"
+import DatetimeField from "app/core/components/form/DatetimeField"
 import IntegerField from "app/core/components/form/IntegerField"
 import RadioField from "app/core/components/form/RadioField"
 import SelectField from "app/core/components/form/SelectField"
@@ -8,7 +8,7 @@ export const ScheduleFields = ({ formState, minCycles = 1 }) => {
   return (
     <>
       {/* START DATE */}
-      <DateField title="Start date*" fieldName="scheduleStartDate" minDate={new Date()} />
+      <DatetimeField title="Start date*" fieldName="scheduleStartDate" minDate={new Date()} />
       {/* REPEAT */}
       <label className="font-bold block mt-6">Repeat every</label>
       <div className="flex flex-row space-x-4 w-1/2">
@@ -16,7 +16,7 @@ export const ScheduleFields = ({ formState, minCycles = 1 }) => {
         <SelectField
           fieldName="scheduleRepeatPeriod"
           options={[
-            ScheduleRepeatPeriod.MINUTES, // uncomment when devving
+            // ScheduleRepeatPeriod.MINUTES, // uncomment for testing
             ScheduleRepeatPeriod.WEEKS,
             ScheduleRepeatPeriod.MONTHS,
           ]}
