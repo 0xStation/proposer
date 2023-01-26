@@ -67,6 +67,7 @@ const InboxRequest: BlitzPage = () => {
               title: values.note,
               to: to,
               value: value.toString(),
+              operation: 0,
               data: data,
               meta: {
                 type: CheckType.FungibleTransfer,
