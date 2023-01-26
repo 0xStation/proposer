@@ -50,6 +50,7 @@ export const NewCheckFungibleForm = ({ goBack, onCreate }) => {
             title: values.title,
             to: to,
             value: value.toString(),
+            operation: 0,
             data: data,
             meta: {
               type: CheckType.FungibleTransfer,

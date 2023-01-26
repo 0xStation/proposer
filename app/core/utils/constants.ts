@@ -31,10 +31,10 @@ export const gradientMap = {
   5: Gradient5,
 }
 
-export const FLEXIBLE_SIGNING_CONTRACT = "0xa9879cbfa6a1fe2964f37bccd6fcf6ea61efcdbf" // Goerli
+export const FLEXIBLE_SIGNING_GOERLI_CONTRACT = "0x123104c37829bab922be6f8f1278a50daccdb8e5" // Goerli
 
 export const CHECKBOOK_MODULE_ADDRESS = {
-  5: FLEXIBLE_SIGNING_CONTRACT,
+  5: FLEXIBLE_SIGNING_GOERLI_CONTRACT,
 }
 
 export enum ProposalFormStep {

@@ -1,7 +1,7 @@
+import { useState } from "react"
 import { invalidateQuery, useMutation } from "@blitzjs/rpc"
 import { checkbookTransaction } from "app/checkbook/transaction"
 import useStore from "app/core/hooks/useStore"
-import { useState } from "react"
 import { useSendTransaction, useWaitForTransaction } from "wagmi"
 import addTransactionHashToChecks from "../mutations/addTransactionHashToChecks"
 import getChecks from "../queries/getChecks"
@@ -49,6 +49,7 @@ export const useExecuteCheck = ({ check, setIsLoading }) => {
         to: check.data.txn.to,
         value: check.data.txn.value,
         data: check.data.txn.data,
+        operation: check.data.txn.operation,
         proofs: check?.proofs,
       })
 
