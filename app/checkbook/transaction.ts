@@ -17,6 +17,7 @@ export const checkbookTransaction = ({
   ])
 
   console.log(
+    checkTitle,
     chainId,
     safe,
     nonce,
@@ -46,7 +47,7 @@ export const checkbookTransaction = ({
     })),
     // TODO: we should notify users that the check title will be published on-chain if the checkbook is public
     // if the checkbook is private, we should pass in an empty string to not publicize on chain
-    checkTitle.length > 44 ? checkTitle.substr(0, 44) + "..." : checkTitle,
+    checkTitle,
   ])
 
   return {
