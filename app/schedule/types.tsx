@@ -8,15 +8,15 @@ export type Schedule = PrismaSchedule & {
 
 export type ScheduleMetadata = CheckMetadata & {
   startDate: Date
-  repeatFrequency: number // integer
-  repeatPeriod: ScheduleRepeatPeriod
+  periodCoefficient: number // integer
+  periodUnit: SchedulePeriodUnit
   maxCount?: number // undefined if schedule is ongoing
 }
 
-export enum ScheduleRepeatPeriod {
-  MINUTES = "minute(s)", // for testing
-  WEEKS = "week(s)",
-  MONTHS = "month(s)",
+export enum SchedulePeriodUnit {
+  MINUTE = "MINUTE", // for testing
+  WEEK = "WEEK",
+  MONTH = "MONTH",
 }
 
 export enum ScheduleEnds {

@@ -16,6 +16,7 @@ import { invalidateQuery } from "@blitzjs/rpc"
 import getChecks from "app/check/queries/getChecks"
 import getSchedules from "../queries/getSchedules"
 import { useToast } from "app/core/hooks/useToast"
+import useCountdown from "app/core/hooks/useCountdown"
 
 export const ViewScheduleModal = ({
   schedule,
@@ -69,12 +70,15 @@ export const ViewScheduleModal = ({
             {formatDate(new Date(schedule.data.startDate))}
           </MetadataItem>
           <MetadataItem label="Repeat every">
-            {schedule.data.repeatFrequency + " " + schedule.data.repeatPeriod}
+            {schedule.data.periodCoefficient + " " + schedule.data.periodUnit}
           </MetadataItem>
           <MetadataItem label="Progress">
             {schedule.data.maxCount
               ? `${schedule.counter}/${schedule.data.maxCount} cycles`
               : "Ongoing"}
+          </MetadataItem>
+          <MetadataItem label="Next refresh at">
+            {schedule.nextRefreshAt?.toUTCString()}
           </MetadataItem>
         </div>
       )}

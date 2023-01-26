@@ -1,7 +1,6 @@
-import { d } from "@blitzjs/auth/dist/index-57d74361"
 import db from "db"
 import * as z from "zod"
-import { Schedule, ScheduleRepeatPeriod } from "../types"
+import { Schedule, SchedulePeriodUnit } from "../types"
 import { calculateNextRefreshTime } from "../utils"
 
 const UpdateSchedule = z.object({
@@ -13,11 +12,11 @@ const UpdateSchedule = z.object({
   meta: z.any(),
   schedule: z.object({
     startDate: z.date(),
-    repeatFrequency: z.number(),
-    repeatPeriod: z.enum([
-      ScheduleRepeatPeriod.WEEKS,
-      ScheduleRepeatPeriod.MONTHS,
-      //   ScheduleRepeatPeriod.MINUTES, // uncomment for testing
+    periodCoefficient: z.number(),
+    periodUnit: z.enum([
+      SchedulePeriodUnit.WEEK,
+      SchedulePeriodUnit.MONTH,
+      SchedulePeriodUnit.MINUTE, // uncomment for testing
     ]),
     maxCount: z.number().optional(),
   }),
@@ -50,17 +49,22 @@ export default async function updateSchedule(input: z.infer<typeof UpdateSchedul
           data: params.data,
         },
         startDate: params.schedule.startDate.toJSON(),
-        repeatFrequency: params.schedule.repeatFrequency,
-        repeatPeriod: params.schedule.repeatPeriod,
+        periodCoefficient: params.schedule.periodCoefficient,
+        periodUnit: params.schedule.periodUnit,
         maxCount: params.schedule.maxCount,
       },
       nextRefreshAt:
-        params.schedule.maxCount && schedule.counter >= params.schedule.maxCount
+        // schedule has not hit first refresh -> next refresh at start date
+        !schedule.lastRefreshMarker
+          ? params.schedule.startDate
+          : // schedule has max count and count has been reached -> no next refresh
+          params.schedule.maxCount && schedule.counter >= params.schedule.maxCount
           ? null
-          : calculateNextRefreshTime({
-              frequency: params.schedule.repeatFrequency,
-              period: params.schedule.repeatPeriod,
-              lastRefreshedAt: new Date(),
+          : // calculate next refresh time
+            calculateNextRefreshTime({
+              periodCoefficient: params.schedule.periodCoefficient,
+              periodUnit: params.schedule.periodUnit,
+              lastRefreshMarker: schedule.lastRefreshMarker,
             }),
     },
   })

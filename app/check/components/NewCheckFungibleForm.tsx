@@ -8,7 +8,7 @@ import { preparePaymentTransaction } from "app/transaction/payments"
 import { CheckType } from "../types"
 import { useResolveEnsAddress } from "app/proposalForm/hooks/useResolveEnsAddress"
 import SwitchField from "app/core/components/form/SwitchField"
-import { ScheduleEnds, ScheduleRepeatPeriod } from "app/schedule/types"
+import { ScheduleEnds, SchedulePeriodUnit } from "app/schedule/types"
 import formatDateForFieldInput from "app/core/utils/formatDateForFieldInput"
 import convertDateFieldInputToDate from "app/core/utils/convertDateFieldInputToDate"
 import ScheduleFields from "app/schedule/componenets/ScheduleFields"
@@ -37,8 +37,8 @@ export const NewCheckFungibleForm = ({ goBack, onCreate }) => {
       <Form
         initialValues={{
           scheduleStartDate: formatDateForFieldInput(new Date()),
-          scheduleRepeatFrequency: "1",
-          scheduleRepeatPeriod: ScheduleRepeatPeriod.WEEKS,
+          schedulePeriodCoefficient: "1",
+          schedulePeriodUnit: SchedulePeriodUnit.WEEK,
           scheduleEnds: ScheduleEnds.NEVER,
           scheduleMaxCount: "1",
         }}
@@ -66,8 +66,8 @@ export const NewCheckFungibleForm = ({ goBack, onCreate }) => {
             ...(values.scheduleEnabled && {
               schedule: {
                 startDate: convertDateFieldInputToDate(values.scheduleStartDate),
-                repeatFrequency: parseInt(values.scheduleRepeatFrequency),
-                repeatPeriod: values.scheduleRepeatPeriod,
+                periodCoefficient: parseInt(values.schedulePeriodCoefficient),
+                periodUnit: values.schedulePeriodUnit,
                 maxCount:
                   values.scheduleEnds === ScheduleEnds.NEVER
                     ? undefined

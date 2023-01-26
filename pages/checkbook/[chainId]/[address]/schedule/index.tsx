@@ -25,6 +25,7 @@ import { useSchedules } from "app/schedule/hooks/useSchedules"
 import truncateString from "app/core/utils/truncateString"
 import ViewScheduleModal from "app/schedule/componenets/ViewScheduleModal"
 import { Schedule } from "app/schedule/types"
+import useCountdown from "app/core/hooks/useCountdown"
 
 const SchedulesHome: BlitzPage = () => {
   const checkbookChainId = useParam("chainId", "number") as number
@@ -67,6 +68,9 @@ const SchedulesHome: BlitzPage = () => {
             <th className="text-xs tracking-wide uppercase text-concrete py-2 text-left">
               Progress
             </th>
+            <th className="text-xs tracking-wide uppercase text-concrete py-2 text-left">
+              Next refresh at
+            </th>
           </tr>
         </thead>
         {/* TABLE BODY */}
@@ -92,13 +96,14 @@ const SchedulesHome: BlitzPage = () => {
                     {formatDate(new Date(schedule.data.startDate))}
                   </td>
                   <td className="text-base py-4">
-                    {schedule.data.repeatFrequency + " " + schedule.data.repeatPeriod}
+                    {schedule.data.periodCoefficient + " " + schedule.data.periodUnit}
                   </td>
                   <td className="text-base py-4">
                     {schedule.data.maxCount
                       ? `${schedule.counter}/${schedule.data.maxCount} cycles`
                       : "Ongoing"}
                   </td>
+                  <td className="text-base py-4">{schedule.nextRefreshAt?.toUTCString()}</td>
                 </tr>
               )
             })}

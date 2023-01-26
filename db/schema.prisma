@@ -76,14 +76,15 @@ model Inbox {
 }
 
 model Schedule {
-  id            String    @id @default(uuid())
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  data          Json
-  chainId       Int
-  address       String
-  counter       Int       @default(0) // how many refresh cycles 
-  nextRefreshAt DateTime? // null when no next refresh
+  id                String    @id @default(uuid())
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  data              Json
+  chainId           Int
+  address           String
+  counter           Int       @default(0) // how many refresh cycles 
+  nextRefreshAt     DateTime? // null when no next refresh
+  lastRefreshMarker DateTime? // null before first refresh
 
   checkbook Checkbook @relation(fields: [chainId, address], references: [chainId, address])
   checks    Check[]

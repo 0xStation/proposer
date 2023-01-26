@@ -11,6 +11,7 @@ CREATE TABLE "Schedule" (
     "address" TEXT NOT NULL,
     "counter" INTEGER NOT NULL DEFAULT 0,
     "nextRefreshAt" TIMESTAMP(3),
+    "lastRefreshMarker" TIMESTAMP(3),
 
     CONSTRAINT "Schedule_pkey" PRIMARY KEY ("id")
 );

@@ -1,25 +1,26 @@
-import { ScheduleRepeatPeriod } from "./types"
+import { SchedulePeriodUnit } from "./types"
 
 export const calculateNextRefreshTime = ({
-  frequency,
-  period,
-  lastRefreshedAt,
+  periodCoefficient,
+  periodUnit,
+  lastRefreshMarker,
 }: {
-  frequency: number
-  period: ScheduleRepeatPeriod
-  lastRefreshedAt: Date
+  periodCoefficient: number
+  periodUnit: SchedulePeriodUnit
+  lastRefreshMarker: Date
 }): Date => {
   let delay: number
-  if (period === ScheduleRepeatPeriod.MINUTES) {
-    delay = 1000 * 60 * frequency
-  } else if (period === ScheduleRepeatPeriod.WEEKS) {
-    delay = 1000 * 60 * 60 * 24 * 7 * frequency
-  } else if (period === ScheduleRepeatPeriod.MONTHS) {
+  if (periodUnit === SchedulePeriodUnit.MINUTE) {
+    delay = periodCoefficient * 1000 * 60
+  } else if (periodUnit === SchedulePeriodUnit.WEEK) {
+    delay = periodCoefficient * 1000 * 60 * 60 * 24 * 7
+  } else if (periodUnit === SchedulePeriodUnit.MONTH) {
     // TODO: fix this to jump months appropriately taking into account 28/30/31 days in a month
-    delay = 1000 * 60 * 60 * 24 * 30 * frequency
+    delay = periodCoefficient * 1000 * 60 * 60 * 24 * 30
   } else {
     console.log("delay is zero")
     delay = 0
   }
-  return new Date(lastRefreshedAt.valueOf() + delay)
+  // if schedule has no last refresh marker, next refresh is start date
+  return new Date(lastRefreshMarker.valueOf() + delay)
 }

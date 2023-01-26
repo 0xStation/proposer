@@ -48,8 +48,8 @@ export const UpdateScheduleForm = ({
           token: schedule.data.meta.token,
           tokenAmount: schedule.data.meta.amount?.toString(),
           scheduleStartDate: formatDateForFieldInput(new Date(schedule.data.startDate)),
-          scheduleRepeatFrequency: schedule.data.repeatFrequency.toString(),
-          scheduleRepeatPeriod: schedule.data.repeatPeriod,
+          schedulePeriodCoefficient: schedule.data.periodCoefficient.toString(),
+          schedulePeriodUnit: schedule.data.periodUnit,
           scheduleEnds: schedule.data.maxCount ? ScheduleEnds.AFTER_CYCLES : ScheduleEnds.NEVER,
           scheduleMaxCount: schedule.data.maxCount?.toString() || "1",
         }}
@@ -75,8 +75,8 @@ export const UpdateScheduleForm = ({
             },
             schedule: {
               startDate: convertDateFieldInputToDate(values.scheduleStartDate),
-              repeatFrequency: parseInt(values.scheduleRepeatFrequency),
-              repeatPeriod: values.scheduleRepeatPeriod,
+              periodCoefficient: parseInt(values.schedulePeriodCoefficient),
+              periodUnit: values.schedulePeriodUnit,
               maxCount:
                 values.scheduleEnds === ScheduleEnds.NEVER
                   ? undefined

@@ -6,6 +6,7 @@ import { NewCheckFungibleForm } from "./NewCheckFungibleForm"
 import { NewCheckNonFungibleForm } from "./NewCheckNonFungibleForm"
 import { invalidateQuery } from "@blitzjs/rpc"
 import getChecks from "../queries/getChecks"
+import getSchedules from "app/schedule/queries/getSchedules"
 
 export const NewCheckModal = ({
   isOpen,
@@ -109,6 +110,7 @@ export const NewCheckModal = ({
             onCreate={() => {
               setIsOpen(false)
               invalidateQuery(getChecks)
+              invalidateQuery(getSchedules)
             }}
           />
         )}

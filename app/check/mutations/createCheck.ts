@@ -1,4 +1,4 @@
-import { ScheduleRepeatPeriod } from "app/schedule/types"
+import { SchedulePeriodUnit } from "app/schedule/types"
 import db from "db"
 import * as z from "zod"
 import { Check } from "../types"
@@ -15,11 +15,11 @@ const CreateCheck = z.object({
   schedule: z
     .object({
       startDate: z.date(),
-      repeatFrequency: z.number(),
-      repeatPeriod: z.enum([
-        ScheduleRepeatPeriod.WEEKS,
-        ScheduleRepeatPeriod.MONTHS,
-        // ScheduleRepeatPeriod.MINUTES, // uncomment for testing
+      periodCoefficient: z.number(),
+      periodUnit: z.enum([
+        SchedulePeriodUnit.WEEK,
+        SchedulePeriodUnit.MONTH,
+        SchedulePeriodUnit.MINUTE, // uncomment for testing
       ]),
       maxCount: z.number().optional(),
     })
@@ -57,8 +57,8 @@ export default async function createCheck(input: z.infer<typeof CreateCheck>) {
               data: params.data,
             },
             startDate: params.schedule.startDate.toJSON(),
-            repeatFrequency: params.schedule.repeatFrequency,
-            repeatPeriod: params.schedule.repeatPeriod,
+            periodCoefficient: params.schedule.periodCoefficient,
+            periodUnit: params.schedule.periodUnit,
             maxCount: params.schedule.maxCount,
           },
           nextRefreshAt: params.schedule.startDate,

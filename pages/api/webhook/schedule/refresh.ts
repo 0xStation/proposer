@@ -57,13 +57,15 @@ async function handler(req, res) {
         },
         data: {
           counter: schedule.counter + 1,
-          nextRefreshAt: counterReached
-            ? null
-            : calculateNextRefreshTime({
-                frequency: schedule.data.repeatFrequency,
-                period: schedule.data.repeatPeriod,
-                lastRefreshedAt: now,
-              }),
+          lastRefreshMarker: schedule.nextRefreshAt,
+          nextRefreshAt:
+            counterReached || !schedule.nextRefreshAt
+              ? null
+              : calculateNextRefreshTime({
+                  periodCoefficient: schedule.data.periodCoefficient,
+                  periodUnit: schedule.data.periodUnit,
+                  lastRefreshMarker: schedule.nextRefreshAt,
+                }),
         },
       })
     })

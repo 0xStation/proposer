@@ -132,7 +132,7 @@ const CheckbookHome: BlitzPage = () => {
                       Status
                     </th>
                     <th className="text-xs tracking-wide uppercase text-concrete py-2 text-left">
-                      Title
+                      Note
                     </th>
                     <th className="text-xs tracking-wide uppercase text-concrete py-2 text-left">
                       Created
@@ -191,7 +191,7 @@ const CheckbookHome: BlitzPage = () => {
                                     setViewScheduleModalOpen(true)
                                   }}
                                 >
-                                  {`Repeats every ${check.schedule?.data.repeatFrequency} ${check.schedule?.data.repeatPeriod}`}
+                                  {`Repeats every ${check.schedule?.data.periodCoefficient} ${check.schedule?.data.periodUnit}`}
                                 </div>
                               )}
                             </div>

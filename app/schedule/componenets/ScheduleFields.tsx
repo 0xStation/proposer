@@ -2,7 +2,7 @@ import DatetimeField from "app/core/components/form/DatetimeField"
 import IntegerField from "app/core/components/form/IntegerField"
 import RadioField from "app/core/components/form/RadioField"
 import SelectField from "app/core/components/form/SelectField"
-import { ScheduleEnds, ScheduleRepeatPeriod } from "../types"
+import { ScheduleEnds, SchedulePeriodUnit } from "../types"
 
 export const ScheduleFields = ({ formState, minCycles = 1 }) => {
   return (
@@ -12,13 +12,13 @@ export const ScheduleFields = ({ formState, minCycles = 1 }) => {
       {/* REPEAT */}
       <label className="font-bold block mt-6">Repeat every</label>
       <div className="flex flex-row space-x-4 w-1/2">
-        <IntegerField fieldName="scheduleRepeatFrequency" min={1} />
+        <IntegerField fieldName="schedulePeriodCoefficient" min={1} />
         <SelectField
-          fieldName="scheduleRepeatPeriod"
+          fieldName="schedulePeriodUnit"
           options={[
-            // ScheduleRepeatPeriod.MINUTES, // uncomment for testing
-            ScheduleRepeatPeriod.WEEKS,
-            ScheduleRepeatPeriod.MONTHS,
+            SchedulePeriodUnit.MINUTE, // uncomment for testing
+            SchedulePeriodUnit.WEEK,
+            SchedulePeriodUnit.MONTH,
           ]}
         />
       </div>
