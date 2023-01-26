@@ -2,22 +2,22 @@ import { Interface } from "@ethersproject/abi"
 import { CHECKBOOK_MODULE_ADDRESS, ZERO_ADDRESS } from "app/core/utils/constants"
 import { BigNumber } from "@ethersproject/bignumber"
 
-// function execute(
-//     address safe,
-//     uint256 nonce,
-//     address executor,
-//     address to,
-//     uint256 value,
-//     bytes calldata data,
-//     bytes[] calldata signatures
-// ) external returns (bool success)
-
-export const checkbookTransaction = ({ chainId, safe, nonce, to, value, data, proofs }) => {
+export const checkbookTransaction = ({
+  checkTitle,
+  chainId,
+  safe,
+  nonce,
+  to,
+  value,
+  data,
+  proofs,
+}) => {
   const checkbookInterface = new Interface([
-    "function execute(address safe,uint256 nonce,address executor,address to,uint256 value,bytes calldata data,tuple(bytes32[] calldata path,bytes signature)[] calldata proofs) external returns (bool success)",
+    "function execute(address safe,uint256 nonce,address executor,address to,uint256 value,bytes calldata data,tuple(bytes32[] calldata path,bytes signature)[] calldata proofs, string note) external returns (bool success)",
   ])
 
   console.log(
+    checkTitle,
     chainId,
     safe,
     nonce,
@@ -45,6 +45,9 @@ export const checkbookTransaction = ({ chainId, safe, nonce, to, value, data, pr
       path: proof.data.path,
       signature: proof.signature.data.signature,
     })),
+    // TODO: we should notify users that the check title will be published on-chain if the checkbook is public
+    // if the checkbook is private, we should pass in an empty string to not publicize on chain
+    checkTitle,
   ])
 
   return {

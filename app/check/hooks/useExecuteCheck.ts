@@ -43,6 +43,7 @@ export const useExecuteCheck = ({ check, setIsLoading }) => {
       setIsLoading(true)
 
       const transactionPayload = checkbookTransaction({
+        checkTitle: check.data.title,
         chainId: check.chainId,
         safe: check.address,
         nonce: check.nonce,
