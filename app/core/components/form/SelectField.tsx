@@ -1,5 +1,4 @@
 import { Listbox, Transition } from "@headlessui/react"
-import { Safe } from "app/safe/types"
 import { Fragment } from "react"
 import { Field } from "react-final-form"
 

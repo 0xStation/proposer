@@ -1,41 +1,18 @@
-import { gSSP } from "app/blitz-server"
-import Link from "next/link"
-import { invoke, useQuery } from "@blitzjs/rpc"
-import { BlitzPage, useParam, Routes } from "@blitzjs/next"
+import { BlitzPage, useParam } from "@blitzjs/next"
 import Layout from "app/core/layouts/Layout"
-import Button from "app/core/components/sds/buttons/Button"
-import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { formatDate } from "app/core/utils/formatDate"
-import { isAddress } from "ethers/lib/utils"
-import { useRouter } from "next/router"
-import getCheckbook from "app/checkbook/queries/getCheckbook"
-import { useChecks } from "app/check/hooks/useChecks"
 import CheckbookSidebar from "app/checkbook/components/CheckbookSidebar"
 import { useState } from "react"
-import NewCheckModal from "app/check/components/NewCheckModal"
-import ViewCheckModal from "app/check/components/ViewCheckModal"
-import { Check } from "app/check/types"
-import { CheckStatusIndicator } from "app/check/components/CheckStatusIndicator"
-import { useSafeMetadata } from "app/safe/hooks/useSafeMetadata"
-import getChecks from "app/check/queries/getChecks"
-import { useInboxes } from "app/inbox/hooks/useInboxes"
-import NewInboxModal from "app/inbox/components/NewInboxModal"
-import { useCheckbook } from "app/checkbook/hooks/useCheckbook"
 import { useSchedules } from "app/schedule/hooks/useSchedules"
 import truncateString from "app/core/utils/truncateString"
 import ViewScheduleModal from "app/schedule/componenets/ViewScheduleModal"
 import { Schedule } from "app/schedule/types"
-import useCountdown from "app/core/hooks/useCountdown"
 
 const SchedulesHome: BlitzPage = () => {
   const checkbookChainId = useParam("chainId", "number") as number
   const checkbookAddress = useParam("address", "string") as string
-  const [newCheckModalOpen, setNewCheckModalOpen] = useState<boolean>(false)
   const [viewScheduleModalOpen, setViewScheduleModalOpen] = useState<boolean>(false)
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule>()
-  const [newInboxModalOpen, setNewInboxModalOpen] = useState<boolean>(false)
-
-  const router = useRouter()
 
   const { schedules } = useSchedules(checkbookChainId, checkbookAddress)
 
