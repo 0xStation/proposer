@@ -33,6 +33,8 @@ export const gradientMap = {
 
 export const FLEXIBLE_SIGNING_CONTRACT = "0xa11f46fc7f540929c904805c3f21d1af34a7af51" // Goerli
 
+export const THRESHOLD_CHANGE = "THESHOLD CHANGE"
+
 export const CHECKBOOK_MODULE_ADDRESS = {
   5: FLEXIBLE_SIGNING_CONTRACT,
 }

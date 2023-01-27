@@ -36,7 +36,7 @@ model Check {
   txnHash   String?
   inboxId   String?
 
-  checkbook Checkbook @relation(fields: [chainId, address], references: [chainId, address])
+  checkbook Checkbook @relation(fields: [chainId, address], references: [chainId, address], onDelete: Cascade)
   proofs    Proof[]
   inbox     Inbox?    @relation(fields: [inboxId], references: [id])
 }
@@ -68,7 +68,7 @@ model Inbox {
   chainId   Int
   address   String
 
-  checkbook Checkbook @relation(fields: [chainId, address], references: [chainId, address])
+  checkbook Checkbook @relation(fields: [chainId, address], references: [chainId, address], onDelete: Cascade)
   checks    Check[]
 }
 

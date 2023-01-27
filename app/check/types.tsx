@@ -27,6 +27,7 @@ export type CheckMetadata = {
 export enum CheckType {
   FungibleTransfer,
   NonFungibleTransfer,
+  ThresholdChange,
 }
 
 export enum CheckStatus {
