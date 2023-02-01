@@ -5,6 +5,8 @@ import { useState } from "react"
 import { useSendTransaction, useWaitForTransaction } from "wagmi"
 import addTransactionHashToChecks from "../mutations/addTransactionHashToChecks"
 import getChecks from "../queries/getChecks"
+import { ADD_SIGNER_AND_THRESHOLD_CHANGE, THRESHOLD_CHANGE } from "app/core/utils/constants"
+import getSafeMetadata from "../../account/queries/getSafeMetadata"
 
 export const useExecuteCheck = ({ check, setIsLoading }) => {
   const setToastState = useStore((state) => state.setToastState)
@@ -19,6 +21,12 @@ export const useExecuteCheck = ({ check, setIsLoading }) => {
     hash: txnHash as `0x${string}`,
     onSuccess: async (data) => {
       invalidateQuery(getChecks)
+      if (
+        check.data.title === THRESHOLD_CHANGE ||
+        check.data.title === ADD_SIGNER_AND_THRESHOLD_CHANGE
+      ) {
+        invalidateQuery(getSafeMetadata)
+      }
       setToastState({
         isToastShowing: true,
         type: "success",

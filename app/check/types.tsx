@@ -28,6 +28,7 @@ export enum CheckType {
   FungibleTransfer,
   NonFungibleTransfer,
   ThresholdChange,
+  NewSignerAndThresholdChange,
 }
 
 export enum CheckStatus {

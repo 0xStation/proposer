@@ -7,7 +7,7 @@ import { useState } from "react"
 const ChangeThresholdModal = dynamic(() => import("./ChangeThresholdModal"), {
   ssr: false,
 })
-export const SignatureThreshold = () => {
+export const SignatureThresholdBox = ({ className }: { className?: "" }) => {
   const checkbookChainId = useParam("chainId", "number") as number
   const checkbookAddress = useParam("address", "string") as string
   const [changeThresholdModalOpen, setChangeThresholdModalOpen] = useState<boolean>(false)
@@ -22,7 +22,7 @@ export const SignatureThreshold = () => {
           safe={safe}
         />
       )}
-      <div className="bg-charcoal w-1/2 rounded p-6">
+      <div className={`bg-charcoal w-1/2 rounded p-6 ${className}`}>
         <h1 className="text-lg font-bold">Signature threshold</h1>
         <div className="mt-4">
           Number of required owners to sign an action before it&apos;s executed.
