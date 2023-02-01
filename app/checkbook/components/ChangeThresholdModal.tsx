@@ -40,11 +40,8 @@ export const ChangeThresholdModal = ({
   })
 
   useEffect(() => {
-    if (safe?.quorum && editedQuorum && editedQuorum !== safe?.quorum) {
-      setSameThreshold(false)
-    } else {
-      setSameThreshold(true)
-    }
+    // This is basically checking whether the threshold is dirty and has changed from the original.
+    setSameThreshold(Boolean(!safe?.quorum || !editedQuorum || editedQuorum === safe?.quorum))
   }, [safe?.quorum, editedQuorum])
 
   const { signCheck } = useSignCheck()
@@ -56,7 +53,7 @@ export const ChangeThresholdModal = ({
     const newCheck = await createCheckMutation({
       chainId: safe?.chainId,
       address: safe?.address,
-      title: THRESHOLD_CHANGE, // TODO: make constant
+      title: THRESHOLD_CHANGE,
       to: safe?.address,
       value,
       data: data,
@@ -65,8 +62,6 @@ export const ChangeThresholdModal = ({
         prevQuorum: safe?.quorum,
       },
     })
-
-    console.log("newCheck!!", newCheck)
 
     const success = await signCheck({ checks: [newCheck], setIsLoading })
 
