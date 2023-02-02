@@ -9,6 +9,7 @@ export const SignerActionComponent = ({
   signerAddress,
   setReplaceSignerModalOpen,
   setSelectedSignerAddress,
+  setRemoveSignerModalOpen,
 }) => {
   return (
     <div className="flex flex-row justify-between border-b border-b-concrete py-3 px-1 rounded">
@@ -23,7 +24,15 @@ export const SignerActionComponent = ({
         >
           <PencilIcon className="h-5 w-5" />
         </button>
-        <TrashIcon className="h-5 w-5" />
+        <button
+          onClick={() => {
+            setSelectedSignerAddress(signerAddress)
+            setRemoveSignerModalOpen(true)
+          }}
+          className="hover:bg-wet-concrete rounded px-1 mr-3"
+        >
+          <TrashIcon className="h-5 w-5" />
+        </button>
       </div>
     </div>
   )
@@ -37,11 +46,16 @@ const ReplaceSignerModal = dynamic(() => import("./ReplaceSignerModal"), {
   ssr: false,
 })
 
+const RemoveSignerModal = dynamic(() => import("./RemoveSignerModal"), {
+  ssr: false,
+})
+
 export const ChangeSignersBox = ({ className }: { className?: string }) => {
   const checkbookChainId = useParam("chainId", "number") as number
   const checkbookAddress = useParam("address", "string") as string
   const [addNewSignerModalOpen, setAddNewSignerModalOpen] = useState<boolean>(false)
   const [replaceSignerModalOpen, setReplaceSignerModalOpen] = useState<boolean>(false)
+  const [removeSignerModalOpen, setRemoveSignerModalOpen] = useState<boolean>(false)
   const [selectedSignerAddress, setSelectedSignerAddress] = useState<string>("")
   const { safe } = useSafeMetadata({ chainId: checkbookChainId, address: checkbookAddress })
 
@@ -62,6 +76,14 @@ export const ChangeSignersBox = ({ className }: { className?: string }) => {
           safe={safe}
         />
       )}
+      {removeSignerModalOpen && (
+        <RemoveSignerModal
+          isOpen={removeSignerModalOpen}
+          setIsOpen={setRemoveSignerModalOpen}
+          selectedSignerAddress={selectedSignerAddress}
+          safe={safe}
+        />
+      )}
       <div className={`bg-charcoal w-1/2 min-w-fit rounded p-6 ${className}`}>
         <h1 className="text-lg font-bold">Signers</h1>
         <div className="mt-4">
@@ -72,6 +94,7 @@ export const ChangeSignersBox = ({ className }: { className?: string }) => {
                 key={signerAddress}
                 setSelectedSignerAddress={setSelectedSignerAddress}
                 setReplaceSignerModalOpen={setReplaceSignerModalOpen}
+                setRemoveSignerModalOpen={setRemoveSignerModalOpen}
               />
             )
           })}

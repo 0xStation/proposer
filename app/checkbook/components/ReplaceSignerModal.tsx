@@ -10,9 +10,7 @@ import deleteCheckById from "../../check/mutations/deleteCheckById"
 import { prepareReplaceSignerTransaction } from "app/transaction/replaceSigner"
 import { useGetOwners } from "app/safe/hooks/useGetOwners"
 import { addressesAreEqual } from "../../core/utils/addressesAreEqual"
-import { REPLACE_SIGNER } from "app/core/utils/constants"
-
-const SENTINEL_ADDRESS = "0x0000000000000000000000000000000000000001"
+import { REPLACE_SIGNER, SENTINEL_ADDRESS } from "app/core/utils/constants"
 
 export const ReplaceSignerModal = ({
   isOpen,
@@ -45,7 +43,6 @@ export const ReplaceSignerModal = ({
     },
   })
   const owners = useGetOwners({ chainId: safe?.chainId, safeAddress: safe?.address }) as []
-  console.log("owners", owners)
 
   const { signCheck } = useSignCheck()
 
