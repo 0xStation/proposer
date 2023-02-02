@@ -29,6 +29,7 @@ export enum CheckType {
   NonFungibleTransfer,
   ThresholdChange,
   NewSignerAndThresholdChange,
+  ReplaceSigner,
 }
 
 export enum CheckStatus {
