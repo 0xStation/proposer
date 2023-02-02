@@ -58,7 +58,7 @@ const PaymentRow = ({ proposal, milestone, payment }) => {
                   <TextLink
                     url={`${getNetworkGnosisUrl(payment?.data?.token?.chainId)}:${
                       payment?.senderAddress
-                    }/transactions/${attempt.multisigTransaction.transactionId}`}
+                    }/transactions/tx?id=${attempt.multisigTransaction.transactionId}`}
                     // NOTE: if we change gnosisUrl to safe.global, this needs to change too!
                     className="text-sm"
                   >
