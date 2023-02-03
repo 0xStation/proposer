@@ -102,7 +102,7 @@ export const ChangeThresholdModal = ({
               setEditedQuorum(parseInt(e.target.value))
             }}
           />
-          out of {safe?.signers.length} owners
+          out of {safe?.signers.length} signers.
           <p
             className={`${
               isDirty && sameThreshold ? "visible" : "invisible"

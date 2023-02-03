@@ -150,7 +150,7 @@ export const AddNewSignerModal = ({
                   setEditedQuorum(parseInt(e.target.value))
                 }}
               />
-              out of {safe?.signers.length} owners
+              out of {safe?.signers.length} signers.
               <div className="w-full flex flex-row justify-between mt-8">
                 <button
                   className="h-[20px] w-[20px] self-center"

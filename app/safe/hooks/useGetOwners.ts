@@ -9,7 +9,5 @@ export const useGetOwners = ({ chainId, safeAddress }) => {
     functionName: "getOwners",
   })
 
-  console.log("owners", response)
-
   return response?.data || false
 }

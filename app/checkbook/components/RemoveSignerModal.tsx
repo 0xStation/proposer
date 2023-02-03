@@ -123,7 +123,7 @@ export const RemoveSignerModal = ({
                   setEditedQuorum(parseInt(e.target.value))
                 }}
               />
-              out of {safe?.signers.length - 1} owners
+              out of {safe?.signers.length - 1} signers.
               <div className="w-full flex flex-row justify-between mt-8">
                 <button
                   className="h-[20px] w-[20px] self-center"

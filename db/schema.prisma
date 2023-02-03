@@ -55,8 +55,8 @@ model Proof {
   id               String         @id @default(uuid())
   checkSignatureId String
   checkId          String
-  check            Check          @relation(fields: [checkId], references: [id])
-  signature        CheckSignature @relation(fields: [checkSignatureId], references: [id])
+  check            Check          @relation(fields: [checkId], references: [id], onDelete: Cascade)
+  signature        CheckSignature @relation(fields: [checkSignatureId], references: [id], onDelete: Cascade)
   data             Json
 }
 
@@ -252,6 +252,7 @@ model ProposalMilestone {
 
   proposal Proposal          @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   payments ProposalPayment[]
+
   @@unique([proposalId, index])
 }
 
@@ -265,7 +266,6 @@ model ProposalPayment {
   tokenId          Float? // float to support larger size numbers
   transactionHash  String?
   data             Json
-
 
   proposal  Proposal          @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   milestone ProposalMilestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
@@ -312,6 +312,7 @@ model Token {
   decimals Int?
 
   accounts AccountToken[]
+
   @@id([address, chainId])
 }
 
@@ -330,6 +331,7 @@ model AccountToken {
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
   token   Token   @relation(fields: [tokenAddress, chainId], references: [address, chainId])
+
   @@id([accountId, tokenAddress, chainId])
 }
 

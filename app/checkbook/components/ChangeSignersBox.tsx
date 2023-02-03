@@ -99,7 +99,7 @@ export const ChangeSignersBox = ({ className }: { className?: string }) => {
             )
           })}
           <Button className="mt-6" onClick={() => setAddNewSignerModalOpen(true)}>
-            Add new owner
+            Add new signer
           </Button>
         </div>
       </div>

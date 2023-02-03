@@ -25,9 +25,10 @@ export const SignatureThresholdBox = ({ className }: { className?: "" }) => {
       <div className={`bg-charcoal w-1/2 rounded p-6 ${className}`}>
         <h1 className="text-lg font-bold">Signature threshold</h1>
         <div className="mt-4">
-          Number of required owners to sign an action before it&apos;s executed.
+          Number of required signers to sign an action before it&apos;s executed.
           <p className="mt-4">
-            {safe?.quorum} out of <span className="font-bold">{safe?.signers?.length}</span> owners.
+            {safe?.quorum} out of <span className="font-bold">{safe?.signers?.length}</span>{" "}
+            signers.
           </p>
           <Button className="mt-6" onClick={() => setChangeThresholdModalOpen(true)}>
             Change
