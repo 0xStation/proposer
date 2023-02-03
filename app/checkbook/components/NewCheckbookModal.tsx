@@ -96,8 +96,10 @@ export const NewCheckbookModal = ({
   const { sendTransactionAsync } = useSendTransaction({ mode: "recklesslyUnprepared" })
 
   const createSafe = async () => {
-    const initializeModuleInterface = new Interface(["function initializeSafe()"])
-    const initializeModuleData = initializeModuleInterface.encodeFunctionData("initializeSafe")
+    const initializeModuleInterface = new Interface(["function enableModuleWithinDeploy()"])
+    const initializeModuleData = initializeModuleInterface.encodeFunctionData(
+      "enableModuleWithinDeploy"
+    )
     const params = [
       ["0x6860c9323d4976615ae515ab4b0039d7399e7cc8"], // owners
       1, // threshold
