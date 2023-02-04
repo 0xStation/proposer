@@ -32,6 +32,9 @@ export default async function getRfpsForAccount(input: z.infer<typeof GetRfpsFor
     },
     take: input.paginationTake,
     skip: input.page * input.paginationTake,
+    orderBy: {
+      status: "asc", // jank way to sort so OPEN rfps are shown first, temp fix
+    },
   })
 
   return rfps.map((rfp) => {
