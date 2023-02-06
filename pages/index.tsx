@@ -1,5 +1,5 @@
 import { BlitzPage, Routes } from "@blitzjs/next"
-import { useInfiniteQuery, useQuery } from "@blitzjs/rpc"
+import { invoke, useInfiniteQuery, useQuery } from "@blitzjs/rpc"
 import { useCallback, useRef, useState } from "react"
 import { Rfp } from "app/rfp/types"
 import { useRouter } from "next/router"
@@ -13,12 +13,42 @@ import getPaginatedRfps from "app/rfp/queries/getPaginatedRfps"
 import useStore from "app/core/hooks/useStore"
 import dynamic from "next/dynamic"
 import { Account } from "app/account/types"
+import { gSSP } from "app/blitz-server"
+import { GetServerSideProps, InferGetServerSidePropsType } from "next"
 
 const RfpPreCreateModal = dynamic(() => import("app/rfp/components/RfpPreCreateModal"), {
   ssr: false,
 })
 
-const Home: BlitzPage = () => {
+export const getServerSideProps: GetServerSideProps = gSSP(async ({ params = {} }) => {
+  const accounts = await invoke(getAccountsByAddresses, {
+    addresses: [
+      "0x0C528bA4964673a9187A6F7BEc96E8aFD3409a54", // tiny factories
+      "0x332557dE221d09AD5b164a665c585fca0200b4B1", // foxes
+      "0x96F0F1Ddafae2C6bd0635D28BdbA6B959Fb99eea", // tchard.eth
+      "0xc517c83f417b73dA98647dad0FCB80af9f3b9531", // station
+      "0x08C75DE5686923a93E6D1B0160E3ef4913c3F3f0", // polygon
+      "0xEC41a0AAea12ad8F588e5aD0e71A837d83e05792", // popp.eth
+      "0x8dca852d10c3CfccB88584281eC1Ef2d335253Fd", // cabindao
+      "0xEAB32a423B3dA4049F1Ad379737fCf1f4F9a5137", // radicle
+      "0xBb398Fd83126500E3f0afec6d4c69411576bc7FB", // blurryjpeg
+      "0xf60B82309D90c0c90826266aaa22b00322C2f632", // the symmetrical
+    ],
+  })
+
+  const rfps = await invoke(getPaginatedRfps, {
+    take: 12,
+  })
+
+  return {
+    props: { accounts, rfps: rfps.rfps }, // will be passed to the page component as props
+  }
+})
+
+const Home: BlitzPage = ({
+  accounts,
+  rfps: ssrRfps,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const session = useSession({ suspense: false })
   const toggleWalletModal = useStore((state) => state.toggleWalletModal)
   const router = useRouter()
@@ -39,24 +69,24 @@ const Home: BlitzPage = () => {
     }
   )
 
-  const [accounts] = useQuery(
-    getAccountsByAddresses,
-    {
-      addresses: [
-        "0x0C528bA4964673a9187A6F7BEc96E8aFD3409a54", // tiny factories
-        "0x332557dE221d09AD5b164a665c585fca0200b4B1", // foxes
-        "0x96F0F1Ddafae2C6bd0635D28BdbA6B959Fb99eea", // tchard.eth
-        "0xc517c83f417b73dA98647dad0FCB80af9f3b9531", // station
-        "0x08C75DE5686923a93E6D1B0160E3ef4913c3F3f0", // polygon
-        "0xEC41a0AAea12ad8F588e5aD0e71A837d83e05792", // popp.eth
-        "0x8dca852d10c3CfccB88584281eC1Ef2d335253Fd", // cabindao
-        "0xEAB32a423B3dA4049F1Ad379737fCf1f4F9a5137", // radicle
-        "0xBb398Fd83126500E3f0afec6d4c69411576bc7FB", // blurryjpeg
-        "0xf60B82309D90c0c90826266aaa22b00322C2f632", // the symmetrical
-      ],
-    },
-    { suspense: false }
-  )
+  // const [accounts] = useQuery(
+  //   getAccountsByAddresses,
+  //   {
+  //     addresses: [
+  //       "0x0C528bA4964673a9187A6F7BEc96E8aFD3409a54", // tiny factories
+  //       "0x332557dE221d09AD5b164a665c585fca0200b4B1", // foxes
+  //       "0x96F0F1Ddafae2C6bd0635D28BdbA6B959Fb99eea", // tchard.eth
+  //       "0xc517c83f417b73dA98647dad0FCB80af9f3b9531", // station
+  //       "0x08C75DE5686923a93E6D1B0160E3ef4913c3F3f0", // polygon
+  //       "0xEC41a0AAea12ad8F588e5aD0e71A837d83e05792", // popp.eth
+  //       "0x8dca852d10c3CfccB88584281eC1Ef2d335253Fd", // cabindao
+  //       "0xEAB32a423B3dA4049F1Ad379737fCf1f4F9a5137", // radicle
+  //       "0xBb398Fd83126500E3f0afec6d4c69411576bc7FB", // blurryjpeg
+  //       "0xf60B82309D90c0c90826266aaa22b00322C2f632", // the symmetrical
+  //     ],
+  //   },
+  //   { suspense: false }
+  // )
 
   // attach ref to last post so that when it's seen, we fetch
   // the next batch of paginated rfps
@@ -106,12 +136,25 @@ const Home: BlitzPage = () => {
           )
         })
       )
-    : Array.from(Array(12)).map((idx) => (
-        <div
-          key={idx}
-          className="h-[170px] motion-safe:animate-pulse rounded bg-wet-concrete"
-        ></div>
-      ))
+    : ssrRfps?.map((rfp) => {
+        console.log(rfp)
+        return (
+          <RfpCard
+            key={rfp.id}
+            account={rfp.account as Account}
+            rfp={rfp as Rfp}
+            href={Routes.RfpDetail({
+              rfpId: rfp?.id,
+            })}
+          />
+        )
+      })
+  // Array.from(Array(12)).map((idx) => (
+  //   <div
+  //     key={idx}
+  //     className="h-[170px] motion-safe:animate-pulse rounded bg-wet-concrete"
+  //   ></div>
+  // ))
 
   return (
     <>

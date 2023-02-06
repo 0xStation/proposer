@@ -4,7 +4,12 @@ import { useEffect } from "react"
 export const useScheduleCallback = ({ callback, date }) => {
   useEffect(() => {
     if (!date) return
-    const delay = date.getTime() - Date.now()
+    console.log(typeof date)
+    let parsed = date
+    if (typeof date === typeof "") {
+      parsed = new Date(Date.parse(date as unknown as string))
+    }
+    const delay = parsed.getTime() - Date.now()
     if (delay < 0) return
     // set timer to refresh RFP detail view once we hit refresh date
     setTimeout(() => {

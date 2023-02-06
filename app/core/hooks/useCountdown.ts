@@ -29,25 +29,30 @@ const useCountdown = (date?: Date | null) => {
   // set timer to refresh RFP detail view once we hit refresh date
   useEffect(() => {
     if (!date) return
-    const timeDelta = date.getTime() - Date.now()
+    console.log(typeof date)
+    let parsed = date
+    if (typeof date === typeof "") {
+      parsed = new Date(Date.parse(date as unknown as string))
+    }
+    const timeDelta = parsed.getTime() - Date.now()
     if (timeDelta < 0) return
-    if (countdownString(date) != countdown) {
-      setCountdown(countdownString(date))
+    if (countdownString(parsed) != countdown) {
+      setCountdown(countdownString(parsed))
     }
     if (timeDelta < 1 * hours) {
       const refresh = 1 * seconds
       setTimeout(() => {
-        setCountdown(countdownString(date))
+        setCountdown(countdownString(parsed))
       }, refresh)
     } else if (timeDelta < 2 * hours) {
       const refresh = timeDelta - 1 * hours
       setTimeout(() => {
-        setCountdown(countdownString(date))
+        setCountdown(countdownString(parsed))
       }, refresh)
     } else if (timeDelta < 24 * hours) {
       const refresh = 1 * hours
       setTimeout(() => {
-        setCountdown(countdownString(date))
+        setCountdown(countdownString(parsed))
       }, refresh)
     }
   }, [date, countdown])
