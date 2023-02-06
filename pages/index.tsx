@@ -54,20 +54,20 @@ const Home: BlitzPage = ({
   const router = useRouter()
   const searchRef = useRef<HTMLInputElement>(null)
   const [isRfpPreCreateModalOpen, setIsRfpPreCreateModalOpen] = useState<boolean>(false)
-  const [results, { isFetchingNextPage, fetchNextPage, hasNextPage }] = useInfiniteQuery(
-    getPaginatedRfps,
-    (
-      page = {
-        take: 12,
-      }
-    ) => page,
-    {
-      suspense: false,
-      getNextPageParam: (lastPageResults, allPagesResults) => {
-        return lastPageResults.nextPage
-      },
-    }
-  )
+  // const [results, { isFetchingNextPage, fetchNextPage, hasNextPage }] = useInfiniteQuery(
+  //   getPaginatedRfps,
+  //   (
+  //     page = {
+  //       take: 12,
+  //     }
+  //   ) => page,
+  //   {
+  //     suspense: false,
+  //     getNextPageParam: (lastPageResults, allPagesResults) => {
+  //       return lastPageResults.nextPage
+  //     },
+  //   }
+  // )
 
   // const [accounts] = useQuery(
   //   getAccountsByAddresses,
@@ -90,65 +90,68 @@ const Home: BlitzPage = ({
 
   // attach ref to last post so that when it's seen, we fetch
   // the next batch of paginated rfps
-  const intObserver = useRef<IntersectionObserver | null>(null)
-  const lastPostRef = useCallback(
-    (rfpCard) => {
-      if (isFetchingNextPage) return null
-      if (intObserver.current) intObserver.current.disconnect()
 
-      intObserver.current = new IntersectionObserver((cards) => {
-        if (cards[0]?.isIntersecting && hasNextPage) {
-          fetchNextPage()
-        }
-      })
+  // const intObserver = useRef<IntersectionObserver | null>(null)
+  // const lastPostRef = useCallback(
+  //   (rfpCard) => {
+  //     if (isFetchingNextPage) return null
+  //     if (intObserver.current) intObserver.current.disconnect()
 
-      if (rfpCard) intObserver.current.observe(rfpCard)
-    },
-    [isFetchingNextPage, fetchNextPage, hasNextPage]
-  )
+  //     intObserver.current = new IntersectionObserver((cards) => {
+  //       if (cards[0]?.isIntersecting && hasNextPage) {
+  //         fetchNextPage()
+  //       }
+  //     })
 
-  const rfpCards = results
-    ? results?.map(({ rfps }) =>
-        rfps.map((rfp, i) => {
-          // if it's the last rfp, attach ref
-          if (rfps.length === i + 1) {
-            return (
-              <RfpCard
-                ref={lastPostRef}
-                key={rfp.id}
-                account={rfp.account as Account}
-                rfp={rfp as Rfp}
-                href={Routes.RfpDetail({
-                  rfpId: rfp?.id,
-                })}
-              />
-            )
-          }
-          return (
-            <RfpCard
-              key={rfp.id}
-              account={rfp.account as Account}
-              rfp={rfp as Rfp}
-              href={Routes.RfpDetail({
-                rfpId: rfp?.id,
-              })}
-            />
-          )
-        })
+  //     if (rfpCard) intObserver.current.observe(rfpCard)
+  //   },
+  //   [isFetchingNextPage, fetchNextPage, hasNextPage]
+  // )
+
+  const rfpCards =
+    // results
+    //   ? results?.map(({ rfps }) =>
+    //       rfps.map((rfp, i) => {
+    //         // if it's the last rfp, attach ref
+    //         if (rfps.length === i + 1) {
+    //           return (
+    //             <RfpCard
+    //               ref={lastPostRef}
+    //               key={rfp.id}
+    //               account={rfp.account as Account}
+    //               rfp={rfp as Rfp}
+    //               href={Routes.RfpDetail({
+    //                 rfpId: rfp?.id,
+    //               })}
+    //             />
+    //           )
+    //         }
+    //         return (
+    //           <RfpCard
+    //             key={rfp.id}
+    //             account={rfp.account as Account}
+    //             rfp={rfp as Rfp}
+    //             href={Routes.RfpDetail({
+    //               rfpId: rfp?.id,
+    //             })}
+    //           />
+    //         )
+    //       })
+    //     )
+    //   :
+    ssrRfps?.map((rfp) => {
+      console.log(rfp)
+      return (
+        <RfpCard
+          key={rfp.id}
+          account={rfp.account as Account}
+          rfp={rfp as Rfp}
+          href={Routes.RfpDetail({
+            rfpId: rfp?.id,
+          })}
+        />
       )
-    : ssrRfps?.map((rfp) => {
-        console.log(rfp)
-        return (
-          <RfpCard
-            key={rfp.id}
-            account={rfp.account as Account}
-            rfp={rfp as Rfp}
-            href={Routes.RfpDetail({
-              rfpId: rfp?.id,
-            })}
-          />
-        )
-      })
+    })
   // Array.from(Array(12)).map((idx) => (
   //   <div
   //     key={idx}
