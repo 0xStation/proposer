@@ -62,7 +62,6 @@ export const NewCheckNonFungibleForm = ({ goBack, onCreate }) => {
             to: to,
             value: value.toString(),
             data: data,
-            operation: 0,
             meta: {
               type: CheckType.NonFungibleTransfer,
               token: {
@@ -75,6 +74,7 @@ export const NewCheckNonFungibleForm = ({ goBack, onCreate }) => {
               },
               recipient,
             },
+            delegatecall: false,
           })
         }}
         render={({ form, handleSubmit }) => {

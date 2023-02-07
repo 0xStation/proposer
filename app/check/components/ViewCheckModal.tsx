@@ -36,7 +36,7 @@ export const ViewCheckModal = ({
     ?.map((proof) => proof.signature)
     ?.some((signature) => addressesAreEqual(signature.signer, activeUser?.address))
 
-  const { signCheck } = useSignCheck({ checks: [check], setIsLoading })
+  const { signCheck } = useSignCheck()
   const { executeCheck } = useExecuteCheck({ check, setIsLoading })
 
   return (
@@ -55,7 +55,7 @@ export const ViewCheckModal = ({
                 className="mt-8"
                 isLoading={isLoading}
                 onClick={async () => {
-                  const success = await signCheck()
+                  const success = await signCheck({ checks: [check], setIsLoading })
                   if (success) {
                     setIsOpen(false)
                   }

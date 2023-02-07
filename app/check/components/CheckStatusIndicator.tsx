@@ -1,8 +1,6 @@
 import ProgressCircleAndNumber from "app/core/components/ProgressCircleAndNumber"
 import { Check, CheckStatus } from "../types"
 import useCheckStatus from "../hooks/useCheckStatus"
-import SeeTransaction from "app/core/components/SeeTransaction"
-import { CheckSignature } from "app/checkSignature/types"
 
 export const CheckStatusIndicator = ({
   check,

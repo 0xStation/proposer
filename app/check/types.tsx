@@ -28,6 +28,9 @@ export type CheckMetadata = {
 export enum CheckType {
   FungibleTransfer,
   NonFungibleTransfer,
+  ThresholdChange,
+  NewSignerAndThresholdChange,
+  ReplaceSigner,
   CustomCall,
 }
 
