@@ -15,7 +15,7 @@ export const SignatureCheckbox = ({ check, className }: { check: Check; classNam
         className={`${
           isChecked
             ? "visible"
-            : status === CheckStatus.PENDING
+            : status === CheckStatus.PENDING || status === CheckStatus.READY
             ? "group:visible invisible"
             : "invisible"
         }`}
@@ -28,7 +28,7 @@ export const SignatureCheckbox = ({ check, className }: { check: Check; classNam
               className={`${className} custom-checkbox-container relative inline-block cursor-pointer border border-marble-white p-0.5 ${
                 isChecked
                   ? "visible"
-                  : status === CheckStatus.PENDING
+                  : status === CheckStatus.PENDING || status === CheckStatus.READY
                   ? "group-hover:visible invisible"
                   : "invisible"
               }`}

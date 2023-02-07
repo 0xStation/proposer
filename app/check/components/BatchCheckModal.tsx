@@ -40,7 +40,7 @@ export const BatchCheckModal = ({
     ?.map((proof) => proof.signature)
     ?.some((signature) => addressesAreEqual(signature.signer, activeUser?.address))
 
-  const { signCheck } = useSignCheck({ checks: checks, setIsLoading })
+  const { signCheck } = useSignCheck()
   const { executeCheck } = useExecuteCheck({ check: checks[0], setIsLoading })
 
   return (
@@ -61,7 +61,7 @@ export const BatchCheckModal = ({
             ) : (
               <Button
                 onClick={async () => {
-                  const success = await signCheck()
+                  const success = await signCheck({ checks: checks, setIsLoading })
                   if (success) {
                     form.reset()
                     setIsOpen(false)

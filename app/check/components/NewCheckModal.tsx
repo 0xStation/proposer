@@ -7,6 +7,7 @@ import { NewCheckNonFungibleForm } from "./NewCheckNonFungibleForm"
 import { invalidateQuery } from "@blitzjs/rpc"
 import getChecks from "../queries/getChecks"
 import getSchedules from "app/schedule/queries/getSchedules"
+import { NewCheckWizardForm } from "./NewCheckWizardForm"
 
 export const NewCheckModal = ({
   isOpen,
@@ -74,8 +75,8 @@ export const NewCheckModal = ({
     {
       value: OptionValue.CUSTOM,
       title: "Custom contract calls",
-      subtitle: "Coming soon",
-      disabled: true,
+      subtitle: "Send any amount of arbitrary contract interactions",
+      disabled: false,
     },
   ]
 
@@ -117,6 +118,16 @@ export const NewCheckModal = ({
 
         {selection === OptionValue.NFT && (
           <NewCheckNonFungibleForm
+            goBack={() => setSelection(null)}
+            onCreate={() => {
+              setIsOpen(false)
+              invalidateQuery(getChecks)
+            }}
+          />
+        )}
+
+        {selection === OptionValue.CUSTOM && (
+          <NewCheckWizardForm
             goBack={() => setSelection(null)}
             onCreate={() => {
               setIsOpen(false)

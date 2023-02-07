@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { ClockIcon, InboxIcon, LightBulbIcon } from "@heroicons/react/outline"
+import { CogIcon, ClockIcon, InboxIcon, LightBulbIcon } from "@heroicons/react/outline"
 import { Routes, useParam } from "@blitzjs/next"
 import { useRouter } from "next/router"
 import truncateString from "app/core/utils/truncateString"
@@ -16,7 +16,6 @@ export const CheckbookSidebar = () => {
   const checkbookChainId = useParam("chainId", "number") as number
   const checkbookAddress = useParam("address", "string") as string
   const router = useRouter()
-  const activeUser = useStore((state) => state.activeUser)
 
   const { checkbook } = useCheckbook(checkbookChainId, checkbookAddress)
 
@@ -53,7 +52,7 @@ export const CheckbookSidebar = () => {
         <ul className="mt-6 mb-12 space-y-2">
           {/* REQUESTS */}
           <li
-            className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer hover:bg-charcoal ${
+            className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer hover:bg-wet-concrete ${
               router.pathname ===
                 Routes.CheckbookHome({ chainId: checkbookChainId, address: checkbookAddress })
                   .pathname && "bg-wet-concrete"
@@ -65,7 +64,7 @@ export const CheckbookSidebar = () => {
             }
           >
             <LightBulbIcon className="h-5 w-5 text-white cursor-pointer" />
-            <span>All Requests</span>
+            <span>All requests</span>
           </li>
           {/* SCHEDULES */}
           <li
@@ -85,7 +84,7 @@ export const CheckbookSidebar = () => {
           </li>
           {/* INBOXES */}
           <li
-            className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer hover:bg-charcoal ${
+            className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer hover:bg-wet-concrete ${
               router.pathname ===
                 Routes.InboxesHome({ chainId: checkbookChainId, address: checkbookAddress })
                   .pathname && "bg-wet-concrete"
@@ -98,6 +97,22 @@ export const CheckbookSidebar = () => {
           >
             <InboxIcon className="h-5 w-5 text-white cursor-pointer" />
             <span>Inboxes</span>
+          </li>
+          {/* INBOXES */}
+          <li
+            className={`p-2 rounded flex flex-row items-center space-x-2 cursor-pointer hover:bg-wet-concrete ${
+              router.pathname ===
+                Routes.SettingsHome({ chainId: checkbookChainId, address: checkbookAddress })
+                  .pathname && "bg-wet-concrete"
+            }`}
+            onClick={() =>
+              router.push(
+                Routes.SettingsHome({ chainId: checkbookChainId, address: checkbookAddress })
+              )
+            }
+          >
+            <CogIcon className="h-5 w-5 text-white cursor-pointer" />
+            <span>Settings</span>
           </li>
         </ul>
       </div>

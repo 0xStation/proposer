@@ -74,6 +74,7 @@ const InboxRequest: BlitzPage = () => {
                 token: values.token,
                 amount: values.tokenAmount,
               },
+              delegatecall: false,
             })
           }}
           render={({ form, handleSubmit }) => {

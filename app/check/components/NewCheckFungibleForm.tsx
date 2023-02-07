@@ -74,6 +74,7 @@ export const NewCheckFungibleForm = ({ goBack, onCreate }) => {
                     : parseInt(values.scheduleMaxCount),
               },
             }),
+            delegatecall: false,
           })
         }}
         render={({ form, handleSubmit }) => {

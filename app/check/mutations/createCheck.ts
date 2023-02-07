@@ -24,6 +24,7 @@ const CreateCheck = z.object({
       maxCount: z.number().optional(),
     })
     .optional(),
+  delegatecall: z.boolean().default(false),
 })
 
 export default async function createCheck(input: z.infer<typeof CreateCheck>) {
@@ -81,6 +82,7 @@ export default async function createCheck(input: z.infer<typeof CreateCheck>) {
             to: params.to,
             value: params.value,
             data: params.data,
+            operation: params.delegatecall ? 1 : 0,
           },
         },
       },

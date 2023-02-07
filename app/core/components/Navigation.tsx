@@ -78,7 +78,6 @@ const Navigation = ({ children }: { children?: any }) => {
     }
     if (session?.siwe?.address !== activeUser?.address) {
       const setActiveAccount = async () => {
-        console.log("set active account")
         const account = await invoke(getAccountByAddress, { address: session?.siwe?.address })
         if (!account) {
           const newUser = await invoke(createAccount, {
