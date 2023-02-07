@@ -75,6 +75,7 @@ export const ReplaceSignerModal = ({
         oldSignerAddress: selectedSignerAddress,
         newSignerAddress: newSigner,
       },
+      delegatecall: false,
     })
     const success = await signCheck({ checks: [newCheck], setIsLoading })
     if (!success) {

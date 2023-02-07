@@ -76,6 +76,7 @@ export const RemoveSignerModal = ({
         type: CheckType.NewSignerAndThresholdChange,
         prevQuorum: safe?.quorum,
       },
+      delegatecall: false,
     })
 
     const success = await signCheck({ checks: [newCheck], setIsLoading })

@@ -61,6 +61,7 @@ export const ChangeThresholdModal = ({
         type: CheckType.ThresholdChange,
         prevQuorum: safe?.quorum,
       },
+      delegatecall: false,
     })
 
     const success = await signCheck({ checks: [newCheck], setIsLoading })

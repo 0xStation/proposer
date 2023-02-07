@@ -54,10 +54,10 @@ export const NewCheckWizardForm = ({ goBack, onCreate }) => {
               to,
               value,
               data,
-              operation,
               meta: {
                 type: CheckType.CustomCall,
               },
+              delegatecall: Boolean(operation),
             })
           } else {
             const { operation, to, value, data } = prepareMultiTransaction(
@@ -72,10 +72,10 @@ export const NewCheckWizardForm = ({ goBack, onCreate }) => {
               to,
               value,
               data,
-              operation,
               meta: {
                 type: CheckType.CustomCall,
               },
+              delegatecall: Boolean(operation),
             })
           }
         }}
