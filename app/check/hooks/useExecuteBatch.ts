@@ -1,24 +1,15 @@
 import { useState } from "react"
 import { invalidateQuery, useMutation } from "@blitzjs/rpc"
-import { checkbookTransaction } from "app/checkbook/transaction"
 import useStore from "app/core/hooks/useStore"
 import { useSendTransaction, useWaitForTransaction } from "wagmi"
-import addTransactionHashToChecks from "../mutations/addTransactionHashToChecks"
 import getChecks from "../queries/getChecks"
-import {
-  ADD_SIGNER_AND_THRESHOLD_CHANGE,
-  REMOVE_SIGNER,
-  THRESHOLD_CHANGE,
-} from "app/core/utils/constants"
-import getSafeMetadata from "../../account/queries/getSafeMetadata"
-import { REPLACE_SIGNER } from "../../core/utils/constants"
+import addTransactionHashToChecks from "../mutations/addTransactionHashToChecks"
+import { PreparedTransaction } from "app/transaction/types"
 
-export const useExecuteCheck = ({ check, setIsLoading }) => {
+export const useExecuteBatch = () => {
   const setToastState = useStore((state) => state.setToastState)
   const [txnHash, setTxnHash] = useState<string>()
-
   const { sendTransactionAsync } = useSendTransaction({ mode: "recklesslyUnprepared" })
-
   const [addTransactionHashToChecksMutation] = useMutation(addTransactionHashToChecks)
 
   useWaitForTransaction({
@@ -26,18 +17,6 @@ export const useExecuteCheck = ({ check, setIsLoading }) => {
     hash: txnHash as `0x${string}`,
     onSuccess: async (data) => {
       invalidateQuery(getChecks)
-      // not really a valid check to invalidate a query since these
-      // constants aren't reserved key words, but left it here for demo
-      // purposes. we'll probably use some sort of tagging system in the
-      // new app
-      if (
-        check.data.title === THRESHOLD_CHANGE ||
-        check.data.title === ADD_SIGNER_AND_THRESHOLD_CHANGE ||
-        check.data.title === REPLACE_SIGNER ||
-        check.data.title === REMOVE_SIGNER
-      ) {
-        invalidateQuery(getSafeMetadata)
-      }
       setToastState({
         isToastShowing: true,
         type: "success",
@@ -53,36 +32,29 @@ export const useExecuteCheck = ({ check, setIsLoading }) => {
       console.error(data)
     },
     onSettled: () => {
-      setIsLoading(false)
+      // setIsLoading(false)
     },
   })
 
-  const executeCheck = async () => {
+  const executeCheck = async (
+    batchTxn: PreparedTransaction & { chainId: number },
+    checkIds: string[]
+  ) => {
     try {
-      setIsLoading(true)
-
-      const transactionPayload = checkbookTransaction({
-        checkTitle: check.data.title,
-        chainId: check.chainId,
-        safe: check.address,
-        nonce: check.nonce,
-        to: check.data.txn.to,
-        value: check.data.txn.value,
-        data: check.data.txn.data,
-        operation: check.data.txn.operation,
-        proofs: check?.proofs,
-      })
+      // setIsLoading(true)
 
       const transaction = await sendTransactionAsync({
         recklesslySetUnpreparedRequest: {
-          ...transactionPayload,
+          chainId: batchTxn.chainId,
+          to: batchTxn.target,
+          value: batchTxn.value,
+          data: batchTxn.data,
         },
       })
 
-      // update payment as cashed in db
       await addTransactionHashToChecksMutation({
         txnHash: transaction.hash,
-        checkIds: [check.id],
+        checkIds,
       })
 
       // the `txnHash` state is required to enable the useWaitForTransaction hook in the parent page
@@ -90,7 +62,7 @@ export const useExecuteCheck = ({ check, setIsLoading }) => {
       // on successful processing of our transaction, we show a toast and update the check's status on UI
       setTxnHash(transaction.hash)
     } catch (e) {
-      setIsLoading(false)
+      // setIsLoading(false)
       console.error(e)
       let message = "Something went wrong."
       if (e.name == "ConnectorNotFoundError") {

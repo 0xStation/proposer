@@ -11,6 +11,7 @@ const CreateCheck = z.object({
   data: z.string(),
   title: z.string(),
   meta: z.any(),
+  delegatecall: z.boolean().default(false),
 })
 
 export default async function createCheck(input: z.infer<typeof CreateCheck>) {
@@ -42,6 +43,7 @@ export default async function createCheck(input: z.infer<typeof CreateCheck>) {
             to: params.to,
             value: params.value,
             data: params.data,
+            operation: params.delegatecall ? 1 : 0,
           },
         },
       },

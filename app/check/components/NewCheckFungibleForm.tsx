@@ -57,6 +57,7 @@ export const NewCheckFungibleForm = ({ goBack, onCreate }) => {
               token: values.token,
               amount: values.tokenAmount,
             },
+            delegatecall: false,
           })
         }}
         render={({ form, handleSubmit }) => {

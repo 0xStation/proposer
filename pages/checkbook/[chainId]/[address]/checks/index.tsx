@@ -1,22 +1,20 @@
-import { gSSP } from "app/blitz-server"
 import Link from "next/link"
-import { invoke, useQuery } from "@blitzjs/rpc"
 import dynamic from "next/dynamic"
 import { BlitzPage, useParam, Routes } from "@blitzjs/next"
 import Layout from "app/core/layouts/Layout"
 import Button from "app/core/components/sds/buttons/Button"
-import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import { formatDate } from "app/core/utils/formatDate"
 import CheckbookSidebar from "app/checkbook/components/CheckbookSidebar"
 import { useState } from "react"
 import NewCheckModal from "app/check/components/NewCheckModal"
 import ViewCheckModal from "app/check/components/ViewCheckModal"
 import { Check } from "app/check/types"
-import getChecks from "app/check/queries/getChecks"
 import { Form } from "react-final-form"
 import { CheckStatusIndicator } from "app/check/components/CheckStatusIndicator"
 import { SignatureCheckbox } from "app/check/components/SignatureCheckbox"
 import { useChecks } from "app/check/hooks/useChecks"
+import { prepareBatchTransaction } from "app/transaction/batch"
+import { useExecuteBatch } from "app/check/hooks/useExecuteBatch"
 
 const BatchCheckModal = dynamic(() => import("app/check/components/BatchCheckModal"), {
   ssr: false,
@@ -56,6 +54,22 @@ const CheckbookHome: BlitzPage = () => {
   const [selectedCheck, setSelectedCheck] = useState<Check>()
   const [selectedChecks, setSelectedChecks] = useState<Check[]>()
   const { checks } = useChecks(checkbookChainId, checkbookAddress)
+  const { executeCheck } = useExecuteBatch()
+
+  const handleExecute = async (form) => {
+    const formState = form.getState()
+    if (Boolean(checks) && checks?.length) {
+      const checksToExecute = Object.entries(formState.values)
+        .filter(([key, value]) => checks?.find((check) => check?.id === key && value === true))
+        .map(([key, _value]) => checks.find((check) => check.id === key)!)
+
+      const chainId = checks[0]!.chainId
+      const { operation, to, value, data } = prepareBatchTransaction(chainId, checksToExecute)
+      const checkIds = checksToExecute.map((check) => check.id)
+      await executeCheck({ target: to, value, data, operation, chainId }, checkIds)
+      form.reset()
+    }
+  }
 
   return (
     <>
@@ -82,6 +96,7 @@ const CheckbookHome: BlitzPage = () => {
         }}
         render={({ form, handleSubmit }) => {
           const formState = form.getState()
+
           return (
             <form>
               {selectedChecks && (
@@ -95,9 +110,14 @@ const CheckbookHome: BlitzPage = () => {
               <div className="flex flex-row justify-between">
                 <h1 className="text-2xl font-bold">Checks</h1>
                 {formState.dirty ? (
-                  <Button isSubmitType={true} onClick={handleSubmit}>
-                    Approve
-                  </Button>
+                  <div className="flex flex-row space-x-2">
+                    <Button isSubmitType={true} onClick={handleSubmit}>
+                      Approve
+                    </Button>
+                    <Button isSubmitType={false} onClick={() => handleExecute(form)}>
+                      Execute
+                    </Button>
+                  </div>
                 ) : (
                   <Button
                     className="hidden md:block w-full px-10"

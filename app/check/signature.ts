@@ -16,6 +16,7 @@ export const genCheckDigest = (check: Check) => {
         { name: "executor", type: "address" },
         { name: "to", type: "address" },
         { name: "value", type: "uint256" },
+        { name: "operation", type: "uint8" },
         { name: "data", type: "bytes" },
       ],
     },
@@ -26,6 +27,7 @@ export const genCheckDigest = (check: Check) => {
       executor: ZERO_ADDRESS,
       to: check.data.txn.to,
       value: check.data.txn.value,
+      operation: check.data.txn.operation,
       data: check.data.txn.data,
     },
   }

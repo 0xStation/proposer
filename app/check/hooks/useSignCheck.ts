@@ -12,14 +12,14 @@ import batchSignCheck from "app/checkSignature/mutations/batchSignChecks"
 import { BigNumber } from "ethers"
 import { keccak256 } from "@ethersproject/keccak256"
 
-export const useSignCheck = ({ checks, setIsLoading }) => {
+export const useSignCheck = () => {
   const activeUser = useStore((state) => state.activeUser)
   const setToastState = useStore((state) => state.setToastState)
   const { signMessage } = useSignature()
   const [signCheckMutation] = useMutation(signCheck)
   const [batchSignChecksMutation] = useMutation(batchSignCheck)
 
-  const initiateSignature = async () => {
+  const initiateSignature = async ({ checks, setIsLoading }) => {
     try {
       const checkMessages = checks?.map((check) => genCheckDigest(check))
       const leaves = checkMessages
@@ -96,7 +96,6 @@ export const useSignCheck = ({ checks, setIsLoading }) => {
       })
       return false
     }
-    return false
   }
 
   return { signCheck: initiateSignature }

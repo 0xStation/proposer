@@ -74,6 +74,7 @@ export const NewCheckNonFungibleForm = ({ goBack, onCreate }) => {
               },
               recipient,
             },
+            delegatecall: false,
           })
         }}
         render={({ form, handleSubmit }) => {
