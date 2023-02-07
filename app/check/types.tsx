@@ -21,12 +21,14 @@ export type CheckMetadata = {
     to: string
     value: string
     data: string
+    operation: number
   }
 }
 
 export enum CheckType {
   FungibleTransfer,
   NonFungibleTransfer,
+  CustomCall,
 }
 
 export enum CheckStatus {

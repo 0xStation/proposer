@@ -1,17 +1,15 @@
 import { useState } from "react"
 import { invalidateQuery, useMutation } from "@blitzjs/rpc"
-import { checkbookTransaction } from "app/checkbook/transaction"
 import useStore from "app/core/hooks/useStore"
 import { useSendTransaction, useWaitForTransaction } from "wagmi"
-import addTransactionHashToChecks from "../mutations/addTransactionHashToChecks"
 import getChecks from "../queries/getChecks"
+import addTransactionHashToChecks from "../mutations/addTransactionHashToChecks"
+import { PreparedTransaction } from "app/transaction/types"
 
-export const useExecuteCheck = ({ check, setIsLoading }) => {
+export const useExecuteBatch = () => {
   const setToastState = useStore((state) => state.setToastState)
   const [txnHash, setTxnHash] = useState<string>()
-
   const { sendTransactionAsync } = useSendTransaction({ mode: "recklesslyUnprepared" })
-
   const [addTransactionHashToChecksMutation] = useMutation(addTransactionHashToChecks)
 
   useWaitForTransaction({
@@ -34,36 +32,29 @@ export const useExecuteCheck = ({ check, setIsLoading }) => {
       console.error(data)
     },
     onSettled: () => {
-      setIsLoading(false)
+      // setIsLoading(false)
     },
   })
 
-  const executeCheck = async () => {
+  const executeCheck = async (
+    batchTxn: PreparedTransaction & { chainId: number },
+    checkIds: string[]
+  ) => {
     try {
-      setIsLoading(true)
-
-      const transactionPayload = checkbookTransaction({
-        checkTitle: check.data.title,
-        chainId: check.chainId,
-        safe: check.address,
-        nonce: check.nonce,
-        to: check.data.txn.to,
-        value: check.data.txn.value,
-        data: check.data.txn.data,
-        operation: check.data.txn.operation,
-        proofs: check?.proofs,
-      })
+      // setIsLoading(true)
 
       const transaction = await sendTransactionAsync({
         recklesslySetUnpreparedRequest: {
-          ...transactionPayload,
+          chainId: batchTxn.chainId,
+          to: batchTxn.target,
+          value: batchTxn.value,
+          data: batchTxn.data,
         },
       })
 
-      // update payment as cashed in db
       await addTransactionHashToChecksMutation({
         txnHash: transaction.hash,
-        checkIds: [check.id],
+        checkIds,
       })
 
       // the `txnHash` state is required to enable the useWaitForTransaction hook in the parent page
@@ -71,7 +62,7 @@ export const useExecuteCheck = ({ check, setIsLoading }) => {
       // on successful processing of our transaction, we show a toast and update the check's status on UI
       setTxnHash(transaction.hash)
     } catch (e) {
-      setIsLoading(false)
+      // setIsLoading(false)
       console.error(e)
       let message = "Something went wrong."
       if (e.name == "ConnectorNotFoundError") {
