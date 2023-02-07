@@ -19,6 +19,7 @@ export default async function getChecks(input: z.infer<typeof GetChecks>) {
     },
     include: {
       inbox: true,
+      schedule: true,
       proofs: {
         include: {
           signature: true,

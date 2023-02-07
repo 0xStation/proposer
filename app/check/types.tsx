@@ -1,11 +1,13 @@
 import { Check as PrismaCheck } from "@prisma/client"
 import { Inbox } from "app/inbox/types"
 import { Proof } from "app/proof/types"
+import { Schedule } from "app/schedule/types"
 import { Token } from "app/token/types"
 
 export type Check = PrismaCheck & {
   data: CheckMetadata
   inbox?: Inbox
+  schedule?: Schedule
   proofs?: Proof[]
 }
 

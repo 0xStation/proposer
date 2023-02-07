@@ -1,17 +1,19 @@
 import { Form } from "react-final-form"
 import Button, { ButtonType } from "app/core/components/sds/buttons/Button"
-import { AddressField } from "app/core/components/form/AddressField"
-import { SelectTokenField } from "app/core/components/form/SelectTokenField"
-import { TokenAmountField } from "app/core/components/form/TokenAmountField"
 import { useParam } from "@blitzjs/next"
 import { getNetworkTokens } from "app/core/utils/networkInfo"
-import WhenFieldChanges from "app/core/components/WhenFieldChanges"
 import { useMutation } from "@blitzjs/rpc"
 import createCheck from "../mutations/createCheck"
 import { preparePaymentTransaction } from "app/transaction/payments"
-import { TextField } from "app/core/components/form/TextField"
 import { CheckType } from "../types"
 import { useResolveEnsAddress } from "app/proposalForm/hooks/useResolveEnsAddress"
+import SwitchField from "app/core/components/form/SwitchField"
+import { ScheduleEnds, SchedulePeriodUnit } from "app/schedule/types"
+import formatDateForFieldInput from "app/core/utils/formatDateForFieldInput"
+import convertDateFieldInputToDate from "app/core/utils/convertDateFieldInputToDate"
+import ScheduleFields from "app/schedule/componenets/ScheduleFields"
+import TextareaField from "app/core/components/form/TextareaField"
+import { FungibleTransferFields } from "./FungibleTransferFields"
 
 export const NewCheckFungibleForm = ({ goBack, onCreate }) => {
   const checkbookChainId = useParam("chainId", "number") as number
@@ -33,7 +35,13 @@ export const NewCheckFungibleForm = ({ goBack, onCreate }) => {
     <>
       <h1 className="text-2xl font-bold">Transfer fungible tokens (ETH or ERC20)</h1>
       <Form
-        initialValues={{}}
+        initialValues={{
+          scheduleStartDate: formatDateForFieldInput(new Date()),
+          schedulePeriodCoefficient: "1",
+          schedulePeriodUnit: SchedulePeriodUnit.WEEK,
+          scheduleEnds: ScheduleEnds.NEVER,
+          scheduleMaxCount: "1",
+        }}
         onSubmit={async (values, form) => {
           const recipient = await resolveEnsAddress(values.recipientAddress?.trim())
           const { to, value, data } = preparePaymentTransaction(
@@ -42,9 +50,7 @@ export const NewCheckFungibleForm = ({ goBack, onCreate }) => {
             values.tokenAmount
           )
 
-          console.log(to, value.toString(), data)
-
-          createCheckMutation({
+          await createCheckMutation({
             chainId: checkbookChainId,
             address: checkbookAddress,
             title: values.title,
@@ -57,6 +63,17 @@ export const NewCheckFungibleForm = ({ goBack, onCreate }) => {
               token: values.token,
               amount: values.tokenAmount,
             },
+            ...(values.scheduleEnabled && {
+              schedule: {
+                startDate: convertDateFieldInputToDate(values.scheduleStartDate),
+                periodCoefficient: parseInt(values.schedulePeriodCoefficient),
+                periodUnit: values.schedulePeriodUnit,
+                maxCount:
+                  values.scheduleEnds === ScheduleEnds.NEVER
+                    ? undefined
+                    : parseInt(values.scheduleMaxCount),
+              },
+            }),
             delegatecall: false,
           })
         }}
@@ -64,27 +81,14 @@ export const NewCheckFungibleForm = ({ goBack, onCreate }) => {
           const formState = form.getState()
           return (
             <form onSubmit={handleSubmit}>
-              <TextField
-                title="Title*"
+              <TextareaField
+                title="Note*"
                 fieldName="title"
                 placeholder="Enter a few words for accounting"
               />
-              {/* RECIPIENT */}
-              <AddressField title="Recipient*" fieldName="recipientAddress" />
-              {/* TOKEN */}
-              <SelectTokenField
-                title="Token*"
-                subtitle="Only tokens on this checkbook's network are allowed"
-                fieldName="token"
-                tokens={tokens}
-              />
-              <WhenFieldChanges field="token" set="tokenAmount" to={""} />
-              <TokenAmountField
-                title="Amount*"
-                // subtitle="Only tokens on this checkbook's network are allowed"
-                fieldName="tokenAmount"
-                token={formState.values.token}
-              />
+              <FungibleTransferFields formState={formState} tokens={tokens} />
+              <SwitchField title="Add a repeating schedule?" fieldName="scheduleEnabled" />
+              {formState.values.scheduleEnabled && <ScheduleFields formState={formState} />}
               {/* BUTTONS */}
               <div className="mt-12 flex justify-between">
                 <Button type={ButtonType.Unemphasized} onClick={goBack}>

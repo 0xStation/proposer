@@ -57,6 +57,7 @@
     "@types/jest": "29.2.3",
     "@types/remarkable": "2.0.3",
     "@typescript-eslint/eslint-plugin": "5.40.1",
+    "@upstash/qstash": "0.3.4",
     "autoprefixer": "10.4.0",
     "aws-sdk": "2.1060.0",
     "blitz": "2.0.0-beta.13",
