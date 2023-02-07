@@ -21,6 +21,7 @@ export type CheckMetadata = {
     to: string
     value: string
     data: string
+    operation: number
   }
 }
 
@@ -30,6 +31,7 @@ export enum CheckType {
   ThresholdChange,
   NewSignerAndThresholdChange,
   ReplaceSigner,
+  CustomCall,
 }
 
 export enum CheckStatus {
