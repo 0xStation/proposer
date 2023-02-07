@@ -31,7 +31,8 @@ export const gradientMap = {
   5: Gradient5,
 }
 
-export const FLEXIBLE_SIGNING_GOERLI_CONTRACT = "0xfee094c604360acfbe69e2e1fd07fa8995153d0e" // Goerli
+export const FLEXIBLE_SIGNING_CONTRACT = "0x629cb9ec3ef20624eb750e0670c1e2e81053ab5a" // Goerli
+export const FLEXIBLE_SIGNING_GOERLI_CONTRACT = "0x629cb9ec3ef20624eb750e0670c1e2e81053ab5a" // Goerli
 
 export const SENTINEL_ADDRESS = "0x0000000000000000000000000000000000000001"
 

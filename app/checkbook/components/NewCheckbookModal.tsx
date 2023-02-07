@@ -1,6 +1,6 @@
 import { Routes } from "@blitzjs/next"
 import { useRouter } from "next/router"
-import { useMutation, invoke } from "@blitzjs/rpc"
+import { useMutation } from "@blitzjs/rpc"
 import { useEffect, useState } from "react"
 import Modal from "app/core/components/sds/overlays/modal"
 import Button from "app/core/components/sds/buttons/Button"
@@ -8,15 +8,15 @@ import { Form, Field } from "react-final-form"
 import useStore from "app/core/hooks/useStore"
 import createCheckbook from "app/checkbook/mutations/createCheckbook"
 import { Account } from "app/account/types"
-import getAccountByAddress from "app/account/queries/getAccountByAddress"
 import { toChecksumAddress } from "app/core/utils/checksumAddress"
 import networks from "app/utils/networks.json"
-import SelectSafeField from "app/core/components/form/SelectSafeField"
-import { Safe } from "app/safe/types"
 import useAddCheckbookToSafe from "../hooks/useAddCheckbookToSafe"
 import { TextField } from "app/core/components/form/TextField"
-import { composeValidators, isAddress, requiredField } from "app/utils/validators"
+import { requiredField } from "app/utils/validators"
 import { useCheckbooks } from "../hooks/useCheckbooks"
+import { Interface } from "@ethersproject/abi"
+import { useSendTransaction, useWaitForTransaction } from "wagmi"
+import { ZERO_ADDRESS, CHECKBOOK_MODULE_ADDRESS } from "app/core/utils/constants"
 
 export const NewCheckbookModal = ({
   isOpen,
@@ -93,6 +93,51 @@ export const NewCheckbookModal = ({
     )
   }, [safes, checkbooks])
 
+  const { sendTransactionAsync } = useSendTransaction({ mode: "recklesslyUnprepared" })
+
+  const createSafe = async () => {
+    const initializeModuleInterface = new Interface(["function enableModuleWithinDeploy()"])
+    const initializeModuleData = initializeModuleInterface.encodeFunctionData(
+      "enableModuleWithinDeploy"
+    )
+    const params = [
+      ["0x6860c9323d4976615ae515ab4b0039d7399e7cc8"], // owners
+      1, // threshold
+      CHECKBOOK_MODULE_ADDRESS[5], // to
+      initializeModuleData, // data
+      ZERO_ADDRESS, // fallbackHandler
+      ZERO_ADDRESS, // paymentToken
+      0, // payment
+      ZERO_ADDRESS, // paymentReceiver
+    ]
+    const setupSafeInterface = new Interface([
+      "function setup(address[] calldata _owners,uint256 _threshold,address to,bytes calldata data,address fallbackHandler,address paymentToken,uint256 payment,address payable paymentReceiver)",
+    ])
+    const setupSafeData = setupSafeInterface.encodeFunctionData("setup", params)
+
+    const createSafeInterface = new Interface([
+      "function createProxyWithNonce(address _singleton, bytes initializer, uint256 saltNonce)",
+    ])
+
+    let date = new Date()
+    const data = createSafeInterface.encodeFunctionData("createProxyWithNonce", [
+      "0x3E5c63644E683549055b9Be8653de26E0B4CD36E", // need to check goerli or mainnet
+      setupSafeData,
+      date.getTime(), // convert date to ms to count as seed
+    ])
+
+    const transaction = await sendTransactionAsync({
+      recklesslySetUnpreparedRequest: {
+        chainId: 5,
+        to: "0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2",
+        value: 0,
+        data,
+      },
+    })
+
+    console.log(transaction)
+  }
+
   return (
     <Modal
       open={isOpen}
@@ -112,7 +157,6 @@ export const NewCheckbookModal = ({
             setIsLoading(true)
             const signatureData = await signAddCheckbookModule(values.safeAddress)
             if (!signatureData) return
-            console.log(signatureData)
             try {
               createCheckbookMutation({
                 address: values.safeAddress,
@@ -155,6 +199,12 @@ export const NewCheckbookModal = ({
                     )
                   })}
                 </Field>
+                <button
+                  className="text-electric-violet mt-1 underline"
+                  onClick={() => createSafe()}
+                >
+                  Create safe
+                </button>
                 <TextField
                   title="Name*"
                   fieldName="name"
