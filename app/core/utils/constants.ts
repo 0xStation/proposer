@@ -85,6 +85,12 @@ export const DEFAULT_PFP_URLS = {
   TERMINAL: "https://station-images.nyc3.digitaloceanspaces.com/terminal-gradient.png",
 }
 
+export const chainIdToPath: Record<number, string> = {
+  1: "eth",
+  5: "gor",
+  137: "matic",
+}
+
 export const PAYMENT_ATTEMPT_STATUS_DISPLAY_MAP = {
   [ProposalPaymentStatus.SUCCESS]: {
     copy: "executed",

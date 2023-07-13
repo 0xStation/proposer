@@ -7,7 +7,7 @@
     "alchemyNetwork": "homestead",
     "gnosisApi": "https://safe-transaction-mainnet.safe.global",
     "gnosisNetwork": "mainnet",
-    "gnosisUrl": "https://app.safe.global/app/eth",
+    "gnosisUrl": "https://app.safe.global/eth",
     "nftUrl": "https://opensea.io/assets/ethereum",
     "multicall": "0xeefba1e63905ef1d7acba5a8513c70307c1ce441",
     "ensResolver": "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41",

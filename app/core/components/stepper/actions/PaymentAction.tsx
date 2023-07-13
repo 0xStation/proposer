@@ -12,6 +12,8 @@ import { StepType } from "../steps/Step"
 import { useSafeTxStatus } from "app/core/hooks/useSafeTxStatus"
 import TextLink from "../../TextLink"
 import { getMostRecentPaymentAttempt } from "app/proposalPayment/utils"
+import { chainIdToPath } from "app/core/utils/constants"
+import { toChecksumAddress } from "app/core/utils/checksumAddress"
 
 const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true }) => {
   const mostRecentPaymentAttempt = getMostRecentPaymentAttempt(payment)
@@ -170,9 +172,9 @@ const PaymentAction = ({ proposal, milestone, payment, isWithinStepper = true })
               <span className="w-full text-xs text-concrete">
                 This transaction is blocked by other pending transactions.{" "}
                 <TextLink
-                  url={`${getNetworkGnosisUrl(payment.data.token.chainId)}:${
-                    payment.senderAddress
-                  }/transactions/queue`}
+                  url={`https://app.safe.global/transactions/queue?safe=${
+                    chainIdToPath[payment.data.token.chainId]
+                  }:${toChecksumAddress(payment.senderAddress)}`}
                 >
                   Execute them on Gnosis
                 </TextLink>{" "}
