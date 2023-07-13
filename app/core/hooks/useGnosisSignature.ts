@@ -91,7 +91,7 @@ const useGnosisSignature = (payment: ProposalPayment) => {
   }
 
   const createTransaction = async (signature, transactionData) => {
-    const url = `https://safe-client.gnosis.io/v1/chains/${
+    const url = `https://safe-client.safe.global/v1/chains/${
       payment.data.token.chainId
     }/transactions/${toChecksumAddress(payment.senderAddress)}/propose`
 
