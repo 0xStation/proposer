@@ -49,19 +49,20 @@ const useGnosisSignature = (payment: ProposalPayment) => {
         return data
       }
 
-      if (!account.moralisStreamId) {
-        const moralisStreamId = await createMoralisStream(
-          payment.proposalId,
-          getMoralisNetwork(payment.data.token.chainId),
-          payment.senderAddress
-        )
+      // REMOVE MORALIS BECAUSE CAUSING BUGS
+      // if (!account.moralisStreamId) {
+      //   const moralisStreamId = await createMoralisStream(
+      //     payment.proposalId,
+      //     getMoralisNetwork(payment.data.token.chainId),
+      //     payment.senderAddress
+      //   )
 
-        // update the account to include the moralis stream
-        await updateAccountMutation({
-          address: payment.senderAddress,
-          moralisStreamId,
-        })
-      }
+      //   // update the account to include the moralis stream
+      //   await updateAccountMutation({
+      //     address: payment.senderAddress,
+      //     moralisStreamId,
+      //   })
+      // }
 
       setToastState({
         isToastShowing: true,
